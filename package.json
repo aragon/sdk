@@ -1,0 +1,30 @@
+{
+  "name": "@aragon/sdk",
+  "version": "0.1.0",
+  "description": "Aragon JS SDK",
+  "repository": "https://github.com/aragon/js-sdk",
+  "author": "Aragon Association",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "pkgs/*"
+    ],
+    "nohoist": [
+      "**/@graphprotocol/graph-ts",
+      "**/@graphprotocol/graph-ts/**",
+      "**/@graphprotocol/graph-cli",
+      "**/@graphprotocol/graph-cli/**",
+      "**/matchstick-as",
+      "**/matchstick-as/**"
+    ]
+  },
+  "scripts": {
+    "clean": "rm -Rf node_modules ./pkgs/*/node_modules ./pkgs/*/dist",
+    "lint": "tsdx lint pkgs/*/src",
+    "test": "tsdx test"
+  },
+  "engines": {
+    "node": ">=14 <17.0.0"
+  }
+}

@@ -1,0 +1,10 @@
+node_modules
+example
+test
+coverage
+pkgs
+.env
+.github
+.vscode
+CHANGELOG.md
+code-of-conduct.md

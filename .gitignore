@@ -1,0 +1,11 @@
+# Covers JetBrains IDEs
+.idea/
+# Project
+node_modules
+dist
+coverage
+.env
+.cache
+.DS_Store
+*.tgz
+*.log
