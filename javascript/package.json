@@ -2,7 +2,7 @@
   "name": "@aragon/sdk",
   "version": "0.1.0",
   "description": "Aragon JS SDK",
-  "repository": "https://github.com/aragon/js-sdk",
+  "repository": "https://github.com/aragon/sdk/tree/main/javascript",
   "author": "Aragon Association",
   "license": "GPL-3.0-or-later",
   "private": true,
