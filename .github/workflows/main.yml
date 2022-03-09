@@ -1,7 +1,7 @@
 name: CI
 on: [push]
 jobs:
-  build:
+  build-js:
     name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}

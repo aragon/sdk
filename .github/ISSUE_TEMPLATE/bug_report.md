@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a bug report to help us on reinventing digital voting
+about: Create a bug report to help us
 title: 'Bug: <add-text-here>'
 labels: bug
 assignees: ''
