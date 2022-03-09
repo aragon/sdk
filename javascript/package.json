@@ -8,7 +8,7 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "pkgs/*"
+      "modules/*"
     ],
     "nohoist": [
       "**/@graphprotocol/graph-ts",
@@ -20,8 +20,8 @@
     ]
   },
   "scripts": {
-    "clean": "rm -Rf node_modules ./pkgs/*/node_modules ./pkgs/*/dist",
-    "lint": "tsdx lint pkgs/*/src",
+    "clean": "rm -Rf node_modules ./modules/*/node_modules ./modules/*/dist",
+    "lint": "tsdx lint modules/*/src",
     "test": "tsdx test"
   },
   "engines": {

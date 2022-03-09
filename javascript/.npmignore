@@ -2,9 +2,8 @@ node_modules
 example
 test
 coverage
-pkgs
 .env
 .github
 .vscode
+./modules
 CHANGELOG.md
-code-of-conduct.md
