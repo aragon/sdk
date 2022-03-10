@@ -1,5 +1,4 @@
-// CLIENT METHODS
-export interface IClientCore {}
+import { IClientCore } from "./client";
 
 export interface IClientDao extends IClientCore {
   dao: {

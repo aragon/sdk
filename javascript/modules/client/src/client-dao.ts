@@ -1,5 +1,5 @@
 import { ClientCore } from "./internal/client-core";
-import { DaoAction, DaoRole, IClientDao } from "./internal/interfaces";
+import { DaoAction, DaoRole, IClientDao } from "./internal/interfaces/dao";
 import { exampleContractAbi, ExampleContractMethods } from "./internal/abi/dao";
 
 export class ClientDao extends ClientCore implements IClientDao {

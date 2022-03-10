@@ -3,7 +3,7 @@ import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
-import { IClientCore } from "./interfaces";
+import { IClientCore } from "./interfaces/client";
 const supportedProtocols = ["https:"];
 
 export abstract class ClientCore implements IClientCore {
