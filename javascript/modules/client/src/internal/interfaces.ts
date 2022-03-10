@@ -14,13 +14,13 @@ export interface IClientDao extends IClientCore {
     deposit(
       tokenAddress: string,
       amount: bigint,
-      reference: string,
+      reference: string
     ): Promise<void>;
     withdraw(
       tokenAddress: string,
       to: string,
       amount: bigint,
-      reference: string,
+      reference: string
     ): Promise<void>;
   };
 }

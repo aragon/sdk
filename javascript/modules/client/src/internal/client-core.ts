@@ -14,11 +14,11 @@ export abstract class ClientCore implements IClientCore {
   constructor(
     network: Networkish = "mainnet",
     web3Endpoints?: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-    signer?: Signer,
+    signer?: Signer
   ) {
     if (web3Endpoints) {
       if (Array.isArray(web3Endpoints)) {
-        this._web3Endpoints = web3Endpoints.map((item) => {
+        this._web3Endpoints = web3Endpoints.map(item => {
           if (typeof item === "string") {
             const url = new URL(item);
             if (!supportedProtocols.includes(url.protocol)) {
@@ -80,7 +80,8 @@ export abstract class ClientCore implements IClientCore {
   }
 
   public async checkWeb3Status(): Promise<boolean> {
-    return this.web3.getNetwork()
+    return this.web3
+      .getNetwork()
       .then(() => true)
       .catch(() => false);
   }
@@ -94,20 +95,18 @@ export abstract class ClientCore implements IClientCore {
    */
   protected attachContract<T>(
     address: string,
-    abi: ContractInterface,
-  ): (Contract & T) {
+    abi: ContractInterface
+  ): Contract & T {
     if (!address) throw new Error("Invalid contract address");
     else if (!abi) throw new Error("Invalid contract ABI");
 
     const contract = new Contract(address, abi, this.web3);
 
-    if (!this.signer) return contract as (Contract & T);
+    if (!this.signer) return contract as Contract & T;
     else if (this.signer instanceof Wallet) {
-      return contract.connect(
-        this.signer.connect(this.web3),
-      ) as (Contract & T);
+      return contract.connect(this.signer.connect(this.web3)) as Contract & T;
     }
 
-    return contract.connect(this.signer) as (Contract & T);
+    return contract.connect(this.signer) as Contract & T;
   }
 }
