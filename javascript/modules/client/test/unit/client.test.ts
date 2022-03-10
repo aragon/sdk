@@ -1,4 +1,4 @@
-import { Client } from "../../src";
+import { ClientDao } from "../../src";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
 const web3endpoints = {
@@ -13,33 +13,33 @@ const web3endpoints = {
 
 describe("Client instances", () => {
     it("Should create an empty client", () => {
-        const client = new Client();
+        const client = new ClientDao();
 
-        expect(client).toBeInstanceOf(Client);
+        expect(client).toBeInstanceOf(ClientDao);
         expect(client.signer).toEqual(undefined);
     });
     it("Should create a working client", async () => {
-        const client = new Client("mainnet", web3endpoints.working);
+        const client = new ClientDao("mainnet", web3endpoints.working);
 
-        expect(client).toBeInstanceOf(Client);
+        expect(client).toBeInstanceOf(ClientDao);
         expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
         const status = await client.checkWeb3Status();
         expect(status).toEqual(true)
     });
     it("Should create a failing client", async () => {
-        const client = new Client("mainnet", web3endpoints.failing);
+        const client = new ClientDao("mainnet", web3endpoints.failing);
 
-        expect(client).toBeInstanceOf(Client);
+        expect(client).toBeInstanceOf(ClientDao);
         expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
         const status = await client.checkWeb3Status();
         expect(status).toEqual(false)
     });
     it("Should create a client, fail and shift to a working endpoint", async () => {
-        const client = new Client("mainnet", web3endpoints.failing.concat(web3endpoints.working));
+        const client = new ClientDao("mainnet", web3endpoints.failing.concat(web3endpoints.working));
 
-        expect(client).toBeInstanceOf(Client);
+        expect(client).toBeInstanceOf(ClientDao);
         expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
         await client.checkWeb3Status()
