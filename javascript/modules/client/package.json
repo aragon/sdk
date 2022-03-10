@@ -1,0 +1,60 @@
+{
+  "name": "@aragon/sdk-client",
+  "author": "Aragon Association",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "main": "dist/index.js",
+  "module": "dist/sdk-client.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": false,
+    "trailingComma": "es5"
+  },
+  "size-limit": [
+    {
+      "path": "dist/sdk-client.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/sdk-client.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^7.0.8",
+    "husky": "^7.0.4",
+    "size-limit": "^7.0.8",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.2"
+  },
+  "dependencies": {
+    "@ethersproject/abstract-signer": "^5.5.0",
+    "@ethersproject/wallet": "^5.5.0",
+    "@ethersproject/providers": "^5.5.0",
+    "@ethersproject/contracts": "^5.5.0"
+  }
+}
