@@ -1,5 +1,8 @@
 import { ClientDao } from "../../src";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import {ContextParams} from "../../src/internal/interfaces/context";
+import {Wallet} from "@ethersproject/wallet";
+import {Context} from "../../src/context";
 
 const web3endpoints = {
   working: [
@@ -9,15 +12,25 @@ const web3endpoints = {
   failing: ["https://bad-url-gateway.io/"],
 };
 
+const TEST_WALLET = "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb"
+
+const contextParams: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(TEST_WALLET),
+  dao: "Dao",
+  daoFactoryAddress: "0x1234",
+  endpoints: web3endpoints.working
+}
+
 describe("Client instances", () => {
   it("Should create an empty client", () => {
-    const client = new ClientDao();
+    const client = new ClientDao({} as Context);
 
     expect(client).toBeInstanceOf(ClientDao);
-    expect(client.signer).toEqual(null);
   });
   it("Should create a working client", async () => {
-    const client = new ClientDao("mainnet", web3endpoints.working);
+    const context = new Context(contextParams);
+    const client = new ClientDao(context);
 
     expect(client).toBeInstanceOf(ClientDao);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
@@ -26,7 +39,9 @@ describe("Client instances", () => {
     expect(status).toEqual(true);
   });
   it("Should create a failing client", async () => {
-    const client = new ClientDao("mainnet", web3endpoints.failing);
+    contextParams.endpoints = web3endpoints.failing
+    const context = new Context(contextParams);
+    const client = new ClientDao(context);
 
     expect(client).toBeInstanceOf(ClientDao);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
@@ -35,10 +50,9 @@ describe("Client instances", () => {
     expect(status).toEqual(false);
   });
   it("Should create a client, fail and shift to a working endpoint", async () => {
-    const client = new ClientDao(
-      "mainnet",
-      web3endpoints.failing.concat(web3endpoints.working)
-    );
+    contextParams.endpoints = web3endpoints.failing.concat(web3endpoints.working)
+    const context = new Context(contextParams);
+    const client = new ClientDao(context);
 
     expect(client).toBeInstanceOf(ClientDao);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);

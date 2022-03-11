@@ -1,4 +1,6 @@
 import { Signer } from "@ethersproject/abstract-signer";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import { EthNetworkID } from "@aragon/sdk-common";
 // import {
 //   create as ipfsCreate,
 //   IPFSHTTPClient,
@@ -8,9 +10,11 @@ import { Signer } from "@ethersproject/abstract-signer";
 
 // Context input parameters
 interface Web3ContextParams {
+  network: EthNetworkID;
   signer: Signer;
   dao: string;
   daoFactoryAddress: string;
+  endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[];
 }
 interface VocdoniContextParams {
   // Vocdoni
@@ -31,9 +35,11 @@ export interface ContextParams
 // Context state data
 
 interface Web3ContextState {
+  network: EthNetworkID;
   signer?: Signer;
   dao: string;
   daoFactoryAddress: string;
+  endpoints?: JsonRpcProvider[];
 }
 interface VocdoniContextState {}
 interface IpfsContextState {

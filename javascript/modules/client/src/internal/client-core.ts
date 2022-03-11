@@ -1,10 +1,9 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { Wallet } from "@ethersproject/wallet";
-import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
+import { JsonRpcProvider } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
-import { UnsupportedProtocolError } from "@aragon/sdk-common";
 import { IClientCore } from "./interfaces/client-core";
-const supportedProtocols = ["https:"];
+import { Context } from "../context";
 
 export abstract class ClientCore implements IClientCore {
   private _web3Endpoints: JsonRpcProvider[] = [];
@@ -12,36 +11,15 @@ export abstract class ClientCore implements IClientCore {
   private _signer: Signer | undefined;
 
   constructor(
-    network: Networkish = "mainnet",
-    web3Endpoints?: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-    signer?: Signer
+    context: Context
   ) {
-    if (web3Endpoints) {
-      if (Array.isArray(web3Endpoints)) {
-        this._web3Endpoints = web3Endpoints.map(item => {
-          if (typeof item === "string") {
-            const url = new URL(item);
-            if (!supportedProtocols.includes(url.protocol)) {
-              throw new UnsupportedProtocolError(url.protocol);
-            }
-            return new JsonRpcProvider(url.href, network);
-          }
-          return item;
-        });
-      } else if (typeof web3Endpoints === "string") {
-        const url = new URL(web3Endpoints);
-        if (!supportedProtocols.includes(url.protocol)) {
-          throw new UnsupportedProtocolError(url.protocol);
-        }
-        this._web3Endpoints = [new JsonRpcProvider(url.href, network)];
-      } else {
-        this._web3Endpoints = [web3Endpoints];
-      }
+    if (context.web3Endpoints) {
+      this._web3Endpoints = context.web3Endpoints
       this._web3Idx = 0;
     }
 
-    if (signer) {
-      this.useSigner(signer);
+    if (context.signer) {
+      this.useSigner(context.signer);
     }
   }
 
