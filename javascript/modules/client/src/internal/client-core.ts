@@ -3,7 +3,7 @@ import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
-import { IClientCore } from "./interfaces/client";
+import { IClientCore } from "./interfaces/client-core";
 const supportedProtocols = ["https:"];
 
 export abstract class ClientCore implements IClientCore {
@@ -56,6 +56,7 @@ export abstract class ClientCore implements IClientCore {
     }
 
     this._signer = signer;
+    return this;
   }
 
   /**
@@ -72,7 +73,7 @@ export abstract class ClientCore implements IClientCore {
   }
 
   get signer() {
-    return this._signer;
+    return this._signer || null;
   }
 
   get web3() {
@@ -93,10 +94,7 @@ export abstract class ClientCore implements IClientCore {
    * @param abi The Application Binary Inteface of the contract
    * @return A contract instance attached to the given address
    */
-  protected attachContract<T>(
-    address: string,
-    abi: ContractInterface
-  ): Contract & T {
+  attachContract<T>(address: string, abi: ContractInterface): Contract & T {
     if (!address) throw new Error("Invalid contract address");
     else if (!abi) throw new Error("Invalid contract ABI");
 

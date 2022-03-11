@@ -14,7 +14,7 @@ describe("Client instances", () => {
     const client = new ClientDao();
 
     expect(client).toBeInstanceOf(ClientDao);
-    expect(client.signer).toEqual(undefined);
+    expect(client.signer).toEqual(null);
   });
   it("Should create a working client", async () => {
     const client = new ClientDao("mainnet", web3endpoints.working);

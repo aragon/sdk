@@ -1,4 +1,4 @@
-import { IClientCore } from "./client";
+import { IClientCore } from "./client-core";
 
 export interface IClientDao extends IClientCore {
   dao: {

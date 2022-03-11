@@ -12,8 +12,8 @@ interface Web3ContextParams {
   dao: string;
   daoFactoryAddress: string;
 }
-interface DvoteContextParams {
-  // dvote
+interface VocdoniContextParams {
+  // Vocdoni
 }
 interface IpfsContextParams {
   // ipfs: IpfsOptions;
@@ -24,7 +24,7 @@ interface GraphQLContextParams {
 
 export interface ContextParams
   extends Web3ContextParams,
-    DvoteContextParams,
+    VocdoniContextParams,
     IpfsContextParams,
     GraphQLContextParams {}
 
@@ -35,7 +35,7 @@ interface Web3ContextState {
   dao: string;
   daoFactoryAddress: string;
 }
-interface DvoteContextState {}
+interface VocdoniContextState {}
 interface IpfsContextState {
   // ipfs?: IPFSHTTPClient;
 }
@@ -45,6 +45,6 @@ interface GraphQLContextState {
 
 export interface ContextState
   extends Web3ContextState,
-    DvoteContextState,
+    VocdoniContextState,
     IpfsContextState,
     GraphQLContextState {}
