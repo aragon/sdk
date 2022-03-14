@@ -2,7 +2,7 @@ import { Context } from "../../src/context";
 import { ContextParams } from "../../src/internal/interfaces/context";
 import { Wallet } from "@ethersproject/wallet";
 import { Signer } from "@ethersproject/abstract-signer";
-import {JsonRpcProvider} from "@ethersproject/providers";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 const TEST_WALLET = "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb"
 const web3endpoints = {
@@ -33,7 +33,7 @@ describe("Context instances", () => {
             signer: new Wallet(TEST_WALLET),
             dao: "Dao",
             daoFactoryAddress: "0x1234",
-            endpoints: web3endpoints.working
+            web3Providers: web3endpoints.working
         }
         const context = new Context(contextParams);
 
@@ -42,6 +42,6 @@ describe("Context instances", () => {
         expect(context.signer).toBeInstanceOf(Signer);
         expect(context.dao).toEqual("Dao");
         expect(context.daoFactoryAddress).toEqual("0x1234");
-        context.web3Endpoints?.map(web3 => expect(web3).toBeInstanceOf(JsonRpcProvider))
+        context.web3Providers?.map(provider => expect(provider).toBeInstanceOf(JsonRpcProvider))
     });
 });

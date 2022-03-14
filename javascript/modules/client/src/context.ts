@@ -1,6 +1,6 @@
 import { ContextParams, ContextState } from "./internal/interfaces/context";
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { EthNetworkID, UnsupportedProtocolError } from "@aragon/sdk-common";
+import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
+import { UnsupportedProtocolError } from "@aragon/sdk-common";
 // import { create as ipfsCreate, Options as IpfsOptions } from "ipfs-http-client";
 // import { GraphQLClient } from "graphql-request";
 
@@ -11,7 +11,7 @@ let defaultState: ContextState = {
   network: "mainnet",
   dao: "",
   daoFactoryAddress: "",
-  endpoints: []
+  web3Providers: []
 };
 
 export class Context {
@@ -49,7 +49,7 @@ export class Context {
       throw new Error("Please pass the required signer");
     } else if (!contextParams.dao) {
       throw new Error("No DAO address defined");
-    } else if (!contextParams.endpoints) {
+    } else if (!contextParams.web3Providers) {
       throw new Error("No web3 endpoints defined");
     }
     // else if (!contextParams.ipfs) {
@@ -61,7 +61,7 @@ export class Context {
       signer: contextParams.signer,
       daoFactoryAddress: contextParams.daoFactoryAddress,
       dao: contextParams.dao,
-      endpoints: this.setWeb3Endpoints(contextParams.endpoints, contextParams.network)
+      web3Providers: this.useWeb3Providers(contextParams.web3Providers, contextParams.network)
       // ipfs: ipfsCreate(contextParams.ipfs),
       // subgraph: new GraphQLClient(contextParams.subgraphURL),
     };
@@ -80,8 +80,8 @@ export class Context {
     if (contextParams.signer) {
       this.state.signer = contextParams.signer;
     }
-    if (contextParams.endpoints) {
-      this.state.endpoints = this.setWeb3Endpoints(contextParams.endpoints, this.state.network);
+    if (contextParams.web3Providers) {
+      this.state.web3Providers = this.useWeb3Providers(contextParams.web3Providers, this.state.network);
     }
     // if (contextParams.ipfs) {
     //   this.state.ipfs = ipfsCreate(contextParams.ipfs);
@@ -91,9 +91,9 @@ export class Context {
     // }
   }
 
-  setWeb3Endpoints(
+  useWeb3Providers(
       endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-      network: EthNetworkID
+      network: Networkish
   ): JsonRpcProvider[] {
     if (Array.isArray(endpoints)) {
       return endpoints.map(item => {
@@ -124,7 +124,7 @@ export class Context {
    *
    * @var network
    *
-   * @returns {EthNetworkID}
+   * @returns {Networkish}
    *
    * @public
    */
@@ -146,16 +146,16 @@ export class Context {
   }
 
   /**
-   * Getter for the web3 endpoints
+   * Getter for the web3 providers
    *
-   * @var web3Endpoints
+   * @var web3Providers
    *
    * @returns {JsonRpcProvider[]}
    *
    * @public
    */
-  get web3Endpoints() {
-    return this.state.endpoints || defaultState.endpoints;
+  get web3Providers() {
+    return this.state.web3Providers || defaultState.web3Providers;
   }
 
   /**

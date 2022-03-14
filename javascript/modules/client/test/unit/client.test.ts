@@ -1,8 +1,8 @@
 import { ClientDao } from "../../src";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import {ContextParams} from "../../src/internal/interfaces/context";
-import {Wallet} from "@ethersproject/wallet";
-import {Context} from "../../src/context";
+import { ContextParams } from "../../src/internal/interfaces/context";
+import { Wallet } from "@ethersproject/wallet";
+import { Context } from "../../src/context";
 
 const web3endpoints = {
   working: [
@@ -19,7 +19,7 @@ const contextParams: ContextParams = {
   signer: new Wallet(TEST_WALLET),
   dao: "Dao",
   daoFactoryAddress: "0x1234",
-  endpoints: web3endpoints.working
+  web3Providers: web3endpoints.working
 }
 
 describe("Client instances", () => {
@@ -39,7 +39,7 @@ describe("Client instances", () => {
     expect(status).toEqual(true);
   });
   it("Should create a failing client", async () => {
-    contextParams.endpoints = web3endpoints.failing
+    contextParams.web3Providers = web3endpoints.failing
     const context = new Context(contextParams);
     const client = new ClientDao(context);
 
@@ -50,7 +50,7 @@ describe("Client instances", () => {
     expect(status).toEqual(false);
   });
   it("Should create a client, fail and shift to a working endpoint", async () => {
-    contextParams.endpoints = web3endpoints.failing.concat(web3endpoints.working)
+    contextParams.web3Providers = web3endpoints.failing.concat(web3endpoints.working)
     const context = new Context(contextParams);
     const client = new ClientDao(context);
 

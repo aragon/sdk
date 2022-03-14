@@ -6,15 +6,15 @@ import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
 
 export abstract class ClientCore implements IClientCore {
-  private _web3Endpoints: JsonRpcProvider[] = [];
+  private _web3Providers: JsonRpcProvider[] = [];
   private _web3Idx = -1;
   private _signer: Signer | undefined;
 
   constructor(
     context: Context
   ) {
-    if (context.web3Endpoints) {
-      this._web3Endpoints = context.web3Endpoints
+    if (context.web3Providers) {
+      this._web3Providers = context.web3Providers
       this._web3Idx = 0;
     }
 
@@ -41,12 +41,12 @@ export abstract class ClientCore implements IClientCore {
    * Starts using the next available Web3 endpoints
    */
   shiftWeb3Node() {
-    if (!this._web3Endpoints.length) throw new Error("No endpoints");
-    else if (this._web3Endpoints.length <= 1) {
+    if (!this._web3Providers.length) throw new Error("No endpoints");
+    else if (this._web3Providers.length <= 1) {
       throw new Error("No other endpoints");
     }
 
-    this._web3Idx = (this._web3Idx + 1) % this._web3Endpoints.length;
+    this._web3Idx = (this._web3Idx + 1) % this._web3Providers.length;
     return this;
   }
 
@@ -55,7 +55,7 @@ export abstract class ClientCore implements IClientCore {
   }
 
   get web3() {
-    return this._web3Endpoints[this._web3Idx] || null;
+    return this._web3Providers[this._web3Idx] || null;
   }
 
   public async checkWeb3Status(): Promise<boolean> {
