@@ -17,8 +17,8 @@ const TEST_WALLET = "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8
 const contextParams: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  dao: "Dao",
-  daoFactoryAddress: "0x1234",
+  dao: "0x1234567890123456789012345678901234567890",
+  daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working
 }
 

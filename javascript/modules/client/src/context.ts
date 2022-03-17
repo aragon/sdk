@@ -11,7 +11,7 @@ let defaultState: ContextState = {
   network: "mainnet",
   dao: "",
   daoFactoryAddress: "",
-  web3Providers: []
+  web3Providers: [],
 };
 
 export class Context {
@@ -61,7 +61,10 @@ export class Context {
       signer: contextParams.signer,
       daoFactoryAddress: contextParams.daoFactoryAddress,
       dao: contextParams.dao,
-      web3Providers: this.useWeb3Providers(contextParams.web3Providers, contextParams.network)
+      web3Providers: this.useWeb3Providers(
+        contextParams.web3Providers,
+        contextParams.network
+      ),
       // ipfs: ipfsCreate(contextParams.ipfs),
       // subgraph: new GraphQLClient(contextParams.subgraphURL),
     };
@@ -81,7 +84,10 @@ export class Context {
       this.state.signer = contextParams.signer;
     }
     if (contextParams.web3Providers) {
-      this.state.web3Providers = this.useWeb3Providers(contextParams.web3Providers, this.state.network);
+      this.state.web3Providers = this.useWeb3Providers(
+        contextParams.web3Providers,
+        this.state.network
+      );
     }
     // if (contextParams.ipfs) {
     //   this.state.ipfs = ipfsCreate(contextParams.ipfs);
@@ -92,8 +98,8 @@ export class Context {
   }
 
   useWeb3Providers(
-      endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-      network: Networkish
+    endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
+    network: Networkish
   ): JsonRpcProvider[] {
     if (Array.isArray(endpoints)) {
       return endpoints.map(item => {

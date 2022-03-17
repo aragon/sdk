@@ -10,11 +10,9 @@ export abstract class ClientCore implements IClientCore {
   private _web3Idx = -1;
   private _signer: Signer | undefined;
 
-  constructor(
-    context: Context
-  ) {
+  constructor(context: Context) {
     if (context.web3Providers) {
-      this._web3Providers = context.web3Providers
+      this._web3Providers = context.web3Providers;
       this._web3Idx = 0;
     }
 

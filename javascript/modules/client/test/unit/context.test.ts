@@ -39,7 +39,7 @@ describe("Context instances", () => {
 
         expect(context).toBeInstanceOf(Context);
         expect(context.network).toEqual("mainnet");
-        expect(context.signer).toBeInstanceOf(Signer);
+        expect(context.signer).toBeInstanceOf(Wallet);
         expect(context.dao).toEqual("Dao");
         expect(context.daoFactoryAddress).toEqual("0x1234");
         context.web3Providers?.map(provider => expect(provider).toBeInstanceOf(JsonRpcProvider))
