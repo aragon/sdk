@@ -1,46 +1,55 @@
 import { IClientCore } from "./client-core";
 
-export interface IClientDao extends IClientCore {
+export interface IClientDaoBase extends IClientCore {
   dao: {
-    createDao(
+    create(
       daoConfig: DaoConfig,
       tokenConfig: TokenConfig,
       mintConfig: MintConfig,
       votingConfig: VotingConfig,
       gsnForwarder?: string,
     ): Promise<string>;
-    grant(where: string, who: string, role: DaoRole): Promise<void>;
-    grantWithOracle(
-      where: string,
-      who: string,
-      oracle: string,
-      role: DaoRole,
-    ): Promise<void>;
-    revoke(where: string, who: string, role: DaoRole): Promise<void>;
-    freeze(where: string, role: DaoRole): Promise<void>;
-    isFrozen(where: string, role: DaoRole): Promise<boolean>;
-    /** Applies a set of permission mutations at once */
-    bulkPermissions: (where: string, permissionItems: any[]) => Promise<void>;
-    /** Determines whether an action is allowed by the curren DAO's ACL settings */
+    /** Checks whether a role is granted by the curren DAO's ACL settings */
     hasPermission: (
       where: string,
       who: string,
       role: DaoRole,
       data: Uint8Array,
     ) => Promise<void>;
-    setMetadata(metadata: string): Promise<void>;
-    execute(callId: string, actions: DaoAction[]): Promise<void>;
-    deposit(
-      tokenAddress: string,
-      amount: bigint,
-      reference: string,
-    ): Promise<void>;
-    withdraw(
-      tokenAddress: string,
-      to: string,
-      amount: bigint,
-      reference: string,
-    ): Promise<void>;
+  };
+}
+
+export interface IClientDaoWhitelist extends IClientCore {
+  dao: {
+    whitelist: {
+      createProposal: (
+        startDate: number,
+        endDate: number,
+        executeApproved?: boolean,
+        voteOnCreation?: boolean,
+      ) => Promise<string>;
+      voteProposal: (proposalId: string, approve: boolean) => Promise<void>;
+      executeProposal: (proposalId: string) => Promise<void>;
+      setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
+      setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
+    };
+  };
+}
+
+export interface IClientDaoSimpleVote extends IClientCore {
+  dao: {
+    simpleVote: {
+      createProposal: (
+        startDate: number,
+        endDate: number,
+        executeApproved?: boolean,
+        voteOnCreation?: boolean,
+      ) => Promise<string>;
+      voteProposal: (proposalId: string, approve: boolean) => Promise<void>;
+      executeProposal: (proposalId: string) => Promise<void>;
+      setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
+      setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
+    };
   };
 }
 
