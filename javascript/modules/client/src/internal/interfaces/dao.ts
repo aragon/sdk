@@ -6,15 +6,15 @@ export interface IClientDao extends IClientCore {
       daoConfig: DaoConfig,
       tokenConfig: TokenConfig,
       mintConfig: MintConfig,
-      votingConfig: [number, number, number],
-      gsnForwarder?: string
+      votingConfig: VotingConfig,
+      gsnForwarder?: string,
     ): Promise<string>;
     grant(where: string, who: string, role: DaoRole): Promise<void>;
     grantWithOracle(
       where: string,
       who: string,
       oracle: string,
-      role: DaoRole
+      role: DaoRole,
     ): Promise<void>;
     revoke(where: string, who: string, role: DaoRole): Promise<void>;
     freeze(where: string, role: DaoRole): Promise<void>;
@@ -26,20 +26,20 @@ export interface IClientDao extends IClientCore {
       where: string,
       who: string,
       role: DaoRole,
-      data: Uint8Array
+      data: Uint8Array,
     ) => Promise<void>;
     setMetadata(metadata: string): Promise<void>;
     execute(callId: string, actions: DaoAction[]): Promise<void>;
     deposit(
       tokenAddress: string,
       amount: bigint,
-      reference: string
+      reference: string,
     ): Promise<void>;
     withdraw(
       tokenAddress: string,
       to: string,
       amount: bigint,
-      reference: string
+      reference: string,
     ): Promise<void>;
   };
 }
@@ -73,4 +73,14 @@ export interface TokenConfig {
 export interface MintConfig {
   receivers: string[];
   amounts: bigint[];
+}
+
+/** Global settings applied to the organization */
+export interface VotingConfig {
+  /** 0-100 as a percentage */
+  minSupport: number;
+  /** 0-100 as a percentage */
+  minParticipation: number;
+  /** In seconds */
+  minDuration: number;
 }

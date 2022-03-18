@@ -6,6 +6,7 @@ import {
   IClientDao,
   MintConfig,
   TokenConfig,
+  VotingConfig,
 } from "./internal/interfaces/dao";
 // import { exampleContractAbi, ExampleContractMethods } from "./internal/abi/dao";
 
@@ -16,7 +17,7 @@ export class ClientDao extends ClientCore implements IClientDao {
       _daoConfig: DaoConfig,
       _tokenConfig: TokenConfig,
       _mintConfig: MintConfig,
-      _votingConfig: [number, number, number],
+      _votingConfig: VotingConfig,
       _gsnForwarder?: string
     ): Promise<string> => {
       // TODO: This is an ethers.js integration example
