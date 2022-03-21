@@ -1,6 +1,7 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { GraphQLClient } from "graphql-request";
 
 export interface IClientWeb3Core {
   // useSigner(signer: Signer): this;
@@ -17,7 +18,8 @@ export interface IClientIpfsCore {
   // Add here
 }
 export interface IClientGraphQLCore {
-  // Add here
+  graphQL: GraphQLClient | undefined;
+  checkGraphQLStatus(): Promise<boolean>;
 }
 
 export interface IClientCore
