@@ -69,7 +69,7 @@ describe("Client instances", () => {
         expect(isUp).toEqual(true);
       });
   });
-  it("Should create a working client and execute a graphQL request", async () => {
+  it("Should create a working client and succeed when checking graphQL status", async () => {
     contextParams.subgraphHeaders = {
       Authorization: 'Bearer MY_TOKEN',
       AnotherHeader: 'Another Value'
@@ -83,7 +83,7 @@ describe("Client instances", () => {
     const status = await client.checkGraphQLStatus();
     expect(status).toEqual(true);
   });
-  it("Should create a working client and fail when executing a graphQL request", async () => {
+  it("Should create a working client and fail when checking graphQL status", async () => {
     contextParams.subgraphURL = "https://bad-url-gateway.io/"
     const context = new Context(contextParams);
     const client = new ClientDaoWhitelist(context);
@@ -93,5 +93,17 @@ describe("Client instances", () => {
 
     const status = await client.checkGraphQLStatus();
     expect(status).toEqual(false);
+  });
+  it("Should create a working client and execute a graphQL request", async () => {
+    contextParams.subgraphURL = "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
+    const context = new Context(contextParams);
+    const client = new ClientDaoWhitelist(context);
+
+    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const daoList = await client.daoList(0, 100);
+    expect(daoList.daos).toBeDefined();
+    expect(daoList.daos).toBeInstanceOf(Array);
   });
 });

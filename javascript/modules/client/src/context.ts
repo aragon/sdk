@@ -175,7 +175,7 @@ export class Context {
   }
 
   /**
-   * Getter for the GraphQL client
+   * Getter for the GraphQLClient instance of the subgraph
    *
    * @var graphQL
    *
@@ -186,19 +186,6 @@ export class Context {
   get graphQL() {
     return this.state.graphQL || defaultState.graphQL;
   }
-
-  /**
-   * Getter for the GraphQLClient instance of the subgraph
-   *
-   * @var subgraph
-   *
-   * @returns {GraphQLClient}
-   *
-   * @public
-   */
-  // get subgraph(): GraphQLClient {
-  //   return this.state.subgraph || defaultState.subgraph;
-  // }
 
   /**
    * Getter for daoFactoryAddress property

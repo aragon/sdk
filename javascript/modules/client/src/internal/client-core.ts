@@ -5,6 +5,7 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
 import { GraphQLClient } from "graphql-request";
+import { DAO_LIST } from "./graphql/dao";
 
 export abstract class ClientCore implements IClientCore {
   private _web3Providers: JsonRpcProvider[] = [];
@@ -79,6 +80,14 @@ export abstract class ClientCore implements IClientCore {
     return this.graphQL.rawRequest('')
       .then(() => true)
       .catch(err => err?.response?.status == 400)
+  }
+
+  public async daoList(offset: number, limit: number): Promise<any> {
+    if(!this.graphQL) throw new Error("No GraphQL defined");
+    if(offset < 0) throw new Error("Invalid offset");
+    if(limit <= 0) throw new Error("Invalid limit");
+
+    return this.graphQL.request(DAO_LIST, { offset, limit })
   }
 
   /**
