@@ -1,7 +1,5 @@
-import { Context } from "../../src/context";
-import { ContextParams } from "../../src/internal/interfaces/context";
+import { Context, ContextParams } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
-import { Signer } from "@ethersproject/abstract-signer";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
 const TEST_WALLET = "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb"

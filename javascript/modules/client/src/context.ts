@@ -1,4 +1,10 @@
-import { ContextParams, ContextState } from "./internal/interfaces/context";
+import {
+  Web3ContextParams,
+  VocdoniContextParams,
+  IpfsContextParams,
+  GraphQLContextParams,
+  ContextState
+} from "./internal/interfaces/context";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
 // import { create as ipfsCreate, Options as IpfsOptions } from "ipfs-http-client";
@@ -13,6 +19,12 @@ let defaultState: ContextState = {
   daoFactoryAddress: "",
   web3Providers: [],
 };
+
+export interface ContextParams
+    extends Web3ContextParams,
+        VocdoniContextParams,
+        IpfsContextParams,
+        GraphQLContextParams {}
 
 export class Context {
   private state: ContextState = Object.assign({}, defaultState);

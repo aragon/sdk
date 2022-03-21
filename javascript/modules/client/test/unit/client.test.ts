@@ -1,8 +1,6 @@
-import { ClientDaoSimpleVote, ClientDaoWhitelist } from "../../src";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { ContextParams } from "../../src/internal/interfaces/context";
 import { Wallet } from "@ethersproject/wallet";
-import { Context } from "../../src/context";
+import { ClientDaoWhitelist, Context, ContextParams } from "../../src";
 
 const web3endpoints = {
   working: [

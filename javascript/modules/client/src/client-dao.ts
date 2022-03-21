@@ -1,6 +1,5 @@
 import { ClientCore } from "./internal/client-core";
 import {
-  DaoAction,
   DaoConfig,
   DaoRole,
   IClientDaoBase,
