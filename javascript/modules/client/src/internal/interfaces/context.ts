@@ -8,22 +8,28 @@ import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 // import { GraphQLClient } from "graphql-request";
 
 // Context input parameters
-export interface Web3ContextParams {
+interface Web3ContextParams {
   network: Networkish;
   signer: Signer;
   dao: string;
   daoFactoryAddress: string;
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
 }
-export interface VocdoniContextParams {
+interface VocdoniContextParams {
   // Vocdoni
 }
-export interface IpfsContextParams {
+interface IpfsContextParams {
   // ipfs: IpfsOptions;
 }
-export interface GraphQLContextParams {
+interface GraphQLContextParams {
   // subgraphURL: string;
 }
+
+export interface ContextParams
+    extends Web3ContextParams,
+        VocdoniContextParams,
+        IpfsContextParams,
+        GraphQLContextParams {}
 
 // Context state data
 
