@@ -4,11 +4,13 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
+import { GraphQLClient } from "graphql-request";
 
 export abstract class ClientCore implements IClientCore {
   private _web3Providers: JsonRpcProvider[] = [];
   private _web3Idx = -1;
   private _signer: Signer | undefined;
+  private _graphQL: GraphQLClient | undefined;
 
   constructor(context: Context) {
     if (context.web3Providers) {
@@ -18,6 +20,10 @@ export abstract class ClientCore implements IClientCore {
 
     if (context.signer) {
       this.useSigner(context.signer);
+    }
+
+    if (context.graphQL) {
+      this._graphQL = context.graphQL
     }
   }
 
@@ -56,11 +62,23 @@ export abstract class ClientCore implements IClientCore {
     return this._web3Providers[this._web3Idx] || null;
   }
 
+  get graphQL() {
+    return this._graphQL;
+  }
+
   public async checkWeb3Status(): Promise<boolean> {
     return this.web3
       .getNetwork()
       .then(() => true)
       .catch(() => false);
+  }
+
+  public async checkGraphQLStatus(): Promise<boolean> {
+    if(!this.graphQL) throw new Error("No GraphQL defined");
+
+    return this.graphQL.rawRequest('')
+      .then(() => true)
+      .catch(err => err?.response?.status == 400)
   }
 
   /**

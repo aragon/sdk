@@ -1,11 +1,11 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
+import { GraphQLClient } from "graphql-request";
 // import {
 //   create as ipfsCreate,
 //   IPFSHTTPClient,
 //   Options as IpfsOptions,
 // } from "ipfs-http-client";
-// import { GraphQLClient } from "graphql-request";
 
 // Context input parameters
 interface Web3ContextParams {
@@ -22,7 +22,8 @@ interface IpfsContextParams {
   // ipfs: IpfsOptions;
 }
 interface GraphQLContextParams {
-  // subgraphURL: string;
+  subgraphURL: string;
+  subgraphHeaders?: { [key: string]: string; };
 }
 
 export interface ContextParams
@@ -45,7 +46,7 @@ interface IpfsContextState {
   // ipfs?: IPFSHTTPClient;
 }
 interface GraphQLContextState {
-  // subgraph?: GraphQLClient;
+  graphQL?: GraphQLClient;
 }
 
 export interface ContextState

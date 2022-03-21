@@ -19,6 +19,7 @@ const contextParams: ContextParams = {
   dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
+  subgraphURL: "https://48p1r2roz4.sse.codesandbox.io/"
 };
 
 describe("Client instances", () => {
@@ -67,5 +68,30 @@ describe("Client instances", () => {
       .then((isUp) => {
         expect(isUp).toEqual(true);
       });
+  });
+  it("Should create a working client and execute a graphQL request", async () => {
+    contextParams.subgraphHeaders = {
+      Authorization: 'Bearer MY_TOKEN',
+      AnotherHeader: 'Another Value'
+    };
+    const context = new Context(contextParams);
+    const client = new ClientDaoWhitelist(context);
+
+    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const status = await client.checkGraphQLStatus();
+    expect(status).toEqual(true);
+  });
+  it("Should create a working client and fail when executing a graphQL request", async () => {
+    contextParams.subgraphURL = "https://bad-url-gateway.io/"
+    const context = new Context(contextParams);
+    const client = new ClientDaoWhitelist(context);
+
+    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const status = await client.checkGraphQLStatus();
+    expect(status).toEqual(false);
   });
 });

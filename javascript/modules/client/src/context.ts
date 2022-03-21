@@ -2,7 +2,7 @@ import { ContextState, ContextParams } from "./internal/interfaces/context";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
 // import { create as ipfsCreate, Options as IpfsOptions } from "ipfs-http-client";
-// import { GraphQLClient } from "graphql-request";
+import { GraphQLClient } from "graphql-request";
 export { ContextParams } from "./internal/interfaces/context"
 
 const supportedProtocols = ["https:"];
@@ -13,6 +13,7 @@ let defaultState: ContextState = {
   dao: "",
   daoFactoryAddress: "",
   web3Providers: [],
+  graphQL: undefined
 };
 
 export class Context {
@@ -52,6 +53,8 @@ export class Context {
       throw new Error("No DAO address defined");
     } else if (!contextParams.web3Providers) {
       throw new Error("No web3 endpoints defined");
+    } else if (!contextParams.subgraphURL) {
+      throw new Error("No subgraph url defined");
     }
     // else if (!contextParams.ipfs) {
     //   throw new Error("No IPFS options defined");
@@ -67,7 +70,7 @@ export class Context {
         contextParams.network
       ),
       // ipfs: ipfsCreate(contextParams.ipfs),
-      // subgraph: new GraphQLClient(contextParams.subgraphURL),
+      graphQL: this.useSubgraphClient(contextParams.subgraphURL, contextParams?.subgraphHeaders),
     };
   }
 
@@ -90,11 +93,11 @@ export class Context {
         this.state.network
       );
     }
+    if (contextParams.subgraphURL) {
+      this.state.graphQL = this.useSubgraphClient(contextParams.subgraphURL, contextParams?.subgraphHeaders);
+    }
     // if (contextParams.ipfs) {
     //   this.state.ipfs = ipfsCreate(contextParams.ipfs);
-    // }
-    // if (contextParams.subgraphURL) {
-    //   this.state.subgraph = new GraphQLClient(contextParams.subgraphURL);
     // }
   }
 
@@ -122,6 +125,12 @@ export class Context {
     } else {
       return [endpoints];
     }
+  }
+
+  useSubgraphClient(endpoint: string, headers?: { [key: string]: string; }): GraphQLClient {
+    return new GraphQLClient(endpoint, headers ? {
+      headers: headers
+    } : {});
   }
 
   // GETTERS
@@ -163,6 +172,19 @@ export class Context {
    */
   get web3Providers() {
     return this.state.web3Providers || defaultState.web3Providers;
+  }
+
+  /**
+   * Getter for the GraphQL client
+   *
+   * @var graphQL
+   *
+   * @returns {GraphQLClient}
+   *
+   * @public
+   */
+  get graphQL() {
+    return this.state.graphQL || defaultState.graphQL;
   }
 
   /**
