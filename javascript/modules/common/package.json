@@ -2,7 +2,7 @@
   "name": "@aragon/sdk-common",
   "author": "Aragon Association",
   "version": "0.1.0",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/sdk-common.esm.js",
   "typings": "dist/index.d.ts",

@@ -18,14 +18,14 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-
+ 
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
         with:
           working-directory: javascript
 
-      - name: Lint
-        run: yarn lint
+      - name: Build subpackages
+        run: yarn turbo run build
         working-directory: javascript
 
       - name: Test

@@ -4,27 +4,23 @@
   "description": "Aragon JS SDK",
   "repository": "https://github.com/aragon/sdk/tree/main/javascript",
   "author": "Aragon Association",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "private": true,
   "workspaces": {
     "packages": [
       "modules/*"
-    ],
-    "nohoist": [
-      "**/@graphprotocol/graph-ts",
-      "**/@graphprotocol/graph-ts/**",
-      "**/@graphprotocol/graph-cli",
-      "**/@graphprotocol/graph-cli/**",
-      "**/matchstick-as",
-      "**/matchstick-as/**"
     ]
   },
   "scripts": {
     "clean": "rm -Rf node_modules ./modules/*/node_modules ./modules/*/dist",
     "lint": "tsdx lint modules/*/src",
+    "build": "yarn turbo run build",
     "test": "tsdx test"
   },
   "engines": {
     "node": ">=14 <17.0.0"
+  },
+  "devDependencies": {
+    "turbo": "^1.1.9"
   }
 }
