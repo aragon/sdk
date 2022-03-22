@@ -9,22 +9,11 @@
   "workspaces": {
     "packages": [
       "modules/*"
-    ],
-    "nohoist": [
-      "**/@graphprotocol/graph-ts",
-      "**/@graphprotocol/graph-ts/**",
-      "**/@graphprotocol/graph-cli",
-      "**/@graphprotocol/graph-cli/**",
-      "**/matchstick-as",
-      "**/matchstick-as/**"
     ]
   },
   "scripts": {
     "clean": "rm -Rf node_modules ./modules/*/node_modules ./modules/*/dist",
     "lint": "tsdx lint modules/*/src",
     "test": "tsdx test"
-  },
-  "engines": {
-    "node": ">=14 <17.0.0"
   }
 }

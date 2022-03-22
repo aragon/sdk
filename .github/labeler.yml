@@ -1,0 +1,7 @@
+javascript:
+- javascript/**/*
+- javascript/*
+
+javascript-common:
+- javascript/modules/common/**/*
+- javascript/modules/common/*
