@@ -31,7 +31,8 @@ describe("Context instances", () => {
             signer: new Wallet(TEST_WALLET),
             dao: "Dao",
             daoFactoryAddress: "0x1234",
-            web3Providers: web3endpoints.working
+            web3Providers: web3endpoints.working,
+            subgraphURL: "https://bad-url-gateway.io/"
         }
         const context = new Context(contextParams);
 
