@@ -9,3 +9,4 @@ coverage
 .DS_Store
 *.tgz
 *.log
+.turbo
