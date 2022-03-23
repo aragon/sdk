@@ -4,7 +4,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
-import { GraphQLClient } from "graphql-request";
+import {gql, GraphQLClient} from "graphql-request";
 import { DAO_LIST } from "./graphql/dao";
 
 export abstract class ClientCore implements IClientCore {
@@ -82,12 +82,19 @@ export abstract class ClientCore implements IClientCore {
       .catch(err => err?.response?.status == 400)
   }
 
-  public async daoList(offset: number, limit: number): Promise<any> {
-    if(!this.graphQL) throw new Error("No GraphQL defined");
-    if(offset < 0) throw new Error("Invalid offset");
-    if(limit <= 0) throw new Error("Invalid limit");
+  graph = {
+    raw: (query: string, variables?: object): Promise<any> => {
+      if(!this.graphQL) throw new Error("No GraphQL defined");
 
-    return this.graphQL.request(DAO_LIST, { offset, limit })
+      return this.graphQL.request(gql`${query}`, variables)
+    },
+    daoList: (offset: number, limit: number): Promise<any> => {
+      if(!this.graphQL) throw new Error("No GraphQL defined");
+      if(offset < 0) throw new Error("Invalid offset");
+      if(limit <= 0) throw new Error("Invalid limit");
+
+      return this.graphQL.request(DAO_LIST, { offset, limit })
+    }
   }
 
   /**

@@ -94,6 +94,18 @@ describe("Client instances", () => {
     const status = await client.checkGraphQLStatus();
     expect(status).toEqual(false);
   });
+  it("Should create a working client and execute a raw graphQL request", async () => {
+    contextParams.subgraphURL = "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
+    const context = new Context(contextParams);
+    const client = new ClientDaoWhitelist(context);
+
+    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const daoList = await client.graph.raw("{ daos { id } }");
+    expect(daoList.daos).toBeDefined();
+    expect(daoList.daos).toBeInstanceOf(Array);
+  });
   it("Should create a working client and execute a graphQL request", async () => {
     contextParams.subgraphURL = "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
     const context = new Context(contextParams);
@@ -102,7 +114,7 @@ describe("Client instances", () => {
     expect(client).toBeInstanceOf(ClientDaoWhitelist);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
-    const daoList = await client.daoList(0, 100);
+    const daoList = await client.graph.daoList(0, 100);
     expect(daoList.daos).toBeDefined();
     expect(daoList.daos).toBeInstanceOf(Array);
   });

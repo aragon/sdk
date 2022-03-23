@@ -17,17 +17,19 @@ export interface IClientVocdoniCore {
 export interface IClientIpfsCore {
   // Add here
 }
-export interface IClientGraphQLCore {
+export interface IClientGraphQLCore extends IClientGraphQLRequests {
   graphQL: GraphQLClient | undefined;
   checkGraphQLStatus(): Promise<boolean>;
 }
 export interface IClientGraphQLRequests {
-  daoList(offset: number, limit: number): Promise<any>;
+  graph: {
+    raw: (query: string, variables?: object) => Promise<any>;
+    daoList: (offset: number, limit: number) => Promise<any>;
+  }
 }
 
 export interface IClientCore
   extends IClientWeb3Core,
     IClientVocdoniCore,
     IClientIpfsCore,
-    IClientGraphQLCore,
-    IClientGraphQLRequests {}
+    IClientGraphQLCore {}
