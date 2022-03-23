@@ -9,7 +9,7 @@ import {
   TokenConfig,
   VotingConfig,
 } from "./internal/interfaces/dao";
-// import { exampleContractAbi, ExampleContractMethods } from "./internal/abi/dao";
+import { exampleContractAbi, ExampleContractMethods } from "./internal/abi/dao";
 
 export class ClientDaoWhitelist extends ClientCore
   implements IClientDaoBase, IClientDaoWhitelist {
@@ -161,10 +161,10 @@ export class ClientDaoSimpleVote extends ClientCore
    *
    * @param contractAddress Address of the contract instance
    */
-  // private attachContractExample(contractAddress: string) {
-  //   return this.attachContract<ExampleContractMethods>(
-  //     contractAddress,
-  //     exampleContractAbi,
-  //   );
-  // }
+  public attachContractExample(contractAddress: string) {
+    return this.attachContract<ExampleContractMethods>(
+        contractAddress,
+        exampleContractAbi,
+    );
+  }
 }

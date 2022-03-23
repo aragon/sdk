@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientDaoWhitelist, Context, ContextParams } from "../../src";
+import {ClientDaoSimpleVote, ClientDaoWhitelist, Context, ContextParams} from "../../src";
 
 const web3endpoints = {
   working: [
@@ -67,5 +67,38 @@ describe("Client instances", () => {
       .then((isUp) => {
         expect(isUp).toEqual(true);
       });
+  });
+  it("Should be a test", async () => {
+    contextParams.network = "rinkeby"
+    contextParams.web3Providers = ["https://rinkeby.infura.io/v3/b5825b1fbf1e4a828cc385de83b9dc7e"]
+    // contextParams.web3Providers = ["https://eth-rinkeby.alchemyapi.io/v2/bgIqe2NxazpzsjfmVmhj3aS3j_HZ9mpr"]
+    const context = new Context(contextParams);
+    const client = new ClientDaoSimpleVote(context);
+
+    expect(client).toBeInstanceOf(ClientDaoSimpleVote);
+    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+// console.log(client.web3)
+    const testAttach = await client
+        .attachContractExample("0xbda31B34f09069DF702cC9eC7F27AEAFAA3a2ce7")
+    console.log(testAttach.functions)
+    console.log(await testAttach.functions.daoBase())
+
+    const overrideOptions = {
+      gasLimit: 30000000,
+      gasPrice: 100000
+    };
+
+    console.log(await testAttach.functions.newDAO(
+        ['test1', '0x1111'],
+        ['0x0000000000000000000000000000000000000000','TestMVM1','MVM1'],
+        [
+          ['0x71EeDbe7c99d08C9755579f2c312C8E2755F165F',
+            '0xc95D9623E8FDc248C61152bAC87c2f914FEB7b13'],
+          [1,1]
+        ],
+        [10, 10, 10],
+        '0x71EeDbe7c99d08C9755579f2c312C8E2755F165F', overrideOptions
+        // '0x71EeDbe7c99d08C9755579f2c312C8E2755F165F', overrideOptions
+    ))
   });
 });
