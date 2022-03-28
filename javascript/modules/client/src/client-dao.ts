@@ -9,10 +9,22 @@ import {
   TokenConfig,
   VotingConfig,
 } from "./internal/interfaces/dao";
-// import { exampleContractAbi, ExampleContractMethods } from "./internal/abi/dao";
+import { DAOFactory__factory } from "@aragon/core-contracts/dist/factories/DAOFactory__factory";
+import { Context } from "./context";
 
 export class ClientDaoWhitelist extends ClientCore
   implements IClientDaoBase, IClientDaoWhitelist {
+
+  private _daoFactoryAddress = "";
+
+  constructor(context: Context) {
+    super(context);
+
+    if (context.daoFactoryAddress) {
+      this._daoFactoryAddress = context.daoFactoryAddress;
+    }
+  }
+
   /** DAO related methods */
   dao = {
     create: async (
@@ -28,6 +40,20 @@ export class ClientDaoWhitelist extends ClientCore
       // );
       // const tx = await instance.store("0x1234");
       // await tx.wait();
+
+      if(!this.signer) throw new Error("A signer is needed for creating a DAO");
+
+      const daoFactoryContract = DAOFactory__factory.connect(this._daoFactoryAddress, this.signer.connect(this.web3));
+
+      const createDaoTx = await daoFactoryContract.newDAO(
+            _daoConfig,
+          _tokenConfig,
+          _mintConfig,
+          [_votingConfig.minSupport, _votingConfig.minDuration, _votingConfig.minParticipation],
+          _gsnForwarder ?? ''
+          );
+
+      await createDaoTx.wait();
 
       // TODO: Not implemented
       return Promise.resolve("0x1234567890123456789012345678901234567890");

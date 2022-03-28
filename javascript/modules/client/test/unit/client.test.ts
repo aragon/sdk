@@ -11,7 +11,7 @@ const web3endpoints = {
 };
 
 const TEST_WALLET =
-  "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
+  "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
 const contextParams: ContextParams = {
   network: "mainnet",
@@ -67,5 +67,31 @@ describe("Client instances", () => {
       .then((isUp) => {
         expect(isUp).toEqual(true);
       });
+  });
+  it("Should create a DAO (just testing locally)", async () => {
+    contextParams.network = 31337
+    contextParams.web3Providers = ["http://localhost:8545"]
+    contextParams.daoFactoryAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+    // contextParams.web3Providers = ["https://eth-rinkeby.alchemyapi.io/v2/bgIqe2NxazpzsjfmVmhj3aS3j_HZ9mpr"]
+    const context = new Context(contextParams);
+    const client = new ClientDaoWhitelist(context);
+
+    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const createDao = await client
+      .dao.create(
+        { name: 'test' + Math.random().toString(), metadata:'0x1111' },
+        { addr: '0x0000000000000000000000000000000000000000', name:'TestMVM', symbol:'MVM' },
+        {
+          receivers: ['0x71EeDbe7c99d08C9755579f2c312C8E2755F165F',
+            '0xc95D9623E8FDc248C61152bAC87c2f914FEB7b13'],
+          amounts: [BigInt(1), BigInt(1)]
+        },
+        { minParticipation: 10, minDuration: 10, minSupport: 10 },
+          '0x71EeDbe7c99d08C9755579f2c312C8E2755F165F'
+      )
+
+    expect(createDao).toEqual("0x1234567890123456789012345678901234567890")
   });
 });

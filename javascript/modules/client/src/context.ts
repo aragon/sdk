@@ -5,7 +5,7 @@ import { UnsupportedProtocolError } from "@aragon/sdk-common";
 // import { GraphQLClient } from "graphql-request";
 export { ContextParams } from "./internal/interfaces/context"
 
-const supportedProtocols = ["https:"];
+const supportedProtocols = ["http:", "https:"];
 
 // State
 let defaultState: ContextState = {
