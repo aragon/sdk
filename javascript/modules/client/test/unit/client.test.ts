@@ -79,19 +79,20 @@ describe("Client instances", () => {
     expect(client).toBeInstanceOf(ClientDaoWhitelist);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
-    const createDao = await client
-      .dao.create(
-        { name: 'test' + Math.random().toString(), metadata:'0x1111' },
-        { addr: '0x0000000000000000000000000000000000000000', name:'TestMVM', symbol:'MVM' },
-        {
-          receivers: ['0x71EeDbe7c99d08C9755579f2c312C8E2755F165F',
-            '0xc95D9623E8FDc248C61152bAC87c2f914FEB7b13'],
-          amounts: [BigInt(1), BigInt(1)]
-        },
-        { minParticipation: 10, minDuration: 10, minSupport: 10 },
-          '0x71EeDbe7c99d08C9755579f2c312C8E2755F165F'
-      )
+    const newDaoAddress = await client.dao.create(
+      { name: 'test' + Math.random().toString(), metadata: '0x1111' },
+      { addr: '0x0000000000000000000000000000000000000000', name: 'TestMVM', symbol: 'MVM' },
+      {
+        receivers: ['0x71EeDbe7c99d08C9755579f2c312C8E2755F165F', '0xc95D9623E8FDc248C61152bAC87c2f914FEB7b13'],
+        amounts: [BigInt(1), BigInt(1)]
+      },
+      [BigInt(10), BigInt(10), BigInt(10)],
+      '0x71EeDbe7c99d08C9755579f2c312C8E2755F165F'
+    )
 
-    expect(createDao).toEqual("0x1234567890123456789012345678901234567890")
+    expect(typeof newDaoAddress).toBe("string")
+    expect(newDaoAddress.length).toBe(42)
+    expect(newDaoAddress).toContain("0x")
+    expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i)
   });
 });

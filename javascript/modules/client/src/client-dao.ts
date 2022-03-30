@@ -9,8 +9,14 @@ import {
   TokenConfig,
   VotingConfig,
 } from "./internal/interfaces/dao";
-import { DAOFactory__factory } from "@aragon/core-contracts/dist/factories/DAOFactory__factory";
+import {
+  DAOFactory,
+  DAOFactory__factory,
+  Registry__factory,
+  TokenFactory
+} from "@aragon/core-contracts-ethers";
 import { Context } from "./context";
+import { BigNumberish } from "@ethersproject/bignumber";
 
 export class ClientDaoWhitelist extends ClientCore
   implements IClientDaoBase, IClientDaoWhitelist {
@@ -28,10 +34,10 @@ export class ClientDaoWhitelist extends ClientCore
   /** DAO related methods */
   dao = {
     create: async (
-      _daoConfig: DaoConfig,
-      _tokenConfig: TokenConfig,
-      _mintConfig: MintConfig,
-      _votingConfig: VotingConfig,
+      _daoConfig: DAOFactory.DAOConfigStruct,
+      _tokenConfig: TokenFactory.TokenConfigStruct,
+      _mintConfig: TokenFactory.MintConfigStruct,
+      _votingConfig: [BigNumberish, BigNumberish, BigNumberish],
       _gsnForwarder?: string,
     ): Promise<string> => {
       // TODO: This is an ethers.js integration example
@@ -42,21 +48,23 @@ export class ClientDaoWhitelist extends ClientCore
       // await tx.wait();
 
       if(!this.signer) throw new Error("A signer is needed for creating a DAO");
-
       const daoFactoryContract = DAOFactory__factory.connect(this._daoFactoryAddress, this.signer.connect(this.web3));
 
-      const createDaoTx = await daoFactoryContract.newDAO(
-            _daoConfig,
-          _tokenConfig,
-          _mintConfig,
-          [_votingConfig.minSupport, _votingConfig.minDuration, _votingConfig.minParticipation],
-          _gsnForwarder ?? ''
-          );
+      const registry = await daoFactoryContract.registry()
+        .then(registryAddress => {
+          return Registry__factory.connect(registryAddress, this.web3)
+        });
 
-      await createDaoTx.wait();
+      let daoAddress = ''
+      registry.on("NewDAORegistered", (dao: string) => {
+        daoAddress = dao;
+      })
 
-      // TODO: Not implemented
-      return Promise.resolve("0x1234567890123456789012345678901234567890");
+      return daoFactoryContract.newDAO(
+          _daoConfig, _tokenConfig, _mintConfig, _votingConfig, _gsnForwarder ?? ''
+      )
+        .then(tx => tx.wait())
+        .then(() => daoAddress);
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
     hasPermission: (

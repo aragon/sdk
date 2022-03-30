@@ -1,12 +1,14 @@
 import { IClientCore } from "./client-core";
+import { DAOFactory, TokenFactory } from "@aragon/core-contracts-ethers";
+import { BigNumberish } from "@ethersproject/bignumber";
 
 export interface IClientDaoBase extends IClientCore {
   dao: {
     create(
-      daoConfig: DaoConfig,
-      tokenConfig: TokenConfig,
-      mintConfig: MintConfig,
-      votingConfig: VotingConfig,
+      daoConfig: DaoConfig | DAOFactory.DAOConfigStruct,
+      tokenConfig: TokenConfig | TokenFactory.TokenConfigStruct,
+      mintConfig: MintConfig | TokenFactory.MintConfigStruct,
+      votingConfig: VotingConfig | [BigNumberish, BigNumberish, BigNumberish],
       gsnForwarder?: string,
     ): Promise<string>;
     /** Checks whether a role is granted by the curren DAO's ACL settings */
