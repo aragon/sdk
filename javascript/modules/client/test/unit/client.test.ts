@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientDaoWhitelist, Context, ContextParams } from "../../src";
+import { ClientDaoERC20Voting, ClientDaoWhitelistVoting, Context, ContextParams } from "../../src";
 
 const web3endpoints = {
   working: [
@@ -23,15 +23,15 @@ const contextParams: ContextParams = {
 
 describe("Client instances", () => {
   it("Should create an empty client", () => {
-    const client = new ClientDaoWhitelist({} as Context);
+    const client = new ClientDaoERC20Voting({} as Context);
 
-    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
   });
   it("Should create a working client", async () => {
     const context = new Context(contextParams);
-    const client = new ClientDaoWhitelist(context);
+    const client = new ClientDaoERC20Voting(context);
 
-    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
     const status = await client.checkWeb3Status();
@@ -40,9 +40,9 @@ describe("Client instances", () => {
   it("Should create a failing client", async () => {
     contextParams.web3Providers = web3endpoints.failing;
     const context = new Context(contextParams);
-    const client = new ClientDaoWhitelist(context);
+    const client = new ClientDaoERC20Voting(context);
 
-    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
     const status = await client.checkWeb3Status();
@@ -53,9 +53,9 @@ describe("Client instances", () => {
       web3endpoints.working,
     );
     const context = new Context(contextParams);
-    const client = new ClientDaoWhitelist(context);
+    const client = new ClientDaoERC20Voting(context);
 
-    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
     await client
@@ -68,15 +68,15 @@ describe("Client instances", () => {
         expect(isUp).toEqual(true);
       });
   });
-  it("Should create a DAO (just testing locally)", async () => {
+  it("Should create a ERC20VotingDAO locally", async () => {
     contextParams.network = 31337
     contextParams.web3Providers = ["http://localhost:8545"]
     contextParams.daoFactoryAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
-    // contextParams.web3Providers = ["https://eth-rinkeby.alchemyapi.io/v2/bgIqe2NxazpzsjfmVmhj3aS3j_HZ9mpr"]
-    const context = new Context(contextParams);
-    const client = new ClientDaoWhitelist(context);
 
-    expect(client).toBeInstanceOf(ClientDaoWhitelist);
+    const context = new Context(contextParams);
+    const client = new ClientDaoERC20Voting(context);
+
+    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
     const newDaoAddress = await client.dao.create(
@@ -87,6 +87,29 @@ describe("Client instances", () => {
         amounts: [BigInt(1), BigInt(1)]
       },
       [BigInt(10), BigInt(10), BigInt(10)],
+      '0x71EeDbe7c99d08C9755579f2c312C8E2755F165F'
+    )
+
+    expect(typeof newDaoAddress).toBe("string")
+    expect(newDaoAddress.length).toBe(42)
+    expect(newDaoAddress).toContain("0x")
+    expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i)
+  });
+  it("Should create a WhitelistVoting locally", async () => {
+    contextParams.network = 31337
+    contextParams.web3Providers = ["http://localhost:8545"]
+    contextParams.daoFactoryAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+
+    const context = new Context(contextParams);
+    const client = new ClientDaoWhitelistVoting(context);
+
+    expect(client).toBeInstanceOf(ClientDaoWhitelistVoting);
+    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const newDaoAddress = await client.dao.create(
+      { name: 'test' + Math.random().toString(), metadata: '0x1111' },
+        [BigInt(10), BigInt(10), BigInt(10)],
+    ['0x71EeDbe7c99d08C9755579f2c312C8E2755F165F', '0xc95D9623E8FDc248C61152bAC87c2f914FEB7b13'],
       '0x71EeDbe7c99d08C9755579f2c312C8E2755F165F'
     )
 

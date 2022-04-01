@@ -4,13 +4,6 @@ import { BigNumberish } from "@ethersproject/bignumber";
 
 export interface IClientDaoBase extends IClientCore {
   dao: {
-    create(
-      daoConfig: DaoConfig | DAOFactory.DAOConfigStruct,
-      tokenConfig: TokenConfig | TokenFactory.TokenConfigStruct,
-      mintConfig: MintConfig | TokenFactory.MintConfigStruct,
-      votingConfig: VotingConfig | [BigNumberish, BigNumberish, BigNumberish],
-      gsnForwarder?: string,
-    ): Promise<string>;
     /** Checks whether a role is granted by the curren DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -21,9 +14,16 @@ export interface IClientDaoBase extends IClientCore {
   };
 }
 
-export interface IClientDaoWhitelist extends IClientCore {
+export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
-    whitelist: {
+    create: (
+        daoConfig: DAOFactory.DAOConfigStruct,
+        tokenConfig: TokenFactory.TokenConfigStruct,
+        mintConfig: TokenFactory.MintConfigStruct,
+        votingConfig: [BigNumberish, BigNumberish, BigNumberish],
+        gsnForwarder?: string,
+    ) => Promise<string>;
+    simpleVote: {
       createProposal: (
         startDate: number,
         endDate: number,
@@ -38,9 +38,15 @@ export interface IClientDaoWhitelist extends IClientCore {
   };
 }
 
-export interface IClientDaoSimpleVote extends IClientCore {
+export interface IClientDaoWhitelistVoting extends IClientCore {
   dao: {
-    simpleVote: {
+    create: (
+        daoConfig: DAOFactory.DAOConfigStruct,
+        votingConfig: [BigNumberish, BigNumberish, BigNumberish],
+        whitelistVoters: string[],
+        gsnForwarder?: string,
+    ) => Promise<string>;
+    whitelist: {
       createProposal: (
         startDate: number,
         endDate: number,
