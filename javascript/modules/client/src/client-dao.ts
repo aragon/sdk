@@ -3,30 +3,23 @@ import {
   DaoConfig,
   DaoRole,
   IClientDaoBase,
-  IClientDaoERC20Voting,
-  IClientDaoWhitelistVoting,
+  IClientDaoERC20Voting, ICreateDaoERC20Voting,
+  IClientDaoWhitelistVoting, ICreateDaoWhitelistVoting,
   VotingConfig,
 } from "./internal/interfaces/dao";
 import {
-  DAOFactory,
   DAOFactory__factory,
-  Registry__factory,
-  TokenFactory
+  Registry__factory
 } from "@aragon/core-contracts-ethers";
-import { BigNumberish } from "@ethersproject/bignumber";
+
+export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting }
 
 export class ClientDaoERC20Voting extends ClientCore
   implements IClientDaoBase, IClientDaoERC20Voting {
 
   /** DAO related methods */
   dao = {
-    create: async (
-      _daoConfig: DAOFactory.DAOConfigStruct,
-      _tokenConfig: TokenFactory.TokenConfigStruct,
-      _mintConfig: TokenFactory.MintConfigStruct,
-      _votingConfig: [BigNumberish, BigNumberish, BigNumberish],
-      _gsnForwarder?: string,
-    ): Promise<string> => {
+    create: async (params: ICreateDaoERC20Voting): Promise<string> => {
       if(!this.signer) throw new Error("A signer is needed for creating a DAO");
       const daoFactoryContract = DAOFactory__factory.connect(this.daoFactoryAddress, this.signer.connect(this.web3));
 
@@ -41,7 +34,7 @@ export class ClientDaoERC20Voting extends ClientCore
       })
 
       return daoFactoryContract.newERC20VotingDAO(
-          _daoConfig, _votingConfig, _tokenConfig, _mintConfig, _gsnForwarder ?? ''
+          params.daoConfig, params.votingConfig, params.tokenConfig, params.mintConfig, params.gsnForwarder ?? ''
       )
         .then(tx => tx.wait())
         .then(() => daoAddress);
@@ -109,12 +102,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
 
   /** DAO related methods */
   dao = {
-    create: async (
-        _daoConfig: DAOFactory.DAOConfigStruct,
-        _votingConfig: [BigNumberish, BigNumberish, BigNumberish],
-        _whitelistVoters: string[],
-        _gsnForwarder?: string,
-    ): Promise<string> => {
+    create: async (params: ICreateDaoWhitelistVoting): Promise<string> => {
       if(!this.signer) throw new Error("A signer is needed for creating a DAO");
       const daoFactoryContract = DAOFactory__factory.connect(this.daoFactoryAddress, this.signer.connect(this.web3));
 
@@ -129,7 +117,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
       })
 
       return daoFactoryContract.newWhitelistVotingDAO(
-          _daoConfig, _votingConfig, _whitelistVoters, _gsnForwarder ?? ''
+          params.daoConfig, params.votingConfig, params.whitelistVoters, params.gsnForwarder ?? ''
       )
           .then(tx => tx.wait())
           .then(() => daoAddress);

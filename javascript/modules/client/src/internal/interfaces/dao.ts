@@ -16,13 +16,7 @@ export interface IClientDaoBase extends IClientCore {
 
 export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
-    create: (
-        daoConfig: DAOFactory.DAOConfigStruct,
-        tokenConfig: TokenFactory.TokenConfigStruct,
-        mintConfig: TokenFactory.MintConfigStruct,
-        votingConfig: [BigNumberish, BigNumberish, BigNumberish],
-        gsnForwarder?: string,
-    ) => Promise<string>;
+    create: (params: ICreateDaoERC20Voting) => Promise<string>;
     simpleVote: {
       createProposal: (
         startDate: number,
@@ -40,12 +34,7 @@ export interface IClientDaoERC20Voting extends IClientCore {
 
 export interface IClientDaoWhitelistVoting extends IClientCore {
   dao: {
-    create: (
-        daoConfig: DAOFactory.DAOConfigStruct,
-        votingConfig: [BigNumberish, BigNumberish, BigNumberish],
-        whitelistVoters: string[],
-        gsnForwarder?: string,
-    ) => Promise<string>;
+    create: (params: ICreateDaoWhitelistVoting) => Promise<string>;
     whitelist: {
       createProposal: (
         startDate: number,
@@ -74,6 +63,21 @@ export enum DaoRole {
   EXEC_ROLE = "EXEC_ROLE",
   WITHDRAW_ROLE = "WITHDRAW_ROLE",
   SET_SIGNATURE_VALIDATOR_ROLE = "SET_SIGNATURE_VALIDATOR_ROLE",
+}
+
+export interface ICreateDaoERC20Voting {
+  daoConfig: DAOFactory.DAOConfigStruct,
+  tokenConfig: TokenFactory.TokenConfigStruct,
+  mintConfig: TokenFactory.MintConfigStruct,
+  votingConfig: [BigNumberish, BigNumberish, BigNumberish],
+  gsnForwarder?: string,
+}
+
+export interface ICreateDaoWhitelistVoting {
+  daoConfig: DAOFactory.DAOConfigStruct,
+  votingConfig: [BigNumberish, BigNumberish, BigNumberish],
+  whitelistVoters: string[],
+  gsnForwarder?: string,
 }
 
 export interface DaoConfig {

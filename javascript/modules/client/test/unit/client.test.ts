@@ -1,6 +1,13 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientDaoERC20Voting, ClientDaoWhitelistVoting, Context, ContextParams } from "../../src";
+import {
+  ClientDaoERC20Voting,
+  ClientDaoWhitelistVoting,
+  Context,
+  ContextParams,
+  ICreateDaoERC20Voting,
+  ICreateDaoWhitelistVoting
+} from "../../src";
 
 const web3endpoints = {
   working: [
@@ -79,16 +86,29 @@ describe("Client instances", () => {
     expect(client).toBeInstanceOf(ClientDaoERC20Voting);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
-    const newDaoAddress = await client.dao.create(
-      { name: 'test' + Math.random().toString(), metadata: '0x1111' },
-      { addr: '0x0000000000000000000000000000000000000000', name: 'TestMVM', symbol: 'MVM' },
-      {
-        receivers: ['0x71EeDbe7c99d08C9755579f2c312C8E2755F165F', '0xc95D9623E8FDc248C61152bAC87c2f914FEB7b13'],
-        amounts: [BigInt(1), BigInt(1)]
+    const daoCreationParams: ICreateDaoERC20Voting = {
+      daoConfig: {
+        name: 'ERC20VotingDAO_' + Math.floor(Math.random() * 9999) + 1,
+        metadata: '0x1234'
       },
-      [BigInt(10), BigInt(10), BigInt(10)],
-      '0x71EeDbe7c99d08C9755579f2c312C8E2755F165F'
-    )
+      tokenConfig: {
+        addr: '0x0000000000000000000000000000000000000000',
+        name: 'TestToken' + (Math.random() + 1).toString(36).substring(4).toUpperCase(),
+        symbol: 'TEST' + (Math.random() + 1).toString(36).substring(4).toUpperCase()
+      },
+      mintConfig: {
+        receivers: [Wallet.createRandom().address, Wallet.createRandom().address],
+        amounts: [BigInt(Math.floor(Math.random() * 9999) + 1), BigInt(Math.floor(Math.random() * 9999) + 1)]
+      },
+      votingConfig: [
+        BigInt(Math.floor(Math.random() * 100) + 1),
+        BigInt(Math.floor(Math.random() * 100) + 1),
+        BigInt(Math.floor(Math.random() * 9999) + 1)
+      ],
+      gsnForwarder: Wallet.createRandom().address
+    }
+
+    const newDaoAddress = await client.dao.create(daoCreationParams);
 
     expect(typeof newDaoAddress).toBe("string")
     expect(newDaoAddress.length).toBe(42)
@@ -106,12 +126,24 @@ describe("Client instances", () => {
     expect(client).toBeInstanceOf(ClientDaoWhitelistVoting);
     expect(client.web3).toBeInstanceOf(JsonRpcProvider);
 
-    const newDaoAddress = await client.dao.create(
-      { name: 'test' + Math.random().toString(), metadata: '0x1111' },
-        [BigInt(10), BigInt(10), BigInt(10)],
-    ['0x71EeDbe7c99d08C9755579f2c312C8E2755F165F', '0xc95D9623E8FDc248C61152bAC87c2f914FEB7b13'],
-      '0x71EeDbe7c99d08C9755579f2c312C8E2755F165F'
-    )
+    const daoCreationParams: ICreateDaoWhitelistVoting = {
+      daoConfig: {
+        name: 'WhitelistVotingDAO_' + Math.floor(Math.random() * 9999) + 1,
+        metadata: '0x1234'
+      },
+      votingConfig: [
+        BigInt(Math.floor(Math.random() * 100) + 1),
+        BigInt(Math.floor(Math.random() * 100) + 1),
+        BigInt(Math.floor(Math.random() * 9999) + 1)
+      ],
+      whitelistVoters: [
+        Wallet.createRandom().address,
+        Wallet.createRandom().address
+      ],
+      gsnForwarder: Wallet.createRandom().address
+    }
+
+    const newDaoAddress = await client.dao.create(daoCreationParams)
 
     expect(typeof newDaoAddress).toBe("string")
     expect(newDaoAddress.length).toBe(42)
