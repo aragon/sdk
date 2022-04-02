@@ -13,21 +13,10 @@ import {
   Registry__factory,
   TokenFactory
 } from "@aragon/core-contracts-ethers";
-import { Context } from "./context";
 import { BigNumberish } from "@ethersproject/bignumber";
 
 export class ClientDaoERC20Voting extends ClientCore
   implements IClientDaoBase, IClientDaoERC20Voting {
-
-  private _daoFactoryAddress = "";
-
-  constructor(context: Context) {
-    super(context);
-
-    if (context.daoFactoryAddress) {
-      this._daoFactoryAddress = context.daoFactoryAddress;
-    }
-  }
 
   /** DAO related methods */
   dao = {
@@ -39,7 +28,7 @@ export class ClientDaoERC20Voting extends ClientCore
       _gsnForwarder?: string,
     ): Promise<string> => {
       if(!this.signer) throw new Error("A signer is needed for creating a DAO");
-      const daoFactoryContract = DAOFactory__factory.connect(this._daoFactoryAddress, this.signer.connect(this.web3));
+      const daoFactoryContract = DAOFactory__factory.connect(this.daoFactoryAddress, this.signer.connect(this.web3));
 
       const registry = await daoFactoryContract.registry()
         .then(registryAddress => {
@@ -118,16 +107,6 @@ export class ClientDaoERC20Voting extends ClientCore
 export class ClientDaoWhitelistVoting extends ClientCore
   implements IClientDaoBase, IClientDaoWhitelistVoting {
 
-  private _daoFactoryAddress = "";
-
-  constructor(context: Context) {
-    super(context);
-
-    if (context.daoFactoryAddress) {
-      this._daoFactoryAddress = context.daoFactoryAddress;
-    }
-  }
-
   /** DAO related methods */
   dao = {
     create: async (
@@ -137,7 +116,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
         _gsnForwarder?: string,
     ): Promise<string> => {
       if(!this.signer) throw new Error("A signer is needed for creating a DAO");
-      const daoFactoryContract = DAOFactory__factory.connect(this._daoFactoryAddress, this.signer.connect(this.web3));
+      const daoFactoryContract = DAOFactory__factory.connect(this.daoFactoryAddress, this.signer.connect(this.web3));
 
       const registry = await daoFactoryContract.registry()
           .then(registryAddress => {

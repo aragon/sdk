@@ -9,6 +9,7 @@ export abstract class ClientCore implements IClientCore {
   private _web3Providers: JsonRpcProvider[] = [];
   private _web3Idx = -1;
   private _signer: Signer | undefined;
+  private _daoFactoryAddress = "";
 
   constructor(context: Context) {
     if (context.web3Providers) {
@@ -18,6 +19,10 @@ export abstract class ClientCore implements IClientCore {
 
     if (context.signer) {
       this.useSigner(context.signer);
+    }
+
+    if (context.daoFactoryAddress) {
+      this._daoFactoryAddress = context.daoFactoryAddress;
     }
   }
 
@@ -54,6 +59,10 @@ export abstract class ClientCore implements IClientCore {
 
   get web3() {
     return this._web3Providers[this._web3Idx] || null;
+  }
+
+  get daoFactoryAddress() {
+    return this._daoFactoryAddress;
   }
 
   public async checkWeb3Status(): Promise<boolean> {
