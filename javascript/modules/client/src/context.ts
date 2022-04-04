@@ -3,9 +3,9 @@ import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
 // import { create as ipfsCreate, Options as IpfsOptions } from "ipfs-http-client";
 // import { GraphQLClient } from "graphql-request";
-export { ContextParams } from "./internal/interfaces/context"
+export { ContextParams } from "./internal/interfaces/context";
 
-const supportedProtocols = ["http:", "https:"];
+const supportedProtocols = ["https:"];
 
 // State
 let defaultState: ContextState = {

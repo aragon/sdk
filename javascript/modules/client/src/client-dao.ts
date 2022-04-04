@@ -3,48 +3,60 @@ import {
   DaoConfig,
   DaoRole,
   IClientDaoBase,
-  IClientDaoERC20Voting, ICreateDaoERC20Voting,
-  IClientDaoWhitelistVoting, ICreateDaoWhitelistVoting,
+  IClientDaoERC20Voting,
+  ICreateDaoERC20Voting,
+  IClientDaoWhitelistVoting,
+  ICreateDaoWhitelistVoting,
   VotingConfig,
 } from "./internal/interfaces/dao";
 import {
   DAOFactory__factory,
-  Registry__factory
+  Registry__factory,
 } from "@aragon/core-contracts-ethers";
+import { DeferredPromise } from "@aragon/sdk-common";
 
-export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting }
+export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
 
 export class ClientDaoERC20Voting extends ClientCore
   implements IClientDaoBase, IClientDaoERC20Voting {
-
   /** DAO related methods */
   dao = {
     create: async (params: ICreateDaoERC20Voting): Promise<string> => {
-      if(!this.signer) throw new Error("A signer is needed for creating a DAO");
-      const daoFactoryContract = DAOFactory__factory.connect(this.daoFactoryAddress, this.signer.connect(this.web3));
+      if (!this.signer)
+        throw new Error("A signer is needed for creating a DAO");
+      const daoFactoryInstance = DAOFactory__factory.connect(
+        this.daoFactoryAddress,
+        this.signer.connect(this.web3)
+      );
 
-      const registry = await daoFactoryContract.registry()
+      const registry = await daoFactoryInstance
+        .registry()
         .then(registryAddress => {
-          return Registry__factory.connect(registryAddress, this.web3)
+          return Registry__factory.connect(registryAddress, this.web3);
         });
 
-      let daoAddress = ''
+      const newDaoRegisteredAddress = new DeferredPromise<string>();
       registry.on("NewDAORegistered", (dao: string) => {
-        daoAddress = dao;
-      })
+        newDaoRegisteredAddress.resolve(dao);
+      });
 
-      return daoFactoryContract.newERC20VotingDAO(
-          params.daoConfig, params.votingConfig, params.tokenConfig, params.mintConfig, params.gsnForwarder ?? ''
-      )
+      return daoFactoryInstance
+        .newERC20VotingDAO(
+          params.daoConfig,
+          params.votingConfig,
+          params.tokenConfig,
+          params.mintConfig,
+          params.gsnForwarder ?? ""
+        )
         .then(tx => tx.wait())
-        .then(() => daoAddress);
+        .then(() => newDaoRegisteredAddress);
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
     hasPermission: (
       _where: string,
       _who: string,
       _role: DaoRole,
-      _data: Uint8Array,
+      _data: Uint8Array
     ) => {
       // TODO: Not implemented
       return Promise.resolve();
@@ -55,7 +67,7 @@ export class ClientDaoERC20Voting extends ClientCore
         _startDate: number,
         _endDate: number,
         _executeApproved?: boolean,
-        _voteOnCreation?: boolean,
+        _voteOnCreation?: boolean
       ): Promise<string> => {
         // TODO: Not implemented
         return Promise.resolve("0x1234567890123456789012345678901234567890");
@@ -74,7 +86,7 @@ export class ClientDaoERC20Voting extends ClientCore
       },
       setVotingConfig: (
         _address: string,
-        _config: VotingConfig,
+        _config: VotingConfig
       ): Promise<void> => {
         // TODO: Not implemented
         return Promise.resolve();
@@ -99,35 +111,43 @@ export class ClientDaoERC20Voting extends ClientCore
 
 export class ClientDaoWhitelistVoting extends ClientCore
   implements IClientDaoBase, IClientDaoWhitelistVoting {
-
   /** DAO related methods */
   dao = {
     create: async (params: ICreateDaoWhitelistVoting): Promise<string> => {
-      if(!this.signer) throw new Error("A signer is needed for creating a DAO");
-      const daoFactoryContract = DAOFactory__factory.connect(this.daoFactoryAddress, this.signer.connect(this.web3));
+      if (!this.signer)
+        throw new Error("A signer is needed for creating a DAO");
+      const daoFactoryInstance = DAOFactory__factory.connect(
+        this.daoFactoryAddress,
+        this.signer.connect(this.web3)
+      );
 
-      const registry = await daoFactoryContract.registry()
-          .then(registryAddress => {
-            return Registry__factory.connect(registryAddress, this.web3)
-          });
+      const registry = await daoFactoryInstance
+        .registry()
+        .then(registryAddress => {
+          return Registry__factory.connect(registryAddress, this.web3);
+        });
 
-      let daoAddress = ''
+      const newDaoRegisteredAddress = new DeferredPromise<string>();
       registry.on("NewDAORegistered", (dao: string) => {
-        daoAddress = dao;
-      })
+        newDaoRegisteredAddress.resolve(dao);
+      });
 
-      return daoFactoryContract.newWhitelistVotingDAO(
-          params.daoConfig, params.votingConfig, params.whitelistVoters, params.gsnForwarder ?? ''
-      )
-          .then(tx => tx.wait())
-          .then(() => daoAddress);
+      return daoFactoryInstance
+        .newWhitelistVotingDAO(
+          params.daoConfig,
+          params.votingConfig,
+          params.whitelistVoters,
+          params.gsnForwarder ?? ""
+        )
+        .then(tx => tx.wait())
+        .then(() => newDaoRegisteredAddress);
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
     hasPermission: (
       _where: string,
       _who: string,
       _role: DaoRole,
-      _data: Uint8Array,
+      _data: Uint8Array
     ) => {
       // TODO: Not implemented
       return Promise.resolve();
@@ -138,7 +158,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
         _startDate: number,
         _endDate: number,
         _executeApproved?: boolean,
-        _voteOnCreation?: boolean,
+        _voteOnCreation?: boolean
       ): Promise<string> => {
         // TODO: Not implemented
         return Promise.resolve("0x1234567890123456789012345678901234567890");
@@ -157,7 +177,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
       },
       setVotingConfig: (
         _address: string,
-        _config: VotingConfig,
+        _config: VotingConfig
       ): Promise<void> => {
         // TODO: Not implemented
         return Promise.resolve();

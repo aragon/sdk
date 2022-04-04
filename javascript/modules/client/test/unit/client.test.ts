@@ -6,7 +6,7 @@ import {
   Context,
   ContextParams,
   ICreateDaoERC20Voting,
-  ICreateDaoWhitelistVoting
+  ICreateDaoWhitelistVoting,
 } from "../../src";
 
 const web3endpoints = {
@@ -30,55 +30,88 @@ const contextParams: ContextParams = {
 
 describe("Client instances", () => {
   it("Should create an empty client", () => {
-    const client = new ClientDaoERC20Voting({} as Context);
+    const clientDaoERC20Voting = new ClientDaoERC20Voting({} as Context);
+    const clientDaoWhitelistVoting = new ClientDaoWhitelistVoting(
+      {} as Context
+    );
 
-    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
+    expect(clientDaoERC20Voting).toBeInstanceOf(ClientDaoERC20Voting);
+    expect(clientDaoWhitelistVoting).toBeInstanceOf(ClientDaoWhitelistVoting);
   });
   it("Should create a working client", async () => {
     const context = new Context(contextParams);
-    const client = new ClientDaoERC20Voting(context);
+    const clientDaoERC20Voting = new ClientDaoERC20Voting(context);
+    const clientDaoWhitelistVoting = new ClientDaoWhitelistVoting(context);
 
-    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
-    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+    expect(clientDaoERC20Voting).toBeInstanceOf(ClientDaoERC20Voting);
+    expect(clientDaoWhitelistVoting).toBeInstanceOf(ClientDaoWhitelistVoting);
 
-    const status = await client.checkWeb3Status();
-    expect(status).toEqual(true);
+    expect(clientDaoERC20Voting.web3).toBeInstanceOf(JsonRpcProvider);
+    expect(clientDaoWhitelistVoting.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const clientDaoERC20VotingStatus = await clientDaoERC20Voting.checkWeb3Status();
+    expect(clientDaoERC20VotingStatus).toEqual(true);
+
+    const clientDaoWhitelistVotingStatus = await clientDaoWhitelistVoting.checkWeb3Status();
+    expect(clientDaoWhitelistVotingStatus).toEqual(true);
   });
   it("Should create a failing client", async () => {
     contextParams.web3Providers = web3endpoints.failing;
     const context = new Context(contextParams);
-    const client = new ClientDaoERC20Voting(context);
+    const clientDaoERC20Voting = new ClientDaoERC20Voting(context);
+    const clientDaoWhitelistVoting = new ClientDaoWhitelistVoting(context);
 
-    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
-    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+    expect(clientDaoERC20Voting).toBeInstanceOf(ClientDaoERC20Voting);
+    expect(clientDaoWhitelistVoting).toBeInstanceOf(ClientDaoWhitelistVoting);
 
-    const status = await client.checkWeb3Status();
-    expect(status).toEqual(false);
+    expect(clientDaoERC20Voting.web3).toBeInstanceOf(JsonRpcProvider);
+    expect(clientDaoWhitelistVoting.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const clientDaoERC20VotingStatus = await clientDaoERC20Voting.checkWeb3Status();
+    expect(clientDaoERC20VotingStatus).toEqual(false);
+
+    const clientDaoWhitelistVotingStatus = await clientDaoWhitelistVoting.checkWeb3Status();
+    expect(clientDaoWhitelistVotingStatus).toEqual(false);
   });
   it("Should create a client, fail and shift to a working endpoint", async () => {
     contextParams.web3Providers = web3endpoints.failing.concat(
-      web3endpoints.working,
+      web3endpoints.working
     );
     const context = new Context(contextParams);
-    const client = new ClientDaoERC20Voting(context);
+    const clientDaoERC20Voting = new ClientDaoERC20Voting(context);
+    const clientDaoWhitelistVoting = new ClientDaoWhitelistVoting(context);
 
-    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
-    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+    expect(clientDaoERC20Voting).toBeInstanceOf(ClientDaoERC20Voting);
+    expect(clientDaoWhitelistVoting).toBeInstanceOf(ClientDaoWhitelistVoting);
 
-    await client
+    expect(clientDaoERC20Voting.web3).toBeInstanceOf(JsonRpcProvider);
+    expect(clientDaoWhitelistVoting.web3).toBeInstanceOf(JsonRpcProvider);
+
+    await clientDaoERC20Voting
       .checkWeb3Status()
-      .then((isUp) => {
+      .then(isUp => {
         expect(isUp).toEqual(false);
-        return client.shiftWeb3Node().checkWeb3Status();
+        return clientDaoERC20Voting.shiftWeb3Node().checkWeb3Status();
       })
-      .then((isUp) => {
+      .then(isUp => {
+        expect(isUp).toEqual(true);
+      });
+
+    await clientDaoWhitelistVoting
+      .checkWeb3Status()
+      .then(isUp => {
+        expect(isUp).toEqual(false);
+        return clientDaoWhitelistVoting.shiftWeb3Node().checkWeb3Status();
+      })
+      .then(isUp => {
         expect(isUp).toEqual(true);
       });
   });
   it("Should create a ERC20VotingDAO locally", async () => {
-    contextParams.network = 31337
-    contextParams.web3Providers = ["http://localhost:8545"]
-    contextParams.daoFactoryAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+    contextParams.network = 31337;
+    contextParams.web3Providers = ["http://localhost:8545"];
+    contextParams.daoFactoryAddress =
+      "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 
     const context = new Context(contextParams);
     const client = new ClientDaoERC20Voting(context);
@@ -88,37 +121,54 @@ describe("Client instances", () => {
 
     const daoCreationParams: ICreateDaoERC20Voting = {
       daoConfig: {
-        name: 'ERC20VotingDAO_' + Math.floor(Math.random() * 9999) + 1,
-        metadata: '0x1234'
+        name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+        metadata: "0x1234",
       },
       tokenConfig: {
-        addr: '0x0000000000000000000000000000000000000000',
-        name: 'TestToken' + (Math.random() + 1).toString(36).substring(4).toUpperCase(),
-        symbol: 'TEST' + (Math.random() + 1).toString(36).substring(4).toUpperCase()
+        addr: "0x0000000000000000000000000000000000000000",
+        name:
+          "TestToken" +
+          (Math.random() + 1)
+            .toString(36)
+            .substring(4)
+            .toUpperCase(),
+        symbol:
+          "TEST" +
+          (Math.random() + 1)
+            .toString(36)
+            .substring(4)
+            .toUpperCase(),
       },
       mintConfig: {
-        receivers: [Wallet.createRandom().address, Wallet.createRandom().address],
-        amounts: [BigInt(Math.floor(Math.random() * 9999) + 1), BigInt(Math.floor(Math.random() * 9999) + 1)]
+        receivers: [
+          Wallet.createRandom().address,
+          Wallet.createRandom().address,
+        ],
+        amounts: [
+          BigInt(Math.floor(Math.random() * 9999) + 1),
+          BigInt(Math.floor(Math.random() * 9999) + 1),
+        ],
       },
       votingConfig: [
         BigInt(Math.floor(Math.random() * 100) + 1),
         BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 9999) + 1)
+        BigInt(Math.floor(Math.random() * 9999) + 1),
       ],
-      gsnForwarder: Wallet.createRandom().address
-    }
+      gsnForwarder: Wallet.createRandom().address,
+    };
 
     const newDaoAddress = await client.dao.create(daoCreationParams);
 
-    expect(typeof newDaoAddress).toBe("string")
-    expect(newDaoAddress.length).toBe(42)
-    expect(newDaoAddress).toContain("0x")
-    expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i)
+    expect(typeof newDaoAddress).toBe("string");
+    expect(newDaoAddress.length).toBe(42);
+    expect(newDaoAddress).toContain("0x");
+    expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i);
   });
   it("Should create a WhitelistVoting locally", async () => {
-    contextParams.network = 31337
-    contextParams.web3Providers = ["http://localhost:8545"]
-    contextParams.daoFactoryAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+    contextParams.network = 31337;
+    contextParams.web3Providers = ["http://localhost:8545"];
+    contextParams.daoFactoryAddress =
+      "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 
     const context = new Context(contextParams);
     const client = new ClientDaoWhitelistVoting(context);
@@ -128,26 +178,26 @@ describe("Client instances", () => {
 
     const daoCreationParams: ICreateDaoWhitelistVoting = {
       daoConfig: {
-        name: 'WhitelistVotingDAO_' + Math.floor(Math.random() * 9999) + 1,
-        metadata: '0x1234'
+        name: "WhitelistVotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+        metadata: "0x1234",
       },
       votingConfig: [
         BigInt(Math.floor(Math.random() * 100) + 1),
         BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 9999) + 1)
+        BigInt(Math.floor(Math.random() * 9999) + 1),
       ],
       whitelistVoters: [
         Wallet.createRandom().address,
-        Wallet.createRandom().address
+        Wallet.createRandom().address,
       ],
-      gsnForwarder: Wallet.createRandom().address
-    }
+      gsnForwarder: Wallet.createRandom().address,
+    };
 
-    const newDaoAddress = await client.dao.create(daoCreationParams)
+    const newDaoAddress = await client.dao.create(daoCreationParams);
 
-    expect(typeof newDaoAddress).toBe("string")
-    expect(newDaoAddress.length).toBe(42)
-    expect(newDaoAddress).toContain("0x")
-    expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i)
+    expect(typeof newDaoAddress).toBe("string");
+    expect(newDaoAddress.length).toBe(42);
+    expect(newDaoAddress).toContain("0x");
+    expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i);
   });
 });
