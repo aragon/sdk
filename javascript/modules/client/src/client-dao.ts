@@ -13,7 +13,6 @@ import {
   DAOFactory__factory,
   Registry__factory,
 } from "@aragon/core-contracts-ethers";
-import { DeferredPromise } from "@aragon/sdk-common";
 
 export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
 
@@ -29,16 +28,11 @@ export class ClientDaoERC20Voting extends ClientCore
         this.signer.connect(this.web3)
       );
 
-      const registry = await daoFactoryInstance
+      const registryInstance = await daoFactoryInstance
         .registry()
         .then(registryAddress => {
           return Registry__factory.connect(registryAddress, this.web3);
         });
-
-      const newDaoRegisteredAddress = new DeferredPromise<string>();
-      registry.on("NewDAORegistered", (dao: string) => {
-        newDaoRegisteredAddress.resolve(dao);
-      });
 
       return daoFactoryInstance
         .newERC20VotingDAO(
@@ -49,7 +43,15 @@ export class ClientDaoERC20Voting extends ClientCore
           params.gsnForwarder ?? ""
         )
         .then(tx => tx.wait())
-        .then(() => newDaoRegisteredAddress);
+        .then(cr => {
+          const newDaoAddress = cr.events?.find(
+            e => e.address === registryInstance.address
+          )?.topics[1];
+          if (newDaoAddress)
+            return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
+
+          throw new Error("Could not create DAO");
+        });
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
     hasPermission: (
@@ -121,16 +123,11 @@ export class ClientDaoWhitelistVoting extends ClientCore
         this.signer.connect(this.web3)
       );
 
-      const registry = await daoFactoryInstance
+      const registryInstance = await daoFactoryInstance
         .registry()
         .then(registryAddress => {
           return Registry__factory.connect(registryAddress, this.web3);
         });
-
-      const newDaoRegisteredAddress = new DeferredPromise<string>();
-      registry.on("NewDAORegistered", (dao: string) => {
-        newDaoRegisteredAddress.resolve(dao);
-      });
 
       return daoFactoryInstance
         .newWhitelistVotingDAO(
@@ -140,7 +137,15 @@ export class ClientDaoWhitelistVoting extends ClientCore
           params.gsnForwarder ?? ""
         )
         .then(tx => tx.wait())
-        .then(() => newDaoRegisteredAddress);
+        .then(cr => {
+          const newDaoAddress = cr.events?.find(
+            e => e.address === registryInstance.address
+          )?.topics[1];
+          if (newDaoAddress)
+            return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
+
+          throw new Error("Could not create DAO");
+        });
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
     hasPermission: (
