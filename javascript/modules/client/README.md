@@ -35,7 +35,7 @@ const daoCreationParams: ICreateDaoERC20Voting = {
         metadata: "0x1234",
     },
     tokenConfig: {
-        addr: "0x0000000000000000000000000000000000000000",
+        address: "0x0000000000000000000000000000000000000000",
         name:
             "TestToken" +
             (Math.random() + 1)
@@ -49,21 +49,21 @@ const daoCreationParams: ICreateDaoERC20Voting = {
                 .substring(4)
                 .toUpperCase(),
     },
-    mintConfig: {
-        receivers: [
-            Wallet.createRandom().address,
-            Wallet.createRandom().address,
-        ],
-        amounts: [
-            BigInt(Math.floor(Math.random() * 9999) + 1),
-            BigInt(Math.floor(Math.random() * 9999) + 1),
-        ],
-    },
-    votingConfig: [
-        BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 9999) + 1),
+    mintConfig: [
+        {
+            address: Wallet.createRandom().address,
+            balance: BigInt(Math.floor(Math.random() * 9999) + 1),
+        },
+        {
+            address: Wallet.createRandom().address,
+            balance: BigInt(Math.floor(Math.random() * 9999) + 1),
+        },
     ],
+    votingConfig: {
+        minSupport: Math.floor(Math.random() * 100) + 1,
+        minParticipation: Math.floor(Math.random() * 100) + 1,
+        minDuration: Math.floor(Math.random() * 9999) + 1,
+    },
     gsnForwarder: Wallet.createRandom().address,
 };
 
@@ -90,11 +90,11 @@ const daoCreationParams: ICreateDaoWhitelistVoting = {
         name: "WhitelistVotingDAO_" + Math.floor(Math.random() * 9999) + 1,
         metadata: "0x1234",
     },
-    votingConfig: [
-        BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 9999) + 1),
-    ],
+    votingConfig: {
+        minSupport: Math.floor(Math.random() * 100) + 1,
+        minParticipation: Math.floor(Math.random() * 100) + 1,
+        minDuration: Math.floor(Math.random() * 9999) + 1,
+    },
     whitelistVoters: [
         Wallet.createRandom().address,
         Wallet.createRandom().address,
