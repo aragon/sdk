@@ -37,9 +37,20 @@ export class ClientDaoERC20Voting extends ClientCore
       return daoFactoryInstance
         .newERC20VotingDAO(
           params.daoConfig,
-          params.votingConfig,
-          params.tokenConfig,
-          params.mintConfig,
+          [
+            BigInt(params.votingConfig.minParticipation),
+            BigInt(params.votingConfig.minSupport),
+            BigInt(params.votingConfig.minDuration),
+          ],
+          {
+            addr: params.tokenConfig.address,
+            name: params.tokenConfig.name,
+            symbol: params.tokenConfig.symbol,
+          },
+          {
+            receivers: params.mintConfig.map(receiver => receiver.address),
+            amounts: params.mintConfig.map(receiver => receiver.balance),
+          },
           params.gsnForwarder ?? ""
         )
         .then(tx => tx.wait())
@@ -47,10 +58,9 @@ export class ClientDaoERC20Voting extends ClientCore
           const newDaoAddress = cr.events?.find(
             e => e.address === registryInstance.address
           )?.topics[1];
-          if (newDaoAddress)
-            return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
+          if (!newDaoAddress) throw new Error("Could not create DAO");
 
-          throw new Error("Could not create DAO");
+          return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
         });
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
@@ -132,7 +142,11 @@ export class ClientDaoWhitelistVoting extends ClientCore
       return daoFactoryInstance
         .newWhitelistVotingDAO(
           params.daoConfig,
-          params.votingConfig,
+          [
+            BigInt(params.votingConfig.minParticipation),
+            BigInt(params.votingConfig.minSupport),
+            BigInt(params.votingConfig.minDuration),
+          ],
           params.whitelistVoters,
           params.gsnForwarder ?? ""
         )
@@ -141,10 +155,9 @@ export class ClientDaoWhitelistVoting extends ClientCore
           const newDaoAddress = cr.events?.find(
             e => e.address === registryInstance.address
           )?.topics[1];
-          if (newDaoAddress)
-            return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
+          if (!newDaoAddress) throw new Error("Could not create DAO");
 
-          throw new Error("Could not create DAO");
+          return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
         });
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */

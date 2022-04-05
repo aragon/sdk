@@ -1,6 +1,4 @@
 import { IClientCore } from "./client-core";
-import { DAOFactory, TokenFactory } from "@aragon/core-contracts-ethers";
-import { BigNumberish } from "@ethersproject/bignumber";
 
 export interface IClientDaoBase extends IClientCore {
   dao: {
@@ -65,17 +63,18 @@ export enum DaoRole {
   SET_SIGNATURE_VALIDATOR_ROLE = "SET_SIGNATURE_VALIDATOR_ROLE",
 }
 
+/** Global settings applied to the organization */
 export interface ICreateDaoERC20Voting {
-  daoConfig: DAOFactory.DAOConfigStruct;
-  tokenConfig: TokenFactory.TokenConfigStruct;
-  mintConfig: TokenFactory.MintConfigStruct;
-  votingConfig: [BigNumberish, BigNumberish, BigNumberish];
+  daoConfig: DaoConfig;
+  tokenConfig: TokenConfig;
+  mintConfig: MintConfig[];
+  votingConfig: VotingConfig;
   gsnForwarder?: string;
 }
 
 export interface ICreateDaoWhitelistVoting {
-  daoConfig: DAOFactory.DAOConfigStruct;
-  votingConfig: [BigNumberish, BigNumberish, BigNumberish];
+  daoConfig: DaoConfig;
+  votingConfig: VotingConfig;
   whitelistVoters: string[];
   gsnForwarder?: string;
 }
@@ -86,17 +85,16 @@ export interface DaoConfig {
 }
 
 export interface TokenConfig {
-  addr: string;
+  address: string;
   name: string;
   symbol: string;
 }
 
 export interface MintConfig {
-  receivers: string[];
-  amounts: bigint[];
+  address: string;
+  balance: bigint;
 }
 
-/** Global settings applied to the organization */
 export interface VotingConfig {
   /** 0-100 as a percentage */
   minSupport: number;

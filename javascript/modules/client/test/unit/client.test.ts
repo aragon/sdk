@@ -28,6 +28,14 @@ const contextParams: ContextParams = {
   web3Providers: web3endpoints.working,
 };
 
+const contextParamsLocalChain: ContextParams = {
+  network: 31337,
+  signer: new Wallet(TEST_WALLET),
+  dao: "0x1234567890123456789012345678901234567890",
+  daoFactoryAddress: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+  web3Providers: ["http://localhost:8545"],
+};
+
 describe("Client instances", () => {
   it("Should create an empty client", () => {
     const clientDaoERC20Voting = new ClientDaoERC20Voting({} as Context);
@@ -108,12 +116,7 @@ describe("Client instances", () => {
       });
   });
   it("Should create a ERC20VotingDAO locally", async () => {
-    contextParams.network = 31337;
-    contextParams.web3Providers = ["http://localhost:8545"];
-    contextParams.daoFactoryAddress =
-      "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
-
-    const context = new Context(contextParams);
+    const context = new Context(contextParamsLocalChain);
     const client = new ClientDaoERC20Voting(context);
 
     expect(client).toBeInstanceOf(ClientDaoERC20Voting);
@@ -125,7 +128,7 @@ describe("Client instances", () => {
         metadata: "0x1234",
       },
       tokenConfig: {
-        addr: "0x0000000000000000000000000000000000000000",
+        address: "0x0000000000000000000000000000000000000000",
         name:
           "TestToken" +
           (Math.random() + 1)
@@ -139,21 +142,21 @@ describe("Client instances", () => {
             .substring(4)
             .toUpperCase(),
       },
-      mintConfig: {
-        receivers: [
-          Wallet.createRandom().address,
-          Wallet.createRandom().address,
-        ],
-        amounts: [
-          BigInt(Math.floor(Math.random() * 9999) + 1),
-          BigInt(Math.floor(Math.random() * 9999) + 1),
-        ],
-      },
-      votingConfig: [
-        BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 9999) + 1),
+      mintConfig: [
+        {
+          address: Wallet.createRandom().address,
+          balance: BigInt(Math.floor(Math.random() * 9999) + 1),
+        },
+        {
+          address: Wallet.createRandom().address,
+          balance: BigInt(Math.floor(Math.random() * 9999) + 1),
+        },
       ],
+      votingConfig: {
+        minSupport: Math.floor(Math.random() * 100) + 1,
+        minParticipation: Math.floor(Math.random() * 100) + 1,
+        minDuration: Math.floor(Math.random() * 9999) + 1,
+      },
       gsnForwarder: Wallet.createRandom().address,
     };
 
@@ -165,12 +168,7 @@ describe("Client instances", () => {
     expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i);
   });
   it("Should create a WhitelistVoting locally", async () => {
-    contextParams.network = 31337;
-    contextParams.web3Providers = ["http://localhost:8545"];
-    contextParams.daoFactoryAddress =
-      "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
-
-    const context = new Context(contextParams);
+    const context = new Context(contextParamsLocalChain);
     const client = new ClientDaoWhitelistVoting(context);
 
     expect(client).toBeInstanceOf(ClientDaoWhitelistVoting);
@@ -181,11 +179,11 @@ describe("Client instances", () => {
         name: "WhitelistVotingDAO_" + Math.floor(Math.random() * 9999) + 1,
         metadata: "0x1234",
       },
-      votingConfig: [
-        BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 100) + 1),
-        BigInt(Math.floor(Math.random() * 9999) + 1),
-      ],
+      votingConfig: {
+        minSupport: Math.floor(Math.random() * 100) + 1,
+        minParticipation: Math.floor(Math.random() * 100) + 1,
+        minDuration: Math.floor(Math.random() * 9999) + 1,
+      },
       whitelistVoters: [
         Wallet.createRandom().address,
         Wallet.createRandom().address,
