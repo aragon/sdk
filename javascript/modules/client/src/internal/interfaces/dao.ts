@@ -2,31 +2,25 @@ import { IClientCore } from "./client-core";
 
 export interface IClientDaoBase extends IClientCore {
   dao: {
-    create(
-      daoConfig: DaoConfig,
-      tokenConfig: TokenConfig,
-      mintConfig: MintConfig,
-      votingConfig: VotingConfig,
-      gsnForwarder?: string,
-    ): Promise<string>;
     /** Checks whether a role is granted by the curren DAO's ACL settings */
     hasPermission: (
       where: string,
       who: string,
       role: DaoRole,
-      data: Uint8Array,
+      data: Uint8Array
     ) => Promise<void>;
   };
 }
 
-export interface IClientDaoWhitelist extends IClientCore {
+export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
-    whitelist: {
+    create: (params: ICreateDaoERC20Voting) => Promise<string>;
+    simpleVote: {
       createProposal: (
         startDate: number,
         endDate: number,
         executeApproved?: boolean,
-        voteOnCreation?: boolean,
+        voteOnCreation?: boolean
       ) => Promise<string>;
       voteProposal: (proposalId: string, approve: boolean) => Promise<void>;
       executeProposal: (proposalId: string) => Promise<void>;
@@ -36,14 +30,15 @@ export interface IClientDaoWhitelist extends IClientCore {
   };
 }
 
-export interface IClientDaoSimpleVote extends IClientCore {
+export interface IClientDaoWhitelistVoting extends IClientCore {
   dao: {
-    simpleVote: {
+    create: (params: ICreateDaoWhitelistVoting) => Promise<string>;
+    whitelist: {
       createProposal: (
         startDate: number,
         endDate: number,
         executeApproved?: boolean,
-        voteOnCreation?: boolean,
+        voteOnCreation?: boolean
       ) => Promise<string>;
       voteProposal: (proposalId: string, approve: boolean) => Promise<void>;
       executeProposal: (proposalId: string) => Promise<void>;
@@ -68,23 +63,38 @@ export enum DaoRole {
   SET_SIGNATURE_VALIDATOR_ROLE = "SET_SIGNATURE_VALIDATOR_ROLE",
 }
 
+/** Global settings applied to the organization */
+export interface ICreateDaoERC20Voting {
+  daoConfig: DaoConfig;
+  tokenConfig: TokenConfig;
+  mintConfig: MintConfig[];
+  votingConfig: VotingConfig;
+  gsnForwarder?: string;
+}
+
+export interface ICreateDaoWhitelistVoting {
+  daoConfig: DaoConfig;
+  votingConfig: VotingConfig;
+  whitelistVoters: string[];
+  gsnForwarder?: string;
+}
+
 export interface DaoConfig {
   name: string;
   metadata: string;
 }
 
 export interface TokenConfig {
-  addr: string;
+  address: string;
   name: string;
   symbol: string;
 }
 
 export interface MintConfig {
-  receivers: string[];
-  amounts: bigint[];
+  address: string;
+  balance: bigint;
 }
 
-/** Global settings applied to the organization */
 export interface VotingConfig {
   /** 0-100 as a percentage */
   minSupport: number;

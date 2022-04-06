@@ -3,52 +3,83 @@ import {
   DaoConfig,
   DaoRole,
   IClientDaoBase,
-  IClientDaoSimpleVote,
-  IClientDaoWhitelist,
-  MintConfig,
-  TokenConfig,
+  IClientDaoERC20Voting,
+  ICreateDaoERC20Voting,
+  IClientDaoWhitelistVoting,
+  ICreateDaoWhitelistVoting,
   VotingConfig,
 } from "./internal/interfaces/dao";
-// import { exampleContractAbi, ExampleContractMethods } from "./internal/abi/dao";
+import {
+  DAOFactory__factory,
+  Registry__factory,
+} from "@aragon/core-contracts-ethers";
 
-export class ClientDaoWhitelist extends ClientCore
-  implements IClientDaoBase, IClientDaoWhitelist {
+export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
+
+export class ClientDaoERC20Voting extends ClientCore
+  implements IClientDaoBase, IClientDaoERC20Voting {
   /** DAO related methods */
   dao = {
-    create: async (
-      _daoConfig: DaoConfig,
-      _tokenConfig: TokenConfig,
-      _mintConfig: MintConfig,
-      _votingConfig: VotingConfig,
-      _gsnForwarder?: string,
-    ): Promise<string> => {
-      // TODO: This is an ethers.js integration example
-      // const instance = this.attachContractExample(
-      //   "0x1234567890123456789012345678901234567890"
-      // );
-      // const tx = await instance.store("0x1234");
-      // await tx.wait();
+    create: async (params: ICreateDaoERC20Voting): Promise<string> => {
+      if (!this.signer)
+        throw new Error("A signer is needed for creating a DAO");
+      const daoFactoryInstance = DAOFactory__factory.connect(
+        this.daoFactoryAddress,
+        this.signer.connect(this.web3)
+      );
 
-      // TODO: Not implemented
-      return Promise.resolve("0x1234567890123456789012345678901234567890");
+      const registryInstance = await daoFactoryInstance
+        .registry()
+        .then(registryAddress => {
+          return Registry__factory.connect(registryAddress, this.web3);
+        });
+
+      return daoFactoryInstance
+        .newERC20VotingDAO(
+          params.daoConfig,
+          [
+            BigInt(params.votingConfig.minParticipation),
+            BigInt(params.votingConfig.minSupport),
+            BigInt(params.votingConfig.minDuration),
+          ],
+          {
+            addr: params.tokenConfig.address,
+            name: params.tokenConfig.name,
+            symbol: params.tokenConfig.symbol,
+          },
+          {
+            receivers: params.mintConfig.map(receiver => receiver.address),
+            amounts: params.mintConfig.map(receiver => receiver.balance),
+          },
+          params.gsnForwarder ?? ""
+        )
+        .then(tx => tx.wait())
+        .then(cr => {
+          const newDaoAddress = cr.events?.find(
+            e => e.address === registryInstance.address
+          )?.topics[1];
+          if (!newDaoAddress) throw new Error("Could not create DAO");
+
+          return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
+        });
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
     hasPermission: (
       _where: string,
       _who: string,
       _role: DaoRole,
-      _data: Uint8Array,
+      _data: Uint8Array
     ) => {
       // TODO: Not implemented
       return Promise.resolve();
     },
 
-    whitelist: {
+    simpleVote: {
       createProposal: (
         _startDate: number,
         _endDate: number,
         _executeApproved?: boolean,
-        _voteOnCreation?: boolean,
+        _voteOnCreation?: boolean
       ): Promise<string> => {
         // TODO: Not implemented
         return Promise.resolve("0x1234567890123456789012345678901234567890");
@@ -67,7 +98,7 @@ export class ClientDaoWhitelist extends ClientCore
       },
       setVotingConfig: (
         _address: string,
-        _config: VotingConfig,
+        _config: VotingConfig
       ): Promise<void> => {
         // TODO: Not implemented
         return Promise.resolve();
@@ -90,44 +121,62 @@ export class ClientDaoWhitelist extends ClientCore
   // }
 }
 
-export class ClientDaoSimpleVote extends ClientCore
-  implements IClientDaoBase, IClientDaoSimpleVote {
+export class ClientDaoWhitelistVoting extends ClientCore
+  implements IClientDaoBase, IClientDaoWhitelistVoting {
   /** DAO related methods */
   dao = {
-    create: async (
-      _daoConfig: DaoConfig,
-      _tokenConfig: TokenConfig,
-      _mintConfig: MintConfig,
-      _votingConfig: VotingConfig,
-      _gsnForwarder?: string,
-    ): Promise<string> => {
-      // TODO: This is an ethers.js integration example
-      // const instance = this.attachContractExample(
-      //   "0x1234567890123456789012345678901234567890"
-      // );
-      // const tx = await instance.store("0x1234");
-      // await tx.wait();
+    create: async (params: ICreateDaoWhitelistVoting): Promise<string> => {
+      if (!this.signer)
+        throw new Error("A signer is needed for creating a DAO");
+      const daoFactoryInstance = DAOFactory__factory.connect(
+        this.daoFactoryAddress,
+        this.signer.connect(this.web3)
+      );
 
-      // TODO: Not implemented
-      return Promise.resolve("0x1234567890123456789012345678901234567890");
+      const registryInstance = await daoFactoryInstance
+        .registry()
+        .then(registryAddress => {
+          return Registry__factory.connect(registryAddress, this.web3);
+        });
+
+      return daoFactoryInstance
+        .newWhitelistVotingDAO(
+          params.daoConfig,
+          [
+            BigInt(params.votingConfig.minParticipation),
+            BigInt(params.votingConfig.minSupport),
+            BigInt(params.votingConfig.minDuration),
+          ],
+          params.whitelistVoters,
+          params.gsnForwarder ?? ""
+        )
+        .then(tx => tx.wait())
+        .then(cr => {
+          const newDaoAddress = cr.events?.find(
+            e => e.address === registryInstance.address
+          )?.topics[1];
+          if (!newDaoAddress) throw new Error("Could not create DAO");
+
+          return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
+        });
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
     hasPermission: (
       _where: string,
       _who: string,
       _role: DaoRole,
-      _data: Uint8Array,
+      _data: Uint8Array
     ) => {
       // TODO: Not implemented
       return Promise.resolve();
     },
 
-    simpleVote: {
+    whitelist: {
       createProposal: (
         _startDate: number,
         _endDate: number,
         _executeApproved?: boolean,
-        _voteOnCreation?: boolean,
+        _voteOnCreation?: boolean
       ): Promise<string> => {
         // TODO: Not implemented
         return Promise.resolve("0x1234567890123456789012345678901234567890");
@@ -146,7 +195,7 @@ export class ClientDaoSimpleVote extends ClientCore
       },
       setVotingConfig: (
         _address: string,
-        _config: VotingConfig,
+        _config: VotingConfig
       ): Promise<void> => {
         // TODO: Not implemented
         return Promise.resolve();

@@ -26,10 +26,10 @@ interface GraphQLContextParams {
 }
 
 export interface ContextParams
-    extends Web3ContextParams,
-        VocdoniContextParams,
-        IpfsContextParams,
-        GraphQLContextParams {}
+  extends Web3ContextParams,
+    VocdoniContextParams,
+    IpfsContextParams,
+    GraphQLContextParams {}
 
 // Context state data
 
