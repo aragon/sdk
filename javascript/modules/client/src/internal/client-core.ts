@@ -57,6 +57,14 @@ export abstract class ClientCore implements IClientCore {
     return this._signer || null;
   }
 
+  get connectedSigner() {
+    if (!this.signer) throw new Error("No signer");
+    else if (!this.signer.provider && !this.web3)
+      throw new Error("No provider");
+
+    return this.signer.provider ? this.signer : this.signer.connect(this.web3);
+  }
+
   get web3() {
     return this._web3Providers[this._web3Idx] || null;
   }

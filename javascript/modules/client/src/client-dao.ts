@@ -25,7 +25,7 @@ export class ClientDaoERC20Voting extends ClientCore
         throw new Error("A signer is needed for creating a DAO");
       const daoFactoryInstance = DAOFactory__factory.connect(
         this.daoFactoryAddress,
-        this.signer.connect(this.web3)
+        this.connectedSigner
       );
 
       const registryInstance = await daoFactoryInstance
@@ -130,7 +130,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
         throw new Error("A signer is needed for creating a DAO");
       const daoFactoryInstance = DAOFactory__factory.connect(
         this.daoFactoryAddress,
-        this.signer.connect(this.web3)
+        this.connectedSigner
       );
 
       const registryInstance = await daoFactoryInstance

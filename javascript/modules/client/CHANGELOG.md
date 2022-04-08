@@ -20,6 +20,19 @@ All notable changes to the javascript client package of the SDK will be document
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.1.0] - 2022-04-02
+## [0.0.3-alpha] - 2022-04-08
+
+### Added
+- Connected signer getter in `ClientCore`.
+
+### Fixed
+- Use of a connected signer in the DAO creation process.
+
+## [0.0.2-alpha] - 2022-04-06
+
+### Fixed
+- Fixed `@aragon/sdk-common` dependency.
+
+## [0.0.1-alpha] - 2022-04-02
 
 First initial version of the client package.
