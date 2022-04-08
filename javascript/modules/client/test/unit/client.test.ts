@@ -57,6 +57,9 @@ describe("Client instances", () => {
     expect(clientDaoERC20Voting.web3).toBeInstanceOf(JsonRpcProvider);
     expect(clientDaoWhitelistVoting.web3).toBeInstanceOf(JsonRpcProvider);
 
+    expect(clientDaoERC20Voting.connectedSigner).toBeInstanceOf(Wallet);
+    expect(clientDaoWhitelistVoting.connectedSigner).toBeInstanceOf(Wallet);
+
     const clientDaoERC20VotingStatus = await clientDaoERC20Voting.checkWeb3Status();
     expect(clientDaoERC20VotingStatus).toEqual(true);
 
@@ -74,6 +77,9 @@ describe("Client instances", () => {
 
     expect(clientDaoERC20Voting.web3).toBeInstanceOf(JsonRpcProvider);
     expect(clientDaoWhitelistVoting.web3).toBeInstanceOf(JsonRpcProvider);
+
+    expect(clientDaoERC20Voting.connectedSigner).toBeInstanceOf(Wallet);
+    expect(clientDaoWhitelistVoting.connectedSigner).toBeInstanceOf(Wallet);
 
     const clientDaoERC20VotingStatus = await clientDaoERC20Voting.checkWeb3Status();
     expect(clientDaoERC20VotingStatus).toEqual(false);
