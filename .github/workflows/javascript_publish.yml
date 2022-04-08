@@ -1,0 +1,43 @@
+name: Javascript Publish
+on:
+  push:
+    paths:
+      - "javascript/**"
+      - ".github/workflows/javascript_publish.yml"
+    branches:
+      - develop
+
+jobs:
+  checkLabels:
+    runs-on: ubuntu-latest
+    steps:
+      - if: contains( github.event.pull_request.labels.*.name, 'fix') || contains( github.event.pull_request.labels.*.name, 'feature') || contains( github.event.pull_request.labels.*.name, 'breaking')
+        run: echo "Labels are OK"
+  publish:
+    needs: [checkLabels]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check labels
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Test
+        uses: ./.github/workflows/javascript_push
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          registry-url: https://registry.npmjs.org/
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Bump patch
+        if: contains( github.event.pull_request.labels.*.name, 'fix')
+        run: yarn version --patch --no-git-tag-version
+      - name: Bump minor
+        if: contains( github.event.pull_request.labels.*.name, 'feature')
+        run: yarn version --minor --no-git-tag-version
+      - name: Bump major
+        if: contains( github.event.pull_request.labels.*.name, 'breaking')
+        run: yarn version --major --no-git-tag-version
+      - name: Publish
+        run: yarn publish --no-git-tag-version
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
