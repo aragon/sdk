@@ -27,17 +27,17 @@ jobs:
         with:
           registry-url: https://registry.npmjs.org/
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
       - name: Bump patch
         if: contains( github.event.pull_request.labels.*.name, 'fix')
-        run: yarn version --patch --no-git-tag-version
+        run: yarn workspaces foreach -p yarn version patch
       - name: Bump minor
         if: contains( github.event.pull_request.labels.*.name, 'feature')
-        run: yarn version --minor --no-git-tag-version
+        run: yarn workspaces foreach -p yarn version minor
       - name: Bump major
         if: contains( github.event.pull_request.labels.*.name, 'breaking')
-        run: yarn version --major --no-git-tag-version
+        run: yarn workspaces foreach -p yarn version major
       - name: Publish
-        run: yarn publish --no-git-tag-version
+        run: yarn workspaces forach -p npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
