@@ -5,3 +5,7 @@ javascript:
 javascript-common:
 - javascript/modules/common/**/*
 - javascript/modules/common/*
+
+javascript-client:
+- javascript/modules/client/**/*
+- javascript/modules/client/*

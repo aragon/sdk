@@ -1,5 +1,12 @@
-name: CI
-on: [push]
+name: Javascript Test
+on:
+  workflow_call:
+  push:
+    branches-ignore:
+      - develop
+    paths:
+      - 'javascript/**'
+      - '.github/workflows/javascript_*'
 jobs:
   build-js:
     name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
