@@ -1,6 +1,6 @@
 <!--
 Template:
-## [TBD] (Add the TBD that github actions can replace it with the correct version and date)
+## [TBD] (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
 
 Description of the release
 
