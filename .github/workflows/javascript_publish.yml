@@ -53,7 +53,7 @@ jobs:
           architecture: 'x64'
       - name: Get Release Notes
         id: notes
-        run: python ./.github/scripts/generate_release_notes.py javascript/modules/${{ needs.checkTag.outputs.package }}
+        run: python ./.github/scripts/generate_release_notes.py javascript/modules/${{ needs.checkTag.outputs.package }}/CHANGELOG.md"
       - uses: "softprops/action-gh-release@v1"
         if: startsWith(github.ref, 'refs/tags/')
         with:
