@@ -1,4 +1,5 @@
 import { IClientCore } from "./client-core";
+import { BigNumber } from "@ethersproject/bignumber";
 
 export interface IClientDaoBase extends IClientCore {
   dao: {
@@ -28,6 +29,9 @@ export interface IClientDaoERC20Voting extends IClientCore {
       setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
     };
   };
+  estimate: {
+    create: (params: ICreateDaoERC20Voting) => Promise<BigNumber>;
+  };
 }
 
 export interface IClientDaoWhitelistVoting extends IClientCore {
@@ -45,6 +49,9 @@ export interface IClientDaoWhitelistVoting extends IClientCore {
       setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
       setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
     };
+  };
+  estimate: {
+    create: (params: ICreateDaoWhitelistVoting) => Promise<BigNumber>;
   };
 }
 

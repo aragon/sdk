@@ -12,7 +12,10 @@ import {
 import {
   DAOFactory__factory,
   Registry__factory,
+  DAOFactory,
+  TokenFactory,
 } from "@aragon/core-contracts-ethers";
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
 export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
 
@@ -35,24 +38,7 @@ export class ClientDaoERC20Voting extends ClientCore
         });
 
       return daoFactoryInstance
-        .newERC20VotingDAO(
-          params.daoConfig,
-          [
-            BigInt(params.votingConfig.minParticipation),
-            BigInt(params.votingConfig.minSupport),
-            BigInt(params.votingConfig.minDuration),
-          ],
-          {
-            addr: params.tokenConfig.address,
-            name: params.tokenConfig.name,
-            symbol: params.tokenConfig.symbol,
-          },
-          {
-            receivers: params.mintConfig.map(receiver => receiver.address),
-            amounts: params.mintConfig.map(receiver => receiver.balance),
-          },
-          params.gsnForwarder ?? ""
-        )
+        .newERC20VotingDAO(...ClientDaoERC20Voting.createDaoParameters(params))
         .then(tx => tx.wait())
         .then(cr => {
           const newDaoAddress = cr.events?.find(
@@ -106,19 +92,52 @@ export class ClientDaoERC20Voting extends ClientCore
     },
   };
 
-  // INTERNAL WRAPPERS
+  /** Estimation related methods */
+  estimate = {
+    create: async (params: ICreateDaoERC20Voting): Promise<BigNumber> => {
+      if (!this.signer)
+        throw new Error("A signer is needed for creating a DAO");
+      const daoFactoryInstance = DAOFactory__factory.connect(
+        this.daoFactoryAddress,
+        this.connectedSigner
+      );
 
-  /**
-   * Returns a contract instance, bound to the current Web3 gateway client
-   *
-   * @param contractAddress Address of the contract instance
-   */
-  // private attachContractExample(contractAddress: string) {
-  //   return this.attachContract<ExampleContractMethods>(
-  //     contractAddress,
-  //     exampleContractAbi,
-  //   );
-  // }
+      return daoFactoryInstance.estimateGas.newERC20VotingDAO(
+        ...ClientDaoERC20Voting.createDaoParameters(params)
+      );
+    },
+  };
+
+  /** Helpers */
+
+  private static createDaoParameters(
+    params: ICreateDaoERC20Voting
+  ): [
+    DAOFactory.DAOConfigStruct,
+    [BigNumberish, BigNumberish, BigNumberish],
+    TokenFactory.TokenConfigStruct,
+    TokenFactory.MintConfigStruct,
+    string
+  ] {
+    return [
+      params.daoConfig,
+      [
+        BigInt(params.votingConfig.minParticipation),
+        BigInt(params.votingConfig.minSupport),
+        BigInt(params.votingConfig.minDuration),
+      ],
+      {
+        addr: params.tokenConfig.address,
+        name: params.tokenConfig.name,
+        symbol: params.tokenConfig.symbol,
+      },
+      {
+        receivers: params.mintConfig.map(receiver => receiver.address),
+        amounts: params.mintConfig.map(receiver => receiver.balance),
+      },
+      params.gsnForwarder ?? "",
+    ];
+  }
 }
 
 export class ClientDaoWhitelistVoting extends ClientCore
@@ -141,14 +160,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
 
       return daoFactoryInstance
         .newWhitelistVotingDAO(
-          params.daoConfig,
-          [
-            BigInt(params.votingConfig.minParticipation),
-            BigInt(params.votingConfig.minSupport),
-            BigInt(params.votingConfig.minDuration),
-          ],
-          params.whitelistVoters,
-          params.gsnForwarder ?? ""
+          ...ClientDaoWhitelistVoting.createDaoParameters(params)
         )
         .then(tx => tx.wait())
         .then(cr => {
@@ -203,17 +215,41 @@ export class ClientDaoWhitelistVoting extends ClientCore
     },
   };
 
-  // INTERNAL WRAPPERS
+  /** Estimation related methods */
+  estimate = {
+    create: async (params: ICreateDaoWhitelistVoting): Promise<BigNumber> => {
+      if (!this.signer)
+        throw new Error("A signer is needed for creating a DAO");
+      const daoFactoryInstance = DAOFactory__factory.connect(
+        this.daoFactoryAddress,
+        this.connectedSigner
+      );
 
-  /**
-   * Returns a contract instance, bound to the current Web3 gateway client
-   *
-   * @param contractAddress Address of the contract instance
-   */
-  // private attachContractExample(contractAddress: string) {
-  //   return this.attachContract<ExampleContractMethods>(
-  //     contractAddress,
-  //     exampleContractAbi,
-  //   );
-  // }
+      return daoFactoryInstance.estimateGas.newWhitelistVotingDAO(
+        ...ClientDaoWhitelistVoting.createDaoParameters(params)
+      );
+    },
+  };
+
+  /** Helpers */
+
+  private static createDaoParameters(
+    params: ICreateDaoWhitelistVoting
+  ): [
+    DAOFactory.DAOConfigStruct,
+    [BigNumberish, BigNumberish, BigNumberish],
+    string[],
+    string
+  ] {
+    return [
+      params.daoConfig,
+      [
+        BigInt(params.votingConfig.minParticipation),
+        BigInt(params.votingConfig.minSupport),
+        BigInt(params.votingConfig.minDuration),
+      ],
+      params.whitelistVoters,
+      params.gsnForwarder ?? "",
+    ];
+  }
 }
