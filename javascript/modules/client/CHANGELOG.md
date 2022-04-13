@@ -20,6 +20,11 @@ All notable changes to the javascript client package of the SDK will be document
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.4-alpha] - 2022-04-13
+
+### Added
+- Gas estimation for creating DAOs.
+
 ## [0.0.3-alpha] - 2022-04-08
 
 ### Added
