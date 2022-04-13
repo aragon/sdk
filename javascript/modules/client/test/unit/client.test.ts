@@ -167,9 +167,7 @@ describe("Client instances", () => {
       gsnForwarder: Wallet.createRandom().address,
     };
 
-    const gasFeesEstimation = await client.dao.estimateCreate(
-      daoCreationParams
-    );
+    const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 
     expect(BigNumber.isBigNumber(gasFeesEstimation)).toBeTruthy();
   });
@@ -249,9 +247,7 @@ describe("Client instances", () => {
       gsnForwarder: Wallet.createRandom().address,
     };
 
-    const gasFeesEstimation = await client.dao.estimateCreate(
-      daoCreationParams
-    );
+    const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 
     expect(BigNumber.isBigNumber(gasFeesEstimation)).toBeTruthy();
   });

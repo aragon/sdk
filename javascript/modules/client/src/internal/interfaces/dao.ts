@@ -16,7 +16,6 @@ export interface IClientDaoBase extends IClientCore {
 export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
     create: (params: ICreateDaoERC20Voting) => Promise<string>;
-    estimateCreate: (params: ICreateDaoERC20Voting) => Promise<BigNumber>;
     simpleVote: {
       createProposal: (
         startDate: number,
@@ -30,12 +29,14 @@ export interface IClientDaoERC20Voting extends IClientCore {
       setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
     };
   };
+  estimate: {
+    create: (params: ICreateDaoERC20Voting) => Promise<BigNumber>;
+  };
 }
 
 export interface IClientDaoWhitelistVoting extends IClientCore {
   dao: {
     create: (params: ICreateDaoWhitelistVoting) => Promise<string>;
-    estimateCreate: (params: ICreateDaoWhitelistVoting) => Promise<BigNumber>;
     whitelist: {
       createProposal: (
         startDate: number,
@@ -48,6 +49,9 @@ export interface IClientDaoWhitelistVoting extends IClientCore {
       setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
       setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
     };
+  };
+  estimate: {
+    create: (params: ICreateDaoWhitelistVoting) => Promise<BigNumber>;
   };
 }
 
