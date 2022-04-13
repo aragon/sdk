@@ -15,44 +15,41 @@ import {
   DAOFactory,
   TokenFactory,
 } from "@aragon/core-contracts-ethers";
-import { BigNumber } from "@ethersproject/bignumber";
-import { BigNumberish } from "ethers";
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
 export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
 
 export class ClientDaoERC20Voting extends ClientCore
   implements IClientDaoBase, IClientDaoERC20Voting {
   /** Helpers */
-  params = {
-    create: (
-      params: ICreateDaoERC20Voting
-    ): [
-      DAOFactory.DAOConfigStruct,
-      [BigNumberish, BigNumberish, BigNumberish],
-      TokenFactory.TokenConfigStruct,
-      TokenFactory.MintConfigStruct,
-      string
-    ] => {
-      return [
-        params.daoConfig,
-        [
-          BigInt(params.votingConfig.minParticipation),
-          BigInt(params.votingConfig.minSupport),
-          BigInt(params.votingConfig.minDuration),
-        ],
-        {
-          addr: params.tokenConfig.address,
-          name: params.tokenConfig.name,
-          symbol: params.tokenConfig.symbol,
-        },
-        {
-          receivers: params.mintConfig.map(receiver => receiver.address),
-          amounts: params.mintConfig.map(receiver => receiver.balance),
-        },
-        params.gsnForwarder ?? "",
-      ];
-    },
-  };
+  static createDaoParameters(
+    params: ICreateDaoERC20Voting
+  ): [
+    DAOFactory.DAOConfigStruct,
+    [BigNumberish, BigNumberish, BigNumberish],
+    TokenFactory.TokenConfigStruct,
+    TokenFactory.MintConfigStruct,
+    string
+  ] {
+    return [
+      params.daoConfig,
+      [
+        BigInt(params.votingConfig.minParticipation),
+        BigInt(params.votingConfig.minSupport),
+        BigInt(params.votingConfig.minDuration),
+      ],
+      {
+        addr: params.tokenConfig.address,
+        name: params.tokenConfig.name,
+        symbol: params.tokenConfig.symbol,
+      },
+      {
+        receivers: params.mintConfig.map(receiver => receiver.address),
+        amounts: params.mintConfig.map(receiver => receiver.balance),
+      },
+      params.gsnForwarder ?? "",
+    ];
+  }
 
   /** DAO related methods */
   dao = {
@@ -71,7 +68,7 @@ export class ClientDaoERC20Voting extends ClientCore
         });
 
       return daoFactoryInstance
-        .newERC20VotingDAO(...this.params.create(params))
+        .newERC20VotingDAO(...ClientDaoERC20Voting.createDaoParameters(params))
         .then(tx => tx.wait())
         .then(cr => {
           const newDaoAddress = cr.events?.find(
@@ -91,7 +88,7 @@ export class ClientDaoERC20Voting extends ClientCore
       );
 
       return daoFactoryInstance.estimateGas.newERC20VotingDAO(
-        ...this.params.create(params)
+        ...ClientDaoERC20Voting.createDaoParameters(params)
       );
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
@@ -155,27 +152,25 @@ export class ClientDaoERC20Voting extends ClientCore
 export class ClientDaoWhitelistVoting extends ClientCore
   implements IClientDaoBase, IClientDaoWhitelistVoting {
   /** Helpers */
-  params = {
-    create: (
-      params: ICreateDaoWhitelistVoting
-    ): [
-      DAOFactory.DAOConfigStruct,
-      [BigNumberish, BigNumberish, BigNumberish],
-      string[],
-      string
-    ] => {
-      return [
-        params.daoConfig,
-        [
-          BigInt(params.votingConfig.minParticipation),
-          BigInt(params.votingConfig.minSupport),
-          BigInt(params.votingConfig.minDuration),
-        ],
-        params.whitelistVoters,
-        params.gsnForwarder ?? "",
-      ];
-    },
-  };
+  static createDaoParameters(
+    params: ICreateDaoWhitelistVoting
+  ): [
+    DAOFactory.DAOConfigStruct,
+    [BigNumberish, BigNumberish, BigNumberish],
+    string[],
+    string
+  ] {
+    return [
+      params.daoConfig,
+      [
+        BigInt(params.votingConfig.minParticipation),
+        BigInt(params.votingConfig.minSupport),
+        BigInt(params.votingConfig.minDuration),
+      ],
+      params.whitelistVoters,
+      params.gsnForwarder ?? "",
+    ];
+  }
 
   /** DAO related methods */
   dao = {
@@ -194,7 +189,9 @@ export class ClientDaoWhitelistVoting extends ClientCore
         });
 
       return daoFactoryInstance
-        .newWhitelistVotingDAO(...this.params.create(params))
+        .newWhitelistVotingDAO(
+          ...ClientDaoWhitelistVoting.createDaoParameters(params)
+        )
         .then(tx => tx.wait())
         .then(cr => {
           const newDaoAddress = cr.events?.find(
@@ -214,7 +211,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
       );
 
       return daoFactoryInstance.estimateGas.newWhitelistVotingDAO(
-        ...this.params.create(params)
+        ...ClientDaoWhitelistVoting.createDaoParameters(params)
       );
     },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
