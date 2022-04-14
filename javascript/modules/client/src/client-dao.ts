@@ -4,17 +4,14 @@ import {
   DaoRole,
   IClientDaoBase,
   IClientDaoERC20Voting,
-  ICreateDaoERC20Voting,
   IClientDaoWhitelistVoting,
+  ICreateDaoERC20Voting,
   ICreateDaoWhitelistVoting,
+  ICreateProposal,
+  VoteOption,
   VotingConfig,
 } from "./internal/interfaces/dao";
-import {
-  DAOFactory__factory,
-  Registry__factory,
-  DAOFactory,
-  TokenFactory,
-} from "@aragon/core-contracts-ethers";
+import { DAOFactory, DAOFactory__factory, IDAO, Registry__factory, TokenFactory, } from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
 export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
@@ -61,14 +58,10 @@ export class ClientDaoERC20Voting extends ClientCore
     },
 
     simpleVote: {
-      createProposal: (
-        _startDate: number,
-        _endDate: number,
-        _executeApproved?: boolean,
-        _voteOnCreation?: boolean
-      ): Promise<string> => {
+      createProposal: async (params: ICreateProposal): Promise<number> => {
+        console.log(ClientDaoERC20Voting.createProposalParameters(params))
         // TODO: Not implemented
-        return Promise.resolve("0x1234567890123456789012345678901234567890");
+        return Promise.resolve(1);
       },
       voteProposal: (_proposalId: string, _approve: boolean): Promise<void> => {
         // TODO: Not implemented
@@ -136,6 +129,26 @@ export class ClientDaoERC20Voting extends ClientCore
         amounts: params.mintConfig.map(receiver => receiver.balance),
       },
       params.gsnForwarder ?? "",
+    ];
+  }
+
+  private static createProposalParameters(
+    params: ICreateProposal
+  ): [
+    string,
+    IDAO.ActionStruct[],
+    BigNumberish,
+    BigNumberish,
+    boolean,
+    BigNumberish
+  ] {
+    return [
+      params.metadata,
+      params.actions ?? [],
+      params.startDate ?? 0,
+      params.endDate ?? 0,
+      params.executeIfDecided ?? false,
+      params.creatorChoice ?? VoteOption.None
     ];
   }
 }

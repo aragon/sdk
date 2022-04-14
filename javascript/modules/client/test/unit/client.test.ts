@@ -9,6 +9,7 @@ import {
   ICreateDaoWhitelistVoting,
 } from "../../src";
 import { BigNumber } from "@ethersproject/bignumber";
+import { ICreateProposal } from "../../src/internal/interfaces/dao";
 
 const web3endpoints = {
   working: [
@@ -281,5 +282,18 @@ describe("Client instances", () => {
     expect(newDaoAddress.length).toBe(42);
     expect(newDaoAddress).toContain("0x");
     expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i);
+  });
+  it("Should create a ERC20Voting proposal locally", async () => {
+    const context = new Context(contextParamsLocalChain);
+    const client = new ClientDaoERC20Voting(context);
+
+    const proposalCreationParams: ICreateProposal = {
+      metadata: "0x1234",
+    };
+
+    const newProposalId = await client.dao.simpleVote.createProposal(proposalCreationParams);
+
+    expect(typeof newProposalId).toBe("number");
+    expect(newProposalId).toBeGreaterThanOrEqual(0);
   });
 });

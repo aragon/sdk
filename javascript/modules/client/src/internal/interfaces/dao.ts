@@ -17,12 +17,7 @@ export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
     create: (params: ICreateDaoERC20Voting) => Promise<string>;
     simpleVote: {
-      createProposal: (
-        startDate: number,
-        endDate: number,
-        executeApproved?: boolean,
-        voteOnCreation?: boolean
-      ) => Promise<string>;
+      createProposal: (params: ICreateProposal) => Promise<number>;
       voteProposal: (proposalId: string, approve: boolean) => Promise<void>;
       executeProposal: (proposalId: string) => Promise<void>;
       setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
@@ -109,4 +104,26 @@ export interface VotingConfig {
   minParticipation: number;
   /** In seconds */
   minDuration: number;
+}
+
+export interface ICreateProposal {
+  metadata: string;
+  actions?: ProposalAction[];
+  startDate?: number;
+  endDate?: number;
+  executeIfDecided?: boolean;
+  creatorChoice?: VoteOption;
+}
+
+export interface ProposalAction {
+  to: string;
+  value: number;
+  data: string;
+}
+
+export enum VoteOption {
+  None,
+  Abstain,
+  Yea,
+  Nay
 }
