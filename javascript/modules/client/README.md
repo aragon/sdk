@@ -67,6 +67,9 @@ const daoCreationParams: ICreateDaoERC20Voting = {
     gsnForwarder: Wallet.createRandom().address,
 };
 
+const gasFeesEstimation = await client.estimate.create(daoCreationParams);
+console.log(gasFeesEstimation) // Gas fee estimation
+
 const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address
 ```
@@ -102,8 +105,67 @@ const daoCreationParams: ICreateDaoWhitelistVoting = {
     gsnForwarder: Wallet.createRandom().address,
 };
 
+const gasFeesEstimation = await client.estimate.create(daoCreationParams);
+console.log(gasFeesEstimation) // Gas fee estimation
+
 const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address
+```
+
+#### Proposal Creation
+
+###### ERC20 Voting Proposal
+
+```ts
+// For local testing
+const contextParams: ContextParams = {
+    network: 31337,
+    signer: new Wallet("privateKey"),
+    daoFactoryAddress: "daoFactoryAddress",
+    web3Providers: ["http://localhost:8545"],
+};
+const context = new Context(contextParams);
+
+const client = new ClientDaoERC20Voting(context);
+
+const proposalCreationParams: ICreateProposal = {
+    metadata: "0x1234",
+    executeIfDecided: true,
+    creatorChoice: VoteOption.YEA,
+};
+
+const newProposalId = await client.dao.simpleVote.createProposal(
+    "votingAddress",
+    proposalCreationParams
+);
+console.log(newProposalId) // New proposal id
+```
+
+###### Whitelist Voting Proposal
+
+```ts
+// For local testing
+const contextParams: ContextParams = {
+    network: 31337,
+    signer: new Wallet("privateKey"),
+    daoFactoryAddress: "daoFactoryAddress",
+    web3Providers: ["http://localhost:8545"],
+};
+const context = new Context(contextParams);
+
+const client = new ClientDaoWhitelistVoting(context);
+
+const proposalCreationParams: ICreateProposal = {
+    metadata: "0x1234",
+    executeIfDecided: true,
+    creatorChoice: VoteOption.YEA,
+};
+
+const newProposalId = await client.dao.whitelist.createProposal(
+    "votingAddress",
+    proposalCreationParams
+);
+console.log(newProposalId) // New proposal id
 ```
 
 ## Testing
