@@ -11,7 +11,14 @@ import {
   VoteOption,
   VotingConfig,
 } from "./internal/interfaces/dao";
-import { DAOFactory, DAOFactory__factory, IDAO, Registry__factory, TokenFactory, } from "@aragon/core-contracts-ethers";
+import {
+  DAOFactory,
+  DAOFactory__factory,
+  ERC20Voting__factory,
+  IDAO,
+  Registry__factory,
+  TokenFactory,
+} from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
 export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
@@ -58,10 +65,33 @@ export class ClientDaoERC20Voting extends ClientCore
     },
 
     simpleVote: {
-      createProposal: async (params: ICreateProposal): Promise<number> => {
-        console.log(ClientDaoERC20Voting.createProposalParameters(params))
-        // TODO: Not implemented
-        return Promise.resolve(1);
+      createProposal: async (
+        votingAddress: string,
+        params: ICreateProposal
+      ): Promise<BigNumber> => {
+        if (!this.signer)
+          throw new Error("A signer is needed for creating a DAO");
+        if (!votingAddress)
+          throw new Error(
+            "A voting contract address is needed for creating a proposal"
+          );
+        const erc20VotingInstance = ERC20Voting__factory.connect(
+          votingAddress,
+          this.connectedSigner
+        );
+
+        return erc20VotingInstance
+          .newVote(...ClientDaoERC20Voting.createProposalParameters(params))
+          .then(tx => tx.wait())
+          .then(cr => {
+            const startVoteEvent = cr.events?.find(
+              e => e.event === "StartVote"
+            );
+            if (!startVoteEvent)
+              throw new Error("Could not find StartVote event");
+
+            return startVoteEvent.args?.voteId;
+          });
       },
       voteProposal: (_proposalId: string, _approve: boolean): Promise<void> => {
         // TODO: Not implemented
@@ -148,7 +178,7 @@ export class ClientDaoERC20Voting extends ClientCore
       params.startDate ?? 0,
       params.endDate ?? 0,
       params.executeIfDecided ?? false,
-      params.creatorChoice ?? VoteOption.None
+      params.creatorChoice ?? VoteOption.None,
     ];
   }
 }

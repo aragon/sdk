@@ -17,7 +17,10 @@ export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
     create: (params: ICreateDaoERC20Voting) => Promise<string>;
     simpleVote: {
-      createProposal: (params: ICreateProposal) => Promise<number>;
+      createProposal: (
+        votingAddress: string,
+        params: ICreateProposal
+      ) => Promise<BigNumber>;
       voteProposal: (proposalId: string, approve: boolean) => Promise<void>;
       executeProposal: (proposalId: string) => Promise<void>;
       setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
@@ -125,5 +128,5 @@ export enum VoteOption {
   None,
   Abstain,
   Yea,
-  Nay
+  Nay,
 }
