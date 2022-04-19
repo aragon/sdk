@@ -68,7 +68,7 @@ const daoCreationParams: ICreateDaoERC20Voting = {
 };
 
 const gasFeesEstimation = await client.estimate.create(daoCreationParams);
-console.log(gasFeesEstimation) // Gas fee estimation
+console.log(gasFeesEstimation) // BigNumber { _hex: '0x1e3949', _isBigNumber: true } (Gas fee estimation)
 
 const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address
@@ -106,7 +106,7 @@ const daoCreationParams: ICreateDaoWhitelistVoting = {
 };
 
 const gasFeesEstimation = await client.estimate.create(daoCreationParams);
-console.log(gasFeesEstimation) // Gas fee estimation
+console.log(gasFeesEstimation) // BigNumber { _hex: '0x1e3949', _isBigNumber: true } (Gas fee estimation)
 
 const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address
@@ -129,7 +129,7 @@ const context = new Context(contextParams);
 const client = new ClientDaoERC20Voting(context);
 
 const proposalCreationParams: ICreateProposal = {
-    metadata: "0x1234",
+    metadata: "0x1234", // IPFS CID
     executeIfDecided: true,
     creatorChoice: VoteOption.YEA,
 };
