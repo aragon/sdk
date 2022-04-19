@@ -9,6 +9,7 @@ import {
   ICreateDaoWhitelistVoting,
 } from "../../src";
 import { BigNumber } from "@ethersproject/bignumber";
+// import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 
 const web3endpoints = {
   working: [
@@ -282,4 +283,42 @@ describe("Client instances", () => {
     expect(newDaoAddress).toContain("0x");
     expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i);
   });
+  // it("Should create a ERC20Voting proposal locally", async () => {
+  //   const context = new Context(contextParamsLocalChain);
+  //   const client = new ClientDaoERC20Voting(context);
+  //
+  //   const proposalCreationParams: ICreateProposal = {
+  //     metadata: "0x1234",
+  //     executeIfDecided: true,
+  //     creatorChoice: VoteOption.YEA,
+  //   };
+  //
+  //   const newProposalId = await client.dao.simpleVote.createProposal(
+  //     "0xB30dAf0240261Be564Cea33260F01213c47AAa0D",
+  //     proposalCreationParams
+  //   );
+  //
+  //   expect(newProposalId).toBeInstanceOf(BigNumber);
+  //   expect(BigNumber.isBigNumber(newProposalId)).toBeTruthy();
+  //   expect(newProposalId.toBigInt()).toBeGreaterThan(0);
+  // });
+  // it("Should create a WhitelistVoting proposal locally", async () => {
+  //   const context = new Context(contextParamsLocalChain);
+  //   const client = new ClientDaoWhitelistVoting(context);
+  //
+  //   const proposalCreationParams: ICreateProposal = {
+  //     metadata: "0x1234",
+  //     executeIfDecided: true,
+  //     creatorChoice: VoteOption.YEA,
+  //   };
+  //
+  //   const newProposalId = await client.dao.whitelist.createProposal(
+  //     "0xB30dAf0240261Be564Cea33260F01213c47AAa0D",
+  //     proposalCreationParams
+  //   );
+  //
+  //   expect(newProposalId).toBeInstanceOf(BigNumber);
+  //   expect(BigNumber.isBigNumber(newProposalId)).toBeTruthy();
+  //   expect(newProposalId.toBigInt()).toBeGreaterThan(0);
+  // });
 });

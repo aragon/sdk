@@ -4,16 +4,19 @@ import {
   DaoRole,
   IClientDaoBase,
   IClientDaoERC20Voting,
-  ICreateDaoERC20Voting,
   IClientDaoWhitelistVoting,
+  ICreateDaoERC20Voting,
   ICreateDaoWhitelistVoting,
+  ICreateProposal,
   VotingConfig,
 } from "./internal/interfaces/dao";
 import {
-  DAOFactory__factory,
-  Registry__factory,
   DAOFactory,
+  DAOFactory__factory,
+  ERC20Voting__factory,
+  Registry__factory,
   TokenFactory,
+  WhitelistVoting__factory,
 } from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
@@ -25,7 +28,7 @@ export class ClientDaoERC20Voting extends ClientCore
   dao = {
     create: async (params: ICreateDaoERC20Voting): Promise<string> => {
       if (!this.signer)
-        throw new Error("A signer is needed for creating a DAO");
+        return Promise.reject(new Error("A signer is needed for creating a DAO"));
       const daoFactoryInstance = DAOFactory__factory.connect(
         this.daoFactoryAddress,
         this.connectedSigner
@@ -44,7 +47,7 @@ export class ClientDaoERC20Voting extends ClientCore
           const newDaoAddress = cr.events?.find(
             e => e.address === registryInstance.address
           )?.topics[1];
-          if (!newDaoAddress) throw new Error("Could not create DAO");
+          if (!newDaoAddress) return Promise.reject(new Error("Could not create DAO"));
 
           return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
         });
@@ -62,13 +65,32 @@ export class ClientDaoERC20Voting extends ClientCore
 
     simpleVote: {
       createProposal: (
-        _startDate: number,
-        _endDate: number,
-        _executeApproved?: boolean,
-        _voteOnCreation?: boolean
-      ): Promise<string> => {
-        // TODO: Not implemented
-        return Promise.resolve("0x1234567890123456789012345678901234567890");
+        votingAddress: string,
+        params: ICreateProposal
+      ): Promise<BigNumber> => {
+        if (!this.signer)
+          return Promise.reject(new Error("A signer is needed for creating a DAO"));
+        else if (!votingAddress)
+          return Promise.reject(new Error(
+            "A voting contract address is needed for creating a proposal"
+          ));
+        const erc20VotingInstance = ERC20Voting__factory.connect(
+          votingAddress,
+          this.connectedSigner
+        );
+
+        return erc20VotingInstance
+          .newVote(...ClientDaoERC20Voting.createProposalParameters(params))
+          .then(tx => tx.wait())
+          .then(cr => {
+            const startVoteEvent = cr.events?.find(
+              e => e.event === "StartVote"
+            );
+            if (!startVoteEvent)
+              return Promise.reject(new Error("Could not find StartVote event"));
+
+            return startVoteEvent.args?.voteId;
+          });
       },
       voteProposal: (_proposalId: string, _approve: boolean): Promise<void> => {
         // TODO: Not implemented
@@ -96,7 +118,7 @@ export class ClientDaoERC20Voting extends ClientCore
   estimate = {
     create: async (params: ICreateDaoERC20Voting): Promise<BigNumber> => {
       if (!this.signer)
-        throw new Error("A signer is needed for creating a DAO");
+        return Promise.reject(new Error("A signer is needed for creating a DAO"));
       const daoFactoryInstance = DAOFactory__factory.connect(
         this.daoFactoryAddress,
         this.connectedSigner
@@ -146,7 +168,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
   dao = {
     create: async (params: ICreateDaoWhitelistVoting): Promise<string> => {
       if (!this.signer)
-        throw new Error("A signer is needed for creating a DAO");
+        return Promise.reject(new Error("A signer is needed for creating a DAO"));
       const daoFactoryInstance = DAOFactory__factory.connect(
         this.daoFactoryAddress,
         this.connectedSigner
@@ -167,7 +189,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
           const newDaoAddress = cr.events?.find(
             e => e.address === registryInstance.address
           )?.topics[1];
-          if (!newDaoAddress) throw new Error("Could not create DAO");
+          if (!newDaoAddress) return Promise.reject(new Error("Could not create DAO"));
 
           return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
         });
@@ -185,13 +207,32 @@ export class ClientDaoWhitelistVoting extends ClientCore
 
     whitelist: {
       createProposal: (
-        _startDate: number,
-        _endDate: number,
-        _executeApproved?: boolean,
-        _voteOnCreation?: boolean
-      ): Promise<string> => {
-        // TODO: Not implemented
-        return Promise.resolve("0x1234567890123456789012345678901234567890");
+        votingAddress: string,
+        params: ICreateProposal
+      ): Promise<BigNumber> => {
+        if (!this.signer)
+          return Promise.reject(new Error("A signer is needed for creating a DAO"));
+        else if (!votingAddress)
+          return Promise.reject(new Error(
+            "A voting contract address is needed for creating a proposal"
+          ));
+        const whitelistVotingInstance = WhitelistVoting__factory.connect(
+          votingAddress,
+          this.connectedSigner
+        );
+
+        return whitelistVotingInstance
+          .newVote(...ClientDaoWhitelistVoting.createProposalParameters(params))
+          .then(tx => tx.wait())
+          .then(cr => {
+            const startVoteEvent = cr.events?.find(
+              e => e.event === "StartVote"
+            );
+            if (!startVoteEvent)
+              return Promise.reject(new Error("Could not find StartVote event"));
+
+            return startVoteEvent.args?.voteId;
+          });
       },
       voteProposal: (_proposalId: string, _approve: boolean): Promise<void> => {
         // TODO: Not implemented
@@ -219,7 +260,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
   estimate = {
     create: async (params: ICreateDaoWhitelistVoting): Promise<BigNumber> => {
       if (!this.signer)
-        throw new Error("A signer is needed for creating a DAO");
+        return Promise.reject(new Error("A signer is needed for creating a DAO"));
       const daoFactoryInstance = DAOFactory__factory.connect(
         this.daoFactoryAddress,
         this.connectedSigner
