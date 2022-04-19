@@ -4,6 +4,9 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
+import { ICreateProposal, VoteOption } from "./interfaces/dao";
+import { IDAO } from "@aragon/core-contracts-ethers";
+import { BigNumberish } from "@ethersproject/bignumber";
 
 export abstract class ClientCore implements IClientCore {
   private _web3Providers: JsonRpcProvider[] = [];
@@ -99,5 +102,25 @@ export abstract class ClientCore implements IClientCore {
     }
 
     return contract.connect(this.signer) as Contract & T;
+  }
+
+  protected static createProposalParameters(
+    params: ICreateProposal
+  ): [
+    string,
+    IDAO.ActionStruct[],
+    BigNumberish,
+    BigNumberish,
+    boolean,
+    BigNumberish
+  ] {
+    return [
+      params.metadata,
+      params.actions ?? [],
+      params.startDate ?? 0,
+      params.endDate ?? 0,
+      params.executeIfDecided ?? false,
+      params.creatorChoice ?? VoteOption.NONE,
+    ];
   }
 }

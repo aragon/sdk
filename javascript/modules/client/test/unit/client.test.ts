@@ -302,4 +302,23 @@ describe("Client instances", () => {
   //   expect(BigNumber.isBigNumber(newProposalId)).toBeTruthy();
   //   expect(newProposalId.toBigInt()).toBeGreaterThan(0);
   // });
+  // it("Should create a WhitelistVoting proposal locally", async () => {
+  //   const context = new Context(contextParamsLocalChain);
+  //   const client = new ClientDaoWhitelistVoting(context);
+  //
+  //   const proposalCreationParams: ICreateProposal = {
+  //     metadata: "0x1234",
+  //     executeIfDecided: true,
+  //     creatorChoice: VoteOption.YEA,
+  //   };
+  //
+  //   const newProposalId = await client.dao.whitelist.createProposal(
+  //     "0xB30dAf0240261Be564Cea33260F01213c47AAa0D",
+  //     proposalCreationParams
+  //   );
+  //
+  //   expect(newProposalId).toBeInstanceOf(BigNumber);
+  //   expect(BigNumber.isBigNumber(newProposalId)).toBeTruthy();
+  //   expect(newProposalId.toBigInt()).toBeGreaterThan(0);
+  // });
 });

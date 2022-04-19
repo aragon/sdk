@@ -37,11 +37,9 @@ export interface IClientDaoWhitelistVoting extends IClientCore {
     create: (params: ICreateDaoWhitelistVoting) => Promise<string>;
     whitelist: {
       createProposal: (
-        startDate: number,
-        endDate: number,
-        executeApproved?: boolean,
-        voteOnCreation?: boolean
-      ) => Promise<string>;
+        votingAddress: string,
+        params: ICreateProposal
+      ) => Promise<BigNumber>;
       voteProposal: (proposalId: string, approve: boolean) => Promise<void>;
       executeProposal: (proposalId: string) => Promise<void>;
       setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;

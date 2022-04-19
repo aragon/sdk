@@ -8,16 +8,15 @@ import {
   ICreateDaoERC20Voting,
   ICreateDaoWhitelistVoting,
   ICreateProposal,
-  VoteOption,
   VotingConfig,
 } from "./internal/interfaces/dao";
 import {
   DAOFactory,
   DAOFactory__factory,
   ERC20Voting__factory,
-  IDAO,
   Registry__factory,
   TokenFactory,
+  WhitelistVoting__factory,
 } from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
@@ -161,26 +160,6 @@ export class ClientDaoERC20Voting extends ClientCore
       params.gsnForwarder ?? "",
     ];
   }
-
-  private static createProposalParameters(
-    params: ICreateProposal
-  ): [
-    string,
-    IDAO.ActionStruct[],
-    BigNumberish,
-    BigNumberish,
-    boolean,
-    BigNumberish
-  ] {
-    return [
-      params.metadata,
-      params.actions ?? [],
-      params.startDate ?? 0,
-      params.endDate ?? 0,
-      params.executeIfDecided ?? false,
-      params.creatorChoice ?? VoteOption.NONE,
-    ];
-  }
 }
 
 export class ClientDaoWhitelistVoting extends ClientCore
@@ -228,13 +207,32 @@ export class ClientDaoWhitelistVoting extends ClientCore
 
     whitelist: {
       createProposal: (
-        _startDate: number,
-        _endDate: number,
-        _executeApproved?: boolean,
-        _voteOnCreation?: boolean
-      ): Promise<string> => {
-        // TODO: Not implemented
-        return Promise.resolve("0x1234567890123456789012345678901234567890");
+        votingAddress: string,
+        params: ICreateProposal
+      ): Promise<BigNumber> => {
+        if (!this.signer)
+          throw new Error("A signer is needed for creating a DAO");
+        if (!votingAddress)
+          throw new Error(
+            "A voting contract address is needed for creating a proposal"
+          );
+        const whitelistVotingInstance = WhitelistVoting__factory.connect(
+          votingAddress,
+          this.connectedSigner
+        );
+
+        return whitelistVotingInstance
+          .newVote(...ClientDaoWhitelistVoting.createProposalParameters(params))
+          .then(tx => tx.wait())
+          .then(cr => {
+            const startVoteEvent = cr.events?.find(
+              e => e.event === "StartVote"
+            );
+            if (!startVoteEvent)
+              throw new Error("Could not find StartVote event");
+
+            return startVoteEvent.args?.voteId;
+          });
       },
       voteProposal: (_proposalId: string, _approve: boolean): Promise<void> => {
         // TODO: Not implemented
