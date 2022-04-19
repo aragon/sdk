@@ -65,7 +65,7 @@ export class ClientDaoERC20Voting extends ClientCore
     },
 
     simpleVote: {
-      createProposal: async (
+      createProposal: (
         votingAddress: string,
         params: ICreateProposal
       ): Promise<BigNumber> => {
@@ -178,7 +178,7 @@ export class ClientDaoERC20Voting extends ClientCore
       params.startDate ?? 0,
       params.endDate ?? 0,
       params.executeIfDecided ?? false,
-      params.creatorChoice ?? VoteOption.None,
+      params.creatorChoice ?? VoteOption.NONE,
     ];
   }
 }

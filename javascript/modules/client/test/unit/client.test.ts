@@ -290,7 +290,7 @@ describe("Client instances", () => {
   //   const proposalCreationParams: ICreateProposal = {
   //     metadata: "0x1234",
   //     executeIfDecided: true,
-  //     creatorChoice: VoteOption.Yea,
+  //     creatorChoice: VoteOption.YEA,
   //   };
   //
   //   const newProposalId = await client.dao.simpleVote.createProposal(

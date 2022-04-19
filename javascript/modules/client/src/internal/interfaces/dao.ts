@@ -111,22 +111,22 @@ export interface VotingConfig {
 
 export interface ICreateProposal {
   metadata: string;
-  actions?: ProposalAction[];
+  actions?: IProposalAction[];
   startDate?: number;
   endDate?: number;
   executeIfDecided?: boolean;
   creatorChoice?: VoteOption;
 }
 
-export interface ProposalAction {
+export interface IProposalAction {
   to: string;
   value: number;
   data: string;
 }
 
 export enum VoteOption {
-  None,
-  Abstain,
-  Yea,
-  Nay,
+  NONE,
+  ABSTAIN,
+  YEA,
+  NAY,
 }
