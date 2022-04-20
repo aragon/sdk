@@ -8,6 +8,8 @@ import {
   ICreateDaoERC20Voting,
   ICreateDaoWhitelistVoting,
 } from "../../src";
+import { BigNumber } from "@ethersproject/bignumber";
+// import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 
 const web3endpoints = {
   working: [
@@ -121,6 +123,55 @@ describe("Client instances", () => {
         expect(isUp).toEqual(true);
       });
   });
+  it("Should estimate gas fees for creating a ERC20VotingDAO", async () => {
+    const context = new Context(contextParamsLocalChain);
+    const client = new ClientDaoERC20Voting(context);
+
+    expect(client).toBeInstanceOf(ClientDaoERC20Voting);
+    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const daoCreationParams: ICreateDaoERC20Voting = {
+      daoConfig: {
+        name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+        metadata: "0x1234",
+      },
+      tokenConfig: {
+        address: "0x0000000000000000000000000000000000000000",
+        name:
+          "TestToken" +
+          (Math.random() + 1)
+            .toString(36)
+            .substring(4)
+            .toUpperCase(),
+        symbol:
+          "TEST" +
+          (Math.random() + 1)
+            .toString(36)
+            .substring(4)
+            .toUpperCase(),
+      },
+      mintConfig: [
+        {
+          address: Wallet.createRandom().address,
+          balance: BigInt(Math.floor(Math.random() * 9999) + 1),
+        },
+        {
+          address: Wallet.createRandom().address,
+          balance: BigInt(Math.floor(Math.random() * 9999) + 1),
+        },
+      ],
+      votingConfig: {
+        minSupport: Math.floor(Math.random() * 100) + 1,
+        minParticipation: Math.floor(Math.random() * 100) + 1,
+        minDuration: Math.floor(Math.random() * 9999) + 1,
+      },
+      gsnForwarder: Wallet.createRandom().address,
+    };
+
+    const gasFeesEstimation = await client.estimate.create(daoCreationParams);
+
+    expect(BigNumber.isBigNumber(gasFeesEstimation)).toBeTruthy();
+  });
   it("Should create a ERC20VotingDAO locally", async () => {
     const context = new Context(contextParamsLocalChain);
     const client = new ClientDaoERC20Voting(context);
@@ -173,6 +224,34 @@ describe("Client instances", () => {
     expect(newDaoAddress).toContain("0x");
     expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i);
   });
+  it("Should estimate gas fees for creating a WhitelistVoting", async () => {
+    const context = new Context(contextParamsLocalChain);
+    const client = new ClientDaoWhitelistVoting(context);
+
+    expect(client).toBeInstanceOf(ClientDaoWhitelistVoting);
+    expect(client.web3).toBeInstanceOf(JsonRpcProvider);
+
+    const daoCreationParams: ICreateDaoWhitelistVoting = {
+      daoConfig: {
+        name: "WhitelistVotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+        metadata: "0x1234",
+      },
+      votingConfig: {
+        minSupport: Math.floor(Math.random() * 100) + 1,
+        minParticipation: Math.floor(Math.random() * 100) + 1,
+        minDuration: Math.floor(Math.random() * 9999) + 1,
+      },
+      whitelistVoters: [
+        Wallet.createRandom().address,
+        Wallet.createRandom().address,
+      ],
+      gsnForwarder: Wallet.createRandom().address,
+    };
+
+    const gasFeesEstimation = await client.estimate.create(daoCreationParams);
+
+    expect(BigNumber.isBigNumber(gasFeesEstimation)).toBeTruthy();
+  });
   it("Should create a WhitelistVoting locally", async () => {
     const context = new Context(contextParamsLocalChain);
     const client = new ClientDaoWhitelistVoting(context);
@@ -204,4 +283,42 @@ describe("Client instances", () => {
     expect(newDaoAddress).toContain("0x");
     expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i);
   });
+  // it("Should create a ERC20Voting proposal locally", async () => {
+  //   const context = new Context(contextParamsLocalChain);
+  //   const client = new ClientDaoERC20Voting(context);
+  //
+  //   const proposalCreationParams: ICreateProposal = {
+  //     metadata: "0x1234",
+  //     executeIfDecided: true,
+  //     creatorChoice: VoteOption.YEA,
+  //   };
+  //
+  //   const newProposalId = await client.dao.simpleVote.createProposal(
+  //     "0xB30dAf0240261Be564Cea33260F01213c47AAa0D",
+  //     proposalCreationParams
+  //   );
+  //
+  //   expect(newProposalId).toBeInstanceOf(BigNumber);
+  //   expect(BigNumber.isBigNumber(newProposalId)).toBeTruthy();
+  //   expect(newProposalId.toBigInt()).toBeGreaterThan(0);
+  // });
+  // it("Should create a WhitelistVoting proposal locally", async () => {
+  //   const context = new Context(contextParamsLocalChain);
+  //   const client = new ClientDaoWhitelistVoting(context);
+  //
+  //   const proposalCreationParams: ICreateProposal = {
+  //     metadata: "0x1234",
+  //     executeIfDecided: true,
+  //     creatorChoice: VoteOption.YEA,
+  //   };
+  //
+  //   const newProposalId = await client.dao.whitelist.createProposal(
+  //     "0xB30dAf0240261Be564Cea33260F01213c47AAa0D",
+  //     proposalCreationParams
+  //   );
+  //
+  //   expect(newProposalId).toBeInstanceOf(BigNumber);
+  //   expect(BigNumber.isBigNumber(newProposalId)).toBeTruthy();
+  //   expect(newProposalId.toBigInt()).toBeGreaterThan(0);
+  // });
 });
