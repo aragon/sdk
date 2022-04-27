@@ -7,6 +7,11 @@ on:
     paths:
       - 'javascript/**'
       - '.github/workflows/javascript_*'
+
+defaults:
+  run:
+    working-directory: './javascript'
+
 jobs:
   build-js:
     name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
@@ -26,15 +31,23 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
  
-      - name: Install deps and build (with cache)
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: javascript
+      - name: install deps
+        run: yarn install --frozen-lockfile
+
+      - name: Install ganache
+        run: yarn global add ganache-cli
+
+      - name: Run ganache
+        run: nohup ganache-cli --account_keys_path ganache-keys.json -l 80000000 -i 31337 --chain-id 31337 &
+
+      - name: Deploy contracts
+        id: contracts
+        run: node helpers/deployContracts.js
 
       - name: Build subpackages
-        run: yarn turbo run build
-        working-directory: javascript
+        run: yarn run build
 
       - name: Test
         run: yarn test --ci --coverage --maxWorkers=2
-        working-directory: javascript
+        env:
+          DAO_FACTORY: ${{ steps.contracts.outputs.dao }}

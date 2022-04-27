@@ -34,7 +34,7 @@ const contextParamsLocalChain: ContextParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
   dao: "0x1234567890123456789012345678901234567890",
-  daoFactoryAddress: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+  daoFactoryAddress: process.env.DAO_FACTORY || "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
 };
 
