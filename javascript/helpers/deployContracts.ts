@@ -9,12 +9,13 @@ export async function deploy(server: Server) {
   );
   const owner = new ethers.Wallet(accounts[Object.keys(accounts)[0]].secretKey, provider);
 
+  // @ts-ignore
   const tokenFactory = new aragonContracts.TokenFactory__factory();
   const token = await tokenFactory.connect(owner).deploy();
-
+  // @ts-ignore
   const registryFactory = new aragonContracts.Registry__factory();
   const registry = await registryFactory.connect(owner).deploy();
-
+  // @ts-ignore
   const daoFactory = new aragonContracts.DAOFactory__factory();
   const dao = await daoFactory
     .connect(owner)
