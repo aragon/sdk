@@ -26,5 +26,5 @@ export async function deploy(server: Server) {
     value: ethers.utils.parseEther("50.0"),
   });
 
-  process.env.DAO_FACTORY = dao.address;
+  return dao;
 }

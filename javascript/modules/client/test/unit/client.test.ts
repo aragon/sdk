@@ -36,14 +36,15 @@ const contextParamsLocalChain: ContextParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
   dao: "0x1234567890123456789012345678901234567890",
-  daoFactoryAddress: process.env.DAO_FACTORY || "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
 };
 
 describe("Client instances", () => {
   beforeAll(async () => {
     const server = await ganacheSetup.start();
-    await deployContracts.deploy(server);
+    const daoFactory = await deployContracts.deploy(server);
+    contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
   })
 
   afterAll(async () => {
