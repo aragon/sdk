@@ -1,6 +1,6 @@
 <!--
 Template:
-## [X.X.X] - YYYY-MM-DD
+## [TBD] (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
 
 Description of the release
 
@@ -20,10 +20,16 @@ All notable changes to the javascript client package of the SDK will be document
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [TBD] 
+
+### Added
+- Github actions automation to deploy this package 
+
 ## [0.0.4-alpha] - 2022-04-13
 
 ### Added
 - Gas estimation for creating DAOs.
+
 
 ## [0.0.3-alpha] - 2022-04-08
 
