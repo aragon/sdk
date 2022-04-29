@@ -6,7 +6,7 @@ import { UnsupportedProtocolError } from "@aragon/sdk-common";
 export { ContextParams } from "./internal/interfaces/context";
 
 const supportedProtocols = ["https:"];
-if(process.env.TESTING) {
+if(process && process.env && process.env.TESTING) {
   supportedProtocols.push("http:");
 }
 
