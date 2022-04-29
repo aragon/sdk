@@ -10,6 +10,8 @@ import {
 } from "../../src";
 import { BigNumber } from "@ethersproject/bignumber";
 // import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
+import * as ganacheSetup from "../../../../helpers/ganache-setup";
+import * as deployContracts from "../../../../helpers/deployContracts";
 
 const web3endpoints = {
   working: [
@@ -39,6 +41,15 @@ const contextParamsLocalChain: ContextParams = {
 };
 
 describe("Client instances", () => {
+  beforeAll(async () => {
+    const server = await ganacheSetup.start();
+    await deployContracts.deploy(server);
+  })
+
+  afterAll(async () => {
+    await ganacheSetup.stop();
+  })
+
   it("Should create an empty client", () => {
     const clientDaoERC20Voting = new ClientDaoERC20Voting({} as Context);
     const clientDaoWhitelistVoting = new ClientDaoWhitelistVoting(

@@ -1,16 +1,13 @@
-const aragonContracts = require("@aragon/core-contracts-ethers");
-const ethers = require("ethers");
-const fs = require("fs/promises");
+import * as aragonContracts from "@aragon/core-contracts-ethers";
+import {ethers} from "ethers";
+import {Server} from 'ganache'
 
-async function deploy() {
-  const keys = JSON.parse(
-    (await fs.readFile("./ganache-keys.json")).toString()
-  );
-  const key = keys.private_keys[Object.keys(keys.private_keys)[0]];
+export async function deploy(server: Server) {
+  const accounts = await server.provider.getInitialAccounts()
   const provider = new ethers.providers.JsonRpcProvider(
     "http://127.0.0.1:8545"
   );
-  const owner = new ethers.Wallet(key, provider);
+  const owner = new ethers.Wallet(accounts[Object.keys(accounts)[0]].secretKey, provider);
 
   const tokenFactory = new aragonContracts.TokenFactory__factory();
   const token = await tokenFactory.connect(owner).deploy();
@@ -29,17 +26,5 @@ async function deploy() {
     value: ethers.utils.parseEther("50.0"),
   });
 
-  console.log("Token:", token.address);
-  console.log("Registry:", registry.address);
-  console.log("DAO:", dao.address);
-  if (process.env.CI) {
-    console.log(`::set-output name=dao::${dao.address}`);
-  }
+  process.env.DAO_FACTORY = dao.address;
 }
-
-deploy()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });

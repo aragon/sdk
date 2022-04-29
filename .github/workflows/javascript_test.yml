@@ -34,16 +34,6 @@ jobs:
       - name: install deps
         run: yarn install --frozen-lockfile
 
-      - name: Install ganache
-        run: yarn global add ganache-cli
-
-      - name: Run ganache
-        run: nohup ganache-cli --account_keys_path ganache-keys.json -l 80000000 -i 31337 --chain-id 31337 &
-
-      - name: Deploy contracts
-        id: contracts
-        run: node helpers/deployContracts.js
-
       - name: Build subpackages
         run: yarn run build
 
