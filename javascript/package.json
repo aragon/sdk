@@ -11,6 +11,9 @@
       "modules/*"
     ]
   },
+  "jest": {
+    "preset": "ts-jest"
+  },
   "scripts": {
     "clean": "rm -Rf node_modules ./modules/*/node_modules ./modules/*/dist",
     "lint": "tsdx lint modules/*/src",

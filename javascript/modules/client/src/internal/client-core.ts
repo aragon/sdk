@@ -6,13 +6,14 @@ import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
 import { ICreateProposal, VoteOption } from "./interfaces/dao";
 import { IDAO } from "@aragon/core-contracts-ethers";
-import { BigNumberish } from "@ethersproject/bignumber";
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
 export abstract class ClientCore implements IClientCore {
   private _web3Providers: JsonRpcProvider[] = [];
   private _web3Idx = -1;
   private _signer: Signer | undefined;
   private _daoFactoryAddress = "";
+  private _gasFeeReducer = 1;
 
   constructor(context: Context) {
     if (context.web3Providers) {
@@ -26,6 +27,10 @@ export abstract class ClientCore implements IClientCore {
 
     if (context.daoFactoryAddress) {
       this._daoFactoryAddress = context.daoFactoryAddress;
+    }
+
+    if (context.gasFeeReducer) {
+      this._gasFeeReducer = context.gasFeeReducer;
     }
   }
 
@@ -66,6 +71,28 @@ export abstract class ClientCore implements IClientCore {
       throw new Error("No provider");
 
     return this.signer.provider ? this.signer : this.signer.connect(this.web3);
+  }
+
+  get maxFeePerGas(): Promise<BigNumber> {
+    return this.connectedSigner
+      .getFeeData()
+      .then(
+        feeData =>
+          feeData.maxFeePerGas ??
+          Promise.reject(new Error("Cannot estimate gas"))
+      );
+  }
+
+  get feeEstimationReducer(): BigNumber {
+    let estimationReducer = 100;
+    if (
+      this._gasFeeReducer &&
+      this._gasFeeReducer > 0 &&
+      this._gasFeeReducer < 1
+    ) {
+      estimationReducer = Math.trunc((1 / this._gasFeeReducer) * 100);
+    }
+    return BigNumber.from(estimationReducer);
   }
 
   get web3() {

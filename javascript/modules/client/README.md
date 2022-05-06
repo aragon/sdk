@@ -4,7 +4,7 @@
 
 ## Installation
 
-Use [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/) to install @aragon/sdk-signing.
+Use [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/) to install @aragon/sdk-client.
 
 ```bash
 npm install @aragon/sdk-client
@@ -68,7 +68,11 @@ const daoCreationParams: ICreateDaoERC20Voting = {
 };
 
 const gasFeesEstimation = await client.estimate.create(daoCreationParams);
-console.log(gasFeesEstimation) // BigNumber { _hex: '0x1e3949', _isBigNumber: true } (Gas fee estimation)
+console.log(gasFeesEstimation)
+// {
+//   avg: BigNumber { _hex: '0x0a509a23250504', _isBigNumber: true }, // Average gas fee estimation (reducing the max value by heuristic) 
+//   max: BigNumber { _hex: '0x1080f69ea1a1fc', _isBigNumber: true } // Maximum gas fee estimation
+// }
 
 const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address
@@ -106,7 +110,10 @@ const daoCreationParams: ICreateDaoWhitelistVoting = {
 };
 
 const gasFeesEstimation = await client.estimate.create(daoCreationParams);
-console.log(gasFeesEstimation) // BigNumber { _hex: '0x1e3949', _isBigNumber: true } (Gas fee estimation)
+// {
+//   avg: BigNumber { _hex: '0x0a509a23250504', _isBigNumber: true }, // Average gas fee estimation (reducing the max value by heuristic) 
+//   max: BigNumber { _hex: '0x1080f69ea1a1fc', _isBigNumber: true } // Maximum gas fee estimation
+// }
 
 const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address

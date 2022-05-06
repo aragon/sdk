@@ -25,6 +25,7 @@ describe("Context instances", () => {
     expect(context.signer).toEqual(undefined);
     expect(context.dao).toEqual("");
     expect(context.daoFactoryAddress).toEqual("");
+    expect(context.gasFeeReducer).toEqual(0.625);
   });
   it("Should create a context and have the correct values", () => {
     const contextParams: ContextParams = {
@@ -33,6 +34,7 @@ describe("Context instances", () => {
       dao: "Dao",
       daoFactoryAddress: "0x1234",
       web3Providers: web3endpoints.working,
+      gasFeeReducer: 0.1,
     };
     const context = new Context(contextParams);
 
@@ -44,5 +46,6 @@ describe("Context instances", () => {
     context.web3Providers?.map(provider =>
       expect(provider).toBeInstanceOf(JsonRpcProvider)
     );
+    expect(context.gasFeeReducer).toEqual(0.1);
   });
 });

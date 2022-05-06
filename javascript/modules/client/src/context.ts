@@ -16,6 +16,7 @@ let defaultState: ContextState = {
   dao: "",
   daoFactoryAddress: "",
   web3Providers: [],
+  gasFeeReducer: 0.625,
 };
 
 export class Context {
@@ -55,6 +56,8 @@ export class Context {
       throw new Error("No DAO address defined");
     } else if (!contextParams.web3Providers) {
       throw new Error("No web3 endpoints defined");
+    } else if (!contextParams.gasFeeReducer) {
+      throw new Error("No gas fee reducer defined");
     }
     // else if (!contextParams.ipfs) {
     //   throw new Error("No IPFS options defined");
@@ -69,6 +72,7 @@ export class Context {
         contextParams.web3Providers,
         contextParams.network
       ),
+      gasFeeReducer: contextParams.gasFeeReducer,
       // ipfs: ipfsCreate(contextParams.ipfs),
       // subgraph: new GraphQLClient(contextParams.subgraphURL),
     };
@@ -92,6 +96,9 @@ export class Context {
         contextParams.web3Providers,
         this.state.network
       );
+    }
+    if (contextParams.gasFeeReducer) {
+      this.state.gasFeeReducer = contextParams.gasFeeReducer;
     }
     // if (contextParams.ipfs) {
     //   this.state.ipfs = ipfsCreate(contextParams.ipfs);
@@ -205,6 +212,19 @@ export class Context {
    */
   get dao(): string {
     return this.state.dao || defaultState.dao;
+  }
+
+  /**
+   * Getter for the gas fee reducer used in estimations
+   *
+   * @var gasFeeReducer
+   *
+   * @returns {number}
+   *
+   * @public
+   */
+  get gasFeeReducer(): number {
+    return this.state.gasFeeReducer || defaultState.gasFeeReducer;
   }
 
   /**

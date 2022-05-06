@@ -28,7 +28,7 @@ export interface IClientDaoERC20Voting extends IClientCore {
     };
   };
   estimate: {
-    create: (params: ICreateDaoERC20Voting) => Promise<BigNumber>;
+    create: (params: ICreateDaoERC20Voting) => Promise<IGasFeeEstimation>;
   };
 }
 
@@ -47,7 +47,7 @@ export interface IClientDaoWhitelistVoting extends IClientCore {
     };
   };
   estimate: {
-    create: (params: ICreateDaoWhitelistVoting) => Promise<BigNumber>;
+    create: (params: ICreateDaoWhitelistVoting) => Promise<IGasFeeEstimation>;
   };
 }
 
@@ -127,4 +127,9 @@ export enum VoteOption {
   ABSTAIN,
   YEA,
   NAY,
+}
+
+export interface IGasFeeEstimation {
+  avg: BigNumber;
+  max: BigNumber;
 }

@@ -14,6 +14,7 @@ interface Web3ContextParams {
   dao: string;
   daoFactoryAddress: string;
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
+  gasFeeReducer?: number;
 }
 interface VocdoniContextParams {
   // Vocdoni
@@ -39,6 +40,7 @@ interface Web3ContextState {
   dao: string;
   daoFactoryAddress: string;
   web3Providers: JsonRpcProvider[];
+  gasFeeReducer: number;
 }
 interface VocdoniContextState {}
 interface IpfsContextState {
