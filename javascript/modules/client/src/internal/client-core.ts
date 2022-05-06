@@ -4,7 +4,11 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
-import { ICreateProposal, VoteOption } from "./interfaces/dao";
+import {
+  ICreateProposal,
+  IGasFeeEstimation,
+  VoteOption,
+} from "./interfaces/dao";
 import { IDAO } from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
@@ -149,5 +153,21 @@ export abstract class ClientCore implements IClientCore {
       params.executeIfDecided ?? false,
       params.creatorChoice ?? VoteOption.NONE,
     ];
+  }
+
+  protected calculateGasFeeEstimation(
+    gasLimitEstimationFromCall: Promise<BigNumber>
+  ): Promise<IGasFeeEstimation> {
+    return Promise.all([this.maxFeePerGas, gasLimitEstimationFromCall]).then(
+      data => {
+        return {
+          avg: data[0]
+            .mul(data[1])
+            .div(this.feeEstimationReducer)
+            .mul(BigNumber.from(100)),
+          max: data[0].mul(data[1]),
+        };
+      }
+    );
   }
 }

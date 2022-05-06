@@ -142,15 +142,7 @@ export class ClientDaoERC20Voting extends ClientCore
         ...ClientDaoERC20Voting.createDaoParameters(params)
       );
 
-      return Promise.all([this.maxFeePerGas, gasLimit]).then(data => {
-        return {
-          avg: data[0]
-            .mul(data[1])
-            .div(this.feeEstimationReducer)
-            .mul(BigNumber.from(100)),
-          max: data[0].mul(data[1]),
-        };
-      });
+      return this.calculateGasFeeEstimation(gasLimit);
     },
   };
 
@@ -307,15 +299,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
         ...ClientDaoWhitelistVoting.createDaoParameters(params)
       );
 
-      return Promise.all([this.maxFeePerGas, gasLimit]).then(data => {
-        return {
-          avg: data[0]
-            .mul(data[1])
-            .div(this.feeEstimationReducer)
-            .mul(BigNumber.from(100)),
-          max: data[0].mul(data[1]),
-        };
-      });
+      return this.calculateGasFeeEstimation(gasLimit);
     },
   };
 
