@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Github actions automation to deploy this package.
 
 ### Changed
-- Returning of `avg` and `max` values for the gas fee estimations.
+- Returning of `average` and `max` values for the gas fee estimations.
 
 ### Fixed
 - Gas fee estimations with new `gasFeeData` functions for EIP-1559.

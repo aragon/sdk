@@ -183,9 +183,9 @@ describe("Client instances", () => {
     const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 
     expect(typeof gasFeesEstimation).toEqual("object");
-    expect(BigNumber.isBigNumber(gasFeesEstimation.avg)).toBeTruthy();
+    expect(BigNumber.isBigNumber(gasFeesEstimation.average)).toBeTruthy();
     expect(BigNumber.isBigNumber(gasFeesEstimation.max)).toBeTruthy();
-    expect(gasFeesEstimation.max.gt(gasFeesEstimation.avg)).toBeTruthy();
+    expect(gasFeesEstimation.max.gt(gasFeesEstimation.average)).toBeTruthy();
   });
   it("Should create a ERC20VotingDAO locally", async () => {
     const context = new Context(contextParamsLocalChain);
@@ -266,9 +266,9 @@ describe("Client instances", () => {
     const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 
     expect(typeof gasFeesEstimation).toEqual("object");
-    expect(BigNumber.isBigNumber(gasFeesEstimation.avg)).toBeTruthy();
+    expect(BigNumber.isBigNumber(gasFeesEstimation.average)).toBeTruthy();
     expect(BigNumber.isBigNumber(gasFeesEstimation.max)).toBeTruthy();
-    expect(gasFeesEstimation.max.gt(gasFeesEstimation.avg)).toBeTruthy();
+    expect(gasFeesEstimation.max.gt(gasFeesEstimation.average)).toBeTruthy();
   });
   it("Should create a WhitelistVoting locally", async () => {
     const context = new Context(contextParamsLocalChain);

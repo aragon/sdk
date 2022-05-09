@@ -130,6 +130,6 @@ export enum VoteOption {
 }
 
 export interface IGasFeeEstimation {
-  avg: BigNumber;
+  average: BigNumber;
   max: BigNumber;
 }

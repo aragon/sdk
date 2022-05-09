@@ -13,11 +13,13 @@ import { IDAO } from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
 export abstract class ClientCore implements IClientCore {
+  private static readonly PRECISION_FACTOR = 1000;
+
   private _web3Providers: JsonRpcProvider[] = [];
   private _web3Idx = -1;
   private _signer: Signer | undefined;
   private _daoFactoryAddress = "";
-  private _gasFeeReducer = 1;
+  private _gasFeeEstimationFactor = 1;
 
   constructor(context: Context) {
     if (context.web3Providers) {
@@ -33,8 +35,8 @@ export abstract class ClientCore implements IClientCore {
       this._daoFactoryAddress = context.daoFactoryAddress;
     }
 
-    if (context.gasFeeReducer) {
-      this._gasFeeReducer = context.gasFeeReducer;
+    if (context.gasFeeEstimationFactor) {
+      this._gasFeeEstimationFactor = context.gasFeeEstimationFactor;
     }
   }
 
@@ -85,18 +87,6 @@ export abstract class ClientCore implements IClientCore {
           feeData.maxFeePerGas ??
           Promise.reject(new Error("Cannot estimate gas"))
       );
-  }
-
-  get feeEstimationReducer(): BigNumber {
-    let estimationReducer = 100;
-    if (
-      this._gasFeeReducer &&
-      this._gasFeeReducer > 0 &&
-      this._gasFeeReducer < 1
-    ) {
-      estimationReducer = Math.trunc((1 / this._gasFeeReducer) * 100);
-    }
-    return BigNumber.from(estimationReducer);
   }
 
   get web3() {
@@ -155,18 +145,24 @@ export abstract class ClientCore implements IClientCore {
     ];
   }
 
-  protected calculateGasFeeEstimation(
+  protected estimateGasFee(
     gasLimitEstimationFromCall: Promise<BigNumber>
   ): Promise<IGasFeeEstimation> {
     return Promise.all([this.maxFeePerGas, gasLimitEstimationFromCall]).then(
       data => {
         return {
-          avg: data[0]
+          average: data[0]
             .mul(data[1])
-            .div(this.feeEstimationReducer)
-            .mul(BigNumber.from(100)),
+            .mul(
+              BigNumber.from(
+                Math.trunc(
+                  this._gasFeeEstimationFactor * ClientCore.PRECISION_FACTOR
+                )
+              )
+            )
+            .div(BigNumber.from(ClientCore.PRECISION_FACTOR)),
           max: data[0].mul(data[1]),
-        };
+        } as IGasFeeEstimation;
       }
     );
   }

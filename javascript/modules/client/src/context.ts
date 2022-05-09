@@ -16,7 +16,7 @@ let defaultState: ContextState = {
   dao: "",
   daoFactoryAddress: "",
   web3Providers: [],
-  gasFeeReducer: 0.625,
+  gasFeeEstimationFactor: 0.625,
 };
 
 export class Context {
@@ -56,7 +56,7 @@ export class Context {
       throw new Error("No DAO address defined");
     } else if (!contextParams.web3Providers) {
       throw new Error("No web3 endpoints defined");
-    } else if (!contextParams.gasFeeReducer) {
+    } else if (!contextParams.gasFeeEstimationFactor) {
       throw new Error("No gas fee reducer defined");
     }
     // else if (!contextParams.ipfs) {
@@ -72,7 +72,9 @@ export class Context {
         contextParams.web3Providers,
         contextParams.network
       ),
-      gasFeeReducer: contextParams.gasFeeReducer,
+      gasFeeEstimationFactor: this.useGasFeeEstimationFactor(
+        contextParams.gasFeeEstimationFactor
+      ),
       // ipfs: ipfsCreate(contextParams.ipfs),
       // subgraph: new GraphQLClient(contextParams.subgraphURL),
     };
@@ -97,8 +99,10 @@ export class Context {
         this.state.network
       );
     }
-    if (contextParams.gasFeeReducer) {
-      this.state.gasFeeReducer = contextParams.gasFeeReducer;
+    if (contextParams.gasFeeEstimationFactor) {
+      this.state.gasFeeEstimationFactor = this.useGasFeeEstimationFactor(
+        contextParams.gasFeeEstimationFactor
+      );
     }
     // if (contextParams.ipfs) {
     //   this.state.ipfs = ipfsCreate(contextParams.ipfs);
@@ -132,6 +136,14 @@ export class Context {
     } else {
       return [endpoints];
     }
+  }
+
+  useGasFeeEstimationFactor(gasFeeEstimationFactor: number): number {
+    if (!gasFeeEstimationFactor) return 1;
+    else if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
+      throw new Error("Gas estimation factor value should be between 0 and 1");
+    }
+    return gasFeeEstimationFactor;
   }
 
   // GETTERS
@@ -217,14 +229,16 @@ export class Context {
   /**
    * Getter for the gas fee reducer used in estimations
    *
-   * @var gasFeeReducer
+   * @var gasFeeEstimationFactor
    *
    * @returns {number}
    *
    * @public
    */
-  get gasFeeReducer(): number {
-    return this.state.gasFeeReducer || defaultState.gasFeeReducer;
+  get gasFeeEstimationFactor(): number {
+    return (
+      this.state.gasFeeEstimationFactor || defaultState.gasFeeEstimationFactor
+    );
   }
 
   /**

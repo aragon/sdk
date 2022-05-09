@@ -12,7 +12,19 @@ const web3endpoints = {
   failing: ["https://bad-url-gateway.io/"],
 };
 
+let contextParams: ContextParams;
+
 describe("Context instances", () => {
+  beforeAll(() => {
+    contextParams = {
+      network: "mainnet",
+      signer: new Wallet(TEST_WALLET),
+      dao: "Dao",
+      daoFactoryAddress: "0x1234",
+      web3Providers: web3endpoints.working,
+      gasFeeEstimationFactor: 0.1,
+    };
+  });
   it("Should create an empty context", () => {
     const context = new Context({});
 
@@ -25,17 +37,9 @@ describe("Context instances", () => {
     expect(context.signer).toEqual(undefined);
     expect(context.dao).toEqual("");
     expect(context.daoFactoryAddress).toEqual("");
-    expect(context.gasFeeReducer).toEqual(0.625);
+    expect(context.gasFeeEstimationFactor).toEqual(0.625);
   });
   it("Should create a context and have the correct values", () => {
-    const contextParams: ContextParams = {
-      network: "mainnet",
-      signer: new Wallet(TEST_WALLET),
-      dao: "Dao",
-      daoFactoryAddress: "0x1234",
-      web3Providers: web3endpoints.working,
-      gasFeeReducer: 0.1,
-    };
     const context = new Context(contextParams);
 
     expect(context).toBeInstanceOf(Context);
@@ -46,6 +50,13 @@ describe("Context instances", () => {
     context.web3Providers?.map(provider =>
       expect(provider).toBeInstanceOf(JsonRpcProvider)
     );
-    expect(context.gasFeeReducer).toEqual(0.1);
+    expect(context.gasFeeEstimationFactor).toEqual(0.1);
+  });
+  it("Should create a context with invalid gas fee estimation factor and fail", () => {
+    contextParams.gasFeeEstimationFactor = 1.1;
+
+    expect(() => {
+      new Context(contextParams);
+    }).toThrow();
   });
 });

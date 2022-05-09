@@ -142,7 +142,7 @@ export class ClientDaoERC20Voting extends ClientCore
         ...ClientDaoERC20Voting.createDaoParameters(params)
       );
 
-      return this.calculateGasFeeEstimation(gasLimit);
+      return this.estimateGasFee(gasLimit);
     },
   };
 
@@ -299,7 +299,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
         ...ClientDaoWhitelistVoting.createDaoParameters(params)
       );
 
-      return this.calculateGasFeeEstimation(gasLimit);
+      return this.estimateGasFee(gasLimit);
     },
   };
 

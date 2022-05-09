@@ -70,7 +70,7 @@ const daoCreationParams: ICreateDaoERC20Voting = {
 const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 console.log(gasFeesEstimation)
 // {
-//   avg: BigNumber { _hex: '0x0a509a23250504', _isBigNumber: true }, // Average gas fee estimation (reducing the max value by heuristic) 
+//   average: BigNumber { _hex: '0x0a509a23250504', _isBigNumber: true }, // Average gas fee estimation (reducing the max value by heuristic) 
 //   max: BigNumber { _hex: '0x1080f69ea1a1fc', _isBigNumber: true } // Maximum gas fee estimation
 // }
 
@@ -111,7 +111,7 @@ const daoCreationParams: ICreateDaoWhitelistVoting = {
 
 const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 // {
-//   avg: BigNumber { _hex: '0x0a509a23250504', _isBigNumber: true }, // Average gas fee estimation (reducing the max value by heuristic) 
+//   average: BigNumber { _hex: '0x0a509a23250504', _isBigNumber: true }, // Average gas fee estimation (reducing the max value by heuristic) 
 //   max: BigNumber { _hex: '0x1080f69ea1a1fc', _isBigNumber: true } // Maximum gas fee estimation
 // }
 
