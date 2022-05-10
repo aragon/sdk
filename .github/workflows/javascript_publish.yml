@@ -23,7 +23,6 @@ jobs:
             echo "::set-output name=version::$VERSION"
           fi
   test:
-    id: test
     uses: ./.github/workflows/javascript_test.yml
   publish:
     runs-on: ubuntu-latest
