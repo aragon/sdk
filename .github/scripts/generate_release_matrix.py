@@ -8,7 +8,7 @@ except:
 
 matrix = []
 for label in labels:
-    splitted = label.name.split(':')
+    splitted = label['name'].split(':')
     if len(splitted) == 2:
         if splitted[1] == 'breaking' or splitted[1] == 'feature' or splitted[1] == 'fix':
             matrix.append({
