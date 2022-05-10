@@ -5,10 +5,6 @@ on:
     tags:
       - '*'
 
-defaults:
-  run:
-    working-directory: './javascript'
-
 jobs:
   checkTag:
     runs-on: ubuntu-latest
@@ -55,11 +51,13 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: install deps
+        working-directory: javascript/
         run: yarn install --frozen-lockfile
 
       - name: Build subpackages
+        working-directory: javascript/
         run: yarn run build
-        
+
       - name: Publish
         run: yarn publish --no-git-tag-version --new-version ${{ needs.checkTag.outputs.version }}
         working-directory: javascript/modules/${{ needs.checkTag.outputs.package }}
