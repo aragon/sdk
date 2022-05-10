@@ -16,4 +16,4 @@ for label in labels:
                 'bump': splitted[1]
             })
 
-print("::set-output name=matrix::" + json.dumps(matrix))
+print("::set-output name=matrix::" + json.dumps({'include': matrix}))
