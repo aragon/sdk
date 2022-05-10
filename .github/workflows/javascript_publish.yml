@@ -16,6 +16,7 @@ jobs:
       - name: get info from tag
         id: tagInfo
         run: |
+          GITHUB_REF="${{ github.ref }}"
           TAG=${GITHUB_REF##*/}
           VERSION=$(echo "$TAG" | grep -woP "([0-9]+\.[0-9]+\.[0-9]+)")
           PACKAGE=$(echo "$TAG" | grep -oP "javascript-(.+)" | sed 's/javascript-//')
