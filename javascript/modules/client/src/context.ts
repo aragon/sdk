@@ -5,18 +5,20 @@ import { UnsupportedProtocolError } from "@aragon/sdk-common";
 // import { GraphQLClient } from "graphql-request";
 export { ContextParams } from "./internal/interfaces/context";
 
+const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
+
 const supportedProtocols = ["https:"];
 if (typeof process !== "undefined" && process.env?.TESTING) {
   supportedProtocols.push("http:");
 }
 
 // State
-let defaultState: ContextState = {
+const defaultState: ContextState = {
   network: "mainnet",
   dao: "",
   daoFactoryAddress: "",
   web3Providers: [],
-  gasFeeEstimationFactor: 0.625,
+  gasFeeEstimationFactor: DEFAULT_GAS_FEE_ESTIMATION_FACTOR,
 };
 
 export class Context {
@@ -72,7 +74,7 @@ export class Context {
         contextParams.web3Providers,
         contextParams.network
       ),
-      gasFeeEstimationFactor: this.useGasFeeEstimationFactor(
+      gasFeeEstimationFactor: Context.resolveGasFeeEstimationFactor(
         contextParams.gasFeeEstimationFactor
       ),
       // ipfs: ipfsCreate(contextParams.ipfs),
@@ -100,7 +102,7 @@ export class Context {
       );
     }
     if (contextParams.gasFeeEstimationFactor) {
-      this.state.gasFeeEstimationFactor = this.useGasFeeEstimationFactor(
+      this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
         contextParams.gasFeeEstimationFactor
       );
     }
@@ -136,14 +138,6 @@ export class Context {
     } else {
       return [endpoints];
     }
-  }
-
-  useGasFeeEstimationFactor(gasFeeEstimationFactor: number): number {
-    if (!gasFeeEstimationFactor) return 1;
-    else if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
-      throw new Error("Gas estimation factor value should be between 0 and 1");
-    }
-    return gasFeeEstimationFactor;
   }
 
   // GETTERS
@@ -274,5 +268,15 @@ export class Context {
   }
   static getDefault() {
     return defaultState;
+  }
+
+  // INTERNAL HELPERS
+
+  private static resolveGasFeeEstimationFactor(gasFeeEstimationFactor: number): number {
+    if (typeof gasFeeEstimationFactor === "undefined") return 1;
+    else if (typeof gasFeeEstimationFactor !== "number" || gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
+      throw new Error("Gas estimation factor value should be a number between 0 and 1");
+    }
+    return gasFeeEstimationFactor;
   }
 }
