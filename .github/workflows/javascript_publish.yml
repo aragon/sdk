@@ -44,6 +44,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.ARABOT_PAT }}
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install Deps
+        run: yarn install --pure-lockfile
+        working-directory: javascript/modules/${{ needs.checkTag.outputs.package }}
       - name: Publish
         run: yarn publish --no-git-tag-version --new-version ${{ needs.checkTag.outputs.version }}
         working-directory: javascript/modules/${{ needs.checkTag.outputs.package }}
