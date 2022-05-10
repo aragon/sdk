@@ -45,11 +45,11 @@ describe("Client instances", () => {
     const server = await ganacheSetup.start();
     const daoFactory = await deployContracts.deploy(server);
     contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
-  })
+  });
 
   afterAll(async () => {
     await ganacheSetup.stop();
-  })
+  });
 
   it("Should create an empty client", () => {
     const clientDaoERC20Voting = new ClientDaoERC20Voting({} as Context);
@@ -182,7 +182,10 @@ describe("Client instances", () => {
 
     const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 
-    expect(BigNumber.isBigNumber(gasFeesEstimation)).toBeTruthy();
+    expect(typeof gasFeesEstimation).toEqual("object");
+    expect(BigNumber.isBigNumber(gasFeesEstimation.average)).toBeTruthy();
+    expect(BigNumber.isBigNumber(gasFeesEstimation.max)).toBeTruthy();
+    expect(gasFeesEstimation.max.gt(gasFeesEstimation.average)).toBeTruthy();
   });
   it("Should create a ERC20VotingDAO locally", async () => {
     const context = new Context(contextParamsLocalChain);
@@ -262,7 +265,10 @@ describe("Client instances", () => {
 
     const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 
-    expect(BigNumber.isBigNumber(gasFeesEstimation)).toBeTruthy();
+    expect(typeof gasFeesEstimation).toEqual("object");
+    expect(BigNumber.isBigNumber(gasFeesEstimation.average)).toBeTruthy();
+    expect(BigNumber.isBigNumber(gasFeesEstimation.max)).toBeTruthy();
+    expect(gasFeesEstimation.max.gt(gasFeesEstimation.average)).toBeTruthy();
   });
   it("Should create a WhitelistVoting locally", async () => {
     const context = new Context(contextParamsLocalChain);

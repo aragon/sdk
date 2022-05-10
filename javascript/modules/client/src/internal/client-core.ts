@@ -4,15 +4,22 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
-import { ICreateProposal, VoteOption } from "./interfaces/dao";
+import {
+  ICreateProposal,
+  IGasFeeEstimation,
+  VoteOption,
+} from "./interfaces/dao";
 import { IDAO } from "@aragon/core-contracts-ethers";
-import { BigNumberish } from "@ethersproject/bignumber";
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
 export abstract class ClientCore implements IClientCore {
+  private static readonly PRECISION_FACTOR_BASE = 1000;
+
   private _web3Providers: JsonRpcProvider[] = [];
   private _web3Idx = -1;
   private _signer: Signer | undefined;
   private _daoFactoryAddress = "";
+  private _gasFeeEstimationFactor = 1;
 
   constructor(context: Context) {
     if (context.web3Providers) {
@@ -26,6 +33,10 @@ export abstract class ClientCore implements IClientCore {
 
     if (context.daoFactoryAddress) {
       this._daoFactoryAddress = context.daoFactoryAddress;
+    }
+
+    if (context.gasFeeEstimationFactor) {
+      this._gasFeeEstimationFactor = context.gasFeeEstimationFactor;
     }
   }
 
@@ -46,7 +57,7 @@ export abstract class ClientCore implements IClientCore {
   /**
    * Starts using the next available Web3 endpoints
    */
-  shiftWeb3Node() {
+  public shiftWeb3Node() {
     if (!this._web3Providers.length) throw new Error("No endpoints");
     else if (this._web3Providers.length <= 1) {
       throw new Error("No other endpoints");
@@ -66,6 +77,16 @@ export abstract class ClientCore implements IClientCore {
       throw new Error("No provider");
 
     return this.signer.provider ? this.signer : this.signer.connect(this.web3);
+  }
+
+  get maxFeePerGas(): Promise<BigNumber> {
+    return this.connectedSigner
+      .getFeeData()
+      .then(
+        feeData =>
+          feeData.maxFeePerGas ??
+          Promise.reject(new Error("Cannot estimate gas"))
+      );
   }
 
   get web3() {
@@ -90,7 +111,10 @@ export abstract class ClientCore implements IClientCore {
    * @param abi The Application Binary Inteface of the contract
    * @return A contract instance attached to the given address
    */
-  attachContract<T>(address: string, abi: ContractInterface): Contract & T {
+  public attachContract<T>(
+    address: string,
+    abi: ContractInterface
+  ): Contract & T {
     if (!address) throw new Error("Invalid contract address");
     else if (!abi) throw new Error("Invalid contract ABI");
 
@@ -122,5 +146,24 @@ export abstract class ClientCore implements IClientCore {
       params.executeIfDecided ?? false,
       params.creatorChoice ?? VoteOption.NONE,
     ];
+  }
+
+  protected estimateGasFee(
+    gasLimitEstimationFromCall: Promise<BigNumber>
+  ): Promise<IGasFeeEstimation> {
+    return Promise.all([this.maxFeePerGas, gasLimitEstimationFromCall]).then(
+      data => {
+        const max = data[0].mul(data[1]);
+
+        const factor =
+          this._gasFeeEstimationFactor * ClientCore.PRECISION_FACTOR_BASE;
+
+        const average = max
+          .mul(BigNumber.from(Math.trunc(factor)))
+          .div(BigNumber.from(ClientCore.PRECISION_FACTOR_BASE));
+
+        return { average, max };
+      }
+    );
   }
 }

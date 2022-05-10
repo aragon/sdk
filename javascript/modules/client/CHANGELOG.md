@@ -23,13 +23,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [TBD] 
 
 ### Added
-- Github actions automation to deploy this package 
+- Github actions automation to deploy this package.
+
+### Changed
+- Returning of `average` and `max` values for the gas fee estimations.
+
+### Fixed
+- Gas fee estimations with new `gasFeeData` functions for EIP-1559.
+
+## [0.0.5-alpha] - 2022-04-19
+
+### Added
+- Creation of proposals.
 
 ## [0.0.4-alpha] - 2022-04-13
 
 ### Added
 - Gas estimation for creating DAOs.
-
 
 ## [0.0.3-alpha] - 2022-04-08
 

@@ -5,17 +5,20 @@ import { UnsupportedProtocolError } from "@aragon/sdk-common";
 // import { GraphQLClient } from "graphql-request";
 export { ContextParams } from "./internal/interfaces/context";
 
+const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
+
 const supportedProtocols = ["https:"];
-if(typeof process !== "undefined" && process.env?.TESTING) {
+if (typeof process !== "undefined" && process.env?.TESTING) {
   supportedProtocols.push("http:");
 }
 
 // State
-let defaultState: ContextState = {
+const defaultState: ContextState = {
   network: "mainnet",
   dao: "",
   daoFactoryAddress: "",
   web3Providers: [],
+  gasFeeEstimationFactor: DEFAULT_GAS_FEE_ESTIMATION_FACTOR,
 };
 
 export class Context {
@@ -55,6 +58,8 @@ export class Context {
       throw new Error("No DAO address defined");
     } else if (!contextParams.web3Providers) {
       throw new Error("No web3 endpoints defined");
+    } else if (!contextParams.gasFeeEstimationFactor) {
+      throw new Error("No gas fee reducer defined");
     }
     // else if (!contextParams.ipfs) {
     //   throw new Error("No IPFS options defined");
@@ -68,6 +73,9 @@ export class Context {
       web3Providers: this.useWeb3Providers(
         contextParams.web3Providers,
         contextParams.network
+      ),
+      gasFeeEstimationFactor: Context.resolveGasFeeEstimationFactor(
+        contextParams.gasFeeEstimationFactor
       ),
       // ipfs: ipfsCreate(contextParams.ipfs),
       // subgraph: new GraphQLClient(contextParams.subgraphURL),
@@ -91,6 +99,11 @@ export class Context {
       this.state.web3Providers = this.useWeb3Providers(
         contextParams.web3Providers,
         this.state.network
+      );
+    }
+    if (contextParams.gasFeeEstimationFactor) {
+      this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
+        contextParams.gasFeeEstimationFactor
       );
     }
     // if (contextParams.ipfs) {
@@ -208,6 +221,21 @@ export class Context {
   }
 
   /**
+   * Getter for the gas fee reducer used in estimations
+   *
+   * @var gasFeeEstimationFactor
+   *
+   * @returns {number}
+   *
+   * @public
+   */
+  get gasFeeEstimationFactor(): number {
+    return (
+      this.state.gasFeeEstimationFactor || defaultState.gasFeeEstimationFactor
+    );
+  }
+
+  /**
    * Getter for the IPFS http client
    *
    * @var ipfs
@@ -240,5 +268,19 @@ export class Context {
   }
   static getDefault() {
     return defaultState;
+  }
+
+  // INTERNAL HELPERS
+
+  private static resolveGasFeeEstimationFactor(
+    gasFeeEstimationFactor: number
+  ): number {
+    if (typeof gasFeeEstimationFactor === "undefined") return 1;
+    else if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
+      throw new Error(
+        "Gas estimation factor value should be a number between 0 and 1"
+      );
+    }
+    return gasFeeEstimationFactor;
   }
 }
