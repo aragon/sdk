@@ -12,6 +12,7 @@ jobs:
       package: ${{ steps.tagInfo.outputs.package }}
       version: ${{ steps.tagInfo.outputs.version }}
     steps:
+      - uses: actions/checkout@v2
       - name: get info from tag
         id: tagInfo
         run: |
@@ -27,9 +28,9 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: [checkTag, test]
+    if: ${{ needs.checkTag.outputs.package }}
     steps:
       - name: Validate outputs
-        if: ${{ needs.checkTag.outputs.package }}
         run: |
           if [ -z "${{ needs.checkTag.outputs.package }}" ]; then
             echo "::error ::No package found in tag"
