@@ -50,7 +50,7 @@ jobs:
           node-version: 14
           registry-url: 'https://registry.npmjs.org'
       - name: Install Deps
-        run: yarn install --pure-lockfile
+        run: yarn install --frozen-lockfile
       - name: Publish
         run: yarn publish --no-git-tag-version --new-version ${{ needs.checkTag.outputs.version }}
         working-directory: javascript/modules/${{ needs.checkTag.outputs.package }}
