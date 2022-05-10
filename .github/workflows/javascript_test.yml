@@ -14,6 +14,7 @@ defaults:
 
 jobs:
   build-js:
+    if: github.actor != 'arabot-1'
     name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
