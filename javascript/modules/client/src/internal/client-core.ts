@@ -111,7 +111,10 @@ export abstract class ClientCore implements IClientCore {
    * @param abi The Application Binary Inteface of the contract
    * @return A contract instance attached to the given address
    */
-  public attachContract<T>(address: string, abi: ContractInterface): Contract & T {
+  public attachContract<T>(
+    address: string,
+    abi: ContractInterface
+  ): Contract & T {
     if (!address) throw new Error("Invalid contract address");
     else if (!abi) throw new Error("Invalid contract ABI");
 
@@ -152,13 +155,13 @@ export abstract class ClientCore implements IClientCore {
       data => {
         const max = data[0].mul(data[1]);
 
-        const factor = this._gasFeeEstimationFactor * 
-          ClientCore.PRECISION_FACTOR_BASE;
+        const factor =
+          this._gasFeeEstimationFactor * ClientCore.PRECISION_FACTOR_BASE;
 
         const average = max
           .mul(BigNumber.from(Math.trunc(factor)))
           .div(BigNumber.from(ClientCore.PRECISION_FACTOR_BASE));
-        
+
         return { average, max };
       }
     );

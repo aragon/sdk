@@ -272,10 +272,14 @@ export class Context {
 
   // INTERNAL HELPERS
 
-  private static resolveGasFeeEstimationFactor(gasFeeEstimationFactor: number): number {
+  private static resolveGasFeeEstimationFactor(
+    gasFeeEstimationFactor: number
+  ): number {
     if (typeof gasFeeEstimationFactor === "undefined") return 1;
-    else if (typeof gasFeeEstimationFactor !== "number" || gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
-      throw new Error("Gas estimation factor value should be a number between 0 and 1");
+    else if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
+      throw new Error(
+        "Gas estimation factor value should be a number between 0 and 1"
+      );
     }
     return gasFeeEstimationFactor;
   }
