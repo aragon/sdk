@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Gas fee estimations with new `gasFeeData` functions for EIP-1559.
+- Fixes Github actions workflows
 
 ## [0.0.5-alpha] - 2022-04-19
 
