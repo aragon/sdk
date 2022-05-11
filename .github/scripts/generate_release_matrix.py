@@ -11,9 +11,15 @@ for label in labels:
     splitted = label['name'].split(':')
     if len(splitted) == 2:
         if splitted[1] == 'breaking' or splitted[1] == 'feature' or splitted[1] == 'fix':
+            bump = 'patch'
+            if splitted[1] == 'breaking':
+                bump = 'major'
+            elif splitted[1] == 'feature':
+                bump = 'minor'
+
             matrix.append({
                 'package': splitted[0],
-                'bump': splitted[1]
+                'bump': bump
             })
 
 print("::set-output name=matrix::" + json.dumps({'include': matrix}))
