@@ -62,14 +62,12 @@ jobs:
           echo "::set-output name=commitid::$(git rev-parse HEAD)"
       - name: create tag
         uses: actions/github-script@v5
-        env:
-          TAG_NAME: "${{ steps.bump.outputs.version }}-javascript-${{ matrix.package }}"
         with:
           github-token: ${{ secrets.ARABOT_PAT }}
           script: |
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `refs/tags/${process.env.TAG_NAME}`,
+              ref: `refs/tags/${{ steps.bump.outputs.version }}-javascript-${{ matrix.package }}`,
               sha: ${{ steps.commit.outputs.commitid }}
             })
