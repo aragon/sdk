@@ -22,4 +22,6 @@ with open(changelog, 'r') as f:
             notes.append(line.strip())
 
 notesStr='  \n'.join(notes)
-print("::set-output name=notes::" + notesStr)
+
+with open("release-notes.txt", "w") as f:
+    f.write(notesStr)
