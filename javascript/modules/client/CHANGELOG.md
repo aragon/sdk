@@ -1,6 +1,8 @@
 <!--
 Template:
-## [TBD] (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
+## [TBD]  
+  
+## [0.0.9-alpha] - Wed May 11 09:17:46 UTC 2022 (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
 
 Description of the release
 
@@ -20,7 +22,9 @@ All notable changes to the javascript client package of the SDK will be document
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [TBD] 
+## [TBD]  
+  
+## [0.0.9-alpha] - Wed May 11 09:17:46 UTC 2022 
 
 ### Added
 - Github actions automation to deploy this package.
