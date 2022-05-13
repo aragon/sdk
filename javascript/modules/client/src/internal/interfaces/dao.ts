@@ -16,6 +16,7 @@ export interface IClientDaoBase extends IClientCore {
 export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
     create: (params: ICreateDaoERC20Voting) => Promise<string>;
+    deposit: (params: IDeposit) => Promise<boolean>;
     simpleVote: {
       createProposal: (
         votingAddress: string,
@@ -132,4 +133,11 @@ export enum VoteOption {
 export interface IGasFeeEstimation {
   average: BigNumber;
   max: BigNumber;
+}
+
+export interface IDeposit {
+  daoAddress: string;
+  amount: bigint;
+  token?: string;
+  reference?: string;
 }
