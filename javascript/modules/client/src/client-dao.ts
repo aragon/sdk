@@ -13,17 +13,14 @@ import {
   IDeposit,
 } from "./internal/interfaces/dao";
 import {
-  DAO__factory,
   DAOFactory,
   DAOFactory__factory,
   ERC20Voting__factory,
-  GovernanceERC20__factory,
   Registry__factory,
   TokenFactory,
   WhitelistVoting__factory,
 } from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
-import { AddressZero } from "@ethersproject/constants";
 
 export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
 
@@ -71,65 +68,11 @@ export class ClientDaoERC20Voting extends ClientCore
       return Promise.resolve();
     },
 
-    deposit: async (params: IDeposit): Promise<boolean> => {
+    deposit: (params: IDeposit): Promise<boolean> => {
       if (!this.connectedSigner)
-        return Promise.reject(
-          new Error("A signer is needed for creating a DAO")
-        );
+        throw new Error("A signer is needed for creating a DAO");
 
-      const daoInstance = DAO__factory.connect(
-        params.daoAddress,
-        this.connectedSigner
-      );
-
-      const tokenAddress = params.token ?? AddressZero;
-      const override = params.token
-        ? {}
-        : {
-            value: BigNumber.from(params.amount),
-          };
-
-      if (params.token) {
-        const governanceERC20Instance = await GovernanceERC20__factory.connect(
-          tokenAddress,
-          this.connectedSigner
-        );
-
-        const currentAllowance = await governanceERC20Instance.allowance(
-          await this.connectedSigner.getAddress(),
-          params.daoAddress
-        );
-        if (currentAllowance.lt(params.amount)) {
-          const allowanceIncrease = await governanceERC20Instance
-            .increaseAllowance(
-              params.daoAddress,
-              BigNumber.from(params.amount).sub(currentAllowance)
-            )
-            .then(tx => tx.wait())
-            .then(cr => {
-              return BigNumber.from(params.amount).eq(
-                cr.events?.find(e => e?.event === "Approval")?.args?.value
-              );
-            });
-          if (!allowanceIncrease) {
-            return Promise.reject(new Error("Could not increase allowance"));
-          }
-        }
-      }
-
-      return daoInstance
-        .deposit(
-          tokenAddress,
-          BigNumber.from(params.amount),
-          params.reference ?? "",
-          override
-        )
-        .then(tx => tx.wait())
-        .then(cr => {
-          return BigNumber.from(params.amount).eq(
-            cr.events?.find(e => e?.event === "Deposited")?.args?.amount
-          );
-        });
+      return this.deposit(params);
     },
 
     simpleVote: {
@@ -287,6 +230,13 @@ export class ClientDaoWhitelistVoting extends ClientCore
     ) => {
       // TODO: Not implemented
       return Promise.resolve();
+    },
+
+    deposit: (params: IDeposit): Promise<boolean> => {
+      if (!this.connectedSigner)
+        throw new Error("A signer is needed for creating a DAO");
+
+      return this.deposit(params);
     },
 
     whitelist: {

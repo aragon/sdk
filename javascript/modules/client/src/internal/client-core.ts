@@ -6,11 +6,17 @@ import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
 import {
   ICreateProposal,
+  IDeposit,
   IGasFeeEstimation,
   VoteOption,
 } from "./interfaces/dao";
-import { IDAO } from "@aragon/core-contracts-ethers";
+import {
+  DAO__factory,
+  GovernanceERC20__factory,
+  IDAO,
+} from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import { AddressZero } from "@ethersproject/constants";
 
 export abstract class ClientCore implements IClientCore {
   private static readonly PRECISION_FACTOR_BASE = 1000;
@@ -148,6 +154,17 @@ export abstract class ClientCore implements IClientCore {
     ];
   }
 
+  protected static createDepositParameters(
+    params: IDeposit
+  ): [string, BigNumber, string, string] {
+    return [
+      params.daoAddress,
+      BigNumber.from(params.amount),
+      params.token ?? AddressZero,
+      params.reference ?? "",
+    ];
+  }
+
   protected estimateGasFee(
     gasLimitEstimationFromCall: Promise<BigNumber>
   ): Promise<IGasFeeEstimation> {
@@ -165,5 +182,59 @@ export abstract class ClientCore implements IClientCore {
         return { average, max };
       }
     );
+  }
+
+  protected async deposit(params: IDeposit): Promise<boolean> {
+    const [
+      daoAddress,
+      amount,
+      tokenAddress,
+      reference,
+    ] = ClientCore.createDepositParameters(params);
+
+    const daoInstance = DAO__factory.connect(daoAddress, this.connectedSigner);
+
+    const override =
+      tokenAddress !== AddressZero
+        ? {}
+        : {
+            value: amount,
+          };
+
+    if (tokenAddress !== AddressZero) {
+      const governanceERC20Instance = GovernanceERC20__factory.connect(
+        tokenAddress,
+        this.connectedSigner
+      );
+
+      const currentAllowance = await governanceERC20Instance.allowance(
+        await this.connectedSigner.getAddress(),
+        daoAddress
+      );
+
+      if (currentAllowance.lt(amount)) {
+        await governanceERC20Instance
+          .increaseAllowance(daoAddress, amount.sub(currentAllowance))
+          .then(tx => tx.wait())
+          .then(cr => {
+            if (
+              !amount.eq(
+                cr.events?.find(e => e?.event === "Approval")?.args?.value
+              )
+            ) {
+              throw new Error("Could not increase allowance");
+            }
+          });
+      }
+    }
+
+    return daoInstance
+      .deposit(tokenAddress, amount, reference, override)
+      .then(tx => tx.wait())
+      .then(cr => {
+        return amount.eq(
+          cr.events?.find(e => e?.event === "Deposited")?.args?.amount
+        );
+      });
   }
 }

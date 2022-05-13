@@ -1,5 +1,5 @@
 import { IClientCore } from "./client-core";
-import { BigNumber } from "@ethersproject/bignumber";
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
 export interface IClientDaoBase extends IClientCore {
   dao: {
@@ -36,6 +36,7 @@ export interface IClientDaoERC20Voting extends IClientCore {
 export interface IClientDaoWhitelistVoting extends IClientCore {
   dao: {
     create: (params: ICreateDaoWhitelistVoting) => Promise<string>;
+    deposit: (params: IDeposit) => Promise<boolean>;
     whitelist: {
       createProposal: (
         votingAddress: string,
@@ -137,7 +138,7 @@ export interface IGasFeeEstimation {
 
 export interface IDeposit {
   daoAddress: string;
-  amount: bigint;
+  amount: BigNumberish;
   token?: string;
   reference?: string;
 }
