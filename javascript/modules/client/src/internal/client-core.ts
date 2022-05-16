@@ -218,7 +218,7 @@ export abstract class ClientCore implements IClientCore {
           .then(tx => tx.wait())
           .then(cr => {
             if (
-              !amount.eq(
+              amount.gt(
                 cr.events?.find(e => e?.event === "Approval")?.args?.value
               )
             ) {
@@ -232,9 +232,14 @@ export abstract class ClientCore implements IClientCore {
       .deposit(tokenAddress, amount, reference, override)
       .then(tx => tx.wait())
       .then(cr => {
-        return amount.eq(
-          cr.events?.find(e => e?.event === "Deposited")?.args?.amount
-        );
+        const eventAmount = cr.events?.find(e => e?.event === "Deposited")?.args
+          ?.amount;
+        if (!amount.eq(eventAmount)) {
+          throw new Error(
+            `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`
+          );
+        }
+        return true;
       });
   }
 }
