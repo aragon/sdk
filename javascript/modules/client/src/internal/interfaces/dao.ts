@@ -1,5 +1,5 @@
 import { IClientCore } from "./client-core";
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import { BigNumber } from "@ethersproject/bignumber";
 
 export interface IClientDaoBase extends IClientCore {
   dao: {
@@ -138,7 +138,7 @@ export interface IGasFeeEstimation {
 
 export interface IDeposit {
   daoAddress: string;
-  amount: BigNumberish;
+  amount: bigint;
   token?: string;
   reference?: string;
 }
