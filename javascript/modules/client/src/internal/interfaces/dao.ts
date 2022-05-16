@@ -16,7 +16,7 @@ export interface IClientDaoBase extends IClientCore {
 export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
     create: (params: ICreateDaoERC20Voting) => Promise<string>;
-    deposit: (params: IDeposit) => Promise<boolean>;
+    deposit: (params: IDeposit) => Promise<void>;
     simpleVote: {
       createProposal: (
         votingAddress: string,
@@ -36,7 +36,7 @@ export interface IClientDaoERC20Voting extends IClientCore {
 export interface IClientDaoWhitelistVoting extends IClientCore {
   dao: {
     create: (params: ICreateDaoWhitelistVoting) => Promise<string>;
-    deposit: (params: IDeposit) => Promise<boolean>;
+    deposit: (params: IDeposit) => Promise<void>;
     whitelist: {
       createProposal: (
         votingAddress: string,

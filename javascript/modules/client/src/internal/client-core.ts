@@ -184,7 +184,10 @@ export abstract class ClientCore implements IClientCore {
     );
   }
 
-  protected async deposit(params: IDeposit): Promise<boolean> {
+  protected async deposit(params: IDeposit): Promise<void> {
+    if (!this.connectedSigner)
+      throw new Error("A signer is needed for creating a DAO");
+
     const [
       daoAddress,
       amount,
@@ -239,7 +242,6 @@ export abstract class ClientCore implements IClientCore {
             `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`
           );
         }
-        return true;
       });
   }
 }

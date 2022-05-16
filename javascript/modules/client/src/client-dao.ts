@@ -68,12 +68,7 @@ export class ClientDaoERC20Voting extends ClientCore
       return Promise.resolve();
     },
 
-    deposit: (params: IDeposit): Promise<boolean> => {
-      if (!this.connectedSigner)
-        throw new Error("A signer is needed for creating a DAO");
-
-      return this.deposit(params);
-    },
+    deposit: (params: IDeposit): Promise<void> => this.deposit(params),
 
     simpleVote: {
       createProposal: (
@@ -232,12 +227,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
       return Promise.resolve();
     },
 
-    deposit: (params: IDeposit): Promise<boolean> => {
-      if (!this.connectedSigner)
-        throw new Error("A signer is needed for creating a DAO");
-
-      return this.deposit(params);
-    },
+    deposit: (params: IDeposit): Promise<void> => this.deposit(params),
 
     whitelist: {
       createProposal: (
