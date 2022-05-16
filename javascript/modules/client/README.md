@@ -175,6 +175,42 @@ const newProposalId = await client.dao.whitelist.createProposal(
 console.log(newProposalId) // New proposal id
 ```
 
+#### Deposit to DAO
+
+###### Deposit ETH to ERC20Voting and WhitelistVoting DAOs
+
+```ts
+const client = new ClientDaoERC20Voting(context);
+// or
+const client = new ClientDaoWhitelistVoting(context);
+
+const depositParams: IDeposit = {
+    daoAddress: newDaoAddress,
+    token: null,
+    amount: BigInt(10), // Ethers amount in Gwei
+    reference: "Reference of the deposit (reason)", // Optional
+};
+
+await client.dao.deposit(depositParams);
+```
+
+###### Deposit ERC20 token to ERC20Voting and WhitelistVoting DAOs
+
+```ts
+const client = new ClientDaoERC20Voting(context);
+// or
+const client = new ClientDaoWhitelistVoting(context);
+
+const depositParams: IDeposit = {
+    daoAddress: newDaoAddress,
+    token: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877", // Token Address
+    amount: BigInt(10), // ERC20 token units amount
+    reference: "Reference of the deposit (reason)", // Optional
+};
+
+await client.dao.deposit(depositParams);
+```
+
 ## Testing
 
 To execute library tests just run

@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Github actions automation to deploy this package.
+- Deposit ETH and ERC20 tokens to DAO.
 
 ### Changed
 - Returning of `average` and `max` values for the gas fee estimations.
