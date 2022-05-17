@@ -22,7 +22,7 @@ interface VocdoniContextParams {
 }
 interface IpfsContextParams {
   ipfsOptions?: Options;
-  ipfsPeers?: string[]
+  ipfsPeers?: string[];
 }
 interface GraphQLContextParams {
   // subgraphURL: string;

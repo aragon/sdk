@@ -109,7 +109,7 @@ export class Context {
       );
     }
     if (contextParams.ipfsOptions) {
-      this.state.ipfs = ipfsCreate(contextParams.ipfsOptions)
+      this.state.ipfs = ipfsCreate(contextParams.ipfsOptions);
     }
     // if (contextParams.subgraphURL) {
     //   this.state.subgraph = new GraphQLClient(contextParams.subgraphURL);
@@ -262,7 +262,7 @@ export class Context {
       defaultState.signer = params.signer;
     }
     if (params.ipfsOptions) {
-      defaultState.ipfs = ipfsCreate(params.ipfsOptions)
+      defaultState.ipfs = ipfsCreate(params.ipfsOptions);
     }
     // if (params.subgraphURL) {
     //   defaultState.subgraph = new GraphQLClient(params.subgraphURL);

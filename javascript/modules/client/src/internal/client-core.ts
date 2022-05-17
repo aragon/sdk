@@ -29,11 +29,11 @@ export abstract class ClientCore implements IClientCore {
   private _signer: Signer | undefined;
   private _daoFactoryAddress = "";
   private _gasFeeEstimationFactor = 1;
-  private _ipfs: IPFSHTTPClient | undefined
+  private _ipfs: IPFSHTTPClient | undefined;
 
   constructor(context: Context) {
     if (context.ipfs) {
-      this._ipfs = context.ipfs
+      this._ipfs = context.ipfs;
     }
     if (context.web3Providers) {
       this._web3Providers = context.web3Providers;
@@ -148,13 +148,13 @@ export abstract class ClientCore implements IClientCore {
   protected static createProposalParameters(
     params: ICreateProposal
   ): [
-      string,
-      IDAO.ActionStruct[],
-      BigNumberish,
-      BigNumberish,
-      boolean,
-      BigNumberish
-    ] {
+    string,
+    IDAO.ActionStruct[],
+    BigNumberish,
+    BigNumberish,
+    boolean,
+    BigNumberish
+  ] {
     return [
       params.metadata,
       params.actions ?? [],
@@ -284,31 +284,36 @@ export abstract class ClientCore implements IClientCore {
     );
   }
   public async pin(input: string | Uint8Array): Promise<string> {
-    if (!this.ipfs) return Promise.reject(new Error("IPFS client is not initialized"))
-    return this.ipfs.add(input).then((res) => {
-      return Promise.resolve(res.path)
-    }).catch((e) => {
-      return Promise.reject(e)
-    })
+    if (!this.ipfs)
+      return Promise.reject(new Error("IPFS client is not initialized"));
+    return this.ipfs
+      .add(input)
+      .then(res => {
+        return Promise.resolve(res.path);
+      })
+      .catch(e => {
+        return Promise.reject(e);
+      });
   }
   public async fetchBytes(cid: string) {
-    if (!this.ipfs) return Promise.reject(new Error("IPFS client is not initialized"))
+    if (!this.ipfs)
+      return Promise.reject(new Error("IPFS client is not initialized"));
     try {
       for await (const chunk of this.ipfs.cat(cid)) {
-        return Promise.resolve(chunk)
+        return Promise.resolve(chunk);
       }
     } catch (e) {
-      Promise.reject(e)
+      Promise.reject(e);
     }
-    return
+    return;
   }
   public fetchString(cid: string): Promise<string> {
-    return this.fetchBytes(cid).then((bytes) => {
-      return new TextDecoder().decode(bytes)
-    }).catch((e) => {
-      return Promise.reject(e)
-    })
+    return this.fetchBytes(cid)
+      .then(bytes => {
+        return new TextDecoder().decode(bytes);
+      })
+      .catch(e => {
+        return Promise.reject(e);
+      });
   }
-
-
 }
