@@ -1,13 +1,12 @@
 import { ContextState, ContextParams } from "./internal/interfaces/context";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
+import { create as ipfsCreate, IPFSHTTPClient } from 'ipfs-http-client'
 import { activeContractsList } from "@aragon/core-contracts-ethers";
-// import { create as ipfsCreate, Options as IpfsOptions } from "ipfs-http-client";
 // import { GraphQLClient } from "graphql-request";
 export { ContextParams } from "./internal/interfaces/context";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
-
 const supportedProtocols = ["https:"];
 if (typeof process !== "undefined" && process.env?.TESTING) {
   supportedProtocols.push("http:");
@@ -23,7 +22,6 @@ const defaultState: ContextState = {
 
 export class Context {
   private state: ContextState = Object.assign({}, defaultState);
-
   // INTERNAL CONTEXT STATE
 
   /**
@@ -60,10 +58,9 @@ export class Context {
       throw new Error("No web3 endpoints defined");
     } else if (!contextParams.gasFeeEstimationFactor) {
       throw new Error("No gas fee reducer defined");
+    } else if (!contextParams.ipfsOptions) {
+      throw new Error("No IPFS options defined");
     }
-    // else if (!contextParams.ipfs) {
-    //   throw new Error("No IPFS options defined");
-    // }
 
     this.state = {
       network: contextParams.network,
@@ -77,7 +74,7 @@ export class Context {
       gasFeeEstimationFactor: Context.resolveGasFeeEstimationFactor(
         contextParams.gasFeeEstimationFactor
       ),
-      // ipfs: ipfsCreate(contextParams.ipfs),
+      ipfs: ipfsCreate(contextParams.ipfsOptions),
       // subgraph: new GraphQLClient(contextParams.subgraphURL),
     };
   }
@@ -111,9 +108,9 @@ export class Context {
         contextParams.gasFeeEstimationFactor
       );
     }
-    // if (contextParams.ipfs) {
-    //   this.state.ipfs = ipfsCreate(contextParams.ipfs);
-    // }
+    if (contextParams.ipfsOptions) {
+      this.state.ipfs = ipfsCreate(contextParams.ipfsOptions)
+    }
     // if (contextParams.subgraphURL) {
     //   this.state.subgraph = new GraphQLClient(contextParams.subgraphURL);
     // }
@@ -249,9 +246,9 @@ export class Context {
    *
    * @public
    */
-  // get ipfs(): IPFSHTTPClient {
-  //   return this.state.ipfs || defaultState.ipfs;
-  // }
+  get ipfs(): IPFSHTTPClient | undefined {
+    return this.state.ipfs || defaultState.ipfs;
+  }
 
   // DEFAULT CONTEXT STATE
   static setDefault(params: Partial<ContextParams>) {
@@ -264,9 +261,9 @@ export class Context {
     if (params.signer) {
       defaultState.signer = params.signer;
     }
-    // if (params.ipfs) {
-    //   defaultState.ipfs = ipfsCreate(params.ipfs);
-    // }
+    if (params.ipfsOptions) {
+      defaultState.ipfs = ipfsCreate(params.ipfsOptions)
+    }
     // if (params.subgraphURL) {
     //   defaultState.subgraph = new GraphQLClient(params.subgraphURL);
     // }

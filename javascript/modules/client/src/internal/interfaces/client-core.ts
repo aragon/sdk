@@ -2,6 +2,7 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
+
 export interface IClientWeb3Core {
   // useSigner(signer: Signer): this;
   shiftWeb3Node(): this;
@@ -15,6 +16,7 @@ export interface IClientVocdoniCore {
 }
 export interface IClientIpfsCore {
   // Add here
+  pin(entry: string | Uint8Array): Promise<string>
 }
 export interface IClientGraphQLCore {
   // Add here
@@ -22,6 +24,6 @@ export interface IClientGraphQLCore {
 
 export interface IClientCore
   extends IClientWeb3Core,
-    IClientVocdoniCore,
-    IClientIpfsCore,
-    IClientGraphQLCore {}
+  IClientVocdoniCore,
+  IClientIpfsCore,
+  IClientGraphQLCore { }

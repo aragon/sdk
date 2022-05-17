@@ -19,6 +19,7 @@ import {
 } from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
+import { IPFSHTTPClient } from "ipfs-http-client";
 
 export abstract class ClientCore implements IClientCore {
   private static readonly PRECISION_FACTOR_BASE = 1000;
@@ -28,8 +29,12 @@ export abstract class ClientCore implements IClientCore {
   private _signer: Signer | undefined;
   private _daoFactoryAddress = "";
   private _gasFeeEstimationFactor = 1;
+  private _ipfs: IPFSHTTPClient | undefined
 
   constructor(context: Context) {
+    if (context.ipfs) {
+      this._ipfs = context.ipfs
+    }
     if (context.web3Providers) {
       this._web3Providers = context.web3Providers;
       this._web3Idx = 0;
@@ -105,6 +110,10 @@ export abstract class ClientCore implements IClientCore {
     return this._daoFactoryAddress;
   }
 
+  get ipfs() {
+    return this._ipfs;
+  }
+
   public async checkWeb3Status(): Promise<boolean> {
     return this.web3
       .getNetwork()
@@ -139,13 +148,13 @@ export abstract class ClientCore implements IClientCore {
   protected static createProposalParameters(
     params: ICreateProposal
   ): [
-    string,
-    IDAO.ActionStruct[],
-    BigNumberish,
-    BigNumberish,
-    boolean,
-    BigNumberish
-  ] {
+      string,
+      IDAO.ActionStruct[],
+      BigNumberish,
+      BigNumberish,
+      boolean,
+      BigNumberish
+    ] {
     return [
       params.metadata,
       params.actions ?? [],
@@ -274,4 +283,32 @@ export abstract class ClientCore implements IClientCore {
       ClientCore.createWithdrawParameters(params)
     );
   }
+  public async pin(input: string | Uint8Array): Promise<string> {
+    if (!this.ipfs) return Promise.reject(new Error("IPFS client is not initialized"))
+    return this.ipfs.add(input).then((res) => {
+      return Promise.resolve(res.path)
+    }).catch((e) => {
+      return Promise.reject(e)
+    })
+  }
+  public async fetchBytes(cid: string) {
+    if (!this.ipfs) return Promise.reject(new Error("IPFS client is not initialized"))
+    try {
+      for await (const chunk of this.ipfs.cat(cid)) {
+        return Promise.resolve(chunk)
+      }
+    } catch (e) {
+      Promise.reject(e)
+    }
+    return
+  }
+  public fetchString(cid: string): Promise<string> {
+    return this.fetchBytes(cid).then((bytes) => {
+      return new TextDecoder().decode(bytes)
+    }).catch((e) => {
+      return Promise.reject(e)
+    })
+  }
+
+
 }
