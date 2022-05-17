@@ -258,16 +258,16 @@ export abstract class ClientCore implements IClientCore {
       });
   }
 
-  protected static generateWithdrawAction(
+  protected static createWithdrawAction(
     to: string,
     value: bigint,
     params: IWithdraw
   ): IProposalAction {
-    const data = ClientCore.generateWithdrawActionData(params);
+    const data = ClientCore.createWithdrawActionData(params);
     return { to, value, data };
   }
 
-  protected static generateWithdrawActionData(params: IWithdraw): string {
+  protected static createWithdrawActionData(params: IWithdraw): string {
     const daoInterface = DAO__factory.createInterface();
     return daoInterface.encodeFunctionData(
       "withdraw",

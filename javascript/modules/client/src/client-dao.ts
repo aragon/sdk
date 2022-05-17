@@ -135,7 +135,7 @@ export class ClientDaoERC20Voting extends ClientCore
       value: bigint,
       params: IWithdraw
     ): IProposalAction => {
-      return ClientCore.generateWithdrawAction(to, value, params);
+      return ClientCore.createWithdrawAction(to, value, params);
     },
   };
 
@@ -304,7 +304,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
       value: bigint,
       params: IWithdraw
     ): IProposalAction => {
-      return ClientCore.generateWithdrawAction(to, value, params);
+      return ClientCore.createWithdrawAction(to, value, params);
     },
   };
 
