@@ -12,6 +12,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 // import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
+import { IWithdraw } from "../../src/internal/interfaces/dao";
 
 const web3endpoints = {
   working: [
@@ -339,4 +340,54 @@ describe("Client instances", () => {
   //   expect(BigNumber.isBigNumber(newProposalId)).toBeTruthy();
   //   expect(newProposalId.toBigInt()).toBeGreaterThan(0);
   // });
+  it("Should create a ERC20VotingDAO client and generate a withdraw action", async () => {
+    const context = new Context(contextParamsLocalChain);
+    const client = new ClientDaoERC20Voting(context);
+
+    const withdrawParams: IWithdraw = {
+      to: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
+      amount: BigInt(10),
+      reference: "Test",
+    };
+
+    const withdrawAction = client.actions.withdraw(
+      "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
+      BigInt(1),
+      withdrawParams
+    );
+
+    expect(typeof withdrawAction).toBe("object");
+    expect(withdrawAction.to).toEqual(
+      "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877"
+    );
+    expect(withdrawAction.value).toEqual(BigInt(1));
+    expect(withdrawAction.data).toEqual(
+      "0x4f06563200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a16078c911afab4ce4b7d261a67f8df99fad877000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000045465737400000000000000000000000000000000000000000000000000000000"
+    );
+  });
+  it("Should create a WhitelistVoting client and generate a withdraw action", async () => {
+    const context = new Context(contextParamsLocalChain);
+    const client = new ClientDaoWhitelistVoting(context);
+
+    const withdrawParams: IWithdraw = {
+      to: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
+      amount: BigInt(10),
+      reference: "Test",
+    };
+
+    const withdrawAction = client.actions.withdraw(
+      "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
+      BigInt(1),
+      withdrawParams
+    );
+
+    expect(typeof withdrawAction).toBe("object");
+    expect(withdrawAction.to).toEqual(
+      "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877"
+    );
+    expect(withdrawAction.value).toEqual(BigInt(1));
+    expect(withdrawAction.data).toEqual(
+      "0x4f06563200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a16078c911afab4ce4b7d261a67f8df99fad877000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000045465737400000000000000000000000000000000000000000000000000000000"
+    );
+  });
 });

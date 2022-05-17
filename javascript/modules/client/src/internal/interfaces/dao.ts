@@ -11,6 +11,9 @@ export interface IClientDaoBase extends IClientCore {
       data: Uint8Array
     ) => Promise<void>;
   };
+  actions: {
+    withdraw: (to: string, value: bigint, params: IWithdraw) => IProposalAction;
+  };
 }
 
 export interface IClientDaoERC20Voting extends IClientCore {
@@ -120,7 +123,7 @@ export interface ICreateProposal {
 
 export interface IProposalAction {
   to: string;
-  value: number;
+  value: bigint;
   data: string;
 }
 
@@ -138,6 +141,13 @@ export interface IGasFeeEstimation {
 
 export interface IDeposit {
   daoAddress: string;
+  amount: bigint;
+  token?: string;
+  reference?: string;
+}
+
+export interface IWithdraw {
+  to: string;
   amount: bigint;
   token?: string;
   reference?: string;

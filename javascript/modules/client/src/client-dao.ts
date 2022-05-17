@@ -11,6 +11,8 @@ import {
   ICreateProposal,
   VotingConfig,
   IDeposit,
+  IProposalAction,
+  IWithdraw,
 } from "./internal/interfaces/dao";
 import {
   DAOFactory,
@@ -124,6 +126,16 @@ export class ClientDaoERC20Voting extends ClientCore
         // TODO: Not implemented
         return Promise.resolve();
       },
+    },
+  };
+
+  actions = {
+    withdraw: (
+      to: string,
+      value: bigint,
+      params: IWithdraw
+    ): IProposalAction => {
+      return ClientCore.generateWithdrawAction(to, value, params);
     },
   };
 
@@ -283,6 +295,16 @@ export class ClientDaoWhitelistVoting extends ClientCore
         // TODO: Not implemented
         return Promise.resolve();
       },
+    },
+  };
+
+  actions = {
+    withdraw: (
+      to: string,
+      value: bigint,
+      params: IWithdraw
+    ): IProposalAction => {
+      return ClientCore.generateWithdrawAction(to, value, params);
     },
   };
 
