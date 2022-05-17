@@ -10,6 +10,7 @@ import {
   ICreateDaoWhitelistVoting,
   ICreateProposal,
   VotingConfig,
+  IDeposit,
 } from "./internal/interfaces/dao";
 import {
   DAOFactory,
@@ -66,6 +67,8 @@ export class ClientDaoERC20Voting extends ClientCore
       // TODO: Not implemented
       return Promise.resolve();
     },
+
+    deposit: (params: IDeposit): Promise<void> => this.deposit(params),
 
     simpleVote: {
       createProposal: (
@@ -223,6 +226,8 @@ export class ClientDaoWhitelistVoting extends ClientCore
       // TODO: Not implemented
       return Promise.resolve();
     },
+
+    deposit: (params: IDeposit): Promise<void> => this.deposit(params),
 
     whitelist: {
       createProposal: (
