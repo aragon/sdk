@@ -2,22 +2,22 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
-import { IClientCore } from "./interfaces/client-core";
+import { IClientCore } from "./interfaces/core";
 import { Context } from "../context";
 import {
-  ICreateProposal,
-  IDeposit,
+  IDepositParams,
   IGasFeeEstimation,
-  VoteOption,
 } from "./interfaces/dao";
 import {
   DAO__factory,
   GovernanceERC20__factory,
-  IDAO,
 } from "@aragon/core-contracts-ethers";
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 
+/** 
+ * Low level implementation of the network primitives
+ */
 export abstract class ClientCore implements IClientCore {
   private static readonly PRECISION_FACTOR_BASE = 1000;
 
@@ -134,28 +134,8 @@ export abstract class ClientCore implements IClientCore {
     return contract.connect(this.signer) as Contract & T;
   }
 
-  protected static createProposalParameters(
-    params: ICreateProposal
-  ): [
-    string,
-    IDAO.ActionStruct[],
-    BigNumberish,
-    BigNumberish,
-    boolean,
-    BigNumberish
-  ] {
-    return [
-      params.metadata,
-      params.actions ?? [],
-      params.startDate ?? 0,
-      params.endDate ?? 0,
-      params.executeIfDecided ?? false,
-      params.creatorChoice ?? VoteOption.NONE,
-    ];
-  }
-
   protected static createDepositParameters(
-    params: IDeposit
+    params: IDepositParams
   ): [string, BigNumber, string, string] {
     return [
       params.daoAddress,
@@ -184,7 +164,7 @@ export abstract class ClientCore implements IClientCore {
     );
   }
 
-  protected async deposit(params: IDeposit): Promise<void> {
+  protected async deposit(params: IDepositParams): Promise<void> {
     if (!this.connectedSigner)
       throw new Error("A signer is needed for creating a DAO");
 
