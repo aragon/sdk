@@ -24,7 +24,13 @@ import {
 } from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
-export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
+export {
+  ICreateDaoERC20Voting,
+  ICreateDaoWhitelistVoting,
+  ICreateProposal,
+  IDeposit,
+  IWithdraw,
+};
 
 export class ClientDaoERC20Voting extends ClientCore
   implements IClientDaoBase, IClientDaoERC20Voting {

@@ -7,12 +7,11 @@ import {
   ContextParams,
   ICreateDaoERC20Voting,
   ICreateDaoWhitelistVoting,
+  IWithdraw,
 } from "../../src";
-import { BigNumber } from "@ethersproject/bignumber";
 // import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
-import { IWithdraw } from "../../src/internal/interfaces/dao";
 
 const web3endpoints = {
   working: [
@@ -184,9 +183,9 @@ describe("Client instances", () => {
     const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 
     expect(typeof gasFeesEstimation).toEqual("object");
-    expect(BigNumber.isBigNumber(gasFeesEstimation.average)).toBeTruthy();
-    expect(BigNumber.isBigNumber(gasFeesEstimation.max)).toBeTruthy();
-    expect(gasFeesEstimation.max.gt(gasFeesEstimation.average)).toBeTruthy();
+    expect(typeof gasFeesEstimation.average).toEqual("bigint");
+    expect(typeof gasFeesEstimation.max).toEqual("bigint");
+    expect(gasFeesEstimation.max > gasFeesEstimation.average).toBeTruthy();
   });
   it("Should create a ERC20VotingDAO locally", async () => {
     const context = new Context(contextParamsLocalChain);
@@ -267,9 +266,9 @@ describe("Client instances", () => {
     const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 
     expect(typeof gasFeesEstimation).toEqual("object");
-    expect(BigNumber.isBigNumber(gasFeesEstimation.average)).toBeTruthy();
-    expect(BigNumber.isBigNumber(gasFeesEstimation.max)).toBeTruthy();
-    expect(gasFeesEstimation.max.gt(gasFeesEstimation.average)).toBeTruthy();
+    expect(typeof gasFeesEstimation.average).toEqual("bigint");
+    expect(typeof gasFeesEstimation.max).toEqual("bigint");
+    expect(gasFeesEstimation.max > gasFeesEstimation.average).toBeTruthy();
   });
   it("Should create a WhitelistVoting locally", async () => {
     const context = new Context(contextParamsLocalChain);

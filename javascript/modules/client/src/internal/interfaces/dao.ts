@@ -118,7 +118,7 @@ export interface ICreateProposal {
 
 export interface IProposalAction {
   to: string;
-  value: number | bigint;
+  value: bigint;
   data: string;
 }
 
@@ -130,20 +130,20 @@ export enum VoteOption {
 }
 
 export interface IGasFeeEstimation {
-  average: BigNumber;
-  max: BigNumber;
+  average: bigint;
+  max: bigint;
 }
 
 export interface IDeposit {
   daoAddress: string;
-  amount: number | bigint;
+  amount: bigint;
   token?: string;
   reference?: string;
 }
 
 export interface IWithdraw {
   to: string;
-  amount: number | bigint;
+  amount: bigint;
   token?: string;
   reference?: string;
 }

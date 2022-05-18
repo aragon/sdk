@@ -192,7 +192,7 @@ export abstract class ClientCore implements IClientCore {
           .mul(BigNumber.from(Math.trunc(factor)))
           .div(BigNumber.from(ClientCore.PRECISION_FACTOR_BASE));
 
-        return { average, max };
+        return { average: average.toBigInt(), max: max.toBigInt() };
       }
     );
   }
@@ -260,7 +260,7 @@ export abstract class ClientCore implements IClientCore {
 
   protected static createWithdrawAction(
     to: string,
-    value: number | bigint,
+    value: bigint,
     params: IWithdraw
   ): IProposalAction {
     const data = ClientCore.createWithdrawActionData(params);
