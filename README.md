@@ -29,6 +29,12 @@ To handle certain automated tasks, you can add labels to your pull requests. Her
 | `<component>:feature`    | This label triggers a new NPM minor version of the corresponding JS package | Don't add any other &lt;component&gt;:\* label                    |
 | `<component>:breaking`   | This label triggers a new NPM major version of the corresponding JS package | Don't add any other &lt;component&gt;:\* label                    |
 
+The available components and labels are:
+- `client`
+  - `client:fix`, `client:feature`, `client:breaking`
+- `common`
+  - `common:fix`, `common:feature`, `common:breaking`
+
 
 ### General
 
