@@ -16,17 +16,17 @@ To handle certain automated tasks, you can add labels to your pull requests. Her
 | `<component>:minor` | Triggers a new NPM minor version of the corresponding JS package | Don't add any other `<component>:*` label |
 | `<component>:major` | Triggers a new NPM major version of the corresponding JS package | Don't add any other `<component>:*` label |
 
-The available components and labels are:
+The available components are:
 
 - Client package
   - `client:patch`, `client:minor`, `client:major`
-- Common pagkage
+- Common package
   - `common:patch`, `common:minor`, `common:major`
 
 ### General tags
 
 | Label             | Meaning                                                                          | Remarks                                                |
 | ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| javascript        | This label indicates that something in a javascript package has changed          | This labels gets added automatically by the automation |
-| javascript:client | This label indicates that something in the javascript client package has changed | This labels gets added automatically by the automation |
-| javascript:common | This label indicates that something in the javascript common package has changed | This labels gets added automatically by the automation |
+| `javascript`        | This label indicates that something in a javascript package has changed          | This labels gets added automatically by the automation |
+| `javascript:client` | This label indicates that something in the javascript client package has changed | This labels gets added automatically by the automation |
+| `javascript:common` | This label indicates that something in the javascript common package has changed | This labels gets added automatically by the automation |
