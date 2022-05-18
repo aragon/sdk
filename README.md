@@ -23,23 +23,23 @@ To handle certain automated tasks, you can add labels to your pull requests. Her
 
 ### JavaScript
 
-| Label             | Meaning                                                                                             | Remarks                                              |
-| ----------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `<component>:fix`        | This label triggers a new NPM patch version of the corresponding JS package | Don't add any other &lt;component&gt;:\* label                    |
-| `<component>:feature`    | This label triggers a new NPM minor version of the corresponding JS package | Don't add any other &lt;component&gt;:\* label                    |
-| `<component>:breaking`   | This label triggers a new NPM major version of the corresponding JS package | Don't add any other &lt;component&gt;:\* label                    |
+| Label               | Meaning                                                                     | Remarks                                        |
+| ------------------- | --------------------------------------------------------------------------- | ---------------------------------------------- |
+| `<component>:patch` | This label triggers a new NPM patch version of the corresponding JS package | Don't add any other &lt;component&gt;:\* label |
+| `<component>:minor` | This label triggers a new NPM minor version of the corresponding JS package | Don't add any other &lt;component&gt;:\* label |
+| `<component>:major` | This label triggers a new NPM major version of the corresponding JS package | Don't add any other &lt;component&gt;:\* label |
 
 The available components and labels are:
-- `client`
-  - `client:fix`, `client:feature`, `client:breaking`
-- `common`
-  - `common:fix`, `common:feature`, `common:breaking`
 
+- `client`
+  - `client:patch`, `client:minor`, `client:major`
+- `common`
+  - `common:patch`, `common:minor`, `common:major`
 
 ### General
 
-| Label             | Meaning                                                                                             | Remarks                                              |
-| ----------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | 
-| javascript        | This label indicates that something in a javascript package has changed                             | This labels gets added automatically by the automation |
-| javascript:client | This label indicates that something in the javascript client package has changed                    | This labels gets added automatically by the automation |
-| javascript:common | This label indicates that something in the javascript common package has changed                    | This labels gets added automatically by the automation |
+| Label             | Meaning                                                                          | Remarks                                                |
+| ----------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| javascript        | This label indicates that something in a javascript package has changed          | This labels gets added automatically by the automation |
+| javascript:client | This label indicates that something in the javascript client package has changed | This labels gets added automatically by the automation |
+| javascript:common | This label indicates that something in the javascript common package has changed | This labels gets added automatically by the automation |
