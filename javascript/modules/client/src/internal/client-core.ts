@@ -260,7 +260,7 @@ export abstract class ClientCore implements IClientCore {
 
   protected static createWithdrawAction(
     to: string,
-    value: bigint,
+    value: number | bigint,
     params: IWithdraw
   ): IProposalAction {
     const data = ClientCore.createWithdrawActionData(params);

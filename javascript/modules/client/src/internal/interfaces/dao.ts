@@ -57,11 +57,6 @@ export interface IClientDaoWhitelistVoting extends IClientCore {
 }
 
 // DAO DATA TYPES
-export interface DaoAction {
-  to: string;
-  value: bigint;
-  bytes: string;
-}
 
 export enum DaoRole {
   UPGRADE_ROLE = "UPGRADE_ROLE",
@@ -123,7 +118,7 @@ export interface ICreateProposal {
 
 export interface IProposalAction {
   to: string;
-  value: bigint;
+  value: number | bigint;
   data: string;
 }
 
@@ -141,14 +136,14 @@ export interface IGasFeeEstimation {
 
 export interface IDeposit {
   daoAddress: string;
-  amount: bigint;
+  amount: number | bigint;
   token?: string;
   reference?: string;
 }
 
 export interface IWithdraw {
   to: string;
-  amount: bigint;
+  amount: number | bigint;
   token?: string;
   reference?: string;
 }
