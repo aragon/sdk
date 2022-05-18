@@ -12,9 +12,9 @@ To handle certain automated tasks, you can add labels to your pull requests. Her
 
 | Label               | Meaning                                                          | Remarks                                          |
 | ------------------- | ---------------------------------------------------------------- | ------------------------------------------------ |
-| `<component>:patch` | Triggers a new NPM patch version of the corresponding JS package | Don't add any other `&lt;component&gt;:\*` label |
-| `<component>:minor` | Triggers a new NPM minor version of the corresponding JS package | Don't add any other `&lt;component&gt;:\*` label |
-| `<component>:major` | Triggers a new NPM major version of the corresponding JS package | Don't add any other `&lt;component&gt;:\*` label |
+| `<component>:patch` | Triggers a new NPM patch version of the corresponding JS package | Don't add any other `<component>:*` label |
+| `<component>:minor` | Triggers a new NPM minor version of the corresponding JS package | Don't add any other `<component>:*` label |
+| `<component>:major` | Triggers a new NPM major version of the corresponding JS package | Don't add any other `<component>:*` label |
 
 The available components and labels are:
 
