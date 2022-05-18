@@ -7,6 +7,7 @@ except:
     labels = []
 
 matrix = []
+hasLabels = False
 for label in labels:
     splitted = label['name'].split(':')
     if len(splitted) == 2:
@@ -21,5 +22,7 @@ for label in labels:
                 'package': splitted[0],
                 'bump': bump
             })
+            hasLabels = True
 
+print("::set-output name=hasLabels::" + str(hasLabels))
 print("::set-output name=matrix::" + json.dumps({'include': matrix}))
