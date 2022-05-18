@@ -11,16 +11,10 @@ hasLabels = False
 for label in labels:
     splitted = label['name'].split(':')
     if len(splitted) == 2:
-        if splitted[1] == 'breaking' or splitted[1] == 'feature' or splitted[1] == 'fix':
-            bump = 'patch'
-            if splitted[1] == 'breaking':
-                bump = 'major'
-            elif splitted[1] == 'feature':
-                bump = 'minor'
-
+        if splitted[1] == 'patch' or splitted[1] == 'minor' or splitted[1] == 'major':
             matrix.append({
                 'package': splitted[0],
-                'bump': bump
+                'bump': splitted[1]
             })
             hasLabels = True
 
