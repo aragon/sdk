@@ -1,6 +1,11 @@
 name: Javascript Test
 on:
   workflow_call:
+    inputs:
+      run:
+        description: "Forces a run if true"
+        required: false
+        type: boolean
   push:
     branches-ignore:
       - develop
@@ -14,7 +19,7 @@ defaults:
 
 jobs:
   build-js:
-    if: github.actor != 'arabot-1'
+    if: ${{ github.actor != 'arabot-1' || inputs.run }}
     name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}

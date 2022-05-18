@@ -26,6 +26,8 @@ jobs:
           fi
   test:
     uses: ./.github/workflows/javascript_test.yml
+    with:
+      run: true
   publish:
     runs-on: ubuntu-latest
     needs: [checkTag, test]
