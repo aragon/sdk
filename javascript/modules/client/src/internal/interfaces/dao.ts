@@ -11,6 +11,9 @@ export interface IClientDaoBase extends IClientCore {
       data: Uint8Array
     ) => Promise<void>;
   };
+  actions: {
+    withdraw: (to: string, value: bigint, params: IWithdraw) => IProposalAction;
+  };
 }
 
 export interface IClientDaoERC20Voting extends IClientCore {
@@ -54,11 +57,6 @@ export interface IClientDaoWhitelistVoting extends IClientCore {
 }
 
 // DAO DATA TYPES
-export interface DaoAction {
-  to: string;
-  value: bigint;
-  bytes: string;
-}
 
 export enum DaoRole {
   UPGRADE_ROLE = "UPGRADE_ROLE",
@@ -120,7 +118,7 @@ export interface ICreateProposal {
 
 export interface IProposalAction {
   to: string;
-  value: number;
+  value: bigint;
   data: string;
 }
 
@@ -132,12 +130,19 @@ export enum VoteOption {
 }
 
 export interface IGasFeeEstimation {
-  average: BigNumber;
-  max: BigNumber;
+  average: bigint;
+  max: bigint;
 }
 
 export interface IDeposit {
   daoAddress: string;
+  amount: bigint;
+  token?: string;
+  reference?: string;
+}
+
+export interface IWithdraw {
+  to: string;
   amount: bigint;
   token?: string;
   reference?: string;

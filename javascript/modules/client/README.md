@@ -70,8 +70,8 @@ const daoCreationParams: ICreateDaoERC20Voting = {
 const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 console.log(gasFeesEstimation)
 // {
-//   average: BigNumber { _hex: '0x0a509a23250504', _isBigNumber: true }, // Average gas fee estimation (reducing the max value by heuristic) 
-//   max: BigNumber { _hex: '0x1080f69ea1a1fc', _isBigNumber: true } // Maximum gas fee estimation
+//   average: 4670887392191186n, // Average gas fee estimation (reducing the max value by heuristic) 
+//   max: 7473419827505898n // Maximum gas fee estimation
 // }
 
 const newDaoAddress = await client.dao.create(daoCreationParams);
@@ -111,8 +111,8 @@ const daoCreationParams: ICreateDaoWhitelistVoting = {
 
 const gasFeesEstimation = await client.estimate.create(daoCreationParams);
 // {
-//   average: BigNumber { _hex: '0x0a509a23250504', _isBigNumber: true }, // Average gas fee estimation (reducing the max value by heuristic) 
-//   max: BigNumber { _hex: '0x1080f69ea1a1fc', _isBigNumber: true } // Maximum gas fee estimation
+//   average: 4670887392191186n, // Average gas fee estimation (reducing the max value by heuristic) 
+//   max: 7473419827505898n // Maximum gas fee estimation
 // }
 
 const newDaoAddress = await client.dao.create(daoCreationParams);
@@ -209,6 +209,30 @@ const depositParams: IDeposit = {
 };
 
 await client.dao.deposit(depositParams);
+```
+
+#### Actions helpers
+
+###### Withdraw
+
+```ts
+const client = new ClientDaoERC20Voting(context);
+// or
+const client = new ClientDaoWhitelistVoting(context);
+
+const withdrawParams: IWithdraw = {
+    to: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
+    amount: BigInt(10),
+    reference: "Test",
+};
+
+const withdrawAction = client.actions.withdraw(
+    "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
+    BigInt(1),
+    withdrawParams
+);
+
+console.log(withdrawAction) // Encoded withdraw action
 ```
 
 ## Testing

@@ -23,12 +23,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [TBD]  
-  
+
+### Added
+- Deposit ETH and ERC20 tokens to DAO.
+- Withdrawal action creation helper.
+
+### Changed
+- `average` and `max` values for the gas fee estimations returned as `bigint`.
+
+### Fixed
+- Exported `IDeposit` and `ICreateProposal`.
+
 ## [0.0.9-alpha] - Wed May 11 09:17:46 UTC 2022 
 
 ### Added
 - Github actions automation to deploy this package.
-- Deposit ETH and ERC20 tokens to DAO.
 
 ### Changed
 - Returning of `average` and `max` values for the gas fee estimations.

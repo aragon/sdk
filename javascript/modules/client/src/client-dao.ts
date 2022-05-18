@@ -11,6 +11,8 @@ import {
   ICreateProposal,
   VotingConfig,
   IDeposit,
+  IProposalAction,
+  IWithdraw,
 } from "./internal/interfaces/dao";
 import {
   DAOFactory,
@@ -22,7 +24,13 @@ import {
 } from "@aragon/core-contracts-ethers";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 
-export { ICreateDaoERC20Voting, ICreateDaoWhitelistVoting };
+export {
+  ICreateDaoERC20Voting,
+  ICreateDaoWhitelistVoting,
+  ICreateProposal,
+  IDeposit,
+  IWithdraw,
+};
 
 export class ClientDaoERC20Voting extends ClientCore
   implements IClientDaoBase, IClientDaoERC20Voting {
@@ -124,6 +132,16 @@ export class ClientDaoERC20Voting extends ClientCore
         // TODO: Not implemented
         return Promise.resolve();
       },
+    },
+  };
+
+  actions = {
+    withdraw: (
+      to: string,
+      value: bigint,
+      params: IWithdraw
+    ): IProposalAction => {
+      return ClientCore.createWithdrawAction(to, value, params);
     },
   };
 
@@ -283,6 +301,16 @@ export class ClientDaoWhitelistVoting extends ClientCore
         // TODO: Not implemented
         return Promise.resolve();
       },
+    },
+  };
+
+  actions = {
+    withdraw: (
+      to: string,
+      value: bigint,
+      params: IWithdraw
+    ): IProposalAction => {
+      return ClientCore.createWithdrawAction(to, value, params);
     },
   };
 

@@ -8,6 +8,8 @@ import {
   ICreateProposal,
   IDeposit,
   IGasFeeEstimation,
+  IProposalAction,
+  IWithdraw,
   VoteOption,
 } from "./interfaces/dao";
 import {
@@ -165,6 +167,17 @@ export abstract class ClientCore implements IClientCore {
     ];
   }
 
+  protected static createWithdrawParameters(
+    params: IWithdraw
+  ): [string, string, BigNumber, string] {
+    return [
+      params.token ?? AddressZero,
+      params.to,
+      BigNumber.from(params.amount),
+      params.reference ?? "",
+    ];
+  }
+
   protected estimateGasFee(
     gasLimitEstimationFromCall: Promise<BigNumber>
   ): Promise<IGasFeeEstimation> {
@@ -179,7 +192,7 @@ export abstract class ClientCore implements IClientCore {
           .mul(BigNumber.from(Math.trunc(factor)))
           .div(BigNumber.from(ClientCore.PRECISION_FACTOR_BASE));
 
-        return { average, max };
+        return { average: average.toBigInt(), max: max.toBigInt() };
       }
     );
   }
@@ -243,5 +256,22 @@ export abstract class ClientCore implements IClientCore {
           );
         }
       });
+  }
+
+  protected static createWithdrawAction(
+    to: string,
+    value: bigint,
+    params: IWithdraw
+  ): IProposalAction {
+    const data = ClientCore.createWithdrawActionData(params);
+    return { to, value, data };
+  }
+
+  protected static createWithdrawActionData(params: IWithdraw): string {
+    const daoInterface = DAO__factory.createInterface();
+    return daoInterface.encodeFunctionData(
+      "withdraw",
+      ClientCore.createWithdrawParameters(params)
+    );
   }
 }
