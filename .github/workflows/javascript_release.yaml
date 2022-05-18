@@ -71,5 +71,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: `refs/tags/${{ steps.bump.outputs.version }}-javascript-${{ matrix.package }}`,
-              sha: ${{ steps.commit.outputs.commitid }}
+              sha: "${{ steps.commit.outputs.commitid }}"
             })
