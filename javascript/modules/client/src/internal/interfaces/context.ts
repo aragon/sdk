@@ -1,11 +1,6 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { Options, IPFSHTTPClient } from "ipfs-http-client";
-// import {
-//   create as ipfsCreate,
-//   IPFSHTTPClient,
-//   Options as IpfsOptions,
-// } from "ipfs-http-client";
 // import { GraphQLClient } from "graphql-request";
 
 // Context input parameters

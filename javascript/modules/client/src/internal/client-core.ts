@@ -283,37 +283,37 @@ export abstract class ClientCore implements IClientCore {
       ClientCore.createWithdrawParameters(params)
     );
   }
-  public async pin(input: string | Uint8Array): Promise<string> {
+  protected pin(input: string | Uint8Array): Promise<string> {
     if (!this.ipfs)
       return Promise.reject(new Error("IPFS client is not initialized"));
     return this.ipfs
       .add(input)
-      .then(res => {
-        return Promise.resolve(res.path);
-      })
-      .catch(e => {
-        return Promise.reject(e);
-      });
+      .then(res => res.path)
+      .catch(e =>
+        Promise.reject(new Error("Could not pin data: " + (e?.message || "")))
+      );
   }
-  public async fetchBytes(cid: string) {
-    if (!this.ipfs)
-      return Promise.reject(new Error("IPFS client is not initialized"));
+  protected async fetchBytes(cid: string) {
+    if (!this.ipfs) throw new Error("IPFS client is not initialized");
     try {
       for await (const chunk of this.ipfs.cat(cid)) {
         return Promise.resolve(chunk);
       }
     } catch (e) {
-      Promise.reject(e);
+      throw new Error("Could not fetch data");
     }
     return;
   }
-  public fetchString(cid: string): Promise<string> {
+  protected fetchString(cid: string): Promise<string> {
     return this.fetchBytes(cid)
-      .then(bytes => {
-        return new TextDecoder().decode(bytes);
-      })
-      .catch(e => {
-        return Promise.reject(e);
-      });
+      .then(bytes => new TextDecoder().decode(bytes))
+      .catch(e =>
+        Promise.reject(
+          new Error(
+            "Error while fetching and decoding bytes: ",
+            e?.message || ""
+          )
+        )
+      );
   }
 }

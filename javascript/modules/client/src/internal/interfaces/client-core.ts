@@ -15,7 +15,10 @@ export interface IClientVocdoniCore {
 }
 export interface IClientIpfsCore {
   // Add here
-  pin(entry: string | Uint8Array): Promise<string>;
+  
+  // pin(input: string | Uint8Array): Promise<string>;
+  // fetchString(cid: string): Promise<string>;
+  // fetchBytes(cid: string): Promise<Uint8Array | undefined>;
 }
 export interface IClientGraphQLCore {
   // Add here
