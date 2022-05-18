@@ -1,5 +1,21 @@
 # Aragon JS SDK
 
+This folder contains all the JS packages available on NPM:
+- [Client](./modules/client)
+- [Common](./modules/common)
+
+## Available scripts
+
+- `yarn build`
+  - Compiles all the modules, respecting their internal dependencies
+- `yarn clean`
+  - Removes the existing artifacts
+- `yarn lint`
+  - Checks the current code for inconsistencies
+- `yarn test`
+  - Runs the test suite on all modules
+
+
 <!--
 This library aims to provide utility classes and methods to invoke decentralized operations within a voting process. It covers the typical functionality of Client applications, as well as the Process Manager or the Census Manager.
 
