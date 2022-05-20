@@ -13,7 +13,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=15"
+    "node": ">=16"
   },
   "scripts": {
     "start": "tsdx watch",

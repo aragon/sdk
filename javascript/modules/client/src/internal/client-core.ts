@@ -148,13 +148,13 @@ export abstract class ClientCore implements IClientCore {
   protected static createProposalParameters(
     params: ICreateProposal
   ): [
-    string,
-    IDAO.ActionStruct[],
-    BigNumberish,
-    BigNumberish,
-    boolean,
-    BigNumberish
-  ] {
+      string,
+      IDAO.ActionStruct[],
+      BigNumberish,
+      BigNumberish,
+      boolean,
+      BigNumberish
+    ] {
     return [
       params.metadata,
       params.actions ?? [],
@@ -223,8 +223,8 @@ export abstract class ClientCore implements IClientCore {
       tokenAddress !== AddressZero
         ? {}
         : {
-            value: amount,
-          };
+          value: amount,
+        };
 
     if (tokenAddress !== AddressZero) {
       const governanceERC20Instance = GovernanceERC20__factory.connect(
@@ -283,37 +283,46 @@ export abstract class ClientCore implements IClientCore {
       ClientCore.createWithdrawParameters(params)
     );
   }
-  protected pin(input: string | Uint8Array): Promise<string> {
+
+  public pin(input: string | Uint8Array): Promise<string> {
     if (!this.ipfs)
       return Promise.reject(new Error("IPFS client is not initialized"));
     return this.ipfs
       .add(input)
       .then(res => res.path)
-      .catch(e =>
-        Promise.reject(new Error("Could not pin data: " + (e?.message || "")))
-      );
+      .catch(e => {
+        throw new Error("Could not pin data: " + (e?.message || ""));
+      });
   }
-  protected async fetchBytes(cid: string) {
+
+  public async fetchBytes(cid: string) {
     if (!this.ipfs) throw new Error("IPFS client is not initialized");
     try {
+      let chunks: Uint8Array[] = []
+      let totalArrayLength = 0
       for await (const chunk of this.ipfs.cat(cid)) {
-        return Promise.resolve(chunk);
+        chunks.push(chunk)
+        totalArrayLength += chunk.length
       }
+      var mergedArray = new Uint8Array(totalArrayLength);
+      let lastIndex = 0
+      chunks.forEach((chunk) => {
+        mergedArray.set(chunk, lastIndex)
+        lastIndex += chunk.length
+      })
+      return mergedArray
     } catch (e) {
       throw new Error("Could not fetch data");
     }
-    return;
   }
-  protected fetchString(cid: string): Promise<string> {
+
+  public fetchString(cid: string): Promise<string> {
     return this.fetchBytes(cid)
       .then(bytes => new TextDecoder().decode(bytes))
-      .catch(e =>
-        Promise.reject(
-          new Error(
-            "Error while fetching and decoding bytes: ",
-            e?.message || ""
-          )
-        )
-      );
+      .catch(e => {
+        throw new Error(
+          "Error while fetching and decoding bytes: " + (e?.message || "")
+        );
+      });
   }
 }
