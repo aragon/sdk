@@ -148,13 +148,13 @@ export abstract class ClientCore implements IClientCore {
   protected static createProposalParameters(
     params: ICreateProposal
   ): [
-      string,
-      IDAO.ActionStruct[],
-      BigNumberish,
-      BigNumberish,
-      boolean,
-      BigNumberish
-    ] {
+    string,
+    IDAO.ActionStruct[],
+    BigNumberish,
+    BigNumberish,
+    boolean,
+    BigNumberish
+  ] {
     return [
       params.metadata,
       params.actions ?? [],
@@ -223,8 +223,8 @@ export abstract class ClientCore implements IClientCore {
       tokenAddress !== AddressZero
         ? {}
         : {
-          value: amount,
-        };
+            value: amount,
+          };
 
     if (tokenAddress !== AddressZero) {
       const governanceERC20Instance = GovernanceERC20__factory.connect(
@@ -298,19 +298,19 @@ export abstract class ClientCore implements IClientCore {
   public async fetchBytes(cid: string) {
     if (!this.ipfs) throw new Error("IPFS client is not initialized");
     try {
-      let chunks: Uint8Array[] = []
-      let totalArrayLength = 0
+      let chunks: Uint8Array[] = [];
+      let totalArrayLength = 0;
       for await (const chunk of this.ipfs.cat(cid)) {
-        chunks.push(chunk)
-        totalArrayLength += chunk.length
+        chunks.push(chunk);
+        totalArrayLength += chunk.length;
       }
       var mergedArray = new Uint8Array(totalArrayLength);
-      let lastIndex = 0
-      chunks.forEach((chunk) => {
-        mergedArray.set(chunk, lastIndex)
-        lastIndex += chunk.length
-      })
-      return mergedArray
+      let lastIndex = 0;
+      chunks.forEach(chunk => {
+        mergedArray.set(chunk, lastIndex);
+        lastIndex += chunk.length;
+      });
+      return mergedArray;
     } catch (e) {
       throw new Error("Could not fetch data");
     }
