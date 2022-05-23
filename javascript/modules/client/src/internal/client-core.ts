@@ -304,12 +304,12 @@ export abstract class ClientCore implements IClientCore {
         chunks.push(chunk);
         totalArrayLength += chunk.length;
       }
-      var mergedArray = new Uint8Array(totalArrayLength);
+      const mergedArray = new Uint8Array(totalArrayLength);
       let lastIndex = 0;
-      chunks.forEach(chunk => {
+      for (const chunk of chunks) {
         mergedArray.set(chunk, lastIndex);
         lastIndex += chunk.length;
-      });
+      }
       return mergedArray;
     } catch (e) {
       throw new Error("Could not fetch data");

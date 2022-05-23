@@ -17,7 +17,6 @@ interface VocdoniContextParams {
 }
 interface IpfsContextParams {
   ipfsOptions?: Options;
-  ipfsPeers?: string[];
 }
 interface GraphQLContextParams {
   // subgraphURL: string;
