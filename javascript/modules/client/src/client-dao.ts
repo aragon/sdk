@@ -2,17 +2,17 @@ import { ClientCore } from "./internal/client-core";
 import {
   DaoConfig,
   DaoRole,
-  IGasFeeEstimation,
   IClientDaoBase,
   IClientDaoERC20Voting,
   IClientDaoWhitelistVoting,
   ICreateDaoERC20Voting,
   ICreateDaoWhitelistVoting,
   ICreateProposal,
-  VotingConfig,
   IDeposit,
+  IGasFeeEstimation,
   IProposalAction,
   IWithdraw,
+  VotingConfig,
 } from "./internal/interfaces/dao";
 import {
   DAOFactory,
@@ -22,7 +22,7 @@ import {
   TokenFactory,
   WhitelistVoting__factory,
 } from "@aragon/core-contracts-ethers";
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import { BigNumber } from "@ethersproject/bignumber";
 
 export {
   ICreateDaoERC20Voting,
@@ -173,18 +173,18 @@ export class ClientDaoERC20Voting extends ClientCore
     params: ICreateDaoERC20Voting
   ): [
     DAOFactory.DAOConfigStruct,
-    [BigNumberish, BigNumberish, BigNumberish],
+    DAOFactory.VoteConfigStruct,
     TokenFactory.TokenConfigStruct,
     TokenFactory.MintConfigStruct,
     string
   ] {
     return [
       params.daoConfig,
-      [
-        BigInt(params.votingConfig.minParticipation),
-        BigInt(params.votingConfig.minSupport),
-        BigInt(params.votingConfig.minDuration),
-      ],
+      {
+        participationRequiredPct: BigInt(params.votingConfig.minParticipation),
+        supportRequiredPct: BigInt(params.votingConfig.minSupport),
+        minDuration: BigInt(params.votingConfig.minDuration),
+      },
       {
         addr: params.tokenConfig.address,
         name: params.tokenConfig.name,
@@ -342,17 +342,17 @@ export class ClientDaoWhitelistVoting extends ClientCore
     params: ICreateDaoWhitelistVoting
   ): [
     DAOFactory.DAOConfigStruct,
-    [BigNumberish, BigNumberish, BigNumberish],
+    DAOFactory.VoteConfigStruct,
     string[],
     string
   ] {
     return [
       params.daoConfig,
-      [
-        BigInt(params.votingConfig.minParticipation),
-        BigInt(params.votingConfig.minSupport),
-        BigInt(params.votingConfig.minDuration),
-      ],
+      {
+        participationRequiredPct: BigInt(params.votingConfig.minParticipation),
+        supportRequiredPct: BigInt(params.votingConfig.minSupport),
+        minDuration: BigInt(params.votingConfig.minDuration),
+      },
       params.whitelistVoters,
       params.gsnForwarder ?? "",
     ];
