@@ -17,7 +17,6 @@ if (typeof process !== "undefined" && process.env?.TESTING) {
 const defaultState: ContextState = {
   network: "mainnet",
   dao: "",
-  daoFactoryAddress: "",
   web3Providers: [],
   gasFeeEstimationFactor: DEFAULT_GAS_FEE_ESTIMATION_FACTOR,
 };
@@ -93,7 +92,10 @@ export class Context {
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
     } else if (this.state.network.toString() in activeContractsList) {
-      this.state.daoFactoryAddress = activeContractsList[this.state.network.toString() as keyof typeof activeContractsList].DAOFactory
+      this.state.daoFactoryAddress =
+        activeContractsList[
+          this.state.network.toString() as keyof typeof activeContractsList
+        ].DAOFactory;
     }
     if (contextParams.signer) {
       this.state.signer = contextParams.signer;
@@ -206,7 +208,7 @@ export class Context {
    *
    * @public
    */
-  get daoFactoryAddress(): string {
+  get daoFactoryAddress(): string | undefined {
     return this.state.daoFactoryAddress || defaultState.daoFactoryAddress;
   }
 

@@ -22,7 +22,7 @@ yarn add @aragon/sdk-client
 const contextParams: ContextParams = {
     network: 31337,
     signer: new Wallet("privateKey"),
-    daoFactoryAddress: "daoFactoryAddress",
+    daoFactoryAddress: "daoFactoryAddress", // Not needed for already-known networks like "rinkeby", "arbitrum-rinkeby" or "mumbai"
     web3Providers: ["http://localhost:8545"],
 };
 const context = new Context(contextParams);
@@ -85,7 +85,7 @@ console.log(newDaoAddress) // New DAO address
 const contextParams: ContextParams = {
     network: 31337,
     signer: new Wallet("privateKey"),
-    daoFactoryAddress: "daoFactoryAddress",
+    daoFactoryAddress: "daoFactoryAddress", // Not needed for already-known networks like "rinkeby", "arbitrum-rinkeby" or "mumbai"
     web3Providers: ["http://localhost:8545"],
 };
 const context = new Context(contextParams);
@@ -128,7 +128,7 @@ console.log(newDaoAddress) // New DAO address
 const contextParams: ContextParams = {
     network: 31337,
     signer: new Wallet("privateKey"),
-    daoFactoryAddress: "daoFactoryAddress",
+    daoFactoryAddress: "daoFactoryAddress", // Not needed for already-known networks like "rinkeby", "arbitrum-rinkeby" or "mumbai"
     web3Providers: ["http://localhost:8545"],
 };
 const context = new Context(contextParams);
@@ -155,7 +155,7 @@ console.log(newProposalId) // New proposal id
 const contextParams: ContextParams = {
     network: 31337,
     signer: new Wallet("privateKey"),
-    daoFactoryAddress: "daoFactoryAddress",
+    daoFactoryAddress: "daoFactoryAddress", // Not needed for already-known networks like "rinkeby", "arbitrum-rinkeby" or "mumbai"
     web3Providers: ["http://localhost:8545"],
 };
 const context = new Context(contextParams);

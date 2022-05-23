@@ -37,7 +37,7 @@ describe("Context instances", () => {
     expect(context).toBeInstanceOf(Context);
     expect(context.signer).toEqual(undefined);
     expect(context.dao).toEqual("");
-    expect(context.daoFactoryAddress).toEqual("");
+    expect(context.daoFactoryAddress).toEqual(undefined);
     expect(context.gasFeeEstimationFactor).toEqual(0.625);
   });
   it("Should create a context and have the correct values", () => {
@@ -67,6 +67,8 @@ describe("Context instances", () => {
 
     expect(context).toBeInstanceOf(Context);
     expect(context.network).toEqual("rinkeby");
-    expect(context.daoFactoryAddress).toEqual(activeContractsList.rinkeby.DAOFactory);
+    expect(context.daoFactoryAddress).toEqual(
+      activeContractsList.rinkeby.DAOFactory
+    );
   });
 });
