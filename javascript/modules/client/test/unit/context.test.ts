@@ -1,6 +1,7 @@
 import { Context, ContextParams } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { activeContractsList } from "@aragon/core-contracts-ethers";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
@@ -15,7 +16,7 @@ const web3endpoints = {
 let contextParams: ContextParams;
 
 describe("Context instances", () => {
-  beforeAll(() => {
+  beforeEach(() => {
     contextParams = {
       network: "mainnet",
       signer: new Wallet(TEST_WALLET),
@@ -58,5 +59,14 @@ describe("Context instances", () => {
     expect(() => {
       new Context(contextParams);
     }).toThrow();
+  });
+  it("Should create a context with the correct DAOFactory address from the core-contracts-package", () => {
+    contextParams.daoFactoryAddress = "";
+    contextParams.network = "rinkeby";
+    const context = new Context(contextParams);
+
+    expect(context).toBeInstanceOf(Context);
+    expect(context.network).toEqual("rinkeby");
+    expect(context.daoFactoryAddress).toEqual(activeContractsList.rinkeby.DAOFactory);
   });
 });

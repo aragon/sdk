@@ -1,6 +1,7 @@
 import { ContextState, ContextParams } from "./internal/interfaces/context";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
+import { activeContractsList } from "@aragon/core-contracts-ethers";
 // import { create as ipfsCreate, Options as IpfsOptions } from "ipfs-http-client";
 // import { GraphQLClient } from "graphql-request";
 export { ContextParams } from "./internal/interfaces/context";
@@ -91,6 +92,8 @@ export class Context {
     }
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
+    } else if (this.state.network.toString() in activeContractsList) {
+      this.state.daoFactoryAddress = activeContractsList[this.state.network.toString() as keyof typeof activeContractsList].DAOFactory
     }
     if (contextParams.signer) {
       this.state.signer = contextParams.signer;
