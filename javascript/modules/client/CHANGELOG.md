@@ -29,13 +29,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [TBD]  
+
+### Added
+- Getting `DAOFactory` address from `@aragon/core-contracts-ethers` package depending on the selected network in `Context`.
   
 ## [0.0.12-alpha] - Mon May 23 11:17:16 UTC 2022  
 
 ### Changed
 - Upgraded `@aragon/core-contracts-ethers` package to the `0.2.1-alpha` version and adapted the base code to accept the new `VoteConfigStruct` struct.
 
-  
 ## [0.0.11-alpha] - Wed May 18 14:51:02 UTC 2022  
   
 ## [0.0.10-alpha] - Wed May 18 14:42:35 UTC 2022  
