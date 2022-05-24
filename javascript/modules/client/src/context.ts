@@ -209,7 +209,7 @@ export class Context {
    * @public
    */
   get daoFactoryAddress(): string | undefined {
-    return this.state.daoFactoryAddress || defaultState.daoFactoryAddress;
+    return this.state.daoFactoryAddress;
   }
 
   /**
