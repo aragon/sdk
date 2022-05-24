@@ -53,6 +53,13 @@ describe("Context instances", () => {
     );
     expect(context.gasFeeEstimationFactor).toEqual(0.1);
   });
+  it("Should create a context with invalid network and fail", () => {
+    contextParams.network = "notexistingnetwork";
+
+    expect(() => {
+      new Context(contextParams);
+    }).toThrow();
+  });
   it("Should create a context with invalid gas fee estimation factor and fail", () => {
     contextParams.gasFeeEstimationFactor = 1.1;
 
