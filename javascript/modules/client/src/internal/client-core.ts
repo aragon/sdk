@@ -29,11 +29,13 @@ export abstract class ClientCore implements IClientCore {
   private _signer: Signer | undefined;
   private _daoFactoryAddress = "";
   private _gasFeeEstimationFactor = 1;
-  private _ipfs: IPFSHTTPClient | undefined;
+  private _ipfs: IPFSHTTPClient[] = [];
+  private _ipfsIdx: number = -1;
 
   constructor(context: Context) {
     if (context.ipfs) {
       this._ipfs = context.ipfs;
+      this._ipfsIdx = Math.floor(Math.random() * context.ipfs.length);
     }
     if (context.web3Providers) {
       this._web3Providers = context.web3Providers;
@@ -62,9 +64,16 @@ export abstract class ClientCore implements IClientCore {
     if (!signer) {
       throw new Error("Empty wallet or signer");
     }
-
     this._signer = signer;
     return this;
+  }
+
+  public shiftIpfsNode() {
+    if (!this._ipfs.length) throw new Error("No endpoints");
+    else if (this._ipfs.length <= 1) {
+      throw new Error("No other endpoints");
+    }
+    this._ipfsIdx = (this._ipfsIdx + 1) % this._ipfs.length;
   }
 
   /**
@@ -114,11 +123,23 @@ export abstract class ClientCore implements IClientCore {
     return this._ipfs;
   }
 
+  get ipfsIdx() {
+    return this._ipfsIdx;
+  }
+
   public async checkWeb3Status(): Promise<boolean> {
     return this.web3
       .getNetwork()
       .then(() => true)
       .catch(() => false);
+  }
+
+  public checkIpfsStatus(): boolean {
+    try {
+      return this.ipfs[this._ipfsIdx].isOnline();
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -287,7 +308,15 @@ export abstract class ClientCore implements IClientCore {
   public pin(input: string | Uint8Array): Promise<string> {
     if (!this.ipfs)
       return Promise.reject(new Error("IPFS client is not initialized"));
-    return this.ipfs
+    // find online node
+    let isOnline = false;
+    for (var i = 0; i < this.ipfs.length; i++) {
+      isOnline = this.checkIpfsStatus();
+      if (isOnline) break;
+      this.shiftIpfsNode();
+    }
+    if (!isOnline) throw new Error("IPFS nodes are not available");
+    return this.ipfs[this._ipfsIdx]
       .add(input)
       .then(res => res.path)
       .catch(e => {
@@ -297,10 +326,18 @@ export abstract class ClientCore implements IClientCore {
 
   public async fetchBytes(cid: string) {
     if (!this.ipfs) throw new Error("IPFS client is not initialized");
+    // find online node
+    let isOnline = false;
+    for (var i = 0; i < this.ipfs.length; i++) {
+      isOnline = this.checkIpfsStatus();
+      if (isOnline) break;
+      this.shiftIpfsNode();
+    }
+    if (!isOnline) throw new Error("IPFS nodes are not available");
     try {
       let chunks: Uint8Array[] = [];
       let totalArrayLength = 0;
-      for await (const chunk of this.ipfs.cat(cid)) {
+      for await (const chunk of this.ipfs[this._ipfsIdx].cat(cid)) {
         chunks.push(chunk);
         totalArrayLength += chunk.length;
       }

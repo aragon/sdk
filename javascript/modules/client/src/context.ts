@@ -1,8 +1,19 @@
 import { ContextState, ContextParams } from "./internal/interfaces/context";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
+<<<<<<< HEAD
 import { create as ipfsCreate, IPFSHTTPClient } from 'ipfs-http-client'
 import { activeContractsList } from "@aragon/core-contracts-ethers";
+=======
+import {
+  create as ipfsCreate,
+  IPFSHTTPClient,
+  Options,
+} from "ipfs-http-client";
+// const { TextEncoder, TextDecoder } = require("util");
+// global.TextEncoder = TextEncoder;
+// global.TextDecoder = TextDecoder;
+>>>>>>> add ipfs node shift
 // import { GraphQLClient } from "graphql-request";
 export { ContextParams } from "./internal/interfaces/context";
 
@@ -58,8 +69,8 @@ export class Context {
       throw new Error("No web3 endpoints defined");
     } else if (!contextParams.gasFeeEstimationFactor) {
       throw new Error("No gas fee reducer defined");
-    } else if (!contextParams.ipfsOptions) {
-      throw new Error("No IPFS options defined");
+    } else if (!contextParams.ipfsNodes) {
+      throw new Error("No IPFS nodes defined");
     }
 
     this.state = {
@@ -74,7 +85,7 @@ export class Context {
       gasFeeEstimationFactor: Context.resolveGasFeeEstimationFactor(
         contextParams.gasFeeEstimationFactor
       ),
-      ipfs: ipfsCreate(contextParams.ipfsOptions),
+      ipfs: this.useIpfsNodes(contextParams.ipfsNodes),
       // subgraph: new GraphQLClient(contextParams.subgraphURL),
     };
   }
@@ -108,8 +119,8 @@ export class Context {
         contextParams.gasFeeEstimationFactor
       );
     }
-    if (contextParams.ipfsOptions) {
-      this.state.ipfs = ipfsCreate(contextParams.ipfsOptions);
+    if (contextParams.ipfsNodes) {
+      this.state.ipfs = this.useIpfsNodes(contextParams.ipfsNodes);
     }
     // if (contextParams.subgraphURL) {
     //   this.state.subgraph = new GraphQLClient(contextParams.subgraphURL);
@@ -140,6 +151,17 @@ export class Context {
     } else {
       return [endpoints];
     }
+  }
+
+  useIpfsNodes(nodes: Options[]): IPFSHTTPClient[] {
+    if (nodes.length > 0) {
+      const clients: IPFSHTTPClient[] = [];
+      for (const node of nodes) {
+        clients.push(ipfsCreate(node));
+      }
+      return clients;
+    }
+    return [];
   }
 
   // GETTERS
@@ -246,7 +268,7 @@ export class Context {
    *
    * @public
    */
-  get ipfs(): IPFSHTTPClient | undefined {
+  get ipfs(): IPFSHTTPClient[] | undefined {
     return this.state.ipfs || defaultState.ipfs;
   }
 
@@ -260,9 +282,6 @@ export class Context {
     }
     if (params.signer) {
       defaultState.signer = params.signer;
-    }
-    if (params.ipfsOptions) {
-      defaultState.ipfs = ipfsCreate(params.ipfsOptions);
     }
     // if (params.subgraphURL) {
     //   defaultState.subgraph = new GraphQLClient(params.subgraphURL);

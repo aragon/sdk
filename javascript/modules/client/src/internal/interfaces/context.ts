@@ -16,7 +16,7 @@ interface VocdoniContextParams {
   // Vocdoni
 }
 interface IpfsContextParams {
-  ipfsOptions?: Options;
+  ipfsNodes?: Options[];
 }
 interface GraphQLContextParams {
   // subgraphURL: string;
@@ -40,7 +40,7 @@ interface Web3ContextState {
 }
 interface VocdoniContextState {}
 interface IpfsContextState {
-  ipfs?: IPFSHTTPClient;
+  ipfs?: IPFSHTTPClient[];
 }
 interface GraphQLContextState {
   // subgraph?: GraphQLClient;
