@@ -10,16 +10,33 @@ export interface IClientDaoBase extends IClientCore {
       role: DaoRole,
       data: Uint8Array
     ) => Promise<void>;
+    deposit: (params: IDeposit) => Promise<void>;
+    currentAllowance: (
+      tokenAddress: string,
+      daoAddress: string
+    ) => Promise<bigint>;
+    increaseAllowance: (
+      tokenAddress: string,
+      daoAddress: string,
+      amount: bigint
+    ) => Promise<void>;
   };
   actions: {
     withdraw: (to: string, value: bigint, params: IWithdraw) => IProposalAction;
+  };
+  estimate: {
+    deposit: (params: IDeposit) => Promise<IGasFeeEstimation>;
+    increaseAllowance: (
+      tokenAddress: string,
+      daoAddress: string,
+      amount: bigint
+    ) => Promise<IGasFeeEstimation>;
   };
 }
 
 export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
     create: (params: ICreateDaoERC20Voting) => Promise<string>;
-    deposit: (params: IDeposit) => Promise<void>;
     simpleVote: {
       createProposal: (
         votingAddress: string,
@@ -39,7 +56,6 @@ export interface IClientDaoERC20Voting extends IClientCore {
 export interface IClientDaoWhitelistVoting extends IClientCore {
   dao: {
     create: (params: ICreateDaoWhitelistVoting) => Promise<string>;
-    deposit: (params: IDeposit) => Promise<void>;
     whitelist: {
       createProposal: (
         votingAddress: string,

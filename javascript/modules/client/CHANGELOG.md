@@ -18,6 +18,12 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+- Gas fee estimation for `deposit` and `increaseAllowance`.
+- New `currentAllowance` method for checking allowance of a token.
+
+### Changed
+- `deposit` method handles only depositing funds, the increase allowance for a token is now done using the `increaseAllowance` method.
+
 ## [0.0.15-alpha] - Tue Jun 14 12:33:47 UTC 2022  
   
 ## [0.0.14-alpha] - Tue Jun 14 08:40:07 UTC 2022  

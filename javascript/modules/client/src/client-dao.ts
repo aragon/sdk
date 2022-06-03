@@ -77,6 +77,16 @@ export class ClientDaoERC20Voting extends ClientCore
     },
 
     deposit: (params: IDeposit): Promise<void> => this.deposit(params),
+    currentAllowance: (
+      tokenAddress: string,
+      daoAddress: string
+    ): Promise<bigint> => this.currentAllowance(tokenAddress, daoAddress),
+    increaseAllowance: (
+      tokenAddress: string,
+      daoAddress: string,
+      amount: bigint
+    ): Promise<void> =>
+      this.increaseAllowance(tokenAddress, daoAddress, amount),
 
     simpleVote: {
       createProposal: (
@@ -165,6 +175,14 @@ export class ClientDaoERC20Voting extends ClientCore
 
       return this.estimateGasFee(gasLimit);
     },
+    deposit: (params: IDeposit): Promise<IGasFeeEstimation> =>
+      this.estimateDeposit(params),
+    increaseAllowance: (
+      tokenAddress: string,
+      daoAddress: string,
+      amount: bigint
+    ): Promise<IGasFeeEstimation> =>
+      this.estimateIncreaseAllowance(tokenAddress, daoAddress, amount),
   };
 
   /** Helpers */
@@ -246,6 +264,16 @@ export class ClientDaoWhitelistVoting extends ClientCore
     },
 
     deposit: (params: IDeposit): Promise<void> => this.deposit(params),
+    currentAllowance: (
+      tokenAddress: string,
+      daoAddress: string
+    ): Promise<bigint> => this.currentAllowance(tokenAddress, daoAddress),
+    increaseAllowance: (
+      tokenAddress: string,
+      daoAddress: string,
+      amount: bigint
+    ): Promise<void> =>
+      this.increaseAllowance(tokenAddress, daoAddress, amount),
 
     whitelist: {
       createProposal: (
@@ -334,6 +362,14 @@ export class ClientDaoWhitelistVoting extends ClientCore
 
       return this.estimateGasFee(gasLimit);
     },
+    deposit: (params: IDeposit): Promise<IGasFeeEstimation> =>
+      this.estimateDeposit(params),
+    increaseAllowance: (
+      tokenAddress: string,
+      daoAddress: string,
+      amount: bigint
+    ): Promise<IGasFeeEstimation> =>
+      this.estimateIncreaseAllowance(tokenAddress, daoAddress, amount),
   };
 
   /** Helpers */
