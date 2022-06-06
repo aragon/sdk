@@ -1,10 +1,7 @@
 import { ContextState, ContextParams } from "./internal/interfaces/context";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
-<<<<<<< HEAD
-import { create as ipfsCreate, IPFSHTTPClient } from 'ipfs-http-client'
 import { activeContractsList } from "@aragon/core-contracts-ethers";
-=======
 import {
   create as ipfsCreate,
   IPFSHTTPClient,
