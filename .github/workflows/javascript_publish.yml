@@ -49,7 +49,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
 
       - name: install deps
