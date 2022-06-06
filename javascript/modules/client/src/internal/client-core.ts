@@ -34,9 +34,6 @@ export abstract class ClientCore implements IClientCore {
 
   constructor(context: Context) {
     if (context.ipfs) {
-      if (this._ipfs.length === 0) {
-        throw new Error("No IPFS nodes available");
-      }
       this._ipfs = context.ipfs;
       this._ipfsIdx = Math.floor(Math.random() * context.ipfs.length);
     }
