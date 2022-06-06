@@ -20,6 +20,10 @@ const web3endpoints = {
   ],
   failing: ["https://bad-url-gateway.io/"],
 };
+const ipfsEndpoints = {
+  working: ["https://ipfs-0.aragon.network", "https://ipfs-1.aragon.network"],
+  failing: ["https://bad-url-gateway.io/"],
+};
 
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
@@ -30,6 +34,14 @@ const contextParams: ContextParams = {
   dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
+  ipfsNodes: [
+    {
+      url: ipfsEndpoints.working[0],
+    },
+    {
+      url: ipfsEndpoints.working[1],
+    },
+  ],
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -38,6 +50,11 @@ const contextParamsLocalChain: ContextParams = {
   dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
+  ipfsNodes: [
+    {
+      url: "http://localhost:5001",
+    },
+  ],
 };
 
 describe("Client instances", () => {
@@ -300,6 +317,48 @@ describe("Client instances", () => {
     expect(newDaoAddress.length).toBe(42);
     expect(newDaoAddress).toContain("0x");
     expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i);
+  });
+  it("Should connect to a IPFS node and upload a string and recover the same string", async () => {
+    const context = new Context(contextParams);
+    const client = new ClientDaoERC20Voting(context);
+    const string = "I am a test";
+    const cid = await client.pin(string);
+    const recoveredString = await client.fetchString(cid);
+    const recoveredBytes = await client.fetchBytes(cid);
+    const decodedString = new TextDecoder().decode(recoveredBytes);
+    expect(typeof recoveredBytes).toBe("object");
+    expect(typeof recoveredString).toBe("string");
+    expect(typeof decodedString).toBe("string");
+    expect(string).toEqual(recoveredString);
+    expect(string).toEqual(decodedString);
+  });
+  it("Should connect to a IPFS node and upload bytes and recover the same string", async () => {
+    const context = new Context(contextParams);
+    const client = new ClientDaoERC20Voting(context);
+    const bytes = new Uint8Array([
+      72,
+      101,
+      108,
+      111,
+      32,
+      116,
+      104,
+      101,
+      114,
+      101,
+      32,
+      58,
+      41,
+    ]);
+    const cid = await client.pin(bytes);
+    const recoveredString = await client.fetchString(cid);
+    const recoveredBytes = await client.fetchBytes(cid);
+    const decodedString = new TextDecoder().decode(recoveredBytes);
+    expect(typeof recoveredBytes).toBe("object");
+    expect(typeof recoveredString).toBe("string");
+    expect(typeof decodedString).toBe("string");
+    expect("Hello There :)").toEqual(recoveredString);
+    expect("Hello there :)").toEqual(decodedString);
   });
   // it("Should create a ERC20Voting proposal locally", async () => {
   //   const context = new Context(contextParamsLocalChain);

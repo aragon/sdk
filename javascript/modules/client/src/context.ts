@@ -10,10 +10,6 @@ import {
   IPFSHTTPClient,
   Options,
 } from "ipfs-http-client";
-// const { TextEncoder, TextDecoder } = require("util");
-// global.TextEncoder = TextEncoder;
-// global.TextDecoder = TextDecoder;
->>>>>>> add ipfs node shift
 // import { GraphQLClient } from "graphql-request";
 export { ContextParams } from "./internal/interfaces/context";
 
@@ -69,7 +65,7 @@ export class Context {
       throw new Error("No web3 endpoints defined");
     } else if (!contextParams.gasFeeEstimationFactor) {
       throw new Error("No gas fee reducer defined");
-    } else if (!contextParams.ipfsNodes) {
+    } else if (!contextParams.ipfsNodes?.length) {
       throw new Error("No IPFS nodes defined");
     }
 
@@ -119,7 +115,7 @@ export class Context {
         contextParams.gasFeeEstimationFactor
       );
     }
-    if (contextParams.ipfsNodes) {
+    if (contextParams.ipfsNodes?.length) {
       this.state.ipfs = this.useIpfsNodes(contextParams.ipfsNodes);
     }
     // if (contextParams.subgraphURL) {
@@ -161,7 +157,7 @@ export class Context {
       }
       return clients;
     }
-    return [];
+    throw new Error("No IPFS nodes specified");
   }
 
   // GETTERS
