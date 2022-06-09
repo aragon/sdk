@@ -177,7 +177,7 @@ console.log(newProposalId) // New proposal id
 
 #### Deposit to DAO
 
-###### Deposit ETH to ERC20Voting and WhitelistVoting DAOs
+###### Deposit native token to ERC20Voting and WhitelistVoting DAOs
 
 ```ts
 const client = new ClientDaoERC20Voting(context);
@@ -191,46 +191,22 @@ const depositParams: IDeposit = {
     reference: "Reference of the deposit (reason)", // Optional
 };
 
-await client.dao.deposit(depositParams);
-```
-
-###### Check ERC20 token current allowance for ERC20Voting and WhitelistVoting DAOs
-
-```ts
-const client = new ClientDaoERC20Voting(context);
-// or
-const client = new ClientDaoWhitelistVoting(context);
-
-const currentAllowance = await client.dao.currentAllowance(
-    tokenAddress,
-    daoAddress
-); // Current allowance from the token for the given DAO
-```
-
-###### Increase ERC20 token allowance for ERC20Voting and WhitelistVoting DAOs
-
-```ts
-const client = new ClientDaoERC20Voting(context);
-// or
-const client = new ClientDaoWhitelistVoting(context);
-
-const amount = BigInt(20);
-
-const gasFeesEstimation = await client.estimate.increaseAllowance(
-    tokenAddress,
-    daoAddress,
-    amount
-);
+const gasFeesEstimation = await client.estimate.deposit(depositParams);
 // {
-//   average: 69863383844718n, // Average gas fee estimation (reducing the max value by heuristic) 
-//   max: 111781414151550n // Maximum gas fee estimation
+//   average: 249901378296462n, // Average gas fee estimation (reducing the max value by heuristic) 
+//   max: 399842205274340n // Maximum gas fee estimation
 // }
 
-await client.dao.increaseAllowance(
-    tokenAddress,
-    daoAddress,
-    amount
-); // Increase the given amount allowance from the token for the given DAO
+for await (const step of client.dao.deposit(depositParams)) {
+    switch (step.idx) {
+        case "depositTx":
+            console.log(step.value); // 0xb1c14a49...3e8620b0f5832d61c
+            break;
+        case "deposit":
+            console.log(step.value); // 10n
+            break;
+    }
+}
 ```
 
 ###### Deposit ERC20 token to ERC20Voting and WhitelistVoting DAOs
@@ -253,7 +229,25 @@ const gasFeesEstimation = await client.estimate.deposit(depositParams);
 //   max: 399842205274340n // Maximum gas fee estimation
 // }
 
-await client.dao.deposit(depositParams);
+for await (const step of client.dao.deposit(depositParams)) {
+    switch (step.idx) {
+        case DepositSteps.CURRENT_ALLOWANCE:
+            console.log(step.value); // 0n
+            break;
+        case DepositSteps.INCREASE_ALLOWANCE_TX:
+            console.log(step.value); // 0xb1c14a49...3e8620b0f5832d61c
+            break;
+        case DepositSteps.INCREASE_ALLOWANCE:
+            console.log(step.value); // 10n
+            break;
+        case DepositSteps.DEPOSIT_TX:
+            console.log(step.value); // 0xb1c14a49...3e8620b0f5832d61c
+            break;
+        case DepositSteps.DEPOSIT:
+            console.log(step.value); // 10n
+            break;
+    }
+}
 ```
 
 #### Actions helpers

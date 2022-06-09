@@ -19,10 +19,9 @@ TEMPLATE:
 ## [UPCOMING]
 
 - Gas fee estimation for `deposit` and `increaseAllowance`.
-- New `currentAllowance` method for checking allowance of a token.
 
 ### Changed
-- `deposit` method handles only depositing funds, the increase allowance for a token is now done using the `increaseAllowance` method.
+- `deposit` method handles all steps by using a `AsyncGenerator`.
 
 ## [0.0.15-alpha] - Tue Jun 14 12:33:47 UTC 2022  
   
@@ -30,7 +29,7 @@ TEMPLATE:
 
 ### Added
 - Adding IPFS support for pinning and fetching data
-  
+
 ## [0.0.13-alpha] - Tue May 24 09:26:45 UTC 2022  
 
 ### Added

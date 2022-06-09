@@ -5,6 +5,7 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
 import {
+  DepositSteps,
   ICreateProposal,
   IDeposit,
   IGasFeeEstimation,
@@ -254,7 +255,9 @@ export abstract class ClientCore implements IClientCore {
 
   // DAO METHODS
 
-  protected async deposit(params: IDeposit): Promise<void> {
+  protected async *deposit(
+    params: IDeposit
+  ): AsyncGenerator<{ idx: DepositSteps; value: string | bigint }> {
     if (!this.connectedSigner) {
       throw new Error("A signer is needed for creating a DAO");
     }
@@ -265,6 +268,49 @@ export abstract class ClientCore implements IClientCore {
       tokenAddress,
       reference,
     ] = ClientCore.createDepositParameters(params);
+
+    if (tokenAddress !== AddressZero) {
+      const governanceERC20Instance = GovernanceERC20__factory.connect(
+        tokenAddress,
+        this.connectedSigner
+      );
+
+      const currentAllowance = await this.connectedSigner
+        .getAddress()
+        .then(address =>
+          governanceERC20Instance.allowance(address, daoAddress)
+        );
+      yield {
+        idx: DepositSteps.CURRENT_ALLOWANCE,
+        value: currentAllowance.toBigInt(),
+      };
+
+      if (currentAllowance.lt(amount)) {
+        const increaseAllowanceTx = await governanceERC20Instance.increaseAllowance(
+          daoAddress,
+          BigNumber.from(amount)
+        );
+        yield {
+          idx: DepositSteps.INCREASE_ALLOWANCE_TX,
+          value: increaseAllowanceTx.hash,
+        };
+
+        increaseAllowanceTx.wait().then(cr => {
+          if (
+            BigNumber.from(amount).gt(
+              cr.events?.find(e => e?.event === "Approval")?.args?.value
+            )
+          ) {
+            throw new Error("Could not increase allowance");
+          }
+        });
+
+        yield {
+          idx: DepositSteps.INCREASE_ALLOWANCE,
+          value: amount.toBigInt(),
+        };
+      }
+    }
 
     const daoInstance = DAO__factory.connect(daoAddress, this.connectedSigner);
 
@@ -299,19 +345,24 @@ export abstract class ClientCore implements IClientCore {
       }
     }
 
-    return daoInstance
-      .deposit(tokenAddress, amount, reference, override)
-      .then((tx) => tx.wait())
-      .then((cr) => {
-        const eventAmount = cr.events?.find((e) => e?.event === "Deposited")
-          ?.args
-          ?.amount;
-        if (!amount.eq(eventAmount)) {
-          throw new Error(
-            `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`,
-          );
-        }
-      });
+    const depositTx = await daoInstance.deposit(
+      tokenAddress,
+      amount,
+      reference,
+      override
+    );
+    yield { idx: DepositSteps.DEPOSIT_TX, value: depositTx.hash };
+
+    await depositTx.wait().then(cr => {
+      const eventAmount = cr.events?.find(e => e?.event === "Deposited")?.args
+        ?.amount;
+      if (!amount.eq(eventAmount)) {
+        throw new Error(
+          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`
+        );
+      }
+    });
+    yield { idx: DepositSteps.DEPOSIT, value: amount.toBigInt() };
   }
 
   protected estimateDeposit(params: IDeposit): Promise<IGasFeeEstimation> {
@@ -341,33 +392,6 @@ export abstract class ClientCore implements IClientCore {
       override
     );
     return this.estimateGasFee(gasLimit);
-  }
-
-  protected increaseAllowance(
-    tokenAddress: string,
-    daoAddress: string,
-    amount: bigint
-  ): Promise<void> {
-    if (!this.connectedSigner)
-      throw new Error("A signer is needed for creating a DAO");
-
-    const governanceERC20Instance = GovernanceERC20__factory.connect(
-      tokenAddress,
-      this.connectedSigner
-    );
-
-    return governanceERC20Instance
-      .increaseAllowance(daoAddress, BigNumber.from(amount))
-      .then(tx => tx.wait())
-      .then(cr => {
-        if (
-          BigNumber.from(amount).gt(
-            cr.events?.find(e => e?.event === "Approval")?.args?.value
-          )
-        ) {
-          throw new Error("Could not increase allowance");
-        }
-      });
   }
 
   protected estimateIncreaseAllowance(

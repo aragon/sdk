@@ -2,6 +2,7 @@ import { ClientCore } from "./internal/client-core";
 import {
   DaoConfig,
   DaoRole,
+  DepositSteps,
   IClientDaoBase,
   IClientDaoERC20Voting,
   IClientDaoWhitelistVoting,
@@ -30,6 +31,7 @@ export {
   ICreateProposal,
   IDeposit,
   IWithdraw,
+  DepositSteps,
 };
 
 export class ClientDaoERC20Voting extends ClientCore
@@ -76,17 +78,10 @@ export class ClientDaoERC20Voting extends ClientCore
       return Promise.resolve();
     },
 
-    deposit: (params: IDeposit): Promise<void> => this.deposit(params),
-    currentAllowance: (
-      tokenAddress: string,
-      daoAddress: string
-    ): Promise<bigint> => this.currentAllowance(tokenAddress, daoAddress),
-    increaseAllowance: (
-      tokenAddress: string,
-      daoAddress: string,
-      amount: bigint
-    ): Promise<void> =>
-      this.increaseAllowance(tokenAddress, daoAddress, amount),
+    deposit: (
+      params: IDeposit
+    ): AsyncGenerator<{ idx: DepositSteps; value: string | bigint }> =>
+      this.deposit(params),
 
     simpleVote: {
       createProposal: (
@@ -263,17 +258,10 @@ export class ClientDaoWhitelistVoting extends ClientCore
       return Promise.resolve();
     },
 
-    deposit: (params: IDeposit): Promise<void> => this.deposit(params),
-    currentAllowance: (
-      tokenAddress: string,
-      daoAddress: string
-    ): Promise<bigint> => this.currentAllowance(tokenAddress, daoAddress),
-    increaseAllowance: (
-      tokenAddress: string,
-      daoAddress: string,
-      amount: bigint
-    ): Promise<void> =>
-      this.increaseAllowance(tokenAddress, daoAddress, amount),
+    deposit: (
+      params: IDeposit
+    ): AsyncGenerator<{ idx: DepositSteps; value: string | bigint }> =>
+      this.deposit(params),
 
     whitelist: {
       createProposal: (

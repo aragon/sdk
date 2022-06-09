@@ -10,16 +10,9 @@ export interface IClientDaoBase extends IClientCore {
       role: DaoRole,
       data: Uint8Array
     ) => Promise<void>;
-    deposit: (params: IDeposit) => Promise<void>;
-    currentAllowance: (
-      tokenAddress: string,
-      daoAddress: string
-    ) => Promise<bigint>;
-    increaseAllowance: (
-      tokenAddress: string,
-      daoAddress: string,
-      amount: bigint
-    ) => Promise<void>;
+    deposit: (
+      params: IDeposit
+    ) => AsyncGenerator<{ idx: DepositSteps; value: string | bigint }>;
   };
   actions: {
     withdraw: (to: string, value: bigint, params: IWithdraw) => IProposalAction;
@@ -155,6 +148,14 @@ export interface IDeposit {
   amount: bigint;
   token?: string;
   reference?: string;
+}
+
+export enum DepositSteps {
+  CURRENT_ALLOWANCE = "currentAllowance",
+  INCREASE_ALLOWANCE_TX = "increaseAllowanceTx",
+  INCREASE_ALLOWANCE = "increaseAllowance",
+  DEPOSIT_TX = "depositTx",
+  DEPOSIT = "deposit",
 }
 
 export interface IWithdraw {
