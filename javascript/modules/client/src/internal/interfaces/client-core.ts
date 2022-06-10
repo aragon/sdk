@@ -1,9 +1,10 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { IPFSHTTPClient } from "ipfs-http-client";
 
 export interface IClientWeb3Core {
-  // useSigner(signer: Signer): this;
+  useSigner(signer: Signer): this;
   shiftWeb3Node(): this;
   signer: Signer | null;
   web3: JsonRpcProvider | null;
@@ -14,6 +15,9 @@ export interface IClientVocdoniCore {
   // Add here
 }
 export interface IClientIpfsCore {
+  shiftIpfsNode(): this;
+  checkIpfsStatus(): Promise<boolean>;
+  ipfs: IPFSHTTPClient;
   pin(input: string | Uint8Array): Promise<string>;
   fetchString(cid: string): Promise<string>;
   fetchBytes(cid: string): Promise<Uint8Array | undefined>;
@@ -23,7 +27,8 @@ export interface IClientGraphQLCore {
 }
 
 export interface IClientCore
-  extends IClientWeb3Core,
+  extends
+    IClientWeb3Core,
     IClientVocdoniCore,
     IClientIpfsCore,
     IClientGraphQLCore {}

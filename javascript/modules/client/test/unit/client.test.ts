@@ -34,7 +34,7 @@ const contextParams: ContextParams = {
     {
       url: "https://testing-ipfs-0.aragon.network",
       headers:{
-        "X-API-KEY": process.env.IPFS_API_KEY
+        "X-API-KEY": process.env.IPFS_API_KEY || ""
       }
     }
   ],
@@ -323,30 +323,32 @@ describe("Client instances", () => {
   it("Should connect to a IPFS node and upload a string and recover the same string", async () => {
     const context = new Context(contextParams);
     const client = new ClientDaoERC20Voting(context);
-    const string = "I am a test";
-    const cid = await client.pin(string);
+    const originalStr = "I am a test";
+    const cid = await client.pin(originalStr);
     const recoveredString = await client.fetchString(cid);
     const recoveredBytes = await client.fetchBytes(cid);
-    const decodedString = new TextDecoder().decode(recoveredBytes);
+    const decodedString = new TextDecoder().decode(recoveredBytes)
+
     expect(typeof recoveredBytes).toBe("object");
     expect(typeof recoveredString).toBe("string");
     expect(typeof decodedString).toBe("string");
-    expect(string).toEqual(recoveredString);
-    expect(string).toEqual(decodedString);
+    expect(recoveredString).toEqual(originalStr);
+    expect(decodedString).toEqual(originalStr);
   });
   it("Should connect to a IPFS node and upload bytes and recover the same string", async () => {
     const context = new Context(contextParams);
     const client = new ClientDaoERC20Voting(context);
-    const bytes = new Uint8Array([72, 101, 108, 108, 111, 32, 84, 104, 101, 114, 101, 32, 58, 41]);
-    const cid = await client.pin(bytes);
+    const originalBytes = new Uint8Array([72, 101, 108, 108, 111, 32, 84, 104, 101, 114, 101, 32, 58, 41]);
+    const cid = await client.pin(originalBytes);
     const recoveredString = await client.fetchString(cid);
     const recoveredBytes = await client.fetchBytes(cid);
     const decodedString = new TextDecoder().decode(recoveredBytes);
+
     expect(typeof recoveredBytes).toBe("object");
     expect(typeof recoveredString).toBe("string");
     expect(typeof decodedString).toBe("string");
-    expect("Hello There :)").toEqual(recoveredString);
-    expect("Hello There :)").toEqual(decodedString);
+    expect(recoveredString).toEqual("Hello There :)");
+    expect(decodedString).toEqual("Hello There :)");
   });
   // it("Should create a ERC20Voting proposal locally", async () => {
   //   const context = new Context(contextParamsLocalChain);
