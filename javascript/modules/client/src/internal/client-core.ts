@@ -132,9 +132,10 @@ export abstract class ClientCore implements IClientCore {
       .catch(() => false);
   }
 
-  public checkIpfsStatus(): boolean {
+  public async checkIpfsStatus(): Promise<boolean> {
     try {
-      return this.ipfs.isOnline();
+      const isOnline = await this.ipfs.isOnline();
+      return isOnline
     } catch {
       return false;
     }
@@ -167,13 +168,13 @@ export abstract class ClientCore implements IClientCore {
   protected static createProposalParameters(
     params: ICreateProposal
   ): [
-    string,
-    IDAO.ActionStruct[],
-    BigNumberish,
-    BigNumberish,
-    boolean,
-    BigNumberish
-  ] {
+      string,
+      IDAO.ActionStruct[],
+      BigNumberish,
+      BigNumberish,
+      boolean,
+      BigNumberish
+    ] {
     return [
       params.metadata,
       params.actions ?? [],
@@ -242,8 +243,8 @@ export abstract class ClientCore implements IClientCore {
       tokenAddress !== AddressZero
         ? {}
         : {
-            value: amount,
-          };
+          value: amount,
+        };
 
     if (tokenAddress !== AddressZero) {
       const governanceERC20Instance = GovernanceERC20__factory.connect(
@@ -303,15 +304,15 @@ export abstract class ClientCore implements IClientCore {
     );
   }
 
-  public pin(input: string | Uint8Array): Promise<string> {
+  public async pin(input: string | Uint8Array): Promise<string> {
     if (!this.ipfs)
       return Promise.reject(new Error("IPFS client is not initialized"));
     // find online node
     let isOnline = false;
     for (var i = 0; i < this._ipfs.length; i++) {
-      isOnline = this.checkIpfsStatus();
+      isOnline = await this.checkIpfsStatus();
       if (isOnline) break;
-      this.shiftIpfsNode();
+      else this.shiftIpfsNode();
     }
     if (!isOnline) throw new Error("No IPFS nodes available");
     return this._ipfs[this._ipfsIdx]
@@ -327,9 +328,9 @@ export abstract class ClientCore implements IClientCore {
     // find online node
     let isOnline = false;
     for (var i = 0; i < this._ipfs.length; i++) {
-      isOnline = this.checkIpfsStatus();
+      isOnline = await this.checkIpfsStatus();
       if (isOnline) break;
-      this.shiftIpfsNode();
+      else this.shiftIpfsNode();
     }
     if (!isOnline) throw new Error("No IPFS nodes available");
     try {

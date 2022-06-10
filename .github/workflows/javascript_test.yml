@@ -47,3 +47,4 @@ jobs:
         run: yarn test --ci --coverage --maxWorkers=2
         env:
           DAO_FACTORY: ${{ steps.contracts.outputs.dao }}
+          IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}

@@ -20,10 +20,6 @@ const web3endpoints = {
   ],
   failing: ["https://bad-url-gateway.io/"],
 };
-const ipfsEndpoints = {
-  working: ["https://ipfs-0.aragon.network", "https://ipfs-1.aragon.network"],
-  failing: ["https://bad-url-gateway.io/"],
-};
 
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
@@ -36,11 +32,11 @@ const contextParams: ContextParams = {
   web3Providers: web3endpoints.working,
   ipfsNodes: [
     {
-      url: ipfsEndpoints.working[0],
-    },
-    {
-      url: ipfsEndpoints.working[1],
-    },
+      url: "https://testing-ipfs-0.aragon.network",
+      headers:{
+        "X-API-KEY": process.env.IPFS_API_KEY
+      }
+    }
   ],
 };
 
@@ -52,7 +48,13 @@ const contextParamsLocalChain: ContextParams = {
   web3Providers: ["http://localhost:8545"],
   ipfsNodes: [
     {
-      url: "http://localhost:5001",
+      url: "http:localhost:5001",
+    },
+    {
+      url: "http:localhost:5002",
+    },
+    {
+      url: "http:localhost:5003",
     },
   ],
 };
@@ -335,21 +337,7 @@ describe("Client instances", () => {
   it("Should connect to a IPFS node and upload bytes and recover the same string", async () => {
     const context = new Context(contextParams);
     const client = new ClientDaoERC20Voting(context);
-    const bytes = new Uint8Array([
-      72,
-      101,
-      108,
-      111,
-      32,
-      116,
-      104,
-      101,
-      114,
-      101,
-      32,
-      58,
-      41,
-    ]);
+    const bytes = new Uint8Array([72, 101, 108, 108, 111, 32, 84, 104, 101, 114, 101, 32, 58, 41]);
     const cid = await client.pin(bytes);
     const recoveredString = await client.fetchString(cid);
     const recoveredBytes = await client.fetchBytes(cid);
@@ -358,7 +346,7 @@ describe("Client instances", () => {
     expect(typeof recoveredString).toBe("string");
     expect(typeof decodedString).toBe("string");
     expect("Hello There :)").toEqual(recoveredString);
-    expect("Hello there :)").toEqual(decodedString);
+    expect("Hello There :)").toEqual(decodedString);
   });
   // it("Should create a ERC20Voting proposal locally", async () => {
   //   const context = new Context(contextParamsLocalChain);
