@@ -8,7 +8,7 @@ export interface IClientWeb3Core {
   shiftWeb3Node(): this;
   signer: Signer | null;
   web3: JsonRpcProvider | null;
-  checkWeb3Status(): Promise<boolean>;
+  isWeb3NodeUp(): Promise<boolean>;
   attachContract<T>(address: string, abi: ContractInterface): Contract & T;
 }
 export interface IClientVocdoniCore {
@@ -16,7 +16,7 @@ export interface IClientVocdoniCore {
 }
 export interface IClientIpfsCore {
   shiftIpfsNode(): this;
-  checkIpfsStatus(): Promise<boolean>;
+  isIpfsNodeUp(): Promise<boolean>;
   ipfs: IPFSHTTPClient;
   pin(input: string | Uint8Array): Promise<string>;
   fetchString(cid: string): Promise<string>;

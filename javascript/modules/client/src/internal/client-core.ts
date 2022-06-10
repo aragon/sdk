@@ -131,7 +131,7 @@ export abstract class ClientCore implements IClientCore {
     return this._ipfs[this._ipfsIdx];
   }
 
-  public async checkWeb3Status(): Promise<boolean> {
+  public isWeb3NodeUp(): Promise<boolean> {
     return this.web3
       .getNetwork()
       .then(() => true)
@@ -139,7 +139,7 @@ export abstract class ClientCore implements IClientCore {
   }
 
   /** Returns `true` if the current client is on line */
-  public checkIpfsStatus(): Promise<boolean> {
+  public isIpfsNodeUp(): Promise<boolean> {
     // Note: the TS typing is incorrect (returns a Promise)
     return Promise.resolve(this.ipfs.isOnline())
       .catch(() => false);
@@ -317,12 +317,12 @@ export abstract class ClientCore implements IClientCore {
 
   public async pin(input: string | Uint8Array): Promise<string> {
     if (!this.ipfs) {
-      return Promise.reject(new Error("IPFS client is not initialized"));
+      throw new Error("IPFS client is not initialized");
     }
     // find online node
     let isOnline = false;
     for (var i = 0; i < this._ipfs.length; i++) {
-      isOnline = await this.checkIpfsStatus();
+      isOnline = await this.isIpfsNodeUp();
       if (isOnline) break;
 
       this.shiftIpfsNode();
@@ -342,7 +342,7 @@ export abstract class ClientCore implements IClientCore {
     // find online node
     let isOnline = false;
     for (let i = 0; i < this._ipfs.length; i++) {
-      isOnline = await this.checkIpfsStatus();
+      isOnline = await this.isIpfsNodeUp();
       if (isOnline) break;
 
       this.shiftIpfsNode();
