@@ -1,4 +1,4 @@
-import { ContextState, ContextParams } from "./internal/interfaces/context";
+import { ContextParams, ContextState } from "./internal/interfaces/context";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
 import { activeContractsList } from "@aragon/core-contracts-ethers";
@@ -73,12 +73,12 @@ export class Context {
       dao: contextParams.dao,
       web3Providers: this.useWeb3Providers(
         contextParams.web3Providers,
-        contextParams.network
+        contextParams.network,
       ),
       gasFeeEstimationFactor: Context.resolveGasFeeEstimationFactor(
-        contextParams.gasFeeEstimationFactor
+        contextParams.gasFeeEstimationFactor,
       ),
-      ipfs: this.useIpfsNodes(contextParams.ipfsNodes),
+      ipfs: Context.mapIpfsNodes(contextParams.ipfsNodes),
       // subgraph: new GraphQLClient(contextParams.subgraphURL),
     };
   }
@@ -93,10 +93,9 @@ export class Context {
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
     } else if (this.state.network.toString() in activeContractsList) {
-      this.state.daoFactoryAddress =
-        activeContractsList[
-          this.state.network.toString() as keyof typeof activeContractsList
-        ].DAOFactory;
+      this.state.daoFactoryAddress = activeContractsList[
+        this.state.network.toString() as keyof typeof activeContractsList
+      ].DAOFactory;
     }
     if (contextParams.signer) {
       this.state.signer = contextParams.signer;
@@ -104,16 +103,16 @@ export class Context {
     if (contextParams.web3Providers) {
       this.state.web3Providers = this.useWeb3Providers(
         contextParams.web3Providers,
-        this.state.network
+        this.state.network,
       );
     }
     if (contextParams.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
-        contextParams.gasFeeEstimationFactor
+        contextParams.gasFeeEstimationFactor,
       );
     }
     if (contextParams.ipfsNodes?.length) {
-      this.state.ipfs = this.useIpfsNodes(contextParams.ipfsNodes);
+      this.state.ipfs = Context.mapIpfsNodes(contextParams.ipfsNodes);
     }
     // if (contextParams.subgraphURL) {
     //   this.state.subgraph = new GraphQLClient(contextParams.subgraphURL);
@@ -122,10 +121,10 @@ export class Context {
 
   useWeb3Providers(
     endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-    network: Networkish
+    network: Networkish,
   ): JsonRpcProvider[] {
     if (Array.isArray(endpoints)) {
-      return endpoints.map(item => {
+      return endpoints.map((item) => {
         if (typeof item === "string") {
           const url = new URL(item);
           if (!supportedProtocols.includes(url.protocol)) {
@@ -144,17 +143,6 @@ export class Context {
     } else {
       return [endpoints];
     }
-  }
-
-  useIpfsNodes(nodes: Options[]): IPFSHTTPClient[] {
-    if (nodes.length > 0) {
-      const clients: IPFSHTTPClient[] = [];
-      for (const node of nodes) {
-        clients.push(ipfsCreate(node));
-      }
-      return clients;
-    }
-    throw new Error("No IPFS nodes specified");
   }
 
   // GETTERS
@@ -287,14 +275,20 @@ export class Context {
   // INTERNAL HELPERS
 
   private static resolveGasFeeEstimationFactor(
-    gasFeeEstimationFactor: number
+    gasFeeEstimationFactor: number,
   ): number {
     if (typeof gasFeeEstimationFactor === "undefined") return 1;
     else if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
       throw new Error(
-        "Gas estimation factor value should be a number between 0 and 1"
+        "Gas estimation factor value should be a number between 0 and 1",
       );
     }
     return gasFeeEstimationFactor;
+  }
+
+  private static mapIpfsNodes(nodes: Options[]): IPFSHTTPClient[] {
+    if (!nodes?.length) throw new Error("No IPFS nodes specified");
+
+    return nodes.map((node) => ipfsCreate(node));
   }
 }
