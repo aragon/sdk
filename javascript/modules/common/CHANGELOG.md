@@ -20,6 +20,7 @@ Description of the release
 
 ### Added
 - Github actions automation to deploy this package 
+- `Random.getFloat()`
 
 ## 0.1.0
 

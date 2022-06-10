@@ -17,6 +17,7 @@ import {
   GovernanceERC20__factory,
   IDAO,
 } from "@aragon/core-contracts-ethers";
+import { Random } from "@aragon/sdk-common";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { IPFSHTTPClient } from "ipfs-http-client";
@@ -35,7 +36,7 @@ export abstract class ClientCore implements IClientCore {
   constructor(context: Context) {
     if (context.ipfs?.length) {
       this._ipfs = context.ipfs;
-      this._ipfsIdx = Math.floor(Math.random() * context.ipfs.length);
+      this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
     }
     if (context.web3Providers) {
       this._web3Providers = context.web3Providers;
