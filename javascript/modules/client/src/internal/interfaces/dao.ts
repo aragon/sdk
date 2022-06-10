@@ -12,7 +12,7 @@ export interface IClientDaoBase extends IClientCore {
     ) => Promise<void>;
     deposit: (
       params: IDeposit
-    ) => AsyncGenerator<{ idx: DepositSteps; value: string | bigint }>;
+    ) => AsyncGenerator<DaoDepositStepValue>;
   };
   actions: {
     withdraw: (to: string, value: bigint, params: IWithdraw) => IProposalAction;
@@ -150,13 +150,20 @@ export interface IDeposit {
   reference?: string;
 }
 
-export enum DepositSteps {
-  CURRENT_ALLOWANCE = "currentAllowance",
-  INCREASE_ALLOWANCE_TX = "increaseAllowanceTx",
-  INCREASE_ALLOWANCE = "increaseAllowance",
-  DEPOSIT_TX = "depositTx",
-  DEPOSIT = "deposit",
+export enum DaoDepositSteps {
+  CHECKED_ALLOWANCE = "checkedAllowance",
+  INCREASING_ALLOWANCE = "increasingAllowance",
+  INCREASED_ALLOWANCE = "increasedAllowance",
+  DEPOSITING = "depositing",
+  DEPOSITED = "deposited",
 }
+
+export type DaoDepositStepValue = 
+  { key: DaoDepositSteps.CHECKED_ALLOWANCE, allowance: bigint } |
+  { key: DaoDepositSteps.INCREASING_ALLOWANCE, txHash: string } |
+  { key: DaoDepositSteps.INCREASED_ALLOWANCE, allowance: bigint } |
+  { key: DaoDepositSteps.DEPOSITING, txHash: string } |
+  { key: DaoDepositSteps.DEPOSITED, amount: bigint }
 
 export interface IWithdraw {
   to: string;

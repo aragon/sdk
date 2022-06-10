@@ -5,7 +5,8 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
 import {
-  DepositSteps,
+  DaoDepositSteps,
+  DaoDepositStepValue,
   ICreateProposal,
   IDeposit,
   IGasFeeEstimation,
@@ -257,7 +258,7 @@ export abstract class ClientCore implements IClientCore {
 
   protected async *deposit(
     params: IDeposit
-  ): AsyncGenerator<{ idx: DepositSteps; value: string | bigint }> {
+  ): AsyncGenerator<DaoDepositStepValue> {
     if (!this.connectedSigner) {
       throw new Error("A signer is needed for creating a DAO");
     }
@@ -269,6 +270,7 @@ export abstract class ClientCore implements IClientCore {
       reference,
     ] = ClientCore.createDepositParameters(params);
 
+    // Depositing an ERC20 token?
     if (tokenAddress !== AddressZero) {
       const governanceERC20Instance = GovernanceERC20__factory.connect(
         tokenAddress,
@@ -281,8 +283,8 @@ export abstract class ClientCore implements IClientCore {
           governanceERC20Instance.allowance(address, daoAddress)
         );
       yield {
-        idx: DepositSteps.CURRENT_ALLOWANCE,
-        value: currentAllowance.toBigInt(),
+        key: DaoDepositSteps.CHECKED_ALLOWANCE,
+        allowance: currentAllowance.toBigInt(),
       };
 
       if (currentAllowance.lt(amount)) {
@@ -291,11 +293,11 @@ export abstract class ClientCore implements IClientCore {
           BigNumber.from(amount)
         );
         yield {
-          idx: DepositSteps.INCREASE_ALLOWANCE_TX,
-          value: increaseAllowanceTx.hash,
+          key: DaoDepositSteps.INCREASING_ALLOWANCE,
+          txHash: increaseAllowanceTx.hash,
         };
 
-        increaseAllowanceTx.wait().then(cr => {
+        await increaseAllowanceTx.wait().then(cr => {
           if (
             BigNumber.from(amount).gt(
               cr.events?.find(e => e?.event === "Approval")?.args?.value
@@ -306,11 +308,13 @@ export abstract class ClientCore implements IClientCore {
         });
 
         yield {
-          idx: DepositSteps.INCREASE_ALLOWANCE,
-          value: amount.toBigInt(),
+          key: DaoDepositSteps.INCREASED_ALLOWANCE,
+          allowance: amount.toBigInt(),
         };
       }
     }
+
+    // Doing the transfer
 
     const daoInstance = DAO__factory.connect(daoAddress, this.connectedSigner);
 
@@ -351,7 +355,7 @@ export abstract class ClientCore implements IClientCore {
       reference,
       override
     );
-    yield { idx: DepositSteps.DEPOSIT_TX, value: depositTx.hash };
+    yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
 
     await depositTx.wait().then(cr => {
       const eventAmount = cr.events?.find(e => e?.event === "Deposited")?.args
@@ -362,7 +366,7 @@ export abstract class ClientCore implements IClientCore {
         );
       }
     });
-    yield { idx: DepositSteps.DEPOSIT, value: amount.toBigInt() };
+    yield { key: DaoDepositSteps.DEPOSITED, amount: amount.toBigInt() };
   }
 
   protected estimateDeposit(params: IDeposit): Promise<IGasFeeEstimation> {

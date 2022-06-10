@@ -2,7 +2,8 @@ import { ClientCore } from "./internal/client-core";
 import {
   DaoConfig,
   DaoRole,
-  DepositSteps,
+  DaoDepositSteps,
+  DaoDepositStepValue,
   IClientDaoBase,
   IClientDaoERC20Voting,
   IClientDaoWhitelistVoting,
@@ -31,7 +32,7 @@ export {
   ICreateProposal,
   IDeposit,
   IWithdraw,
-  DepositSteps,
+  DaoDepositSteps,
 };
 
 export class ClientDaoERC20Voting extends ClientCore
@@ -80,7 +81,7 @@ export class ClientDaoERC20Voting extends ClientCore
 
     deposit: (
       params: IDeposit
-    ): AsyncGenerator<{ idx: DepositSteps; value: string | bigint }> =>
+    ): AsyncGenerator<DaoDepositStepValue> =>
       this.deposit(params),
 
     simpleVote: {
@@ -260,7 +261,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
 
     deposit: (
       params: IDeposit
-    ): AsyncGenerator<{ idx: DepositSteps; value: string | bigint }> =>
+    ): AsyncGenerator<DaoDepositStepValue> =>
       this.deposit(params),
 
     whitelist: {

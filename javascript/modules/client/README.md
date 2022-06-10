@@ -177,7 +177,7 @@ console.log(newProposalId) // New proposal id
 
 #### Deposit to DAO
 
-###### Deposit native token to ERC20Voting and WhitelistVoting DAOs
+###### Deposit native tokens to the DAO
 
 ```ts
 const client = new ClientDaoERC20Voting(context);
@@ -199,17 +199,17 @@ const gasFeesEstimation = await client.estimate.deposit(depositParams);
 
 for await (const step of client.dao.deposit(depositParams)) {
     switch (step.idx) {
-        case "depositTx":
-            console.log(step.value); // 0xb1c14a49...3e8620b0f5832d61c
+        case DaoDepositSteps.DEPOSITING:
+            console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
             break;
-        case "deposit":
-            console.log(step.value); // 10n
+        case DaoDepositSteps.DEPOSITED:
+            console.log(step.amount); // 10n
             break;
     }
 }
 ```
 
-###### Deposit ERC20 token to ERC20Voting and WhitelistVoting DAOs
+###### Deposit ERC20 tokens to the DAO
 
 ```ts
 const client = new ClientDaoERC20Voting(context);
@@ -231,20 +231,20 @@ const gasFeesEstimation = await client.estimate.deposit(depositParams);
 
 for await (const step of client.dao.deposit(depositParams)) {
     switch (step.idx) {
-        case DepositSteps.CURRENT_ALLOWANCE:
-            console.log(step.value); // 0n
+        case DaoDepositSteps.CHECKED_ALLOWANCE:
+            console.log(step.allowance); // 0n
             break;
-        case DepositSteps.INCREASE_ALLOWANCE_TX:
-            console.log(step.value); // 0xb1c14a49...3e8620b0f5832d61c
+        case DaoDepositSteps.INCREASING_ALLOWANCE:
+            console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
             break;
-        case DepositSteps.INCREASE_ALLOWANCE:
-            console.log(step.value); // 10n
+        case DaoDepositSteps.INCREASED_ALLOWANCE:
+            console.log(step.allowance); // 10n
             break;
-        case DepositSteps.DEPOSIT_TX:
-            console.log(step.value); // 0xb1c14a49...3e8620b0f5832d61c
+        case DaoDepositSteps.DEPOSITING:
+            console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
             break;
-        case DepositSteps.DEPOSIT:
-            console.log(step.value); // 10n
+        case DaoDepositSteps.DEPOSITED:
+            console.log(step.amount); // 10n
             break;
     }
 }
