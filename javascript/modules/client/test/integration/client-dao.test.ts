@@ -329,6 +329,7 @@ describe("Client", () => {
   });
 
   describe("Proposals", () => {
+    test.todo("Should create a ERC20Voting proposal locally");
     // it("Should create a ERC20Voting proposal locally", async () => {
     //   const context = new Context(contextParamsLocalChain);
     //   const client = new ClientDaoERC20Voting(context);
@@ -348,6 +349,7 @@ describe("Client", () => {
     //   expect(BigNumber.isBigNumber(newProposalId)).toBeTruthy();
     //   expect(newProposalId.toBigInt()).toBeGreaterThan(0);
     // });
+    test.todo("Should create a WhitelistVoting proposal locally");
     // it("Should create a WhitelistVoting proposal locally", async () => {
     //   const context = new Context(contextParamsLocalChain);
     //   const client = new ClientDaoWhitelistVoting(context);
