@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ['14.x']
+        node: ['16.x']
         os: [ubuntu-latest]
 
     steps:
@@ -47,3 +47,4 @@ jobs:
         run: yarn test --ci --coverage --maxWorkers=2
         env:
           DAO_FACTORY: ${{ steps.contracts.outputs.dao }}
+          IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}

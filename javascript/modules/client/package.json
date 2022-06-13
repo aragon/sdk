@@ -13,12 +13,12 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
-    "test": "TESTING=true tsdx test",
+    "test": "TESTING=true tsdx test --verbose",
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
@@ -61,6 +61,10 @@
     "@ethersproject/constants": "^5.6.0",
     "@ethersproject/contracts": "^5.5.0",
     "@ethersproject/providers": "^5.5.0",
-    "@ethersproject/wallet": "^5.6.0"
+    "@ethersproject/wallet": "^5.6.0",
+    "ipfs-http-client": "^56.0.3"
+  },
+  "jest": {
+    "testEnvironment": "../../test-environment"
   }
 }

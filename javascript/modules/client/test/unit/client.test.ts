@@ -30,6 +30,14 @@ const contextParams: ContextParams = {
   dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
+  ipfsNodes: [
+    {
+      url: "https://testing-ipfs-0.aragon.network",
+      headers:{
+        "X-API-KEY": process.env.IPFS_API_KEY || ""
+      }
+    }
+  ],
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -38,6 +46,17 @@ const contextParamsLocalChain: ContextParams = {
   dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
+  ipfsNodes: [
+    {
+      url: "http:localhost:5001",
+    },
+    {
+      url: "http:localhost:5002",
+    },
+    {
+      url: "http:localhost:5003",
+    },
+  ],
 };
 
 describe("Client instances", () => {
@@ -74,10 +93,10 @@ describe("Client instances", () => {
     expect(clientDaoERC20Voting.connectedSigner).toBeInstanceOf(Wallet);
     expect(clientDaoWhitelistVoting.connectedSigner).toBeInstanceOf(Wallet);
 
-    const clientDaoERC20VotingStatus = await clientDaoERC20Voting.checkWeb3Status();
+    const clientDaoERC20VotingStatus = await clientDaoERC20Voting.isWeb3NodeUp();
     expect(clientDaoERC20VotingStatus).toEqual(true);
 
-    const clientDaoWhitelistVotingStatus = await clientDaoWhitelistVoting.checkWeb3Status();
+    const clientDaoWhitelistVotingStatus = await clientDaoWhitelistVoting.isWeb3NodeUp();
     expect(clientDaoWhitelistVotingStatus).toEqual(true);
   });
   it("Should create a failing client", async () => {
@@ -95,10 +114,10 @@ describe("Client instances", () => {
     expect(clientDaoERC20Voting.connectedSigner).toBeInstanceOf(Wallet);
     expect(clientDaoWhitelistVoting.connectedSigner).toBeInstanceOf(Wallet);
 
-    const clientDaoERC20VotingStatus = await clientDaoERC20Voting.checkWeb3Status();
+    const clientDaoERC20VotingStatus = await clientDaoERC20Voting.isWeb3NodeUp();
     expect(clientDaoERC20VotingStatus).toEqual(false);
 
-    const clientDaoWhitelistVotingStatus = await clientDaoWhitelistVoting.checkWeb3Status();
+    const clientDaoWhitelistVotingStatus = await clientDaoWhitelistVoting.isWeb3NodeUp();
     expect(clientDaoWhitelistVotingStatus).toEqual(false);
   });
   it("Should create a client, fail and shift to a working endpoint", async () => {
@@ -116,20 +135,20 @@ describe("Client instances", () => {
     expect(clientDaoWhitelistVoting.web3).toBeInstanceOf(JsonRpcProvider);
 
     await clientDaoERC20Voting
-      .checkWeb3Status()
+      .isWeb3NodeUp()
       .then(isUp => {
         expect(isUp).toEqual(false);
-        return clientDaoERC20Voting.shiftWeb3Node().checkWeb3Status();
+        return clientDaoERC20Voting.shiftWeb3Node().isWeb3NodeUp();
       })
       .then(isUp => {
         expect(isUp).toEqual(true);
       });
 
     await clientDaoWhitelistVoting
-      .checkWeb3Status()
+      .isWeb3NodeUp()
       .then(isUp => {
         expect(isUp).toEqual(false);
-        return clientDaoWhitelistVoting.shiftWeb3Node().checkWeb3Status();
+        return clientDaoWhitelistVoting.shiftWeb3Node().isWeb3NodeUp();
       })
       .then(isUp => {
         expect(isUp).toEqual(true);
@@ -300,6 +319,54 @@ describe("Client instances", () => {
     expect(newDaoAddress.length).toBe(42);
     expect(newDaoAddress).toContain("0x");
     expect(newDaoAddress).toMatch(/^[A-Fa-f0-9]/i);
+  });
+  it("Should connect to a IPFS node and upload a string and recover the same string", async () => {
+    const context = new Context(contextParams);
+    const client = new ClientDaoERC20Voting(context);
+    const originalStr = "I am a test";
+    const cid = await client.pin(originalStr);
+    const recoveredString = await client.fetchString(cid);
+    const recoveredBytes = await client.fetchBytes(cid);
+    const decodedString = new TextDecoder().decode(recoveredBytes)
+
+    expect(typeof recoveredBytes).toBe("object");
+    expect(typeof recoveredString).toBe("string");
+    expect(typeof decodedString).toBe("string");
+    expect(recoveredString).toEqual(originalStr);
+    expect(decodedString).toEqual(originalStr);
+  });
+  it("Should connect to a IPFS node and upload bytes and recover the same string", async () => {
+    const context = new Context(contextParams);
+    const client = new ClientDaoERC20Voting(context);
+    const originalBytes = new Uint8Array([72, 101, 108, 108, 111, 32, 84, 104, 101, 114, 101, 32, 58, 41]);
+    const cid = await client.pin(originalBytes);
+    const recoveredString = await client.fetchString(cid);
+    const recoveredBytes = await client.fetchBytes(cid);
+    const decodedString = new TextDecoder().decode(recoveredBytes);
+
+    expect(typeof recoveredBytes).toBe("object");
+    expect(typeof recoveredString).toBe("string");
+    expect(typeof decodedString).toBe("string");
+    expect(recoveredString).toEqual("Hello There :)");
+    expect(decodedString).toEqual("Hello There :)");
+  });
+  it("Should work when an IPFS node is functional", async () => {
+    const context = new Context(contextParams);
+    const client = new ClientDaoERC20Voting(context);
+    const isOnline = await client.isIpfsNodeUp();
+
+    expect(isOnline).toEqual(true);
+  });
+  it("Should fail when an IPFS node is not working", async () => {
+    const context = new Context(
+      Object.assign({}, contextParams, {
+        ipfsNodes: [{ url: "https://does-not-exist-here.random.hb/1234" }],
+      }),
+    );
+    const client = new ClientDaoERC20Voting(context);
+    const isOnline = await client.isIpfsNodeUp();
+
+    expect(isOnline).toEqual(false);
   });
   // it("Should create a ERC20Voting proposal locally", async () => {
   //   const context = new Context(contextParamsLocalChain);

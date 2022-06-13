@@ -12,13 +12,14 @@
     ]
   },
   "jest": {
-    "preset": "ts-jest"
+    "preset": "ts-jest",
+    "testEnvironment": "./test-environment"
   },
   "scripts": {
     "clean": "rm -Rf node_modules ./modules/*/node_modules ./modules/*/dist",
     "lint": "tsdx lint modules/*/src",
     "build": "yarn turbo run build",
-    "test": "TESTING=true tsdx test"
+    "test": "TESTING=true tsdx test --verbose"
   },
   "devDependencies": {
     "ganache": "^7.1.0",

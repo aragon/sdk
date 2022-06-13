@@ -31,6 +31,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [TBD]  
+
+- Adding IPFS support for pinning and fetching data
   
 ## [0.0.13-alpha] - Tue May 24 09:26:45 UTC 2022  
 

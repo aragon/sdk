@@ -17,8 +17,10 @@ import {
   GovernanceERC20__factory,
   IDAO,
 } from "@aragon/core-contracts-ethers";
+import { Random } from "@aragon/sdk-common";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
+import { IPFSHTTPClient } from "ipfs-http-client";
 
 export abstract class ClientCore implements IClientCore {
   private static readonly PRECISION_FACTOR_BASE = 1000;
@@ -28,8 +30,14 @@ export abstract class ClientCore implements IClientCore {
   private _signer: Signer | undefined;
   private _daoFactoryAddress = "";
   private _gasFeeEstimationFactor = 1;
+  private _ipfs: IPFSHTTPClient[] = [];
+  private _ipfsIdx: number = -1;
 
   constructor(context: Context) {
+    if (context.ipfs?.length) {
+      this._ipfs = context.ipfs;
+      this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
+    }
     if (context.web3Providers) {
       this._web3Providers = context.web3Providers;
       this._web3Idx = 0;
@@ -53,17 +61,28 @@ export abstract class ClientCore implements IClientCore {
    *
    * @param signer
    */
-  protected useSigner(signer: Signer) {
+  useSigner(signer: Signer) {
     if (!signer) {
       throw new Error("Empty wallet or signer");
     }
-
     this._signer = signer;
     return this;
   }
 
   /**
-   * Starts using the next available Web3 endpoints
+   * Starts using the next available IPFS endpoint
+   */
+  public shiftIpfsNode() {
+    if (!this._ipfs.length) throw new Error("No IPFS endpoints available");
+    else if (this._ipfs.length < 2) {
+      throw new Error("No other endpoints");
+    }
+    this._ipfsIdx = (this._ipfsIdx + 1) % this._ipfs.length;
+    return this;
+  }
+
+  /**
+   * Starts using the next available Web3 endpoint
    */
   public shiftWeb3Node() {
     if (!this._web3Providers.length) throw new Error("No endpoints");
@@ -81,8 +100,9 @@ export abstract class ClientCore implements IClientCore {
 
   get connectedSigner() {
     if (!this.signer) throw new Error("No signer");
-    else if (!this.signer.provider && !this.web3)
+    else if (!this.signer.provider && !this.web3) {
       throw new Error("No provider");
+    }
 
     return this.signer.provider ? this.signer : this.signer.connect(this.web3);
   }
@@ -91,9 +111,9 @@ export abstract class ClientCore implements IClientCore {
     return this.connectedSigner
       .getFeeData()
       .then(
-        feeData =>
+        (feeData) =>
           feeData.maxFeePerGas ??
-          Promise.reject(new Error("Cannot estimate gas"))
+            Promise.reject(new Error("Cannot estimate gas")),
       );
   }
 
@@ -105,10 +125,24 @@ export abstract class ClientCore implements IClientCore {
     return this._daoFactoryAddress;
   }
 
-  public async checkWeb3Status(): Promise<boolean> {
+  get ipfs() {
+    if (!this._ipfs[this._ipfsIdx]) {
+      throw new Error("No IPFS endpoints available");
+    }
+    return this._ipfs[this._ipfsIdx];
+  }
+
+  public isWeb3NodeUp(): Promise<boolean> {
     return this.web3
       .getNetwork()
       .then(() => true)
+      .catch(() => false);
+  }
+
+  /** Returns `true` if the current client is on line */
+  public isIpfsNodeUp(): Promise<boolean> {
+    // Note: the TS typing is incorrect (returns a Promise)
+    return Promise.resolve(this.ipfs.isOnline())
       .catch(() => false);
   }
 
@@ -121,7 +155,7 @@ export abstract class ClientCore implements IClientCore {
    */
   public attachContract<T>(
     address: string,
-    abi: ContractInterface
+    abi: ContractInterface,
   ): Contract & T {
     if (!address) throw new Error("Invalid contract address");
     else if (!abi) throw new Error("Invalid contract ABI");
@@ -136,15 +170,17 @@ export abstract class ClientCore implements IClientCore {
     return contract.connect(this.signer) as Contract & T;
   }
 
+  // PARAMETER TEMPLATES
+
   protected static createProposalParameters(
-    params: ICreateProposal
+    params: ICreateProposal,
   ): [
     string,
     IDAO.ActionStruct[],
     BigNumberish,
     BigNumberish,
     boolean,
-    BigNumberish
+    BigNumberish,
   ] {
     return [
       params.metadata,
@@ -157,7 +193,7 @@ export abstract class ClientCore implements IClientCore {
   }
 
   protected static createDepositParameters(
-    params: IDeposit
+    params: IDeposit,
   ): [string, BigNumber, string, string] {
     return [
       params.daoAddress,
@@ -168,7 +204,7 @@ export abstract class ClientCore implements IClientCore {
   }
 
   protected static createWithdrawParameters(
-    params: IWithdraw
+    params: IWithdraw,
   ): [string, string, BigNumber, string] {
     return [
       params.token ?? AddressZero,
@@ -178,28 +214,50 @@ export abstract class ClientCore implements IClientCore {
     ];
   }
 
+  protected static createWithdrawAction(
+    to: string,
+    value: bigint,
+    params: IWithdraw,
+  ): IProposalAction {
+    const data = ClientCore.createWithdrawActionData(params);
+    return { to, value, data };
+  }
+
+  protected static createWithdrawActionData(params: IWithdraw): string {
+    const daoInterface = DAO__factory.createInterface();
+    return daoInterface.encodeFunctionData(
+      "withdraw",
+      ClientCore.createWithdrawParameters(params),
+    );
+  }
+
+  // ESTIMATION
+
   protected estimateGasFee(
-    gasLimitEstimationFromCall: Promise<BigNumber>
+    gasLimitEstimationFromCall: Promise<BigNumber>,
   ): Promise<IGasFeeEstimation> {
     return Promise.all([this.maxFeePerGas, gasLimitEstimationFromCall]).then(
-      data => {
+      (data) => {
         const max = data[0].mul(data[1]);
 
-        const factor =
-          this._gasFeeEstimationFactor * ClientCore.PRECISION_FACTOR_BASE;
+        const factor = this._gasFeeEstimationFactor *
+          ClientCore.PRECISION_FACTOR_BASE;
 
         const average = max
           .mul(BigNumber.from(Math.trunc(factor)))
           .div(BigNumber.from(ClientCore.PRECISION_FACTOR_BASE));
 
         return { average: average.toBigInt(), max: max.toBigInt() };
-      }
+      },
     );
   }
 
+  // DAO METHODS
+
   protected async deposit(params: IDeposit): Promise<void> {
-    if (!this.connectedSigner)
+    if (!this.connectedSigner) {
       throw new Error("A signer is needed for creating a DAO");
+    }
 
     const [
       daoAddress,
@@ -210,32 +268,29 @@ export abstract class ClientCore implements IClientCore {
 
     const daoInstance = DAO__factory.connect(daoAddress, this.connectedSigner);
 
-    const override =
-      tokenAddress !== AddressZero
-        ? {}
-        : {
-            value: amount,
-          };
+    const override = tokenAddress !== AddressZero ? {} : {
+      value: amount,
+    };
 
     if (tokenAddress !== AddressZero) {
       const governanceERC20Instance = GovernanceERC20__factory.connect(
         tokenAddress,
-        this.connectedSigner
+        this.connectedSigner,
       );
 
       const currentAllowance = await governanceERC20Instance.allowance(
         await this.connectedSigner.getAddress(),
-        daoAddress
+        daoAddress,
       );
 
       if (currentAllowance.lt(amount)) {
         await governanceERC20Instance
           .increaseAllowance(daoAddress, amount.sub(currentAllowance))
-          .then(tx => tx.wait())
-          .then(cr => {
+          .then((tx) => tx.wait())
+          .then((cr) => {
             if (
               amount.gt(
-                cr.events?.find(e => e?.event === "Approval")?.args?.value
+                cr.events?.find((e) => e?.event === "Approval")?.args?.value,
               )
             ) {
               throw new Error("Could not increase allowance");
@@ -246,32 +301,82 @@ export abstract class ClientCore implements IClientCore {
 
     return daoInstance
       .deposit(tokenAddress, amount, reference, override)
-      .then(tx => tx.wait())
-      .then(cr => {
-        const eventAmount = cr.events?.find(e => e?.event === "Deposited")?.args
+      .then((tx) => tx.wait())
+      .then((cr) => {
+        const eventAmount = cr.events?.find((e) => e?.event === "Deposited")
+          ?.args
           ?.amount;
         if (!amount.eq(eventAmount)) {
           throw new Error(
-            `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`
+            `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`,
           );
         }
       });
   }
 
-  protected static createWithdrawAction(
-    to: string,
-    value: bigint,
-    params: IWithdraw
-  ): IProposalAction {
-    const data = ClientCore.createWithdrawActionData(params);
-    return { to, value, data };
+  // IPFS METHODS
+
+  public async pin(input: string | Uint8Array): Promise<string> {
+    if (!this.ipfs) {
+      throw new Error("IPFS client is not initialized");
+    }
+    // find online node
+    let isOnline = false;
+    for (var i = 0; i < this._ipfs.length; i++) {
+      isOnline = await this.isIpfsNodeUp();
+      if (isOnline) break;
+
+      this.shiftIpfsNode();
+    }
+    if (!isOnline) throw new Error("No IPFS nodes available");
+
+    return this._ipfs[this._ipfsIdx]
+      .add(input)
+      .then((res) => res.path)
+      .catch((e) => {
+        throw new Error("Could not pin data: " + (e?.message || ""));
+      });
   }
 
-  protected static createWithdrawActionData(params: IWithdraw): string {
-    const daoInterface = DAO__factory.createInterface();
-    return daoInterface.encodeFunctionData(
-      "withdraw",
-      ClientCore.createWithdrawParameters(params)
-    );
+  public async fetchBytes(cid: string) {
+    if (!this.ipfs) throw new Error("IPFS client is not initialized");
+    // find online node
+    let isOnline = false;
+    for (let i = 0; i < this._ipfs.length; i++) {
+      isOnline = await this.isIpfsNodeUp();
+      if (isOnline) break;
+
+      this.shiftIpfsNode();
+    }
+    if (!isOnline) throw new Error("No IPFS nodes available");
+
+    try {
+      const chunks: Uint8Array[] = [];
+      let totalArrayLength = 0;
+      for await (const chunk of this._ipfs[this._ipfsIdx].cat(cid)) {
+        chunks.push(chunk);
+        totalArrayLength += chunk.length;
+      }
+
+      const mergedArray = new Uint8Array(totalArrayLength);
+      let lastIndex = 0;
+      for (const chunk of chunks) {
+        mergedArray.set(chunk, lastIndex);
+        lastIndex += chunk.length;
+      }
+      return mergedArray;
+    } catch (e) {
+      throw new Error("Could not fetch data");
+    }
+  }
+
+  public fetchString(cid: string): Promise<string> {
+    return this.fetchBytes(cid)
+      .then((bytes) => new TextDecoder().decode(bytes))
+      .catch((e) => {
+        throw new Error(
+          "Error while fetching and decoding bytes: " + (e?.message || ""),
+        );
+      });
   }
 }

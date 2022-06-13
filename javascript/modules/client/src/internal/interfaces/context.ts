@@ -1,10 +1,6 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
-// import {
-//   create as ipfsCreate,
-//   IPFSHTTPClient,
-//   Options as IpfsOptions,
-// } from "ipfs-http-client";
+import { Options, IPFSHTTPClient } from "ipfs-http-client";
 // import { GraphQLClient } from "graphql-request";
 
 // Context input parameters
@@ -20,7 +16,7 @@ interface VocdoniContextParams {
   // Vocdoni
 }
 interface IpfsContextParams {
-  // ipfs: IpfsOptions;
+  ipfsNodes?: Options[];
 }
 interface GraphQLContextParams {
   // subgraphURL: string;
@@ -44,7 +40,7 @@ interface Web3ContextState {
 }
 interface VocdoniContextState {}
 interface IpfsContextState {
-  // ipfs?: IPFSHTTPClient;
+  ipfs?: IPFSHTTPClient[];
 }
 interface GraphQLContextState {
   // subgraph?: GraphQLClient;

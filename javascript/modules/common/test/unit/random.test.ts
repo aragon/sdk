@@ -19,6 +19,14 @@ describe("Random generation", () => {
 
     expect(typeof bigint).toEqual("bigint");
   });
+  it("Should generate a random float from 0 to 1", () => {
+    for (let i = 0; i < 20; i++) {
+      const num = Random.getFloat();
+      expect(typeof num).toEqual("number");
+      expect(num).toBeGreaterThanOrEqual(0);
+      expect(num).toBeLessThan(1);
+    }
+  });
   it("Should shuffle an array in random order", () => {
     const nums = [1, 2, 3, 4];
     const shuffled = Random.shuffle(nums);

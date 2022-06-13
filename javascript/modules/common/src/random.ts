@@ -59,6 +59,16 @@ export namespace Random {
   }
 
   /**
+   * Generates a random decimal number, ranging from `0` to `1`
+   */
+  export function getFloat(): number {
+    const MAX_BI = "100000000000000000000";
+    const digits = Random.getBigInt(BigInt(MAX_BI));
+
+    return Number("0." + digits);
+  }
+
+  /**
    * Shuffles the given array and returns it
    */
   export function shuffle<T>(array: T[]): T[] {
