@@ -11,11 +11,11 @@ npm install @aragon/sdk-client
 yarn add @aragon/sdk-client
 ```
 
-## Usage
+## Client usage
 
-#### DAO Creation
+### DAO Creation
 
-###### DAO ERC20 Voting
+#### DAO ERC20 Voting
 
 ```ts
 // For local testing
@@ -78,7 +78,7 @@ const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address
 ```
 
-###### DAO Whitelist Voting
+#### DAO Whitelist Voting
 
 ```ts
 // For local testing
@@ -119,9 +119,9 @@ const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address
 ```
 
-#### Proposal Creation
+### Proposal Creation
 
-###### ERC20 Voting Proposal
+#### ERC20 Voting Proposal
 
 ```ts
 // For local testing
@@ -148,7 +148,7 @@ const newProposalId = await client.dao.simpleVote.createProposal(
 console.log(newProposalId) // New proposal id
 ```
 
-###### Whitelist Voting Proposal
+#### Whitelist Voting Proposal
 
 ```ts
 // For local testing
@@ -175,9 +175,9 @@ const newProposalId = await client.dao.whitelist.createProposal(
 console.log(newProposalId) // New proposal id
 ```
 
-#### Deposit to DAO
+### Deposit to DAO
 
-###### Deposit native tokens to the DAO
+#### Deposit native tokens to the DAO
 
 ```ts
 const client = new ClientDaoERC20Voting(context);
@@ -209,7 +209,7 @@ for await (const step of client.dao.deposit(depositParams)) {
 }
 ```
 
-###### Deposit ERC20 tokens to the DAO
+#### Deposit ERC20 tokens to the DAO
 
 ```ts
 const client = new ClientDaoERC20Voting(context);
@@ -250,9 +250,9 @@ for await (const step of client.dao.deposit(depositParams)) {
 }
 ```
 
-#### Actions helpers
+### Actions helpers
 
-###### Withdraw
+#### Withdrawals
 
 ```ts
 const client = new ClientDaoERC20Voting(context);
