@@ -89,7 +89,7 @@ jobs:
           git pull
           git config --global user.name "Arabot-1"
           git config --global user.email "arabot-1@users.noreply.github.com"
-          sed -i "s/\[TBD\]/[TBD]  \n  \n\## [${{ needs.checkTag.outputs.version }}\] - $(date)/" "javascript/modules/${{ needs.checkTag.outputs.package }}/CHANGELOG.md"
+          sed -i "s/^\#\# \[UPCOMING\]/## [UPCOMING]\n\n\## ${{ needs.checkTag.outputs.version }}\nOn $(date +'%Y-%m-%d %H:%M:%S')/" "javascript/modules/${{ needs.checkTag.outputs.package }}/CHANGELOG.md"
           git add "javascript/modules/${{ needs.checkTag.outputs.package }}/CHANGELOG.md"
           git commit -am "Update Changelog for ${{ needs.checkTag.outputs.package }}"
           git push

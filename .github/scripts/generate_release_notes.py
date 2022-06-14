@@ -2,26 +2,25 @@ import sys
 
 changelog = sys.argv[1]
 
-
-notes = []
+releaseNotesLines = []
 with open(changelog, 'r') as f:
     lines = f.readlines()
     foundStart = False
-    startLine = 0
-    # Skip the template if necessary
-    if lines[0] == "<!--\n":
-        startLine = 15
-    for i in range(startLine, len(lines), 1):
+    i = 0
+    while i < len(lines):
         line = lines[i]
-        if line.startswith('## [TBD] '):
-            foundStart = True
-            continue
         if foundStart:
             if line.startswith('## ['):
                 break
-            notes.append(line.strip())
+            releaseNotesLines.append(line.strip())
+        if line.startswith("<!--\n"):  # Skip the token line
+            i += 3
+            continue
+        if line.startswith('## [UPCOMING]'):
+            foundStart = True
+        i += 1
 
-notesStr='  \n'.join(notes)
+releaseNotesMsg='  \n'.join(releaseNotesLines)
 
 with open("release-notes.txt", "w") as f:
-    f.write(notesStr)
+    f.write(releaseNotesMsg)
