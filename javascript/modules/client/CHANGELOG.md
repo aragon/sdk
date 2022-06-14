@@ -1,31 +1,28 @@
+# Aragon JS SDK (client) changelog
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
+
 <!--
-Template:
- ## [TBD]  
-  
-## [0.0.15-alpha] - Tue Jun 14 12:33:47 UTC 2022 (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
+TEMPLATE:
+(Leave "## [UPCOMING]" first and describe the changes below it)
 
 ### Added
-- Link, and make it obvious that date format is ISO 8601.
+- Feature 1, 2, 3
 
 ### Changed
-- Clarified the section on "Is there a standard change log format?".
+- Change 1, 2, 3
 
 ### Fixed
-- Fix Markdown links to tag comparison URL with footnote-style links.
+- Fix 1, 2, 3
 -->
 
-# Change Log
-All notable changes to the javascript client package of the SDK will be documented in this file.
+## [UPCOMING]
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/)
-and this project adheres to [Semantic Versioning](http://semver.org/).
-
-## [TBD]  
-  
 ## [0.0.15-alpha] - Tue Jun 14 12:33:47 UTC 2022  
   
 ## [0.0.14-alpha] - Tue Jun 14 08:40:07 UTC 2022  
 
+### Added
 - Adding IPFS support for pinning and fetching data
   
 ## [0.0.13-alpha] - Tue May 24 09:26:45 UTC 2022  

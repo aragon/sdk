@@ -1,22 +1,22 @@
-<!--
-Template:
- ## [TBD] (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
+# Aragon JS SDK (common) changelog
 
-Description of the release
+The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
+
+<!--
+TEMPLATE:
+(Leave "## [UPCOMING]" first and describe the changes below it)
 
 ### Added
-- Link, and make it obvious that date format is ISO 8601.
+- Feature 1, 2, 3
 
 ### Changed
-- Clarified the section on "Is there a standard change log format?".
+- Change 1, 2, 3
 
 ### Fixed
-- Fix Markdown links to tag comparison URL with footnote-style links.
+- Fix 1, 2, 3
 -->
 
-# Aragon JS SDK changelog
-
-## [TBD] 
+## [UPCOMING] 
 
 ### Added
 - Github actions automation to deploy this package 
