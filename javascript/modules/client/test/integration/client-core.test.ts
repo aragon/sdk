@@ -1,7 +1,11 @@
 import { Wallet } from "@ethersproject/wallet";
 import { ClientDaoERC20Voting, Context, ContextParams } from "../../src";
 
-const IPFS_API_KEY = process.env.IPFS_API_KEY || "";
+const IPFS_API_KEY = process.env.IPFS_API_KEY ||
+  Buffer.from(
+    "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
+    "base64",
+  ).toString().trim();
 
 const web3endpoints = {
   working: [
