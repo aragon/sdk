@@ -18,13 +18,18 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+- Gas fee estimation for `deposit` and `increaseAllowance`.
+
+### Changed
+- `deposit` method handles all steps by using a `AsyncGenerator`.
+
 ## [0.0.15-alpha] - Tue Jun 14 12:33:47 UTC 2022  
   
 ## [0.0.14-alpha] - Tue Jun 14 08:40:07 UTC 2022  
 
 ### Added
 - Adding IPFS support for pinning and fetching data
-  
+
 ## [0.0.13-alpha] - Tue May 24 09:26:45 UTC 2022  
 
 ### Added

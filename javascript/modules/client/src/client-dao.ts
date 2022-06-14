@@ -2,6 +2,8 @@ import { ClientCore } from "./internal/client-core";
 import {
   DaoConfig,
   DaoRole,
+  DaoDepositSteps,
+  DaoDepositStepValue,
   IClientDaoBase,
   IClientDaoERC20Voting,
   IClientDaoWhitelistVoting,
@@ -30,6 +32,7 @@ export {
   ICreateProposal,
   IDeposit,
   IWithdraw,
+  DaoDepositSteps,
 };
 
 export class ClientDaoERC20Voting extends ClientCore
@@ -76,7 +79,10 @@ export class ClientDaoERC20Voting extends ClientCore
       return Promise.resolve();
     },
 
-    deposit: (params: IDeposit): Promise<void> => this.deposit(params),
+    deposit: (
+      params: IDeposit
+    ): AsyncGenerator<DaoDepositStepValue> =>
+      this.deposit(params),
 
     simpleVote: {
       createProposal: (
@@ -165,6 +171,14 @@ export class ClientDaoERC20Voting extends ClientCore
 
       return this.estimateGasFee(gasLimit);
     },
+    deposit: (params: IDeposit): Promise<IGasFeeEstimation> =>
+      this.estimateDeposit(params),
+    increaseAllowance: (
+      tokenAddress: string,
+      daoAddress: string,
+      amount: bigint
+    ): Promise<IGasFeeEstimation> =>
+      this.estimateIncreaseAllowance(tokenAddress, daoAddress, amount),
   };
 
   /** Helpers */
@@ -245,7 +259,10 @@ export class ClientDaoWhitelistVoting extends ClientCore
       return Promise.resolve();
     },
 
-    deposit: (params: IDeposit): Promise<void> => this.deposit(params),
+    deposit: (
+      params: IDeposit
+    ): AsyncGenerator<DaoDepositStepValue> =>
+      this.deposit(params),
 
     whitelist: {
       createProposal: (
@@ -334,6 +351,14 @@ export class ClientDaoWhitelistVoting extends ClientCore
 
       return this.estimateGasFee(gasLimit);
     },
+    deposit: (params: IDeposit): Promise<IGasFeeEstimation> =>
+      this.estimateDeposit(params),
+    increaseAllowance: (
+      tokenAddress: string,
+      daoAddress: string,
+      amount: bigint
+    ): Promise<IGasFeeEstimation> =>
+      this.estimateIncreaseAllowance(tokenAddress, daoAddress, amount),
   };
 
   /** Helpers */

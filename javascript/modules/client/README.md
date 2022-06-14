@@ -11,11 +11,11 @@ npm install @aragon/sdk-client
 yarn add @aragon/sdk-client
 ```
 
-## Usage
+## Client usage
 
-#### DAO Creation
+### DAO Creation
 
-###### DAO ERC20 Voting
+#### DAO ERC20 Voting
 
 ```ts
 // For local testing
@@ -78,7 +78,7 @@ const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address
 ```
 
-###### DAO Whitelist Voting
+#### DAO Whitelist Voting
 
 ```ts
 // For local testing
@@ -119,9 +119,9 @@ const newDaoAddress = await client.dao.create(daoCreationParams);
 console.log(newDaoAddress) // New DAO address
 ```
 
-#### Proposal Creation
+### Proposal Creation
 
-###### ERC20 Voting Proposal
+#### ERC20 Voting Proposal
 
 ```ts
 // For local testing
@@ -148,7 +148,7 @@ const newProposalId = await client.dao.simpleVote.createProposal(
 console.log(newProposalId) // New proposal id
 ```
 
-###### Whitelist Voting Proposal
+#### Whitelist Voting Proposal
 
 ```ts
 // For local testing
@@ -175,9 +175,9 @@ const newProposalId = await client.dao.whitelist.createProposal(
 console.log(newProposalId) // New proposal id
 ```
 
-#### Deposit to DAO
+### Deposit to DAO
 
-###### Deposit ETH to ERC20Voting and WhitelistVoting DAOs
+#### Deposit native tokens to the DAO
 
 ```ts
 const client = new ClientDaoERC20Voting(context);
@@ -191,10 +191,25 @@ const depositParams: IDeposit = {
     reference: "Reference of the deposit (reason)", // Optional
 };
 
-await client.dao.deposit(depositParams);
+const gasFeesEstimation = await client.estimate.deposit(depositParams);
+// {
+//   average: 249901378296462n, // Average gas fee estimation (reducing the max value by heuristic) 
+//   max: 399842205274340n // Maximum gas fee estimation
+// }
+
+for await (const step of client.dao.deposit(depositParams)) {
+    switch (step.idx) {
+        case DaoDepositSteps.DEPOSITING:
+            console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+            break;
+        case DaoDepositSteps.DEPOSITED:
+            console.log(step.amount); // 10n
+            break;
+    }
+}
 ```
 
-###### Deposit ERC20 token to ERC20Voting and WhitelistVoting DAOs
+#### Deposit ERC20 tokens to the DAO
 
 ```ts
 const client = new ClientDaoERC20Voting(context);
@@ -208,12 +223,36 @@ const depositParams: IDeposit = {
     reference: "Reference of the deposit (reason)", // Optional
 };
 
-await client.dao.deposit(depositParams);
+const gasFeesEstimation = await client.estimate.deposit(depositParams);
+// {
+//   average: 249901378296462n, // Average gas fee estimation (reducing the max value by heuristic) 
+//   max: 399842205274340n // Maximum gas fee estimation
+// }
+
+for await (const step of client.dao.deposit(depositParams)) {
+    switch (step.idx) {
+        case DaoDepositSteps.CHECKED_ALLOWANCE:
+            console.log(step.allowance); // 0n
+            break;
+        case DaoDepositSteps.INCREASING_ALLOWANCE:
+            console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+            break;
+        case DaoDepositSteps.INCREASED_ALLOWANCE:
+            console.log(step.allowance); // 10n
+            break;
+        case DaoDepositSteps.DEPOSITING:
+            console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+            break;
+        case DaoDepositSteps.DEPOSITED:
+            console.log(step.amount); // 10n
+            break;
+    }
+}
 ```
 
-#### Actions helpers
+### Actions helpers
 
-###### Withdraw
+#### Withdrawals
 
 ```ts
 const client = new ClientDaoERC20Voting(context);

@@ -10,16 +10,26 @@ export interface IClientDaoBase extends IClientCore {
       role: DaoRole,
       data: Uint8Array
     ) => Promise<void>;
+    deposit: (
+      params: IDeposit
+    ) => AsyncGenerator<DaoDepositStepValue>;
   };
   actions: {
     withdraw: (to: string, value: bigint, params: IWithdraw) => IProposalAction;
+  };
+  estimate: {
+    deposit: (params: IDeposit) => Promise<IGasFeeEstimation>;
+    increaseAllowance: (
+      tokenAddress: string,
+      daoAddress: string,
+      amount: bigint
+    ) => Promise<IGasFeeEstimation>;
   };
 }
 
 export interface IClientDaoERC20Voting extends IClientCore {
   dao: {
     create: (params: ICreateDaoERC20Voting) => Promise<string>;
-    deposit: (params: IDeposit) => Promise<void>;
     simpleVote: {
       createProposal: (
         votingAddress: string,
@@ -39,7 +49,6 @@ export interface IClientDaoERC20Voting extends IClientCore {
 export interface IClientDaoWhitelistVoting extends IClientCore {
   dao: {
     create: (params: ICreateDaoWhitelistVoting) => Promise<string>;
-    deposit: (params: IDeposit) => Promise<void>;
     whitelist: {
       createProposal: (
         votingAddress: string,
@@ -140,6 +149,21 @@ export interface IDeposit {
   token?: string;
   reference?: string;
 }
+
+export enum DaoDepositSteps {
+  CHECKED_ALLOWANCE = "checkedAllowance",
+  INCREASING_ALLOWANCE = "increasingAllowance",
+  INCREASED_ALLOWANCE = "increasedAllowance",
+  DEPOSITING = "depositing",
+  DEPOSITED = "deposited",
+}
+
+export type DaoDepositStepValue = 
+  { key: DaoDepositSteps.CHECKED_ALLOWANCE, allowance: bigint } |
+  { key: DaoDepositSteps.INCREASING_ALLOWANCE, txHash: string } |
+  { key: DaoDepositSteps.INCREASED_ALLOWANCE, allowance: bigint } |
+  { key: DaoDepositSteps.DEPOSITING, txHash: string } |
+  { key: DaoDepositSteps.DEPOSITED, amount: bigint }
 
 export interface IWithdraw {
   to: string;
