@@ -3,7 +3,7 @@ name: Javascript Publish
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 jobs:
   checkTag:
@@ -26,6 +26,8 @@ jobs:
           fi
   test:
     uses: ./.github/workflows/javascript_test.yml
+    secrets:
+      IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
     with:
       run: true
   publish:
@@ -50,7 +52,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
 
       - name: install deps
         working-directory: javascript/
@@ -67,12 +69,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
-          architecture: 'x64'
+          python-version: "3.x"
+          architecture: "x64"
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.ARABOT_PAT }}
-          ref: 'develop'
+          ref: "develop"
       - name: Get Release Notes
         id: notes
         run: python ./.github/scripts/generate_release_notes.py "javascript/modules/${{ needs.checkTag.outputs.package }}/CHANGELOG.md"

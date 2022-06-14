@@ -7,6 +7,8 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/javascript_test.yml
+    secrets:
+      IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
   prepare:
     needs: ['test']
     name: Prepare release generation
