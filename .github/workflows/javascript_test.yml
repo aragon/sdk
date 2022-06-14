@@ -6,6 +6,10 @@ on:
         description: "Forces a run if true"
         required: false
         type: boolean
+    secrets:
+      IPFS_API_KEY:
+        description: "IPFS API Key"
+        required: true
   push:
     branches-ignore:
       - develop
