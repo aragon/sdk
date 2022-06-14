@@ -2,6 +2,8 @@
 Template:
 ## [TBD]  
   
+## [0.0.14-alpha] - Tue Jun 14 08:40:07 UTC 2022  
+  
 ## [0.0.13-alpha] - Tue May 24 09:26:45 UTC 2022  
   
 ## [0.0.12-alpha] - Mon May 23 11:17:16 UTC 2022  
@@ -31,6 +33,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [TBD]  
+  
+## [0.0.14-alpha] - Tue Jun 14 08:40:07 UTC 2022  
 
 - Adding IPFS support for pinning and fetching data
   
