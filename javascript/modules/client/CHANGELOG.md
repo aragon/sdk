@@ -1,20 +1,6 @@
 <!--
 Template:
-## [TBD]  
-  
-## [0.0.14-alpha] - Tue Jun 14 08:40:07 UTC 2022  
-  
-## [0.0.13-alpha] - Tue May 24 09:26:45 UTC 2022  
-  
-## [0.0.12-alpha] - Mon May 23 11:17:16 UTC 2022  
-  
-## [0.0.11-alpha] - Wed May 18 14:51:02 UTC 2022  
-  
-## [0.0.10-alpha] - Wed May 18 14:42:35 UTC 2022  
-  
-## [0.0.9-alpha] - Wed May 11 09:17:46 UTC 2022 (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
-
-Description of the release
+ ## [TBD] (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
 
 ### Added
 - Link, and make it obvious that date format is ISO 8601.

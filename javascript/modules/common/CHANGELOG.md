@@ -1,6 +1,6 @@
 <!--
 Template:
-## [TBD] (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
+ ## [TBD] (Leave the TBD and add your changes below it. Github actions uses this pattern to get the right Changelogs for the release)
 
 Description of the release
 
@@ -22,6 +22,6 @@ Description of the release
 - Github actions automation to deploy this package 
 - `Random.getFloat()`
 
-## 0.1.0
+## 0.0.1-alpha
 
 - Initial version
