@@ -65,6 +65,6 @@
     "ipfs-http-client": "^56.0.3"
   },
   "jest": {
-    "testEnvironment": "../../test-environment"
+    "testEnvironment": "../../test-environment.js"
   }
 }

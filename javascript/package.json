@@ -13,7 +13,7 @@
   },
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "./test-environment"
+    "testEnvironment": "./test-environment.js"
   },
   "scripts": {
     "clean": "rm -Rf node_modules ./modules/*/node_modules ./modules/*/dist",
