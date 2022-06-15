@@ -36,14 +36,15 @@ const contextParams: ContextParams = {
   dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
-  ipfsNodes: [
-    {
-      url: "https://testing-ipfs-0.aragon.network",
-      headers: {
-        "X-API-KEY": IPFS_API_KEY || "",
-      },
-    },
-  ],
+  // NOTE: Backing off ipfs-http-client until the UI framework supports it
+  // ipfsNodes: [
+  //   {
+  //     url: "https://testing-ipfs-0.aragon.network",
+  //     headers: {
+  //       "X-API-KEY": IPFS_API_KEY || "",
+  //     },
+  //   },
+  // ],
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -52,17 +53,18 @@ const contextParamsLocalChain: ContextParams = {
   dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
-  ipfsNodes: [
-    {
-      url: "http:localhost:5001",
-    },
-    {
-      url: "http:localhost:5002",
-    },
-    {
-      url: "http:localhost:5003",
-    },
-  ],
+  // NOTE: Backing off ipfs-http-client until the UI framework supports it
+  // ipfsNodes: [
+  //   {
+  //     url: "http:localhost:5001",
+  //   },
+  //   {
+  //     url: "http:localhost:5002",
+  //   },
+  //   {
+  //     url: "http:localhost:5003",
+  //   },
+  // ],
 };
 
 describe("Client", () => {

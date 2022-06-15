@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Changed
+- Backing off `ipfs-http-client` until the UI framework supports it
+
 ## 0.0.16-alpha
 On 2022-06-14 15:03:15
 

@@ -24,18 +24,22 @@ const contextParams: ContextParams = {
   dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
-  ipfsNodes: [
-    {
-      url: "https://testing-ipfs-0.aragon.network",
-      headers: {
-        "X-API-KEY": IPFS_API_KEY,
-      },
-    },
-  ],
+  // NOTE: Backing off ipfs-http-client until the UI framework supports it
+  // ipfsNodes: [
+  //   {
+  //     url: "https://testing-ipfs-0.aragon.network",
+  //     headers: {
+  //       "X-API-KEY": IPFS_API_KEY,
+  //     },
+  //   },
+  // ],
 };
 
 describe("Client Core", () => {
   describe("IPFS client", () => {
+    test.todo("Should reenable IPFS support and undo 'Backing off ipfs-http-client until the UI framework supports it'")
+    // NOTE: Backing off ipfs-http-client until the UI framework supports it
+    /*
     it("Should have an API token to test the proxy", () => {
       expect(IPFS_API_KEY.length).toBeGreaterThan(0);
     });
@@ -102,5 +106,6 @@ describe("Client Core", () => {
 
       expect(isOnline).toEqual(false);
     });
+    */
   });
 });
