@@ -1,3 +1,5 @@
+// This file defines the interfaces of the context object holding client settings
+
 import { Signer } from "@ethersproject/abstract-signer";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 // NOTE: Backing off ipfs-http-client until the UI framework supports it
@@ -5,6 +7,7 @@ import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 // import { GraphQLClient } from "graphql-request";
 
 // Context input parameters
+
 interface Web3ContextParams {
   network: Networkish;
   signer: Signer;
@@ -12,9 +15,6 @@ interface Web3ContextParams {
   daoFactoryAddress?: string;
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   gasFeeEstimationFactor?: number;
-}
-interface VocdoniContextParams {
-  // Vocdoni
 }
 interface IpfsContextParams {
   // NOTE: Backing off ipfs-http-client until the UI framework supports it
@@ -25,10 +25,7 @@ interface GraphQLContextParams {
 }
 
 export interface ContextParams
-  extends Web3ContextParams,
-    VocdoniContextParams,
-    IpfsContextParams,
-    GraphQLContextParams {}
+  extends Web3ContextParams, IpfsContextParams, GraphQLContextParams {}
 
 // Context state data
 
@@ -40,7 +37,6 @@ interface Web3ContextState {
   web3Providers: JsonRpcProvider[];
   gasFeeEstimationFactor: number;
 }
-interface VocdoniContextState {}
 interface IpfsContextState {
   // NOTE: Backing off ipfs-http-client until the UI framework supports it
   // ipfs?: IPFSHTTPClient[];
@@ -50,7 +46,4 @@ interface GraphQLContextState {
 }
 
 export interface ContextState
-  extends Web3ContextState,
-    VocdoniContextState,
-    IpfsContextState,
-    GraphQLContextState {}
+  extends Web3ContextState, IpfsContextState, GraphQLContextState {}

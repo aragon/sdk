@@ -1,3 +1,5 @@
+// This file contains the definition of the low level network clients
+
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -5,17 +7,23 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 // import { IPFSHTTPClient } from "ipfs-http-client";
 
 export interface IClientWeb3Core {
-  useSigner(signer: Signer): this;
-  shiftWeb3Node(): this;
-  signer: Signer | null;
-  web3: JsonRpcProvider | null;
-  isWeb3NodeUp(): Promise<boolean>;
-  attachContract<T>(address: string, abi: ContractInterface): Contract & T;
-}
-export interface IClientVocdoniCore {
-  // Add here
+  web3: {
+    useSigner: (signer: Signer) => void;
+    shiftEndpoint: () => void;
+    getSigner: () => Signer | null;
+    getConnectedSigner: () => Signer;
+    getProvider: () => JsonRpcProvider | null;
+    getMaxFeePerGas: () => Promise<bigint>;
+    isUp: () => Promise<boolean>;
+    attachContract: <T>(
+      address: string,
+      abi: ContractInterface,
+    ) => Contract & T;
+    getDaoFactoryAddress: () => string;
+  };
 }
 export interface IClientIpfsCore {
+  ipfs: {};
   // NOTE: Backing off ipfs-http-client until the UI framework supports it
   // shiftIpfsNode(): this;
   // isIpfsNodeUp(): Promise<boolean>;
@@ -29,8 +37,4 @@ export interface IClientGraphQLCore {
 }
 
 export interface IClientCore
-  extends
-    IClientWeb3Core,
-    IClientVocdoniCore,
-    IClientIpfsCore,
-    IClientGraphQLCore {}
+  extends IClientWeb3Core, IClientIpfsCore, IClientGraphQLCore {}

@@ -1,4 +1,4 @@
-import { ClientCore } from "./internal/client-core";
+import { ClientCore } from "./internal/core";
 import {
   DaoConfig,
   DaoRole,
@@ -11,11 +11,11 @@ import {
   ICreateDaoWhitelistVoting,
   ICreateProposal,
   IDeposit,
-  IGasFeeEstimation,
+  GasFeeEstimation,
   IProposalAction,
   IWithdraw,
   VotingConfig,
-} from "./internal/interfaces/dao";
+} from "./internal/interfaces/client";
 import {
   DAOFactory,
   DAOFactory__factory,
@@ -39,35 +39,35 @@ export class ClientDaoERC20Voting extends ClientCore
   implements IClientDaoBase, IClientDaoERC20Voting {
   /** DAO related methods */
   dao = {
-    create: async (params: ICreateDaoERC20Voting): Promise<string> => {
-      if (!this.signer)
-        return Promise.reject(
-          new Error("A signer is needed for creating a DAO")
-        );
-      const daoFactoryInstance = DAOFactory__factory.connect(
-        this.daoFactoryAddress,
-        this.connectedSigner
-      );
+    // create: async (params: ICreateDaoERC20Voting): Promise<string> => {
+    //   if (!this.signer)
+    //     return Promise.reject(
+    //       new Error("A signer is needed for creating a DAO")
+    //     );
+    //   const daoFactoryInstance = DAOFactory__factory.connect(
+    //     this.daoFactoryAddress,
+    //     this.connectedSigner
+    //   );
 
-      const registryInstance = await daoFactoryInstance
-        .registry()
-        .then(registryAddress => {
-          return Registry__factory.connect(registryAddress, this.web3);
-        });
+    //   const registryInstance = await daoFactoryInstance
+    //     .registry()
+    //     .then(registryAddress => {
+    //       return Registry__factory.connect(registryAddress, this.web3);
+    //     });
 
-      return daoFactoryInstance
-        .newERC20VotingDAO(...ClientDaoERC20Voting.createDaoParameters(params))
-        .then(tx => tx.wait())
-        .then(cr => {
-          const newDaoAddress = cr.events?.find(
-            e => e.address === registryInstance.address
-          )?.topics[1];
-          if (!newDaoAddress)
-            return Promise.reject(new Error("Could not create DAO"));
+    //   return daoFactoryInstance
+    //     .newERC20VotingDAO(...ClientDaoERC20Voting.createDaoParameters(params))
+    //     .then(tx => tx.wait())
+    //     .then(cr => {
+    //       const newDaoAddress = cr.events?.find(
+    //         e => e.address === registryInstance.address
+    //       )?.topics[1];
+    //       if (!newDaoAddress)
+    //         return Promise.reject(new Error("Could not create DAO"));
 
-          return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
-        });
-    },
+    //       return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
+    //     });
+    // },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
     hasPermission: (
       _where: string,
@@ -153,101 +153,95 @@ export class ClientDaoERC20Voting extends ClientCore
 
   /** Estimation related methods */
   estimate = {
-    create: async (
-      params: ICreateDaoERC20Voting
-    ): Promise<IGasFeeEstimation> => {
-      if (!this.signer)
-        return Promise.reject(
-          new Error("A signer is needed for creating a DAO")
-        );
-      const daoFactoryInstance = DAOFactory__factory.connect(
-        this.daoFactoryAddress,
-        this.connectedSigner
-      );
+    // create: async (
+    //   params: ICreateDaoERC20Voting
+    // ): Promise<GasFeeEstimation> => {
+    //   if (!this.signer)
+    //     return Promise.reject(
+    //       new Error("A signer is needed for creating a DAO")
+    //     );
+    //   const daoFactoryInstance = DAOFactory__factory.connect(
+    //     this.daoFactoryAddress,
+    //     this.connectedSigner
+    //   );
 
-      const gasLimit = daoFactoryInstance.estimateGas.newERC20VotingDAO(
-        ...ClientDaoERC20Voting.createDaoParameters(params)
-      );
+    //   const gasLimit = daoFactoryInstance.estimateGas.newERC20VotingDAO(
+    //     ...ClientDaoERC20Voting.createDaoParameters(params)
+    //   );
 
-      return this.estimateGasFee(gasLimit);
-    },
-    deposit: (params: IDeposit): Promise<IGasFeeEstimation> =>
+    //   return this.estimateGasFee(gasLimit);
+    // },
+    deposit: (params: IDeposit): Promise<GasFeeEstimation> =>
       this.estimateDeposit(params),
-    increaseAllowance: (
-      tokenAddress: string,
-      daoAddress: string,
-      amount: bigint
-    ): Promise<IGasFeeEstimation> =>
-      this.estimateIncreaseAllowance(tokenAddress, daoAddress, amount),
   };
 
   /** Helpers */
 
-  private static createDaoParameters(
-    params: ICreateDaoERC20Voting
-  ): [
-    DAOFactory.DAOConfigStruct,
-    DAOFactory.VoteConfigStruct,
-    TokenFactory.TokenConfigStruct,
-    TokenFactory.MintConfigStruct,
-    string
-  ] {
-    return [
-      params.daoConfig,
-      {
-        participationRequiredPct: BigInt(params.votingConfig.minParticipation),
-        supportRequiredPct: BigInt(params.votingConfig.minSupport),
-        minDuration: BigInt(params.votingConfig.minDuration),
-      },
-      {
-        addr: params.tokenConfig.address,
-        name: params.tokenConfig.name,
-        symbol: params.tokenConfig.symbol,
-      },
-      {
-        receivers: params.mintConfig.map(receiver => receiver.address),
-        amounts: params.mintConfig.map(receiver => receiver.balance),
-      },
-      params.gsnForwarder ?? "",
-    ];
-  }
+//   private static createDaoParameters(
+//     params: ICreateDaoERC20Voting
+//   ): [
+//     DAOFactory.DAOConfigStruct,
+//     DAOFactory.VoteConfigStruct,
+//     TokenFactory.TokenConfigStruct,
+//     TokenFactory.MintConfigStruct,
+//     string
+//   ] {
+//     return [
+//       params.daoConfig,
+//       {
+//         participationRequiredPct: BigInt(params.votingConfig.minParticipation),
+//         supportRequiredPct: BigInt(params.votingConfig.minSupport),
+//         minDuration: BigInt(params.votingConfig.minDuration),
+//       },
+//       {
+//         addr: params.tokenConfig.address,
+//         name: params.tokenConfig.name,
+//         symbol: params.tokenConfig.symbol,
+//       },
+//       {
+//         receivers: params.mintConfig.map(receiver => receiver.address),
+//         amounts: params.mintConfig.map(receiver => receiver.balance),
+//       },
+//       params.gsnForwarder ?? "",
+//     ];
+//   }
 }
 
 export class ClientDaoWhitelistVoting extends ClientCore
   implements IClientDaoBase, IClientDaoWhitelistVoting {
   /** DAO related methods */
   dao = {
-    create: async (params: ICreateDaoWhitelistVoting): Promise<string> => {
-      if (!this.signer)
-        return Promise.reject(
-          new Error("A signer is needed for creating a DAO")
-        );
-      const daoFactoryInstance = DAOFactory__factory.connect(
-        this.daoFactoryAddress,
-        this.connectedSigner
-      );
+    // create: async (params: ICreateDaoWhitelistVoting): Promise<string> => {
+    //   if (!this.signer)
+    //     return Promise.reject(
+    //       new Error("A signer is needed for creating a DAO")
+    //     );
+    //   const daoFactoryInstance = DAOFactory__factory.connect(
+    //     this.daoFactoryAddress,
+    //     this.connectedSigner
+    //   );
 
-      const registryInstance = await daoFactoryInstance
-        .registry()
-        .then(registryAddress => {
-          return Registry__factory.connect(registryAddress, this.web3);
-        });
+    //   const registryInstance = await daoFactoryInstance
+    //     .registry()
+    //     .then(registryAddress => {
+    //       return Registry__factory.connect(registryAddress, this.web3);
+    //     });
 
-      return daoFactoryInstance
-        .newWhitelistVotingDAO(
-          ...ClientDaoWhitelistVoting.createDaoParameters(params)
-        )
-        .then(tx => tx.wait())
-        .then(cr => {
-          const newDaoAddress = cr.events?.find(
-            e => e.address === registryInstance.address
-          )?.topics[1];
-          if (!newDaoAddress)
-            return Promise.reject(new Error("Could not create DAO"));
+    //   return daoFactoryInstance
+    //     .newWhitelistVotingDAO(
+    //       ...ClientDaoWhitelistVoting.createDaoParameters(params)
+    //     )
+    //     .then(tx => tx.wait())
+    //     .then(cr => {
+    //       const newDaoAddress = cr.events?.find(
+    //         e => e.address === registryInstance.address
+    //       )?.topics[1];
+    //       if (!newDaoAddress)
+    //         return Promise.reject(new Error("Could not create DAO"));
 
-          return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
-        });
-    },
+    //       return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
+    //     });
+    // },
     /** Determines whether an action is allowed by the curren DAO's ACL settings */
     hasPermission: (
       _where: string,
@@ -333,32 +327,26 @@ export class ClientDaoWhitelistVoting extends ClientCore
 
   /** Estimation related methods */
   estimate = {
-    create: async (
-      params: ICreateDaoWhitelistVoting
-    ): Promise<IGasFeeEstimation> => {
-      if (!this.signer)
-        return Promise.reject(
-          new Error("A signer is needed for creating a DAO")
-        );
-      const daoFactoryInstance = DAOFactory__factory.connect(
-        this.daoFactoryAddress,
-        this.connectedSigner
-      );
+    // create: async (
+    //   params: ICreateDaoWhitelistVoting
+    // ): Promise<GasFeeEstimation> => {
+    //   if (!this.signer)
+    //     return Promise.reject(
+    //       new Error("A signer is needed for creating a DAO")
+    //     );
+    //   const daoFactoryInstance = DAOFactory__factory.connect(
+    //     this.daoFactoryAddress,
+    //     this.connectedSigner
+    //   );
 
-      const gasLimit = daoFactoryInstance.estimateGas.newWhitelistVotingDAO(
-        ...ClientDaoWhitelistVoting.createDaoParameters(params)
-      );
+    //   const gasLimit = daoFactoryInstance.estimateGas.newWhitelistVotingDAO(
+    //     ...ClientDaoWhitelistVoting.createDaoParameters(params)
+    //   );
 
-      return this.estimateGasFee(gasLimit);
-    },
-    deposit: (params: IDeposit): Promise<IGasFeeEstimation> =>
+    //   return this.estimateGasFee(gasLimit);
+    // },
+    deposit: (params: IDeposit): Promise<GasFeeEstimation> =>
       this.estimateDeposit(params),
-    increaseAllowance: (
-      tokenAddress: string,
-      daoAddress: string,
-      amount: bigint
-    ): Promise<IGasFeeEstimation> =>
-      this.estimateIncreaseAllowance(tokenAddress, daoAddress, amount),
   };
 
   /** Helpers */

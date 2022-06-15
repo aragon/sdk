@@ -1,2 +1,3 @@
-export * from "./client-dao";
+export * from "./client";
+export * from "./plugins";
 export * from "./context";
