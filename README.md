@@ -2,7 +2,8 @@
 
 This repository contains the Softward Development Kit to interact with the Aragon protocol.
 
-It currently provides support for JavaScript and TypeScript. [Learn more](./javascript). 
+It currently provides support for:
+- [JavaScript - TypeScript](./javascript)
 
 ## Pull Request Labels
 
