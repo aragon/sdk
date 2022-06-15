@@ -19,10 +19,13 @@ import {
   GovernanceERC20__factory,
   IDAO,
 } from "@aragon/core-contracts-ethers";
-import { Random } from "@aragon/sdk-common";
+// NOTE: Backing off ipfs-http-client until the UI framework supports it
+// import { Random } from "@aragon/sdk-common";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { IPFSHTTPClient } from "ipfs-http-client";
+
+// NOTE: Backing off ipfs-http-client until the UI framework supports it
+// import { IPFSHTTPClient } from "ipfs-http-client";
 
 export abstract class ClientCore implements IClientCore {
   private static readonly PRECISION_FACTOR_BASE = 1000;
@@ -32,14 +35,16 @@ export abstract class ClientCore implements IClientCore {
   private _signer: Signer | undefined;
   private _daoFactoryAddress = "";
   private _gasFeeEstimationFactor = 1;
-  private _ipfs: IPFSHTTPClient[] = [];
-  private _ipfsIdx: number = -1;
+  // NOTE: Backing off ipfs-http-client until the UI framework supports it
+  // private _ipfs: IPFSHTTPClient[] = [];
+  // private _ipfsIdx: number = -1;
 
   constructor(context: Context) {
-    if (context.ipfs?.length) {
-      this._ipfs = context.ipfs;
-      this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
-    }
+    // NOTE: Backing off ipfs-http-client until the UI framework supports it
+    // if (context.ipfs?.length) {
+    //   this._ipfs = context.ipfs;
+    //   this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
+    // }
     if (context.web3Providers) {
       this._web3Providers = context.web3Providers;
       this._web3Idx = 0;
@@ -71,17 +76,19 @@ export abstract class ClientCore implements IClientCore {
     return this;
   }
 
-  /**
-   * Starts using the next available IPFS endpoint
-   */
-  public shiftIpfsNode() {
-    if (!this._ipfs.length) throw new Error("No IPFS endpoints available");
-    else if (this._ipfs.length < 2) {
-      throw new Error("No other endpoints");
-    }
-    this._ipfsIdx = (this._ipfsIdx + 1) % this._ipfs.length;
-    return this;
-  }
+  // NOTE: Backing off ipfs-http-client until the UI framework supports it
+
+  // /**
+  //  * Starts using the next available IPFS endpoint
+  //  */
+  // public shiftIpfsNode() {
+  //   if (!this._ipfs.length) throw new Error("No IPFS endpoints available");
+  //   else if (this._ipfs.length < 2) {
+  //     throw new Error("No other endpoints");
+  //   }
+  //   this._ipfsIdx = (this._ipfsIdx + 1) % this._ipfs.length;
+  //   return this;
+  // }
 
   /**
    * Starts using the next available Web3 endpoint
@@ -126,13 +133,15 @@ export abstract class ClientCore implements IClientCore {
   get daoFactoryAddress() {
     return this._daoFactoryAddress;
   }
+  
+  // NOTE: Backing off ipfs-http-client until the UI framework supports it
 
-  get ipfs() {
-    if (!this._ipfs[this._ipfsIdx]) {
-      throw new Error("No IPFS endpoints available");
-    }
-    return this._ipfs[this._ipfsIdx];
-  }
+  // get ipfs() {
+  //   if (!this._ipfs[this._ipfsIdx]) {
+  //     throw new Error("No IPFS endpoints available");
+  //   }
+  //   return this._ipfs[this._ipfsIdx];
+  // }
 
   public isWeb3NodeUp(): Promise<boolean> {
     return this.web3
@@ -141,12 +150,14 @@ export abstract class ClientCore implements IClientCore {
       .catch(() => false);
   }
 
-  /** Returns `true` if the current client is on line */
-  public isIpfsNodeUp(): Promise<boolean> {
-    // Note: the TS typing is incorrect (returns a Promise)
-    return Promise.resolve(this.ipfs.isOnline())
-      .catch(() => false);
-  }
+  // NOTE: Backing off ipfs-http-client until the UI framework supports it
+
+  // /** Returns `true` if the current client is on line */
+  // public isIpfsNodeUp(): Promise<boolean> {
+  //   // Note: the TS typing is incorrect (returns a Promise)
+  //   return Promise.resolve(this.ipfs.isOnline())
+  //     .catch(() => false);
+  // }
 
   /**
    * Use the contract instance at the given address
@@ -436,69 +447,71 @@ export abstract class ClientCore implements IClientCore {
       .then(allowance => allowance.toBigInt());
   }
 
-  // IPFS METHODS
+  // NOTE: Backing off ipfs-http-client until the UI framework supports it
 
-  public async pin(input: string | Uint8Array): Promise<string> {
-    if (!this.ipfs) {
-      throw new Error("IPFS client is not initialized");
-    }
-    // find online node
-    let isOnline = false;
-    for (var i = 0; i < this._ipfs.length; i++) {
-      isOnline = await this.isIpfsNodeUp();
-      if (isOnline) break;
+  // // IPFS METHODS
 
-      this.shiftIpfsNode();
-    }
-    if (!isOnline) throw new Error("No IPFS nodes available");
+  // public async pin(input: string | Uint8Array): Promise<string> {
+  //   if (!this.ipfs) {
+  //     throw new Error("IPFS client is not initialized");
+  //   }
+  //   // find online node
+  //   let isOnline = false;
+  //   for (var i = 0; i < this._ipfs.length; i++) {
+  //     isOnline = await this.isIpfsNodeUp();
+  //     if (isOnline) break;
 
-    return this._ipfs[this._ipfsIdx]
-      .add(input)
-      .then((res) => res.path)
-      .catch((e) => {
-        throw new Error("Could not pin data: " + (e?.message || ""));
-      });
-  }
+  //     this.shiftIpfsNode();
+  //   }
+  //   if (!isOnline) throw new Error("No IPFS nodes available");
 
-  public async fetchBytes(cid: string) {
-    if (!this.ipfs) throw new Error("IPFS client is not initialized");
-    // find online node
-    let isOnline = false;
-    for (let i = 0; i < this._ipfs.length; i++) {
-      isOnline = await this.isIpfsNodeUp();
-      if (isOnline) break;
+  //   return this._ipfs[this._ipfsIdx]
+  //     .add(input)
+  //     .then((res) => res.path)
+  //     .catch((e) => {
+  //       throw new Error("Could not pin data: " + (e?.message || ""));
+  //     });
+  // }
 
-      this.shiftIpfsNode();
-    }
-    if (!isOnline) throw new Error("No IPFS nodes available");
+  // public async fetchBytes(cid: string) {
+  //   if (!this.ipfs) throw new Error("IPFS client is not initialized");
+  //   // find online node
+  //   let isOnline = false;
+  //   for (let i = 0; i < this._ipfs.length; i++) {
+  //     isOnline = await this.isIpfsNodeUp();
+  //     if (isOnline) break;
 
-    try {
-      const chunks: Uint8Array[] = [];
-      let totalArrayLength = 0;
-      for await (const chunk of this._ipfs[this._ipfsIdx].cat(cid)) {
-        chunks.push(chunk);
-        totalArrayLength += chunk.length;
-      }
+  //     this.shiftIpfsNode();
+  //   }
+  //   if (!isOnline) throw new Error("No IPFS nodes available");
 
-      const mergedArray = new Uint8Array(totalArrayLength);
-      let lastIndex = 0;
-      for (const chunk of chunks) {
-        mergedArray.set(chunk, lastIndex);
-        lastIndex += chunk.length;
-      }
-      return mergedArray;
-    } catch (e) {
-      throw new Error("Could not fetch data");
-    }
-  }
+  //   try {
+  //     const chunks: Uint8Array[] = [];
+  //     let totalArrayLength = 0;
+  //     for await (const chunk of this._ipfs[this._ipfsIdx].cat(cid)) {
+  //       chunks.push(chunk);
+  //       totalArrayLength += chunk.length;
+  //     }
 
-  public fetchString(cid: string): Promise<string> {
-    return this.fetchBytes(cid)
-      .then((bytes) => new TextDecoder().decode(bytes))
-      .catch((e) => {
-        throw new Error(
-          "Error while fetching and decoding bytes: " + (e?.message || ""),
-        );
-      });
-  }
+  //     const mergedArray = new Uint8Array(totalArrayLength);
+  //     let lastIndex = 0;
+  //     for (const chunk of chunks) {
+  //       mergedArray.set(chunk, lastIndex);
+  //       lastIndex += chunk.length;
+  //     }
+  //     return mergedArray;
+  //   } catch (e) {
+  //     throw new Error("Could not fetch data");
+  //   }
+  // }
+
+  // public fetchString(cid: string): Promise<string> {
+  //   return this.fetchBytes(cid)
+  //     .then((bytes) => new TextDecoder().decode(bytes))
+  //     .catch((e) => {
+  //       throw new Error(
+  //         "Error while fetching and decoding bytes: " + (e?.message || ""),
+  //       );
+  //     });
+  // }
 }
