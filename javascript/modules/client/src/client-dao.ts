@@ -179,6 +179,25 @@ export class ClientDaoERC20Voting extends ClientCore
       amount: bigint
     ): Promise<IGasFeeEstimation> =>
       this.estimateIncreaseAllowance(tokenAddress, daoAddress, amount),
+    createProposal: (
+      votingAddress: string,
+      params: ICreateProposal
+    ): Promise<IGasFeeEstimation> => {
+      if (!this.signer)
+      return Promise.reject(
+        new Error("A signer is needed for creating a DAO")
+      );
+      const erc20VotingInstance = ERC20Voting__factory.connect(
+        votingAddress,
+        this.connectedSigner
+      );
+
+      const gasLimit = erc20VotingInstance.estimateGas.newVote(
+        ...ClientDaoERC20Voting.createProposalParameters(params)
+      );
+
+      return this.estimateGasFee(gasLimit);
+    }
   };
 
   /** Helpers */
@@ -359,6 +378,25 @@ export class ClientDaoWhitelistVoting extends ClientCore
       amount: bigint
     ): Promise<IGasFeeEstimation> =>
       this.estimateIncreaseAllowance(tokenAddress, daoAddress, amount),
+    createProposal: (
+      votingAddress: string,
+      params: ICreateProposal
+    ): Promise<IGasFeeEstimation> => {
+      if (!this.signer)
+      return Promise.reject(
+        new Error("A signer is needed for creating a DAO")
+      );
+      const whitelistVotingInstance = WhitelistVoting__factory.connect(
+        votingAddress,
+        this.connectedSigner
+      );
+
+      const gasLimit = whitelistVotingInstance.estimateGas.newVote(
+        ...ClientDaoWhitelistVoting.createProposalParameters(params)
+      );
+
+      return this.estimateGasFee(gasLimit);
+    }
   };
 
   /** Helpers */
