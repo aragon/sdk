@@ -185,7 +185,7 @@ export class ClientDaoERC20Voting extends ClientCore
     ): Promise<IGasFeeEstimation> => {
       if (!this.signer)
       return Promise.reject(
-        new Error("A signer is needed for creating a DAO")
+        new Error("A signer is needed for creating a proposal")
       );
       const erc20VotingInstance = ERC20Voting__factory.connect(
         votingAddress,
@@ -384,7 +384,7 @@ export class ClientDaoWhitelistVoting extends ClientCore
     ): Promise<IGasFeeEstimation> => {
       if (!this.signer)
       return Promise.reject(
-        new Error("A signer is needed for creating a DAO")
+        new Error("A signer is needed for creating a proposal")
       );
       const whitelistVotingInstance = WhitelistVoting__factory.connect(
         votingAddress,
