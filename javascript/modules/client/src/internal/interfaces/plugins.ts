@@ -1,7 +1,6 @@
 // This file contains the definitions of the ERC20 and Multisig DAO clients
 
 import { IClientCore } from "./core";
-import { BigNumber } from "@ethersproject/bignumber";
 import { DaoAction, DaoConfig, FactoryInitParams } from "./common";
 
 // NOTE: These 2 clients will eventually be moved to their own package
@@ -11,21 +10,23 @@ import { DaoAction, DaoConfig, FactoryInitParams } from "./common";
 /** Defines the shape of the ERC20 client class */
 export interface IClientErc20 extends IClientCore {
   methods: {
-    createProposal: (params: ICreateProposalParams) => Promise<BigNumber>;
-    voteProposal: (proposalId: string, approve: VoteOptions) => Promise<void>;
+    createProposal: (
+      params: ICreateProposalParams,
+    ) => AsyncGenerator<ProposalCreationStepValue>;
+    voteProposal: (proposalId: string, vote: VoteOptions) => Promise<void>;
     executeProposal: (proposalId: string) => Promise<void>;
     setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
     setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
   };
-  actionBuilders: {
+  encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     init: (params: IErc20FactoryParams) => FactoryInitParams;
     /** Compones the action payload to pass upon proposal creation */
-    withdraw: (to: string, value: bigint, params: IWithdrawParams) => DaoAction;
+    withdrawAction: (to: string, value: bigint, params: IWithdrawParams) => DaoAction;
   };
   estimation: {
     createProposal: (params: ICreateProposalParams) => Promise<bigint>;
-    voteProposal: (proposalId: string, approve: VoteOptions) => Promise<bigint>;
+    voteProposal: (proposalId: string, vote: VoteOptions) => Promise<bigint>;
     executeProposal: (proposalId: string) => Promise<bigint>;
     setDaoConfig: (address: string, config: DaoConfig) => Promise<bigint>;
     setVotingConfig: (address: string, config: VotingConfig) => Promise<bigint>;
@@ -37,21 +38,23 @@ export interface IClientErc20 extends IClientCore {
 /** Defines the shape of the Multisig client class */
 export interface IClientMultisig extends IClientCore {
   methods: {
-    createProposal: (params: ICreateProposalParams) => Promise<BigNumber>;
-    voteProposal: (proposalId: string, approve: VoteOptions) => Promise<void>;
+    createProposal: (
+      params: ICreateProposalParams,
+    ) => AsyncGenerator<ProposalCreationStepValue>;
+    voteProposal: (proposalId: string, vote: VoteOptions) => Promise<void>;
     executeProposal: (proposalId: string) => Promise<void>;
     setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
     setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
   };
-  actionBuilders: {
+  encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     init: (params: IMultisigFactoryParams) => FactoryInitParams;
     /** Compones the action payload to pass upon proposal creation */
-    withdraw: (to: string, value: bigint, params: IWithdrawParams) => DaoAction;
+    withdrawAction: (to: string, value: bigint, params: IWithdrawParams) => DaoAction;
   };
   estimation: {
     createProposal: (params: ICreateProposalParams) => Promise<bigint>;
-    voteProposal: (proposalId: string, approve: VoteOptions) => Promise<bigint>;
+    voteProposal: (proposalId: string, vote: VoteOptions) => Promise<bigint>;
     executeProposal: (proposalId: string) => Promise<bigint>;
     setDaoConfig: (address: string, config: DaoConfig) => Promise<bigint>;
     setVotingConfig: (address: string, config: VotingConfig) => Promise<bigint>;
@@ -82,7 +85,7 @@ export interface VotingConfig {
 }
 
 export interface ICreateProposalParams {
-  metadata: string;
+  metadataUri: string;
   actions?: DaoAction[];
   // TODO: Clarify => block number? timestamp?
   startDate?: number;
@@ -92,6 +95,7 @@ export interface ICreateProposalParams {
   creatorVote?: VoteOptions;
 }
 
+// TODO: Confirm values
 export enum VoteOptions {
   NONE = 0,
   ABSTAIN = 1,
@@ -118,3 +122,14 @@ export interface IMultisigFactoryParams {
   votingConfig: VotingConfig;
   whitelistVoters: string[];
 }
+
+// PROPOSAL CREATION
+
+export enum ProposalCreationSteps {
+  CREATING = "creating",
+  DONE = "done",
+}
+
+export type ProposalCreationStepValue =
+  | { key: ProposalCreationSteps.CREATING; txHash: string }
+  | { key: ProposalCreationSteps.DONE; proposalId: string };

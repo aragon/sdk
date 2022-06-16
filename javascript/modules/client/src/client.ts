@@ -20,14 +20,22 @@ import { DaoRole } from "./internal/interfaces/common";
 import { solidityPack } from "ethers/lib/utils";
 import { strip0x } from "@aragon/sdk-common";
 
+export { DaoCreationSteps, DaoDepositSteps };
+export { ICreateParams, IDepositParams };
+
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
  */
 export class Client extends ClientCore implements IClient {
+  //// HIGH LEVEL HANDLERS
+
   /** Contains all the generic high level methods to interact with a DAO */
   methods = {
+    /** Created a DAO with the given parameters and plugins */
     create: (params: ICreateParams) => this._createDao(params),
+    /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => this._deposit(params),
+    /** Checks whether a role is granted by the curren DAO's ACL settings */
     hasPermission: (
       where: string,
       who: string,
@@ -36,7 +44,7 @@ export class Client extends ClientCore implements IClient {
     ) => this._hasPermission(where, who, role, data),
   };
 
-  // ESTIMATION HANDLERS
+  //// ESTIMATION HANDLERS
 
   /** Contains the gas estimation of the Ethereum transactions */
   estimation = {
@@ -44,7 +52,7 @@ export class Client extends ClientCore implements IClient {
     deposit: (params: IDepositParams) => this._estimateDeposit(params),
   };
 
-  // PRIVATE METHOD IMPLEMENTATIONS
+  //// PRIVATE METHOD IMPLEMENTATIONS
 
   private async *_createDao(
     params: ICreateParams,
@@ -58,7 +66,7 @@ export class Client extends ClientCore implements IClient {
 
     const daoFactoryInstance = DAOFactory__factory.connect(
       this.web3.getDaoFactoryAddress(),
-      this.web3.getConnectedSigner(),
+      signer,
     );
 
     const registryAddress = await daoFactoryInstance.registry();
@@ -72,8 +80,8 @@ export class Client extends ClientCore implements IClient {
       key: DaoCreationSteps.CREATING,
       txHash: tx.hash,
     };
-    const cr = await tx.wait();
-    const newDaoAddress = cr.events?.find(
+    const receipt = await tx.wait();
+    const newDaoAddress = receipt.events?.find(
       (e) => e.address === registryAddress,
     )?.topics[1];
     if (!newDaoAddress) {
@@ -218,7 +226,7 @@ export class Client extends ClientCore implements IClient {
     return Promise.reject();
   }
 
-  // PRIVATE METHOD GAS ESTIMATIONS
+  //// PRIVATE METHOD GAS ESTIMATIONS
 
   _estimateCreation(params: ICreateParams) {
     const signer = this.web3.getConnectedSigner();
@@ -236,6 +244,8 @@ export class Client extends ClientCore implements IClient {
       throw new Error("A signer is needed for estimating the gas cost");
     }
 
+    // TODO: ESTIMATE INCREASED ALLOWANCE AS WELL
+
     const [daoAddress, amount, tokenAddress, reference] =
       unwrapDepositParameters(params);
 
@@ -250,11 +260,13 @@ export class Client extends ClientCore implements IClient {
       amount,
       reference,
       override,
-    ).then((gasLimit) => this.web3.getApproximateGasFee(gasLimit.toBigInt()));
+    ).then((gasLimit) => {
+      return this.web3.getApproximateGasFee(gasLimit.toBigInt());
+    });
   }
 }
 
-// PRIVATE HELPERS
+//// PRIVATE HELPERS
 
 function unwrapCreateDaoParameters(
   params: ICreateParams,

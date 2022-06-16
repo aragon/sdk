@@ -3,12 +3,15 @@ import {
   ICreateProposalParams,
   IErc20FactoryParams,
   IWithdrawParams,
+  ProposalCreationSteps,
+  ProposalCreationStepValue,
   VoteOptions,
   VotingConfig,
 } from "./internal/interfaces/plugins";
 import {
   DAO__factory,
-  GovernanceERC20__factory,
+  ERC20Voting__factory,
+  // GovernanceERC20__factory,
   IDAO,
 } from "@aragon/core-contracts-ethers";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -19,17 +22,31 @@ import {
   DaoConfig,
   FactoryInitParams,
 } from "./internal/interfaces/common";
+import { Context } from "./context";
 
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
  */
 export class ClientErc20 extends ClientCore implements IClientErc20 {
+  private _pluginAddress: string;
+
+  constructor(pluginAddress: string, context: Context) {
+    super(context);
+
+    if (!pluginAddress) {
+      throw new Error("An address for the plugin is required");
+    }
+    this._pluginAddress = pluginAddress;
+  }
+
+  //// HIGH LEVEL HANDLERS
+
   /** Contains all the generic high level methods to interact with a DAO */
   methods = {
     createProposal: (params: ICreateProposalParams) =>
       this._createProposal(params),
-    voteProposal: (proposalId: string, approve: VoteOptions) =>
-      this._voteProposal(proposalId, approve),
+    voteProposal: (proposalId: string, vote: VoteOptions) =>
+      this._voteProposal(proposalId, vote),
     executeProposal: (proposalId: string) => this._executeProposal(proposalId),
     setDaoConfig: (address: string, config: DaoConfig) =>
       this._setDaoConfig(address, config),
@@ -37,39 +54,72 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       this._setVotingConfig(address, config),
   };
 
-  // ACTION BUILDERS
+  //// ACTION BUILDERS
 
-  actionBuilder = {
-    /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
+  /** Contains the helpers to encode actions and parameters that can be passed as a serialized buffer on-chain */
+  encoding = {
+    /** Computes the parameters to be given when creating the DAO, as the initialization for the plugin */
     init: (params: IErc20FactoryParams) => this._buildActionInit(params),
-    /** Compones the action payload to pass upon proposal creation */
-    withdraw: (to: string, value: bigint, params: IWithdrawParams) =>
+    /** Computes the action payload to pass upon proposal creation */
+    withdrawAction: (to: string, value: bigint, params: IWithdrawParams) =>
       this._buildActionWithdraw(to, value, params),
   };
 
-  // ESTIMATION HANDLERS
+  //// ESTIMATION HANDLERS
 
   /** Contains the gas estimation of the Ethereum transactions */
   estimation = {
     createProposal: (params: ICreateProposalParams) =>
       this._estimateCreateProposal(params),
-    voteProposal: (proposalId: string, approve: VoteOptions) =>
-      this._estimateVoteProposal(proposalId, approve),
+    voteProposal: (proposalId: string, vote: VoteOptions) =>
+      this._estimateVoteProposal(proposalId, vote),
     executeProposal: (proposalId: string) =>
       this._estimateExecuteProposal(proposalId),
-    setDaoConfig: (address: string, config: DaoConfig) =>
-      this._estimateSetDaoConfig(address, config),
-    setVotingConfig: (address: string, config: VotingConfig) =>
-      this._estimateSetVotingConfig(address, config),
+    setDaoConfig: (daoAddress: string, config: DaoConfig) =>
+      this._estimateSetDaoConfig(daoAddress, config),
+    setVotingConfig: (daoAddress: string, config: VotingConfig) =>
+      this._estimateSetVotingConfig(daoAddress, config),
   };
 
-  // PRIVATE METHOD IMPLEMENTATIONS
+  //// PRIVATE METHOD IMPLEMENTATIONS
 
-  private _createProposal(params: ICreateProposalParams) {
-    // TODO: Unimplemented
-    throw new Error("Unimplemented");
+  private async *_createProposal(
+    params: ICreateProposalParams,
+  ): AsyncGenerator<ProposalCreationStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new Error("A signer is needed");
+    } else if (!signer.provider) {
+      throw new Error("A web3 provider is needed");
+    }
+
+    const erc20VotingInstance = ERC20Voting__factory.connect(
+      this._pluginAddress,
+      signer,
+    );
+
+    const tx = await erc20VotingInstance
+      .newVote(...unwrapProposalParameters(params));
+
+    yield { key: ProposalCreationSteps.CREATING, txHash: tx.hash };
+
+    const receipt = await tx.wait();
+    const startVoteEvent = receipt.events?.find(
+      (e) => e.event === "StartVote",
+    );
+    if (!startVoteEvent || startVoteEvent.args?.voteId) {
+      return Promise.reject(
+        new Error("Could not read the proposal ID"),
+      );
+    }
+
+    yield {
+      key: ProposalCreationSteps.DONE,
+      proposalId: startVoteEvent.args?.voteId,
+    };
   }
-  private _voteProposal(proposalId: string, approve: VoteOptions) {
+
+  private _voteProposal(proposalId: string, vote: VoteOptions) {
     // TODO: Unimplemented
     throw new Error("Unimplemented");
   }
@@ -77,16 +127,16 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     // TODO: Unimplemented
     throw new Error("Unimplemented");
   }
-  private _setDaoConfig(address: string, config: DaoConfig) {
+  private _setDaoConfig(daoAddress: string, config: DaoConfig) {
     // TODO: Unimplemented
     throw new Error("Unimplemented");
   }
-  private _setVotingConfig(address: string, config: VotingConfig) {
+  private _setVotingConfig(daoAddress: string, config: VotingConfig) {
     // TODO: Unimplemented
     throw new Error("Unimplemented");
   }
 
-  // PRIVATE ACTION BUILDER HANDLERS
+  //// PRIVATE ACTION BUILDER HANDLERS
 
   private _buildActionInit(params: IErc20FactoryParams): FactoryInitParams {
     // TODO: Unimplemented
@@ -102,13 +152,29 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     return { to, value, data };
   }
 
-  // PRIVATE METHOD GAS ESTIMATIONS
+  //// PRIVATE METHOD GAS ESTIMATIONS
 
   private _estimateCreateProposal(params: ICreateProposalParams) {
-    // TODO: Unimplemented
-    return Promise.resolve(BigInt(0));
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new Error("A signer is needed");
+    } else if (!signer.provider) {
+      throw new Error("A web3 provider is needed");
+    }
+
+    const erc20VotingInstance = ERC20Voting__factory.connect(
+      this._pluginAddress,
+      signer,
+    );
+
+    return erc20VotingInstance.estimateGas.newVote(
+      ...unwrapProposalParameters(params),
+    ).then((gasLimit) => {
+      return this.web3.getApproximateGasFee(gasLimit.toBigInt());
+    });
   }
-  private _estimateVoteProposal(proposalId: string, approve: VoteOptions) {
+
+  private _estimateVoteProposal(proposalId: string, vote: VoteOptions) {
     // TODO: Unimplemented
     return Promise.resolve(BigInt(0));
   }
@@ -116,46 +182,17 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     // TODO: Unimplemented
     return Promise.resolve(BigInt(0));
   }
-  private _estimateSetDaoConfig(address: string, config: DaoConfig) {
+  private _estimateSetDaoConfig(daoAddress: string, config: DaoConfig) {
     // TODO: Unimplemented
     return Promise.resolve(BigInt(0));
   }
-  private _estimateSetVotingConfig(address: string, config: VotingConfig) {
+  private _estimateSetVotingConfig(daoAddress: string, config: VotingConfig) {
     // TODO: Unimplemented
     return Promise.resolve(BigInt(0));
   }
-
-  // EXAMPLE:
-
-  // _estimateDeposit(params: IDepositParams) {
-  //   const signer = this.web3.getConnectedSigner();
-  //   if (!signer) {
-  //     throw new Error("A signer is needed for estimating the gas cost");
-  //   }
-
-  //   const [
-  //     daoAddress,
-  //     amount,
-  //     tokenAddress,
-  //     reference,
-  //   ] = unwrapDepositParameters(params);
-
-  //   const daoInstance = DAO__factory.connect(daoAddress, signer);
-
-  //   const override = tokenAddress !== AddressZero ? {} : {
-  //     value: amount,
-  //   };
-
-  //   return daoInstance.estimateGas.deposit(
-  //     tokenAddress,
-  //     amount,
-  //     reference,
-  //     override,
-  //   ).then((gasLimit) => this.web3.getApproximateGasFee(gasLimit.toBigInt()));
-  // }
 }
 
-// PARAMETER TEMPLATES
+//// PARAMETER MANAGERS
 
 function unwrapProposalParameters(
   params: ICreateProposalParams,
@@ -168,7 +205,7 @@ function unwrapProposalParameters(
   number,
 ] {
   return [
-    params.metadata,
+    params.metadataUri,
     params.actions ?? [],
     params.startDate ?? 0,
     params.endDate ?? 0,
@@ -181,11 +218,11 @@ function encodeWithdrawActionData(params: IWithdrawParams): string {
   const daoInterface = DAO__factory.createInterface();
   return daoInterface.encodeFunctionData(
     "withdraw",
-    unwrapWithdrawParameters(params),
+    unwrapWithdrawParams(params),
   );
 }
 
-function unwrapWithdrawParameters(
+function unwrapWithdrawParams(
   params: IWithdrawParams,
 ): [string, string, BigNumber, string] {
   return [
