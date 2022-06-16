@@ -99,7 +99,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     );
 
     const tx = await erc20VotingInstance
-      .newVote(...unwrapProposalParameters(params));
+      .newVote(...unwrapProposalParams(params));
 
     yield { key: ProposalCreationSteps.CREATING, txHash: tx.hash };
 
@@ -168,7 +168,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     );
 
     return erc20VotingInstance.estimateGas.newVote(
-      ...unwrapProposalParameters(params),
+      ...unwrapProposalParams(params),
     ).then((gasLimit) => {
       return this.web3.getApproximateGasFee(gasLimit.toBigInt());
     });
@@ -194,7 +194,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
 //// PARAMETER MANAGERS
 
-function unwrapProposalParameters(
+function unwrapProposalParams(
   params: ICreateProposalParams,
 ): [
   string,

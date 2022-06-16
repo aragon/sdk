@@ -73,7 +73,7 @@ export class Client extends ClientCore implements IClient {
 
     // TODO: Use the new factory method
     const tx = await daoFactoryInstance.createDao(
-      ...unwrapCreateDaoParameters(params),
+      ...unwrapCreateDaoParams(params),
     );
 
     yield {
@@ -109,52 +109,17 @@ export class Client extends ClientCore implements IClient {
       amount,
       tokenAddress,
       reference,
-    ] = unwrapDepositParameters(params);
+    ] = unwrapDepositParams(params);
 
-    // Depositing an ERC20 token?
-    if (tokenAddress !== AddressZero) {
-      // FIXME: The factory should be the SafeERC20, not the plugin?
-      const governanceERC20Instance = GovernanceERC20__factory.connect(
+    // Ensure that if the target is an ERC20 token, it can be transferred
+    for await (
+      const step of this._ensureAllowance(
+        daoAddress,
+        amount.toBigInt(),
         tokenAddress,
-        signer,
-      );
-
-      const currentAllowance = await signer.getAddress()
-        .then((address) =>
-          governanceERC20Instance.allowance(address, daoAddress)
-        );
-
-      yield {
-        key: DaoDepositSteps.CHECKED_ALLOWANCE,
-        allowance: currentAllowance.toBigInt(),
-      };
-
-      if (currentAllowance.lt(amount)) {
-        const increaseAllowanceTx = await governanceERC20Instance
-          .increaseAllowance(
-            daoAddress,
-            BigNumber.from(amount),
-          );
-
-        yield {
-          key: DaoDepositSteps.INCREASING_ALLOWANCE,
-          txHash: increaseAllowanceTx.hash,
-        };
-
-        await increaseAllowanceTx.wait()
-          .then((cr) => {
-            const value = cr.events?.find((e) => e?.event === "Approval")?.args
-              ?.value;
-            if (!value || BigNumber.from(amount).gt(value)) {
-              throw new Error("Could not increase allowance");
-            }
-          });
-
-        yield {
-          key: DaoDepositSteps.INCREASED_ALLOWANCE,
-          allowance: amount.toBigInt(),
-        };
-      }
+      )
+    ) {
+      yield step;
     }
 
     // Doing the transfer
@@ -163,12 +128,13 @@ export class Client extends ClientCore implements IClient {
       daoAddress,
       signer,
     );
+    const override: { value?: BigNumber } = {};
 
-    const override = tokenAddress !== AddressZero ? {} : {
-      value: amount,
-    };
-
-    if (tokenAddress !== AddressZero) {
+    if (tokenAddress === AddressZero) {
+      // Ether
+      override.value = amount;
+    } else {
+      // ERC20
       const governanceERC20Instance = GovernanceERC20__factory.connect(
         tokenAddress,
         signer,
@@ -205,8 +171,7 @@ export class Client extends ClientCore implements IClient {
 
     await depositTx.wait().then((cr) => {
       const eventAmount = cr.events?.find((e) => e?.event === "Deposited")
-        ?.args
-        ?.amount;
+        ?.args?.amount;
       if (!amount.eq(eventAmount)) {
         throw new Error(
           `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`,
@@ -214,6 +179,66 @@ export class Client extends ClientCore implements IClient {
       }
     });
     yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
+  }
+
+  private async *_ensureAllowance(
+    daoAddress: string,
+    amount: bigint,
+    tokenAddress: string,
+  ): AsyncGenerator<DaoDepositStepValue> {
+    // Don't need to do anything if the target is ether
+    if (tokenAddress === AddressZero) return;
+
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new Error("A signer is needed");
+    } else if (!signer.provider) {
+      throw new Error("A web3 provider is needed");
+    }
+
+    // FIXME: The factory should be the SafeERC20, not the plugin?
+    const governanceERC20Instance = GovernanceERC20__factory.connect(
+      tokenAddress,
+      signer,
+    );
+
+    const currentAllowance = await signer.getAddress()
+      .then((address) =>
+        governanceERC20Instance.allowance(address, daoAddress)
+      );
+
+    yield {
+      key: DaoDepositSteps.CHECKED_ALLOWANCE,
+      allowance: currentAllowance.toBigInt(),
+    };
+
+    if (currentAllowance.gte(amount)) return;
+
+    // TODO: Shouldn't we increase the REMAINING amount only?
+    const increaseAllowanceTx = await governanceERC20Instance
+      .increaseAllowance(
+        daoAddress,
+        BigNumber.from(amount),
+      );
+
+    yield {
+      key: DaoDepositSteps.INCREASING_ALLOWANCE,
+      txHash: increaseAllowanceTx.hash,
+    };
+
+    await increaseAllowanceTx.wait()
+      .then((cr) => {
+        const value = cr.events?.find((e) => e?.event === "Approval")?.args
+          ?.value;
+        if (!value || BigNumber.from(amount).gt(value)) {
+          throw new Error("Could not increase allowance");
+        }
+      });
+
+    yield {
+      key: DaoDepositSteps.INCREASED_ALLOWANCE,
+      allowance: amount,
+    };
   }
 
   private _hasPermission(
@@ -235,6 +260,7 @@ export class Client extends ClientCore implements IClient {
     }
 
     // TODO: Unimplemented
+    // TODO: The new contract code is needed
     return this.web3.getApproximateGasFee(BigInt("0"));
   }
 
@@ -247,13 +273,14 @@ export class Client extends ClientCore implements IClient {
     // TODO: ESTIMATE INCREASED ALLOWANCE AS WELL
 
     const [daoAddress, amount, tokenAddress, reference] =
-      unwrapDepositParameters(params);
+      unwrapDepositParams(params);
 
     const daoInstance = DAO__factory.connect(daoAddress, signer);
 
-    const override = tokenAddress !== AddressZero ? {} : {
-      value: amount,
-    };
+    const override: { value?: BigNumber } = {};
+    if (tokenAddress === AddressZero) {
+      override.value = amount;
+    }
 
     return daoInstance.estimateGas.deposit(
       tokenAddress,
@@ -268,7 +295,7 @@ export class Client extends ClientCore implements IClient {
 
 //// PRIVATE HELPERS
 
-function unwrapCreateDaoParameters(
+function unwrapCreateDaoParams(
   params: ICreateParams,
 ): [
   DAOFactory.DAOConfigStruct,
@@ -304,7 +331,7 @@ function unwrapCreateDaoParameters(
   ];
 }
 
-function unwrapDepositParameters(
+function unwrapDepositParams(
   params: IDepositParams,
 ): [string, BigNumber, string, string] {
   return [
