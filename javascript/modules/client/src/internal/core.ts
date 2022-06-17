@@ -59,8 +59,8 @@ export abstract class ClientCore implements IClientCore {
       this._signer = signer;
     },
 
-    /** Starts using the next available Web3 endpoint */
-    shiftEndpoint: () => {
+    /** Starts using the next available Web3 provider */
+    shiftProvider: () => {
       if (!this._web3Providers.length) throw new Error("No endpoints");
       else if (this._web3Providers.length <= 1) {
         throw new Error("No other endpoints");
@@ -167,7 +167,7 @@ export abstract class ClientCore implements IClientCore {
     // /**
     //  * Starts using the next available IPFS endpoint
     //  */
-    // public shiftIpfsNode() {
+    // public shiftClient() {
     //   if (!this._ipfs.length) throw new Error("No IPFS endpoints available");
     //   else if (this._ipfs.length < 2) {
     //     throw new Error("No other endpoints");
@@ -176,15 +176,15 @@ export abstract class ClientCore implements IClientCore {
     //   return this;
     // }
 
-    // get ipfs() {
+    // getClient: () => {
     //   if (!this._ipfs[this._ipfsIdx]) {
     //     throw new Error("No IPFS endpoints available");
     //   }
     //   return this._ipfs[this._ipfsIdx];
-    // }
+    // },
 
     // /** Returns `true` if the current client is on line */
-    // public isIpfsNodeUp(): Promise<boolean> {
+    // isUp: () => {
     //   // Note: the TS typing is incorrect (returns a Promise)
     //   return Promise.resolve(this.ipfs.isOnline())
     //     .catch(() => false);
@@ -192,7 +192,7 @@ export abstract class ClientCore implements IClientCore {
 
     // // IPFS METHODS
 
-    // public async pin(input: string | Uint8Array): Promise<string> {
+    // pin: async (input: string | Uint8Array) => {
     //   if (!this.ipfs) {
     //     throw new Error("IPFS client is not initialized");
     //   }

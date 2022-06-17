@@ -9,7 +9,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 export interface IClientWeb3Core {
   web3: {
     useSigner: (signer: Signer) => void;
-    shiftEndpoint: () => void;
+    shiftProvider: () => void;
     getSigner: () => Signer | null;
     getConnectedSigner: () => Signer;
     getProvider: () => JsonRpcProvider | null;
@@ -23,14 +23,16 @@ export interface IClientWeb3Core {
   };
 }
 export interface IClientIpfsCore {
-  ipfs: {};
-  // NOTE: Backing off ipfs-http-client until the UI framework supports it
-  // shiftIpfsNode(): this;
-  // isIpfsNodeUp(): Promise<boolean>;
-  // ipfs: IPFSHTTPClient;
-  // pin(input: string | Uint8Array): Promise<string>;
-  // fetchString(cid: string): Promise<string>;
-  // fetchBytes(cid: string): Promise<Uint8Array | undefined>;
+  ipfs: {
+    // NOTE: Backing off ipfs-http-client until the UI framework supports it
+
+    // shiftClient: () => void;
+    // isUp: () => Promise<boolean>;
+    // getClient: () => IPFSHTTPClient;
+    // pin: (input: string | Uint8Array) => Promise<string>;
+    // fetchString: (cid: string) => Promise<string>;
+    // fetchBytes: (cid: string) => Promise<Uint8Array | undefined>;
+  };
 }
 export interface IClientGraphQLCore {
   // Add here
