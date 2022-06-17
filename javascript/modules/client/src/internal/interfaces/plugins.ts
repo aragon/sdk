@@ -22,7 +22,7 @@ export interface IClientErc20 extends IClientCore {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     init: (params: IErc20FactoryParams) => FactoryInitParams;
     /** Compones the action payload to pass upon proposal creation */
-    withdrawAction: (to: string, value: bigint, params: IWithdrawParams) => DaoAction;
+    withdrawAction: (params: IWithdrawParams) => DaoAction;
   };
   estimation: {
     createProposal: (params: ICreateProposalParams) => Promise<bigint>;
@@ -104,9 +104,9 @@ export enum VoteOptions {
 }
 
 export interface IWithdrawParams {
-  to: string;
+  recipientAddress: string;
   amount: bigint;
-  token?: string;
+  tokenAddress?: string;
   reference?: string;
 }
 

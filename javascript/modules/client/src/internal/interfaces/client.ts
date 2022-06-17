@@ -55,7 +55,7 @@ export type DaoCreationStepValue =
 export interface IDepositParams {
   daoAddress: string;
   amount: bigint;
-  token?: string;
+  tokenAddress?: string;
   reference?: string;
 }
 

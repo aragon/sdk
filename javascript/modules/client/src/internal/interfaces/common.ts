@@ -15,7 +15,7 @@ export enum DaoRole {
 export type DaoAction = {
   to: string;
   value: bigint;
-  data: string;
+  data: Uint8Array;
 };
 
 /**
@@ -26,7 +26,7 @@ export type FactoryInitParams = {
   /** The ID of the plugin to use */
   id: string;
   /** ABI encoded parameters to pass to the plugin factory */
-  data: string;
+  data: Uint8Array;
 };
 
 /**

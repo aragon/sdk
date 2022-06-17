@@ -1,282 +1,304 @@
 # @aragon/sdk-client
 
-@aragon/sdk-client contains the high level operations for interacting with the Aragon ecosystem
+@aragon/sdk-client provides easy access to the high level interactions to be
+made with an Aragon DAO. It consists of three different components:
+
+- General-purpose DAO client
+- Custom clients for specific DAO plugins
+- Context for holding inheritable configuration
+
+Contributors: See [development](#development) below
 
 ## Installation
 
-Use [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/) to install @aragon/sdk-client.
+Use [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/) to install
+@aragon/sdk-client.
 
 ```bash
 npm install @aragon/sdk-client
 yarn add @aragon/sdk-client
 ```
 
-## Client usage
+## Usage
 
-### DAO Creation
+### Context
 
-#### DAO ERC20 Voting
+The [Context](./src/context.ts) class is an utility component that holds the
+configuration passed to any [Client](./src/client.ts) instance.
 
 ```ts
-// For local testing
+import { Context } from "@aragon/sdk-client";
+
+// Define
 const contextParams: ContextParams = {
-    network: 31337,
-    signer: new Wallet("privateKey"),
-    daoFactoryAddress: "0x1234...", // Optional on networks like "rinkeby", "arbitrum-rinkeby" or "mumbai"
-    web3Providers: ["http://localhost:8545"],
+  network: 31337,
+  signer: new Wallet("privateKey"),
+  // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
+  daoFactoryAddress: "0x1234...",
+  web3Providers: ["http://localhost:8545"],
 };
+
+// Instantiate
 const context = new Context(contextParams);
 
-const client = new ClientDaoERC20Voting(context);
-
-const daoCreationParams: ICreateDaoERC20Voting = {
-    daoConfig: {
-        name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
-        metadata: "0x1234",
-    },
-    tokenConfig: {
-        address: "0x0000000000000000000000000000000000000000",
-        name:
-            "TestToken" +
-            (Math.random() + 1)
-                .toString(36)
-                .substring(4)
-                .toUpperCase(),
-        symbol:
-            "TEST" +
-            (Math.random() + 1)
-                .toString(36)
-                .substring(4)
-                .toUpperCase(),
-    },
-    mintConfig: [
-        {
-            address: Wallet.createRandom().address,
-            balance: BigInt(Math.floor(Math.random() * 9999) + 1),
-        },
-        {
-            address: Wallet.createRandom().address,
-            balance: BigInt(Math.floor(Math.random() * 9999) + 1),
-        },
-    ],
-    votingConfig: {
-        minSupport: Math.floor(Math.random() * 100) + 1,
-        minParticipation: Math.floor(Math.random() * 100) + 1,
-        minDuration: Math.floor(Math.random() * 9999) + 1,
-    },
-    gsnForwarder: Wallet.createRandom().address,
-};
-
-const gasFeesEstimation = await client.estimate.create(daoCreationParams);
-console.log(gasFeesEstimation)
-// {
-//   average: 4670887392191186n, // Average gas fee estimation (reducing the max value by heuristic) 
-//   max: 7473419827505898n // Maximum gas fee estimation
-// }
-
-const newDaoAddress = await client.dao.create(daoCreationParams);
-console.log(newDaoAddress) // New DAO address
+// Update
+context.set({ network: 1 });
+context.set({ signer });
+context.setFull(contextParams);
+context.useWeb3Providers(["http://server:8545"], "mainnet");
 ```
 
-#### DAO Whitelist Voting
+### General purpose client
+
+The [Client](./src/client.ts) class allows to perform operations that apply to
+all DAO's, regardless of the plugins they use.
 
 ```ts
-// For local testing
-const contextParams: ContextParams = {
-    network: 31337,
-    signer: new Wallet("privateKey"),
-    daoFactoryAddress: "0x1234...", // Optional on networks like "rinkeby", "arbitrum-rinkeby" or "mumbai"
-    web3Providers: ["http://localhost:8545"],
-};
-const context = new Context(contextParams);
+import { Client } from "@aragon/sdk-client";
 
-const client = new ClientDaoWhitelistVoting(context);
-
-const daoCreationParams: ICreateDaoWhitelistVoting = {
-    daoConfig: {
-        name: "WhitelistVotingDAO_" + Math.floor(Math.random() * 9999) + 1,
-        metadata: "0x1234",
-    },
-    votingConfig: {
-        minSupport: Math.floor(Math.random() * 100) + 1,
-        minParticipation: Math.floor(Math.random() * 100) + 1,
-        minDuration: Math.floor(Math.random() * 9999) + 1,
-    },
-    whitelistVoters: [
-        Wallet.createRandom().address,
-        Wallet.createRandom().address,
-    ],
-    gsnForwarder: Wallet.createRandom().address,
-};
-
-const gasFeesEstimation = await client.estimate.create(daoCreationParams);
-// {
-//   average: 4670887392191186n, // Average gas fee estimation (reducing the max value by heuristic) 
-//   max: 7473419827505898n // Maximum gas fee estimation
-// }
-
-const newDaoAddress = await client.dao.create(daoCreationParams);
-console.log(newDaoAddress) // New DAO address
+const client = new Client(context);
 ```
 
-### Proposal Creation
-
-#### ERC20 Voting Proposal
+#### Creating a DAO
 
 ```ts
-// For local testing
-const contextParams: ContextParams = {
-    network: 31337,
-    signer: new Wallet("privateKey"),
-    daoFactoryAddress: "0x1234...", // Optional on networks like "rinkeby", "arbitrum-rinkeby" or "mumbai"
-    web3Providers: ["http://localhost:8545"],
-};
-const context = new Context(contextParams);
+import { DaoCreationSteps, ICreateParams } from "@aragon/sdk-client";
 
-const client = new ClientDaoERC20Voting(context);
-
-const proposalCreationParams: ICreateProposal = {
-    metadata: "0x1234", // IPFS CID
-    executeIfDecided: true,
-    creatorChoice: VoteOption.YEA,
+const creationParams: ICreateParams = {
+  daoConfig: {
+    name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+    metadata: "<ipfs-http-uri>",
+  },
+  votingConfig: {
+    minSupport: Math.floor(Math.random() * 100) + 1,
+    minParticipation: Math.floor(Math.random() * 100) + 1,
+    minDuration: Math.floor(Math.random() * 9999) + 1,
+  },
+  gsnForwarder: Wallet.createRandom().address,
 };
 
-const newProposalId = await client.dao.simpleVote.createProposal(
-    "votingAddress",
-    proposalCreationParams
-);
-console.log(newProposalId) // New proposal id
-```
+const estimatedGas = await client.estimation.create(creationParams);
+console.log(estimatedGas.average); // bigint
+console.log(estimatedGas.max); // bigint
 
-#### Whitelist Voting Proposal
-
-```ts
-// For local testing
-const contextParams: ContextParams = {
-    network: 31337,
-    signer: new Wallet("privateKey"),
-    daoFactoryAddress: "0x1234...", // Optional on networks like "rinkeby", "arbitrum-rinkeby" or "mumbai"
-    web3Providers: ["http://localhost:8545"],
-};
-const context = new Context(contextParams);
-
-const client = new ClientDaoWhitelistVoting(context);
-
-const proposalCreationParams: ICreateProposal = {
-    metadata: "0x1234",
-    executeIfDecided: true,
-    creatorChoice: VoteOption.YEA,
-};
-
-const newProposalId = await client.dao.whitelist.createProposal(
-    "votingAddress",
-    proposalCreationParams
-);
-console.log(newProposalId) // New proposal id
-```
-
-### Deposit to DAO
-
-#### Deposit native tokens to the DAO
-
-```ts
-const client = new ClientDaoERC20Voting(context);
-// or
-const client = new ClientDaoWhitelistVoting(context);
-
-const depositParams: IDeposit = {
-    daoAddress: newDaoAddress,
-    token: null,
-    amount: BigInt(10), // Ethers amount in Gwei
-    reference: "Reference of the deposit (reason)", // Optional
-};
-
-const gasFeesEstimation = await client.estimate.deposit(depositParams);
-// {
-//   average: 249901378296462n, // Average gas fee estimation (reducing the max value by heuristic) 
-//   max: 399842205274340n // Maximum gas fee estimation
-// }
-
-for await (const step of client.dao.deposit(depositParams)) {
-    switch (step.idx) {
-        case DaoDepositSteps.DEPOSITING:
-            console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-            break;
-        case DaoDepositSteps.DEPOSITED:
-            console.log(step.amount); // 10n
-            break;
+// Steps
+for await (const step of client.methods.create(creationParams)) {
+  try {
+    switch (step.key) {
+      case DaoCreationSteps.CREATING:
+        // Transaction waiting on the mempool
+        console.log(step.txHash);
+        break;
+      case DaoCreationSteps.DONE:
+        // DAO address
+        console.log(step.address);
+        break;
     }
+  } catch (err) {
+    // ...
+  }
 }
 ```
 
-#### Deposit ERC20 tokens to the DAO
+#### Depositing ETH to a DAO
+
+Handles the flow of depositing the native EVM token to an Aragon DAO.
 
 ```ts
-const client = new ClientDaoERC20Voting(context);
-// or
-const client = new ClientDaoWhitelistVoting(context);
+import { DaoDepositSteps, IDepositParams } from "@aragon/sdk-client";
 
-const depositParams: IDeposit = {
-    daoAddress: newDaoAddress,
-    token: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877", // Token Address
-    amount: BigInt(10), // ERC20 token units amount
-    reference: "Reference of the deposit (reason)", // Optional
+const client = new Client(context);
+
+const depositParams: IDepositParams = {
+  daoAddress: "0x1234...",
+  token: null, // or leave empty
+  amount: BigInt(1000), // Ether amount in wei
+  reference: "Your memo goes here", // Optional
 };
 
-const gasFeesEstimation = await client.estimate.deposit(depositParams);
-// {
-//   average: 249901378296462n, // Average gas fee estimation (reducing the max value by heuristic) 
-//   max: 399842205274340n // Maximum gas fee estimation
-// }
+const estimatedGas = await client.estimation.deposit(depositParams);
+console.log(estimatedGas.average); // bigint
+console.log(estimatedGas.max); // bigint
 
-for await (const step of client.dao.deposit(depositParams)) {
-    switch (step.idx) {
-        case DaoDepositSteps.CHECKED_ALLOWANCE:
-            console.log(step.allowance); // 0n
-            break;
-        case DaoDepositSteps.INCREASING_ALLOWANCE:
-            console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-            break;
-        case DaoDepositSteps.INCREASED_ALLOWANCE:
-            console.log(step.allowance); // 10n
-            break;
-        case DaoDepositSteps.DEPOSITING:
-            console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-            break;
-        case DaoDepositSteps.DEPOSITED:
-            console.log(step.amount); // 10n
-            break;
-    }
+for await (const step of client.methods.deposit(depositParams)) {
+  switch (step.idx) {
+    case DaoDepositSteps.DEPOSITING:
+      console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+      break;
+    case DaoDepositSteps.DONE:
+      console.log(step.amount); // 1000n
+      break;
+  }
 }
 ```
 
-### Actions helpers
+#### Depositing ERC20 tokens to a DAO
+
+Handles the flow of depositing ERC20 tokens to a DAO.
+
+- Similar to the example above
+- The `token` field is now required
+- Will attempt to increase the ERC20 allowance if not sufficient
+- More fintermediate steps are yielded
+
+```ts
+import { Client, DaoDepositSteps, IDepositParams } from "@aragon/sdk-client";
+
+const client = new Client(context);
+
+const depositParams: IDepositParams = {
+  daoAddress: "0x1234...",
+  token: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877", // Token contract address
+  amount: BigInt(1000), // Ether amount in wei
+  reference: "Your memo goes here", // Optional
+};
+
+const estimatedGas = await client.estimation.deposit(depositParams);
+console.log(estimatedGas.average); // bigint
+console.log(estimatedGas.max); // bigint
+
+for await (const step of client.methods.deposit(depositParams)) {
+  switch (step.idx) {
+    case DaoDepositSteps.CHECKED_ALLOWANCE:
+      console.log(step.allowance); // 0n
+      break;
+    case DaoDepositSteps.INCREASING_ALLOWANCE:
+      console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+      break;
+    case DaoDepositSteps.INCREASED_ALLOWANCE:
+      console.log(step.allowance); // 1000n
+      break;
+    case DaoDepositSteps.DEPOSITING:
+      console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+      break;
+    case DaoDepositSteps.DONE:
+      console.log(step.amount); // 1000n
+      break;
+  }
+}
+```
+
+---
+---
+
+#### TODO:
+
+Add methods for:
+
+- Reading DAO metadata
+- Reading DAO Dashboard info
+  - List of installed plugin ID's
+- Reading DAO finance
+  - Assets
+  - Current market value (?)
+
+(other)
+
+---
+---
+
+### ERC20 governance plugin client
+
+This is a `Client`-like class, tailored to suit the specific use cases of the
+built-in ERC20 voting DAO Plugin.
+
+Similarly to the above class, it provides high level methods that abstract the
+underlying network requests.
+
+#### Creating a DAO with an ERC20 plugin
+
+- TO DO
+
+#### Creating an ERC20 proposal
+
+```ts
+import {
+  ClientErc20,
+  DaoAction,
+  ICreateProposalParams,
+  VoteOption,
+} from "@aragon/sdk-client";
+
+const client = new ClientErc20(context);
+
+const actions: DaoAction[] = [
+  // See action builders below
+  { to: "0x1234...", value: BigInt(100), data: new Uint8Array([1, 2, 3, 4]) },
+];
+const proposalCreationParams: ICreateProposalParams = {
+  metadataUri: "<uri>", // Following the EIP-4824
+  actions,
+  // TODO: Clarify => block number or timestamp?
+  startDate: 1234,
+  endDate: 2345,
+  executeIfPassed: true,
+  creatorVote: VoteOption.YEA,
+};
+
+const estimatedGas = await client.estimation.createProposal(proposalCreationParams);
+console.log(estimatedGas.average); // bigint
+console.log(estimatedGas.max); // bigint
+
+for await (
+  const step of client.methods.createProposal(proposalCreationParams)
+) {
+  switch (step.idx) {
+    case DaoDepositSteps.CREATING:
+      console.log(step.txHash); // 0xb1c14a49...
+      break;
+    case DaoDepositSteps.DONE:
+      console.log(step.proposalId); // 0x1234...
+      break;
+  }
+}
+```
+
+#### Voting on an ERC20 proposal
+
+- TO DO
+
+### Multisig governance plugin client
+
+#### Creating a DAO with a multisig plugin
+
+- TO DO
+
+#### Creating a multisig proposal
+
+- TO DO
+
+#### Voting on a multisig proposal
+
+- TO DO
+
+
+### Action encoders
+
+Proposals will eventually need to execute some action on behalf of the DAO, which needs to be encoded in a low level format. 
+
+The helpers above help encoding the most typical DAO operations.
 
 #### Withdrawals
 
 ```ts
-const client = new ClientDaoERC20Voting(context);
-// or
-const client = new ClientDaoWhitelistVoting(context);
+import { Client } from "@aragon/sdk-client";
 
-const withdrawParams: IWithdraw = {
-    to: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
-    amount: BigInt(10),
-    reference: "Test",
+const client = new Client(context);
+
+const withdrawParams: IWithdrawParams = {
+  recipientAddress: "0x1234...", // Recipient
+  amount: BigInt(10),
+  // tokenAddress: "0x2345...",  (required for sending ERC20 tokens)
+  reference: "Some withdrawal message",
 };
 
-const withdrawAction = client.actions.withdraw(
-    "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
-    BigInt(1),
-    withdrawParams
-);
-
-console.log(withdrawAction) // Encoded withdraw action
+const withdrawAction = client.encoding.withdrawAction(withdrawParams);
+console.log(withdrawAction);
 ```
 
 ## Testing
 
-To execute library tests just run
+To execute library tests just run:
 
 ```bash
 yarn test

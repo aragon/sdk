@@ -23,6 +23,7 @@ import {
   FactoryInitParams,
 } from "./internal/interfaces/common";
 import { Context } from "./context";
+import { strip0x } from "@aragon/sdk-common";
 
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
@@ -61,8 +62,8 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /** Computes the parameters to be given when creating the DAO, as the initialization for the plugin */
     init: (params: IErc20FactoryParams) => this._buildActionInit(params),
     /** Computes the action payload to pass upon proposal creation */
-    withdrawAction: (to: string, value: bigint, params: IWithdrawParams) =>
-      this._buildActionWithdraw(to, value, params),
+    withdrawAction: (params: IWithdrawParams) =>
+      this._buildActionWithdraw(params),
   };
 
   //// ESTIMATION HANDLERS
@@ -143,13 +144,11 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     throw new Error("Unimplemented");
   }
 
-  private _buildActionWithdraw(
-    to: string,
-    value: bigint,
-    params: IWithdrawParams,
-  ): DaoAction {
+  private _buildActionWithdraw(params: IWithdrawParams): DaoAction {
     const data = encodeWithdrawActionData(params);
-    return { to, value, data };
+
+    // TODO: CONFIRM THAT THE "to" field needs to contain the DAO address
+    return { to: AddressZero, value: BigInt(0), data };
   }
 
   //// PRIVATE METHOD GAS ESTIMATIONS
@@ -214,20 +213,22 @@ function unwrapProposalParams(
   ];
 }
 
-function encodeWithdrawActionData(params: IWithdrawParams): string {
+function encodeWithdrawActionData(params: IWithdrawParams): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
-  return daoInterface.encodeFunctionData(
-    "withdraw",
-    unwrapWithdrawParams(params),
-  );
+  const args = unwrapWithdrawParams(params);
+
+  const hexBytes = daoInterface.encodeFunctionData("withdraw", args);
+
+  // TODO: ENCODE HEX => UINT8Array in a BROWSER FRIENDLY way
+  return new Uint8Array(Buffer.from(strip0x(hexBytes), "hex"));
 }
 
 function unwrapWithdrawParams(
   params: IWithdrawParams,
 ): [string, string, BigNumber, string] {
   return [
-    params.token ?? AddressZero,
-    params.to,
+    params.tokenAddress ?? AddressZero,
+    params.recipientAddress,
     BigNumber.from(params.amount),
     params.reference ?? "",
   ];

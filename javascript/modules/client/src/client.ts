@@ -337,7 +337,7 @@ function unwrapDepositParams(
   return [
     params.daoAddress,
     BigNumber.from(params.amount),
-    params.token ?? AddressZero,
+    params.tokenAddress ?? AddressZero,
     params.reference ?? "",
   ];
 }
