@@ -1,4 +1,5 @@
-# @aragon/sdk-client
+Aragon JS SDK Client
+---
 
 @aragon/sdk-client provides easy access to the high level interactions to be
 made with an Aragon DAO. It consists of three different components:
@@ -9,7 +10,7 @@ made with an Aragon DAO. It consists of three different components:
 
 Contributors: See [development](#development) below
 
-## Installation
+# Installation
 
 Use [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/) to install
 @aragon/sdk-client.
@@ -19,9 +20,9 @@ npm install @aragon/sdk-client
 yarn add @aragon/sdk-client
 ```
 
-## Usage
+# Usage
 
-### Context
+## Context
 
 The [Context](./src/context.ts) class is an utility component that holds the
 configuration passed to any [Client](./src/client.ts) instance.
@@ -48,7 +49,7 @@ context.setFull(contextParams);
 context.useWeb3Providers(["http://server:8545"], "mainnet");
 ```
 
-### General purpose client
+## General purpose client
 
 The [Client](./src/client.ts) class allows to perform operations that apply to
 all DAO's, regardless of the plugins they use.
@@ -59,7 +60,7 @@ import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
 ```
 
-#### Creating a DAO
+### Creating a DAO
 
 ```ts
 import { DaoCreationSteps, ICreateParams } from "@aragon/sdk-client";
@@ -100,7 +101,7 @@ for await (const step of client.methods.create(creationParams)) {
 }
 ```
 
-#### Depositing ETH to a DAO
+### Depositing ETH to a DAO
 
 Handles the flow of depositing the native EVM token to an Aragon DAO.
 
@@ -131,7 +132,7 @@ for await (const step of client.methods.deposit(depositParams)) {
 }
 ```
 
-#### Depositing ERC20 tokens to a DAO
+### Depositing ERC20 tokens to a DAO
 
 Handles the flow of depositing ERC20 tokens to a DAO.
 
@@ -177,20 +178,20 @@ for await (const step of client.methods.deposit(depositParams)) {
 }
 ```
 
-#### Loading DAO details
+### Loading DAO details
 
 - __TODO__:  Name, metadata, installed plugin list
 
-#### Loading DAO activity
+### Loading DAO activity
 
 - __TODO__:  Transactions
 
-#### Loading DAO financial data
+### Loading DAO financial data
 
 - __TODO__:  Assets, valuation
 
 
-### ERC20 governance plugin client
+## ERC20 governance plugin client
 
 This is a `Client`-like class, tailored to suit the specific use cases of the
 built-in ERC20 voting DAO Plugin.
@@ -198,11 +199,11 @@ built-in ERC20 voting DAO Plugin.
 Similarly to the above class, it provides high level methods that abstract the
 underlying network requests.
 
-#### Creating a DAO with an ERC20 plugin
+### Creating a DAO with an ERC20 plugin
 
 - __TODO__
 
-#### Creating an ERC20 proposal
+### Creating an ERC20 proposal
 
 ```ts
 import {
@@ -246,48 +247,48 @@ for await (
 }
 ```
 
-#### Voting on an ERC20 proposal
+### Voting on an ERC20 proposal
 
 - __TODO__
 
-#### Loading the list of members (ERC20)
+### Loading the list of members (ERC20)
 
 - __TODO__
 
-#### Loading the list of proposals (ERC20)
+### Loading the list of proposals (ERC20)
 
 - __TODO__
 
-### Multisig governance plugin client
+## Multisig governance plugin client
 
-#### Creating a DAO with a multisig plugin
-
-- __TODO__
-
-#### Creating a multisig proposal
+### Creating a DAO with a multisig plugin
 
 - __TODO__
 
-#### Voting on a multisig proposal
+### Creating a multisig proposal
 
 - __TODO__
 
-#### Loading the list of members (multisig)
+### Voting on a multisig proposal
 
 - __TODO__
 
-#### Loading the list of proposals (multisig)
+### Loading the list of members (multisig)
+
+- __TODO__
+
+### Loading the list of proposals (multisig)
 
 - __TODO__
 
 
-### Action encoders
+## Action encoders
 
 Proposals will eventually need to execute some action on behalf of the DAO, which needs to be encoded in a low level format. 
 
 The helpers above help encoding the most typical DAO operations.
 
-#### Withdrawals
+### Withdrawals
 
 ```ts
 import { Client } from "@aragon/sdk-client";
@@ -305,11 +306,11 @@ const withdrawAction = client.encoding.withdrawAction(withdrawParams);
 console.log(withdrawAction);
 ```
 
-## Development
+# Development
 
 The building blocks are defined within the `src/internal` folder. The high level client wrappers are implemented in `src/client*.ts`
 
-### Low level networking
+## Low level networking
 
 See `ClientCore` ([source](./src/internal/core.ts)):
 - Abstract class implementing primitives for:
@@ -318,7 +319,7 @@ See `ClientCore` ([source](./src/internal/core.ts)):
     - GraphQL
 - Inherited by classes like `Client` and all plugin classes like `ClientErc20`.
 
-### Common interfaces, types, enum's
+## Common interfaces, types, enum's
 
 When updating a `ClientXXX` (plugin) class:
 - **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/plugins.ts`
@@ -329,11 +330,11 @@ When updating the `Client` class:
 When updating the `ClientCore` class:
 - **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/core.ts`
 
-### Developing a new Plugin client
+## Developing a new Plugin client
 
 Create a new class that `extends` from `ClientCore`, receives a `Context` on the `constructor` and follows the structure of [ClientErc20](./src/client-erc20.ts).
 
-## Testing
+# Testing
 
 To execute library tests just run:
 
