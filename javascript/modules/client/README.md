@@ -111,7 +111,6 @@ const client = new Client(context);
 
 const depositParams: IDepositParams = {
   daoAddress: "0x1234...",
-  token: null, // or leave empty
   amount: BigInt(1000), // Ether amount in wei
   reference: "Your memo goes here", // Optional
 };
@@ -137,7 +136,7 @@ for await (const step of client.methods.deposit(depositParams)) {
 Handles the flow of depositing ERC20 tokens to a DAO.
 
 - Similar to the example above
-- The `token` field is now required
+- The `tokenAddress` field is required
 - Will attempt to increase the ERC20 allowance if not sufficient
 - More fintermediate steps are yielded
 
@@ -148,7 +147,7 @@ const client = new Client(context);
 
 const depositParams: IDepositParams = {
   daoAddress: "0x1234...",
-  token: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877", // Token contract address
+  tokenAddress: "0x2345...", // Token contract address
   amount: BigInt(1000), // Ether amount in wei
   reference: "Your memo goes here", // Optional
 };
@@ -178,24 +177,18 @@ for await (const step of client.methods.deposit(depositParams)) {
 }
 ```
 
----
----
+#### Loading DAO details
 
-#### TODO:
+- __TODO__:  Name, metadata, installed plugin list
 
-Add methods for:
+#### Loading DAO activity
 
-- Reading DAO metadata
-- Reading DAO Dashboard info
-  - List of installed plugin ID's
-- Reading DAO finance
-  - Assets
-  - Current market value (?)
+- __TODO__:  Transactions
 
-(other)
+#### Loading DAO financial data
 
----
----
+- __TODO__:  Assets, valuation
+
 
 ### ERC20 governance plugin client
 
@@ -207,7 +200,7 @@ underlying network requests.
 
 #### Creating a DAO with an ERC20 plugin
 
-- TO DO
+- __TODO__
 
 #### Creating an ERC20 proposal
 
@@ -222,7 +215,7 @@ import {
 const client = new ClientErc20(context);
 
 const actions: DaoAction[] = [
-  // See action builders below
+  // See the "Action encoders" section below
   { to: "0x1234...", value: BigInt(100), data: new Uint8Array([1, 2, 3, 4]) },
 ];
 const proposalCreationParams: ICreateProposalParams = {
@@ -255,21 +248,37 @@ for await (
 
 #### Voting on an ERC20 proposal
 
-- TO DO
+- __TODO__
+
+#### Loading the list of members (ERC20)
+
+- __TODO__
+
+#### Loading the list of proposals (ERC20)
+
+- __TODO__
 
 ### Multisig governance plugin client
 
 #### Creating a DAO with a multisig plugin
 
-- TO DO
+- __TODO__
 
 #### Creating a multisig proposal
 
-- TO DO
+- __TODO__
 
 #### Voting on a multisig proposal
 
-- TO DO
+- __TODO__
+
+#### Loading the list of members (multisig)
+
+- __TODO__
+
+#### Loading the list of proposals (multisig)
+
+- __TODO__
 
 
 ### Action encoders
@@ -295,6 +304,34 @@ const withdrawParams: IWithdrawParams = {
 const withdrawAction = client.encoding.withdrawAction(withdrawParams);
 console.log(withdrawAction);
 ```
+
+## Development
+
+The building blocks are defined within the `src/internal` folder. The high level client wrappers are implemented in `src/client*.ts`
+
+### Low level networking
+
+See `ClientCore` ([source](./src/internal/core.ts)):
+- Abstract class implementing primitives for:
+    - Web3, contracts, signing
+    - IPFS
+    - GraphQL
+- Inherited by classes like `Client` and all plugin classes like `ClientErc20`.
+
+### Common interfaces, types, enum's
+
+When updating a `ClientXXX` (plugin) class:
+- **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/plugins.ts`
+
+When updating the `Client` class:
+- **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/client.ts`
+
+When updating the `ClientCore` class:
+- **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/core.ts`
+
+### Developing a new Plugin client
+
+Create a new class that `extends` from `ClientCore`, receives a `Context` on the `constructor` and follows the structure of [ClientErc20](./src/client-erc20.ts).
 
 ## Testing
 
