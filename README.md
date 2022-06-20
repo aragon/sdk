@@ -6,6 +6,16 @@ It currently provides support for JavaScript and TypeScript. [Learn more](./java
 
 ## Automatic publishing
 
+### With labels
+
+To automtically publish the new version on pull request merge add one or all of these labels:
+| Label Name | Package that gets published |
+| --- | --- |
+| client-publish | `javascript/modules/client/` |
+| common-publish | `javascript/modules/common/` |
+
+### With tags
+
 To publish a new version of a subpackage create a new git tag following this schema:  
 `VERSION-LANGUAGE-PACKAGE_FOLDER_NAME`  
 Example to publish a new version of the javascript client module: `0.0.1-javascript-client`.  
