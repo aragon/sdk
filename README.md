@@ -9,10 +9,10 @@ It currently provides support for JavaScript and TypeScript. [Learn more](./java
 ### With labels
 
 To automtically publish the new version on pull request merge add one or all of these labels:
-| Label Name | Package that gets published |
-| --- | --- |
-| client-publish | `javascript/modules/client/` |
-| common-publish | `javascript/modules/common/` |
+| Label Name | Package that gets published | NPM package name |
+| --- | --- | --- |
+| client-publish | `javascript/modules/client/` | `@aragon/sdk-client` |
+| common-publish | `javascript/modules/common/` | `@aragon/sdk-common` |
 
 ### With tags
 
