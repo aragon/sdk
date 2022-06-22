@@ -43,27 +43,11 @@ jobs:
         with:
           ref: 'develop'
           token: ${{ secrets.ARABOT_PAT }}
-      - name: apply version Bump
-        id: bump
+      - name: get version
+        id: version
         run: | 
-          # Needs to do it twice to frist remove the -alpha and than do the actual bump. -alpha gets added back later
-          yarn version --${{ matrix.bump }} --no-git-tag-version
-          yarn version --${{ matrix.bump }} --no-git-tag-version
           VERSION=$(cat package.json | jq -r .version)
-          yarn version --new-version "$VERSION-alpha" --no-git-tag-version
-          echo "::set-output name=version::$VERSION-alpha"
         working-directory: 'javascript/modules/${{ matrix.package }}'
-      - name: Commit new package version
-        id: commit
-        run: |
-          git fetch
-          git pull
-          git config --global user.name "Arabot-1"
-          git config --global user.email "arabot-1@users.noreply.github.com"
-          git add ./javascript/modules/${{ matrix.package }}/package.json
-          git commit -am "Updates version in package.json for ${{ matrix.package }}"
-          git push
-          echo "::set-output name=commitid::$(git rev-parse HEAD)"
       - name: create tag
         uses: actions/github-script@v5
         with:
@@ -72,6 +56,6 @@ jobs:
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `refs/tags/${{ steps.bump.outputs.version }}-javascript-${{ matrix.package }}`,
-              sha: "${{ steps.commit.outputs.commitid }}"
+              ref: `refs/tags/${{ steps.version.outputs.version }}-javascript-${{ matrix.package }}`,
+              sha: "${{ github.sha }}"
             })
