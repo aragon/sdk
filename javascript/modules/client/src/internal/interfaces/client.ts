@@ -8,7 +8,7 @@ export interface IClient extends IClientCore {
   methods: {
     /** Created a DAO with the given parameters and plugins */
     create: (params: ICreateParams) => AsyncGenerator<DaoCreationStepValue>;
-    /** Checks whether a role is granted by the curren DAO's ACL settings */
+    /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
       where: string,
       who: string,
@@ -17,6 +17,8 @@ export interface IClient extends IClientCore {
     ) => Promise<void>;
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
+    /** Retrieves metadata for DAO with given identifier*/
+    getDaoMetadata: (daoIdentifier: string) => Promise<DaoMetadata>;
   };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
@@ -74,7 +76,7 @@ export type DaoDepositStepValue =
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 
-// DAO Details
+// DAO DETAILS
 export type DaoResourceLink = { label: string; url: string };
 
 export type DaoToken = {

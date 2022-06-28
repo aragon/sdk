@@ -182,6 +182,8 @@ for await (const step of client.methods.deposit(depositParams)) {
 Handles retrieving DAO metadata using unique identifier.
 
 ```ts
+import { Client } from "@aragon/sdk-client";
+
 const client = new Client(context);
 const daoIdentifier = "0x1234..."; // unique identifier; dao name or address
 
@@ -190,7 +192,7 @@ console.log(metadata);
 
 /* 
 {
-   address: "0x1234....",
+   address: "0x1234...",
    avatar: "http..."
    createdAt: 1656411653742,
    description: "This dao...",
