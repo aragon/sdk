@@ -13,7 +13,7 @@ export interface IClient extends IClientCore {
       where: string,
       who: string,
       role: DaoRole,
-      data: Uint8Array,
+      data: Uint8Array
     ) => Promise<void>;
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
@@ -73,3 +73,27 @@ export type DaoDepositStepValue =
   | { key: DaoDepositSteps.INCREASED_ALLOWANCE; allowance: bigint }
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
+
+export type TokenBalance = {
+  token: {
+    id: string;
+    name: string;
+    symbol: string;
+    decimals: number;
+    price?: number;
+  };
+  balance: bigint;
+};
+
+/** The Dao transfer */
+export type DaoTransfer = {
+  amount: number;
+  createdAt: number;
+  dao: {
+    id: string;
+  };
+  token: TokenBalance["token"];
+  id: string;
+  reference: string;
+  transaction: string;
+};
