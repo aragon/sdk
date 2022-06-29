@@ -224,7 +224,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
     ];
 
-    return mockAddresses.filter(() => Math.random() > 0.4);
+    return Promise.resolve(mockAddresses.filter(() => Math.random() > 0.4));
   }
 }
 

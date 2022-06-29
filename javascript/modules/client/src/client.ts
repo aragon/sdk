@@ -289,6 +289,11 @@ export class Client extends ClientCore implements IClient {
       throw new Error("A DAO identifier is needed");
     }
 
+    // Generate DAO creation within the past year
+    const fromDate = new Date(
+      new Date().setFullYear(new Date().getFullYear() - 1)
+    ).getTime();
+
     const dummyDaoNames = [
       "Patito Dao",
       "One World Dao",
@@ -310,7 +315,9 @@ export class Client extends ClientCore implements IClient {
             name: daoIdentifier,
           }),
 
-      createdAt: Date.now(),
+      createdAt: new Date(
+        fromDate + Math.random() * (Date.now() - fromDate)
+      ).getTime(),
       description: `We are a community that loves trees and the planet. We track where forestation
        is increasing (or shrinking), fund people who are growing and protecting trees...`,
       links: [
