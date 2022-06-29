@@ -285,10 +285,14 @@ export class Client extends ClientCore implements IClient {
   private async _getDaoBalances(
     daoIdentifier: string
   ): Promise<TokenBalance[]> {
+    // TODO: Implement actual fetch logic using subgraph.
+    // Note: it would be nice if the client could be instantiated with dao identifier
+
     if (!daoIdentifier) {
       throw new Error("A DAO identifier is needed");
     }
 
+    // This is a temporary token list, needs to remove later
     const TokenList = [
       {
         id: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
@@ -320,9 +324,11 @@ export class Client extends ClientCore implements IClient {
       (token: TokenBalance["token"]) => ({
         id: `${daoIdentifier}_${token.id}`,
         token,
+        // generate a random balance amount between [0, 1000]
         balance: BigInt(
           (Math.floor(Math.random() * (1000 - 1 + 1) + 1) * 10) ** 18
         ),
+        // generate a random date in the past
         lastUpdated: Math.floor(
           new Date(
             +new Date() - Math.floor(Math.random() * 10000000000)
