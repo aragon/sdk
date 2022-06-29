@@ -329,11 +329,11 @@ export class Client extends ClientCore implements IClient {
       (token: TokenBalance["token"]) => ({
         id: `${daoIdentifier}_${token.id}`,
         token,
-        // generate a random balance amount between [0, 1000]
+        // Generate a random balance amount between [0, 1000]
         balance: BigInt(
           (Math.floor(Math.random() * (1000 - 1 + 1) + 1) * 10) ** 18
         ),
-        // generate a random date in the past
+        // Generate a random date in the past
         lastUpdated: Math.floor(
           new Date(
             +new Date() - Math.floor(Math.random() * 10000000000)
@@ -355,7 +355,7 @@ export class Client extends ClientCore implements IClient {
       throw new Error("A DAO identifier is needed");
     }
 
-    // This is a temporary token list, needs to remove later
+    // This is a temporary transfer list, needs to remove later
     const transfers = [
       {
         sender: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
@@ -387,11 +387,13 @@ export class Client extends ClientCore implements IClient {
         },
         token,
         sender: transfers[index].sender,
+        // Generate a random amount between [0, 10]
         amount: BigInt(
           (Math.floor(Math.random() * (10 - 1 + 1) + 1) * 10) ** 18
         ),
         reference: "",
         transaction: transfers[index].transaction,
+        // Generate a random date in the past
         createdAt: Math.floor(
           new Date(
             +new Date() - Math.floor(Math.random() * 10000000000)
@@ -400,6 +402,7 @@ export class Client extends ClientCore implements IClient {
       })
     );
 
+    // Withdraw data structure would be similar to deposit list
     const vaultWithdraws: DaoTransfer[] = [];
 
     return Promise.resolve({ vaultDeposits, vaultWithdraws });
