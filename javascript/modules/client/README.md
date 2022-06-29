@@ -1,5 +1,4 @@
-Aragon JS SDK Client
----
+## Aragon JS SDK Client
 
 @aragon/sdk-client provides easy access to the high level interactions to be
 made with an Aragon DAO. It consists of three different components:
@@ -180,16 +179,38 @@ for await (const step of client.methods.deposit(depositParams)) {
 
 ### Loading DAO details
 
-- __TODO__:  Name, metadata, installed plugin list
+- **TODO**: Name, metadata, installed plugin list
 
 ### Loading DAO activity
 
-- __TODO__:  Transactions
+- **TODO**: Transactions
 
 ### Loading DAO financial data
 
-- __TODO__:  Assets, valuation
+Handles retrieving DAO asset balances using unique identifier.
 
+```ts
+import { Client } from "@aragon/sdk-client";
+const client = new Client(context);
+const daoIdentifier = "0x1234..."; // unique identifier; dao name or address
+const metadata = await client.methods.getDaoBalances(daoIdentifier);
+console.log(metadata);
+/* 
+[{
+  "id": "0x1234...",
+  "token": {
+    "id": "0x000...",
+    "name": "Ethereum (Canonical)",
+    "symbol": "ETH",
+    "decimals": "18"
+  },
+  "dao": {
+    "id": "0x1234..."
+  },
+  "balance": "1100000000000000",
+  "lastUpdated": "1655983088"
+},...] */
+```
 
 ## ERC20 governance plugin client
 
@@ -201,7 +222,7 @@ underlying network requests.
 
 ### Creating a DAO with an ERC20 plugin
 
-- __TODO__
+- **TODO**
 
 ### Creating an ERC20 proposal
 
@@ -229,13 +250,15 @@ const proposalCreationParams: ICreateProposalParams = {
   creatorVote: VoteOption.YEA,
 };
 
-const estimatedGas = await client.estimation.createProposal(proposalCreationParams);
+const estimatedGas = await client.estimation.createProposal(
+  proposalCreationParams
+);
 console.log(estimatedGas.average); // bigint
 console.log(estimatedGas.max); // bigint
 
-for await (
-  const step of client.methods.createProposal(proposalCreationParams)
-) {
+for await (const step of client.methods.createProposal(
+  proposalCreationParams
+)) {
   switch (step.idx) {
     case DaoDepositSteps.CREATING:
       console.log(step.txHash); // 0xb1c14a49...
@@ -249,42 +272,41 @@ for await (
 
 ### Voting on an ERC20 proposal
 
-- __TODO__
+- **TODO**
 
 ### Loading the list of members (ERC20)
 
-- __TODO__
+- **TODO**
 
 ### Loading the list of proposals (ERC20)
 
-- __TODO__
+- **TODO**
 
 ## Multisig governance plugin client
 
 ### Creating a DAO with a multisig plugin
 
-- __TODO__
+- **TODO**
 
 ### Creating a multisig proposal
 
-- __TODO__
+- **TODO**
 
 ### Voting on a multisig proposal
 
-- __TODO__
+- **TODO**
 
 ### Loading the list of members (multisig)
 
-- __TODO__
+- **TODO**
 
 ### Loading the list of proposals (multisig)
 
-- __TODO__
-
+- **TODO**
 
 ## Action encoders
 
-Proposals will eventually need to execute some action on behalf of the DAO, which needs to be encoded in a low level format. 
+Proposals will eventually need to execute some action on behalf of the DAO, which needs to be encoded in a low level format.
 
 The helpers above help encoding the most typical DAO operations.
 
@@ -313,21 +335,25 @@ The building blocks are defined within the `src/internal` folder. The high level
 ## Low level networking
 
 See `ClientCore` ([source](./src/internal/core.ts)):
+
 - Abstract class implementing primitives for:
-    - Web3, contracts, signing
-    - IPFS
-    - GraphQL
+  - Web3, contracts, signing
+  - IPFS
+  - GraphQL
 - Inherited by classes like `Client` and all plugin classes like `ClientErc20`.
 
 ## Common interfaces, types, enum's
 
 When updating a `ClientXXX` (plugin) class:
+
 - **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/plugins.ts`
 
 When updating the `Client` class:
+
 - **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/client.ts`
 
 When updating the `ClientCore` class:
+
 - **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/core.ts`
 
 ## Developing a new Plugin client

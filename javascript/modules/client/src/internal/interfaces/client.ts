@@ -79,10 +79,10 @@ export type TokenBalance = {
     id: string;
     name: string;
     symbol: string;
-    decimals: number;
-    price?: number;
+    decimals: string;
   };
   balance: bigint;
+  lastUpdated: string;
 };
 
 /** The Dao transfer */
