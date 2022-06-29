@@ -212,6 +212,54 @@ console.log(metadata);
 },...] */
 ```
 
+Handles retrieving DAO transfer list using unique identifier.
+
+```ts
+import { Client } from "@aragon/sdk-client";
+const client = new Client(context);
+const daoIdentifier = "0x1234..."; // unique identifier; dao name or address
+const metadata = await client.methods.getDaoTransfers(daoIdentifier);
+console.log(metadata);
+/*
+{ 
+  "vaultDeposits": [{
+    "id": "0x1234...",
+    "dao": {
+      "id": "0x1234...",
+    },
+    "token": {
+      "id": "0x000...",
+      "name": "Ethereum (Canonical)",
+      "symbol": "ETH",
+      "decimals": "18"
+    },
+    "sender":"0x1234...",
+    "amount": "1000000000000000",
+    "reference": "",
+    "transaction": "0x1234...",
+    "createdAt": "1655983088"
+  },...],
+  "vaultWithdraws": [{
+    "id": "0x1234...",
+    "dao": {
+      "id": "0x1234...",
+    },
+    "token": {
+      "id": "0x000...",
+      "name": "Ethereum (Canonical)",
+      "symbol": "ETH",
+      "decimals": "18"
+    },
+    "sender":"0x1234...",
+    "amount": "1000000000000000",
+    "reference": "",
+    "transaction": "0x1234...",
+    "createdAt": "1655983088"
+  },...]
+}
+*/
+```
+
 ## ERC20 governance plugin client
 
 This is a `Client`-like class, tailored to suit the specific use cases of the

@@ -87,8 +87,8 @@ export type TokenBalance = {
 
 /** The Dao transfer */
 export type DaoTransfer = {
-  amount: number;
-  createdAt: number;
+  amount: bigint;
+  createdAt: string;
   dao: {
     id: string;
   };
@@ -97,3 +97,7 @@ export type DaoTransfer = {
   reference: string;
   transaction: string;
 };
+export interface IDaoTransfers {
+  vaultDeposits: DaoTransfer[];
+  vaultWithdraws: DaoTransfer[];
+}

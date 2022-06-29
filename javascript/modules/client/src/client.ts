@@ -5,6 +5,7 @@ import {
   DaoDepositStepValue,
   DaoTransfer,
   TokenBalance,
+  IDaoTransfers,
   IClient,
   ICreateParams,
   IDepositParams,
@@ -25,6 +26,34 @@ import { strip0x } from "@aragon/sdk-common";
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
 
+// This is a temporary token list, needs to remove later
+const tokenList = [
+  {
+    id: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
+    name: "myjooje",
+    symbol: "JOJ",
+    decimals: "18",
+  },
+  {
+    id: "0x0000000000000000000000000000000000000000",
+    name: "Ethereum (Canonical)",
+    symbol: "ETH",
+    decimals: "18",
+  },
+  {
+    id: "0x35f7a3379b8d0613c3f753863edc85997d8d0968",
+    name: "Dummy Test Token",
+    symbol: "DTT",
+    decimals: "18",
+  },
+  {
+    id: "0xd783d0f9d8f5c956b808d641dea2038b050389d1",
+    name: "Test Token",
+    symbol: "TTK",
+    decimals: "18",
+  },
+];
+
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
  */
@@ -37,9 +66,13 @@ export class Client extends ClientCore implements IClient {
     create: (params: ICreateParams) => this._createDao(params),
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => this._deposit(params),
-    /** Checks whether a role is granted by the curren DAO's ACL settings */
+    /** Retrieves asset balances for DAO with given identifier*/
     getDaoBalances: (daoIdentifier: string) =>
       this._getDaoBalances(daoIdentifier),
+    /** Retrieves transfer list for DAO with given identifier*/
+    getDaoTransfers: (daoIdentifier: string) =>
+      this._getDaoTransfers(daoIdentifier),
+    /** Checks whether a role is granted by the curren DAO's ACL settings */
     hasPermission: (
       where: string,
       who: string,
@@ -292,35 +325,7 @@ export class Client extends ClientCore implements IClient {
       throw new Error("A DAO identifier is needed");
     }
 
-    // This is a temporary token list, needs to remove later
-    const TokenList = [
-      {
-        id: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
-        name: "myjooje",
-        symbol: "JOJ",
-        decimals: "18",
-      },
-      {
-        id: "0x0000000000000000000000000000000000000000",
-        name: "Ethereum (Canonical)",
-        symbol: "ETH",
-        decimals: "18",
-      },
-      {
-        id: "0x35f7a3379b8d0613c3f753863edc85997d8d0968",
-        name: "Dummy Test Token",
-        symbol: "DTT",
-        decimals: "18",
-      },
-      {
-        id: "0xd783d0f9d8f5c956b808d641dea2038b050389d1",
-        name: "Test Token",
-        symbol: "TTK",
-        decimals: "18",
-      },
-    ];
-
-    const TokenBalances: TokenBalance[] = TokenList.map(
+    const tokenBalances: TokenBalance[] = tokenList.map(
       (token: TokenBalance["token"]) => ({
         id: `${daoIdentifier}_${token.id}`,
         token,
@@ -337,7 +342,67 @@ export class Client extends ClientCore implements IClient {
       })
     );
 
-    return Promise.resolve(TokenBalances);
+    return Promise.resolve(tokenBalances);
+  }
+
+  private async _getDaoTransfers(
+    daoIdentifier: string
+  ): Promise<IDaoTransfers> {
+    // TODO: Implement actual fetch logic using subgraph.
+    // Note: it would be nice if the client could be instantiated with dao identifier
+
+    if (!daoIdentifier) {
+      throw new Error("A DAO identifier is needed");
+    }
+
+    // This is a temporary token list, needs to remove later
+    const transfers = [
+      {
+        sender: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
+        transaction:
+          "0x4c97c60f499dc69918b1b77ab7504eeacbd1e1a536e10471e12c184885dafc05",
+      },
+      {
+        sender: "0xb1dc5d0881eea99a61d28be66fc491aae2a13d6a",
+        transaction:
+          "0x6b0b8b815d78b83a5a69a883244a3ca2bdc25832edee2bc45e7b6392ad57fd94",
+      },
+      {
+        sender: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
+        transaction:
+          "0x08525a68b342be200c220f5a22d30425a262c5603e63c210b7664f26b8418bcc",
+      },
+      {
+        sender: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
+        transaction:
+          "0x8269a60f658e33393d3f20d065cd5107d410d41c5dba9e5c467efcd3f98db015",
+      },
+    ];
+
+    const vaultDeposits: DaoTransfer[] = tokenList.map(
+      (token: TokenBalance["token"], index: number) => ({
+        id: `${daoIdentifier}_${token.id}`,
+        dao: {
+          id: daoIdentifier,
+        },
+        token,
+        sender: transfers[index].sender,
+        amount: BigInt(
+          (Math.floor(Math.random() * (10 - 1 + 1) + 1) * 10) ** 18
+        ),
+        reference: "",
+        transaction: transfers[index].transaction,
+        createdAt: Math.floor(
+          new Date(
+            +new Date() - Math.floor(Math.random() * 10000000000)
+          ).getTime() / 1000
+        ).toString(),
+      })
+    );
+
+    const vaultWithdraws: DaoTransfer[] = [];
+
+    return Promise.resolve({ vaultDeposits, vaultWithdraws });
   }
 }
 
