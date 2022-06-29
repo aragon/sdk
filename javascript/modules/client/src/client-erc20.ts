@@ -49,6 +49,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     //   this._setDaoConfig(address, config),
     // setVotingConfig: (address: string, config: VotingConfig) =>
     //   this._setVotingConfig(address, config),
+    getDaoMembers: (address: string) => this._getDaoMembers(address),
   };
 
   //// ACTION BUILDERS
@@ -109,22 +110,19 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /*
     const erc20VotingInstance = ERC20Voting__factory.connect(
       this._pluginAddress,
-      signer,
+      signer
     );
 
-    const tx = await erc20VotingInstance
-      .newVote(...unwrapProposalParams(params));
+    const tx = await erc20VotingInstance.newVote(
+      ...unwrapProposalParams(params)
+    );
 
     yield { key: ProposalCreationSteps.CREATING, txHash: tx.hash };
 
     const receipt = await tx.wait();
-    const startVoteEvent = receipt.events?.find(
-      (e) => e.event === "StartVote",
-    );
+    const startVoteEvent = receipt.events?.find(e => e.event === "StartVote");
     if (!startVoteEvent || startVoteEvent.args?.voteId) {
-      return Promise.reject(
-        new Error("Could not read the proposal ID"),
-      );
+      return Promise.reject(new Error("Could not read the proposal ID"));
     }
 
     yield {
@@ -184,7 +182,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /*
     const erc20VotingInstance = ERC20Voting__factory.connect(
       this._pluginAddress,
-      signer,
+      signer
     );
 
     return erc20VotingInstance.estimateGas.newVote(
@@ -211,21 +209,31 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   // private _estimateSetVotingConfig(daoAddress: string, config: VotingConfig) {
   //   return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
   // }
+
+  //// PRIVATE RETRIEVAL HANDLERS
+  private async _getDaoMembers(daoAddress: string) {
+    if (!daoAddress) {
+      throw new Error("A DAO address is needed");
+    }
+
+    const mockAddresses = [
+      "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+      "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
+      "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
+      "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
+      "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
+    ];
+
+    return mockAddresses.filter(() => Math.random() > 0.4);
+  }
 }
 
 //// PARAMETER MANAGERS
 
 // @ts-ignore TODO: Remove when contracts are available
 function unwrapProposalParams(
-  params: ICreateProposalParams,
-): [
-  string,
-  IDAO.ActionStruct[],
-  number,
-  number,
-  boolean,
-  number,
-] {
+  params: ICreateProposalParams
+): [string, IDAO.ActionStruct[], number, number, boolean, number] {
   return [
     params.metadataUri,
     params.actions ?? [],
@@ -249,7 +257,7 @@ function encodeWithdrawActionData(params: IWithdrawParams): Uint8Array {
 }
 
 function unwrapWithdrawParams(
-  params: IWithdrawParams,
+  params: IWithdrawParams
 ): [string, string, BigNumber, string] {
   return [
     params.tokenAddress ?? AddressZero,

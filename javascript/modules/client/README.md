@@ -275,7 +275,16 @@ for await (const step of client.methods.createProposal(
 
 ### Loading the list of members (ERC20)
 
-- **TODO**
+Retrieving all the members of an ERC20 DAO.
+
+```ts
+import { ClientErc20 } from "@aragon/sdk-client";
+
+const client = new ClientERC20(context);
+const members = await client.methods.getDaoMembers();
+
+console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
+```
 
 ### Loading the list of proposals (ERC20)
 

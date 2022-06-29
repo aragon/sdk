@@ -11,12 +11,13 @@ import { DaoAction, DaoConfig, FactoryInitParams, GasFeeEstimation } from "./com
 export interface IClientErc20 extends IClientCore {
   methods: {
     createProposal: (
-      params: ICreateProposalParams,
+      params: ICreateProposalParams
     ) => AsyncGenerator<ProposalCreationStepValue>;
     voteProposal: (proposalId: string, vote: VoteOptions) => Promise<void>;
     executeProposal: (proposalId: string) => Promise<void>;
     // setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
     // setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
+    getDaoMembers: (address: string) => Promise<string[]>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
@@ -39,7 +40,7 @@ export interface IClientErc20 extends IClientCore {
 export interface IClientMultisig extends IClientCore {
   methods: {
     createProposal: (
-      params: ICreateProposalParams,
+      params: ICreateProposalParams
     ) => AsyncGenerator<ProposalCreationStepValue>;
     voteProposal: (proposalId: string, vote: VoteOptions) => Promise<void>;
     executeProposal: (proposalId: string) => Promise<void>;
@@ -50,7 +51,11 @@ export interface IClientMultisig extends IClientCore {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     init: (params: IMultisigFactoryParams) => FactoryInitParams;
     /** Compones the action payload to pass upon proposal creation */
-    withdrawAction: (to: string, value: bigint, params: IWithdrawParams) => DaoAction;
+    withdrawAction: (
+      to: string,
+      value: bigint,
+      params: IWithdrawParams
+    ) => DaoAction;
   };
   estimation: {
     createProposal: (params: ICreateProposalParams) => Promise<bigint>;
