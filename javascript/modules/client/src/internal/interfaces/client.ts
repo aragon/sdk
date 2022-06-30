@@ -18,7 +18,7 @@ export interface IClient extends IClientCore {
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
     /** Retrieves metadata for DAO with given identifier*/
-    getDaoMetadata: (daoIdentifier: string) => Promise<DaoMetadata>;
+    getMetadata: (daoIdentifier: string) => Promise<DaoMetadata>;
   };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
