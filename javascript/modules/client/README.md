@@ -185,7 +185,7 @@ Handles retrieving DAO metadata using unique identifier.
 import { Client } from "@aragon/sdk-client";
 
 const client = new Client(context);
-const daoIdentifier = "0x1234..."; // unique identifier; dao name or address
+const daoIdentifier = "0x1234..."; // unique identifier; dao ENS domain or address
 
 const metadata = await client.methods.getDaoMetadata(daoIdentifier);
 console.log(metadata);
