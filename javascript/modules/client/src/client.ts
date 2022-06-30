@@ -71,6 +71,19 @@ export class Client extends ClientCore implements IClient {
 
     const registryAddress = await daoFactoryInstance.registry();
 
+    // TODO: Remove mock result
+    yield {
+      key: DaoCreationSteps.CREATING,
+      txHash: "0x1298376517236498176239851762938512359817623985761239486128937461",
+    };
+    yield {
+      key: DaoCreationSteps.DONE,
+      address: "0x6592568247592378465987126349817263958713",
+    };
+
+    // TODO: Uncomment when the new DAO factory is available
+
+    /**
     // TODO: Use the new factory method
     const tx = await daoFactoryInstance.createDao(
       ...unwrapCreateDaoParams(params),
@@ -92,6 +105,7 @@ export class Client extends ClientCore implements IClient {
       key: DaoCreationSteps.DONE,
       address: "0x" + newDaoAddress.slice(newDaoAddress.length - 40),
     };
+     */
   }
 
   private async *_deposit(
@@ -272,8 +286,9 @@ export class Client extends ClientCore implements IClient {
 
     // TODO: ESTIMATE INCREASED ALLOWANCE AS WELL
 
-    const [daoAddress, amount, tokenAddress, reference] =
-      unwrapDepositParams(params);
+    const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
+      params,
+    );
 
     const daoInstance = DAO__factory.connect(daoAddress, signer);
 
@@ -313,9 +328,9 @@ function unwrapCreateDaoParams(
     params.daoConfig,
     {
       // TODO: Adapt the DAO creation parameters
-      participationRequiredPct: BigInt(params.votingConfig.minParticipation),
-      supportRequiredPct: BigInt(params.votingConfig.minSupport),
-      minDuration: BigInt(params.votingConfig.minDuration),
+      participationRequiredPct: BigInt(10), // BigInt(params.votingConfig.minParticipation),
+      supportRequiredPct: BigInt(50), // BigInt(params.votingConfig.minSupport),
+      minDuration: BigInt(50) // BigInt(params.votingConfig.minDuration),
     },
     // {
     //   addr: params.tokenConfig.address,

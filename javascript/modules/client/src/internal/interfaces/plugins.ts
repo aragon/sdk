@@ -1,7 +1,7 @@
 // This file contains the definitions of the ERC20 and Multisig DAO clients
 
 import { IClientCore } from "./core";
-import { DaoAction, DaoConfig, FactoryInitParams } from "./common";
+import { DaoAction, DaoConfig, FactoryInitParams, GasFeeEstimation } from "./common";
 
 // NOTE: These 2 clients will eventually be moved to their own package
 
@@ -25,11 +25,11 @@ export interface IClientErc20 extends IClientCore {
     withdrawAction: (params: IWithdrawParams) => DaoAction;
   };
   estimation: {
-    createProposal: (params: ICreateProposalParams) => Promise<bigint>;
-    voteProposal: (proposalId: string, vote: VoteOptions) => Promise<bigint>;
-    executeProposal: (proposalId: string) => Promise<bigint>;
-    setDaoConfig: (address: string, config: DaoConfig) => Promise<bigint>;
-    setVotingConfig: (address: string, config: VotingConfig) => Promise<bigint>;
+    createProposal: (params: ICreateProposalParams) => Promise<GasFeeEstimation>;
+    voteProposal: (proposalId: string, vote: VoteOptions) => Promise<GasFeeEstimation>;
+    executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
+    setDaoConfig: (address: string, config: DaoConfig) => Promise<GasFeeEstimation>;
+    setVotingConfig: (address: string, config: VotingConfig) => Promise<GasFeeEstimation>;
   };
 }
 

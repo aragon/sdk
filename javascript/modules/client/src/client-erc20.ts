@@ -122,19 +122,19 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
   private _voteProposal(proposalId: string, vote: VoteOptions) {
     // TODO: Unimplemented
-    throw new Error("Unimplemented");
+    return Promise.reject(new Error("Unimplemented"));
   }
   private _executeProposal(proposalId: string) {
     // TODO: Unimplemented
-    throw new Error("Unimplemented");
+    return Promise.reject(new Error("Unimplemented"));
   }
   private _setDaoConfig(daoAddress: string, config: DaoConfig) {
     // TODO: Unimplemented
-    throw new Error("Unimplemented");
+    return Promise.reject(new Error("Unimplemented"));
   }
   private _setVotingConfig(daoAddress: string, config: VotingConfig) {
     // TODO: Unimplemented
-    throw new Error("Unimplemented");
+    return Promise.reject(new Error("Unimplemented"));
   }
 
   //// PRIVATE ACTION BUILDER HANDLERS
@@ -175,19 +175,19 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
   private _estimateVoteProposal(proposalId: string, vote: VoteOptions) {
     // TODO: Unimplemented
-    return Promise.resolve(BigInt(0));
+    return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
   }
   private _estimateExecuteProposal(proposalId: string) {
     // TODO: Unimplemented
-    return Promise.resolve(BigInt(0));
+    return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
   }
   private _estimateSetDaoConfig(daoAddress: string, config: DaoConfig) {
     // TODO: Unimplemented
-    return Promise.resolve(BigInt(0));
+    return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
   }
   private _estimateSetVotingConfig(daoAddress: string, config: VotingConfig) {
     // TODO: Unimplemented
-    return Promise.resolve(BigInt(0));
+    return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
   }
 }
 
