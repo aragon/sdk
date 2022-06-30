@@ -44,8 +44,8 @@ export class Client extends ClientCore implements IClient {
     deposit: (params: IDepositParams) => this._deposit(params),
 
     /** Retrieves metadata for DAO with given identifier*/
-    getDaoMetadata: (daoIdentifier: string) =>
-      this._getDaoMetadata(daoIdentifier),
+    getMetadata: (daoIdentifier: string) =>
+      this._getMetadata(daoIdentifier),
 
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
