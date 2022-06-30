@@ -193,7 +193,7 @@ console.log(metadata);
 /* 
 {
    address: "0x1234...",
-   avatar: "http..."
+   avatar: "http...",
    createdAt: 1656411653742,
    description: "This dao...",
    links: [{label: "Website", url: "http..."}];
