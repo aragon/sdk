@@ -280,7 +280,7 @@ export class Client extends ClientCore implements IClient {
 
   //// PRIVATE METHODS METADATA
 
-  private async _getDaoMetadata(daoIdentifier: string): Promise<DaoMetadata> {
+  private async _getMetadata(daoIdentifier: string): Promise<DaoMetadata> {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
     // thereby removing the need to pass in the identifier for all the data retrieval methods
