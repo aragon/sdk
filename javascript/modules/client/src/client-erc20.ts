@@ -49,7 +49,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     //   this._setDaoConfig(address, config),
     // setVotingConfig: (address: string, config: VotingConfig) =>
     //   this._setVotingConfig(address, config),
-    getDaoMembers: (address: string) => this._getDaoMembers(address),
+    getMembers: (daoAddressOrEns: string) => this._getMembers(daoAddressOrEns),
   };
 
   //// ACTION BUILDERS
@@ -211,9 +211,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   // }
 
   //// PRIVATE RETRIEVAL HANDLERS
-  private async _getDaoMembers(daoAddress: string) {
-    if (!daoAddress) {
-      throw new Error("A DAO address is needed");
+  private _getMembers(daoAddressOrEns: string) {
+    if (!daoAddressOrEns) {
+      throw new Error("Invalid DAO address or ENS");
     }
 
     const mockAddresses = [

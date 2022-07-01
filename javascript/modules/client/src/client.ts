@@ -22,7 +22,9 @@ import {
 } from "@ethersproject/contracts";
 import { ClientCore } from "./internal/core";
 import { DaoRole } from "./internal/interfaces/common";
-import { solidityPack, isAddress } from "ethers/lib/utils";
+import { isAddress } from "@ethersproject/address";
+import { pack } from "@ethersproject/solidity";
+
 import { strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/dao";
 import { Signer } from "@ethersproject/abstract-signer";
@@ -43,9 +45,9 @@ export class Client extends ClientCore implements IClient {
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => this._deposit(params),
 
-    /** Retrieves metadata for DAO with given identifier*/
-    getMetadata: (daoIdentifier: string) =>
-      this._getMetadata(daoIdentifier),
+    /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
+    getMetadata: (daoAddressOrEns: string) =>
+      this._getMetadata(daoAddressOrEns),
 
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
@@ -280,13 +282,11 @@ export class Client extends ClientCore implements IClient {
 
   //// PRIVATE METHODS METADATA
 
-  private async _getMetadata(daoIdentifier: string): Promise<DaoMetadata> {
+  private _getMetadata(daoAddressOrEns: string): Promise<DaoMetadata> {
     // TODO: Implement actual fetch logic using subgraph.
-    // Note: it would be nice if the client could be instantiated with dao identifier
-    // thereby removing the need to pass in the identifier for all the data retrieval methods
 
-    if (!daoIdentifier) {
-      throw new Error("A DAO identifier is needed");
+    if (!daoAddressOrEns) {
+      throw new Error("Invalid DAO address or ENS");
     }
 
     // Generate DAO creation within the past year
@@ -302,9 +302,9 @@ export class Client extends ClientCore implements IClient {
     ];
 
     return Promise.resolve({
-      ...(isAddress(daoIdentifier)
+      ...(isAddress(daoAddressOrEns)
         ? {
-            address: daoIdentifier,
+            address: daoAddressOrEns,
             name:
               dummyDaoNames[
                 Math.floor(Math.random() * dummyDaoNames.length - 1)
@@ -312,12 +312,10 @@ export class Client extends ClientCore implements IClient {
           }
         : {
             address: "0x663ac3c648548eb8ccd292b41a8ff829631c846d",
-            name: daoIdentifier,
+            name: daoAddressOrEns,
           }),
 
-      createdAt: new Date(
-        fromDate + Math.random() * (Date.now() - fromDate)
-      ).getTime(),
+      createdAt: new Date(fromDate + Math.random() * (Date.now() - fromDate)),
       description: `We are a community that loves trees and the planet. We track where forestation
        is increasing (or shrinking), fund people who are growing and protecting trees...`,
       links: [
@@ -330,13 +328,7 @@ export class Client extends ClientCore implements IClient {
           url: "https://google.com",
         },
       ],
-      packages: ["WhitelistPackage", "ERC20VotingPackage"],
-      token: {
-        address: "0x0000000000000000000000000000000000000000",
-        name: "Ethereum (Canonical)",
-        symbol: "ETH",
-        decimals: 18,
-      },
+      packages: ["0x123...", "0x456..."],
     });
   }
 }
@@ -352,10 +344,7 @@ function unwrapCreateDaoParams(
     "0x" +
     params.plugins
       .map(entry => {
-        const item = solidityPack(
-          ["uint256", "bytes[]"],
-          [entry.id, entry.data]
-        );
+        const item = pack(["uint256", "bytes[]"], [entry.id, entry.data]);
         return strip0x(item);
       })
       .join("");

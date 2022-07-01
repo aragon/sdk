@@ -22,7 +22,7 @@ export interface IClientErc20 extends IClientCore {
     executeProposal: (proposalId: string) => Promise<void>;
     // setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
     // setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
-    getDaoMembers: (address: string) => Promise<string[]>;
+    getMembers: (daoAddressOrEns: string) => Promise<string[]>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */

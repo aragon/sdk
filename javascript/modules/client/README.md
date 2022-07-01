@@ -1,4 +1,5 @@
-## Aragon JS SDK Client
+Aragon JS SDK Client
+---
 
 @aragon/sdk-client provides easy access to the high level interactions to be
 made with an Aragon DAO. It consists of three different components:
@@ -196,9 +197,9 @@ console.log(metadata);
    avatar: "http...",
    createdAt: 1656411653742,
    description: "This dao...",
-   links: [{label: "Website", url: "http..."}];
+   links: [{label: "Website", url: "http..."}],
    name: "Abc Dao",
-   packages: ["ERC20VotingPackage"];
+   packages: ["0x1245..."],
    token: {address: '0x123...', decimals: 18, name: "Test Token", symbol: "TKN"};
 } */
 ```
@@ -281,7 +282,7 @@ Retrieving all the members of an ERC20 DAO.
 import { ClientErc20 } from "@aragon/sdk-client";
 
 const client = new ClientERC20(context);
-const members = await client.methods.getDaoMembers();
+const members = await client.methods.getMembers();
 
 console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
 ```

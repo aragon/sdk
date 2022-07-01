@@ -17,8 +17,8 @@ export interface IClient extends IClientCore {
     ) => Promise<void>;
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
-    /** Retrieves metadata for DAO with given identifier*/
-    getMetadata: (daoIdentifier: string) => Promise<DaoMetadata>;
+    /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
+    getMetadata: (daoAddressOrEns: string) => Promise<DaoMetadata>;
   };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
@@ -79,20 +79,12 @@ export type DaoDepositStepValue =
 // DAO DETAILS
 export type DaoResourceLink = { label: string; url: string };
 
-export type DaoToken = {
-  address: string;
-  decimals: number;
-  name: string;
-  symbol: string;
-};
-
 export type DaoMetadata = {
   address: string;
   avatar?: string;
-  createdAt: number;
+  createdAt: Date;
   description: string;
   links?: DaoResourceLink[];
   name: string;
   packages: string[];
-  token: DaoToken;
 };
