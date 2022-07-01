@@ -195,12 +195,11 @@ console.log(metadata);
 {
    address: "0x1234...",
    avatar: "http...",
-   createdAt: 1656411653742,
+   createdAt: <Date>,
    description: "This dao...",
    links: [{label: "Website", url: "http..."}],
    name: "Abc Dao",
-   packages: ["0x1245..."],
-   token: {address: '0x123...', decimals: 18, name: "Test Token", symbol: "TKN"};
+   packages: ["0x1245...", "0x3456..."],
 } */
 ```
 
