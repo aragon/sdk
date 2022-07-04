@@ -29,25 +29,25 @@ export { ICreateParams, IDepositParams };
 // This is a temporary token list, needs to remove later
 const tokenList = [
   {
-    id: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
+    address: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
     name: "myjooje",
     symbol: "JOJ",
     decimals: "18",
   },
   {
-    id: "0x0000000000000000000000000000000000000000",
+    address: "0x0000000000000000000000000000000000000000",
     name: "Ethereum (Canonical)",
     symbol: "ETH",
     decimals: "18",
   },
   {
-    id: "0x35f7a3379b8d0613c3f753863edc85997d8d0968",
+    address: "0x35f7a3379b8d0613c3f753863edc85997d8d0968",
     name: "Dummy Test Token",
     symbol: "DTT",
     decimals: "18",
   },
   {
-    id: "0xd783d0f9d8f5c956b808d641dea2038b050389d1",
+    address: "0xd783d0f9d8f5c956b808d641dea2038b050389d1",
     name: "Test Token",
     symbol: "TTK",
     decimals: "18",
@@ -298,7 +298,7 @@ export class Client extends ClientCore implements IClient {
     // TODO: ESTIMATE INCREASED ALLOWANCE AS WELL
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params
+      params,
     );
 
     const daoInstance = DAO__factory.connect(daoAddress, signer);
@@ -328,7 +328,7 @@ export class Client extends ClientCore implements IClient {
 
     const tokenBalances: TokenBalance[] = tokenList.map(
       (token: TokenBalance["token"]) => ({
-        id: `${daoIdentifier}_${token.id}`,
+        id: `${daoIdentifier}_${token.address}`,
         token,
         // Generate a random balance amount between [0, 1000]
         balance: BigInt(
@@ -350,48 +350,48 @@ export class Client extends ClientCore implements IClient {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
 
-    if (!daoIdentifier) {
+    if (!daoAddressOrEns) {
       throw new Error("Invalid DAO address or ENS");
     }
 
     // This is a temporary transfer list, needs to remove later
     const transfers = [
       {
-        sender: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
+        from: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
         transaction:
           "0x4c97c60f499dc69918b1b77ab7504eeacbd1e1a536e10471e12c184885dafc05",
       },
       {
-        sender: "0xb1dc5d0881eea99a61d28be66fc491aae2a13d6a",
+        from: "0xb1dc5d0881eea99a61d28be66fc491aae2a13d6a",
         transaction:
           "0x6b0b8b815d78b83a5a69a883244a3ca2bdc25832edee2bc45e7b6392ad57fd94",
       },
       {
-        sender: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
+        from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
         transaction:
           "0x08525a68b342be200c220f5a22d30425a262c5603e63c210b7664f26b8418bcc",
       },
       {
-        sender: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
+        from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
         transaction:
           "0x8269a60f658e33393d3f20d065cd5107d410d41c5dba9e5c467efcd3f98db015",
       },
     ];
 
-    const vaultDeposits: DaoTransfer[] = tokenList.map(
+    const deposits: DaoTransfer[] = tokenList.map(
       (token: TokenBalance["token"], index: number) => ({
-        id: `${daoIdentifier}_${token.id}`,
+        id: `${daoAddressOrEns}_${token.address}`,
         dao: {
-          id: daoIdentifier,
+          id: daoAddressOrEns,
         },
         token,
-        sender: transfers[index].sender,
+        from: transfers[index].from,
         // Generate a random amount between [0, 10]
         amount: BigInt(
           (Math.floor(Math.random() * (10 - 1 + 1) + 1) * 10) ** 18
         ),
         reference: "",
-        transaction: transfers[index].transaction,
+        transaction: transfers[index].transactionId,
         // Generate a random date in the past
         createdAt: Math.floor(
           new Date(
@@ -402,7 +402,7 @@ export class Client extends ClientCore implements IClient {
     );
 
     // Withdraw data structure would be similar to deposit list
-    const vaultWithdraws: DaoTransfer[] = [];
+    const withdrawals: DaoTransfer[] = [];
 
     return Promise.resolve({ deposits, withdrawals });
   }

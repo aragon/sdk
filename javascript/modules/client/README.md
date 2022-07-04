@@ -208,8 +208,8 @@ console.log(metadata);
   "dao": {
     "id": "0x1234..."
   },
-  "balance": "1100000000000000",
-  "lastUpdated": "1655983088"
+  "balance": BigInt,
+  "lastUpdate": <Date>
 },...] */
 ```
 
@@ -235,7 +235,7 @@ console.log(transfers);
       "decimals": "18"
     },
     "from":"0x1234...",
-    "amount": "1234n",
+    "amount": 1000000000000000n,
     "reference": "",
     "transactionId": "0x1234...",
     "date": <Date>
@@ -252,10 +252,10 @@ console.log(transfers);
       "decimals": "18"
     },
     "from":"0x1234...",
-    "amount": BigInt,
+    "amount": 1000000000000000n,
     "reference": "",
     "transactionId": "0x1234...",
-    "createdAt": JS Date
+    "date": <Date>
   }, ...]
 }
 */
