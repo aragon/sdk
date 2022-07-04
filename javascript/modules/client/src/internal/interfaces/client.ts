@@ -8,10 +8,10 @@ export interface IClient extends IClientCore {
   methods: {
     /** Created a DAO with the given parameters and plugins */
     create: (params: ICreateParams) => AsyncGenerator<DaoCreationStepValue>;
-    /** Retrieves asset balances for DAO with given identifier*/
-    getDaoBalances: (daoIdentifier: string) => Promise<TokenBalance[]>;
-    /** Retrieves transfer list for DAO with given identifier*/
-    getDaoTransfers: (daoIdentifier: string) => Promise<IDaoTransfers>;
+    /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
+    getBalances: (daoAddressOrEns: string) => Promise<TokenBalance[]>;
+    /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
+    getTransfers: (daoAddressOrEns: string) => Promise<IDaoTransfers>;
     /** Checks whether a role is granted by the curren DAO's ACL settings */
     hasPermission: (
       where: string,
