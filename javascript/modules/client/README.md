@@ -188,12 +188,12 @@ for await (const step of client.methods.deposit(depositParams)) {
 
 ### Loading DAO financial data
 
-Handles retrieving DAO asset balances using unique identifier.
+Handles retrieving DAO asset balances using the DAO address or its ENS domain.
 
 ```ts
 import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
-const daoIdentifier = "0x1234..."; // unique identifier; dao name or address
+const daoIdentifier = "0x1234..."; // unique identifier; dao ENS domain or address
 const metadata = await client.methods.getBalances(daoIdentifier);
 console.log(metadata);
 /* 
@@ -213,50 +213,50 @@ console.log(metadata);
 },...] */
 ```
 
-Handles retrieving DAO transfer list using unique identifier.
+Retrieves the list of transfers made from and to a certain DAO.
 
 ```ts
 import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
-const daoIdentifier = "0x1234..."; // unique identifier; dao name or address
-const metadata = await client.methods.getDaoTransfers(daoIdentifier);
-console.log(metadata);
+const daoAddressOrEns = "0x1234...";
+const transfers = await client.methods.getDaoTransfers(daoIdentifier);
+console.log(transfers);
 /*
 { 
-  "vaultDeposits": [{
+  "deposits": [{
     "id": "0x1234...",
     "dao": {
       "id": "0x1234...",
     },
     "token": {
-      "id": "0x000...",
+      "address": null,
       "name": "Ethereum (Canonical)",
       "symbol": "ETH",
       "decimals": "18"
     },
-    "sender":"0x1234...",
-    "amount": "1000000000000000",
+    "from":"0x1234...",
+    "amount": "1234n",
     "reference": "",
-    "transaction": "0x1234...",
-    "createdAt": "1655983088"
+    "transactionId": "0x1234...",
+    "date": <Date>
   },...],
-  "vaultWithdraws": [{
+  "withdrawals": [{
     "id": "0x1234...",
     "dao": {
       "id": "0x1234...",
     },
     "token": {
-      "id": "0x000...",
+      "address": "0x1234...", // null for Ether or the native token
       "name": "Ethereum (Canonical)",
       "symbol": "ETH",
       "decimals": "18"
     },
-    "sender":"0x1234...",
-    "amount": "1000000000000000",
+    "from":"0x1234...",
+    "amount": BigInt,
     "reference": "",
-    "transaction": "0x1234...",
-    "createdAt": "1655983088"
-  },...]
+    "transactionId": "0x1234...",
+    "createdAt": JS Date
+  }, ...]
 }
 */
 ```
