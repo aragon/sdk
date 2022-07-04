@@ -102,6 +102,6 @@ export type DaoTransfer = {
   transaction: string;
 };
 export interface IDaoTransfers {
-  vaultDeposits: DaoTransfer[];
-  vaultWithdraws: DaoTransfer[];
+  deposits: DaoTransfer[];
+  withdrawals: DaoTransfer[];
 }

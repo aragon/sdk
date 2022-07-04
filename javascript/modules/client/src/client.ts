@@ -66,12 +66,12 @@ export class Client extends ClientCore implements IClient {
     create: (params: ICreateParams) => this._createDao(params),
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => this._deposit(params),
-    /** Retrieves asset balances for DAO with given identifier*/
-    getDaoBalances: (daoIdentifier: string) =>
-      this._getDaoBalances(daoIdentifier),
-    /** Retrieves transfer list for DAO with given identifier*/
-    getDaoTransfers: (daoIdentifier: string) =>
-      this._getDaoTransfers(daoIdentifier),
+    /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet */
+    getBalances: (daoAddressOrEns: string, tokenAddresses: string[] = []) =>
+      this._getBalances(daoAddressOrEns, tokenAddresses),
+    /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
+    getTransfers: (daoAddressOrEns: string, tokenAddresses: string[] = []) =>
+      this._getTransfers(daoAddressOrEns, tokenAddresses),
     /** Checks whether a role is granted by the curren DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -315,14 +315,15 @@ export class Client extends ClientCore implements IClient {
       });
   }
 
-  private async _getDaoBalances(
-    daoIdentifier: string
+  private _getBalances(
+    daoIdentifier: string,
+    tokenAddresses: string[]
   ): Promise<TokenBalance[]> {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
 
     if (!daoIdentifier) {
-      throw new Error("A DAO identifier is needed");
+      throw new Error("Invalid DAO address or ENS");
     }
 
     const tokenBalances: TokenBalance[] = tokenList.map(
@@ -345,14 +346,12 @@ export class Client extends ClientCore implements IClient {
     return Promise.resolve(tokenBalances);
   }
 
-  private async _getDaoTransfers(
-    daoIdentifier: string
-  ): Promise<IDaoTransfers> {
+  private async _getTransfers(daoAddressOrEns: string): Promise<IDaoTransfers> {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
 
     if (!daoIdentifier) {
-      throw new Error("A DAO identifier is needed");
+      throw new Error("Invalid DAO address or ENS");
     }
 
     // This is a temporary transfer list, needs to remove later
@@ -405,7 +404,7 @@ export class Client extends ClientCore implements IClient {
     // Withdraw data structure would be similar to deposit list
     const vaultWithdraws: DaoTransfer[] = [];
 
-    return Promise.resolve({ vaultDeposits, vaultWithdraws });
+    return Promise.resolve({ deposits, withdrawals });
   }
 }
 

@@ -1,4 +1,5 @@
-## Aragon JS SDK Client
+Aragon JS SDK Client
+---
 
 @aragon/sdk-client provides easy access to the high level interactions to be
 made with an Aragon DAO. It consists of three different components:
@@ -179,11 +180,11 @@ for await (const step of client.methods.deposit(depositParams)) {
 
 ### Loading DAO details
 
-- **TODO**: Name, metadata, installed plugin list
+- __TODO__: Name, metadata, installed plugin list
 
 ### Loading DAO activity
 
-- **TODO**: Transactions
+- __TODO__: Transactions
 
 ### Loading DAO financial data
 
@@ -193,7 +194,7 @@ Handles retrieving DAO asset balances using unique identifier.
 import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
 const daoIdentifier = "0x1234..."; // unique identifier; dao name or address
-const metadata = await client.methods.getDaoBalances(daoIdentifier);
+const metadata = await client.methods.getBalances(daoIdentifier);
 console.log(metadata);
 /* 
 [{
@@ -270,7 +271,7 @@ underlying network requests.
 
 ### Creating a DAO with an ERC20 plugin
 
-- **TODO**
+- __TODO__
 
 ### Creating an ERC20 proposal
 
@@ -320,37 +321,37 @@ for await (const step of client.methods.createProposal(
 
 ### Voting on an ERC20 proposal
 
-- **TODO**
+- __TODO__
 
 ### Loading the list of members (ERC20)
 
-- **TODO**
+- __TODO__
 
 ### Loading the list of proposals (ERC20)
 
-- **TODO**
+- __TODO__
 
 ## Multisig governance plugin client
 
 ### Creating a DAO with a multisig plugin
 
-- **TODO**
+- __TODO__
 
 ### Creating a multisig proposal
 
-- **TODO**
+- __TODO__
 
 ### Voting on a multisig proposal
 
-- **TODO**
+- __TODO__
 
 ### Loading the list of members (multisig)
 
-- **TODO**
+- __TODO__
 
 ### Loading the list of proposals (multisig)
 
-- **TODO**
+- __TODO__
 
 ## Action encoders
 
@@ -383,7 +384,6 @@ The building blocks are defined within the `src/internal` folder. The high level
 ## Low level networking
 
 See `ClientCore` ([source](./src/internal/core.ts)):
-
 - Abstract class implementing primitives for:
   - Web3, contracts, signing
   - IPFS
@@ -393,15 +393,12 @@ See `ClientCore` ([source](./src/internal/core.ts)):
 ## Common interfaces, types, enum's
 
 When updating a `ClientXXX` (plugin) class:
-
 - **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/plugins.ts`
 
 When updating the `Client` class:
-
 - **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/client.ts`
 
 When updating the `ClientCore` class:
-
 - **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/core.ts`
 
 ## Developing a new Plugin client
