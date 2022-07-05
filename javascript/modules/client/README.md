@@ -193,19 +193,18 @@ Handles retrieving DAO asset balances using the DAO address or its ENS domain.
 ```ts
 import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
-const daoIdentifier = "0x1234..."; // unique identifier; dao ENS domain or address
-const balances = await client.methods.getBalances(daoIdentifier);
+const daoAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
+const balances = await client.methods.getBalances(daoAddressOrEns);
 console.log(balances);
 /* 
 [{
-  "id": "0x1234...",
   "token": {
-    "id": "0x000...",
+    "address": "0x000...",
     "name": "Ethereum (Canonical)",
     "symbol": "ETH",
     "decimals": "18"
   },
-  "balance": BigInt,
+  "balance": 1000000000000000n,
   "lastUpdate": <Date>
 }, ...] */
 ```
@@ -216,12 +215,11 @@ Retrieves the list of transfers made from and to a certain DAO.
 import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
 const daoAddressOrEns = "0x1234...";
-const transfers = await client.methods.getDaoTransfers(daoIdentifier);
+const transfers = await client.methods.getDaoTransfers(daoAddressOrEns);
 console.log(transfers);
 /*
 { 
   "deposits": [{
-    "id": "0x1234...",
     "token": {
       "address": null,
       "name": "Ethereum (Canonical)",
@@ -235,14 +233,13 @@ console.log(transfers);
     "date": <Date>
   },...],
   "withdrawals": [{
-    "id": "0x1234...",
     "token": {
       "address": null, // null for Ether or the native token
       "name": "Ethereum (Canonical)",
       "symbol": "ETH",
       "decimals": "18"
     },
-    "from":"0x1234...",
+    "to":"0x1234...",
     "amount": 1000000000000000n,
     "reference": "",
     "transactionId": "0x1234...",

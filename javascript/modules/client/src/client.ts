@@ -70,8 +70,8 @@ export class Client extends ClientCore implements IClient {
     getBalances: (daoAddressOrEns: string, tokenAddresses: string[] = []) =>
       this._getBalances(daoAddressOrEns, tokenAddresses),
     /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
-    getTransfers: (daoAddressOrEns: string, tokenAddresses: string[] = []) =>
-      this._getTransfers(daoAddressOrEns, tokenAddresses),
+    getTransfers: (daoAddressOrEns: string) =>
+      this._getTransfers(daoAddressOrEns),
     /** Checks whether a role is granted by the curren DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -298,7 +298,7 @@ export class Client extends ClientCore implements IClient {
     // TODO: ESTIMATE INCREASED ALLOWANCE AS WELL
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params,
+      params
     );
 
     const daoInstance = DAO__factory.connect(daoAddress, signer);
@@ -379,7 +379,6 @@ export class Client extends ClientCore implements IClient {
 
     const deposits: DaoTransfer[] = tokenList.map(
       (token: TokenBalance["token"], index: number) => ({
-        address: `${token.address}`,
         token,
         from: transfers[index].from,
         // Generate a random amount between [0, 10]
@@ -387,9 +386,9 @@ export class Client extends ClientCore implements IClient {
           (Math.floor(Math.random() * (10 - 1 + 1) + 1) * 10) ** 18
         ),
         reference: "",
-        transaction: transfers[index].transactionId,
+        transactionId: transfers[index].transactionId,
         // Generate a random date in the past
-        createdAt: Math.floor(
+        date: Math.floor(
           new Date(
             +new Date() - Math.floor(Math.random() * 10000000000)
           ).getTime() / 1000
