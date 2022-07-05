@@ -328,14 +328,13 @@ export class Client extends ClientCore implements IClient {
 
     const tokenBalances: TokenBalance[] = tokenList.map(
       (token: TokenBalance["token"]) => ({
-        id: `${daoIdentifier}_${token.address}`,
         token,
         // Generate a random balance amount between [0, 1000]
         balance: BigInt(
           (Math.floor(Math.random() * (1000 - 1 + 1) + 1) * 10) ** 18
         ),
         // Generate a random date in the past
-        lastUpdated: Math.floor(
+        lastUpdate: Math.floor(
           new Date(
             +new Date() - Math.floor(Math.random() * 10000000000)
           ).getTime() / 1000
@@ -358,32 +357,29 @@ export class Client extends ClientCore implements IClient {
     const transfers = [
       {
         from: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
-        transaction:
+        transactionId:
           "0x4c97c60f499dc69918b1b77ab7504eeacbd1e1a536e10471e12c184885dafc05",
       },
       {
         from: "0xb1dc5d0881eea99a61d28be66fc491aae2a13d6a",
-        transaction:
+        transactionId:
           "0x6b0b8b815d78b83a5a69a883244a3ca2bdc25832edee2bc45e7b6392ad57fd94",
       },
       {
         from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
-        transaction:
+        transactionId:
           "0x08525a68b342be200c220f5a22d30425a262c5603e63c210b7664f26b8418bcc",
       },
       {
         from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
-        transaction:
+        transactionId:
           "0x8269a60f658e33393d3f20d065cd5107d410d41c5dba9e5c467efcd3f98db015",
       },
     ];
 
     const deposits: DaoTransfer[] = tokenList.map(
       (token: TokenBalance["token"], index: number) => ({
-        id: `${daoAddressOrEns}_${token.address}`,
-        dao: {
-          id: daoAddressOrEns,
-        },
+        address: `${token.address}`,
         token,
         from: transfers[index].from,
         // Generate a random amount between [0, 10]

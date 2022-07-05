@@ -225,9 +225,6 @@ console.log(transfers);
 { 
   "deposits": [{
     "id": "0x1234...",
-    "dao": {
-      "id": "0x1234...",
-    },
     "token": {
       "address": null,
       "name": "Ethereum (Canonical)",
@@ -242,9 +239,6 @@ console.log(transfers);
   },...],
   "withdrawals": [{
     "id": "0x1234...",
-    "dao": {
-      "id": "0x1234...",
-    },
     "token": {
       "address": "0x1234...", // null for Ether or the native token
       "name": "Ethereum (Canonical)",

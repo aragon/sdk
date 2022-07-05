@@ -80,24 +80,21 @@ export type DaoDepositStepValue =
 
 export type TokenBalance = {
   token: {
-    id: string;
+    address: string;
     name: string;
     symbol: string;
     decimals: string;
   };
   balance: bigint;
-  lastUpdated: string;
+  lastUpdate: string;
 };
 
 /** The Dao transfer */
 export type DaoTransfer = {
   amount: bigint;
   createdAt: string;
-  dao: {
-    id: string;
-  };
   token: TokenBalance["token"];
-  id: string;
+  address: string;
   reference: string;
   transaction: string;
 };
