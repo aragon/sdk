@@ -180,11 +180,11 @@ for await (const step of client.methods.deposit(depositParams)) {
 
 ### Loading DAO details
 
-- __TODO__: Name, metadata, installed plugin list
+- __TODO__:  Name, metadata, installed plugin list
 
 ### Loading DAO activity
 
-- __TODO__: Transactions
+- __TODO__:  Transactions
 
 ### Loading DAO financial data
 
@@ -194,8 +194,8 @@ Handles retrieving DAO asset balances using the DAO address or its ENS domain.
 import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
 const daoIdentifier = "0x1234..."; // unique identifier; dao ENS domain or address
-const metadata = await client.methods.getBalances(daoIdentifier);
-console.log(metadata);
+const balances = await client.methods.getBalances(daoIdentifier);
+console.log(balances);
 /* 
 [{
   "id": "0x1234...",
@@ -205,12 +205,9 @@ console.log(metadata);
     "symbol": "ETH",
     "decimals": "18"
   },
-  "dao": {
-    "id": "0x1234..."
-  },
   "balance": BigInt,
   "lastUpdate": <Date>
-},...] */
+}, ...] */
 ```
 
 Retrieves the list of transfers made from and to a certain DAO.
@@ -240,7 +237,7 @@ console.log(transfers);
   "withdrawals": [{
     "id": "0x1234...",
     "token": {
-      "address": "0x1234...", // null for Ether or the native token
+      "address": null, // null for Ether or the native token
       "name": "Ethereum (Canonical)",
       "symbol": "ETH",
       "decimals": "18"
