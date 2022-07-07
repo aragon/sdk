@@ -1,7 +1,7 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { Contract, ContractInterface } from "@ethersproject/contracts";
+import { Contract, ContractInterface, ContractReceipt, ContractTransaction } from "@ethersproject/contracts";
 import { IClientCore } from "./interfaces/client-core";
 import { Context } from "../context";
 import {
@@ -16,13 +16,13 @@ import {
 } from "./interfaces/dao";
 import {
   DAO__factory,
-  GovernanceERC20__factory,
   IDAO,
 } from "@aragon/core-contracts-ethers";
 // NOTE: Backing off ipfs-http-client until the UI framework supports it
 // import { Random } from "@aragon/sdk-common";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
+import { erc20ContractAbi } from "./abi/dao";
 
 // NOTE: Backing off ipfs-http-client until the UI framework supports it
 // import { IPFSHTTPClient } from "ipfs-http-client";
@@ -122,7 +122,7 @@ export abstract class ClientCore implements IClientCore {
       .then(
         (feeData) =>
           feeData.maxFeePerGas ??
-            Promise.reject(new Error("Cannot estimate gas")),
+            Promise.reject(new Error("Cannot estimate gas"))
       );
   }
 
@@ -133,7 +133,7 @@ export abstract class ClientCore implements IClientCore {
   get daoFactoryAddress() {
     return this._daoFactoryAddress;
   }
-  
+
   // NOTE: Backing off ipfs-http-client until the UI framework supports it
 
   // get ipfs() {
@@ -283,8 +283,9 @@ export abstract class ClientCore implements IClientCore {
 
     // Depositing an ERC20 token?
     if (tokenAddress !== AddressZero) {
-      const governanceERC20Instance = GovernanceERC20__factory.connect(
+      const governanceERC20Instance = new Contract(
         tokenAddress,
+        erc20ContractAbi,
         this.connectedSigner
       );
 
@@ -299,7 +300,7 @@ export abstract class ClientCore implements IClientCore {
       };
 
       if (currentAllowance.lt(amount)) {
-        const increaseAllowanceTx = await governanceERC20Instance.increaseAllowance(
+        const increaseAllowanceTx = await governanceERC20Instance.approve(
           daoAddress,
           BigNumber.from(amount)
         );
@@ -308,7 +309,7 @@ export abstract class ClientCore implements IClientCore {
           txHash: increaseAllowanceTx.hash,
         };
 
-        await increaseAllowanceTx.wait().then(cr => {
+        await increaseAllowanceTx.wait().then((cr: ContractReceipt) => {
           if (
             BigNumber.from(amount).gt(
               cr.events?.find(e => e?.event === "Approval")?.args?.value
@@ -330,13 +331,14 @@ export abstract class ClientCore implements IClientCore {
     const daoInstance = DAO__factory.connect(daoAddress, this.connectedSigner);
 
     const override = tokenAddress !== AddressZero ? {} : {
-      value: amount,
-    };
+            value: amount,
+          };
 
     if (tokenAddress !== AddressZero) {
-      const governanceERC20Instance = GovernanceERC20__factory.connect(
+      const governanceERC20Instance = new Contract(
         tokenAddress,
-        this.connectedSigner,
+        erc20ContractAbi,
+        this.connectedSigner
       );
 
       const currentAllowance = await governanceERC20Instance.allowance(
@@ -346,12 +348,12 @@ export abstract class ClientCore implements IClientCore {
 
       if (currentAllowance.lt(amount)) {
         await governanceERC20Instance
-          .increaseAllowance(daoAddress, amount.sub(currentAllowance))
-          .then((tx) => tx.wait())
-          .then((cr) => {
+          .approve(daoAddress, BigNumber.from(amount))
+          .then((tx: ContractTransaction) => tx.wait())
+          .then((cr: ContractReceipt) => {
             if (
               amount.gt(
-                cr.events?.find((e) => e?.event === "Approval")?.args?.value,
+                cr.events?.find(e => e?.event === "Approval")?.args?.value,
               )
             ) {
               throw new Error("Could not increase allowance");
@@ -417,12 +419,13 @@ export abstract class ClientCore implements IClientCore {
     if (!this.connectedSigner)
       throw new Error("A signer is needed for creating a DAO");
 
-    const governanceERC20Instance = GovernanceERC20__factory.connect(
+    const governanceERC20Instance = new Contract(
       tokenAddress,
+      erc20ContractAbi,
       this.connectedSigner
     );
 
-    const gasLimit = governanceERC20Instance.estimateGas.increaseAllowance(
+    const gasLimit = governanceERC20Instance.estimateGas.approve(
       daoAddress,
       BigNumber.from(amount)
     );
@@ -436,8 +439,9 @@ export abstract class ClientCore implements IClientCore {
     if (!this.connectedSigner)
       throw new Error("A signer is needed for creating a DAO");
 
-    const governanceERC20Instance = GovernanceERC20__factory.connect(
+    const governanceERC20Instance = new Contract(
       tokenAddress,
+      erc20ContractAbi,
       this.connectedSigner
     );
 

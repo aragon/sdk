@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Fixed
+- `estimateDeposit` and `deposit` methods fixed For standard ERC20 tokens.
+
 ## 0.0.18-alpha
 On 2022-06-16 12:44:48
 
