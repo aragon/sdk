@@ -125,7 +125,7 @@ export class Client extends ClientCore implements IClient {
     };
     const receipt = await tx.wait();
     const newDaoAddress = receipt.events?.find(
-      (e) => e.address === registryAddress
+      (e) => e.address === registryAddress,
     )?.topics[1];
     if (!newDaoAddress) {
       return Promise.reject(new Error("Could not create DAO"));
@@ -191,11 +191,11 @@ export class Client extends ClientCore implements IClient {
       if (currentAllowance.lt(amount)) {
         await governanceERC20Instance
           .increaseAllowance(daoAddress, amount.sub(currentAllowance))
-          .then(tx => tx.wait())
-          .then(cr => {
+          .then((tx) => tx.wait())
+          .then((cr) => {
             if (
               amount.gt(
-                cr.events?.find(e => e?.event === "Approval")?.args?.value,
+                cr.events?.find((e) => e?.event === "Approval")?.args?.value,
               )
             ) {
               throw new Error("Could not increase allowance");
@@ -259,10 +259,10 @@ export class Client extends ClientCore implements IClient {
 
     // TODO: Shouldn't we increase the REMAINING amount only?
     const increaseAllowanceTx = await governanceERC20Instance
-    .increaseAllowance(
-      daoAddress,
-      BigNumber.from(amount),
-    );
+      .increaseAllowance(
+        daoAddress,
+        BigNumber.from(amount),
+      );
 
     yield {
       key: DaoDepositSteps.INCREASING_ALLOWANCE,
@@ -270,13 +270,13 @@ export class Client extends ClientCore implements IClient {
     };
 
     await increaseAllowanceTx.wait()
-    .then((cr) => {
-      const value = cr.events?.find((e) => e?.event === "Approval")?.args
-        ?.value;
-      if (!value || BigNumber.from(amount).gt(value)) {
-        throw new Error("Could not increase allowance");
-      }
-    });
+      .then((cr) => {
+        const value = cr.events?.find((e) => e?.event === "Approval")?.args
+          ?.value;
+        if (!value || BigNumber.from(amount).gt(value)) {
+          throw new Error("Could not increase allowance");
+        }
+      });
 
     yield {
       key: DaoDepositSteps.INCREASED_ALLOWANCE,
