@@ -299,7 +299,7 @@ export abstract class ClientCore implements IClientCore {
       };
 
       if (currentAllowance.lt(amount)) {
-        const increaseAllowanceTx = await governanceERC20Instance.increaseAllowance(
+        const increaseAllowanceTx = await governanceERC20Instance.approve(
           daoAddress,
           BigNumber.from(amount)
         );
@@ -346,7 +346,7 @@ export abstract class ClientCore implements IClientCore {
 
       if (currentAllowance.lt(amount)) {
         await governanceERC20Instance
-          .increaseAllowance(daoAddress, amount.sub(currentAllowance))
+          .approve(daoAddress, amount.sub(currentAllowance))
           .then((tx) => tx.wait())
           .then((cr) => {
             if (
@@ -422,7 +422,7 @@ export abstract class ClientCore implements IClientCore {
       this.connectedSigner
     );
 
-    const gasLimit = governanceERC20Instance.estimateGas.increaseAllowance(
+    const gasLimit = governanceERC20Instance.estimateGas.approve(
       daoAddress,
       BigNumber.from(amount)
     );
