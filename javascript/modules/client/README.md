@@ -202,7 +202,7 @@ console.log(balances);
   "amount": 1000000000000000n,
   "lastUpdate": <Date>
 },{
-  type: "erc20"
+  "type": "erc20"
   "address": "0x123...",
   "name": "TestToken",
   "symbol": "TST",
@@ -223,10 +223,7 @@ console.log(transfers);
 /*
 { 
   "deposits": [{
-    "address": null,
-    "name": "Ethereum (Canonical)",
-    "symbol": "ETH",
-    "decimals": "18"
+    "type": "native"
     "from":"0x1234...",
     "amount": 1000000000000000n,
     "reference": "",
@@ -234,9 +231,10 @@ console.log(transfers);
     "date": <Date>
   },...],
   "withdrawals": [{
-    "address": null, // null for Ether or the native token
-    "name": "Ethereum (Canonical)",
-    "symbol": "ETH",
+    "type": "erc20"
+    "address": "0x123...",
+    "name": "TestToken",
+    "symbol": "TST",
     "decimals": "18"
     "to":"0x1234...",
     "amount": 1000000000000000n,
