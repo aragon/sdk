@@ -3,9 +3,9 @@ import {
   DaoCreationStepValue,
   DaoDepositSteps,
   DaoDepositStepValue,
-  DaoTransfer,
-  TokenBalance,
-  IDaoTransfers,
+  AssetTransfer,
+  AssetBalance,
+  IAssetTransfers,
   IClient,
   ICreateParams,
   IDepositParams,
@@ -318,7 +318,7 @@ export class Client extends ClientCore implements IClient {
   private _getBalances(
     daoIdentifier: string,
     tokenAddresses: string[]
-  ): Promise<TokenBalance[]> {
+  ): Promise<AssetBalance[]> {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
 
@@ -326,8 +326,8 @@ export class Client extends ClientCore implements IClient {
       throw new Error("Invalid DAO address or ENS");
     }
 
-    const tokenBalances: TokenBalance[] = tokenList.map(
-      (token: TokenBalance["token"]) => ({
+    const AssetBalances: AssetBalance[] = tokenList.map(
+      (token: AssetBalance["token"]) => ({
         token,
         // Generate a random balance amount between [0, 1000]
         balance: BigInt(
@@ -342,10 +342,10 @@ export class Client extends ClientCore implements IClient {
       })
     );
 
-    return Promise.resolve(tokenBalances);
+    return Promise.resolve(AssetBalances);
   }
 
-  private async _getTransfers(daoAddressOrEns: string): Promise<IDaoTransfers> {
+  private async _getTransfers(daoAddressOrEns: string): Promise<IAssetTransfers> {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
 
@@ -377,8 +377,8 @@ export class Client extends ClientCore implements IClient {
       },
     ];
 
-    const deposits: DaoTransfer[] = tokenList.map(
-      (token: TokenBalance["token"], index: number) => ({
+    const deposits: AssetTransfer[] = tokenList.map(
+      (token: AssetBalance["token"], index: number) => ({
         token,
         from: transfers[index].from,
         // Generate a random amount between [0, 10]
@@ -397,7 +397,7 @@ export class Client extends ClientCore implements IClient {
     );
 
     // Withdraw data structure would be similar to deposit list
-    const withdrawals: DaoTransfer[] = [];
+    const withdrawals: AssetTransfer[] = [];
 
     return Promise.resolve({ deposits, withdrawals });
   }

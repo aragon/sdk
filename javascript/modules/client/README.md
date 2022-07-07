@@ -215,7 +215,7 @@ Retrieves the list of transfers made from and to a certain DAO.
 import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
 const daoAddressOrEns = "0x1234...";
-const transfers = await client.methods.getDaoTransfers(daoAddressOrEns);
+const transfers = await client.methods.getTransfers(daoAddressOrEns);
 console.log(transfers);
 /*
 { 
