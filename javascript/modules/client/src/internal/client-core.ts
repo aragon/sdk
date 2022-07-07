@@ -288,10 +288,6 @@ export abstract class ClientCore implements IClientCore {
         erc20ContractAbi,
         this.connectedSigner
       );
-      // const governanceERC20Instance = GovernanceERC20__factory.connect(
-      //   tokenAddress,
-      //   this.connectedSigner
-      // );
 
       const currentAllowance = await this.connectedSigner
         .getAddress()
