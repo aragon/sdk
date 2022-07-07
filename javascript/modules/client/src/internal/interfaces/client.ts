@@ -84,15 +84,14 @@ export type AssetBalance = {
   name?: string;
   symbol?: string;
   decimals?: string;
-  balance?: bigint;
+  amount?: bigint;
   lastUpdate: Date;
 };
 
-export type AssetType =  Omit<AssetBalance, "balance" | "lastUpdate">;
+export type AssetType =  Omit<AssetBalance , "lastUpdate">;
 
 /** The Dao transfer */
 export type DepositAssetTransfer = AssetType & {
-  amount: bigint;
   date: Date;
   reference: string;
   transactionId: string;
@@ -101,7 +100,6 @@ export type DepositAssetTransfer = AssetType & {
 
 /** The Dao transfer */
 export type WithdrawAssetTransfer = AssetType & {
-  amount: bigint;
   date: Date;
   reference: string;
   transactionId: string;

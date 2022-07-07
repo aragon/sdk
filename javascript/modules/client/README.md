@@ -199,22 +199,14 @@ console.log(balances);
 /* 
 [{
   type: "native"
-  "token": {
-    "address": "0x000...",
-    "name": "Ethereum (Canonical)",
-    "symbol": "ETH",
-    "decimals": "18"
-  },
-  "balance": 1000000000000000n,
+  "amount": 1000000000000000n,
   "lastUpdate": <Date>
 },{
   type: "erc20"
-  "token": {
-    "address": "0x123...",
-    "name": "TestToken",
-    "symbol": "TST",
-    "decimals": "18"
-  },
+  "address": "0x123...",
+  "name": "TestToken",
+  "symbol": "TST",
+  "decimals": "18"
   "balance": 1000000000000000n,
   "lastUpdate": <Date>
 }, ...] */
@@ -231,12 +223,10 @@ console.log(transfers);
 /*
 { 
   "deposits": [{
-    "token": {
-      "address": null,
-      "name": "Ethereum (Canonical)",
-      "symbol": "ETH",
-      "decimals": "18"
-    },
+    "address": null,
+    "name": "Ethereum (Canonical)",
+    "symbol": "ETH",
+    "decimals": "18"
     "from":"0x1234...",
     "amount": 1000000000000000n,
     "reference": "",
@@ -244,12 +234,10 @@ console.log(transfers);
     "date": <Date>
   },...],
   "withdrawals": [{
-    "token": {
-      "address": null, // null for Ether or the native token
-      "name": "Ethereum (Canonical)",
-      "symbol": "ETH",
-      "decimals": "18"
-    },
+    "address": null, // null for Ether or the native token
+    "name": "Ethereum (Canonical)",
+    "symbol": "ETH",
+    "decimals": "18"
     "to":"0x1234...",
     "amount": 1000000000000000n,
     "reference": "",

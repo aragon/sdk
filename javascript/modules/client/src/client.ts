@@ -32,6 +32,7 @@ export { ICreateParams, IDepositParams };
 const assetList: AssetType[] = [
   {
     type: "native",
+    amount: BigInt(100 ** 18)
   },
   {
     type: "erc20",
@@ -39,6 +40,7 @@ const assetList: AssetType[] = [
     name: "myjooje",
     symbol: "JOJ",
     decimals: "18",
+    amount: BigInt(100 ** 18)
   },
   {
     type: "erc20",
@@ -46,6 +48,7 @@ const assetList: AssetType[] = [
     name: "Dummy Test Token",
     symbol: "DTT",
     decimals: "18",
+    amount: BigInt(100 ** 18)
   },
   {
     type: "erc20",
@@ -53,6 +56,7 @@ const assetList: AssetType[] = [
     name: "Test Token",
     symbol: "TTK",
     decimals: "18",
+    amount: BigInt(100 ** 18)
   },
 ];
 
@@ -331,10 +335,6 @@ export class Client extends ClientCore implements IClient {
     const AssetBalances: AssetBalance[] = assetList.map(
       (token) => ({
         ...token,
-        // Generate a random balance amount between [0, 1000]
-        balance: BigInt(
-          (Math.floor(Math.random() * (1000 - 1 + 1) + 1) * 10) ** 18
-        ),
         // Generate a random date in the past
         lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
       })
@@ -380,9 +380,6 @@ export class Client extends ClientCore implements IClient {
         ...token,
         from: transfers[index].from,
         // Generate a random amount between [0, 10]
-        amount: BigInt(
-          (Math.floor(Math.random() * (10 - 1 + 1) + 1) * 10) ** 18
-        ),
         reference: "",
         transactionId: transfers[index].transactionId,
         // Generate a random date in the past
