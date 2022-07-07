@@ -346,7 +346,7 @@ export abstract class ClientCore implements IClientCore {
 
       if (currentAllowance.lt(amount)) {
         await governanceERC20Instance
-          .approve(daoAddress, amount.sub(currentAllowance))
+          .approve(daoAddress, BigNumber.from(amount))
           .then((tx) => tx.wait())
           .then((cr) => {
             if (
