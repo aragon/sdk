@@ -286,15 +286,13 @@ const proposalCreationParams: ICreateProposalParams = {
   creatorVote: VoteOption.YEA,
 };
 
-const estimatedGas = await client.estimation.createProposal(
-  proposalCreationParams
-);
+const estimatedGas = await client.estimation.createProposal(proposalCreationParams);
 console.log(estimatedGas.average); // bigint
 console.log(estimatedGas.max); // bigint
 
-for await (const step of client.methods.createProposal(
-  proposalCreationParams
-)) {
+for await (
+  const step of client.methods.createProposal(proposalCreationParams)
+) {
   switch (step.idx) {
     case DaoDepositSteps.CREATING:
       console.log(step.txHash); // 0xb1c14a49...
@@ -342,7 +340,7 @@ for await (const step of client.methods.createProposal(
 
 ## Action encoders
 
-Proposals will eventually need to execute some action on behalf of the DAO, which needs to be encoded in a low level format.
+Proposals will eventually need to execute some action on behalf of the DAO, which needs to be encoded in a low level format. 
 
 The helpers above help encoding the most typical DAO operations.
 
@@ -372,9 +370,9 @@ The building blocks are defined within the `src/internal` folder. The high level
 
 See `ClientCore` ([source](./src/internal/core.ts)):
 - Abstract class implementing primitives for:
-  - Web3, contracts, signing
-  - IPFS
-  - GraphQL
+    - Web3, contracts, signing
+    - IPFS
+    - GraphQL
 - Inherited by classes like `Client` and all plugin classes like `ClientErc20`.
 
 ## Common interfaces, types, enum's
