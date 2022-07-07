@@ -17,7 +17,7 @@ export interface IClient extends IClientCore {
       where: string,
       who: string,
       role: DaoRole,
-      data: Uint8Array
+      data: Uint8Array,
     ) => Promise<void>;
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;

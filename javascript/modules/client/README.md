@@ -207,7 +207,7 @@ console.log(balances);
   "name": "TestToken",
   "symbol": "TST",
   "decimals": "18"
-  "balance": 1000000000000000n,
+  "amount": 1000000000000000n,
   "lastUpdate": <Date>
 }, ...] */
 ```
