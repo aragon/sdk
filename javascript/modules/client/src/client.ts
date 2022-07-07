@@ -3,12 +3,14 @@ import {
   DaoCreationStepValue,
   DaoDepositSteps,
   DaoDepositStepValue,
-  AssetTransfer,
+  DepositAssetTransfer,
+  WithdrawAssetTransfer,
   AssetBalance,
   IAssetTransfers,
   IClient,
   ICreateParams,
   IDepositParams,
+  AssetType,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -27,26 +29,26 @@ export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
 
 // This is a temporary token list, needs to remove later
-const tokenList = [
+const assetList: AssetType[] = [
   {
+    type: "native",
+  },
+  {
+    type: "erc20",
     address: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
     name: "myjooje",
     symbol: "JOJ",
     decimals: "18",
   },
   {
-    address: "0x0000000000000000000000000000000000000000",
-    name: "Ethereum (Canonical)",
-    symbol: "ETH",
-    decimals: "18",
-  },
-  {
+    type: "erc20",
     address: "0x35f7a3379b8d0613c3f753863edc85997d8d0968",
     name: "Dummy Test Token",
     symbol: "DTT",
     decimals: "18",
   },
   {
+    type: "erc20",
     address: "0xd783d0f9d8f5c956b808d641dea2038b050389d1",
     name: "Test Token",
     symbol: "TTK",
@@ -326,19 +328,15 @@ export class Client extends ClientCore implements IClient {
       throw new Error("Invalid DAO address or ENS");
     }
 
-    const AssetBalances: AssetBalance[] = tokenList.map(
-      (token: AssetBalance["token"]) => ({
-        token,
+    const AssetBalances: AssetBalance[] = assetList.map(
+      (token) => ({
+        ...token,
         // Generate a random balance amount between [0, 1000]
         balance: BigInt(
           (Math.floor(Math.random() * (1000 - 1 + 1) + 1) * 10) ** 18
         ),
         // Generate a random date in the past
-        lastUpdate: Math.floor(
-          new Date(
-            +new Date() - Math.floor(Math.random() * 10000000000)
-          ).getTime() / 1000
-        ).toString(),
+        lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
       })
     );
 
@@ -377,9 +375,9 @@ export class Client extends ClientCore implements IClient {
       },
     ];
 
-    const deposits: AssetTransfer[] = tokenList.map(
-      (token: AssetBalance["token"], index: number) => ({
-        token,
+    const deposits: DepositAssetTransfer[] = assetList.map(
+      (token, index: number) => ({
+        ...token,
         from: transfers[index].from,
         // Generate a random amount between [0, 10]
         amount: BigInt(
@@ -388,16 +386,12 @@ export class Client extends ClientCore implements IClient {
         reference: "",
         transactionId: transfers[index].transactionId,
         // Generate a random date in the past
-        date: Math.floor(
-          new Date(
-            +new Date() - Math.floor(Math.random() * 10000000000)
-          ).getTime() / 1000
-        ).toString(),
+        date: new Date(+new Date() - Math.floor(Math.random() * 10000000000))
       })
     );
 
     // Withdraw data structure would be similar to deposit list
-    const withdrawals: AssetTransfer[] = [];
+    const withdrawals: WithdrawAssetTransfer[] = [];
 
     return Promise.resolve({ deposits, withdrawals });
   }

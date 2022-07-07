@@ -198,10 +198,21 @@ const balances = await client.methods.getBalances(daoAddressOrEns);
 console.log(balances);
 /* 
 [{
+  type: "native"
   "token": {
     "address": "0x000...",
     "name": "Ethereum (Canonical)",
     "symbol": "ETH",
+    "decimals": "18"
+  },
+  "balance": 1000000000000000n,
+  "lastUpdate": <Date>
+},{
+  type: "erc20"
+  "token": {
+    "address": "0x123...",
+    "name": "TestToken",
+    "symbol": "TST",
     "decimals": "18"
   },
   "balance": 1000000000000000n,
