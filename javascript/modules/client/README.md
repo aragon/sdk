@@ -186,9 +186,9 @@ Handles retrieving DAO metadata using its address or ENS domain.
 import { Client } from "@aragon/sdk-client";
 
 const client = new Client(context);
-const daoIdentifier = "0x1234..."; // unique identifier; dao ENS domain or address
+const doaAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
 
-const metadata = await client.methods.getDaoMetadata(daoIdentifier);
+const metadata = await client.methods.getMetadata(daoIdentifier);
 console.log(metadata);
 
 /* 
@@ -281,7 +281,9 @@ Retrieving all the members of an ERC20 DAO.
 import { ClientErc20 } from "@aragon/sdk-client";
 
 const client = new ClientERC20(context);
-const members = await client.methods.getMembers();
+const doaAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
+
+const members = await client.methods.getMembers(daoAddressOrEns);
 
 console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
 ```
