@@ -180,7 +180,7 @@ for await (const step of client.methods.deposit(depositParams)) {
 
 ### Loading DAO details
 
-Handles retrieving DAO metadata using unique identifier.
+Handles retrieving DAO metadata using its address or ENS domain.
 
 ```ts
 import { Client } from "@aragon/sdk-client";
