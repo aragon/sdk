@@ -11,7 +11,7 @@ hasLabels = False
 for label in labels:
     splitted = label['name'].split('-')
     if len(splitted) == 2:
-        if splitted[1] == 'patch' or splitted[1] == 'minor' or splitted[1] == 'major':
+        if splitted[1] == 'release':
             matrix.append({
                 'package': splitted[0],
             })
