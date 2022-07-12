@@ -301,7 +301,7 @@ export class Client extends ClientCore implements IClient {
       "Yggdrasil Unite",
     ];
 
-    return Promise.resolve({
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() => ({
       ...(isAddress(daoAddressOrEns)
         ? {
             address: daoAddressOrEns,
@@ -329,7 +329,7 @@ export class Client extends ClientCore implements IClient {
         },
       ],
       packages: ["0x123...", "0x456..."],
-    });
+    }));
   }
 }
 

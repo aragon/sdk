@@ -1,4 +1,5 @@
 import {
+  IErc20VotingProposal,
   IClientErc20,
   ICreateProposalParams,
   IErc20FactoryParams,
@@ -16,6 +17,7 @@ import {
   DaoAction,
   // DaoConfig,
   FactoryInitParams,
+  ProposalStatus,
 } from "./internal/interfaces/common";
 import { ContextErc20 } from "./context-erc20";
 import { strip0x } from "@aragon/sdk-common";
@@ -49,7 +51,11 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     //   this._setDaoConfig(address, config),
     // setVotingConfig: (address: string, config: VotingConfig) =>
     //   this._setVotingConfig(address, config),
+    /** Retrieves the list of Ethereum addresses that can cast weighted votes on the given DAO's proposals */
     getMembers: (daoAddressOrEns: string) => this._getMembers(daoAddressOrEns),
+    /** Retrieves the list of proposals of the given DAO */
+    getProposals: (daoAddressOrEns: string) =>
+      this._getProposals(daoAddressOrEns),
   };
 
   //// ACTION BUILDERS
@@ -217,14 +223,27 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
 
     const mockAddresses = [
-      "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+      "0x1234...",
       "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
       "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
       "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
       "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
     ];
 
-    return Promise.resolve(mockAddresses.filter(() => Math.random() > 0.4));
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
+      mockAddresses.filter(() => Math.random() > 0.4)
+    );
+  }
+
+  private _getProposals(daoAddressOrEns: string) {
+    if (!daoAddressOrEns) {
+      throw new Error("Invalid DAO address or ENS");
+    }
+
+    setProposalStatus(MOCK_PROPOSALS);
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() => [
+      ...MOCK_PROPOSALS,
+    ]);
   }
 }
 
@@ -266,3 +285,79 @@ function unwrapWithdrawParams(
     params.reference ?? "",
   ];
 }
+
+/// HELPER FUNCTIONS TODO: move to utils?
+function setProposalStatus(proposals: IErc20VotingProposal[]) {
+  const now = new Date();
+
+  for (let proposal of proposals) {
+    if (proposal.startDate >= now) {
+      proposal.status = ProposalStatus.PENDING;
+    } else if (proposal.endDate >= now) {
+      proposal.status = ProposalStatus.ACTIVE;
+    } else if (proposal.executed) {
+      proposal.status = ProposalStatus.EXECUTED;
+    } else if (proposal.yea && proposal.nay && proposal.yea > proposal.nay) {
+      proposal.status = ProposalStatus.SUCCEEDED;
+    } else {
+      proposal.status = ProposalStatus.DEFEATED;
+    }
+  }
+}
+
+/// MOCK DATA FOR PROPOSALS
+const dateWithinThisYear = new Date(
+  new Date().setFullYear(new Date().getFullYear() - 1)
+).getTime();
+
+const startDate = new Date(
+  dateWithinThisYear + Math.random() * (Date.now() - dateWithinThisYear)
+);
+
+const MOCK_PROPOSALS = [
+  {
+    id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
+    daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
+    daoName: "DAO 1",
+    creator: "0x1234...",
+
+    startDate,
+    endDate: new Date(startDate.getTime() + 7200000),
+    createdAt: new Date(dateWithinThisYear),
+
+    title: "New Founding for Lorex Lab SubDao",
+    summary:
+      "As most community members know, Aragon has strived to deploy its products to more cost-efficient blockchain networks to facilitate interaction.",
+    proposal: "<h1>This is the super important proposal body<h1>",
+    resources: [{ url: "https://example.com", description: "Example" }],
+
+    executed: false,
+    status: ProposalStatus.PENDING,
+
+    voteId: "0",
+    token: {
+      address: "0x1234...",
+      name: "DAO Token",
+      symbol: "DAO",
+      decimals: 18,
+    },
+
+    yea: 3,
+    nay: 1,
+    abstain: 2,
+
+    open: true,
+    participationRequiredPct: 30,
+    supportRequiredPct: 52,
+    votingPower: 135,
+
+    voters: [
+      { id: "0x1334...", voterState: VoteOptions.YEA, weight: 1 },
+      { id: "0x1434...", voterState: VoteOptions.YEA, weight: 1 },
+      { id: "0x1534...", voterState: VoteOptions.NAY, weight: 1 },
+      { id: "0x1634...", voterState: VoteOptions.ABSTAIN, weight: 1 },
+      { id: "0x1734...", voterState: VoteOptions.YEA, weight: 1 },
+      { id: "0x1834...", voterState: VoteOptions.ABSTAIN, weight: 1 },
+    ],
+  },
+];
