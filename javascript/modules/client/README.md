@@ -188,10 +188,10 @@ import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
 const doaAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
 
-const metadata = await client.methods.getMetadata(daoIdentifier);
+const metadata = await client.methods.getMetadata(doaAddressOrEns);
 console.log(metadata);
 
-/* 
+/*
 {
    address: "0x1234...",
    avatar: "http...",
@@ -250,14 +250,16 @@ const proposalCreationParams: ICreateProposalParams = {
 };
 
 const estimatedGas = await client.estimation.createProposal(
-  proposalCreationParams
+  proposalCreationParams,
 );
 console.log(estimatedGas.average); // bigint
 console.log(estimatedGas.max); // bigint
 
-for await (const step of client.methods.createProposal(
-  proposalCreationParams
-)) {
+for await (
+  const step of client.methods.createProposal(
+    proposalCreationParams,
+  )
+) {
   switch (step.idx) {
     case DaoDepositSteps.CREATING:
       console.log(step.txHash); // 0xb1c14a49...
@@ -290,7 +292,60 @@ console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
 
 ### Loading the list of proposals (ERC20)
 
-- **TODO**
+Retrieving the proposals of an ERC20 DAO.
+
+```ts
+import { Client } from "@aragon/sdk-client";
+
+const client = new Client(context);
+const doaAddressOrEns = "0x1234...";
+
+const proposals = await client.methods.getProposals(doaAddressOrEns);
+console.log(proposals);
+
+/*
+ [{
+    id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
+    daoAddress: "0x1234...",
+    daoName: "DAO 1",
+    creator: "0x1234...",
+
+    token: {
+      address: "0x1234...",
+      name: "DAO Token",
+      symbol: "DAO",
+      decimals: 18,
+    },
+
+    title: "New Founding for Lorex Lab SubDao",
+    summary: "As most community members know, Aragon has strived to deploy its products to more...",
+    proposal: "<h1>This is the super <strong>important</strong> proposal body<h1>",
+    resources: [{ url: "https://example.com", description: "Amazing Link" }],
+
+    startDate: <Date>,
+    endDate: <Date>,
+    createdAt: <Date>,
+
+    voteId: "0",
+    participationRequiredPct: 30,
+    supportRequiredPct: 52,
+    votingPower: 135,
+
+    yea: 3,
+    nay: 1,
+    abstain: 2,
+
+    open: true,
+    executed: false,
+    status: ProposalStatus.PENDING,
+    
+    voters: [
+      { id: "0x1334...", voterState: VoteOptions.YEA, weight: 1 },
+      ...,
+      { id: "0x1834...", voterState: VoteOptions.ABSTAIN, weight: 1 },
+    ],
+  }] */
+```
 
 ## Multisig governance plugin client
 
@@ -316,7 +371,8 @@ console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
 
 ## Action encoders
 
-Proposals will eventually need to execute some action on behalf of the DAO, which needs to be encoded in a low level format.
+Proposals will eventually need to execute some action on behalf of the DAO,
+which needs to be encoded in a low level format.
 
 The helpers above help encoding the most typical DAO operations.
 
@@ -356,19 +412,23 @@ See `ClientCore` ([source](./src/internal/core.ts)):
 
 When updating a `ClientXXX` (plugin) class:
 
-- **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/plugins.ts`
+- **Update first** all affected enum's, types and interfaces in
+  `src/internal/interfaces/plugins.ts`
 
 When updating the `Client` class:
 
-- **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/client.ts`
+- **Update first** all affected enum's, types and interfaces in
+  `src/internal/interfaces/client.ts`
 
 When updating the `ClientCore` class:
 
-- **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/core.ts`
+- **Update first** all affected enum's, types and interfaces in
+  `src/internal/interfaces/core.ts`
 
 ## Developing a new Plugin client
 
-Create a new class that `extends` from `ClientCore`, receives a `Context` on the `constructor` and follows the structure of [ClientErc20](./src/client-erc20.ts).
+Create a new class that `extends` from `ClientCore`, receives a `Context` on the
+`constructor` and follows the structure of [ClientErc20](./src/client-erc20.ts).
 
 # Testing
 
