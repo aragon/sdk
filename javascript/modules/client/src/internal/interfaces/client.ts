@@ -78,34 +78,35 @@ export type DaoDepositStepValue =
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 
-export type AssetBalance = {
-  type: "native" | "erc20",
-  address?: string;
-  name?: string;
-  symbol?: string;
-  decimals?: string;
-  amount?: bigint;
-  lastUpdate: Date;
+type NativeTokenBalance = {
+  type: "native",
+  balance: bigint
+};
+type Erc20TokenBalance = {
+  type: "erc20",
+  address: string,
+  name: string,
+  symbol: string,
+  balance: bigint,
+  decimals: number
 };
 
-export type AssetType =  Omit<AssetBalance , "lastUpdate">;
+export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & { lastUpdate: Date };
 
 /** The Dao transfer */
-export type DepositAssetTransfer = AssetType & {
+type AssetTransfer =  Omit<AssetBalance , "balance"> & {
+  amount: bigint;
   date: Date;
   reference: string;
   transactionId: string;
+};
+export type AssetDeposit = AssetTransfer & {
   from: string;
 };
-
-/** The Dao transfer */
-export type WithdrawAssetTransfer = AssetType & {
-  date: Date;
-  reference: string;
-  transactionId: string;
+export type AssetWithdrawal = AssetTransfer & {
   to: string;
 };
 export interface IAssetTransfers {
-  deposits: DepositAssetTransfer[];
-  withdrawals: WithdrawAssetTransfer[];
+  deposits: AssetDeposit[];
+  withdrawals: AssetWithdrawal[];
 }

@@ -32,7 +32,7 @@ export { ICreateParams, IDepositParams };
 const assetList: AssetType[] = [
   {
     type: "native",
-    amount: BigInt(100 ** 18)
+    amount: BigInt("100000000000000000000")
   },
   {
     type: "erc20",
@@ -40,7 +40,7 @@ const assetList: AssetType[] = [
     name: "myjooje",
     symbol: "JOJ",
     decimals: "18",
-    amount: BigInt(100 ** 18)
+    amount: BigInt("100000000000000000000")
   },
   {
     type: "erc20",
@@ -48,7 +48,7 @@ const assetList: AssetType[] = [
     name: "Dummy Test Token",
     symbol: "DTT",
     decimals: "18",
-    amount: BigInt(100 ** 18)
+    amount: BigInt("100000000000000000000")
   },
   {
     type: "erc20",
@@ -56,7 +56,7 @@ const assetList: AssetType[] = [
     name: "Test Token",
     symbol: "TTK",
     decimals: "18",
-    amount: BigInt(100 ** 18)
+    amount: BigInt("100000000000000000000")
   },
 ];
 
