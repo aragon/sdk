@@ -1,6 +1,10 @@
-import { Wallet } from "@ethersproject/wallet";
-import { ClientDaoERC20Voting, Context, ContextParams } from "../../src";
+// @ts-ignore
+declare const describe, it, beforeAll, afterAll, expect, test;
 
+import { Wallet } from "@ethersproject/wallet";
+import { ContextParams } from "../../src";
+
+// @ts-ignore  TODO: Remove this comment
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
@@ -18,6 +22,7 @@ const web3endpoints = {
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
+  // @ts-ignore  TODO: Remove this comment
 const contextParams: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
@@ -37,7 +42,9 @@ const contextParams: ContextParams = {
 
 describe("Client Core", () => {
   describe("IPFS client", () => {
-    test.todo("Should reenable IPFS support and undo 'Backing off ipfs-http-client until the UI framework supports it'")
+    test.todo(
+      "Should reenable IPFS support and undo 'Backing off ipfs-http-client until the UI framework supports it'",
+    );
     // NOTE: Backing off ipfs-http-client until the UI framework supports it
     /*
     it("Should have an API token to test the proxy", () => {

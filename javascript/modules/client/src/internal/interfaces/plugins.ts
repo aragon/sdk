@@ -15,21 +15,21 @@ export interface IClientErc20 extends IClientCore {
     ) => AsyncGenerator<ProposalCreationStepValue>;
     voteProposal: (proposalId: string, vote: VoteOptions) => Promise<void>;
     executeProposal: (proposalId: string) => Promise<void>;
-    setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
-    setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
+    // setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
+    // setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     init: (params: IErc20FactoryParams) => FactoryInitParams;
-    /** Compones the action payload to pass upon proposal creation */
+    /** Computes the action payload to pass upon proposal creation */
     withdrawAction: (params: IWithdrawParams) => DaoAction;
   };
   estimation: {
     createProposal: (params: ICreateProposalParams) => Promise<GasFeeEstimation>;
     voteProposal: (proposalId: string, vote: VoteOptions) => Promise<GasFeeEstimation>;
     executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
-    setDaoConfig: (address: string, config: DaoConfig) => Promise<GasFeeEstimation>;
-    setVotingConfig: (address: string, config: VotingConfig) => Promise<GasFeeEstimation>;
+    // setDaoConfig: (address: string, config: DaoConfig) => Promise<GasFeeEstimation>;
+    // setVotingConfig: (address: string, config: VotingConfig) => Promise<GasFeeEstimation>;
   };
 }
 
@@ -87,10 +87,8 @@ export interface VotingConfig {
 export interface ICreateProposalParams {
   metadataUri: string;
   actions?: DaoAction[];
-  // TODO: Clarify => block number? timestamp?
-  startDate?: number;
-  // TODO: Clarify => block number? timestamp?
-  endDate?: number;
+  startDate?: Date;
+  endDate?: Date;
   executeIfPassed?: boolean;
   creatorVote?: VoteOptions;
 }

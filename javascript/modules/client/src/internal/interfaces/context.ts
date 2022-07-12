@@ -8,42 +8,46 @@ import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 
 // Context input parameters
 
-interface Web3ContextParams {
+type Web3ContextParams = {
   network: Networkish;
   signer: Signer;
   dao: string;
   daoFactoryAddress?: string;
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   gasFeeEstimationFactor?: number;
-}
-interface IpfsContextParams {
+};
+type IpfsContextParams = {
   // NOTE: Backing off ipfs-http-client until the UI framework supports it
   // ipfsNodes?: Options[];
-}
-interface GraphQLContextParams {
+};
+type GraphQLContextParams = {
   // subgraphURL: string;
-}
+};
 
-export interface ContextParams
-  extends Web3ContextParams, IpfsContextParams, GraphQLContextParams {}
+export type ContextParams =
+  & Web3ContextParams
+  & IpfsContextParams
+  & GraphQLContextParams;
 
 // Context state data
 
-interface Web3ContextState {
+type Web3ContextState = {
   network: Networkish;
   signer?: Signer;
   dao: string;
   daoFactoryAddress?: string;
   web3Providers: JsonRpcProvider[];
   gasFeeEstimationFactor: number;
-}
-interface IpfsContextState {
+};
+type IpfsContextState = {
   // NOTE: Backing off ipfs-http-client until the UI framework supports it
   // ipfs?: IPFSHTTPClient[];
-}
-interface GraphQLContextState {
+};
+type GraphQLContextState = {
   // subgraph?: GraphQLClient;
-}
+};
 
-export interface ContextState
-  extends Web3ContextState, IpfsContextState, GraphQLContextState {}
+export type ContextState =
+  & Web3ContextState
+  & IpfsContextState
+  & GraphQLContextState;

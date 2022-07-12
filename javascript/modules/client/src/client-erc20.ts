@@ -6,7 +6,7 @@ import {
   ProposalCreationSteps,
   ProposalCreationStepValue,
   VoteOptions,
-  VotingConfig,
+  // VotingConfig,
 } from "./internal/interfaces/plugins";
 import {
   DAO__factory,
@@ -19,10 +19,10 @@ import { AddressZero } from "@ethersproject/constants";
 import { ClientCore } from "./internal/core";
 import {
   DaoAction,
-  DaoConfig,
+  // DaoConfig,
   FactoryInitParams,
 } from "./internal/interfaces/common";
-import { Context } from "./context";
+import { ContextErc20 } from "./context-erc20";
 import { strip0x } from "@aragon/sdk-common";
 
 /**
@@ -31,13 +31,13 @@ import { strip0x } from "@aragon/sdk-common";
 export class ClientErc20 extends ClientCore implements IClientErc20 {
   private _pluginAddress: string;
 
-  constructor(pluginAddress: string, context: Context) {
+  constructor(context: ContextErc20) {
     super(context);
 
-    if (!pluginAddress) {
+    if (!context.pluginAddress) {
       throw new Error("An address for the plugin is required");
     }
-    this._pluginAddress = pluginAddress;
+    this._pluginAddress = context.pluginAddress;
   }
 
   //// HIGH LEVEL HANDLERS
@@ -49,10 +49,10 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     voteProposal: (proposalId: string, vote: VoteOptions) =>
       this._voteProposal(proposalId, vote),
     executeProposal: (proposalId: string) => this._executeProposal(proposalId),
-    setDaoConfig: (address: string, config: DaoConfig) =>
-      this._setDaoConfig(address, config),
-    setVotingConfig: (address: string, config: VotingConfig) =>
-      this._setVotingConfig(address, config),
+    // setDaoConfig: (address: string, config: DaoConfig) =>
+    //   this._setDaoConfig(address, config),
+    // setVotingConfig: (address: string, config: VotingConfig) =>
+    //   this._setVotingConfig(address, config),
   };
 
   //// ACTION BUILDERS
@@ -76,10 +76,10 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       this._estimateVoteProposal(proposalId, vote),
     executeProposal: (proposalId: string) =>
       this._estimateExecuteProposal(proposalId),
-    setDaoConfig: (daoAddress: string, config: DaoConfig) =>
-      this._estimateSetDaoConfig(daoAddress, config),
-    setVotingConfig: (daoAddress: string, config: VotingConfig) =>
-      this._estimateSetVotingConfig(daoAddress, config),
+    // setDaoConfig: (daoAddress: string, config: DaoConfig) =>
+    //   this._estimateSetDaoConfig(daoAddress, config),
+    // setVotingConfig: (daoAddress: string, config: VotingConfig) =>
+    //   this._estimateSetVotingConfig(daoAddress, config),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -120,25 +120,26 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     };
   }
 
+  // @ts-ignore  TODO: Remove this comment when implemented
   private _voteProposal(proposalId: string, vote: VoteOptions) {
     // TODO: Unimplemented
     return Promise.reject(new Error("Unimplemented"));
   }
+  // @ts-ignore  TODO: Remove this comment when implemented
   private _executeProposal(proposalId: string) {
     // TODO: Unimplemented
     return Promise.reject(new Error("Unimplemented"));
   }
-  private _setDaoConfig(daoAddress: string, config: DaoConfig) {
-    // TODO: Unimplemented
-    return Promise.reject(new Error("Unimplemented"));
-  }
-  private _setVotingConfig(daoAddress: string, config: VotingConfig) {
-    // TODO: Unimplemented
-    return Promise.reject(new Error("Unimplemented"));
-  }
+  // private _setDaoConfig(daoAddress: string, config: DaoConfig) {
+  //   return Promise.reject(new Error("Unimplemented"));
+  // }
+  // private _setVotingConfig(daoAddress: string, config: VotingConfig) {
+  //   return Promise.reject(new Error("Unimplemented"));
+  // }
 
   //// PRIVATE ACTION BUILDER HANDLERS
 
+  // @ts-ignore  TODO: Remove this comment when implemented
   private _buildActionInit(params: IErc20FactoryParams): FactoryInitParams {
     // TODO: Unimplemented
     throw new Error("Unimplemented");
@@ -173,22 +174,22 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     });
   }
 
+  // @ts-ignore  TODO: Remove this comment when implemented
   private _estimateVoteProposal(proposalId: string, vote: VoteOptions) {
     // TODO: Unimplemented
     return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
   }
+  // @ts-ignore  TODO: Remove this comment when implemented
   private _estimateExecuteProposal(proposalId: string) {
     // TODO: Unimplemented
     return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
   }
-  private _estimateSetDaoConfig(daoAddress: string, config: DaoConfig) {
-    // TODO: Unimplemented
-    return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
-  }
-  private _estimateSetVotingConfig(daoAddress: string, config: VotingConfig) {
-    // TODO: Unimplemented
-    return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
-  }
+  // private _estimateSetDaoConfig(daoAddress: string, config: DaoConfig) {
+  //   return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
+  // }
+  // private _estimateSetVotingConfig(daoAddress: string, config: VotingConfig) {
+  //   return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
+  // }
 }
 
 //// PARAMETER MANAGERS
@@ -206,8 +207,10 @@ function unwrapProposalParams(
   return [
     params.metadataUri,
     params.actions ?? [],
-    params.startDate ?? 0,
-    params.endDate ?? 0,
+    // TODO: Verify => seconds?
+    params.startDate ? Math.floor(params.startDate.getTime() / 1000) : 0,
+    // TODO: Verify => seconds?
+    params.endDate ? Math.floor(params.endDate.getTime() / 1000) : 0,
     params.executeIfPassed ?? false,
     params.creatorVote ?? VoteOptions.NONE,
   ];

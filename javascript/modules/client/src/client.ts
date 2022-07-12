@@ -55,6 +55,7 @@ export class Client extends ClientCore implements IClient {
   //// PRIVATE METHOD IMPLEMENTATIONS
 
   private async *_createDao(
+    // @ts-ignore  TODO: Remove this comment when used
     params: ICreateParams,
   ): AsyncGenerator<DaoCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
@@ -69,12 +70,14 @@ export class Client extends ClientCore implements IClient {
       signer,
     );
 
+  // @ts-ignore  TODO: Remove this comment when used
     const registryAddress = await daoFactoryInstance.registry();
 
     // TODO: Remove mock result
     yield {
       key: DaoCreationSteps.CREATING,
-      txHash: "0x1298376517236498176239851762938512359817623985761239486128937461",
+      txHash:
+        "0x1298376517236498176239851762938512359817623985761239486128937461",
     };
     yield {
       key: DaoCreationSteps.DONE,
@@ -256,10 +259,10 @@ export class Client extends ClientCore implements IClient {
   }
 
   private _hasPermission(
-    where: string,
-    who: string,
-    role: DaoRole,
-    data: Uint8Array,
+    _where: string,
+    _who: string,
+    _role: DaoRole,
+    _data: Uint8Array,
   ) {
     // TODO: Unimplemented
     return Promise.reject();
@@ -267,6 +270,7 @@ export class Client extends ClientCore implements IClient {
 
   //// PRIVATE METHOD GAS ESTIMATIONS
 
+  // @ts-ignore  TODO: Remove this comment
   _estimateCreation(params: ICreateParams) {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -308,8 +312,9 @@ export class Client extends ClientCore implements IClient {
   }
 }
 
-//// PRIVATE HELPERS
+// PRIVATE HELPERS
 
+// @ts-ignore  TODO: Remove this comment
 function unwrapCreateDaoParams(
   params: ICreateParams,
 ): [
@@ -330,7 +335,7 @@ function unwrapCreateDaoParams(
       // TODO: Adapt the DAO creation parameters
       participationRequiredPct: BigInt(10), // BigInt(params.votingConfig.minParticipation),
       supportRequiredPct: BigInt(50), // BigInt(params.votingConfig.minSupport),
-      minDuration: BigInt(50) // BigInt(params.votingConfig.minDuration),
+      minDuration: BigInt(50), // BigInt(params.votingConfig.minDuration),
     },
     // {
     //   addr: params.tokenConfig.address,
