@@ -6,6 +6,7 @@ import {
   DaoConfig,
   FactoryInitParams,
   GasFeeEstimation,
+  IProposal,
 } from "./common";
 
 // NOTE: These 2 clients will eventually be moved to their own package
@@ -23,6 +24,7 @@ export interface IClientErc20 extends IClientCore {
     // setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
     // setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
     getMembers: (daoAddressOrEns: string) => Promise<string[]>;
+    getProposals: (daoAddressOrEns: string) => Promise<IErc20VotingProposal[]>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
@@ -56,11 +58,14 @@ export interface IClientMultisig extends IClientCore {
     executeProposal: (proposalId: string) => Promise<void>;
     setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
     setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
+    getMembers: (daoAddressOrEns: string) => Promise<string[]>;
+    /* TODO: define proper return type */
+    getProposals: (daoAddressOrEns: string) => Promise<IProposal[]>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     init: (params: IMultisigFactoryParams) => FactoryInitParams;
-    /** Compones the action payload to pass upon proposal creation */
+    /** Compotes the action payload to pass upon proposal creation */
     withdrawAction: (
       to: string,
       value: bigint,
@@ -146,3 +151,28 @@ export enum ProposalCreationSteps {
 export type ProposalCreationStepValue =
   | { key: ProposalCreationSteps.CREATING; txHash: string }
   | { key: ProposalCreationSteps.DONE; proposalId: string };
+
+// PROPOSAL RETRIEVAL
+
+export interface IErc20VotingProposal extends IProposal {
+  voteId: string;
+  token: DaoToken;
+
+  yea?: number;
+  nay?: number;
+  abstain?: number;
+
+  open: boolean;
+  participationRequiredPct: number;
+  supportRequiredPct: number;
+  votingPower: number;
+
+  voters: { id: string; voterState: VoteOptions; weight: number }[];
+}
+
+export type DaoToken = {
+  address: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+};

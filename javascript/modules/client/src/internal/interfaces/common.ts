@@ -1,4 +1,4 @@
-// This file contains common types and enumerations
+// This file contains common types, interfaces, and enumerations
 
 export enum DaoRole {
   UPGRADE_ROLE = "UPGRADE_ROLE",
@@ -41,3 +41,40 @@ export type GasFeeEstimation = {
   average: bigint;
   max: bigint;
 };
+
+/**
+ * Contains the base structure of a proposal
+ */
+export interface IProposal {
+  id: string;
+  daoAddress: string;
+  daoName: string;
+  creator: string;
+
+  // date
+  endDate: Date;
+  startDate: Date;
+  createdAt: Date;
+
+  // metadata
+  title: string;
+  summary: string;
+  proposal: string;
+  resources: { url: string; description: string }[];
+
+  actions?: DaoAction[];
+  executed: boolean;
+  status: ProposalStatus;
+}
+
+/**
+ * Contains the states of a proposal. Note that on chain
+ * proposals cannot be in draft state
+ */
+export enum ProposalStatus {
+  ACTIVE = "Active",
+  PENDING = "Pending",
+  SUCCEEDED = "Succeeded",
+  EXECUTED = "Executed",
+  DEFEATED = "Defeated",
+}
