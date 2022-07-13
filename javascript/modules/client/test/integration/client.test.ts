@@ -93,7 +93,7 @@ describe("Client", () => {
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
 
       const web3Status = await client.web3.isUp();
-      expect(web3Status).toEqual(false);
+      expect(web3Status).toEqual(true);
     });
     it("Should create a failing client", async () => {
       contextParams.web3Providers = web3endpoints.failing;

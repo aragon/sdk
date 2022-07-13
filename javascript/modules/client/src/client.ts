@@ -24,6 +24,7 @@ import { DaoRole } from "./internal/interfaces/common";
 import { solidityPack } from "ethers/lib/utils";
 import { strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/dao";
+import { Signer } from "@ethersproject/abstract-signer";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -136,7 +137,12 @@ export class Client extends ClientCore implements IClient {
     if (tokenAddress && tokenAddress !== AddressZero) {
       // If the target is an ERC20 token, ensure that the amount can be transferred
       // Relay the yield steps to the caller as they are received
-      yield* this._ensureAllowance(daoAddress, amount.toBigInt(), tokenAddress);
+      yield* this._ensureAllowance(
+        daoAddress,
+        amount.toBigInt(),
+        tokenAddress,
+        signer,
+      );
     }
 
     // Doing the transfer
@@ -178,14 +184,8 @@ export class Client extends ClientCore implements IClient {
     daoAddress: string,
     amount: bigint,
     tokenAddress: string,
+    signer: Signer,
   ): AsyncGenerator<DaoDepositStepValue> {
-    const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
-    }
-
     const tokenInstance = new Contract(
       tokenAddress,
       erc20ContractAbi,
