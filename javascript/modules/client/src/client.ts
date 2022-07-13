@@ -11,14 +11,19 @@ import {
   DAO__factory,
   DAOFactory,
   DAOFactory__factory,
-  GovernanceERC20__factory,
 } from "@aragon/core-contracts-ethers";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
+import {
+  Contract,
+  ContractReceipt,
+  ContractTransaction,
+} from "@ethersproject/contracts";
 import { ClientCore } from "./internal/core";
 import { DaoRole } from "./internal/interfaces/common";
 import { solidityPack } from "ethers/lib/utils";
 import { strip0x } from "@aragon/sdk-common";
+import { erc20ContractAbi } from "./internal/abi/dao";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -128,19 +133,13 @@ export class Client extends ClientCore implements IClient {
       reference,
     ] = unwrapDepositParams(params);
 
-    // Ensure that if the target is an ERC20 token, it can be transferred
-    for await (
-      const step of this._ensureAllowance(
-        daoAddress,
-        amount.toBigInt(),
-        tokenAddress,
-      )
-    ) {
-      yield step;
+    if (tokenAddress && tokenAddress !== AddressZero) {
+      // If the target is an ERC20 token, ensure that the amount can be transferred
+      // Relay the yield steps to the caller as they are received
+      yield* this._ensureAllowance(daoAddress, amount.toBigInt(), tokenAddress);
     }
 
     // Doing the transfer
-
     const daoInstance = DAO__factory.connect(
       daoAddress,
       signer,
@@ -150,32 +149,6 @@ export class Client extends ClientCore implements IClient {
     if (tokenAddress === AddressZero) {
       // Ether
       override.value = amount;
-    } else {
-      // ERC20
-      const governanceERC20Instance = GovernanceERC20__factory.connect(
-        tokenAddress,
-        signer,
-      );
-
-      const currentAllowance = await governanceERC20Instance.allowance(
-        await signer.getAddress(),
-        daoAddress,
-      );
-
-      if (currentAllowance.lt(amount)) {
-        await governanceERC20Instance
-          .increaseAllowance(daoAddress, amount.sub(currentAllowance))
-          .then((tx) => tx.wait())
-          .then((cr) => {
-            if (
-              amount.gt(
-                cr.events?.find((e) => e?.event === "Approval")?.args?.value,
-              )
-            ) {
-              throw new Error("Could not increase allowance");
-            }
-          });
-      }
     }
 
     const depositTx = await daoInstance.deposit(
@@ -188,7 +161,7 @@ export class Client extends ClientCore implements IClient {
 
     await depositTx.wait().then((cr) => {
       if (!cr.events?.length) {
-        throw new Error("The deposit was not properly tracked");
+        throw new Error("The deposit was not properly registered");
       }
       const eventAmount = cr.events?.find((e) => e?.event === "Deposited")
         ?.args?.amount;
@@ -206,9 +179,6 @@ export class Client extends ClientCore implements IClient {
     amount: bigint,
     tokenAddress: string,
   ): AsyncGenerator<DaoDepositStepValue> {
-    // Don't need to do anything if the target is ether
-    if (tokenAddress === AddressZero) return;
-
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -216,16 +186,16 @@ export class Client extends ClientCore implements IClient {
       throw new Error("A web3 provider is needed");
     }
 
-    // FIXME: The factory should be the SafeERC20, not the plugin?
-    const governanceERC20Instance = GovernanceERC20__factory.connect(
+    const tokenInstance = new Contract(
       tokenAddress,
+      erc20ContractAbi,
       signer,
     );
 
-    const currentAllowance = await signer.getAddress()
-      .then((address) =>
-        governanceERC20Instance.allowance(address, daoAddress)
-      );
+    const currentAllowance = await tokenInstance.allowance(
+      await signer.getAddress(),
+      daoAddress,
+    );
 
     yield {
       key: DaoDepositSteps.CHECKED_ALLOWANCE,
@@ -234,20 +204,16 @@ export class Client extends ClientCore implements IClient {
 
     if (currentAllowance.gte(amount)) return;
 
-    // TODO: Shouldn't we increase the REMAINING amount only?
-    const increaseAllowanceTx = await governanceERC20Instance
-      .increaseAllowance(
-        daoAddress,
-        BigNumber.from(amount),
-      );
+    const tx: ContractTransaction = await tokenInstance
+      .approve(daoAddress, BigNumber.from(amount));
 
     yield {
-      key: DaoDepositSteps.INCREASING_ALLOWANCE,
-      txHash: increaseAllowanceTx.hash,
+      key: DaoDepositSteps.UPDATING_ALLOWANCE,
+      txHash: tx.hash,
     };
 
-    await increaseAllowanceTx.wait()
-      .then((cr) => {
+    await tx.wait()
+      .then((cr: ContractReceipt) => {
         const value = cr.events?.find((e) => e?.event === "Approval")?.args
           ?.value;
         if (!value || BigNumber.from(amount).gt(value)) {
@@ -256,7 +222,7 @@ export class Client extends ClientCore implements IClient {
       });
 
     yield {
-      key: DaoDepositSteps.INCREASED_ALLOWANCE,
+      key: DaoDepositSteps.UPDATED_ALLOWANCE,
       allowance: amount,
     };
   }

@@ -255,11 +255,11 @@ describe("Client", () => {
             expect(typeof step.allowance).toBe("bigint");
             expect(step.allowance).toBe(BigInt(0));
             break;
-          case DaoDepositSteps.INCREASING_ALLOWANCE:
+          case DaoDepositSteps.UPDATING_ALLOWANCE:
             expect(typeof step.txHash).toBe("string");
             expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             break;
-          case DaoDepositSteps.INCREASED_ALLOWANCE:
+          case DaoDepositSteps.UPDATED_ALLOWANCE:
             expect(typeof step.allowance).toBe("biting");
             expect(step.allowance).toBe(BigInt(1234));
             break;

@@ -61,15 +61,15 @@ export interface IDepositParams {
 
 export enum DaoDepositSteps {
   CHECKED_ALLOWANCE = "checkedAllowance",
-  INCREASING_ALLOWANCE = "increasingAllowance",
-  INCREASED_ALLOWANCE = "increasedAllowance",
+  UPDATING_ALLOWANCE = "updatingAllowance",
+  UPDATED_ALLOWANCE = "updatedAllowance",
   DEPOSITING = "depositing",
   DONE = "done",
 }
 
 export type DaoDepositStepValue =
   | { key: DaoDepositSteps.CHECKED_ALLOWANCE; allowance: bigint }
-  | { key: DaoDepositSteps.INCREASING_ALLOWANCE; txHash: string }
-  | { key: DaoDepositSteps.INCREASED_ALLOWANCE; allowance: bigint }
+  | { key: DaoDepositSteps.UPDATING_ALLOWANCE; txHash: string }
+  | { key: DaoDepositSteps.UPDATED_ALLOWANCE; allowance: bigint }
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };

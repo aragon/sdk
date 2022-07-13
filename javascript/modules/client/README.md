@@ -162,10 +162,10 @@ for await (const step of client.methods.deposit(depositParams)) {
     case DaoDepositSteps.CHECKED_ALLOWANCE:
       console.log(step.allowance); // 0n
       break;
-    case DaoDepositSteps.INCREASING_ALLOWANCE:
+    case DaoDepositSteps.UPDATING_ALLOWANCE:
       console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
       break;
-    case DaoDepositSteps.INCREASED_ALLOWANCE:
+    case DaoDepositSteps.UPDATED_ALLOWANCE:
       console.log(step.allowance); // 1000n
       break;
     case DaoDepositSteps.DEPOSITING:
