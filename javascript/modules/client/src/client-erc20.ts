@@ -1,5 +1,5 @@
 import {
-  IErc20VotingProposal,
+  Erc20Proposal,
   IClientErc20,
   ICreateProposalParams,
   IErc20FactoryParams,
@@ -223,7 +223,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
 
     const mockAddresses = [
-      "0x1234...",
+      "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
       "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
       "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
       "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
@@ -235,15 +235,15 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     );
   }
 
+  // TODO: get method ready for filtering, ordering and limiting
   private _getProposals(daoAddressOrEns: string) {
     if (!daoAddressOrEns) {
       throw new Error("Invalid DAO address or ENS");
     }
 
-    setProposalStatus(MOCK_PROPOSALS);
-    return new Promise(resolve => setTimeout(resolve, 1000)).then(() => [
-      ...MOCK_PROPOSALS,
-    ]);
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
+      getProposalsWithStatus(MOCK_PROPOSALS)
+    );
   }
 }
 
@@ -287,22 +287,26 @@ function unwrapWithdrawParams(
 }
 
 /// HELPER FUNCTIONS TODO: move to utils?
-function setProposalStatus(proposals: IErc20VotingProposal[]) {
+function getProposalsWithStatus(proposals: Erc20Proposal[]) {
   const now = new Date();
 
-  for (let proposal of proposals) {
+  return proposals.map(proposal => {
     if (proposal.startDate >= now) {
-      proposal.status = ProposalStatus.PENDING;
+      return { ...proposal, status: ProposalStatus.PENDING };
     } else if (proposal.endDate >= now) {
-      proposal.status = ProposalStatus.ACTIVE;
+      return { ...proposal, status: ProposalStatus.ACTIVE };
     } else if (proposal.executed) {
-      proposal.status = ProposalStatus.EXECUTED;
-    } else if (proposal.yea && proposal.nay && proposal.yea > proposal.nay) {
-      proposal.status = ProposalStatus.SUCCEEDED;
+      return { ...proposal, status: ProposalStatus.EXECUTED };
+    } else if (
+      proposal.result.yea &&
+      proposal.result.nay &&
+      proposal.result.yea > proposal.result.nay
+    ) {
+      return { ...proposal, status: ProposalStatus.SUCCEEDED };
     } else {
-      proposal.status = ProposalStatus.DEFEATED;
+      return { ...proposal, status: ProposalStatus.DEFEATED };
     }
-  }
+  });
 }
 
 /// MOCK DATA FOR PROPOSALS
@@ -314,12 +318,12 @@ const startDate = new Date(
   dateWithinThisYear + Math.random() * (Date.now() - dateWithinThisYear)
 );
 
-const MOCK_PROPOSALS = [
+const MOCK_PROPOSALS: Erc20Proposal[] = [
   {
     id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
     daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
     daoName: "DAO 1",
-    creator: "0x1234...",
+    creator: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
 
     startDate,
     endDate: new Date(startDate.getTime() + 7200000),
@@ -328,36 +332,65 @@ const MOCK_PROPOSALS = [
     title: "New Founding for Lorex Lab SubDao",
     summary:
       "As most community members know, Aragon has strived to deploy its products to more cost-efficient blockchain networks to facilitate interaction.",
-    proposal: "<h1>This is the super important proposal body<h1>",
+    proposal: "This is the super important proposal body",
     resources: [{ url: "https://example.com", description: "Example" }],
-
-    executed: false,
-    status: ProposalStatus.PENDING,
 
     voteId: "0",
     token: {
-      address: "0x1234...",
+      address: "0x9df6870250396e10d187b188b8bd9179ba1a9c18",
       name: "DAO Token",
       symbol: "DAO",
       decimals: 18,
     },
 
-    yea: 3,
-    nay: 1,
-    abstain: 2,
+    result: {
+      yea: 3,
+      nay: 1,
+      abstain: 2,
+    },
 
-    open: true,
-    participationRequiredPct: 30,
-    supportRequiredPct: 52,
+    open: false,
+    executed: false,
+    status: ProposalStatus.PENDING,
+
+    config: {
+      participationRequiredPct: 30,
+      supportRequiredPct: 52,
+    },
+
     votingPower: 135,
 
     voters: [
-      { id: "0x1334...", voterState: VoteOptions.YEA, weight: 1 },
-      { id: "0x1434...", voterState: VoteOptions.YEA, weight: 1 },
-      { id: "0x1534...", voterState: VoteOptions.NAY, weight: 1 },
-      { id: "0x1634...", voterState: VoteOptions.ABSTAIN, weight: 1 },
-      { id: "0x1734...", voterState: VoteOptions.YEA, weight: 1 },
-      { id: "0x1834...", voterState: VoteOptions.ABSTAIN, weight: 1 },
+      {
+        address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+        voteValue: VoteOptions.YEA,
+        weight: 1,
+      },
+      {
+        address: "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
+        voteValue: VoteOptions.YEA,
+        weight: 1,
+      },
+      {
+        address: "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
+        voteValue: VoteOptions.NAY,
+        weight: 1,
+      },
+      {
+        address: "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
+        voteValue: VoteOptions.ABSTAIN,
+        weight: 1,
+      },
+      {
+        address: "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
+        voteValue: VoteOptions.YEA,
+        weight: 1,
+      },
+      {
+        address: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
+        voteValue: VoteOptions.ABSTAIN,
+        weight: 1,
+      },
     ],
   },
 ];

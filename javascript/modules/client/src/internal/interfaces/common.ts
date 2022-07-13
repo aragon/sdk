@@ -45,7 +45,7 @@ export type GasFeeEstimation = {
 /**
  * Contains the base structure of a proposal
  */
-export interface IProposal {
+export type Proposal = {
   id: string;
   daoAddress: string;
   daoName: string;
@@ -63,9 +63,8 @@ export interface IProposal {
   resources: { url: string; description: string }[];
 
   actions?: DaoAction[];
-  executed: boolean;
   status: ProposalStatus;
-}
+};
 
 /**
  * Contains the states of a proposal. Note that on chain

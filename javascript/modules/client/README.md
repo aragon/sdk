@@ -304,47 +304,55 @@ const proposals = await client.methods.getProposals(doaAddressOrEns);
 console.log(proposals);
 
 /*
- [{
+ [ {
     id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
-    daoAddress: "0x1234...",
+    daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
     daoName: "DAO 1",
-    creator: "0x1234...",
-
-    token: {
-      address: "0x1234...",
-      name: "DAO Token",
-      symbol: "DAO",
-      decimals: 18,
-    },
-
-    title: "New Founding for Lorex Lab SubDao",
-    summary: "As most community members know, Aragon has strived to deploy its products to more...",
-    proposal: "<h1>This is the super <strong>important</strong> proposal body<h1>",
-    resources: [{ url: "https://example.com", description: "Amazing Link" }],
+    creator: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
 
     startDate: <Date>,
     endDate: <Date>,
     createdAt: <Date>,
 
+    title: "New Founding for Lorex Lab SubDao",
+    summary: "As most community members know, Aragon has strived.",
+    proposal: "This is the super important proposal body",
+    resources: [{ url: "https://example.com", description: "Example" }],
+
     voteId: "0",
-    participationRequiredPct: 30,
-    supportRequiredPct: 52,
+    token: {
+      address: "0x9df6870250396e10d187b188b8bd9179ba1a9c18",
+      name: "DAO Token",
+      symbol: "DAO",
+      decimals: 18,
+    },
+
+    result: {
+      yea: 3,
+      nay: 1,
+      abstain: 2,
+    },
+
+    open: false,
+    executed: false,
+    status: "Pending",
+
+    config: {
+      participationRequiredPct: 30,
+      supportRequiredPct: 52,
+    },
+
     votingPower: 135,
 
-    yea: 3,
-    nay: 1,
-    abstain: 2,
-
-    open: true,
-    executed: false,
-    status: ProposalStatus.PENDING,
-    
     voters: [
-      { id: "0x1334...", voterState: VoteOptions.YEA, weight: 1 },
-      ...,
-      { id: "0x1834...", voterState: VoteOptions.ABSTAIN, weight: 1 },
+      {
+        address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+        voteValue: VoteOptions.YEA,
+        weight: 1,
+      },
+      {...}
     ],
-  }] */
+  },] */
 ```
 
 ## Multisig governance plugin client

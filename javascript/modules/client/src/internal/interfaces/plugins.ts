@@ -6,7 +6,7 @@ import {
   DaoConfig,
   FactoryInitParams,
   GasFeeEstimation,
-  IProposal,
+  Proposal,
 } from "./common";
 
 // NOTE: These 2 clients will eventually be moved to their own package
@@ -24,7 +24,7 @@ export interface IClientErc20 extends IClientCore {
     // setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
     // setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
     getMembers: (daoAddressOrEns: string) => Promise<string[]>;
-    getProposals: (daoAddressOrEns: string) => Promise<IErc20VotingProposal[]>;
+    getProposals: (daoAddressOrEns: string) => Promise<Erc20Proposal[]>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
@@ -60,7 +60,7 @@ export interface IClientMultisig extends IClientCore {
     setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
     getMembers: (daoAddressOrEns: string) => Promise<string[]>;
     /* TODO: define proper return type */
-    getProposals: (daoAddressOrEns: string) => Promise<IProposal[]>;
+    getProposals: (daoAddressOrEns: string) => Promise<Proposal[]>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
@@ -154,23 +154,29 @@ export type ProposalCreationStepValue =
 
 // PROPOSAL RETRIEVAL
 
-export interface IErc20VotingProposal extends IProposal {
+export type Erc20Proposal = Proposal & {
   voteId: string;
-  token: DaoToken;
+  token: Erc20Token;
 
-  yea?: number;
-  nay?: number;
-  abstain?: number;
+  result: {
+    yea?: number;
+    nay?: number;
+    abstain?: number;
+  };
+
+  config: {
+    participationRequiredPct: number;
+    supportRequiredPct: number;
+  };
+
+  votingPower: number;
+  voters: { address: string; voteValue: VoteOptions; weight: number }[];
 
   open: boolean;
-  participationRequiredPct: number;
-  supportRequiredPct: number;
-  votingPower: number;
+  executed: boolean;
+};
 
-  voters: { id: string; voterState: VoteOptions; weight: number }[];
-}
-
-export type DaoToken = {
+export type Erc20Token = {
   address: string;
   name: string;
   symbol: string;
