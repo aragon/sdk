@@ -13,8 +13,8 @@ const IPFS_API_KEY = process.env.IPFS_API_KEY ||
 
 const web3endpoints = {
   working: [
-    "https://cloudflare-eth.com/",
     "https://mainnet.infura.io/v3/94d2e8caf1bc4c4884af830d96f927ca",
+    "https://cloudflare-eth.com/",
   ],
   failing: ["https://bad-url-gateway.io/"],
 };

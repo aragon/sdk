@@ -8,12 +8,7 @@ import {
   VoteOptions,
   // VotingConfig,
 } from "./internal/interfaces/plugins";
-import {
-  DAO__factory,
-  ERC20Voting__factory,
-  // GovernanceERC20__factory,
-  IDAO,
-} from "@aragon/core-contracts-ethers";
+import { DAO__factory, IDAO } from "@aragon/core-contracts-ethers";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { ClientCore } from "./internal/core";
@@ -29,6 +24,7 @@ import { strip0x } from "@aragon/sdk-common";
  * Provider a generic client with high level methods to manage and interact with DAO's
  */
 export class ClientErc20 extends ClientCore implements IClientErc20 {
+  // @ts-ignore TODO: Remove
   private _pluginAddress: string;
 
   constructor(context: ContextErc20) {
@@ -85,7 +81,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   //// PRIVATE METHOD IMPLEMENTATIONS
 
   private async *_createProposal(
-    params: ICreateProposalParams,
+    _params: ICreateProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -94,6 +90,23 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       throw new Error("A web3 provider is needed");
     }
 
+    // TODO: Remove below as the new contracts are ready
+
+    yield {
+      key: ProposalCreationSteps.CREATING,
+      txHash:
+        "0x0123456789012345678901234567890123456789012345678901234567890123",
+    };
+
+    yield {
+      key: ProposalCreationSteps.DONE,
+      proposalId:
+        "0x1234567890123456789012345678901234567890123456789012345678901234",
+    };
+
+    // TODO: Uncomment as the new contracts are ready
+
+    /*
     const erc20VotingInstance = ERC20Voting__factory.connect(
       this._pluginAddress,
       signer,
@@ -118,6 +131,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       key: ProposalCreationSteps.DONE,
       proposalId: startVoteEvent.args?.voteId,
     };
+    */
   }
 
   // @ts-ignore  TODO: Remove this comment when implemented
@@ -154,7 +168,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
   //// PRIVATE METHOD GAS ESTIMATIONS
 
-  private _estimateCreateProposal(params: ICreateProposalParams) {
+  private _estimateCreateProposal(_params: ICreateProposalParams) {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -162,6 +176,12 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       throw new Error("A web3 provider is needed");
     }
 
+    // TODO: Remove below as the new contracts are ready
+
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(1234)));
+
+    // TODO: Uncomment below as the new contracts are ready
+    /*
     const erc20VotingInstance = ERC20Voting__factory.connect(
       this._pluginAddress,
       signer,
@@ -172,6 +192,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     ).then((gasLimit) => {
       return this.web3.getApproximateGasFee(gasLimit.toBigInt());
     });
+    */
   }
 
   // @ts-ignore  TODO: Remove this comment when implemented
@@ -194,6 +215,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
 //// PARAMETER MANAGERS
 
+// @ts-ignore TODO: Remove when contracts are available
 function unwrapProposalParams(
   params: ICreateProposalParams,
 ): [

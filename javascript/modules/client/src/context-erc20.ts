@@ -1,4 +1,5 @@
 import { Context, ContextParams as MainContextParams } from "./context";
+import { ContextState } from "./internal/interfaces/context";
 
 type ContextErc20State = {
   pluginAddress: string;
@@ -13,7 +14,11 @@ const defaultState: ContextErc20State = {
 };
 
 export class ContextErc20 extends Context {
-  private erc20State: ContextErc20State = Object.assign({}, defaultState);
+  protected state: ContextState & ContextErc20State = Object.assign(
+    {},
+    Context.getDefault(),
+    defaultState,
+  );
 
   // INTERNAL CONTEXT STATE
 
@@ -44,16 +49,14 @@ export class ContextErc20 extends Context {
       throw new Error("Invalid plugin address");
     }
 
-    this.erc20State = {
-      pluginAddress: contextParams.pluginAddress,
-    };
+    this.state.pluginAddress = contextParams.pluginAddress;
   }
 
   set(contextParams: Partial<ContextErc20Params>) {
     super.set(contextParams);
 
     if (contextParams.pluginAddress) {
-      this.erc20State.pluginAddress = contextParams.pluginAddress;
+      this.state.pluginAddress = contextParams.pluginAddress;
     }
   }
 
@@ -69,7 +72,7 @@ export class ContextErc20 extends Context {
    * @public
    */
   get pluginAddress() {
-    return this.erc20State.pluginAddress || defaultState.pluginAddress;
+    return this.state.pluginAddress || defaultState.pluginAddress;
   }
 
   // DEFAULT CONTEXT STATE

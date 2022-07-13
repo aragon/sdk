@@ -10,8 +10,8 @@ const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
 const web3endpoints = {
   working: [
-    "https://cloudflare-eth.com/",
     "https://mainnet.infura.io/v3/94d2e8caf1bc4c4884af830d96f927ca",
+    "https://cloudflare-eth.com/",
   ],
   failing: ["https://bad-url-gateway.io/"],
 };

@@ -70,7 +70,7 @@ export class Client extends ClientCore implements IClient {
       signer,
     );
 
-  // @ts-ignore  TODO: Remove this comment when used
+    // @ts-ignore  TODO: Remove this comment when used
     const registryAddress = await daoFactoryInstance.registry();
 
     // TODO: Remove mock result
@@ -187,6 +187,9 @@ export class Client extends ClientCore implements IClient {
     yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
 
     await depositTx.wait().then((cr) => {
+      if (!cr.events?.length) {
+        throw new Error("The deposit was not properly tracked");
+      }
       const eventAmount = cr.events?.find((e) => e?.event === "Deposited")
         ?.args?.amount;
       if (!amount.eq(eventAmount)) {
