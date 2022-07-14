@@ -434,22 +434,33 @@ export class Client extends ClientCore implements IClient {
     const deposits: AssetDeposit[] = assetList.map(
       (token, index: number) => {
         const {type, balance} = token;
-        return({
-          type,
-          balance,
-          ...((type === "erc20") && {
+        if(type === "erc20"){
+          return({
+            type,
+            balance,
             address: token.address,
             name: token.name,
             symbol: token.symbol,
-            decimals: token.decimals
-          }),
-          from: transfers[index].from,
-          amount: BigInt("100000000000000000000"),
-          reference: "",
-          transactionId: transfers[index].transactionId,
-          // Generate a random date in the past
-          date: new Date(+new Date() - Math.floor(Math.random() * 10000000000))}
-        );
+            decimals: token.decimals,
+            from: transfers[index].from,
+            amount: BigInt("100000000000000000000"),
+            reference: "",
+            transactionId: transfers[index].transactionId,
+            // Generate a random date in the past
+            date: new Date(+new Date() - Math.floor(Math.random() * 10000000000))}
+          );
+        }else{
+          return({
+            type,
+            balance,
+            from: transfers[index].from,
+            amount: BigInt("100000000000000000000"),
+            reference: "",
+            transactionId: transfers[index].transactionId,
+            // Generate a random date in the past
+            date: new Date(+new Date() - Math.floor(Math.random() * 10000000000))}
+          );
+        }
       }
     );
 
