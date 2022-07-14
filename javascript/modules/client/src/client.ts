@@ -381,7 +381,7 @@ export class Client extends ClientCore implements IClient {
 
   private _getBalances(
     daoIdentifier: string,
-    tokenAddresses: string[]
+    _tokenAddresses: string[]
   ): Promise<AssetBalance[]> {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
