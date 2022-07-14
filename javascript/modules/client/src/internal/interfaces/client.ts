@@ -9,7 +9,10 @@ export interface IClient extends IClientCore {
     /** Created a DAO with the given parameters and plugins */
     create: (params: ICreateParams) => AsyncGenerator<DaoCreationStepValue>;
     /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
-    getBalances: (daoAddressOrEns: string, tokenAddresses: string[]) => Promise<AssetBalance[]>;
+    getBalances: (
+      daoAddressOrEns: string,
+      tokenAddresses: string[],
+    ) => Promise<AssetBalance[]>;
     /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string) => Promise<IAssetTransfers>;
     /** Checks whether a role is granted by the curren DAO's ACL settings */
@@ -17,7 +20,7 @@ export interface IClient extends IClientCore {
       where: string,
       who: string,
       role: DaoRole,
-      data: Uint8Array
+      data: Uint8Array,
     ) => Promise<void>;
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
@@ -80,39 +83,64 @@ export type DaoDepositStepValue =
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 
-type NativeTokenBalance = {
-  type: "native",
-  balance: bigint
+// Token types
+
+type NativeTokenBase = {
+  type: "native";
 };
-type Erc20TokenBalance = {
-  type: "erc20",
-  address: string,
-  name: string,
-  symbol: string,
-  balance: bigint,
-  decimals: number
+type Erc20TokenBase = {
+  type: "erc20";
+  /** The address of the token contract */
+  address: string;
+  name: string;
+  symbol: string;
+  decimals: number;
 };
 
-export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & { lastUpdate: Date };
+// Token balances
 
-/** The Dao transfer */
-type AssetTransfer =  Omit<AssetBalance , "balance" | "lastUpdate"> & {
+type NativeTokenBalance = NativeTokenBase & {
+  balance: bigint;
+};
+type Erc20TokenBalance = Erc20TokenBase & {
+  balance: bigint;
+};
+
+export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & {
+  lastUpdate: Date;
+};
+
+// Token transfers
+
+type NativeTokenTransfer = NativeTokenBase & {
   amount: bigint;
   date: Date;
   reference: string;
   transactionId: string;
 };
-export type AssetDeposit = AssetTransfer & {
+
+type Erc20TokenTransfer = Erc20TokenBase & {
+  amount: bigint;
+  date: Date;
+  reference: string;
+  transactionId: string;
+};
+
+export type AssetDeposit = (NativeTokenTransfer | Erc20TokenTransfer) & {
   from: string;
 };
-export type AssetWithdrawal = AssetTransfer & {
+
+export type AssetWithdrawal = (NativeTokenTransfer | Erc20TokenTransfer) & {
   to: string;
 };
+
 export interface IAssetTransfers {
   deposits: AssetDeposit[];
   withdrawals: AssetWithdrawal[];
 }
-// DAO DETAILS
+
+// DAO details
+
 export type DaoResourceLink = { label: string; url: string };
 
 export type DaoMetadata = {
