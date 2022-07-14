@@ -3,14 +3,13 @@ import {
   DaoCreationStepValue,
   DaoDepositSteps,
   DaoDepositStepValue,
-  DepositAssetTransfer,
-  WithdrawAssetTransfer,
-  AssetBalance,
+  AssetDeposit,
+  AssetWithdrawal,
   IAssetTransfers,
   IClient,
   ICreateParams,
   IDepositParams,
-  AssetType,
+  AssetBalance,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -29,34 +28,38 @@ export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
 
 // This is a temporary token list, needs to remove later
-const assetList: AssetType[] = [
+const assetList: AssetBalance[] = [
   {
     type: "native",
-    amount: BigInt("100000000000000000000")
+    balance: BigInt("100000000000000000000"),
+    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
   },
   {
     type: "erc20",
     address: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
     name: "myjooje",
     symbol: "JOJ",
-    decimals: "18",
-    amount: BigInt("100000000000000000000")
+    decimals: 18,
+    balance: BigInt("100000000000000000000"),
+    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
   },
   {
     type: "erc20",
     address: "0x35f7a3379b8d0613c3f753863edc85997d8d0968",
     name: "Dummy Test Token",
     symbol: "DTT",
-    decimals: "18",
-    amount: BigInt("100000000000000000000")
+    decimals: 18,
+    balance: BigInt("100000000000000000000"),
+    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
   },
   {
     type: "erc20",
     address: "0xd783d0f9d8f5c956b808d641dea2038b050389d1",
     name: "Test Token",
     symbol: "TTK",
-    decimals: "18",
-    amount: BigInt("100000000000000000000")
+    decimals: 18,
+    balance: BigInt("100000000000000000000"),
+    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
   },
 ];
 
@@ -349,8 +352,6 @@ export class Client extends ClientCore implements IClient {
     const AssetBalances: AssetBalance[] = assetList.map(
       (token) => ({
         ...token,
-        // Generate a random date in the past
-        lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
       })
     );
 
@@ -389,20 +390,30 @@ export class Client extends ClientCore implements IClient {
       },
     ];
 
-    const deposits: DepositAssetTransfer[] = assetList.map(
-      (token, index: number) => ({
-        ...token,
-        from: transfers[index].from,
-        // Generate a random amount between [0, 10]
-        reference: "",
-        transactionId: transfers[index].transactionId,
-        // Generate a random date in the past
-        date: new Date(+new Date() - Math.floor(Math.random() * 10000000000))
-      })
+    const deposits: AssetDeposit[] = assetList.map(
+      (token, index: number) => {
+        const {type, balance} = token;
+        return({
+          type,
+          balance,
+          ...((type === "erc20") && {
+            address: token.address,
+            name: token.name,
+            symbol: token.symbol,
+            decimals: token.decimals
+          }),
+          from: transfers[index].from,
+          amount: BigInt("100000000000000000000"),
+          reference: "",
+          transactionId: transfers[index].transactionId,
+          // Generate a random date in the past
+          date: new Date(+new Date() - Math.floor(Math.random() * 10000000000))}
+        );
+      }
     );
 
     // Withdraw data structure would be similar to deposit list
-    const withdrawals: WithdrawAssetTransfer[] = [];
+    const withdrawals: AssetWithdrawal[] = [];
 
     return Promise.resolve({ deposits, withdrawals });
   }

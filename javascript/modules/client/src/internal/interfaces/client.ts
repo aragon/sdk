@@ -94,7 +94,7 @@ type Erc20TokenBalance = {
 export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & { lastUpdate: Date };
 
 /** The Dao transfer */
-type AssetTransfer =  Omit<AssetBalance , "balance"> & {
+type AssetTransfer =  Omit<AssetBalance , "balance" | "lastUpdate"> & {
   amount: bigint;
   date: Date;
   reference: string;
