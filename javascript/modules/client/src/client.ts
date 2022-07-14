@@ -433,11 +433,10 @@ export class Client extends ClientCore implements IClient {
 
     const deposits: AssetDeposit[] = assetList.map(
       (token, index: number) => {
-        const {type, balance} = token;
-        if(type === "erc20"){
+        if(token.type === "erc20"){
           return({
-            type,
-            balance,
+            type: token.type,
+            balance: token.balance,
             address: token.address,
             name: token.name,
             symbol: token.symbol,
@@ -451,8 +450,8 @@ export class Client extends ClientCore implements IClient {
           );
         }else{
           return({
-            type,
-            balance,
+            type: token.type,
+            balance: token.balance,
             from: transfers[index].from,
             amount: BigInt("100000000000000000000"),
             reference: "",
