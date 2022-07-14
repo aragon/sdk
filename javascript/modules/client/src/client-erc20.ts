@@ -1,4 +1,5 @@
 import {
+  Erc20Proposal,
   IClientErc20,
   ICreateProposalParams,
   IErc20FactoryParams,
@@ -16,6 +17,7 @@ import {
   DaoAction,
   // DaoConfig,
   FactoryInitParams,
+  ProposalStatus,
 } from "./internal/interfaces/common";
 import { ContextErc20 } from "./context-erc20";
 import { strip0x } from "@aragon/sdk-common";
@@ -49,6 +51,11 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     //   this._setDaoConfig(address, config),
     // setVotingConfig: (address: string, config: VotingConfig) =>
     //   this._setVotingConfig(address, config),
+    /** Retrieves the list of Ethereum addresses that can cast weighted votes on the given DAO's proposals */
+    getMembers: (daoAddressOrEns: string) => this._getMembers(daoAddressOrEns),
+    /** Retrieves the list of proposals of the given DAO */
+    getProposals: (daoAddressOrEns: string) =>
+      this._getProposals(daoAddressOrEns),
   };
 
   //// ACTION BUILDERS
@@ -109,22 +116,19 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /*
     const erc20VotingInstance = ERC20Voting__factory.connect(
       this._pluginAddress,
-      signer,
+      signer
     );
 
-    const tx = await erc20VotingInstance
-      .newVote(...unwrapProposalParams(params));
+    const tx = await erc20VotingInstance.newVote(
+      ...unwrapProposalParams(params)
+    );
 
     yield { key: ProposalCreationSteps.CREATING, txHash: tx.hash };
 
     const receipt = await tx.wait();
-    const startVoteEvent = receipt.events?.find(
-      (e) => e.event === "StartVote",
-    );
+    const startVoteEvent = receipt.events?.find(e => e.event === "StartVote");
     if (!startVoteEvent || startVoteEvent.args?.voteId) {
-      return Promise.reject(
-        new Error("Could not read the proposal ID"),
-      );
+      return Promise.reject(new Error("Could not read the proposal ID"));
     }
 
     yield {
@@ -184,7 +188,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /*
     const erc20VotingInstance = ERC20Voting__factory.connect(
       this._pluginAddress,
-      signer,
+      signer
     );
 
     return erc20VotingInstance.estimateGas.newVote(
@@ -211,21 +215,44 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   // private _estimateSetVotingConfig(daoAddress: string, config: VotingConfig) {
   //   return Promise.resolve({ average: BigInt(0), max: BigInt(0) });
   // }
+
+  //// PRIVATE RETRIEVAL HANDLERS
+  private _getMembers(daoAddressOrEns: string) {
+    if (!daoAddressOrEns) {
+      throw new Error("Invalid DAO address or ENS");
+    }
+
+    const mockAddresses = [
+      "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+      "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
+      "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
+      "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
+      "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
+    ];
+
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
+      mockAddresses.filter(() => Math.random() > 0.4)
+    );
+  }
+
+  // TODO: get method ready for filtering, ordering and limiting
+  private _getProposals(daoAddressOrEns: string) {
+    if (!daoAddressOrEns) {
+      throw new Error("Invalid DAO address or ENS");
+    }
+
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
+      getProposalsWithStatus(MOCK_PROPOSALS)
+    );
+  }
 }
 
 //// PARAMETER MANAGERS
 
 // @ts-ignore TODO: Remove when contracts are available
 function unwrapProposalParams(
-  params: ICreateProposalParams,
-): [
-  string,
-  IDAO.ActionStruct[],
-  number,
-  number,
-  boolean,
-  number,
-] {
+  params: ICreateProposalParams
+): [string, IDAO.ActionStruct[], number, number, boolean, number] {
   return [
     params.metadataUri,
     params.actions ?? [],
@@ -249,7 +276,7 @@ function encodeWithdrawActionData(params: IWithdrawParams): Uint8Array {
 }
 
 function unwrapWithdrawParams(
-  params: IWithdrawParams,
+  params: IWithdrawParams
 ): [string, string, BigNumber, string] {
   return [
     params.tokenAddress ?? AddressZero,
@@ -258,3 +285,112 @@ function unwrapWithdrawParams(
     params.reference ?? "",
   ];
 }
+
+/// HELPER FUNCTIONS TODO: move to utils?
+function getProposalsWithStatus(proposals: Erc20Proposal[]) {
+  const now = new Date();
+
+  return proposals.map(proposal => {
+    if (proposal.startDate >= now) {
+      return { ...proposal, status: ProposalStatus.PENDING };
+    } else if (proposal.endDate >= now) {
+      return { ...proposal, status: ProposalStatus.ACTIVE };
+    } else if (proposal.executed) {
+      return { ...proposal, status: ProposalStatus.EXECUTED };
+    } else if (
+      proposal.result.yea &&
+      proposal.result.nay &&
+      proposal.result.yea > proposal.result.nay
+    ) {
+      return { ...proposal, status: ProposalStatus.SUCCEEDED };
+    } else {
+      return { ...proposal, status: ProposalStatus.DEFEATED };
+    }
+  });
+}
+
+/// MOCK DATA FOR PROPOSALS
+const dateWithinThisYear = new Date(
+  new Date().setFullYear(new Date().getFullYear() - 1)
+).getTime();
+
+const startDate = new Date(
+  dateWithinThisYear + Math.random() * (Date.now() - dateWithinThisYear)
+);
+
+const MOCK_PROPOSALS: Erc20Proposal[] = [
+  {
+    id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
+    daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
+    daoName: "DAO 1",
+    creator: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+
+    startDate,
+    endDate: new Date(startDate.getTime() + 7200000),
+    createdAt: new Date(dateWithinThisYear),
+
+    title: "New Founding for Lorex Lab SubDao",
+    summary:
+      "As most community members know, Aragon has strived to deploy its products to more cost-efficient blockchain networks to facilitate interaction.",
+    proposal: "This is the super important proposal body",
+    resources: [{ url: "https://example.com", description: "Example" }],
+
+    voteId: "0",
+    token: {
+      address: "0x9df6870250396e10d187b188b8bd9179ba1a9c18",
+      name: "DAO Token",
+      symbol: "DAO",
+      decimals: 18,
+    },
+
+    result: {
+      yea: 3,
+      nay: 1,
+      abstain: 2,
+    },
+
+    open: false,
+    executed: false,
+    status: ProposalStatus.PENDING,
+
+    config: {
+      participationRequiredPct: 30,
+      supportRequiredPct: 52,
+    },
+
+    votingPower: 135,
+
+    voters: [
+      {
+        address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+        voteValue: VoteOptions.YEA,
+        weight: 1,
+      },
+      {
+        address: "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
+        voteValue: VoteOptions.YEA,
+        weight: 1,
+      },
+      {
+        address: "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
+        voteValue: VoteOptions.NAY,
+        weight: 1,
+      },
+      {
+        address: "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
+        voteValue: VoteOptions.ABSTAIN,
+        weight: 1,
+      },
+      {
+        address: "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
+        voteValue: VoteOptions.YEA,
+        weight: 1,
+      },
+      {
+        address: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
+        voteValue: VoteOptions.ABSTAIN,
+        weight: 1,
+      },
+    ],
+  },
+];
