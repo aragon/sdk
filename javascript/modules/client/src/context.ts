@@ -24,7 +24,7 @@ const defaultState: ContextState = {
 };
 
 export class Context {
-  private state: ContextState = Object.assign({}, defaultState);
+  protected state: ContextState = Object.assign({}, defaultState);
   // INTERNAL CONTEXT STATE
 
   /**

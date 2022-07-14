@@ -17,10 +17,12 @@ export interface IClient extends IClientCore {
       where: string,
       who: string,
       role: DaoRole,
-      data: Uint8Array,
+      data: Uint8Array
     ) => Promise<void>;
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
+    /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
+    getMetadata: (daoAddressOrEns: string) => Promise<DaoMetadata>;
   };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
@@ -65,16 +67,16 @@ export interface IDepositParams {
 
 export enum DaoDepositSteps {
   CHECKED_ALLOWANCE = "checkedAllowance",
-  INCREASING_ALLOWANCE = "increasingAllowance",
-  INCREASED_ALLOWANCE = "increasedAllowance",
+  UPDATING_ALLOWANCE = "updatingAllowance",
+  UPDATED_ALLOWANCE = "updatedAllowance",
   DEPOSITING = "depositing",
   DONE = "done",
 }
 
 export type DaoDepositStepValue =
   | { key: DaoDepositSteps.CHECKED_ALLOWANCE; allowance: bigint }
-  | { key: DaoDepositSteps.INCREASING_ALLOWANCE; txHash: string }
-  | { key: DaoDepositSteps.INCREASED_ALLOWANCE; allowance: bigint }
+  | { key: DaoDepositSteps.UPDATING_ALLOWANCE; txHash: string }
+  | { key: DaoDepositSteps.UPDATED_ALLOWANCE; allowance: bigint }
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 
@@ -110,3 +112,15 @@ export interface IAssetTransfers {
   deposits: AssetDeposit[];
   withdrawals: AssetWithdrawal[];
 }
+// DAO DETAILS
+export type DaoResourceLink = { label: string; url: string };
+
+export type DaoMetadata = {
+  address: string;
+  avatar?: string;
+  createdAt: Date;
+  description: string;
+  links?: DaoResourceLink[];
+  name: string;
+  packages: string[];
+};

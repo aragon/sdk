@@ -1,7 +1,7 @@
 // @ts-ignore
 declare const describe, it, beforeEach, expect, test;
 
-import { Context, ContextParams } from "../../src";
+import { ContextErc20, ContextErc20Params } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { activeContractsList } from "@aragon/core-contracts-ethers";
@@ -16,9 +16,9 @@ const web3endpoints = {
   failing: ["https://bad-url-gateway.io/"],
 };
 
-let contextParams: ContextParams;
+let contextParams: ContextErc20Params;
 
-describe("Context instances", () => {
+describe("ContextErc20 instances", () => {
   beforeEach(() => {
     contextParams = {
       network: "mainnet",
@@ -27,26 +27,28 @@ describe("Context instances", () => {
       daoFactoryAddress: "0x1234",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
+      pluginAddress: "0x2345",
     };
   });
   it("Should create an empty context", () => {
-    const context = new Context({});
+    const context = new ContextErc20({});
 
-    expect(context).toBeInstanceOf(Context);
+    expect(context).toBeInstanceOf(ContextErc20);
   });
   it("Should create an empty context and have default values", () => {
-    const context = new Context({});
+    const context = new ContextErc20({});
 
-    expect(context).toBeInstanceOf(Context);
+    expect(context).toBeInstanceOf(ContextErc20);
     expect(context.signer).toEqual(undefined);
     expect(context.dao).toEqual("");
     expect(context.daoFactoryAddress).toEqual(undefined);
     expect(context.gasFeeEstimationFactor).toEqual(0.625);
+    expect(context.pluginAddress).toEqual("");
   });
   it("Should create a context and have the correct values", () => {
-    const context = new Context(contextParams);
+    const context = new ContextErc20(contextParams);
 
-    expect(context).toBeInstanceOf(Context);
+    expect(context).toBeInstanceOf(ContextErc20);
     expect(context.network).toEqual("mainnet");
     expect(context.signer).toBeInstanceOf(Wallet);
     expect(context.dao).toEqual("Dao");
@@ -55,27 +57,28 @@ describe("Context instances", () => {
       expect(provider).toBeInstanceOf(JsonRpcProvider)
     );
     expect(context.gasFeeEstimationFactor).toEqual(0.1);
+    expect(context.pluginAddress).toEqual("0x2345");
   });
   it("Should create a context with invalid network and fail", () => {
     contextParams.network = "notexistingnetwork";
 
     expect(() => {
-      new Context(contextParams);
+      new ContextErc20(contextParams);
     }).toThrow();
   });
   it("Should create a context with invalid gas fee estimation factor and fail", () => {
     contextParams.gasFeeEstimationFactor = 1.1;
 
     expect(() => {
-      new Context(contextParams);
+      new ContextErc20(contextParams);
     }).toThrow();
   });
   it("Should create a context with the correct DAOFactory address from the core-contracts-package", () => {
     contextParams.daoFactoryAddress = "";
     contextParams.network = "rinkeby";
-    const context = new Context(contextParams);
+    const context = new ContextErc20(contextParams);
 
-    expect(context).toBeInstanceOf(Context);
+    expect(context).toBeInstanceOf(ContextErc20);
     expect(context.network).toEqual("rinkeby");
     expect(context.daoFactoryAddress).toEqual(
       activeContractsList.rinkeby.DAOFactory,

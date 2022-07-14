@@ -139,7 +139,7 @@ Handles the flow of depositing ERC20 tokens to a DAO.
 - Similar to the example above
 - The `tokenAddress` field is required
 - Will attempt to increase the ERC20 allowance if not sufficient
-- More fintermediate steps are yielded
+- More intermediate steps are yielded
 
 ```ts
 import { Client, DaoDepositSteps, IDepositParams } from "@aragon/sdk-client";
@@ -162,10 +162,10 @@ for await (const step of client.methods.deposit(depositParams)) {
     case DaoDepositSteps.CHECKED_ALLOWANCE:
       console.log(step.allowance); // 0n
       break;
-    case DaoDepositSteps.INCREASING_ALLOWANCE:
+    case DaoDepositSteps.UPDATING_ALLOWANCE:
       console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
       break;
-    case DaoDepositSteps.INCREASED_ALLOWANCE:
+    case DaoDepositSteps.UPDATED_ALLOWANCE:
       console.log(step.allowance); // 1000n
       break;
     case DaoDepositSteps.DEPOSITING:
@@ -180,11 +180,32 @@ for await (const step of client.methods.deposit(depositParams)) {
 
 ### Loading DAO details
 
-- __TODO__:  Name, metadata, installed plugin list
+Handles retrieving DAO metadata using its address or ENS domain.
+
+```ts
+import { Client } from "@aragon/sdk-client";
+
+const client = new Client(context);
+const doaAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
+
+const metadata = await client.methods.getMetadata(doaAddressOrEns);
+console.log(metadata);
+
+/*
+{
+   address: "0x1234...",
+   avatar: "http...",
+   createdAt: <Date>,
+   description: "This dao...",
+   links: [{label: "Website", url: "http..."}],
+   name: "Abc Dao",
+   packages: ["0x1245...", "0x3456..."],
+} */
+```
 
 ### Loading DAO activity
 
-- __TODO__:  Transactions
+- **TODO**: Transactions
 
 ### Loading DAO financial data
 
@@ -256,7 +277,7 @@ underlying network requests.
 
 ### Creating a DAO with an ERC20 plugin
 
-- __TODO__
+- **TODO**
 
 ### Creating an ERC20 proposal
 
@@ -284,12 +305,16 @@ const proposalCreationParams: ICreateProposalParams = {
   creatorVote: VoteOption.YEA,
 };
 
-const estimatedGas = await client.estimation.createProposal(proposalCreationParams);
+const estimatedGas = await client.estimation.createProposal(
+  proposalCreationParams,
+);
 console.log(estimatedGas.average); // bigint
 console.log(estimatedGas.max); // bigint
 
 for await (
-  const step of client.methods.createProposal(proposalCreationParams)
+  const step of client.methods.createProposal(
+    proposalCreationParams,
+  )
 ) {
   switch (step.idx) {
     case DaoDepositSteps.CREATING:
@@ -304,41 +329,114 @@ for await (
 
 ### Voting on an ERC20 proposal
 
-- __TODO__
+- **TODO**
 
 ### Loading the list of members (ERC20)
 
-- __TODO__
+Retrieving all the members of an ERC20 DAO.
+
+```ts
+import { ClientErc20 } from "@aragon/sdk-client";
+
+const client = new ClientERC20(context);
+const doaAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
+
+const members = await client.methods.getMembers(daoAddressOrEns);
+
+console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
+```
 
 ### Loading the list of proposals (ERC20)
 
-- __TODO__
+Retrieving the proposals of an ERC20 DAO.
+
+```ts
+import { Client } from "@aragon/sdk-client";
+
+const client = new Client(context);
+const doaAddressOrEns = "0x1234...";
+
+const proposals = await client.methods.getProposals(doaAddressOrEns);
+console.log(proposals);
+
+/*
+ [ {
+    id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
+    daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
+    daoName: "DAO 1",
+    creator: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+
+    startDate: <Date>,
+    endDate: <Date>,
+    createdAt: <Date>,
+
+    title: "New Founding for Lorex Lab SubDao",
+    summary: "As most community members know, Aragon has strived.",
+    proposal: "This is the super important proposal body",
+    resources: [{ url: "https://example.com", description: "Example" }],
+
+    voteId: "0",
+    token: {
+      address: "0x9df6870250396e10d187b188b8bd9179ba1a9c18",
+      name: "DAO Token",
+      symbol: "DAO",
+      decimals: 18,
+    },
+
+    result: {
+      yea: 3,
+      nay: 1,
+      abstain: 2,
+    },
+
+    open: false,
+    executed: false,
+    status: "Pending",
+
+    config: {
+      participationRequiredPct: 30,
+      supportRequiredPct: 52,
+    },
+
+    votingPower: 135,
+
+    voters: [
+      {
+        address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+        voteValue: VoteOptions.YEA,
+        weight: 1,
+      },
+      {...}
+    ],
+  },] */
+```
 
 ## Multisig governance plugin client
 
 ### Creating a DAO with a multisig plugin
 
-- __TODO__
+- **TODO**
 
 ### Creating a multisig proposal
 
-- __TODO__
+- **TODO**
 
 ### Voting on a multisig proposal
 
-- __TODO__
+- **TODO**
 
 ### Loading the list of members (multisig)
 
-- __TODO__
+- **TODO**
 
 ### Loading the list of proposals (multisig)
 
-- __TODO__
+- **TODO**
 
 ## Action encoders
 
-Proposals will eventually need to execute some action on behalf of the DAO, which needs to be encoded in a low level format. 
+Proposals will eventually need to execute some action on behalf of the DAO,
+which needs to be encoded in a low level format.
 
 The helpers above help encoding the most typical DAO operations.
 
@@ -367,26 +465,34 @@ The building blocks are defined within the `src/internal` folder. The high level
 ## Low level networking
 
 See `ClientCore` ([source](./src/internal/core.ts)):
+
 - Abstract class implementing primitives for:
-    - Web3, contracts, signing
-    - IPFS
-    - GraphQL
+  - Web3, contracts, signing
+  - IPFS
+  - GraphQL
 - Inherited by classes like `Client` and all plugin classes like `ClientErc20`.
 
 ## Common interfaces, types, enum's
 
 When updating a `ClientXXX` (plugin) class:
-- **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/plugins.ts`
+
+- **Update first** all affected enum's, types and interfaces in
+  `src/internal/interfaces/plugins.ts`
 
 When updating the `Client` class:
-- **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/client.ts`
+
+- **Update first** all affected enum's, types and interfaces in
+  `src/internal/interfaces/client.ts`
 
 When updating the `ClientCore` class:
-- **Update first** all affected enum's, types and interfaces in `src/internal/interfaces/core.ts`
+
+- **Update first** all affected enum's, types and interfaces in
+  `src/internal/interfaces/core.ts`
 
 ## Developing a new Plugin client
 
-Create a new class that `extends` from `ClientCore`, receives a `Context` on the `constructor` and follows the structure of [ClientErc20](./src/client-erc20.ts).
+Create a new class that `extends` from `ClientCore`, receives a `Context` on the
+`constructor` and follows the structure of [ClientErc20](./src/client-erc20.ts).
 
 # Testing
 
