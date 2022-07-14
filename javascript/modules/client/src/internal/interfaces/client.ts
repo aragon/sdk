@@ -8,7 +8,11 @@ export interface IClient extends IClientCore {
   methods: {
     /** Created a DAO with the given parameters and plugins */
     create: (params: ICreateParams) => AsyncGenerator<DaoCreationStepValue>;
-    /** Checks whether a role is granted by the current DAO's ACL settings */
+    /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
+    getBalances: (daoAddressOrEns: string, tokenAddresses: string[]) => Promise<AssetBalance[]>;
+    /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
+    getTransfers: (daoAddressOrEns: string) => Promise<IAssetTransfers>;
+    /** Checks whether a role is granted by the curren DAO's ACL settings */
     hasPermission: (
       where: string,
       who: string,
@@ -76,6 +80,38 @@ export type DaoDepositStepValue =
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 
+type NativeTokenBalance = {
+  type: "native",
+  balance: bigint
+};
+type Erc20TokenBalance = {
+  type: "erc20",
+  address: string,
+  name: string,
+  symbol: string,
+  balance: bigint,
+  decimals: number
+};
+
+export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & { lastUpdate: Date };
+
+/** The Dao transfer */
+type AssetTransfer =  Omit<AssetBalance , "balance" | "lastUpdate"> & {
+  amount: bigint;
+  date: Date;
+  reference: string;
+  transactionId: string;
+};
+export type AssetDeposit = AssetTransfer & {
+  from: string;
+};
+export type AssetWithdrawal = AssetTransfer & {
+  to: string;
+};
+export interface IAssetTransfers {
+  deposits: AssetDeposit[];
+  withdrawals: AssetWithdrawal[];
+}
 // DAO DETAILS
 export type DaoResourceLink = { label: string; url: string };
 
@@ -86,5 +122,5 @@ export type DaoMetadata = {
   description: string;
   links?: DaoResourceLink[];
   name: string;
-  packages: string[];
+  plugins: string[];
 };

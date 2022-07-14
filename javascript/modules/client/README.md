@@ -199,7 +199,7 @@ console.log(metadata);
    description: "This dao...",
    links: [{label: "Website", url: "http..."}],
    name: "Abc Dao",
-   packages: ["0x1245...", "0x3456..."],
+   plugins: ["0x1245...", "0x3456..."],
 } */
 ```
 
@@ -209,7 +209,63 @@ console.log(metadata);
 
 ### Loading DAO financial data
 
-- **TODO**: Assets, valuation
+Handles retrieving DAO asset balances using the DAO address or its ENS domain.
+
+```ts
+import { Client } from "@aragon/sdk-client";
+const client = new Client(context);
+const daoAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
+const balances = await client.methods.getBalances(daoAddressOrEns);
+console.log(balances);
+/* 
+[{
+  type: "native"
+  "balance": 1000000000000000n,
+  "lastUpdate": <Date>
+},{
+  "type": "erc20"
+  "address": "0x123...",
+  "name": "TestToken",
+  "symbol": "TST",
+  "decimals": "18"
+  "balance": 1000000000000000n,
+  "lastUpdate": <Date>
+}, ...] */
+```
+
+Retrieves the list of transfers made from and to a certain DAO.
+
+```ts
+import { Client } from "@aragon/sdk-client";
+const client = new Client(context);
+const daoAddressOrEns = "0x1234...";
+const transfers = await client.methods.getTransfers(daoAddressOrEns);
+console.log(transfers);
+/*
+{ 
+  "deposits": [{
+    "type": "native"
+    "from":"0x1234...",
+    "amount": 1000000000000000n,
+    "reference": "",
+    "transactionId": "0x1234...",
+    "date": <Date>
+  },...],
+  "withdrawals": [{
+    "type": "erc20"
+    "address": "0x123...",
+    "name": "TestToken",
+    "symbol": "TST",
+    "decimals": "18"
+    "to":"0x1234...",
+    "amount": 1000000000000000n,
+    "reference": "",
+    "transactionId": "0x1234...",
+    "date": <Date>
+  }, ...]
+}
+*/
+```
 
 ## ERC20 governance plugin client
 

@@ -3,10 +3,14 @@ import {
   DaoCreationStepValue,
   DaoDepositSteps,
   DaoDepositStepValue,
+  AssetDeposit,
+  AssetWithdrawal,
+  IAssetTransfers,
   DaoMetadata,
   IClient,
   ICreateParams,
   IDepositParams,
+  AssetBalance,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -32,6 +36,42 @@ import { Signer } from "@ethersproject/abstract-signer";
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
 
+// This is a temporary token list, needs to remove later
+const assetList: AssetBalance[] = [
+  {
+    type: "native",
+    balance: BigInt("100000000000000000000"),
+    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+  },
+  {
+    type: "erc20",
+    address: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
+    name: "myjooje",
+    symbol: "JOJ",
+    decimals: 18,
+    balance: BigInt("100000000000000000000"),
+    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+  },
+  {
+    type: "erc20",
+    address: "0x35f7a3379b8d0613c3f753863edc85997d8d0968",
+    name: "Dummy Test Token",
+    symbol: "DTT",
+    decimals: 18,
+    balance: BigInt("100000000000000000000"),
+    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+  },
+  {
+    type: "erc20",
+    address: "0xd783d0f9d8f5c956b808d641dea2038b050389d1",
+    name: "Test Token",
+    symbol: "TTK",
+    decimals: 18,
+    balance: BigInt("100000000000000000000"),
+    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+  },
+];
+
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
  */
@@ -44,6 +84,13 @@ export class Client extends ClientCore implements IClient {
     create: (params: ICreateParams) => this._createDao(params),
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => this._deposit(params),
+    /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet */
+    getBalances: (daoAddressOrEns: string, tokenAddresses: string[] = []) =>
+      this._getBalances(daoAddressOrEns, tokenAddresses),
+    /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
+    getTransfers: (daoAddressOrEns: string) =>
+      this._getTransfers(daoAddressOrEns),
+    /** Checks whether a role is granted by the curren DAO's ACL settings */
 
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getMetadata: (daoAddressOrEns: string) =>
@@ -328,8 +375,98 @@ export class Client extends ClientCore implements IClient {
           url: "https://google.com",
         },
       ],
-      packages: ["0x123...", "0x456..."],
+      plugins: ["0x123...", "0x456..."],
     }));
+  }
+
+  private _getBalances(
+    daoIdentifier: string,
+    _tokenAddresses: string[]
+  ): Promise<AssetBalance[]> {
+    // TODO: Implement actual fetch logic using subgraph.
+    // Note: it would be nice if the client could be instantiated with dao identifier
+
+    if (!daoIdentifier) {
+      throw new Error("Invalid DAO address or ENS");
+    }
+
+    const AssetBalances: AssetBalance[] = assetList.map(
+      (token) => ({
+        ...token,
+      })
+    );
+
+    return Promise.resolve(AssetBalances);
+  }
+
+  private async _getTransfers(daoAddressOrEns: string): Promise<IAssetTransfers> {
+    // TODO: Implement actual fetch logic using subgraph.
+    // Note: it would be nice if the client could be instantiated with dao identifier
+
+    if (!daoAddressOrEns) {
+      throw new Error("Invalid DAO address or ENS");
+    }
+
+    // This is a temporary transfer list, needs to remove later
+    const transfers = [
+      {
+        from: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
+        transactionId:
+          "0x4c97c60f499dc69918b1b77ab7504eeacbd1e1a536e10471e12c184885dafc05",
+      },
+      {
+        from: "0xb1dc5d0881eea99a61d28be66fc491aae2a13d6a",
+        transactionId:
+          "0x6b0b8b815d78b83a5a69a883244a3ca2bdc25832edee2bc45e7b6392ad57fd94",
+      },
+      {
+        from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
+        transactionId:
+          "0x08525a68b342be200c220f5a22d30425a262c5603e63c210b7664f26b8418bcc",
+      },
+      {
+        from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
+        transactionId:
+          "0x8269a60f658e33393d3f20d065cd5107d410d41c5dba9e5c467efcd3f98db015",
+      },
+    ];
+
+    const deposits: AssetDeposit[] = assetList.map(
+      (token, index: number) => {
+        if(token.type === "erc20"){
+          return({
+            type: token.type,
+            balance: token.balance,
+            address: token.address,
+            name: token.name,
+            symbol: token.symbol,
+            decimals: token.decimals,
+            from: transfers[index].from,
+            amount: BigInt("100000000000000000000"),
+            reference: "",
+            transactionId: transfers[index].transactionId,
+            // Generate a random date in the past
+            date: new Date(+new Date() - Math.floor(Math.random() * 10000000000))}
+          );
+        }else{
+          return({
+            type: token.type,
+            balance: token.balance,
+            from: transfers[index].from,
+            amount: BigInt("100000000000000000000"),
+            reference: "",
+            transactionId: transfers[index].transactionId,
+            // Generate a random date in the past
+            date: new Date(+new Date() - Math.floor(Math.random() * 10000000000))}
+          );
+        }
+      }
+    );
+
+    // Withdraw data structure would be similar to deposit list
+    const withdrawals: AssetWithdrawal[] = [];
+
+    return Promise.resolve({ deposits, withdrawals });
   }
 }
 
