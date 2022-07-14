@@ -122,5 +122,5 @@ export type DaoMetadata = {
   description: string;
   links?: DaoResourceLink[];
   name: string;
-  packages: string[];
+  plugins: string[];
 };

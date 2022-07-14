@@ -375,7 +375,7 @@ export class Client extends ClientCore implements IClient {
           url: "https://google.com",
         },
       ],
-      packages: ["0x123...", "0x456..."],
+      plugins: ["0x123...", "0x456..."],
     }));
   }
 

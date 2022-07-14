@@ -199,7 +199,7 @@ console.log(metadata);
    description: "This dao...",
    links: [{label: "Website", url: "http..."}],
    name: "Abc Dao",
-   packages: ["0x1245...", "0x3456..."],
+   plugins: ["0x1245...", "0x3456..."],
 } */
 ```
 
