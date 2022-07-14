@@ -199,7 +199,7 @@ console.log(balances);
 /* 
 [{
   type: "native"
-  "amount": 1000000000000000n,
+  "balance": 1000000000000000n,
   "lastUpdate": <Date>
 },{
   "type": "erc20"
@@ -207,7 +207,7 @@ console.log(balances);
   "name": "TestToken",
   "symbol": "TST",
   "decimals": "18"
-  "amount": 1000000000000000n,
+  "balance": 1000000000000000n,
   "lastUpdate": <Date>
 }, ...] */
 ```
