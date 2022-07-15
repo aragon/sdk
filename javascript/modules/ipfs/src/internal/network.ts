@@ -1,4 +1,4 @@
-import { Config } from "../interfaces";
+import { IClientConfig } from "../interfaces";
 import { GenericRecord } from "../typings";
 import fetch from "isomorphic-unfetch";
 
@@ -7,7 +7,7 @@ export namespace Network {
    * Performs a request and returns a JSON object with the response
    */
   export async function request(
-    config: Config,
+    config: IClientConfig,
     path: string,
     {
       method,
@@ -19,7 +19,7 @@ export namespace Network {
       params?: GenericRecord;
       body?: BodyInit;
       signal?: AbortSignal;
-    }
+    },
   ) {
     const { url, headers } = config;
     const endpoint = new URL(path, url);
@@ -39,14 +39,14 @@ export namespace Network {
     if (!response.ok) {
       throw Object.assign(
         new Error(`${response.status}: ${response.statusText}`),
-        { response }
+        { response },
       );
     }
     return response.json();
   }
 
   export async function* stream(
-    { url, headers }: Config,
+    { url, headers }: IClientConfig,
     path: string,
     {
       method,
@@ -58,7 +58,7 @@ export namespace Network {
       params?: GenericRecord;
       body?: BodyInit;
       signal?: AbortSignal;
-    }
+    },
   ) {
     const endpoint = new URL(path, url);
     for (const [key, value] of Object.entries(params || {})) {
@@ -84,7 +84,7 @@ export namespace Network {
   }
 
   async function* streamedBytes(
-    stream: ReadableStream<Uint8Array>
+    stream: ReadableStream<Uint8Array>,
   ): AsyncGenerator<Uint8Array> {
     let error = null;
     const reader = stream.getReader();

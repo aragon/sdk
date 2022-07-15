@@ -1,10 +1,10 @@
-import { API } from "./api";
+import { API } from "./internal/api";
 import {
   AddResponse,
   NodeInfoResponse,
   PinResponse,
   VersionResponse,
-} from "../typings";
+} from "./typings";
 import {
   AddOptions,
   CatOptions,
@@ -12,7 +12,7 @@ import {
   VersionOptions,
   PinOptions,
   UnpinOptions,
-} from "../interfaces";
+} from "./interfaces";
 
 export class IpfsClient {
   readonly url: URL;

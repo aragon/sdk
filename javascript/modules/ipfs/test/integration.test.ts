@@ -1,14 +1,9 @@
 import { IpfsClient } from "../src";
-// import { FormData } from '@web-std/form-data'
-// import  FormData from 'formdata-polyfill/esm.min.js'
-// console.log(global)
-// Object.assign(global, { FormData })
 
-const IPFS_API_KEY =
-  process.env.IPFS_API_KEY ||
+const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
-    "base64"
+    "base64",
   )
     .toString()
     .trim();
@@ -44,6 +39,14 @@ describe("IPFS client", () => {
     expect(typeof recoveredBytes).toBe("object");
     expect(typeof recoveredContent).toBe("string");
     expect(recoveredContent).toEqual(content);
+  });
+
+  it("Should upload a Uint8Array and recover the same thing", async () => {
+    const content = new Uint8Array([80, 81, 82, 83, 84, 85, 86, 87, 88, 89]);
+    const { hash } = await client.add(content);
+    expect(hash).toBe("12341234");
+    const recoveredBytes = await client.cat(hash);
+    expect(recoveredBytes.toString()).toEqual("80,81,82,83,84,85,86,87,88,89");
   });
 
   it("Should upload a file and recover the same content", async () => {
@@ -83,7 +86,7 @@ describe("IPFS client", () => {
   it("Should return an error when trying to cat an invalid cid", async () => {
     const path = "1nv4l1dC1D";
     await expect(client.cat(path)).rejects.toThrow(
-      "500: Internal Server Error"
+      "500: Internal Server Error",
     );
   });
 
@@ -103,7 +106,7 @@ describe("IPFS client", () => {
   it("Should throw an error when trying to unpin an invalid CID", async () => {
     const path = "1nv4l1dC1D";
     await expect(client.unpin(path)).rejects.toThrow(
-      "500: Internal Server Error"
+      "500: Internal Server Error",
     );
   });
 
@@ -115,7 +118,7 @@ describe("IPFS client", () => {
     expect(Array.isArray(unpin.Pins)).toBe(true);
     expect(unpin.Pins[0]).toBe(hash);
     await expect(client.unpin(hash)).rejects.toThrow(
-      "500: Internal Server Error"
+      "500: Internal Server Error",
     );
   });
 });

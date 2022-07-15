@@ -1,4 +1,3 @@
-export { IpfsClient } from "./internal/client";
+export { IpfsClient } from "./client";
 export * from "./interfaces";
 export * from "./typings";
-export * from "./enums";

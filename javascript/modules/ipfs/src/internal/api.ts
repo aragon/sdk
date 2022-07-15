@@ -1,8 +1,7 @@
-import { IpfsClient } from "./client";
 import {
   AddOptions,
   CatOptions,
-  Config,
+  IClientConfig,
   NodeInfoOptions,
   VersionOptions,
   PinOptions,
@@ -20,7 +19,7 @@ import { Helpers } from "./helpers";
 export namespace API {
   /** Gets cluster version */
   export function version(
-    cluster: IpfsClient,
+    cluster: IClientConfig,
     options: VersionOptions = {}
   ): Promise<VersionResponse> {
     return Network.request(cluster, "version", {
@@ -36,7 +35,7 @@ export namespace API {
 
   /** Gets the cluster node information */
   export function nodeInfo(
-    cluster: IpfsClient,
+    cluster: IClientConfig,
     options = {} as NodeInfoOptions
   ): Promise<NodeInfoResponse> {
     return Network.request(cluster, "id", {
@@ -52,7 +51,7 @@ export namespace API {
 
   /** Upload a file to the cluster and pin it */
   export function add(
-    cluster: Config,
+    cluster: IClientConfig,
     file: File | Blob | Uint8Array | string,
     options: AddOptions = {}
   ): Promise<AddResponse> {
@@ -88,7 +87,7 @@ export namespace API {
 
   /** Fetches the data behind the given path or CiD and returns it as bytes */
   export async function cat(
-    cluster: Config,
+    cluster: IClientConfig,
     path: string,
     options: CatOptions = {}
   ): Promise<Uint8Array> {
@@ -108,7 +107,7 @@ export namespace API {
 
   /** Pins the given path or CiD or IPFS/IPNS path to the cluster */
   export function pin(
-    cluster: IpfsClient,
+    cluster: IClientConfig,
     path: string,
     options: PinOptions = {}
   ): Promise<PinResponse> {
@@ -124,7 +123,7 @@ export namespace API {
 
   /** Unpins the given path or CiD or IPFS/IPNS path from the cluster */
   export function unpin(
-    cluster: IpfsClient,
+    cluster: IClientConfig,
     path: string,
     options: UnpinOptions = {}
   ): Promise<PinResponse> {

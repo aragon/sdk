@@ -1,4 +1,4 @@
-export interface Config {
+export interface IClientConfig {
   /** IPFS Cluster URL */
   url: URL;
   /** Additional headers to be included with requests */
