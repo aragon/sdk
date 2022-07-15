@@ -26,37 +26,37 @@ export interface NodeInfoOptions extends RequestOptions {
 }
 
 export interface AddOptions extends RequestOptions {
-  // Write minimal output.
+  /** Write minimal output. */
   quiet?: boolean;
-  // Write only final hash
+  /** Write only final hash */
   quieter?: boolean;
-  // Write no output
+  /** Write no output */
   silent?: boolean;
-  // Stream progress data
+  /** Stream progress data */
   progress?: boolean;
-  // Use trickle-dag format for dag generation
+  /** Use trickle-dag format for dag generation */
   trickle?: boolean;
-  // Only chunk and hash - do not write to disk
+  /** Only chunk and hash - do not write to disk */
   onlyHash?: boolean;
-  // Wrap files with a directory object
+  /** Wrap files with a directory object */
   wrapWithDirectory?: boolean;
-  // Chunking algorithm, size-[bytes], rabin-[min]-[avg]-[max] or buzhash. Default: size-262144
+  /** Chunking algorithm, size-[bytes], rabin-[min]-[avg]-[max] or buzhash. Default: size-262144 */
   chunker?: string;
-  // Pin this object when adding. Default: true
+  /** Pin this object when adding. Default: true */
   pin?: boolean;
-  // Use raw blocks for leaf nodes.
+  /** Use raw blocks for leaf nodes. */
   rawLeaves?: boolean;
-  // Add the file using filestore. Implies raw-leaves. (experimental).
+  /** Add the file using filestore. Implies raw-leaves. (experimental). */
   noCopy?: boolean;
-  // Check the filestore for pre-existing blocks.
+  /** Check the filestore for pre-existing blocks. */
   fsCache?: boolean;
-  // CID version. Defaults to 0 unless an option that depends on CIDv1 is passed. Passing version 1 will cause the raw-leaves option to default to true
+  /** CID version. Defaults to 0 unless an option that depends on CIDv1 is passed. Passing version 1 will cause the raw-leaves option to default to true */
   cidVersion?: 0 | 1;
-  // Hash function to use. Implies CIDv1 if not sha2-256. (experimental). Default: sha2-256
+  /** Hash function to use. Implies CIDv1 if not sha2-256. (experimental). Default: sha2-256 */
   hash?: string;
-  // Inline small blocks into CIDs. (experimental).
+  /** Inline small blocks into CIDs. (experimental). */
   inline?: boolean;
-  // Maximum block size to inline. (experimental). Default: 32
+  /** Maximum block size to inline. (experimental). Default: 32 */
   inlineLimit?: number;
 }
 export interface CatOptions extends RequestOptions {

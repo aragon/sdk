@@ -17,8 +17,7 @@ export namespace Helpers {
     return file.name;
   }
 
-  export function handleError(e: any) {
-    const error = e as Error & { response?: Response };
+  export function handleError(error: Error & { response?: Response }) {
     if (error.response?.ok) {
       return new Error("Error parsing body");
     } else {

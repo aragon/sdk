@@ -43,7 +43,7 @@ export class IpfsClient {
    * Imports a file to the cluster. First argument must be a `File` or `Blob`.
    * Note: by default this module uses v1 CIDs and raw leaves enabled.
    */
-  add(file: File | Blob | string, options?: AddOptions): Promise<AddResponse> {
+  add(file: File | Blob | Uint8Array | string, options?: AddOptions): Promise<AddResponse> {
     return API.add(this, file, options);
   }
 
@@ -51,6 +51,7 @@ export class IpfsClient {
   cat(path: string, options?: CatOptions): Promise<Uint8Array> {
     return API.cat(this, path, options);
   }
+
   /**
    * Tracks a path with the given replication factor and a name for
    * human-friendliness.
@@ -60,7 +61,7 @@ export class IpfsClient {
   }
 
   /**
-   * Untracks a path from cluster.
+   * Untracks a path on the cluster.
    */
   unpin(path: string, options?: UnpinOptions): Promise<PinResponse> {
     return API.unpin(this, path, options);
