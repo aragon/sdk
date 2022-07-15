@@ -19,12 +19,6 @@ describe("IPFS client", () => {
     });
   });
 
-  it("Should get the version info of a node", async () => {
-    const versionInfo = await client.version();
-    expect(typeof versionInfo.version).toBe("string");
-    expect(versionInfo.version !== "").toBe(true);
-  });
-
   it("Should get the info of a node", async () => {
     const versionInfo = await client.nodeInfo();
     expect(typeof versionInfo.id).toBe("string");
@@ -109,37 +103,22 @@ describe("IPFS client", () => {
     );
   });
 
-  it("Should add a string unpin it, and pin it again", async () => {
-    const content = "I am a test";
-    const { hash } = await client.add(content);
+  // Not currently allowed by the IPFS cluster proxy
 
-    const unpin = await client.unpin(hash);
-    expect(typeof unpin).toBe("object");
-    expect(Array.isArray(unpin.pins)).toBe(true);
-    expect(unpin.pins[0]).toBe(hash);
+  // it("Should add a string and pin it", async () => {
+  //   const content = "I am a test";
+  //   const { hash } = await client.add(content);
 
-    const pin = await client.pin(hash);
-    expect(typeof pin).toBe("object");
-    expect(Array.isArray(pin.pins)).toBe(true);
-    expect(pin.pins[0]).toBe(hash);
-  });
+  //   const pin = await client.pin(hash);
+  //   expect(typeof pin).toBe("object");
+  //   expect(Array.isArray(pin.pins)).toBe(true);
+  //   expect(pin.pins[0]).toBe(hash);
+  // });
 
-  it("Should throw an error when trying to unpin an invalid CID", async () => {
-    const path = "1nv4l1dC1D";
-    await expect(client.unpin(path)).rejects.toThrow(
-      "500: Internal Server Error",
-    );
-  });
-
-  it("Should throw an error when trying unpining an unexistent pin", async () => {
-    const content = "I am a test";
-    const { hash } = await client.add(content);
-    const unpin = await client.unpin(hash);
-    expect(typeof unpin).toBe("object");
-    expect(Array.isArray(unpin.pins)).toBe(true);
-    expect(unpin.pins[0]).toBe(hash);
-    await expect(client.unpin(hash)).rejects.toThrow(
-      "500: Internal Server Error",
-    );
-  });
+  // it("Should throw an error when trying to pin an invalid CID", async () => {
+  //   const path = "1nv4l1dC1D";
+  //   await expect(client.pin(path)).rejects.toThrow(
+  //     "500: Internal Server Error",
+  //   );
+  // });
 });
