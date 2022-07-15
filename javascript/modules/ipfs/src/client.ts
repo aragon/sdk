@@ -8,10 +8,10 @@ import {
 import {
   AddOptions,
   CatOptions,
-  RequestOptions,
-  VersionOptions,
   PinOptions,
+  RequestOptions,
   UnpinOptions,
+  VersionOptions,
 } from "./interfaces";
 
 export class IpfsClient {
@@ -20,7 +20,7 @@ export class IpfsClient {
 
   /** Create a new instance of the IPFS cluster client */
   constructor(url: string, headers?: Record<string, string>) {
-    this.url = new URL(url);
+    this.url = url.endsWith("/") ? new URL(url) : new URL(url + "/");
     this.headers = headers || {};
   }
 
@@ -43,7 +43,10 @@ export class IpfsClient {
    * Imports a file to the cluster. First argument must be a `File` or `Blob`.
    * Note: by default this module uses v1 CIDs and raw leaves enabled.
    */
-  add(file: File | Blob | Uint8Array | string, options?: AddOptions): Promise<AddResponse> {
+  add(
+    file: File | Blob | Uint8Array | string,
+    options?: AddOptions,
+  ): Promise<AddResponse> {
     return API.add(this, file, options);
   }
 
