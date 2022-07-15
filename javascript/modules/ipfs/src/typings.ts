@@ -23,8 +23,8 @@ export type AddResponse = {
 };
 
 export type PinResponse = {
-  Pins: string[];
-  Progress?: number;
+  pins: string[];
+  progress?: number;
 };
 
 export type GenericRecord = Record<

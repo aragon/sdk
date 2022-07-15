@@ -9,8 +9,8 @@ const IPFS_API_KEY = process.env.IPFS_API_KEY ||
     .trim();
 
 // const IPFS_CLUSTER_URL = "https://ipfs-0.aragon.network/api/v0";
-// const IPFS_CLUSTER_URL = "https://testing-ipfs-0.aragon.network:5001";
-const IPFS_CLUSTER_URL = "http://127.0.0.1:5001/api/v0/";
+const IPFS_CLUSTER_URL = "https://testing-ipfs-0.aragon.network";
+// const IPFS_CLUSTER_URL = "http://127.0.0.1:5001/api/v0/";
 
 describe("IPFS client", () => {
   let client: IpfsClient;
@@ -98,13 +98,6 @@ describe("IPFS client", () => {
     expect(recoveredContent).toEqual(string);
   });
 
-  // this test should pass but for some reason it don'
-  // it("Should return an error when trying to add an invalid file", async () => {
-  //   const content = ["Not a string"];
-  //   // @ts-ignore
-  //   await expect(client.add(content)).rejects.toThrow("Invalid file");
-  // });
-
   it("Should return an error when trying to cat an empty string", async () => {
     const path = "";
     await expect(client.cat(path)).rejects.toThrow("Invalid CID");
@@ -120,14 +113,16 @@ describe("IPFS client", () => {
   it("Should add a string unpin it, and pin it again", async () => {
     const content = "I am a test";
     const { hash } = await client.add(content);
+
     const unpin = await client.unpin(hash);
     expect(typeof unpin).toBe("object");
-    expect(Array.isArray(unpin.Pins)).toBe(true);
-    expect(unpin.Pins[0]).toBe(hash);
+    expect(Array.isArray(unpin.pins)).toBe(true);
+    expect(unpin.pins[0]).toBe(hash);
+
     const pin = await client.pin(hash);
     expect(typeof pin).toBe("object");
-    expect(Array.isArray(pin.Pins)).toBe(true);
-    expect(pin.Pins[0]).toBe(hash);
+    expect(Array.isArray(pin.pins)).toBe(true);
+    expect(pin.pins[0]).toBe(hash);
   });
 
   it("Should throw an error when trying to unpin an invalid CID", async () => {
@@ -142,8 +137,8 @@ describe("IPFS client", () => {
     const { hash } = await client.add(content);
     const unpin = await client.unpin(hash);
     expect(typeof unpin).toBe("object");
-    expect(Array.isArray(unpin.Pins)).toBe(true);
-    expect(unpin.Pins[0]).toBe(hash);
+    expect(Array.isArray(unpin.pins)).toBe(true);
+    expect(unpin.pins[0]).toBe(hash);
     await expect(client.unpin(hash)).rejects.toThrow(
       "500: Internal Server Error",
     );
