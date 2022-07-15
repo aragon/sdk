@@ -3,15 +3,23 @@ import { GenericRecord } from "../typings";
 import fetch from "isomorphic-unfetch";
 
 export namespace Network {
+  /**
+   * Performs a request and returns a JSON object with the response
+   */
   export async function request(
     config: Config,
     path: string,
-    { method, params, body, signal }: {
+    {
+      method,
+      params,
+      body,
+      signal,
+    }: {
       method?: string;
       params?: GenericRecord;
       body?: BodyInit;
       signal?: AbortSignal;
-    },
+    }
   ) {
     const { url, headers } = config;
     const endpoint = new URL(path, url);
@@ -31,7 +39,7 @@ export namespace Network {
     if (!response.ok) {
       throw Object.assign(
         new Error(`${response.status}: ${response.statusText}`),
-        { response },
+        { response }
       );
     }
     return response.json();
@@ -40,12 +48,17 @@ export namespace Network {
   export async function* stream(
     { url, headers }: Config,
     path: string,
-    { method, params, body, signal }: {
+    {
+      method,
+      params,
+      body,
+      signal,
+    }: {
       method?: string;
       params?: GenericRecord;
       body?: BodyInit;
       signal?: AbortSignal;
-    },
+    }
   ) {
     const endpoint = new URL(path, url);
     for (const [key, value] of Object.entries(params || {})) {
@@ -67,34 +80,28 @@ export namespace Network {
         response: res,
       });
     }
-
-    yield* streamedJsonParse(res.body);
+    yield* streamedBytes(res.body);
   }
 
-  async function* streamedJsonParse(stream: ReadableStream<Uint8Array>) {
+  async function* streamedBytes(
+    stream: ReadableStream<Uint8Array>
+  ): AsyncGenerator<Uint8Array> {
+    let error = null;
     const reader = stream.getReader();
-    const matcher = /\r?\n/;
-    const decoder = new TextDecoder("utf8");
-    let buffer = "";
     try {
       while (true) {
         const result = await reader.read();
-
         if (result.done) {
           break;
         }
-
-        buffer += decoder.decode(result.value, { stream: true });
-        const parts = buffer.split(matcher);
-        buffer = parts.pop() || "";
-        for (const part of parts) yield JSON.parse(part);
+        yield result.value;
       }
+    } catch (err) {
+      error = err;
     } finally {
       reader.cancel();
       reader.releaseLock();
     }
-    buffer += decoder.decode(undefined, { stream: false });
-
-    if (buffer) yield JSON.parse(buffer);
+    if (error) throw error;
   }
 }
