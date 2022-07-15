@@ -44,7 +44,6 @@ describe("IPFS client", () => {
   it("Should upload a Uint8Array and recover the same thing", async () => {
     const content = new Uint8Array([80, 81, 82, 83, 84, 85, 86, 87, 88, 89]);
     const { hash } = await client.add(content);
-    expect(hash).toBe("12341234");
     const recoveredBytes = await client.cat(hash);
     expect(recoveredBytes.toString()).toEqual("80,81,82,83,84,85,86,87,88,89");
   });

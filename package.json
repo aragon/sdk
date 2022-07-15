@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@web-std/fetch": "^4.1.0",
+    "@web-std/file": "^3.0.2",
+    "@web-std/form-data": "^3.0.2"
+  }
+}
