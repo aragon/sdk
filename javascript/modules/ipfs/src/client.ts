@@ -19,8 +19,13 @@ export class Client {
   readonly headers: Record<string, string>;
 
   /** Create a new instance of the IPFS cluster client */
-  constructor(url: string, headers?: Record<string, string>) {
-    this.url = url.endsWith("/") ? new URL(url) : new URL(url + "/");
+  constructor(url: string | URL, headers?: Record<string, string>) {
+    const newUrl = typeof url === "string" ? new URL(url) : url;
+    if (!newUrl.pathname.endsWith("/")) {
+      newUrl.pathname += "/";
+    }
+    this.url = newUrl;
+
     this.headers = headers || {};
   }
 

@@ -2,8 +2,7 @@
 
 import { Signer } from "@ethersproject/abstract-signer";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
-// NOTE: Backing off ipfs-http-client until the UI framework supports it
-// import { Options, IPFSHTTPClient } from "ipfs-http-client";
+import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 // import { GraphQLClient } from "graphql-request";
 
 // Context input parameters
@@ -17,8 +16,7 @@ type Web3ContextParams = {
   gasFeeEstimationFactor?: number;
 };
 type IpfsContextParams = {
-  // NOTE: Backing off ipfs-http-client until the UI framework supports it
-  // ipfsNodes?: Options[];
+  ipfsNodes?: { url: string; headers?: Record<string, string> }[];
 };
 type GraphQLContextParams = {
   // subgraphURL: string;
@@ -40,8 +38,7 @@ type Web3ContextState = {
   gasFeeEstimationFactor: number;
 };
 type IpfsContextState = {
-  // NOTE: Backing off ipfs-http-client until the UI framework supports it
-  // ipfs?: IPFSHTTPClient[];
+  ipfs?: IpfsClient[];
 };
 type GraphQLContextState = {
   // subgraph?: GraphQLClient;

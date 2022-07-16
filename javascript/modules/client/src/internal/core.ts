@@ -2,14 +2,16 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
-import { IClientCore } from "./interfaces/core";
+import {
+  IClientCore,
+  IClientGraphQLCore,
+  IClientIpfsCore,
+  IClientWeb3Core,
+} from "./interfaces/core";
 import { Context } from "../context";
 import { GasFeeEstimation } from "./interfaces/common";
-// NOTE: Backing off ipfs-http-client until the UI framework supports it
-// import { Random } from "@aragon/sdk-common";
-
-// NOTE: Backing off ipfs-http-client until the UI framework supports it
-// import { IPFSHTTPClient } from "ipfs-http-client";
+import { Random } from "@aragon/sdk-common";
+import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 
 /**
  * Provides the low level foundation so that subclasses have ready-made access to Web3, IPFS and GraphQL primitives
@@ -22,16 +24,14 @@ export abstract class ClientCore implements IClientCore {
   private _signer: Signer | undefined;
   private _daoFactoryAddress = "";
   private _gasFeeEstimationFactor = 1;
-  // NOTE: Backing off ipfs-http-client until the UI framework supports it
-  // private _ipfs: IPFSHTTPClient[] = [];
-  // private _ipfsIdx: number = -1;
+  private _ipfs: IpfsClient[] = [];
+  private _ipfsIdx: number = -1;
 
   constructor(context: Context) {
-    // NOTE: Backing off ipfs-http-client until the UI framework supports it
-    // if (context.ipfs?.length) {
-    //   this._ipfs = context.ipfs;
-    //   this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
-    // }
+    if (context.ipfs?.length) {
+      this._ipfs = context.ipfs;
+      this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
+    }
     if (context.web3Providers) {
       this._web3Providers = context.web3Providers;
       this._web3Idx = 0;
@@ -50,7 +50,7 @@ export abstract class ClientCore implements IClientCore {
     }
   }
 
-  web3 = {
+  web3: IClientWeb3Core = {
     /** Replaces the current signer by the given one */
     useSigner: (signer: Signer) => {
       if (!signer) {
@@ -82,7 +82,10 @@ export abstract class ClientCore implements IClientCore {
         throw new Error("No provider");
       } else if (signer.provider) return signer;
 
-      signer = signer.connect(this.web3.getProvider());
+      const provider = this.web3.getProvider();
+      if (!provider) throw new Error("No provider");
+
+      signer = signer.connect(provider);
       return signer;
     },
 
@@ -93,7 +96,10 @@ export abstract class ClientCore implements IClientCore {
 
     /** Returns whether the current provider is functional or not */
     isUp: () => {
-      return this.web3.getProvider()
+      const provider = this.web3.getProvider();
+      if (!provider) return Promise.reject(new Error("No provider"));
+
+      return provider
         .getNetwork()
         .then(() => true)
         .catch(() => false);
@@ -118,6 +124,8 @@ export abstract class ClientCore implements IClientCore {
       else if (!this.web3.getProvider()) throw new Error("No signer");
 
       const provider = this.web3.getProvider();
+      if (!provider) throw new Error("No provider");
+
       const contract = new Contract(address, abi, provider);
 
       if (!signer) return contract as Contract & T;
@@ -161,99 +169,73 @@ export abstract class ClientCore implements IClientCore {
     },
   };
 
-  ipfs = {
-    // NOTE: Backing off ipfs-http-client until the UI framework supports it
+  ipfs: IClientIpfsCore = {
+    getClient: () => {
+      if (!this._ipfs[this._ipfsIdx]) {
+        throw new Error("No IPFS endpoints available");
+      }
+      return this._ipfs[this._ipfsIdx];
+    },
 
-    // /**
-    //  * Starts using the next available IPFS endpoint
-    //  */
-    // public shiftClient() {
-    //   if (!this._ipfs.length) throw new Error("No IPFS endpoints available");
-    //   else if (this._ipfs.length < 2) {
-    //     throw new Error("No other endpoints");
-    //   }
-    //   this._ipfsIdx = (this._ipfsIdx + 1) % this._ipfs.length;
-    //   return this;
-    // }
+    /**
+     * Starts using the next available IPFS endpoint
+     */
+    shiftClient: () => {
+      if (!this._ipfs?.length) throw new Error("No IPFS endpoints available");
+      else if (this._ipfs?.length < 2) {
+        throw new Error("No other endpoints");
+      }
+      this._ipfsIdx = (this._ipfsIdx + 1) % this._ipfs?.length;
+    },
 
-    // getClient: () => {
-    //   if (!this._ipfs[this._ipfsIdx]) {
-    //     throw new Error("No IPFS endpoints available");
-    //   }
-    //   return this._ipfs[this._ipfsIdx];
-    // },
+    /** Returns `true` if the current client is on line */
+    isUp: () => {
+      if (!this._ipfs?.length) return Promise.resolve(false);
 
-    // /** Returns `true` if the current client is on line */
-    // isUp: () => {
-    //   // Note: the TS typing is incorrect (returns a Promise)
-    //   return Promise.resolve(this.ipfs.isOnline())
-    //     .catch(() => false);
-    // }
+      return Promise.resolve(this.ipfs.getClient().nodeInfo())
+        .then(() => true)
+        .catch(() => false);
+    },
 
-    // // IPFS METHODS
+    ensureOnline: async () => {
+      if (!this._ipfs?.length) {
+        return Promise.reject(new Error("IPFS client is not initialized"));
+      }
 
-    // pin: async (input: string | Uint8Array) => {
-    //   if (!this.ipfs) {
-    //     throw new Error("IPFS client is not initialized");
-    //   }
-    //   // find online node
-    //   let isOnline = false;
-    //   for (var i = 0; i < this._ipfs.length; i++) {
-    //     isOnline = await this.isIpfsNodeUp();
-    //     if (isOnline) break;
+      for (var i = 0; i < this._ipfs?.length; i++) {
+        if (await this.ipfs.isUp()) return;
 
-    //     this.shiftIpfsNode();
-    //   }
-    //   if (!isOnline) throw new Error("No IPFS nodes available");
+        this.ipfs.shiftClient();
+      }
+      throw new Error("No IPFS nodes available");
+    },
 
-    //   return this._ipfs[this._ipfsIdx]
-    //     .add(input)
-    //     .then((res) => res.path)
-    //     .catch((e) => {
-    //       throw new Error("Could not pin data: " + (e?.message || ""));
-    //     });
-    // }
+    // IPFS METHODS
 
-    // public async fetchBytes(cid: string) {
-    //   if (!this.ipfs) throw new Error("IPFS client is not initialized");
-    //   // find online node
-    //   let isOnline = false;
-    //   for (let i = 0; i < this._ipfs.length; i++) {
-    //     isOnline = await this.isIpfsNodeUp();
-    //     if (isOnline) break;
+    add: async (input: string | Uint8Array) => {
+      return this.ipfs.ensureOnline()
+        .then(() => this.ipfs.getClient().add(input))
+        .then((res) => res.hash)
+        .catch((e) => {
+          throw new Error("Could not upload data: " + (e?.message || ""));
+        });
+    },
 
-    //     this.shiftIpfsNode();
-    //   }
-    //   if (!isOnline) throw new Error("No IPFS nodes available");
+    fetchBytes: (cid: string) => {
+      return this.ipfs.ensureOnline()
+        .then(() => this.ipfs.getClient().cat(cid));
+    },
 
-    //   try {
-    //     const chunks: Uint8Array[] = [];
-    //     let totalArrayLength = 0;
-    //     for await (const chunk of this._ipfs[this._ipfsIdx].cat(cid)) {
-    //       chunks.push(chunk);
-    //       totalArrayLength += chunk.length;
-    //     }
-
-    //     const mergedArray = new Uint8Array(totalArrayLength);
-    //     let lastIndex = 0;
-    //     for (const chunk of chunks) {
-    //       mergedArray.set(chunk, lastIndex);
-    //       lastIndex += chunk.length;
-    //     }
-    //     return mergedArray;
-    //   } catch (e) {
-    //     throw new Error("Could not fetch data");
-    //   }
-    // }
-
-    // public fetchString(cid: string): Promise<string> {
-    //   return this.fetchBytes(cid)
-    //     .then((bytes) => new TextDecoder().decode(bytes))
-    //     .catch((e) => {
-    //       throw new Error(
-    //         "Error while fetching and decoding bytes: " + (e?.message || ""),
-    //       );
-    //     });
-    // }
+    fetchString: (cid: string): Promise<string> => {
+      return this.ipfs.fetchBytes(cid)
+        .then((bytes) => new TextDecoder().decode(bytes))
+        .catch((e) => {
+          throw new Error(
+            "Error while fetching and decoding bytes: " + (e?.message || ""),
+          );
+        });
+    },
   };
+
+  graphql: IClientGraphQLCore = {};
 }

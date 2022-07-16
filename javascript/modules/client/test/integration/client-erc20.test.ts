@@ -14,7 +14,6 @@ import {
   VoteOptions,
 } from "../../src/internal/interfaces/plugins";
 
-// @ts-ignore  TODO: Remove this comment
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
@@ -39,15 +38,14 @@ const contextParams: ContextErc20Params = {
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   pluginAddress: "0x2345678901234567890123456789012345678901",
-  // NOTE: Backing off ipfs-http-client until the UI framework supports it
-  // ipfsNodes: [
-  //   {
-  //     url: "https://testing-ipfs-0.aragon.network",
-  //     headers: {
-  //       "X-API-KEY": IPFS_API_KEY || "",
-  //     },
-  //   },
-  // ],
+  ipfsNodes: [
+    {
+      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || "",
+      },
+    },
+  ],
 };
 
 const contextParamsLocalChain: ContextErc20Params = {
@@ -57,18 +55,17 @@ const contextParamsLocalChain: ContextErc20Params = {
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
   pluginAddress: "0x2345678901234567890123456789012345678901",
-  // NOTE: Backing off ipfs-http-client until the UI framework supports it
-  // ipfsNodes: [
-  //   {
-  //     url: "http:localhost:5001",
-  //   },
-  //   {
-  //     url: "http:localhost:5002",
-  //   },
-  //   {
-  //     url: "http:localhost:5003",
-  //   },
-  // ],
+  ipfsNodes: [
+    {
+      url: "http:localhost:5001",
+    },
+    {
+      url: "http:localhost:5002",
+    },
+    {
+      url: "http:localhost:5003",
+    },
+  ],
 };
 
 describe("Client", () => {
