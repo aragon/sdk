@@ -30,7 +30,7 @@ import { isAddress } from "@ethersproject/address";
 import { pack } from "@ethersproject/solidity";
 
 import { strip0x } from "@aragon/sdk-common";
-import { erc20ContractAbi } from "./internal/abi/dao";
+import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
 
 export { DaoCreationSteps, DaoDepositSteps };
@@ -214,19 +214,20 @@ export class Client extends ClientCore implements IClient {
     );
     yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
 
-    await depositTx.wait().then((cr) => {
-      if (!cr.events?.length) {
-        throw new Error("The deposit was not properly registered");
-      }
+    await depositTx.wait()
+      .then((cr) => {
+        if (!cr.events?.length) {
+          throw new Error("The deposit was not properly registered");
+        }
 
-      const eventAmount = cr.events?.find((e) => e?.event === "Deposited")
-        ?.args?.amount;
-      if (!amount.eq(eventAmount)) {
-        throw new Error(
-          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`,
-        );
-      }
-    });
+        const eventAmount = cr.events?.find((e) => e?.event === "Deposited")
+          ?.args?.amount;
+        if (!amount.eq(eventAmount)) {
+          throw new Error(
+            `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`,
+          );
+        }
+      });
     yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
   }
 
@@ -375,7 +376,10 @@ export class Client extends ClientCore implements IClient {
           url: "https://google.com",
         },
       ],
-      plugins: ["0x1234567890123456789012345678901234567890", "0x2345678901234567890123456789012345678901"],
+      plugins: [
+        "0x1234567890123456789012345678901234567890",
+        "0x2345678901234567890123456789012345678901",
+      ],
     }));
   }
 
