@@ -1,4 +1,4 @@
-import { IpfsClient } from "../src";
+import { Client } from "../src";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -12,9 +12,9 @@ const IPFS_CLUSTER_URL = "https://testing-ipfs-0.aragon.network/api/v0";
 // const IPFS_CLUSTER_URL = "http://127.0.0.1:5001/api/v0/";
 
 describe("IPFS client", () => {
-  let client: IpfsClient;
+  let client: Client;
   beforeEach(() => {
-    client = new IpfsClient(IPFS_CLUSTER_URL, {
+    client = new Client(IPFS_CLUSTER_URL, {
       "X-API-KEY": IPFS_API_KEY,
     });
   });

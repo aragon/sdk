@@ -14,7 +14,7 @@ import {
   VersionOptions,
 } from "./interfaces";
 
-export class IpfsClient {
+export class Client {
   readonly url: URL;
   readonly headers: Record<string, string>;
 

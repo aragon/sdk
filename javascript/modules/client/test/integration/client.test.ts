@@ -18,7 +18,6 @@ import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
 // import { TestERC20__factory } from "@aragon/core-contracts-ethers";
 
-// @ts-ignore  TODO: Remove this comment
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",

@@ -1,7 +1,7 @@
 # Aragon JS SDK IPFS
 
 @aragon/sdk-ifps provides a wrapper to send requests to an IPFS Cluster using
-the IPFS API. It supports standard operations as well as streamed requests.
+the IPFS API. It supports standard requests as well as streamed requests.
 
 # Installation
 
@@ -18,11 +18,11 @@ yarn add @aragon/sdk-ipfs
 ## IPFS Client
 
 The Aragon infrastructure uses an IPFS cluster which requires authentication
-based on an API key. The provided `IpfsClient` works as well on any canonical
+based on an API key. The provided `Client` works as well on any canonical
 deployment by just not providing any API key in the headers.
 
 ```ts
-import { IpfsClient } from "@aragon/sdk-ipfs";
+import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 
 const headers = {
   "X-API-KEY": "1234...",

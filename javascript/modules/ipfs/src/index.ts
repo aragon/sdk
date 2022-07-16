@@ -1,3 +1,3 @@
-export { IpfsClient } from "./client";
+export { Client } from "./client";
 export * from "./interfaces";
 export * from "./typings";
