@@ -1,5 +1,4 @@
-Aragon JS SDK Client
----
+--- Aragon JS SDK Client
 
 @aragon/sdk-client provides easy access to the high level interactions to be
 made with an Aragon DAO. It consists of three different components:
@@ -187,9 +186,9 @@ import { Client } from "@aragon/sdk-client";
 
 const client = new Client(context);
 const options = {
-	orderBy: OrderBy.POPULARITY,
-	limit: 10
-}
+  orderBy: OrderBy.POPULARITY,
+  limit: 10,
+};
 
 const result = await client.methods.getDaos(options);
 console.log(result);
@@ -206,7 +205,6 @@ console.log(result);
 }, {...}]
 */
 ```
-
 
 ### Loading DAO details
 
@@ -247,7 +245,7 @@ const client = new Client(context);
 const daoAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
 const balances = await client.methods.getBalances(daoAddressOrEns);
 console.log(balances);
-/* 
+/*
 [{
   type: "native"
   "balance": 1000000000000000n,
@@ -272,7 +270,7 @@ const daoAddressOrEns = "0x1234...";
 const transfers = await client.methods.getTransfers(daoAddressOrEns);
 console.log(transfers);
 /*
-{ 
+{
   "deposits": [{
     "type": "native"
     "from":"0x1234...",
@@ -490,7 +488,8 @@ console.log(withdrawAction);
 
 # Development
 
-The building blocks are defined within the `src/internal` folder. The high level client wrappers are implemented in `src/client*.ts`
+The building blocks are defined within the `src/internal` folder. The high level
+client wrappers are implemented in `src/client*.ts`
 
 ## Low level networking
 
