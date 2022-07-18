@@ -101,7 +101,7 @@ export class Client extends ClientCore implements IClient {
       where: string,
       who: string,
       role: DaoRole,
-      data: Uint8Array,
+      data: Uint8Array
     ) => this._hasPermission(where, who, role, data),
   };
 
@@ -117,7 +117,7 @@ export class Client extends ClientCore implements IClient {
 
   private async *_createDao(
     // @ts-ignore  TODO: Remove this comment when used
-    params: ICreateParams,
+    params: ICreateParams
   ): AsyncGenerator<DaoCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -128,7 +128,7 @@ export class Client extends ClientCore implements IClient {
 
     const daoFactoryInstance = DAOFactory__factory.connect(
       this.web3.getDaoFactoryAddress(),
-      signer,
+      signer
     );
 
     // @ts-ignore  TODO: Remove this comment when used
@@ -173,7 +173,7 @@ export class Client extends ClientCore implements IClient {
   }
 
   private async *_deposit(
-    params: IDepositParams,
+    params: IDepositParams
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -183,7 +183,7 @@ export class Client extends ClientCore implements IClient {
     }
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params,
+      params
     );
 
     if (tokenAddress && tokenAddress !== AddressZero) {
@@ -193,7 +193,7 @@ export class Client extends ClientCore implements IClient {
         daoAddress,
         amount.toBigInt(),
         tokenAddress,
-        signer,
+        signer
       );
     }
 
@@ -210,24 +210,23 @@ export class Client extends ClientCore implements IClient {
       tokenAddress,
       amount,
       reference,
-      override,
+      override
     );
     yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
 
-    await depositTx.wait()
-      .then((cr) => {
-        if (!cr.events?.length) {
-          throw new Error("The deposit was not properly registered");
-        }
+    await depositTx.wait().then(cr => {
+      if (!cr.events?.length) {
+        throw new Error("The deposit was not properly registered");
+      }
 
-        const eventAmount = cr.events?.find((e) => e?.event === "Deposited")
-          ?.args?.amount;
-        if (!amount.eq(eventAmount)) {
-          throw new Error(
-            `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`,
-          );
-        }
-      });
+      const eventAmount = cr.events?.find(e => e?.event === "Deposited")?.args
+        ?.amount;
+      if (!amount.eq(eventAmount)) {
+        throw new Error(
+          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`
+        );
+      }
+    });
     yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
   }
 
@@ -235,17 +234,13 @@ export class Client extends ClientCore implements IClient {
     daoAddress: string,
     amount: bigint,
     tokenAddress: string,
-    signer: Signer,
+    signer: Signer
   ): AsyncGenerator<DaoDepositStepValue> {
-    const tokenInstance = new Contract(
-      tokenAddress,
-      erc20ContractAbi,
-      signer,
-    );
+    const tokenInstance = new Contract(tokenAddress, erc20ContractAbi, signer);
 
     const currentAllowance = await tokenInstance.allowance(
       await signer.getAddress(),
-      daoAddress,
+      daoAddress
     );
 
     yield {
@@ -255,22 +250,22 @@ export class Client extends ClientCore implements IClient {
 
     if (currentAllowance.gte(amount)) return;
 
-    const tx: ContractTransaction = await tokenInstance
-      .approve(daoAddress, BigNumber.from(amount));
+    const tx: ContractTransaction = await tokenInstance.approve(
+      daoAddress,
+      BigNumber.from(amount)
+    );
 
     yield {
       key: DaoDepositSteps.UPDATING_ALLOWANCE,
       txHash: tx.hash,
     };
 
-    await tx.wait()
-      .then((cr: ContractReceipt) => {
-        const value = cr.events?.find((e) => e?.event === "Approval")?.args
-          ?.value;
-        if (!value || BigNumber.from(amount).gt(value)) {
-          throw new Error("Could not increase allowance");
-        }
-      });
+    await tx.wait().then((cr: ContractReceipt) => {
+      const value = cr.events?.find(e => e?.event === "Approval")?.args?.value;
+      if (!value || BigNumber.from(amount).gt(value)) {
+        throw new Error("Could not increase allowance");
+      }
+    });
 
     yield {
       key: DaoDepositSteps.UPDATED_ALLOWANCE,
@@ -282,7 +277,7 @@ export class Client extends ClientCore implements IClient {
     _where: string,
     _who: string,
     _role: DaoRole,
-    _data: Uint8Array,
+    _data: Uint8Array
   ) {
     // TODO: Unimplemented
     return Promise.reject();
@@ -311,7 +306,7 @@ export class Client extends ClientCore implements IClient {
     // TODO: ESTIMATE INCREASED ALLOWANCE AS WELL
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params,
+      params
     );
 
     const daoInstance = DAO__factory.connect(daoAddress, signer);
@@ -323,7 +318,7 @@ export class Client extends ClientCore implements IClient {
 
     return daoInstance.estimateGas
       .deposit(tokenAddress, amount, reference, override)
-      .then((gasLimit) => {
+      .then(gasLimit => {
         return this.web3.getApproximateGasFee(gasLimit.toBigInt());
       });
   }
@@ -339,7 +334,7 @@ export class Client extends ClientCore implements IClient {
 
     // Generate DAO creation within the past year
     const fromDate = new Date(
-      new Date().setFullYear(new Date().getFullYear() - 1),
+      new Date().setFullYear(new Date().getFullYear() - 1)
     ).getTime();
 
     const dummyDaoNames = [
@@ -349,30 +344,30 @@ export class Client extends ClientCore implements IClient {
       "Yggdrasil Unite",
     ];
 
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => ({
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() => ({
       ...(isAddress(daoAddressOrEns)
         ? {
-          address: daoAddressOrEns,
-          name: dummyDaoNames[
-            Math.floor(Math.random() * dummyDaoNames.length - 1)
-          ],
-        }
+            address: daoAddressOrEns,
+            name:
+              dummyDaoNames[
+                Math.floor(Math.random() * dummyDaoNames.length - 1)
+              ],
+          }
         : {
-          address: "0x663ac3c648548eb8ccd292b41a8ff829631c846d",
-          name: daoAddressOrEns,
-        }),
+            address: "0x663ac3c648548eb8ccd292b41a8ff829631c846d",
+            name: daoAddressOrEns,
+          }),
 
       createdAt: new Date(fromDate + Math.random() * (Date.now() - fromDate)),
-      description:
-        `We are a community that loves trees and the planet. We track where forestation
+      description: `We are a community that loves trees and the planet. We track where forestation
        is increasing (or shrinking), fund people who are growing and protecting trees...`,
       links: [
         {
-          label: "Website",
+          description: "Website",
           url: "https://google.com",
         },
         {
-          label: "Discord",
+          description: "Discord",
           url: "https://google.com",
         },
       ],
@@ -385,7 +380,7 @@ export class Client extends ClientCore implements IClient {
 
   private _getBalances(
     daoIdentifier: string,
-    _tokenAddresses: string[],
+    _tokenAddresses: string[]
   ): Promise<AssetBalance[]> {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
@@ -394,17 +389,15 @@ export class Client extends ClientCore implements IClient {
       throw new Error("Invalid DAO address or ENS");
     }
 
-    const AssetBalances: AssetBalance[] = assetList.map(
-      (token) => ({
-        ...token,
-      }),
-    );
+    const AssetBalances: AssetBalance[] = assetList.map(token => ({
+      ...token,
+    }));
 
     return Promise.resolve(AssetBalances);
   }
 
   private async _getTransfers(
-    daoAddressOrEns: string,
+    daoAddressOrEns: string
   ): Promise<IAssetTransfers> {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
@@ -452,7 +445,7 @@ export class Client extends ClientCore implements IClient {
             transactionId: transfers[index].transactionId,
             // Generate a random date in the past
             date: new Date(
-              +new Date() - Math.floor(Math.random() * 10000000000),
+              +new Date() - Math.floor(Math.random() * 10000000000)
             ),
           };
           return result;
@@ -464,12 +457,10 @@ export class Client extends ClientCore implements IClient {
           reference: "Some reference",
           transactionId: transfers[index].transactionId,
           // Generate a random date in the past
-          date: new Date(
-            +new Date() - Math.floor(Math.random() * 10000000000),
-          ),
+          date: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
         };
         return result;
-      },
+      }
     );
 
     // Withdraw data structure would be similar to deposit list
@@ -483,12 +474,13 @@ export class Client extends ClientCore implements IClient {
 
 // @ts-ignore  TODO: Remove this comment
 function unwrapCreateDaoParams(
-  params: ICreateParams,
+  params: ICreateParams
 ): [DAOFactory.DAOConfigStruct, DAOFactory.VoteConfigStruct, string, string] {
   // TODO: Serialize plugin params into a buffer
-  const pluginDataBytes = "0x" +
+  const pluginDataBytes =
+    "0x" +
     params.plugins
-      .map((entry) => {
+      .map(entry => {
         const item = pack(["uint256", "bytes[]"], [entry.id, entry.data]);
         return strip0x(item);
       })
@@ -517,7 +509,7 @@ function unwrapCreateDaoParams(
 }
 
 function unwrapDepositParams(
-  params: IDepositParams,
+  params: IDepositParams
 ): [string, BigNumber, string, string] {
   return [
     params.daoAddress,

@@ -11,7 +11,7 @@ export interface IClient extends IClientCore {
     /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
     getBalances: (
       daoAddressOrEns: string,
-      tokenAddresses: string[],
+      tokenAddresses: string[]
     ) => Promise<AssetBalance[]>;
     /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string) => Promise<IAssetTransfers>;
@@ -20,7 +20,7 @@ export interface IClient extends IClientCore {
       where: string,
       who: string,
       role: DaoRole,
-      data: Uint8Array,
+      data: Uint8Array
     ) => Promise<void>;
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
@@ -141,7 +141,7 @@ export interface IAssetTransfers {
 
 // DAO details
 
-export type DaoResourceLink = { label: string; url: string };
+export type DaoResourceLink = { description: string; url: string };
 
 export type DaoMetadata = {
   address: string;

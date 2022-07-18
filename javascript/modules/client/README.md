@@ -197,7 +197,7 @@ console.log(metadata);
    avatar: "http...",
    createdAt: <Date>,
    description: "This dao...",
-   links: [{label: "Website", url: "http..."}],
+   links: [{description: "Website", url: "http..."}],
    name: "Abc Dao",
    plugins: ["0x1245...", "0x3456..."],
 } */
