@@ -178,6 +178,36 @@ for await (const step of client.methods.deposit(depositParams)) {
 }
 ```
 
+### Loading Multiple DAOs
+
+Handles retrieving list of DAO metadata.
+
+```ts
+import { Client } from "@aragon/sdk-client";
+
+const client = new Client(context);
+const options = {
+	orderBy: OrderBy.POPULARITY,
+	limit: 10
+}
+
+const result = await client.methods.getDaos(options);
+console.log(result);
+
+/*
+[{
+   address: "0x1234...",
+   avatar: "http...",
+   createdAt: <Date>,
+   description: "This dao...",
+   links: [{description: "Website", url: "http..."}],
+   name: "Abc Dao",
+   plugins: ["0x1245...", "0x3456..."],
+}, {...}]
+*/
+```
+
+
 ### Loading DAO details
 
 Handles retrieving DAO metadata using its address or ENS domain.

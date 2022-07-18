@@ -15,7 +15,7 @@ export interface IClient extends IClientCore {
     ) => Promise<AssetBalance[]>;
     /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string) => Promise<IAssetTransfers>;
-    /** Checks whether a role is granted by the curren DAO's ACL settings */
+    /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
       where: string,
       who: string,
@@ -26,6 +26,8 @@ export interface IClient extends IClientCore {
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getMetadata: (daoAddressOrEns: string) => Promise<DaoMetadata>;
+    /** Retrieves list of created DAOs and the corresponding metadata*/
+    getDaos: (options?: DaoQueryOptions) => Promise<DaoMetadata[]>;
   };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
@@ -151,4 +153,18 @@ export type DaoMetadata = {
   links?: DaoResourceLink[];
   name: string;
   plugins: string[];
+};
+
+export enum DaoOrderBy {
+  CREATED_AT,
+  NAME,
+  POPULARITY, // Currently defined by overall number of proposals
+}
+
+// TODO: Rename ?
+export type DaoQueryOptions = {
+  orderBy?: DaoOrderBy;
+  direction?: "asc" | "desc";
+  skip?: number;
+  limit?: number;
 };

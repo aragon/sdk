@@ -7,6 +7,7 @@ import {
   DaoDepositSteps,
   DaoDepositStepValue,
   DaoMetadata,
+  DaoQueryOptions,
   IAssetTransfers,
   IClient,
   ICreateParams,
@@ -90,12 +91,11 @@ export class Client extends ClientCore implements IClient {
     /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string) =>
       this._getTransfers(daoAddressOrEns),
-    /** Checks whether a role is granted by the curren DAO's ACL settings */
-
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getMetadata: (daoAddressOrEns: string) =>
       this._getMetadata(daoAddressOrEns),
-
+    /** Retrieves list of created DAOs and the corresponding metadata*/
+    getDaos: (options?: DaoQueryOptions) => this._getDaos(options),
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -344,6 +344,11 @@ export class Client extends ClientCore implements IClient {
       "Yggdrasil Unite",
     ];
 
+    const pluginAddresses = [
+      "0x1234567890123456789012345678901234567890",
+      "0x2345678901234567890123456789012345678901",
+    ];
+
     return new Promise(resolve => setTimeout(resolve, 1000)).then(() => ({
       ...(isAddress(daoAddressOrEns)
         ? {
@@ -371,11 +376,26 @@ export class Client extends ClientCore implements IClient {
           url: "https://google.com",
         },
       ],
-      plugins: [
-        "0x1234567890123456789012345678901234567890",
-        "0x2345678901234567890123456789012345678901",
-      ],
+      plugins: [pluginAddresses[Math.round(Math.random())]],
     }));
+  }
+
+  // @ts-ignore  TODO: Remove this comment when options used
+  private async _getDaos(options?: DaoQueryOptions) {
+    const daos = [
+      "0x0028807509712aa45eafd5fdd0982c4db36fbe50",
+      "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61",
+      "0x09e7a6b83f7417cbca993fed2dd3c7d2b4d23794",
+      "0x16f7129ae281f29d51ea085ac496501b7a1c0391",
+    ];
+
+    const daosWithMetadata = await Promise.all(
+      daos.map(address => this._getMetadata(address))
+    );
+
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(
+      () => daosWithMetadata
+    );
   }
 
   private _getBalances(
