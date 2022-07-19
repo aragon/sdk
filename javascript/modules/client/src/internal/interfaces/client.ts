@@ -27,7 +27,7 @@ export interface IClient extends IClientCore {
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getMetadata: (daoAddressOrEns: string) => Promise<DaoMetadata>;
     /** Retrieves list of created DAOs and the corresponding metadata*/
-    getDaos: (options?: DaoQueryOptions) => Promise<DaoMetadata[]>;
+    getMetadataMany: (options?: DaoQueryOptions) => Promise<DaoMetadata[]>;
   };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
@@ -155,7 +155,7 @@ export type DaoMetadata = {
   plugins: string[];
 };
 
-export enum DaoOrderBy {
+export enum DaoSortBy {
   CREATED_AT,
   NAME,
   POPULARITY, // Currently defined by overall number of proposals
@@ -163,8 +163,8 @@ export enum DaoOrderBy {
 
 // TODO: Rename ?
 export type DaoQueryOptions = {
-  orderBy?: DaoOrderBy;
-  direction?: "asc" | "desc";
+  sortBy?: DaoSortBy;
+  sortDirection?: "asc" | "desc";
   skip?: number;
   limit?: number;
 };

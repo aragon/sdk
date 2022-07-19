@@ -95,7 +95,8 @@ export class Client extends ClientCore implements IClient {
     getMetadata: (daoAddressOrEns: string) =>
       this._getMetadata(daoAddressOrEns),
     /** Retrieves list of created DAOs and the corresponding metadata*/
-    getDaos: (options?: DaoQueryOptions) => this._getDaos(options),
+    getMetadataMany: (options?: DaoQueryOptions) =>
+      this._getMetadataMany(options),
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -382,7 +383,7 @@ export class Client extends ClientCore implements IClient {
   }
 
   // @ts-ignore  TODO: Remove this comment when options used
-  private async _getDaos(options?: DaoQueryOptions) {
+  private async _getMetadataMany(options?: DaoQueryOptions) {
     const daos = [
       "0x0028807509712aa45eafd5fdd0982c4db36fbe50",
       "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61",

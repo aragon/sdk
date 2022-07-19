@@ -1,4 +1,4 @@
---- Aragon JS SDK Client
+# Aragon JS SDK Client
 
 @aragon/sdk-client provides easy access to the high level interactions to be
 made with an Aragon DAO. It consists of three different components:
@@ -186,11 +186,11 @@ import { Client } from "@aragon/sdk-client";
 
 const client = new Client(context);
 const options = {
-  orderBy: OrderBy.POPULARITY,
+  sortBy: DaosSortBy.POPULARITY,
   limit: 10,
 };
 
-const result = await client.methods.getDaos(options);
+const result = await client.methods.getMetadataMany(options);
 console.log(result);
 
 /*
