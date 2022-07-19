@@ -1,7 +1,7 @@
 // @ts-ignore
 declare const describe, it, beforeAll, afterAll, expect, test;
 
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import {
   Client,
@@ -16,7 +16,7 @@ import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
-// import { TestERC20__factory } from "@aragon/core-contracts-ethers";
+import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-ethers";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -59,13 +59,13 @@ const contextParamsLocalChain: ContextParams = {
   web3Providers: ["http://localhost:8545"],
   ipfsNodes: [
     {
-      url: "http:localhost:5001",
+      url: "http://localhost:5001",
     },
     {
-      url: "http:localhost:5002",
+      url: "http://localhost:5002",
     },
     {
-      url: "http:localhost:5003",
+      url: "http://localhost:5003",
     },
   ],
 };
@@ -75,6 +75,9 @@ describe("Client", () => {
     const server = await ganacheSetup.start();
     const daoFactory = await deployContracts.deploy(server);
     contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
+    /* TODO: REMOVE ME */
+    const daoAddress = await createLegacyDao(contextParamsLocalChain)
+    contextParamsLocalChain.dao = daoAddress;
   });
 
   afterAll(async () => {
@@ -194,7 +197,7 @@ describe("Client", () => {
       const client = new Client(context);
 
       const depositParams: IDepositParams = {
-        daoAddress: "0x1234567890123456789012345678901234567890",
+        daoAddress: contextParamsLocalChain.dao,
         amount: BigInt(1234),
       };
 
@@ -236,7 +239,7 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: "0x2345678901234567890123456789012345678901",
+        daoAddress: contextParamsLocalChain.dao,
         amount: BigInt(5),
         tokenAddress: tokenContract.address,
         reference: "My reference",
@@ -289,7 +292,7 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: "0x2345678901234567890123456789012345678901",
+        daoAddress: contextParamsLocalChain.dao,
         amount: BigInt(7),
         tokenAddress: tokenContract.address,
         reference: "My reference",
@@ -343,7 +346,7 @@ describe("Client", () => {
       expect(
         (await tokenContract.functions.balanceOf(depositParams.daoAddress))
           .toString(),
-      ).toBe("5");
+      ).toBe("7");
     });
   });
 });
@@ -362,4 +365,132 @@ function deployErc20(client: Client) {
 
   // If your contract requires constructor args, you can specify them here
   return factory.deploy();
+}
+
+/* TODO: 
+This code creates a dao with the legacy method
+to be able to test the deposit, please remove
+everything from here once the new dao creation works
+*/
+async function createLegacyDao(params: ContextParams) {
+  if (!params.web3Providers) {
+    throw new Error("A provider is needed");
+  }
+  if (!params.daoFactoryAddress) {
+    throw new Error("A dao factory is needed");
+  }
+  const provider = useWeb3Providers(params.web3Providers, params.network)
+  const signer = new Wallet(TEST_WALLET, provider[0])
+  const daoFactoryInstance = DAOFactory__factory.connect(
+    params.daoFactoryAddress,
+    signer
+  );
+
+  const daoCreationParams: ICreateDaoERC20Voting = {
+    daoConfig: {
+      name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+      metadata: "0x1234",
+    },
+    tokenConfig: {
+      addr: "0x0000000000000000000000000000000000000000",
+      name:
+        "TestToken" +
+        (Math.random() + 1)
+          .toString(36)
+          .substring(4)
+          .toUpperCase(),
+      symbol:
+        "TEST" +
+        (Math.random() + 1)
+          .toString(36)
+          .substring(4)
+          .toUpperCase(),
+    },
+    mintConfig: {
+      receivers: [Wallet.createRandom().address, Wallet.createRandom().address],
+      amounts: [BigInt(Math.floor(Math.random() * 9999) + 1), BigInt(Math.floor(Math.random() * 9999) + 1)]
+    },
+    votingConfig: {
+      supportRequiredPct: Math.floor(Math.random() * 100) + 1,
+      participationRequiredPct: Math.floor(Math.random() * 100) + 1,
+      minDuration: Math.floor(Math.random() * 9999) + 1,
+    },
+    gsnForwarder: Wallet.createRandom().address,
+  };
+  const registryInstance = await daoFactoryInstance
+    .registry()
+    .then(registryAddress => {
+      return Registry__factory.connect(registryAddress, provider[0]);
+    });
+  return daoFactoryInstance.newERC20VotingDAO(
+    daoCreationParams.daoConfig,
+    daoCreationParams.votingConfig,
+    daoCreationParams.tokenConfig,
+    daoCreationParams.mintConfig,
+    daoCreationParams.gsnForwarder ? daoCreationParams.gsnForwarder : ""
+  )
+    .then(tx => tx.wait())
+    .then((cr) => {
+      const newDaoAddress = cr.events?.find(
+        e => e.address === registryInstance.address
+      )?.topics[1];
+      if (!newDaoAddress)
+        return Promise.reject(new Error("Could not create DAO"));
+
+      return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
+    })
+}
+
+export interface ICreateDaoERC20Voting {
+  daoConfig: DaoConfig;
+  tokenConfig: TokenConfig;
+  mintConfig: MintConfig;
+  votingConfig: VotingConfig;
+  gsnForwarder?: string;
+}
+
+export interface DaoConfig {
+  name: string;
+  metadata: string;
+}
+
+export interface TokenConfig {
+  addr: string;
+  name: string;
+  symbol: string;
+}
+
+export interface MintConfig {
+  receivers: string[];
+  amounts: bigint[];
+}
+
+export interface VotingConfig {
+  /** 0-100 as a percentage */
+  supportRequiredPct: number;
+  /** 0-100 as a percentage */
+  participationRequiredPct: number;
+  /** In seconds */
+  minDuration: number;
+}
+
+
+function useWeb3Providers(
+  endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
+  network: Networkish,
+): JsonRpcProvider[] {
+  if (Array.isArray(endpoints)) {
+    return endpoints.map((item) => {
+      if (typeof item === "string") {
+        const url = new URL(item);
+        return new JsonRpcProvider(url.href, network);
+      }
+      return item;
+    });
+  } else if (typeof endpoints === "string") {
+    const url = new URL(endpoints);
+    return [new JsonRpcProvider(url.href, network)];
+  } else {
+    return [endpoints];
+  }
 }
