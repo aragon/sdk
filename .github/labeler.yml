@@ -9,3 +9,7 @@ javascript-common:
 javascript-client:
 - javascript/modules/client/**/*
 - javascript/modules/client/*
+
+javascript-ipfs:
+- javascript/modules/ipfs/**/*
+- javascript/modules/ipfs/*
