@@ -13,6 +13,7 @@
   },
   "jest": {
     "preset": "ts-jest",
+    "testTimeout": 20000,
     "testEnvironment": "./test-environment.js"
   },
   "scripts": {
