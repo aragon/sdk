@@ -18,6 +18,12 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Changes (breaking)
+- Now using a general-purpose `Client` class and a plugin-specific one for the rest (`ClientErc20`)
+
+### Added
+- Providing IPFS support with full isomorphic compatibility
+
 ## 0.0.18-alpha
 On 2022-06-16 12:44:48
 

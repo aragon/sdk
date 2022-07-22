@@ -18,6 +18,10 @@ TEMPLATE:
 
 ## [UPCOMING] 
 
+- Version bump
+
+## 0.0.2-alpha
+
 ### Added
 - Github actions automation to deploy this package 
 - `Random.getFloat()`
