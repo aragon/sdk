@@ -46,6 +46,7 @@ const contextParams: ContextErc20Params = {
       },
     },
   ],
+  subgraphURL: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
 };
 
 const contextParamsLocalChain: ContextErc20Params = {
@@ -66,6 +67,7 @@ const contextParamsLocalChain: ContextErc20Params = {
       url: "http:localhost:5003",
     },
   ],
+  subgraphURL: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
 };
 
 describe("Client", () => {
