@@ -49,6 +49,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
+  subgraphURL: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -68,6 +69,7 @@ const contextParamsLocalChain: ContextParams = {
       url: "http://localhost:5003",
     },
   ],
+  subgraphURL: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
 };
 
 describe("Client", () => {
@@ -83,7 +85,6 @@ describe("Client", () => {
   afterAll(async () => {
     await ganacheSetup.stop();
   });
-
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParams);
@@ -349,6 +350,48 @@ describe("Client", () => {
       ).toBe("7");
     });
   });
+  describe("GraphQL Client", () => {
+    it("Should create an invalid subgraph client", async () => {
+      const ctx = new Context({ ...contextParamsLocalChain, subgraphURL: "http://th.wrong/url" });
+      const client = new Client(ctx)
+      const isUp = await client.subgraph.isUp()
+      expect(isUp).toBe(false);
+    })
+    it("Should create an valid subgraph client", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx)
+      const isUp = await client.subgraph.isUp()
+      expect(isUp).toBe(true);
+    })
+    // it("Should get a dao with a specific address", async () => {
+    //   const ctx = new Context(contextParams);
+    //   const client = new Client(ctx)
+    //   client.methods.getMetadata(contextParams.dao)
+    // })
+    it("Should get the transfers of a dao", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx)
+      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+      const res = await client.methods.getTransfers(daoAddress)
+      expect(Array.isArray(res.deposits)).toBe(true)
+      expect(Array.isArray(res.withdraws)).toBe(true)
+    })
+    it("Should return null when trying the get the transfers of a dao that does not exist", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx)
+      const res = await client.methods.getTransfers(contextParamsLocalChain.dao)
+      expect(res).toBe(null)
+    })
+    it("Should get the transfers of a dao", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx)
+      // will fail when tested on local chain
+      await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
+        "Invalid ENS name"
+      );
+    })
+  });
+
 });
 
 // HELPERS

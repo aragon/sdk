@@ -12,6 +12,8 @@ import { Context } from "../context";
 import { GasFeeEstimation } from "./interfaces/common";
 import { Random } from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
+import { GraphQLClient } from "graphql-request";
+import { status } from "./queries";
 
 /**
  * Provides the low level foundation so that subclasses have ready-made access to Web3, IPFS and GraphQL primitives
@@ -25,6 +27,7 @@ export abstract class ClientCore implements IClientCore {
   private _daoFactoryAddress = "";
   private _gasFeeEstimationFactor = 1;
   private _ipfs: IpfsClient[] = [];
+  private _subgraph: GraphQLClient | undefined
   private _ipfsIdx: number = -1;
 
   constructor(context: Context) {
@@ -32,6 +35,11 @@ export abstract class ClientCore implements IClientCore {
       this._ipfs = context.ipfs;
       this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
     }
+
+    if (context.subgraph) {
+      this._subgraph = context.subgraph
+    }
+
     if (context.web3Providers) {
       this._web3Providers = context.web3Providers;
       this._web3Idx = 0;
@@ -237,5 +245,21 @@ export abstract class ClientCore implements IClientCore {
     },
   };
 
-  graphql: IClientGraphQLCore = {};
+  subgraph: IClientGraphQLCore = {
+    getClient: () => {
+      if (!this._subgraph) {
+        throw new Error("GraphQl client not inicialized")
+      }
+      return this._subgraph
+    },
+    isUp: async ():Promise<boolean> => {
+      return this.subgraph.getClient().request(status)
+        .then((res) => {
+          if (res._meta && res._meta.deployment) {
+            return true
+          }
+          return false
+        }).catch(() => false)
+    }
+  };
 }

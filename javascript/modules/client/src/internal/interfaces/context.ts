@@ -3,7 +3,7 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
-// import { GraphQLClient } from "graphql-request";
+import { GraphQLClient } from "graphql-request";
 
 // Context input parameters
 
@@ -19,7 +19,7 @@ type IpfsContextParams = {
   ipfsNodes?: { url: string; headers?: Record<string, string> }[];
 };
 type GraphQLContextParams = {
-  // subgraphURL: string;
+  subgraphURL: string;
 };
 
 export type ContextParams =
@@ -41,7 +41,7 @@ type IpfsContextState = {
   ipfs?: IpfsClient[];
 };
 type GraphQLContextState = {
-  // subgraph?: GraphQLClient;
+  subgraph?: GraphQLClient;
 };
 
 export type ContextState =
