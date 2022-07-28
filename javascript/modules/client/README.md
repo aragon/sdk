@@ -1,5 +1,4 @@
-Aragon JS SDK Client
----
+# Aragon JS SDK Client
 
 @aragon/sdk-client provides easy access to the high level interactions to be
 made with an Aragon DAO. It consists of three different components:
@@ -178,6 +177,35 @@ for await (const step of client.methods.deposit(depositParams)) {
 }
 ```
 
+### Loading Multiple DAOs
+
+Handles retrieving list of DAO metadata.
+
+```ts
+import { Client } from "@aragon/sdk-client";
+
+const client = new Client(context);
+const options = {
+  sortBy: DaosSortBy.POPULARITY,
+  limit: 10,
+};
+
+const result = await client.methods.getMetadataMany(options);
+console.log(result);
+
+/*
+[{
+   address: "0x1234...",
+   avatar: "http...",
+   createdAt: <Date>,
+   description: "This dao...",
+   links: [{description: "Website", url: "http..."}],
+   name: "Abc Dao",
+   plugins: ["0x1245...", "0x3456..."],
+}, {...}]
+*/
+```
+
 ### Loading DAO details
 
 Handles retrieving DAO metadata using its address or ENS domain.
@@ -197,7 +225,7 @@ console.log(metadata);
    avatar: "http...",
    createdAt: <Date>,
    description: "This dao...",
-   links: [{label: "Website", url: "http..."}],
+   links: [{description: "Website", url: "http..."}],
    name: "Abc Dao",
    plugins: ["0x1245...", "0x3456..."],
 } */
@@ -217,7 +245,7 @@ const client = new Client(context);
 const daoAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
 const balances = await client.methods.getBalances(daoAddressOrEns);
 console.log(balances);
-/* 
+/*
 [{
   type: "native"
   "balance": 1000000000000000n,
@@ -242,7 +270,7 @@ const daoAddressOrEns = "0x1234...";
 const transfers = await client.methods.getTransfers(daoAddressOrEns);
 console.log(transfers);
 /*
-{ 
+{
   "deposits": [{
     "type": "native"
     "from":"0x1234...",
@@ -460,7 +488,8 @@ console.log(withdrawAction);
 
 # Development
 
-The building blocks are defined within the `src/internal` folder. The high level client wrappers are implemented in `src/client*.ts`
+The building blocks are defined within the `src/internal` folder. The high level
+client wrappers are implemented in `src/client*.ts`
 
 ## Low level networking
 

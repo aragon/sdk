@@ -7,6 +7,7 @@ import {
   DaoDepositSteps,
   DaoDepositStepValue,
   DaoMetadata,
+  DaoQueryOptions,
   IAssetTransfers,
   IClient,
   ICreateParams,
@@ -90,12 +91,12 @@ export class Client extends ClientCore implements IClient {
     /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string) =>
       this._getTransfers(daoAddressOrEns),
-    /** Checks whether a role is granted by the curren DAO's ACL settings */
-
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getMetadata: (daoAddressOrEns: string) =>
       this._getMetadata(daoAddressOrEns),
-
+    /** Retrieves list of created DAOs and the corresponding metadata*/
+    getMetadataMany: (options?: DaoQueryOptions) =>
+      this._getMetadataMany(options),
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -214,20 +215,19 @@ export class Client extends ClientCore implements IClient {
     );
     yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
 
-    await depositTx.wait()
-      .then((cr) => {
-        if (!cr.events?.length) {
-          throw new Error("The deposit was not properly registered");
-        }
+    await depositTx.wait().then((cr) => {
+      if (!cr.events?.length) {
+        throw new Error("The deposit was not properly registered");
+      }
 
-        const eventAmount = cr.events?.find((e) => e?.event === "Deposited")
-          ?.args?.amount;
-        if (!amount.eq(eventAmount)) {
-          throw new Error(
-            `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`,
-          );
-        }
-      });
+      const eventAmount = cr.events?.find((e) => e?.event === "Deposited")?.args
+        ?.amount;
+      if (!amount.eq(eventAmount)) {
+        throw new Error(
+          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`,
+        );
+      }
+    });
     yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
   }
 
@@ -237,11 +237,7 @@ export class Client extends ClientCore implements IClient {
     tokenAddress: string,
     signer: Signer,
   ): AsyncGenerator<DaoDepositStepValue> {
-    const tokenInstance = new Contract(
-      tokenAddress,
-      erc20ContractAbi,
-      signer,
-    );
+    const tokenInstance = new Contract(tokenAddress, erc20ContractAbi, signer);
 
     const currentAllowance = await tokenInstance.allowance(
       await signer.getAddress(),
@@ -255,22 +251,23 @@ export class Client extends ClientCore implements IClient {
 
     if (currentAllowance.gte(amount)) return;
 
-    const tx: ContractTransaction = await tokenInstance
-      .approve(daoAddress, BigNumber.from(amount));
+    const tx: ContractTransaction = await tokenInstance.approve(
+      daoAddress,
+      BigNumber.from(amount),
+    );
 
     yield {
       key: DaoDepositSteps.UPDATING_ALLOWANCE,
       txHash: tx.hash,
     };
 
-    await tx.wait()
-      .then((cr: ContractReceipt) => {
-        const value = cr.events?.find((e) => e?.event === "Approval")?.args
-          ?.value;
-        if (!value || BigNumber.from(amount).gt(value)) {
-          throw new Error("Could not increase allowance");
-        }
-      });
+    await tx.wait().then((cr: ContractReceipt) => {
+      const value = cr.events?.find((e) => e?.event === "Approval")?.args
+        ?.value;
+      if (!value || BigNumber.from(amount).gt(value)) {
+        throw new Error("Could not increase allowance");
+      }
+    });
 
     yield {
       key: DaoDepositSteps.UPDATED_ALLOWANCE,
@@ -349,6 +346,11 @@ export class Client extends ClientCore implements IClient {
       "Yggdrasil Unite",
     ];
 
+    const pluginAddresses = [
+      "0x1234567890123456789012345678901234567890",
+      "0x2345678901234567890123456789012345678901",
+    ];
+
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => ({
       ...(isAddress(daoAddressOrEns)
         ? {
@@ -368,19 +370,34 @@ export class Client extends ClientCore implements IClient {
        is increasing (or shrinking), fund people who are growing and protecting trees...`,
       links: [
         {
-          label: "Website",
+          description: "Website",
           url: "https://google.com",
         },
         {
-          label: "Discord",
+          description: "Discord",
           url: "https://google.com",
         },
       ],
-      plugins: [
-        "0x1234567890123456789012345678901234567890",
-        "0x2345678901234567890123456789012345678901",
-      ],
+      plugins: [pluginAddresses[Math.round(Math.random())]],
     }));
+  }
+
+  // @ts-ignore  TODO: Remove this comment when options used
+  private async _getMetadataMany(options?: DaoQueryOptions) {
+    const daos = [
+      "0x0028807509712aa45eafd5fdd0982c4db36fbe50",
+      "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61",
+      "0x09e7a6b83f7417cbca993fed2dd3c7d2b4d23794",
+      "0x16f7129ae281f29d51ea085ac496501b7a1c0391",
+    ];
+
+    const daosWithMetadata = await Promise.all(
+      daos.map((address) => this._getMetadata(address)),
+    );
+
+    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
+      () => daosWithMetadata,
+    );
   }
 
   private _getBalances(
@@ -394,11 +411,9 @@ export class Client extends ClientCore implements IClient {
       throw new Error("Invalid DAO address or ENS");
     }
 
-    const AssetBalances: AssetBalance[] = assetList.map(
-      (token) => ({
-        ...token,
-      }),
-    );
+    const AssetBalances: AssetBalance[] = assetList.map((token) => ({
+      ...token,
+    }));
 
     return Promise.resolve(AssetBalances);
   }
@@ -464,9 +479,7 @@ export class Client extends ClientCore implements IClient {
           reference: "Some reference",
           transactionId: transfers[index].transactionId,
           // Generate a random date in the past
-          date: new Date(
-            +new Date() - Math.floor(Math.random() * 10000000000),
-          ),
+          date: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
         };
         return result;
       },
