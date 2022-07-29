@@ -1,6 +1,6 @@
 import { gql } from "graphql-request";
 
-export const status = gql`
+export const QueryStatus = gql`
 {
   _meta{
     deployment

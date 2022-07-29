@@ -19,7 +19,7 @@ type IpfsContextParams = {
   ipfsNodes?: { url: string; headers?: Record<string, string> }[];
 };
 type GraphQLContextParams = {
-  subgraphURL: string;
+  subgraphURLs: string[];
 };
 
 export type ContextParams =
@@ -41,7 +41,7 @@ type IpfsContextState = {
   ipfs?: IpfsClient[];
 };
 type GraphQLContextState = {
-  subgraph?: GraphQLClient;
+  subgraph?: GraphQLClient[];
 };
 
 export type ContextState =

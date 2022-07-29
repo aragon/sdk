@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
-export const searchWithdraw = gql`
-query searchWithdraw($address: ID!, $pageSize: Int = 10, $offset: Int = 0) {
-  vaultWithdraws(where: {to: $address}, limit: $pageSize, skip: $offset){
+export const QueryGetWhithdrawals = gql`
+query getWithdrawals($address: ID!, $limit: Int = 10, $skip: Int = 0) {
+  vaultWithdraws(where: {to: $address}, limit: $limit, skip: $skip){
     id
     token {
       symbol

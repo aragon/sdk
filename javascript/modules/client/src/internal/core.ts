@@ -13,7 +13,7 @@ import { GasFeeEstimation } from "./interfaces/common";
 import { Random } from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-import { status } from "./queries";
+import { QueryStatus } from "./graphql-queries";
 
 /**
  * Provides the low level foundation so that subclasses have ready-made access to Web3, IPFS and GraphQL primitives
@@ -27,8 +27,9 @@ export abstract class ClientCore implements IClientCore {
   private _daoFactoryAddress = "";
   private _gasFeeEstimationFactor = 1;
   private _ipfs: IpfsClient[] = [];
-  private _subgraph: GraphQLClient | undefined
   private _ipfsIdx: number = -1;
+  private _subgraph: GraphQLClient[] = [];
+  private _subgraphIdx: number = -1;
 
   constructor(context: Context) {
     if (context.ipfs?.length) {
@@ -36,8 +37,9 @@ export abstract class ClientCore implements IClientCore {
       this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
     }
 
-    if (context.subgraph) {
+    if (context.subgraph?.length) {
       this._subgraph = context.subgraph
+      this._subgraphIdx = Math.floor(Random.getFloat() * context.subgraph.length);
     }
 
     if (context.web3Providers) {
@@ -246,20 +248,66 @@ export abstract class ClientCore implements IClientCore {
   };
 
   subgraph: IClientGraphQLCore = {
-    getClient: () => {
-      if (!this._subgraph) {
-        throw new Error("GraphQl client not inicialized")
+
+    /**
+     * Get the current graphql client
+     * without any additional checks
+     * @returns {GraphQLClient}
+     */
+    getClient: (): GraphQLClient => {
+      if (!this._subgraph[this._subgraphIdx]) {
+        throw new Error("No subgraph endpoints available");
       }
-      return this._subgraph
+      return this._subgraph[this._subgraphIdx];
     },
-    isUp: async ():Promise<boolean> => {
-      return this.subgraph.getClient().request(status)
+
+    /**
+     * Starts using the next available IPFS endpoint
+     * @returns {void}
+     */
+    shiftClient: () => {
+      if (!this._subgraph?.length) throw new Error("No subgraph endpoints available");
+      else if (this._subgraph?.length < 2) {
+        throw new Error("No other endpoints");
+      }
+      this._subgraphIdx = (this._subgraphIdx + 1) % this._subgraph?.length;
+    },
+
+    /**
+     * Checks if the current node is online
+     * @returns {Promise<boolean>}
+     */
+    isUp: async (): Promise<boolean> => {
+      return this.subgraph.getClient().request(QueryStatus)
         .then((res) => {
-          if (res._meta && res._meta.deployment) {
+          if (res._meta?.deployment) {
             return true
           }
           return false
         }).catch(() => false)
-    }
+    },
+    
+    /**
+     * Ensures that the subgraph is online.
+     * If the current node is not online
+     * it will shift to the next one and
+     * repeat until it finds an online 
+     * node. In the case that there are no
+     * nodes or none of them is available
+     * it will throw an error
+     * @returns {Promise<void>}
+     */
+    ensureOnline: async (): Promise<void> => {
+      if (!this._subgraph?.length) {
+        return Promise.reject(new Error("Subgraph client is not initialized"));
+      }
+
+      for (var i = 0; i < this._subgraph?.length; i++) {
+        if (await this.subgraph.isUp()) return;
+
+        this.subgraph.shiftClient();
+      }
+      throw new Error("No subgraph nodes available");
+    },
   };
 }

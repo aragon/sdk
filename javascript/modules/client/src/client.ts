@@ -1,7 +1,7 @@
 import {
   AssetBalance,
-  // AssetDeposit,
-  // AssetWithdrawal,
+  AssetDeposit,
+  AssetWithdrawal,
   DaoCreationSteps,
   DaoCreationStepValue,
   DaoDepositSteps,
@@ -33,8 +33,6 @@ import { pack } from "@ethersproject/solidity";
 import { strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
-// import { getENS } from "get-ens";
-import { getDaoByAddress, getDaoTransfersByAddress } from "./internal/queries";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -336,14 +334,6 @@ export class Client extends ClientCore implements IClient {
       throw new Error("Invalid DAO address or ENS");
     }
 
-    const dao = await this.subgraph.getClient()
-      .request(
-        getDaoByAddress,
-        { address: daoAddressOrEns }
-      )
-
-    console.log(JSON.stringify(dao))
-
     // Generate DAO creation within the past year
     const fromDate = new Date(
       new Date().setFullYear(new Date().getFullYear() - 1),
@@ -427,36 +417,59 @@ export class Client extends ClientCore implements IClient {
 
     return Promise.resolve(AssetBalances);
   }
-
   private async _getTransfers(
-    daoAddressOrEns: string
-  ): Promise<any> {
-    // TODO: typing on return
-
+    daoAddressOrEns: string,
+  ): Promise<IAssetTransfers> {
     // TODO: Implement actual fetch logic using subgraph.
     // Note: it would be nice if the client could be instantiated with dao identifier
 
     if (!daoAddressOrEns) {
-      throw new Error("Empty DAO address or ENS");
-    }
-    const provider = this.web3.getProvider()
-    if (!provider) {
-      throw new Error("No provider");
-    }
-    let address = daoAddressOrEns
-    if (!isAddress(daoAddressOrEns)) {
-      const recoveredAddress = await provider.resolveName(daoAddressOrEns)
-      if (!recoveredAddress) {
-        throw new Error("Invalid ENS name")
-      }
-      address = recoveredAddress
+      throw new Error("Invalid DAO address or ENS");
     }
 
-    const { dao: transfers } = await this.subgraph.getClient()
-      .request(
-        getDaoTransfersByAddress,
-        {
-          address,
+    // This is a temporary transfer list, needs to remove later
+    const transfers = [
+      {
+        from: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
+        transactionId:
+          "0x4c97c60f499dc69918b1b77ab7504eeacbd1e1a536e10471e12c184885dafc05",
+      },
+      {
+        from: "0xb1dc5d0881eea99a61d28be66fc491aae2a13d6a",
+        transactionId:
+          "0x6b0b8b815d78b83a5a69a883244a3ca2bdc25832edee2bc45e7b6392ad57fd94",
+      },
+      {
+        from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
+        transactionId:
+          "0x08525a68b342be200c220f5a22d30425a262c5603e63c210b7664f26b8418bcc",
+      },
+      {
+        from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
+        transactionId:
+          "0x8269a60f658e33393d3f20d065cd5107d410d41c5dba9e5c467efcd3f98db015",
+      },
+    ];
+
+    const deposits: AssetDeposit[] = assetList.map(
+      (assetBalance, index: number) => {
+        if (assetBalance.type === "erc20") {
+          const result: AssetDeposit = {
+            type: "erc20",
+            address: assetBalance.address,
+            name: assetBalance.name,
+            symbol: assetBalance.symbol,
+            decimals: assetBalance.decimals,
+            from: transfers[index].from,
+            amount: assetBalance.balance,
+            reference: "Some reference",
+            transactionId: transfers[index].transactionId,
+            // Generate a random date in the past
+            date: new Date(
+              +new Date() - Math.floor(Math.random() * 10000000000),
+            ),
+          };
+          return result;
         }
         const result: AssetDeposit = {
           type: "native",
@@ -471,7 +484,10 @@ export class Client extends ClientCore implements IClient {
       },
     );
 
-    return Promise.resolve(transfers);
+    // Withdraw data structure would be similar to deposit list
+    const withdrawals: AssetWithdrawal[] = [];
+
+    return Promise.resolve({ deposits, withdrawals });
   }
 }
 

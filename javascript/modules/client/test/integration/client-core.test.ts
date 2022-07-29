@@ -35,7 +35,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  subgraphURL: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
+  subgraphURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 describe("Client Core", () => {

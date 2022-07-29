@@ -49,7 +49,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  subgraphURL: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
+  subgraphURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -69,7 +69,7 @@ const contextParamsLocalChain: ContextParams = {
       url: "http://localhost:5003",
     },
   ],
-  subgraphURL: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
+  subgraphURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 describe("Client", () => {
@@ -351,47 +351,70 @@ describe("Client", () => {
     });
   });
   describe("GraphQL Client", () => {
-    it("Should create an invalid subgraph client", async () => {
-      const ctx = new Context({ ...contextParamsLocalChain, subgraphURL: "http://th.wrong/url" });
+    it("Should detect all invalid subgraph endpoints", async () => {
+      const ctx = new Context(
+        {
+          ...contextParamsLocalChain,
+          subgraphURLs: [
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url"
+          ]
+        });
       const client = new Client(ctx)
       const isUp = await client.subgraph.isUp()
       expect(isUp).toBe(false);
+      await expect(client.subgraph.ensureOnline()).rejects.toThrow("No subgraph nodes available")
     })
-    it("Should create an valid subgraph client", async () => {
-      const ctx = new Context(contextParamsLocalChain);
+    it("Should create a valid subgraph client", async () => {
+      const ctx = new Context(
+        {
+          ...contextParamsLocalChain,
+          subgraphURLs: [
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url"
+          ]
+        });
       const client = new Client(ctx)
+      await client.subgraph.ensureOnline()
       const isUp = await client.subgraph.isUp()
       expect(isUp).toBe(true);
     })
-    // it("Should get a dao with a specific address", async () => {
+    test.todo("Should get a DAO's metadata with a specific address")// , async () => {
     //   const ctx = new Context(contextParams);
     //   const client = new Client(ctx)
     //   client.methods.getMetadata(contextParams.dao)
     // })
-    it("Should get the transfers of a dao", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const client = new Client(ctx)
-      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
-      const res = await client.methods.getTransfers(daoAddress)
-      expect(Array.isArray(res.deposits)).toBe(true)
-      expect(Array.isArray(res.withdraws)).toBe(true)
-    })
-    it("Should return null when trying the get the transfers of a dao that does not exist", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const client = new Client(ctx)
-      const res = await client.methods.getTransfers(contextParamsLocalChain.dao)
-      expect(res).toBe(null)
-    })
-    it("Should get the transfers of a dao", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const client = new Client(ctx)
-      // will fail when tested on local chain
-      await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
-        "Invalid ENS name"
-      );
-    })
-  });
 
+    test.todo("Should get the transfers of a dao")// , async () => {
+    //   const ctx = new Context(contextParamsLocalChain);
+    //   const client = new Client(ctx)
+    //   const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+    //   const res = await client.methods.getTransfers(daoAddress)
+    //   expect(Array.isArray(res.deposits)).toBe(true)
+    //   expect(Array.isArray(res.withdrawals)).toBe(true)
+    // })
+    test.todo("Should return an empty array when getting the transfers of a DAO that does not exist")//, async () => {
+    //   const ctx = new Context(contextParamsLocalChain);
+    //   const client = new Client(ctx)
+    //   const res = await client.methods.getTransfers(contextParamsLocalChain.dao)
+    //   expect(res.length).toBe(0)
+    // })
+    test.todo("Should fail if the given ENS is invalid")// async () => {
+    // const ctx = new Context(contextParamsLocalChain);
+    // const client = new Client(ctx)
+    // // will fail when tested on local chain
+    // await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
+    //   "Invalid ENS name"
+    // );
+  })
 });
 
 // HELPERS
@@ -484,7 +507,7 @@ async function createLegacyDao(params: ContextParams) {
     })
 }
 
-export interface ICreateDaoERC20Voting {
+interface ICreateDaoERC20Voting {
   daoConfig: DaoConfig;
   tokenConfig: TokenConfig;
   mintConfig: MintConfig;
@@ -492,23 +515,23 @@ export interface ICreateDaoERC20Voting {
   gsnForwarder?: string;
 }
 
-export interface DaoConfig {
+interface DaoConfig {
   name: string;
   metadata: string;
 }
 
-export interface TokenConfig {
+interface TokenConfig {
   addr: string;
   name: string;
   symbol: string;
 }
 
-export interface MintConfig {
+interface MintConfig {
   receivers: string[];
   amounts: bigint[];
 }
 
-export interface VotingConfig {
+interface VotingConfig {
   /** 0-100 as a percentage */
   supportRequiredPct: number;
   /** 0-100 as a percentage */

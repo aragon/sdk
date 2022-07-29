@@ -62,7 +62,7 @@ export class Context {
       throw new Error("No gas fee reducer defined");
     } else if (!contextParams.ipfsNodes?.length) {
       throw new Error("No IPFS nodes defined");
-    } else if (!contextParams.subgraphURL) {
+    } else if (!contextParams.subgraphURLs?.length) {
       throw new Error("No Subgraph URL defined");
     }
 
@@ -81,7 +81,9 @@ export class Context {
       ipfs: contextParams.ipfsNodes.map((config) =>
         new IpfsClient(config.url, config.headers)
       ),
-      subgraph: new GraphQLClient(contextParams.subgraphURL),
+      subgraph: contextParams.subgraphURLs.map((url) =>
+        new GraphQLClient(url)
+      ),
     };
   }
 
@@ -119,8 +121,10 @@ export class Context {
         new IpfsClient(config.url, config.headers)
       );
     }
-    if (contextParams.subgraphURL) {
-      this.state.subgraph = new GraphQLClient(contextParams.subgraphURL);
+    if (contextParams.subgraphURLs?.length) {
+      this.state.subgraph = contextParams.subgraphURLs.map((url) =>
+        new GraphQLClient(url)
+      );
     }
   }
 
@@ -192,19 +196,6 @@ export class Context {
   }
 
   /**
-   * Getter for the GraphQLClient instance of the subgraph
-   *
-   * @var subgraph
-   *
-   * @returns {GraphQLClient}
-   *
-   * @public
-   */
-  // get subgraph(): GraphQLClient {
-  //   return this.state.subgraph || defaultState.subgraph;
-  // }
-
-  /**
    * Getter for daoFactoryAddress property
    *
    * @var daoFactoryAddress
@@ -250,24 +241,24 @@ export class Context {
    *
    * @var ipfs
    *
-   * @returns {IpfsClient}
+   * @returns {IpfsClient[] | undefined}
    *
    * @public
    */
-   get ipfs(): IpfsClient[] | undefined {
+  get ipfs(): IpfsClient[] | undefined {
     return this.state.ipfs || defaultState.ipfs;
   }
 
   /**
-   * Getter for the IPFS http client
+   * Getter for the GraphQL client
    *
    * @var subgraph
    *
-   * @returns {GraphQLClient}
+   * @returns {GraphQLClient[] | undefined}
    *
    * @public
    */
-  get subgraph(): GraphQLClient | undefined {
+  get subgraph(): GraphQLClient[] | undefined {
     return this.state.subgraph || defaultState.subgraph;
   }
 
@@ -281,9 +272,6 @@ export class Context {
     }
     if (params.signer) {
       defaultState.signer = params.signer;
-    }
-    if (params.subgraphURL) {
-      defaultState.subgraph = new GraphQLClient(params.subgraphURL);
     }
   }
   static getDefault() {

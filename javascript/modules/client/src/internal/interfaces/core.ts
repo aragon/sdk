@@ -32,9 +32,10 @@ export interface IClientIpfsCore {
   fetchBytes: (cid: string) => Promise<Uint8Array | undefined>;
 }
 export interface IClientGraphQLCore {
-  // Add here
   getClient: () => GraphQLClient
+  shiftClient: () => void
   isUp: () => Promise<boolean>
+  ensureOnline: () => Promise<void>;
 }
 
 export interface IClientCore {
