@@ -27,6 +27,7 @@ describe("Context instances", () => {
       daoFactoryAddress: "0x1234",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
+      subgraphURLs: []
     };
   });
   it("Should create an empty context", () => {
