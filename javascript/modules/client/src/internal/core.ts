@@ -28,8 +28,8 @@ export abstract class ClientCore implements IClientCore {
   private _gasFeeEstimationFactor = 1;
   private _ipfs: IpfsClient[] = [];
   private _ipfsIdx: number = -1;
-  private _subgraph: GraphQLClient[] = [];
-  private _subgraphIdx: number = -1;
+  private _graphql: GraphQLClient[] = [];
+  private _graphqlIdx: number = -1;
 
   constructor(context: Context) {
     if (context.ipfs?.length) {
@@ -37,9 +37,9 @@ export abstract class ClientCore implements IClientCore {
       this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
     }
 
-    if (context.subgraph?.length) {
-      this._subgraph = context.subgraph
-      this._subgraphIdx = Math.floor(Random.getFloat() * context.subgraph.length);
+    if (context.graphql?.length) {
+      this._graphql = context.graphql
+      this._graphqlIdx = Math.floor(Random.getFloat() * context.graphql.length);
     }
 
     if (context.web3Providers) {
@@ -247,7 +247,7 @@ export abstract class ClientCore implements IClientCore {
     },
   };
 
-  subgraph: IClientGraphQLCore = {
+  graphql: IClientGraphQLCore = {
 
     /**
      * Get the current graphql client
@@ -255,10 +255,10 @@ export abstract class ClientCore implements IClientCore {
      * @returns {GraphQLClient}
      */
     getClient: (): GraphQLClient => {
-      if (!this._subgraph[this._subgraphIdx]) {
-        throw new Error("No subgraph endpoints available");
+      if (!this._graphql[this._graphqlIdx]) {
+        throw new Error("No graphql endpoints available");
       }
-      return this._subgraph[this._subgraphIdx];
+      return this._graphql[this._graphqlIdx];
     },
 
     /**
@@ -266,11 +266,11 @@ export abstract class ClientCore implements IClientCore {
      * @returns {void}
      */
     shiftClient: () => {
-      if (!this._subgraph?.length) throw new Error("No subgraph endpoints available");
-      else if (this._subgraph?.length < 2) {
+      if (!this._graphql?.length) throw new Error("No graphql endpoints available");
+      else if (this._graphql?.length < 2) {
         throw new Error("No other endpoints");
       }
-      this._subgraphIdx = (this._subgraphIdx + 1) % this._subgraph?.length;
+      this._graphqlIdx = (this._graphqlIdx + 1) % this._graphql?.length;
     },
 
     /**
@@ -278,7 +278,7 @@ export abstract class ClientCore implements IClientCore {
      * @returns {Promise<boolean>}
      */
     isUp: async (): Promise<boolean> => {
-      return this.subgraph.getClient().request(QueryStatus)
+      return this.graphql.getClient().request(QueryStatus)
         .then((res) => {
           if (res._meta?.deployment) {
             return true
@@ -288,7 +288,7 @@ export abstract class ClientCore implements IClientCore {
     },
     
     /**
-     * Ensures that the subgraph is online.
+     * Ensures that the graphql is online.
      * If the current node is not online
      * it will shift to the next one and
      * repeat until it finds an online 
@@ -298,16 +298,16 @@ export abstract class ClientCore implements IClientCore {
      * @returns {Promise<void>}
      */
     ensureOnline: async (): Promise<void> => {
-      if (!this._subgraph?.length) {
-        return Promise.reject(new Error("Subgraph client is not initialized"));
+      if (!this._graphql?.length) {
+        return Promise.reject(new Error("graphql client is not initialized"));
       }
 
-      for (var i = 0; i < this._subgraph?.length; i++) {
-        if (await this.subgraph.isUp()) return;
+      for (var i = 0; i < this._graphql?.length; i++) {
+        if (await this.graphql.isUp()) return;
 
-        this.subgraph.shiftClient();
+        this.graphql.shiftClient();
       }
-      throw new Error("No subgraph nodes available");
+      throw new Error("No graphql nodes available");
     },
   };
 }

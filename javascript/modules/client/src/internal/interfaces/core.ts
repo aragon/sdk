@@ -41,5 +41,5 @@ export interface IClientGraphQLCore {
 export interface IClientCore {
   web3: IClientWeb3Core;
   ipfs: IClientIpfsCore;
-  subgraph: IClientGraphQLCore;
+  graphql: IClientGraphQLCore;
 }

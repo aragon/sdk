@@ -62,8 +62,8 @@ export class Context {
       throw new Error("No gas fee reducer defined");
     } else if (!contextParams.ipfsNodes?.length) {
       throw new Error("No IPFS nodes defined");
-    } else if (!contextParams.subgraphURLs?.length) {
-      throw new Error("No Subgraph URL defined");
+    } else if (!contextParams.graphqlURLs?.length) {
+      throw new Error("No graphql URL defined");
     }
 
     this.state = {
@@ -81,7 +81,7 @@ export class Context {
       ipfs: contextParams.ipfsNodes.map((config) =>
         new IpfsClient(config.url, config.headers)
       ),
-      subgraph: contextParams.subgraphURLs.map((url) =>
+      graphql: contextParams.graphqlURLs.map((url) =>
         new GraphQLClient(url)
       ),
     };
@@ -121,8 +121,8 @@ export class Context {
         new IpfsClient(config.url, config.headers)
       );
     }
-    if (contextParams.subgraphURLs?.length) {
-      this.state.subgraph = contextParams.subgraphURLs.map((url) =>
+    if (contextParams.graphqlURLs?.length) {
+      this.state.graphql = contextParams.graphqlURLs.map((url) =>
         new GraphQLClient(url)
       );
     }
@@ -252,14 +252,14 @@ export class Context {
   /**
    * Getter for the GraphQL client
    *
-   * @var subgraph
+   * @var graphql
    *
    * @returns {GraphQLClient[] | undefined}
    *
    * @public
    */
-  get subgraph(): GraphQLClient[] | undefined {
-    return this.state.subgraph || defaultState.subgraph;
+  get graphql(): GraphQLClient[] | undefined {
+    return this.state.graphql || defaultState.graphql;
   }
 
   // DEFAULT CONTEXT STATE

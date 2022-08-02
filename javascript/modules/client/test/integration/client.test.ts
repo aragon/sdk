@@ -49,7 +49,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  subgraphURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -69,7 +69,7 @@ const contextParamsLocalChain: ContextParams = {
       url: "http://localhost:5003",
     },
   ],
-  subgraphURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 describe("Client", () => {
@@ -351,26 +351,26 @@ describe("Client", () => {
     });
   });
   describe("GraphQL Client", () => {
-    it("Should detect all invalid subgraph endpoints", async () => {
+    it("Should detect all invalid graphql endpoints", async () => {
       const ctx = new Context(
         {
           ...contextParamsLocalChain,
-          subgraphURLs: [
+          graphqlURLs: [
             "https://the.wrong/url",
             "https://the.wrong/url",
             "https://the.wrong/url"
           ]
         });
       const client = new Client(ctx)
-      const isUp = await client.subgraph.isUp()
+      const isUp = await client.graphql.isUp()
       expect(isUp).toBe(false);
-      await expect(client.subgraph.ensureOnline()).rejects.toThrow("No subgraph nodes available")
+      await expect(client.graphql.ensureOnline()).rejects.toThrow("No graphql nodes available")
     })
-    it("Should create a valid subgraph client", async () => {
+    it("Should create a valid graphql client", async () => {
       const ctx = new Context(
         {
           ...contextParamsLocalChain,
-          subgraphURLs: [
+          graphqlURLs: [
             "https://the.wrong/url",
             "https://the.wrong/url",
             "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
@@ -383,8 +383,8 @@ describe("Client", () => {
           ]
         });
       const client = new Client(ctx)
-      await client.subgraph.ensureOnline()
-      const isUp = await client.subgraph.isUp()
+      await client.graphql.ensureOnline()
+      const isUp = await client.graphql.isUp()
       expect(isUp).toBe(true);
     })
     test.todo("Should get a DAO's metadata with a specific address")// , async () => {
