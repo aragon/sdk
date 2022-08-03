@@ -19,6 +19,7 @@ import { erc20ContractAbi } from "../../src/internal/abi/erc20";
 import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-ethers";
 import { DaoSortBy, IDaoQueryParams } from "../../src/internal/interfaces/client";
 import { SortDireccions } from "../../src/internal/interfaces/common";
+import { IWithdrawParams } from "../../src/internal/interfaces/plugins";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -133,32 +134,31 @@ describe("Client", () => {
   });
 
   describe("DAO Creation", () => {
-    test.todo("Should estimate gas fees for creating a DAO");
-    // it("Should estimate gas fees for creating a DAO", async () => {
-    //   const context = new Context(contextParamsLocalChain);
-    //   const client = new Client(context);
+    it("Should estimate gas fees for creating a DAO", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
 
-    //   const daoCreationParams: ICreateParams = {
-    //     daoConfig: {
-    //       name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
-    //       metadata: "0x1234",
-    //     },
-    //     plugins: [
-    //       { id: "0x1234", data: "0x1234" },
-    //     ],
-    //     gsnForwarder: Wallet.createRandom().address,
-    //   };
+      const daoCreationParams: ICreateParams = {
+        daoConfig: {
+          name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+          metadata: "0x1234",
+        },
+        plugins: [
+          { id: "0x1234", data: "0x1234" },
+        ],
+        gsnForwarder: Wallet.createRandom().address,
+      };
 
-    //   const gasFeesEstimation = await client.estimation.create(
-    //     daoCreationParams,
-    //   );
+      const gasFeesEstimation = await client.estimation.create(
+        daoCreationParams,
+      );
 
-    //   expect(typeof gasFeesEstimation).toEqual("object");
-    //   expect(typeof gasFeesEstimation.average).toEqual("bigint");
-    //   expect(typeof gasFeesEstimation.max).toEqual("bigint");
-    //   expect(typeof gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
-    //   expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
-    // });
+      expect(typeof gasFeesEstimation).toEqual("object");
+      expect(typeof gasFeesEstimation.average).toEqual("bigint");
+      expect(typeof gasFeesEstimation.max).toEqual("bigint");
+      expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
+      expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
+    });
 
     it("Should create a DAO locally", async () => {
       const context = new Context(contextParamsLocalChain);
@@ -195,6 +195,25 @@ describe("Client", () => {
   });
 
   describe("DAO deposit", () => {
+    it("Should estimate gas fees for making a deposit", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const depositParams: IDepositParams = {
+        daoAddress: contextParamsLocalChain.dao,
+        amount: BigInt(1234),
+      };
+
+      const gasFeesEstimation = await client.estimation.deposit(
+        depositParams,
+      );
+
+      expect(typeof gasFeesEstimation).toEqual("object");
+      expect(typeof gasFeesEstimation.average).toEqual("bigint");
+      expect(typeof gasFeesEstimation.max).toEqual("bigint");
+      expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
+      expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
+    });
     it("Should allow to deposit Ether", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
@@ -351,10 +370,10 @@ describe("Client", () => {
           .toString(),
       ).toBe("7");
     });
-    it("Should get the metadata of daos based on the search params", async() => {
+    it("Should get the metadata of daos based on the search params", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const params:IDaoQueryParams = {
+      const params: IDaoQueryParams = {
         limit: 10,
         skip: 0,
         sortDirection: SortDireccions.ASC,
@@ -365,57 +384,72 @@ describe("Client", () => {
       expect(daos.length <= 10).toBe(true);
     })
   });
-  describe("GraphQL Client", () => {
-    it("Should detect all invalid graphql endpoints", async () => {
-      const ctx = new Context(
-        {
-          ...contextParamsLocalChain,
-          graphqlURLs: [
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url"
-          ]
-        });
-      const client = new Client(ctx)
-      const isUp = await client.graphql.isUp()
-      expect(isUp).toBe(false);
-      await expect(client.graphql.ensureOnline()).rejects.toThrow("No graphql nodes available")
-    })
-    it("Should create a valid graphql client", async () => {
-      const ctx = new Context(
-        {
-          ...contextParamsLocalChain,
-          graphqlURLs: [
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url"
-          ]
-        });
-      const client = new Client(ctx)
-      await client.graphql.ensureOnline()
-      const isUp = await client.graphql.isUp()
-      expect(isUp).toBe(true);
-    })
-    test.todo("Should get a DAO's metadata with a specific address")// , async () => {
-    //   const ctx = new Context(contextParams);
-    //   const client = new Client(ctx)
-    //   client.methods.getMetadata(contextParams.dao)
-    // })
+  describe('Action generators', () => {
+    it("Should create a Erc20 client and generate a init action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
 
-    test.todo("Should get the transfers of a dao")// , async () => {
-    //   const ctx = new Context(contextParamsLocalChain);
-    //   const client = new Client(ctx)
-    //   const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
-    //   const res = await client.methods.getTransfers(daoAddress)
-    //   expect(Array.isArray(res.deposits)).toBe(true)
-    //   expect(Array.isArray(res.withdrawals)).toBe(true)
-    // })
+      const initParams: IWithdrawParams = {
+        recipientAddress: '0x1234567890123456789012345678901234567890',
+        amount: BigInt(10),
+        reference: 'test'
+      };
+
+      const initAction = client.encoding.withdrawAction(initParams);
+
+      expect(typeof initAction).toBe("object");
+      expect(initAction.data).toBeInstanceOf(Uint8Array);
+    });
+  })
+  describe("Retrieve data", () => {
+    it("Should get a DAO's metadata with a specific address", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx)
+      const dao = await client.methods.getMetadata(contextParams.dao)
+      expect(typeof dao).toBe('object');
+      expect(dao.address).toBe(contextParams.dao);
+      expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+    })
+
+    it("Should get multiple DAOs metadata filtered by the query params", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx)
+      const limit = 15
+      const params: IDaoQueryParams = {
+        limit
+      }
+      const daos = await client.methods.getMetadataMany(params)
+      expect(Array.isArray(daos)).toBe(true);
+      expect(daos.length <= limit).toBe(true)
+    })
+
+    it("Should get DAOs balances", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx)
+      const balances = await client.methods.getBalances("0x1234567890123456789012345678901234567890")
+      expect(Array.isArray(balances)).toBe(true);
+    })
+
+    it("Should get the transfers of a dao", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx)
+      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+      const transfers = await client.methods.getTransfers(daoAddress)
+      expect(Array.isArray(transfers.deposits)).toBe(true)
+      expect(Array.isArray(transfers.withdrawals)).toBe(true)
+    })
+
+    it("Should get a list of plugins installed in the DAO", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx)
+      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+      const plugins = await client.methods.getPlugins(daoAddress)
+      expect(Array.isArray(plugins)).toBe(true)
+      if (plugins.length > 0) {
+        expect(typeof plugins[0]).toBe('string')
+      }
+    })
+    
     test.todo("Should return an empty array when getting the transfers of a DAO that does not exist")//, async () => {
     //   const ctx = new Context(contextParamsLocalChain);
     //   const client = new Client(ctx)

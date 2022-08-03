@@ -5,10 +5,10 @@ import { AddressZero } from "@ethersproject/constants";
 import { IErc20FactoryParams, IMultisigFactoryParams } from "../interfaces/plugins";
 
 export function encodeMultisigActionInit(params: IMultisigFactoryParams): Uint8Array {
-  const whitelistVotingInterface = WhitelistVoting__factory.createInterface();
+  const multisigVotingInterface = WhitelistVoting__factory.createInterface();
   const args = unwrapMultisigInitParams(params);
   // get hex bytes
-  const hexBytes = whitelistVotingInterface.encodeFunctionData("initialize", args);
+  const hexBytes = multisigVotingInterface.encodeFunctionData("initialize", args);
   // Strip 0x => cast to ASCII => encode in Uint8Array
   return new TextEncoder().encode(hexToAscii(strip0x(hexBytes)));
 }
@@ -28,10 +28,10 @@ function unwrapMultisigInitParams(params: IMultisigFactoryParams): [string, stri
 }
 
 export function encodeErc20ActionInit(params: IErc20FactoryParams): Uint8Array {
-  const whitelistVotingInterface = ERC20Voting__factory.createInterface();
+  const erc20votingInterface = ERC20Voting__factory.createInterface();
   const args = unwrapErc20InitParams(params);
   // get hex bytes
-  const hexBytes = whitelistVotingInterface.encodeFunctionData("initialize", args);
+  const hexBytes = erc20votingInterface.encodeFunctionData("initialize", args);
   // Strip 0x => cast to ASCII => encode in Uint8Array
   return new TextEncoder().encode(hexToAscii(strip0x(hexBytes)));
 }

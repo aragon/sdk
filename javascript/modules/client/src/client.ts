@@ -32,9 +32,10 @@ import { pack } from "@ethersproject/solidity";
 import { strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
-import { ethers } from "ethers";
 import { IWithdrawParams } from "./internal/interfaces/plugins";
 import { encodeWithdrawActionData } from "./internal/encoding/client";
+import { getRandomInteger } from "./internal/utils/plugins";
+import { getDummyDao } from "./internal/utils/client";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -93,6 +94,9 @@ export class Client extends ClientCore implements IClient {
     /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string) =>
       this._getTransfers(daoAddressOrEns),
+    /** Retrieves the list of plugin installed in the DAO*/
+    getPlugins: (daoAddressOrEns: string): Promise<string[]> =>
+      this._getPlugins(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getMetadata: (daoAddressOrEns: string) =>
       this._getMetadata(daoAddressOrEns),
@@ -304,7 +308,7 @@ export class Client extends ClientCore implements IClient {
 
     // TODO: Unimplemented
     // TODO: The new contract code is needed
-    return this.web3.getApproximateGasFee(BigInt("0"));
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
   _estimateDeposit(params: IDepositParams) {
@@ -331,6 +335,24 @@ export class Client extends ClientCore implements IClient {
       .then((gasLimit) => {
         return this.web3.getApproximateGasFee(gasLimit.toBigInt());
       });
+  }
+
+  private _getPlugins(daoAddressOrEns: string): Promise<string[]> {
+    if (!daoAddressOrEns) {
+      throw new Error("Invalid DAO address or ENS");
+    }
+
+    const mockAddresses = [
+      "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+      "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
+      "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
+      "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
+      "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
+    ];
+
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
+      mockAddresses.filter(() => Math.random() > 0.4)
+    );
   }
 
   //// PRIVATE METHODS METADATA
@@ -516,50 +538,3 @@ function unwrapDepositParams(
   ];
 }
 
-// TODO
-// delete me
-
-function getDummyDao(addressOrEns?: string): DaoMetadata {
-  const dummyDaoNames = [
-    "Patito Dao",
-    "One World Dao",
-    "Sparta Dao",
-    "Yggdrasil Unite",
-  ];
-  const dummyDaoEns = [
-    "patito.eth",
-    "oneworld.eth",
-    "spartadao.eth",
-    "yggdrasil.eth",
-  ];
-  const daoIndex = Math.floor(Math.random() * dummyDaoNames.length + 1)
-  let address = Math.random() < 0.5 ? ethers.Wallet.createRandom().address : dummyDaoEns[daoIndex]
-  if (addressOrEns) {
-    address = addressOrEns
-  }
-
-  const fromDate = new Date(
-    new Date().setFullYear(new Date().getFullYear() - 1),
-  ).getTime();
-
-  return {
-    address,
-    name: dummyDaoNames[daoIndex],
-    createdAt: new Date(fromDate + Math.random() * (Date.now() - fromDate)),
-    description: `We are a community that loves trees and the planet. We track where forestation is increasing (or shrinking), fund people who are growing and protecting trees...`,
-    links: [
-      {
-        description: "Website",
-        url: "https://google.com",
-      },
-      {
-        description: "Discord",
-        url: "https://google.com",
-      },
-    ],
-    plugins: [
-      ethers.Wallet.createRandom().address,
-      ethers.Wallet.createRandom().address
-    ]
-  }
-}

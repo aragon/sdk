@@ -3,16 +3,25 @@ declare const describe, it, beforeAll, afterAll, expect, test;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { Client, ClientErc20, ContextErc20, ContextErc20Params } from "../../src";
+import { ClientErc20, ContextErc20, ContextErc20Params, Client } from "../../src";
 // import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
+import { Client as IpfsClient } from "@aragon/sdk-ipfs";
+import { GraphQLClient } from "graphql-request";
+
 import {
+  ExecuteProposalStep,
   ICreateProposalParams,
-  // IWithdrawParams,
+  IErc20FactoryParams,
+  IERC20ProposalQueryParams,
   ProposalCreationSteps,
+  SetVotingConfigStep,
   VoteOptions,
+  VoteProposalStep,
+  VotingConfig,
 } from "../../src/internal/interfaces/plugins";
+import { AddressZero } from "@ethersproject/constants";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -27,6 +36,27 @@ const web3endpoints = {
   ],
   failing: ["https://bad-url-gateway.io/"],
 };
+const ipfsEndpoints = {
+  working: [
+    {
+      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || "",
+      },
+    },
+  ],
+  failing: [
+    {
+      url: "https://bad-url-gateway.io/",
+    }
+  ],
+};
+const grapqhlEndpoints = {
+  working: [
+    "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
+  ],
+  failing: ["https://bad-url-gateway.io/"],
+};
 
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
@@ -38,15 +68,8 @@ const contextParams: ContextErc20Params = {
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   pluginAddress: "0x2345678901234567890123456789012345678901",
-  ipfsNodes: [
-    {
-      url: "https://testing-ipfs-0.aragon.network/api/v0",
-      headers: {
-        "X-API-KEY": IPFS_API_KEY || "",
-      },
-    },
-  ],
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  ipfsNodes: ipfsEndpoints.working,
+  graphqlURLs: grapqhlEndpoints.working
 };
 
 const contextParamsLocalChain: ContextErc20Params = {
@@ -78,7 +101,7 @@ describe("Client", () => {
   });
 
   afterAll(async () => {
-    await ganacheSetup.stop();
+    await ganacheSetup.stop()
   });
 
   describe("Client instances", () => {
@@ -89,89 +112,92 @@ describe("Client", () => {
       expect(client).toBeInstanceOf(ClientErc20);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
+      expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
+      expect(client.graphql.getClient()).toBeInstanceOf(GraphQLClient);
 
-      const status = await client.web3.isUp();
-      expect(status).toEqual(true);
+      // Web3
+      const web3status = await client.web3.isUp();
+      expect(web3status).toEqual(true);
+      // IPFS
+      await client.ipfs.ensureOnline();
+      const ipfsStatus = await client.ipfs.isUp();
+      expect(ipfsStatus).toEqual(true);
+      // GraqphQl
+      await client.graphql.ensureOnline();
+      const graphqlStatus = await client.graphql.isUp();
+      expect(graphqlStatus).toEqual(true);
+
     });
+
     it("Should create a failing client", async () => {
-      contextParams.web3Providers = web3endpoints.failing;
-      const context = new ContextErc20(contextParams);
-      const client = new ClientErc20(context);
+      contextParams.web3Providers = web3endpoints.failing
+      contextParams.ipfsNodes = ipfsEndpoints.failing
+      contextParams.graphqlURLs = grapqhlEndpoints.failing
+      const ctx = new ContextErc20(contextParams);
+      const client = new ClientErc20(ctx);
 
       expect(client).toBeInstanceOf(ClientErc20);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
+      expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
+      expect(client.graphql.getClient()).toBeInstanceOf(GraphQLClient);
 
-      const web3Status = await client.web3.isUp();
-      expect(web3Status).toEqual(false);
-    });
-    it("Should create a client, fail and shift to a working endpoint", async () => {
-      contextParams.web3Providers = web3endpoints.failing.concat(
-        web3endpoints.working,
-      );
-      const context = new ContextErc20(contextParams);
-      const client = new ClientErc20(context);
-
-      await client
-        .web3.isUp()
-        .then((isUp) => {
-          expect(isUp).toEqual(false);
-          client.web3.shiftProvider();
-
-          return client.web3.isUp();
-        })
-        .then((isUp) => {
-          expect(isUp).toEqual(true);
-        });
+      // Web3
+      const web3status = await client.web3.isUp();
+      expect(web3status).toEqual(false);
+      // IPFS
+      const ipfsStatus = await client.ipfs.isUp();
+      expect(ipfsStatus).toEqual(false);
+      // GraqphQl
+      const graphqlStatus = await client.graphql.isUp();
+      expect(graphqlStatus).toEqual(false);
     });
   });
-
   describe("Proposal Creation", () => {
-    test.todo("Should estimate gas fees for creating a new proposal");
-    // it("Should estimate gas fees for creating a new proposal", async () => {
-    //   const context = new ContextErc20(contextParamsLocalChain);
-    //   const client = new ClientErc20(context);
-
-    //   const proposalParams: ICreateProposalParams = {
-    //     metadataUri: "ipfs://",
-    //     actions: [],
-    //     creatorVote: VoteOptions.YEA,
-    //     startDate: new Date(),
-    //     endDate: new Date(),
-    //     executeIfPassed: true,
-    //   };
-
-    //   const gasFeesEstimation = await client.estimation.createProposal(
-    //     proposalParams,
-    //   );
-
-    //   expect(typeof gasFeesEstimation).toEqual("object");
-    //   expect(typeof gasFeesEstimation.average).toEqual("bigint");
-    //   expect(typeof gasFeesEstimation.max).toEqual("bigint");
-    //   expect(typeof gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
-    //   expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
-    // });
-    it("Should create a proposal locally", async () => {
-      const context = new ContextErc20(contextParamsLocalChain);
-      const erc20client = new ClientErc20(context);
-      const client = new Client(context);
+    it("Should estimate the gas fees for creating a new proposal", async () => {
+      const context = new ContextErc20(contextParamsLocalChain)
+      const client = new ClientErc20(context)
 
       const proposalParams: ICreateProposalParams = {
         metadataUri: "ipfs://",
-        actions: [
-          client.encoding.withdrawAction({
-            recipientAddress: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
-            amount: BigInt(10),
-            reference: "Test",
-          }),
-        ],
-        creatorVote: VoteOptions.NAY,
+        actions: [],
+        creatorVote: VoteOptions.YEA,
         startDate: new Date(),
         endDate: new Date(),
-        executeIfPassed: true,
-      };
+        executeIfPassed: true
+      }
 
-      for await (const step of erc20client.methods.createProposal(proposalParams)) {
+      const estimation = await client.estimation.createProposal(proposalParams)
+
+      expect(typeof estimation).toEqual("object")
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+
+    })
+    it("Should create a new proposal locally", async () => {
+      const context = new ContextErc20(contextParamsLocalChain)
+      const erc20Client = new ClientErc20(context)
+      const client = new Client(context)
+
+      // generate actions
+      const action = client.encoding.withdrawAction({
+        recipientAddress: "0x1234567890123456789012345678901234567890",
+        amount: BigInt(1),
+        reference: 'test'
+      })
+
+      const proposalParams: ICreateProposalParams = {
+        metadataUri: "ipfs://",
+        actions: [action],
+        creatorVote: VoteOptions.YEA,
+        startDate: new Date(),
+        endDate: new Date(),
+        executeIfPassed: true
+      }
+
+      for await (const step of erc20Client.methods.createProposal(proposalParams)) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");
@@ -183,37 +209,225 @@ describe("Client", () => {
             break;
           default:
             throw new Error(
-              "Unexpected DAO deposit step: " + Object.keys(step).join(", "),
+              "Unexpected proposal creation step: " + Object.keys(step).join(", "),
             );
         }
       }
+    })
+  });
+
+  describe("Vote on a proposal", () => {
+    it("Should estimate the gas fees for casting a vote", async () => {
+      const context = new ContextErc20(contextParamsLocalChain)
+      const client = new ClientErc20(context)
+
+      const estimation = await client.estimation.voteProposal(
+        '0x1234567890123456789012345678901234567890',
+        VoteOptions.YEA
+      )
+
+      expect(typeof estimation).toEqual("object")
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+
+    })
+
+    it("Should vote on a proposal locally", async () => {
+      const context = new ContextErc20(contextParamsLocalChain)
+      const client = new ClientErc20(context)
+
+      const proposalId = '0x1234567890123456789012345678901234567890'
+
+      for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YEA)) {
+        switch (step.key) {
+          case VoteProposalStep.VOTING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case VoteProposalStep.DONE:
+            expect(typeof step.voteId).toBe("string");
+            expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          default:
+            throw new Error(
+              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+            );
+        }
+      }
+
+    })
+  })
+
+  describe("Execute proposal", () => {
+    it("Should estimate the gas fees for executing a proposal", async () => {
+      const context = new ContextErc20(contextParamsLocalChain)
+      const client = new ClientErc20(context)
+
+      const estimation = await client.estimation.executeProposal(
+        '0x1234567890123456789012345678901234567890'
+      )
+
+      expect(typeof estimation).toEqual("object")
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+
+    })
+
+    it("Should execute a local proposal", async () => {
+      const context = new ContextErc20(contextParamsLocalChain)
+      const client = new ClientErc20(context)
+
+      const proposalId = '0x1234567890123456789012345678901234567890'
+
+      for await (const step of client.methods.executeProposal(proposalId)) {
+        switch (step.key) {
+          case ExecuteProposalStep.EXECUTING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case ExecuteProposalStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+            );
+        }
+      }
+
+    })
+  })
+
+
+  describe("Set voting config", () => {
+    it("Should estimate the gas fees for executing a proposal", async () => {
+      const context = new ContextErc20(contextParamsLocalChain)
+      const client = new ClientErc20(context)
+
+      const estimation = await client.estimation.setVotingConfig(
+        '0x1234567890123456789012345678901234567890',
+        {
+          minDuration: 7200,
+          minParticipation: 25,
+          minSupport: 50
+        }
+      )
+
+      expect(typeof estimation).toEqual("object")
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+
+    })
+
+    it("Should set voting config locally", async () => {
+      const context = new ContextErc20(contextParamsLocalChain)
+      const client = new ClientErc20(context)
+
+      const daoAddress = '0x1234567890123456789012345678901234567890'
+      const votingConfig: VotingConfig = {
+        minDuration: 7200,
+        minParticipation: 25,
+        minSupport: 50
+      }
+
+      for await (const step of client.methods.setVotingConfig(daoAddress, votingConfig)) {
+        switch (step.key) {
+          case SetVotingConfigStep.CONFIGURING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case SetVotingConfigStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+            );
+        }
+      }
+
+    })
+  })
+
+  describe('Action generators', () => {
+    it("Should create a Erc20 client and generate a init action", async () => {
+      const context = new ContextErc20(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+
+      const initParams: IErc20FactoryParams = {
+        votingConfig: {
+          minDuration: 7200,
+          minParticipation: 25,
+          minSupport: 50
+        },
+        tokenConfig: {
+          name: "Token",
+          address: "0x1234567890123456789012345678901234567890",
+          symbol: "TOK"
+        },
+        mintConfig: [
+          {
+            address: AddressZero,
+            balance: BigInt(10)
+          },
+          {
+            address: "0x1234567890123456789012345678901234567890",
+            balance: BigInt(10)
+          },
+          {
+            address: "0x1234567890123456789012345678901234567890",
+            balance: BigInt(10)
+          },
+        ]
+      };
+
+      const initAction = client.encoding.init(initParams);
+
+      expect(typeof initAction).toBe("object");
+      // what does this should be
+      expect(initAction.data).toBeInstanceOf(Uint8Array);
     });
-  });
+  })
 
-  describe("Action generators", () => {
-    test.todo(
-      "Should create a ERC20VotingDAO client and generate a withdraw action",
-    );
-    // it("Should create a ERC20VotingDAO client and generate a withdraw action", async () => {
-    //   const context = new ContextErc20(contextParamsLocalChain);
-    //   const client = new ClientErc20(context);
+  describe('Retrieve data', () => {
+    it("Should get the list of members that can vote in a proposal", async () => {
+      const context = new ContextErc20(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      
+      const wallets = await client.methods.getMembers("0x1234567890123456789012345678901234567890")
 
-    //   const withdrawParams: IWithdrawParams = {
-    //     recipientAddress: "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
-    //     amount: BigInt(10),
-    //     reference: "Test",
-    //   };
+      expect(Array.isArray(wallets)).toBe(true);
+      expect(wallets.length).toBeGreaterThan(0);
+      expect(typeof wallets[0]).toBe('string');
+      expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+    })
+    it("Should get a proposal filtered by proposal Id", async () => {
+      const context = new ContextErc20(contextParamsLocalChain);
+      const client = new ClientErc20(context);
 
-    //   const withdrawAction = client.encoding.withdrawAction(withdrawParams);
+      const proposalId = "0x1234567890123456789012345678901234567890_0x55"
+      const proposal = await client.methods.getProposal(proposalId)
 
-    //   expect(typeof withdrawAction).toBe("object");
-    //   expect(withdrawAction.to).toEqual(
-    //     "0x9a16078c911afAb4CE4B7d261A67F8DF99fAd877",
-    //   );
-    //   expect(withdrawAction.value).toEqual(BigInt(10));
-    //   expect(withdrawAction.data).toEqual(
-    //     "0x4f06563200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a16078c911afab4ce4b7d261a67f8df99fad877000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000045465737400000000000000000000000000000000000000000000000000000000",
-    //   );
-    // });
-  });
-});
+      expect(typeof proposal).toBe('object');
+      expect(proposal.id).toBe(proposalId);
+      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+    })
+    it("Should get a list list of proposals", async () => {
+      const context = new ContextErc20(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const limit = 5
+      const params: IERC20ProposalQueryParams = {
+        limit
+      }
+      const proposals = await client.methods.getProposalMany(params)
+
+      expect(Array.isArray(proposals)).toBe(true)
+      expect(proposals.length <= limit).toBe(true)
+    })
+  })
+
+})

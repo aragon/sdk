@@ -1,6 +1,8 @@
 import { ProposalStatus } from "../interfaces/common";
 import { Erc20Proposal, MultisigProposal, VoteOptions } from "../interfaces/plugins";
 
+// TODO: delete this file
+
 export function getERC20ProposalsWithStatus(proposals: Erc20Proposal[]) {
   const now = new Date();
 

@@ -24,7 +24,7 @@ import {
   GasFeeEstimation,
 } from "./internal/interfaces/common";
 import { ContextErc20 } from "./context-erc20";
-import { getDummyErc20Proposal, getERC20ProposalsWithStatus } from "./internal/utils/plugins";
+import { getDummyErc20Proposal, getERC20ProposalsWithStatus, getRandomInteger } from "./internal/utils/plugins";
 import { encodeErc20ActionInit } from "./internal/encoding/plugins";
 
 /**
@@ -300,7 +300,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
     // TODO: Remove below as the new contracts are ready
 
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(Math.random() * (1500 - 1000 + 1) + 1000)))
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
 
     // TODO: Uncomment below as the new contracts are ready
     /*
@@ -326,7 +326,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       throw new Error("A web3 provider is needed");
     }
     // TODO: remove this
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(Math.random() * (1500 - 1000 + 1) + 1000)))
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
   // @ts-ignore  TODO: Remove this comment when implemented
   private _estimateExecuteProposal(proposalId: string): Promise<GasFeeEstimation> {
@@ -337,7 +337,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       throw new Error("A web3 provider is needed");
     }
     // TODO: remove this
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(Math.random() * (1500 - 1000 + 1) + 1000)))
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
 
@@ -349,10 +349,10 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       throw new Error("A web3 provider is needed");
     }
     // TODO: Remove below as the new contracts are ready
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(Math.random() * (1500 - 1000 + 1) + 1000)))
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
-  private _getMembers(daoAddressOrEns: string) {
+  private _getMembers(daoAddressOrEns: string): Promise<string[]> {
     if (!daoAddressOrEns) {
       throw new Error("Invalid DAO address or ENS");
     }
@@ -374,7 +374,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     if (!proposalId) {
       throw new Error("Invalid proposalId");
     }
-    const proposal: Erc20Proposal = getERC20ProposalsWithStatus([getDummyErc20Proposal()])[0]
+    const proposal: Erc20Proposal = getERC20ProposalsWithStatus([getDummyErc20Proposal(proposalId)])[0]
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposal))
   }
 
