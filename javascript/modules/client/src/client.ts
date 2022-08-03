@@ -7,7 +7,6 @@ import {
   DaoDepositSteps,
   DaoDepositStepValue,
   DaoMetadata,
-  DaoQueryOptions,
   IAssetTransfers,
   IClient,
   ICreateParams,
@@ -360,24 +359,6 @@ export class Client extends ClientCore implements IClient {
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (metadataMany))
   }
 
-  // @ts-ignore  TODO: Remove this comment when options used
-  private async _getMetadataMany(options?: DaoQueryOptions) {
-    const daos = [
-      "0x0028807509712aa45eafd5fdd0982c4db36fbe50",
-      "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61",
-      "0x09e7a6b83f7417cbca993fed2dd3c7d2b4d23794",
-      "0x16f7129ae281f29d51ea085ac496501b7a1c0391",
-    ];
-
-    const daosWithMetadata = await Promise.all(
-      daos.map((address) => this._getMetadata(address)),
-    );
-
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => daosWithMetadata,
-    );
-  }
-
   private _getBalances(
     daoIdentifier: string,
     _tokenAddresses: string[],
@@ -568,11 +549,11 @@ function getDummyDao(addressOrEns?: string): DaoMetadata {
     description: `We are a community that loves trees and the planet. We track where forestation is increasing (or shrinking), fund people who are growing and protecting trees...`,
     links: [
       {
-        label: "Website",
+        description: "Website",
         url: "https://google.com",
       },
       {
-        label: "Discord",
+        description: "Discord",
         url: "https://google.com",
       },
     ],
