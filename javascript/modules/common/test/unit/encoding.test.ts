@@ -5,6 +5,7 @@ import {
   bufferToBigInt,
   ensure0x,
   hexStringToBuffer,
+  hexToAscii,
   strip0x,
   uintArrayToHex,
 } from "../../src";
@@ -268,6 +269,19 @@ describe("Value encoding", () => {
 
     for (let input of inputs) {
       const result = ensure0x(input.in);
+      expect(result).toEqual(input.out);
+    }
+  });
+
+  it("Should convert a hex string to ASCII", () => {
+    const inputs = [
+      { in: "61", out: "a" },
+      { in: "6161", out: "aa" },
+      { in: "616162", out: "aab" },
+      { in: "68656c6c6f207468657265", out: "hello there" }
+    ]
+    for (let input of inputs) {
+      const result = hexToAscii(input.in);
       expect(result).toEqual(input.out);
     }
   });

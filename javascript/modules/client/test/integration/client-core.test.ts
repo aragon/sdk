@@ -133,4 +133,42 @@ describe("Client Core", () => {
       }
     });
   });
+  describe("GraphQL Client", () => {
+    it("Should detect all invalid graphql endpoints", async () => {
+      const ctx = new Context(
+        {
+          ...contextParams,
+          graphqlURLs: [
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url"
+          ]
+        });
+      const client = new Client(ctx)
+      const isUp = await client.graphql.isUp()
+      expect(isUp).toBe(false);
+      await expect(client.graphql.ensureOnline()).rejects.toThrow("No graphql nodes available")
+    })
+    it("Should create a valid graphql client", async () => {
+      const ctx = new Context(
+        {
+          ...contextParams,
+          graphqlURLs: [
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url"
+          ]
+        });
+      const client = new Client(ctx)
+      await client.graphql.ensureOnline()
+      const isUp = await client.graphql.isUp()
+      expect(isUp).toBe(true);
+    });
+  });
 });

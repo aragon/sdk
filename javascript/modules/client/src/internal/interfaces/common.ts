@@ -66,6 +66,17 @@ export type Proposal = {
   status: ProposalStatus;
 };
 
+export interface IPagination {
+  skip?: number
+  limit?: number
+  sortDirection?: SortDireccions
+}
+
+export enum SortDireccions {
+  ASC = "asc",
+  DESC = "desc"
+}
+
 /**
  * Contains the states of a proposal. Note that on chain
  * proposals cannot be in draft state
@@ -77,3 +88,4 @@ export enum ProposalStatus {
   EXECUTED = "Executed",
   DEFEATED = "Defeated",
 }
+

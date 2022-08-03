@@ -1,11 +1,15 @@
+import { ContextErc20 } from "./context-erc20";
+import { ClientCore } from "./internal/core";
+import { encodeMultisigActionInit } from "./internal/encoding/plugins";
+import { FactoryInitParams, GasFeeEstimation } from "./internal/interfaces/common";
 import {
-  Erc20Proposal,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  IClientErc20,
+  IClientMultisig,
   ICreateProposalParams,
-  IErc20FactoryParams,
-  IERC20ProposalQueryParams,
+  IMultisigFactoryParams,
+  IMultisigProposalQueryParams,
+  MultisigProposal,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   SetVotingConfigStep,
@@ -13,25 +17,12 @@ import {
   VoteOptions,
   VoteProposalStep,
   VoteProposalStepValue,
-  VotingConfig,
-  // VotingConfig,
+  VotingConfig
 } from "./internal/interfaces/plugins";
-import { IDAO } from "@aragon/core-contracts-ethers";
-import { ClientCore } from "./internal/core";
-import {
-  // DaoConfig,
-  FactoryInitParams,
-  GasFeeEstimation,
-} from "./internal/interfaces/common";
-import { ContextErc20 } from "./context-erc20";
-import { getDummyErc20Proposal, getERC20ProposalsWithStatus, getRandomInteger } from "./internal/utils/plugins";
-import { encodeErc20ActionInit } from "./internal/encoding/plugins";
+import { getDummyMultisigProposal, getMultisigProposalsWithStatus, getRandomInteger } from "./internal/utils/plugins";
 
-/**
- * Provider a generic client with high level methods to manage and interact with DAO's
- */
-export class ClientErc20 extends ClientCore implements IClientErc20 {
-  // @ts-ignore TODO: Remove
+
+export class ClientMultisig extends ClientCore implements IClientMultisig {
   private _pluginAddress: string;
 
   constructor(context: ContextErc20) {
@@ -42,17 +33,13 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
     this._pluginAddress = context.pluginAddress;
   }
-
-  //// HIGH LEVEL HANDLERS
-
-  /** Contains all the generic high level methods to interact with a DAO */
   methods = {
     /**
-     * Creates a new ERC20 voting proposal
+     * Creates a new multisig voting proposal
      *
-     * @param {ICreateProposalParams} params
+     * @param {ICreateProposalParams} _params
      * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
     createProposal: (params: ICreateProposalParams): AsyncGenerator<ProposalCreationStepValue> =>
       this._createProposal(params),
@@ -62,7 +49,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @param {string} proposalId
      * @param {VoteOptions} vote
      * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
     voteProposal: (proposalId: string, vote: VoteOptions): AsyncGenerator<VoteProposalStepValue> =>
       this._voteProposal(proposalId, vote),
@@ -71,107 +58,104 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      *
      * @param {string} proposalId
      * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
     executeProposal: (proposalId: string): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(proposalId),
     /**
-     * Sets the voting configuration in a multisig proposal given a daoAddress and a configuration
+     * Sets the voting configuration in a multisig proposal given a proposalId and a configuration
      *
      * @param {string} daoAddressOrEns
      * @param {VotingConfig} config
      * @return {*}  {AsyncGenerator<SetVotingConfigStepValue>}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
     setVotingConfig: (daoAddressOrEns: string, config: VotingConfig): AsyncGenerator<SetVotingConfigStepValue> =>
       this._setVotingConfig(daoAddressOrEns, config),
-
     /**
-     * Returns the list of members given a dao address or ens
+     * Returns the list of members of a spcific dao address or ens
      *
      * @param {string} daoAddressOrEns
      * @return {*}  {Promise<string[]>}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
-    getMembers: (daoAddressOrEns: string): Promise<string[]> => this._getMembers(daoAddressOrEns),
+    getMembers: (daoAddressOrEns: string): Promise<string[]> =>
+      this._getMemebers(daoAddressOrEns),
     /**
      * Returns a proposal data given a specific propoosal id
      *
      * @param {string} proposalId
-     * @return {*}  {Promise<Erc20Proposal>}
-     * @memberof ClientErc20
+     * @return {*}  {Promise<MultisigProposal>}
+     * @memberof ClientMultisig
      */
-    getProposal: (proposalId: string): Promise<Erc20Proposal> =>
+    getProposal: (proposalId: string): Promise<MultisigProposal> =>
       this._getProposal(proposalId),
     /**
-     * Returns a list of proposals filtered by the query params
+     * Returns a list of proposals filtered by the input params
      *
-     * @param {IERC20ProposalQueryParams} params
-     * @return {*}  {Promise<Erc20Proposal[]>}
-     * @memberof ClientErc20
+     * @param {IMultisigProposalQueryParams}
+     * @return {*}  {Promise<MultisigProposal[]>}
+     * @memberof ClientMultisig
      */
-    getProposalMany: (params?: IERC20ProposalQueryParams): Promise<Erc20Proposal[]> =>
+    getProposalMany: (params?: IMultisigProposalQueryParams): Promise<MultisigProposal[]> =>
       this._getProposalMany(params ?? {}),
-  };
-
-  //// ACTION BUILDERS
-
-  /** Contains the helpers to encode actions and parameters that can be passed as a serialized buffer on-chain */
+  }
   encoding = {
     /**
-     * Computes the parameters to be given when creating the DAO, as the initialization for the plugin
+     * Computes the parameters to be given when creating the DAO,
+     * so that the plugin is configured
      *
-     * @param {IErc20FactoryParams} params
+     * @param {IMultisigFactoryParams} params
      * @return {*}  {FactoryInitParams}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
-    init: (params: IErc20FactoryParams) => this._buildActionInit(params),
+    init: (params: IMultisigFactoryParams): FactoryInitParams => this._buildActionInit(params),
   }
-  //// ESTIMATION HANDLERS
-
-  /** Contains the gas estimation of the Ethereum transactions */
   estimation = {
+
     /**
-     * Estimates the gas fee of creating a ERC20 proposal
+     * Estimates the gas fee of the creation oa multisig propoosal
      *
      * @param {ICreateProposalParams} params
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
     createProposal: (params: ICreateProposalParams): Promise<GasFeeEstimation> =>
       this._estimateCreateProposal(params),
+
     /**
-     * Estimates the gas fee of casting a vote in a ERC20 proposal
+     * Estimates the gas fee of voting in a multisig propoosal
      *
      * @param {string} proposalId
      * @param {VoteOptions} vote
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
     voteProposal: (proposalId: string, vote: VoteOptions): Promise<GasFeeEstimation> =>
       this._estimateVoteProposal(proposalId, vote),
+
     /**
-     * Estimates the gas fee of executing a ERC20 proposal
+     * Estimates the gas fee of executing a proposal
      *
      * @param {string} proposalId
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
     executeProposal: (proposalId: string): Promise<GasFeeEstimation> =>
       this._estimateExecuteProposal(proposalId),
+
     /**
-     * Estimates the gas fee of setting the voting configuration in a ERC20 voting
+     * Estimates the gas fee of setting the voting configuration in a multisig voting
      *
      * @param {string} daoAddressOrEns
      * @param {VotingConfig} config
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientErc20
+     * @memberof ClientMultisig
      */
     setVotingConfig: (daoAddressOrEns: string, config: VotingConfig): Promise<GasFeeEstimation> =>
-      this._estimateSetVotingConfig(daoAddressOrEns, config),
-  };
+      this._estimateSetVotingConfig(daoAddressOrEns, config)
+  }
 
-  //// PRIVATE METHOD IMPLEMENTATIONS
   private async *_createProposal(
     _params: ICreateProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
@@ -181,46 +165,14 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-
-    // TODO: Remove below as the new contracts are ready
-
     yield {
       key: ProposalCreationSteps.CREATING,
-      txHash:
-        "0x0123456789012345678901234567890123456789012345678901234567890123",
-    };
-
-    yield {
-      key: ProposalCreationSteps.DONE,
-      proposalId:
-        "0x1234567890123456789012345678901234567890123456789012345678901234",
-    };
-
-    // TODO: Uncomment as the new contracts are ready
-
-    /*
-    const erc20VotingInstance = ERC20Voting__factory.connect(
-      this._pluginAddress,
-      signer
-    );
-
-    const tx = await erc20VotingInstance.newVote(
-      ...unwrapProposalParams(params)
-    );
-
-    yield { key: ProposalCreationSteps.CREATING, txHash: tx.hash };
-
-    const receipt = await tx.wait();
-    const startVoteEvent = receipt.events?.find(e => e.event === "StartVote");
-    if (!startVoteEvent || startVoteEvent.args?.voteId) {
-      return Promise.reject(new Error("Could not read the proposal ID"));
+      txHash: "0x0123456789012345678901234567890123456789012345678901234567890123"
     }
-
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: startVoteEvent.args?.voteId,
-    };
-    */
+      proposalId: "0x0123456789012345678901234567890123456789012345678901234567890123"
+    }
   }
 
   private async *_voteProposal(_proposalId: string, _vote: VoteOptions): AsyncGenerator<VoteProposalStepValue> {
@@ -272,24 +224,69 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
   }
 
-
-  //// PRIVATE ACTION BUILDER HANDLERS
-
-  private _buildActionInit(params: IErc20FactoryParams): FactoryInitParams {
-    return {
-      id: this._pluginAddress,
-      data: encodeErc20ActionInit(params)
+  private _getMemebers(daoAddressOrEns: string): Promise<string[]> {
+    if (!daoAddressOrEns) {
+      throw new Error("Invalid DAO address or ENS");
     }
+    const mockAddresses: string[] = [
+      "0x0123456789012345678901234567890123456789",
+      "0x1234567890123456789012345678901234567890",
+      "0x2345678901234567890123456789012345678901",
+      "0x3456789012345678901234567890123456789012",
+      "0x4567890123456789012345678901234567890123",
+    ]
+    return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
+      mockAddresses.filter(() => Math.random() > 0.4)
+    );
+  }
+
+  private _getProposal(proposalId: string): Promise<MultisigProposal> {
+    if (!proposalId) {
+      throw new Error("Invalid proposalId");
+    }
+    const proposal = getMultisigProposalsWithStatus([getDummyMultisigProposal(proposalId)])[0]
+    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposal))
   }
 
   /**
-   *
+   * Returns a list of proposals filtered by the input params
    *
    * @private
-   * @param {ICreateProposalParams} _params
-   * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientErc20
+   * @param {IMultisigProposalQueryParams} {
+   *     limit = 0,
+   *     // TODO
+   *     // uncomment this
+   *     // skip = 0,
+   *     // sortDirection = SortDireccions.ASC,
+   *     // sortBy = MultisigProposalSortBy.CREATED_AT
+   *   }
+   * @return {*}  {Promise<MultisigProposal[]>}
+   * @memberof ClientMultisig
    */
+  private _getProposalMany({
+    // TODO 
+    // uncomment when querying to subgraph
+    // daoAddressOrEns,
+    limit = 0,
+    // skip = 0,
+    // sortDirection = SortDireccions.ASC,
+    // sortBy = MultisigProposalSortBy.CREATED_AT
+  }: IMultisigProposalQueryParams): Promise<MultisigProposal[]> {
+    let proposals: MultisigProposal[] = []
+    for (let index = 0; index < limit; index++) {
+      proposals.push(getDummyMultisigProposal())
+    }
+    proposals = getMultisigProposalsWithStatus(proposals)
+    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
+  }
+
+  private _buildActionInit(params: IMultisigFactoryParams): FactoryInitParams {
+    return {
+      id: this._pluginAddress,
+      data: encodeMultisigActionInit(params)
+    }
+  }
+
   private _estimateCreateProposal(_params: ICreateProposalParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -297,49 +294,31 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-
     // TODO: Remove below as the new contracts are ready
-
     return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
-
-    // TODO: Uncomment below as the new contracts are ready
-    /*
-    const erc20VotingInstance = ERC20Voting__factory.connect(
-      this._pluginAddress,
-      signer
-    );
-
-    return erc20VotingInstance.estimateGas.newVote(
-      ...unwrapProposalParams(params),
-    ).then((gasLimit) => {
-      return this.web3.getApproximateGasFee(gasLimit.toBigInt());
-    });
-    */
   }
 
-  // @ts-ignore  TODO: Remove this comment when implemented
-  private _estimateVoteProposal(proposalId: string, vote: VoteOptions): Promise<GasFeeEstimation> {
+  private _estimateVoteProposal(_proposalId: string, _vote: VoteOptions): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: remove this
+    // TODO: Remove below as the new contracts are ready
     return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
-  // @ts-ignore  TODO: Remove this comment when implemented
-  private _estimateExecuteProposal(proposalId: string): Promise<GasFeeEstimation> {
+
+  private _estimateExecuteProposal(_proposalId: string): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: remove this
+    // TODO: Remove below as the new contracts are ready
     return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
-
 
   private _estimateSetVotingConfig(_daoAddressOrEns: string, _config: VotingConfig): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -351,65 +330,4 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     // TODO: Remove below as the new contracts are ready
     return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
-
-  private _getMembers(daoAddressOrEns: string): Promise<string[]> {
-    if (!daoAddressOrEns) {
-      throw new Error("Invalid DAO address or ENS");
-    }
-
-    const mockAddresses = [
-      "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-      "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
-      "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
-      "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
-      "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
-    ];
-
-    return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
-      mockAddresses.filter(() => Math.random() > 0.4)
-    );
-  }
-
-  private _getProposal(proposalId: string) {
-    if (!proposalId) {
-      throw new Error("Invalid proposalId");
-    }
-    const proposal: Erc20Proposal = getERC20ProposalsWithStatus([getDummyErc20Proposal(proposalId)])[0]
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposal))
-  }
-
-  private _getProposalMany({
-    // TODO 
-    // uncomment when querying to subgraph
-    // addressOrEns,
-    limit = 0,
-    // skip = 0,
-    // sortDirection = SortDireccions.ASC,
-    // sortBy = MultisigProposalSortBy.CREATED_AT
-  }: IERC20ProposalQueryParams): Promise<Erc20Proposal[]> {
-    let proposals: Erc20Proposal[] = []
-    for (let index = 0; index < limit; index++) {
-      proposals.push(getDummyErc20Proposal())
-    }
-    proposals = getERC20ProposalsWithStatus(proposals)
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
-  }
-}
-
-//// PARAMETER MANAGERS
-
-// @ts-ignore TODO: Remove when contracts are available
-function unwrapProposalParams(
-  params: ICreateProposalParams
-): [string, IDAO.ActionStruct[], number, number, boolean, number] {
-  return [
-    params.metadataUri,
-    params.actions ?? [],
-    // TODO: Verify => seconds?
-    params.startDate ? Math.floor(params.startDate.getTime() / 1000) : 0,
-    // TODO: Verify => seconds?
-    params.endDate ? Math.floor(params.endDate.getTime() / 1000) : 0,
-    params.executeIfPassed ?? false,
-    params.creatorVote ?? VoteOptions.NONE,
-  ];
 }
