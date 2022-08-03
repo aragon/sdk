@@ -3,7 +3,7 @@ declare const describe, it, beforeAll, afterAll, expect, test;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientErc20, ContextErc20, ContextErc20Params } from "../../src";
+import { Client, ClientErc20, ContextErc20, ContextErc20Params } from "../../src";
 // import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
@@ -153,7 +153,8 @@ describe("Client", () => {
     // });
     it("Should create a proposal locally", async () => {
       const context = new ContextErc20(contextParamsLocalChain);
-      const client = new ClientErc20(context);
+      const erc20client = new ClientErc20(context);
+      const client = new Client(context);
 
       const proposalParams: ICreateProposalParams = {
         metadataUri: "ipfs://",
@@ -170,7 +171,7 @@ describe("Client", () => {
         executeIfPassed: true,
       };
 
-      for await (const step of client.methods.createProposal(proposalParams)) {
+      for await (const step of erc20client.methods.createProposal(proposalParams)) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");

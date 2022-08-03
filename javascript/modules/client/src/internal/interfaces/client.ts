@@ -1,7 +1,8 @@
 // This file contains the definitions of the general purpose DAO client
 
 import { IClientCore } from "./core";
-import { DaoConfig, DaoRole, GasFeeEstimation } from "./common";
+import { DaoAction, DaoConfig, DaoRole, GasFeeEstimation, IPagination } from "./common";
+import { IWithdrawParams } from "./plugins";
 
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
@@ -26,8 +27,12 @@ export interface IClient extends IClientCore {
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getMetadata: (daoAddressOrEns: string) => Promise<DaoMetadata>;
-    /** Retrieves list of created DAOs and the corresponding metadata*/
-    getMetadataMany: (options?: DaoQueryOptions) => Promise<DaoMetadata[]>;
+    /** Retrieves metadata for many daos */
+    getMetadataMany: (params: IDaoQueryParams) => Promise<DaoMetadata[]>;
+  };
+  encoding: {
+    /** Computes the withdraw action payload */
+    withdrawAction: (params: IWithdrawParams) => DaoAction;
   };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
@@ -160,16 +165,12 @@ export type DaoMetadata = {
   plugins: string[];
 };
 
+export interface IDaoQueryParams extends IPagination {
+  sortBy?: DaoSortBy
+}
+
 export enum DaoSortBy {
   CREATED_AT,
   NAME,
-  POPULARITY, // Currently defined by overall number of proposals
+  POPULARITY, // currently defined as number of proposals
 }
-
-// TODO: Rename ?
-export type DaoQueryOptions = {
-  sortBy?: DaoSortBy;
-  sortDirection?: "asc" | "desc";
-  skip?: number;
-  limit?: number;
-};

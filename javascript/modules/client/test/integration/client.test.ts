@@ -17,6 +17,8 @@ import * as deployContracts from "../../../../helpers/deployContracts";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
 import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-ethers";
+import { DaoSortBy, IDaoQueryParams } from "../../src/internal/interfaces/client";
+import { SortDireccions } from "../../src/internal/interfaces/common";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -349,6 +351,19 @@ describe("Client", () => {
           .toString(),
       ).toBe("7");
     });
+    it("Should get the metadata of daos based on the search params", async() => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params:IDaoQueryParams = {
+        limit: 10,
+        skip: 0,
+        sortDirection: SortDireccions.ASC,
+        sortBy: DaoSortBy.NAME
+      }
+      const daos = await client.methods.getMetadataMany(params)
+      expect(Array.isArray(daos)).toBe(true)
+      expect(daos.length <= 10).toBe(true);
+    })
   });
   describe("GraphQL Client", () => {
     it("Should detect all invalid graphql endpoints", async () => {

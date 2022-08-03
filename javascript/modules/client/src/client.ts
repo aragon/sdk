@@ -11,6 +11,7 @@ import {
   IAssetTransfers,
   IClient,
   ICreateParams,
+  IDaoQueryParams,
   IDepositParams,
 } from "./internal/interfaces/client";
 import {
@@ -26,13 +27,15 @@ import {
   ContractTransaction,
 } from "@ethersproject/contracts";
 import { ClientCore } from "./internal/core";
-import { DaoRole } from "./internal/interfaces/common";
-import { isAddress } from "@ethersproject/address";
+import { DaoAction, DaoRole } from "./internal/interfaces/common";
 import { pack } from "@ethersproject/solidity";
 
 import { strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
+import { ethers } from "ethers";
+import { IWithdrawParams } from "./internal/interfaces/plugins";
+import { encodeWithdrawActionData } from "./internal/encoding/client";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -94,9 +97,10 @@ export class Client extends ClientCore implements IClient {
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getMetadata: (daoAddressOrEns: string) =>
       this._getMetadata(daoAddressOrEns),
-    /** Retrieves list of created DAOs and the corresponding metadata*/
-    getMetadataMany: (options?: DaoQueryOptions) =>
-      this._getMetadataMany(options),
+    /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
+    getMetadataMany: (params?: IDaoQueryParams): Promise<DaoMetadata[]> =>
+      this._getMetadataMany(params ?? {}),
+
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -104,6 +108,11 @@ export class Client extends ClientCore implements IClient {
       role: DaoRole,
       data: Uint8Array,
     ) => this._hasPermission(where, who, role, data),
+  };
+
+  encoding = {
+    withdrawAction: (params: IWithdrawParams): DaoAction => this._buildActionWithdraw(params)
+
   };
 
   //// ESTIMATION HANDLERS
@@ -333,53 +342,22 @@ export class Client extends ClientCore implements IClient {
     if (!daoAddressOrEns) {
       throw new Error("Invalid DAO address or ENS");
     }
+    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => getDummyDao(daoAddressOrEns));
+  }
 
-    // Generate DAO creation within the past year
-    const fromDate = new Date(
-      new Date().setFullYear(new Date().getFullYear() - 1),
-    ).getTime();
-
-    const dummyDaoNames = [
-      "Patito Dao",
-      "One World Dao",
-      "Sparta Dao",
-      "Yggdrasil Unite",
-    ];
-
-    const pluginAddresses = [
-      "0x1234567890123456789012345678901234567890",
-      "0x2345678901234567890123456789012345678901",
-    ];
-
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => ({
-      ...(isAddress(daoAddressOrEns)
-        ? {
-          address: daoAddressOrEns,
-          name: dummyDaoNames[
-            Math.floor(Math.random() * dummyDaoNames.length - 1)
-          ],
-        }
-        : {
-          address: "0x663ac3c648548eb8ccd292b41a8ff829631c846d",
-          name: daoAddressOrEns,
-        }),
-
-      createdAt: new Date(fromDate + Math.random() * (Date.now() - fromDate)),
-      description:
-        `We are a community that loves trees and the planet. We track where forestation
-       is increasing (or shrinking), fund people who are growing and protecting trees...`,
-      links: [
-        {
-          description: "Website",
-          url: "https://google.com",
-        },
-        {
-          description: "Discord",
-          url: "https://google.com",
-        },
-      ],
-      plugins: [pluginAddresses[Math.round(Math.random())]],
-    }));
+  private _getMetadataMany({
+    limit = 10,
+    // TODO
+    // uncomment this
+    // skip = 0,
+    // sortDirection = SortDireccions.ASC,
+    // sortBy = DaoSortBy.CREATED_AT
+  }: IDaoQueryParams): Promise<DaoMetadata[]> {
+    const metadataMany: DaoMetadata[] = []
+    for (let index = 0; index < limit; index++) {
+      metadataMany.push(getDummyDao())
+    }
+    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (metadataMany))
   }
 
   // @ts-ignore  TODO: Remove this comment when options used
@@ -489,6 +467,24 @@ export class Client extends ClientCore implements IClient {
 
     return Promise.resolve({ deposits, withdrawals });
   }
+  /**
+   * Build withdraw action
+   *
+   * @private
+   * @param {string} to
+   * @param {bigint} value
+   * @param {IWithdrawParams} params
+   * @return {*}  {DaoAction}
+   * @memberof Client
+   */
+  private _buildActionWithdraw(params: IWithdrawParams): DaoAction {
+    // TODO: CONFIRM THAT THE "to" field needs to contain the DAO address
+    return {
+      to: AddressZero,
+      value: BigInt(0),
+      data: encodeWithdrawActionData(params)
+    }
+  }
 }
 
 // PRIVATE HELPERS
@@ -537,4 +533,52 @@ function unwrapDepositParams(
     params.tokenAddress ?? AddressZero,
     params.reference ?? "",
   ];
+}
+
+// TODO
+// delete me
+
+function getDummyDao(addressOrEns?: string): DaoMetadata {
+  const dummyDaoNames = [
+    "Patito Dao",
+    "One World Dao",
+    "Sparta Dao",
+    "Yggdrasil Unite",
+  ];
+  const dummyDaoEns = [
+    "patito.eth",
+    "oneworld.eth",
+    "spartadao.eth",
+    "yggdrasil.eth",
+  ];
+  const daoIndex = Math.floor(Math.random() * dummyDaoNames.length + 1)
+  let address = Math.random() < 0.5 ? ethers.Wallet.createRandom().address : dummyDaoEns[daoIndex]
+  if (addressOrEns) {
+    address = addressOrEns
+  }
+
+  const fromDate = new Date(
+    new Date().setFullYear(new Date().getFullYear() - 1),
+  ).getTime();
+
+  return {
+    address,
+    name: dummyDaoNames[daoIndex],
+    createdAt: new Date(fromDate + Math.random() * (Date.now() - fromDate)),
+    description: `We are a community that loves trees and the planet. We track where forestation is increasing (or shrinking), fund people who are growing and protecting trees...`,
+    links: [
+      {
+        label: "Website",
+        url: "https://google.com",
+      },
+      {
+        label: "Discord",
+        url: "https://google.com",
+      },
+    ],
+    plugins: [
+      ethers.Wallet.createRandom().address,
+      ethers.Wallet.createRandom().address
+    ]
+  }
 }

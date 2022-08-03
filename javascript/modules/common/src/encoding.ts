@@ -52,3 +52,12 @@ export function ensure0x(value: string): string {
 export function strip0x(value: string): string {
   return value.startsWith("0x") ? value.substring(2) : value;
 }
+
+export function hexToAscii(hex: string) {
+  var hex = hex.toString();
+  var str = '';
+  for (var n = 0; n < hex.length; n += 2) {
+    str += String.fromCharCode(parseInt(hex.substring(n, n + 2), 16));
+  }
+  return str;
+}
