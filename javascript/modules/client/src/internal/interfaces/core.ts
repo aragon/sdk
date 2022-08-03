@@ -5,6 +5,7 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GasFeeEstimation } from "./common";
+import { GraphQLClient } from "graphql-request";
 
 export interface IClientWeb3Core {
   useSigner: (signer: Signer) => void;
@@ -31,7 +32,10 @@ export interface IClientIpfsCore {
   fetchBytes: (cid: string) => Promise<Uint8Array | undefined>;
 }
 export interface IClientGraphQLCore {
-  // Add here
+  getClient: () => GraphQLClient
+  shiftClient: () => void
+  isUp: () => Promise<boolean>
+  ensureOnline: () => Promise<void>;
 }
 
 export interface IClientCore {

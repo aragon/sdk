@@ -12,6 +12,8 @@ import { Context } from "../context";
 import { GasFeeEstimation } from "./interfaces/common";
 import { Random } from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
+import { GraphQLClient } from "graphql-request";
+import { QueryStatus } from "./graphql-queries";
 
 /**
  * Provides the low level foundation so that subclasses have ready-made access to Web3, IPFS and GraphQL primitives
@@ -26,12 +28,20 @@ export abstract class ClientCore implements IClientCore {
   private _gasFeeEstimationFactor = 1;
   private _ipfs: IpfsClient[] = [];
   private _ipfsIdx: number = -1;
+  private _graphql: GraphQLClient[] = [];
+  private _graphqlIdx: number = -1;
 
   constructor(context: Context) {
     if (context.ipfs?.length) {
       this._ipfs = context.ipfs;
       this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
     }
+
+    if (context.graphql?.length) {
+      this._graphql = context.graphql
+      this._graphqlIdx = Math.floor(Random.getFloat() * context.graphql.length);
+    }
+
     if (context.web3Providers) {
       this._web3Providers = context.web3Providers;
       this._web3Idx = 0;
@@ -237,5 +247,67 @@ export abstract class ClientCore implements IClientCore {
     },
   };
 
-  graphql: IClientGraphQLCore = {};
+  graphql: IClientGraphQLCore = {
+
+    /**
+     * Get the current graphql client
+     * without any additional checks
+     * @returns {GraphQLClient}
+     */
+    getClient: (): GraphQLClient => {
+      if (!this._graphql[this._graphqlIdx]) {
+        throw new Error("No graphql endpoints available");
+      }
+      return this._graphql[this._graphqlIdx];
+    },
+
+    /**
+     * Starts using the next available IPFS endpoint
+     * @returns {void}
+     */
+    shiftClient: () => {
+      if (!this._graphql?.length) throw new Error("No graphql endpoints available");
+      else if (this._graphql?.length < 2) {
+        throw new Error("No other endpoints");
+      }
+      this._graphqlIdx = (this._graphqlIdx + 1) % this._graphql?.length;
+    },
+
+    /**
+     * Checks if the current node is online
+     * @returns {Promise<boolean>}
+     */
+    isUp: async (): Promise<boolean> => {
+      return this.graphql.getClient().request(QueryStatus)
+        .then((res) => {
+          if (res._meta?.deployment) {
+            return true
+          }
+          return false
+        }).catch(() => false)
+    },
+    
+    /**
+     * Ensures that the graphql is online.
+     * If the current node is not online
+     * it will shift to the next one and
+     * repeat until it finds an online 
+     * node. In the case that there are no
+     * nodes or none of them is available
+     * it will throw an error
+     * @returns {Promise<void>}
+     */
+    ensureOnline: async (): Promise<void> => {
+      if (!this._graphql?.length) {
+        return Promise.reject(new Error("graphql client is not initialized"));
+      }
+
+      for (var i = 0; i < this._graphql?.length; i++) {
+        if (await this.graphql.isUp()) return;
+
+        this.graphql.shiftClient();
+      }
+      throw new Error("No graphql nodes available");
+    },
+  };
 }

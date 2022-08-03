@@ -28,6 +28,7 @@ describe("ContextErc20 instances", () => {
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
       pluginAddress: "0x2345",
+      graphqlURLs: []
     };
   });
   it("Should create an empty context", () => {

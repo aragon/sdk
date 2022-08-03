@@ -417,7 +417,6 @@ export class Client extends ClientCore implements IClient {
 
     return Promise.resolve(AssetBalances);
   }
-
   private async _getTransfers(
     daoAddressOrEns: string,
   ): Promise<IAssetTransfers> {

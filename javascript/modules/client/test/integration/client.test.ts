@@ -49,6 +49,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -68,6 +69,7 @@ const contextParamsLocalChain: ContextParams = {
       url: "http://localhost:5003",
     },
   ],
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 describe("Client", () => {
@@ -83,7 +85,6 @@ describe("Client", () => {
   afterAll(async () => {
     await ganacheSetup.stop();
   });
-
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParams);
@@ -349,6 +350,71 @@ describe("Client", () => {
       ).toBe("7");
     });
   });
+  describe("GraphQL Client", () => {
+    it("Should detect all invalid graphql endpoints", async () => {
+      const ctx = new Context(
+        {
+          ...contextParamsLocalChain,
+          graphqlURLs: [
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url"
+          ]
+        });
+      const client = new Client(ctx)
+      const isUp = await client.graphql.isUp()
+      expect(isUp).toBe(false);
+      await expect(client.graphql.ensureOnline()).rejects.toThrow("No graphql nodes available")
+    })
+    it("Should create a valid graphql client", async () => {
+      const ctx = new Context(
+        {
+          ...contextParamsLocalChain,
+          graphqlURLs: [
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url"
+          ]
+        });
+      const client = new Client(ctx)
+      await client.graphql.ensureOnline()
+      const isUp = await client.graphql.isUp()
+      expect(isUp).toBe(true);
+    })
+    test.todo("Should get a DAO's metadata with a specific address")// , async () => {
+    //   const ctx = new Context(contextParams);
+    //   const client = new Client(ctx)
+    //   client.methods.getMetadata(contextParams.dao)
+    // })
+
+    test.todo("Should get the transfers of a dao")// , async () => {
+    //   const ctx = new Context(contextParamsLocalChain);
+    //   const client = new Client(ctx)
+    //   const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+    //   const res = await client.methods.getTransfers(daoAddress)
+    //   expect(Array.isArray(res.deposits)).toBe(true)
+    //   expect(Array.isArray(res.withdrawals)).toBe(true)
+    // })
+    test.todo("Should return an empty array when getting the transfers of a DAO that does not exist")//, async () => {
+    //   const ctx = new Context(contextParamsLocalChain);
+    //   const client = new Client(ctx)
+    //   const res = await client.methods.getTransfers(contextParamsLocalChain.dao)
+    //   expect(res.length).toBe(0)
+    // })
+    test.todo("Should fail if the given ENS is invalid")// async () => {
+    // const ctx = new Context(contextParamsLocalChain);
+    // const client = new Client(ctx)
+    // // will fail when tested on local chain
+    // await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
+    //   "Invalid ENS name"
+    // );
+  })
 });
 
 // HELPERS
@@ -441,7 +507,7 @@ async function createLegacyDao(params: ContextParams) {
     })
 }
 
-export interface ICreateDaoERC20Voting {
+interface ICreateDaoERC20Voting {
   daoConfig: DaoConfig;
   tokenConfig: TokenConfig;
   mintConfig: MintConfig;
@@ -449,23 +515,23 @@ export interface ICreateDaoERC20Voting {
   gsnForwarder?: string;
 }
 
-export interface DaoConfig {
+interface DaoConfig {
   name: string;
   metadata: string;
 }
 
-export interface TokenConfig {
+interface TokenConfig {
   addr: string;
   name: string;
   symbol: string;
 }
 
-export interface MintConfig {
+interface MintConfig {
   receivers: string[];
   amounts: bigint[];
 }
 
-export interface VotingConfig {
+interface VotingConfig {
   /** 0-100 as a percentage */
   supportRequiredPct: number;
   /** 0-100 as a percentage */

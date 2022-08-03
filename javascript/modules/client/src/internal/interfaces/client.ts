@@ -35,6 +35,11 @@ export interface IClient extends IClientCore {
   };
 }
 
+export interface ISearchParams{
+  pageSize?: number
+  page?: number
+}
+
 // DAO CREATION
 
 /** Holds the parameters that the DAO will be created with */

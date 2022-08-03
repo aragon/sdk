@@ -3,6 +3,7 @@ import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
 import { activeContractsList } from "@aragon/core-contracts-ethers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
+import { GraphQLClient } from "graphql-request";
 // import { GraphQLClient } from "graphql-request";
 
 export { ContextParams } from "./internal/interfaces/context";
@@ -61,6 +62,8 @@ export class Context {
       throw new Error("No gas fee reducer defined");
     } else if (!contextParams.ipfsNodes?.length) {
       throw new Error("No IPFS nodes defined");
+    } else if (!contextParams.graphqlURLs?.length) {
+      throw new Error("No graphql URL defined");
     }
 
     this.state = {
@@ -78,7 +81,9 @@ export class Context {
       ipfs: contextParams.ipfsNodes.map((config) =>
         new IpfsClient(config.url, config.headers)
       ),
-      // subgraph: new GraphQLClient(contextParams.subgraphURL),
+      graphql: contextParams.graphqlURLs.map((url) =>
+        new GraphQLClient(url)
+      ),
     };
   }
 
@@ -116,9 +121,11 @@ export class Context {
         new IpfsClient(config.url, config.headers)
       );
     }
-    // if (contextParams.subgraphURL) {
-    //   this.state.subgraph = new GraphQLClient(contextParams.subgraphURL);
-    // }
+    if (contextParams.graphqlURLs?.length) {
+      this.state.graphql = contextParams.graphqlURLs.map((url) =>
+        new GraphQLClient(url)
+      );
+    }
   }
 
   useWeb3Providers(
@@ -189,19 +196,6 @@ export class Context {
   }
 
   /**
-   * Getter for the GraphQLClient instance of the subgraph
-   *
-   * @var subgraph
-   *
-   * @returns {GraphQLClient}
-   *
-   * @public
-   */
-  // get subgraph(): GraphQLClient {
-  //   return this.state.subgraph || defaultState.subgraph;
-  // }
-
-  /**
    * Getter for daoFactoryAddress property
    *
    * @var daoFactoryAddress
@@ -247,12 +241,25 @@ export class Context {
    *
    * @var ipfs
    *
-   * @returns {IpfsClient}
+   * @returns {IpfsClient[] | undefined}
    *
    * @public
    */
   get ipfs(): IpfsClient[] | undefined {
     return this.state.ipfs || defaultState.ipfs;
+  }
+
+  /**
+   * Getter for the GraphQL client
+   *
+   * @var graphql
+   *
+   * @returns {GraphQLClient[] | undefined}
+   *
+   * @public
+   */
+  get graphql(): GraphQLClient[] | undefined {
+    return this.state.graphql || defaultState.graphql;
   }
 
   // DEFAULT CONTEXT STATE
@@ -266,9 +273,6 @@ export class Context {
     if (params.signer) {
       defaultState.signer = params.signer;
     }
-    // if (params.subgraphURL) {
-    //   defaultState.subgraph = new GraphQLClient(params.subgraphURL);
-    // }
   }
   static getDefault() {
     return defaultState;
