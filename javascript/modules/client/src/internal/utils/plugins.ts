@@ -1,6 +1,5 @@
 import { ProposalStatus } from "../interfaces/common";
 import { Erc20Proposal, MultisigProposal, VoteOptions } from "../interfaces/plugins";
-import { ethers } from "ethers";
 
 export function getERC20ProposalsWithStatus(proposals: Erc20Proposal[]) {
   const now = new Date();
@@ -45,7 +44,7 @@ export function getMultisigProposalsWithStatus(proposals: MultisigProposal[]) {
   });
 }
 
-export function getDummyMultisigProposal(): MultisigProposal {
+export function getDummyMultisigProposal(proposalId?: string): MultisigProposal {
 
   const dummyDaoNames = [
     "Patito Dao",
@@ -70,7 +69,7 @@ export function getDummyMultisigProposal(): MultisigProposal {
   const nay = Math.floor(Math.random() * 1001)
   const abstain = Math.floor(Math.random() * 1001)
   const index = Math.floor(Math.random() * dummyDaoNames.length + 1)
-  let address = Math.random() < 0.5 ? ethers.Wallet.createRandom().address : dummyDaoEns[index]
+  let address = Math.random() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
 
   const dateWithinThisYear = new Date(
     new Date().setFullYear(new Date().getFullYear() - 1)
@@ -81,7 +80,7 @@ export function getDummyMultisigProposal(): MultisigProposal {
   );
   const voteId = Math.floor(Math.random() * 101).toString(16)
   return {
-    id: ethers.Wallet.createRandom().address + '_0x' + voteId,
+    id: proposalId ?? ("0x1234567890123456789012345678901234567890" + '_0x' + voteId),
     daoAddress: address,
     daoName: dummyDaoNames[index],
     startDate,
@@ -93,7 +92,7 @@ export function getDummyMultisigProposal(): MultisigProposal {
     proposal: "This is the super important proposal body",
     resources: [{ url: "https://example.com", description: "Example" }],
     voteId,
-    creator: ethers.Wallet.createRandom().address,
+    creator: "0x1234567890123456789012345678901234567890",
     status: ProposalStatus.ACTIVE,
     result: {
       yea,
@@ -106,17 +105,17 @@ export function getDummyMultisigProposal(): MultisigProposal {
     },
     voters: [
       {
-        address: ethers.Wallet.createRandom().address,
+        address: "0x1234567890123456789012345678901234567890",
         voteValue: VoteOptions.YEA,
         weight: yea
       },
       {
-        address: ethers.Wallet.createRandom().address,
+        address: "0x2345678901234567890123456789012345678901",
         voteValue: VoteOptions.NAY,
         weight: nay
       },
       {
-        address: ethers.Wallet.createRandom().address,
+        address: "0x3456789012345678901234567890123456789012",
         voteValue: VoteOptions.ABSTAIN,
         weight: abstain
       }
@@ -125,7 +124,7 @@ export function getDummyMultisigProposal(): MultisigProposal {
     executed: Boolean(Math.round(Math.random()))
   }
 }
-export function getDummyErc20Proposal(): Erc20Proposal {
+export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
 
   const dummyDaoNames = [
     "Patito Dao",
@@ -150,7 +149,7 @@ export function getDummyErc20Proposal(): Erc20Proposal {
   const nay = Math.floor(Math.random() * 1001)
   const abstain = Math.floor(Math.random() * 1001)
   const index = Math.floor(Math.random() * dummyDaoNames.length + 1)
-  let address = Math.random() < 0.5 ? ethers.Wallet.createRandom().address : dummyDaoEns[index]
+  let address = Math.random() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
 
   const dateWithinThisYear = new Date(
     new Date().setFullYear(new Date().getFullYear() - 1)
@@ -161,7 +160,7 @@ export function getDummyErc20Proposal(): Erc20Proposal {
   );
   const voteId = Math.floor(Math.random() * 101).toString(16)
   return {
-    id: ethers.Wallet.createRandom().address + '_0x' + voteId,
+    id: proposalId ?? ("0x1234567890123456789012345678901234567890" + '_0x' + voteId),
     daoAddress: address,
     daoName: dummyDaoNames[index],
     startDate,
@@ -173,7 +172,7 @@ export function getDummyErc20Proposal(): Erc20Proposal {
     proposal: "This is the super important proposal body",
     resources: [{ url: "https://example.com", description: "Example" }],
     voteId,
-    creator: ethers.Wallet.createRandom().address,
+    creator: "0x1234567890123456789012345678901234567890",
     status: ProposalStatus.ACTIVE,
     result: {
       yea,
@@ -186,17 +185,17 @@ export function getDummyErc20Proposal(): Erc20Proposal {
     },
     voters: [
       {
-        address: ethers.Wallet.createRandom().address,
+        address: "0x1234567890123456789012345678901234567890",
         voteValue: VoteOptions.YEA,
         weight: yea
       },
       {
-        address: ethers.Wallet.createRandom().address,
+        address: "0x2345678901234567890123456789012345678901",
         voteValue: VoteOptions.NAY,
         weight: nay
       },
       {
-        address: ethers.Wallet.createRandom().address,
+        address: "0x3456789012345678901234567890123456789012",
         voteValue: VoteOptions.ABSTAIN,
         weight: abstain
       }
@@ -211,4 +210,8 @@ export function getDummyErc20Proposal(): Erc20Proposal {
     open: Boolean(Math.round(Math.random())),
     executed: Boolean(Math.round(Math.random()))
   }
+}
+
+export function getRandomInteger(min: number, max: number): number {
+  return Math.round(Math.random() * (max - min + 1) + min)
 }

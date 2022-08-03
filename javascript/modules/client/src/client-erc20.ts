@@ -252,8 +252,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
     }
     yield {
-      key: ExecuteProposalStep.DONE,
-      voteId: '0x0123456789012345678901234567890123456789012345678901234567890123'
+      key: ExecuteProposalStep.DONE
     }
   }
 

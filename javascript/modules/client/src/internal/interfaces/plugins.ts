@@ -157,7 +157,7 @@ export enum ExecuteProposalStep {
 
 export type ExecuteProposalStepValue =
   | { key: ExecuteProposalStep.EXECUTING; txHash: string }
-  | { key: ExecuteProposalStep.DONE; voteId: string };
+  | { key: ExecuteProposalStep.DONE };
 
 // VOTING CONFIGURATION
 export enum SetVotingConfigStep {

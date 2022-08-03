@@ -2,8 +2,24 @@ import { ContextErc20 } from "./context-erc20";
 import { ClientCore } from "./internal/core";
 import { encodeMultisigActionInit } from "./internal/encoding/plugins";
 import { FactoryInitParams, GasFeeEstimation } from "./internal/interfaces/common";
-import { ExecuteProposalStep, ExecuteProposalStepValue, IClientMultisig, ICreateProposalParams, IMultisigFactoryParams, IMultisigProposalQueryParams, IWithdrawParams, MultisigProposal, MultisigProposalSortBy, ProposalCreationSteps, ProposalCreationStepValue, SetVotingConfigStep, SetVotingConfigStepValue, VoteOptions, VoteProposalStep, VoteProposalStepValue, VotingConfig } from "./internal/interfaces/plugins";
-import { getDummyMultisigProposal, getMultisigProposalsWithStatus } from "./internal/utils/plugins";
+import {
+  ExecuteProposalStep,
+  ExecuteProposalStepValue,
+  IClientMultisig,
+  ICreateProposalParams,
+  IMultisigFactoryParams,
+  IMultisigProposalQueryParams,
+  MultisigProposal,
+  ProposalCreationSteps,
+  ProposalCreationStepValue,
+  SetVotingConfigStep,
+  SetVotingConfigStepValue,
+  VoteOptions,
+  VoteProposalStep,
+  VoteProposalStepValue,
+  VotingConfig
+} from "./internal/interfaces/plugins";
+import { getDummyMultisigProposal, getMultisigProposalsWithStatus, getRandomInteger } from "./internal/utils/plugins";
 
 
 export class ClientMultisig extends ClientCore implements IClientMultisig {
@@ -72,8 +88,8 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
      * @return {*}  {Promise<MultisigProposal>}
      * @memberof ClientMultisig
      */
-    getProposal: (propoosalId: string): Promise<MultisigProposal> =>
-      this._getProposal(propoosalId),
+    getProposal: (proposalId: string): Promise<MultisigProposal> =>
+      this._getProposal(proposalId),
     /**
      * Returns a list of proposals filtered by the input params
      *
@@ -188,8 +204,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
       txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
     }
     yield {
-      key: ExecuteProposalStep.DONE,
-      voteId: '0x0123456789012345678901234567890123456789012345678901234567890123'
+      key: ExecuteProposalStep.DONE
     }
   }
 
@@ -229,7 +244,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     if (!proposalId) {
       throw new Error("Invalid proposalId");
     }
-    const proposal = getMultisigProposalsWithStatus([getDummyMultisigProposal()])[0]
+    const proposal = getMultisigProposalsWithStatus([getDummyMultisigProposal(proposalId)])[0]
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposal))
   }
 
@@ -280,7 +295,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
       throw new Error("A web3 provider is needed");
     }
     // TODO: Remove below as the new contracts are ready
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(Math.random() * (1500 - 1000 + 1) + 1000)))
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
   private _estimateVoteProposal(_proposalId: string, _vote: VoteOptions): Promise<GasFeeEstimation> {
@@ -291,7 +306,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
       throw new Error("A web3 provider is needed");
     }
     // TODO: Remove below as the new contracts are ready
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(Math.random() * (1500 - 1000 + 1) + 1000)))
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
   private _estimateExecuteProposal(_proposalId: string): Promise<GasFeeEstimation> {
@@ -302,7 +317,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
       throw new Error("A web3 provider is needed");
     }
     // TODO: Remove below as the new contracts are ready
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(Math.random() * (1500 - 1000 + 1) + 1000)))
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
   private _estimateSetVotingConfig(_daoAddressOrEns: string, _config: VotingConfig): Promise<GasFeeEstimation> {
@@ -313,6 +328,6 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
       throw new Error("A web3 provider is needed");
     }
     // TODO: Remove below as the new contracts are ready
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(Math.random() * (1500 - 1000 + 1) + 1000)))
+    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 }
