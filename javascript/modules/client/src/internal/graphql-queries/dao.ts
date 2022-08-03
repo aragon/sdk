@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 
-export const QueryGetDaoByAddres = gql`
-  query getDaoByAddress($address: ID!) {
+export const QueryDaoByAddress = gql`
+  query daoByAddress($address: ID!) {
     dao(id: $address){
       id
       name
@@ -11,8 +11,8 @@ export const QueryGetDaoByAddres = gql`
   }
 `
 
-export const QueryGetDaoTransfersByAddress = gql`
-query getDaoTransfersByAddress($address: ID!) {
+export const QueryDaoTransfersByAddress = gql`
+query daoTransfersByAddress($address: ID!) {
   dao(id: $address) {
     withdraws {
       id
