@@ -3,7 +3,7 @@ import { Erc20Proposal, AllowListProposal } from "../interfaces/plugins";
 
 // TODO: delete this file
 
-export function getERC20ProposalsWithStatus(proposals: Erc20Proposal[]) {
+export function getErc20ProposalsWithStatus(proposals: Erc20Proposal[]) {
   const now = new Date();
 
   return proposals.map(proposal => {

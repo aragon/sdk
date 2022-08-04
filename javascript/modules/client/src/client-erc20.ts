@@ -23,7 +23,7 @@ import {
   GasFeeEstimation,
 } from "./internal/interfaces/common";
 import { ContextErc20 } from "./context-erc20";
-import { getERC20ProposalsWithStatus } from "./internal/utils/plugins";
+import { getErc20ProposalsWithStatus } from "./internal/utils/plugins";
 import { encodeErc20ActionInit } from "./internal/encoding/plugins";
 import { Random } from "@aragon/sdk-common";
 import { getDummyErc20Proposal, getRandomInteger } from "./internal/temp-mock";
@@ -375,7 +375,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     if (!proposalId) {
       throw new Error("Invalid proposalId");
     }
-    const proposal: Erc20Proposal = getERC20ProposalsWithStatus([getDummyErc20Proposal(proposalId)])[0]
+    const proposal: Erc20Proposal = getErc20ProposalsWithStatus([getDummyErc20Proposal(proposalId)])[0]
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposal))
   }
 
@@ -395,7 +395,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     for (let index = 0; index < limit; index++) {
       proposals.push(getDummyErc20Proposal())
     }
-    proposals = getERC20ProposalsWithStatus(proposals)
+    proposals = getErc20ProposalsWithStatus(proposals)
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 }
