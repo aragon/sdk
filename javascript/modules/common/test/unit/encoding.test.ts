@@ -5,7 +5,7 @@ import {
   bufferToBigInt,
   ensure0x,
   hexStringToBuffer,
-  hexToAscii,
+  hexToDecUint8Array,
   strip0x,
   uintArrayToHex,
 } from "../../src";
@@ -273,15 +273,15 @@ describe("Value encoding", () => {
     }
   });
 
-  it("Should convert a hex string to ASCII", () => {
+  it("Should convert a hex string to a decimal Uint8Array", () => {
     const inputs = [
-      { in: "61", out: "a" },
-      { in: "6161", out: "aa" },
-      { in: "616162", out: "aab" },
-      { in: "68656c6c6f207468657265", out: "hello there" }
+      { in: "61", out: new Uint8Array([97]) },
+      { in: "6161", out: new Uint8Array([97, 97]) },
+      { in: "616162", out: new Uint8Array([97, 97, 98]) },
+      { in: "68656c6c6f207468657265", out: new Uint8Array([104, 101, 108, 108, 111, 32, 116, 104, 101, 114, 101]) }
     ]
     for (let input of inputs) {
-      const result = hexToAscii(input.in);
+      const result = hexToDecUint8Array(input.in);
       expect(result).toEqual(input.out);
     }
   });

@@ -5,7 +5,7 @@ import {
   IClientErc20,
   ICreateProposalParams,
   IErc20FactoryParams,
-  IERC20ProposalQueryParams,
+  IProposalQueryParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   SetVotingConfigStep,
@@ -19,13 +19,14 @@ import {
 import { IDAO } from "@aragon/core-contracts-ethers";
 import { ClientCore } from "./internal/core";
 import {
-  // DaoConfig,
-  FactoryInitParams,
+  PluginInitAction,
   GasFeeEstimation,
 } from "./internal/interfaces/common";
 import { ContextErc20 } from "./context-erc20";
-import { getDummyErc20Proposal, getERC20ProposalsWithStatus, getRandomInteger } from "./internal/utils/plugins";
+import { getERC20ProposalsWithStatus } from "./internal/utils/plugins";
 import { encodeErc20ActionInit } from "./internal/encoding/plugins";
+import { Random } from "@aragon/sdk-common";
+import { getDummyErc20Proposal, getRandomInteger } from "./internal/temp-mock";
 
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
@@ -48,7 +49,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   /** Contains all the generic high level methods to interact with a DAO */
   methods = {
     /**
-     * Creates a new ERC20 voting proposal
+     * Creates a new proposal on the given ERC20 plugin contract
      *
      * @param {ICreateProposalParams} params
      * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
@@ -57,7 +58,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     createProposal: (params: ICreateProposalParams): AsyncGenerator<ProposalCreationStepValue> =>
       this._createProposal(params),
     /**
-     * Cast a vote o a proposal given the proposalId and the vote
+     * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
      *
      * @param {string} proposalId
      * @param {VoteOptions} vote
@@ -67,7 +68,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     voteProposal: (proposalId: string, vote: VoteOptions): AsyncGenerator<VoteProposalStepValue> =>
       this._voteProposal(proposalId, vote),
     /**
-     * Executes a proposal given a specific proposalId
+     * Executes the given proposal, provided that it has already passed
      *
      * @param {string} proposalId
      * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
@@ -76,27 +77,25 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     executeProposal: (proposalId: string): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(proposalId),
     /**
-     * Sets the voting configuration in a multisig proposal given a daoAddress and a configuration
+     * Sets the voting configuration in a allowlist proposal given a daoAddress and a configuration
      *
-     * @param {string} daoAddressOrEns
      * @param {VotingConfig} config
      * @return {*}  {AsyncGenerator<SetVotingConfigStepValue>}
      * @memberof ClientErc20
      */
-    setVotingConfig: (daoAddressOrEns: string, config: VotingConfig): AsyncGenerator<SetVotingConfigStepValue> =>
-      this._setVotingConfig(daoAddressOrEns, config),
+    setPluginConfig: (config: VotingConfig): AsyncGenerator<SetVotingConfigStepValue> =>
+      this._setPluginConfig(config),
 
     /**
-     * Returns the list of members given a dao address or ens
+     * Returns the list of wallet addresses holding tokens from the underlying ERC20 contract used by the plugin
      *
-     * @param {string} daoAddressOrEns
      * @return {*}  {Promise<string[]>}
      * @memberof ClientErc20
      */
-    getMembers: (daoAddressOrEns: string): Promise<string[]> => this._getMembers(daoAddressOrEns),
+    getMembers: (): Promise<string[]> => this._getMembers(),
     /**
-     * Returns a proposal data given a specific propoosal id
-     *
+     * Returns the details of the given proposal
+     * 
      * @param {string} proposalId
      * @return {*}  {Promise<Erc20Proposal>}
      * @memberof ClientErc20
@@ -104,13 +103,13 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     getProposal: (proposalId: string): Promise<Erc20Proposal> =>
       this._getProposal(proposalId),
     /**
-     * Returns a list of proposals filtered by the query params
+     * Returns a list of proposals on the Plugin, filtered by the given criteria
      *
-     * @param {IERC20ProposalQueryParams} params
+     * @param {IProposalQueryParams} params
      * @return {*}  {Promise<Erc20Proposal[]>}
      * @memberof ClientErc20
      */
-    getProposalMany: (params?: IERC20ProposalQueryParams): Promise<Erc20Proposal[]> =>
+    getProposalMany: (params?: IProposalQueryParams): Promise<Erc20Proposal[]> =>
       this._getProposalMany(params ?? {}),
   };
 
@@ -119,20 +118,21 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   /** Contains the helpers to encode actions and parameters that can be passed as a serialized buffer on-chain */
   encoding = {
     /**
-     * Computes the parameters to be given when creating the DAO, as the initialization for the plugin
+     * Encodes the parameters for the plugin initialization as a hex string, to be used when deploying a DAO or installing/updating the plugin
      *
      * @param {IErc20FactoryParams} params
      * @return {*}  {FactoryInitParams}
      * @memberof ClientErc20
      */
-    init: (params: IErc20FactoryParams) => this._buildActionInit(params),
+  // DaoConfig,
+    init: (params: IErc20FactoryParams): PluginInitAction => this._buildActionInit(params),
   }
   //// ESTIMATION HANDLERS
 
   /** Contains the gas estimation of the Ethereum transactions */
   estimation = {
     /**
-     * Estimates the gas fee of creating a ERC20 proposal
+     * Estimates the gas fee of creating a proposal on the plugin
      *
      * @param {ICreateProposalParams} params
      * @return {*}  {Promise<GasFeeEstimation>}
@@ -141,7 +141,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     createProposal: (params: ICreateProposalParams): Promise<GasFeeEstimation> =>
       this._estimateCreateProposal(params),
     /**
-     * Estimates the gas fee of casting a vote in a ERC20 proposal
+     * Estimates the gas fee of casting a vote on a proposal
      *
      * @param {string} proposalId
      * @param {VoteOptions} vote
@@ -151,7 +151,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     voteProposal: (proposalId: string, vote: VoteOptions): Promise<GasFeeEstimation> =>
       this._estimateVoteProposal(proposalId, vote),
     /**
-     * Estimates the gas fee of executing a ERC20 proposal
+     * Estimates the gas fee of executing an ERC20 proposal
      *
      * @param {string} proposalId
      * @return {*}  {Promise<GasFeeEstimation>}
@@ -160,15 +160,15 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     executeProposal: (proposalId: string): Promise<GasFeeEstimation> =>
       this._estimateExecuteProposal(proposalId),
     /**
-     * Estimates the gas fee of setting the voting configuration in a ERC20 voting
+     * Estimates the gas fee of updating the governance configuration through a new ERC20 proposal
      *
      * @param {string} daoAddressOrEns
      * @param {VotingConfig} config
      * @return {*}  {Promise<GasFeeEstimation>}
      * @memberof ClientErc20
      */
-    setVotingConfig: (daoAddressOrEns: string, config: VotingConfig): Promise<GasFeeEstimation> =>
-      this._estimateSetVotingConfig(daoAddressOrEns, config),
+    setPluginConfig: (config: VotingConfig): Promise<GasFeeEstimation> =>
+      this._estimateSetPluginConfig(config),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -230,6 +230,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
+
+    // TODO: Implement
+
     yield {
       key: VoteProposalStep.VOTING,
       txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
@@ -247,6 +250,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
+
+    // TODO: Implement
+
     yield {
       key: ExecuteProposalStep.EXECUTING,
       txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
@@ -256,15 +262,18 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
   }
 
-  private async *_setVotingConfig(_daoAddressOrEns: string, _config: VotingConfig): AsyncGenerator<SetVotingConfigStepValue> {
+  private async *_setPluginConfig(_config: VotingConfig): AsyncGenerator<SetVotingConfigStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
+
+    // TODO: Implement
+
     yield {
-      key: SetVotingConfigStep.CONFIGURING,
+      key: SetVotingConfigStep.CREATING_PROPOSAL,
       txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
     }
     yield {
@@ -275,21 +284,13 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
   //// PRIVATE ACTION BUILDER HANDLERS
 
-  private _buildActionInit(params: IErc20FactoryParams): FactoryInitParams {
+  private _buildActionInit(params: IErc20FactoryParams): PluginInitAction {
     return {
       id: this._pluginAddress,
       data: encodeErc20ActionInit(params)
     }
   }
 
-  /**
-   *
-   *
-   * @private
-   * @param {ICreateProposalParams} _params
-   * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientErc20
-   */
   private _estimateCreateProposal(_params: ICreateProposalParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -341,7 +342,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   }
 
 
-  private _estimateSetVotingConfig(_daoAddressOrEns: string, _config: VotingConfig): Promise<GasFeeEstimation> {
+  private _estimateSetPluginConfig(_config: VotingConfig): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -352,10 +353,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
-  private _getMembers(daoAddressOrEns: string): Promise<string[]> {
-    if (!daoAddressOrEns) {
-      throw new Error("Invalid DAO address or ENS");
-    }
+  private _getMembers(): Promise<string[]> {
+
+    // TODO: Implementation
 
     const mockAddresses = [
       "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
@@ -366,7 +366,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     ];
 
     return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
-      mockAddresses.filter(() => Math.random() > 0.4)
+      mockAddresses.filter(() => Random.getFloat() > 0.4)
     );
   }
 
@@ -385,8 +385,8 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     limit = 0,
     // skip = 0,
     // sortDirection = SortDireccions.ASC,
-    // sortBy = MultisigProposalSortBy.CREATED_AT
-  }: IERC20ProposalQueryParams): Promise<Erc20Proposal[]> {
+    // sortBy = Erc20ProposalSortBy.CREATED_AT
+  }: IProposalQueryParams): Promise<Erc20Proposal[]> {
     let proposals: Erc20Proposal[] = []
     for (let index = 0; index < limit; index++) {
       proposals.push(getDummyErc20Proposal())

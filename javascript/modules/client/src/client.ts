@@ -29,13 +29,12 @@ import { ClientCore } from "./internal/core";
 import { DaoAction, DaoRole } from "./internal/interfaces/common";
 import { pack } from "@ethersproject/solidity";
 
-import { strip0x } from "@aragon/sdk-common";
+import { Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
 import { IWithdrawParams } from "./internal/interfaces/plugins";
 import { encodeWithdrawActionData } from "./internal/encoding/client";
-import { getRandomInteger } from "./internal/utils/plugins";
-import { getDummyDao } from "./internal/utils/client";
+import { getDummyDao, getRandomInteger } from "./internal/temp-mock";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -45,7 +44,7 @@ const assetList: AssetBalance[] = [
   {
     type: "native",
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
   },
   {
     type: "erc20",
@@ -54,7 +53,7 @@ const assetList: AssetBalance[] = [
     symbol: "JOJ",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
   },
   {
     type: "erc20",
@@ -63,7 +62,7 @@ const assetList: AssetBalance[] = [
     symbol: "DTT",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
   },
   {
     type: "erc20",
@@ -72,7 +71,7 @@ const assetList: AssetBalance[] = [
     symbol: "TTK",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
   },
 ];
 
@@ -95,8 +94,8 @@ export class Client extends ClientCore implements IClient {
     getTransfers: (daoAddressOrEns: string) =>
       this._getTransfers(daoAddressOrEns),
     /** Retrieves the list of plugin installed in the DAO*/
-    getPlugins: (daoAddressOrEns: string): Promise<string[]> =>
-      this._getPlugins(daoAddressOrEns),
+    getInstalledPlugins: (daoAddressOrEns: string): Promise<string[]> =>
+      this._getInstalledPlugins(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getMetadata: (daoAddressOrEns: string) =>
       this._getMetadata(daoAddressOrEns),
@@ -337,10 +336,15 @@ export class Client extends ClientCore implements IClient {
       });
   }
 
-  private _getPlugins(daoAddressOrEns: string): Promise<string[]> {
+  //// PRIVATE METHODS METADATA
+
+
+  private _getInstalledPlugins(daoAddressOrEns: string): Promise<string[]> {
     if (!daoAddressOrEns) {
       throw new Error("Invalid DAO address or ENS");
     }
+
+    // TODO: Implement
 
     const mockAddresses = [
       "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
@@ -351,7 +355,7 @@ export class Client extends ClientCore implements IClient {
     ];
 
     return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
-      mockAddresses.filter(() => Math.random() > 0.4)
+      mockAddresses.filter(() => Random.getFloat() > 0.4)
     );
   }
 
@@ -447,7 +451,7 @@ export class Client extends ClientCore implements IClient {
             transactionId: transfers[index].transactionId,
             // Generate a random date in the past
             date: new Date(
-              +new Date() - Math.floor(Math.random() * 10000000000),
+              +new Date() - Math.floor(Random.getFloat() * 10000000000),
             ),
           };
           return result;
@@ -459,7 +463,7 @@ export class Client extends ClientCore implements IClient {
           reference: "Some reference",
           transactionId: transfers[index].transactionId,
           // Generate a random date in the past
-          date: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+          date: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
         };
         return result;
       },

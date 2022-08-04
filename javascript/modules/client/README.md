@@ -330,7 +330,7 @@ const proposalCreationParams: ICreateProposalParams = {
   startDate: 1234,
   endDate: 2345,
   executeIfPassed: true,
-  creatorVote: VoteOption.YEA,
+  creatorVote: VoteOption.YES,
 };
 
 const estimatedGas = await client.estimation.createProposal(
@@ -412,8 +412,8 @@ console.log(proposals);
     },
 
     result: {
-      yea: 3,
-      nay: 1,
+      yes: 3,
+      no: 1,
       abstain: 2,
     },
 
@@ -431,7 +431,7 @@ console.log(proposals);
     voters: [
       {
         address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-        voteValue: VoteOptions.YEA,
+        voteValue: VoteOptions.YES,
         weight: 1,
       },
       {...}
@@ -439,25 +439,25 @@ console.log(proposals);
   },] */
 ```
 
-## Multisig governance plugin client
+## AllowList governance plugin client
 
-### Creating a DAO with a multisig plugin
-
-- **TODO**
-
-### Creating a multisig proposal
+### Creating a DAO with a allolist plugin
 
 - **TODO**
 
-### Voting on a multisig proposal
+### Creating a allowlist proposal
 
 - **TODO**
 
-### Loading the list of members (multisig)
+### Voting on a allowlist proposal
 
 - **TODO**
 
-### Loading the list of proposals (multisig)
+### Loading the list of members (allowlist)
+
+- **TODO**
+
+### Loading the list of proposals (allowlist)
 
 - **TODO**
 

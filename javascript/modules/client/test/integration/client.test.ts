@@ -20,6 +20,7 @@ import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-e
 import { DaoSortBy, IDaoQueryParams } from "../../src/internal/interfaces/client";
 import { SortDireccions } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/plugins";
+import { Random } from "@aragon/sdk-common";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -140,7 +141,7 @@ describe("Client", () => {
 
       const daoCreationParams: ICreateParams = {
         daoConfig: {
-          name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+          name: "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1,
           metadata: "0x1234",
         },
         plugins: [
@@ -166,7 +167,7 @@ describe("Client", () => {
 
       const daoCreationParams: ICreateParams = {
         daoConfig: {
-          name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+          name: "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1,
           metadata: "0x1234",
         },
         plugins: [
@@ -370,32 +371,19 @@ describe("Client", () => {
           .toString(),
       ).toBe("7");
     });
-    it("Should get the metadata of daos based on the search params", async () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
-      const params: IDaoQueryParams = {
-        limit: 10,
-        skip: 0,
-        sortDirection: SortDireccions.ASC,
-        sortBy: DaoSortBy.NAME
-      }
-      const daos = await client.methods.getMetadataMany(params)
-      expect(Array.isArray(daos)).toBe(true)
-      expect(daos.length <= 10).toBe(true);
-    })
   });
   describe('Action generators', () => {
     it("Should create a Erc20 client and generate a init action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const initParams: IWithdrawParams = {
+      const withdrawParams: IWithdrawParams = {
         recipientAddress: '0x1234567890123456789012345678901234567890',
         amount: BigInt(10),
         reference: 'test'
       };
 
-      const initAction = client.encoding.withdrawAction(initParams);
+      const initAction = client.encoding.withdrawAction(withdrawParams);
 
       expect(typeof initAction).toBe("object");
       expect(initAction.data).toBeInstanceOf(Uint8Array);
@@ -411,16 +399,18 @@ describe("Client", () => {
       expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     })
 
-    it("Should get multiple DAOs metadata filtered by the query params", async () => {
-      const ctx = new Context(contextParams);
-      const client = new Client(ctx)
-      const limit = 15
+    it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
       const params: IDaoQueryParams = {
-        limit
+        limit: 10,
+        skip: 0,
+        sortDirection: SortDireccions.ASC,
+        sortBy: DaoSortBy.NAME
       }
       const daos = await client.methods.getMetadataMany(params)
-      expect(Array.isArray(daos)).toBe(true);
-      expect(daos.length <= limit).toBe(true)
+      expect(Array.isArray(daos)).toBe(true)
+      expect(daos.length <= 10).toBe(true);
     })
 
     it("Should get DAOs balances", async () => {
@@ -428,6 +418,9 @@ describe("Client", () => {
       const client = new Client(ctx)
       const balances = await client.methods.getBalances("0x1234567890123456789012345678901234567890")
       expect(Array.isArray(balances)).toBe(true);
+      if (balances.length > 0) {
+        expect(typeof balances[0].balance).toBe('bigint');
+      }
     })
 
     it("Should get the transfers of a dao", async () => {
@@ -439,11 +432,11 @@ describe("Client", () => {
       expect(Array.isArray(transfers.withdrawals)).toBe(true)
     })
 
-    it("Should get a list of plugins installed in the DAO", async () => {
+    it("Should get the list of a DAO's installed plugin's addresses", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const client = new Client(ctx)
       const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
-      const plugins = await client.methods.getPlugins(daoAddress)
+      const plugins = await client.methods.getInstalledPlugins(daoAddress)
       expect(Array.isArray(plugins)).toBe(true)
       if (plugins.length > 0) {
         expect(typeof plugins[0]).toBe('string')
@@ -503,32 +496,32 @@ async function createLegacyDao(params: ContextParams) {
 
   const daoCreationParams: ICreateDaoERC20Voting = {
     daoConfig: {
-      name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+      name: "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1,
       metadata: "0x1234",
     },
     tokenConfig: {
       addr: "0x0000000000000000000000000000000000000000",
       name:
         "TestToken" +
-        (Math.random() + 1)
+        (Random.getFloat() + 1)
           .toString(36)
           .substring(4)
           .toUpperCase(),
       symbol:
         "TEST" +
-        (Math.random() + 1)
+        (Random.getFloat() + 1)
           .toString(36)
           .substring(4)
           .toUpperCase(),
     },
     mintConfig: {
       receivers: [Wallet.createRandom().address, Wallet.createRandom().address],
-      amounts: [BigInt(Math.floor(Math.random() * 9999) + 1), BigInt(Math.floor(Math.random() * 9999) + 1)]
+      amounts: [BigInt(Math.floor(Random.getFloat() * 9999) + 1), BigInt(Math.floor(Random.getFloat() * 9999) + 1)]
     },
     votingConfig: {
-      supportRequiredPct: Math.floor(Math.random() * 100) + 1,
-      participationRequiredPct: Math.floor(Math.random() * 100) + 1,
-      minDuration: Math.floor(Math.random() * 9999) + 1,
+      supportRequiredPct: Math.floor(Random.getFloat() * 100) + 1,
+      participationRequiredPct: Math.floor(Random.getFloat() * 100) + 1,
+      minDuration: Math.floor(Random.getFloat() * 9999) + 1,
     },
     gsnForwarder: Wallet.createRandom().address,
   };

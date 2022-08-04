@@ -14,7 +14,7 @@ import {
   ExecuteProposalStep,
   ICreateProposalParams,
   IErc20FactoryParams,
-  IERC20ProposalQueryParams,
+  IProposalQueryParams,
   ProposalCreationSteps,
   SetVotingConfigStep,
   VoteOptions,
@@ -161,7 +161,7 @@ describe("Client", () => {
       const proposalParams: ICreateProposalParams = {
         metadataUri: "ipfs://",
         actions: [],
-        creatorVote: VoteOptions.YEA,
+        creatorVote: VoteOptions.YES,
         startDate: new Date(),
         endDate: new Date(),
         executeIfPassed: true
@@ -191,7 +191,7 @@ describe("Client", () => {
       const proposalParams: ICreateProposalParams = {
         metadataUri: "ipfs://",
         actions: [action],
-        creatorVote: VoteOptions.YEA,
+        creatorVote: VoteOptions.YES,
         startDate: new Date(),
         endDate: new Date(),
         executeIfPassed: true
@@ -223,7 +223,7 @@ describe("Client", () => {
 
       const estimation = await client.estimation.voteProposal(
         '0x1234567890123456789012345678901234567890',
-        VoteOptions.YEA
+        VoteOptions.YES
       )
 
       expect(typeof estimation).toEqual("object")
@@ -240,7 +240,7 @@ describe("Client", () => {
 
       const proposalId = '0x1234567890123456789012345678901234567890'
 
-      for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YEA)) {
+      for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
         switch (step.key) {
           case VoteProposalStep.VOTING:
             expect(typeof step.txHash).toBe("string");
@@ -293,7 +293,7 @@ describe("Client", () => {
             break;
           default:
             throw new Error(
-              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+              "Unexpected execute proposal step: " + Object.keys(step).join(", "),
             );
         }
       }
@@ -307,8 +307,7 @@ describe("Client", () => {
       const context = new ContextErc20(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
-      const estimation = await client.estimation.setVotingConfig(
-        '0x1234567890123456789012345678901234567890',
+      const estimation = await client.estimation.setPluginConfig(
         {
           minDuration: 7200,
           minParticipation: 25,
@@ -335,9 +334,9 @@ describe("Client", () => {
         minSupport: 50
       }
 
-      for await (const step of client.methods.setVotingConfig(daoAddress, votingConfig)) {
+      for await (const step of client.methods.setPluginConfig(votingConfig)) {
         switch (step.key) {
-          case SetVotingConfigStep.CONFIGURING:
+          case SetVotingConfigStep.CREATING_PROPOSAL:
             expect(typeof step.txHash).toBe("string");
             expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             break;
@@ -393,19 +392,19 @@ describe("Client", () => {
     });
   })
 
-  describe('Retrieve data', () => {
+  describe('Data retrieval', () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const context = new ContextErc20(contextParamsLocalChain);
       const client = new ClientErc20(context);
       
-      const wallets = await client.methods.getMembers("0x1234567890123456789012345678901234567890")
+      const wallets = await client.methods.getMembers()
 
       expect(Array.isArray(wallets)).toBe(true);
       expect(wallets.length).toBeGreaterThan(0);
       expect(typeof wallets[0]).toBe('string');
       expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     })
-    it("Should get a proposal filtered by proposal Id", async () => {
+    it("Should fetch the given proposal", async () => {
       const context = new ContextErc20(contextParamsLocalChain);
       const client = new ClientErc20(context);
 
@@ -416,11 +415,11 @@ describe("Client", () => {
       expect(proposal.id).toBe(proposalId);
       expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
     })
-    it("Should get a list list of proposals", async () => {
+    it("Should get a list of proposals filtered by the given criteria", async () => {
       const context = new ContextErc20(contextParamsLocalChain);
       const client = new ClientErc20(context);
       const limit = 5
-      const params: IERC20ProposalQueryParams = {
+      const params: IProposalQueryParams = {
         limit
       }
       const proposals = await client.methods.getProposalMany(params)

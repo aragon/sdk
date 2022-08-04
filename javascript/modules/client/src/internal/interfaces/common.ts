@@ -22,7 +22,7 @@ export type DaoAction = {
  * Contains the payload passed to the global DAO factory so that
  * plugins can be initialized
  */
-export type FactoryInitParams = {
+export type PluginInitAction = {
   /** The ID of the plugin to use */
   id: string;
   /** ABI encoded parameters to pass to the plugin factory */
