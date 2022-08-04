@@ -1,5 +1,5 @@
 import { ProposalStatus } from "../interfaces/common";
-import { Erc20Proposal, AllowListProposal, VoteOptions } from "../interfaces/plugins";
+import { Erc20Proposal, AllowListProposal } from "../interfaces/plugins";
 
 // TODO: delete this file
 
