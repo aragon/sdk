@@ -37,7 +37,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
   }
   methods = {
     /**
-     * Creates a new allowlist voting proposal
+     * Creates a new proposal on the given AllowList plugin contract
      *
      * @param {ICreateProposalParams} _params
      * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
@@ -46,7 +46,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     createProposal: (params: ICreateProposalParams): AsyncGenerator<ProposalCreationStepValue> =>
       this._createProposal(params),
     /**
-     * Cast a vote o a proposal given the proposalId and the vote
+     * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
      *
      * @param {string} proposalId
      * @param {VoteOptions} vote
@@ -56,7 +56,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     voteProposal: (proposalId: string, vote: VoteOptions): AsyncGenerator<VoteProposalStepValue> =>
       this._voteProposal(proposalId, vote),
     /**
-     * Executes a proposal given a specific proposalId
+     * Executes the given proposal, provided that it has already passed
      *
      * @param {string} proposalId
      * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
@@ -74,7 +74,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     setPluginConfig: (config: VotingConfig): AsyncGenerator<SetVotingConfigStepValue> =>
       this._setPluginConfig(config),
     /**
-     * Returns the list of members of a spcific dao address or ens
+     * Returns the list of wallet addresses holding tokens from the underlying Allowlist contract used by the plugin
      *
      * @return {*}  {Promise<string[]>}
      * @memberof ClientAllowList
@@ -82,7 +82,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     getMembers: (): Promise<string[]> =>
       this._getMemebers(),
     /**
-     * Returns a proposal data given a specific propoosal id
+     * Returns the details of the given proposal
      *
      * @param {string} proposalId
      * @return {*}  {Promise<AllowListProposal>}
@@ -91,7 +91,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     getProposal: (proposalId: string): Promise<AllowListProposal> =>
       this._getProposal(proposalId),
     /**
-     * Returns a list of proposals filtered by the input params
+     * Returns a list of proposals on the Plugin, filtered by the given criteria
      *
      * @param {IProposalQueryParams}
      * @return {*}  {Promise<AllowListProposal[]>}
@@ -114,7 +114,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
   estimation = {
 
     /**
-     * Estimates the gas fee of the creation oa allowlist propoosal
+     * Estimates the gas fee of creating a proposal on the plugin
      *
      * @param {ICreateProposalParams} params
      * @return {*}  {Promise<GasFeeEstimation>}
@@ -124,7 +124,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
       this._estimateCreateProposal(params),
 
     /**
-     * Estimates the gas fee of voting in a allowlist propoosal
+     * Estimates the gas fee of casting a vote on a proposal
      *
      * @param {string} proposalId
      * @param {VoteOptions} vote
@@ -135,7 +135,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
       this._estimateVoteProposal(proposalId, vote),
 
     /**
-     * Estimates the gas fee of executing a proposal
+     * Estimates the gas fee of executing an Allowlist proposal
      *
      * @param {string} proposalId
      * @return {*}  {Promise<GasFeeEstimation>}
@@ -145,7 +145,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
       this._estimateExecuteProposal(proposalId),
 
     /**
-     * Estimates the gas fee of setting the voting configuration in a allowlist voting
+     * Estimates the gas fee of updating the governance configuration through a new Allowlist proposal
      *
      * @param {VotingConfig} config
      * @return {*}  {Promise<GasFeeEstimation>}
@@ -164,6 +164,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
+
+    // TODO: Implement
+
     yield {
       key: ProposalCreationSteps.CREATING,
       txHash: "0x0123456789012345678901234567890123456789012345678901234567890123"
@@ -181,6 +184,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
+
+    // TODO: Implement
+
     yield {
       key: VoteProposalStep.VOTING,
       txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
@@ -198,6 +204,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
+
+    // TODO: Implement
+
     yield {
       key: ExecuteProposalStep.EXECUTING,
       txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
@@ -214,6 +223,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
+
+    // TODO: Implement
+
     yield {
       key: SetVotingConfigStep.CREATING_PROPOSAL,
       txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
@@ -231,6 +243,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
       "0x3456789012345678901234567890123456789012",
       "0x4567890123456789012345678901234567890123",
     ]
+
+    // TODO: Implement
+
     return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
       mockAddresses.filter(() => Random.getFloat() > 0.4)
     );
@@ -240,6 +255,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     if (!proposalId) {
       throw new Error("Invalid proposalId");
     }
+
+    // TODO: Implement
+
     const proposal = getAllowListProposalsWithStatus([getDummyAllowListProposal(proposalId)])[0]
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposal))
   }
@@ -269,6 +287,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     // sortBy = AllowListProposalSortBy.CREATED_AT
   }: IProposalQueryParams): Promise<AllowListProposal[]> {
     let proposals: AllowListProposal[] = []
+
+    // TODO: Implement
+
     for (let index = 0; index < limit; index++) {
       proposals.push(getDummyAllowListProposal())
     }
@@ -290,7 +311,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: Remove below as the new contracts are ready
+
+    // TODO: Implement
+
     return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
@@ -301,7 +324,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: Remove below as the new contracts are ready
+
+    // TODO: Implement
+
     return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
@@ -312,7 +337,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: Remove below as the new contracts are ready
+
+    // TODO: Implement
+
     return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 
@@ -323,7 +350,9 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: Remove below as the new contracts are ready
+
+    // TODO: Implement
+
     return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
   }
 }

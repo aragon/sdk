@@ -77,7 +77,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     executeProposal: (proposalId: string): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(proposalId),
     /**
-     * Sets the voting configuration in a allowlist proposal given a daoAddress and a configuration
+     * Sets the voting configuration in a erc20 proposal given a proposalId and a configuration
      *
      * @param {VotingConfig} config
      * @return {*}  {AsyncGenerator<SetVotingConfigStepValue>}
@@ -118,8 +118,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   /** Contains the helpers to encode actions and parameters that can be passed as a serialized buffer on-chain */
   encoding = {
     /**
-     * Encodes the parameters for the plugin initialization as a hex string, to be used when deploying a DAO or installing/updating the plugin
-     *
+     * Computes the parameters to be given when creating the DAO,
+     * so that the plugin is configured    
+     * 
      * @param {IErc20FactoryParams} params
      * @return {*}  {FactoryInitParams}
      * @memberof ClientErc20
@@ -355,7 +356,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
   private _getMembers(): Promise<string[]> {
 
-    // TODO: Implementation
+    // TODO: Implement
 
     const mockAddresses = [
       "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
@@ -388,6 +389,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     // sortBy = Erc20ProposalSortBy.CREATED_AT
   }: IProposalQueryParams): Promise<Erc20Proposal[]> {
     let proposals: Erc20Proposal[] = []
+
+    // TODO: Implement
+
     for (let index = 0; index < limit; index++) {
       proposals.push(getDummyErc20Proposal())
     }

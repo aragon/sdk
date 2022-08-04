@@ -389,7 +389,7 @@ describe("Client", () => {
       expect(initAction.data).toBeInstanceOf(Uint8Array);
     });
   })
-  describe("Retrieve data", () => {
+  describe("Data retrieval", () => {
     it("Should get a DAO's metadata with a specific address", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx)
