@@ -306,6 +306,7 @@ underlying network requests.
 ### Creating a DAO with an ERC20 plugin
 
 ```ts
+const context: ContextPluginParams = new ContextPlugin(contextParams)
 const client = new Client(context) 
 const erc20Client = new Client({...context, pluginAddress: "0x12345..."})
 const pluginInitParams: IErc20FactoryParams = {
@@ -396,7 +397,7 @@ for await (
 ### Voting on an ERC20 proposal
 
 ```ts
-  // const contextParams: ContextPluginParams = {...} 
+  const context: ContextPluginParams = new ContextPlugin(contextParams)
   const context = new ContextPlugin(contextParams)
   const client = new ClientErc20(context)
 
@@ -501,7 +502,7 @@ console.log(proposals);
 ## Multisig governance plugin client
 
 ```ts
-  // const contextParams: ContextPluginParams = {...} 
+  const context: ContextPluginParams = new ContextPlugin(contextParams)
   const context = new ContextPlugin(contextParams)
   const client = new ClientMultisig(context)
 ```
@@ -509,7 +510,7 @@ console.log(proposals);
 ### Creating a DAO with a multisig plugin
 
 ```ts
-  // const context: ContextParams = {...} 
+  const context: ContextParams = new Context(contextParams)
   const client = new Client(context) 
   const multisigClient = new Client({...context, pluginAddress: "0x12345..."})
   const pluginInitParams: IMultisigFactoryParams = {
@@ -538,6 +539,7 @@ console.log(proposals);
 
 ### Creating a Multisig proposal
 ```ts
+const context: ContextPluginParams = new ContextPlugin(contextParams)
 const client = new Client(context);
 
 const actions: DaoAction[] = [
@@ -580,7 +582,7 @@ for await (
 
 ### Voting on a Multisig proposal
 ```ts
-  // const contextParams: ContextPluginParams = {...} 
+  const context: ContextPluginParams = new ContextPlugin(contextParams)
   const context = new ContextPlugin(contextParams)
   const client = new ClientMultisig(context)
   const estimatedGas = await client.estimation.voteProposal(
@@ -610,7 +612,7 @@ for await (
 
 ### Loading the list of members (Multisig)
 ```ts
-  const context = new ContextPlugin(contextParams)
+  const context: ContextPluginParams = new ContextPlugin(contextParams)
   const client = new ClientMultisig(context)
   const members = await client.methods.getMemebers()
   /*
@@ -626,7 +628,7 @@ for await (
 
 ### Loading the a proposal by proposalId (Multisig)
 ```ts
-  const context = new ContextPlugin(contextParams)
+  const context: ContextPluginParams = new ContextPlugin(contextParams)
   const client = new ClientMultisig(context)
   const proposals = await client.methods.getProposal(
     "0x1234567890123456789012345678901234567890_0x0"
@@ -678,7 +680,7 @@ for await (
 ```
 ### Loading the list of proposals (Multisig)
 ```ts
-  const context = new ContextPlugin(contextParams)
+  const context: ContextPluginParams = new ContextPlugin(contextParams)
   const client = new ClientMultisig(context)
   const queryParams:IProposalQueryParams = {
     skip: 0,
