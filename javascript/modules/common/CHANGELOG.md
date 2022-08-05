@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING] 
+### Added
+- `hexToBytes` function
 
 - Version bump
 

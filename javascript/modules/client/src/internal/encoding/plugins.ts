@@ -1,19 +1,19 @@
-import { ERC20Voting__factory, WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
-import { strip0x, hexToDecUint8Array } from "@aragon/sdk-common";
+import { ERC20Voting__factory, MajorityVoting__factory, WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
+import { strip0x, hexToBytes } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { IErc20FactoryParams, IAllowListFactoryParams } from "../interfaces/plugins";
+import { IErc20FactoryParams, IMultisigFactoryParams, VotingConfig } from "../interfaces/plugins";
 
-export function encodeAllowListActionInit(params: IAllowListFactoryParams): Uint8Array {
-  const allowListVotingInterface = WhitelistVoting__factory.createInterface();
-  const args = unwrapAllowListInitParams(params);
+export function encodeMultisigActionInit(params: IMultisigFactoryParams): Uint8Array {
+  const multisigVotingInterface = WhitelistVoting__factory.createInterface();
+  const args = unwrapMultisigInitParams(params);
   // get hex bytes
-  const hexBytes = allowListVotingInterface.encodeFunctionData("initialize", args);
+  const hexBytes = multisigVotingInterface.encodeFunctionData("initialize", args);
   // Strip 0x => encode in Uint8Array
-  return hexToDecUint8Array(strip0x(hexBytes));
+  return hexToBytes(strip0x(hexBytes));
 }
 
-function unwrapAllowListInitParams(params: IAllowListFactoryParams): [string, string, BigNumber, BigNumber, BigNumber, string[]] {
+function unwrapMultisigInitParams(params: IMultisigFactoryParams): [string, string, BigNumber, BigNumber, BigNumber, string[]] {
   // TODO
   // not sure if the IDao and gsn params will be needed after
   // this is converted into a plugin
@@ -33,7 +33,7 @@ export function encodeErc20ActionInit(params: IErc20FactoryParams): Uint8Array {
   // get hex bytes
   const hexBytes = erc20votingInterface.encodeFunctionData("initialize", args);
   // Strip 0x => encode in Uint8Array
-  return hexToDecUint8Array(strip0x(hexBytes));
+  return hexToBytes(strip0x(hexBytes));
 }
 
 function unwrapErc20InitParams(params: IErc20FactoryParams): [string, string, BigNumber, BigNumber, BigNumber, string] {
@@ -49,5 +49,22 @@ function unwrapErc20InitParams(params: IErc20FactoryParams): [string, string, Bi
     BigNumber.from(params.votingConfig.minSupport),
     BigNumber.from(params.votingConfig.minSupport),
     params.tokenConfig.address
+  ]
+}
+
+export function encodeActionSetPluginConfig(params: VotingConfig): Uint8Array {
+  const votingInterface = MajorityVoting__factory.createInterface();
+  const args = unwrapSetPluginConfig(params);
+  // get hex bytes
+  const hexBytes = votingInterface.encodeFunctionData("changeVoteConfig", args);
+  // Strip 0x => encode in Uint8Array
+  return hexToBytes(strip0x(hexBytes));
+}
+
+function unwrapSetPluginConfig(params: VotingConfig): [BigNumber, BigNumber, BigNumber] {
+  return [
+    BigNumber.from(params.minParticipation),
+    BigNumber.from(params.minSupport),
+    BigNumber.from(params.minDuration)
   ]
 }

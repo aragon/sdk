@@ -3,7 +3,7 @@ declare const describe, it, beforeAll, afterAll, expect, test;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientAllowList, ContextErc20, ContextErc20Params, Client } from "../../src";
+import { ClientMultisig, ContextPlugin, ContextPluginParams, Client } from "../../src";
 // import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
@@ -13,10 +13,9 @@ import { GraphQLClient } from "graphql-request";
 import {
   ExecuteProposalStep,
   ICreateProposalParams,
-  IAllowListFactoryParams,
+  IMultisigFactoryParams,
   IProposalQueryParams,
   ProposalCreationSteps,
-  SetVotingConfigStep,
   VoteOptions,
   VoteProposalStep,
   VotingConfig,
@@ -60,7 +59,7 @@ const grapqhlEndpoints = {
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
-const contextParams: ContextErc20Params = {
+const contextParams: ContextPluginParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
   dao: "0x1234567890123456789012345678901234567890",
@@ -71,7 +70,7 @@ const contextParams: ContextErc20Params = {
   graphqlURLs: grapqhlEndpoints.working
 };
 
-const contextParamsLocalChain: ContextErc20Params = {
+const contextParamsLocalChain: ContextPluginParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
   dao: "0x1234567890123456789012345678901234567890",
@@ -105,10 +104,10 @@ describe("Client", () => {
 
   describe("Client instances", () => {
     it("Should create a working client", async () => {
-      const ctx = new ContextErc20(contextParams);
-      const client = new ClientAllowList(ctx);
+      const ctx = new ContextPlugin(contextParams);
+      const client = new ClientMultisig(ctx);
 
-      expect(client).toBeInstanceOf(ClientAllowList);
+      expect(client).toBeInstanceOf(ClientMultisig);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
@@ -132,10 +131,10 @@ describe("Client", () => {
       contextParams.web3Providers = web3endpoints.failing
       contextParams.ipfsNodes = ipfsEndpoints.failing
       contextParams.graphqlURLs = grapqhlEndpoints.failing
-      const ctx = new ContextErc20(contextParams);
-      const client = new ClientAllowList(ctx);
+      const ctx = new ContextPlugin(contextParams);
+      const client = new ClientMultisig(ctx);
 
-      expect(client).toBeInstanceOf(ClientAllowList);
+      expect(client).toBeInstanceOf(ClientMultisig);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
@@ -154,8 +153,8 @@ describe("Client", () => {
   });
   describe("Proposal Creation", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const client = new ClientAllowList(context)
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientMultisig(context)
 
       const proposalParams: ICreateProposalParams = {
         metadataUri: "ipfs://",
@@ -176,8 +175,8 @@ describe("Client", () => {
 
     })
     it("Should create a new proposal locally", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const allowListClient = new ClientAllowList(context)
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const multisigClient = new ClientMultisig(context)
       const client = new Client(context)
 
       // generate actions
@@ -196,7 +195,7 @@ describe("Client", () => {
         executeIfPassed: true
       }
 
-      for await (const step of allowListClient.methods.createProposal(proposalParams)) {
+      for await (const step of multisigClient.methods.createProposal(proposalParams)) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");
@@ -217,8 +216,8 @@ describe("Client", () => {
 
   describe("Vote on a proposal", () => {
     it("Should estimate the gas fees for casting a vote", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const client = new ClientAllowList(context)
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientMultisig(context)
 
       const estimation = await client.estimation.voteProposal(
         '0x1234567890123456789012345678901234567890',
@@ -234,8 +233,8 @@ describe("Client", () => {
     })
 
     it("Should vote on a proposal locally", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const client = new ClientAllowList(context)
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientMultisig(context)
 
       const proposalId = '0x1234567890123456789012345678901234567890'
 
@@ -261,8 +260,8 @@ describe("Client", () => {
 
   describe("Execute proposal", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const client = new ClientAllowList(context)
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientMultisig(context)
 
       const estimation = await client.estimation.executeProposal(
         '0x1234567890123456789012345678901234567890'
@@ -277,8 +276,8 @@ describe("Client", () => {
     })
 
     it("Should execute a local proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const client = new ClientAllowList(context)
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientMultisig(context)
 
       const proposalId = '0x1234567890123456789012345678901234567890'
 
@@ -300,63 +299,12 @@ describe("Client", () => {
     })
   })
 
-
-  describe("Set voting config", () => {
-    it("Should estimate the gas fees for executing a proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const client = new ClientAllowList(context)
-
-      const estimation = await client.estimation.setPluginConfig(
-        {
-          minDuration: 7200,
-          minParticipation: 25,
-          minSupport: 50
-        }
-      )
-
-      expect(typeof estimation).toEqual("object")
-      expect(typeof estimation.average).toEqual("bigint");
-      expect(typeof estimation.max).toEqual("bigint");
-      expect(estimation.max).toBeGreaterThan(BigInt(0));
-      expect(estimation.max).toBeGreaterThan(estimation.average);
-
-    })
-
-    it("Should set voting config locally", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const client = new ClientAllowList(context)
-
-      const daoAddress = '0x1234567890123456789012345678901234567890'
-      const votingConfig: VotingConfig = {
-        minDuration: 7200,
-        minParticipation: 25,
-        minSupport: 50
-      }
-
-      for await (const step of client.methods.setPluginConfig(votingConfig)) {
-        switch (step.key) {
-          case SetVotingConfigStep.CREATING_PROPOSAL:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case SetVotingConfigStep.DONE:
-            break;
-          default:
-            throw new Error(
-              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
-            );
-        }
-      }
-
-    })
-  })
-
   describe('Action generators', () => {
     it("Should create a Mulisig client and generate a init action", async () => {
-      const context = new ContextErc20(contextParamsLocalChain);
-      const client = new ClientAllowList(context);
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientMultisig(context);
 
-      const withdrawParams: IAllowListFactoryParams = {
+      const withdrawParams: IMultisigFactoryParams = {
         votingConfig: {
           minDuration: 7200,
           minParticipation: 25,
@@ -376,13 +324,30 @@ describe("Client", () => {
       // what does this should be
       expect(initAction.data).toBeInstanceOf(Uint8Array);
     });
+
+    it("Should create a Mulisig client and generate a plugin config action action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientMultisig(context);
+
+      const pluginConfigParams: VotingConfig = {
+        minDuration: 100000,
+        minParticipation: 25,
+        minSupport: 51
+      };
+
+      const initAction = client.encoding.setPluginConfigAction(pluginConfigParams);
+
+      expect(typeof initAction).toBe("object");
+      // what does this should be
+      expect(initAction.data).toBeInstanceOf(Uint8Array);
+    });
   })
 
   describe('Data retrieval', () => {
     it("Should get the list of members that can vote in a proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain);
-      const client = new ClientAllowList(context);
-      
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientMultisig(context);
+
       const wallets = await client.methods.getMembers()
 
       expect(Array.isArray(wallets)).toBe(true);
@@ -391,8 +356,8 @@ describe("Client", () => {
       expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     })
     it("Should fetch the given proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain);
-      const client = new ClientAllowList(context);
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientMultisig(context);
 
       const proposalId = "0x1234567890123456789012345678901234567890_0x55"
       const proposal = await client.methods.getProposal(proposalId)
@@ -402,8 +367,8 @@ describe("Client", () => {
       expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
     })
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const context = new ContextErc20(contextParamsLocalChain);
-      const client = new ClientAllowList(context);
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientMultisig(context);
       const limit = 2
       const params: IProposalQueryParams = {
         limit

@@ -3,7 +3,7 @@ declare const describe, it, beforeAll, afterAll, expect, test;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientErc20, ContextErc20, ContextErc20Params, Client } from "../../src";
+import { ClientErc20, ContextPlugin, ContextPluginParams, Client } from "../../src";
 // import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
@@ -16,10 +16,8 @@ import {
   IErc20FactoryParams,
   IProposalQueryParams,
   ProposalCreationSteps,
-  SetVotingConfigStep,
   VoteOptions,
   VoteProposalStep,
-  VotingConfig,
 } from "../../src/internal/interfaces/plugins";
 import { AddressZero } from "@ethersproject/constants";
 
@@ -61,7 +59,7 @@ const grapqhlEndpoints = {
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
-const contextParams: ContextErc20Params = {
+const contextParams: ContextPluginParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
   dao: "0x1234567890123456789012345678901234567890",
@@ -72,7 +70,7 @@ const contextParams: ContextErc20Params = {
   graphqlURLs: grapqhlEndpoints.working
 };
 
-const contextParamsLocalChain: ContextErc20Params = {
+const contextParamsLocalChain: ContextPluginParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
   dao: "0x1234567890123456789012345678901234567890",
@@ -106,7 +104,7 @@ describe("Client", () => {
 
   describe("Client instances", () => {
     it("Should create a working client", async () => {
-      const ctx = new ContextErc20(contextParams);
+      const ctx = new ContextPlugin(contextParams);
       const client = new ClientErc20(ctx);
 
       expect(client).toBeInstanceOf(ClientErc20);
@@ -133,7 +131,7 @@ describe("Client", () => {
       contextParams.web3Providers = web3endpoints.failing
       contextParams.ipfsNodes = ipfsEndpoints.failing
       contextParams.graphqlURLs = grapqhlEndpoints.failing
-      const ctx = new ContextErc20(contextParams);
+      const ctx = new ContextPlugin(contextParams);
       const client = new ClientErc20(ctx);
 
       expect(client).toBeInstanceOf(ClientErc20);
@@ -155,7 +153,7 @@ describe("Client", () => {
   });
   describe("Proposal Creation", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
+      const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
       const proposalParams: ICreateProposalParams = {
@@ -177,7 +175,7 @@ describe("Client", () => {
 
     })
     it("Should create a new proposal locally", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
+      const context = new ContextPlugin(contextParamsLocalChain)
       const erc20Client = new ClientErc20(context)
       const client = new Client(context)
 
@@ -218,7 +216,7 @@ describe("Client", () => {
 
   describe("Vote on a proposal", () => {
     it("Should estimate the gas fees for casting a vote", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
+      const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
       const estimation = await client.estimation.voteProposal(
@@ -235,7 +233,7 @@ describe("Client", () => {
     })
 
     it("Should vote on a proposal locally", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
+      const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
       const proposalId = '0x1234567890123456789012345678901234567890'
@@ -262,7 +260,7 @@ describe("Client", () => {
 
   describe("Execute proposal", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
+      const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
       const estimation = await client.estimation.executeProposal(
@@ -278,7 +276,7 @@ describe("Client", () => {
     })
 
     it("Should execute a local proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
+      const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
       const proposalId = '0x1234567890123456789012345678901234567890'
@@ -301,60 +299,9 @@ describe("Client", () => {
     })
   })
 
-
-  describe("Set voting config", () => {
-    it("Should estimate the gas fees for executing a proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const client = new ClientErc20(context)
-
-      const estimation = await client.estimation.setPluginConfig(
-        {
-          minDuration: 7200,
-          minParticipation: 25,
-          minSupport: 50
-        }
-      )
-
-      expect(typeof estimation).toEqual("object")
-      expect(typeof estimation.average).toEqual("bigint");
-      expect(typeof estimation.max).toEqual("bigint");
-      expect(estimation.max).toBeGreaterThan(BigInt(0));
-      expect(estimation.max).toBeGreaterThan(estimation.average);
-
-    })
-
-    it("Should set voting config locally", async () => {
-      const context = new ContextErc20(contextParamsLocalChain)
-      const client = new ClientErc20(context)
-
-      const daoAddress = '0x1234567890123456789012345678901234567890'
-      const votingConfig: VotingConfig = {
-        minDuration: 7200,
-        minParticipation: 25,
-        minSupport: 50
-      }
-
-      for await (const step of client.methods.setPluginConfig(votingConfig)) {
-        switch (step.key) {
-          case SetVotingConfigStep.CREATING_PROPOSAL:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case SetVotingConfigStep.DONE:
-            break;
-          default:
-            throw new Error(
-              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
-            );
-        }
-      }
-
-    })
-  })
-
   describe('Action generators', () => {
     it("Should create a Erc20 client and generate a init action", async () => {
-      const context = new ContextErc20(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
 
       const initParams: IErc20FactoryParams = {
@@ -394,7 +341,7 @@ describe("Client", () => {
 
   describe('Data retrieval', () => {
     it("Should get the list of members that can vote in a proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
       
       const wallets = await client.methods.getMembers()
@@ -405,7 +352,7 @@ describe("Client", () => {
       expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     })
     it("Should fetch the given proposal", async () => {
-      const context = new ContextErc20(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
 
       const proposalId = "0x1234567890123456789012345678901234567890_0x55"
@@ -416,7 +363,7 @@ describe("Client", () => {
       expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
     })
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const context = new ContextErc20(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
       const limit = 5
       const params: IProposalQueryParams = {

@@ -1,5 +1,5 @@
 export * from "./client";
 export * from "./client-erc20";
-export * from "./client-allowlist";
+export * from "./client-multisig";
 export * from "./context";
-export * from "./context-erc20";
+export * from "./context-plugins";

@@ -1,4 +1,4 @@
-// This file contains the definitions of the ERC20 and AllowList DAO clients
+// This file contains the definitions of the ERC20 and Multisig DAO clients
 
 import { IClientCore } from "./core";
 import {
@@ -29,6 +29,7 @@ export interface IClientErc20 extends IClientCore {
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     init: (params: IErc20FactoryParams) => PluginInitAction;
+    setPluginConfigAction: (params: VotingConfig) => DaoAction;
   };
   estimation: {
     createProposal: (
@@ -39,14 +40,13 @@ export interface IClientErc20 extends IClientCore {
       vote: VoteOptions
     ) => Promise<GasFeeEstimation>;
     executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
-    setPluginConfig: (config: VotingConfig) => Promise<GasFeeEstimation>;
   };
 }
 
 // MULTISIG
 
-/** Defines the shape of the AllowList client class */
-export interface IClientAllowList extends IClientCore {
+/** Defines the shape of the Multisig client class */
+export interface IClientMultisig extends IClientCore {
   methods: {
     createProposal: (
       params: ICreateProposalParams
@@ -55,18 +55,18 @@ export interface IClientAllowList extends IClientCore {
     executeProposal: (proposalId: string) => AsyncGenerator<ExecuteProposalStepValue>;
     setPluginConfig: (config: VotingConfig) => AsyncGenerator<SetVotingConfigStepValue>
     getMembers: () => Promise<string[]>;
-    getProposal: (propoosalId: string) => Promise<AllowListProposal>
-    getProposalMany: (params?: IProposalQueryParams) => Promise<AllowListProposal[]>
+    getProposal: (propoosalId: string) => Promise<MultisigProposal>
+    getProposalMany: (params?: IProposalQueryParams) => Promise<MultisigProposal[]>
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    init: (params: IAllowListFactoryParams) => PluginInitAction;
+    init: (params: IMultisigFactoryParams) => PluginInitAction;
+    setPluginConfigAction: (params: VotingConfig) => DaoAction;
   };
   estimation: {
     createProposal: (params: ICreateProposalParams) => Promise<GasFeeEstimation>;
     voteProposal: (proposalId: string, vote: VoteOptions) => Promise<GasFeeEstimation>;
     executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
-    setPluginConfig: (config: VotingConfig) => Promise<GasFeeEstimation>;
   };
 }
 
@@ -124,7 +124,7 @@ export interface IErc20FactoryParams {
   votingConfig: VotingConfig;
 }
 
-export interface IAllowListFactoryParams {
+export interface IMultisigFactoryParams {
   votingConfig: VotingConfig;
   whitelistVoters: string[];
 }
@@ -216,7 +216,7 @@ export enum ProposalSortBy {
 
 // MULTISIG PROPOSAL
 
-export type AllowListProposal = Proposal & {
+export type MultisigProposal = Proposal & {
   voteId: string;
 
   result: {

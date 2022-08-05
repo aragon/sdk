@@ -1,16 +1,17 @@
 import { Random } from "@aragon/sdk-common";
-import { ContextErc20 } from "./context-erc20";
+import { AddressZero } from "@ethersproject/constants";
+import { ContextPlugin } from "./context-plugins";
 import { ClientCore } from "./internal/core";
-import { encodeAllowListActionInit } from "./internal/encoding/plugins";
-import { PluginInitAction, GasFeeEstimation } from "./internal/interfaces/common";
+import { encodeActionSetPluginConfig, encodeMultisigActionInit } from "./internal/encoding/plugins";
+import { PluginInitAction, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
 import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  IClientAllowList,
+  IClientMultisig,
   ICreateProposalParams,
-  IAllowListFactoryParams,
+  IMultisigFactoryParams,
   IProposalQueryParams,
-  AllowListProposal,
+  MultisigProposal,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   SetVotingConfigStep,
@@ -20,14 +21,14 @@ import {
   VoteProposalStepValue,
   VotingConfig
 } from "./internal/interfaces/plugins";
-import { getDummyAllowListProposal, getRandomInteger } from "./internal/temp-mock";
-import { getAllowListProposalsWithStatus } from "./internal/utils/plugins";
+import { getDummyMultisigProposal } from "./internal/temp-mock";
+import { getMultisigProposalsWithStatus } from "./internal/utils/plugins";
 
 
-export class ClientAllowList extends ClientCore implements IClientAllowList {
+export class ClientMultisig extends ClientCore implements IClientMultisig {
   private _pluginAddress: string;
 
-  constructor(context: ContextErc20) {
+  constructor(context: ContextPlugin) {
     super(context);
 
     if (!context.pluginAddress) {
@@ -37,11 +38,11 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
   }
   methods = {
     /**
-     * Creates a new proposal on the given AllowList plugin contract
+     * Creates a new proposal on the given Multisig plugin contract
      *
      * @param {ICreateProposalParams} _params
      * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
-     * @memberof ClientAllowList
+     * @memberof ClientMultisig
      */
     createProposal: (params: ICreateProposalParams): AsyncGenerator<ProposalCreationStepValue> =>
       this._createProposal(params),
@@ -51,7 +52,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
      * @param {string} proposalId
      * @param {VoteOptions} vote
      * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
-     * @memberof ClientAllowList
+     * @memberof ClientMultisig
      */
     voteProposal: (proposalId: string, vote: VoteOptions): AsyncGenerator<VoteProposalStepValue> =>
       this._voteProposal(proposalId, vote),
@@ -60,24 +61,24 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
      *
      * @param {string} proposalId
      * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
-     * @memberof ClientAllowList
+     * @memberof ClientMultisig
      */
     executeProposal: (proposalId: string): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(proposalId),
     /**
-     * Sets the voting configuration in a allowlist proposal given a proposalId and a configuration
+     * Sets the voting configuration in a Multisig proposal given a proposalId and a configuration
      *
      * @param {VotingConfig} config
      * @return {*}  {AsyncGenerator<SetVotingConfigStepValue>}
-     * @memberof ClientAllowList
+     * @memberof ClientMultisig
      */
     setPluginConfig: (config: VotingConfig): AsyncGenerator<SetVotingConfigStepValue> =>
       this._setPluginConfig(config),
     /**
-     * Returns the list of wallet addresses holding tokens from the underlying Allowlist contract used by the plugin
+     * Returns the list of wallet addresses with signing capabilities on the plugin
      *
      * @return {*}  {Promise<string[]>}
-     * @memberof ClientAllowList
+     * @memberof ClientMultisig
      */
     getMembers: (): Promise<string[]> =>
       this._getMemebers(),
@@ -85,19 +86,19 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
      * Returns the details of the given proposal
      *
      * @param {string} proposalId
-     * @return {*}  {Promise<AllowListProposal>}
-     * @memberof ClientAllowList
+     * @return {*}  {Promise<MultisigProposal>}
+     * @memberof ClientMultisig
      */
-    getProposal: (proposalId: string): Promise<AllowListProposal> =>
+    getProposal: (proposalId: string): Promise<MultisigProposal> =>
       this._getProposal(proposalId),
     /**
      * Returns a list of proposals on the Plugin, filtered by the given criteria
      *
      * @param {IProposalQueryParams}
-     * @return {*}  {Promise<AllowListProposal[]>}
-     * @memberof ClientAllowList
+     * @return {*}  {Promise<MultisigProposal[]>}
+     * @memberof ClientMultisig
      */
-    getProposalMany: (params?: IProposalQueryParams): Promise<AllowListProposal[]> =>
+    getProposalMany: (params?: IProposalQueryParams): Promise<MultisigProposal[]> =>
       this._getProposalMany(params ?? {}),
   }
   encoding = {
@@ -105,11 +106,19 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
      * Computes the parameters to be given when creating the DAO,
      * so that the plugin is configured
      *
-     * @param {IAllowListFactoryParams} params
+     * @param {IMultisigFactoryParams} params
      * @return {*}  {FactoryInitParams}
-     * @memberof ClientAllowList
+     * @memberof ClientMultisig
      */
-    init: (params: IAllowListFactoryParams): PluginInitAction => this._buildActionInit(params),
+    init: (params: IMultisigFactoryParams): PluginInitAction => this._buildActionInit(params),
+    /**
+     * Computes the parameters to be given when creating a proposal that updates the governance configuration
+     *
+     * @param {VotingConfig} params
+     * @return {*}  {DaoAction}
+     * @memberof ClientMultisig
+     */
+    setPluginConfigAction: (params: VotingConfig): DaoAction => this._buildActionSetPluginConfig(params)
   }
   estimation = {
 
@@ -118,7 +127,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
      *
      * @param {ICreateProposalParams} params
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientAllowList
+     * @memberof ClientMultisig
      */
     createProposal: (params: ICreateProposalParams): Promise<GasFeeEstimation> =>
       this._estimateCreateProposal(params),
@@ -129,30 +138,20 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
      * @param {string} proposalId
      * @param {VoteOptions} vote
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientAllowList
+     * @memberof ClientMultisig
      */
     voteProposal: (proposalId: string, vote: VoteOptions): Promise<GasFeeEstimation> =>
       this._estimateVoteProposal(proposalId, vote),
 
     /**
-     * Estimates the gas fee of executing an Allowlist proposal
+     * Estimates the gas fee of executing an Multisig proposal
      *
      * @param {string} proposalId
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientAllowList
+     * @memberof ClientMultisig
      */
     executeProposal: (proposalId: string): Promise<GasFeeEstimation> =>
       this._estimateExecuteProposal(proposalId),
-
-    /**
-     * Estimates the gas fee of updating the governance configuration through a new Allowlist proposal
-     *
-     * @param {VotingConfig} config
-     * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientAllowList
-     */
-    setPluginConfig: (config: VotingConfig): Promise<GasFeeEstimation> =>
-      this._estimateSetPluginConfig(config)
   }
 
   private async *_createProposal(
@@ -251,14 +250,14 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     );
   }
 
-  private _getProposal(proposalId: string): Promise<AllowListProposal> {
+  private _getProposal(proposalId: string): Promise<MultisigProposal> {
     if (!proposalId) {
       throw new Error("Invalid proposalId");
     }
 
     // TODO: Implement
 
-    const proposal = getAllowListProposalsWithStatus([getDummyAllowListProposal(proposalId)])[0]
+    const proposal = getMultisigProposalsWithStatus([getDummyMultisigProposal(proposalId)])[0]
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposal))
   }
 
@@ -272,10 +271,10 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
    *     // uncomment this
    *     // skip = 0,
    *     // sortDirection = SortDireccions.ASC,
-   *     // sortBy = AllowListProposalSortBy.CREATED_AT
+   *     // sortBy = MultisigProposalSortBy.CREATED_AT
    *   }
-   * @return {*}  {Promise<AllowListProposal[]>}
-   * @memberof ClientAllowList
+   * @return {*}  {Promise<MultisigProposal[]>}
+   * @memberof ClientMultisig
    */
   private _getProposalMany({
     // TODO 
@@ -284,23 +283,32 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
     limit = 0,
     // skip = 0,
     // sortDirection = SortDireccions.ASC,
-    // sortBy = AllowListProposalSortBy.CREATED_AT
-  }: IProposalQueryParams): Promise<AllowListProposal[]> {
-    let proposals: AllowListProposal[] = []
+    // sortBy = MultisigProposalSortBy.CREATED_AT
+  }: IProposalQueryParams): Promise<MultisigProposal[]> {
+    let proposals: MultisigProposal[] = []
 
     // TODO: Implement
 
     for (let index = 0; index < limit; index++) {
-      proposals.push(getDummyAllowListProposal())
+      proposals.push(getDummyMultisigProposal())
     }
-    proposals = getAllowListProposalsWithStatus(proposals)
+    proposals = getMultisigProposalsWithStatus(proposals)
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 
-  private _buildActionInit(params: IAllowListFactoryParams): PluginInitAction {
+  private _buildActionInit(params: IMultisigFactoryParams): PluginInitAction {
     return {
       id: this._pluginAddress,
-      data: encodeAllowListActionInit(params)
+      data: encodeMultisigActionInit(params)
+    }
+  }
+
+  private _buildActionSetPluginConfig(params: VotingConfig): DaoAction {
+    // TODO: check if to and value are correct
+    return {
+      to: AddressZero,
+      value: BigInt(0),
+      data: encodeActionSetPluginConfig(params)
     }
   }
 
@@ -314,7 +322,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
 
     // TODO: Implement
 
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
   private _estimateVoteProposal(_proposalId: string, _vote: VoteOptions): Promise<GasFeeEstimation> {
@@ -327,7 +335,7 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
 
     // TODO: Implement
 
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
   private _estimateExecuteProposal(_proposalId: string): Promise<GasFeeEstimation> {
@@ -340,19 +348,6 @@ export class ClientAllowList extends ClientCore implements IClientAllowList {
 
     // TODO: Implement
 
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
-  }
-
-  private _estimateSetPluginConfig(_config: VotingConfig): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
-    }
-
-    // TODO: Implement
-
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 }

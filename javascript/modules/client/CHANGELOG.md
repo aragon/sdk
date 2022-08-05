@@ -18,6 +18,16 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Added
+- Internal Graphql client
+- Multisig Client
+- JsDoc to Multisig Client and ERC20 Client
+- Mocks in Multisig Client
+- Other mocks in `Client` and `ERC20Client`
+
+### Changed
+- `ContextErc20` => `ContextPlugin`
+
 ### Changes (breaking)
 - Now using a general-purpose `Client` class and a plugin-specific one for the rest (`ClientErc20`)
 

@@ -305,7 +305,45 @@ underlying network requests.
 
 ### Creating a DAO with an ERC20 plugin
 
-- **TODO**
+```ts
+const client = new Client(context) 
+const erc20Client = new Client({...context, pluginAddress: "0x12345..."})
+const pluginInitParams: IErc20FactoryParams = {
+  votingConfig: {
+    minDuration: 7200,
+    minParticipation: 25,
+    minSupport: 50
+  },
+  tokenConfig: {
+    name: "Token",
+    address: "0x1234567890123456789012345678901234567890",
+    symbol: "TOK"
+  },
+  mintConfig: [
+    {
+      address: AddressZero,
+      balance: BigInt(10)
+    },
+    {
+      address: "0x1234567890123456789012345678901234567890",
+      balance: BigInt(10)
+    },
+    {
+      address: "0x1234567890123456789012345678901234567890",
+      balance: BigInt(10)
+    },
+  ]
+};
+const erc20InitAction = erc20Client.encoding.init(pluginInitParams)
+const params: ICreatePArams = {
+  daoConfig: {
+    name: "The Dao",
+    metadata: "{...}"
+  },
+  gsnForwarder: "",
+  plugins: [...otherPlugins, erc20InitAction]
+}
+```
 
 ### Creating an ERC20 proposal
 
@@ -357,7 +395,28 @@ for await (
 
 ### Voting on an ERC20 proposal
 
-- **TODO**
+```ts
+  // const contextParams: ContextPluginParams = {...} 
+  const context = new ContextPlugin(contextParams)
+  const client = new ClientErc20(context)
+
+  for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+    switch (step.key) {
+      case VoteProposalStep.VOTING:
+        expect(typeof step.txHash).toBe("string");
+        expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+        break;
+      case VoteProposalStep.DONE:
+        expect(typeof step.voteId).toBe("string");
+        expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+        break;
+      default:
+        throw new Error(
+          "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+        );
+    }
+  }
+```
 
 ### Loading the list of members (ERC20)
 
@@ -439,25 +498,243 @@ console.log(proposals);
   },] */
 ```
 
-## AllowList governance plugin client
+## Multisig governance plugin client
 
-### Creating a DAO with a allolist plugin
+```ts
+  // const contextParams: ContextPluginParams = {...} 
+  const context = new ContextPlugin(contextParams)
+  const client = new ClientMultisig(context)
+```
 
-- **TODO**
+### Creating a DAO with a multisig plugin
 
-### Creating a allowlist proposal
+```ts
+  // const context: ContextParams = {...} 
+  const client = new Client(context) 
+  const multisigClient = new Client({...context, pluginAddress: "0x12345..."})
+  const pluginInitParams: IMultisigFactoryParams = {
+    votingConfig: {
+      minDuration: 7200,
+      minParticipation: 25,
+      minSupport: 50
+    },
+    whitelistVoters: [
+      "0x1234567890123456789012345678901234567890",
+      "0x2345678901234567890123456789012345678901",
+      "0x3456789012345678901234567890123456789012",
+      "0x4567890123456789012345678901234567890123",
+    ]
+  };
+  const multisigInitAction = multisigClient.encoding.init(pluginInitParams)
+  const params: ICreatePArams = {
+    daoConfig: {
+      name: "The Dao",
+      metadata: "{...}"
+    },
+    gsnForwarder: "",
+    plugins: [...otherPlugins, multisigInitAction]
+  }
+```
 
-- **TODO**
+### Creating a Multisig proposal
+```ts
+const client = new Client(context);
 
-### Voting on a allowlist proposal
+const actions: DaoAction[] = [
+  // See the "Action encoders" section below
+  { to: "0x1234...", value: BigInt(100), data: new Uint8Array([1, 2, 3, 4]) },
+];
+const proposalCreationParams: ICreateProposalParams = {
+  metadataUri: "<uri>", // Following the EIP-4824
+  actions,
+  // TODO: Clarify => block number or timestamp?
+  startDate: 1234,
+  endDate: 2345,
+  executeIfPassed: true,
+  creatorVote: VoteOption.YES,
+};
 
-- **TODO**
+const estimatedGas = await client.estimation.createProposal(
+  proposalCreationParams,
+);
+console.log(estimatedGas.average); // bigint
+console.log(estimatedGas.max); // bigint
 
-### Loading the list of members (allowlist)
+for await (
+  const step of client.methods.createProposal(
+    proposalCreationParams,
+  )
+) {
+  switch (step.idx) {
+    case DaoDepositSteps.CREATING:
+      console.log(step.txHash); // 0xb1c14a49...
+      break;
+    case DaoDepositSteps.DONE:
+      console.log(step.proposalId); // 0x1234...
+      break;
+  }
+}
 
-- **TODO**
 
-### Loading the list of proposals (allowlist)
+```
+
+### Voting on a Multisig proposal
+```ts
+  // const contextParams: ContextPluginParams = {...} 
+  const context = new ContextPlugin(contextParams)
+  const client = new ClientMultisig(context)
+  const estimatedGas = await client.estimation.voteProposal(
+    proposalId, VoteOptions.YES
+  );
+  console.log(estimatedGas.average); // bigint
+  console.log(estimatedGas.max); // bigint
+
+  for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+    switch (step.key) {
+      case VoteProposalStep.VOTING:
+        expect(typeof step.txHash).toBe("string");
+        expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+        break;
+      case VoteProposalStep.DONE:
+        expect(typeof step.voteId).toBe("string");
+        expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+        break;
+      default:
+        throw new Error(
+          "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+        );
+    }
+  }
+
+```
+
+### Loading the list of members (Multisig)
+```ts
+  const context = new ContextPlugin(contextParams)
+  const client = new ClientMultisig(context)
+  const members = await client.methods.getMemebers()
+  /*
+    [
+      "0x1234567890123456789012345678901234567890",
+      "0x2345678901234567890123456789012345678901",
+      "0x3456789012345678901234567890123456789012",
+      "0x4567890123456789012345678901234567890123",
+    ]
+  */
+
+```
+
+### Loading the a proposal by proposalId (Multisig)
+```ts
+  const context = new ContextPlugin(contextParams)
+  const client = new ClientMultisig(context)
+  const proposals = await client.methods.getProposal(
+    "0x1234567890123456789012345678901234567890_0x0"
+  )
+  /*
+    {
+      id: "0x1234567890123456789012345678901234567890_0x0",
+      daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
+      daoName: "DAO 1",
+      creator: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+
+      startDate: <Date>,
+      endDate: <Date>,
+      createdAt: <Date>,
+
+      title: "New Founding for Lorex Lab SubDao",
+      summary: "As most community members know, Aragon has strived.",
+      proposal: "This is the super important proposal body",
+      resources: [{ url: "https://example.com", description: "Example" }],
+
+      voteId: "0",
+
+      result: {
+        yes: 3,
+        no: 1,
+        abstain: 2,
+      },
+
+      open: false,
+      executed: false,
+      status: "Pending",
+
+      config: {
+        participationRequiredPct: 30,
+        supportRequiredPct: 52,
+      },
+
+      voters: [
+        {
+          address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+          voteValue: VoteOptions.YES,
+          weight: 1,
+        },
+        {...}
+      ],
+    },
+  */
+
+```
+### Loading the list of proposals (Multisig)
+```ts
+  const context = new ContextPlugin(contextParams)
+  const client = new ClientMultisig(context)
+  const queryParams:IProposalQueryParams = {
+    skip: 0,
+    limit: 10,
+    sortDirection: SortDirections.ASC,
+    sortBy: Proposal.sortBy.POPULARITY,
+    addresOrEns: "", // Filter by dao address or ens
+  }
+  const proposals = await client.methods.getProposalMany(queryParams)
+  /*
+    [ 
+      {
+        id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
+        daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
+        daoName: "DAO 1",
+        creator: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+
+        startDate: <Date>,
+        endDate: <Date>,
+        createdAt: <Date>,
+
+        title: "New Founding for Lorex Lab SubDao",
+        summary: "As most community members know, Aragon has strived.",
+        proposal: "This is the super important proposal body",
+        resources: [{ url: "https://example.com", description: "Example" }],
+
+        voteId: "0",
+
+        result: {
+          yes: 3,
+          no: 1,
+          abstain: 2,
+        },
+
+        open: false,
+        executed: false,
+        status: "Pending",
+
+        config: {
+          participationRequiredPct: 30,
+          supportRequiredPct: 52,
+        },
+
+        voters: [
+          {
+            address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+            voteValue: VoteOptions.YES,
+            weight: 1,
+          },
+          {...}
+        ],
+      },
+    ]
+  */
+
+```
 
 - **TODO**
 

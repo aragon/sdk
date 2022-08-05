@@ -1,5 +1,5 @@
 import { ProposalStatus } from "../interfaces/common";
-import { Erc20Proposal, AllowListProposal } from "../interfaces/plugins";
+import { Erc20Proposal, MultisigProposal } from "../interfaces/plugins";
 
 // TODO: delete this file
 
@@ -24,7 +24,7 @@ export function getErc20ProposalsWithStatus(proposals: Erc20Proposal[]) {
     }
   });
 }
-export function getAllowListProposalsWithStatus(proposals: AllowListProposal[]) {
+export function getMultisigProposalsWithStatus(proposals: MultisigProposal[]) {
   const now = new Date();
 
   return proposals.map(proposal => {

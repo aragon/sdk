@@ -1,9 +1,9 @@
 import { Random } from "@aragon/sdk-common";
 import { DaoMetadata } from "./interfaces/client";
 import { ProposalStatus } from "./interfaces/common";
-import { Erc20Proposal, AllowListProposal, VoteOptions } from "./interfaces/plugins";
+import { Erc20Proposal, MultisigProposal, VoteOptions } from "./interfaces/plugins";
 
-export function getDummyAllowListProposal(proposalId?: string): AllowListProposal {
+export function getDummyMultisigProposal(proposalId?: string): MultisigProposal {
 
   const dummyDaoNames = [
     "Patito Dao",
@@ -214,8 +214,4 @@ export function getDummyDao(addressOrEns?: string): DaoMetadata {
       "0x1234567890123456789012345678901234567890"
     ]
   }
-}
-
-export function getRandomInteger(min: number, max: number): number {
-  return Math.round(Random.getFloat() * (max - min + 1) + min)
 }

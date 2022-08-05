@@ -53,10 +53,10 @@ export function strip0x(value: string): string {
   return value.startsWith("0x") ? value.substring(2) : value;
 }
 
-export function hexToDecUint8Array(hex: string): Uint8Array {
-  const array: number[] = []
-  for (var n = 0; n < hex.length; n += 2) {
-    array.push(parseInt(hex.substring(n, n + 2), 16))
+export function hexToBytes(hex: string): Uint8Array {
+  const hexMatch = hex.match(/.{1,2}/g)
+  if (!hexMatch) {
+    throw new Error("invalid hex string")
   }
-  return new Uint8Array(array)
+  return Uint8Array.from(hexMatch.map((byte) => parseInt(byte, 16)));
 }

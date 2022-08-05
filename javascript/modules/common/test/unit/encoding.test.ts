@@ -5,7 +5,7 @@ import {
   bufferToBigInt,
   ensure0x,
   hexStringToBuffer,
-  hexToDecUint8Array,
+  hexToBytes,
   strip0x,
   uintArrayToHex,
 } from "../../src";
@@ -281,7 +281,7 @@ describe("Value encoding", () => {
       { in: "68656c6c6f207468657265", out: new Uint8Array([104, 101, 108, 108, 111, 32, 116, 104, 101, 114, 101]) }
     ]
     for (let input of inputs) {
-      const result = hexToDecUint8Array(input.in);
+      const result = hexToBytes(input.in);
       expect(result).toEqual(input.out);
     }
   });

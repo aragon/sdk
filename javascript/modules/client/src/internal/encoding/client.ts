@@ -1,5 +1,5 @@
 import { DAO__factory } from "@aragon/core-contracts-ethers";
-import { strip0x, hexToDecUint8Array } from "@aragon/sdk-common";
+import { strip0x, hexToBytes } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { IWithdrawParams } from "../interfaces/plugins";
@@ -10,7 +10,7 @@ export function encodeWithdrawActionData(params: IWithdrawParams): Uint8Array {
   // get hex bytes
   const hexBytes = daoInterface.encodeFunctionData("withdraw", args);
   // Strip 0x => cast to ASCII => encode in Uint8Array
-  return hexToDecUint8Array((strip0x(hexBytes)));
+  return hexToBytes((strip0x(hexBytes)));
 }
 
 function unwrapWithdrawParams(

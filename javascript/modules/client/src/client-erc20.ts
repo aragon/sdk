@@ -14,19 +14,20 @@ import {
   VoteProposalStep,
   VoteProposalStepValue,
   VotingConfig,
-  // VotingConfig,
 } from "./internal/interfaces/plugins";
 import { IDAO } from "@aragon/core-contracts-ethers";
 import { ClientCore } from "./internal/core";
 import {
   PluginInitAction,
   GasFeeEstimation,
+  DaoAction,
 } from "./internal/interfaces/common";
-import { ContextErc20 } from "./context-erc20";
+import { ContextPlugin } from "./context-plugins";
 import { getErc20ProposalsWithStatus } from "./internal/utils/plugins";
-import { encodeErc20ActionInit } from "./internal/encoding/plugins";
+import { encodeActionSetPluginConfig, encodeErc20ActionInit } from "./internal/encoding/plugins";
 import { Random } from "@aragon/sdk-common";
-import { getDummyErc20Proposal, getRandomInteger } from "./internal/temp-mock";
+import { getDummyErc20Proposal } from "./internal/temp-mock";
+import { AddressZero } from "@ethersproject/constants";
 
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
@@ -35,7 +36,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   // @ts-ignore TODO: Remove
   private _pluginAddress: string;
 
-  constructor(context: ContextErc20) {
+  constructor(context: ContextPlugin) {
     super(context);
 
     if (!context.pluginAddress) {
@@ -125,8 +126,16 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @return {*}  {FactoryInitParams}
      * @memberof ClientErc20
      */
-  // DaoConfig,
+    // DaoConfig,
     init: (params: IErc20FactoryParams): PluginInitAction => this._buildActionInit(params),
+        /**
+     * Computes the parameters to be given when creating a proposal that updates the governance configuration
+     *
+     * @param {VotingConfig} params
+     * @return {*}  {DaoAction}
+     * @memberof ClientMultisig
+     */
+    setPluginConfigAction: (params: VotingConfig): DaoAction => this._buildActionSetPluginConfig(params)
   }
   //// ESTIMATION HANDLERS
 
@@ -160,16 +169,6 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      */
     executeProposal: (proposalId: string): Promise<GasFeeEstimation> =>
       this._estimateExecuteProposal(proposalId),
-    /**
-     * Estimates the gas fee of updating the governance configuration through a new ERC20 proposal
-     *
-     * @param {string} daoAddressOrEns
-     * @param {VotingConfig} config
-     * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientErc20
-     */
-    setPluginConfig: (config: VotingConfig): Promise<GasFeeEstimation> =>
-      this._estimateSetPluginConfig(config),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -292,6 +291,15 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
   }
 
+  private _buildActionSetPluginConfig(params: VotingConfig): DaoAction {
+    // TODO: check if to and value are correct
+    return {
+      to: AddressZero,
+      value: BigInt(0),
+      data: encodeActionSetPluginConfig(params)
+    }
+  }
+
   private _estimateCreateProposal(_params: ICreateProposalParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -302,7 +310,8 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
     // TODO: Remove below as the new contracts are ready
 
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
+    BigInt(1)
 
     // TODO: Uncomment below as the new contracts are ready
     /*
@@ -328,8 +337,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       throw new Error("A web3 provider is needed");
     }
     // TODO: remove this
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
+
   // @ts-ignore  TODO: Remove this comment when implemented
   private _estimateExecuteProposal(proposalId: string): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -339,19 +349,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       throw new Error("A web3 provider is needed");
     }
     // TODO: remove this
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
-  }
-
-
-  private _estimateSetPluginConfig(_config: VotingConfig): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
-    }
-    // TODO: Remove below as the new contracts are ready
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
   private _getMembers(): Promise<string[]> {

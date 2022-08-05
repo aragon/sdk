@@ -34,7 +34,7 @@ import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
 import { IWithdrawParams } from "./internal/interfaces/plugins";
 import { encodeWithdrawActionData } from "./internal/encoding/client";
-import { getDummyDao, getRandomInteger } from "./internal/temp-mock";
+import { getDummyDao } from "./internal/temp-mock";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -307,7 +307,7 @@ export class Client extends ClientCore implements IClient {
 
     // TODO: Unimplemented
     // TODO: The new contract code is needed
-    return Promise.resolve(this.web3.getApproximateGasFee(BigInt(getRandomInteger(1000, 1500))))
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
   _estimateDeposit(params: IDepositParams) {
