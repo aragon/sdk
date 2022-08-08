@@ -62,6 +62,7 @@ export type Proposal = {
 
   actions?: DaoAction[];
   status: ProposalStatus;
+
 };
 
 export interface IPagination {

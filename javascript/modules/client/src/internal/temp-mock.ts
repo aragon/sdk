@@ -76,7 +76,7 @@ export function getDummyMultisigProposal(proposalId?: string): MultisigProposal 
         address: "0x3456789012345678901234567890123456789012",
         voteValue: VoteOptions.ABSTAIN,
         weight: abstain
-      }
+      },
     ],
   }
 }

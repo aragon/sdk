@@ -3,7 +3,6 @@
 import { IClientCore } from "./core";
 import {
   DaoAction,
-  IPluginInstallEntry,
   GasFeeEstimation,
   IPagination,
   Proposal,

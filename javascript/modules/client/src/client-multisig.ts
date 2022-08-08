@@ -27,6 +27,7 @@ import { getMultisigProposalsWithStatus } from "./internal/utils/plugins";
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890"
 
 export class ClientMultisig extends ClientCore implements IClientMultisig {
+  //@ts-ignore TODO: Remove
   private _pluginAddress: string;
 
   constructor(context: ContextPlugin) {
