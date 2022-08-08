@@ -12,13 +12,13 @@ import { GraphQLClient } from "graphql-request";
 
 import {
   ExecuteProposalStep,
-  ICreateProposalParams,
-  IMultisigFactoryParams,
+  ICreateProposal,
+  IMultisigPluginInstall,
   IProposalQueryParams,
   ProposalCreationSteps,
   VoteOptions,
   VoteProposalStep,
-  VotingConfig,
+  ProposalConfig,
 } from "../../src/internal/interfaces/plugins";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
@@ -156,13 +156,25 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientMultisig(context)
 
-      const proposalParams: ICreateProposalParams = {
-        metadataUri: "ipfs://",
+      const proposalParams: ICreateProposal = {
+        metadata: {
+          title: 'Best Proposal',
+          summary: 'this is the sumnary',
+          description: 'This is a very long description',
+          resources: [{
+            name: "Website",
+            url: "https://the.website"
+          }],
+          media: {
+            header: 'https://no.media/media.jpeg',
+            logo: 'https://no.media/media.jpeg'
+          }
+        },
         actions: [],
         creatorVote: VoteOptions.YES,
         startDate: new Date(),
         endDate: new Date(),
-        executeIfPassed: true
+        executeOnPass: true
       }
 
       const estimation = await client.estimation.createProposal(proposalParams)
@@ -180,19 +192,33 @@ describe("Client", () => {
       const client = new Client(context)
 
       // generate actions
-      const action = client.encoding.withdrawAction({
-        recipientAddress: "0x1234567890123456789012345678901234567890",
-        amount: BigInt(1),
-        reference: 'test'
-      })
+      const action = await client.encoding.withdrawAction(
+        "0x1234567890123456789012345678901234567890",
+        {
+          recipientAddress: "0x1234567890123456789012345678901234567890",
+          amount: BigInt(1),
+          reference: 'test'
+        })
 
-      const proposalParams: ICreateProposalParams = {
-        metadataUri: "ipfs://",
+      const proposalParams: ICreateProposal = {
+        metadata: {
+          title: 'Best Proposal',
+          summary: 'this is the sumnary',
+          description: 'This is a very long description',
+          resources: [{
+            name: "Website",
+            url: "https://the.website"
+          }],
+          media: {
+            header: 'https://no.media/media.jpeg',
+            logo: 'https://no.media/media.jpeg'
+          }
+        },
         actions: [action],
         creatorVote: VoteOptions.YES,
         startDate: new Date(),
         endDate: new Date(),
-        executeIfPassed: true
+        executeOnPass: true
       }
 
       for await (const step of multisigClient.methods.createProposal(proposalParams)) {
@@ -302,15 +328,14 @@ describe("Client", () => {
   describe('Action generators', () => {
     it("Should create a Mulisig client and generate a init action", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientMultisig(context);
 
-      const withdrawParams: IMultisigFactoryParams = {
-        votingConfig: {
-          minDuration: 7200,
-          minParticipation: 25,
-          minSupport: 50
+      const withdrawParams: IMultisigPluginInstall = {
+        proposals: {
+          minDuration: 7200, // seconds
+          minTurnout: 0.5,
+          minSupport: 0.5
         },
-        whitelistVoters: [
+        addresses: [
           "0x1234567890123456789012345678901234567890",
           "0x2345678901234567890123456789012345678901",
           "0x3456789012345678901234567890123456789012",
@@ -318,7 +343,7 @@ describe("Client", () => {
         ]
       };
 
-      const initAction = client.encoding.init(withdrawParams);
+      const initAction = ClientMultisig.encoding.installEntry(withdrawParams);
 
       expect(typeof initAction).toBe("object");
       // what does this should be
@@ -329,10 +354,10 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientMultisig(context);
 
-      const pluginConfigParams: VotingConfig = {
+      const pluginConfigParams: ProposalConfig = {
         minDuration: 100000,
-        minParticipation: 25,
-        minSupport: 51
+        minTurnout: 0.25,
+        minSupport: 0.51
       };
 
       const initAction = client.encoding.setPluginConfigAction(pluginConfigParams);
@@ -373,7 +398,7 @@ describe("Client", () => {
       const params: IProposalQueryParams = {
         limit
       }
-      const proposals = await client.methods.getProposalMany(params)
+      const proposals = await client.methods.getProposals(params)
 
       expect(Array.isArray(proposals)).toBe(true)
       expect(proposals.length <= limit).toBe(true)

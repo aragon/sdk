@@ -69,7 +69,7 @@ const creationParams: ICreateParams = {
     name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
     metadata: "<ipfs-http-uri>",
   },
-  votingConfig: {
+  : {
     minSupport: Math.floor(Math.random() * 100) + 1,
     minParticipation: Math.floor(Math.random() * 100) + 1,
     minDuration: Math.floor(Math.random() * 9999) + 1,
@@ -190,14 +190,14 @@ const options = {
   limit: 10,
 };
 
-const result = await client.methods.getMetadataMany(options);
+const result = await client.methods.getDaos(options);
 console.log(result);
 
 /*
 [{
    address: "0x1234...",
    avatar: "http...",
-   createdAt: <Date>,
+   creatonDate: <Date>,
    description: "This dao...",
    links: [{description: "Website", url: "http..."}],
    name: "Abc Dao",
@@ -216,14 +216,14 @@ import { Client } from "@aragon/sdk-client";
 const client = new Client(context);
 const doaAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
 
-const metadata = await client.methods.getMetadata(doaAddressOrEns);
+const metadata = await client.methods.getDao(doaAddressOrEns);
 console.log(metadata);
 
 /*
 {
    address: "0x1234...",
    avatar: "http...",
-   createdAt: <Date>,
+   creatonDate: <Date>,
    description: "This dao...",
    links: [{description: "Website", url: "http..."}],
    name: "Abc Dao",
@@ -303,46 +303,125 @@ built-in ERC20 voting DAO Plugin.
 Similarly to the above class, it provides high level methods that abstract the
 underlying network requests.
 
+## ERC20 governance plugin client
+
+
+### Creating an ERC20 client
+
+```ts
+import {
+  ClientErc20,
+  Client,
+  Context
+  ContextParams,
+  ContextPlugin
+} from "@aragon/sdk-client";
+
+const contextParams: ContextParams = {
+  // network id or name
+  network: 31337,
+  signer: new Wallet("0x..."),
+  dao: "0x1234567890123456789012345678901234567890",
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["http://localhost:8545"],
+  pluginAddress: "0x2345678901234567890123456789012345678901",
+  ipfsNodes: [
+    {
+      url: "http:localhost:5001",
+    },
+  ],
+  graphqlURLs: ["https://the-subgraph-url.io"]
+}
+// create a simple context
+const context: Context = new Context(contextParams)
+// create a plugin context from the simple context and the plugin address
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+// create the multisig client
+const client = new ClientErc20(context)
+```
 ### Creating a DAO with an ERC20 plugin
 
 ```ts
-const context: ContextPluginParams = new ContextPlugin(contextParams)
+import {
+  ContextPlugin,
+  Client,
+  Erc20Client,
+  IErc20PluginInstall,
+  ICreateParams
+} from "@aragon/sdk-client";
+// create context
+const context = new Context(params)
+// create clients
 const client = new Client(context) 
-const erc20Client = new Client({...context, pluginAddress: "0x12345..."})
-const pluginInitParams: IErc20FactoryParams = {
-  votingConfig: {
-    minDuration: 7200,
-    minParticipation: 25,
-    minSupport: 50
+const pluginInitParams: IErc20PluginInstall = {
+  proposals: {
+    minDuration: 7200, // seconds
+    minTurnout: 0.25, // between 0 and 1
+    minSupport: 0.5 // between 0 and 1
   },
-  tokenConfig: {
-    name: "Token",
-    address: "0x1234567890123456789012345678901234567890",
-    symbol: "TOK"
-  },
-  mintConfig: [
-    {
-      address: AddressZero,
-      balance: BigInt(10)
-    },
-    {
-      address: "0x1234567890123456789012345678901234567890",
-      balance: BigInt(10)
-    },
-    {
-      address: "0x1234567890123456789012345678901234567890",
-      balance: BigInt(10)
-    },
-  ]
+  useToken:{
+    address: "0x..."
+  }
 };
-const erc20InitAction = erc20Client.encoding.init(pluginInitParams)
-const params: ICreatePArams = {
+// OR
+// const pluginInitParams: IErc20PluginInstall = {
+//   proposals: {
+//     minDuration: 7200,
+//     minTurnout: 0.5,
+//     minSupport: 0.5
+//   },
+//   newToken: {
+//     name: "Token",
+//     symbol: "TOK",
+//     decimals: 18,
+//     // minter: "0x...",
+//     balances: [
+//       {
+//         address: "0x...",
+//         balance: BigInt(10)
+//       },
+//       {
+//         address: "0x...",
+//         balance: BigInt(10)
+//       },
+//       {
+//         address: "0x...",
+//         balance: BigInt(10)
+//       },
+//     ]
+//   }
+// }
+const erc20InitAction = ClientErc20.encoding.installEntry(pluginInitParams)
+// create DAO params with the init action in the plugins field
+const params: ICreateParams = {
   daoConfig: {
     name: "The Dao",
-    metadata: "{...}"
+    metadata: {...daoMetadata}
   },
-  gsnForwarder: "",
   plugins: [...otherPlugins, erc20InitAction]
+}
+// estimate gas
+const estimatedGas = await client.estimation.create(
+  params,
+);
+console.log(estimatedGas.average); // bigint
+console.log(estimatedGas.max); // bigint
+// create DAO
+for await (const step of client.methods.create(creationParams)) {
+  try {
+    switch (step.key) {
+      case DaoCreationSteps.CREATING:
+        // Transaction waiting on the mempool
+        console.log(step.txHash);
+        break;
+      case DaoCreationSteps.DONE:
+        // DAO address
+        console.log(step.address);
+        break;
+    }
+  } catch (err) {
+    // ...
+  }
 }
 ```
 
@@ -352,23 +431,27 @@ const params: ICreatePArams = {
 import {
   ClientErc20,
   DaoAction,
-  ICreateProposalParams,
+  ICreateProposal,
   VoteOption,
+  ContextPlugin,
+  ProposalCreationSteps
 } from "@aragon/sdk-client";
+// context
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientErc20(contextPlugin);
 
-const client = new ClientErc20(context);
-
+// actions to execute if the proposal is apporved
 const actions: DaoAction[] = [
   // See the "Action encoders" section below
   { to: "0x1234...", value: BigInt(100), data: new Uint8Array([1, 2, 3, 4]) },
 ];
-const proposalCreationParams: ICreateProposalParams = {
+// proposal params
+const proposalCreationParams: ICreateProposal = {
   metadataUri: "<uri>", // Following the EIP-4824
   actions,
-  // TODO: Clarify => block number or timestamp?
-  startDate: 1234,
-  endDate: 2345,
-  executeIfPassed: true,
+  startDate: new Date(), // Date
+  endDate: new Date(),  // Date
+  executeOnPass: true,
   creatorVote: VoteOption.YES,
 };
 
@@ -383,13 +466,18 @@ for await (
     proposalCreationParams,
   )
 ) {
-  switch (step.idx) {
-    case DaoDepositSteps.CREATING:
-      console.log(step.txHash); // 0xb1c14a49...
-      break;
-    case DaoDepositSteps.DONE:
-      console.log(step.proposalId); // 0x1234...
-      break;
+  try {
+    switch (step.idx) {
+      case ProposalCreationSteps.CREATING:
+        console.log(step.txHash); // 0xb1c14a49...
+        break;
+      case ProposalCreationSteps.DONE:
+        console.log(step.proposalId); // 0x1234...
+        break;
+    }
+  }
+  catch (err){
+    // ...err
   }
 }
 ```
@@ -397,26 +485,39 @@ for await (
 ### Voting on an ERC20 proposal
 
 ```ts
-  const context: ContextPluginParams = new ContextPlugin(contextParams)
-  const context = new ContextPlugin(contextParams)
-  const client = new ClientErc20(context)
+import {
+  ClientErc20,
+  DaoAction,
+  ICreateProposal,
+  VoteOption,
+  ContextPlugin,
+  VoteProposalStep
+} from "@aragon/sdk-client";
+// context
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientErc20(contextPlugin);
 
-  for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+// gas estimation
+const estimatedGas = await client.estimation.voteProposal(
+  proposalId, VoteOptions.YES
+);
+console.log(estimatedGas.average); // bigint
+console.log(estimatedGas.max); // bigint
+
+for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+  try {
     switch (step.key) {
-      case VoteProposalStep.VOTING:
-        expect(typeof step.txHash).toBe("string");
-        expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-        break;
-      case VoteProposalStep.DONE:
-        expect(typeof step.voteId).toBe("string");
-        expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-        break;
-      default:
-        throw new Error(
-          "Unexpected vote proposal step: " + Object.keys(step).join(", "),
-        );
+    case VoteProposalStep.VOTING:
+        console.log(step.txHash); // 0xb1c14a49...
+      break;
+    case VoteProposalStep.DONE:
+        console.log(step.voteId); // 0x12345...
+      break;
     }
+  } catch (err) {
+    // ...
   }
+}
 ```
 
 ### Loading the list of members (ERC20)
@@ -424,27 +525,102 @@ for await (
 Retrieving all the members of an ERC20 DAO.
 
 ```ts
-import { ClientErc20 } from "@aragon/sdk-client";
+import { ClientErc20, ContextPlugin } from "@aragon/sdk-client";
+// create client
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientErc20(contextPlugin);
 
-const client = new ClientERC20(context);
-const doaAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
-
-const members = await client.methods.getMembers(daoAddressOrEns);
+const members = await client.methods.getMembers();
 
 console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
 ```
 
+### Retrieve a proposal by proposalID (ERC20)
+
+Retrieving the proposals of an ERC20 DAO.
+
+```ts
+import { ClientErc20, ContextPlugin } from "@aragon/sdk-client";
+// create client
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientErc20(contextPlugin);
+
+const proposalId = "0x1234567..._0x0"
+
+const proposal = await client.methods.getProposal(proposalId);
+console.log(proposal);
+
+/*
+  {
+    id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
+    daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
+    daoName: "DAO 1",
+    creatorAddress: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+
+    startDate: <Date>,
+    endDate: <Date>,
+    creatonDate: <Date>,
+
+    title: "New Founding for Lorex Lab SubDao",
+    summary: "As most community members know, Aragon has strived.",
+    proposal: "This is the super important proposal body",
+    resources: [{ url: "https://example.com", description: "Example" }],
+
+    voteId: "0",
+    token: {
+      address: "0x9df6870250396e10d187b188b8bd9179ba1a9c18",
+      name: "DAO Token",
+      symbol: "DAO",
+      decimals: 18,
+    },
+
+    result: {
+      yes: 3,
+      no: 1,
+      abstain: 2,
+    },
+
+    open: false,
+    executed: false,
+    status: "Pending",
+
+    config: {
+      participationRequiredPct: 30,
+      supportRequiredPct: 52,
+    },
+
+    votingPower: 135,
+
+    voters: [
+      {
+        address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+        voteValue: VoteOptions.YES,
+        weight: 1,
+      },
+      {...}
+    ],
+  }
+*/
+```
 ### Loading the list of proposals (ERC20)
 
 Retrieving the proposals of an ERC20 DAO.
 
 ```ts
-import { Client } from "@aragon/sdk-client";
+import { ClientErc20, ContextPlugin } from "@aragon/sdk-client";
+// create client
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientErc20(contextPlugin);
 
-const client = new Client(context);
-const doaAddressOrEns = "0x1234...";
+const queryParams: IProposalQueryParams = {
+  skip: 0,
+  limit: 10,
+  direction: SortDirection.ASC,
+  sortBy: Proposal.sortBy.POPULARITY,
+  addresOrEns: "", // Filter by dao address or ens
+}
 
-const proposals = await client.methods.getProposals(doaAddressOrEns);
+const proposals = await client.methods.getProposals(queryParams);
 console.log(proposals);
 
 /*
@@ -452,11 +628,11 @@ console.log(proposals);
     id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
     daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
     daoName: "DAO 1",
-    creator: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+    creatorAddress: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
 
     startDate: <Date>,
     endDate: <Date>,
-    createdAt: <Date>,
+    creatonDate: <Date>,
 
     title: "New Founding for Lorex Lab SubDao",
     summary: "As most community members know, Aragon has strived.",
@@ -502,57 +678,125 @@ console.log(proposals);
 ## Multisig governance plugin client
 
 ```ts
-  const context: ContextPluginParams = new ContextPlugin(contextParams)
-  const context = new ContextPlugin(contextParams)
-  const client = new ClientMultisig(context)
+import {
+  ClientMultisig,
+  Client,
+  Context
+  ContextParams,
+  ContextPlugin
+} from "@aragon/sdk-client";
+
+const contextParams: ContextParams = {
+  // network id or name
+  network: 31337,
+  signer: new Wallet("0x..."),
+  dao: "0x1234567890123456789012345678901234567890",
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["http://localhost:8545"],
+  pluginAddress: "0x2345678901234567890123456789012345678901",
+  ipfsNodes: [
+    {
+      url: "http:localhost:5001",
+    },
+  ],
+  graphqlURLs: ["https://the-subgraph-url.io"]
+}
+// create a simple context
+const context: Context = new Context(contextParams)
+// create a plugin context from the simple context and the plugin address
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+// create the multisig client
+const client = new ClientMultisig(context)
 ```
 
 ### Creating a DAO with a multisig plugin
 
 ```ts
-  const context: ContextParams = new Context(contextParams)
-  const client = new Client(context) 
-  const multisigClient = new Client({...context, pluginAddress: "0x12345..."})
-  const pluginInitParams: IMultisigFactoryParams = {
-    votingConfig: {
-      minDuration: 7200,
-      minParticipation: 25,
-      minSupport: 50
-    },
-    whitelistVoters: [
-      "0x1234567890123456789012345678901234567890",
-      "0x2345678901234567890123456789012345678901",
-      "0x3456789012345678901234567890123456789012",
-      "0x4567890123456789012345678901234567890123",
-    ]
-  };
-  const multisigInitAction = multisigClient.encoding.init(pluginInitParams)
-  const params: ICreatePArams = {
-    daoConfig: {
-      name: "The Dao",
-      metadata: "{...}"
-    },
-    gsnForwarder: "",
-    plugins: [...otherPlugins, multisigInitAction]
+import {
+  ContextPlugin,
+  Client,
+  MultisigClient,
+  IMultisigFactoryParams,
+  ICreateParams
+} from "@aragon/sdk-client";
+// create clients
+const client = new Client(context) 
+// create init action for the erc20 plugin
+const pluginInitParams: IMultisigPluginInstall = {
+  votingConfig: {
+    minDuration: 7200, // seconds
+    minTurnout: 0.25, // between 0 and 1
+    minSupport: 0.5 // between 0 and 1
+  },
+  addresses: [
+    "0x1234567890123456789012345678901234567890",
+    "0x2345678901234567890123456789012345678901",
+    "0x3456789012345678901234567890123456789012",
+    "0x4567890123456789012345678901234567890123",
+  ]
+};
+// create initialize action for the dao
+const multisigInitAction = ClientMultisig.encoding.installEntry(pluginInitParams)
+// create DAO params with the init action in the plugins field
+const params: ICreateParams = {
+  daoConfig: {
+    name: "The Dao",
+    metadata: {...daoMetadata}
+  },
+  gsnForwarder: "",
+  plugins: [...otherPlugins, multisigInitAction]
+}
+// estimate gas
+const estimatedGas = await client.estimation.create(
+  params,
+);
+console.log(estimatedGas.average); // bigint
+console.log(estimatedGas.max); // bigint
+// create DAO
+for await (const step of client.methods.create(creationParams)) {
+  try {
+    switch (step.key) {
+      case DaoCreationSteps.CREATING:
+        // Transaction waiting on the mempool
+        console.log(step.txHash);
+        break;
+      case DaoCreationSteps.DONE:
+        // DAO address
+        console.log(step.address);
+        break;
+    }
+  } catch (err) {
+    // ...
   }
+}
 ```
 
 ### Creating a Multisig proposal
 ```ts
-const context: ContextPluginParams = new ContextPlugin(contextParams)
-const client = new Client(context);
+import {
+  ClientMultisig,
+  DaoAction,
+  ICreateProposal,
+  VoteOption,
+  ContextPlugin,
+  ProposalCreationSteps
+} from "@aragon/sdk-client";
+// context
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientMultisig(contextPlugin);
 
+// actions to execute if the proposal is apporved
 const actions: DaoAction[] = [
   // See the "Action encoders" section below
   { to: "0x1234...", value: BigInt(100), data: new Uint8Array([1, 2, 3, 4]) },
 ];
-const proposalCreationParams: ICreateProposalParams = {
+// proposal params
+const proposalCreationParams: ICreateProposal = {
   metadataUri: "<uri>", // Following the EIP-4824
   actions,
-  // TODO: Clarify => block number or timestamp?
-  startDate: 1234,
-  endDate: 2345,
-  executeIfPassed: true,
+  startDate: new Date(), // Date
+  endDate: new Date(),  // Date
+  executeOnPass: true,
   creatorVote: VoteOption.YES,
 };
 
@@ -567,82 +811,93 @@ for await (
     proposalCreationParams,
   )
 ) {
-  switch (step.idx) {
-    case DaoDepositSteps.CREATING:
-      console.log(step.txHash); // 0xb1c14a49...
-      break;
-    case DaoDepositSteps.DONE:
-      console.log(step.proposalId); // 0x1234...
-      break;
+  try {
+    switch (step.idx) {
+      case ProposalCreationSteps.CREATING:
+        console.log(step.txHash); // 0xb1c14a49...
+        break;
+      case ProposalCreationSteps.DONE:
+        console.log(step.proposalId); // 0x1234...
+        break;
+    }
+  }
+  catch (err){
+    // ...err
   }
 }
-
-
 ```
 
 ### Voting on a Multisig proposal
 ```ts
-  const context: ContextPluginParams = new ContextPlugin(contextParams)
-  const context = new ContextPlugin(contextParams)
-  const client = new ClientMultisig(context)
-  const estimatedGas = await client.estimation.voteProposal(
-    proposalId, VoteOptions.YES
-  );
-  console.log(estimatedGas.average); // bigint
-  console.log(estimatedGas.max); // bigint
+import {
+  ClientMultisig,
+  DaoAction,
+  ICreateProposal,
+  VoteOption,
+  ContextPlugin,
+  VoteProposalStep
+} from "@aragon/sdk-client";
+// context
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientMultisig(contextPlugin);
 
-  for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+// gas estimation
+const estimatedGas = await client.estimation.voteProposal(
+  proposalId, VoteOptions.YES
+);
+console.log(estimatedGas.average); // bigint
+console.log(estimatedGas.max); // bigint
+
+for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+  try {
     switch (step.key) {
-      case VoteProposalStep.VOTING:
-        expect(typeof step.txHash).toBe("string");
-        expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-        break;
-      case VoteProposalStep.DONE:
-        expect(typeof step.voteId).toBe("string");
-        expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-        break;
-      default:
-        throw new Error(
-          "Unexpected vote proposal step: " + Object.keys(step).join(", "),
-        );
+    case VoteProposalStep.VOTING:
+        console.log(step.txHash); // 0xb1c14a49...
+      break;
+    case VoteProposalStep.DONE:
+        console.log(step.voteId); // 0x12345...
+      break;
     }
+  } catch (err) {
+    // ...
   }
-
+}
 ```
 
 ### Loading the list of members (Multisig)
 ```ts
-  const context: ContextPluginParams = new ContextPlugin(contextParams)
-  const client = new ClientMultisig(context)
-  const members = await client.methods.getMemebers()
-  /*
-    [
-      "0x1234567890123456789012345678901234567890",
-      "0x2345678901234567890123456789012345678901",
-      "0x3456789012345678901234567890123456789012",
-      "0x4567890123456789012345678901234567890123",
-    ]
-  */
+import { ClientMultisig, ContextPlugin } from "@aragon/sdk-client";
+// create client
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientMultisig(contextPlugin);
+
+const members = await client.methods.getMembers();
+
+console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
 
 ```
 
 ### Loading the a proposal by proposalId (Multisig)
 ```ts
-  const context: ContextPluginParams = new ContextPlugin(contextParams)
-  const client = new ClientMultisig(context)
-  const proposals = await client.methods.getProposal(
-    "0x1234567890123456789012345678901234567890_0x0"
-  )
+import { ClientMultisig, ContextPlugin } from "@aragon/sdk-client";
+// create client
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientMultisig(contextPlugin);
+
+const proposalId = "0x1234567..._0x0"
+
+const proposal = await client.methods.getProposal(proposalId);
+console.log(proposal);
   /*
     {
       id: "0x1234567890123456789012345678901234567890_0x0",
       daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
       daoName: "DAO 1",
-      creator: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+      creatorAddress: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
 
       startDate: <Date>,
       endDate: <Date>,
-      createdAt: <Date>,
+      creatonDate: <Date>,
 
       title: "New Founding for Lorex Lab SubDao",
       summary: "As most community members know, Aragon has strived.",
@@ -680,27 +935,32 @@ for await (
 ```
 ### Loading the list of proposals (Multisig)
 ```ts
-  const context: ContextPluginParams = new ContextPlugin(contextParams)
-  const client = new ClientMultisig(context)
-  const queryParams:IProposalQueryParams = {
-    skip: 0,
-    limit: 10,
-    sortDirection: SortDirections.ASC,
-    sortBy: Proposal.sortBy.POPULARITY,
-    addresOrEns: "", // Filter by dao address or ens
-  }
-  const proposals = await client.methods.getProposalMany(queryParams)
+import { ClientMultisig, ContextPlugin } from "@aragon/sdk-client";
+// create client
+const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+const client = new ClientMultisig(contextPlugin);
+
+const queryParams: IProposalQueryParams = {
+  skip: 0,
+  limit: 10,
+  direction: SortDirection.ASC,
+  sortBy: Proposal.sortBy.POPULARITY,
+  addresOrEns: "", // Filter by dao address or ens
+}
+
+const proposals = await client.methods.getProposals(queryParams);
+console.log(proposals);
   /*
     [ 
       {
         id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
         daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
         daoName: "DAO 1",
-        creator: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+        creatorAddress: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
 
         startDate: <Date>,
         endDate: <Date>,
-        createdAt: <Date>,
+        creatonDate: <Date>,
 
         title: "New Founding for Lorex Lab SubDao",
         summary: "As most community members know, Aragon has strived.",
@@ -738,8 +998,6 @@ for await (
 
 ```
 
-- **TODO**
-
 ## Action encoders
 
 Proposals will eventually need to execute some action on behalf of the DAO,
@@ -761,7 +1019,10 @@ const withdrawParams: IWithdrawParams = {
   reference: "Some withdrawal message",
 };
 
-const withdrawAction = client.encoding.withdrawAction(withdrawParams);
+const withdrawAction = await client.encoding.withdrawAction(
+  "0x1234567890123456789012345678901234567890",  
+  withdrawParams
+);
 console.log(withdrawAction);
 ```
 

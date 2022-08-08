@@ -6,7 +6,7 @@ export const QueryDaoByAddress = gql`
       id
       name
       metadata
-      createdAt
+      creatonDate
     }
   }
 `
@@ -29,7 +29,7 @@ query daoTransfersByAddress($address: ID!) {
       amount
       reference
       transaction
-      createdAt
+      creatonDate
     }
     deposits {
       id
@@ -46,7 +46,7 @@ query daoTransfersByAddress($address: ID!) {
       amount
       reference
       transaction
-      createdAt
+      creatonDate
     }
   }
 }

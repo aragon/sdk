@@ -32,6 +32,18 @@ export class ContextPlugin extends Context {
 
     this.set(params);
   }
+  
+  /**
+   * Generate a plugin context from a client clontext and a plugin address
+   *
+   * @param {Context} ctx
+   * @param {string} pluginAddress
+   * @return {*}  {ContextPlugin}
+   * @memberof ContextPlugin
+   */
+  public fromContext(ctx: Context, pluginAddress: string): ContextPlugin {
+    return new ContextPlugin({ ...ctx, pluginAddress })
+  }
 
   /**
    * Does set and parse the given context configuration object

@@ -18,7 +18,7 @@ import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
 import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-ethers";
 import { DaoSortBy, IDaoQueryParams } from "../../src/internal/interfaces/client";
-import { SortDireccions } from "../../src/internal/interfaces/common";
+import { SortDireccion } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/plugins";
 import { Random } from "@aragon/sdk-common";
 
@@ -383,7 +383,10 @@ describe("Client", () => {
         reference: 'test'
       };
 
-      const initAction = client.encoding.withdrawAction(withdrawParams);
+      const initAction = await client.encoding.withdrawAction(
+        "0x1234567890123456789012345678901234567890",
+        withdrawParams
+      );
 
       expect(typeof initAction).toBe("object");
       expect(initAction.data).toBeInstanceOf(Uint8Array);
@@ -393,7 +396,7 @@ describe("Client", () => {
     it("Should get a DAO's metadata with a specific address", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx)
-      const dao = await client.methods.getMetadata(contextParams.dao)
+      const dao = await client.methods.getDao(contextParams.dao)
       expect(typeof dao).toBe('object');
       expect(dao.address).toBe(contextParams.dao);
       expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
@@ -405,10 +408,10 @@ describe("Client", () => {
       const params: IDaoQueryParams = {
         limit: 10,
         skip: 0,
-        sortDirection: SortDireccions.ASC,
+        direction: SortDireccion.ASC,
         sortBy: DaoSortBy.NAME
       }
-      const daos = await client.methods.getMetadataMany(params)
+      const daos = await client.methods.getDaos(params)
       expect(Array.isArray(daos)).toBe(true)
       expect(daos.length <= 10).toBe(true);
     })
@@ -442,7 +445,7 @@ describe("Client", () => {
         expect(typeof plugins[0]).toBe('string')
       }
     })
-    
+
     test.todo("Should return an empty array when getting the transfers of a DAO that does not exist")//, async () => {
     //   const ctx = new Context(contextParamsLocalChain);
     //   const client = new Client(ctx)
@@ -523,7 +526,7 @@ async function createLegacyDao(params: ContextParams) {
       participationRequiredPct: Math.floor(Random.getFloat() * 100) + 1,
       minDuration: Math.floor(Random.getFloat() * 9999) + 1,
     },
-    gsnForwarder: Wallet.createRandom().address,
+    // gsnForwarder: Wallet.createRandom().address,
   };
   const registryInstance = await daoFactoryInstance
     .registry()

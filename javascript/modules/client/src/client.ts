@@ -97,10 +97,10 @@ export class Client extends ClientCore implements IClient {
     getInstalledPlugins: (daoAddressOrEns: string): Promise<string[]> =>
       this._getInstalledPlugins(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getMetadata: (daoAddressOrEns: string) =>
+    getDao: (daoAddressOrEns: string) =>
       this._getMetadata(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getMetadataMany: (params?: IDaoQueryParams): Promise<DaoMetadata[]> =>
+    getDaos: (params?: IDaoQueryParams): Promise<DaoMetadata[]> =>
       this._getMetadataMany(params ?? {}),
 
     /** Checks whether a role is granted by the current DAO's ACL settings */
@@ -113,8 +113,8 @@ export class Client extends ClientCore implements IClient {
   };
 
   encoding = {
-    withdrawAction: (params: IWithdrawParams): DaoAction => this._buildActionWithdraw(params)
-
+    withdrawAction: (daoAddressOrEns: string, params: IWithdrawParams): Promise<DaoAction> =>
+      this._buildActionWithdraw(daoAddressOrEns, params)
   };
 
   //// ESTIMATION HANDLERS
@@ -375,7 +375,7 @@ export class Client extends ClientCore implements IClient {
     // TODO
     // uncomment this
     // skip = 0,
-    // sortDirection = SortDireccions.ASC,
+    // direction = SortDireccion.ASC,
     // sortBy = DaoSortBy.CREATED_AT
   }: IDaoQueryParams): Promise<DaoMetadata[]> {
     const metadataMany: DaoMetadata[] = []
@@ -484,10 +484,18 @@ export class Client extends ClientCore implements IClient {
    * @return {*}  {DaoAction}
    * @memberof Client
    */
-  private _buildActionWithdraw(params: IWithdrawParams): DaoAction {
-    // TODO: CONFIRM THAT THE "to" field needs to contain the DAO address
+  private async _buildActionWithdraw(daoAddreessOrEns: string, params: IWithdrawParams): Promise<DaoAction> {
+    // check ens
+    // if (!isAddress(daoAddreessOrEns)) {
+    //   const resolvedAddress = await this.web3.getSigner()?.resolveName(daoAddreessOrEns)
+    //   if (!resolvedAddress) {
+    //     throw new Error("invalid ens")
+    //   }
+    //   address = resolvedAddress
+    // }
+
     return {
-      to: AddressZero,
+      to: daoAddreessOrEns,
       value: BigInt(0),
       data: encodeWithdrawActionData(params)
     }

@@ -44,14 +44,13 @@ export function getDummyMultisigProposal(proposalId?: string): MultisigProposal 
     daoName: dummyDaoNames[index],
     startDate,
     endDate: new Date(startDate.getTime() + 7200000),
-    createdAt: new Date(dateWithinThisYear),
+    creatonDate: new Date(dateWithinThisYear),
     title: proposalTitles[index],
     summary:
       "As most community members know, Aragon has strived to deploy its products to more cost-efficient blockchain networks to facilitate interaction.",
-    proposal: "This is the super important proposal body",
+    description: "This is the super important proposal body",
     resources: [{ url: "https://example.com", description: "Example" }],
-    voteId,
-    creator: "0x1234567890123456789012345678901234567890",
+    creatorAddress: "0x1234567890123456789012345678901234567890",
     status: ProposalStatus.ACTIVE,
     result: {
       yes,
@@ -59,8 +58,8 @@ export function getDummyMultisigProposal(proposalId?: string): MultisigProposal 
       abstain,
     },
     config: {
-      participationRequiredPct: Math.floor(Random.getFloat() * 101),
-      supportRequiredPct: Math.floor(Random.getFloat() * 101),
+      minParticipationPct: Math.floor(Random.getFloat() * 101),
+      minTurnoutPct: Math.floor(Random.getFloat() * 101),
     },
     voters: [
       {
@@ -79,8 +78,6 @@ export function getDummyMultisigProposal(proposalId?: string): MultisigProposal 
         weight: abstain
       }
     ],
-    open: Boolean(Math.round(Random.getFloat())),
-    executed: Boolean(Math.round(Random.getFloat()))
   }
 }
 export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
@@ -124,14 +121,13 @@ export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
     daoName: dummyDaoNames[index],
     startDate,
     endDate: new Date(startDate.getTime() + 7200000),
-    createdAt: new Date(dateWithinThisYear),
+    creatonDate: new Date(dateWithinThisYear),
     title: proposalTitles[index],
     summary:
       "As most community members know, Aragon has strived to deploy its products to more cost-efficient blockchain networks to facilitate interaction.",
-    proposal: "This is the super important proposal body",
+    description: "This is the super important proposal body",
     resources: [{ url: "https://example.com", description: "Example" }],
-    voteId,
-    creator: "0x1234567890123456789012345678901234567890",
+    creatorAddress: "0x1234567890123456789012345678901234567890",
     status: ProposalStatus.ACTIVE,
     result: {
       yes,
@@ -139,8 +135,8 @@ export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
       abstain,
     },
     config: {
-      participationRequiredPct: Math.floor(Random.getFloat() * 101),
-      supportRequiredPct: Math.floor(Random.getFloat() * 101),
+      minParticipationPct: Math.floor(Random.getFloat() * 101),
+      minTurnoutPct: Math.floor(Random.getFloat() * 101),
     },
     voters: [
       {
@@ -166,8 +162,6 @@ export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
       decimals: 18
     },
     votingPower: yes + no + abstain,
-    open: Boolean(Math.round(Random.getFloat())),
-    executed: Boolean(Math.round(Random.getFloat()))
   }
 }
 
@@ -197,7 +191,7 @@ export function getDummyDao(addressOrEns?: string): DaoMetadata {
   return {
     address,
     name: dummyDaoNames[daoIndex],
-    createdAt: new Date(fromDate + Random.getFloat() * (Date.now() - fromDate)),
+    creatonDate: new Date(fromDate + Random.getFloat() * (Date.now() - fromDate)),
     description: `We are a community that loves trees and the planet. We track where forestation is increasing (or shrinking), fund people who are growing and protecting trees...`,
     links: [
       {

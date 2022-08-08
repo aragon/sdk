@@ -12,8 +12,8 @@ import { GraphQLClient } from "graphql-request";
 
 import {
   ExecuteProposalStep,
-  ICreateProposalParams,
-  IErc20FactoryParams,
+  ICreateProposal,
+  IErc20PluginInstall,
   IProposalQueryParams,
   ProposalCreationSteps,
   VoteOptions,
@@ -156,13 +156,25 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
-      const proposalParams: ICreateProposalParams = {
-        metadataUri: "ipfs://",
+      const proposalParams: ICreateProposal = {
+        metadata: {
+          title: 'Best Proposal',
+          summary: 'this is the sumnary',
+          description: 'This is a very long description',
+          resources: [{
+            name: "Website",
+            url: "https://the.website"
+          }],
+          media: {
+            header: 'https://no.media/media.jpeg',
+            logo: 'https://no.media/media.jpeg'
+          }
+        },
         actions: [],
         creatorVote: VoteOptions.YES,
         startDate: new Date(),
         endDate: new Date(),
-        executeIfPassed: true
+        executeOnPass: true
       }
 
       const estimation = await client.estimation.createProposal(proposalParams)
@@ -180,19 +192,33 @@ describe("Client", () => {
       const client = new Client(context)
 
       // generate actions
-      const action = client.encoding.withdrawAction({
-        recipientAddress: "0x1234567890123456789012345678901234567890",
-        amount: BigInt(1),
-        reference: 'test'
-      })
+      const action = await client.encoding.withdrawAction(
+        "0x1234567890123456789012345678901234567890",
+        {
+          recipientAddress: "0x1234567890123456789012345678901234567890",
+          amount: BigInt(1),
+          reference: 'test'
+        })
 
-      const proposalParams: ICreateProposalParams = {
-        metadataUri: "ipfs://",
+      const proposalParams: ICreateProposal = {
+        metadata: {
+          title: 'Best Proposal',
+          summary: 'this is the sumnary',
+          description: 'This is a very long description',
+          resources: [{
+            name: "Website",
+            url: "https://the.website"
+          }],
+          media: {
+            header: 'https://no.media/media.jpeg',
+            logo: 'https://no.media/media.jpeg'
+          }
+        },
         actions: [action],
         creatorVote: VoteOptions.YES,
         startDate: new Date(),
         endDate: new Date(),
-        executeIfPassed: true
+        executeOnPass: true
       }
 
       for await (const step of erc20Client.methods.createProposal(proposalParams)) {
@@ -301,41 +327,21 @@ describe("Client", () => {
 
   describe('Action generators', () => {
     it("Should create a Erc20 client and generate a init action", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientErc20(context);
-
-      const initParams: IErc20FactoryParams = {
-        votingConfig: {
+      const initParams: IErc20PluginInstall = {
+        proposals: {
           minDuration: 7200,
-          minParticipation: 25,
-          minSupport: 50
+          minTurnout: 0.5,
+          minSupport: 0.5
         },
-        tokenConfig: {
-          name: "Token",
-          address: "0x1234567890123456789012345678901234567890",
-          symbol: "TOK"
+        useToken:{
+          address: AddressZero
         },
-        mintConfig: [
-          {
-            address: AddressZero,
-            balance: BigInt(10)
-          },
-          {
-            address: "0x1234567890123456789012345678901234567890",
-            balance: BigInt(10)
-          },
-          {
-            address: "0x1234567890123456789012345678901234567890",
-            balance: BigInt(10)
-          },
-        ]
       };
+      const erc20InstallEntry = ClientErc20.encoding.installEntry(initParams);
 
-      const initAction = client.encoding.init(initParams);
-
-      expect(typeof initAction).toBe("object");
+      expect(typeof erc20InstallEntry).toBe("object");
       // what does this should be
-      expect(initAction.data).toBeInstanceOf(Uint8Array);
+      expect(erc20InstallEntry.data).toBeInstanceOf(Uint8Array);
     });
   })
 
@@ -343,7 +349,7 @@ describe("Client", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
-      
+
       const wallets = await client.methods.getMembers()
 
       expect(Array.isArray(wallets)).toBe(true);
@@ -369,7 +375,7 @@ describe("Client", () => {
       const params: IProposalQueryParams = {
         limit
       }
-      const proposals = await client.methods.getProposalMany(params)
+      const proposals = await client.methods.getProposals(params)
 
       expect(Array.isArray(proposals)).toBe(true)
       expect(proposals.length <= limit).toBe(true)

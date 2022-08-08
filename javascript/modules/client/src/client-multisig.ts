@@ -1,29 +1,30 @@
 import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
-import { ContextPlugin } from "./context-plugins";
+import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
 import { encodeActionSetPluginConfig, encodeMultisigActionInit } from "./internal/encoding/plugins";
-import { PluginInitAction, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
+import { IPluginInstallEntry, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
 import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   IClientMultisig,
-  ICreateProposalParams,
-  IMultisigFactoryParams,
+  ICreateProposal,
+  IMultisigPluginInstall,
   IProposalQueryParams,
   MultisigProposal,
   ProposalCreationSteps,
   ProposalCreationStepValue,
-  SetVotingConfigStep,
-  SetVotingConfigStepValue,
+  SetPluginConfigStep,
+  SetPluginConfigStepValue,
   VoteOptions,
   VoteProposalStep,
   VoteProposalStepValue,
-  VotingConfig
+  ProposalConfig
 } from "./internal/interfaces/plugins";
 import { getDummyMultisigProposal } from "./internal/temp-mock";
 import { getMultisigProposalsWithStatus } from "./internal/utils/plugins";
 
+const PLUGIN_ID = "0x1234567890123456789012345678901234567890"
 
 export class ClientMultisig extends ClientCore implements IClientMultisig {
   private _pluginAddress: string;
@@ -40,11 +41,11 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     /**
      * Creates a new proposal on the given Multisig plugin contract
      *
-     * @param {ICreateProposalParams} _params
+     * @param {ICreateProposal} _params
      * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
      * @memberof ClientMultisig
      */
-    createProposal: (params: ICreateProposalParams): AsyncGenerator<ProposalCreationStepValue> =>
+    createProposal: (params: ICreateProposal): AsyncGenerator<ProposalCreationStepValue> =>
       this._createProposal(params),
     /**
      * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
@@ -68,11 +69,11 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     /**
      * Sets the voting configuration in a Multisig proposal given a proposalId and a configuration
      *
-     * @param {VotingConfig} config
-     * @return {*}  {AsyncGenerator<SetVotingConfigStepValue>}
+     * @param {ProposalConfig} config
+     * @return {*}  {AsyncGenerator<SetPluginConfigStepValue>}
      * @memberof ClientMultisig
      */
-    setPluginConfig: (config: VotingConfig): AsyncGenerator<SetVotingConfigStepValue> =>
+    setPluginConfig: (config: ProposalConfig): AsyncGenerator<SetPluginConfigStepValue> =>
       this._setPluginConfig(config),
     /**
      * Returns the list of wallet addresses with signing capabilities on the plugin
@@ -98,38 +99,45 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
      * @return {*}  {Promise<MultisigProposal[]>}
      * @memberof ClientMultisig
      */
-    getProposalMany: (params?: IProposalQueryParams): Promise<MultisigProposal[]> =>
-      this._getProposalMany(params ?? {}),
+    getProposals: (params?: IProposalQueryParams): Promise<MultisigProposal[]> =>
+      this._getProposals(params ?? {}),
   }
   encoding = {
     /**
-     * Computes the parameters to be given when creating the DAO,
-     * so that the plugin is configured
-     *
-     * @param {IMultisigFactoryParams} params
-     * @return {*}  {FactoryInitParams}
-     * @memberof ClientMultisig
-     */
-    init: (params: IMultisigFactoryParams): PluginInitAction => this._buildActionInit(params),
-    /**
      * Computes the parameters to be given when creating a proposal that updates the governance configuration
      *
-     * @param {VotingConfig} params
+     * @param {ProposalConfig} params
      * @return {*}  {DaoAction}
      * @memberof ClientMultisig
      */
-    setPluginConfigAction: (params: VotingConfig): DaoAction => this._buildActionSetPluginConfig(params)
+    setPluginConfigAction: (params: ProposalConfig): DaoAction => this._buildActionSetPluginConfig(params)
+  }
+  static encoding = {
+    /**
+     * Computes the parameters to be given when creating the DAO,
+     * so that the plugin is configured    
+     * 
+     * @param {IErc20PluginInstall} params
+     * @return {*}  {FactoryInitParams}
+     * @memberof ClientErc20
+     */
+    installEntry: (params: IMultisigPluginInstall): IPluginInstallEntry => {
+      return {
+        id: PLUGIN_ID,
+        data: encodeMultisigActionInit(params)
+      }
+    }
   }
   estimation = {
 
     /**
      * Estimates the gas fee of creating a proposal on the plugin
      *
-     * @param {ICreateProposalParams} params
+     * @param {ICreateProposal} params
      * @return {*}  {Promise<GasFeeEstimation>}
      * @memberof ClientMultisig
      */
-    createProposal: (params: ICreateProposalParams): Promise<GasFeeEstimation> =>
+    createProposal: (params: ICreateProposal): Promise<GasFeeEstimation> =>
       this._estimateCreateProposal(params),
 
     /**
@@ -155,7 +163,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
   }
 
   private async *_createProposal(
-    _params: ICreateProposalParams,
+    _params: ICreateProposal,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -215,7 +223,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     }
   }
 
-  private async *_setPluginConfig(_config: VotingConfig): AsyncGenerator<SetVotingConfigStepValue> {
+  private async *_setPluginConfig(_config: ProposalConfig): AsyncGenerator<SetPluginConfigStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -226,11 +234,11 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     // TODO: Implement
 
     yield {
-      key: SetVotingConfigStep.CREATING_PROPOSAL,
+      key: SetPluginConfigStep.CREATING_PROPOSAL,
       txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
     }
     yield {
-      key: SetVotingConfigStep.DONE
+      key: SetPluginConfigStep.DONE
     }
   }
 
@@ -270,19 +278,19 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
    *     // TODO
    *     // uncomment this
    *     // skip = 0,
-   *     // sortDirection = SortDireccions.ASC,
+   *     // direction = SortDireccion.ASC,
    *     // sortBy = MultisigProposalSortBy.CREATED_AT
    *   }
    * @return {*}  {Promise<MultisigProposal[]>}
    * @memberof ClientMultisig
    */
-  private _getProposalMany({
+  private _getProposals({
     // TODO 
     // uncomment when querying to subgraph
     // daoAddressOrEns,
     limit = 0,
     // skip = 0,
-    // sortDirection = SortDireccions.ASC,
+    // direction = SortDireccion.ASC,
     // sortBy = MultisigProposalSortBy.CREATED_AT
   }: IProposalQueryParams): Promise<MultisigProposal[]> {
     let proposals: MultisigProposal[] = []
@@ -296,14 +304,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 
-  private _buildActionInit(params: IMultisigFactoryParams): PluginInitAction {
-    return {
-      id: this._pluginAddress,
-      data: encodeMultisigActionInit(params)
-    }
-  }
-
-  private _buildActionSetPluginConfig(params: VotingConfig): DaoAction {
+  private _buildActionSetPluginConfig(params: ProposalConfig): DaoAction {
     // TODO: check if to and value are correct
     return {
       to: AddressZero,
@@ -312,7 +313,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     }
   }
 
-  private _estimateCreateProposal(_params: ICreateProposalParams): Promise<GasFeeEstimation> {
+  private _estimateCreateProposal(_params: ICreateProposal): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
