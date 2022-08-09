@@ -21,6 +21,7 @@ import { DaoSortBy, IDaoQueryParams } from "../../src/internal/interfaces/client
 import { SortDireccion } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/plugins";
 import { Random } from "@aragon/sdk-common";
+import { AddressZero } from "@ethersproject/constants";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -538,7 +539,7 @@ async function createLegacyDao(params: ContextParams) {
     daoCreationParams.votingConfig,
     daoCreationParams.tokenConfig,
     daoCreationParams.mintConfig,
-    daoCreationParams.gsnForwarder ? daoCreationParams.gsnForwarder : ""
+    daoCreationParams.gsnForwarder ?? AddressZero
   )
     .then(tx => tx.wait())
     .then((cr) => {

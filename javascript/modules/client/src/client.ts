@@ -35,6 +35,7 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { IWithdrawParams } from "./internal/interfaces/plugins";
 import { encodeWithdrawActionData } from "./internal/encoding/client";
 import { getDummyDao } from "./internal/temp-mock";
+import { isAddress } from "@ethersproject/address";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -486,16 +487,17 @@ export class Client extends ClientCore implements IClient {
    */
   private async _buildActionWithdraw(daoAddreessOrEns: string, params: IWithdrawParams): Promise<DaoAction> {
     // check ens
-    // if (!isAddress(daoAddreessOrEns)) {
-    //   const resolvedAddress = await this.web3.getSigner()?.resolveName(daoAddreessOrEns)
-    //   if (!resolvedAddress) {
-    //     throw new Error("invalid ens")
-    //   }
-    //   address = resolvedAddress
-    // }
+    let address = daoAddreessOrEns
+    if (!isAddress(daoAddreessOrEns)) {
+      const resolvedAddress = await this.web3.getSigner()?.resolveName(daoAddreessOrEns)
+      if (!resolvedAddress) {
+        throw new Error("invalid ens")
+      }
+      address = resolvedAddress
+    }
 
     return {
-      to: daoAddreessOrEns,
+      to: address,
       value: BigInt(0),
       data: encodeWithdrawActionData(params)
     }
