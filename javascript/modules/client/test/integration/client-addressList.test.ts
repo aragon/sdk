@@ -4,7 +4,6 @@ declare const describe, it, beforeAll, afterAll, expect, test;
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import { ClientAddressList, ContextPlugin, ContextPluginParams, Client } from "../../src";
-// import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";

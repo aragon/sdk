@@ -2,7 +2,7 @@ import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { strip0x, hexToBytes } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { IWithdrawParams } from "../interfaces/plugins";
+import { IWithdrawParams } from "../interfaces/client";
 
 export function encodeWithdrawActionData(params: IWithdrawParams): Uint8Array {
   const daoInterface = DAO__factory.createInterface();

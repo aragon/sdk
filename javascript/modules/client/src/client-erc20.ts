@@ -164,7 +164,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * Estimates the gas fee of casting a vote on a proposal
      *
      * @param {string} proposalId
-     * @param {VoteOptions} vote
+     * @param {VoteValues} vote
      * @return {*}  {Promise<GasFeeEstimation>}
      * @memberof ClientErc20
      */
@@ -330,7 +330,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   }
 
   // @ts-ignore  TODO: Remove this comment when implemented
-  private _estimateVoteProposal(proposalId: string, vote: VoteOptions): Promise<GasFeeEstimation> {
+  private _estimateVoteProposal(proposalId: string, vote: VoteValues): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
