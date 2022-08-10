@@ -19,7 +19,7 @@ import { erc20ContractAbi } from "../../src/internal/abi/erc20";
 import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-ethers";
 import { DaoSortBy, IDaoQueryParams } from "../../src/internal/interfaces/client";
 import { SortDireccion } from "../../src/internal/interfaces/common";
-import { IWithdrawParams } from "../../src/internal/interfaces/plugins";
+import { IWithdrawParams } from "../../src/internal/interfaces/client";
 import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 
@@ -43,7 +43,7 @@ const TEST_WALLET =
 const contextParams: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  dao: "0x1234567890123456789012345678901234567890",
+  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   ipfsNodes: [
@@ -60,7 +60,7 @@ const contextParams: ContextParams = {
 const contextParamsLocalChain: ContextParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
-  dao: "0x1234567890123456789012345678901234567890",
+  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
   ipfsNodes: [
@@ -84,7 +84,7 @@ describe("Client", () => {
     contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
     /* TODO: REMOVE ME */
     const daoAddress = await createLegacyDao(contextParamsLocalChain)
-    contextParamsLocalChain.dao = daoAddress;
+    contextParamsLocalChain.daoAddress = daoAddress;
   });
 
   afterAll(async () => {
@@ -140,15 +140,19 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
+      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1
+
       const daoCreationParams: ICreateParams = {
-        daoConfig: {
-          name: "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1,
-          metadata: "0x1234",
+        metadata: {
+          name: daoName,
+          description: "this is a dao",
+          avatar: 'https://...',
+          links: []
         },
+        ensSubdomain: daoName,
         plugins: [
           { id: "0x1234", data: "0x1234" },
         ],
-        gsnForwarder: Wallet.createRandom().address,
       };
 
       const gasFeesEstimation = await client.estimation.create(
@@ -166,15 +170,19 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
+      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1
+
       const daoCreationParams: ICreateParams = {
-        daoConfig: {
-          name: "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1,
-          metadata: "0x1234",
+        metadata: {
+          name: daoName,
+          description: "this is a dao",
+          avatar: 'https://...',
+          links: []
         },
+        ensSubdomain: daoName,
         plugins: [
           { id: "0x1234", data: "0x1234" },
         ],
-        gsnForwarder: Wallet.createRandom().address,
       };
 
       for await (const step of client.methods.create(daoCreationParams)) {
@@ -202,7 +210,7 @@ describe("Client", () => {
       const client = new Client(context);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.dao,
+        daoAddress: contextParamsLocalChain.daoAddress,
         amount: BigInt(1234),
       };
 
@@ -221,7 +229,7 @@ describe("Client", () => {
       const client = new Client(context);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.dao,
+        daoAddress: contextParamsLocalChain.daoAddress,
         amount: BigInt(1234),
       };
 
@@ -263,7 +271,7 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.dao,
+        daoAddress: contextParamsLocalChain.daoAddress,
         amount: BigInt(5),
         tokenAddress: tokenContract.address,
         reference: "My reference",
@@ -316,7 +324,7 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.dao,
+        daoAddress: contextParamsLocalChain.daoAddress,
         amount: BigInt(7),
         tokenAddress: tokenContract.address,
         reference: "My reference",
@@ -397,9 +405,9 @@ describe("Client", () => {
     it("Should get a DAO's metadata with a specific address", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx)
-      const dao = await client.methods.getDao(contextParams.dao)
+      const dao = await client.methods.getDao(contextParams.daoAddress)
       expect(typeof dao).toBe('object');
-      expect(dao.address).toBe(contextParams.dao);
+      expect(dao.address).toBe(contextParams.daoAddress);
       expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     })
 

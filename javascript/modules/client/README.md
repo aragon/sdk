@@ -321,10 +321,9 @@ const contextParams: ContextParams = {
   // network id or name
   network: 31337,
   signer: new Wallet("0x..."),
-  dao: "0x1234567890123456789012345678901234567890",
+  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
-  pluginAddress: "0x2345678901234567890123456789012345678901",
   ipfsNodes: [
     {
       url: "http:localhost:5001",
@@ -335,8 +334,9 @@ const contextParams: ContextParams = {
 // create a simple context
 const context: Context = new Context(contextParams)
 // create a plugin context from the simple context and the plugin address
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
-// create the multisig client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create the addressList client
 const client = new ClientErc20(context)
 ```
 ### Creating a DAO with an ERC20 plugin
@@ -353,57 +353,56 @@ import {
 const context = new Context(params)
 // create clients
 const client = new Client(context) 
-const pluginInitParams: IErc20PluginInstall = {
+const pluginInitParams1: IErc20PluginInstall = {
   proposals: {
     minDuration: 7200, // seconds
-    minTurnout: 0.25, // between 0 and 1
-    minSupport: 0.5 // between 0 and 1
+    minTurnout: 0.25, // 25%
+    minSupport: 0.5 // 50%
   },
-  useToken:{
+  useToken: {
     address: "0x..."
   }
 };
-// OR
-// const pluginInitParams: IErc20PluginInstall = {
-//   proposals: {
-//     minDuration: 7200,
-//     minTurnout: 0.5,
-//     minSupport: 0.5
-//   },
-//   newToken: {
-//     name: "Token",
-//     symbol: "TOK",
-//     decimals: 18,
-//     // minter: "0x...",
-//     balances: [
-//       {
-//         address: "0x...",
-//         balance: BigInt(10)
-//       },
-//       {
-//         address: "0x...",
-//         balance: BigInt(10)
-//       },
-//       {
-//         address: "0x...",
-//         balance: BigInt(10)
-//       },
-//     ]
-//   }
-// }
-const erc20InitAction = ClientErc20.encoding.installEntry(pluginInitParams)
-// create DAO params with the init action in the plugins field
-const params: ICreateParams = {
-  daoConfig: {
-    name: "The Dao",
-    metadata: {...daoMetadata}
+const pluginInitParams2: IErc20PluginInstall = {
+  proposals: {
+    minDuration: 60 * 60 * 24,  // seconds
+    minTurnout: 0.4, // 40%
+    minSupport: 0.55 // 55%
   },
-  plugins: [...otherPlugins, erc20InitAction]
+  newToken: {
+    name: "Token",
+    symbol: "TOK",
+    decimals: 18,
+    minter: "0x...",  // optionally, define a minter
+    balances: [
+      {
+        address: "0x...",
+        balance: BigInt(10)
+      },
+      {
+        address: "0x...",
+        balance: BigInt(10)
+      },
+      {
+        address: "0x...",
+        balance: BigInt(10)
+      },
+    ]
+  }
 }
-// estimate gas
-const estimatedGas = await client.estimation.create(
-  params,
-);
+const erc20InstallEntry1 = ClientErc20.encoding.installEntry(pluginInitParams1)
+const erc20InstallEntry2 = ClientErc20.encoding.installEntry(pluginInitParams2)
+// create a DAO with the install entries within plugins[]
+const params: ICreateParams = {
+  metadata: {
+      name: "Cool DAO",
+      description: "This is a cool DAO",
+      avatar: "https://...",
+      links: [ { name: "Web site", url: "https://..." }, ]
+  },
+  ensSubdomain: "cool", // cool.dao.eth
+  plugins: [erc20InstallEntry1, erc20InstallEntry2]
+}
 console.log(estimatedGas.average); // bigint
 console.log(estimatedGas.max); // bigint
 // create DAO
@@ -436,8 +435,9 @@ import {
   ContextPlugin,
   ProposalCreationSteps
 } from "@aragon/sdk-client";
-// context
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
 const client = new ClientErc20(contextPlugin);
 
 // actions to execute if the proposal is apporved
@@ -493,8 +493,9 @@ import {
   ContextPlugin,
   VoteProposalStep
 } from "@aragon/sdk-client";
-// context
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
 const client = new ClientErc20(contextPlugin);
 
 // gas estimation
@@ -526,8 +527,9 @@ Retrieving all the members of an ERC20 DAO.
 
 ```ts
 import { ClientErc20, ContextPlugin } from "@aragon/sdk-client";
-// create client
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
 const client = new ClientErc20(contextPlugin);
 
 const members = await client.methods.getMembers();
@@ -541,8 +543,9 @@ Retrieving the proposals of an ERC20 DAO.
 
 ```ts
 import { ClientErc20, ContextPlugin } from "@aragon/sdk-client";
-// create client
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
 const client = new ClientErc20(contextPlugin);
 
 const proposalId = "0x1234567..._0x0"
@@ -566,7 +569,6 @@ console.log(proposal);
     proposal: "This is the super important proposal body",
     resources: [{ url: "https://example.com", description: "Example" }],
 
-    voteId: "0",
     token: {
       address: "0x9df6870250396e10d187b188b8bd9179ba1a9c18",
       name: "DAO Token",
@@ -580,13 +582,12 @@ console.log(proposal);
       abstain: 2,
     },
 
-    open: false,
-    executed: false,
     status: "Pending",
 
-    config: {
-      participationRequiredPct: 30,
-      supportRequiredPct: 52,
+    settings: {
+      minSupport: 0-3,
+      minTurnout: 0.5,
+      minDuration: 7200,
     },
 
     votingPower: 135,
@@ -608,8 +609,9 @@ Retrieving the proposals of an ERC20 DAO.
 
 ```ts
 import { ClientErc20, ContextPlugin } from "@aragon/sdk-client";
-// create client
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
 const client = new ClientErc20(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
@@ -639,7 +641,6 @@ console.log(proposals);
     proposal: "This is the super important proposal body",
     resources: [{ url: "https://example.com", description: "Example" }],
 
-    voteId: "0",
     token: {
       address: "0x9df6870250396e10d187b188b8bd9179ba1a9c18",
       name: "DAO Token",
@@ -653,13 +654,12 @@ console.log(proposals);
       abstain: 2,
     },
 
-    open: false,
-    executed: false,
     status: "Pending",
 
-    config: {
-      participationRequiredPct: 30,
-      supportRequiredPct: 52,
+    settings: {
+      minSupport: 0-3,
+      minTurnout: 0.5,
+      minDuration: 7200,
     },
 
     votingPower: 135,
@@ -675,11 +675,11 @@ console.log(proposals);
   },] */
 ```
 
-## Multisig governance plugin client
+## Address list governance plugin client
 
 ```ts
 import {
-  ClientMultisig,
+  ClientAddressList,
   Client,
   Context
   ContextParams,
@@ -690,43 +690,40 @@ const contextParams: ContextParams = {
   // network id or name
   network: 31337,
   signer: new Wallet("0x..."),
-  dao: "0x1234567890123456789012345678901234567890",
+  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
-  pluginAddress: "0x2345678901234567890123456789012345678901",
-  ipfsNodes: [
-    {
-      url: "http:localhost:5001",
-    },
-  ],
+  ipfsNodes: [{url: "http:localhost:5001"}],
   graphqlURLs: ["https://the-subgraph-url.io"]
 }
 // create a simple context
 const context: Context = new Context(contextParams)
 // create a plugin context from the simple context and the plugin address
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
-// create the multisig client
-const client = new ClientMultisig(context)
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create the addressList client
+const client = new ClientAddressList(context)
 ```
 
-### Creating a DAO with a multisig plugin
+### Creating a DAO with a addressList plugin
 
 ```ts
 import {
   ContextPlugin,
   Client,
-  MultisigClient,
-  IMultisigFactoryParams,
+  AddressListClient,
+  IAddressListFactoryParams,
   ICreateParams
 } from "@aragon/sdk-client";
 // create clients
 const client = new Client(context) 
 // create init action for the erc20 plugin
-const pluginInitParams: IMultisigPluginInstall = {
-  votingConfig: {
+const pluginInitParams: IAddressListPluginInstall = {
+  proposals: {
     minDuration: 7200, // seconds
-    minTurnout: 0.25, // between 0 and 1
-    minSupport: 0.5 // between 0 and 1
+    minTurnout: 0.25, // 25%
+    minSupport: 0.5 // 50%
   },
   addresses: [
     "0x1234567890123456789012345678901234567890",
@@ -736,7 +733,7 @@ const pluginInitParams: IMultisigPluginInstall = {
   ]
 };
 // create initialize action for the dao
-const multisigInitAction = ClientMultisig.encoding.installEntry(pluginInitParams)
+const addressListInitAction = ClientAddressList.encoding.installEntry(pluginInitParams)
 // create DAO params with the init action in the plugins field
 const params: ICreateParams = {
   daoConfig: {
@@ -744,7 +741,7 @@ const params: ICreateParams = {
     metadata: {...daoMetadata}
   },
   gsnForwarder: "",
-  plugins: [...otherPlugins, multisigInitAction]
+  plugins: [...otherPlugins, addressListInitAction]
 }
 // estimate gas
 const estimatedGas = await client.estimation.create(
@@ -771,19 +768,20 @@ for await (const step of client.methods.create(creationParams)) {
 }
 ```
 
-### Creating a Multisig proposal
+### Creating a address list proposal
 ```ts
 import {
-  ClientMultisig,
+  ClientAddressList,
   DaoAction,
   ICreateProposal,
   VoteOption,
   ContextPlugin,
   ProposalCreationSteps
 } from "@aragon/sdk-client";
-// context
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
-const client = new ClientMultisig(contextPlugin);
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+const client = new ClientAddressList(contextPlugin);
 
 // actions to execute if the proposal is apporved
 const actions: DaoAction[] = [
@@ -792,7 +790,16 @@ const actions: DaoAction[] = [
 ];
 // proposal params
 const proposalCreationParams: ICreateProposal = {
-  metadataUri: "<uri>", // Following the EIP-4824
+  metadata: {
+    title: "xxx",
+    summary: "xxx",
+    description: "xxx",
+    resources: [ { url: "https://...", name: "Document" } ],
+    media: {
+      header: "https://...",
+      logo: "https://..."
+    }
+  },
   actions,
   startDate: new Date(), // Date
   endDate: new Date(),  // Date
@@ -806,11 +813,9 @@ const estimatedGas = await client.estimation.createProposal(
 console.log(estimatedGas.average); // bigint
 console.log(estimatedGas.max); // bigint
 
-for await (
-  const step of client.methods.createProposal(
-    proposalCreationParams,
-  )
-) {
+const steps = client.methods.createProposal(proposalCreationParams)
+
+for await ( const step of steps) {
   try {
     switch (step.idx) {
       case ProposalCreationSteps.CREATING:
@@ -827,19 +832,20 @@ for await (
 }
 ```
 
-### Voting on a Multisig proposal
+### Voting on a address list proposal
 ```ts
 import {
-  ClientMultisig,
+  ClientAddressList,
   DaoAction,
   ICreateProposal,
   VoteOption,
   ContextPlugin,
   VoteProposalStep
 } from "@aragon/sdk-client";
-// context
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
-const client = new ClientMultisig(contextPlugin);
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+const client = new ClientAddressList(contextPlugin);
 
 // gas estimation
 const estimatedGas = await client.estimation.voteProposal(
@@ -864,12 +870,13 @@ for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES
 }
 ```
 
-### Loading the list of members (Multisig)
+### Loading the list of members (address list plugin)
 ```ts
-import { ClientMultisig, ContextPlugin } from "@aragon/sdk-client";
-// create client
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
-const client = new ClientMultisig(contextPlugin);
+import { ClientAddressList, ContextPlugin } from "@aragon/sdk-client";
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+const client = new ClientAddressList(contextPlugin);
 
 const members = await client.methods.getMembers();
 
@@ -877,12 +884,13 @@ console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
 
 ```
 
-### Loading the a proposal by proposalId (Multisig)
+### Loading the a proposal by proposalId (address list plugin)
 ```ts
-import { ClientMultisig, ContextPlugin } from "@aragon/sdk-client";
-// create client
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
-const client = new ClientMultisig(contextPlugin);
+import { ClientAddressList, ContextPlugin } from "@aragon/sdk-client";
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+const client = new ClientAddressList(contextPlugin);
 
 const proposalId = "0x1234567..._0x0"
 
@@ -904,7 +912,6 @@ console.log(proposal);
       proposal: "This is the super important proposal body",
       resources: [{ url: "https://example.com", description: "Example" }],
 
-      voteId: "0",
 
       result: {
         yes: 3,
@@ -912,8 +919,6 @@ console.log(proposal);
         abstain: 2,
       },
 
-      open: false,
-      executed: false,
       status: "Pending",
 
       config: {
@@ -933,18 +938,19 @@ console.log(proposal);
   */
 
 ```
-### Loading the list of proposals (Multisig)
+### Loading the list of proposals (address list plugin)
 ```ts
-import { ClientMultisig, ContextPlugin } from "@aragon/sdk-client";
-// create client
-const contextPlugin = ContextPlugin.fromContext(context, "0x...")
-const client = new ClientMultisig(contextPlugin);
+import { ClientAddressList, ContextPlugin } from "@aragon/sdk-client";
+// Plugin client
+const pluginAddress = "0x12345..."
+const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+const client = new ClientAddressList(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0,
   limit: 10,
   direction: SortDirection.ASC,
-  sortBy: Proposal.sortBy.POPULARITY,
+  sortBy: ProposalSortBy.POPULARITY,
   addresOrEns: "", // Filter by dao address or ens
 }
 
@@ -967,16 +973,12 @@ console.log(proposals);
         proposal: "This is the super important proposal body",
         resources: [{ url: "https://example.com", description: "Example" }],
 
-        voteId: "0",
-
         result: {
           yes: 3,
           no: 1,
           abstain: 2,
         },
 
-        open: false,
-        executed: false,
         status: "Pending",
 
         config: {

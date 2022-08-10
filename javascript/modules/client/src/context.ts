@@ -54,7 +54,7 @@ export class Context {
       throw new Error("Missing DAO factory address");
     } else if (!contextParams.signer) {
       throw new Error("Please pass the required signer");
-    } else if (!contextParams.dao) {
+    } else if (!contextParams.daoAddress) {
       throw new Error("No DAO address defined");
     } else if (!contextParams.web3Providers) {
       throw new Error("No web3 endpoints defined");
@@ -70,7 +70,7 @@ export class Context {
       network: contextParams.network,
       signer: contextParams.signer,
       daoFactoryAddress: contextParams.daoFactoryAddress,
-      dao: contextParams.dao,
+      dao: contextParams.daoAddress,
       web3Providers: this.useWeb3Providers(
         contextParams.web3Providers,
         contextParams.network,
@@ -91,8 +91,8 @@ export class Context {
     if (contextParams.network) {
       this.state.network = contextParams.network;
     }
-    if (contextParams.dao) {
-      this.state.dao = contextParams.dao;
+    if (contextParams.daoAddress) {
+      this.state.dao = contextParams.daoAddress;
     }
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
@@ -264,8 +264,8 @@ export class Context {
 
   // DEFAULT CONTEXT STATE
   static setDefault(params: Partial<ContextParams>) {
-    if (params.dao) {
-      defaultState.dao = params.dao;
+    if (params.daoAddress) {
+      defaultState.dao = params.daoAddress;
     }
     if (params.daoFactoryAddress) {
       defaultState.daoFactoryAddress = params.daoFactoryAddress;

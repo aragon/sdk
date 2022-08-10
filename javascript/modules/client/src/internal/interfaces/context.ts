@@ -10,7 +10,7 @@ import { GraphQLClient } from "graphql-request";
 type Web3ContextParams = {
   network: Networkish;
   signer: Signer;
-  dao: string;
+  daoAddress: string;
   daoFactoryAddress?: string;
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   gasFeeEstimationFactor?: number;

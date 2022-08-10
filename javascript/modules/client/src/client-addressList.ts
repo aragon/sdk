@@ -2,31 +2,32 @@ import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
-import { encodeActionSetPluginConfig, encodeMultisigActionInit } from "./internal/encoding/plugins";
+import { encodeActionSetPluginConfig, encodeAddressListActionInit } from "./internal/encoding/plugins";
 import { IPluginInstallEntry, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
 import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  IClientMultisig,
+  IClientAddressList,
   ICreateProposal,
-  IMultisigPluginInstall,
+  IAddressListPluginInstall,
   IProposalQueryParams,
-  MultisigProposal,
+  AddressListProposal,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   SetPluginConfigStep,
   SetPluginConfigStepValue,
-  VoteOptions,
+  VoteValues,
   VoteProposalStep,
   VoteProposalStepValue,
-  ProposalConfig
+  ProposalConfig,
+  AddressListProposalListItem
 } from "./internal/interfaces/plugins";
-import { getDummyMultisigProposal } from "./internal/temp-mock";
-import { getMultisigProposalsWithStatus } from "./internal/utils/plugins";
+import { getDummyAddressListProposal, getDummyAddressListProposalListItem } from "./internal/temp-mock";
+import { getProposalStatus } from "./internal/utils/plugins";
 
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890"
 
-export class ClientMultisig extends ClientCore implements IClientMultisig {
+export class ClientAddressList extends ClientCore implements IClientAddressList {
   //@ts-ignore TODO: Remove
   private _pluginAddress: string;
 
@@ -40,11 +41,11 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
   }
   methods = {
     /**
-     * Creates a new proposal on the given Multisig plugin contract
+     * Creates a new proposal on the given AddressList plugin contract
      *
      * @param {ICreateProposal} _params
      * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
-     * @memberof ClientMultisig
+     * @memberof ClientAddressList
      */
     createProposal: (params: ICreateProposal): AsyncGenerator<ProposalCreationStepValue> =>
       this._createProposal(params),
@@ -52,27 +53,27 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
      * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
      *
      * @param {string} proposalId
-     * @param {VoteOptions} vote
+     * @param {VoteValues} vote
      * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
-     * @memberof ClientMultisig
+     * @memberof ClientAddressList
      */
-    voteProposal: (proposalId: string, vote: VoteOptions): AsyncGenerator<VoteProposalStepValue> =>
+    voteProposal: (proposalId: string, vote: VoteValues): AsyncGenerator<VoteProposalStepValue> =>
       this._voteProposal(proposalId, vote),
     /**
      * Executes the given proposal, provided that it has already passed
      *
      * @param {string} proposalId
      * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
-     * @memberof ClientMultisig
+     * @memberof ClientAddressList
      */
     executeProposal: (proposalId: string): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(proposalId),
     /**
-     * Sets the voting configuration in a Multisig proposal given a proposalId and a configuration
+     * Sets the voting configuration in a AddressList proposal given a proposalId and a configuration
      *
      * @param {ProposalConfig} config
      * @return {*}  {AsyncGenerator<SetPluginConfigStepValue>}
-     * @memberof ClientMultisig
+     * @memberof ClientAddressList
      */
     setPluginConfig: (config: ProposalConfig): AsyncGenerator<SetPluginConfigStepValue> =>
       this._setPluginConfig(config),
@@ -80,7 +81,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
      * Returns the list of wallet addresses with signing capabilities on the plugin
      *
      * @return {*}  {Promise<string[]>}
-     * @memberof ClientMultisig
+     * @memberof ClientAddressList
      */
     getMembers: (): Promise<string[]> =>
       this._getMemebers(),
@@ -88,19 +89,19 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
      * Returns the details of the given proposal
      *
      * @param {string} proposalId
-     * @return {*}  {Promise<MultisigProposal>}
-     * @memberof ClientMultisig
+     * @return {*}  {Promise<AddressListProposal>}
+     * @memberof ClientAddressList
      */
-    getProposal: (proposalId: string): Promise<MultisigProposal> =>
+    getProposal: (proposalId: string): Promise<AddressListProposal> =>
       this._getProposal(proposalId),
     /**
      * Returns a list of proposals on the Plugin, filtered by the given criteria
      *
      * @param {IProposalQueryParams}
-     * @return {*}  {Promise<MultisigProposal[]>}
-     * @memberof ClientMultisig
+     * @return {*}  {Promise<AddressListProposalListItem[]>}
+     * @memberof ClientAddressList
      */
-    getProposals: (params?: IProposalQueryParams): Promise<MultisigProposal[]> =>
+    getProposals: (params?: IProposalQueryParams): Promise<AddressListProposalListItem[]> =>
       this._getProposals(params ?? {}),
   }
   encoding = {
@@ -109,7 +110,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
      *
      * @param {ProposalConfig} params
      * @return {*}  {DaoAction}
-     * @memberof ClientMultisig
+     * @memberof ClientAddressList
      */
     setPluginConfigAction: (params: ProposalConfig): DaoAction => this._buildActionSetPluginConfig(params)
   }
@@ -122,10 +123,10 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
      * @return {*}  {FactoryInitParams}
      * @memberof ClientErc20
      */
-    installEntry: (params: IMultisigPluginInstall): IPluginInstallEntry => {
+    installEntry: (params: IAddressListPluginInstall): IPluginInstallEntry => {
       return {
         id: PLUGIN_ID,
-        data: encodeMultisigActionInit(params)
+        data: encodeAddressListActionInit(params)
       }
     }
   }
@@ -136,7 +137,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
      *
      * @param {ICreateProposal} params
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientMultisig
+     * @memberof ClientAddressList
      */
     createProposal: (params: ICreateProposal): Promise<GasFeeEstimation> =>
       this._estimateCreateProposal(params),
@@ -145,19 +146,19 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
      * Estimates the gas fee of casting a vote on a proposal
      *
      * @param {string} proposalId
-     * @param {VoteOptions} vote
+     * @param {VoteValues} vote
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientMultisig
+     * @memberof ClientAddressList
      */
-    voteProposal: (proposalId: string, vote: VoteOptions): Promise<GasFeeEstimation> =>
+    voteProposal: (proposalId: string, vote: VoteValues): Promise<GasFeeEstimation> =>
       this._estimateVoteProposal(proposalId, vote),
 
     /**
-     * Estimates the gas fee of executing an Multisig proposal
+     * Estimates the gas fee of executing an AddressList proposal
      *
      * @param {string} proposalId
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientMultisig
+     * @memberof ClientAddressList
      */
     executeProposal: (proposalId: string): Promise<GasFeeEstimation> =>
       this._estimateExecuteProposal(proposalId),
@@ -185,7 +186,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     }
   }
 
-  private async *_voteProposal(_proposalId: string, _vote: VoteOptions): AsyncGenerator<VoteProposalStepValue> {
+  private async *_voteProposal(_proposalId: string, _vote: VoteValues): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -259,32 +260,18 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     );
   }
 
-  private _getProposal(proposalId: string): Promise<MultisigProposal> {
+  private _getProposal(proposalId: string): Promise<AddressListProposal> {
     if (!proposalId) {
       throw new Error("Invalid proposalId");
     }
 
     // TODO: Implement
 
-    const proposal = getMultisigProposalsWithStatus([getDummyMultisigProposal(proposalId)])[0]
+    const proposal = getDummyAddressListProposal(proposalId)
+    proposal.status = getProposalStatus(proposal.startDate, proposal.endDate, true, BigInt(proposal.result.yes), BigInt(proposal.result.no))
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposal))
   }
 
-  /**
-   * Returns a list of proposals filtered by the input params
-   *
-   * @private
-   * @param {IProposalQueryParams} {
-   *     limit = 0,
-   *     // TODO
-   *     // uncomment this
-   *     // skip = 0,
-   *     // direction = SortDireccion.ASC,
-   *     // sortBy = MultisigProposalSortBy.CREATED_AT
-   *   }
-   * @return {*}  {Promise<MultisigProposal[]>}
-   * @memberof ClientMultisig
-   */
   private _getProposals({
     // TODO 
     // uncomment when querying to subgraph
@@ -292,16 +279,18 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     limit = 0,
     // skip = 0,
     // direction = SortDireccion.ASC,
-    // sortBy = MultisigProposalSortBy.CREATED_AT
-  }: IProposalQueryParams): Promise<MultisigProposal[]> {
-    let proposals: MultisigProposal[] = []
+    // sortBy = AddressListProposalSortBy.CREATED_AT
+  }: IProposalQueryParams): Promise<AddressListProposalListItem[]> {
+    let proposals: AddressListProposalListItem[] = []
 
     // TODO: Implement
 
     for (let index = 0; index < limit; index++) {
-      proposals.push(getDummyMultisigProposal())
+      proposals.push(getDummyAddressListProposalListItem())
     }
-    proposals = getMultisigProposalsWithStatus(proposals)
+    proposals.map((proposal) => {
+      proposal.status = getProposalStatus(proposal.startDate, proposal.endDate, true, BigInt(proposal.result.yes), BigInt(proposal.result.no))
+    })
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 
@@ -327,7 +316,7 @@ export class ClientMultisig extends ClientCore implements IClientMultisig {
     return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
-  private _estimateVoteProposal(_proposalId: string, _vote: VoteOptions): Promise<GasFeeEstimation> {
+  private _estimateVoteProposal(_proposalId: string, _vote: VoteValues): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");

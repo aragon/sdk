@@ -5,16 +5,17 @@ import {
   IClientErc20,
   ICreateProposal,
   IErc20PluginInstall,
-  IProposalMetadata,
   IProposalQueryParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   SetPluginConfigStep,
   SetPluginConfigStepValue,
-  VoteOptions,
   VoteProposalStep,
   VoteProposalStepValue,
   ProposalConfig,
+  VoteValues,
+  Erc20ProposalListItem,
+  ProposalMetadata,
 } from "./internal/interfaces/plugins";
 import { IDAO } from "@aragon/core-contracts-ethers";
 import { ClientCore } from "./internal/core";
@@ -24,10 +25,10 @@ import {
   DaoAction,
 } from "./internal/interfaces/common";
 import { ContextPlugin } from "./context-plugin";
-import { getErc20ProposalsWithStatus } from "./internal/utils/plugins";
+import { getProposalStatus } from "./internal/utils/plugins";
 import { encodeActionSetPluginConfig, encodeErc20ActionInit } from "./internal/encoding/plugins";
 import { Random } from "@aragon/sdk-common";
-import { getDummyErc20Proposal } from "./internal/temp-mock";
+import { getDummyErc20Proposal, getDummyErc20ProposalListItem } from "./internal/temp-mock";
 import { AddressZero } from "@ethersproject/constants";
 
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890"
@@ -64,11 +65,11 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
      *
      * @param {string} proposalId
-     * @param {VoteOptions} vote
+     * @param {VoteValues} vote
      * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
      * @memberof ClientErc20
      */
-    voteProposal: (proposalId: string, vote: VoteOptions): AsyncGenerator<VoteProposalStepValue> =>
+    voteProposal: (proposalId: string, vote: VoteValues): AsyncGenerator<VoteProposalStepValue> =>
       this._voteProposal(proposalId, vote),
     /**
      * Executes the given proposal, provided that it has already passed
@@ -109,10 +110,10 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * Returns a list of proposals on the Plugin, filtered by the given criteria
      *
      * @param {IProposalQueryParams} params
-     * @return {*}  {Promise<Erc20Proposal[]>}
+     * @return {*}  {Promise<Erc20ProposalListItem[]>}
      * @memberof ClientErc20
      */
-    getProposals: (params?: IProposalQueryParams): Promise<Erc20Proposal[]> =>
+    getProposals: (params?: IProposalQueryParams): Promise<Erc20ProposalListItem[]> =>
       this._getProposals(params ?? {}),
   };
 
@@ -125,7 +126,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       *
       * @param {ProposalConfig} params
       * @return {*}  {DaoAction}
-      * @memberof ClientMultisig
+      * @memberof ClientAddressList
      */
     setPluginConfigAction: (params: ProposalConfig): DaoAction => this._buildActionSetPluginConfig(params)
   }
@@ -167,7 +168,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @return {*}  {Promise<GasFeeEstimation>}
      * @memberof ClientErc20
      */
-    voteProposal: (proposalId: string, vote: VoteOptions): Promise<GasFeeEstimation> =>
+    voteProposal: (proposalId: string, vote: VoteValues): Promise<GasFeeEstimation> =>
       this._estimateVoteProposal(proposalId, vote),
     /**
      * Estimates the gas fee of executing an ERC20 proposal
@@ -232,7 +233,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     */
   }
 
-  private async *_voteProposal(_proposalId: string, _vote: VoteOptions): AsyncGenerator<VoteProposalStepValue> {
+  private async *_voteProposal(_proposalId: string, _vote: VoteValues): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -369,11 +370,12 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     );
   }
 
-  private _getProposal(proposalId: string) {
+  private _getProposal(proposalId: string): Promise<Erc20Proposal> {
     if (!proposalId) {
       throw new Error("Invalid proposalId");
     }
-    const proposal: Erc20Proposal = getErc20ProposalsWithStatus([getDummyErc20Proposal(proposalId)])[0]
+    const proposal = getDummyErc20Proposal(proposalId)
+    proposal.status = getProposalStatus(proposal.startDate, proposal.endDate, true, proposal.result.yes, proposal.result.no)
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposal))
   }
 
@@ -385,15 +387,17 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     // skip = 0,
     // direction = SortDireccion.ASC,
     // sortBy = Erc20ProposalSortBy.CREATED_AT
-  }: IProposalQueryParams): Promise<Erc20Proposal[]> {
-    let proposals: Erc20Proposal[] = []
+  }: IProposalQueryParams): Promise<Erc20ProposalListItem[]> {
+    let proposals: Erc20ProposalListItem[] = []
 
     // TODO: Implement
 
     for (let index = 0; index < limit; index++) {
-      proposals.push(getDummyErc20Proposal())
+      proposals.push(getDummyErc20ProposalListItem())
     }
-    proposals = getErc20ProposalsWithStatus(proposals)
+    proposals.map((proposal) => {
+      proposal.status = getProposalStatus(proposal.startDate, proposal.endDate, true, proposal.result.yes, proposal.result.no)
+    })
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 }
@@ -403,7 +407,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 // @ts-ignore TODO: Remove when contracts are available
 function unwrapProposalParams(
   params: ICreateProposal
-): [IProposalMetadata, IDAO.ActionStruct[], number, number, boolean, number] {
+): [ProposalMetadata, IDAO.ActionStruct[], number, number, boolean, number] {
   return [
     params.metadata,
     params.actions ?? [],
@@ -412,6 +416,6 @@ function unwrapProposalParams(
     // TODO: Verify => seconds?
     params.endDate ? Math.floor(params.endDate.getTime() / 1000) : 0,
     params.executeOnPass ?? false,
-    params.creatorVote ?? VoteOptions.ABSTAIN,
+    params.creatorVote ?? VoteValues.ABSTAIN,
   ];
 }

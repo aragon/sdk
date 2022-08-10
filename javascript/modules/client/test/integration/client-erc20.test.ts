@@ -16,7 +16,7 @@ import {
   IErc20PluginInstall,
   IProposalQueryParams,
   ProposalCreationSteps,
-  VoteOptions,
+  VoteValues,
   VoteProposalStep,
 } from "../../src/internal/interfaces/plugins";
 import { AddressZero } from "@ethersproject/constants";
@@ -62,7 +62,7 @@ const TEST_WALLET =
 const contextParams: ContextPluginParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  dao: "0x1234567890123456789012345678901234567890",
+  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   pluginAddress: "0x2345678901234567890123456789012345678901",
@@ -73,7 +73,7 @@ const contextParams: ContextPluginParams = {
 const contextParamsLocalChain: ContextPluginParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
-  dao: "0x1234567890123456789012345678901234567890",
+  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
   pluginAddress: "0x2345678901234567890123456789012345678901",
@@ -171,7 +171,7 @@ describe("Client", () => {
           }
         },
         actions: [],
-        creatorVote: VoteOptions.YES,
+        creatorVote: VoteValues.YES,
         startDate: new Date(),
         endDate: new Date(),
         executeOnPass: true
@@ -215,7 +215,7 @@ describe("Client", () => {
           }
         },
         actions: [action],
-        creatorVote: VoteOptions.YES,
+        creatorVote: VoteValues.YES,
         startDate: new Date(),
         endDate: new Date(),
         executeOnPass: true
@@ -247,7 +247,7 @@ describe("Client", () => {
 
       const estimation = await client.estimation.voteProposal(
         '0x1234567890123456789012345678901234567890',
-        VoteOptions.YES
+        VoteValues.YES
       )
 
       expect(typeof estimation).toEqual("object")
@@ -264,7 +264,7 @@ describe("Client", () => {
 
       const proposalId = '0x1234567890123456789012345678901234567890'
 
-      for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+      for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
         switch (step.key) {
           case VoteProposalStep.VOTING:
             expect(typeof step.txHash).toBe("string");

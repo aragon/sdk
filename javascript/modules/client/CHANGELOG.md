@@ -20,9 +20,9 @@ TEMPLATE:
 
 ### Added
 - Internal Graphql client
-- Multisig Client
-- JsDoc to Multisig Client and ERC20 Client
-- Mocks in Multisig Client
+- AddressList Client
+- JsDoc to AddressList Client and ERC20 Client
+- Mocks in AddressList Client
 - Other mocks in `Client` and `ERC20Client`
 
 ### Changed

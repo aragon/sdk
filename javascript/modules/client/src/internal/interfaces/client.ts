@@ -1,8 +1,7 @@
 // This file contains the definitions of the general purpose DAO client
 
 import { IClientCore } from "./core";
-import { DaoAction, DaoConfig, DaoRole, GasFeeEstimation, IPagination } from "./common";
-import { IWithdrawParams } from "./plugins";
+import { DaoAction, DaoRole, GasFeeEstimation, IPagination } from "./common";
 
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
@@ -28,9 +27,9 @@ export interface IClient extends IClientCore {
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getDao: (daoAddressOrEns: string) => Promise<DaoMetadata>;
+    getDao: (daoAddressOrEns: string) => Promise<Dao>;
     /** Retrieves metadata for many daos */
-    getDaos: (params: IDaoQueryParams) => Promise<DaoMetadata[]>;
+    getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
   };
   encoding: {
     /** Computes the withdraw action payload */
@@ -46,15 +45,27 @@ export interface IClient extends IClientCore {
 
 /** Holds the parameters that the DAO will be created with */
 export interface ICreateParams {
-  daoConfig: DaoConfig;
-  gsnForwarder?: string;
+  metadata: IDaoMetadata
+  ensSubdomain: string
+  plugins: IPluginInstallEntry[]
+}
 
-  // TODO: Support an array of package + parameters to install
-  plugins: IPluginFactoryParams[];
+export interface IDaoMetadata {
+  name: string,
+  description: string,
+  avatar: string,
+  links: { name: string, url: string }[]
+}
+
+export interface IWithdrawParams {
+  recipientAddress: string;
+  amount: bigint;
+  tokenAddress?: string;
+  reference?: string;
 }
 
 /** Holds the parameters passed to a Plugin factory when creating a DAO or installing a plugin */
-export interface IPluginFactoryParams {
+export interface IPluginInstallEntry {
   id: string;
   data: string;
 }
@@ -150,16 +161,30 @@ export interface IAssetTransfers {
 
 // DAO details
 
-export type DaoResourceLink = { description: string; url: string };
+export type DaoResourceLink = { name: string; url: string };
+export type PluginListItem = { id: string; instanceAddress: string };
 
-export type DaoMetadata = {
+export type Dao = {
   address: string;
-  avatar?: string;
-  creatonDate: Date;
-  description: string;
-  links?: DaoResourceLink[];
-  name: string;
-  plugins: string[];
+  ensDomain: string;
+  metadata: {
+    name: string,
+    description: string,
+    avatar?: string,
+    links: DaoResourceLink[],
+  }
+  creationDate: Date
+  plugins: PluginListItem[]
+};
+
+export type DaoListItem = {
+  address: string;
+  ensDomain: string;
+  metadata: {
+    name: string;
+    avatar?: string;
+  }
+  plugins: PluginListItem[]
 };
 
 export interface IDaoQueryParams extends IPagination {

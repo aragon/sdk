@@ -3,7 +3,7 @@ declare const describe, it, beforeAll, afterAll, expect, test;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientMultisig, ContextPlugin, ContextPluginParams, Client } from "../../src";
+import { ClientAddressList, ContextPlugin, ContextPluginParams, Client } from "../../src";
 // import { ICreateProposal, VoteOption } from "../../src/internal/interfaces/dao";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
@@ -13,10 +13,10 @@ import { GraphQLClient } from "graphql-request";
 import {
   ExecuteProposalStep,
   ICreateProposal,
-  IMultisigPluginInstall,
+  IAddressListPluginInstall,
   IProposalQueryParams,
   ProposalCreationSteps,
-  VoteOptions,
+  VoteValues,
   VoteProposalStep,
   ProposalConfig,
 } from "../../src/internal/interfaces/plugins";
@@ -62,7 +62,7 @@ const TEST_WALLET =
 const contextParams: ContextPluginParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  dao: "0x1234567890123456789012345678901234567890",
+  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   pluginAddress: "0x2345678901234567890123456789012345678901",
@@ -73,7 +73,7 @@ const contextParams: ContextPluginParams = {
 const contextParamsLocalChain: ContextPluginParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
-  dao: "0x1234567890123456789012345678901234567890",
+  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
   pluginAddress: "0x2345678901234567890123456789012345678901",
@@ -105,9 +105,9 @@ describe("Client", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new ContextPlugin(contextParams);
-      const client = new ClientMultisig(ctx);
+      const client = new ClientAddressList(ctx);
 
-      expect(client).toBeInstanceOf(ClientMultisig);
+      expect(client).toBeInstanceOf(ClientAddressList);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
@@ -132,9 +132,9 @@ describe("Client", () => {
       contextParams.ipfsNodes = ipfsEndpoints.failing
       contextParams.graphqlURLs = grapqhlEndpoints.failing
       const ctx = new ContextPlugin(contextParams);
-      const client = new ClientMultisig(ctx);
+      const client = new ClientAddressList(ctx);
 
-      expect(client).toBeInstanceOf(ClientMultisig);
+      expect(client).toBeInstanceOf(ClientAddressList);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
@@ -154,7 +154,7 @@ describe("Client", () => {
   describe("Proposal Creation", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientMultisig(context)
+      const client = new ClientAddressList(context)
 
       const proposalParams: ICreateProposal = {
         metadata: {
@@ -171,7 +171,7 @@ describe("Client", () => {
           }
         },
         actions: [],
-        creatorVote: VoteOptions.YES,
+        creatorVote: VoteValues.YES,
         startDate: new Date(),
         endDate: new Date(),
         executeOnPass: true
@@ -188,7 +188,7 @@ describe("Client", () => {
     })
     it("Should create a new proposal locally", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const multisigClient = new ClientMultisig(context)
+      const addressListClient = new ClientAddressList(context)
       const client = new Client(context)
 
       // generate actions
@@ -215,13 +215,13 @@ describe("Client", () => {
           }
         },
         actions: [action],
-        creatorVote: VoteOptions.YES,
+        creatorVote: VoteValues.YES,
         startDate: new Date(),
         endDate: new Date(),
         executeOnPass: true
       }
 
-      for await (const step of multisigClient.methods.createProposal(proposalParams)) {
+      for await (const step of addressListClient.methods.createProposal(proposalParams)) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");
@@ -243,11 +243,11 @@ describe("Client", () => {
   describe("Vote on a proposal", () => {
     it("Should estimate the gas fees for casting a vote", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientMultisig(context)
+      const client = new ClientAddressList(context)
 
       const estimation = await client.estimation.voteProposal(
         '0x1234567890123456789012345678901234567890',
-        VoteOptions.YES
+        VoteValues.YES
       )
 
       expect(typeof estimation).toEqual("object")
@@ -260,11 +260,11 @@ describe("Client", () => {
 
     it("Should vote on a proposal locally", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientMultisig(context)
+      const client = new ClientAddressList(context)
 
       const proposalId = '0x1234567890123456789012345678901234567890'
 
-      for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+      for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
         switch (step.key) {
           case VoteProposalStep.VOTING:
             expect(typeof step.txHash).toBe("string");
@@ -287,7 +287,7 @@ describe("Client", () => {
   describe("Execute proposal", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientMultisig(context)
+      const client = new ClientAddressList(context)
 
       const estimation = await client.estimation.executeProposal(
         '0x1234567890123456789012345678901234567890'
@@ -303,7 +303,7 @@ describe("Client", () => {
 
     it("Should execute a local proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientMultisig(context)
+      const client = new ClientAddressList(context)
 
       const proposalId = '0x1234567890123456789012345678901234567890'
 
@@ -327,9 +327,7 @@ describe("Client", () => {
 
   describe('Action generators', () => {
     it("Should create a Mulisig client and generate a init action", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-
-      const withdrawParams: IMultisigPluginInstall = {
+      const withdrawParams: IAddressListPluginInstall = {
         proposals: {
           minDuration: 7200, // seconds
           minTurnout: 0.5,
@@ -343,7 +341,7 @@ describe("Client", () => {
         ]
       };
 
-      const initAction = ClientMultisig.encoding.installEntry(withdrawParams);
+      const initAction = ClientAddressList.encoding.installEntry(withdrawParams);
 
       expect(typeof initAction).toBe("object");
       // what does this should be
@@ -352,7 +350,7 @@ describe("Client", () => {
 
     it("Should create a Mulisig client and generate a plugin config action action", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientMultisig(context);
+      const client = new ClientAddressList(context);
 
       const pluginConfigParams: ProposalConfig = {
         minDuration: 100000,
@@ -371,7 +369,7 @@ describe("Client", () => {
   describe('Data retrieval', () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientMultisig(context);
+      const client = new ClientAddressList(context);
 
       const wallets = await client.methods.getMembers()
 
@@ -382,7 +380,7 @@ describe("Client", () => {
     })
     it("Should fetch the given proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientMultisig(context);
+      const client = new ClientAddressList(context);
 
       const proposalId = "0x1234567890123456789012345678901234567890_0x55"
       const proposal = await client.methods.getProposal(proposalId)
@@ -393,7 +391,7 @@ describe("Client", () => {
     })
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientMultisig(context);
+      const client = new ClientAddressList(context);
       const limit = 2
       const params: IProposalQueryParams = {
         limit

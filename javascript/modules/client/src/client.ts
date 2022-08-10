@@ -6,12 +6,13 @@ import {
   DaoCreationStepValue,
   DaoDepositSteps,
   DaoDepositStepValue,
-  DaoMetadata,
+  Dao,
   IAssetTransfers,
   IClient,
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
+  IWithdrawParams,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -32,7 +33,6 @@ import { pack } from "@ethersproject/solidity";
 import { Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
-import { IWithdrawParams } from "./internal/interfaces/plugins";
 import { encodeWithdrawActionData } from "./internal/encoding/client";
 import { getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
@@ -98,10 +98,10 @@ export class Client extends ClientCore implements IClient {
     getInstalledPlugins: (daoAddressOrEns: string): Promise<string[]> =>
       this._getInstalledPlugins(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getDao: (daoAddressOrEns: string) =>
+    getDao: (daoAddressOrEns: string): Promise<Dao> =>
       this._getMetadata(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getDaos: (params?: IDaoQueryParams): Promise<DaoMetadata[]> =>
+    getDaos: (params?: IDaoQueryParams): Promise<Dao[]> =>
       this._getMetadataMany(params ?? {}),
 
     /** Checks whether a role is granted by the current DAO's ACL settings */
@@ -362,7 +362,7 @@ export class Client extends ClientCore implements IClient {
 
   //// PRIVATE METHODS METADATA
 
-  private _getMetadata(daoAddressOrEns: string): Promise<DaoMetadata> {
+  private _getMetadata(daoAddressOrEns: string): Promise<Dao> {
     // TODO: Implement actual fetch logic using subgraph.
 
     if (!daoAddressOrEns) {
@@ -378,8 +378,8 @@ export class Client extends ClientCore implements IClient {
     // skip = 0,
     // direction = SortDireccion.ASC,
     // sortBy = DaoSortBy.CREATED_AT
-  }: IDaoQueryParams): Promise<DaoMetadata[]> {
-    const metadataMany: DaoMetadata[] = []
+  }: IDaoQueryParams): Promise<Dao[]> {
+    const metadataMany: Dao[] = []
     for (let index = 0; index < limit; index++) {
       metadataMany.push(getDummyDao())
     }
@@ -520,7 +520,10 @@ function unwrapCreateDaoParams(
       .join("");
 
   return [
-    params.daoConfig,
+    {
+      name: params.ensSubdomain,
+      metadata: JSON.stringify(params.metadata)
+    },
     {
       // TODO: Adapt the DAO creation parameters
       participationRequiredPct: BigInt(10), // BigInt(params.votingConfig.minParticipation),
@@ -537,7 +540,7 @@ function unwrapCreateDaoParams(
     //   amounts: params.mintConfig.map((receiver) => receiver.balance),
     // },
     pluginDataBytes,
-    params.gsnForwarder ?? "",
+    AddressZero,
   ];
 }
 

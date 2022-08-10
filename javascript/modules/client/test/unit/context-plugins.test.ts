@@ -23,7 +23,7 @@ describe("ContextPlugin instances", () => {
     contextParams = {
       network: "mainnet",
       signer: new Wallet(TEST_WALLET),
-      dao: "Dao",
+      daoAddress: "Dao",
       daoFactoryAddress: "0x1234",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
