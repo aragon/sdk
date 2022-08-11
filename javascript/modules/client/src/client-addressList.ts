@@ -14,8 +14,6 @@ import {
   AddressListProposal,
   ProposalCreationSteps,
   ProposalCreationStepValue,
-  SetPluginConfigStep,
-  SetPluginConfigStepValue,
   VoteValues,
   VoteProposalStep,
   VoteProposalStepValue,
@@ -69,22 +67,13 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     executeProposal: (proposalId: string): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(proposalId),
     /**
-     * Sets the voting configuration in a AddressList proposal given a proposalId and a configuration
-     *
-     * @param {ProposalConfig} config
-     * @return {*}  {AsyncGenerator<SetPluginConfigStepValue>}
-     * @memberof ClientAddressList
-     */
-    setPluginConfig: (config: ProposalConfig): AsyncGenerator<SetPluginConfigStepValue> =>
-      this._setPluginConfig(config),
-    /**
      * Returns the list of wallet addresses with signing capabilities on the plugin
      *
      * @return {*}  {Promise<string[]>}
      * @memberof ClientAddressList
      */
-    getMembers: (): Promise<string[]> =>
-      this._getMemebers(),
+    getMembers: (addressOrEns: string): Promise<string[]> =>
+      this._getMemebers(addressOrEns),
     /**
      * Returns the details of the given proposal
      *
@@ -126,7 +115,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     installEntry: (params: IAddressListPluginInstall): IPluginInstallEntry => {
       return {
         id: PLUGIN_ID,
-        data: encodeAddressListActionInit(params)
+        data: encodeAddressListActionInit(params),
       }
     }
   }
@@ -225,26 +214,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     }
   }
 
-  private async *_setPluginConfig(_config: ProposalConfig): AsyncGenerator<SetPluginConfigStepValue> {
-    const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
-    }
-
-    // TODO: Implement
-
-    yield {
-      key: SetPluginConfigStep.CREATING_PROPOSAL,
-      txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
-    }
-    yield {
-      key: SetPluginConfigStep.DONE
-    }
-  }
-
-  private _getMemebers(): Promise<string[]> {
+  private _getMemebers(_addressOrEns: string): Promise<string[]> {
     const mockAddresses: string[] = [
       "0x0123456789012345678901234567890123456789",
       "0x1234567890123456789012345678901234567890",
@@ -278,7 +248,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     // daoAddressOrEns,
     limit = 0,
     // skip = 0,
-    // direction = SortDireccion.ASC,
+    // direction = SortDirection.ASC,
     // sortBy = AddressListProposalSortBy.CREATED_AT
   }: IProposalQueryParams): Promise<AddressListProposalListItem[]> {
     let proposals: AddressListProposalListItem[] = []

@@ -23,7 +23,6 @@ describe("Context instances", () => {
     contextParams = {
       network: "mainnet",
       signer: new Wallet(TEST_WALLET),
-      daoAddress: "Dao",
       daoFactoryAddress: "0x1234",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
@@ -40,7 +39,8 @@ describe("Context instances", () => {
 
     expect(context).toBeInstanceOf(Context);
     expect(context.signer).toEqual(undefined);
-    expect(context.dao).toEqual("");
+    // TODO: Delete me
+    // expect(context.dao).toEqual("");
     expect(context.daoFactoryAddress).toEqual(undefined);
     expect(context.gasFeeEstimationFactor).toEqual(0.625);
   });
@@ -50,7 +50,8 @@ describe("Context instances", () => {
     expect(context).toBeInstanceOf(Context);
     expect(context.network).toEqual("mainnet");
     expect(context.signer).toBeInstanceOf(Wallet);
-    expect(context.dao).toEqual("Dao");
+    // TODO: Delete me
+    // expect(context.dao).toEqual("Dao");
     expect(context.daoFactoryAddress).toEqual("0x1234");
     context.web3Providers?.map((provider) =>
       expect(provider).toBeInstanceOf(JsonRpcProvider)

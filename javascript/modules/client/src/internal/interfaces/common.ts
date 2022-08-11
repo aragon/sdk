@@ -68,10 +68,10 @@ export type Proposal = {
 export interface IPagination {
   skip?: number
   limit?: number
-  direction?: SortDireccion
+  direction?: SortDirection
 }
 
-export enum SortDireccion {
+export enum SortDirection {
   ASC = "asc",
   DESC = "desc"
 }

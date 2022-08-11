@@ -89,10 +89,10 @@ export class Client extends ClientCore implements IClient {
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => this._deposit(params),
     /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet */
-    getBalances: (daoAddressOrEns: string, tokenAddresses: string[] = []) =>
+    getBalances: (daoAddressOrEns: string, tokenAddresses: string[] = []): Promise<AssetBalance[]> =>
       this._getBalances(daoAddressOrEns, tokenAddresses),
     /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
-    getTransfers: (daoAddressOrEns: string) =>
+    getTransfers: (daoAddressOrEns: string): Promise<IAssetTransfers> =>
       this._getTransfers(daoAddressOrEns),
     /** Retrieves the list of plugin installed in the DAO*/
     getInstalledPlugins: (daoAddressOrEns: string): Promise<string[]> =>
@@ -194,7 +194,6 @@ export class Client extends ClientCore implements IClient {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
       params,
     );
@@ -376,7 +375,7 @@ export class Client extends ClientCore implements IClient {
     // TODO
     // uncomment this
     // skip = 0,
-    // direction = SortDireccion.ASC,
+    // direction = SortDirection.ASC,
     // sortBy = DaoSortBy.CREATED_AT
   }: IDaoQueryParams): Promise<Dao[]> {
     const metadataMany: Dao[] = []

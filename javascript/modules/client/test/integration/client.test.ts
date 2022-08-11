@@ -18,7 +18,7 @@ import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
 import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-ethers";
 import { DaoSortBy, IDaoQueryParams } from "../../src/internal/interfaces/client";
-import { SortDireccion } from "../../src/internal/interfaces/common";
+import { SortDirection } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/client";
 import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
@@ -43,7 +43,6 @@ const TEST_WALLET =
 const contextParams: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   ipfsNodes: [
@@ -60,7 +59,6 @@ const contextParams: ContextParams = {
 const contextParamsLocalChain: ContextParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
-  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
   ipfsNodes: [
@@ -77,14 +75,15 @@ const contextParamsLocalChain: ContextParams = {
   graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
+let daoAddress = "0x123456789012345678901234567890123456789012345678"
+
 describe("Client", () => {
   beforeAll(async () => {
     const server = await ganacheSetup.start();
     const daoFactory = await deployContracts.deploy(server);
     contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
-    /* TODO: REMOVE ME */
-    const daoAddress = await createLegacyDao(contextParamsLocalChain)
-    contextParamsLocalChain.daoAddress = daoAddress;
+    const addr = await createLegacyDao(contextParamsLocalChain)
+    daoAddress = addr;
   });
 
   afterAll(async () => {
@@ -151,7 +150,7 @@ describe("Client", () => {
         },
         ensSubdomain: daoName,
         plugins: [
-          { id: "0x1234", data: "0x1234" },
+          { id: "0x1234", data: new Uint8Array([11, 11]) },
         ],
       };
 
@@ -181,7 +180,7 @@ describe("Client", () => {
         },
         ensSubdomain: daoName,
         plugins: [
-          { id: "0x1234", data: "0x1234" },
+          { id: "0x1234", data: new Uint8Array([11, 11]) },
         ],
       };
 
@@ -210,7 +209,7 @@ describe("Client", () => {
       const client = new Client(context);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.daoAddress,
+        daoAddress: daoAddress,
         amount: BigInt(1234),
       };
 
@@ -229,7 +228,7 @@ describe("Client", () => {
       const client = new Client(context);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.daoAddress,
+        daoAddress: daoAddress,
         amount: BigInt(1234),
       };
 
@@ -271,7 +270,7 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.daoAddress,
+        daoAddress: daoAddress,
         amount: BigInt(5),
         tokenAddress: tokenContract.address,
         reference: "My reference",
@@ -324,7 +323,7 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.daoAddress,
+        daoAddress: daoAddress,
         amount: BigInt(7),
         tokenAddress: tokenContract.address,
         reference: "My reference",
@@ -405,9 +404,10 @@ describe("Client", () => {
     it("Should get a DAO's metadata with a specific address", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx)
-      const dao = await client.methods.getDao(contextParams.daoAddress)
+      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+      const dao = await client.methods.getDao(daoAddress)
       expect(typeof dao).toBe('object');
-      expect(dao.address).toBe(contextParams.daoAddress);
+      expect(dao.address).toBe(daoAddress);
       expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     })
 
@@ -417,7 +417,7 @@ describe("Client", () => {
       const params: IDaoQueryParams = {
         limit: 10,
         skip: 0,
-        direction: SortDireccion.ASC,
+        direction: SortDirection.ASC,
         sortBy: DaoSortBy.NAME
       }
       const daos = await client.methods.getDaos(params)
@@ -442,17 +442,6 @@ describe("Client", () => {
       const transfers = await client.methods.getTransfers(daoAddress)
       expect(Array.isArray(transfers.deposits)).toBe(true)
       expect(Array.isArray(transfers.withdrawals)).toBe(true)
-    })
-
-    it("Should get the list of a DAO's installed plugin's addresses", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const client = new Client(ctx)
-      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
-      const plugins = await client.methods.getInstalledPlugins(daoAddress)
-      expect(Array.isArray(plugins)).toBe(true)
-      if (plugins.length > 0) {
-        expect(typeof plugins[0]).toBe('string')
-      }
     })
 
     test.todo("Should return an empty array when getting the transfers of a DAO that does not exist")//, async () => {

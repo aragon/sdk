@@ -31,11 +31,11 @@ import { Context } from "@aragon/sdk-client";
 
 // Define
 const contextParams: ContextParams = {
-  network: 31337,
+  network: "mainnet",
   signer: new Wallet("privateKey"),
   // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
   daoFactoryAddress: "0x1234...",
-  web3Providers: ["http://localhost:8545"],
+  web3Providers: ["https://cloudflare-eth.com/"],
 };
 
 // Instantiate
@@ -62,40 +62,59 @@ const client = new Client(context);
 ### Creating a DAO
 
 ```ts
-import { DaoCreationSteps, ICreateParams } from "@aragon/sdk-client";
+import { Client, Context, ContextParams, DaoCreationSteps, ICreateParams, GasFeeEstimation } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const creationParams: ICreateParams = {
-  daoConfig: {
-    name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
-    metadata: "<ipfs-http-uri>",
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+const createParams: ICreateParams = {
+  metadata: {
+    name: "test-dao",
+    description: "this is a description",
+    avatar: "",
+    links: [{
+      name: "website",
+      url: "https://..."
+    }]
   },
-  : {
-    minSupport: Math.floor(Math.random() * 100) + 1,
-    minParticipation: Math.floor(Math.random() * 100) + 1,
-    minDuration: Math.floor(Math.random() * 9999) + 1,
-  },
-  gsnForwarder: Wallet.createRandom().address,
-};
+  ensSubdomain: "test-dao",
+  plugins: []
+}
 
-const estimatedGas = await client.estimation.create(creationParams);
-console.log(estimatedGas.average); // bigint
-console.log(estimatedGas.max); // bigint
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.create(createParams)
+console.log(estimatedGas.average)
+console.log(estimatedGas.max)
 
-// Steps
-for await (const step of client.methods.create(creationParams)) {
+const steps = client.methods.create(createParams)
+for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoCreationSteps.CREATING:
-        // Transaction waiting on the mempool
-        console.log(step.txHash);
-        break;
+        console.log(step.txHash)
+        break
       case DaoCreationSteps.DONE:
-        // DAO address
-        console.log(step.address);
-        break;
+        console.log(step.address)
+        break
     }
   } catch (err) {
-    // ...
+    console.error(err)
   }
 }
 ```
@@ -105,28 +124,51 @@ for await (const step of client.methods.create(creationParams)) {
 Handles the flow of depositing the native EVM token to an Aragon DAO.
 
 ```ts
-import { DaoDepositSteps, IDepositParams } from "@aragon/sdk-client";
+import { Client, Context, ContextParams, DaoDepositSteps, IDepositParams, GasFeeEstimation } from "@aragon/sdk-client"
+import { Wallet } from 'ethers'
 
-const client = new Client(context);
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
+}
+const context: Context = new Context(params)
+const client: Client = new Client(context)
 const depositParams: IDepositParams = {
-  daoAddress: "0x1234...",
-  amount: BigInt(1000), // Ether amount in wei
-  reference: "Your memo goes here", // Optional
-};
+  daoAddress: "0x1234567890123456789012345678901234567890",
+  amount: BigInt(10), // amount in gwei
+  reference: "test deposit" // optional
+}
 
-const estimatedGas = await client.estimation.deposit(depositParams);
-console.log(estimatedGas.average); // bigint
-console.log(estimatedGas.max); // bigint
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.deposit(depositParams)
+console.log(estimatedGas.average)
+console.log(estimatedGas.max)
 
-for await (const step of client.methods.deposit(depositParams)) {
-  switch (step.idx) {
-    case DaoDepositSteps.DEPOSITING:
-      console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-      break;
-    case DaoDepositSteps.DONE:
-      console.log(step.amount); // 1000n
-      break;
+const steps = client.methods.deposit(depositParams)
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case DaoDepositSteps.DEPOSITING:
+        console.log(step.txHash) // 0xb1c14a49...3e8620b0f5832d61c
+        break
+      case DaoDepositSteps.DONE:
+        console.log(step.amount) // 10n
+        break
+    }
+  } catch (err) {
+    console.error(err)
   }
 }
 ```
@@ -141,38 +183,62 @@ Handles the flow of depositing ERC20 tokens to a DAO.
 - More intermediate steps are yielded
 
 ```ts
-import { Client, DaoDepositSteps, IDepositParams } from "@aragon/sdk-client";
+import { Client, Context, DaoDepositSteps, ContextParams GasFeeEstimation, IDepositParams, } from "@aragon/sdk-client"
+import { Wallet } from 'ethers'
 
-const client = new Client(context);
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
+}
+
+const context = new Context(params)
+const client = new Client(context)
 const depositParams: IDepositParams = {
-  daoAddress: "0x1234...",
-  tokenAddress: "0x2345...", // Token contract address
-  amount: BigInt(1000), // Ether amount in wei
-  reference: "Your memo goes here", // Optional
-};
+  daoAddress: "0x1234567890123456789012345678901234567890",
+  amount: BigInt(10), // amount
+  tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
+  reference: "test deposit" // optional
+}
 
-const estimatedGas = await client.estimation.deposit(depositParams);
-console.log(estimatedGas.average); // bigint
-console.log(estimatedGas.max); // bigint
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.deposit(depositParams)
+console.log(estimatedGas.average)
+console.log(estimatedGas.max)
 
-for await (const step of client.methods.deposit(depositParams)) {
-  switch (step.idx) {
-    case DaoDepositSteps.CHECKED_ALLOWANCE:
-      console.log(step.allowance); // 0n
-      break;
-    case DaoDepositSteps.UPDATING_ALLOWANCE:
-      console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-      break;
-    case DaoDepositSteps.UPDATED_ALLOWANCE:
-      console.log(step.allowance); // 1000n
-      break;
-    case DaoDepositSteps.DEPOSITING:
-      console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-      break;
-    case DaoDepositSteps.DONE:
-      console.log(step.amount); // 1000n
-      break;
+const steps = client.methods.deposit(depositParams)
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case DaoDepositSteps.CHECKED_ALLOWANCE:
+        console.log(step.allowance); // 0n
+        break;
+      case DaoDepositSteps.UPDATING_ALLOWANCE:
+        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+        break;
+      case DaoDepositSteps.UPDATED_ALLOWANCE:
+        console.log(step.allowance); // 10n
+        break;
+      case DaoDepositSteps.DEPOSITING:
+        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+        break;
+      case DaoDepositSteps.DONE:
+        console.log(step.amount); // 10n
+        break;
+    }
+  } catch (err) {
+    console.error(err)
   }
 }
 ```
@@ -182,27 +248,80 @@ for await (const step of client.methods.deposit(depositParams)) {
 Handles retrieving list of DAO metadata.
 
 ```ts
-import { Client } from "@aragon/sdk-client";
+import { Client, Context, ContextParams, SortDirection, DaoListItem, DaoSortBy, IDaoQueryParams } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const client = new Client(context);
-const options = {
-  sortBy: DaosSortBy.POPULARITY,
-  limit: 10,
-};
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
-const result = await client.methods.getDaos(options);
-console.log(result);
-
+}
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+const queryParams: IDaoQueryParams = {
+  skip: 0, // optional
+  limit: 10, // optional,
+  direction: SortDirection.ASC, // optional
+  sortBy: DaoSortBy.POPULARITY //optional
+}
+const daos: DaoListItem[] = await client.methods.getDaos(queryParams)
+console.log(daos)
 /*
-[{
-   address: "0x1234...",
-   avatar: "http...",
-   creatonDate: <Date>,
-   description: "This dao...",
-   links: [{description: "Website", url: "http..."}],
-   name: "Abc Dao",
-   plugins: ["0x1245...", "0x3456..."],
-}, {...}]
+[
+  {
+    address: "0x12345...",
+    ensDomain: "test",
+    metadata: {
+        name: "test",
+        description: "this is a description"
+    };
+    plugins: [
+      {
+        id: erc20-voting.plugin.dao.eth,
+        instanceAddress: "0x12345..."
+      }
+    ]
+  },
+  {
+    address: "0x12345...",
+    ensDomain: "test-1",
+    metadata: {
+        name: "test 1",
+        description: "this is a description 1"
+    };
+    plugins: [
+      {
+        id: allowList-voting.plugin.dao.eth,
+        instanceAddress: "0x12345..."
+      }
+    ]
+  },
+  {
+    address: "0x12345...",
+    ensDomain: "test-2",
+    metadata: {
+        name: "test 2",
+        description: "this is a description 2"
+    };
+    plugins: [
+      {
+        id: erc20-voting.plugin.dao.eth,
+        instanceAddress: "0x12345..."
+      }
+    ]
+  }
+]
 */
 ```
 
@@ -211,24 +330,58 @@ console.log(result);
 Handles retrieving DAO metadata using its address or ENS domain.
 
 ```ts
-import { Client } from "@aragon/sdk-client";
+import { Client, Context, ContextParams, Dao } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const client = new Client(context);
-const doaAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
-const metadata = await client.methods.getDao(doaAddressOrEns);
-console.log(metadata);
-
+}
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+const dao: Dao = await client.methods.getDao("0x12345...")
+console.log(dao)
 /*
 {
-   address: "0x1234...",
-   avatar: "http...",
-   creatonDate: <Date>,
-   description: "This dao...",
-   links: [{description: "Website", url: "http..."}],
-   name: "Abc Dao",
-   plugins: ["0x1245...", "0x3456..."],
-} */
+  address: "0x12345...",
+  ensDomain: "test",
+  metadata: {
+      name: "test",
+      description: "this is a description",
+      // TODO: check what this field will be
+      avatar?: "",
+      links: [
+        {
+          name: "Website",
+          url: "https://website..."
+        },
+        {
+          name: "Discord",
+          url: "https://discord.com/..."
+        }
+      ];
+  };
+  creationDate: "1970-01-01T00:00:00.000Z";
+  plugins: [
+    {
+      id: erc20-voting.plugin.dao.eth,
+      instanceAddress: "0x12345..."
+    }
+  ]
+}
+*/
 ```
 
 ### Loading DAO activity
@@ -240,25 +393,54 @@ console.log(metadata);
 Handles retrieving DAO asset balances using the DAO address or its ENS domain.
 
 ```ts
-import { Client } from "@aragon/sdk-client";
-const client = new Client(context);
-const daoAddressOrEns = "0x1234..."; // unique identifier; dao ENS domain or address
-const balances = await client.methods.getBalances(daoAddressOrEns);
-console.log(balances);
+import { Client, Context, ContextParams, AssetBalance } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+const daoAddressOrEns = "0x12345..."
+const tokenAddresses = [ // optional param
+  "0x1234567890123456789012345678901234567890",
+  "0x2345678901234567890123456789012345678901",
+  "0x3456789012345678901234567890123456789012",
+  "0x4567890123456789012345678901234567890123"
+]
+const balances: AssetBalance[] = await client.methods.getBalances(daoAddressOrEns, tokenAddresses)
+console.log(balances)
 /*
-[{
-  type: "native"
-  "balance": 1000000000000000n,
-  "lastUpdate": <Date>
-},{
-  "type": "erc20"
-  "address": "0x123...",
-  "name": "TestToken",
-  "symbol": "TST",
-  "decimals": "18"
-  "balance": 1000000000000000n,
-  "lastUpdate": <Date>
-}, ...] */
+  [
+    {
+      type: "native",
+      balance: 100000n,
+      lastUpdate: "1970-01-01T00:00:00.000Z"
+    },
+    {
+      type: "erc20",
+      address: "0x1234567890123456789012345678901234567890"
+      name: "The Token",
+      symbol: "TOK",
+      decimals: 18,
+      balance: 200000n
+      lastUpdate: "1970-01-01T00:00:00.000Z"
+    }
+  ]
+*/
 ```
 
 Retrieves the list of transfers made from and to a certain DAO.
@@ -309,50 +491,30 @@ underlying network requests.
 ### Creating an ERC20 client
 
 ```ts
-import {
-  ClientErc20,
-  Client,
-  Context
-  ContextParams,
-  ContextPlugin
-} from "@aragon/sdk-client";
+import { Client, Context, ContextParams, DaoCreationSteps, ICreateParams, IErc20PluginInstall, GasFeeEstimation, ClientErc20 } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const contextParams: ContextParams = {
-  // network id or name
-  network: 31337,
-  signer: new Wallet("0x..."),
-  daoAddress: "0x1234567890123456789012345678901234567890",
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
-  web3Providers: ["http://localhost:8545"],
+  web3Providers: ["https://cloudflare-eth.com/"],
   ipfsNodes: [
     {
-      url: "http:localhost:5001",
-    },
-  ],
-  graphqlURLs: ["https://the-subgraph-url.io"]
-}
-// create a simple context
-const context: Context = new Context(contextParams)
-// create a plugin context from the simple context and the plugin address
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create the addressList client
-const client = new ClientErc20(context)
-```
-### Creating a DAO with an ERC20 plugin
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
-```ts
-import {
-  ContextPlugin,
-  Client,
-  Erc20Client,
-  IErc20PluginInstall,
-  ICreateParams
-} from "@aragon/sdk-client";
-// create context
-const context = new Context(params)
-// create clients
-const client = new Client(context) 
+}
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+
+// create plugin entries
+// already existing token
 const pluginInitParams1: IErc20PluginInstall = {
   proposals: {
     minDuration: 7200, // seconds
@@ -363,6 +525,7 @@ const pluginInitParams1: IErc20PluginInstall = {
     address: "0x..."
   }
 };
+// new token
 const pluginInitParams2: IErc20PluginInstall = {
   proposals: {
     minDuration: 60 * 60 * 24,  // seconds
@@ -392,34 +555,40 @@ const pluginInitParams2: IErc20PluginInstall = {
 }
 const erc20InstallEntry1 = ClientErc20.encoding.installEntry(pluginInitParams1)
 const erc20InstallEntry2 = ClientErc20.encoding.installEntry(pluginInitParams2)
-// create a DAO with the install entries within plugins[]
-const params: ICreateParams = {
+
+
+const createParams: ICreateParams = {
   metadata: {
-      name: "Cool DAO",
-      description: "This is a cool DAO",
-      avatar: "https://...",
-      links: [ { name: "Web site", url: "https://..." }, ]
+    name: "test-dao",
+    description: "this is a description",
+    avatar: "",
+    links: [{
+      name: "website",
+      url: "https://..."
+    }]
   },
-  ensSubdomain: "cool", // cool.dao.eth
+  ensSubdomain: "test-dao",
   plugins: [erc20InstallEntry1, erc20InstallEntry2]
 }
-console.log(estimatedGas.average); // bigint
-console.log(estimatedGas.max); // bigint
-// create DAO
-for await (const step of client.methods.create(creationParams)) {
+
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.create(createParams)
+console.log(estimatedGas.average)
+console.log(estimatedGas.max)
+
+const steps = client.methods.create(createParams)
+for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoCreationSteps.CREATING:
-        // Transaction waiting on the mempool
-        console.log(step.txHash);
-        break;
+        console.log(step.txHash)
+        break
       case DaoCreationSteps.DONE:
-        // DAO address
-        console.log(step.address);
-        break;
+        console.log(step.address)
+        break
     }
   } catch (err) {
-    // ...
+    console.error(err)
   }
 }
 ```
@@ -427,57 +596,155 @@ for await (const step of client.methods.create(creationParams)) {
 ### Creating an ERC20 proposal
 
 ```ts
-import {
-  ClientErc20,
-  DaoAction,
-  ICreateProposal,
-  VoteOption,
-  ContextPlugin,
-  ProposalCreationSteps
-} from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientErc20(contextPlugin);
+import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-// actions to execute if the proposal is apporved
-const actions: DaoAction[] = [
-  // See the "Action encoders" section below
-  { to: "0x1234...", value: BigInt(100), data: new Uint8Array([1, 2, 3, 4]) },
-];
-// proposal params
-const proposalCreationParams: ICreateProposal = {
-  metadataUri: "<uri>", // Following the EIP-4824
-  actions,
-  startDate: new Date(), // Date
-  endDate: new Date(),  // Date
-  executeOnPass: true,
-  creatorVote: VoteOption.YES,
-};
-
-const estimatedGas = await client.estimation.createProposal(
-  proposalCreationParams,
-);
-console.log(estimatedGas.average); // bigint
-console.log(estimatedGas.max); // bigint
-
-for await (
-  const step of client.methods.createProposal(
-    proposalCreationParams,
-  )
-) {
-  try {
-    switch (step.idx) {
-      case ProposalCreationSteps.CREATING:
-        console.log(step.txHash); // 0xb1c14a49...
-        break;
-      case ProposalCreationSteps.DONE:
-        console.log(step.proposalId); // 0x1234...
-        break;
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
     }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientErc20(contextPlugin)
+
+const proposalParams: ICreateProposal = {
+  metadata: {
+    title: "Test Proposal",
+    summary: "This is a short description",
+    description: "This is a long descrioption",
+    resources: [
+      {
+        name: "Discord",
+        url: "https://discord.com/..."
+      },
+      {
+        name: "Website",
+        url: "https://website..."
+      }
+    ],
+    media: {
+      logo: "https://...",
+      header: "https://..."
+    }
+  },
+  actions: [],
+  startDate: new Date(),
+  endDate: new Date(),
+  executeOnPass: false,
+  creatorVote: VoteValues.YES
+}
+
+const steps = client.methods.createProposal(proposalParams)
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case ProposalCreationSteps.CREATING:
+        console.log(step.txHash)
+        break
+      case ProposalCreationSteps.DONE:
+        console.log(step.proposalId)
+        break
+    }
+  } catch (err) {
+    console.error(err)
   }
-  catch (err){
-    // ...err
+}
+```
+### Creating an ERC20 proposal with an action
+
+```ts
+import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientErc20(contextPlugin)
+
+// create config action
+const configActionPrarms: ProposalConfig = {
+  minDuration: 3600,
+  minSupport: 0.3, // 30%
+  minTurnout: 0.5 // 50%
+}
+
+const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
+
+const proposalParams: ICreateProposal = {
+  metadata: {
+    title: "Test Proposal",
+    summary: "This is a short description",
+    description: "This is a long descrioption",
+    resources: [
+      {
+        name: "Discord",
+        url: "https://discord.com/..."
+      },
+      {
+        name: "Website",
+        url: "https://website..."
+      }
+    ],
+    media: {
+      logo: "https://...",
+      header: "https://..."
+    }
+  },
+  actions: [configAction],
+  startDate: new Date(),
+  endDate: new Date(),
+  executeOnPass: false,
+  creatorVote: VoteValues.YES
+}
+
+const steps = client.methods.createProposal(proposalParams)
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case ProposalCreationSteps.CREATING:
+        console.log(step.txHash)
+        break
+      case ProposalCreationSteps.DONE:
+        console.log(step.proposalId)
+        break
+    }
+  } catch (err) {
+    console.error(err)
   }
 }
 ```
@@ -485,38 +752,48 @@ for await (
 ### Voting on an ERC20 proposal
 
 ```ts
-import {
-  ClientErc20,
-  DaoAction,
-  ICreateProposal,
-  VoteOption,
-  ContextPlugin,
-  VoteProposalStep
-} from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientErc20(contextPlugin);
+import { ClientErc20, Context, ContextParams, ContextPlugin, VoteProposalStep, VoteValues } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-// gas estimation
-const estimatedGas = await client.estimation.voteProposal(
-  proposalId, VoteOptions.YES
-);
-console.log(estimatedGas.average); // bigint
-console.log(estimatedGas.max); // bigint
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
-for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientErc20(contextPlugin)
+
+const proposalId = "0x12345...0x1"
+
+const steps = client.methods.voteProposal(proposalId, VoteValues.YES)
+for await (const step of steps) {
   try {
     switch (step.key) {
-    case VoteProposalStep.VOTING:
-        console.log(step.txHash); // 0xb1c14a49...
-      break;
-    case VoteProposalStep.DONE:
-        console.log(step.voteId); // 0x12345...
-      break;
+      case VoteProposalStep.VOTING:
+        console.log(step.txHash)
+        break
+      case VoteProposalStep.DONE:
+        console.log(step.voteId)
+        break
     }
   } catch (err) {
-    // ...
+    console.error(err)
   }
 }
 ```
@@ -526,15 +803,46 @@ for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES
 Retrieving all the members of an ERC20 DAO.
 
 ```ts
-import { ClientErc20, ContextPlugin } from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientErc20(contextPlugin);
+import { ClientErc20, Context, ContextParams, ContextPlugin } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const members = await client.methods.getMembers();
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
-console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientErc20(contextPlugin)
+
+const daoAddressorEns = "0x12345..._0x0"
+
+const memebers: string[] = await client.methods.getMembers(daoAddressorEns)
+console.log(memebers)
+/*
+[
+  "0x1234567890123456789012345678901234567890",
+  "0x2345678901234567890123456789012345678901",
+  "0x3456789012345678901234567890123456789012",
+  "0x4567890123456789012345678901234567890123",
+  "0x5678901234567890123456789012345678901234",
+]
+*/
 ```
 
 ### Retrieve a proposal by proposalID (ERC20)
@@ -542,65 +850,105 @@ console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
 Retrieving the proposals of an ERC20 DAO.
 
 ```ts
-import { ClientErc20, ContextPlugin } from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientErc20(contextPlugin);
+import { ClientErc20, Context, ContextParams, ContextPlugin, Erc20Proposal } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const proposalId = "0x1234567..._0x0"
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
-const proposal = await client.methods.getProposal(proposalId);
-console.log(proposal);
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientErc20(contextPlugin)
 
+const proposalId = "0x12345..._0x0"
+
+const proposal: Erc20Proposal = await client.methods.getProposal(proposalId)
+console.log(proposal)
 /*
-  {
-    id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
-    daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
-    daoName: "DAO 1",
-    creatorAddress: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-
-    startDate: <Date>,
-    endDate: <Date>,
-    creatonDate: <Date>,
-
-    title: "New Founding for Lorex Lab SubDao",
-    summary: "As most community members know, Aragon has strived.",
-    proposal: "This is the super important proposal body",
-    resources: [{ url: "https://example.com", description: "Example" }],
-
-    token: {
-      address: "0x9df6870250396e10d187b188b8bd9179ba1a9c18",
-      name: "DAO Token",
-      symbol: "DAO",
-      decimals: 18,
-    },
-
-    result: {
-      yes: 3,
-      no: 1,
-      abstain: 2,
-    },
-
-    status: "Pending",
-
-    settings: {
-      minSupport: 0-3,
-      minTurnout: 0.5,
-      minDuration: 7200,
-    },
-
-    votingPower: 135,
-
-    voters: [
+{
+  id: "0x12345..._0x0",
+  dao: {
+    address: "0x1234567890123456789012345678901234567890",
+    name: "Cool Dao"
+  };
+  creatorAddress: "0x1234567890123456789012345678901234567890",
+  metadata: {
+    title: "Test Proposal",
+    summary: "test proposal sumary",
+    description: "this is a long description",
+    resources: [
       {
-        address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-        voteValue: VoteOptions.YES,
-        weight: 1,
+        url: "https://dicord.com/...",
+        name: Discord
       },
-      {...}
+      {
+        url: "https://docs.com/...",
+        name: Document
+      }
     ],
+    media: {
+      header: "https://.../image.jpeg",
+      logo: "https://.../image.jpeg"
+    }
+  };
+  startDate: "1970-01-01T00:00:00.000Z",
+  endDate: "1970-01-01T00:00:00.000Z",
+  creationDate: "1970-01-01T00:00:00.000Z",,
+  actions: [
+    {
+      to: "0x12345..."
+      value: 10n
+      data: [12,13,154...]
+    }
+  ],
+  result {
+    yes: 700000n,
+    no: 300000n,
+    abstain: 0n
   }
+  settings:{
+    minTurnout: 0.5,
+    minSupport: 0.25,
+    minDuration: 7200
+  },
+  token: {
+    address:_"0x1234567890123456789012345678901234567890,
+    name: "The Token",
+    symbol: "TOK",
+    decimals: 18
+  },
+  usedVotingWeight: 1000000n,
+  votes: [
+    {
+      address: "0x123456789123456789123456789123456789",
+      vote: 2, // equals to yes
+      voteWeight: 700000n,
+    },
+    {
+      address: "0x234567891234567891234567891234567890",
+      vote: 3, // equals to no
+      voteWeight: 300000n,
+    }
+  ]
+  status: "Executed",
+}
 */
 ```
 ### Loading the list of proposals (ERC20)
@@ -608,117 +956,158 @@ console.log(proposal);
 Retrieving the proposals of an ERC20 DAO.
 
 ```ts
-import { ClientErc20, ContextPlugin } from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientErc20(contextPlugin);
+import { ClientErc20, Context, ContextParams, ContextPlugin, SortDirection, IProposalQueryParams, ProposalSortBy, Erc20ProposalListItem } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientErc20(contextPlugin)
 
 const queryParams: IProposalQueryParams = {
-  skip: 0,
-  limit: 10,
-  direction: SortDirection.ASC,
-  sortBy: Proposal.sortBy.POPULARITY,
-  addresOrEns: "", // Filter by dao address or ens
+  skip: 0, // optional
+  limit: 10, // optional,
+  direction: SortDirection.ASC, // optional
+  sortBy: ProposalSortBy.POPULARITY //optional
 }
 
-const proposals = await client.methods.getProposals(queryParams);
-console.log(proposals);
-
+const proposals: Erc20ProposalListItem[] = await client.methods.getProposals(queryParams)
+console.log(proposals)
 /*
- [ {
-    id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
-    daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
-    daoName: "DAO 1",
-    creatorAddress: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-
-    startDate: <Date>,
-    endDate: <Date>,
-    creatonDate: <Date>,
-
-    title: "New Founding for Lorex Lab SubDao",
-    summary: "As most community members know, Aragon has strived.",
-    proposal: "This is the super important proposal body",
-    resources: [{ url: "https://example.com", description: "Example" }],
-
+[
+  {
+    id: "0x12345..._0x0",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool Dao"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal",
+      summary: "test proposal sumary"
+    };
+    startDate: "1970-01-01T00:00:00.000Z",
+    endDate: "1970-01-01T00:00:00.000Z",
+    status: "Executed",
     token: {
-      address: "0x9df6870250396e10d187b188b8bd9179ba1a9c18",
-      name: "DAO Token",
-      symbol: "DAO",
-      decimals: 18,
+      address:_"0x1234567890123456789012345678901234567890,
+      name: "The Token",
+      symbol: "TOK",
+      decimals: 18
     },
-
-    result: {
-      yes: 3,
-      no: 1,
-      abstain: 2,
-    },
-
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
+    }
+  },
+  {
+    id: "0x12345..._0x1",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool Dao"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal 2",
+      summary: "test proposal sumary 2"
+    };
+    startDate: "1970-01-01T00:00:00.000Z",
+    endDate: "1970-01-01T00:00:00.000Z",
     status: "Pending",
-
-    settings: {
-      minSupport: 0-3,
-      minTurnout: 0.5,
-      minDuration: 7200,
+    token: {
+      address:_"0x1234567890123456789012345678901234567890,
+      name: "The Token",
+      symbol: "TOK",
+      decimals: 18
     },
-
-    votingPower: 135,
-
-    voters: [
-      {
-        address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-        voteValue: VoteOptions.YES,
-        weight: 1,
-      },
-      {...}
-    ],
-  },] */
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
+    }
+  }
+]
+*/
 ```
 
 ## Address list governance plugin client
 
 ```ts
-import {
-  ClientAddressList,
-  Client,
-  Context
-  ContextParams,
-  ContextPlugin
-} from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextParams, ContextPlugin } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const contextParams: ContextParams = {
-  // network id or name
-  network: 31337,
-  signer: new Wallet("0x..."),
-  daoAddress: "0x1234567890123456789012345678901234567890",
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
-  web3Providers: ["http://localhost:8545"],
-  ipfsNodes: [{url: "http:localhost:5001"}],
-  graphqlURLs: ["https://the-subgraph-url.io"]
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
 }
 // create a simple context
-const context: Context = new Context(contextParams)
+const context: Context = new Context(params)
 // create a plugin context from the simple context and the plugin address
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create the addressList client
-const client = new ClientAddressList(context)
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create addressList client
+const client = new ClientAddressList(contextPlugin)
 ```
 
 ### Creating a DAO with a addressList plugin
 
 ```ts
-import {
-  ContextPlugin,
-  Client,
-  AddressListClient,
-  IAddressListFactoryParams,
-  ICreateParams
-} from "@aragon/sdk-client";
-// create clients
-const client = new Client(context) 
-// create init action for the erc20 plugin
+import { Client, Context, ContextParams, DaoCreationSteps, ICreateParams, GasFeeEstimation, ClientAddressList, IAddressListPluginInstall } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+
+// create plugin entries
+// already existing token
 const pluginInitParams: IAddressListPluginInstall = {
   proposals: {
     minDuration: 7200, // seconds
@@ -729,275 +1118,472 @@ const pluginInitParams: IAddressListPluginInstall = {
     "0x1234567890123456789012345678901234567890",
     "0x2345678901234567890123456789012345678901",
     "0x3456789012345678901234567890123456789012",
-    "0x4567890123456789012345678901234567890123",
+    "0x4567890123456789012345678901234567890123"
   ]
 };
-// create initialize action for the dao
-const addressListInitAction = ClientAddressList.encoding.installEntry(pluginInitParams)
-// create DAO params with the init action in the plugins field
-const params: ICreateParams = {
-  daoConfig: {
-    name: "The Dao",
-    metadata: {...daoMetadata}
+
+const addressListInstallEntry = ClientAddressList.encoding.installEntry(pluginInitParams)
+
+const createParams: ICreateParams = {
+  metadata: {
+    name: "test-dao",
+    description: "this is a description",
+    avatar: "",
+    links: [{
+      name: "website",
+      url: "https://..."
+    }]
   },
-  gsnForwarder: "",
-  plugins: [...otherPlugins, addressListInitAction]
+  ensSubdomain: "test-dao",
+  plugins: [addressListInstallEntry]
 }
-// estimate gas
-const estimatedGas = await client.estimation.create(
-  params,
-);
-console.log(estimatedGas.average); // bigint
-console.log(estimatedGas.max); // bigint
-// create DAO
-for await (const step of client.methods.create(creationParams)) {
+
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.create(createParams)
+console.log(estimatedGas.average)
+console.log(estimatedGas.max)
+
+const steps = client.methods.create(createParams)
+for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoCreationSteps.CREATING:
-        // Transaction waiting on the mempool
-        console.log(step.txHash);
-        break;
+        console.log(step.txHash)
+        break
       case DaoCreationSteps.DONE:
-        // DAO address
-        console.log(step.address);
-        break;
+        console.log(step.address)
+        break
     }
   } catch (err) {
-    // ...
+    console.error(err)
   }
 }
 ```
 
 ### Creating a address list proposal
 ```ts
-import {
-  ClientAddressList,
-  DaoAction,
-  ICreateProposal,
-  VoteOption,
-  ContextPlugin,
-  ProposalCreationSteps
-} from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientAddressList(contextPlugin);
+import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-// actions to execute if the proposal is apporved
-const actions: DaoAction[] = [
-  // See the "Action encoders" section below
-  { to: "0x1234...", value: BigInt(100), data: new Uint8Array([1, 2, 3, 4]) },
-];
-// proposal params
-const proposalCreationParams: ICreateProposal = {
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientAddressList(contextPlugin)
+
+const proposalParams: ICreateProposal = {
   metadata: {
-    title: "xxx",
-    summary: "xxx",
-    description: "xxx",
-    resources: [ { url: "https://...", name: "Document" } ],
+    title: "Test Proposal",
+    summary: "This is a short description",
+    description: "This is a long descrioption",
+    resources: [
+      {
+        name: "Discord",
+        url: "https://discord.com/..."
+      },
+      {
+        name: "Website",
+        url: "https://website..."
+      }
+    ],
     media: {
-      header: "https://...",
-      logo: "https://..."
+      logo: "https://...",
+      header: "https://..."
     }
   },
-  actions,
-  startDate: new Date(), // Date
-  endDate: new Date(),  // Date
-  executeOnPass: true,
-  creatorVote: VoteOption.YES,
-};
+  actions: [],
+  startDate: new Date(),
+  endDate: new Date(),
+  executeOnPass: false,
+  creatorVote: VoteValues.YES
+}
 
-const estimatedGas = await client.estimation.createProposal(
-  proposalCreationParams,
-);
-console.log(estimatedGas.average); // bigint
-console.log(estimatedGas.max); // bigint
-
-const steps = client.methods.createProposal(proposalCreationParams)
-
-for await ( const step of steps) {
+const steps = client.methods.createProposal(proposalParams)
+for await (const step of steps) {
   try {
-    switch (step.idx) {
+    switch (step.key) {
       case ProposalCreationSteps.CREATING:
-        console.log(step.txHash); // 0xb1c14a49...
-        break;
+        console.log(step.txHash)
+        break
       case ProposalCreationSteps.DONE:
-        console.log(step.proposalId); // 0x1234...
-        break;
+        console.log(step.proposalId)
+        break
     }
+  } catch (err) {
+    console.error(err)
   }
-  catch (err){
-    // ...err
+}
+```
+
+### Creating a address list proposal with an action
+
+```ts
+import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientAddressList(contextPlugin)
+
+// create config action
+const configActionPrarms: ProposalConfig = {
+  minDuration: 3600,
+  minSupport: 0.3, // 30%
+  minTurnout: 0.5 // 50%
+}
+
+const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
+
+const proposalParams: ICreateProposal = {
+  metadata: {
+    title: "Test Proposal",
+    summary: "This is a short description",
+    description: "This is a long descrioption",
+    resources: [
+      {
+        name: "Discord",
+        url: "https://discord.com/..."
+      },
+      {
+        name: "Website",
+        url: "https://website..."
+      }
+    ],
+    media: {
+      logo: "https://...",
+      header: "https://..."
+    }
+  },
+  actions: [configAction],
+  startDate: new Date(),
+  endDate: new Date(),
+  executeOnPass: false,
+  creatorVote: VoteValues.YES
+}
+
+const steps = client.methods.createProposal(proposalParams)
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case ProposalCreationSteps.CREATING:
+        console.log(step.txHash)
+        break
+      case ProposalCreationSteps.DONE:
+        console.log(step.proposalId)
+        break
+    }
+  } catch (err) {
+    console.error(err)
   }
 }
 ```
 
 ### Voting on a address list proposal
 ```ts
-import {
-  ClientAddressList,
-  DaoAction,
-  ICreateProposal,
-  VoteOption,
-  ContextPlugin,
-  VoteProposalStep
-} from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientAddressList(contextPlugin);
+import { ClientAddressList, Context, ContextParams, ContextPlugin, VoteProposalStep, VoteValues } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-// gas estimation
-const estimatedGas = await client.estimation.voteProposal(
-  proposalId, VoteOptions.YES
-);
-console.log(estimatedGas.average); // bigint
-console.log(estimatedGas.max); // bigint
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
-for await (const step of client.methods.voteProposal(proposalId, VoteOptions.YES)) {
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientAddressList(contextPlugin)
+
+const proposalId = "0x12345...0x1"
+
+const steps = client.methods.voteProposal(proposalId, VoteValues.YES)
+for await (const step of steps) {
   try {
     switch (step.key) {
-    case VoteProposalStep.VOTING:
-        console.log(step.txHash); // 0xb1c14a49...
-      break;
-    case VoteProposalStep.DONE:
-        console.log(step.voteId); // 0x12345...
-      break;
+      case VoteProposalStep.VOTING:
+        console.log(step.txHash)
+        break
+      case VoteProposalStep.DONE:
+        console.log(step.voteId)
+        break
     }
   } catch (err) {
-    // ...
+    console.error(err)
   }
 }
-```
+ ```
 
 ### Loading the list of members (address list plugin)
 ```ts
-import { ClientAddressList, ContextPlugin } from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientAddressList(contextPlugin);
+import { ClientAddressList, Context, ContextParams, ContextPlugin } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const members = await client.methods.getMembers();
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
-console.log(members); // ["0x3585...", "0x1235...", "0x6785...",]
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientAddressList(contextPlugin)
 
+const daoAddressorEns = "0x12345..._0x0"
+
+const memebers: string[] = await client.methods.getMembers(daoAddressorEns)
+console.log(memebers)
+/*
+[
+  "0x1234567890123456789012345678901234567890",
+  "0x2345678901234567890123456789012345678901",
+  "0x3456789012345678901234567890123456789012",
+  "0x4567890123456789012345678901234567890123",
+  "0x5678901234567890123456789012345678901234",
+]
+*/
 ```
 
 ### Loading the a proposal by proposalId (address list plugin)
 ```ts
-import { ClientAddressList, ContextPlugin } from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientAddressList(contextPlugin);
+import { ClientAddressList, Context, ContextParams, ContextPlugin, AddressListProposal } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const proposalId = "0x1234567..._0x0"
-
-const proposal = await client.methods.getProposal(proposalId);
-console.log(proposal);
-  /*
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
     {
-      id: "0x1234567890123456789012345678901234567890_0x0",
-      daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
-      daoName: "DAO 1",
-      creatorAddress: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 
-      startDate: <Date>,
-      endDate: <Date>,
-      creatonDate: <Date>,
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientAddressList(contextPlugin)
 
-      title: "New Founding for Lorex Lab SubDao",
-      summary: "As most community members know, Aragon has strived.",
-      proposal: "This is the super important proposal body",
-      resources: [{ url: "https://example.com", description: "Example" }],
+const proposalId = "0x12345..._0x0"
 
-
-      result: {
-        yes: 3,
-        no: 1,
-        abstain: 2,
+const proposal: AddressListProposal = await client.methods.getProposal(proposalId)
+console.log(proposal)
+/*
+{
+  id: "0x12345..._0x0",
+  dao: {
+    address: "0x1234567890123456789012345678901234567890",
+    name: "Cool Dao"
+  };
+  creatorAddress: "0x1234567890123456789012345678901234567890",
+  metadata: {
+    title: "Test Proposal",
+    summary: "test proposal sumary",
+    description: "this is a long description",
+    resources: [
+      {
+        url: "https://dicord.com/...",
+        name: Discord
       },
-
-      status: "Pending",
-
-      config: {
-        participationRequiredPct: 30,
-        supportRequiredPct: 52,
-      },
-
-      voters: [
-        {
-          address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-          voteValue: VoteOptions.YES,
-          weight: 1,
-        },
-        {...}
-      ],
+      {
+        url: "https://docs.com/...",
+        name: Document
+      }
+    ],
+    media: {
+      header: "https://.../image.jpeg",
+      logo: "https://.../image.jpeg"
+    }
+  };
+  startDate: "1970-01-01T00:00:00.000Z",
+  endDate: "1970-01-01T00:00:00.000Z",
+  creationDate: "1970-01-01T00:00:00.000Z",,
+  actions: [
+    {
+      to: "0x12345..."
+      value: 10n
+      data: [12,13,154...]
+    }
+  ],
+  status: "Executed",
+  result {
+    yes: 1,
+    no: 1,
+    abstain: 0
+  }
+  settings:{
+    minTurnout: 0.5,
+    minSupport: 0.25,
+    minDuration: 7200
+  },
+  votes: [
+    {
+      address: "0x123456789123456789123456789123456789",
+      vote: 2, // equals to yes
     },
-  */
-
+    {
+      address: "0x234567891234567891234567891234567890",
+      vote: 3, // equals to no
+    }
+  ]
+}
+*/
 ```
 ### Loading the list of proposals (address list plugin)
 ```ts
-import { ClientAddressList, ContextPlugin } from "@aragon/sdk-client";
-// Plugin client
-const pluginAddress = "0x12345..."
-const contextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-const client = new ClientAddressList(contextPlugin);
+import { ClientAddressList, Context, ContextParams, ContextPlugin, SortDirection, AddressListProposalListItem, ProposalSortBy, IProposalQueryParams } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientAddressList(contextPlugin)
 
 const queryParams: IProposalQueryParams = {
-  skip: 0,
-  limit: 10,
-  direction: SortDirection.ASC,
-  sortBy: ProposalSortBy.POPULARITY,
-  addresOrEns: "", // Filter by dao address or ens
+  skip: 0, // optional
+  limit: 10, // optional,
+  direction: SortDirection.ASC, // optional
+  sortBy: ProposalSortBy.POPULARITY //optional
 }
 
-const proposals = await client.methods.getProposals(queryParams);
-console.log(proposals);
-  /*
-    [ 
-      {
-        id: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0",
-        daoAddress: "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7",
-        daoName: "DAO 1",
-        creatorAddress: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-
-        startDate: <Date>,
-        endDate: <Date>,
-        creatonDate: <Date>,
-
-        title: "New Founding for Lorex Lab SubDao",
-        summary: "As most community members know, Aragon has strived.",
-        proposal: "This is the super important proposal body",
-        resources: [{ url: "https://example.com", description: "Example" }],
-
-        result: {
-          yes: 3,
-          no: 1,
-          abstain: 2,
-        },
-
-        status: "Pending",
-
-        config: {
-          participationRequiredPct: 30,
-          supportRequiredPct: 52,
-        },
-
-        voters: [
-          {
-            address: "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-            voteValue: VoteOptions.YES,
-            weight: 1,
-          },
-          {...}
-        ],
-      },
-    ]
-  */
-
+const proposals: AddressListProposalListItem[] = await client.methods.getProposals(queryParams)
+console.log(proposals)
+/*
+[
+  {
+    id: "0x12345..._0x0",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool Dao"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal",
+      summary: "test proposal sumary"
+    };
+    startDate: "1970-01-01T00:00:00.000Z",
+    endDate: "1970-01-01T00:00:00.000Z",
+    status: "Executed",
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
+    }
+  },
+  {
+    id: "0x12345..._0x1",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool Dao"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal 2",
+      summary: "test proposal sumary 2"
+    };
+    startDate: "1970-01-01T00:00:00.000Z",
+    endDate: "1970-01-01T00:00:00.000Z",
+    status: "Pending",
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
+    }
+  }
+]
+*/
 ```
 
 ## Action encoders
@@ -1010,22 +1596,115 @@ The helpers above help encoding the most typical DAO operations.
 ### Withdrawals
 
 ```ts
-import { Client } from "@aragon/sdk-client";
+import { Client, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig, IWithdrawParams } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
 
-const client = new Client(context);
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+
+}
+const context: Context = new Context(params)
+const client: Client = new Client(context)
 
 const withdrawParams: IWithdrawParams = {
-  recipientAddress: "0x1234...", // Recipient
+  recipientAddress: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10),
-  // tokenAddress: "0x2345...",  (required for sending ERC20 tokens)
-  reference: "Some withdrawal message",
-};
+  tokenAddress: "0x1234567890123456789012345678901234567890",
+  reference: "test",
+}
+const daoAddress = "0x1234567890123456789012345678901234567890"
 
-const withdrawAction = await client.encoding.withdrawAction(
-  "0x1234567890123456789012345678901234567890",  
-  withdrawParams
-);
-console.log(withdrawAction);
+const withdrawAction = await client.encoding.withdrawAction(daoAddress, withdrawParams)
+console.log(withdrawAction)
+```
+
+### Set Plugin Config (Address List)
+
+```ts
+import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientAddressList(contextPlugin)
+
+// create config action
+const configActionPrarms: ProposalConfig = {
+  minDuration: 3600,
+  minSupport: 0.3, // 30%
+  minTurnout: 0.5 // 50%
+}
+const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
+
+```
+### Set Plugin Config (ERC-20)
+
+```ts
+import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const params: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(""),
+  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [
+    {
+      uri: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || ""
+      }
+    }
+  ]
+  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+}
+// create a simple context
+const context: Context = new Context(params)
+// create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// create erc20 client
+const client = new ClientErc20(contextPlugin)
+
+// create config action
+const configActionPrarms: ProposalConfig = {
+  minDuration: 3600,
+  minSupport: 0.3, // 30%
+  minTurnout: 0.5 // 50%
+}
+const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
+
 ```
 
 # Development

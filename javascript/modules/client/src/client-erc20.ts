@@ -8,8 +8,6 @@ import {
   IProposalQueryParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
-  SetPluginConfigStep,
-  SetPluginConfigStepValue,
   VoteProposalStep,
   VoteProposalStepValue,
   ProposalConfig,
@@ -80,15 +78,6 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      */
     executeProposal: (proposalId: string): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(proposalId),
-    /**
-     * Sets the voting configuration in a erc20 proposal given a proposalId and a configuration
-     *
-     * @param {ProposalConfig} config
-     * @return {*}  {AsyncGenerator<SetPluginConfigStepValue>}
-     * @memberof ClientErc20
-     */
-    setPluginConfig: (config: ProposalConfig): AsyncGenerator<SetPluginConfigStepValue> =>
-      this._setPluginConfig(config),
 
     /**
      * Returns the list of wallet addresses holding tokens from the underlying ERC20 contract used by the plugin
@@ -96,7 +85,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @return {*}  {Promise<string[]>}
      * @memberof ClientErc20
      */
-    getMembers: (): Promise<string[]> => this._getMembers(),
+    getMembers: (addressOrEns: string): Promise<string[]> => this._getMembers(addressOrEns),
     /**
      * Returns the details of the given proposal
      * 
@@ -143,7 +132,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       return {
         // id: this._pluginAddress,
         id: PLUGIN_ID,
-        data: encodeErc20ActionInit(params)
+        data: encodeErc20ActionInit(params),
       }
     }
   }
@@ -272,26 +261,6 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
   }
 
-  private async *_setPluginConfig(_config: ProposalConfig): AsyncGenerator<SetPluginConfigStepValue> {
-    const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
-    }
-
-    // TODO: Implement
-
-    yield {
-      key: SetPluginConfigStep.CREATING_PROPOSAL,
-      txHash: '0x0123456789012345678901234567890123456789012345678901234567890123'
-    }
-    yield {
-      key: SetPluginConfigStep.DONE
-    }
-  }
-
-
   //// PRIVATE ACTION BUILDER HANDLERS
   private _buildActionSetPluginConfig(params: ProposalConfig): DaoAction {
     // TODO: check if to and value are correct
@@ -353,7 +322,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
-  private _getMembers(): Promise<string[]> {
+  private _getMembers(_addressOrEns: string): Promise<string[]> {
 
     // TODO: Implement
 
@@ -385,7 +354,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     // addressOrEns,
     limit = 0,
     // skip = 0,
-    // direction = SortDireccion.ASC,
+    // direction = SortDirection.ASC,
     // sortBy = Erc20ProposalSortBy.CREATED_AT
   }: IProposalQueryParams): Promise<Erc20ProposalListItem[]> {
     let proposals: Erc20ProposalListItem[] = []

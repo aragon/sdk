@@ -1,7 +1,7 @@
 // This file contains the definitions of the general purpose DAO client
 
 import { IClientCore } from "./core";
-import { DaoAction, DaoRole, GasFeeEstimation, IPagination } from "./common";
+import { DaoAction, DaoRole, GasFeeEstimation, IPagination, IPluginInstallEntry } from "./common";
 
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
@@ -62,12 +62,6 @@ export interface IWithdrawParams {
   amount: bigint;
   tokenAddress?: string;
   reference?: string;
-}
-
-/** Holds the parameters passed to a Plugin factory when creating a DAO or installing a plugin */
-export interface IPluginInstallEntry {
-  id: string;
-  data: string;
 }
 
 export enum DaoCreationSteps {
@@ -162,7 +156,7 @@ export interface IAssetTransfers {
 // DAO details
 
 export type DaoResourceLink = { name: string; url: string };
-export type PluginListItem = { id: string; instanceAddress: string };
+export type PluginListItem = { id: string; instanceAddress: string, version: string };
 
 export type Dao = {
   address: string;

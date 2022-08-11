@@ -61,7 +61,6 @@ const TEST_WALLET =
 const contextParams: ContextPluginParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   pluginAddress: "0x2345678901234567890123456789012345678901",
@@ -72,7 +71,6 @@ const contextParams: ContextPluginParams = {
 const contextParamsLocalChain: ContextPluginParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
-  daoAddress: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
   pluginAddress: "0x2345678901234567890123456789012345678901",
@@ -370,7 +368,7 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);
 
-      const wallets = await client.methods.getMembers()
+      const wallets = await client.methods.getMembers("0x1234567890123456789012345678901234567890")
 
       expect(Array.isArray(wallets)).toBe(true);
       expect(wallets.length).toBeGreaterThan(0);

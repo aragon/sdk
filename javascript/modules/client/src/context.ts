@@ -17,7 +17,7 @@ if (typeof process !== "undefined" && process.env?.TESTING) {
 // State
 const defaultState: ContextState = {
   network: "mainnet",
-  dao: "",
+  // dao: "",
   web3Providers: [],
   gasFeeEstimationFactor: DEFAULT_GAS_FEE_ESTIMATION_FACTOR,
 };
@@ -45,17 +45,15 @@ export class Context {
    * @private
    */
   setFull(contextParams: ContextParams): void {
-    // if (!contextParams.subgraphURL) {
-    //   throw new Error("Missing subgraph URL");
-    // }
     if (!contextParams.network) {
       throw new Error("Missing network");
     } else if (!contextParams.daoFactoryAddress) {
       throw new Error("Missing DAO factory address");
     } else if (!contextParams.signer) {
       throw new Error("Please pass the required signer");
-    } else if (!contextParams.daoAddress) {
-      throw new Error("No DAO address defined");
+    // TODO: Delete me
+    // } else if (!contextParams.daoAddress) {
+    //   throw new Error("No DAO address defined");
     } else if (!contextParams.web3Providers) {
       throw new Error("No web3 endpoints defined");
     } else if (!contextParams.gasFeeEstimationFactor) {
@@ -70,7 +68,7 @@ export class Context {
       network: contextParams.network,
       signer: contextParams.signer,
       daoFactoryAddress: contextParams.daoFactoryAddress,
-      dao: contextParams.daoAddress,
+      // dao: contextParams.daoAddress,
       web3Providers: this.useWeb3Providers(
         contextParams.web3Providers,
         contextParams.network,
@@ -91,9 +89,10 @@ export class Context {
     if (contextParams.network) {
       this.state.network = contextParams.network;
     }
-    if (contextParams.daoAddress) {
-      this.state.dao = contextParams.daoAddress;
-    }
+    // TODO: Delete me
+    // if (contextParams.daoAddress) {
+    //   this.state.dao = contextParams.daoAddress;
+    // }
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
     } else if (this.state.network.toString() in activeContractsList) {
@@ -208,18 +207,19 @@ export class Context {
     return this.state.daoFactoryAddress;
   }
 
-  /**
-   * Getter for the DAO address in the current global context
-   *
-   * @var dao
-   *
-   * @returns {string}
-   *
-   * @public
-   */
-  get dao(): string {
-    return this.state.dao || defaultState.dao;
-  }
+  // TODO: Delete me
+  // /**
+  //  * Getter for the DAO address in the current global context
+  //  *
+  //  * @var dao
+  //  *
+  //  * @returns {string}
+  //  *
+  //  * @public
+  //  */
+  // get dao(): string {
+  //   return this.state.dao || defaultState.dao;
+  // }
 
   /**
    * Getter for the gas fee reducer used in estimations
@@ -264,9 +264,10 @@ export class Context {
 
   // DEFAULT CONTEXT STATE
   static setDefault(params: Partial<ContextParams>) {
-    if (params.daoAddress) {
-      defaultState.dao = params.daoAddress;
-    }
+    // TODO: Delete me
+    // if (params.daoAddress) {
+    //   defaultState.dao = params.daoAddress;
+    // }
     if (params.daoFactoryAddress) {
       defaultState.daoFactoryAddress = params.daoFactoryAddress;
     }

@@ -340,11 +340,13 @@ export function getDummyDao(address?: string): Dao {
     plugins: [
       {
         id: 'addresslistvoting.dao.eth',
-        instanceAddress: "0x1234567890123456789012345678901234567890"
+        instanceAddress: "0x1234567890123456789012345678901234567890",
+        version: "1.0.0"
       },
       {
         id: 'erc20voting.dao.eth',
-        instanceAddress: "0x1234567890123456789012345678901234567890"
+        instanceAddress: "0x1234567890123456789012345678901234567890",
+        version: "1.0.0"
       }
     ]
   }
@@ -374,11 +376,13 @@ export function getDummyDaoListItem(address?: string): DaoListItem {
     plugins: [
       {
         id: 'addresslistvoting.dao.eth',
-        instanceAddress: "0x1234567890123456789012345678901234567890"
+        instanceAddress: "0x1234567890123456789012345678901234567890",
+        version: "1.0.0"
       },
       {
         id: 'erc20voting.dao.eth',
-        instanceAddress: "0x1234567890123456789012345678901234567890"
+        instanceAddress: "0x1234567890123456789012345678901234567890",
+        version: "1.0.0"
       }
     ]
   }

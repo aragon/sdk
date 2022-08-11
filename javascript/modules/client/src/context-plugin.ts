@@ -41,7 +41,7 @@ export class ContextPlugin extends Context {
    * @return {*}  {ContextPlugin}
    * @memberof ContextPlugin
    */
-  public fromContext(ctx: Context, pluginAddress: string): ContextPlugin {
+  static fromContext(ctx: Context, pluginAddress: string): ContextPlugin {
     return new ContextPlugin({ ...ctx, pluginAddress })
   }
 

@@ -19,8 +19,7 @@ export interface IClientErc20 extends IClientCore {
     ) => AsyncGenerator<ProposalCreationStepValue>;
     voteProposal: (proposalId: string, vote: VoteValues) => AsyncGenerator<VoteProposalStepValue>;
     executeProposal: (proposalId: string) => AsyncGenerator<ExecuteProposalStepValue>;
-    setPluginConfig: (config: ProposalConfig) => AsyncGenerator<SetPluginConfigStepValue>
-    getMembers: () => Promise<string[]>;
+    getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<Erc20Proposal>
     getProposals: (params?: IProposalQueryParams) => Promise<Erc20ProposalListItem[]>
   };
@@ -50,8 +49,7 @@ export interface IClientAddressList extends IClientCore {
     ) => AsyncGenerator<ProposalCreationStepValue>;
     voteProposal: (proposalId: string, vote: VoteValues) => AsyncGenerator<VoteProposalStepValue>;
     executeProposal: (proposalId: string) => AsyncGenerator<ExecuteProposalStepValue>;
-    setPluginConfig: (config: ProposalConfig) => AsyncGenerator<SetPluginConfigStepValue>
-    getMembers: () => Promise<string[]>;
+    getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<AddressListProposal>
     getProposals: (params?: IProposalQueryParams) => Promise<AddressListProposalListItem[]>
   };
@@ -142,17 +140,8 @@ export type ExecuteProposalStepValue =
   | { key: ExecuteProposalStep.EXECUTING; txHash: string }
   | { key: ExecuteProposalStep.DONE };
 
-// VOTING CONFIGURATION
-export enum SetPluginConfigStep {
-  CREATING_PROPOSAL = "creating_proposal",
-  DONE = "done",
-}
 
-export type SetPluginConfigStepValue =
-  | { key: SetPluginConfigStep.CREATING_PROPOSAL; txHash: string }
-  | { key: SetPluginConfigStep.DONE; };
-
-// PROPOSAL RETRIEVAL
+  // PROPOSAL RETRIEVAL
 
 // Long version
 export type ProposalBase = {
