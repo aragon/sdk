@@ -347,7 +347,8 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
 
-      const wallets = await client.methods.getMembers("0x1234567890123456789012345678901234567890")
+      const daoAddress = "0x1234567890123456789012345678901234567890"
+      const wallets = await client.methods.getMembers(daoAddress)
 
       expect(Array.isArray(wallets)).toBe(true);
       expect(wallets.length).toBeGreaterThan(0);

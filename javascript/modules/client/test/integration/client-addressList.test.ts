@@ -17,7 +17,7 @@ import {
   ProposalCreationSteps,
   VoteValues,
   VoteProposalStep,
-  IProposalConfig,
+  IProposalSettings,
 } from "../../src/internal/interfaces/plugins";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
@@ -349,7 +349,7 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);
 
-      const pluginConfigParams: IProposalConfig = {
+      const pluginConfigParams: IProposalSettings = {
         minDuration: 100000,
         minTurnout: 0.25,
         minSupport: 0.51

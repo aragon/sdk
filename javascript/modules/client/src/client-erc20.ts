@@ -10,7 +10,7 @@ import {
   ProposalCreationStepValue,
   VoteProposalStep,
   VoteProposalStepValue,
-  IProposalConfig,
+  IProposalSettings,
   VoteValues,
   Erc20ProposalListItem,
   ProposalMetadata,
@@ -114,11 +114,11 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /**
       * Computes the parameters to be given when creating a proposal that updates the governance configuration
       *
-      * @param {IProposalConfig} params
+      * @param {IProposalSettings} params
       * @return {*}  {DaoAction}
       * @memberof ClientAddressList
      */
-    setPluginConfigAction: (params: IProposalConfig): DaoAction => this._buildActionSetPluginConfig(params)
+    setPluginConfigAction: (params: IProposalSettings): DaoAction => this._buildActionSetPluginConfig(params)
   }
   static encoding = {
     /**
@@ -263,7 +263,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   }
 
   //// PRIVATE ACTION BUILDER HANDLERS
-  private _buildActionSetPluginConfig(params: IProposalConfig): DaoAction {
+  private _buildActionSetPluginConfig(params: IProposalSettings): DaoAction {
     // TODO: check if to and value are correct
     return {
       to: AddressZero,

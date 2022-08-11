@@ -40,8 +40,6 @@ describe("ContextPlugin instances", () => {
 
     expect(context).toBeInstanceOf(ContextPlugin);
     expect(context.signer).toEqual(undefined);
-    // TODO: Delete me
-    // expect(context.dao).toEqual("");
     expect(context.daoFactoryAddress).toEqual(undefined);
     expect(context.gasFeeEstimationFactor).toEqual(0.625);
     expect(context.pluginAddress).toEqual("");
@@ -52,8 +50,6 @@ describe("ContextPlugin instances", () => {
     expect(context).toBeInstanceOf(ContextPlugin);
     expect(context.network).toEqual("mainnet");
     expect(context.signer).toBeInstanceOf(Wallet);
-    // TODO: Delete me
-    // expect(context.dao).toEqual("Dao");
     expect(context.daoFactoryAddress).toEqual("0x1234");
     context.web3Providers?.map((provider) =>
       expect(provider).toBeInstanceOf(JsonRpcProvider)

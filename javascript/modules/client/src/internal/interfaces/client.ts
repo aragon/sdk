@@ -29,7 +29,7 @@ export interface IClient extends IClientCore {
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getDao: (daoAddressOrEns: string) => Promise<DaoDetails>;
     /** Retrieves metadata for many daos */
-    getDaos: (params: IDaoQueryParams) => Promise<DaoDetailsListItem[]>;
+    getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
   };
   encoding: {
     /** Computes the withdraw action payload */
@@ -38,6 +38,7 @@ export interface IClient extends IClientCore {
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
     deposit: (params: IDepositParams) => Promise<GasFeeEstimation>;
+    increaseAllowance: (params: IDepositParams) => Promise<GasFeeEstimation>;
   };
 }
 
@@ -171,7 +172,7 @@ export type DaoDetails = {
   plugins: InstalledPluginListItem[]
 };
 
-export type DaoDetailsListItem = {
+export type DaoListItem = {
   address: string;
   ensDomain: string;
   metadata: {

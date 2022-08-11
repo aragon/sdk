@@ -5,7 +5,7 @@ export * from "./context";
 export * from "./context-plugin";
 export {
   DaoDetails,
-  DaoDetailsListItem,
+  DaoListItem,
   DaoSortBy,
   IDaoQueryParams,
   AssetBalance,
@@ -31,7 +31,7 @@ export {
   AddressListProposalListItem,
   AddressListProposal,
   IAddressListPluginInstall,
-  IProposalConfig,
+  IProposalSettings,
   Erc20Proposal
 } from "./internal/interfaces/plugins";
 

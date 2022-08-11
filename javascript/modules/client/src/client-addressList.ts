@@ -17,7 +17,7 @@ import {
   VoteValues,
   VoteProposalStep,
   VoteProposalStepValue,
-  IProposalConfig,
+  IProposalSettings,
   AddressListProposalListItem
 } from "./internal/interfaces/plugins";
 import { getDummyAddressListProposal, getDummyAddressListProposalListItem } from "./internal/temp-mock";
@@ -99,11 +99,11 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     /**
      * Computes the parameters to be given when creating a proposal that updates the governance configuration
      *
-     * @param {IProposalConfig} params
+     * @param {IProposalSettings} params
      * @return {*}  {DaoAction}
      * @memberof ClientAddressList
      */
-    setPluginConfigAction: (params: IProposalConfig): DaoAction => this._buildActionSetPluginConfig(params)
+    setPluginConfigAction: (params: IProposalSettings): DaoAction => this._buildActionSetPluginConfig(params)
   }
   static encoding = {
     /**
@@ -265,7 +265,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 
-  private _buildActionSetPluginConfig(params: IProposalConfig): DaoAction {
+  private _buildActionSetPluginConfig(params: IProposalSettings): DaoAction {
     // TODO: check if to and value are correct
     return {
       to: AddressZero,

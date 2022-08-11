@@ -25,7 +25,7 @@ export interface IClientErc20 extends IClientCore {
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    setPluginConfigAction: (params: IProposalConfig) => DaoAction;
+    setPluginConfigAction: (params: IProposalSettings) => DaoAction;
   };
   estimation: {
     createProposal: (
@@ -55,7 +55,7 @@ export interface IClientAddressList extends IClientCore {
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    setPluginConfigAction: (params: IProposalConfig) => DaoAction;
+    setPluginConfigAction: (params: IProposalSettings) => DaoAction;
   };
   estimation: {
     createProposal: (params: ICreateProposal) => Promise<GasFeeEstimation>;
@@ -65,7 +65,7 @@ export interface IClientAddressList extends IClientCore {
 }
 
 // TYPES
-export interface IProposalConfig {
+export interface IProposalSettings {
   /** Float: 0 to 1 */
   minSupport: number;
   /** Float: 0 to 1 */
@@ -86,7 +86,7 @@ export interface ICreateProposal {
 // Factory init params
 
 export type IErc20PluginInstall = {
-  proposals: IProposalConfig;
+  proposals: IProposalSettings;
   newToken?: NewTokenParams;
   useToken?: ExistingTokenParams;
 };
@@ -105,7 +105,7 @@ type NewTokenParams = {
 
 export type IAddressListPluginInstall = {
   addresses: string[],
-  proposals: IProposalConfig
+  proposals: IProposalSettings
 }
 
 // STEPS
@@ -161,7 +161,7 @@ export type ProposalBase = {
 
 export type Erc20Proposal = ProposalBase & {
   result: Erc20ProposalResult;
-  settings: IProposalConfig;
+  settings: IProposalSettings;
   token: Erc20TokenDetails;
   usedVotingWeight: bigint;
   votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
@@ -169,7 +169,7 @@ export type Erc20Proposal = ProposalBase & {
 
 export type AddressListProposal = ProposalBase & {
   result: AddressListProposalResult;
-  settings: IProposalConfig;
+  settings: IProposalSettings;
   votes: Array<{ address: string; vote: VoteValues; }>;
 };
 

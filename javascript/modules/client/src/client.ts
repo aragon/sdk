@@ -124,6 +124,7 @@ export class Client extends ClientCore implements IClient {
   estimation = {
     create: (params: ICreateParams) => this._estimateCreation(params),
     deposit: (params: IDepositParams) => this._estimateDeposit(params),
+    increaseAllowance: (params: IDepositParams) => this._estimateIncreaseAllowance(params),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -316,8 +317,6 @@ export class Client extends ClientCore implements IClient {
       throw new Error("A signer is needed for estimating the gas cost");
     }
 
-    // TODO: ESTIMATE INCREASED ALLOWANCE AS WELL
-
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
       params,
     );
@@ -334,6 +333,17 @@ export class Client extends ClientCore implements IClient {
       .then((gasLimit) => {
         return this.web3.getApproximateGasFee(gasLimit.toBigInt());
       });
+  }
+
+  _estimateIncreaseAllowance(_params: IDepositParams) {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new Error("A signer is needed");
+    } else if (!signer.provider) {
+      throw new Error("A web3 provider is needed");
+    }
+    // TODO: remove this
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
   //// PRIVATE METHODS METADATA

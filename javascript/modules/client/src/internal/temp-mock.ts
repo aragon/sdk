@@ -1,5 +1,5 @@
 import { Random } from "@aragon/sdk-common";
-import { DaoDetails, DaoDetailsListItem } from "./interfaces/client";
+import { DaoDetails, DaoListItem } from "./interfaces/client";
 import { ProposalStatus } from "./interfaces/common";
 import { Erc20Proposal, AddressListProposal, VoteValues, AddressListProposalListItem, Erc20ProposalListItem } from "./interfaces/plugins";
 
@@ -351,7 +351,7 @@ export function getDummyDao(address?: string): DaoDetails {
     ]
   }
 }
-export function getDummyDaoDetailsListItem(address?: string): DaoDetailsListItem {
+export function getDummyDaoListItem(address?: string): DaoListItem {
   const dummyDaoNames = [
     "Patito Dao",
     "One World Dao",

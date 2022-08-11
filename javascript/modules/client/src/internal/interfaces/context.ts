@@ -10,8 +10,6 @@ import { GraphQLClient } from "graphql-request";
 type Web3ContextParams = {
   network: Networkish;
   signer: Signer;
-  // TODO: Delete me
-  // daoAddress: string;
   daoFactoryAddress?: string;
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   gasFeeEstimationFactor?: number;
@@ -33,7 +31,6 @@ export type ContextParams =
 type Web3ContextState = {
   network: Networkish;
   signer?: Signer;
-  // dao: string;
   daoFactoryAddress?: string;
   web3Providers: JsonRpcProvider[];
   gasFeeEstimationFactor: number;
