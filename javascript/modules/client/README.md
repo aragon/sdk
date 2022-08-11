@@ -1596,7 +1596,7 @@ The helpers above help encoding the most typical DAO operations.
 ### Withdrawals
 
 ```ts
-import { Client, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalConfig, IWithdrawParams } from "@aragon/sdk-client";
+import { Client, Context, ContextParams, IWithdrawParams } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const params: ContextParams = {
