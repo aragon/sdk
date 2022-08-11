@@ -6,7 +6,7 @@ import {
   DaoCreationStepValue,
   DaoDepositSteps,
   DaoDepositStepValue,
-  Dao,
+  DaoDetails,
   IAssetTransfers,
   IClient,
   ICreateParams,
@@ -98,11 +98,11 @@ export class Client extends ClientCore implements IClient {
     getInstalledPlugins: (daoAddressOrEns: string): Promise<string[]> =>
       this._getInstalledPlugins(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getDao: (daoAddressOrEns: string): Promise<Dao> =>
-      this._getMetadata(daoAddressOrEns),
+    getDao: (daoAddressOrEns: string): Promise<DaoDetails> =>
+      this._getDao(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getDaos: (params?: IDaoQueryParams): Promise<Dao[]> =>
-      this._getMetadataMany(params ?? {}),
+    getDaos: (params?: IDaoQueryParams): Promise<DaoDetails[]> =>
+      this._getDaos(params ?? {}),
 
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
@@ -361,7 +361,7 @@ export class Client extends ClientCore implements IClient {
 
   //// PRIVATE METHODS METADATA
 
-  private _getMetadata(daoAddressOrEns: string): Promise<Dao> {
+  private _getDao(daoAddressOrEns: string): Promise<DaoDetails> {
     // TODO: Implement actual fetch logic using subgraph.
 
     if (!daoAddressOrEns) {
@@ -370,15 +370,15 @@ export class Client extends ClientCore implements IClient {
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => getDummyDao(daoAddressOrEns));
   }
 
-  private _getMetadataMany({
+  private _getDaos({
     limit = 10,
     // TODO
     // uncomment this
     // skip = 0,
     // direction = SortDirection.ASC,
     // sortBy = DaoSortBy.CREATED_AT
-  }: IDaoQueryParams): Promise<Dao[]> {
-    const metadataMany: Dao[] = []
+  }: IDaoQueryParams): Promise<DaoDetails[]> {
+    const metadataMany: DaoDetails[] = []
     for (let index = 0; index < limit; index++) {
       metadataMany.push(getDummyDao())
     }
@@ -539,7 +539,7 @@ function unwrapCreateDaoParams(
     //   amounts: params.mintConfig.map((receiver) => receiver.balance),
     // },
     pluginDataBytes,
-    AddressZero,
+    AddressZero, // TODO: Remove when the new contract version is available
   ];
 }
 

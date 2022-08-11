@@ -282,7 +282,7 @@ describe("Value encoding", () => {
     ]
     for (let input of inputs) {
       const result = hexToBytes(input.in);
-      expect(result).toEqual(input.out);
+      expect(result.toString()).toEqual(input.out.toString());
     }
   });
 });

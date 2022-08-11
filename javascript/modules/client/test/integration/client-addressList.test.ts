@@ -17,7 +17,7 @@ import {
   ProposalCreationSteps,
   VoteValues,
   VoteProposalStep,
-  ProposalConfig,
+  IProposalConfig,
 } from "../../src/internal/interfaces/plugins";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
@@ -323,7 +323,7 @@ describe("Client", () => {
   })
 
   describe('Action generators', () => {
-    it("Should create a Mulisig client and generate a init action", async () => {
+    it("Should create an AddressList client and generate a install entry", async () => {
       const withdrawParams: IAddressListPluginInstall = {
         proposals: {
           minDuration: 7200, // seconds
@@ -338,28 +338,28 @@ describe("Client", () => {
         ]
       };
 
-      const initAction = ClientAddressList.encoding.installEntry(withdrawParams);
+      const installEntry = ClientAddressList.encoding.installEntry(withdrawParams);
 
-      expect(typeof initAction).toBe("object");
+      expect(typeof installEntry).toBe("object");
       // what does this should be
-      expect(initAction.data).toBeInstanceOf(Uint8Array);
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
     });
 
-    it("Should create a Mulisig client and generate a plugin config action action", async () => {
+    it("Should create an AddressList client and generate a plugin config action action", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);
 
-      const pluginConfigParams: ProposalConfig = {
+      const pluginConfigParams: IProposalConfig = {
         minDuration: 100000,
         minTurnout: 0.25,
         minSupport: 0.51
       };
 
-      const initAction = client.encoding.setPluginConfigAction(pluginConfigParams);
+      const installEntry = client.encoding.setPluginConfigAction(pluginConfigParams);
 
-      expect(typeof initAction).toBe("object");
+      expect(typeof installEntry).toBe("object");
       // what does this should be
-      expect(initAction.data).toBeInstanceOf(Uint8Array);
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
     });
   })
 
@@ -389,11 +389,23 @@ describe("Client", () => {
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);
-      const limit = 2
+      let proposals = await client.methods.getProposals()
+
+      expect(Array.isArray(proposals)).toBe(true)
+      expect(proposals.length <= 10).toBe(true)
+
+      let limit = 1
       const params: IProposalQueryParams = {
         limit
       }
-      const proposals = await client.methods.getProposals(params)
+      proposals = await client.methods.getProposals(params)
+
+      expect(Array.isArray(proposals)).toBe(true)
+      expect(proposals.length <= limit).toBe(true)
+
+      limit = 5
+      params.limit = limit
+      proposals = await client.methods.getProposals(params)
 
       expect(Array.isArray(proposals)).toBe(true)
       expect(proposals.length <= limit).toBe(true)

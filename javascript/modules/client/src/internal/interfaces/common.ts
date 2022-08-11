@@ -22,7 +22,7 @@ export type DaoAction = {
  * Contains the payload passed to the global DAO factory so that
  * plugins can be initialized
  */
-export interface IPluginInstallEntry {
+export interface IPluginListItem {
   id: string // ENS domain or address of the plugin's Repo
   data: Uint8Array
 }

@@ -148,7 +148,7 @@ describe("Client", () => {
           avatar: 'https://...',
           links: []
         },
-        ensSubdomain: daoName,
+        ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [
           { id: "0x1234", data: new Uint8Array([11, 11]) },
         ],
@@ -178,7 +178,7 @@ describe("Client", () => {
           avatar: 'https://...',
           links: []
         },
-        ensSubdomain: daoName,
+        ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [
           { id: "0x1234", data: new Uint8Array([11, 11]) },
         ],
@@ -381,7 +381,7 @@ describe("Client", () => {
     });
   });
   describe('Action generators', () => {
-    it("Should create a Erc20 client and generate a init action", async () => {
+    it("Should create a Erc20 client and generate a install entry", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -391,13 +391,13 @@ describe("Client", () => {
         reference: 'test'
       };
 
-      const initAction = await client.encoding.withdrawAction(
+      const installEntry = await client.encoding.withdrawAction(
         "0x1234567890123456789012345678901234567890",
         withdrawParams
       );
 
-      expect(typeof initAction).toBe("object");
-      expect(initAction.data).toBeInstanceOf(Uint8Array);
+      expect(typeof installEntry).toBe("object");
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
     });
   })
   describe("Data retrieval", () => {

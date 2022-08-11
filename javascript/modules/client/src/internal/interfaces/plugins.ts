@@ -25,7 +25,7 @@ export interface IClientErc20 extends IClientCore {
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    setPluginConfigAction: (params: ProposalConfig) => DaoAction;
+    setPluginConfigAction: (params: IProposalConfig) => DaoAction;
   };
   estimation: {
     createProposal: (
@@ -39,7 +39,7 @@ export interface IClientErc20 extends IClientCore {
   };
 }
 
-// MULTISIG
+// Address List
 
 /** Defines the shape of the AddressList client class */
 export interface IClientAddressList extends IClientCore {
@@ -55,7 +55,7 @@ export interface IClientAddressList extends IClientCore {
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    setPluginConfigAction: (params: ProposalConfig) => DaoAction;
+    setPluginConfigAction: (params: IProposalConfig) => DaoAction;
   };
   estimation: {
     createProposal: (params: ICreateProposal) => Promise<GasFeeEstimation>;
@@ -65,7 +65,7 @@ export interface IClientAddressList extends IClientCore {
 }
 
 // TYPES
-export interface ProposalConfig {
+export interface IProposalConfig {
   /** Float: 0 to 1 */
   minSupport: number;
   /** Float: 0 to 1 */
@@ -86,7 +86,7 @@ export interface ICreateProposal {
 // Factory init params
 
 export type IErc20PluginInstall = {
-  proposals: ProposalConfig;
+  proposals: IProposalConfig;
   newToken?: NewTokenParams;
   useToken?: ExistingTokenParams;
 };
@@ -105,7 +105,7 @@ type NewTokenParams = {
 
 export type IAddressListPluginInstall = {
   addresses: string[],
-  proposals: ProposalConfig
+  proposals: IProposalConfig
 }
 
 // STEPS
@@ -155,13 +155,13 @@ export type ProposalBase = {
   startDate: Date;
   endDate: Date;
   creationDate: Date;
-  actions: Array<ProposalAction>;
+  actions: Array<DaoAction>;
   status: ProposalStatus;
 }
 
 export type Erc20Proposal = ProposalBase & {
   result: Erc20ProposalResult;
-  settings: ProposalVotingSettings;
+  settings: IProposalConfig;
   token: Erc20TokenDetails;
   usedVotingWeight: bigint;
   votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
@@ -169,7 +169,7 @@ export type Erc20Proposal = ProposalBase & {
 
 export type AddressListProposal = ProposalBase & {
   result: AddressListProposalResult;
-  settings: ProposalVotingSettings;
+  settings: IProposalConfig;
   votes: Array<{ address: string; vote: VoteValues; }>;
 };
 
@@ -181,21 +181,11 @@ export type AddressListProposal = ProposalBase & {
   summary: string;
   description: string;
   resources: Array<{ url: string; name: string }>;
-  media: {
+  media?: {
     header?: string;
     logo?: string;
   };
 };
-
-/**
- * Contains the human-readable information about a proposal
- */
-export type ProposalAction = {
-  to: string;
-  value: bigint;
-  data: Uint8Array;
-};
-
 
 // Short version
 export type ProposalListItemBase = {
@@ -259,12 +249,6 @@ export type AddressListProposalResult = {
   abstain: number;
 };
 
-
-export type ProposalVotingSettings = {
-  minTurnout: number;  // float 0 to 1
-  minSupport: number;  // float 0 to 1
-  minDuration: number; // in seconds
-};
 
 type Erc20TokenDetails = { address: string, name: string; symbol: string; decimals: number; };
 

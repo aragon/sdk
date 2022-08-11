@@ -4,12 +4,12 @@ export * from "./client-addressList";
 export * from "./context";
 export * from "./context-plugin";
 export {
-  Dao,
-  DaoListItem,
+  DaoDetails,
+  DaoDetailsListItem,
   DaoSortBy,
   IDaoQueryParams,
   AssetBalance,
-  PluginListItem,
+  InstalledPluginListItem,
   IWithdrawParams
 } from "./internal/interfaces/client";
 
@@ -31,7 +31,7 @@ export {
   AddressListProposalListItem,
   AddressListProposal,
   IAddressListPluginInstall,
-  ProposalConfig,
+  IProposalConfig,
   Erc20Proposal
 } from "./internal/interfaces/plugins";
 

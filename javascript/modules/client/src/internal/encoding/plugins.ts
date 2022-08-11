@@ -2,7 +2,7 @@ import { ERC20Voting__factory, MajorityVoting__factory, WhitelistVoting__factory
 import { strip0x, hexToBytes } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { IErc20PluginInstall, IAddressListPluginInstall, ProposalConfig } from "../interfaces/plugins";
+import { IErc20PluginInstall, IAddressListPluginInstall, IProposalConfig } from "../interfaces/plugins";
 
 export function encodeAddressListActionInit(params: IAddressListPluginInstall): Uint8Array {
   const addressListVotingInterface = WhitelistVoting__factory.createInterface();
@@ -58,7 +58,7 @@ function unwrapErc20InitParams(params: IErc20PluginInstall): [string, string, Bi
   ]
 }
 
-export function encodeActionSetPluginConfig(params: ProposalConfig): Uint8Array {
+export function encodeActionSetPluginConfig(params: IProposalConfig): Uint8Array {
   const votingInterface = MajorityVoting__factory.createInterface();
   const args = unwrapSetPluginConfig(params);
   // get hex bytes
@@ -67,7 +67,7 @@ export function encodeActionSetPluginConfig(params: ProposalConfig): Uint8Array 
   return hexToBytes(strip0x(hexBytes));
 }
 
-function unwrapSetPluginConfig(params: ProposalConfig): [BigNumber, BigNumber, BigNumber] {
+function unwrapSetPluginConfig(params: IProposalConfig): [BigNumber, BigNumber, BigNumber] {
   return [
     BigNumber.from(Math.round(params.minTurnout * 100)),
     BigNumber.from(Math.round(params.minSupport * 100)),

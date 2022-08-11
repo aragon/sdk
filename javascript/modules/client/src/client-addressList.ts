@@ -3,7 +3,7 @@ import { AddressZero } from "@ethersproject/constants";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
 import { encodeActionSetPluginConfig, encodeAddressListActionInit } from "./internal/encoding/plugins";
-import { IPluginInstallEntry, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
+import { IPluginListItem, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
 import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
@@ -17,12 +17,14 @@ import {
   VoteValues,
   VoteProposalStep,
   VoteProposalStepValue,
-  ProposalConfig,
+  IProposalConfig,
   AddressListProposalListItem
 } from "./internal/interfaces/plugins";
 import { getDummyAddressListProposal, getDummyAddressListProposalListItem } from "./internal/temp-mock";
 import { getProposalStatus } from "./internal/utils/plugins";
 
+
+// NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890"
 
 export class ClientAddressList extends ClientCore implements IClientAddressList {
@@ -97,11 +99,11 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     /**
      * Computes the parameters to be given when creating a proposal that updates the governance configuration
      *
-     * @param {ProposalConfig} params
+     * @param {IProposalConfig} params
      * @return {*}  {DaoAction}
      * @memberof ClientAddressList
      */
-    setPluginConfigAction: (params: ProposalConfig): DaoAction => this._buildActionSetPluginConfig(params)
+    setPluginConfigAction: (params: IProposalConfig): DaoAction => this._buildActionSetPluginConfig(params)
   }
   static encoding = {
     /**
@@ -112,7 +114,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
      * @return {*}  {FactoryInitParams}
      * @memberof ClientErc20
      */
-    installEntry: (params: IAddressListPluginInstall): IPluginInstallEntry => {
+    installEntry: (params: IAddressListPluginInstall): IPluginListItem => {
       return {
         id: PLUGIN_ID,
         data: encodeAddressListActionInit(params),
@@ -256,15 +258,14 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     // TODO: Implement
 
     for (let index = 0; index < limit; index++) {
-      proposals.push(getDummyAddressListProposalListItem())
-    }
-    proposals.map((proposal) => {
+      const proposal = getDummyAddressListProposalListItem()
       proposal.status = getProposalStatus(proposal.startDate, proposal.endDate, true, BigInt(proposal.result.yes), BigInt(proposal.result.no))
-    })
+      proposals.push(proposal)
+    }
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 
-  private _buildActionSetPluginConfig(params: ProposalConfig): DaoAction {
+  private _buildActionSetPluginConfig(params: IProposalConfig): DaoAction {
     // TODO: check if to and value are correct
     return {
       to: AddressZero,

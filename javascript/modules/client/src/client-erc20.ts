@@ -10,7 +10,7 @@ import {
   ProposalCreationStepValue,
   VoteProposalStep,
   VoteProposalStepValue,
-  ProposalConfig,
+  IProposalConfig,
   VoteValues,
   Erc20ProposalListItem,
   ProposalMetadata,
@@ -18,7 +18,7 @@ import {
 import { IDAO } from "@aragon/core-contracts-ethers";
 import { ClientCore } from "./internal/core";
 import {
-  IPluginInstallEntry,
+  IPluginListItem,
   GasFeeEstimation,
   DaoAction,
 } from "./internal/interfaces/common";
@@ -29,6 +29,7 @@ import { Random } from "@aragon/sdk-common";
 import { getDummyErc20Proposal, getDummyErc20ProposalListItem } from "./internal/temp-mock";
 import { AddressZero } from "@ethersproject/constants";
 
+// NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890"
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
@@ -113,11 +114,11 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /**
       * Computes the parameters to be given when creating a proposal that updates the governance configuration
       *
-      * @param {ProposalConfig} params
+      * @param {IProposalConfig} params
       * @return {*}  {DaoAction}
       * @memberof ClientAddressList
      */
-    setPluginConfigAction: (params: ProposalConfig): DaoAction => this._buildActionSetPluginConfig(params)
+    setPluginConfigAction: (params: IProposalConfig): DaoAction => this._buildActionSetPluginConfig(params)
   }
   static encoding = {
     /**
@@ -128,7 +129,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @return {*}  {FactoryInitParams}
      * @memberof ClientErc20
      */
-    installEntry: (params: IErc20PluginInstall): IPluginInstallEntry => {
+    installEntry: (params: IErc20PluginInstall): IPluginListItem => {
       return {
         // id: this._pluginAddress,
         id: PLUGIN_ID,
@@ -262,7 +263,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   }
 
   //// PRIVATE ACTION BUILDER HANDLERS
-  private _buildActionSetPluginConfig(params: ProposalConfig): DaoAction {
+  private _buildActionSetPluginConfig(params: IProposalConfig): DaoAction {
     // TODO: check if to and value are correct
     return {
       to: AddressZero,
@@ -362,11 +363,10 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     // TODO: Implement
 
     for (let index = 0; index < limit; index++) {
-      proposals.push(getDummyErc20ProposalListItem())
-    }
-    proposals.map((proposal) => {
+      const proposal = getDummyErc20ProposalListItem()
       proposal.status = getProposalStatus(proposal.startDate, proposal.endDate, true, proposal.result.yes, proposal.result.no)
-    })
+      proposals.push(proposal)
+    }
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 }

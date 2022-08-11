@@ -248,7 +248,7 @@ for await (const step of steps) {
 Handles retrieving list of DAO metadata.
 
 ```ts
-import { Client, Context, ContextParams, SortDirection, DaoListItem, DaoSortBy, IDaoQueryParams } from "@aragon/sdk-client";
+import { Client, Context, ContextParams, SortDirection, DaoDetailsListItem, DaoSortBy, IDaoQueryParams } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const params: ContextParams = {
@@ -275,7 +275,7 @@ const queryParams: IDaoQueryParams = {
   direction: SortDirection.ASC, // optional
   sortBy: DaoSortBy.POPULARITY //optional
 }
-const daos: DaoListItem[] = await client.methods.getDaos(queryParams)
+const daos: DaoDetailsListItem[] = await client.methods.getDaos(queryParams)
 console.log(daos)
 /*
 [
@@ -330,7 +330,7 @@ console.log(daos)
 Handles retrieving DAO metadata using its address or ENS domain.
 
 ```ts
-import { Client, Context, ContextParams, Dao } from "@aragon/sdk-client";
+import { Client, Context, ContextParams, DaoDetails } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const params: ContextParams = {
@@ -351,7 +351,7 @@ const params: ContextParams = {
 }
 const context: Context = new Context(params)
 const client: Client = new Client(context)
-const dao: Dao = await client.methods.getDao("0x12345...")
+const dao: DaoDetails = await client.methods.getDao("0x12345...")
 console.log(dao)
 /*
 {
@@ -669,7 +669,7 @@ for await (const step of steps) {
 ### Creating an ERC20 proposal with an action
 
 ```ts
-import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalConfig } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const params: ContextParams = {
@@ -697,7 +697,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 const client = new ClientErc20(contextPlugin)
 
 // create config action
-const configActionPrarms: ProposalConfig = {
+const configActionPrarms: IProposalConfig = {
   minDuration: 3600,
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%
@@ -1236,7 +1236,7 @@ for await (const step of steps) {
 ### Creating a address list proposal with an action
 
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalConfig } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const params: ContextParams = {
@@ -1264,7 +1264,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 const client = new ClientAddressList(contextPlugin)
 
 // create config action
-const configActionPrarms: ProposalConfig = {
+const configActionPrarms: IProposalConfig = {
   minDuration: 3600,
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%
@@ -1596,7 +1596,7 @@ The helpers above help encoding the most typical DAO operations.
 ### Withdrawals
 
 ```ts
-import { Client, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig, IWithdrawParams } from "@aragon/sdk-client";
+import { Client, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalConfig, IWithdrawParams } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const params: ContextParams = {
@@ -1633,7 +1633,7 @@ console.log(withdrawAction)
 ### Set Plugin Config (Address List)
 
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalConfig } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const params: ContextParams = {
@@ -1660,7 +1660,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 const client = new ClientAddressList(contextPlugin)
 
 // create config action
-const configActionPrarms: ProposalConfig = {
+const configActionPrarms: IProposalConfig = {
   minDuration: 3600,
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%
@@ -1671,7 +1671,7 @@ const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
 ### Set Plugin Config (ERC-20)
 
 ```ts
-import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, ProposalConfig } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalConfig } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const params: ContextParams = {
@@ -1698,7 +1698,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 const client = new ClientErc20(contextPlugin)
 
 // create config action
-const configActionPrarms: ProposalConfig = {
+const configActionPrarms: IProposalConfig = {
   minDuration: 3600,
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%

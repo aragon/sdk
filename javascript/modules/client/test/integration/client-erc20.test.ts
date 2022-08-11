@@ -323,7 +323,7 @@ describe("Client", () => {
   })
 
   describe('Action generators', () => {
-    it("Should create a Erc20 client and generate a init action", async () => {
+    it("Should create a Erc20 client and generate a install entry", async () => {
       const initParams: IErc20PluginInstall = {
         proposals: {
           minDuration: 7200,

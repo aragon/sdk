@@ -1,7 +1,7 @@
 // This file contains the definitions of the general purpose DAO client
 
 import { IClientCore } from "./core";
-import { DaoAction, DaoRole, GasFeeEstimation, IPagination, IPluginInstallEntry } from "./common";
+import { DaoAction, DaoRole, GasFeeEstimation, IPagination, IPluginListItem } from "./common";
 
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
@@ -27,9 +27,9 @@ export interface IClient extends IClientCore {
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getDao: (daoAddressOrEns: string) => Promise<Dao>;
+    getDao: (daoAddressOrEns: string) => Promise<DaoDetails>;
     /** Retrieves metadata for many daos */
-    getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
+    getDaos: (params: IDaoQueryParams) => Promise<DaoDetailsListItem[]>;
   };
   encoding: {
     /** Computes the withdraw action payload */
@@ -47,7 +47,7 @@ export interface IClient extends IClientCore {
 export interface ICreateParams {
   metadata: IDaoMetadata
   ensSubdomain: string
-  plugins: IPluginInstallEntry[]
+  plugins: IPluginListItem[]
 }
 
 export interface IDaoMetadata {
@@ -156,9 +156,9 @@ export interface IAssetTransfers {
 // DAO details
 
 export type DaoResourceLink = { name: string; url: string };
-export type PluginListItem = { id: string; instanceAddress: string, version: string };
+export type InstalledPluginListItem = { id: string; instanceAddress: string, version: string };
 
-export type Dao = {
+export type DaoDetails = {
   address: string;
   ensDomain: string;
   metadata: {
@@ -168,17 +168,17 @@ export type Dao = {
     links: DaoResourceLink[],
   }
   creationDate: Date
-  plugins: PluginListItem[]
+  plugins: InstalledPluginListItem[]
 };
 
-export type DaoListItem = {
+export type DaoDetailsListItem = {
   address: string;
   ensDomain: string;
   metadata: {
     name: string;
     avatar?: string;
   }
-  plugins: PluginListItem[]
+  plugins: InstalledPluginListItem[]
 };
 
 export interface IDaoQueryParams extends IPagination {
