@@ -53,6 +53,27 @@ export function strip0x(value: string): string {
   return value.startsWith("0x") ? value.substring(2) : value;
 }
 
+export function encodeRatio(ratio: number, digits: number): bigint {
+  if (ratio < 0 || ratio > 1) {
+    throw new Error("The ratio value should be between 0 and 1")
+  }
+  if (!Number.isInteger(digits) || digits < 0) {
+    throw new Error("The digits value should be an positive integer")
+  }
+  return BigInt(Math.round(ratio * (10 ** digits)))
+}
+
+export function decodeRatio(onChainValue: bigint, digits: number): number {
+  if (!Number.isInteger(digits) || digits < 0) {
+    throw new Error("The number of digits should be a positive int")
+  }
+  const s = onChainValue.toString()
+  if (digits < s.length) {
+    return parseFloat(s.substring(0, s.length - digits) + '.' + s.substring(s.length - digits, s.length))
+  }
+  return parseFloat("0." + "0".repeat(digits - s.length) + s)
+}
+
 export function hexToBytes(hex: string): Uint8Array {
   const hexMatch = hex.match(/.{1,2}/g)
   if (!hexMatch) {
