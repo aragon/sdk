@@ -94,9 +94,6 @@ export class Client extends ClientCore implements IClient {
     /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string): Promise<IAssetTransfers> =>
       this._getTransfers(daoAddressOrEns),
-    /** Retrieves the list of plugin installed in the DAO*/
-    getInstalledPlugins: (daoAddressOrEns: string): Promise<string[]> =>
-      this._getInstalledPlugins(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
     getDao: (daoAddressOrEns: string): Promise<DaoDetails> =>
       this._getDao(daoAddressOrEns),
@@ -124,7 +121,6 @@ export class Client extends ClientCore implements IClient {
   estimation = {
     create: (params: ICreateParams) => this._estimateCreation(params),
     deposit: (params: IDepositParams) => this._estimateDeposit(params),
-    increaseAllowance: (params: IDepositParams) => this._estimateIncreaseAllowance(params),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -328,45 +324,14 @@ export class Client extends ClientCore implements IClient {
       override.value = amount;
     }
 
+    // TODO: If the approved ERC20 amount is not enough,
+    // estimate the cose of increasing the allowance
+
     return daoInstance.estimateGas
       .deposit(tokenAddress, amount, reference, override)
       .then((gasLimit) => {
         return this.web3.getApproximateGasFee(gasLimit.toBigInt());
       });
-  }
-
-  _estimateIncreaseAllowance(_params: IDepositParams) {
-    const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
-    }
-    // TODO: remove this
-    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
-  }
-
-  //// PRIVATE METHODS METADATA
-
-
-  private _getInstalledPlugins(daoAddressOrEns: string): Promise<string[]> {
-    if (!daoAddressOrEns) {
-      throw new Error("Invalid DAO address or ENS");
-    }
-
-    // TODO: Implement
-
-    const mockAddresses = [
-      "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-      "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
-      "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
-      "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
-      "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
-    ];
-
-    return new Promise(resolve => setTimeout(resolve, 1000)).then(() =>
-      mockAddresses.filter(() => Random.getFloat() > 0.4)
-    );
   }
 
   //// PRIVATE METHODS METADATA
@@ -531,6 +496,7 @@ function unwrapCreateDaoParams(
   return [
     {
       name: params.ensSubdomain,
+      // TODO: Return the IPFS URI (ipfs://<cid>)
       metadata: JSON.stringify(params.metadata)
     },
     {

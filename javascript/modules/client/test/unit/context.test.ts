@@ -56,12 +56,21 @@ describe("Context instances", () => {
   });
   it("Should set a new context and have the correct values", () => {
     const context = new Context(contextParams);
+    contextParams = {
+      network: "mainnet",
+      signer: new Wallet(TEST_WALLET),
+      daoFactoryAddress: "0x2345",
+      web3Providers: web3endpoints.working,
+      gasFeeEstimationFactor: 0.1,
+      ipfsNodes: [{ url: "https://localhost", headers: {} }],
+      graphqlNodes: ["https://localhost"],
+    };
     context.setFull(contextParams);
 
     expect(context).toBeInstanceOf(Context);
     expect(context.network).toEqual("mainnet");
     expect(context.signer).toBeInstanceOf(Wallet);
-    expect(context.daoFactoryAddress).toEqual("0x1234");
+    expect(context.daoFactoryAddress).toEqual("0x2345");
     context.web3Providers?.map((provider) =>
       expect(provider).toBeInstanceOf(JsonRpcProvider)
     );

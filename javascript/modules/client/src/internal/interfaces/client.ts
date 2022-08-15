@@ -15,8 +15,6 @@ export interface IClient extends IClientCore {
     ) => Promise<AssetBalance[]>;
     /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string) => Promise<IAssetTransfers>;
-    /** Retrieves the list of plugin installed in the DAO*/
-    getInstalledPlugins: (daoAddressOrEns: string) => Promise<string[]>
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -38,7 +36,6 @@ export interface IClient extends IClientCore {
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
     deposit: (params: IDepositParams) => Promise<GasFeeEstimation>;
-    increaseAllowance: (params: IDepositParams) => Promise<GasFeeEstimation>;
   };
 }
 

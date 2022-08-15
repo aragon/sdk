@@ -79,7 +79,7 @@ const context: Context = new Context(params)
 const client: Client = new Client(context)
 const createParams: ICreateParams = {
   metadata: {
-    name: "My Dao",
+    name: "My DAO",
     description: "This is a description",
     avatar: "",
     links: [{
@@ -285,12 +285,13 @@ import { Wallet } from 'ethers'
 
 const context: Context = new Context(params)
 const client: Client = new Client(context)
-const dao: DaoDetails = await client.methods.getDao("0x12345...")
+const dao: DaoDetails = await client.methods.getDao("test.dao.eth")
+// const dao: DaoDetails = await client.methods.getDao("0x12345...")
 console.log(dao)
 /*
 {
   address: "0x12345...",
-  ensDomain: "test",
+  ensDomain: "test.dao.eth",
   metadata: {
       name: "test",
       description: "this is a description",
@@ -333,7 +334,7 @@ import { Wallet } from 'ethers'
 const context: Context = new Context(params)
 const client: Client = new Client(context)
 const daoAddressOrEns = "0x12345..."
-const tokenAddresses = [ // optional param
+const tokenAddresses = [ // Optional: Token addresses in addition to the common ones
   "0x1234567890123456789012345678901234567890",
   "0x2345678901234567890123456789012345678901",
   "0x3456789012345678901234567890123456789012",
@@ -356,7 +357,8 @@ console.log(balances)
       decimals: 18,
       balance: 200000n
       lastUpdate: <Date>
-    }
+    },
+    ...
   ]
 */
 ```
@@ -379,7 +381,7 @@ console.log(transfers);
     "reference": "",
     "transactionId": "0x1234...",
     "date": <Date>
-  },...],
+  }, ...],
   "withdrawals": [{
     "type": "erc20"
     "address": "0x123...",
@@ -421,7 +423,7 @@ const client: Client = new Client(context)
 // Use an already existing ERC20 token
 const pluginInitParams1: IErc20PluginInstall = {
   proposals: {
-    minDuration: 7200, // seconds
+    minDuration: 60 * 60 * 24 * 2, // seconds
     minTurnout: 0.25, // 25%
     minSupport: 0.5 // 50%
   },
@@ -442,7 +444,7 @@ const pluginInitParams2: IErc20PluginInstall = {
     decimals: 18,
     minter: "0x...",  // optionally, define a minter
     balances: [
-      {
+      { // Initial balances of the new token
         address: "0x...",
         balance: BigInt(10)
       },
@@ -460,12 +462,11 @@ const pluginInitParams2: IErc20PluginInstall = {
 const erc20InstallEntry1 = ClientErc20.encoding.installEntry(pluginInitParams1)
 const erc20InstallEntry2 = ClientErc20.encoding.installEntry(pluginInitParams2)
 
-
 const createParams: ICreateParams = {
   metadata: {
-    name: "My DAo",
+    name: "My DAO",
     description: "This is a description",
-    avatar: "",
+    avatar: "https://...",
     links: [{
       name: "Web site",
       url: "https://..."
@@ -503,12 +504,12 @@ for await (const step of steps) {
 import { ClientErc20, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientErc20(contextPlugin)
 
 const proposalParams: ICreateProposal = {
@@ -554,23 +555,24 @@ for await (const step of steps) {
   }
 }
 ```
+
 ### Creating an ERC20 proposal with an action
 
 ```ts
 import { ClientErc20, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientErc20(contextPlugin)
 
 // create config action
 const configActionPrarms: IProposalSettings = {
-  minDuration: 3600,
+  minDuration: 60 * 60 * 24,
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%
 }
@@ -627,12 +629,12 @@ for await (const step of steps) {
 import { ClientErc20, Context, ContextPlugin, VoteProposalStep, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientErc20(contextPlugin)
 
 const proposalId = "0x12345...0x1"
@@ -662,12 +664,12 @@ Retrieving all the members of an ERC20 DAO.
 import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientErc20(contextPlugin)
 
 const daoAddressorEns = "0x12345..."
@@ -693,12 +695,12 @@ Retrieving the proposals of an ERC20 DAO.
 import { ClientErc20, Context, ContextPlugin, Erc20Proposal } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientErc20(contextPlugin)
 
 const proposalId = "0x12345..."
@@ -710,12 +712,12 @@ console.log(proposal)
   id: "0x12345...",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
-    name: "Cool Dao"
+    name: "Cool DAO"
   };
   creatorAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
-    summary: "test proposal sumary",
+    summary: "test proposal summary",
     description: "this is a long description",
     resources: [
       {
@@ -732,9 +734,9 @@ console.log(proposal)
       logo: "https://.../image.jpeg"
     }
   };
-  startDate: <Date>,,
-  endDate: <Date>,,
-  creationDate: <Date>,,,
+  startDate: <Date>,
+  endDate: <Date>,
+  creationDate: <Date>,
   actions: [
     {
       to: "0x12345..."
@@ -783,12 +785,12 @@ Retrieving the proposals of an ERC20 DAO.
 import { ClientErc20, Context, ContextPlugin, SortDirection, IProposalQueryParams, ProposalSortBy, Erc20ProposalListItem } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientErc20(contextPlugin)
 
 const queryParams: IProposalQueryParams = {
@@ -806,15 +808,15 @@ console.log(proposals)
     id: "0x12345...",
     dao: {
       address: "0x1234567890123456789012345678901234567890",
-      name: "Cool Dao"
+      name: "Cool DAO"
     };
     creatorAddress: "0x1234567890123456789012345678901234567890",
     metadata: {
       title: "Test Proposal",
-      summary: "test proposal sumary"
+      summary: "test proposal summary"
     };
-    startDate: <Date>,,
-    endDate: <Date>,,
+    startDate: <Date>,
+    endDate: <Date>,
     status: "Executed",
     token: {
       address: "0x1234567890123456789012345678901234567890,
@@ -829,18 +831,18 @@ console.log(proposals)
     }
   },
   {
-    id: "0x12345..._0x1",
+    id: "0x12345...",
     dao: {
       address: "0x1234567890123456789012345678901234567890",
-      name: "Cool Dao"
+      name: "Cool DAO"
     };
     creatorAddress: "0x1234567890123456789012345678901234567890",
     metadata: {
       title: "Test Proposal 2",
-      summary: "test proposal sumary 2"
+      summary: "test proposal summary 2"
     };
-    startDate: <Date>,,
-    endDate: <Date>,,
+    startDate: <Date>,
+    endDate: <Date>,
     status: "Pending",
     token: {
       address: "0x1234567890123456789012345678901234567890,
@@ -864,9 +866,9 @@ console.log(proposals)
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
 // create addressList client
@@ -887,7 +889,7 @@ const client: Client = new Client(context)
 
 const pluginInitParams: IAddressListPluginInstall = {
   proposals: {
-    minDuration: 7200, // seconds
+    minDuration: 60 * 60 * 24, // seconds
     minTurnout: 0.25, // 25%
     minSupport: 0.5 // 50%
   },
@@ -903,7 +905,7 @@ const addressListInstallEntry = ClientAddressList.encoding.installEntry(pluginIn
 
 const createParams: ICreateParams = {
   metadata: {
-    name: "My Dao",
+    name: "My DAO",
     description: "This is a description",
     avatar: "",
     links: [{
@@ -942,12 +944,12 @@ for await (const step of steps) {
 import { ClientAddressList, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientAddressList(contextPlugin)
 
 const proposalParams: ICreateProposal = {
@@ -1000,17 +1002,17 @@ for await (const step of steps) {
 import { ClientAddressList, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientAddressList(contextPlugin)
 
 // create config action
 const configActionPrarms: IProposalSettings = {
-  minDuration: 3600,
+  minDuration: 60 * 60 * 24,
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%
 }
@@ -1066,12 +1068,12 @@ for await (const step of steps) {
 import { ClientAddressList, Context, ContextPlugin, VoteProposalStep, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientAddressList(contextPlugin)
 
 const proposalId = "0x12345...0x1"
@@ -1098,12 +1100,12 @@ for await (const step of steps) {
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientAddressList(contextPlugin)
 
 const daoAddressorEns = "0x12345..."
@@ -1126,12 +1128,12 @@ console.log(memebers)
 import { ClientAddressList, Context, ContextPlugin, AddressListProposal } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientAddressList(contextPlugin)
 
 const proposalId = "0x12345..."
@@ -1143,12 +1145,12 @@ console.log(proposal)
   id: "0x12345...",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
-    name: "Cool Dao"
+    name: "Cool DAO"
   };
   creatorAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
-    summary: "test proposal sumary",
+    summary: "test proposal summary",
     description: "this is a long description",
     resources: [
       {
@@ -1165,9 +1167,9 @@ console.log(proposal)
       logo: "https://.../image.jpeg"
     }
   };
-  startDate: <Date>,,
-  endDate: <Date>,,
-  creationDate: <Date>,,,
+  startDate: <Date>,
+  endDate: <Date>,
+  creationDate: <Date>,
   actions: [
     {
       to: "0x12345..."
@@ -1181,7 +1183,7 @@ console.log(proposal)
     no: 1,
     abstain: 0
   }
-  settings:{
+  settings: {
     minTurnout: 0.5,
     minSupport: 0.25,
     minDuration: 7200
@@ -1204,12 +1206,12 @@ console.log(proposal)
 import { ClientAddressList, Context, ContextPlugin, SortDirection, AddressListProposalListItem, ProposalSortBy, IProposalQueryParams } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-// create a simple context
+// Create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
+// Create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
+// Create an ERC20 client
 const client = new ClientAddressList(contextPlugin)
 
 const queryParams: IProposalQueryParams = {
@@ -1227,15 +1229,15 @@ console.log(proposals)
     id: "0x12345...",
     dao: {
       address: "0x1234567890123456789012345678901234567890",
-      name: "Cool Dao"
+      name: "Cool DAO"
     };
     creatorAddress: "0x1234567890123456789012345678901234567890",
     metadata: {
       title: "Test Proposal",
-      summary: "test proposal sumary"
+      summary: "test proposal summary"
     };
-    startDate: <Date>,,
-    endDate: <Date>,,
+    startDate: <Date>,
+    endDate: <Date>,
     status: "Executed",
     results {
       yes: 100000n,
@@ -1244,18 +1246,18 @@ console.log(proposals)
     }
   },
   {
-    id: "0x12345..._0x1",
+    id: "0x12345...",
     dao: {
       address: "0x1234567890123456789012345678901234567890",
-      name: "Cool Dao"
+      name: "Cool DAO"
     };
     creatorAddress: "0x1234567890123456789012345678901234567890",
     metadata: {
       title: "Test Proposal 2",
-      summary: "test proposal sumary 2"
+      summary: "test proposal summary 2"
     };
-    startDate: <Date>,,
-    endDate: <Date>,,
+    startDate: <Date>,
+    endDate: <Date>,
     status: "Pending",
     results {
       yes: 100000n,
@@ -1308,7 +1310,7 @@ const client = new ClientAddressList(contextPlugin)
 
 // create config action
 const configActionPrarms: IProposalSettings = {
-  minDuration: 3600,
+  minDuration: 60 * 60 * 24,
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%
 }
@@ -1328,7 +1330,7 @@ const client = new ClientErc20(contextPlugin)
 
 // create config action
 const configActionPrarms: IProposalSettings = {
-  minDuration: 3600,
+  minDuration: 60 * 60 * 24,
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%
 }

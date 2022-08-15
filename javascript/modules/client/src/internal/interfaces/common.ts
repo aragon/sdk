@@ -52,7 +52,7 @@ export type Proposal = {
   // date
   endDate: Date;
   startDate: Date;
-  creatonDate: Date;
+  creationDate: Date;
 
   // metadata
   title: string;
@@ -62,7 +62,6 @@ export type Proposal = {
 
   actions?: DaoAction[];
   status: ProposalStatus;
-
 };
 
 export interface IPagination {
