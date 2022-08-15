@@ -1,6 +1,6 @@
 # Aragon JS SDK Client
 
-@aragon/sdk-client provides easy access to the high level interactions to be
+`@aragon/sdk-client` provides easy access to the high level interactions to be
 made with an Aragon DAO. It consists of three different components:
 
 - General-purpose DAO client
@@ -36,16 +36,21 @@ const contextParams: ContextParams = {
   // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
   daoFactoryAddress: "0x1234...",
   web3Providers: ["https://cloudflare-eth.com/"],
+  ipfsNodes: [{
+    url: "https://testing-ipfs-0.aragon.network/api/v0",
+    headers: { "X-API-KEY": IPFS_API_KEY || "" }
+  }],
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 // Instantiate
-const context = new Context(contextParams);
+const context = new Context(contextParams)
 
 // Update
-context.set({ network: 1 });
-context.set({ signer });
-context.setFull(contextParams);
-context.useWeb3Providers(["http://server:8545"], "mainnet");
+context.set({ network: 1 })
+context.set({ signer })
+context.setFull(contextParams)
+context.useWeb3Providers(["http://server:8545"], "mainnet")
 ```
 
 ## General purpose client
@@ -54,17 +59,20 @@ The [Client](./src/client.ts) class allows to perform operations that apply to
 all DAO's, regardless of the plugins they use.
 
 ```ts
-import { Client, ContextParams } from "@aragon/sdk-client";
+import { Client, ContextParams } from "@aragon/sdk-client"
 
-const context: Context = new Context(params)
+const contextParams: ContextParams = { ... }
+// Can be stored in a singleton and inherited from there
+const context: Context = new Context(contextParams)
 
-const client = new Client(context);
+const client = new Client(context)
+// ...
 ```
 
 ### Creating a DAO
 
 ```ts
-import { Client, Context, ContextParams, DaoCreationSteps, ICreateParams, GasFeeEstimation } from "@aragon/sdk-client";
+import { Client, Context, DaoCreationSteps, ICreateParams, GasFeeEstimation } from "@aragon/sdk-client"
 import { Wallet } from 'ethers'
 
 const context: Context = new Context(params)
@@ -1306,7 +1314,7 @@ const params: ContextParams = {
       }
     }
   ]
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 }
 // create a simple context
 const context: Context = new Context(params)
@@ -1344,7 +1352,7 @@ const params: ContextParams = {
       }
     }
   ]
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 }
 // create a simple context
 const context: Context = new Context(params)

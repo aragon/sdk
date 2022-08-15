@@ -53,7 +53,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -72,7 +72,7 @@ const contextParamsLocalChain: ContextParams = {
       url: "http://localhost:5003",
     },
   ],
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 let daoAddress = "0x123456789012345678901234567890123456789012345678"

@@ -56,7 +56,7 @@ export class Context {
       throw new Error("No gas fee reducer defined");
     } else if (!contextParams.ipfsNodes?.length) {
       throw new Error("No IPFS nodes defined");
-    } else if (!contextParams.graphqlURLs?.length) {
+    } else if (!contextParams.graphqlNodes?.length) {
       throw new Error("No graphql URL defined");
     }
 
@@ -74,7 +74,7 @@ export class Context {
       ipfs: contextParams.ipfsNodes.map((config) =>
         new IpfsClient(config.url, config.headers)
       ),
-      graphql: contextParams.graphqlURLs.map((url) =>
+      graphql: contextParams.graphqlNodes.map((url) =>
         new GraphQLClient(url)
       ),
     };
@@ -111,8 +111,8 @@ export class Context {
         new IpfsClient(config.url, config.headers)
       );
     }
-    if (contextParams.graphqlURLs?.length) {
-      this.state.graphql = contextParams.graphqlURLs.map((url) =>
+    if (contextParams.graphqlNodes?.length) {
+      this.state.graphql = contextParams.graphqlNodes.map((url) =>
         new GraphQLClient(url)
       );
     }

@@ -26,7 +26,7 @@ describe("Context instances", () => {
       daoFactoryAddress: "0x1234",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
-      graphqlURLs: []
+      graphqlNodes: [],
     };
   });
   it("Should create an empty context", () => {
@@ -44,6 +44,19 @@ describe("Context instances", () => {
   });
   it("Should create a context and have the correct values", () => {
     const context = new Context(contextParams);
+
+    expect(context).toBeInstanceOf(Context);
+    expect(context.network).toEqual("mainnet");
+    expect(context.signer).toBeInstanceOf(Wallet);
+    expect(context.daoFactoryAddress).toEqual("0x1234");
+    context.web3Providers?.map((provider) =>
+      expect(provider).toBeInstanceOf(JsonRpcProvider)
+    );
+    expect(context.gasFeeEstimationFactor).toEqual(0.1);
+  });
+  it("Should set a new context and have the correct values", () => {
+    const context = new Context(contextParams);
+    context.setFull(contextParams);
 
     expect(context).toBeInstanceOf(Context);
     expect(context.network).toEqual("mainnet");

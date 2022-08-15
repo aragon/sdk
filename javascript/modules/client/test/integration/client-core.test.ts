@@ -34,7 +34,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 describe("Client Core", () => {
@@ -137,7 +137,7 @@ describe("Client Core", () => {
       const ctx = new Context(
         {
           ...contextParams,
-          graphqlURLs: [
+          graphqlNodes: [
             "https://the.wrong/url",
             "https://the.wrong/url",
             "https://the.wrong/url"
@@ -152,7 +152,7 @@ describe("Client Core", () => {
       const ctx = new Context(
         {
           ...contextParams,
-          graphqlURLs: [
+          graphqlNodes: [
             "https://the.wrong/url",
             "https://the.wrong/url",
             "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",

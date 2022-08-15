@@ -65,7 +65,7 @@ const contextParams: ContextPluginParams = {
   web3Providers: web3endpoints.working,
   pluginAddress: "0x2345678901234567890123456789012345678901",
   ipfsNodes: ipfsEndpoints.working,
-  graphqlURLs: grapqhlEndpoints.working
+  graphqlNodes: grapqhlEndpoints.working
 };
 
 const contextParamsLocalChain: ContextPluginParams = {
@@ -85,7 +85,7 @@ const contextParamsLocalChain: ContextPluginParams = {
       url: "http:localhost:5003",
     },
   ],
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 describe("Client", () => {
@@ -127,7 +127,7 @@ describe("Client", () => {
     it("Should create a failing client", async () => {
       contextParams.web3Providers = web3endpoints.failing
       contextParams.ipfsNodes = ipfsEndpoints.failing
-      contextParams.graphqlURLs = grapqhlEndpoints.failing
+      contextParams.graphqlNodes = grapqhlEndpoints.failing
       const ctx = new ContextPlugin(contextParams);
       const client = new ClientErc20(ctx);
 
