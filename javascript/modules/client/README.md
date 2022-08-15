@@ -118,7 +118,7 @@ for await (const step of steps) {
 Handles the flow of depositing the native EVM token to an Aragon DAO.
 
 ```ts
-import { Client, Context, ContextParams, DaoDepositSteps, IDepositParams, GasFeeEstimation } from "@aragon/sdk-client"
+import { Client, Context, DaoDepositSteps, IDepositParams, GasFeeEstimation } from "@aragon/sdk-client"
 import { Wallet } from 'ethers'
 
 
@@ -162,7 +162,7 @@ Handles the flow of depositing ERC20 tokens to a DAO.
 - More intermediate steps are yielded
 
 ```ts
-import { Client, Context, DaoDepositSteps, ContextParams GasFeeEstimation, IDepositParams, } from "@aragon/sdk-client"
+import { Client, Context, DaoDepositSteps, GasFeeEstimation, IDepositParams, } from "@aragon/sdk-client"
 import { Wallet } from 'ethers'
 
 
@@ -212,7 +212,7 @@ for await (const step of steps) {
 Handles retrieving list of DAO metadata.
 
 ```ts
-import { Client, Context, ContextParams, SortDirection, DaoListItem, DaoSortBy, IDaoQueryParams } from "@aragon/sdk-client";
+import { Client, Context, SortDirection, DaoListItem, DaoSortBy, IDaoQueryParams } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 
@@ -279,7 +279,7 @@ console.log(daos)
 Handles retrieving DAO metadata using its address or ENS domain.
 
 ```ts
-import { Client, Context, ContextParams, DaoDetails } from "@aragon/sdk-client";
+import { Client, Context, DaoDetails } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 
@@ -326,7 +326,7 @@ console.log(dao)
 Handles retrieving DAO asset balances using the DAO address or its ENS domain.
 
 ```ts
-import { Client, Context, ContextParams, AssetBalance } from "@aragon/sdk-client";
+import { Client, Context, AssetBalance } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 
@@ -410,7 +410,7 @@ underlying network requests.
 ### Creating an ERC20 client
 
 ```ts
-import { Client, Context, ContextParams, DaoCreationSteps, ICreateParams, IErc20PluginInstall, GasFeeEstimation, ClientErc20 } from "@aragon/sdk-client";
+import { Client, Context, DaoCreationSteps, ICreateParams, IErc20PluginInstall, GasFeeEstimation, ClientErc20 } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const context: Context = new Context(params)
@@ -500,7 +500,7 @@ for await (const step of steps) {
 ### Creating an ERC20 proposal
 
 ```ts
-import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -557,7 +557,7 @@ for await (const step of steps) {
 ### Creating an ERC20 proposal with an action
 
 ```ts
-import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -624,7 +624,7 @@ for await (const step of steps) {
 ### Voting on an ERC20 proposal
 
 ```ts
-import { ClientErc20, Context, ContextParams, ContextPlugin, VoteProposalStep, VoteValues } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin, VoteProposalStep, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -659,7 +659,7 @@ for await (const step of steps) {
 Retrieving all the members of an ERC20 DAO.
 
 ```ts
-import { ClientErc20, Context, ContextParams, ContextPlugin } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -690,7 +690,7 @@ console.log(memebers)
 Retrieving the proposals of an ERC20 DAO.
 
 ```ts
-import { ClientErc20, Context, ContextParams, ContextPlugin, Erc20Proposal } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin, Erc20Proposal } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -780,7 +780,7 @@ console.log(proposal)
 Retrieving the proposals of an ERC20 DAO.
 
 ```ts
-import { ClientErc20, Context, ContextParams, ContextPlugin, SortDirection, IProposalQueryParams, ProposalSortBy, Erc20ProposalListItem } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin, SortDirection, IProposalQueryParams, ProposalSortBy, Erc20ProposalListItem } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -861,7 +861,7 @@ console.log(proposals)
 ## Address list governance plugin client
 
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -876,7 +876,7 @@ const client = new ClientAddressList(contextPlugin)
 ### Creating a DAO with a addressList plugin
 
 ```ts
-import { Client, Context, ContextParams, DaoCreationSteps, ICreateParams, GasFeeEstimation, ClientAddressList, IAddressListPluginInstall } from "@aragon/sdk-client";
+import { Client, Context, DaoCreationSteps, ICreateParams, GasFeeEstimation, ClientAddressList, IAddressListPluginInstall } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 
@@ -939,7 +939,7 @@ for await (const step of steps) {
 
 ### Creating a address list proposal
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -997,7 +997,7 @@ for await (const step of steps) {
 ### Creating a address list proposal with an action
 
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -1063,7 +1063,7 @@ for await (const step of steps) {
 
 ### Voting on a address list proposal
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin, VoteProposalStep, VoteValues } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin, VoteProposalStep, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -1095,7 +1095,7 @@ for await (const step of steps) {
 
 ### Loading the list of members (address list plugin)
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -1123,7 +1123,7 @@ console.log(memebers)
 
 ### Loading the a proposal by proposalId (address list plugin)
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin, AddressListProposal } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin, AddressListProposal } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -1201,7 +1201,7 @@ console.log(proposal)
 ```
 ### Loading the list of proposals (address list plugin)
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin, SortDirection, AddressListProposalListItem, ProposalSortBy, IProposalQueryParams } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin, SortDirection, AddressListProposalListItem, ProposalSortBy, IProposalQueryParams } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // create a simple context
@@ -1277,7 +1277,7 @@ The helpers above help encoding the most typical DAO operations.
 ### Withdrawals
 
 ```ts
-import { Client, Context, ContextParams, IWithdrawParams } from "@aragon/sdk-client";
+import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const context: Context = new Context(params)
@@ -1298,30 +1298,12 @@ console.log(withdrawAction)
 ### Set Plugin Config (Address List)
 
 ```ts
-import { ClientAddressList, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-const params: ContextParams = {
-  network: "mainnet",
-  signer: new Wallet(""),
-  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
-  web3Providers: ["https://cloudflare-eth.com/"],
-  ipfsNodes: [
-    {
-      uri: "https://testing-ipfs-0.aragon.network/api/v0",
-      headers: {
-        "X-API-KEY": IPFS_API_KEY || ""
-      }
-    }
-  ]
-  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
-}
-// create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
 const client = new ClientAddressList(contextPlugin)
 
 // create config action
@@ -1336,30 +1318,12 @@ const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
 ### Set Plugin Config (ERC-20)
 
 ```ts
-import { ClientErc20, Context, ContextParams, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
-const params: ContextParams = {
-  network: "mainnet",
-  signer: new Wallet(""),
-  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
-  web3Providers: ["https://cloudflare-eth.com/"],
-  ipfsNodes: [
-    {
-      uri: "https://testing-ipfs-0.aragon.network/api/v0",
-      headers: {
-        "X-API-KEY": IPFS_API_KEY || ""
-      }
-    }
-  ]
-  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
-}
-// create a simple context
 const context: Context = new Context(params)
-// create a plugin context from the simple context and the plugin address
 const pluginAddress = "0x1234567890123456789012345678901234567890"
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
-// create erc20 client
 const client = new ClientErc20(contextPlugin)
 
 // create config action
