@@ -17,6 +17,11 @@ import * as deployContracts from "../../../../helpers/deployContracts";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
 import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-ethers";
+import { DaoSortBy, IDaoQueryParams } from "../../src/internal/interfaces/client";
+import { SortDirection } from "../../src/internal/interfaces/common";
+import { IWithdrawParams } from "../../src/internal/interfaces/client";
+import { Random } from "@aragon/sdk-common";
+import { AddressZero } from "@ethersproject/constants";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -38,7 +43,6 @@ const TEST_WALLET =
 const contextParams: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   ipfsNodes: [
@@ -49,13 +53,12 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 const contextParamsLocalChain: ContextParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
-  dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
   ipfsNodes: [
@@ -69,17 +72,18 @@ const contextParamsLocalChain: ContextParams = {
       url: "http://localhost:5003",
     },
   ],
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
+
+let daoAddress = "0x123456789012345678901234567890123456789012345678"
 
 describe("Client", () => {
   beforeAll(async () => {
     const server = await ganacheSetup.start();
     const daoFactory = await deployContracts.deploy(server);
     contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
-    /* TODO: REMOVE ME */
-    const daoAddress = await createLegacyDao(contextParamsLocalChain)
-    contextParamsLocalChain.dao = daoAddress;
+    const addr = await createLegacyDao(contextParamsLocalChain)
+    daoAddress = addr;
   });
 
   afterAll(async () => {
@@ -131,46 +135,53 @@ describe("Client", () => {
   });
 
   describe("DAO Creation", () => {
-    test.todo("Should estimate gas fees for creating a DAO");
-    // it("Should estimate gas fees for creating a DAO", async () => {
-    //   const context = new Context(contextParamsLocalChain);
-    //   const client = new Client(context);
+    it("Should estimate gas fees for creating a DAO", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
 
-    //   const daoCreationParams: ICreateParams = {
-    //     daoConfig: {
-    //       name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
-    //       metadata: "0x1234",
-    //     },
-    //     plugins: [
-    //       { id: "0x1234", data: "0x1234" },
-    //     ],
-    //     gsnForwarder: Wallet.createRandom().address,
-    //   };
+      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1
 
-    //   const gasFeesEstimation = await client.estimation.create(
-    //     daoCreationParams,
-    //   );
+      const daoCreationParams: ICreateParams = {
+        metadata: {
+          name: daoName,
+          description: "this is a dao",
+          avatar: 'https://...',
+          links: []
+        },
+        ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
+        plugins: [
+          { id: "0x1234", data: new Uint8Array([11, 11]) },
+        ],
+      };
 
-    //   expect(typeof gasFeesEstimation).toEqual("object");
-    //   expect(typeof gasFeesEstimation.average).toEqual("bigint");
-    //   expect(typeof gasFeesEstimation.max).toEqual("bigint");
-    //   expect(typeof gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
-    //   expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
-    // });
+      const gasFeesEstimation = await client.estimation.create(
+        daoCreationParams,
+      );
+
+      expect(typeof gasFeesEstimation).toEqual("object");
+      expect(typeof gasFeesEstimation.average).toEqual("bigint");
+      expect(typeof gasFeesEstimation.max).toEqual("bigint");
+      expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
+      expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
+    });
 
     it("Should create a DAO locally", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
+      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1
+
       const daoCreationParams: ICreateParams = {
-        daoConfig: {
-          name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
-          metadata: "0x1234",
+        metadata: {
+          name: daoName,
+          description: "this is a dao",
+          avatar: 'https://...',
+          links: []
         },
+        ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [
-          { id: "0x1234", data: "0x1234" },
+          { id: "0x1234", data: new Uint8Array([11, 11]) },
         ],
-        gsnForwarder: Wallet.createRandom().address,
       };
 
       for await (const step of client.methods.create(daoCreationParams)) {
@@ -193,12 +204,31 @@ describe("Client", () => {
   });
 
   describe("DAO deposit", () => {
+    it("Should estimate gas fees for making a deposit", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const depositParams: IDepositParams = {
+        daoAddress: daoAddress,
+        amount: BigInt(1234),
+      };
+
+      const gasFeesEstimation = await client.estimation.deposit(
+        depositParams,
+      );
+
+      expect(typeof gasFeesEstimation).toEqual("object");
+      expect(typeof gasFeesEstimation.average).toEqual("bigint");
+      expect(typeof gasFeesEstimation.max).toEqual("bigint");
+      expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
+      expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
+    });
     it("Should allow to deposit Ether", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.dao,
+        daoAddress: daoAddress,
         amount: BigInt(1234),
       };
 
@@ -240,7 +270,7 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.dao,
+        daoAddress: daoAddress,
         amount: BigInt(5),
         tokenAddress: tokenContract.address,
         reference: "My reference",
@@ -293,7 +323,7 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: contextParamsLocalChain.dao,
+        daoAddress: daoAddress,
         amount: BigInt(7),
         tokenAddress: tokenContract.address,
         reference: "My reference",
@@ -350,57 +380,70 @@ describe("Client", () => {
       ).toBe("7");
     });
   });
-  describe("GraphQL Client", () => {
-    it("Should detect all invalid graphql endpoints", async () => {
-      const ctx = new Context(
-        {
-          ...contextParamsLocalChain,
-          graphqlURLs: [
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url"
-          ]
-        });
-      const client = new Client(ctx)
-      const isUp = await client.graphql.isUp()
-      expect(isUp).toBe(false);
-      await expect(client.graphql.ensureOnline()).rejects.toThrow("No graphql nodes available")
-    })
-    it("Should create a valid graphql client", async () => {
-      const ctx = new Context(
-        {
-          ...contextParamsLocalChain,
-          graphqlURLs: [
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url"
-          ]
-        });
-      const client = new Client(ctx)
-      await client.graphql.ensureOnline()
-      const isUp = await client.graphql.isUp()
-      expect(isUp).toBe(true);
-    })
-    test.todo("Should get a DAO's metadata with a specific address")// , async () => {
-    //   const ctx = new Context(contextParams);
-    //   const client = new Client(ctx)
-    //   client.methods.getMetadata(contextParams.dao)
-    // })
+  describe('Action generators', () => {
+    it("Should create a Erc20 client and generate a install entry", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
 
-    test.todo("Should get the transfers of a dao")// , async () => {
-    //   const ctx = new Context(contextParamsLocalChain);
-    //   const client = new Client(ctx)
-    //   const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
-    //   const res = await client.methods.getTransfers(daoAddress)
-    //   expect(Array.isArray(res.deposits)).toBe(true)
-    //   expect(Array.isArray(res.withdrawals)).toBe(true)
-    // })
+      const withdrawParams: IWithdrawParams = {
+        recipientAddress: '0x1234567890123456789012345678901234567890',
+        amount: BigInt(10),
+        reference: 'test'
+      };
+
+      const installEntry = await client.encoding.withdrawAction(
+        "0x1234567890123456789012345678901234567890",
+        withdrawParams
+      );
+
+      expect(typeof installEntry).toBe("object");
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
+    });
+  })
+  describe("Data retrieval", () => {
+    it("Should get a DAO's metadata with a specific address", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx)
+      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+      const dao = await client.methods.getDao(daoAddress)
+      expect(typeof dao).toBe('object');
+      expect(dao.address).toBe(daoAddress);
+      expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+    })
+
+    it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params: IDaoQueryParams = {
+        limit: 10,
+        skip: 0,
+        direction: SortDirection.ASC,
+        sortBy: DaoSortBy.NAME
+      }
+      const daos = await client.methods.getDaos(params)
+      expect(Array.isArray(daos)).toBe(true)
+      expect(daos.length <= 10).toBe(true);
+    })
+
+    it("Should get DAOs balances", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx)
+      const balances = await client.methods.getBalances("0x1234567890123456789012345678901234567890")
+      expect(Array.isArray(balances)).toBe(true);
+      if (balances.length > 0) {
+        expect(typeof balances[0].balance).toBe('bigint');
+      }
+    })
+
+    it("Should get the transfers of a dao", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx)
+      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+      const transfers = await client.methods.getTransfers(daoAddress)
+      expect(Array.isArray(transfers.deposits)).toBe(true)
+      expect(Array.isArray(transfers.withdrawals)).toBe(true)
+    })
+
     test.todo("Should return an empty array when getting the transfers of a DAO that does not exist")//, async () => {
     //   const ctx = new Context(contextParamsLocalChain);
     //   const client = new Client(ctx)
@@ -454,34 +497,34 @@ async function createLegacyDao(params: ContextParams) {
 
   const daoCreationParams: ICreateDaoERC20Voting = {
     daoConfig: {
-      name: "ERC20VotingDAO_" + Math.floor(Math.random() * 9999) + 1,
+      name: "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1,
       metadata: "0x1234",
     },
     tokenConfig: {
       addr: "0x0000000000000000000000000000000000000000",
       name:
         "TestToken" +
-        (Math.random() + 1)
+        (Random.getFloat() + 1)
           .toString(36)
           .substring(4)
           .toUpperCase(),
       symbol:
         "TEST" +
-        (Math.random() + 1)
+        (Random.getFloat() + 1)
           .toString(36)
           .substring(4)
           .toUpperCase(),
     },
     mintConfig: {
       receivers: [Wallet.createRandom().address, Wallet.createRandom().address],
-      amounts: [BigInt(Math.floor(Math.random() * 9999) + 1), BigInt(Math.floor(Math.random() * 9999) + 1)]
+      amounts: [BigInt(Math.floor(Random.getFloat() * 9999) + 1), BigInt(Math.floor(Random.getFloat() * 9999) + 1)]
     },
     votingConfig: {
-      supportRequiredPct: Math.floor(Math.random() * 100) + 1,
-      participationRequiredPct: Math.floor(Math.random() * 100) + 1,
-      minDuration: Math.floor(Math.random() * 9999) + 1,
+      supportRequiredPct: Math.floor(Random.getFloat() * 100) + 1,
+      participationRequiredPct: Math.floor(Random.getFloat() * 100) + 1,
+      minDuration: Math.floor(Random.getFloat() * 9999) + 1,
     },
-    gsnForwarder: Wallet.createRandom().address,
+    // gsnForwarder: Wallet.createRandom().address,
   };
   const registryInstance = await daoFactoryInstance
     .registry()
@@ -493,7 +536,7 @@ async function createLegacyDao(params: ContextParams) {
     daoCreationParams.votingConfig,
     daoCreationParams.tokenConfig,
     daoCreationParams.mintConfig,
-    daoCreationParams.gsnForwarder ? daoCreationParams.gsnForwarder : ""
+    daoCreationParams.gsnForwarder ?? AddressZero
   )
     .then(tx => tx.wait())
     .then((cr) => {

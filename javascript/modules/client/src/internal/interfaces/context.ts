@@ -10,7 +10,6 @@ import { GraphQLClient } from "graphql-request";
 type Web3ContextParams = {
   network: Networkish;
   signer: Signer;
-  dao: string;
   daoFactoryAddress?: string;
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   gasFeeEstimationFactor?: number;
@@ -19,7 +18,7 @@ type IpfsContextParams = {
   ipfsNodes?: { url: string; headers?: Record<string, string> }[];
 };
 type GraphQLContextParams = {
-  graphqlURLs: string[];
+  graphqlNodes: string[];
 };
 
 export type ContextParams =
@@ -32,7 +31,6 @@ export type ContextParams =
 type Web3ContextState = {
   network: Networkish;
   signer?: Signer;
-  dao: string;
   daoFactoryAddress?: string;
   web3Providers: JsonRpcProvider[];
   gasFeeEstimationFactor: number;

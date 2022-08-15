@@ -6,12 +6,13 @@ import {
   DaoCreationStepValue,
   DaoDepositSteps,
   DaoDepositStepValue,
-  DaoMetadata,
-  DaoQueryOptions,
+  DaoDetails,
   IAssetTransfers,
   IClient,
   ICreateParams,
+  IDaoQueryParams,
   IDepositParams,
+  IWithdrawParams,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -26,13 +27,15 @@ import {
   ContractTransaction,
 } from "@ethersproject/contracts";
 import { ClientCore } from "./internal/core";
-import { DaoRole } from "./internal/interfaces/common";
-import { isAddress } from "@ethersproject/address";
+import { DaoAction, DaoRole } from "./internal/interfaces/common";
 import { pack } from "@ethersproject/solidity";
 
-import { strip0x } from "@aragon/sdk-common";
+import { Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
+import { encodeWithdrawActionData } from "./internal/encoding/client";
+import { getDummyDao } from "./internal/temp-mock";
+import { isAddress } from "@ethersproject/address";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -42,7 +45,7 @@ const assetList: AssetBalance[] = [
   {
     type: "native",
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
   },
   {
     type: "erc20",
@@ -51,7 +54,7 @@ const assetList: AssetBalance[] = [
     symbol: "JOJ",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
   },
   {
     type: "erc20",
@@ -60,7 +63,7 @@ const assetList: AssetBalance[] = [
     symbol: "DTT",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
   },
   {
     type: "erc20",
@@ -69,7 +72,7 @@ const assetList: AssetBalance[] = [
     symbol: "TTK",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
   },
 ];
 
@@ -86,17 +89,18 @@ export class Client extends ClientCore implements IClient {
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => this._deposit(params),
     /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet */
-    getBalances: (daoAddressOrEns: string, tokenAddresses: string[] = []) =>
+    getBalances: (daoAddressOrEns: string, tokenAddresses: string[] = []): Promise<AssetBalance[]> =>
       this._getBalances(daoAddressOrEns, tokenAddresses),
     /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
-    getTransfers: (daoAddressOrEns: string) =>
+    getTransfers: (daoAddressOrEns: string): Promise<IAssetTransfers> =>
       this._getTransfers(daoAddressOrEns),
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getMetadata: (daoAddressOrEns: string) =>
-      this._getMetadata(daoAddressOrEns),
-    /** Retrieves list of created DAOs and the corresponding metadata*/
-    getMetadataMany: (options?: DaoQueryOptions) =>
-      this._getMetadataMany(options),
+    getDao: (daoAddressOrEns: string): Promise<DaoDetails> =>
+      this._getDao(daoAddressOrEns),
+    /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
+    getDaos: (params?: IDaoQueryParams): Promise<DaoDetails[]> =>
+      this._getDaos(params ?? {}),
+
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -104,6 +108,11 @@ export class Client extends ClientCore implements IClient {
       role: DaoRole,
       data: Uint8Array,
     ) => this._hasPermission(where, who, role, data),
+  };
+
+  encoding = {
+    withdrawAction: (daoAddressOrEns: string, params: IWithdrawParams): Promise<DaoAction> =>
+      this._buildActionWithdraw(daoAddressOrEns, params)
   };
 
   //// ESTIMATION HANDLERS
@@ -182,7 +191,6 @@ export class Client extends ClientCore implements IClient {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
       params,
     );
@@ -296,7 +304,7 @@ export class Client extends ClientCore implements IClient {
 
     // TODO: Unimplemented
     // TODO: The new contract code is needed
-    return this.web3.getApproximateGasFee(BigInt("0"));
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
   _estimateDeposit(params: IDepositParams) {
@@ -304,8 +312,6 @@ export class Client extends ClientCore implements IClient {
     if (!signer) {
       throw new Error("A signer is needed for estimating the gas cost");
     }
-
-    // TODO: ESTIMATE INCREASED ALLOWANCE AS WELL
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
       params,
@@ -318,6 +324,9 @@ export class Client extends ClientCore implements IClient {
       override.value = amount;
     }
 
+    // TODO: If the approved ERC20 amount is not enough,
+    // estimate the cose of increasing the allowance
+
     return daoInstance.estimateGas
       .deposit(tokenAddress, amount, reference, override)
       .then((gasLimit) => {
@@ -327,77 +336,28 @@ export class Client extends ClientCore implements IClient {
 
   //// PRIVATE METHODS METADATA
 
-  private _getMetadata(daoAddressOrEns: string): Promise<DaoMetadata> {
+  private _getDao(daoAddressOrEns: string): Promise<DaoDetails> {
     // TODO: Implement actual fetch logic using subgraph.
 
     if (!daoAddressOrEns) {
       throw new Error("Invalid DAO address or ENS");
     }
-
-    // Generate DAO creation within the past year
-    const fromDate = new Date(
-      new Date().setFullYear(new Date().getFullYear() - 1),
-    ).getTime();
-
-    const dummyDaoNames = [
-      "Patito Dao",
-      "One World Dao",
-      "Sparta Dao",
-      "Yggdrasil Unite",
-    ];
-
-    const pluginAddresses = [
-      "0x1234567890123456789012345678901234567890",
-      "0x2345678901234567890123456789012345678901",
-    ];
-
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => ({
-      ...(isAddress(daoAddressOrEns)
-        ? {
-          address: daoAddressOrEns,
-          name: dummyDaoNames[
-            Math.floor(Math.random() * dummyDaoNames.length - 1)
-          ],
-        }
-        : {
-          address: "0x663ac3c648548eb8ccd292b41a8ff829631c846d",
-          name: daoAddressOrEns,
-        }),
-
-      createdAt: new Date(fromDate + Math.random() * (Date.now() - fromDate)),
-      description:
-        `We are a community that loves trees and the planet. We track where forestation
-       is increasing (or shrinking), fund people who are growing and protecting trees...`,
-      links: [
-        {
-          description: "Website",
-          url: "https://google.com",
-        },
-        {
-          description: "Discord",
-          url: "https://google.com",
-        },
-      ],
-      plugins: [pluginAddresses[Math.round(Math.random())]],
-    }));
+    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => getDummyDao(daoAddressOrEns));
   }
 
-  // @ts-ignore  TODO: Remove this comment when options used
-  private async _getMetadataMany(options?: DaoQueryOptions) {
-    const daos = [
-      "0x0028807509712aa45eafd5fdd0982c4db36fbe50",
-      "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61",
-      "0x09e7a6b83f7417cbca993fed2dd3c7d2b4d23794",
-      "0x16f7129ae281f29d51ea085ac496501b7a1c0391",
-    ];
-
-    const daosWithMetadata = await Promise.all(
-      daos.map((address) => this._getMetadata(address)),
-    );
-
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => daosWithMetadata,
-    );
+  private _getDaos({
+    limit = 10,
+    // TODO
+    // uncomment this
+    // skip = 0,
+    // direction = SortDirection.ASC,
+    // sortBy = DaoSortBy.CREATED_AT
+  }: IDaoQueryParams): Promise<DaoDetails[]> {
+    const metadataMany: DaoDetails[] = []
+    for (let index = 0; index < limit; index++) {
+      metadataMany.push(getDummyDao())
+    }
+    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (metadataMany))
   }
 
   private _getBalances(
@@ -466,7 +426,7 @@ export class Client extends ClientCore implements IClient {
             transactionId: transfers[index].transactionId,
             // Generate a random date in the past
             date: new Date(
-              +new Date() - Math.floor(Math.random() * 10000000000),
+              +new Date() - Math.floor(Random.getFloat() * 10000000000),
             ),
           };
           return result;
@@ -478,7 +438,7 @@ export class Client extends ClientCore implements IClient {
           reference: "Some reference",
           transactionId: transfers[index].transactionId,
           // Generate a random date in the past
-          date: new Date(+new Date() - Math.floor(Math.random() * 10000000000)),
+          date: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
         };
         return result;
       },
@@ -488,6 +448,33 @@ export class Client extends ClientCore implements IClient {
     const withdrawals: AssetWithdrawal[] = [];
 
     return Promise.resolve({ deposits, withdrawals });
+  }
+  /**
+   * Build withdraw action
+   *
+   * @private
+   * @param {string} to
+   * @param {bigint} value
+   * @param {IWithdrawParams} params
+   * @return {*}  {DaoAction}
+   * @memberof Client
+   */
+  private async _buildActionWithdraw(daoAddreessOrEns: string, params: IWithdrawParams): Promise<DaoAction> {
+    // check ens
+    let address = daoAddreessOrEns
+    if (!isAddress(daoAddreessOrEns)) {
+      const resolvedAddress = await this.web3.getSigner()?.resolveName(daoAddreessOrEns)
+      if (!resolvedAddress) {
+        throw new Error("invalid ens")
+      }
+      address = resolvedAddress
+    }
+
+    return {
+      to: address,
+      value: BigInt(0),
+      data: encodeWithdrawActionData(params)
+    }
   }
 }
 
@@ -507,7 +494,11 @@ function unwrapCreateDaoParams(
       .join("");
 
   return [
-    params.daoConfig,
+    {
+      name: params.ensSubdomain,
+      // TODO: Return the IPFS URI (ipfs://<cid>)
+      metadata: JSON.stringify(params.metadata)
+    },
     {
       // TODO: Adapt the DAO creation parameters
       participationRequiredPct: BigInt(10), // BigInt(params.votingConfig.minParticipation),
@@ -524,7 +515,7 @@ function unwrapCreateDaoParams(
     //   amounts: params.mintConfig.map((receiver) => receiver.balance),
     // },
     pluginDataBytes,
-    params.gsnForwarder ?? "",
+    AddressZero, // TODO: Remove when the new contract version is available
   ];
 }
 
@@ -538,3 +529,4 @@ function unwrapDepositParams(
     params.reference ?? "",
   ];
 }
+

@@ -1,20 +1,20 @@
 import { Context, ContextParams as MainContextParams } from "./context";
 import { ContextState } from "./internal/interfaces/context";
 
-type ContextErc20State = {
+type ContextPluginState = {
   pluginAddress: string;
 };
-export type ContextErc20Params = MainContextParams & {
+export type ContextPluginParams = MainContextParams & {
   pluginAddress: string;
 };
 
 // State
-const defaultState: ContextErc20State = {
+const defaultState: ContextPluginState = {
   pluginAddress: "",
 };
 
-export class ContextErc20 extends Context {
-  protected state: ContextState & ContextErc20State = Object.assign(
+export class ContextPlugin extends Context {
+  protected state: ContextState & ContextPluginState = Object.assign(
     {},
     Context.getDefault(),
     defaultState,
@@ -23,14 +23,26 @@ export class ContextErc20 extends Context {
   // INTERNAL CONTEXT STATE
 
   /**
-   * @param {ContextErc20Params} params The parameters for the client context
+   * @param {ContextPluginParams} params The parameters for the client context
    *
    * @constructor
    */
-  constructor(params: Partial<ContextErc20Params>) {
+  constructor(params: Partial<ContextPluginParams>) {
     super(params);
 
     this.set(params);
+  }
+  
+  /**
+   * Generate a plugin context from a client clontext and a plugin address
+   *
+   * @param {Context} ctx
+   * @param {string} pluginAddress
+   * @return {*}  {ContextPlugin}
+   * @memberof ContextPlugin
+   */
+  static fromContext(ctx: Context, pluginAddress: string): ContextPlugin {
+    return new ContextPlugin({ ...ctx, pluginAddress })
   }
 
   /**
@@ -42,7 +54,7 @@ export class ContextErc20 extends Context {
    *
    * @private
    */
-  setFull(contextParams: ContextErc20Params): void {
+  setFull(contextParams: ContextPluginParams): void {
     super.setFull(contextParams);
 
     if (contextParams?.pluginAddress?.length != 42) {
@@ -52,7 +64,7 @@ export class ContextErc20 extends Context {
     this.state.pluginAddress = contextParams.pluginAddress;
   }
 
-  set(contextParams: Partial<ContextErc20Params>) {
+  set(contextParams: Partial<ContextPluginParams>) {
     super.set(contextParams);
 
     if (contextParams.pluginAddress) {
@@ -76,7 +88,7 @@ export class ContextErc20 extends Context {
   }
 
   // DEFAULT CONTEXT STATE
-  static setDefault(params: Partial<ContextErc20Params>) {
+  static setDefault(params: Partial<ContextPluginParams>) {
     super.setDefault(params);
 
     if (params.pluginAddress) {

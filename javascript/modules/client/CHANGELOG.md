@@ -18,6 +18,16 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Added
+- Internal Graphql client
+- AddressList Client
+- JsDoc to AddressList Client and ERC20 Client
+- Mocks in AddressList Client
+- Other mocks in `Client` and `ERC20Client`
+
+### Changed
+- `ContextErc20` => `ContextPlugin`
+
 ### Changes (breaking)
 - Now using a general-purpose `Client` class and a plugin-specific one for the rest (`ClientErc20`)
 

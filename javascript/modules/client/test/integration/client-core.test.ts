@@ -24,7 +24,6 @@ const TEST_WALLET =
 const contextParams: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  dao: "0x1234567890123456789012345678901234567890",
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   ipfsNodes: [
@@ -35,7 +34,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  graphqlURLs: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
 };
 
 describe("Client Core", () => {
@@ -131,6 +130,44 @@ describe("Client Core", () => {
 
         expect(isOnline).toEqual(false);
       }
+    });
+  });
+  describe("GraphQL Client", () => {
+    it("Should detect all invalid graphql endpoints", async () => {
+      const ctx = new Context(
+        {
+          ...contextParams,
+          graphqlNodes: [
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url"
+          ]
+        });
+      const client = new Client(ctx)
+      const isUp = await client.graphql.isUp()
+      expect(isUp).toBe(false);
+      await expect(client.graphql.ensureOnline()).rejects.toThrow("No graphql nodes available")
+    })
+    it("Should create a valid graphql client", async () => {
+      const ctx = new Context(
+        {
+          ...contextParams,
+          graphqlNodes: [
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url",
+            "https://the.wrong/url"
+          ]
+        });
+      const client = new Client(ctx)
+      await client.graphql.ensureOnline()
+      const isUp = await client.graphql.isUp()
+      expect(isUp).toBe(true);
     });
   });
 });

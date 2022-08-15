@@ -52,3 +52,11 @@ export function ensure0x(value: string): string {
 export function strip0x(value: string): string {
   return value.startsWith("0x") ? value.substring(2) : value;
 }
+
+export function hexToBytes(hex: string): Uint8Array {
+  const hexMatch = hex.match(/.{1,2}/g)
+  if (!hexMatch) {
+    throw new Error("invalid hex string")
+  }
+  return Uint8Array.from(hexMatch.map((byte) => parseInt(byte, 16)));
+}

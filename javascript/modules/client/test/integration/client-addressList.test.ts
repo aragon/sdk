@@ -3,7 +3,7 @@ declare const describe, it, beforeAll, afterAll, expect, test;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientErc20, ContextPlugin, ContextPluginParams, Client } from "../../src";
+import { ClientAddressList, ContextPlugin, ContextPluginParams, Client } from "../../src";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
@@ -12,13 +12,13 @@ import { GraphQLClient } from "graphql-request";
 import {
   ExecuteProposalStep,
   ICreateProposal,
-  IErc20PluginInstall,
+  IAddressListPluginInstall,
   IProposalQueryParams,
   ProposalCreationSteps,
   VoteValues,
   VoteProposalStep,
+  IProposalSettings,
 } from "../../src/internal/interfaces/plugins";
-import { AddressZero } from "@ethersproject/constants";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -102,9 +102,9 @@ describe("Client", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new ContextPlugin(contextParams);
-      const client = new ClientErc20(ctx);
+      const client = new ClientAddressList(ctx);
 
-      expect(client).toBeInstanceOf(ClientErc20);
+      expect(client).toBeInstanceOf(ClientAddressList);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
@@ -129,9 +129,9 @@ describe("Client", () => {
       contextParams.ipfsNodes = ipfsEndpoints.failing
       contextParams.graphqlNodes = grapqhlEndpoints.failing
       const ctx = new ContextPlugin(contextParams);
-      const client = new ClientErc20(ctx);
+      const client = new ClientAddressList(ctx);
 
-      expect(client).toBeInstanceOf(ClientErc20);
+      expect(client).toBeInstanceOf(ClientAddressList);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
@@ -151,7 +151,7 @@ describe("Client", () => {
   describe("Proposal Creation", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
+      const client = new ClientAddressList(context)
 
       const proposalParams: ICreateProposal = {
         metadata: {
@@ -185,7 +185,7 @@ describe("Client", () => {
     })
     it("Should create a new proposal locally", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const erc20Client = new ClientErc20(context)
+      const addressListClient = new ClientAddressList(context)
       const client = new Client(context)
 
       // generate actions
@@ -218,7 +218,7 @@ describe("Client", () => {
         executeOnPass: true
       }
 
-      for await (const step of erc20Client.methods.createProposal(proposalParams)) {
+      for await (const step of addressListClient.methods.createProposal(proposalParams)) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");
@@ -240,7 +240,7 @@ describe("Client", () => {
   describe("Vote on a proposal", () => {
     it("Should estimate the gas fees for casting a vote", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
+      const client = new ClientAddressList(context)
 
       const estimation = await client.estimation.voteProposal(
         '0x1234567890123456789012345678901234567890',
@@ -257,7 +257,7 @@ describe("Client", () => {
 
     it("Should vote on a proposal locally", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
+      const client = new ClientAddressList(context)
 
       const proposalId = '0x1234567890123456789012345678901234567890'
 
@@ -284,7 +284,7 @@ describe("Client", () => {
   describe("Execute proposal", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
+      const client = new ClientAddressList(context)
 
       const estimation = await client.estimation.executeProposal(
         '0x1234567890123456789012345678901234567890'
@@ -300,7 +300,7 @@ describe("Client", () => {
 
     it("Should execute a local proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
+      const client = new ClientAddressList(context)
 
       const proposalId = '0x1234567890123456789012345678901234567890'
 
@@ -323,32 +323,52 @@ describe("Client", () => {
   })
 
   describe('Action generators', () => {
-    it("Should create a Erc20 client and generate a install entry", async () => {
-      const initParams: IErc20PluginInstall = {
+    it("Should create an AddressList client and generate a install entry", async () => {
+      const withdrawParams: IAddressListPluginInstall = {
         proposals: {
-          minDuration: 7200,
+          minDuration: 7200, // seconds
           minTurnout: 0.5,
           minSupport: 0.5
         },
-        useToken:{
-          address: AddressZero
-        },
+        addresses: [
+          "0x1234567890123456789012345678901234567890",
+          "0x2345678901234567890123456789012345678901",
+          "0x3456789012345678901234567890123456789012",
+          "0x4567890123456789012345678901234567890134"
+        ]
       };
-      const erc20InstallEntry = ClientErc20.encoding.installEntry(initParams);
 
-      expect(typeof erc20InstallEntry).toBe("object");
+      const installEntry = ClientAddressList.encoding.installEntry(withdrawParams);
+
+      expect(typeof installEntry).toBe("object");
       // what does this should be
-      expect(erc20InstallEntry.data).toBeInstanceOf(Uint8Array);
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
+    });
+
+    it("Should create an AddressList client and generate a plugin config action action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const pluginConfigParams: IProposalSettings = {
+        minDuration: 100000,
+        minTurnout: 0.25,
+        minSupport: 0.51
+      };
+
+      const installEntry = client.encoding.setPluginConfigAction(pluginConfigParams);
+
+      expect(typeof installEntry).toBe("object");
+      // what does this should be
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
     });
   })
 
   describe('Data retrieval', () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientErc20(context);
+      const client = new ClientAddressList(context);
 
-      const daoAddress = "0x1234567890123456789012345678901234567890"
-      const wallets = await client.methods.getMembers(daoAddress)
+      const wallets = await client.methods.getMembers("0x1234567890123456789012345678901234567890")
 
       expect(Array.isArray(wallets)).toBe(true);
       expect(wallets.length).toBeGreaterThan(0);
@@ -357,7 +377,7 @@ describe("Client", () => {
     })
     it("Should fetch the given proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientErc20(context);
+      const client = new ClientAddressList(context);
 
       const proposalId = "0x1234567890123456789012345678901234567890_0x55"
       const proposal = await client.methods.getProposal(proposalId)
@@ -368,12 +388,24 @@ describe("Client", () => {
     })
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientErc20(context);
-      const limit = 5
+      const client = new ClientAddressList(context);
+      let proposals = await client.methods.getProposals()
+
+      expect(Array.isArray(proposals)).toBe(true)
+      expect(proposals.length <= 10).toBe(true)
+
+      let limit = 1
       const params: IProposalQueryParams = {
         limit
       }
-      const proposals = await client.methods.getProposals(params)
+      proposals = await client.methods.getProposals(params)
+
+      expect(Array.isArray(proposals)).toBe(true)
+      expect(proposals.length <= limit).toBe(true)
+
+      limit = 5
+      params.limit = limit
+      proposals = await client.methods.getProposals(params)
 
       expect(Array.isArray(proposals)).toBe(true)
       expect(proposals.length <= limit).toBe(true)

@@ -5,6 +5,7 @@ import {
   bufferToBigInt,
   ensure0x,
   hexStringToBuffer,
+  hexToBytes,
   strip0x,
   uintArrayToHex,
 } from "../../src";
@@ -269,6 +270,19 @@ describe("Value encoding", () => {
     for (let input of inputs) {
       const result = ensure0x(input.in);
       expect(result).toEqual(input.out);
+    }
+  });
+
+  it("Should convert a hex string to a decimal Uint8Array", () => {
+    const inputs = [
+      { in: "61", out: new Uint8Array([97]) },
+      { in: "6161", out: new Uint8Array([97, 97]) },
+      { in: "616162", out: new Uint8Array([97, 97, 98]) },
+      { in: "68656c6c6f207468657265", out: new Uint8Array([104, 101, 108, 108, 111, 32, 116, 104, 101, 114, 101]) }
+    ]
+    for (let input of inputs) {
+      const result = hexToBytes(input.in);
+      expect(result.toString()).toEqual(input.out.toString());
     }
   });
 });

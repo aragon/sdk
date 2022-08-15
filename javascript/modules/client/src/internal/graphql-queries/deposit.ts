@@ -17,7 +17,7 @@ query deposits($address: ID!, $limit: Int = 10, $skip: Int = 0) {
     amount
     reference
     transaction
-    createdAt
+    creationDate
   }
 }
 `

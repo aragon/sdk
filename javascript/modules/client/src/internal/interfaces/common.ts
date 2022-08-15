@@ -22,12 +22,10 @@ export type DaoAction = {
  * Contains the payload passed to the global DAO factory so that
  * plugins can be initialized
  */
-export type FactoryInitParams = {
-  /** The ID of the plugin to use */
-  id: string;
-  /** ABI encoded parameters to pass to the plugin factory */
-  data: Uint8Array;
-};
+export interface IPluginListItem {
+  id: string // ENS domain or address of the plugin's Repo
+  data: Uint8Array
+}
 
 /**
  * Contains the general human readable information about the DAO
@@ -49,22 +47,33 @@ export type Proposal = {
   id: string;
   daoAddress: string;
   daoName: string;
-  creator: string;
+  creatorAddress: string;
 
   // date
   endDate: Date;
   startDate: Date;
-  createdAt: Date;
+  creationDate: Date;
 
   // metadata
   title: string;
   summary: string;
-  proposal: string;
+  description: string;
   resources: { url: string; description: string }[];
 
   actions?: DaoAction[];
   status: ProposalStatus;
 };
+
+export interface IPagination {
+  skip?: number
+  limit?: number
+  direction?: SortDirection
+}
+
+export enum SortDirection {
+  ASC = "asc",
+  DESC = "desc"
+}
 
 /**
  * Contains the states of a proposal. Note that on chain
@@ -77,3 +86,4 @@ export enum ProposalStatus {
   EXECUTED = "Executed",
   DEFEATED = "Defeated",
 }
+

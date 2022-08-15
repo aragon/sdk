@@ -1,12 +1,10 @@
-// This file contains the definitions of the ERC20 and Multisig DAO clients
+// This file contains the definitions of the ERC20 and AddressList DAO clients
 
 import { IClientCore } from "./core";
 import {
   DaoAction,
-  DaoConfig,
-  FactoryInitParams,
   GasFeeEstimation,
-  Proposal,
+  IPagination,
 } from "./common";
 
 // NOTE: These 2 clients will eventually be moved to their own package
@@ -17,132 +15,102 @@ import {
 export interface IClientErc20 extends IClientCore {
   methods: {
     createProposal: (
-      params: ICreateProposalParams
+      params: ICreateProposal
     ) => AsyncGenerator<ProposalCreationStepValue>;
-    voteProposal: (proposalId: string, vote: VoteOptions) => Promise<void>;
-    executeProposal: (proposalId: string) => Promise<void>;
-    // setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
-    // setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
-    getMembers: (daoAddressOrEns: string) => Promise<string[]>;
-    getProposals: (daoAddressOrEns: string) => Promise<Erc20Proposal[]>;
+    voteProposal: (proposalId: string, vote: VoteValues) => AsyncGenerator<VoteProposalStepValue>;
+    executeProposal: (proposalId: string) => AsyncGenerator<ExecuteProposalStepValue>;
+    getMembers: (addressOrEns: string) => Promise<string[]>;
+    getProposal: (propoosalId: string) => Promise<Erc20Proposal>
+    getProposals: (params?: IProposalQueryParams) => Promise<Erc20ProposalListItem[]>
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    init: (params: IErc20FactoryParams) => FactoryInitParams;
-    /** Computes the action payload to pass upon proposal creation */
-    withdrawAction: (params: IWithdrawParams) => DaoAction;
+    setPluginConfigAction: (params: IProposalSettings) => DaoAction;
   };
   estimation: {
     createProposal: (
-      params: ICreateProposalParams
+      params: ICreateProposal
     ) => Promise<GasFeeEstimation>;
     voteProposal: (
       proposalId: string,
-      vote: VoteOptions
+      vote: VoteValues
     ) => Promise<GasFeeEstimation>;
     executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
-    // setDaoConfig: (address: string, config: DaoConfig) => Promise<GasFeeEstimation>;
-    // setVotingConfig: (address: string, config: VotingConfig) => Promise<GasFeeEstimation>;
   };
 }
 
-// MULTISIG
+// Address List
 
-/** Defines the shape of the Multisig client class */
-export interface IClientMultisig extends IClientCore {
+/** Defines the shape of the AddressList client class */
+export interface IClientAddressList extends IClientCore {
   methods: {
     createProposal: (
-      params: ICreateProposalParams
+      params: ICreateProposal
     ) => AsyncGenerator<ProposalCreationStepValue>;
-    voteProposal: (proposalId: string, vote: VoteOptions) => Promise<void>;
-    executeProposal: (proposalId: string) => Promise<void>;
-    setDaoConfig: (address: string, config: DaoConfig) => Promise<void>;
-    setVotingConfig: (address: string, config: VotingConfig) => Promise<void>;
-    getMembers: (daoAddressOrEns: string) => Promise<string[]>;
-    /* TODO: define proper return type */
-    getProposals: (daoAddressOrEns: string) => Promise<Proposal[]>;
+    voteProposal: (proposalId: string, vote: VoteValues) => AsyncGenerator<VoteProposalStepValue>;
+    executeProposal: (proposalId: string) => AsyncGenerator<ExecuteProposalStepValue>;
+    getMembers: (addressOrEns: string) => Promise<string[]>;
+    getProposal: (propoosalId: string) => Promise<AddressListProposal>
+    getProposals: (params?: IProposalQueryParams) => Promise<AddressListProposalListItem[]>
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    init: (params: IMultisigFactoryParams) => FactoryInitParams;
-    /** Compotes the action payload to pass upon proposal creation */
-    withdrawAction: (
-      to: string,
-      value: bigint,
-      params: IWithdrawParams
-    ) => DaoAction;
+    setPluginConfigAction: (params: IProposalSettings) => DaoAction;
   };
   estimation: {
-    createProposal: (params: ICreateProposalParams) => Promise<bigint>;
-    voteProposal: (proposalId: string, vote: VoteOptions) => Promise<bigint>;
-    executeProposal: (proposalId: string) => Promise<bigint>;
-    setDaoConfig: (address: string, config: DaoConfig) => Promise<bigint>;
-    setVotingConfig: (address: string, config: VotingConfig) => Promise<bigint>;
+    createProposal: (params: ICreateProposal) => Promise<GasFeeEstimation>;
+    voteProposal: (proposalId: string, vote: VoteValues) => Promise<GasFeeEstimation>;
+    executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
   };
 }
 
 // TYPES
-
-export interface TokenConfig {
-  address: string;
-  name: string;
-  symbol: string;
-}
-
-export interface MintConfig {
-  address: string;
-  balance: bigint;
-}
-
-export interface VotingConfig {
-  /** 0-100 as a percentage */
+export interface IProposalSettings {
+  /** Float: 0 to 1 */
   minSupport: number;
-  /** 0-100 as a percentage */
-  minParticipation: number;
-  // TODO: In seconds vs in blocks doesn't make sense
+  /** Float: 0 to 1 */
+  minTurnout: number;
   /** In seconds */
   minDuration: number;
 }
 
-export interface ICreateProposalParams {
-  metadataUri: string;
+export interface ICreateProposal {
+  metadata: ProposalMetadata;
   actions?: DaoAction[];
   startDate?: Date;
   endDate?: Date;
-  executeIfPassed?: boolean;
-  creatorVote?: VoteOptions;
-}
-
-// TODO: Confirm values
-export enum VoteOptions {
-  NONE = 0,
-  ABSTAIN = 1,
-  YEA = 2,
-  NAY = 3,
-}
-
-export interface IWithdrawParams {
-  recipientAddress: string;
-  amount: bigint;
-  tokenAddress?: string;
-  reference?: string;
+  executeOnPass?: boolean;
+  creatorVote?: VoteValues;
 }
 
 // Factory init params
 
-export interface IErc20FactoryParams {
-  tokenConfig: TokenConfig;
-  mintConfig: MintConfig[];
-  votingConfig: VotingConfig;
+export type IErc20PluginInstall = {
+  proposals: IProposalSettings;
+  newToken?: NewTokenParams;
+  useToken?: ExistingTokenParams;
+};
+
+type ExistingTokenParams = {
+  address: string;
+};
+
+type NewTokenParams = {
+  name: string;
+  symbol: string;
+  decimals: number;
+  minter?: string;
+  balances: { address: string; balance: bigint }[];
+};
+
+export type IAddressListPluginInstall = {
+  addresses: string[],
+  proposals: IProposalSettings
 }
 
-export interface IMultisigFactoryParams {
-  votingConfig: VotingConfig;
-  whitelistVoters: string[];
-}
+// STEPS
 
 // PROPOSAL CREATION
-
 export enum ProposalCreationSteps {
   CREATING = "creating",
   DONE = "done",
@@ -152,33 +120,146 @@ export type ProposalCreationStepValue =
   | { key: ProposalCreationSteps.CREATING; txHash: string }
   | { key: ProposalCreationSteps.DONE; proposalId: string };
 
-// PROPOSAL RETRIEVAL
+// PROPOOSAL VOTING
+export enum VoteProposalStep {
+  VOTING = "voting",
+  DONE = "done",
+}
 
-export type Erc20Proposal = Proposal & {
-  voteId: string;
-  token: Erc20Token;
+export type VoteProposalStepValue =
+  | { key: VoteProposalStep.VOTING; txHash: string }
+  | { key: VoteProposalStep.DONE; voteId: string };
 
-  result: {
-    yea?: number;
-    nay?: number;
-    abstain?: number;
-  };
+// PROPOOSAL EXECUTION
+export enum ExecuteProposalStep {
+  EXECUTING = "executing",
+  DONE = "done",
+}
 
-  config: {
-    participationRequiredPct: number;
-    supportRequiredPct: number;
-  };
+export type ExecuteProposalStepValue =
+  | { key: ExecuteProposalStep.EXECUTING; txHash: string }
+  | { key: ExecuteProposalStep.DONE };
 
-  votingPower: number;
-  voters: { address: string; voteValue: VoteOptions; weight: number }[];
 
-  open: boolean;
-  executed: boolean;
+  // PROPOSAL RETRIEVAL
+
+// Long version
+export type ProposalBase = {
+  id: string
+  dao: {
+    address: string,
+    name: string,
+  },
+  creatorAddress: string;
+  metadata: ProposalMetadata;
+  startDate: Date;
+  endDate: Date;
+  creationDate: Date;
+  actions: Array<DaoAction>;
+  status: ProposalStatus;
+}
+
+export type Erc20Proposal = ProposalBase & {
+  result: Erc20ProposalResult;
+  settings: IProposalSettings;
+  token: Erc20TokenDetails;
+  usedVotingWeight: bigint;
+  votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
+}
+
+export type AddressListProposal = ProposalBase & {
+  result: AddressListProposalResult;
+  settings: IProposalSettings;
+  votes: Array<{ address: string; vote: VoteValues; }>;
 };
 
-export type Erc20Token = {
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
+/**
+ * Contains the human-readable information about a proposal
+ */
+ export type ProposalMetadata = {
+  title: string;
+  summary: string;
+  description: string;
+  resources: Array<{ url: string; name: string }>;
+  media?: {
+    header?: string;
+    logo?: string;
+  };
 };
+
+// Short version
+export type ProposalListItemBase = {
+  id: string;
+  dao: {
+    address: string;
+    name: string;
+  },
+  creatorAddress: string;
+  metadata: ProposalMetadataSummary;
+  startDate: Date;
+  endDate: Date;
+  status: ProposalStatus;
+};
+
+export type Erc20ProposalListItem = ProposalListItemBase & {
+  token: Erc20TokenDetails;
+  result: Erc20ProposalResult;
+};
+
+export type AddressListProposalListItem = ProposalListItemBase & {
+  result: AddressListProposalResult;
+}
+
+/**
+ * Contains the human-readable information about a proposal
+ */
+export type ProposalMetadataSummary = {
+  title: string;
+  summary: string;
+};
+
+/**
+ * Contains the statuses of a proposal. Note that on chain
+ * proposals cannot be in draft state
+ */
+export enum ProposalStatus {
+  ACTIVE = "Active",
+  PENDING = "Pending",
+  SUCCEEDED = "Succeeded",
+  EXECUTED = "Executed",
+  DEFEATED = "Defeated",
+}
+
+export enum VoteValues {
+  // NONE = 0,
+  ABSTAIN = 1,
+  YES = 2,
+  NO = 3,
+};
+
+export type Erc20ProposalResult = {
+  yes: bigint;
+  no: bigint;
+  abstain: bigint;
+};
+
+export type AddressListProposalResult = {
+  yes: number;
+  no: number;
+  abstain: number;
+};
+
+
+type Erc20TokenDetails = { address: string, name: string; symbol: string; decimals: number; };
+
+export interface IProposalQueryParams extends IPagination {
+  sortBy?: ProposalSortBy
+  addressOrEns?: string
+}
+
+export enum ProposalSortBy {
+  CREATED_AT,
+  NAME,
+  POPULARITY,
+  VOTES // currently defined as number of proposals
+}

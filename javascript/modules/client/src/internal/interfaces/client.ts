@@ -1,7 +1,7 @@
 // This file contains the definitions of the general purpose DAO client
 
 import { IClientCore } from "./core";
-import { DaoConfig, DaoRole, GasFeeEstimation } from "./common";
+import { DaoAction, DaoRole, GasFeeEstimation, IPagination, IPluginListItem } from "./common";
 
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
@@ -25,9 +25,13 @@ export interface IClient extends IClientCore {
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getMetadata: (daoAddressOrEns: string) => Promise<DaoMetadata>;
-    /** Retrieves list of created DAOs and the corresponding metadata*/
-    getMetadataMany: (options?: DaoQueryOptions) => Promise<DaoMetadata[]>;
+    getDao: (daoAddressOrEns: string) => Promise<DaoDetails>;
+    /** Retrieves metadata for many daos */
+    getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
+  };
+  encoding: {
+    /** Computes the withdraw action payload */
+    withdrawAction: (daoAddresOrEns: string, params: IWithdrawParams) => Promise<DaoAction>;
   };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
@@ -35,26 +39,27 @@ export interface IClient extends IClientCore {
   };
 }
 
-export interface ISearchParams{
-  pageSize?: number
-  page?: number
-}
-
 // DAO CREATION
 
 /** Holds the parameters that the DAO will be created with */
 export interface ICreateParams {
-  daoConfig: DaoConfig;
-  gsnForwarder?: string;
-
-  // TODO: Support an array of package + parameters to install
-  plugins: IPluginFactoryParams[];
+  metadata: IDaoMetadata
+  ensSubdomain: string
+  plugins: IPluginListItem[]
 }
 
-/** Holds the parameters passed to a Plugin factory when creating a DAO or installing a plugin */
-export interface IPluginFactoryParams {
-  id: string;
-  data: string;
+export interface IDaoMetadata {
+  name: string,
+  description: string,
+  avatar: string,
+  links: { name: string, url: string }[]
+}
+
+export interface IWithdrawParams {
+  recipientAddress: string;
+  amount: bigint;
+  tokenAddress?: string;
+  reference?: string;
 }
 
 export enum DaoCreationSteps {
@@ -148,28 +153,38 @@ export interface IAssetTransfers {
 
 // DAO details
 
-export type DaoResourceLink = { description: string; url: string };
+export type DaoResourceLink = { name: string; url: string };
+export type InstalledPluginListItem = { id: string; instanceAddress: string, version: string };
 
-export type DaoMetadata = {
+export type DaoDetails = {
   address: string;
-  avatar?: string;
-  createdAt: Date;
-  description: string;
-  links?: DaoResourceLink[];
-  name: string;
-  plugins: string[];
+  ensDomain: string;
+  metadata: {
+    name: string,
+    description: string,
+    avatar?: string,
+    links: DaoResourceLink[],
+  }
+  creationDate: Date
+  plugins: InstalledPluginListItem[]
 };
+
+export type DaoListItem = {
+  address: string;
+  ensDomain: string;
+  metadata: {
+    name: string;
+    avatar?: string;
+  }
+  plugins: InstalledPluginListItem[]
+};
+
+export interface IDaoQueryParams extends IPagination {
+  sortBy?: DaoSortBy
+}
 
 export enum DaoSortBy {
   CREATED_AT,
   NAME,
-  POPULARITY, // Currently defined by overall number of proposals
+  POPULARITY, // currently defined as number of proposals
 }
-
-// TODO: Rename ?
-export type DaoQueryOptions = {
-  sortBy?: DaoSortBy;
-  sortDirection?: "asc" | "desc";
-  skip?: number;
-  limit?: number;
-};

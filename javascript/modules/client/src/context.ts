@@ -17,7 +17,6 @@ if (typeof process !== "undefined" && process.env?.TESTING) {
 // State
 const defaultState: ContextState = {
   network: "mainnet",
-  dao: "",
   web3Providers: [],
   gasFeeEstimationFactor: DEFAULT_GAS_FEE_ESTIMATION_FACTOR,
 };
@@ -45,24 +44,19 @@ export class Context {
    * @private
    */
   setFull(contextParams: ContextParams): void {
-    // if (!contextParams.subgraphURL) {
-    //   throw new Error("Missing subgraph URL");
-    // }
     if (!contextParams.network) {
       throw new Error("Missing network");
     } else if (!contextParams.daoFactoryAddress) {
       throw new Error("Missing DAO factory address");
     } else if (!contextParams.signer) {
       throw new Error("Please pass the required signer");
-    } else if (!contextParams.dao) {
-      throw new Error("No DAO address defined");
     } else if (!contextParams.web3Providers) {
       throw new Error("No web3 endpoints defined");
     } else if (!contextParams.gasFeeEstimationFactor) {
       throw new Error("No gas fee reducer defined");
     } else if (!contextParams.ipfsNodes?.length) {
       throw new Error("No IPFS nodes defined");
-    } else if (!contextParams.graphqlURLs?.length) {
+    } else if (!contextParams.graphqlNodes?.length) {
       throw new Error("No graphql URL defined");
     }
 
@@ -70,7 +64,6 @@ export class Context {
       network: contextParams.network,
       signer: contextParams.signer,
       daoFactoryAddress: contextParams.daoFactoryAddress,
-      dao: contextParams.dao,
       web3Providers: this.useWeb3Providers(
         contextParams.web3Providers,
         contextParams.network,
@@ -81,7 +74,7 @@ export class Context {
       ipfs: contextParams.ipfsNodes.map((config) =>
         new IpfsClient(config.url, config.headers)
       ),
-      graphql: contextParams.graphqlURLs.map((url) =>
+      graphql: contextParams.graphqlNodes.map((url) =>
         new GraphQLClient(url)
       ),
     };
@@ -90,9 +83,6 @@ export class Context {
   set(contextParams: Partial<ContextParams>) {
     if (contextParams.network) {
       this.state.network = contextParams.network;
-    }
-    if (contextParams.dao) {
-      this.state.dao = contextParams.dao;
     }
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
@@ -121,8 +111,8 @@ export class Context {
         new IpfsClient(config.url, config.headers)
       );
     }
-    if (contextParams.graphqlURLs?.length) {
-      this.state.graphql = contextParams.graphqlURLs.map((url) =>
+    if (contextParams.graphqlNodes?.length) {
+      this.state.graphql = contextParams.graphqlNodes.map((url) =>
         new GraphQLClient(url)
       );
     }
@@ -209,19 +199,6 @@ export class Context {
   }
 
   /**
-   * Getter for the DAO address in the current global context
-   *
-   * @var dao
-   *
-   * @returns {string}
-   *
-   * @public
-   */
-  get dao(): string {
-    return this.state.dao || defaultState.dao;
-  }
-
-  /**
    * Getter for the gas fee reducer used in estimations
    *
    * @var gasFeeEstimationFactor
@@ -264,9 +241,6 @@ export class Context {
 
   // DEFAULT CONTEXT STATE
   static setDefault(params: Partial<ContextParams>) {
-    if (params.dao) {
-      defaultState.dao = params.dao;
-    }
     if (params.daoFactoryAddress) {
       defaultState.daoFactoryAddress = params.daoFactoryAddress;
     }
