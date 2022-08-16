@@ -143,13 +143,13 @@ export class Context {
     }[]
   ): IpfsClient[] {
     let clients: IpfsClient[] = []
-    configs.map((config) => {
-      const url = new URL(config.url)
+    for (let i = 0; i < configs.length; i++) {
+      const url = new URL(configs[i].url)
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
       }
-      clients.push(new IpfsClient(url, config.headers))
-    })
+      clients.push(new IpfsClient(url, configs[i].headers))
+    }
     return clients
   }
 
@@ -157,13 +157,13 @@ export class Context {
     endpoints: string[]
   ): GraphQLClient[] {
     let clients: GraphQLClient[] = []
-    endpoints.map((endpoint) => {
-      const url = new URL(endpoint)
+    for (let i = 0; i < endpoints.length; i++) {
+      const url = new URL(endpoints[i])
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
       }
       clients.push(new GraphQLClient(url.href))
-    })
+    }
     return clients
   }
 
