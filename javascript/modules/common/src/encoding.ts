@@ -10,7 +10,7 @@ export function hexStringToBuffer(hexString: string): Buffer {
 }
 
 /** Encodes a buffer into a hex string */
-export function uintArrayToHex(buff: Uint8Array, prepend0x?: boolean): string {
+export function bufferToHexString(buff: Uint8Array, prepend0x?: boolean): string {
   const bytes: string[] = [];
   for (let i = 0; i < buff.length; i++) {
     if (buff[i] >= 16) bytes.push(buff[i].toString(16));
@@ -53,7 +53,6 @@ export function strip0x(value: string): string {
   return value.startsWith("0x") ? value.substring(2) : value;
 }
 
-
 /**
  * Encodes a 0-1 ratio within the given digit precision for storage on a smart contract
  *
@@ -64,12 +63,13 @@ export function strip0x(value: string): string {
  */
 export function encodeRatio(ratio: number, digits: number): number {
   if (ratio < 0 || ratio > 1) {
-    throw new Error("The ratio value should be between 0 and 1")
+    throw new Error("The ratio value should range between 0 and 1");
+  } else if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
+    throw new Error(
+      "The number of digits should range between 1 and 15",
+    );
   }
-  if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
-    throw new Error("The digits value should be an positive integer between 1 and 15")
-  }
-  return Math.round(ratio * (10 ** digits))
+  return Math.round(ratio * (10 ** digits));
 }
 /**
  * Decodes a value received from a smart contract to a number with
@@ -79,11 +79,19 @@ export function encodeRatio(ratio: number, digits: number): number {
  * @param {number} digits
  * @return {*}  {number}
  */
-export function decodeRatio(onChainValue: bigint, digits: number): number {
+export function decodeRatio(
+  onChainValue: bigint | number,
+  digits: number,
+): number {
   if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
-    throw new Error("The number of digits should be a positive integer between 1 and 15")
+    throw new Error(
+      "The number of digits should be a positive integer between 1 and 15",
+    );
+  } else if (onChainValue > 10 ** digits) {
+    throw new Error("The value is out of range");
   }
-  return parseFloat(onChainValue.toString()) / (10 ** digits)
+
+  return Number(onChainValue) / (10 ** digits);
 }
 
 export function hexToBytes(hex: string): Uint8Array {

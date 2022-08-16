@@ -9,7 +9,7 @@ import {
   hexStringToBuffer,
   hexToBytes,
   strip0x,
-  uintArrayToHex,
+  bufferToHexString,
 } from "../../src";
 
 describe("Value encoding", () => {
@@ -100,7 +100,7 @@ describe("Value encoding", () => {
     ];
 
     for (let item of items) {
-      const hex = uintArrayToHex(item.buffer, item.with0x);
+      const hex = bufferToHexString(item.buffer, item.with0x);
       expect(hex).toEqual(item.output);
     }
   });
@@ -275,17 +275,22 @@ describe("Value encoding", () => {
     }
   });
 
-  it("Should return a bigint encoded from a float between 1 and 0  and a positive integer number of digits", () => {
-    expect(() => encodeRatio(-0.5, 4)).toThrow("The ratio value should be between 0 and 1")
-    expect(() => encodeRatio(5, 4)).toThrow("The ratio value should be between 0 and 1")
-    expect(() => encodeRatio(0.5, -1)).toThrow("The digits value should be an positive integer between 1 and 15")
-    expect(() => encodeRatio(0.5, 18)).toThrow("The digits value should be an positive integer between 1 and 15")
+  it("Should return an integer encoded from a float between 1 and 0 and a positive integer number of digits", () => {
+    expect(() => encodeRatio(-0.5, 4)).toThrow("The ratio value should range between 0 and 1")
+    expect(() => encodeRatio(5, 4)).toThrow("The ratio value should range between 0 and 1")
+    expect(() => encodeRatio(0.5, -1)).toThrow("The number of digits should range between 1 and 15")
+    expect(() => encodeRatio(0.5, 18)).toThrow("The number of digits should range between 1 and 15")
 
     const inputs = [
-      // strip
       { in: [0.5, 1], out: 5 },
       { in: [0.5, 4], out: 5000 },
       { in: [0.5, 10], out: 5000000000 },
+      { in: [0.25, 1], out: 3 },
+      { in: [0.25, 2], out: 25 },
+      { in: [0.251, 2], out: 25 },
+      { in: [0.251, 3], out: 251 },
+      { in: [0.25, 4], out: 2500 },
+      { in: [0.25, 10], out: 2500000000 },
     ];
 
     for (let input of inputs) {
@@ -294,21 +299,30 @@ describe("Value encoding", () => {
     }
   });
 
-  it("Should decode a float from a given bigint and positive integer number of digits", () => {
-    expect(() => encodeRatio(0.5, -1)).toThrow("The digits value should be an positive integer between 1 and 15")
-    expect(() => encodeRatio(0.5, 18)).toThrow("The digits value should be an positive integer between 1 and 15")
+  it("Should decode a float from a given bigint and a number of digits", () => {
+    expect(() => encodeRatio(0.5, -1)).toThrow("The number of digits should range between 1 and 15")
+    expect(() => encodeRatio(0.5, 18)).toThrow("The number of digits should range between 1 and 15")
 
     const inputs = [
-      // strip
       { bigint: BigInt(5), digits: 1, out: 0.5 },
       { bigint: BigInt(5456), digits: 4, out: 0.5456 },
-      { bigint: BigInt(512345898367483947), digits: 9, out: 512345898.367483947 }, // js loses precision above 6 digits
+      { bigint: 5, digits: 1, out: 0.5 },
+      { bigint: 5456, digits: 4, out: 0.5456 },
+      { bigint: BigInt("1"), digits: 9, out: 0.000000001 },
+      { bigint: BigInt("367483947"), digits: 9, out: 0.367483947 },
+      { bigint: 1, digits: 9, out: 0.000000001 },
+      { bigint: 367483947, digits: 9, out: 0.367483947 },
     ];
 
     for (let input of inputs) {
       const result = decodeRatio(input.bigint, input.digits);
       expect(result).toEqual(input.out);
     }
+
+    expect(() => decodeRatio(Number.MAX_SAFE_INTEGER + 1, 12)).toThrow("The value is out of range")
+    expect(() => decodeRatio(BigInt("512345898367483947"), 12)).toThrow("The value is out of range")
+    expect(() => decodeRatio(10 ** 2, 1)).toThrow("The value is out of range")
+    expect(() => decodeRatio(10 ** 10, 9)).toThrow("The value is out of range")
   });
 
   it("Should convert a hex string to a decimal Uint8Array", () => {
