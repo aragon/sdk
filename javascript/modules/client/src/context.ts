@@ -71,12 +71,8 @@ export class Context {
       gasFeeEstimationFactor: Context.resolveGasFeeEstimationFactor(
         contextParams.gasFeeEstimationFactor,
       ),
-      ipfs: contextParams.ipfsNodes.map((config) =>
-        new IpfsClient(config.url, config.headers)
-      ),
-      graphql: contextParams.graphqlNodes.map((url) =>
-        new GraphQLClient(url)
-      ),
+      ipfs: this.useIpfs(contextParams.ipfsNodes),
+      graphql: this.useGraphql(contextParams.graphqlNodes),
     };
   }
 
@@ -107,14 +103,10 @@ export class Context {
     }
 
     if (contextParams.ipfsNodes?.length) {
-      this.state.ipfs = contextParams.ipfsNodes.map((config) =>
-        new IpfsClient(config.url, config.headers)
-      );
+      this.state.ipfs = this.useIpfs(contextParams.ipfsNodes)
     }
     if (contextParams.graphqlNodes?.length) {
-      this.state.graphql = contextParams.graphqlNodes.map((url) =>
-        new GraphQLClient(url)
-      );
+      this.state.graphql = this.useGraphql(contextParams.graphqlNodes)
     }
   }
 
@@ -142,6 +134,37 @@ export class Context {
     } else {
       return [endpoints];
     }
+  }
+
+  useIpfs(
+    configs: {
+      url: string;
+      headers?: Record<string, string> | undefined;
+    }[]
+  ): IpfsClient[] {
+    let clients: IpfsClient[] = []
+    configs.map((config) => {
+      const url = new URL(config.url)
+      if (!supportedProtocols.includes(url.protocol)) {
+        throw new UnsupportedProtocolError(url.protocol);
+      }
+      clients.push(new IpfsClient(url, config.headers))
+    })
+    return clients
+  }
+
+  useGraphql(
+    endpoints: string[]
+  ): GraphQLClient[] {
+    let clients: GraphQLClient[] = []
+    endpoints.map((endpoint) => {
+      const url = new URL(endpoint)
+      if (!supportedProtocols.includes(url.protocol)) {
+        throw new UnsupportedProtocolError(url.protocol);
+      }
+      clients.push(new GraphQLClient(url.href))
+    })
+    return clients
   }
 
   // GETTERS
