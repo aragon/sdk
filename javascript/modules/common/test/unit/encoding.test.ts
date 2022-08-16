@@ -278,23 +278,25 @@ describe("Value encoding", () => {
   it("Should return a bigint encoded from a float between 1 and 0  and a positive integer number of digits", () => {
     expect(() => encodeRatio(-0.5, 4)).toThrow("The ratio value should be between 0 and 1")
     expect(() => encodeRatio(5, 4)).toThrow("The ratio value should be between 0 and 1")
-    expect(() => encodeRatio(0.5, -1)).toThrow("The digits value should be an positive integer")
+    expect(() => encodeRatio(0.5, -1)).toThrow("The digits value should be an positive integer between 1 and 15")
+    expect(() => encodeRatio(0.5, 18)).toThrow("The digits value should be an positive integer between 1 and 15")
 
     const inputs = [
       // strip
-      { in: [0.5, 1], out: "5" },
-      { in: [0.5, 4], out: "5000" },
-      { in: [0.5, 18], out: "500000000000000000" },
+      { in: [0.5, 1], out: 5 },
+      { in: [0.5, 4], out: 5000 },
+      { in: [0.5, 10], out: 5000000000 },
     ];
 
     for (let input of inputs) {
       const result = encodeRatio(input.in[0], input.in[1]);
-      expect(result.toString()).toEqual(input.out);
+      expect(result).toEqual(input.out);
     }
   });
 
   it("Should decode a float from a given bigint and positive integer number of digits", () => {
-    expect(() => encodeRatio(0.5, -1)).toThrow("The digits value should be an positive integer")
+    expect(() => encodeRatio(0.5, -1)).toThrow("The digits value should be an positive integer between 1 and 15")
+    expect(() => encodeRatio(0.5, 18)).toThrow("The digits value should be an positive integer between 1 and 15")
 
     const inputs = [
       // strip

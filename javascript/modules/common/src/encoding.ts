@@ -53,25 +53,37 @@ export function strip0x(value: string): string {
   return value.startsWith("0x") ? value.substring(2) : value;
 }
 
-export function encodeRatio(ratio: number, digits: number): bigint {
+
+/**
+ * Encodes a 0-1 ratio within the given digit precision for storage on a smart contract
+ *
+ * @export
+ * @param {number} ratio
+ * @param {number} digits
+ * @return {*}  {bigint}
+ */
+export function encodeRatio(ratio: number, digits: number): number {
   if (ratio < 0 || ratio > 1) {
     throw new Error("The ratio value should be between 0 and 1")
   }
-  if (!Number.isInteger(digits) || digits < 0) {
-    throw new Error("The digits value should be an positive integer")
+  if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
+    throw new Error("The digits value should be an positive integer between 1 and 15")
   }
-  return BigInt(Math.round(ratio * (10 ** digits)))
+  return Math.round(ratio * (10 ** digits))
 }
-
+/**
+ * Decodes a value received from a smart contract to a number with
+ *
+ * @export
+ * @param {bigint} onChainValue
+ * @param {number} digits
+ * @return {*}  {number}
+ */
 export function decodeRatio(onChainValue: bigint, digits: number): number {
-  if (!Number.isInteger(digits) || digits < 0) {
-    throw new Error("The number of digits should be a positive int")
+  if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
+    throw new Error("The number of digits should be a positive integer between 1 and 15")
   }
-  const s = onChainValue.toString()
-  if (digits < s.length) {
-    return parseFloat(s.substring(0, s.length - digits) + '.' + s.substring(s.length - digits, s.length))
-  }
-  return parseFloat("0." + "0".repeat(digits - s.length) + s)
+  return parseFloat(onChainValue.toString()) / (10 ** digits)
 }
 
 export function hexToBytes(hex: string): Uint8Array {
