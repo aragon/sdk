@@ -11,12 +11,14 @@ import { GraphQLClient } from "graphql-request";
 
 import {
   ExecuteProposalStep,
-  ICreateProposal,
+  ICreateProposalParams,
   IErc20PluginInstall,
   IProposalQueryParams,
   ProposalCreationSteps,
   VoteValues,
   VoteProposalStep,
+  IVoteProposalParams,
+  IExecuteProposalParams,
 } from "../../src/internal/interfaces/plugins";
 import { AddressZero } from "@ethersproject/constants";
 
@@ -153,7 +155,8 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
-      const proposalParams: ICreateProposal = {
+      const proposalParams: ICreateProposalParams = {
+        pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
         metadata: {
           title: 'Best Proposal',
           summary: 'this is the sumnary',
@@ -197,7 +200,8 @@ describe("Client", () => {
           reference: 'test'
         })
 
-      const proposalParams: ICreateProposal = {
+      const proposalParams: ICreateProposalParams = {
+        pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
         metadata: {
           title: 'Best Proposal',
           summary: 'this is the sumnary',
@@ -242,10 +246,12 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
-      const estimation = await client.estimation.voteProposal(
-        '0x1234567890123456789012345678901234567890',
-        VoteValues.YES
-      )
+      const voteParams: IVoteProposalParams = {
+        pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+        proposalId: '0x1234567890123456789012345678901234567890',
+        vote: VoteValues.YES
+      }
+      const estimation = await client.estimation.voteProposal(voteParams)
 
       expect(typeof estimation).toEqual("object")
       expect(typeof estimation.average).toEqual("bigint");
@@ -259,9 +265,13 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
-      const proposalId = '0x1234567890123456789012345678901234567890'
+      const voteParams: IVoteProposalParams = {
+        pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+        proposalId: '0x1234567890123456789012345678901234567890',
+        vote: VoteValues.YES
+      }
 
-      for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
+      for await (const step of client.methods.voteProposal(voteParams)) {
         switch (step.key) {
           case VoteProposalStep.VOTING:
             expect(typeof step.txHash).toBe("string");
@@ -286,9 +296,12 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
-      const estimation = await client.estimation.executeProposal(
-        '0x1234567890123456789012345678901234567890'
-      )
+
+      const executeParams: IExecuteProposalParams = {
+        pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+        proposalId: '0x1234567890123456789012345678901234567890',
+      }
+      const estimation = await client.estimation.executeProposal(executeParams)
 
       expect(typeof estimation).toEqual("object")
       expect(typeof estimation.average).toEqual("bigint");
@@ -302,9 +315,12 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientErc20(context)
 
-      const proposalId = '0x1234567890123456789012345678901234567890'
+      const executeParams: IExecuteProposalParams = {
+        pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+        proposalId: '0x1234567890123456789012345678901234567890',
+      }
 
-      for await (const step of client.methods.executeProposal(proposalId)) {
+      for await (const step of client.methods.executeProposal(executeParams)) {
         switch (step.key) {
           case ExecuteProposalStep.EXECUTING:
             expect(typeof step.txHash).toBe("string");
@@ -330,15 +346,15 @@ describe("Client", () => {
           minTurnout: 0.5,
           minSupport: 0.5
         },
-        useToken:{
+        useToken: {
           address: AddressZero
         },
       };
-      const erc20InstallEntry = ClientErc20.encoding.installEntry(initParams);
+      const erc20InstallPluginItem = ClientErc20.encoding.getPluginInstallItem(initParams);
 
-      expect(typeof erc20InstallEntry).toBe("object");
+      expect(typeof erc20InstallPluginItem).toBe("object");
       // what does this should be
-      expect(erc20InstallEntry.data).toBeInstanceOf(Uint8Array);
+      expect(erc20InstallPluginItem.data).toBeInstanceOf(Uint8Array);
     });
   })
 

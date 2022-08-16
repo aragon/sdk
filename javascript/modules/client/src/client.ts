@@ -121,6 +121,7 @@ export class Client extends ClientCore implements IClient {
   estimation = {
     create: (params: ICreateParams) => this._estimateCreation(params),
     deposit: (params: IDepositParams) => this._estimateDeposit(params),
+    increaseAllowance: (params: IDepositParams) => this._estimateIncreaseAllowance(params),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -334,6 +335,17 @@ export class Client extends ClientCore implements IClient {
       });
   }
 
+  _estimateIncreaseAllowance(_params: IDepositParams) {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new Error("A signer is needed");
+    } else if (!signer.provider) {
+      throw new Error("A web3 provider is needed");
+    }
+    // TODO: remove this
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
+  }
+
   //// PRIVATE METHODS METADATA
 
   private _getDao(daoAddressOrEns: string): Promise<DaoDetails> {
@@ -483,6 +495,7 @@ export class Client extends ClientCore implements IClient {
 // @ts-ignore  TODO: Remove this comment
 function unwrapCreateDaoParams(
   params: ICreateParams,
+  metadataIpfsUri: string
 ): [DAOFactory.DAOConfigStruct, DAOFactory.VoteConfigStruct, string, string] {
   // TODO: Serialize plugin params into a buffer
   const pluginDataBytes = "0x" +
@@ -497,7 +510,7 @@ function unwrapCreateDaoParams(
     {
       name: params.ensSubdomain,
       // TODO: Return the IPFS URI (ipfs://<cid>)
-      metadata: JSON.stringify(params.metadata)
+      metadata: metadataIpfsUri
     },
     {
       // TODO: Adapt the DAO creation parameters

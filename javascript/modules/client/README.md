@@ -251,7 +251,7 @@ console.log(daos)
     };
     plugins: [
       {
-        id: "allowList-voting.plugin.dao.eth",
+        id: "addressList-voting.plugin.dao.eth",
         instanceAddress: "0x12345..."
       }
     ]
@@ -459,8 +459,8 @@ const pluginInitParams2: IErc20PluginInstall = {
     ]
   }
 }
-const erc20InstallEntry1 = ClientErc20.encoding.installEntry(pluginInitParams1)
-const erc20InstallEntry2 = ClientErc20.encoding.installEntry(pluginInitParams2)
+const erc20InstallPluginItem1 = ClientErc20.encoding.getPluginInstallItem(pluginInitParams1)
+const erc20InstallPluginItem2 = ClientErc20.encoding.getPluginInstallItem(pluginInitParams2)
 
 const createParams: ICreateParams = {
   metadata: {
@@ -473,7 +473,7 @@ const createParams: ICreateParams = {
     }]
   },
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [erc20InstallEntry1, erc20InstallEntry2]
+  plugins: [erc20InstallPluginItem1, erc20InstallPluginItem2]
 }
 
 // gas estimation
@@ -501,7 +501,7 @@ for await (const step of steps) {
 ### Creating an ERC20 proposal
 
 ```ts
-import { ClientErc20, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin, ICreateProposalParams, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // Create a simple context
@@ -512,7 +512,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 // Create an ERC20 client
 const client = new ClientErc20(contextPlugin)
 
-const proposalParams: ICreateProposal = {
+const proposalParams: ICreateProposalParams = {
+  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -559,7 +560,7 @@ for await (const step of steps) {
 ### Creating an ERC20 proposal with an action
 
 ```ts
-import { ClientErc20, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin, ICreateProposalParams, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // Create a simple context
@@ -577,9 +578,10 @@ const configActionPrarms: IProposalSettings = {
   minTurnout: 0.5 // 50%
 }
 
-const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
+const configAction = client.encoding.updatePluginSettingsAction(configActionPrarms)
 
-const proposalParams: ICreateProposal = {
+const proposalParams: ICreateProposalParams = {
+  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -637,9 +639,13 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 // Create an ERC20 client
 const client = new ClientErc20(contextPlugin)
 
-const proposalId = "0x12345...0x1"
+const voteParams: IVoteProposalParams = {
+  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+  proposalId: '0x1234567890123456789012345678901234567890',
+  vote: VoteValues.YES
+}
 
-const steps = client.methods.voteProposal(proposalId, VoteValues.YES)
+const steps = client.methods.voteProposal(voteParams)
 for await (const step of steps) {
   try {
     switch (step.key) {
@@ -901,7 +907,7 @@ const pluginInitParams: IAddressListPluginInstall = {
   ]
 };
 
-const addressListInstallEntry = ClientAddressList.encoding.installEntry(pluginInitParams)
+const addressListInstallPluginItem = ClientAddressList.encoding.getPluginInstallItem(pluginInitParams)
 
 const createParams: ICreateParams = {
   metadata: {
@@ -914,7 +920,7 @@ const createParams: ICreateParams = {
     }]
   },
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [addressListInstallEntry]
+  plugins: [addressListInstallPluginItem]
 }
 
 // gas estimation
@@ -941,7 +947,7 @@ for await (const step of steps) {
 
 ### Creating a address list proposal
 ```ts
-import { ClientAddressList, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin, ICreateProposalParams, ProposalCreationSteps, VoteValues } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // Create a simple context
@@ -952,7 +958,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 // Create an ERC20 client
 const client = new ClientAddressList(contextPlugin)
 
-const proposalParams: ICreateProposal = {
+const proposalParams: ICreateProposalParams = {
+  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -999,7 +1006,7 @@ for await (const step of steps) {
 ### Creating a address list proposal with an action
 
 ```ts
-import { ClientAddressList, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin, ICreateProposalParams, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 // Create a simple context
@@ -1017,9 +1024,10 @@ const configActionPrarms: IProposalSettings = {
   minTurnout: 0.5 // 50%
 }
 
-const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
+const configAction = client.encoding.updatePluginSettingsAction(configActionPrarms)
 
-const proposalParams: ICreateProposal = {
+const proposalParams: ICreateProposalParams = {
+  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -1076,9 +1084,13 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 // Create an ERC20 client
 const client = new ClientAddressList(contextPlugin)
 
-const proposalId = "0x12345...0x1"
+const voteParams: IVoteProposalParams = {
+  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+  proposalId: '0x1234567890123456789012345678901234567890',
+  vote: VoteValues.YES
+}
 
-const steps = client.methods.voteProposal(proposalId, VoteValues.YES)
+const steps = client.methods.voteProposal(voteParams)
 for await (const step of steps) {
   try {
     switch (step.key) {
@@ -1300,7 +1312,7 @@ console.log(withdrawAction)
 ### Set Plugin Config (Address List)
 
 ```ts
-import { ClientAddressList, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
+import { ClientAddressList, Context, ContextPlugin, ICreateProposalParams, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const context: Context = new Context(params)
@@ -1314,13 +1326,13 @@ const configActionPrarms: IProposalSettings = {
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%
 }
-const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
+const configAction = client.encoding.updatePluginSettingsAction(configActionPrarms)
 
 ```
 ### Set Plugin Config (ERC-20)
 
 ```ts
-import { ClientErc20, Context, ContextPlugin, ICreateProposal, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin, ICreateProposalParams, ProposalCreationSteps, VoteValues, IProposalSettings } from "@aragon/sdk-client";
 import { Wallet } from 'ethers'
 
 const context: Context = new Context(params)
@@ -1334,7 +1346,7 @@ const configActionPrarms: IProposalSettings = {
   minSupport: 0.3, // 30%
   minTurnout: 0.5 // 50%
 }
-const configAction = client.encoding.setPluginConfigAction(configActionPrarms)
+const configAction = client.encoding.updatePluginSettingsAction(configActionPrarms)
 
 ```
 

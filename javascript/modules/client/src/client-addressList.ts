@@ -3,22 +3,23 @@ import { AddressZero } from "@ethersproject/constants";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
 import { encodeActionSetPluginConfig, encodeAddressListActionInit } from "./internal/encoding/plugins";
-import { IPluginListItem, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
+import { IPluginInstallItem, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
 import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   IClientAddressList,
-  ICreateProposal,
+  ICreateProposalParams,
   IAddressListPluginInstall,
   IProposalQueryParams,
   AddressListProposal,
   ProposalCreationSteps,
   ProposalCreationStepValue,
-  VoteValues,
   VoteProposalStep,
   VoteProposalStepValue,
-  IProposalSettings,
-  AddressListProposalListItem
+  IPluginSettings,
+  AddressListProposalListItem,
+  IExecuteProposalParams,
+  IVoteProposalParams
 } from "./internal/interfaces/plugins";
 import { getDummyAddressListProposal, getDummyAddressListProposalListItem } from "./internal/temp-mock";
 import { getProposalStatus } from "./internal/utils/plugins";
@@ -43,31 +44,31 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     /**
      * Creates a new proposal on the given AddressList plugin contract
      *
-     * @param {ICreateProposal} _params
+     * @param {ICreateProposalParams} _params
      * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
      * @memberof ClientAddressList
      */
-    createProposal: (params: ICreateProposal): AsyncGenerator<ProposalCreationStepValue> =>
+    createProposal: (params: ICreateProposalParams): AsyncGenerator<ProposalCreationStepValue> =>
       this._createProposal(params),
     /**
      * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
      *
      * @param {string} proposalId
-     * @param {VoteValues} vote
+     * @param {IVoteProposalParams} params
      * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
      * @memberof ClientAddressList
      */
-    voteProposal: (proposalId: string, vote: VoteValues): AsyncGenerator<VoteProposalStepValue> =>
-      this._voteProposal(proposalId, vote),
+    voteProposal: (params: IVoteProposalParams): AsyncGenerator<VoteProposalStepValue> =>
+      this._voteProposal(params),
     /**
      * Executes the given proposal, provided that it has already passed
      *
-     * @param {string} proposalId
+     * @param {IExecuteProposalParams} params
      * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
      * @memberof ClientAddressList
      */
-    executeProposal: (proposalId: string): AsyncGenerator<ExecuteProposalStepValue> =>
-      this._executeProposal(proposalId),
+    executeProposal: (params: IExecuteProposalParams): AsyncGenerator<ExecuteProposalStepValue> =>
+      this._executeProposal(params),
     /**
      * Returns the list of wallet addresses with signing capabilities on the plugin
      *
@@ -99,11 +100,11 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     /**
      * Computes the parameters to be given when creating a proposal that updates the governance configuration
      *
-     * @param {IProposalSettings} params
+     * @param {IPluginSettings} params
      * @return {*}  {DaoAction}
      * @memberof ClientAddressList
      */
-    setPluginConfigAction: (params: IProposalSettings): DaoAction => this._buildActionSetPluginConfig(params)
+    updatePluginSettingsAction: (params: IPluginSettings): DaoAction => this._buildUpdatePluginSettingsAction(params)
   }
   static encoding = {
     /**
@@ -114,7 +115,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
      * @return {*}  {FactoryInitParams}
      * @memberof ClientErc20
      */
-    installEntry: (params: IAddressListPluginInstall): IPluginListItem => {
+    getPluginInstallItem: (params: IAddressListPluginInstall): IPluginInstallItem => {
       return {
         id: PLUGIN_ID,
         data: encodeAddressListActionInit(params),
@@ -126,37 +127,37 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     /**
      * Estimates the gas fee of creating a proposal on the plugin
      *
-     * @param {ICreateProposal} params
+     * @param {ICreateProposalParams} params
      * @return {*}  {Promise<GasFeeEstimation>}
      * @memberof ClientAddressList
      */
-    createProposal: (params: ICreateProposal): Promise<GasFeeEstimation> =>
+    createProposal: (params: ICreateProposalParams): Promise<GasFeeEstimation> =>
       this._estimateCreateProposal(params),
 
     /**
      * Estimates the gas fee of casting a vote on a proposal
      *
-     * @param {string} proposalId
+     * @param {IVoteProposalParams} params
      * @param {VoteValues} vote
      * @return {*}  {Promise<GasFeeEstimation>}
      * @memberof ClientAddressList
      */
-    voteProposal: (proposalId: string, vote: VoteValues): Promise<GasFeeEstimation> =>
-      this._estimateVoteProposal(proposalId, vote),
+    voteProposal: (params: IVoteProposalParams): Promise<GasFeeEstimation> =>
+      this._estimateVoteProposal(params),
 
     /**
      * Estimates the gas fee of executing an AddressList proposal
      *
-     * @param {string} proposalId
+     * @param {params} params
      * @return {*}  {Promise<GasFeeEstimation>}
      * @memberof ClientAddressList
      */
-    executeProposal: (proposalId: string): Promise<GasFeeEstimation> =>
-      this._estimateExecuteProposal(proposalId),
+    executeProposal: (params: IExecuteProposalParams): Promise<GasFeeEstimation> =>
+      this._estimateExecuteProposal(params),
   }
 
   private async *_createProposal(
-    _params: ICreateProposal,
+    _params: ICreateProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -177,7 +178,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     }
   }
 
-  private async *_voteProposal(_proposalId: string, _vote: VoteValues): AsyncGenerator<VoteProposalStepValue> {
+  private async *_voteProposal(_params: IVoteProposalParams): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -197,7 +198,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     }
   }
 
-  private async *_executeProposal(_proposalId: string): AsyncGenerator<ExecuteProposalStepValue> {
+  private async *_executeProposal(_params: IExecuteProposalParams): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -265,7 +266,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 
-  private _buildActionSetPluginConfig(params: IProposalSettings): DaoAction {
+  private _buildUpdatePluginSettingsAction(params: IPluginSettings): DaoAction {
     // TODO: check if to and value are correct
     return {
       to: AddressZero,
@@ -274,7 +275,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     }
   }
 
-  private _estimateCreateProposal(_params: ICreateProposal): Promise<GasFeeEstimation> {
+  private _estimateCreateProposal(_params: ICreateProposalParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -287,7 +288,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
-  private _estimateVoteProposal(_proposalId: string, _vote: VoteValues): Promise<GasFeeEstimation> {
+  private _estimateVoteProposal(_params: IVoteProposalParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -300,7 +301,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
-  private _estimateExecuteProposal(_proposalId: string): Promise<GasFeeEstimation> {
+  private _estimateExecuteProposal(_params: IExecuteProposalParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");

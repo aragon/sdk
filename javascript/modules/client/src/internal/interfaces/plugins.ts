@@ -15,27 +15,24 @@ import {
 export interface IClientErc20 extends IClientCore {
   methods: {
     createProposal: (
-      params: ICreateProposal
+      params: ICreateProposalParams
     ) => AsyncGenerator<ProposalCreationStepValue>;
-    voteProposal: (proposalId: string, vote: VoteValues) => AsyncGenerator<VoteProposalStepValue>;
-    executeProposal: (proposalId: string) => AsyncGenerator<ExecuteProposalStepValue>;
+    voteProposal: (params: IVoteProposalParams) => AsyncGenerator<VoteProposalStepValue>;
+    executeProposal: (params: IExecuteProposalParams) => AsyncGenerator<ExecuteProposalStepValue>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<Erc20Proposal>
     getProposals: (params?: IProposalQueryParams) => Promise<Erc20ProposalListItem[]>
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    setPluginConfigAction: (params: IProposalSettings) => DaoAction;
+    updatePluginSettingsAction: (params: IPluginSettings) => DaoAction;
   };
   estimation: {
     createProposal: (
-      params: ICreateProposal
+      params: ICreateProposalParams
     ) => Promise<GasFeeEstimation>;
-    voteProposal: (
-      proposalId: string,
-      vote: VoteValues
-    ) => Promise<GasFeeEstimation>;
-    executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
+    voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
+    executeProposal: (params: IExecuteProposalParams) => Promise<GasFeeEstimation>;
   };
 }
 
@@ -45,22 +42,22 @@ export interface IClientErc20 extends IClientCore {
 export interface IClientAddressList extends IClientCore {
   methods: {
     createProposal: (
-      params: ICreateProposal
+      params: ICreateProposalParams
     ) => AsyncGenerator<ProposalCreationStepValue>;
-    voteProposal: (proposalId: string, vote: VoteValues) => AsyncGenerator<VoteProposalStepValue>;
-    executeProposal: (proposalId: string) => AsyncGenerator<ExecuteProposalStepValue>;
+    voteProposal: (params: IVoteProposalParams) => AsyncGenerator<VoteProposalStepValue>;
+    executeProposal: (params: IExecuteProposalParams) => AsyncGenerator<ExecuteProposalStepValue>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<AddressListProposal>
     getProposals: (params?: IProposalQueryParams) => Promise<AddressListProposalListItem[]>
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    setPluginConfigAction: (params: IProposalSettings) => DaoAction;
+    updatePluginSettingsAction: (params: IPluginSettings) => DaoAction;
   };
   estimation: {
-    createProposal: (params: ICreateProposal) => Promise<GasFeeEstimation>;
-    voteProposal: (proposalId: string, vote: VoteValues) => Promise<GasFeeEstimation>;
-    executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
+    createProposal: (params: ICreateProposalParams) => Promise<GasFeeEstimation>;
+    voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
+    executeProposal: (params: IExecuteProposalParams) => Promise<GasFeeEstimation>;
   };
 }
 
@@ -71,10 +68,20 @@ export interface IProposalSettings {
   /** Float: 0 to 1 */
   minTurnout: number;
   /** In seconds */
+  duration: number;
+}
+
+export interface IPluginSettings {
+  /** Float: 0 to 1 */
+  minSupport: number;
+  /** Float: 0 to 1 */
+  minTurnout: number;
+  /** In seconds */
   minDuration: number;
 }
 
-export interface ICreateProposal {
+export interface ICreateProposalParams {
+  pluginInstanceAddress: string
   metadata: ProposalMetadata;
   actions?: DaoAction[];
   startDate?: Date;
@@ -82,11 +89,20 @@ export interface ICreateProposal {
   executeOnPass?: boolean;
   creatorVote?: VoteValues;
 }
+export interface IVoteProposalParams {
+  pluginInstanceAddress: string
+  vote: VoteValues;
+  proposalId: string;
+}
+export interface IExecuteProposalParams {
+  pluginInstanceAddress: string
+  proposalId: string;
+}
 
 // Factory init params
 
 export type IErc20PluginInstall = {
-  proposals: IProposalSettings;
+  proposals: IPluginSettings;
   newToken?: NewTokenParams;
   useToken?: ExistingTokenParams;
 };
@@ -105,7 +121,7 @@ type NewTokenParams = {
 
 export type IAddressListPluginInstall = {
   addresses: string[],
-  proposals: IProposalSettings
+  proposals: IPluginSettings
 }
 
 // STEPS
@@ -141,7 +157,7 @@ export type ExecuteProposalStepValue =
   | { key: ExecuteProposalStep.DONE };
 
 
-  // PROPOSAL RETRIEVAL
+// PROPOSAL RETRIEVAL
 
 // Long version
 export type ProposalBase = {
@@ -176,7 +192,7 @@ export type AddressListProposal = ProposalBase & {
 /**
  * Contains the human-readable information about a proposal
  */
- export type ProposalMetadata = {
+export type ProposalMetadata = {
   title: string;
   summary: string;
   description: string;

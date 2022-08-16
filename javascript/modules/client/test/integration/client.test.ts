@@ -391,13 +391,13 @@ describe("Client", () => {
         reference: 'test'
       };
 
-      const installEntry = await client.encoding.withdrawAction(
+      const withgrawAction = await client.encoding.withdrawAction(
         "0x1234567890123456789012345678901234567890",
         withdrawParams
       );
 
-      expect(typeof installEntry).toBe("object");
-      expect(installEntry.data).toBeInstanceOf(Uint8Array);
+      expect(typeof withgrawAction).toBe("object");
+      expect(withgrawAction.data).toBeInstanceOf(Uint8Array);
     });
   })
   describe("Data retrieval", () => {
