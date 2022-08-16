@@ -26,15 +26,15 @@ yarn add @aragon/sdk-common
 ### Converting buffers and hex strings
 
 ```ts
-import { hexStringToBuffer, bufferToHexString } from "@aragon/sdk-common";
+import { hexToBytes, bytesToHex } from "@aragon/sdk-common";
 
-const buff = hexStringToBuffer("0xffffffff");
+const buff = hexToBytes("0xffffffff");
 // [255, 255, 255, 255]
 
-const str = bufferToHexString(new Uint8Array([100, 100, 100, 100, 100, 100]));
+const str = bytesToHex(new Uint8Array([100, 100, 100, 100, 100, 100]));
 // "646464646464"
 
-const str0x = bufferToHexString(new Uint8Array([100, 100, 100, 100, 100, 100]), true);
+const str0x = bytesToHex(new Uint8Array([100, 100, 100, 100, 100, 100]), true);
 // "0x646464646464"
 ```
 

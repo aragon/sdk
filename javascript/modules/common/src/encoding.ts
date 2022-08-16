@@ -1,16 +1,23 @@
 /** Decodes a hex string and returns it as a buffer */
-export function hexStringToBuffer(hexString: string): Buffer {
+export function hexToBytes(hexString: string): Uint8Array {
   if (!/^(0x)?[0-9a-fA-F]+$/.test(hexString)) {
     throw new Error("Invalid hex string");
   } else if (hexString.length % 2 !== 0) {
-    throw new Error("The hex string contains an odd length");
+    throw new Error("The hex string has an odd length");
   }
 
-  return Buffer.from(strip0x(hexString), "hex");
+  hexString = strip0x(hexString);
+  const bytes = [];
+  for (let i = 0; i < hexString.length; i += 2) {
+    bytes.push(
+      parseInt(hexString.substring(i, i + 2), 16),
+    );
+  }
+  return Uint8Array.from(bytes);
 }
 
 /** Encodes a buffer into a hex string */
-export function bufferToHexString(buff: Uint8Array, prepend0x?: boolean): string {
+export function bytesToHex(buff: Uint8Array, prepend0x?: boolean): string {
   const bytes: string[] = [];
   for (let i = 0; i < buff.length; i++) {
     if (buff[i] >= 16) bytes.push(buff[i].toString(16));
@@ -21,14 +28,14 @@ export function bufferToHexString(buff: Uint8Array, prepend0x?: boolean): string
 }
 
 /** Encodes the given big integer as a 32 byte big endian buffer */
-export function bigIntToBuffer(number: bigint): Buffer {
+export function bigIntToBuffer(number: bigint): Uint8Array {
   let hexNumber = number.toString(16);
   while (hexNumber.length < 64) hexNumber = "0" + hexNumber;
-  return Buffer.from(hexNumber, "hex");
+  return hexToBytes(hexNumber);
 }
 
 /** Encodes the given big integer as a 32 byte little endian buffer */
-export function bigIntToLeBuffer(number: bigint): Buffer {
+export function bigIntToLeBuffer(number: bigint): Uint8Array {
   return bigIntToBuffer(number).reverse();
 }
 
@@ -92,12 +99,4 @@ export function decodeRatio(
   }
 
   return Number(onChainValue) / (10 ** digits);
-}
-
-export function hexToBytes(hex: string): Uint8Array {
-  const hexMatch = hex.match(/.{1,2}/g)
-  if (!hexMatch) {
-    throw new Error("invalid hex string")
-  }
-  return Uint8Array.from(hexMatch.map((byte) => parseInt(byte, 16)));
 }

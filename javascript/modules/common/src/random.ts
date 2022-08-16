@@ -1,4 +1,4 @@
-import { bufferToHexString } from "./encoding";
+import { bytesToHex } from "./encoding";
 
 export namespace Random {
   /**
@@ -33,7 +33,7 @@ export namespace Random {
    */
   export function getHex(): string {
     const bytes = getBytes(32);
-    return bufferToHexString(bytes);
+    return bytesToHex(bytes);
   }
 
   /**
