@@ -139,17 +139,17 @@ export class Context {
   useIpfs(
     configs: {
       url: string;
-      headers?: Record<string, string> | undefined;
+      headers?: Record<string, string>;
     }[]
   ): IpfsClient[] {
     let clients: IpfsClient[] = []
-    for (let i = 0; i < configs.length; i++) {
-      const url = new URL(configs[i].url)
+    configs.forEach((config) => {
+      const url = new URL(config.url)
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
       }
-      clients.push(new IpfsClient(url, configs[i].headers))
-    }
+      clients.push(new IpfsClient(url, config.headers))
+    })
     return clients
   }
 
@@ -157,13 +157,13 @@ export class Context {
     endpoints: string[]
   ): GraphQLClient[] {
     let clients: GraphQLClient[] = []
-    for (let i = 0; i < endpoints.length; i++) {
-      const url = new URL(endpoints[i])
+    endpoints.forEach((endpoint) => {
+      const url = new URL(endpoint)
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
       }
       clients.push(new GraphQLClient(url.href))
-    }
+    })
     return clients
   }
 
