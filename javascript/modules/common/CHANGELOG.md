@@ -17,9 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING] 
-### Added
-- `hexToBytes` function
-
+### Updated
+- Renaming `bufferToHexString` to `bytesToHex`
+- Renaming `hexStringToBuffer` to `hexToBytes`
 - Version bump
 
 ## 0.0.2-alpha

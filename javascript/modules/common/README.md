@@ -1,106 +1,135 @@
-Aragon JS SDK Common
----
+# Aragon JS SDK Common
 
-<!--
-Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
+@aragon/sdk-common provides general purpose components to use across the entire Aragon SDK:
+- Interfaces
+- Constants
+- Types
+- Enumerations
+- Helpers
 
-> This TSDX setup is meant for developing libraries (not apps!) that can be published to NPM. If you’re looking to build a Node app, you could use `ts-node-dev`, plain `ts-node`, or simple `tsc`.
+# Installation
 
-> If you’re new to TypeScript, checkout [this handy cheatsheet](https://devhints.io/typescript)
-
-## Commands
-
-TSDX scaffolds your new library inside `/src`.
-
-To run TSDX, use:
+Use [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/) to install
+@aragon/sdk-common.
 
 ```bash
-npm start # or yarn start
+npm install @aragon/sdk-common
+yarn add @aragon/sdk-common
 ```
 
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
+# Usage
 
-To do a one-off build, use `npm run build` or `yarn build`.
+## Constants
 
-To run tests, use `npm test` or `yarn test`.
+## Encoding
 
-## Configuration
+### Converting buffers and hex strings
 
-Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
+```ts
+import { hexToBytes, bytesToHex } from "@aragon/sdk-common";
 
-### Jest
+const buff = hexToBytes("0xffffffff");
+// [255, 255, 255, 255]
 
-Jest tests are set up to run with `npm test` or `yarn test`.
+const str = bytesToHex(new Uint8Array([100, 100, 100, 100, 100, 100]));
+// "646464646464"
 
-### Bundle Analysis
-
-[`size-limit`](https://github.com/ai/size-limit) is set up to calculate the real cost of your library with `npm run size` and visualize the bundle with `npm run analyze`.
-
-#### Setup Files
-
-This is the folder structure we set up for you:
-
-```txt
-/src
-  index.tsx       # EDIT THIS
-/test
-  blah.test.tsx   # EDIT THIS
-.gitignore
-package.json
-README.md         # EDIT THIS
-tsconfig.json
+const str0x = bytesToHex(new Uint8Array([100, 100, 100, 100, 100, 100]), true);
+// "0x646464646464"
 ```
 
-### Rollup
+### Converting between buffers and big integers
 
-TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
+```ts
+import { bigIntToBuffer, bigIntToLeBuffer } from "@aragon/sdk-common";
 
-### TypeScript
+const bi = BigInt("111122223333444455556666777788889999000011112222333344445555666677778888999900")
+const buff = bigIntToBuffer(bi);
+// Uint8Array(32) [ 245, 172, 243,  22, 170, 44,  13,  78, ..., 220 ]
 
-`tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
-
-## Continuous Integration
-
-### GitHub Actions
-
-Two actions are added by default:
-
-- `main` which installs deps w/ cache, lints, tests, and builds on all pushes against a Node and OS matrix
-- `size` which comments cost comparison of your library on every pull request using [`size-limit`](https://github.com/ai/size-limit)
-
-## Optimizations
-
-Please see the main `tsdx` [optimizations docs](https://github.com/palmerhq/tsdx#optimizations). In particular, know that you can take advantage of development-only optimizations:
-
-```js
-// ./types/index.d.ts
-declare var __DEV__: boolean;
-
-// inside your code...
-if (__DEV__) {
-  console.log('foo');
-}
+const buffLe = bigIntToLeBuffer(bi);
+// Uint8Array(32) [ 220,  67, 63, 224,  21,  50, 154, 103, ..., 245 ]
 ```
 
-You can also choose to install and use [invariant](https://github.com/palmerhq/tsdx#invariant) and [warning](https://github.com/palmerhq/tsdx#warning) functions.
+```ts
+import { bufferToBigInt, bufferLeToBigInt } from "@aragon/sdk-common";
 
-## Module Formats
+const buff = new Uint8Array([
+  245, 172, 243,  22, 170, 44,  13,  78,
+  106,  70,  70, 147, 249, 71, 137, 190,
+  155,  21, 186,  14, 206, 88,  97, 129,
+  103, 154,  50,  21, 224, 63,  67, 220
+]);
+const hex = bufferToBigInt(buff);
+// 111122223333444455556666777788889999000011112222333344445555666677778888999900n
 
-CJS, ESModules, and UMD module formats are supported.
+const buffLe = new Uint8Array([
+  220,  67, 63, 224,  21,  50, 154, 103,
+  129,  97, 88, 206,  14, 186,  21, 155,
+  190, 137, 71, 249, 147,  70,  70, 106,
+   78,  13, 44, 170,  22, 243, 172, 245
+]);
+const hex = bufferLeToBigInt(buffLe);
+// 111122223333444455556666777788889999000011112222333344445555666677778888999900n
+```
 
-The appropriate paths are configured in `package.json` and `dist/index.js` accordingly. Please report if any issues are found.
+### Percent ratios stored on-chain
 
-## Named Exports
+Encodes ratio values between 0 and 1 translated into an integer range with the given digit precision
 
-Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
+```ts
+import { encodeRatio, decodeRatio } from "@aragon/sdk-common";
 
-## Including Styles
+let digits = 1
+encodeRatio(0.5, digits) // 5
+encodeRatio(0.53625, digits) // 5
+encodeRatio(0.57625, digits) // 6
 
-There are many ways to ship styles, including with CSS-in-JS. TSDX has no opinion on this, configure how you like.
+digits = 4
+encodeRatio(0.5, digits) // 5000
+encodeRatio(0.53625, digits) // 5362
+encodeRatio(0.57625, digits) // 5762
+```
 
-For vanilla CSS, you can include it at the root directory and add it to the `files` section in your `package.json`, so that it can be imported separately by your users and run through their bundler's loader.
+### Hex prefix guards
 
-## Publishing to NPM
+```ts
+import { strip0x, ensure0x } from "@aragon/sdk-common";
 
-We recommend using [np](https://github.com/sindresorhus/np).
--->
+strip0x("1234")
+// "1234"
+strip0x("0x1234")
+// "1234"
+
+ensure0x("1234")
+// "0x1234"
+ensure0x("0x1234")
+// "0x1234"
+```
+
+## Random
+
+```ts
+import { Random } from "@aragon/sdk-common";
+
+// Bytes
+Random.getBytes(1); // Uint8Array(1) [34]
+Random.getBytes(2); // Uint8Array(1) [63, 215]
+Random.getBytes(8); // Uint8Array(1) [2, 194, 201, 142, 26, 5, 77, 152]
+
+// Hex (32 bytes)
+Random.getHex(); // "9a6dbc9176afdb69d6fb9a76fdb917613bd971a6bd9176adf3b791d1bda19d17"
+
+// Big integer up to the given number
+Random.getBigInt(256n); // 251n
+
+Random.getFloat(); // 0.24152366327234
+
+Random.shuffle([1, 2, 3, 4]);  // [3, 1, 4, 2]
+```
+
+## Errors
+
+## Promises
+
+## Types

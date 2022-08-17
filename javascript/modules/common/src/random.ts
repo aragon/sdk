@@ -1,22 +1,22 @@
-import { uintArrayToHex } from "./encoding";
+import { bytesToHex } from "./encoding";
 
 export namespace Random {
   /**
    * Generates a random buffer of the given length
    */
-  export function getBytes(count: number): Buffer {
+  export function getBytes(count: number): Uint8Array {
     if (typeof window?.crypto?.getRandomValues == "function") {
       // Browser
       const buff = new Uint8Array(count);
       window.crypto.getRandomValues(buff);
-      return Buffer.from(buff);
+      return buff;
     } else if (
       // NodeJS
       typeof process !== "undefined" &&
       typeof require !== "undefined" &&
       typeof require("crypto")?.randomBytes !== "undefined"
     ) {
-      return require("crypto").randomBytes(count);
+      return new Uint8Array(require("crypto").randomBytes(count));
     }
 
     // other environments (fallback)
@@ -25,7 +25,7 @@ export namespace Random {
       const val = (Math.random() * 256) | 0;
       result.push(val);
     }
-    return Buffer.from(result);
+    return new Uint8Array(result);
   }
 
   /**
@@ -33,7 +33,7 @@ export namespace Random {
    */
   export function getHex(): string {
     const bytes = getBytes(32);
-    return uintArrayToHex(bytes);
+    return bytesToHex(bytes);
   }
 
   /**
