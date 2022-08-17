@@ -866,6 +866,33 @@ console.log(proposals)
 */
 ```
 
+### Loading a plugin settings
+
+```ts
+import { ClientErc20, Context, ContextPlugin, SortDirection, AddressListProposalListItem, ProposalSortBy, IProposalQueryParams } from "@aragon/sdk-client";
+
+// Create a simple context
+const context: Context = new Context(params)
+// Create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// Create an ERC20 client
+const client = new ClientErc20(contextPlugin)
+
+const pluginInstanceAddress: string = "0x123456789012345678901234567890123456789012"
+
+const settings: IPluginsettings = await client.methods.getPluginSettings(pluginInstanceAddress)
+console.log(settings)
+/*
+  {
+    minDuration: 7200,
+    minTurnout: 0.55,
+    minSupport: 0.25
+  }
+*/
+
+```
+
 ## Address list governance plugin client
 
 ```ts
@@ -1279,6 +1306,33 @@ console.log(proposals)
   }
 ]
 */
+```
+
+### Loading a plugin settings
+
+```ts
+import { ClientAddressList, Context, ContextPlugin, SortDirection, AddressListProposalListItem, ProposalSortBy, IProposalQueryParams } from "@aragon/sdk-client";
+
+// Create a simple context
+const context: Context = new Context(params)
+// Create a plugin context from the simple context and the plugin address
+const pluginAddress = "0x1234567890123456789012345678901234567890"
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAddress)
+// Create an ERC20 client
+const client = new ClientAddressList(contextPlugin)
+
+const pluginInstanceAddress: string = "0x123456789012345678901234567890123456789012"
+
+const settings: IPluginsettings = await client.methods.getPluginSettings(pluginInstanceAddress)
+console.log(settings)
+/*
+  {
+    minDuration: 7200,
+    minTurnout: 0.55,
+    minSupport: 0.25
+  }
+*/
+
 ```
 
 ## Action encoders

@@ -394,6 +394,19 @@ describe("Client", () => {
       expect(Array.isArray(proposals)).toBe(true)
       expect(proposals.length <= limit).toBe(true)
     })
+    it("Should get the settings of a plugin given a plugin instance address", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      
+      const pluginInstanceAddress: string = "0x12345678901234567890º1234567890123456789012"
+      const proposals = await client.methods.getPluginSettings(pluginInstanceAddress)
+
+      expect(typeof proposals.minDuration).toBe('number')
+      expect(typeof proposals.minSupport).toBe('number')
+      expect(typeof proposals.minTurnout).toBe('number')
+      expect(proposals.minTurnout >= 0 && proposals.minTurnout <= 1).toBe(true)
+      expect(proposals.minSupport >= 0 && proposals.minSupport <= 1).toBe(true)
+    })
   })
 
 })
