@@ -10,6 +10,7 @@ import {
   IAssetTransfers,
   IClient,
   ICreateParams,
+  IDaoMetadata,
   IDaoQueryParams,
   IDepositParams,
   IWithdrawParams,
@@ -33,7 +34,7 @@ import { pack } from "@ethersproject/solidity";
 import { Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
-import { encodeWithdrawActionData } from "./internal/encoding/client";
+import { encodeUpdateDaoMetadataAction, encodeWithdrawActionData } from "./internal/encoding/client";
 import { getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
 
@@ -166,7 +167,18 @@ export class Client extends ClientCore implements IClient {
       * @memberof Client
       */
     withdrawAction: (daoAddressOrEns: string, params: IWithdrawParams): Promise<DaoAction> =>
-      this._buildActionWithdraw(daoAddressOrEns, params)
+      this._buildActionWithdraw(daoAddressOrEns, params),
+
+    /**
+      * Computes the parameters to be given when creating a proposal that withdraws ether or an ERC20 token from the dao
+      *
+      * @param {string} daoAddresOrEns
+      * @param {IDaoMetadata} params
+      * @return {*}  {Promise<DaoAction>}
+      * @memberof Client
+      */
+    updateDaoMetadataAction: (daoAddressOrEns: string, params: IDaoMetadata): Promise<DaoAction> =>
+      this._buildActionUpdateDaoMetadata(daoAddressOrEns, params)
   };
 
   //// ESTIMATION HANDLERS
@@ -562,6 +574,24 @@ export class Client extends ClientCore implements IClient {
       to: address,
       value: BigInt(0),
       data: encodeWithdrawActionData(params)
+    }
+  }
+  private async _buildActionUpdateDaoMetadata(daoAddreessOrEns: string, _params: IDaoMetadata): Promise<DaoAction> {
+    // check ens
+    let address = daoAddreessOrEns
+    if (!isAddress(daoAddreessOrEns)) {
+      const resolvedAddress = await this.web3.getSigner()?.resolveName(daoAddreessOrEns)
+      if (!resolvedAddress) {
+        throw new Error("invalid ens")
+      }
+      address = resolvedAddress
+    }
+    // upload metadata to IPFS
+    const cid = "0x1234567890123456789012345678901234567890"
+    return {
+      to: address,
+      value: BigInt(0),
+      data: encodeUpdateDaoMetadataAction(cid)
     }
   }
 }
