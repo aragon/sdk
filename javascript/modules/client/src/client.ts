@@ -162,7 +162,7 @@ export class Client extends ClientCore implements IClient {
       * @param {string} daoAddresOrEns
       * @param {IWithdrawParams} params
       * @return {*}  {Promise<DaoAction>}
-      * @memberof ClientAddressList
+      * @memberof Client
       */
     withdrawAction: (daoAddressOrEns: string, params: IWithdrawParams): Promise<DaoAction> =>
       this._buildActionWithdraw(daoAddressOrEns, params)
@@ -177,7 +177,7 @@ export class Client extends ClientCore implements IClient {
      *
      * @param {ICreateParams} params
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientAddressList
+     * @memberof Client
      */
     create: (params: ICreateParams) => this._estimateCreation(params),
 
@@ -186,7 +186,7 @@ export class Client extends ClientCore implements IClient {
      *
      * @param {IDepositParams} params
      * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientAddressList
+     * @memberof Client
      */
     deposit: (params: IDepositParams) => this._estimateDeposit(params),
     updateAllowance: (params: IDepositParams) => this._estimateUpdateAllowance(params),
