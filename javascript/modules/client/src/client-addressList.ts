@@ -2,7 +2,7 @@ import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
-import { encodeActionSetPluginConfig, encodeAddressListActionInit } from "./internal/encoding/plugins";
+import { encodeAddressListActionInit, encodeUpdatePluginSettingsAction } from "./internal/encoding/plugins";
 import { IPluginInstallItem, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
 import {
   ExecuteProposalStep,
@@ -271,7 +271,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     return {
       to: AddressZero,
       value: BigInt(0),
-      data: encodeActionSetPluginConfig(params)
+      data: encodeUpdatePluginSettingsAction(params)
     }
   }
 

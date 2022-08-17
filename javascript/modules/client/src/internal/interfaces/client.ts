@@ -36,7 +36,7 @@ export interface IClient extends IClientCore {
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
     deposit: (params: IDepositParams) => Promise<GasFeeEstimation>;
-    increaseAllowance: (params: IDepositParams) => Promise<GasFeeEstimation>;
+    updateAllowance: (params: IDepositParams) => Promise<GasFeeEstimation>;
   };
 }
 

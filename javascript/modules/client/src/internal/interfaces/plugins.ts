@@ -81,7 +81,7 @@ export interface IPluginSettings {
 }
 
 export interface ICreateProposalParams {
-  pluginInstanceAddress: string
+  pluginAddress: string
   metadata: ProposalMetadata;
   actions?: DaoAction[];
   startDate?: Date;
@@ -90,12 +90,12 @@ export interface ICreateProposalParams {
   creatorVote?: VoteValues;
 }
 export interface IVoteProposalParams {
-  pluginInstanceAddress: string
+  pluginAddress: string
   vote: VoteValues;
   proposalId: string;
 }
 export interface IExecuteProposalParams {
-  pluginInstanceAddress: string
+  pluginAddress: string
   proposalId: string;
 }
 

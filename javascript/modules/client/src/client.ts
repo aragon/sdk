@@ -121,7 +121,7 @@ export class Client extends ClientCore implements IClient {
   estimation = {
     create: (params: ICreateParams) => this._estimateCreation(params),
     deposit: (params: IDepositParams) => this._estimateDeposit(params),
-    increaseAllowance: (params: IDepositParams) => this._estimateIncreaseAllowance(params),
+    updateAllowance: (params: IDepositParams) => this._estimateUpdateAllowance(params),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -274,7 +274,7 @@ export class Client extends ClientCore implements IClient {
       const value = cr.events?.find((e) => e?.event === "Approval")?.args
         ?.value;
       if (!value || BigNumber.from(amount).gt(value)) {
-        throw new Error("Could not increase allowance");
+        throw new Error("Could not update allowance");
       }
     });
 
@@ -335,7 +335,7 @@ export class Client extends ClientCore implements IClient {
       });
   }
 
-  _estimateIncreaseAllowance(_params: IDepositParams) {
+  _estimateUpdateAllowance(_params: IDepositParams) {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");

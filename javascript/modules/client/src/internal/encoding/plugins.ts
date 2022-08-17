@@ -58,16 +58,16 @@ function unwrapErc20InitParams(params: IErc20PluginInstall): [string, string, Bi
   ]
 }
 
-export function encodeActionSetPluginConfig(params: IPluginSettings): Uint8Array {
+export function encodeUpdatePluginSettingsAction(params: IPluginSettings): Uint8Array {
   const votingInterface = MajorityVoting__factory.createInterface();
-  const args = unwrapSetPluginConfig(params);
+  const args = unwrapUpdatePluginSettings(params);
   // get hex bytes
   const hexBytes = votingInterface.encodeFunctionData("changeVoteConfig", args);
   // Strip 0x => encode in Uint8Array
   return hexToBytes(strip0x(hexBytes));
 }
 
-function unwrapSetPluginConfig(params: IPluginSettings): [BigNumber, BigNumber, BigNumber] {
+function unwrapUpdatePluginSettings(params: IPluginSettings): [BigNumber, BigNumber, BigNumber] {
   return [
     BigNumber.from(Math.round(params.minTurnout * 100)),
     BigNumber.from(Math.round(params.minSupport * 100)),

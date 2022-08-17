@@ -513,7 +513,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 const client = new ClientErc20(contextPlugin)
 
 const proposalParams: ICreateProposalParams = {
-  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x123456789012345678901234567890123456789012",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -581,7 +581,7 @@ const configActionPrarms: IProposalSettings = {
 const configAction = client.encoding.updatePluginSettingsAction(configActionPrarms)
 
 const proposalParams: ICreateProposalParams = {
-  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x123456789012345678901234567890123456789012",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -640,7 +640,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 const client = new ClientErc20(contextPlugin)
 
 const voteParams: IVoteProposalParams = {
-  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x123456789012345678901234567890123456789012",
   proposalId: '0x1234567890123456789012345678901234567890',
   vote: VoteValues.YES
 }
@@ -959,7 +959,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 const client = new ClientAddressList(contextPlugin)
 
 const proposalParams: ICreateProposalParams = {
-  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x123456789012345678901234567890123456789012",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -1027,7 +1027,7 @@ const configActionPrarms: IProposalSettings = {
 const configAction = client.encoding.updatePluginSettingsAction(configActionPrarms)
 
 const proposalParams: ICreateProposalParams = {
-  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x123456789012345678901234567890123456789012",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -1085,7 +1085,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context, pluginAd
 const client = new ClientAddressList(contextPlugin)
 
 const voteParams: IVoteProposalParams = {
-  pluginInstanceAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x123456789012345678901234567890123456789012",
   proposalId: '0x1234567890123456789012345678901234567890',
   vote: VoteValues.YES
 }

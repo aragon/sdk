@@ -46,7 +46,7 @@ On 2022-06-15 13:01:18
 ## 0.0.16-alpha
 On 2022-06-14 15:03:15
 
-- Gas fee estimation for `deposit` and `increaseAllowance`.
+- Gas fee estimation for `deposit` and `updateAllowance`.
 
 ### Changed
 - `deposit` method handles all steps by using a `AsyncGenerator`.

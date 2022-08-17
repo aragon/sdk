@@ -26,7 +26,7 @@ import {
 } from "./internal/interfaces/common";
 import { ContextPlugin } from "./context-plugin";
 import { getProposalStatus } from "./internal/utils/plugins";
-import { encodeActionSetPluginConfig, encodeErc20ActionInit } from "./internal/encoding/plugins";
+import { encodeErc20ActionInit, encodeUpdatePluginSettingsAction } from "./internal/encoding/plugins";
 import { Random } from "@aragon/sdk-common";
 import { getDummyErc20Proposal, getDummyErc20ProposalListItem } from "./internal/temp-mock";
 import { AddressZero } from "@ethersproject/constants";
@@ -271,7 +271,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     return {
       to: AddressZero,
       value: BigInt(0),
-      data: encodeActionSetPluginConfig(params)
+      data: encodeUpdatePluginSettingsAction(params)
     }
   }
 
