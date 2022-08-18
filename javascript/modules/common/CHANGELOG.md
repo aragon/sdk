@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING] 
+### Fixed
+- `Buffer` being used not compatible with web environments
 ### Updated
 - Renaming `bufferToHexString` to `bytesToHex`
 - Renaming `hexStringToBuffer` to `hexToBytes`
