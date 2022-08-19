@@ -148,268 +148,268 @@ describe("Client", () => {
       expect(graphqlStatus).toEqual(false);
     });
   });
-  describe("Proposal Creation", () => {
-    it("Should estimate the gas fees for creating a new proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientAddressList(context)
+  // describe("Proposal Creation", () => {
+  //   it("Should estimate the gas fees for creating a new proposal", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain)
+  //     const client = new ClientAddressList(context)
 
-      const proposalParams: ICreateProposal = {
-        metadata: {
-          title: 'Best Proposal',
-          summary: 'this is the sumnary',
-          description: 'This is a very long description',
-          resources: [{
-            name: "Website",
-            url: "https://the.website"
-          }],
-          media: {
-            header: 'https://no.media/media.jpeg',
-            logo: 'https://no.media/media.jpeg'
-          }
-        },
-        actions: [],
-        creatorVote: VoteValues.YES,
-        startDate: new Date(),
-        endDate: new Date(),
-        executeOnPass: true
-      }
+  //     const proposalParams: ICreateProposal = {
+  //       metadata: {
+  //         title: 'Best Proposal',
+  //         summary: 'this is the sumnary',
+  //         description: 'This is a very long description',
+  //         resources: [{
+  //           name: "Website",
+  //           url: "https://the.website"
+  //         }],
+  //         media: {
+  //           header: 'https://no.media/media.jpeg',
+  //           logo: 'https://no.media/media.jpeg'
+  //         }
+  //       },
+  //       actions: [],
+  //       creatorVote: VoteValues.YES,
+  //       startDate: new Date(),
+  //       endDate: new Date(),
+  //       executeOnPass: true
+  //     }
 
-      const estimation = await client.estimation.createProposal(proposalParams)
+  //     const estimation = await client.estimation.createProposal(proposalParams)
 
-      expect(typeof estimation).toEqual("object")
-      expect(typeof estimation.average).toEqual("bigint");
-      expect(typeof estimation.max).toEqual("bigint");
-      expect(estimation.max).toBeGreaterThan(BigInt(0));
-      expect(estimation.max).toBeGreaterThan(estimation.average);
+  //     expect(typeof estimation).toEqual("object")
+  //     expect(typeof estimation.average).toEqual("bigint");
+  //     expect(typeof estimation.max).toEqual("bigint");
+  //     expect(estimation.max).toBeGreaterThan(BigInt(0));
+  //     expect(estimation.max).toBeGreaterThan(estimation.average);
 
-    })
-    it("Should create a new proposal locally", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const addressListClient = new ClientAddressList(context)
-      const client = new Client(context)
+  //   })
+  //   it("Should create a new proposal locally", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain)
+  //     const addressListClient = new ClientAddressList(context)
+  //     const client = new Client(context)
 
-      // generate actions
-      const action = await client.encoding.withdrawAction(
-        "0x1234567890123456789012345678901234567890",
-        {
-          recipientAddress: "0x1234567890123456789012345678901234567890",
-          amount: BigInt(1),
-          reference: 'test'
-        })
+  //     // generate actions
+  //     const action = await client.encoding.withdrawAction(
+  //       "0x1234567890123456789012345678901234567890",
+  //       {
+  //         recipientAddress: "0x1234567890123456789012345678901234567890",
+  //         amount: BigInt(1),
+  //         reference: 'test'
+  //       })
 
-      const proposalParams: ICreateProposal = {
-        metadata: {
-          title: 'Best Proposal',
-          summary: 'this is the sumnary',
-          description: 'This is a very long description',
-          resources: [{
-            name: "Website",
-            url: "https://the.website"
-          }],
-          media: {
-            header: 'https://no.media/media.jpeg',
-            logo: 'https://no.media/media.jpeg'
-          }
-        },
-        actions: [action],
-        creatorVote: VoteValues.YES,
-        startDate: new Date(),
-        endDate: new Date(),
-        executeOnPass: true
-      }
+  //     const proposalParams: ICreateProposal = {
+  //       metadata: {
+  //         title: 'Best Proposal',
+  //         summary: 'this is the sumnary',
+  //         description: 'This is a very long description',
+  //         resources: [{
+  //           name: "Website",
+  //           url: "https://the.website"
+  //         }],
+  //         media: {
+  //           header: 'https://no.media/media.jpeg',
+  //           logo: 'https://no.media/media.jpeg'
+  //         }
+  //       },
+  //       actions: [action],
+  //       creatorVote: VoteValues.YES,
+  //       startDate: new Date(),
+  //       endDate: new Date(),
+  //       executeOnPass: true
+  //     }
 
-      for await (const step of addressListClient.methods.createProposal(proposalParams)) {
-        switch (step.key) {
-          case ProposalCreationSteps.CREATING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case ProposalCreationSteps.DONE:
-            expect(typeof step.proposalId).toBe("string");
-            expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          default:
-            throw new Error(
-              "Unexpected proposal creation step: " + Object.keys(step).join(", "),
-            );
-        }
-      }
-    })
-  });
+  //     for await (const step of addressListClient.methods.createProposal(proposalParams)) {
+  //       switch (step.key) {
+  //         case ProposalCreationSteps.CREATING:
+  //           expect(typeof step.txHash).toBe("string");
+  //           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+  //           break;
+  //         case ProposalCreationSteps.DONE:
+  //           expect(typeof step.proposalId).toBe("string");
+  //           expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+  //           break;
+  //         default:
+  //           throw new Error(
+  //             "Unexpected proposal creation step: " + Object.keys(step).join(", "),
+  //           );
+  //       }
+  //     }
+  //   })
+  // });
 
-  describe("Vote on a proposal", () => {
-    it("Should estimate the gas fees for casting a vote", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientAddressList(context)
+  // describe("Vote on a proposal", () => {
+  //   it("Should estimate the gas fees for casting a vote", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain)
+  //     const client = new ClientAddressList(context)
 
-      const estimation = await client.estimation.voteProposal(
-        '0x1234567890123456789012345678901234567890',
-        VoteValues.YES
-      )
+  //     const estimation = await client.estimation.voteProposal(
+  //       '0x1234567890123456789012345678901234567890',
+  //       VoteValues.YES
+  //     )
 
-      expect(typeof estimation).toEqual("object")
-      expect(typeof estimation.average).toEqual("bigint");
-      expect(typeof estimation.max).toEqual("bigint");
-      expect(estimation.max).toBeGreaterThan(BigInt(0));
-      expect(estimation.max).toBeGreaterThan(estimation.average);
+  //     expect(typeof estimation).toEqual("object")
+  //     expect(typeof estimation.average).toEqual("bigint");
+  //     expect(typeof estimation.max).toEqual("bigint");
+  //     expect(estimation.max).toBeGreaterThan(BigInt(0));
+  //     expect(estimation.max).toBeGreaterThan(estimation.average);
 
-    })
+  //   })
 
-    it("Should vote on a proposal locally", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientAddressList(context)
+  //   it("Should vote on a proposal locally", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain)
+  //     const client = new ClientAddressList(context)
 
-      const proposalId = '0x1234567890123456789012345678901234567890'
+  //     const proposalId = '0x1234567890123456789012345678901234567890'
 
-      for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
-        switch (step.key) {
-          case VoteProposalStep.VOTING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case VoteProposalStep.DONE:
-            expect(typeof step.voteId).toBe("string");
-            expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          default:
-            throw new Error(
-              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
-            );
-        }
-      }
+  //     for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
+  //       switch (step.key) {
+  //         case VoteProposalStep.VOTING:
+  //           expect(typeof step.txHash).toBe("string");
+  //           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+  //           break;
+  //         case VoteProposalStep.DONE:
+  //           expect(typeof step.voteId).toBe("string");
+  //           expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+  //           break;
+  //         default:
+  //           throw new Error(
+  //             "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+  //           );
+  //       }
+  //     }
 
-    })
-  })
+  //   })
+  // })
 
-  describe("Execute proposal", () => {
-    it("Should estimate the gas fees for executing a proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientAddressList(context)
+  // describe("Execute proposal", () => {
+  //   it("Should estimate the gas fees for executing a proposal", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain)
+  //     const client = new ClientAddressList(context)
 
-      const estimation = await client.estimation.executeProposal(
-        '0x1234567890123456789012345678901234567890'
-      )
+  //     const estimation = await client.estimation.executeProposal(
+  //       '0x1234567890123456789012345678901234567890'
+  //     )
 
-      expect(typeof estimation).toEqual("object")
-      expect(typeof estimation.average).toEqual("bigint");
-      expect(typeof estimation.max).toEqual("bigint");
-      expect(estimation.max).toBeGreaterThan(BigInt(0));
-      expect(estimation.max).toBeGreaterThan(estimation.average);
+  //     expect(typeof estimation).toEqual("object")
+  //     expect(typeof estimation.average).toEqual("bigint");
+  //     expect(typeof estimation.max).toEqual("bigint");
+  //     expect(estimation.max).toBeGreaterThan(BigInt(0));
+  //     expect(estimation.max).toBeGreaterThan(estimation.average);
 
-    })
+  //   })
 
-    it("Should execute a local proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientAddressList(context)
+  //   it("Should execute a local proposal", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain)
+  //     const client = new ClientAddressList(context)
 
-      const proposalId = '0x1234567890123456789012345678901234567890'
+  //     const proposalId = '0x1234567890123456789012345678901234567890'
 
-      for await (const step of client.methods.executeProposal(proposalId)) {
-        switch (step.key) {
-          case ExecuteProposalStep.EXECUTING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case ExecuteProposalStep.DONE:
-            break;
-          default:
-            throw new Error(
-              "Unexpected execute proposal step: " + Object.keys(step).join(", "),
-            );
-        }
-      }
+  //     for await (const step of client.methods.executeProposal(proposalId)) {
+  //       switch (step.key) {
+  //         case ExecuteProposalStep.EXECUTING:
+  //           expect(typeof step.txHash).toBe("string");
+  //           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+  //           break;
+  //         case ExecuteProposalStep.DONE:
+  //           break;
+  //         default:
+  //           throw new Error(
+  //             "Unexpected execute proposal step: " + Object.keys(step).join(", "),
+  //           );
+  //       }
+  //     }
 
-    })
-  })
+  //   })
+  // })
 
-  describe('Action generators', () => {
-    it("Should create an AddressList client and generate a install entry", async () => {
-      const withdrawParams: IAddressListPluginInstall = {
-        proposals: {
-          minDuration: 7200, // seconds
-          minTurnout: 0.5,
-          minSupport: 0.5
-        },
-        addresses: [
-          "0x1234567890123456789012345678901234567890",
-          "0x2345678901234567890123456789012345678901",
-          "0x3456789012345678901234567890123456789012",
-          "0x4567890123456789012345678901234567890134"
-        ]
-      };
+  // describe('Action generators', () => {
+  //   it("Should create an AddressList client and generate a install entry", async () => {
+  //     const withdrawParams: IAddressListPluginInstall = {
+  //       proposals: {
+  //         minDuration: 7200, // seconds
+  //         minTurnout: 0.5,
+  //         minSupport: 0.5
+  //       },
+  //       addresses: [
+  //         "0x1234567890123456789012345678901234567890",
+  //         "0x2345678901234567890123456789012345678901",
+  //         "0x3456789012345678901234567890123456789012",
+  //         "0x4567890123456789012345678901234567890134"
+  //       ]
+  //     };
 
-      const installEntry = ClientAddressList.encoding.installEntry(withdrawParams);
+  //     const installEntry = ClientAddressList.encoding.installEntry(withdrawParams);
 
-      expect(typeof installEntry).toBe("object");
-      // what does this should be
-      expect(installEntry.data).toBeInstanceOf(Uint8Array);
-    });
+  //     expect(typeof installEntry).toBe("object");
+  //     // what does this should be
+  //     expect(installEntry.data).toBeInstanceOf(Uint8Array);
+  //   });
 
-    it("Should create an AddressList client and generate a plugin config action action", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+  //   it("Should create an AddressList client and generate a plugin config action action", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain);
+  //     const client = new ClientAddressList(context);
 
-      const pluginConfigParams: IProposalSettings = {
-        minDuration: 100000,
-        minTurnout: 0.25,
-        minSupport: 0.51
-      };
+  //     const pluginConfigParams: IProposalSettings = {
+  //       minDuration: 100000,
+  //       minTurnout: 0.25,
+  //       minSupport: 0.51
+  //     };
 
-      const installEntry = client.encoding.setPluginConfigAction(pluginConfigParams);
+  //     const installEntry = client.encoding.setPluginConfigAction(pluginConfigParams);
 
-      expect(typeof installEntry).toBe("object");
-      // what does this should be
-      expect(installEntry.data).toBeInstanceOf(Uint8Array);
-    });
-  })
+  //     expect(typeof installEntry).toBe("object");
+  //     // what does this should be
+  //     expect(installEntry.data).toBeInstanceOf(Uint8Array);
+  //   });
+  // })
 
-  describe('Data retrieval', () => {
-    it("Should get the list of members that can vote in a proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+  // describe('Data retrieval', () => {
+  //   it("Should get the list of members that can vote in a proposal", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain);
+  //     const client = new ClientAddressList(context);
 
-      const wallets = await client.methods.getMembers("0x1234567890123456789012345678901234567890")
+  //     const wallets = await client.methods.getMembers("0x1234567890123456789012345678901234567890")
 
-      expect(Array.isArray(wallets)).toBe(true);
-      expect(wallets.length).toBeGreaterThan(0);
-      expect(typeof wallets[0]).toBe('string');
-      expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-    })
-    it("Should fetch the given proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+  //     expect(Array.isArray(wallets)).toBe(true);
+  //     expect(wallets.length).toBeGreaterThan(0);
+  //     expect(typeof wallets[0]).toBe('string');
+  //     expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+  //   })
+  //   it("Should fetch the given proposal", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain);
+  //     const client = new ClientAddressList(context);
 
-      const proposalId = "0x1234567890123456789012345678901234567890_0x55"
-      const proposal = await client.methods.getProposal(proposalId)
+  //     const proposalId = "0x1234567890123456789012345678901234567890_0x55"
+  //     const proposal = await client.methods.getProposal(proposalId)
 
-      expect(typeof proposal).toBe('object');
-      expect(proposal.id).toBe(proposalId);
-      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
-    })
-    it("Should get a list of proposals filtered by the given criteria", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
-      let proposals = await client.methods.getProposals()
+  //     expect(typeof proposal).toBe('object');
+  //     expect(proposal.id).toBe(proposalId);
+  //     expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+  //   })
+  //   it("Should get a list of proposals filtered by the given criteria", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain);
+  //     const client = new ClientAddressList(context);
+  //     let proposals = await client.methods.getProposals()
 
-      expect(Array.isArray(proposals)).toBe(true)
-      expect(proposals.length <= 10).toBe(true)
+  //     expect(Array.isArray(proposals)).toBe(true)
+  //     expect(proposals.length <= 10).toBe(true)
 
-      let limit = 1
-      const params: IProposalQueryParams = {
-        limit
-      }
-      proposals = await client.methods.getProposals(params)
+  //     let limit = 1
+  //     const params: IProposalQueryParams = {
+  //       limit
+  //     }
+  //     proposals = await client.methods.getProposals(params)
 
-      expect(Array.isArray(proposals)).toBe(true)
-      expect(proposals.length <= limit).toBe(true)
+  //     expect(Array.isArray(proposals)).toBe(true)
+  //     expect(proposals.length <= limit).toBe(true)
 
-      limit = 5
-      params.limit = limit
-      proposals = await client.methods.getProposals(params)
+  //     limit = 5
+  //     params.limit = limit
+  //     proposals = await client.methods.getProposals(params)
 
-      expect(Array.isArray(proposals)).toBe(true)
-      expect(proposals.length <= limit).toBe(true)
-    })
-  })
+  //     expect(Array.isArray(proposals)).toBe(true)
+  //     expect(proposals.length <= limit).toBe(true)
+  //   })
+  // })
 
 })
