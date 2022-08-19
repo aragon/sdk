@@ -48,7 +48,7 @@ jobs:
         run: yarn run build
 
       - name: Test
-        run: yarn test --ci
+        run: yarn test modules/common
         env:
           DAO_FACTORY: ${{ steps.contracts.outputs.dao }}
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
