@@ -281,87 +281,87 @@ describe("Client", () => {
   //   })
   // })
 
-  describe("Execute proposal", () => {
-    it("Should estimate the gas fees for executing a proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientAddressList(context)
+  // describe("Execute proposal", () => {
+  //   it("Should estimate the gas fees for executing a proposal", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain)
+  //     const client = new ClientAddressList(context)
 
-      const estimation = await client.estimation.executeProposal(
-        '0x1234567890123456789012345678901234567890'
-      )
+  //     const estimation = await client.estimation.executeProposal(
+  //       '0x1234567890123456789012345678901234567890'
+  //     )
 
-      expect(typeof estimation).toEqual("object")
-      expect(typeof estimation.average).toEqual("bigint");
-      expect(typeof estimation.max).toEqual("bigint");
-      expect(estimation.max).toBeGreaterThan(BigInt(0));
-      expect(estimation.max).toBeGreaterThan(estimation.average);
+  //     expect(typeof estimation).toEqual("object")
+  //     expect(typeof estimation.average).toEqual("bigint");
+  //     expect(typeof estimation.max).toEqual("bigint");
+  //     expect(estimation.max).toBeGreaterThan(BigInt(0));
+  //     expect(estimation.max).toBeGreaterThan(estimation.average);
 
-    })
+  //   })
 
-    it("Should execute a local proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientAddressList(context)
+  //   it("Should execute a local proposal", async () => {
+  //     const context = new ContextPlugin(contextParamsLocalChain)
+  //     const client = new ClientAddressList(context)
 
-      const proposalId = '0x1234567890123456789012345678901234567890'
+  //     const proposalId = '0x1234567890123456789012345678901234567890'
 
-      for await (const step of client.methods.executeProposal(proposalId)) {
-        switch (step.key) {
-          case ExecuteProposalStep.EXECUTING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case ExecuteProposalStep.DONE:
-            break;
-          default:
-            throw new Error(
-              "Unexpected execute proposal step: " + Object.keys(step).join(", "),
-            );
-        }
-      }
+  //     for await (const step of client.methods.executeProposal(proposalId)) {
+  //       switch (step.key) {
+  //         case ExecuteProposalStep.EXECUTING:
+  //           expect(typeof step.txHash).toBe("string");
+  //           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+  //           break;
+  //         case ExecuteProposalStep.DONE:
+  //           break;
+  //         default:
+  //           throw new Error(
+  //             "Unexpected execute proposal step: " + Object.keys(step).join(", "),
+  //           );
+  //       }
+  //     }
 
-    })
-  })
-
-  // describe('Action generators', () => {
-  //   it("Should create an AddressList client and generate a install entry", async () => {
-  //     const withdrawParams: IAddressListPluginInstall = {
-  //       proposals: {
-  //         minDuration: 7200, // seconds
-  //         minTurnout: 0.5,
-  //         minSupport: 0.5
-  //       },
-  //       addresses: [
-  //         "0x1234567890123456789012345678901234567890",
-  //         "0x2345678901234567890123456789012345678901",
-  //         "0x3456789012345678901234567890123456789012",
-  //         "0x4567890123456789012345678901234567890134"
-  //       ]
-  //     };
-
-  //     const installEntry = ClientAddressList.encoding.installEntry(withdrawParams);
-
-  //     expect(typeof installEntry).toBe("object");
-  //     // what does this should be
-  //     expect(installEntry.data).toBeInstanceOf(Uint8Array);
-  //   });
-
-  //   it("Should create an AddressList client and generate a plugin config action action", async () => {
-  //     const context = new ContextPlugin(contextParamsLocalChain);
-  //     const client = new ClientAddressList(context);
-
-  //     const pluginConfigParams: IProposalSettings = {
-  //       minDuration: 100000,
-  //       minTurnout: 0.25,
-  //       minSupport: 0.51
-  //     };
-
-  //     const installEntry = client.encoding.setPluginConfigAction(pluginConfigParams);
-
-  //     expect(typeof installEntry).toBe("object");
-  //     // what does this should be
-  //     expect(installEntry.data).toBeInstanceOf(Uint8Array);
-  //   });
+  //   })
   // })
+
+  describe('Action generators', () => {
+    it("Should create an AddressList client and generate a install entry", async () => {
+      const withdrawParams: IAddressListPluginInstall = {
+        proposals: {
+          minDuration: 7200, // seconds
+          minTurnout: 0.5,
+          minSupport: 0.5
+        },
+        addresses: [
+          "0x1234567890123456789012345678901234567890",
+          "0x2345678901234567890123456789012345678901",
+          "0x3456789012345678901234567890123456789012",
+          "0x4567890123456789012345678901234567890134"
+        ]
+      };
+
+      const installEntry = ClientAddressList.encoding.installEntry(withdrawParams);
+
+      expect(typeof installEntry).toBe("object");
+      // what does this should be
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
+    });
+
+    it("Should create an AddressList client and generate a plugin config action action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const pluginConfigParams: IProposalSettings = {
+        minDuration: 100000,
+        minTurnout: 0.25,
+        minSupport: 0.51
+      };
+
+      const installEntry = client.encoding.setPluginConfigAction(pluginConfigParams);
+
+      expect(typeof installEntry).toBe("object");
+      // what does this should be
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
+    });
+  })
 
   // describe('Data retrieval', () => {
   //   it("Should get the list of members that can vote in a proposal", async () => {
