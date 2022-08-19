@@ -124,29 +124,29 @@ describe("Client", () => {
 
     });
 
-    // it("Should create a failing client", async () => {
-    //   contextParams.web3Providers = web3endpoints.failing
-    //   contextParams.ipfsNodes = ipfsEndpoints.failing
-    //   contextParams.graphqlNodes = grapqhlEndpoints.failing
-    //   const ctx = new ContextPlugin(contextParams);
-    //   const client = new ClientAddressList(ctx);
+    it("Should create a failing client", async () => {
+      contextParams.web3Providers = web3endpoints.failing
+      contextParams.ipfsNodes = ipfsEndpoints.failing
+      contextParams.graphqlNodes = grapqhlEndpoints.failing
+      const ctx = new ContextPlugin(contextParams);
+      const client = new ClientAddressList(ctx);
 
-    //   expect(client).toBeInstanceOf(ClientAddressList);
-    //   expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
-    //   expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
-    //   expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
-    //   expect(client.graphql.getClient()).toBeInstanceOf(GraphQLClient);
+      expect(client).toBeInstanceOf(ClientAddressList);
+      expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
+      expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
+      expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
+      expect(client.graphql.getClient()).toBeInstanceOf(GraphQLClient);
 
-    //   // Web3
-    //   const web3status = await client.web3.isUp();
-    //   expect(web3status).toEqual(false);
-    //   // IPFS
-    //   const ipfsStatus = await client.ipfs.isUp();
-    //   expect(ipfsStatus).toEqual(false);
-    //   // GraqphQl
-    //   const graphqlStatus = await client.graphql.isUp();
-    //   expect(graphqlStatus).toEqual(false);
-    // });
+      // Web3
+      const web3status = await client.web3.isUp();
+      expect(web3status).toEqual(false);
+      // IPFS
+      const ipfsStatus = await client.ipfs.isUp();
+      expect(ipfsStatus).toEqual(false);
+      // GraqphQl
+      const graphqlStatus = await client.graphql.isUp();
+      expect(graphqlStatus).toEqual(false);
+    });
   });
   describe("Proposal Creation", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
@@ -255,30 +255,30 @@ describe("Client", () => {
 
     })
 
-    // it("Should vote on a proposal locally", async () => {
-    //   const context = new ContextPlugin(contextParamsLocalChain)
-    //   const client = new ClientAddressList(context)
+    it("Should vote on a proposal locally", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientAddressList(context)
 
-    //   const proposalId = '0x1234567890123456789012345678901234567890'
+      const proposalId = '0x1234567890123456789012345678901234567890'
 
-    //   for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
-    //     switch (step.key) {
-    //       case VoteProposalStep.VOTING:
-    //         expect(typeof step.txHash).toBe("string");
-    //         expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-    //         break;
-    //       case VoteProposalStep.DONE:
-    //         expect(typeof step.voteId).toBe("string");
-    //         expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-    //         break;
-    //       default:
-    //         throw new Error(
-    //           "Unexpected vote proposal step: " + Object.keys(step).join(", "),
-    //         );
-    //     }
-    //   }
+      for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
+        switch (step.key) {
+          case VoteProposalStep.VOTING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case VoteProposalStep.DONE:
+            expect(typeof step.voteId).toBe("string");
+            expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          default:
+            throw new Error(
+              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+            );
+        }
+      }
 
-    // })
+    })
   })
 
   describe("Execute proposal", () => {
@@ -299,27 +299,27 @@ describe("Client", () => {
 
     })
 
-    // it("Should execute a local proposal", async () => {
-    //   const context = new ContextPlugin(contextParamsLocalChain)
-    //   const client = new ClientAddressList(context)
+    it("Should execute a local proposal", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientAddressList(context)
 
-    //   const proposalId = '0x1234567890123456789012345678901234567890'
+      const proposalId = '0x1234567890123456789012345678901234567890'
 
-    //   for await (const step of client.methods.executeProposal(proposalId)) {
-    //     switch (step.key) {
-    //       case ExecuteProposalStep.EXECUTING:
-    //         expect(typeof step.txHash).toBe("string");
-    //         expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-    //         break;
-    //       case ExecuteProposalStep.DONE:
-    //         break;
-    //       default:
-    //         throw new Error(
-    //           "Unexpected execute proposal step: " + Object.keys(step).join(", "),
-    //         );
-    //     }
-    //   }
-    // })
+      for await (const step of client.methods.executeProposal(proposalId)) {
+        switch (step.key) {
+          case ExecuteProposalStep.EXECUTING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case ExecuteProposalStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected execute proposal step: " + Object.keys(step).join(", "),
+            );
+        }
+      }
+    })
   })
 
   describe('Action generators', () => {
