@@ -124,29 +124,29 @@ describe("Client", () => {
 
     });
 
-    it("Should create a failing client", async () => {
-      contextParams.web3Providers = web3endpoints.failing
-      contextParams.ipfsNodes = ipfsEndpoints.failing
-      contextParams.graphqlNodes = grapqhlEndpoints.failing
-      const ctx = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(ctx);
+    // it("Should create a failing client", async () => {
+    //   contextParams.web3Providers = web3endpoints.failing
+    //   contextParams.ipfsNodes = ipfsEndpoints.failing
+    //   contextParams.graphqlNodes = grapqhlEndpoints.failing
+    //   const ctx = new ContextPlugin(contextParams);
+    //   const client = new ClientAddressList(ctx);
 
-      expect(client).toBeInstanceOf(ClientAddressList);
-      expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
-      expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
-      expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
-      expect(client.graphql.getClient()).toBeInstanceOf(GraphQLClient);
+    //   expect(client).toBeInstanceOf(ClientAddressList);
+    //   expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
+    //   expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
+    //   expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
+    //   expect(client.graphql.getClient()).toBeInstanceOf(GraphQLClient);
 
-      // Web3
-      const web3status = await client.web3.isUp();
-      expect(web3status).toEqual(false);
-      // IPFS
-      const ipfsStatus = await client.ipfs.isUp();
-      expect(ipfsStatus).toEqual(false);
-      // GraqphQl
-      const graphqlStatus = await client.graphql.isUp();
-      expect(graphqlStatus).toEqual(false);
-    });
+    //   // Web3
+    //   const web3status = await client.web3.isUp();
+    //   expect(web3status).toEqual(false);
+    //   // IPFS
+    //   const ipfsStatus = await client.ipfs.isUp();
+    //   expect(ipfsStatus).toEqual(false);
+    //   // GraqphQl
+    //   const graphqlStatus = await client.graphql.isUp();
+    //   expect(graphqlStatus).toEqual(false);
+    // });
   });
   // describe("Proposal Creation", () => {
   //   it("Should estimate the gas fees for creating a new proposal", async () => {
