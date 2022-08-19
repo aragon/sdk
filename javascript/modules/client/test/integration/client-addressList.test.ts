@@ -299,28 +299,27 @@ describe("Client", () => {
 
     })
 
-    it("Should execute a local proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientAddressList(context)
+    // it("Should execute a local proposal", async () => {
+    //   const context = new ContextPlugin(contextParamsLocalChain)
+    //   const client = new ClientAddressList(context)
 
-      const proposalId = '0x1234567890123456789012345678901234567890'
+    //   const proposalId = '0x1234567890123456789012345678901234567890'
 
-      for await (const step of client.methods.executeProposal(proposalId)) {
-        switch (step.key) {
-          case ExecuteProposalStep.EXECUTING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case ExecuteProposalStep.DONE:
-            break;
-          default:
-            throw new Error(
-              "Unexpected execute proposal step: " + Object.keys(step).join(", "),
-            );
-        }
-      }
-      expect(typeof proposalId).toBe("string")
-    })
+    //   for await (const step of client.methods.executeProposal(proposalId)) {
+    //     switch (step.key) {
+    //       case ExecuteProposalStep.EXECUTING:
+    //         expect(typeof step.txHash).toBe("string");
+    //         expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+    //         break;
+    //       case ExecuteProposalStep.DONE:
+    //         break;
+    //       default:
+    //         throw new Error(
+    //           "Unexpected execute proposal step: " + Object.keys(step).join(", "),
+    //         );
+    //     }
+    //   }
+    // })
   })
 
   describe('Action generators', () => {
