@@ -237,49 +237,49 @@ describe("Client", () => {
     })
   });
 
-  // describe("Vote on a proposal", () => {
-  //   it("Should estimate the gas fees for casting a vote", async () => {
-  //     const context = new ContextPlugin(contextParamsLocalChain)
-  //     const client = new ClientAddressList(context)
+  describe("Vote on a proposal", () => {
+    it("Should estimate the gas fees for casting a vote", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientAddressList(context)
 
-  //     const estimation = await client.estimation.voteProposal(
-  //       '0x1234567890123456789012345678901234567890',
-  //       VoteValues.YES
-  //     )
+      const estimation = await client.estimation.voteProposal(
+        '0x1234567890123456789012345678901234567890',
+        VoteValues.YES
+      )
 
-  //     expect(typeof estimation).toEqual("object")
-  //     expect(typeof estimation.average).toEqual("bigint");
-  //     expect(typeof estimation.max).toEqual("bigint");
-  //     expect(estimation.max).toBeGreaterThan(BigInt(0));
-  //     expect(estimation.max).toBeGreaterThan(estimation.average);
+      expect(typeof estimation).toEqual("object")
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
 
-  //   })
+    })
 
-  //   it("Should vote on a proposal locally", async () => {
-  //     const context = new ContextPlugin(contextParamsLocalChain)
-  //     const client = new ClientAddressList(context)
+    it("Should vote on a proposal locally", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientAddressList(context)
 
-  //     const proposalId = '0x1234567890123456789012345678901234567890'
+      const proposalId = '0x1234567890123456789012345678901234567890'
 
-  //     for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
-  //       switch (step.key) {
-  //         case VoteProposalStep.VOTING:
-  //           expect(typeof step.txHash).toBe("string");
-  //           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-  //           break;
-  //         case VoteProposalStep.DONE:
-  //           expect(typeof step.voteId).toBe("string");
-  //           expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-  //           break;
-  //         default:
-  //           throw new Error(
-  //             "Unexpected vote proposal step: " + Object.keys(step).join(", "),
-  //           );
-  //       }
-  //     }
+      for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
+        switch (step.key) {
+          case VoteProposalStep.VOTING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case VoteProposalStep.DONE:
+            expect(typeof step.voteId).toBe("string");
+            expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          default:
+            throw new Error(
+              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+            );
+        }
+      }
 
-  //   })
-  // })
+    })
+  })
 
   // describe("Execute proposal", () => {
   //   it("Should estimate the gas fees for executing a proposal", async () => {
