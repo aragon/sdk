@@ -1,7 +1,7 @@
 declare const describe, it, beforeAll, afterAll, expect;
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
-import { Context, Client, ContextParams, DaoCreationSteps, ICreateParams, DaoDepositSteps, IDepositParams } from "../../src";
+import { Context, Client, ContextParams, DaoCreationSteps, ICreateParams, DaoDepositSteps, IDepositParams, IWithdrawParams } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
@@ -364,6 +364,27 @@ describe("Client", () => {
       ).toBe("7");
     });
   });
+  describe('Action generators', () => {
+    it("Should create a Erc20 client and generate a install entry", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const withdrawParams: IWithdrawParams = {
+        recipientAddress: '0x1234567890123456789012345678901234567890',
+        amount: BigInt(10),
+        reference: 'test'
+      };
+
+      const installEntry = await client.encoding.withdrawAction(
+        "0x1234567890123456789012345678901234567890",
+        withdrawParams
+      );
+
+      expect(typeof installEntry).toBe("object");
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
+    });
+  });
+  
 });
 
 
