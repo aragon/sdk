@@ -1,7 +1,7 @@
-declare const describe, it, beforeAll, afterAll, expect;
+declare const describe, it, beforeAll, afterAll, expect, test;
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
-import { Context, Client, ContextParams, DaoCreationSteps, ICreateParams, DaoDepositSteps, IDepositParams, IWithdrawParams } from "../../src";
+import { Context, Client, ContextParams, DaoCreationSteps, ICreateParams, DaoDepositSteps, IDepositParams, IWithdrawParams, SortDirection, DaoSortBy, IDaoQueryParams } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
@@ -384,7 +384,65 @@ describe("Client", () => {
       expect(installEntry.data).toBeInstanceOf(Uint8Array);
     });
   });
-  
+
+  describe("Data retrieval", () => {
+    it("Should get a DAO's metadata with a specific address", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx)
+      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+      const dao = await client.methods.getDao(daoAddress)
+      expect(typeof dao).toBe('object');
+      expect(dao.address).toBe(daoAddress);
+      expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+    })
+
+    it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params: IDaoQueryParams = {
+        limit: 10,
+        skip: 0,
+        direction: SortDirection.ASC,
+        sortBy: DaoSortBy.NAME
+      }
+      const daos = await client.methods.getDaos(params)
+      expect(Array.isArray(daos)).toBe(true)
+      expect(daos.length <= 10).toBe(true);
+    })
+
+    it("Should get DAOs balances", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx)
+      const balances = await client.methods.getBalances("0x1234567890123456789012345678901234567890")
+      expect(Array.isArray(balances)).toBe(true);
+      if (balances.length > 0) {
+        expect(typeof balances[0].balance).toBe('bigint');
+      }
+    })
+
+    it("Should get the transfers of a dao", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx)
+      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
+      const transfers = await client.methods.getTransfers(daoAddress)
+      expect(Array.isArray(transfers.deposits)).toBe(true)
+      expect(Array.isArray(transfers.withdrawals)).toBe(true)
+    })
+
+    test.todo("Should return an empty array when getting the transfers of a DAO that does not exist")//, async () => {
+    //   const ctx = new Context(contextParamsLocalChain);
+    //   const client = new Client(ctx)
+    //   const res = await client.methods.getTransfers(contextParamsLocalChain.dao)
+    //   expect(res.length).toBe(0)
+    // })
+    test.todo("Should fail if the given ENS is invalid")// async () => {
+    // const ctx = new Context(contextParamsLocalChain);
+    // const client = new Client(ctx)
+    // // will fail when tested on local chain
+    // await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
+    //   "Invalid ENS name"
+    // );
+  })
 });
 
 
