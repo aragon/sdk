@@ -49,7 +49,7 @@ jobs:
 
       - name: Test
         # run: yarn test
-        run: yarn test modules/common modules/ipfs modules/client/test/unit modules/client/test/integration/client.test.ts modules/client/test/integration/client-core.test.ts modules/client/test/integration/client-erc20.test.ts modules/client/test/integration/client-addressList.test.ts
+        run: yarn test modules/common modules/ipfs modules/client/test/unit modules/client/test/integration/client-addressList.test.ts
         env:
           DAO_FACTORY: ${{ steps.contracts.outputs.dao }}
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
