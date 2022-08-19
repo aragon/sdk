@@ -363,53 +363,53 @@ describe("Client", () => {
     });
   })
 
-  // describe('Data retrieval', () => {
-  //   it("Should get the list of members that can vote in a proposal", async () => {
-  //     const context = new ContextPlugin(contextParamsLocalChain);
-  //     const client = new ClientAddressList(context);
+  describe('Data retrieval', () => {
+    it("Should get the list of members that can vote in a proposal", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
 
-  //     const wallets = await client.methods.getMembers("0x1234567890123456789012345678901234567890")
+      const wallets = await client.methods.getMembers("0x1234567890123456789012345678901234567890")
 
-  //     expect(Array.isArray(wallets)).toBe(true);
-  //     expect(wallets.length).toBeGreaterThan(0);
-  //     expect(typeof wallets[0]).toBe('string');
-  //     expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-  //   })
-  //   it("Should fetch the given proposal", async () => {
-  //     const context = new ContextPlugin(contextParamsLocalChain);
-  //     const client = new ClientAddressList(context);
+      expect(Array.isArray(wallets)).toBe(true);
+      expect(wallets.length).toBeGreaterThan(0);
+      expect(typeof wallets[0]).toBe('string');
+      expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+    })
+    it("Should fetch the given proposal", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
 
-  //     const proposalId = "0x1234567890123456789012345678901234567890_0x55"
-  //     const proposal = await client.methods.getProposal(proposalId)
+      const proposalId = "0x1234567890123456789012345678901234567890_0x55"
+      const proposal = await client.methods.getProposal(proposalId)
 
-  //     expect(typeof proposal).toBe('object');
-  //     expect(proposal.id).toBe(proposalId);
-  //     expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
-  //   })
-  //   it("Should get a list of proposals filtered by the given criteria", async () => {
-  //     const context = new ContextPlugin(contextParamsLocalChain);
-  //     const client = new ClientAddressList(context);
-  //     let proposals = await client.methods.getProposals()
+      expect(typeof proposal).toBe('object');
+      expect(proposal.id).toBe(proposalId);
+      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+    })
+    it("Should get a list of proposals filtered by the given criteria", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+      let proposals = await client.methods.getProposals()
 
-  //     expect(Array.isArray(proposals)).toBe(true)
-  //     expect(proposals.length <= 10).toBe(true)
+      expect(Array.isArray(proposals)).toBe(true)
+      expect(proposals.length <= 10).toBe(true)
 
-  //     let limit = 1
-  //     const params: IProposalQueryParams = {
-  //       limit
-  //     }
-  //     proposals = await client.methods.getProposals(params)
+      let limit = 1
+      const params: IProposalQueryParams = {
+        limit
+      }
+      proposals = await client.methods.getProposals(params)
 
-  //     expect(Array.isArray(proposals)).toBe(true)
-  //     expect(proposals.length <= limit).toBe(true)
+      expect(Array.isArray(proposals)).toBe(true)
+      expect(proposals.length <= limit).toBe(true)
 
-  //     limit = 5
-  //     params.limit = limit
-  //     proposals = await client.methods.getProposals(params)
+      limit = 5
+      params.limit = limit
+      proposals = await client.methods.getProposals(params)
 
-  //     expect(Array.isArray(proposals)).toBe(true)
-  //     expect(proposals.length <= limit).toBe(true)
-  //   })
-  // })
+      expect(Array.isArray(proposals)).toBe(true)
+      expect(proposals.length <= limit).toBe(true)
+    })
+  })
 
 })
