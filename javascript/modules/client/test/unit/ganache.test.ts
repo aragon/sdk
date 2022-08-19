@@ -1,7 +1,7 @@
 declare const describe, it, beforeAll, afterAll, expect;
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
-import { Context, Client, ContextParams } from "../../src";
+import { Context, Client, ContextParams, DaoCreationSteps, ICreateParams } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
@@ -115,6 +115,74 @@ describe("Client", () => {
         .then((isUp) => {
           expect(isUp).toEqual(true);
         });
+    });
+  });
+  describe("DAO Creation", () => {
+    it("Should estimate gas fees for creating a DAO", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1
+
+      const daoCreationParams: ICreateParams = {
+        metadata: {
+          name: daoName,
+          description: "this is a dao",
+          avatar: 'https://...',
+          links: []
+        },
+        ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
+        plugins: [
+          { id: "0x1234", data: new Uint8Array([11, 11]) },
+        ],
+      };
+
+      const gasFeesEstimation = await client.estimation.create(
+        daoCreationParams,
+      );
+
+      expect(typeof gasFeesEstimation).toEqual("object");
+      expect(typeof gasFeesEstimation.average).toEqual("bigint");
+      expect(typeof gasFeesEstimation.max).toEqual("bigint");
+      expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
+      expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
+    });
+
+    it("Should create a DAO locally", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1
+
+      const daoCreationParams: ICreateParams = {
+        metadata: {
+          name: daoName,
+          description: "this is a dao",
+          avatar: 'https://...',
+          links: []
+        },
+        ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
+        plugins: [
+          { id: "0x1234", data: new Uint8Array([11, 11]) },
+        ],
+      };
+
+      for await (const step of client.methods.create(daoCreationParams)) {
+        switch (step.key) {
+          case DaoCreationSteps.CREATING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case DaoCreationSteps.DONE:
+            expect(typeof step.address).toBe("string");
+            expect(step.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            break;
+          default:
+            throw new Error(
+              "Unexpected DAO creation step: " + JSON.stringify(step, null, 2),
+            );
+        }
+      }
     });
   });
 });
