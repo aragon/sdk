@@ -56,7 +56,7 @@ jobs:
 
       - name: Unit test
         # run: yarn test
-        run: yarn test testPathIgnorePatterns=modules/client/test/integration --ci --coverage
+        run: yarn test --testPathIgnorePatterns=modules/client/test/integration --ci --coverage
         env:
           DAO_FACTORY: ${{ steps.contracts.outputs.dao }}
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
