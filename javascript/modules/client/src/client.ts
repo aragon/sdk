@@ -121,6 +121,7 @@ export class Client extends ClientCore implements IClient {
   estimation = {
     create: (params: ICreateParams) => this._estimateCreation(params),
     deposit: (params: IDepositParams) => this._estimateDeposit(params),
+    updateAllowance: (params: IDepositParams) => this._estimateUpdateAllowance(params),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -273,7 +274,7 @@ export class Client extends ClientCore implements IClient {
       const value = cr.events?.find((e) => e?.event === "Approval")?.args
         ?.value;
       if (!value || BigNumber.from(amount).gt(value)) {
-        throw new Error("Could not increase allowance");
+        throw new Error("Could not update allowance");
       }
     });
 
@@ -332,6 +333,17 @@ export class Client extends ClientCore implements IClient {
       .then((gasLimit) => {
         return this.web3.getApproximateGasFee(gasLimit.toBigInt());
       });
+  }
+
+  _estimateUpdateAllowance(_params: IDepositParams) {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new Error("A signer is needed");
+    } else if (!signer.provider) {
+      throw new Error("A web3 provider is needed");
+    }
+    // TODO: remove this
+    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
   //// PRIVATE METHODS METADATA
@@ -483,6 +495,7 @@ export class Client extends ClientCore implements IClient {
 // @ts-ignore  TODO: Remove this comment
 function unwrapCreateDaoParams(
   params: ICreateParams,
+  metadataCid: string
 ): [DAOFactory.DAOConfigStruct, DAOFactory.VoteConfigStruct, string, string] {
   // TODO: Serialize plugin params into a buffer
   const pluginDataBytes = "0x" +
@@ -496,8 +509,7 @@ function unwrapCreateDaoParams(
   return [
     {
       name: params.ensSubdomain,
-      // TODO: Return the IPFS URI (ipfs://<cid>)
-      metadata: JSON.stringify(params.metadata)
+      metadata: "ipfs://" + metadataCid
     },
     {
       // TODO: Adapt the DAO creation parameters

@@ -1,7 +1,7 @@
 // This file contains the definitions of the general purpose DAO client
 
 import { IClientCore } from "./core";
-import { DaoAction, DaoRole, GasFeeEstimation, IPagination, IPluginListItem } from "./common";
+import { DaoAction, DaoRole, GasFeeEstimation, IPagination, IPluginInstallItem } from "./common";
 
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
@@ -36,6 +36,7 @@ export interface IClient extends IClientCore {
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
     deposit: (params: IDepositParams) => Promise<GasFeeEstimation>;
+    updateAllowance: (params: IDepositParams) => Promise<GasFeeEstimation>;
   };
 }
 
@@ -45,7 +46,7 @@ export interface IClient extends IClientCore {
 export interface ICreateParams {
   metadata: IDaoMetadata
   ensSubdomain: string
-  plugins: IPluginListItem[]
+  plugins: IPluginInstallItem[]
 }
 
 export interface IDaoMetadata {

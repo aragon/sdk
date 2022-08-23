@@ -20,7 +20,7 @@ export {
 
 export {
   IErc20PluginInstall,
-  ICreateProposal,
+  ICreateProposalParams,
   ProposalCreationSteps,
   VoteValues,
   VoteProposalStep,

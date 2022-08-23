@@ -11,13 +11,15 @@ import { GraphQLClient } from "graphql-request";
 
 import {
   ExecuteProposalStep,
-  ICreateProposal,
+  ICreateProposalParams,
   IAddressListPluginInstall,
   IProposalQueryParams,
   ProposalCreationSteps,
   VoteValues,
   VoteProposalStep,
-  IProposalSettings,
+  IPluginSettings,
+  IVoteProposalParams,
+  IExecuteProposalParams,
 } from "../../src/internal/interfaces/plugins";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
@@ -153,7 +155,8 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientAddressList(context)
 
-      const proposalParams: ICreateProposal = {
+      const proposalParams: ICreateProposalParams = {
+        pluginAddress: '0x123456789012345678901234567890123456789012',
         metadata: {
           title: 'Best Proposal',
           summary: 'this is the sumnary',
@@ -197,7 +200,8 @@ describe("Client", () => {
           reference: 'test'
         })
 
-      const proposalParams: ICreateProposal = {
+      const proposalParams: ICreateProposalParams = {
+        pluginAddress: '0x123456789012345678901234567890123456789012',
         metadata: {
           title: 'Best Proposal',
           summary: 'this is the sumnary',
@@ -242,10 +246,13 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientAddressList(context)
 
-      const estimation = await client.estimation.voteProposal(
-        '0x1234567890123456789012345678901234567890',
-        VoteValues.YES
-      )
+      const voteParams: IVoteProposalParams = {
+        pluginAddress: "0x123456789012345678901234567890123456789012",
+        proposalId: '0x1234567890123456789012345678901234567890',
+        vote: VoteValues.YES
+      }
+
+      const estimation = await client.estimation.voteProposal(voteParams)
 
       expect(typeof estimation).toEqual("object")
       expect(typeof estimation.average).toEqual("bigint");
@@ -259,9 +266,13 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientAddressList(context)
 
-      const proposalId = '0x1234567890123456789012345678901234567890'
+      const voteParams: IVoteProposalParams = {
+        pluginAddress: "0x123456789012345678901234567890123456789012",
+        proposalId: '0x1234567890123456789012345678901234567890',
+        vote: VoteValues.YES
+      }
 
-      for await (const step of client.methods.voteProposal(proposalId, VoteValues.YES)) {
+      for await (const step of client.methods.voteProposal(voteParams)) {
         switch (step.key) {
           case VoteProposalStep.VOTING:
             expect(typeof step.txHash).toBe("string");
@@ -285,10 +296,12 @@ describe("Client", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientAddressList(context)
-
-      const estimation = await client.estimation.executeProposal(
-        '0x1234567890123456789012345678901234567890'
-      )
+      
+      const executeParams: IExecuteProposalParams = {
+        pluginAddress: "0x123456789012345678901234567890123456789012",
+        proposalId: '0x1234567890123456789012345678901234567890',
+      }
+      const estimation = await client.estimation.executeProposal(executeParams)
 
       expect(typeof estimation).toEqual("object")
       expect(typeof estimation.average).toEqual("bigint");
@@ -302,9 +315,11 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientAddressList(context)
 
-      const proposalId = '0x1234567890123456789012345678901234567890'
-
-      for await (const step of client.methods.executeProposal(proposalId)) {
+      const executeParams: IExecuteProposalParams = {
+        pluginAddress: "0x123456789012345678901234567890123456789012",
+        proposalId: '0x1234567890123456789012345678901234567890',
+      }
+      for await (const step of client.methods.executeProposal(executeParams)) {
         switch (step.key) {
           case ExecuteProposalStep.EXECUTING:
             expect(typeof step.txHash).toBe("string");
@@ -325,7 +340,7 @@ describe("Client", () => {
   describe('Action generators', () => {
     it("Should create an AddressList client and generate a install entry", async () => {
       const withdrawParams: IAddressListPluginInstall = {
-        proposals: {
+        settings: {
           minDuration: 7200, // seconds
           minTurnout: 0.5,
           minSupport: 0.5
@@ -338,28 +353,28 @@ describe("Client", () => {
         ]
       };
 
-      const installEntry = ClientAddressList.encoding.installEntry(withdrawParams);
+      const installPluginItemItem = ClientAddressList.encoding.getPluginInstallItem(withdrawParams);
 
-      expect(typeof installEntry).toBe("object");
+      expect(typeof installPluginItemItem).toBe("object");
       // what does this should be
-      expect(installEntry.data).toBeInstanceOf(Uint8Array);
+      expect(installPluginItemItem.data).toBeInstanceOf(Uint8Array);
     });
 
     it("Should create an AddressList client and generate a plugin config action action", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);
 
-      const pluginConfigParams: IProposalSettings = {
+      const pluginConfigParams: IPluginSettings = {
         minDuration: 100000,
         minTurnout: 0.25,
         minSupport: 0.51
       };
 
-      const installEntry = client.encoding.setPluginConfigAction(pluginConfigParams);
+      const installPluginItemItem = client.encoding.updatePluginSettingsAction(pluginConfigParams);
 
-      expect(typeof installEntry).toBe("object");
+      expect(typeof installPluginItemItem).toBe("object");
       // what does this should be
-      expect(installEntry.data).toBeInstanceOf(Uint8Array);
+      expect(installPluginItemItem.data).toBeInstanceOf(Uint8Array);
     });
   })
 

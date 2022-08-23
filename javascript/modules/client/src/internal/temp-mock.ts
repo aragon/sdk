@@ -65,7 +65,7 @@ export function getDummyAddressListProposal(proposalId?: string): AddressListPro
       abstain,
     },
     settings: {
-      minDuration: Math.floor((Random.getFloat() * 5001) + 5000),
+      duration: Math.floor((Random.getFloat() * 5001) + 5000),
       minSupport: Random.getFloat(),
       minTurnout: Random.getFloat()
     },
@@ -205,7 +205,7 @@ export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
       abstain: BigInt(abstain),
     },
     settings: {
-      minDuration: Math.floor((Random.getFloat() * 5001) + 5000),
+      duration: Math.floor((Random.getFloat() * 5001) + 5000),
       minSupport: Random.getFloat(),
       minTurnout: Random.getFloat()
     },

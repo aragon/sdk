@@ -2,7 +2,7 @@ import { ERC20Voting__factory, MajorityVoting__factory, WhitelistVoting__factory
 import { strip0x, hexToBytes } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { IErc20PluginInstall, IAddressListPluginInstall, IProposalSettings } from "../interfaces/plugins";
+import { IErc20PluginInstall, IAddressListPluginInstall, IPluginSettings } from "../interfaces/plugins";
 
 export function encodeAddressListActionInit(params: IAddressListPluginInstall): Uint8Array {
   const addressListVotingInterface = WhitelistVoting__factory.createInterface();
@@ -20,9 +20,9 @@ function unwrapAddressListInitParams(params: IAddressListPluginInstall): [string
   return [
     AddressZero,
     AddressZero,
-    BigNumber.from(Math.round(params.proposals.minTurnout * 100)),
-    BigNumber.from(Math.round(params.proposals.minSupport * 100)),
-    BigNumber.from(Math.round(params.proposals.minDuration * 100)),
+    BigNumber.from(Math.round(params.settings.minTurnout * 100)),
+    BigNumber.from(Math.round(params.settings.minSupport * 100)),
+    BigNumber.from(Math.round(params.settings.minDuration * 100)),
     params.addresses
   ]
 }
@@ -51,23 +51,23 @@ function unwrapErc20InitParams(params: IErc20PluginInstall): [string, string, Bi
   return [
     AddressZero,
     AddressZero,
-    BigNumber.from(Math.round(params.proposals.minTurnout * 100)),
-    BigNumber.from(Math.round(params.proposals.minSupport * 100)),
-    BigNumber.from(Math.round(params.proposals.minDuration * 100)),
+    BigNumber.from(Math.round(params.settings.minTurnout * 100)),
+    BigNumber.from(Math.round(params.settings.minSupport * 100)),
+    BigNumber.from(Math.round(params.settings.minDuration * 100)),
     token
   ]
 }
 
-export function encodeActionSetPluginConfig(params: IProposalSettings): Uint8Array {
+export function encodeUpdatePluginSettingsAction(params: IPluginSettings): Uint8Array {
   const votingInterface = MajorityVoting__factory.createInterface();
-  const args = unwrapSetPluginConfig(params);
+  const args = unwrapUpdatePluginSettings(params);
   // get hex bytes
   const hexBytes = votingInterface.encodeFunctionData("changeVoteConfig", args);
   // Strip 0x => encode in Uint8Array
   return hexToBytes(strip0x(hexBytes));
 }
 
-function unwrapSetPluginConfig(params: IProposalSettings): [BigNumber, BigNumber, BigNumber] {
+function unwrapUpdatePluginSettings(params: IPluginSettings): [BigNumber, BigNumber, BigNumber] {
   return [
     BigNumber.from(Math.round(params.minTurnout * 100)),
     BigNumber.from(Math.round(params.minSupport * 100)),
