@@ -84,24 +84,70 @@ export class Client extends ClientCore implements IClient {
 
   /** Contains all the generic high level methods to interact with a DAO */
   methods = {
-    /** Created a DAO with the given parameters and plugins */
+    /**
+     * Creates a DAO with the given settings and plugins
+     *
+     * @param {ICreateParams} params
+     * @return {*}  {AsyncGenerator<DaoCreationStepValue>}
+     * @memberof Client
+     */
     create: (params: ICreateParams) => this._createDao(params),
-    /** Deposits ether or an ERC20 token */
+    /** 
+     * Deposits ether or an ERC20 token into the DAO
+     * 
+     * @param {IDepositParams} params
+     * @return {*}  {AsyncGenerator<DaoDepositStepValue>}
+     * @memberof Client
+     */
     deposit: (params: IDepositParams) => this._deposit(params),
-    /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet */
+    /** 
+     * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
+     * 
+     * @param {string} daoAddressOrEns
+     * @param {string[]} tokenAddresses
+     * @return {*}  {Promise<AssetBalance[]>}
+     * @memberof Client
+     */
     getBalances: (daoAddressOrEns: string, tokenAddresses: string[] = []): Promise<AssetBalance[]> =>
       this._getBalances(daoAddressOrEns, tokenAddresses),
-    /** Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet*/
+    /** 
+     * Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)
+     * 
+     * @param {string} daoAddressOrEns
+     * @return {*}  {Promise<IAssetTransfers>}
+     * @memberof Client
+     */
     getTransfers: (daoAddressOrEns: string): Promise<IAssetTransfers> =>
       this._getTransfers(daoAddressOrEns),
-    /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
+    /** 
+     * Retrieves metadata for DAO with given identifier (address or ens domain)
+     * 
+     * @param {string} daoAddressOrEns
+     * @return {*}  {Promise<IAssetTransfers>}
+     * @memberof Client
+     */
     getDao: (daoAddressOrEns: string): Promise<DaoDetails> =>
       this._getDao(daoAddressOrEns),
-    /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
+    /** 
+     * Retrieves metadata for DAO with given identifier (address or ens domain)
+     * 
+     * @param {IDaoQueryParams} params
+     * @return {*}  {Promise<DaoDetails[]>}
+     * @memberof Client
+     */
     getDaos: (params?: IDaoQueryParams): Promise<DaoDetails[]> =>
       this._getDaos(params ?? {}),
 
-    /** Checks whether a role is granted by the current DAO's ACL settings */
+    /** 
+     * Checks whether a role is granted by the current DAO's ACL settings
+     * 
+     * @param {string} where
+     * @param {string} who
+     * @param {DaoRole} role
+     * @param {Uint8Array} data
+     * @return {*} 
+     * @memberof Client 
+     */
     hasPermission: (
       where: string,
       who: string,
@@ -111,6 +157,14 @@ export class Client extends ClientCore implements IClient {
   };
 
   encoding = {
+    /**
+      * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
+      *
+      * @param {string} daoAddresOrEns
+      * @param {IWithdrawParams} params
+      * @return {*}  {Promise<DaoAction>}
+      * @memberof Client
+      */
     withdrawAction: (daoAddressOrEns: string, params: IWithdrawParams): Promise<DaoAction> =>
       this._buildActionWithdraw(daoAddressOrEns, params)
   };
@@ -119,13 +173,35 @@ export class Client extends ClientCore implements IClient {
 
   /** Contains the gas estimation of the Ethereum transactions */
   estimation = {
+    /**
+     * Estimates the gas fee of creating a DAO
+     *
+     * @param {ICreateParams} params
+     * @return {*}  {Promise<GasFeeEstimation>}
+     * @memberof Client
+     */
     create: (params: ICreateParams) => this._estimateCreation(params),
+
+    /**
+     * Estimates the gas fee of depositing ether or an ERC20 token into the DAO
+     *
+     * @param {IDepositParams} params
+     * @return {*}  {Promise<GasFeeEstimation>}
+     * @memberof Client
+     */
     deposit: (params: IDepositParams) => this._estimateDeposit(params),
     updateAllowance: (params: IDepositParams) => this._estimateUpdateAllowance(params),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
-
+  /**
+   *
+   *
+   * @private
+   * @param {ICreateParams} params
+   * @return {*}  {AsyncGenerator<DaoCreationStepValue>}
+   * @memberof Client
+   */
   private async *_createDao(
     // @ts-ignore  TODO: Remove this comment when used
     params: ICreateParams,
