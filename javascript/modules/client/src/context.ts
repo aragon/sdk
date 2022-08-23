@@ -64,15 +64,15 @@ export class Context {
       network: contextParams.network,
       signer: contextParams.signer,
       daoFactoryAddress: contextParams.daoFactoryAddress,
-      web3Providers: this.useWeb3Providers(
+      web3Providers: Context.resolveWeb3Providers(
         contextParams.web3Providers,
         contextParams.network,
       ),
       gasFeeEstimationFactor: Context.resolveGasFeeEstimationFactor(
         contextParams.gasFeeEstimationFactor,
       ),
-      ipfs: this.useIpfs(contextParams.ipfsNodes),
-      graphql: this.useGraphql(contextParams.graphqlNodes),
+      ipfs: Context.resolveIpfs(contextParams.ipfsNodes),
+      graphql: Context.resolveGraphql(contextParams.graphqlNodes),
     };
   }
 
@@ -91,7 +91,7 @@ export class Context {
       this.state.signer = contextParams.signer;
     }
     if (contextParams.web3Providers) {
-      this.state.web3Providers = this.useWeb3Providers(
+      this.state.web3Providers = Context.resolveWeb3Providers(
         contextParams.web3Providers,
         this.state.network,
       );
@@ -103,70 +103,12 @@ export class Context {
     }
 
     if (contextParams.ipfsNodes?.length) {
-      this.state.ipfs = this.useIpfs(contextParams.ipfsNodes)
+      this.state.ipfs = Context.resolveIpfs(contextParams.ipfsNodes)
     }
     if (contextParams.graphqlNodes?.length) {
-      this.state.graphql = this.useGraphql(contextParams.graphqlNodes)
+      this.state.graphql = Context.resolveGraphql(contextParams.graphqlNodes)
     }
   }
-
-  useWeb3Providers(
-    endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-    network: Networkish,
-  ): JsonRpcProvider[] {
-    if (Array.isArray(endpoints)) {
-      return endpoints.map((item) => {
-        if (typeof item === "string") {
-          const url = new URL(item);
-          if (!supportedProtocols.includes(url.protocol)) {
-            throw new UnsupportedProtocolError(url.protocol);
-          }
-          return new JsonRpcProvider(url.href, network);
-        }
-        return item;
-      });
-    } else if (typeof endpoints === "string") {
-      const url = new URL(endpoints);
-      if (!supportedProtocols.includes(url.protocol)) {
-        throw new UnsupportedProtocolError(url.protocol);
-      }
-      return [new JsonRpcProvider(url.href, network)];
-    } else {
-      return [endpoints];
-    }
-  }
-
-  useIpfs(
-    configs: {
-      url: string;
-      headers?: Record<string, string>;
-    }[]
-  ): IpfsClient[] {
-    let clients: IpfsClient[] = []
-    configs.forEach((config) => {
-      const url = new URL(config.url)
-      if (!supportedProtocols.includes(url.protocol)) {
-        throw new UnsupportedProtocolError(url.protocol);
-      }
-      clients.push(new IpfsClient(url, config.headers))
-    })
-    return clients
-  }
-
-  useGraphql(
-    endpoints: string[]
-  ): GraphQLClient[] {
-    let clients: GraphQLClient[] = []
-    endpoints.forEach((endpoint) => {
-      const url = new URL(endpoint)
-      if (!supportedProtocols.includes(url.protocol)) {
-        throw new UnsupportedProtocolError(url.protocol);
-      }
-      clients.push(new GraphQLClient(url.href))
-    })
-    return clients
-  }
-
   // GETTERS
 
   /**
@@ -276,6 +218,63 @@ export class Context {
   }
 
   // INTERNAL HELPERS
+
+  private static resolveWeb3Providers(
+    endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
+    network: Networkish,
+  ): JsonRpcProvider[] {
+    if (Array.isArray(endpoints)) {
+      return endpoints.map((item) => {
+        if (typeof item === "string") {
+          const url = new URL(item);
+          if (!supportedProtocols.includes(url.protocol)) {
+            throw new UnsupportedProtocolError(url.protocol);
+          }
+          return new JsonRpcProvider(url.href, network);
+        }
+        return item;
+      });
+    } else if (typeof endpoints === "string") {
+      const url = new URL(endpoints);
+      if (!supportedProtocols.includes(url.protocol)) {
+        throw new UnsupportedProtocolError(url.protocol);
+      }
+      return [new JsonRpcProvider(url.href, network)];
+    } else {
+      return [endpoints];
+    }
+  }
+
+  private static resolveIpfs(
+    configs: {
+      url: string;
+      headers?: Record<string, string>;
+    }[]
+  ): IpfsClient[] {
+    let clients: IpfsClient[] = []
+    configs.forEach((config) => {
+      const url = new URL(config.url)
+      if (!supportedProtocols.includes(url.protocol)) {
+        throw new UnsupportedProtocolError(url.protocol);
+      }
+      clients.push(new IpfsClient(url, config.headers))
+    })
+    return clients
+  }
+
+  private static resolveGraphql(
+    endpoints: string[]
+  ): GraphQLClient[] {
+    let clients: GraphQLClient[] = []
+    endpoints.forEach((endpoint) => {
+      const url = new URL(endpoint)
+      if (!supportedProtocols.includes(url.protocol)) {
+        throw new UnsupportedProtocolError(url.protocol);
+      }
+      clients.push(new GraphQLClient(url.href))
+    })
+    return clients
+  }
 
   private static resolveGasFeeEstimationFactor(
     gasFeeEstimationFactor: number,

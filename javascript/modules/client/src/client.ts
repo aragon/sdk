@@ -495,7 +495,7 @@ export class Client extends ClientCore implements IClient {
 // @ts-ignore  TODO: Remove this comment
 function unwrapCreateDaoParams(
   params: ICreateParams,
-  metadataIpfsUri: string
+  metadataCid: string
 ): [DAOFactory.DAOConfigStruct, DAOFactory.VoteConfigStruct, string, string] {
   // TODO: Serialize plugin params into a buffer
   const pluginDataBytes = "0x" +
@@ -509,8 +509,7 @@ function unwrapCreateDaoParams(
   return [
     {
       name: params.ensSubdomain,
-      // TODO: Return the IPFS URI (ipfs://<cid>)
-      metadata: metadataIpfsUri
+      metadata: metadataCid
     },
     {
       // TODO: Adapt the DAO creation parameters
