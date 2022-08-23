@@ -32,25 +32,6 @@
 <dd><p>Getter for the GraphQL client</p></dd>
 </dl>
 
-## Functions
-
-<dl>
-<dt><a href="#create">create()</a></dt>
-<dd><p>Created a DAO with the given parameters and plugins</p></dd>
-<dt><a href="#deposit">deposit()</a></dt>
-<dd><p>Deposits ether or an ERC20 token</p></dd>
-<dt><a href="#getBalances">getBalances()</a></dt>
-<dd><p>Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet</p></dd>
-<dt><a href="#getTransfers">getTransfers()</a></dt>
-<dd><p>Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet</p></dd>
-<dt><a href="#getDao">getDao()</a></dt>
-<dd><p>Retrieves metadata for DAO with given identifier (address or ens domain)</p></dd>
-<dt><a href="#getDaos">getDaos()</a></dt>
-<dd><p>Retrieves metadata for DAO with given identifier (address or ens domain)</p></dd>
-<dt><a href="#hasPermission">hasPermission()</a></dt>
-<dd><p>Checks whether a role is granted by the current DAO's ACL settings</p></dd>
-</dl>
-
 <a name="ClientErc20"></a>
 
 ## ClientErc20
@@ -62,17 +43,17 @@
     * _instance_
         * [._createProposal()](#ClientErc20+_createProposal)
     * _static_
-        * [.installEntry(params)](#ClientErc20.installEntry) ⇒ <code>\*</code>
+        * [.getPluginInstallItem(params)](#ClientErc20.getPluginInstallItem) ⇒ <code>\*</code>
         * [.createProposal(params)](#ClientErc20.createProposal) ⇒ <code>\*</code>
-        * [.voteProposal(proposalId, vote)](#ClientErc20.voteProposal) ⇒ <code>\*</code>
-        * [.executeProposal(proposalId)](#ClientErc20.executeProposal) ⇒ <code>\*</code>
+        * [.voteProposal(params, vote)](#ClientErc20.voteProposal) ⇒ <code>\*</code>
+        * [.executeProposal(params)](#ClientErc20.executeProposal) ⇒ <code>\*</code>
         * [.getMembers()](#ClientErc20.getMembers) ⇒ <code>\*</code>
         * [.getProposal(proposalId)](#ClientErc20.getProposal) ⇒ <code>\*</code>
         * [.getProposals(params)](#ClientErc20.getProposals) ⇒ <code>\*</code>
         * [.createProposal(params)](#ClientErc20.createProposal) ⇒ <code>\*</code>
-        * [.voteProposal(proposalId, vote)](#ClientErc20.voteProposal) ⇒ <code>\*</code>
-        * [.executeProposal(proposalId)](#ClientErc20.executeProposal) ⇒ <code>\*</code>
-        * [.installEntry(params)](#ClientErc20.installEntry) ⇒ <code>\*</code>
+        * [.voteProposal(params, vote)](#ClientErc20.voteProposal) ⇒ <code>\*</code>
+        * [.executeProposal(params)](#ClientErc20.executeProposal) ⇒ <code>\*</code>
+        * [.getPluginInstallItem(params)](#ClientErc20.getPluginInstallItem) ⇒ <code>\*</code>
 
 <a name="ClientErc20+_createProposal"></a>
 
@@ -80,9 +61,9 @@
 <p>Contains all the generic high level methods to interact with a DAO</p>
 
 **Kind**: instance method of [<code>ClientErc20</code>](#ClientErc20)  
-<a name="ClientErc20.installEntry"></a>
+<a name="ClientErc20.getPluginInstallItem"></a>
 
-### ClientErc20.installEntry(params) ⇒ <code>\*</code>
+### ClientErc20.getPluginInstallItem(params) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
@@ -103,11 +84,11 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>ICreateProposal</code> | 
+| params | <code>ICreateProposalParams</code> | 
 
 <a name="ClientErc20.voteProposal"></a>
 
-### ClientErc20.voteProposal(proposalId, vote) ⇒ <code>\*</code>
+### ClientErc20.voteProposal(params, vote) ⇒ <code>\*</code>
 <p>Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.</p>
 
 **Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
@@ -115,12 +96,12 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| proposalId | <code>string</code> | 
+| params | <code>IVoteProposalParams</code> | 
 | vote | <code>VoteValues</code> | 
 
 <a name="ClientErc20.executeProposal"></a>
 
-### ClientErc20.executeProposal(proposalId) ⇒ <code>\*</code>
+### ClientErc20.executeProposal(params) ⇒ <code>\*</code>
 <p>Executes the given proposal, provided that it has already passed</p>
 
 **Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
@@ -128,7 +109,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| proposalId | <code>string</code> | 
+| params | <code>IExecuteProposalParams</code> | 
 
 <a name="ClientErc20.getMembers"></a>
 
@@ -171,11 +152,11 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>ICreateProposal</code> | 
+| params | <code>ICreateProposalParams</code> | 
 
 <a name="ClientErc20.voteProposal"></a>
 
-### ClientErc20.voteProposal(proposalId, vote) ⇒ <code>\*</code>
+### ClientErc20.voteProposal(params, vote) ⇒ <code>\*</code>
 <p>Estimates the gas fee of casting a vote on a proposal</p>
 
 **Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
@@ -183,12 +164,12 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| proposalId | <code>string</code> | 
+| params | <code>IVoteProposalParams</code> | 
 | vote | <code>VoteValues</code> | 
 
 <a name="ClientErc20.executeProposal"></a>
 
-### ClientErc20.executeProposal(proposalId) ⇒ <code>\*</code>
+### ClientErc20.executeProposal(params) ⇒ <code>\*</code>
 <p>Estimates the gas fee of executing an ERC20 proposal</p>
 
 **Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
@@ -196,11 +177,11 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| proposalId | <code>string</code> | 
+| params | <code>IExecuteProposalParams</code> | 
 
-<a name="ClientErc20.installEntry"></a>
+<a name="ClientErc20.getPluginInstallItem"></a>
 
-### ClientErc20.installEntry(params) ⇒ <code>\*</code>
+### ClientErc20.getPluginInstallItem(params) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
@@ -217,6 +198,143 @@ so that the plugin is configured</p>
 <p>Provider a generic client with high level methods to manage and interact with DAO's</p>
 
 **Kind**: global class  
+
+* [Client](#Client)
+    * [.create(params)](#Client.create) ⇒ <code>\*</code>
+    * [.deposit(params)](#Client.deposit) ⇒ <code>\*</code>
+    * [.getBalances(daoAddressOrEns, tokenAddresses)](#Client.getBalances) ⇒ <code>\*</code>
+    * [.getTransfers(daoAddressOrEns)](#Client.getTransfers) ⇒ <code>\*</code>
+    * [.getDao(daoAddressOrEns)](#Client.getDao) ⇒ <code>\*</code>
+    * [.getDaos(params)](#Client.getDaos) ⇒ <code>\*</code>
+    * [.hasPermission(where, who, role, data)](#Client.hasPermission) ⇒ <code>\*</code>
+    * [.withdrawAction(daoAddresOrEns, params)](#Client.withdrawAction) ⇒ <code>\*</code>
+    * [.create(params)](#Client.create) ⇒ <code>\*</code>
+    * [.deposit(params)](#Client.deposit) ⇒ <code>\*</code>
+
+<a name="Client.create"></a>
+
+### Client.create(params) ⇒ <code>\*</code>
+<p>Creates a DAO with the given settings and plugins</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{AsyncGenerator<DaoCreationStepValue>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>ICreateParams</code> | 
+
+<a name="Client.deposit"></a>
+
+### Client.deposit(params) ⇒ <code>\*</code>
+<p>Deposits ether or an ERC20 token into the DAO</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{AsyncGenerator<DaoDepositStepValue>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>IDepositParams</code> | 
+
+<a name="Client.getBalances"></a>
+
+### Client.getBalances(daoAddressOrEns, tokenAddresses) ⇒ <code>\*</code>
+<p>Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise&lt;AssetBalance[]&gt;}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddressOrEns | <code>string</code> | 
+| tokenAddresses | <code>Array.&lt;string&gt;</code> | 
+
+<a name="Client.getTransfers"></a>
+
+### Client.getTransfers(daoAddressOrEns) ⇒ <code>\*</code>
+<p>Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<IAssetTransfers>}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddressOrEns | <code>string</code> | 
+
+<a name="Client.getDao"></a>
+
+### Client.getDao(daoAddressOrEns) ⇒ <code>\*</code>
+<p>Retrieves metadata for DAO with given identifier (address or ens domain)</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<IAssetTransfers>}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddressOrEns | <code>string</code> | 
+
+<a name="Client.getDaos"></a>
+
+### Client.getDaos(params) ⇒ <code>\*</code>
+<p>Retrieves metadata for DAO with given identifier (address or ens domain)</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise&lt;DaoDetails[]&gt;}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>IDaoQueryParams</code> | 
+
+<a name="Client.hasPermission"></a>
+
+### Client.hasPermission(where, who, role, data) ⇒ <code>\*</code>
+<p>Checks whether a role is granted by the current DAO's ACL settings</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+
+| Param | Type |
+| --- | --- |
+| where | <code>string</code> | 
+| who | <code>string</code> | 
+| role | <code>DaoRole</code> | 
+| data | <code>Uint8Array</code> | 
+
+<a name="Client.withdrawAction"></a>
+
+### Client.withdrawAction(daoAddresOrEns, params) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<DaoAction>}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddresOrEns | <code>string</code> | 
+| params | <code>IWithdrawParams</code> | 
+
+<a name="Client.create"></a>
+
+### Client.create(params) ⇒ <code>\*</code>
+<p>Estimates the gas fee of creating a DAO</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>ICreateParams</code> | 
+
+<a name="Client.deposit"></a>
+
+### Client.deposit(params) ⇒ <code>\*</code>
+<p>Estimates the gas fee of depositing ether or an ERC20 token into the DAO</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>IDepositParams</code> | 
+
 <a name="ContextPlugin"></a>
 
 ## ContextPlugin
@@ -315,45 +433,3 @@ so that the plugin is configured</p>
 
 **Kind**: global variable  
 **Access**: public  
-<a name="create"></a>
-
-## create()
-<p>Created a DAO with the given parameters and plugins</p>
-
-**Kind**: global function  
-<a name="deposit"></a>
-
-## deposit()
-<p>Deposits ether or an ERC20 token</p>
-
-**Kind**: global function  
-<a name="getBalances"></a>
-
-## getBalances()
-<p>Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet</p>
-
-**Kind**: global function  
-<a name="getTransfers"></a>
-
-## getTransfers()
-<p>Retrieves the list of asset transfers to and from the given DAO, by default, from ETH, DAI, USDC and USDT on Mainnet</p>
-
-**Kind**: global function  
-<a name="getDao"></a>
-
-## getDao()
-<p>Retrieves metadata for DAO with given identifier (address or ens domain)</p>
-
-**Kind**: global function  
-<a name="getDaos"></a>
-
-## getDaos()
-<p>Retrieves metadata for DAO with given identifier (address or ens domain)</p>
-
-**Kind**: global function  
-<a name="hasPermission"></a>
-
-## hasPermission()
-<p>Checks whether a role is granted by the current DAO's ACL settings</p>
-
-**Kind**: global function  
