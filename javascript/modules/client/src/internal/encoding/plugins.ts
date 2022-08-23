@@ -20,9 +20,9 @@ function unwrapAddressListInitParams(params: IAddressListPluginInstall): [string
   return [
     AddressZero,
     AddressZero,
-    BigNumber.from(Math.round(params.proposals.minTurnout * 100)),
-    BigNumber.from(Math.round(params.proposals.minSupport * 100)),
-    BigNumber.from(Math.round(params.proposals.minDuration * 100)),
+    BigNumber.from(Math.round(params.settings.minTurnout * 100)),
+    BigNumber.from(Math.round(params.settings.minSupport * 100)),
+    BigNumber.from(Math.round(params.settings.minDuration * 100)),
     params.addresses
   ]
 }
@@ -51,9 +51,9 @@ function unwrapErc20InitParams(params: IErc20PluginInstall): [string, string, Bi
   return [
     AddressZero,
     AddressZero,
-    BigNumber.from(Math.round(params.proposals.minTurnout * 100)),
-    BigNumber.from(Math.round(params.proposals.minSupport * 100)),
-    BigNumber.from(Math.round(params.proposals.minDuration * 100)),
+    BigNumber.from(Math.round(params.settings.minTurnout * 100)),
+    BigNumber.from(Math.round(params.settings.minSupport * 100)),
+    BigNumber.from(Math.round(params.settings.minDuration * 100)),
     token
   ]
 }
