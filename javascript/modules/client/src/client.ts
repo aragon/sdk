@@ -509,7 +509,7 @@ function unwrapCreateDaoParams(
   return [
     {
       name: params.ensSubdomain,
-      metadata: metadataCid
+      metadata: "ipfs://" + metadataCid
     },
     {
       // TODO: Adapt the DAO creation parameters

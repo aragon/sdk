@@ -340,7 +340,7 @@ describe("Client", () => {
   describe('Action generators', () => {
     it("Should create an AddressList client and generate a install entry", async () => {
       const withdrawParams: IAddressListPluginInstall = {
-        proposals: {
+        settings: {
           minDuration: 7200, // seconds
           minTurnout: 0.5,
           minSupport: 0.5

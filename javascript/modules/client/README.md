@@ -422,7 +422,7 @@ const client: Client = new Client(context)
 
 // Use an already existing ERC20 token
 const pluginInitParams1: IErc20PluginInstall = {
-  proposals: {
+  settings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minTurnout: 0.25, // 25%
     minSupport: 0.5 // 50%
@@ -433,7 +433,7 @@ const pluginInitParams1: IErc20PluginInstall = {
 };
 // Mint a new token
 const pluginInitParams2: IErc20PluginInstall = {
-  proposals: {
+  settings: {
     minDuration: 60 * 60 * 24,  // seconds
     minTurnout: 0.4, // 40%
     minSupport: 0.55 // 55%
@@ -894,7 +894,7 @@ const client: Client = new Client(context)
 // Define the plugins to install and their params
 
 const pluginInitParams: IAddressListPluginInstall = {
-  proposals: {
+  settings: {
     minDuration: 60 * 60 * 24, // seconds
     minTurnout: 0.25, // 25%
     minSupport: 0.5 // 50%

@@ -102,7 +102,7 @@ export interface IExecuteProposalParams {
 // Factory init params
 
 export type IErc20PluginInstall = {
-  proposals: IPluginSettings;
+  settings: IPluginSettings;
   newToken?: NewTokenParams;
   useToken?: ExistingTokenParams;
 };
@@ -121,7 +121,7 @@ type NewTokenParams = {
 
 export type IAddressListPluginInstall = {
   addresses: string[],
-  proposals: IPluginSettings
+  settings: IPluginSettings
 }
 
 // STEPS

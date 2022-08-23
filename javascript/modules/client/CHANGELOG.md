@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+- Consistency issues in naming
 
 ### Added
 - Internal Graphql client
