@@ -8,7 +8,7 @@
     "./node_modules/jsdoc-babel"
   ],
   "babel": {
-    "extensions": ["ts", "tsx"],
+    "extensions": ["ts"],
     "ignore": ["**/*.(test|spec).ts"],
     "babelrc": false,
 	"presets": [["@babel/preset-env", { "targets": { "node": true } }], "@babel/preset-typescript"],
