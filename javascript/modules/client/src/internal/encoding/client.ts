@@ -23,3 +23,10 @@ function unwrapWithdrawParams(
     params.reference ?? "",
   ];
 }
+
+export function encodeUpdateMetadataAction(ipfsUri: string): Uint8Array {
+  const daoInterface = DAO__factory.createInterface();
+  const args = hexToBytes(ipfsUri);
+  const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args])
+  return hexToBytes((strip0x(hexBytes)));
+}

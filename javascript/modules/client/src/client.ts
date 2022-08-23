@@ -10,6 +10,7 @@ import {
   IAssetTransfers,
   IClient,
   ICreateParams,
+  IMetadata,
   IDaoQueryParams,
   IDepositParams,
   IWithdrawParams,
@@ -33,7 +34,7 @@ import { pack } from "@ethersproject/solidity";
 import { Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
-import { encodeWithdrawActionData } from "./internal/encoding/client";
+import { encodeUpdateMetadataAction, encodeWithdrawActionData } from "./internal/encoding/client";
 import { getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
 
@@ -166,7 +167,18 @@ export class Client extends ClientCore implements IClient {
       * @memberof Client
       */
     withdrawAction: (daoAddressOrEns: string, params: IWithdrawParams): Promise<DaoAction> =>
-      this._buildActionWithdraw(daoAddressOrEns, params)
+      this._buildWithdrawAction(daoAddressOrEns, params),
+
+    /**
+      * Computes the payload to be given when creating a proposal that updates the metadata the DAO
+      *
+      * @param {string} daoAddresOrEns
+      * @param {IMetadata} params
+      * @return {*}  {Promise<DaoAction>}
+      * @memberof Client
+      */
+    updateMetadataAction: (daoAddressOrEns: string, params: IMetadata): Promise<DaoAction> =>
+      this._buildUpdateMetadataAction(daoAddressOrEns, params)
   };
 
   //// ESTIMATION HANDLERS
@@ -547,7 +559,7 @@ export class Client extends ClientCore implements IClient {
    * @return {*}  {DaoAction}
    * @memberof Client
    */
-  private async _buildActionWithdraw(daoAddreessOrEns: string, params: IWithdrawParams): Promise<DaoAction> {
+  private async _buildWithdrawAction(daoAddreessOrEns: string, params: IWithdrawParams): Promise<DaoAction> {
     // check ens
     let address = daoAddreessOrEns
     if (!isAddress(daoAddreessOrEns)) {
@@ -562,6 +574,24 @@ export class Client extends ClientCore implements IClient {
       to: address,
       value: BigInt(0),
       data: encodeWithdrawActionData(params)
+    }
+  }
+  private async _buildUpdateMetadataAction(daoAddreessOrEns: string, _params: IMetadata): Promise<DaoAction> {
+    // check ens
+    let address = daoAddreessOrEns
+    if (!isAddress(daoAddreessOrEns)) {
+      const resolvedAddress = await this.web3.getSigner()?.resolveName(daoAddreessOrEns)
+      if (!resolvedAddress) {
+        throw new Error("invalid ens")
+      }
+      address = resolvedAddress
+    }
+    // upload metadata to IPFS
+    const cid = "0x1234567890123456789012345678901234567890"
+    return {
+      to: address,
+      value: BigInt(0),
+      data: encodeUpdateMetadataAction(cid)
     }
   }
 }
