@@ -17,7 +17,7 @@ import * as deployContracts from "../../../../helpers/deployContracts";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
 import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-ethers";
-import { DaoSortBy, IDaoMetadata, IDaoQueryParams } from "../../src/internal/interfaces/client";
+import { DaoSortBy, IMetadata, IDaoQueryParams } from "../../src/internal/interfaces/client";
 import { SortDirection } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/client";
 import { Random } from "@aragon/sdk-common";
@@ -399,11 +399,11 @@ describe("Client", () => {
       expect(typeof withgrawAction).toBe("object");
       expect(withgrawAction.data).toBeInstanceOf(Uint8Array);
     });
-    it("Should create a update dao metadata action", async () => {
+    it("Should encode an update metadata action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const params: IDaoMetadata = {
+      const params: IMetadata = {
         name: 'New Name',
         description: 'New description',
         avatar: 'https://theavatar.com/image.jpg',
@@ -420,7 +420,7 @@ describe("Client", () => {
 
       };
 
-      const installEntry = await client.encoding.updateDaoMetadataAction(
+      const installEntry = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
         params
       );

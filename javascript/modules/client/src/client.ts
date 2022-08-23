@@ -10,7 +10,7 @@ import {
   IAssetTransfers,
   IClient,
   ICreateParams,
-  IDaoMetadata,
+  IMetadata,
   IDaoQueryParams,
   IDepositParams,
   IWithdrawParams,
@@ -34,7 +34,7 @@ import { pack } from "@ethersproject/solidity";
 import { Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
-import { encodeUpdateDaoMetadataAction, encodeWithdrawActionData } from "./internal/encoding/client";
+import { encodeUpdateMetadataAction, encodeWithdrawActionData } from "./internal/encoding/client";
 import { getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
 
@@ -167,18 +167,18 @@ export class Client extends ClientCore implements IClient {
       * @memberof Client
       */
     withdrawAction: (daoAddressOrEns: string, params: IWithdrawParams): Promise<DaoAction> =>
-      this._buildActionWithdraw(daoAddressOrEns, params),
+      this._buildWithdrawAction(daoAddressOrEns, params),
 
     /**
-      * Computes the parameters to be given when creating a proposal that withdraws ether or an ERC20 token from the dao
+      * Computes the payload to be given when creating a proposal that updates the metadata the DAO
       *
       * @param {string} daoAddresOrEns
-      * @param {IDaoMetadata} params
+      * @param {IMetadata} params
       * @return {*}  {Promise<DaoAction>}
       * @memberof Client
       */
-    updateDaoMetadataAction: (daoAddressOrEns: string, params: IDaoMetadata): Promise<DaoAction> =>
-      this._buildActionUpdateDaoMetadata(daoAddressOrEns, params)
+    updateMetadataAction: (daoAddressOrEns: string, params: IMetadata): Promise<DaoAction> =>
+      this._buildUpdateMetadataAction(daoAddressOrEns, params)
   };
 
   //// ESTIMATION HANDLERS
@@ -559,7 +559,7 @@ export class Client extends ClientCore implements IClient {
    * @return {*}  {DaoAction}
    * @memberof Client
    */
-  private async _buildActionWithdraw(daoAddreessOrEns: string, params: IWithdrawParams): Promise<DaoAction> {
+  private async _buildWithdrawAction(daoAddreessOrEns: string, params: IWithdrawParams): Promise<DaoAction> {
     // check ens
     let address = daoAddreessOrEns
     if (!isAddress(daoAddreessOrEns)) {
@@ -576,7 +576,7 @@ export class Client extends ClientCore implements IClient {
       data: encodeWithdrawActionData(params)
     }
   }
-  private async _buildActionUpdateDaoMetadata(daoAddreessOrEns: string, _params: IDaoMetadata): Promise<DaoAction> {
+  private async _buildUpdateMetadataAction(daoAddreessOrEns: string, _params: IMetadata): Promise<DaoAction> {
     // check ens
     let address = daoAddreessOrEns
     if (!isAddress(daoAddreessOrEns)) {
@@ -591,7 +591,7 @@ export class Client extends ClientCore implements IClient {
     return {
       to: address,
       value: BigInt(0),
-      data: encodeUpdateDaoMetadataAction(cid)
+      data: encodeUpdateMetadataAction(cid)
     }
   }
 }

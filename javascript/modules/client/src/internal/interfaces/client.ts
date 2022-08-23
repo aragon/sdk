@@ -44,12 +44,12 @@ export interface IClient extends IClientCore {
 
 /** Holds the parameters that the DAO will be created with */
 export interface ICreateParams {
-  metadata: IDaoMetadata
+  metadata: IMetadata
   ensSubdomain: string
   plugins: IPluginInstallItem[]
 }
 
-export interface IDaoMetadata {
+export interface IMetadata {
   name: string,
   description: string,
   avatar: string,
