@@ -34,7 +34,7 @@ import { AddressZero } from "@ethersproject/constants";
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890"
 /**
- * Provider a generic client with high level methods to manage and interact with DAO's
+ * Provider a generic client with high level methods to manage and interact an ERC20 Voting plugin installed in a DAO
  */
 export class ClientErc20 extends ClientCore implements IClientErc20 {
   // @ts-ignore TODO: Remove

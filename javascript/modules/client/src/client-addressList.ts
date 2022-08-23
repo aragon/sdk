@@ -28,6 +28,9 @@ import { getProposalStatus } from "./internal/utils/plugins";
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890"
 
+/**
+ * Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO
+ */
 export class ClientAddressList extends ClientCore implements IClientAddressList {
   //@ts-ignore TODO: Remove
   private _pluginAddress: string;

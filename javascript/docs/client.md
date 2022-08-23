@@ -1,8 +1,10 @@
 ## Classes
 
 <dl>
+<dt><a href="#ClientAddressList">ClientAddressList</a></dt>
+<dd><p>Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO</p></dd>
 <dt><a href="#ClientErc20">ClientErc20</a></dt>
-<dd><p>Provider a generic client with high level methods to manage and interact with DAO's</p></dd>
+<dd><p>Provider a generic client with high level methods to manage and interact an ERC20 Voting plugin installed in a DAO</p></dd>
 <dt><a href="#Client">Client</a></dt>
 <dd><p>Provider a generic client with high level methods to manage and interact with DAO's</p></dd>
 <dt><a href="#ContextPlugin">ContextPlugin</a></dt>
@@ -32,10 +34,159 @@
 <dd><p>Getter for the GraphQL client</p></dd>
 </dl>
 
+<a name="ClientAddressList"></a>
+
+## ClientAddressList
+<p>Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO</p>
+
+**Kind**: global class  
+
+* [ClientAddressList](#ClientAddressList)
+    * [.createProposal(_params)](#ClientAddressList.createProposal) ⇒ <code>\*</code>
+    * [.voteProposal(proposalId, params)](#ClientAddressList.voteProposal) ⇒ <code>\*</code>
+    * [.executeProposal(params)](#ClientAddressList.executeProposal) ⇒ <code>\*</code>
+    * [.getMembers()](#ClientAddressList.getMembers) ⇒ <code>\*</code>
+    * [.getProposal(proposalId)](#ClientAddressList.getProposal) ⇒ <code>\*</code>
+    * [.getProposals()](#ClientAddressList.getProposals) ⇒ <code>\*</code>
+    * [.updatePluginSettingsAction(params)](#ClientAddressList.updatePluginSettingsAction) ⇒ <code>\*</code>
+    * [.createProposal(params)](#ClientAddressList.createProposal) ⇒ <code>\*</code>
+    * [.voteProposal(params, vote)](#ClientAddressList.voteProposal) ⇒ <code>\*</code>
+    * [.executeProposal(params)](#ClientAddressList.executeProposal) ⇒ <code>\*</code>
+    * [.updatePluginSettingsAction(params)](#ClientAddressList.updatePluginSettingsAction) ⇒ <code>\*</code>
+
+<a name="ClientAddressList.createProposal"></a>
+
+### ClientAddressList.createProposal(_params) ⇒ <code>\*</code>
+<p>Creates a new proposal on the given AddressList plugin contract</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{AsyncGenerator<ProposalCreationStepValue>}</p>  
+
+| Param | Type |
+| --- | --- |
+| _params | <code>ICreateProposalParams</code> | 
+
+<a name="ClientAddressList.voteProposal"></a>
+
+### ClientAddressList.voteProposal(proposalId, params) ⇒ <code>\*</code>
+<p>Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{AsyncGenerator<VoteProposalStepValue>}</p>  
+
+| Param | Type |
+| --- | --- |
+| proposalId | <code>string</code> | 
+| params | <code>IVoteProposalParams</code> | 
+
+<a name="ClientAddressList.executeProposal"></a>
+
+### ClientAddressList.executeProposal(params) ⇒ <code>\*</code>
+<p>Executes the given proposal, provided that it has already passed</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{AsyncGenerator<ExecuteProposalStepValue>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>IExecuteProposalParams</code> | 
+
+<a name="ClientAddressList.getMembers"></a>
+
+### ClientAddressList.getMembers() ⇒ <code>\*</code>
+<p>Returns the list of wallet addresses with signing capabilities on the plugin</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{Promise&lt;string[]&gt;}</p>  
+<a name="ClientAddressList.getProposal"></a>
+
+### ClientAddressList.getProposal(proposalId) ⇒ <code>\*</code>
+<p>Returns the details of the given proposal</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{Promise<AddressListProposal>}</p>  
+
+| Param | Type |
+| --- | --- |
+| proposalId | <code>string</code> | 
+
+<a name="ClientAddressList.getProposals"></a>
+
+### ClientAddressList.getProposals() ⇒ <code>\*</code>
+<p>Returns a list of proposals on the Plugin, filtered by the given criteria</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{Promise&lt;AddressListProposalListItem[]&gt;}</p>  
+
+| Type |
+| --- |
+| <code>IProposalQueryParams</code> | 
+
+<a name="ClientAddressList.updatePluginSettingsAction"></a>
+
+### ClientAddressList.updatePluginSettingsAction(params) ⇒ <code>\*</code>
+<p>Computes the parameters to be given when creating a proposal that updates the governance configuration</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>IPluginSettings</code> | 
+
+<a name="ClientAddressList.createProposal"></a>
+
+### ClientAddressList.createProposal(params) ⇒ <code>\*</code>
+<p>Estimates the gas fee of creating a proposal on the plugin</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>ICreateProposalParams</code> | 
+
+<a name="ClientAddressList.voteProposal"></a>
+
+### ClientAddressList.voteProposal(params, vote) ⇒ <code>\*</code>
+<p>Estimates the gas fee of casting a vote on a proposal</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>IVoteProposalParams</code> | 
+| vote | <code>VoteValues</code> | 
+
+<a name="ClientAddressList.executeProposal"></a>
+
+### ClientAddressList.executeProposal(params) ⇒ <code>\*</code>
+<p>Estimates the gas fee of executing an AddressList proposal</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>params</code> | 
+
+<a name="ClientAddressList.updatePluginSettingsAction"></a>
+
+### ClientAddressList.updatePluginSettingsAction(params) ⇒ <code>\*</code>
+<p>Computes the parameters to be given when creating a proposal that updates the governance configuration</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>IPluginSettings</code> | 
+
 <a name="ClientErc20"></a>
 
 ## ClientErc20
-<p>Provider a generic client with high level methods to manage and interact with DAO's</p>
+<p>Provider a generic client with high level methods to manage and interact an ERC20 Voting plugin installed in a DAO</p>
 
 **Kind**: global class  
 
