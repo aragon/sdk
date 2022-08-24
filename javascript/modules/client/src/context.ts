@@ -263,11 +263,11 @@ export class Context {
   }
 
   private static resolveGraphql(
-    endpoints: string[]
+    endpoints: { url: string }[]
   ): GraphQLClient[] {
     let clients: GraphQLClient[] = []
     endpoints.forEach((endpoint) => {
-      const url = new URL(endpoint)
+      const url = new URL(endpoint.url)
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
       }

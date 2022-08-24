@@ -34,7 +34,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
 };
 
 describe("Client Core", () => {
@@ -138,9 +138,9 @@ describe("Client Core", () => {
         {
           ...contextParams,
           graphqlNodes: [
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url"
+            { url: "https://the.wrong/url" },
+            { url: "https://the.wrong/url" },
+            { url: "https://the.wrong/url" }
           ]
         });
       const client = new Client(ctx)
@@ -153,15 +153,15 @@ describe("Client Core", () => {
         {
           ...contextParams,
           graphqlNodes: [
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url",
-            "https://the.wrong/url"
+            { url: "https://the.wrong/url" },
+            { url: "https://the.wrong/url" },
+            { url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" },
+            { url: "https://the.wrong/url" },
+            { url: "https://the.wrong/url" },
+            { url: "https://the.wrong/url" },
+            { url: "https://the.wrong/url" },
+            { url: "https://the.wrong/url" },
+            { url: "https://the.wrong/url" }
           ]
         });
       const client = new Client(ctx)

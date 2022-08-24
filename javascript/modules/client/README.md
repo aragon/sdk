@@ -40,7 +40,7 @@ const contextParams: ContextParams = {
     url: "https://testing-ipfs-0.aragon.network/api/v0",
     headers: { "X-API-KEY": IPFS_API_KEY || "" }
   }],
-  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
 };
 
 // Instantiate

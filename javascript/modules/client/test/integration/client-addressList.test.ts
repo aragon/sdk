@@ -52,9 +52,9 @@ const ipfsEndpoints = {
 };
 const grapqhlEndpoints = {
   working: [
-    "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"
+    { url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }
   ],
-  failing: ["https://bad-url-gateway.io/"],
+  failing: [{ url: "https://bad-url-gateway.io/" }],
 };
 
 const TEST_WALLET =
@@ -87,7 +87,7 @@ const contextParamsLocalChain: ContextPluginParams = {
       url: "http:localhost:5003",
     },
   ],
-  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
 };
 
 describe("Client", () => {
@@ -296,7 +296,7 @@ describe("Client", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientAddressList(context)
-      
+
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x123456789012345678901234567890123456789012",
         proposalId: '0x1234567890123456789012345678901234567890',
