@@ -63,7 +63,7 @@ describe("Context instances", () => {
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
       ipfsNodes: [{ url: "https://localhost", headers: {} }],
-      graphqlNodes: ["https://localhost"],
+      graphqlNodes: [{ url: "https://localhost" }],
     };
     context.setFull(contextParams);
 

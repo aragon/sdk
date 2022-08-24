@@ -17,6 +17,18 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+### Added
+- Update settings action
+- Get Settings method
+- Mock methods for the rest of the flows
+
+### Changed
+- The plugin address is no longer part of the context
+- The plugin address must be specified when calling functions
+- All the plugin functions that interact with a SC now receive an object insted of separate parameters
+- Update Readme
+
 ### Fixed
 - Consistency issues in naming
 

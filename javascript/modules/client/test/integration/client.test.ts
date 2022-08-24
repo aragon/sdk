@@ -53,7 +53,7 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -72,7 +72,7 @@ const contextParamsLocalChain: ContextParams = {
       url: "http://localhost:5003",
     },
   ],
-  graphqlNodes: ["https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby"]
+  graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
 };
 
 let daoAddress = "0x123456789012345678901234567890123456789012345678"
@@ -424,7 +424,7 @@ describe("Client", () => {
         "0x1234567890123456789012345678901234567890",
         params
       );
-      
+
       expect(typeof installEntry).toBe("object");
       expect(installEntry.data).toBeInstanceOf(Uint8Array);
     });

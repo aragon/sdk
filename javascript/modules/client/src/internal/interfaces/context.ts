@@ -18,7 +18,7 @@ type IpfsContextParams = {
   ipfsNodes?: { url: string; headers?: Record<string, string> }[];
 };
 type GraphQLContextParams = {
-  graphqlNodes: string[];
+  graphqlNodes: { url: string }[];
 };
 
 export type ContextParams =
