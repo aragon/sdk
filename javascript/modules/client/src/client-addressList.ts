@@ -101,12 +101,12 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     /**
      * Returns the settings of a plugin given the address of the plugin instance
      *
-     * @param {string} pluginInstanceAddress
+     * @param {string} pluginAddress
      * @return {*}  {Promise<IPluginSettings>}
-     * @memberof ClientErc20
+     * @memberof ClientAddressList
      */
-    getPluginSettings: (pluginInstanceAddress: string): Promise<IPluginSettings> =>
-      this._getPluginSettings(pluginInstanceAddress),
+    getSettings: (pluginAddress: string): Promise<IPluginSettings> =>
+      this._getSettings(pluginAddress),
 
   }
   encoding = {
@@ -126,7 +126,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
      * 
      * @param {IErc20PluginInstall} params
      * @return {*}  {FactoryInitParams}
-     * @memberof ClientErc20
+     * @memberof ClientAddressList
      */
     getPluginInstallItem: (params: IAddressListPluginInstall): IPluginInstallItem => {
       return {
@@ -327,7 +327,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
   }
 
-  private _getPluginSettings(_pluginInstanceAddress: string): Promise<IPluginSettings> {
+  private _getSettings(_pluginAddress: string): Promise<IPluginSettings> {
     const pluginSettings: IPluginSettings = {
       minDuration: 7200,
       minTurnout: 0.55,

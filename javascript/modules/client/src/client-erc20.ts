@@ -110,12 +110,12 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /**
      * Returns the settings of a plugin given the address of the plugin instance
      *
-     * @param {string} pluginInstanceAddress
+     * @param {string} pluginAddress
      * @return {*}  {Promise<IPluginSettings>}
      * @memberof ClientErc20
      */
-    getPluginSettings: (pluginInstanceAddress: string): Promise<IPluginSettings> =>
-      this._getPluginSettings(pluginInstanceAddress),
+    getSettings: (pluginAddress: string): Promise<IPluginSettings> =>
+      this._getSettings(pluginAddress),
   };
 
   //// ACTION BUILDERS
@@ -382,7 +382,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (proposals))
   }
 
-  private _getPluginSettings(_pluginInstanceAddress: string): Promise<IPluginSettings> {
+  private _getSettings(_pluginAddress: string): Promise<IPluginSettings> {
     const pluginSettings: IPluginSettings = {
       minDuration: 7200,
       minTurnout: 0.55,
