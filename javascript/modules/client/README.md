@@ -866,6 +866,32 @@ console.log(proposals)
 */
 ```
 
+### Loading a plugin's settings
+
+```ts
+import { ClientAddressList, Context, ContextPlugin, IPluginSettings } from "@aragon/sdk-client";
+
+// Create a simple context
+const context: Context = new Context(params)
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
+// Create an ERC20 client
+const client = new ClientErc20(contextPlugin)
+
+const pluginAddress: string = "0x123456789012345678901234567890123456789012"
+
+const settings: IPluginSettings = await client.methods.getSettings(pluginAddress)
+console.log(settings)
+/*
+  {
+    minDuration: 7200,
+    minTurnout: 0.55,
+    minSupport: 0.25
+  }
+*/
+
+```
+
 ## Address list governance plugin client
 
 ```ts
@@ -1279,6 +1305,32 @@ console.log(proposals)
   }
 ]
 */
+```
+
+### Loading a plugin's settings
+
+```ts
+import { ClientAddressList, Context, ContextPlugin, IPluginSettings } from "@aragon/sdk-client";
+
+// Create a simple context
+const context: Context = new Context(params)
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
+// Create an addres list client
+const client = new ClientAddressList(contextPlugin)
+
+const pluginAddress: string = "0x123456789012345678901234567890123456789012"
+
+const settings: IPluginSettings = await client.methods.getSettings(pluginAddress)
+console.log(settings)
+/*
+  {
+    minDuration: 7200,
+    minTurnout: 0.55,
+    minSupport: 0.25
+  }
+*/
+
 ```
 
 ## Action encoders
