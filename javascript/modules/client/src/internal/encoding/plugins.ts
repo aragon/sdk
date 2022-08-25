@@ -1,5 +1,6 @@
 import { ERC20Voting__factory, MajorityVoting__factory, WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
 import { strip0x, hexToBytes } from "@aragon/sdk-common";
+import { Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { IErc20PluginInstall, IAddressListPluginInstall, IPluginSettings } from "../interfaces/plugins";
@@ -53,7 +54,7 @@ function unwrapErc20InitParams(params: IErc20PluginInstall): [string, string, Bi
     AddressZero,
     BigNumber.from(Math.round(params.settings.minTurnout * 100)),
     BigNumber.from(Math.round(params.settings.minSupport * 100)),
-    BigNumber.from(Math.round(params.settings.minDuration * 100)),
+    BigNumber.from(params.settings.minDuration),
     token
   ]
 }
@@ -71,6 +72,20 @@ function unwrapUpdatePluginSettings(params: IPluginSettings): [BigNumber, BigNum
   return [
     BigNumber.from(Math.round(params.minTurnout * 100)),
     BigNumber.from(Math.round(params.minSupport * 100)),
-    BigNumber.from(Math.round(params.minDuration * 100))
+    BigNumber.from(params.minDuration)
   ]
+}
+
+export function decodeUpdatePluginSettingsAction(data: Uint8Array): IPluginSettings {
+  const votingInterface = MajorityVoting__factory.createInterface();
+  const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
+  return wrapUpdatePluginSettings(result)
+}
+
+function wrapUpdatePluginSettings(result: Result): IPluginSettings {
+  return {
+    minTurnout: result[0].toNumber() / 100,
+    minSupport: result[1].toNumber() / 100,
+    minDuration: result[2].toNumber(),
+  }
 }

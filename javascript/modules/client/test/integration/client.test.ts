@@ -63,6 +63,12 @@ const contextParamsLocalChain: ContextParams = {
   web3Providers: ["http://localhost:8545"],
   ipfsNodes: [
     {
+      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || "",
+      },
+    },
+    {
       url: "http://localhost:5001",
     },
     {
@@ -427,6 +433,65 @@ describe("Client", () => {
 
       expect(typeof installEntry).toBe("object");
       expect(installEntry.data).toBeInstanceOf(Uint8Array);
+    });
+  })
+  describe('Action decoders', () => {
+    it("Should decode an encoded withdraw action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const withdrawParams: IWithdrawParams = {
+        recipientAddress: '0x1234567890123456789012345678901234567890',
+        amount: BigInt(10),
+        reference: 'test',
+        tokenAddress: "0x1234567890098765432112345678900987654321"
+      };
+
+      const withgrawAction = await client.encoding.withdrawAction(
+        "0x1234567890123456789012345678901234567890",
+        withdrawParams
+      );
+      const decodedWithdrawParams: IWithdrawParams = client.decoding.withdrawAction(withgrawAction.data)
+
+      expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount)
+      expect(decodedWithdrawParams.recipientAddress).toBe(withdrawParams.recipientAddress)
+      expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference)
+      expect(decodedWithdrawParams.tokenAddress).toBe(withdrawParams.tokenAddress)
+    });
+    it("Should decode an encoded update metadata action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const params: IMetadata = {
+        name: 'New Name',
+        description: 'New description',
+        avatar: 'https://theavatar.com/image.jpg',
+        links: [
+          {
+            url: 'https://discord.com/...',
+            name: 'Discord'
+          },
+          {
+            url: 'https://twitter.com/...',
+            name: 'Twitter'
+          }
+        ]
+
+      };
+      const updateMetadataAction = await client.encoding.updateMetadataAction(
+        "0x1234567890123456789012345678901234567890",
+        params
+      );
+
+      const decodedParams: IMetadata = await client.decoding.updateMetadataAction(updateMetadataAction.data)
+
+      expect(decodedParams.name).toBe(params.name)
+      expect(decodedParams.description).toBe(params.description)
+      expect(decodedParams.avatar).toBe(params.avatar)
+      for (let index = 0; index < params.links.length; index++) {
+        expect(decodedParams.links[index].name).toBe(params.links[index].name)
+        expect(decodedParams.links[index].url).toBe(params.links[index].url)
+      }
     });
   })
   describe("Data retrieval", () => {

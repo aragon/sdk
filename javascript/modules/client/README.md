@@ -1411,6 +1411,96 @@ const configAction = client.encoding.updatePluginSettingsAction(configActionPrar
 
 ```
 
+## Action decoders
+
+### Decode Withdraw Action
+```ts
+import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+const data: Uint8Array = [12, ..., 56]
+
+const params: IWithdrawParams = client.decoding.withdrawAction(data)
+
+console.log(params)
+/*
+{
+  recipientAddress: "0x1234567890123456789012345678901234567890",
+  amount: 10n,
+  tokenAddress: "0x1234567890123456789012345678901234567890",
+  reference: "test",
+}
+*/
+```
+### Decode Update Metadata Action
+```ts
+import { Client, Context, IMetadata } from "@aragon/sdk-client";
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+const data: Uint8Array = [12, ..., 56]
+
+const params: IMetadata = client.decoding.updateMetadataAction(data)
+
+console.log(params)
+/*
+{
+  "name":"New Name",
+  "description":"New description",
+  "avatar":"https://theavatar.com/image.jpg",
+  "links":[
+    {
+      "url":"https://discord.com/...",
+      "name":"Discord"
+    },
+    {
+      "url":"https://twitter.com/...",
+      "name":"Twitter"
+    }
+  ]
+}
+*/
+```
+### Decode Update Plugin Settings Action (ERC-20)
+```ts
+import { Client, Context, IMetadata, ClientErc20, ContextPlugin } from "@aragon/sdk-client";
+const context: Context = new Context(params)
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
+const clientErc20 = ClientErc20(contextPlugin)
+const data: Uint8Array = [12, ..., 56]
+
+const params: IPluginSettings = clientErc20.decoding.updatePluginSettingsAction(data)
+
+console.log(params)
+/*
+{
+  minDuration: 7200, // seconds
+  minTurnout: 0.25, // 25%
+  minSupport: 0.5 // 50%
+}
+*/
+```
+### Decode Update Plugin Settings Action (Address List)
+```ts
+import { Client, Context, IMetadata, ClientAddressList, ContextPlugin } from "@aragon/sdk-client";
+const context: Context = new Context(params)
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
+const clientAddressList = ClientAddressList(contextPlugin)
+const data: Uint8Array = [12, ..., 56]
+
+const params: IPluginSettings = clientAddressList.decoding.updatePluginSettingsAction(data)
+
+console.log(params)
+/*
+{
+  minDuration: 7200, // seconds
+  minTurnout: 0.25, // 25%
+  minSupport: 0.5 // 50%
+}
+*/
+```
+
 # Development
 
 The building blocks are defined within the `src/internal` folder. The high level

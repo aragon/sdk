@@ -34,7 +34,7 @@ import { pack } from "@ethersproject/solidity";
 import { Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
-import { encodeUpdateMetadataAction, encodeWithdrawActionData } from "./internal/encoding/client";
+import { decodeUpdateMetadataAction, decodeWithdrawActionData, encodeUpdateMetadataAction, encodeWithdrawActionData } from "./internal/encoding/client";
 import { getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
 
@@ -180,6 +180,28 @@ export class Client extends ClientCore implements IClient {
     updateMetadataAction: (daoAddressOrEns: string, params: IMetadata): Promise<DaoAction> =>
       this._buildUpdateMetadataAction(daoAddressOrEns, params)
   };
+
+  decoding = {
+    /**
+     * Decodes the withdraw parameters from an encoded withdraw action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IWithdrawParams}
+     * @memberof Client
+     */
+    withdrawAction: (data: Uint8Array): IWithdrawParams =>
+      this._decodeWithdrawAction(data),
+
+    /**
+     * Decodes a dao metadata from an encoded update metadata action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {Promise<IMetadata>}
+     * @memberof Client
+     */
+    updateMetadataAction: (data: Uint8Array): Promise<IMetadata> =>
+      this._decodeMetadataAction(data),
+  }
 
   //// ESTIMATION HANDLERS
 
@@ -549,16 +571,7 @@ export class Client extends ClientCore implements IClient {
 
     return Promise.resolve({ deposits, withdrawals });
   }
-  /**
-   * Build withdraw action
-   *
-   * @private
-   * @param {string} to
-   * @param {bigint} value
-   * @param {IWithdrawParams} params
-   * @return {*}  {DaoAction}
-   * @memberof Client
-   */
+
   private async _buildWithdrawAction(daoAddreessOrEns: string, params: IWithdrawParams): Promise<DaoAction> {
     // check ens
     let address = daoAddreessOrEns
@@ -576,7 +589,8 @@ export class Client extends ClientCore implements IClient {
       data: encodeWithdrawActionData(params)
     }
   }
-  private async _buildUpdateMetadataAction(daoAddreessOrEns: string, _params: IMetadata): Promise<DaoAction> {
+
+  private async _buildUpdateMetadataAction(daoAddreessOrEns: string, params: IMetadata): Promise<DaoAction> {
     // check ens
     let address = daoAddreessOrEns
     if (!isAddress(daoAddreessOrEns)) {
@@ -587,11 +601,30 @@ export class Client extends ClientCore implements IClient {
       address = resolvedAddress
     }
     // upload metadata to IPFS
-    const cid = "0x1234567890123456789012345678901234567890"
+    let cid: string
+    try {
+      cid = await this.ipfs.add(JSON.stringify(params))
+    } catch {
+      throw new Error("Error uploading data to IPFS")
+    }
     return {
       to: address,
       value: BigInt(0),
       data: encodeUpdateMetadataAction(cid)
+    }
+  }
+
+  private _decodeWithdrawAction(data: Uint8Array): IWithdrawParams {
+    return decodeWithdrawActionData(data)
+  }
+
+  private async _decodeMetadataAction(data: Uint8Array): Promise<IMetadata> {
+    const cid = decodeUpdateMetadataAction(data)
+    try {
+      const stringMetadata = await this.ipfs.fetchString(cid)
+      return JSON.parse(stringMetadata)
+    } catch {
+      throw new Error("Error reading data from IPFS")
     }
   }
 }

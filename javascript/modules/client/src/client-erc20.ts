@@ -26,7 +26,7 @@ import {
 } from "./internal/interfaces/common";
 import { ContextPlugin } from "./context-plugin";
 import { getProposalStatus } from "./internal/utils/plugins";
-import { encodeErc20ActionInit, encodeUpdatePluginSettingsAction } from "./internal/encoding/plugins";
+import { decodeUpdatePluginSettingsAction, encodeErc20ActionInit, encodeUpdatePluginSettingsAction } from "./internal/encoding/plugins";
 import { Random } from "@aragon/sdk-common";
 import { getDummyErc20Proposal, getDummyErc20ProposalListItem } from "./internal/temp-mock";
 import { AddressZero } from "@ethersproject/constants";
@@ -127,10 +127,20 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       *
       * @param {IPluginSettings} params
       * @return {*}  {DaoAction}
-      * @memberof ClientAddressList
+      * @memberof ClientErc20
      */
     // updatePluginSettings()     not setConfig()
     updatePluginSettingsAction: (params: IPluginSettings): DaoAction => this._buildUpdatePluginSettingsAction(params)
+  }
+  decoding = {
+    /**
+     * Decodes a dao metadata from an encoded update metadata action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IPluginSettings}
+     * @memberof ClientErc20
+     */
+    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => this._decodeUpdatePluginSettingsAction(data)
   }
   static encoding = {
     /**
@@ -282,6 +292,11 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       value: BigInt(0),
       data: encodeUpdatePluginSettingsAction(params)
     }
+  }
+
+  private _decodeUpdatePluginSettingsAction(data: Uint8Array): IPluginSettings {
+    const settings = decodeUpdatePluginSettingsAction(data)
+    return settings
   }
 
   private _estimateCreateProposal(_params: ICreateProposalParams): Promise<GasFeeEstimation> {

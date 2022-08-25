@@ -378,6 +378,25 @@ describe("Client", () => {
     });
   })
 
+
+  describe('Action decoders', () => {
+    it("Should dencode the plugin settings from an update plugin settings action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientAddressList(context)
+      const params: IPluginSettings = {
+        minDuration: 7200,
+        minTurnout: 0.5,
+        minSupport: 0.5
+      };
+      const updatePluginSettingsAction = client.encoding.updatePluginSettingsAction(params)
+      const decodedParams: IPluginSettings = client.decoding.updatePluginSettingsAction(updatePluginSettingsAction.data)
+
+      expect(decodedParams.minDuration).toBe(params.minDuration)
+      expect(decodedParams.minSupport).toBe(params.minSupport)
+      expect(decodedParams.minTurnout).toBe(params.minTurnout)
+    });
+  })
+
   describe('Data retrieval', () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
@@ -428,7 +447,7 @@ describe("Client", () => {
     it("Should get the settings of a plugin given a plugin instance address", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);
-      
+
       const pluginAddress: string = "0x12345678901234567890º1234567890123456789012"
       const proposals = await client.methods.getSettings(pluginAddress)
 

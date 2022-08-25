@@ -2,7 +2,7 @@ import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
-import { encodeAddressListActionInit, encodeUpdatePluginSettingsAction } from "./internal/encoding/plugins";
+import { decodeUpdatePluginSettingsAction, encodeAddressListActionInit, encodeUpdatePluginSettingsAction } from "./internal/encoding/plugins";
 import { IPluginInstallItem, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
 import {
   ExecuteProposalStep,
@@ -118,6 +118,16 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
      * @memberof ClientAddressList
      */
     updatePluginSettingsAction: (params: IPluginSettings): DaoAction => this._buildUpdatePluginSettingsAction(params)
+  }
+  decoding = {
+    /**
+     * Decodes a dao metadata from an encoded update metadata action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IPluginSettings}
+     * @memberof ClientAddressList
+     */
+    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => this._decodeUpdatePluginSettingsAction(data)
   }
   static encoding = {
     /**
@@ -286,6 +296,10 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
       value: BigInt(0),
       data: encodeUpdatePluginSettingsAction(params)
     }
+  }
+
+  private _decodeUpdatePluginSettingsAction(data: Uint8Array): IPluginSettings {
+    return decodeUpdatePluginSettingsAction(data)
   }
 
   private _estimateCreateProposal(_params: ICreateProposalParams): Promise<GasFeeEstimation> {

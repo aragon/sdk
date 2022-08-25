@@ -33,6 +33,10 @@ export interface IClient extends IClientCore {
     /** Computes the withdraw action payload */
     withdrawAction: (daoAddresOrEns: string, params: IWithdrawParams) => Promise<DaoAction>;
   };
+  decoding: {
+    withdrawAction: (data: Uint8Array) => IWithdrawParams,
+    updateMetadataAction: (data: Uint8Array) => Promise<IMetadata>
+  };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;
     deposit: (params: IDepositParams) => Promise<GasFeeEstimation>;
