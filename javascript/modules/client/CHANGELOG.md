@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Fixed
+- Version of the common package `0.2.0` => `0.2.1`
+
 ### Added
 - Update settings action
 - Get Settings method
