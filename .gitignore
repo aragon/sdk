@@ -10,4 +10,3 @@ coverage
 *.tgz
 *.log
 .turbo
-.vscode
