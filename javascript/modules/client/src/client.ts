@@ -28,15 +28,16 @@ import {
   ContractTransaction,
 } from "@ethersproject/contracts";
 import { ClientCore } from "./internal/core";
-import { DaoAction, DaoRole } from "./internal/interfaces/common";
+import { DaoAction, DaoRole, IInterfaceParams } from "./internal/interfaces/common";
 import { pack } from "@ethersproject/solidity";
 
-import { Random, strip0x } from "@aragon/sdk-common";
+import { bytesToHex, Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
 import { decodeUpdateMetadataAction, decodeWithdrawActionData, encodeUpdateMetadataAction, encodeWithdrawActionData } from "./internal/encoding/client";
 import { getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
+import { getFunctionFragment } from "./internal/encoding/common";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -201,6 +202,10 @@ export class Client extends ClientCore implements IClient {
      */
     updateMetadataAction: (data: Uint8Array): Promise<IMetadata> =>
       this._decodeMetadataAction(data),
+
+    getInterface: (data: Uint8Array): IInterfaceParams | null =>
+      this._getInterfaceParams(data)
+
   }
 
   //// ESTIMATION HANDLERS
@@ -236,7 +241,7 @@ export class Client extends ClientCore implements IClient {
    * @return {*}  {AsyncGenerator<DaoCreationStepValue>}
    * @memberof Client
    */
-  private async *_createDao(
+  private async * _createDao(
     // @ts-ignore  TODO: Remove this comment when used
     params: ICreateParams,
   ): AsyncGenerator<DaoCreationStepValue> {
@@ -293,7 +298,7 @@ export class Client extends ClientCore implements IClient {
      */
   }
 
-  private async *_deposit(
+  private async * _deposit(
     params: IDepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
@@ -350,7 +355,7 @@ export class Client extends ClientCore implements IClient {
     yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
   }
 
-  private async *_ensureAllowance(
+  private async * _ensureAllowance(
     daoAddress: string,
     amount: bigint,
     tokenAddress: string,
@@ -625,6 +630,19 @@ export class Client extends ClientCore implements IClient {
       return JSON.parse(stringMetadata)
     } catch {
       throw new Error("Error reading data from IPFS")
+    }
+  }
+
+  private _getInterfaceParams(data: Uint8Array): IInterfaceParams | null {
+    try {
+      const func = getFunctionFragment(data)
+      return {
+        id: func.format(),
+        functionName: func.name,
+        hash: bytesToHex(data).substring(0, 10)
+      }
+    } catch {
+      return null
     }
   }
 }

@@ -1,5 +1,5 @@
 import { ERC20Voting__factory, MajorityVoting__factory, WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
-import { strip0x, hexToBytes } from "@aragon/sdk-common";
+import { strip0x, hexToBytes, bytesToHex } from "@aragon/sdk-common";
 import { Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -23,7 +23,7 @@ function unwrapAddressListInitParams(params: IAddressListPluginInstall): [string
     AddressZero,
     BigNumber.from(Math.round(params.settings.minTurnout * 100)),
     BigNumber.from(Math.round(params.settings.minSupport * 100)),
-    BigNumber.from(Math.round(params.settings.minDuration * 100)),
+    BigNumber.from(params.settings.minDuration),
     params.addresses
   ]
 }
@@ -78,8 +78,19 @@ function unwrapUpdatePluginSettings(params: IPluginSettings): [BigNumber, BigNum
 
 export function decodeUpdatePluginSettingsAction(data: Uint8Array): IPluginSettings {
   const votingInterface = MajorityVoting__factory.createInterface();
-  const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
-  return wrapUpdatePluginSettings(result)
+  const hexBytes = bytesToHex(data, true)
+  try {
+    // @ts-ignore
+    const receivedFunction = votingInterface.getFunction(hexBytes.substring(0,10))
+    const expectedfunction = votingInterface.getFunction("changeVoteConfig")
+    if (receivedFunction.name !== expectedfunction.name) {
+      throw new Error("The received action is different from the expected action")
+    }
+    const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
+    return wrapUpdatePluginSettings(result)
+  } catch {
+    throw new Error("Invalid action")
+  }
 }
 
 function wrapUpdatePluginSettings(result: Result): IPluginSettings {

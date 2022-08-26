@@ -23,13 +23,15 @@ import {
   IPluginInstallItem,
   GasFeeEstimation,
   DaoAction,
+  IInterfaceParams,
 } from "./internal/interfaces/common";
 import { ContextPlugin } from "./context-plugin";
 import { getProposalStatus } from "./internal/utils/plugins";
 import { decodeUpdatePluginSettingsAction, encodeErc20ActionInit, encodeUpdatePluginSettingsAction } from "./internal/encoding/plugins";
-import { Random } from "@aragon/sdk-common";
+import { bytesToHex, Random } from "@aragon/sdk-common";
 import { getDummyErc20Proposal, getDummyErc20ProposalListItem } from "./internal/temp-mock";
 import { AddressZero } from "@ethersproject/constants";
+import { getFunctionFragment } from "./internal/encoding/common";
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890"
@@ -140,7 +142,10 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @return {*}  {IPluginSettings}
      * @memberof ClientErc20
      */
-    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => this._decodeUpdatePluginSettingsAction(data)
+    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => this._decodeUpdatePluginSettingsAction(data),
+    
+    getInterface: (data: Uint8Array): IInterfaceParams | null =>
+      this._getInterfaceParams(data)
   }
   static encoding = {
     /**
@@ -404,6 +409,19 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       minSupport: 0.25
     }
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (pluginSettings))
+  }
+
+  private _getInterfaceParams(data: Uint8Array): IInterfaceParams | null {
+    try {
+      const func = getFunctionFragment(data)
+      return {
+        id: func.format(),
+        functionName: func.name,
+        hash: bytesToHex(data).substring(0, 10)
+      }
+    } catch {
+      return null
+    }
   }
 }
 

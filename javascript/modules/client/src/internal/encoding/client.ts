@@ -1,5 +1,5 @@
 import { DAO__factory } from "@aragon/core-contracts-ethers";
-import { strip0x, hexToBytes } from "@aragon/sdk-common";
+import { strip0x, hexToBytes, bytesToHex } from "@aragon/sdk-common";
 import { Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -16,10 +16,19 @@ export function encodeWithdrawActionData(params: IWithdrawParams): Uint8Array {
 
 export function decodeWithdrawActionData(data: Uint8Array): IWithdrawParams {
   const daoInterface = DAO__factory.createInterface();
-  // get hex bytes
-  const result: Result = daoInterface.decodeFunctionData("withdraw", data);
-  // Strip 0x => cast to ASCII => encode in Uint8Array
-  return wrapWithdrawParams(result);
+  const hexBytes = bytesToHex(data, true)
+  try {
+    // @ts-ignore
+    const receivedFunction = daoInterface.getFunction(hexBytes.substring(0,10))
+    const expectedfunction = daoInterface.getFunction("withdraw")
+    if (receivedFunction.name !== expectedfunction.name) {
+      throw new Error("The received action is different from the expected action")
+    }
+    const result = daoInterface.decodeFunctionData("withdraw", data);
+    return wrapWithdrawParams(result)
+  } catch {
+    throw new Error("Invalid action")
+  }
 }
 
 function wrapWithdrawParams(
@@ -53,7 +62,18 @@ export function encodeUpdateMetadataAction(ipfsUri: string): Uint8Array {
 
 export function decodeUpdateMetadataAction(data: Uint8Array): string {
   const daoInterface = DAO__factory.createInterface();
-  const result: Result = daoInterface.decodeFunctionData("setMetadata", data)
-  const bytes = hexToBytes(result[0])
-  return new TextDecoder().decode(bytes);
+  const hexBytes = bytesToHex(data, true)
+  try {
+    // @ts-ignore
+    const receivedFunction = daoInterface.getFunction(hexBytes.substring(0,10))
+    const expectedfunction = daoInterface.getFunction("setMetadata")
+    if (receivedFunction.name !== expectedfunction.name) {
+      throw new Error("The received action is different from the expected action")
+    }
+    const result = daoInterface.decodeFunctionData("setMetadata", data);
+    const bytes = hexToBytes(result[0])
+    return new TextDecoder().decode(bytes);
+  } catch {
+    throw new Error("Invalid action")
+  }
 }

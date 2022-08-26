@@ -1,9 +1,10 @@
-import { Random } from "@aragon/sdk-common";
+import { bytesToHex, Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
+import { getFunctionFragment } from "./internal/encoding/common";
 import { decodeUpdatePluginSettingsAction, encodeAddressListActionInit, encodeUpdatePluginSettingsAction } from "./internal/encoding/plugins";
-import { IPluginInstallItem, GasFeeEstimation, DaoAction } from "./internal/interfaces/common";
+import { IPluginInstallItem, GasFeeEstimation, DaoAction, IInterfaceParams } from "./internal/interfaces/common";
 import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
@@ -127,7 +128,10 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
      * @return {*}  {IPluginSettings}
      * @memberof ClientAddressList
      */
-    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => this._decodeUpdatePluginSettingsAction(data)
+    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => this._decodeUpdatePluginSettingsAction(data),
+    
+    getInterface: (data: Uint8Array): IInterfaceParams | null =>
+      this._getInterfaceParams(data)
   }
   static encoding = {
     /**
@@ -348,5 +352,18 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
       minSupport: 0.25
     }
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (pluginSettings))
+  }
+
+  private _getInterfaceParams(data: Uint8Array): IInterfaceParams | null {
+    try {
+      const func = getFunctionFragment(data)
+      return {
+        id: func.format(),
+        functionName: func.name,
+        hash: bytesToHex(data).substring(0, 10)
+      }
+    } catch {
+      return null
+    }
   }
 }

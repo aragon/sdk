@@ -4,6 +4,7 @@ import { IClientCore } from "./core";
 import {
   DaoAction,
   GasFeeEstimation,
+  IInterfaceParams,
   IPagination,
 } from "./common";
 
@@ -30,6 +31,7 @@ export interface IClientErc20 extends IClientCore {
   };
   decoding: {
     updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings
+    getInterface: (data: Uint8Array) => IInterfaceParams | null
   };
   estimation: {
     createProposal: (
@@ -61,6 +63,7 @@ export interface IClientAddressList extends IClientCore {
   };
   decoding: {
     updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings
+    getInterface: (data: Uint8Array) => IInterfaceParams | null
   };
   estimation: {
     createProposal: (params: ICreateProposalParams) => Promise<GasFeeEstimation>;
