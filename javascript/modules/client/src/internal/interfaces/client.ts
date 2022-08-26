@@ -32,10 +32,13 @@ export interface IClient extends IClientCore {
   encoding: {
     /** Computes the withdraw action payload */
     withdrawAction: (daoAddresOrEns: string, params: IWithdrawParams) => Promise<DaoAction>;
+    updateMetadataAction: (daoAddressOrEns: string, ipfsUri: string) => Promise<DaoAction>;
+    updateMetadataRawAction: (daoAddressOrEns: string, params: IMetadata) => Promise<DaoAction>;
   };
   decoding: {
     withdrawAction: (data: Uint8Array) => IWithdrawParams,
-    updateMetadataAction: (data: Uint8Array) => Promise<IMetadata>
+    updateMetadataAction: (data: Uint8Array) => string
+    updateMetadataRawAction: (data: Uint8Array) => Promise<IMetadata>
     getInterface: (data: Uint8Array) => IInterfaceParams | null
   };
   estimation: {

@@ -409,6 +409,19 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
+      const ipfsUri = "ipfs://QmcGV8fimB7aeBxnDqr7bSSLUWLeyFKUukGqDhWnvriQ3T"
+      const installEntry = await client.encoding.updateMetadataAction(
+        "0x1234567890123456789012345678901234567890",
+        ipfsUri
+      );
+
+      expect(typeof installEntry).toBe("object");
+      expect(installEntry.data).toBeInstanceOf(Uint8Array);
+    });
+    it("Should encode an update metadata raw action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
       const params: IMetadata = {
         name: 'New Name',
         description: 'New description',
@@ -426,7 +439,7 @@ describe("Client", () => {
 
       };
 
-      const installEntry = await client.encoding.updateMetadataAction(
+      const installEntry = await client.encoding.updateMetadataRawAction(
         "0x1234567890123456789012345678901234567890",
         params
       );
@@ -461,6 +474,19 @@ describe("Client", () => {
     it("Should decode an encoded update metadata action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
+      const ipfsUri = "ipfs://QmcGV8fimB7aeBxnDqr7bSSLUWLeyFKUukGqDhWnvriQ3T"
+      const updateMetadataAction = await client.encoding.updateMetadataAction(
+        "0x1234567890123456789012345678901234567890",
+        ipfsUri
+      );
+
+      const recoveredIpfsUri: string = await client.decoding.updateMetadataAction(updateMetadataAction.data)
+
+      expect(ipfsUri).toBe(recoveredIpfsUri)
+    });
+    it("Should decode an encoded update metadata raw action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
 
       const params: IMetadata = {
         name: 'New Name',
@@ -478,12 +504,12 @@ describe("Client", () => {
         ]
 
       };
-      const updateMetadataAction = await client.encoding.updateMetadataAction(
+      const updateMetadataAction = await client.encoding.updateMetadataRawAction(
         "0x1234567890123456789012345678901234567890",
         params
       );
 
-      const decodedParams: IMetadata = await client.decoding.updateMetadataAction(updateMetadataAction.data)
+      const decodedParams: IMetadata = await client.decoding.updateMetadataRawAction(updateMetadataAction.data)
 
       expect(decodedParams.name).toBe(params.name)
       expect(decodedParams.description).toBe(params.description)
