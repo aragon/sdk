@@ -449,7 +449,7 @@ describe("Client", () => {
     });
   })
   describe('Action decoders', () => {
-    it("Should decode an encoded withdraw action", async () => {
+    it("Should decode an encoded raw withdraw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -471,6 +471,7 @@ describe("Client", () => {
       expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference)
       expect(decodedWithdrawParams.tokenAddress).toBe(withdrawParams.tokenAddress)
     });
+
     it("Should decode an encoded update metadata action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
@@ -484,6 +485,49 @@ describe("Client", () => {
 
       expect(ipfsUri).toBe(recoveredIpfsUri)
     });
+
+    it("Should try to decode an encoded update metadata action with the withdraws decoder and return an error", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const ipfsUri = "ipfs://QmcGV8fimB7aeBxnDqr7bSSLUWLeyFKUukGqDhWnvriQ3T"
+      const updateMetadataAction = await client.encoding.updateMetadataAction(
+        "0x1234567890123456789012345678901234567890",
+        ipfsUri
+      );
+
+      expect(() => client.decoding.withdrawAction(updateMetadataAction.data)).toThrow("The received action is different from the expected action");
+    });
+
+    it("Should try to decode a non valid action return an error", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const data = new Uint8Array([11,22,22,33,33,33])
+
+      expect(() => client.decoding.withdrawAction(data)).toThrow(`no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`);
+    });
+
+    it("Should get the function for a given action data", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const ipfsUri = "ipfs://QmcGV8fimB7aeBxnDqr7bSSLUWLeyFKUukGqDhWnvriQ3T"
+      const updateMetadataAction = await client.encoding.updateMetadataAction(
+        "0x1234567890123456789012345678901234567890",
+        ipfsUri
+      );
+      const iface = client.decoding.getInterface(updateMetadataAction.data)
+      expect(iface?.id).toBe("function setMetadata(bytes)")
+      expect(iface?.functionName).toBe("setMetadata")
+      expect(iface?.hash).toBe("0xee57e36f")
+    });
+
+    it("Should try to get the function of an invalid data and return null", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const data = new Uint8Array([11,22,22,33,33,33])
+      const iface = client.decoding.getInterface(data)
+      expect(iface).toBe(null)
+    });
+
     it("Should decode an encoded update metadata raw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
@@ -520,6 +564,7 @@ describe("Client", () => {
       }
     });
   })
+
   describe("Data retrieval", () => {
     it("Should get a DAO's metadata with a specific address", async () => {
       const ctx = new Context(contextParams);

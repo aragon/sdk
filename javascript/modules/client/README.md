@@ -1371,6 +1371,48 @@ const daoAddress = "0x1234567890123456789012345678901234567890"
 const withdrawAction = await client.encoding.withdrawAction(daoAddress, withdrawParams)
 console.log(withdrawAction)
 ```
+### Upadte Metadata Raw
+
+```ts
+import { Client, Context, IMetadata } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+
+const metadataParams: IMetadata ={
+  name:"New Name",
+  description:"New description",
+  avatar:"https://theavatar.com/image.jpg",
+  links:[
+    {
+      url:"https://discord.com/...",
+      name:"Discord"
+    },
+    {
+      url:"https://twitter.com/...",
+      name:"Twitter"
+    }
+  ]
+}
+
+const updateMetadataAction = await client.encoding.updateMetadataRawAction(metadataParams)
+console.log(updateMetadataAction)
+```
+### Update Metadata
+
+```ts
+import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+
+const metadataIpfsUri = "ipfs://Qm....."
+
+const updateMetadataAction = await client.encoding.updateMetadataAction(metadataIpfsUri)
+console.log(updateMetadataAction)
+```
 
 ### Set Plugin Config (Address List)
 
@@ -1432,14 +1474,16 @@ console.log(params)
 }
 */
 ```
-### Decode Update Metadata Action
+### Decode Update Metadata Raw Action
+
+Decode an update metadata action and expect the metadata
 ```ts
 import { Client, Context, IMetadata } from "@aragon/sdk-client";
 const context: Context = new Context(params)
 const client: Client = new Client(context)
 const data: Uint8Array = [12, ..., 56]
 
-const params: IMetadata = client.decoding.updateMetadataAction(data)
+const params: IMetadata = client.decoding.updateMetadataRawAction(data)
 
 console.log(params)
 /*
@@ -1458,6 +1502,22 @@ console.log(params)
     }
   ]
 }
+*/
+```
+### Decode Update Metadata Action
+
+Decode an update metadata action and expect an IPFS uri containing the cid
+```ts
+import { Client, Context, IMetadata } from "@aragon/sdk-client";
+const context: Context = new Context(params)
+const client: Client = new Client(context)
+const data: Uint8Array = [12, ..., 56]
+
+const params: IMetadata = client.decoding.updateMetadataAction(data)
+
+console.log(params)
+/*
+ipfs://Qm...
 */
 ```
 ### Decode Update Plugin Settings Action (ERC-20)
@@ -1499,6 +1559,30 @@ console.log(params)
   minSupport: 0.5 // 50%
 }
 */
+```
+### Get Function Parameters from an encoded action
+
+```ts
+import { Client, Context } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const context: Context = new Context(params)
+const client = new Client(context)
+
+const data: Uint8Array = [12, ..., 56]
+
+const functionParams = client.decoding.getInterface(data)
+
+console.log(functionParams)
+
+/*
+{
+  id: "function functionName(param1, param2)"
+  functionName: "functionName"
+  hash: "0x12345678"
+}
+*/
+
 ```
 
 # Development

@@ -380,7 +380,7 @@ describe("Client", () => {
 
 
   describe('Action decoders', () => {
-    it("Should dencode the plugin settings from an update plugin settings action", async () => {
+    it("Should decode the plugin settings from an update plugin settings action", async () => {
       const context = new ContextPlugin(contextParamsLocalChain)
       const client = new ClientAddressList(context)
       const params: IPluginSettings = {
@@ -394,6 +394,39 @@ describe("Client", () => {
       expect(decodedParams.minDuration).toBe(params.minDuration)
       expect(decodedParams.minSupport).toBe(params.minSupport)
       expect(decodedParams.minTurnout).toBe(params.minTurnout)
+    });
+
+    it("Should try to decode a non valid action with the update plugin settings decoder return an error", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientAddressList(context)
+      const data = new Uint8Array([11, 22, 22, 33, 33, 33])
+
+      expect(() => client.decoding
+        .updatePluginSettingsAction(data))
+        .toThrow(`no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`)
+    });
+
+    it("Should get the function for a given action data", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientAddressList(context)
+      const params: IPluginSettings = {
+        minDuration: 7200,
+        minTurnout: 0.5,
+        minSupport: 0.5
+      };
+      const updatePluginSettingsAction = client.encoding.updatePluginSettingsAction(params)
+      const iface = client.decoding.getInterface(updatePluginSettingsAction.data)
+      expect(iface?.id).toBe("function changeVoteConfig(uint64,uint64,uint64)")
+      expect(iface?.functionName).toBe("changeVoteConfig")
+      expect(iface?.hash).toBe("0x634fe2fb")
+    });
+
+    it("Should try to get the function of an invalid data and return null", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain)
+      const client = new ClientAddressList(context)
+      const data = new Uint8Array([11, 22, 22, 33, 33, 33])
+      const iface = client.decoding.getInterface(data)
+      expect(iface).toBe(null)
     });
   })
 

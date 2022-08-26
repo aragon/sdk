@@ -19,15 +19,15 @@ export function decodeWithdrawActionData(data: Uint8Array): IWithdrawParams {
   const hexBytes = bytesToHex(data, true)
   try {
     // @ts-ignore
-    const receivedFunction = daoInterface.getFunction(hexBytes.substring(0,10))
-    const expectedfunction = daoInterface.getFunction("withdraw")
-    if (receivedFunction.name !== expectedfunction.name) {
+    const receivedFunction = daoInterface.getFunction(hexBytes.substring(0, 10))
+    const expectedFunction = daoInterface.getFunction("withdraw")
+    if (receivedFunction.name !== expectedFunction.name) {
       throw new Error("The received action is different from the expected action")
     }
     const result = daoInterface.decodeFunctionData("withdraw", data);
     return wrapWithdrawParams(result)
-  } catch {
-    throw new Error("Invalid action")
+  } catch (err) {
+    throw err
   }
 }
 
@@ -65,15 +65,15 @@ export function decodeUpdateMetadataAction(data: Uint8Array): string {
   const hexBytes = bytesToHex(data, true)
   try {
     // @ts-ignore
-    const receivedFunction = daoInterface.getFunction(hexBytes.substring(0,10))
-    const expectedfunction = daoInterface.getFunction("setMetadata")
-    if (receivedFunction.name !== expectedfunction.name) {
+    const receivedFunction = daoInterface.getFunction(hexBytes.substring(0, 10))
+    const expectedFunction = daoInterface.getFunction("setMetadata")
+    if (receivedFunction.name !== expectedFunction.name) {
       throw new Error("The received action is different from the expected action")
     }
     const result = daoInterface.decodeFunctionData("setMetadata", data);
     const bytes = hexToBytes(result[0])
     return new TextDecoder().decode(bytes);
-  } catch {
-    throw new Error("Invalid action")
+  } catch (err) {
+    throw err
   }
 }

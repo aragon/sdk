@@ -204,7 +204,7 @@ export class Client extends ClientCore implements IClient {
       this._decodeWithdrawAction(data),
 
     /**
-     * Decodes a dao metadata from an encoded update metadata action
+     * Decodes a dao metadata ipfs uri from an encoded update metadata action
      *
      * @param {Uint8Array} data
      * @return {*}  {string}
@@ -214,7 +214,7 @@ export class Client extends ClientCore implements IClient {
       this._decodeUpdateMetadataAction(data),
 
     /**
-     * Decodes a dao metadata from an encoded update metadata action
+     * Decodes a dao metadata from an encoded update metadata raw action
      *
      * @param {Uint8Array} data
      * @return {*}  {Promise<IMetadata>}
@@ -223,6 +223,13 @@ export class Client extends ClientCore implements IClient {
     updateMetadataRawAction: (data: Uint8Array): Promise<IMetadata> =>
       this._decodeUpdateMetadataRawAction(data),
 
+    /**
+     * Returns the decoded function info given the encoded data of an action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IInterfaceParams | null}
+     * @memberof Client
+     */
     getInterface: (data: Uint8Array): IInterfaceParams | null =>
       this._getInterfaceParams(data)
 
@@ -682,9 +689,9 @@ export class Client extends ClientCore implements IClient {
     try {
       const func = getFunctionFragment(data)
       return {
-        id: func.format(),
+        id: func.format("minimal"),
         functionName: func.name,
-        hash: bytesToHex(data).substring(0, 10)
+        hash: "0x" + bytesToHex(data).substring(0, 8)
       }
     } catch {
       return null

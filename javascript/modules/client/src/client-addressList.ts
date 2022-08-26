@@ -130,6 +130,13 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
      */
     updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => this._decodeUpdatePluginSettingsAction(data),
     
+    /**
+     * Returns the decoded function info given the encoded data of an action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IInterfaceParams | null}
+     * @memberof ClientAddressList
+     */
     getInterface: (data: Uint8Array): IInterfaceParams | null =>
       this._getInterfaceParams(data)
   }
@@ -358,9 +365,9 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
     try {
       const func = getFunctionFragment(data)
       return {
-        id: func.format(),
+        id: func.format("minimal"),
         functionName: func.name,
-        hash: bytesToHex(data).substring(0, 10)
+        hash: "0x" + bytesToHex(data).substring(0, 8)
       }
     } catch {
       return null

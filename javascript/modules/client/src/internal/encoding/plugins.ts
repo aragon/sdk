@@ -88,8 +88,8 @@ export function decodeUpdatePluginSettingsAction(data: Uint8Array): IPluginSetti
     }
     const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
     return wrapUpdatePluginSettings(result)
-  } catch {
-    throw new Error("Invalid action")
+  } catch (err) {
+    throw err
   }
 }
 
