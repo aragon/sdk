@@ -22,7 +22,7 @@ export function decodeWithdrawActionData(data: Uint8Array): IWithdrawParams {
   const expectedFunction = daoInterface.getFunction("withdraw");
   if (receivedFunction.name !== expectedFunction.name) {
     throw new Error(
-      "The received action is different from the expected action",
+      "The received action is different from the expected one",
     );
   }
   const result = daoInterface.decodeFunctionData("withdraw", data);
@@ -67,7 +67,7 @@ export function decodeUpdateMetadataAction(data: Uint8Array): string {
   const expectedFunction = daoInterface.getFunction("setMetadata");
   if (receivedFunction.name !== expectedFunction.name) {
     throw new Error(
-      "The received action is different from the expected action",
+      "The received action is different from the expected one",
     );
   }
   const result = daoInterface.decodeFunctionData("setMetadata", data);
@@ -77,7 +77,7 @@ export function decodeUpdateMetadataAction(data: Uint8Array): string {
     /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
   if (!ipfsRegex.test(cid)) {
     throw new Error(
-      "The received cid is not valid",
+      "The metadata URL defined on the DAO is invalid",
     );
   }
   return cid;

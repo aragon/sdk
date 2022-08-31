@@ -477,7 +477,7 @@ describe("Client", () => {
         withdrawParams.tokenAddress,
       );
     });
-    
+
     it("Should decode an encoded raw withdraw action of a native token", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
@@ -559,10 +559,10 @@ describe("Client", () => {
       );
 
       expect(() => client.decoding.withdrawAction(updateMetadataAction.data))
-        .toThrow("The received action is different from the expected action");
+        .toThrow("The received action is different from the expected one");
     });
 
-    it("Should try to decode a non valid action return an error", async () => {
+    it("Should try to decode a invalid action and return an error", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);

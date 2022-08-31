@@ -5,6 +5,7 @@ import {
 } from "@aragon/core-contracts-ethers";
 import {
   bytesToHex,
+  decodeRatio,
   encodeRatio,
   hexToBytes,
   strip0x,
@@ -114,7 +115,7 @@ export function decodeUpdatePluginSettingsAction(
   const expectedfunction = votingInterface.getFunction("changeVoteConfig");
   if (receivedFunction.name !== expectedfunction.name) {
     throw new Error(
-      "The received action is different from the expected action",
+      "The received action is different from the expected one",
     );
   }
   const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
@@ -123,8 +124,8 @@ export function decodeUpdatePluginSettingsAction(
 
 function wrapUpdatePluginSettings(result: Result): IPluginSettings {
   return {
-    minTurnout: result[0].toNumber() / 100,
-    minSupport: result[1].toNumber() / 100,
+    minTurnout: decodeRatio(result[0], 2),
+    minSupport: decodeRatio(result[0], 2),
     minDuration: result[2].toNumber(),
   };
 }

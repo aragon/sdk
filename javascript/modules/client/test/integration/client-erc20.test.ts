@@ -404,7 +404,7 @@ describe("Client", () => {
       expect(decodedParams.minTurnout).toBe(params.minTurnout);
     });
 
-    it("Should try to decode a non valid action with the update plugin settings decoder return an error", async () => {
+    it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
