@@ -128,7 +128,7 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
      * @return {*}  {IPluginSettings}
      * @memberof ClientAddressList
      */
-    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => this._decodeUpdatePluginSettingsAction(data),
+    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => decodeUpdatePluginSettingsAction(data),
     
     /**
      * Returns the decoded function info given the encoded data of an action
@@ -307,10 +307,6 @@ export class ClientAddressList extends ClientCore implements IClientAddressList 
       value: BigInt(0),
       data: encodeUpdatePluginSettingsAction(params)
     }
-  }
-
-  private _decodeUpdatePluginSettingsAction(data: Uint8Array): IPluginSettings {
-    return decodeUpdatePluginSettingsAction(data)
   }
 
   private _estimateCreateProposal(_params: ICreateProposalParams): Promise<GasFeeEstimation> {

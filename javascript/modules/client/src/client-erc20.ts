@@ -142,7 +142,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @return {*}  {IPluginSettings}
      * @memberof ClientErc20
      */
-    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => this._decodeUpdatePluginSettingsAction(data),
+    updatePluginSettingsAction: (data: Uint8Array): IPluginSettings => decodeUpdatePluginSettingsAction(data),
     
     /**
      * Returns the decoded function info given the encoded data of an action
@@ -304,11 +304,6 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       value: BigInt(0),
       data: encodeUpdatePluginSettingsAction(params)
     }
-  }
-
-  private _decodeUpdatePluginSettingsAction(data: Uint8Array): IPluginSettings {
-    const settings = decodeUpdatePluginSettingsAction(data)
-    return settings
   }
 
   private _estimateCreateProposal(_params: ICreateProposalParams): Promise<GasFeeEstimation> {

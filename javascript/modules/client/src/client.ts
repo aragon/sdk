@@ -632,7 +632,7 @@ export class Client extends ClientCore implements IClient {
       }
       address = resolvedAddress
     }
-    const ipfsRegex = RegExp(`^(ipfs://Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$`)
+    const ipfsRegex = /^ipfs:\/\/(Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})/gm
     if (!ipfsRegex.test(ipfsUri)) {
       throw new Error("Invalid ipfs uri")
     }

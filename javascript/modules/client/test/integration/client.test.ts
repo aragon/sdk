@@ -387,7 +387,7 @@ describe("Client", () => {
     });
   });
   describe('Action generators', () => {
-    it("Should create a Erc20 client and generate a install entry", async () => {
+    it("Should create a client and generate a withdraw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -397,13 +397,13 @@ describe("Client", () => {
         reference: 'test'
       };
 
-      const withgrawAction = await client.encoding.withdrawAction(
+      const withdrawAction = await client.encoding.withdrawAction(
         "0x1234567890123456789012345678901234567890",
         withdrawParams
       );
 
-      expect(typeof withgrawAction).toBe("object");
-      expect(withgrawAction.data).toBeInstanceOf(Uint8Array);
+      expect(typeof withdrawAction).toBe("object");
+      expect(withdrawAction.data).toBeInstanceOf(Uint8Array);
     });
     it("Should encode an update metadata action", async () => {
       const context = new Context(contextParamsLocalChain);
@@ -460,11 +460,11 @@ describe("Client", () => {
         tokenAddress: "0x1234567890098765432112345678900987654321"
       };
 
-      const withgrawAction = await client.encoding.withdrawAction(
+      const withdrawAction = await client.encoding.withdrawAction(
         "0x1234567890123456789012345678901234567890",
         withdrawParams
       );
-      const decodedWithdrawParams: IWithdrawParams = client.decoding.withdrawAction(withgrawAction.data)
+      const decodedWithdrawParams: IWithdrawParams = client.decoding.withdrawAction(withdrawAction.data)
 
       expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount)
       expect(decodedWithdrawParams.recipientAddress).toBe(withdrawParams.recipientAddress)

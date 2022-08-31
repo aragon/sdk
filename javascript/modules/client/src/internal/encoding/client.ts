@@ -27,7 +27,7 @@ export function decodeWithdrawActionData(data: Uint8Array): IWithdrawParams {
     const result = daoInterface.decodeFunctionData("withdraw", data);
     return wrapWithdrawParams(result)
   } catch (err) {
-    throw err
+    throw(err)
   }
 }
 
@@ -74,6 +74,6 @@ export function decodeUpdateMetadataAction(data: Uint8Array): string {
     const bytes = hexToBytes(result[0])
     return new TextDecoder().decode(bytes);
   } catch (err) {
-    throw err
+    throw(err)
   }
 }
