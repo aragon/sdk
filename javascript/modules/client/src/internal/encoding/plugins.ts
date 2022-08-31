@@ -79,18 +79,14 @@ function unwrapUpdatePluginSettings(params: IPluginSettings): [BigNumber, BigNum
 export function decodeUpdatePluginSettingsAction(data: Uint8Array): IPluginSettings {
   const votingInterface = MajorityVoting__factory.createInterface();
   const hexBytes = bytesToHex(data, true)
-  try {
-    // @ts-ignore
-    const receivedFunction = votingInterface.getFunction(hexBytes.substring(0,10))
-    const expectedfunction = votingInterface.getFunction("changeVoteConfig")
-    if (receivedFunction.name !== expectedfunction.name) {
-      throw new Error("The received action is different from the expected action")
-    }
-    const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
-    return wrapUpdatePluginSettings(result)
-  } catch (err) {
-    throw(err)
+  // @ts-ignore
+  const receivedFunction = votingInterface.getFunction(hexBytes.substring(0, 10))
+  const expectedfunction = votingInterface.getFunction("changeVoteConfig")
+  if (receivedFunction.name !== expectedfunction.name) {
+    throw new Error("The received action is different from the expected action")
   }
+  const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
+  return wrapUpdatePluginSettings(result)
 }
 
 function wrapUpdatePluginSettings(result: Result): IPluginSettings {

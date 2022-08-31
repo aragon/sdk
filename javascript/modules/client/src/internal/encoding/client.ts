@@ -17,18 +17,14 @@ export function encodeWithdrawActionData(params: IWithdrawParams): Uint8Array {
 export function decodeWithdrawActionData(data: Uint8Array): IWithdrawParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true)
-  try {
-    // @ts-ignore
-    const receivedFunction = daoInterface.getFunction(hexBytes.substring(0, 10))
-    const expectedFunction = daoInterface.getFunction("withdraw")
-    if (receivedFunction.name !== expectedFunction.name) {
-      throw new Error("The received action is different from the expected action")
-    }
-    const result = daoInterface.decodeFunctionData("withdraw", data);
-    return wrapWithdrawParams(result)
-  } catch (err) {
-    throw(err)
+  // @ts-ignore
+  const receivedFunction = daoInterface.getFunction(hexBytes.substring(0, 10))
+  const expectedFunction = daoInterface.getFunction("withdraw")
+  if (receivedFunction.name !== expectedFunction.name) {
+    throw new Error("The received action is different from the expected action")
   }
+  const result = daoInterface.decodeFunctionData("withdraw", data);
+  return wrapWithdrawParams(result)
 }
 
 function wrapWithdrawParams(
@@ -63,17 +59,13 @@ export function encodeUpdateMetadataAction(ipfsUri: string): Uint8Array {
 export function decodeUpdateMetadataAction(data: Uint8Array): string {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true)
-  try {
-    // @ts-ignore
-    const receivedFunction = daoInterface.getFunction(hexBytes.substring(0, 10))
-    const expectedFunction = daoInterface.getFunction("setMetadata")
-    if (receivedFunction.name !== expectedFunction.name) {
-      throw new Error("The received action is different from the expected action")
-    }
-    const result = daoInterface.decodeFunctionData("setMetadata", data);
-    const bytes = hexToBytes(result[0])
-    return new TextDecoder().decode(bytes);
-  } catch (err) {
-    throw(err)
+  // @ts-ignore
+  const receivedFunction = daoInterface.getFunction(hexBytes.substring(0, 10))
+  const expectedFunction = daoInterface.getFunction("setMetadata")
+  if (receivedFunction.name !== expectedFunction.name) {
+    throw new Error("The received action is different from the expected action")
   }
+  const result = daoInterface.decodeFunctionData("setMetadata", data);
+  const bytes = hexToBytes(result[0])
+  return new TextDecoder().decode(bytes);
 }
