@@ -178,18 +178,8 @@ export class Client extends ClientCore implements IClient {
       * @return {*}  {Promise<DaoAction>}
       * @memberof Client
       */
-    updateMetadataRawAction: (daoAddressOrEns: string, params: IMetadata): Promise<DaoAction> =>
-      this._buildUpdateMetadataRawAction(daoAddressOrEns, params),
-    /**
-      * Computes the payload to be given when creating a proposal that updates the metadata the DAO
-      *
-      * @param {string} daoAddresOrEns
-      * @param {string} ipfsUri
-      * @return {*}  {Promise<DaoAction>}
-      * @memberof Client
-      */
-    updateMetadataAction: (daoAddressOrEns: string, ipfsUri: string): Promise<DaoAction> =>
-      this._buildUpdateMetadataAction(daoAddressOrEns, ipfsUri)
+    updateMetadataAction: (daoAddressOrEns: string, params: IMetadata): Promise<DaoAction> =>
+      this._buildUpdateMetadataAction(daoAddressOrEns, params),
   };
 
   decoding = {
@@ -210,8 +200,8 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {string}
      * @memberof Client
      */
-    updateMetadataAction: (data: Uint8Array): string =>
-      this._decodeUpdateMetadataAction(data),
+    updateMetadataRawAction: (data: Uint8Array): string =>
+      this._decodeUpdateMetadataRawAction(data),
 
     /**
      * Decodes a dao metadata from an encoded update metadata raw action
@@ -220,8 +210,8 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<IMetadata>}
      * @memberof Client
      */
-    updateMetadataRawAction: (data: Uint8Array): Promise<IMetadata> =>
-      this._decodeUpdateMetadataRawAction(data),
+    updateMetadataAction: (data: Uint8Array): Promise<IMetadata> =>
+      this._decodeUpdateMetadataAction(data),
 
     /**
      * Returns the decoded function info given the encoded data of an action
@@ -622,29 +612,7 @@ export class Client extends ClientCore implements IClient {
     }
   }
 
-  private async _buildUpdateMetadataAction(daoAddreessOrEns: string, ipfsUri: string): Promise<DaoAction> {
-    // check ens
-    let address = daoAddreessOrEns
-    if (!isAddress(daoAddreessOrEns)) {
-      const resolvedAddress = await this.web3.getSigner()?.resolveName(daoAddreessOrEns)
-      if (!resolvedAddress) {
-        throw new Error("invalid ens")
-      }
-      address = resolvedAddress
-    }
-    const ipfsRegex = /^ipfs:\/\/(Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})/gm
-    if (!ipfsRegex.test(ipfsUri)) {
-      throw new Error("Invalid ipfs uri")
-    }
-    const cid = ipfsUri.split("ipfs://")[1]
-    return {
-      to: address,
-      value: BigInt(0),
-      data: encodeUpdateMetadataAction(cid)
-    }
-  }
-
-  private async _buildUpdateMetadataRawAction(daoAddreessOrEns: string, params: IMetadata): Promise<DaoAction> {
+  private async _buildUpdateMetadataAction(daoAddreessOrEns: string, params: IMetadata): Promise<DaoAction> {
     // check ens
     let address = daoAddreessOrEns
     if (!isAddress(daoAddreessOrEns)) {
@@ -672,7 +640,7 @@ export class Client extends ClientCore implements IClient {
     return decodeWithdrawActionData(data)
   }
 
-  private async _decodeUpdateMetadataRawAction(data: Uint8Array): Promise<IMetadata> {
+  private async _decodeUpdateMetadataAction(data: Uint8Array): Promise<IMetadata> {
     const cid = decodeUpdateMetadataAction(data)
     try {
       const stringMetadata = await this.ipfs.fetchString(cid)
@@ -681,7 +649,7 @@ export class Client extends ClientCore implements IClient {
       throw new Error("Error reading data from IPFS")
     }
   }
-  private _decodeUpdateMetadataAction(data: Uint8Array): string {
+  private _decodeUpdateMetadataRawAction(data: Uint8Array): string {
     return "ipfs://" + decodeUpdateMetadataAction(data)
   }
 

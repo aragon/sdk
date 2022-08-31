@@ -405,19 +405,6 @@ describe("Client", () => {
       expect(typeof withdrawAction).toBe("object");
       expect(withdrawAction.data).toBeInstanceOf(Uint8Array);
     });
-    it("Should encode an update metadata action", async () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
-
-      const ipfsUri = "ipfs://QmcGV8fimB7aeBxnDqr7bSSLUWLeyFKUukGqDhWnvriQ3T"
-      const installEntry = await client.encoding.updateMetadataAction(
-        "0x1234567890123456789012345678901234567890",
-        ipfsUri
-      );
-
-      expect(typeof installEntry).toBe("object");
-      expect(installEntry.data).toBeInstanceOf(Uint8Array);
-    });
     it("Should encode an update metadata raw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
@@ -439,7 +426,7 @@ describe("Client", () => {
 
       };
 
-      const installEntry = await client.encoding.updateMetadataRawAction(
+      const installEntry = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
         params
       );
@@ -475,24 +462,54 @@ describe("Client", () => {
     it("Should decode an encoded update metadata action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const ipfsUri = "ipfs://QmcGV8fimB7aeBxnDqr7bSSLUWLeyFKUukGqDhWnvriQ3T"
+
+      const params: IMetadata = {
+        name: 'New Name',
+        description: 'New description',
+        avatar: 'https://theavatar.com/image.jpg',
+        links: [
+          {
+            url: 'https://discord.com/...',
+            name: 'Discord'
+          },
+          {
+            url: 'https://twitter.com/...',
+            name: 'Twitter'
+          }
+        ]
+
+      };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        ipfsUri
+        params
       );
-
-      const recoveredIpfsUri: string = await client.decoding.updateMetadataAction(updateMetadataAction.data)
-
-      expect(ipfsUri).toBe(recoveredIpfsUri)
+      const recoveredIpfsUri: string = await client.decoding.updateMetadataRawAction(updateMetadataAction.data)
+      const ipfsRegex = /^ipfs:\/\/(Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})/gm
+      expect(ipfsRegex.test(recoveredIpfsUri)).toBe(true)
     });
 
     it("Should try to decode an encoded update metadata action with the withdraws decoder and return an error", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const ipfsUri = "ipfs://QmcGV8fimB7aeBxnDqr7bSSLUWLeyFKUukGqDhWnvriQ3T"
+      const params: IMetadata = {
+        name: 'New Name',
+        description: 'New description',
+        avatar: 'https://theavatar.com/image.jpg',
+        links: [
+          {
+            url: 'https://discord.com/...',
+            name: 'Discord'
+          },
+          {
+            url: 'https://twitter.com/...',
+            name: 'Twitter'
+          }
+        ]
+
+      };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        ipfsUri
+        params
       );
 
       expect(() => client.decoding.withdrawAction(updateMetadataAction.data)).toThrow("The received action is different from the expected action");
@@ -501,7 +518,7 @@ describe("Client", () => {
     it("Should try to decode a non valid action return an error", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const data = new Uint8Array([11,22,22,33,33,33])
+      const data = new Uint8Array([11, 22, 22, 33, 33, 33])
 
       expect(() => client.decoding.withdrawAction(data)).toThrow(`no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`);
     });
@@ -509,10 +526,25 @@ describe("Client", () => {
     it("Should get the function for a given action data", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const ipfsUri = "ipfs://QmcGV8fimB7aeBxnDqr7bSSLUWLeyFKUukGqDhWnvriQ3T"
+      const params: IMetadata = {
+        name: 'New Name',
+        description: 'New description',
+        avatar: 'https://theavatar.com/image.jpg',
+        links: [
+          {
+            url: 'https://discord.com/...',
+            name: 'Discord'
+          },
+          {
+            url: 'https://twitter.com/...',
+            name: 'Twitter'
+          }
+        ]
+
+      };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        ipfsUri
+        params
       );
       const iface = client.decoding.getInterface(updateMetadataAction.data)
       expect(iface?.id).toBe("function setMetadata(bytes)")
@@ -523,7 +555,7 @@ describe("Client", () => {
     it("Should try to get the function of an invalid data and return null", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const data = new Uint8Array([11,22,22,33,33,33])
+      const data = new Uint8Array([11, 22, 22, 33, 33, 33])
       const iface = client.decoding.getInterface(data)
       expect(iface).toBe(null)
     });
@@ -548,12 +580,12 @@ describe("Client", () => {
         ]
 
       };
-      const updateMetadataAction = await client.encoding.updateMetadataRawAction(
+      const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
         params
       );
 
-      const decodedParams: IMetadata = await client.decoding.updateMetadataRawAction(updateMetadataAction.data)
+      const decodedParams: IMetadata = await client.decoding.updateMetadataAction(updateMetadataAction.data)
 
       expect(decodedParams.name).toBe(params.name)
       expect(decodedParams.description).toBe(params.description)
