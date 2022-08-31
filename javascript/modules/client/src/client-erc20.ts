@@ -419,7 +419,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       return {
         id: func.format("minimal"),
         functionName: func.name,
-        hash: "0x" + bytesToHex(data).substring(0, 8)
+        hash: bytesToHex(data, true).substring(0, 10)
       }
     } catch {
       return null

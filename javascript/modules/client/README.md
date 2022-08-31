@@ -1525,7 +1525,7 @@ const withdrawAction = await client.encoding.withdrawAction(
 console.log(withdrawAction);
 ```
 
-### Upadte Metadata
+### Update Metadata
 
 ```ts
 import { Client, Context, IMetadata } from "@aragon/sdk-client";
@@ -1622,7 +1622,7 @@ const configAction = client.encoding.updatePluginSettingsAction(
 import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
 const context: Context = new Context(params)
 const client: Client = new Client(context)
-const data: Uint8Array = [12, ..., 56]
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
 const params: IWithdrawParams = client.decoding.withdrawAction(data)
 
@@ -1645,7 +1645,7 @@ Decode an update metadata action and expect the metadata
 import { Client, Context, IMetadata } from "@aragon/sdk-client";
 const context: Context = new Context(params)
 const client: Client = new Client(context)
-const data: Uint8Array = [12, ..., 56]
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
 const params: IMetadata = client.decoding.updateMetadataAction(data)
 
@@ -1677,7 +1677,7 @@ Decode an update metadata action and expect an IPFS uri containing the cid
 import { Client, Context, IMetadata } from "@aragon/sdk-client";
 const context: Context = new Context(params)
 const client: Client = new Client(context)
-const data: Uint8Array = [12, ..., 56]
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
 const params: IMetadata = client.decoding.updateMetadataRawAction(data)
 
@@ -1695,7 +1695,7 @@ const context: Context = new Context(params)
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
 const clientErc20 = ClientErc20(contextPlugin)
-const data: Uint8Array = [12, ..., 56]
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
 const params: IPluginSettings = clientErc20.decoding.updatePluginSettingsAction(data)
 
@@ -1717,7 +1717,7 @@ const context: Context = new Context(params)
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
 const clientAddressList = ClientAddressList(contextPlugin)
-const data: Uint8Array = [12, ..., 56]
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
 const params: IPluginSettings = clientAddressList.decoding.updatePluginSettingsAction(data)
 
@@ -1740,7 +1740,7 @@ import { Wallet } from 'ethers'
 const context: Context = new Context(params)
 const client = new Client(context)
 
-const data: Uint8Array = [12, ..., 56]
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
 const functionParams = client.decoding.getInterface(data)
 
