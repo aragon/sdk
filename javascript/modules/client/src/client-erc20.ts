@@ -380,7 +380,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
   // @ts-ignore  TODO: Remove this comment when implemented
   private _estimateExecuteProposal(
-    params: IExecuteProposalParams,
+    _params: IExecuteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -423,7 +423,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       proposal.result.no,
     );
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (proposal)
+      () => (proposal),
     );
   }
 
@@ -452,7 +452,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       proposals.push(proposal);
     }
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (proposals)
+      () => (proposals),
     );
   }
 
@@ -463,7 +463,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       minSupport: 0.25,
     };
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (pluginSettings)
+      () => (pluginSettings),
     );
   }
 
