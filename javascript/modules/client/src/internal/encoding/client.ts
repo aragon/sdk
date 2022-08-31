@@ -74,7 +74,7 @@ export function decodeUpdateMetadataAction(data: Uint8Array): string {
   const bytes = hexToBytes(result[0]);
   const cid = new TextDecoder().decode(bytes);
   const ipfsRegex =
-    /^Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}$/gm;
+    /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
   if (!ipfsRegex.test(cid)) {
     throw new Error(
       "The received cid is not valid",
