@@ -3,7 +3,17 @@ import { bytesToHex, hexToBytes, strip0x } from "@aragon/sdk-common";
 import { Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
+import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
+import { FunctionFragment } from "@ethersproject/abi";
 import { IWithdrawParams } from "../interfaces/client";
+import { Interface } from "ethers/lib/utils";
+
+
+export function getFunctionFragment(data: Uint8Array): FunctionFragment {
+  const hexBytes = bytesToHex(data, true);
+  const inter = new Interface(AVAILABLE_CLIENT_FUNCTION_SIGNATURES);
+  return inter.getFunction(hexBytes.substring(0, 10));
+}
 
 export function encodeWithdrawActionData(params: IWithdrawParams): Uint8Array {
   const daoInterface = DAO__factory.createInterface();

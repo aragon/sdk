@@ -46,7 +46,7 @@ import {
 } from "./internal/encoding/client";
 import { getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
-import { getFunctionFragment } from "./internal/encoding/common";
+import { getFunctionFragment } from "./internal/encoding/client";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };

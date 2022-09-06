@@ -2,7 +2,7 @@ import { bytesToHex, Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
-import { getFunctionFragment } from "./internal/encoding/common";
+import { getFunctionFragment } from "./internal/encoding/plugins";
 import {
   decodeUpdatePluginSettingsAction,
   encodeAddressListActionInit,

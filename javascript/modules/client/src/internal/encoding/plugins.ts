@@ -19,6 +19,17 @@ import {
   IPluginSettings,
 } from "../interfaces/plugins";
 
+import { Interface } from "ethers/lib/utils";
+import { FunctionFragment } from "@ethersproject/abi";
+import { AVAILABLE_PLUGIN_FUNCTION_SIGNATURES } from "../constants/encoding";
+
+
+export function getFunctionFragment(data: Uint8Array): FunctionFragment {
+  const hexBytes = bytesToHex(data, true);
+  const inter = new Interface(AVAILABLE_PLUGIN_FUNCTION_SIGNATURES);
+  return inter.getFunction(hexBytes.substring(0, 10));
+}
+
 export function encodeAddressListActionInit(
   params: IAddressListPluginInstall,
 ): Uint8Array {
