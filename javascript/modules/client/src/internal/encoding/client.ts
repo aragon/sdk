@@ -4,10 +4,8 @@ import { Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
-import { FunctionFragment } from "@ethersproject/abi";
+import { FunctionFragment, Interface } from "@ethersproject/abi";
 import { IWithdrawParams } from "../interfaces/client";
-import { Interface } from "ethers/lib/utils";
-
 
 export function getFunctionFragment(data: Uint8Array): FunctionFragment {
   const hexBytes = bytesToHex(data, true);

@@ -19,8 +19,7 @@ import {
   IPluginSettings,
 } from "../interfaces/plugins";
 
-import { Interface } from "ethers/lib/utils";
-import { FunctionFragment } from "@ethersproject/abi";
+import { FunctionFragment, Interface } from "@ethersproject/abi";
 import { AVAILABLE_PLUGIN_FUNCTION_SIGNATURES } from "../constants/encoding";
 
 
