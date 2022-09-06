@@ -157,8 +157,8 @@ export class ClientAddressList extends ClientCore
      * @return {*}  {IInterfaceParams | null}
      * @memberof ClientAddressList
      */
-    getInterface: (data: Uint8Array): IInterfaceParams | null =>
-      this._getInterfaceParams(data),
+    findInterface: (data: Uint8Array): IInterfaceParams | null =>
+      this._findInterfaceParams(data),
   };
   static encoding = {
     /**
@@ -419,7 +419,7 @@ export class ClientAddressList extends ClientCore
     );
   }
 
-  private _getInterfaceParams(data: Uint8Array): IInterfaceParams | null {
+  private _findInterfaceParams(data: Uint8Array): IInterfaceParams | null {
     try {
       const func = getFunctionFragment(data);
       return {

@@ -245,8 +245,8 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {IInterfaceParams | null}
      * @memberof Client
      */
-    getInterface: (data: Uint8Array): IInterfaceParams | null =>
-      this._getInterfaceParams(data),
+    findInterface: (data: Uint8Array): IInterfaceParams | null =>
+      this._findInterfaceParams(data),
   };
 
   //// ESTIMATION HANDLERS
@@ -694,7 +694,7 @@ export class Client extends ClientCore implements IClient {
     return "ipfs://" + decodeUpdateMetadataAction(data);
   }
 
-  private _getInterfaceParams(data: Uint8Array): IInterfaceParams | null {
+  private _findInterfaceParams(data: Uint8Array): IInterfaceParams | null {
     try {
       const func = getFunctionFragment(data);
       return {

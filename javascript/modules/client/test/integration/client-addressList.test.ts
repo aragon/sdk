@@ -434,7 +434,7 @@ describe("Client", () => {
       };
       const updatePluginSettingsAction = client.encoding
         .updatePluginSettingsAction(params);
-      const iface = client.decoding.getInterface(
+      const iface = client.decoding.findInterface(
         updatePluginSettingsAction.data,
       );
       expect(iface?.id).toBe("function changeVoteConfig(uint64,uint64,uint64)");
@@ -446,7 +446,7 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
-      const iface = client.decoding.getInterface(data);
+      const iface = client.decoding.findInterface(data);
       expect(iface).toBe(null);
     });
   });

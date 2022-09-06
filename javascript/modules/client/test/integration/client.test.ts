@@ -532,7 +532,10 @@ describe("Client", () => {
         .updateMetadataRawAction(updateMetadataAction.data);
       const ipfsRegex =
         /^ipfs:\/\/(Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}))$/;
+
+      const expectedCid = await client.ipfs.add(JSON.stringify(params));
       expect(ipfsRegex.test(recoveredIpfsUri)).toBe(true);
+      expect(recoveredIpfsUri).toBe("ipfs://" + expectedCid);
     });
 
     it("Should try to decode an encoded update metadata action with the withdraws decoder and return an error", async () => {
@@ -594,7 +597,7 @@ describe("Client", () => {
         "0x1234567890123456789012345678901234567890",
         params,
       );
-      const iface = client.decoding.getInterface(updateMetadataAction.data);
+      const iface = client.decoding.findInterface(updateMetadataAction.data);
       expect(iface?.id).toBe("function setMetadata(bytes)");
       expect(iface?.functionName).toBe("setMetadata");
       expect(iface?.hash).toBe("0xee57e36f");
@@ -604,7 +607,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
-      const iface = client.decoding.getInterface(data);
+      const iface = client.decoding.findInterface(data);
       expect(iface).toBe(null);
     });
 

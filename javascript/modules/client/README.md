@@ -1742,7 +1742,7 @@ const client = new Client(context)
 
 const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
-const functionParams = client.decoding.getInterface(data)
+const functionParams = client.decoding.findInterface(data)
 
 console.log(functionParams)
 

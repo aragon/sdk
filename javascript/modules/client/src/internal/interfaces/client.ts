@@ -51,7 +51,7 @@ export interface IClient extends IClientCore {
     withdrawAction: (data: Uint8Array) => IWithdrawParams;
     updateMetadataRawAction: (data: Uint8Array) => string;
     updateMetadataAction: (data: Uint8Array) => Promise<IMetadata>;
-    getInterface: (data: Uint8Array) => IInterfaceParams | null;
+    findInterface: (data: Uint8Array) => IInterfaceParams | null;
   };
   estimation: {
     create: (params: ICreateParams) => Promise<GasFeeEstimation>;

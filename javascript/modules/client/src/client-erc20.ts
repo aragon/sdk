@@ -167,8 +167,8 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @return {*}  {IInterfaceParams | null}
      * @memberof ClientErc20
      */
-    getInterface: (data: Uint8Array): IInterfaceParams | null =>
-      this._getInterfaceParams(data),
+    findInterface: (data: Uint8Array): IInterfaceParams | null =>
+      this._findInterfaceParams(data),
   };
   static encoding = {
     /**
@@ -467,7 +467,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     );
   }
 
-  private _getInterfaceParams(data: Uint8Array): IInterfaceParams | null {
+  private _findInterfaceParams(data: Uint8Array): IInterfaceParams | null {
     try {
       const func = getFunctionFragment(data);
       return {
