@@ -16,8 +16,15 @@ import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
-import { DAOFactory__factory, Registry__factory } from "@aragon/core-contracts-ethers";
-import { DaoSortBy, IMetadata, IDaoQueryParams } from "../../src/internal/interfaces/client";
+import {
+  DAOFactory__factory,
+  Registry__factory,
+} from "@aragon/core-contracts-ethers";
+import {
+  DaoSortBy,
+  IDaoQueryParams,
+  IMetadata,
+} from "../../src/internal/interfaces/client";
 import { SortDirection } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/client";
 import { Random } from "@aragon/sdk-common";
@@ -53,7 +60,10 @@ const contextParams: ContextParams = {
       },
     },
   ],
-  graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
+  graphqlNodes: [{
+    url:
+      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+  }],
 };
 
 const contextParamsLocalChain: ContextParams = {
@@ -62,6 +72,12 @@ const contextParamsLocalChain: ContextParams = {
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
   ipfsNodes: [
+    {
+      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || "",
+      },
+    },
     {
       url: "http://localhost:5001",
     },
@@ -72,17 +88,20 @@ const contextParamsLocalChain: ContextParams = {
       url: "http://localhost:5003",
     },
   ],
-  graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
+  graphqlNodes: [{
+    url:
+      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+  }],
 };
 
-let daoAddress = "0x123456789012345678901234567890123456789012345678"
+let daoAddress = "0x123456789012345678901234567890123456789012345678";
 
 describe("Client", () => {
   beforeAll(async () => {
     const server = await ganacheSetup.start();
     const daoFactory = await deployContracts.deploy(server);
     contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
-    const addr = await createLegacyDao(contextParamsLocalChain)
+    const addr = await createLegacyDao(contextParamsLocalChain);
     daoAddress = addr;
   });
 
@@ -139,14 +158,15 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1
+      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) +
+        1;
 
       const daoCreationParams: ICreateParams = {
         metadata: {
           name: daoName,
           description: "this is a dao",
-          avatar: 'https://...',
-          links: []
+          avatar: "https://...",
+          links: [],
         },
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [
@@ -169,14 +189,15 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1
+      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) +
+        1;
 
       const daoCreationParams: ICreateParams = {
         metadata: {
           name: daoName,
           description: "this is a dao",
-          avatar: 'https://...',
-          links: []
+          avatar: "https://...",
+          links: [],
         },
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [
@@ -380,65 +401,263 @@ describe("Client", () => {
       ).toBe("7");
     });
   });
-  describe('Action generators', () => {
-    it("Should create a Erc20 client and generate a install entry", async () => {
+  describe("Action generators", () => {
+    it("Should create a client and generate a withdraw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
       const withdrawParams: IWithdrawParams = {
-        recipientAddress: '0x1234567890123456789012345678901234567890',
+        recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
-        reference: 'test'
+        reference: "test",
       };
 
-      const withgrawAction = await client.encoding.withdrawAction(
+      const withdrawAction = await client.encoding.withdrawAction(
         "0x1234567890123456789012345678901234567890",
-        withdrawParams
+        withdrawParams,
       );
 
-      expect(typeof withgrawAction).toBe("object");
-      expect(withgrawAction.data).toBeInstanceOf(Uint8Array);
+      expect(typeof withdrawAction).toBe("object");
+      expect(withdrawAction.data).toBeInstanceOf(Uint8Array);
     });
-    it("Should encode an update metadata action", async () => {
+    it("Should encode an update metadata raw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
       const params: IMetadata = {
-        name: 'New Name',
-        description: 'New description',
-        avatar: 'https://theavatar.com/image.jpg',
+        name: "New Name",
+        description: "New description",
+        avatar: "https://theavatar.com/image.jpg",
         links: [
           {
-            url: 'https://discord.com/...',
-            name: 'Discord'
+            url: "https://discord.com/...",
+            name: "Discord",
           },
           {
-            url: 'https://twitter.com/...',
-            name: 'Twitter'
-          }
-        ]
-
+            url: "https://twitter.com/...",
+            name: "Twitter",
+          },
+        ],
       };
 
       const installEntry = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params
+        params,
       );
 
       expect(typeof installEntry).toBe("object");
       expect(installEntry.data).toBeInstanceOf(Uint8Array);
     });
-  })
+  });
+  describe("Action decoders", () => {
+    it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const withdrawParams: IWithdrawParams = {
+        recipientAddress: "0x1234567890123456789012345678901234567890",
+        amount: BigInt(10),
+        reference: "test",
+        tokenAddress: "0x1234567890098765432112345678900987654321",
+      };
+
+      const withdrawAction = await client.encoding.withdrawAction(
+        "0x1234567890123456789012345678901234567890",
+        withdrawParams,
+      );
+      const decodedWithdrawParams: IWithdrawParams = client.decoding
+        .withdrawAction(withdrawAction.data);
+
+      expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
+      expect(decodedWithdrawParams.recipientAddress).toBe(
+        withdrawParams.recipientAddress,
+      );
+      expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference);
+      expect(decodedWithdrawParams.tokenAddress).toBe(
+        withdrawParams.tokenAddress,
+      );
+    });
+
+    it("Should decode an encoded raw withdraw action of a native token", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const withdrawParams: IWithdrawParams = {
+        recipientAddress: "0x1234567890123456789012345678901234567890",
+        amount: BigInt(10),
+        reference: "test",
+      };
+
+      const withdrawAction = await client.encoding.withdrawAction(
+        "0x1234567890123456789012345678901234567890",
+        withdrawParams,
+      );
+      const decodedWithdrawParams: IWithdrawParams = client.decoding
+        .withdrawAction(withdrawAction.data);
+
+      expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
+      expect(decodedWithdrawParams.recipientAddress).toBe(
+        withdrawParams.recipientAddress,
+      );
+      expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference);
+      expect(decodedWithdrawParams.tokenAddress).toBe(
+        AddressZero,
+      );
+    });
+
+    it("Should decode an encoded update metadata action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const params: IMetadata = {
+        name: "New Name",
+        description: "New description",
+        avatar: "https://theavatar.com/image.jpg",
+        links: [
+          {
+            url: "https://discord.com/...",
+            name: "Discord",
+          },
+          {
+            url: "https://twitter.com/...",
+            name: "Twitter",
+          },
+        ],
+      };
+      const updateMetadataAction = await client.encoding.updateMetadataAction(
+        "0x1234567890123456789012345678901234567890",
+        params,
+      );
+      const recoveredIpfsUri: string = await client.decoding
+        .updateMetadataRawAction(updateMetadataAction.data);
+      const ipfsRegex =
+        /^ipfs:\/\/(Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}))$/;
+
+      const expectedCid = "ipfs://QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ" 
+      expect(ipfsRegex.test(recoveredIpfsUri)).toBe(true);
+      expect(recoveredIpfsUri).toBe(expectedCid);
+    });
+
+    it("Should try to decode an encoded update metadata action with the withdraws decoder and return an error", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params: IMetadata = {
+        name: "New Name",
+        description: "New description",
+        avatar: "https://theavatar.com/image.jpg",
+        links: [
+          {
+            url: "https://discord.com/...",
+            name: "Discord",
+          },
+          {
+            url: "https://twitter.com/...",
+            name: "Twitter",
+          },
+        ],
+      };
+      const updateMetadataAction = await client.encoding.updateMetadataAction(
+        "0x1234567890123456789012345678901234567890",
+        params,
+      );
+
+      expect(() => client.decoding.withdrawAction(updateMetadataAction.data))
+        .toThrow("The received action is different from the expected one");
+    });
+
+    it("Should try to decode a invalid action and return an error", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
+
+      expect(() => client.decoding.withdrawAction(data)).toThrow(
+        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`,
+      );
+    });
+
+    it("Should get the function for a given action data", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params: IMetadata = {
+        name: "New Name",
+        description: "New description",
+        avatar: "https://theavatar.com/image.jpg",
+        links: [
+          {
+            url: "https://discord.com/...",
+            name: "Discord",
+          },
+          {
+            url: "https://twitter.com/...",
+            name: "Twitter",
+          },
+        ],
+      };
+      const updateMetadataAction = await client.encoding.updateMetadataAction(
+        "0x1234567890123456789012345678901234567890",
+        params,
+      );
+      const iface = client.decoding.findInterface(updateMetadataAction.data);
+      expect(iface?.id).toBe("function setMetadata(bytes)");
+      expect(iface?.functionName).toBe("setMetadata");
+      expect(iface?.hash).toBe("0xee57e36f");
+    });
+
+    it("Should try to get the function of an invalid data and return null", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
+      const iface = client.decoding.findInterface(data);
+      expect(iface).toBe(null);
+    });
+
+    it("Should decode an encoded update metadata raw action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const params: IMetadata = {
+        name: "New Name",
+        description: "New description",
+        avatar: "https://theavatar.com/image.jpg",
+        links: [
+          {
+            url: "https://discord.com/...",
+            name: "Discord",
+          },
+          {
+            url: "https://twitter.com/...",
+            name: "Twitter",
+          },
+        ],
+      };
+      const updateMetadataAction = await client.encoding.updateMetadataAction(
+        "0x1234567890123456789012345678901234567890",
+        params,
+      );
+
+      const decodedParams: IMetadata = await client.decoding
+        .updateMetadataAction(updateMetadataAction.data);
+
+      expect(decodedParams.name).toBe(params.name);
+      expect(decodedParams.description).toBe(params.description);
+      expect(decodedParams.avatar).toBe(params.avatar);
+      for (let index = 0; index < params.links.length; index++) {
+        expect(decodedParams.links[index].name).toBe(params.links[index].name);
+        expect(decodedParams.links[index].url).toBe(params.links[index].url);
+      }
+    });
+  });
+
   describe("Data retrieval", () => {
     it("Should get a DAO's metadata with a specific address", async () => {
       const ctx = new Context(contextParams);
-      const client = new Client(ctx)
-      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
-      const dao = await client.methods.getDao(daoAddress)
-      expect(typeof dao).toBe('object');
+      const client = new Client(ctx);
+      const daoAddress = "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61";
+      const dao = await client.methods.getDao(daoAddress);
+      expect(typeof dao).toBe("object");
       expect(dao.address).toBe(daoAddress);
       expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-    })
+    });
 
     it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
       const context = new Context(contextParamsLocalChain);
@@ -447,46 +666,50 @@ describe("Client", () => {
         limit: 10,
         skip: 0,
         direction: SortDirection.ASC,
-        sortBy: DaoSortBy.NAME
-      }
-      const daos = await client.methods.getDaos(params)
-      expect(Array.isArray(daos)).toBe(true)
+        sortBy: DaoSortBy.NAME,
+      };
+      const daos = await client.methods.getDaos(params);
+      expect(Array.isArray(daos)).toBe(true);
       expect(daos.length <= 10).toBe(true);
-    })
+    });
 
     it("Should get DAOs balances", async () => {
       const ctx = new Context(contextParams);
-      const client = new Client(ctx)
-      const balances = await client.methods.getBalances("0x1234567890123456789012345678901234567890")
+      const client = new Client(ctx);
+      const balances = await client.methods.getBalances(
+        "0x1234567890123456789012345678901234567890",
+      );
       expect(Array.isArray(balances)).toBe(true);
       if (balances.length > 0) {
-        expect(typeof balances[0].balance).toBe('bigint');
+        expect(typeof balances[0].balance).toBe("bigint");
       }
-    })
+    });
 
     it("Should get the transfers of a dao", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const client = new Client(ctx)
-      const daoAddress = '0x04d9a0f3f7cf5f9f1220775d48478adfacceff61'
-      const transfers = await client.methods.getTransfers(daoAddress)
-      expect(Array.isArray(transfers.deposits)).toBe(true)
-      expect(Array.isArray(transfers.withdrawals)).toBe(true)
-    })
+      const client = new Client(ctx);
+      const daoAddress = "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61";
+      const transfers = await client.methods.getTransfers(daoAddress);
+      expect(Array.isArray(transfers.deposits)).toBe(true);
+      expect(Array.isArray(transfers.withdrawals)).toBe(true);
+    });
 
-    test.todo("Should return an empty array when getting the transfers of a DAO that does not exist")//, async () => {
+    test.todo(
+      "Should return an empty array when getting the transfers of a DAO that does not exist",
+    ); //, async () => {
     //   const ctx = new Context(contextParamsLocalChain);
     //   const client = new Client(ctx)
     //   const res = await client.methods.getTransfers(contextParamsLocalChain.dao)
     //   expect(res.length).toBe(0)
     // })
-    test.todo("Should fail if the given ENS is invalid")// async () => {
+    test.todo("Should fail if the given ENS is invalid"); // async () => {
     // const ctx = new Context(contextParamsLocalChain);
     // const client = new Client(ctx)
     // // will fail when tested on local chain
     // await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
     //   "Invalid ENS name"
     // );
-  })
+  });
 });
 
 // HELPERS
@@ -505,7 +728,7 @@ function deployErc20(client: Client) {
   return factory.deploy();
 }
 
-/* TODO: 
+/* TODO:
 This code creates a dao with the legacy method
 to be able to test the deposit, please remove
 everything from here once the new dao creation works
@@ -517,11 +740,11 @@ async function createLegacyDao(params: ContextParams) {
   if (!params.daoFactoryAddress) {
     throw new Error("A dao factory is needed");
   }
-  const provider = useWeb3Providers(params.web3Providers, params.network)
-  const signer = new Wallet(TEST_WALLET, provider[0])
+  const provider = useWeb3Providers(params.web3Providers, params.network);
+  const signer = new Wallet(TEST_WALLET, provider[0]);
   const daoFactoryInstance = DAOFactory__factory.connect(
     params.daoFactoryAddress,
-    signer
+    signer,
   );
 
   const daoCreationParams: ICreateDaoERC20Voting = {
@@ -531,14 +754,12 @@ async function createLegacyDao(params: ContextParams) {
     },
     tokenConfig: {
       addr: "0x0000000000000000000000000000000000000000",
-      name:
-        "TestToken" +
+      name: "TestToken" +
         (Random.getFloat() + 1)
           .toString(36)
           .substring(4)
           .toUpperCase(),
-      symbol:
-        "TEST" +
+      symbol: "TEST" +
         (Random.getFloat() + 1)
           .toString(36)
           .substring(4)
@@ -546,7 +767,10 @@ async function createLegacyDao(params: ContextParams) {
     },
     mintConfig: {
       receivers: [Wallet.createRandom().address, Wallet.createRandom().address],
-      amounts: [BigInt(Math.floor(Random.getFloat() * 9999) + 1), BigInt(Math.floor(Random.getFloat() * 9999) + 1)]
+      amounts: [
+        BigInt(Math.floor(Random.getFloat() * 9999) + 1),
+        BigInt(Math.floor(Random.getFloat() * 9999) + 1),
+      ],
     },
     votingConfig: {
       supportRequiredPct: Math.floor(Random.getFloat() * 100) + 1,
@@ -557,7 +781,7 @@ async function createLegacyDao(params: ContextParams) {
   };
   const registryInstance = await daoFactoryInstance
     .registry()
-    .then(registryAddress => {
+    .then((registryAddress) => {
       return Registry__factory.connect(registryAddress, provider[0]);
     });
   return daoFactoryInstance.newERC20VotingDAO(
@@ -565,18 +789,19 @@ async function createLegacyDao(params: ContextParams) {
     daoCreationParams.votingConfig,
     daoCreationParams.tokenConfig,
     daoCreationParams.mintConfig,
-    daoCreationParams.gsnForwarder ?? AddressZero
+    daoCreationParams.gsnForwarder ?? AddressZero,
   )
-    .then(tx => tx.wait())
+    .then((tx) => tx.wait())
     .then((cr) => {
       const newDaoAddress = cr.events?.find(
-        e => e.address === registryInstance.address
+        (e) => e.address === registryInstance.address,
       )?.topics[1];
-      if (!newDaoAddress)
+      if (!newDaoAddress) {
         return Promise.reject(new Error("Could not create DAO"));
+      }
 
       return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
-    })
+    });
 }
 
 interface ICreateDaoERC20Voting {
@@ -611,7 +836,6 @@ interface VotingConfig {
   /** In seconds */
   minDuration: number;
 }
-
 
 function useWeb3Providers(
   endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],

@@ -10,9 +10,9 @@ import {
   IAssetTransfers,
   IClient,
   ICreateParams,
-  IMetadata,
   IDaoQueryParams,
   IDepositParams,
+  IMetadata,
   IWithdrawParams,
 } from "./internal/interfaces/client";
 import {
@@ -28,13 +28,23 @@ import {
   ContractTransaction,
 } from "@ethersproject/contracts";
 import { ClientCore } from "./internal/core";
-import { DaoAction, DaoRole } from "./internal/interfaces/common";
+import {
+  DaoAction,
+  DaoRole,
+  IInterfaceParams,
+} from "./internal/interfaces/common";
 import { pack } from "@ethersproject/solidity";
 
-import { Random, strip0x } from "@aragon/sdk-common";
+import { bytesToHex, Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
-import { encodeUpdateMetadataAction, encodeWithdrawActionData } from "./internal/encoding/client";
+import {
+  decodeUpdateMetadataAction,
+  decodeWithdrawActionData,
+  encodeUpdateMetadataAction,
+  encodeWithdrawActionData,
+  getFunctionFragment,
+} from "./internal/encoding/client";
 import { getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
 
@@ -46,7 +56,9 @@ const assetList: AssetBalance[] = [
   {
     type: "native",
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
+    lastUpdate: new Date(
+      +new Date() - Math.floor(Random.getFloat() * 10000000000),
+    ),
   },
   {
     type: "erc20",
@@ -55,7 +67,9 @@ const assetList: AssetBalance[] = [
     symbol: "JOJ",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
+    lastUpdate: new Date(
+      +new Date() - Math.floor(Random.getFloat() * 10000000000),
+    ),
   },
   {
     type: "erc20",
@@ -64,7 +78,9 @@ const assetList: AssetBalance[] = [
     symbol: "DTT",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
+    lastUpdate: new Date(
+      +new Date() - Math.floor(Random.getFloat() * 10000000000),
+    ),
   },
   {
     type: "erc20",
@@ -73,7 +89,9 @@ const assetList: AssetBalance[] = [
     symbol: "TTK",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
+    lastUpdate: new Date(
+      +new Date() - Math.floor(Random.getFloat() * 10000000000),
+    ),
   },
 ];
 
@@ -93,45 +111,48 @@ export class Client extends ClientCore implements IClient {
      * @memberof Client
      */
     create: (params: ICreateParams) => this._createDao(params),
-    /** 
+    /**
      * Deposits ether or an ERC20 token into the DAO
-     * 
+     *
      * @param {IDepositParams} params
      * @return {*}  {AsyncGenerator<DaoDepositStepValue>}
      * @memberof Client
      */
     deposit: (params: IDepositParams) => this._deposit(params),
-    /** 
+    /**
      * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
-     * 
+     *
      * @param {string} daoAddressOrEns
      * @param {string[]} tokenAddresses
      * @return {*}  {Promise<AssetBalance[]>}
      * @memberof Client
      */
-    getBalances: (daoAddressOrEns: string, tokenAddresses: string[] = []): Promise<AssetBalance[]> =>
+    getBalances: (
+      daoAddressOrEns: string,
+      tokenAddresses: string[] = [],
+    ): Promise<AssetBalance[]> =>
       this._getBalances(daoAddressOrEns, tokenAddresses),
-    /** 
+    /**
      * Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)
-     * 
+     *
      * @param {string} daoAddressOrEns
      * @return {*}  {Promise<IAssetTransfers>}
      * @memberof Client
      */
     getTransfers: (daoAddressOrEns: string): Promise<IAssetTransfers> =>
       this._getTransfers(daoAddressOrEns),
-    /** 
+    /**
      * Retrieves metadata for DAO with given identifier (address or ens domain)
-     * 
+     *
      * @param {string} daoAddressOrEns
      * @return {*}  {Promise<IAssetTransfers>}
      * @memberof Client
      */
     getDao: (daoAddressOrEns: string): Promise<DaoDetails> =>
       this._getDao(daoAddressOrEns),
-    /** 
+    /**
      * Retrieves metadata for DAO with given identifier (address or ens domain)
-     * 
+     *
      * @param {IDaoQueryParams} params
      * @return {*}  {Promise<DaoDetails[]>}
      * @memberof Client
@@ -139,15 +160,15 @@ export class Client extends ClientCore implements IClient {
     getDaos: (params?: IDaoQueryParams): Promise<DaoDetails[]> =>
       this._getDaos(params ?? {}),
 
-    /** 
+    /**
      * Checks whether a role is granted by the current DAO's ACL settings
-     * 
+     *
      * @param {string} where
      * @param {string} who
      * @param {DaoRole} role
      * @param {Uint8Array} data
-     * @return {*} 
-     * @memberof Client 
+     * @return {*}
+     * @memberof Client
      */
     hasPermission: (
       where: string,
@@ -159,26 +180,73 @@ export class Client extends ClientCore implements IClient {
 
   encoding = {
     /**
-      * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
-      *
-      * @param {string} daoAddresOrEns
-      * @param {IWithdrawParams} params
-      * @return {*}  {Promise<DaoAction>}
-      * @memberof Client
-      */
-    withdrawAction: (daoAddressOrEns: string, params: IWithdrawParams): Promise<DaoAction> =>
-      this._buildWithdrawAction(daoAddressOrEns, params),
+     * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
+     *
+     * @param {string} daoAddresOrEns
+     * @param {IWithdrawParams} params
+     * @return {*}  {Promise<DaoAction>}
+     * @memberof Client
+     */
+    withdrawAction: (
+      daoAddressOrEns: string,
+      params: IWithdrawParams,
+    ): Promise<DaoAction> => this._buildWithdrawAction(daoAddressOrEns, params),
 
     /**
-      * Computes the payload to be given when creating a proposal that updates the metadata the DAO
-      *
-      * @param {string} daoAddresOrEns
-      * @param {IMetadata} params
-      * @return {*}  {Promise<DaoAction>}
-      * @memberof Client
-      */
-    updateMetadataAction: (daoAddressOrEns: string, params: IMetadata): Promise<DaoAction> =>
-      this._buildUpdateMetadataAction(daoAddressOrEns, params)
+     * Computes the payload to be given when creating a proposal that updates the metadata the DAO
+     *
+     * @param {string} daoAddresOrEns
+     * @param {IMetadata} params
+     * @return {*}  {Promise<DaoAction>}
+     * @memberof Client
+     */
+    updateMetadataAction: (
+      daoAddressOrEns: string,
+      params: IMetadata,
+    ): Promise<DaoAction> =>
+      this._buildUpdateMetadataAction(daoAddressOrEns, params),
+  };
+
+  decoding = {
+    /**
+     * Decodes the withdraw parameters from an encoded withdraw action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IWithdrawParams}
+     * @memberof Client
+     */
+    withdrawAction: (data: Uint8Array): IWithdrawParams =>
+      decodeWithdrawActionData(data),
+
+    /**
+     * Decodes a dao metadata ipfs uri from an encoded update metadata action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {string}
+     * @memberof Client
+     */
+    updateMetadataRawAction: (data: Uint8Array): string =>
+      this._decodeUpdateMetadataRawAction(data),
+
+    /**
+     * Decodes a dao metadata from an encoded update metadata raw action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {Promise<IMetadata>}
+     * @memberof Client
+     */
+    updateMetadataAction: (data: Uint8Array): Promise<IMetadata> =>
+      this._decodeUpdateMetadataAction(data),
+
+    /**
+     * Returns the decoded function info given the encoded data of an action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IInterfaceParams | null}
+     * @memberof Client
+     */
+    findInterface: (data: Uint8Array): IInterfaceParams | null =>
+      this._findInterfaceParams(data),
   };
 
   //// ESTIMATION HANDLERS
@@ -202,13 +270,12 @@ export class Client extends ClientCore implements IClient {
      * @memberof Client
      */
     deposit: (params: IDepositParams) => this._estimateDeposit(params),
-    updateAllowance: (params: IDepositParams) => this._estimateUpdateAllowance(params),
+    updateAllowance: (params: IDepositParams) =>
+      this._estimateUpdateAllowance(params),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
   /**
-   *
-   *
    * @private
    * @param {ICreateParams} params
    * @return {*}  {AsyncGenerator<DaoCreationStepValue>}
@@ -393,7 +460,9 @@ export class Client extends ClientCore implements IClient {
 
     // TODO: Unimplemented
     // TODO: The new contract code is needed
-    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
+    return Promise.resolve(
+      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+    );
   }
 
   _estimateDeposit(params: IDepositParams) {
@@ -431,7 +500,9 @@ export class Client extends ClientCore implements IClient {
       throw new Error("A web3 provider is needed");
     }
     // TODO: remove this
-    return Promise.resolve(this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))))
+    return Promise.resolve(
+      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+    );
   }
 
   //// PRIVATE METHODS METADATA
@@ -442,7 +513,9 @@ export class Client extends ClientCore implements IClient {
     if (!daoAddressOrEns) {
       throw new Error("Invalid DAO address or ENS");
     }
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => getDummyDao(daoAddressOrEns));
+    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
+      getDummyDao(daoAddressOrEns)
+    );
   }
 
   private _getDaos({
@@ -453,11 +526,13 @@ export class Client extends ClientCore implements IClient {
     // direction = SortDirection.ASC,
     // sortBy = DaoSortBy.CREATED_AT
   }: IDaoQueryParams): Promise<DaoDetails[]> {
-    const metadataMany: DaoDetails[] = []
+    const metadataMany: DaoDetails[] = [];
     for (let index = 0; index < limit; index++) {
-      metadataMany.push(getDummyDao())
+      metadataMany.push(getDummyDao());
     }
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() => (metadataMany))
+    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
+      () => (metadataMany),
+    );
   }
 
   private _getBalances(
@@ -538,7 +613,9 @@ export class Client extends ClientCore implements IClient {
           reference: "Some reference",
           transactionId: transfers[index].transactionId,
           // Generate a random date in the past
-          date: new Date(+new Date() - Math.floor(Random.getFloat() * 10000000000)),
+          date: new Date(
+            +new Date() - Math.floor(Random.getFloat() * 10000000000),
+          ),
         };
         return result;
       },
@@ -549,49 +626,84 @@ export class Client extends ClientCore implements IClient {
 
     return Promise.resolve({ deposits, withdrawals });
   }
-  /**
-   * Build withdraw action
-   *
-   * @private
-   * @param {string} to
-   * @param {bigint} value
-   * @param {IWithdrawParams} params
-   * @return {*}  {DaoAction}
-   * @memberof Client
-   */
-  private async _buildWithdrawAction(daoAddreessOrEns: string, params: IWithdrawParams): Promise<DaoAction> {
+
+  private async _buildWithdrawAction(
+    daoAddreessOrEns: string,
+    params: IWithdrawParams,
+  ): Promise<DaoAction> {
     // check ens
-    let address = daoAddreessOrEns
+    let address = daoAddreessOrEns;
     if (!isAddress(daoAddreessOrEns)) {
-      const resolvedAddress = await this.web3.getSigner()?.resolveName(daoAddreessOrEns)
+      const resolvedAddress = await this.web3.getSigner()?.resolveName(
+        daoAddreessOrEns,
+      );
       if (!resolvedAddress) {
-        throw new Error("invalid ens")
+        throw new Error("invalid ens");
       }
-      address = resolvedAddress
+      address = resolvedAddress;
     }
 
     return {
       to: address,
       value: BigInt(0),
-      data: encodeWithdrawActionData(params)
-    }
+      data: encodeWithdrawActionData(params),
+    };
   }
-  private async _buildUpdateMetadataAction(daoAddreessOrEns: string, _params: IMetadata): Promise<DaoAction> {
+
+  private async _buildUpdateMetadataAction(
+    daoAddreessOrEns: string,
+    params: IMetadata,
+  ): Promise<DaoAction> {
     // check ens
-    let address = daoAddreessOrEns
+    let address = daoAddreessOrEns;
     if (!isAddress(daoAddreessOrEns)) {
-      const resolvedAddress = await this.web3.getSigner()?.resolveName(daoAddreessOrEns)
+      const resolvedAddress = await this.web3.getSigner()?.resolveName(
+        daoAddreessOrEns,
+      );
       if (!resolvedAddress) {
-        throw new Error("invalid ens")
+        throw new Error("invalid ens");
       }
-      address = resolvedAddress
+      address = resolvedAddress;
     }
     // upload metadata to IPFS
-    const cid = "0x1234567890123456789012345678901234567890"
+    let cid: string;
+    try {
+      cid = await this.ipfs.add(JSON.stringify(params));
+    } catch {
+      throw new Error("Could not pin the metadata on IPFS");
+    }
     return {
       to: address,
       value: BigInt(0),
-      data: encodeUpdateMetadataAction(cid)
+      data: encodeUpdateMetadataAction(cid),
+    };
+  }
+
+  private async _decodeUpdateMetadataAction(
+    data: Uint8Array,
+  ): Promise<IMetadata> {
+    const cid = decodeUpdateMetadataAction(data);
+    try {
+      const stringMetadata = await this.ipfs.fetchString(cid);
+      return JSON.parse(stringMetadata);
+    } catch {
+      throw new Error("Error reading data from IPFS");
+    }
+  }
+  private _decodeUpdateMetadataRawAction(data: Uint8Array): string {
+    return "ipfs://" + decodeUpdateMetadataAction(data);
+  }
+
+  private _findInterfaceParams(data: Uint8Array): IInterfaceParams | null {
+    try {
+      const func = getFunctionFragment(data);
+      return {
+        id: func.format("minimal"),
+        functionName: func.name,
+        hash: bytesToHex(data, true).substring(0, 10),
+      };
+    } catch {
+      return null;
     }
   }
 }
@@ -601,7 +713,7 @@ export class Client extends ClientCore implements IClient {
 // @ts-ignore  TODO: Remove this comment
 function unwrapCreateDaoParams(
   params: ICreateParams,
-  metadataCid: string
+  metadataCid: string,
 ): [DAOFactory.DAOConfigStruct, DAOFactory.VoteConfigStruct, string, string] {
   // TODO: Serialize plugin params into a buffer
   const pluginDataBytes = "0x" +
@@ -615,7 +727,7 @@ function unwrapCreateDaoParams(
   return [
     {
       name: params.ensSubdomain,
-      metadata: "ipfs://" + metadataCid
+      metadata: "ipfs://" + metadataCid,
     },
     {
       // TODO: Adapt the DAO creation parameters
@@ -647,4 +759,3 @@ function unwrapDepositParams(
     params.reference ?? "",
   ];
 }
-

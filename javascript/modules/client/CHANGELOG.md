@@ -17,7 +17,15 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-
+### Added
+- Add decoders for the following actions:
+  - **Client**
+    - Withdraw
+    - UpdateMetadata
+  - **ERC20**
+    - UpdatePluginSettings
+  - **Address List**
+    - UpdatePluginSettings
 ### Fixed
 - Version of the common package `0.2.0` => `0.2.1`
 

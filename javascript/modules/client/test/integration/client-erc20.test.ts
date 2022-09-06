@@ -3,7 +3,12 @@ declare const describe, it, beforeAll, afterAll, expect, test;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientErc20, ContextPlugin, ContextPluginParams, Client } from "../../src";
+import {
+  Client,
+  ClientErc20,
+  ContextPlugin,
+  ContextPluginParams,
+} from "../../src";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
@@ -13,12 +18,13 @@ import {
   ExecuteProposalStep,
   ICreateProposalParams,
   IErc20PluginInstall,
-  IProposalQueryParams,
-  ProposalCreationSteps,
-  VoteValues,
-  VoteProposalStep,
-  IVoteProposalParams,
   IExecuteProposalParams,
+  IPluginSettings,
+  IProposalQueryParams,
+  IVoteProposalParams,
+  ProposalCreationSteps,
+  VoteProposalStep,
+  VoteValues,
 } from "../../src/internal/interfaces/plugins";
 import { AddressZero } from "@ethersproject/constants";
 
@@ -47,12 +53,15 @@ const ipfsEndpoints = {
   failing: [
     {
       url: "https://bad-url-gateway.io/",
-    }
+    },
   ],
 };
 const grapqhlEndpoints = {
   working: [
-    { url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }
+    {
+      url:
+        "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+    },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],
 };
@@ -67,7 +76,7 @@ const contextParams: ContextPluginParams = {
   web3Providers: web3endpoints.working,
   pluginAddress: "0x2345678901234567890123456789012345678901",
   ipfsNodes: ipfsEndpoints.working,
-  graphqlNodes: grapqhlEndpoints.working
+  graphqlNodes: grapqhlEndpoints.working,
 };
 
 const contextParamsLocalChain: ContextPluginParams = {
@@ -87,7 +96,10 @@ const contextParamsLocalChain: ContextPluginParams = {
       url: "http:localhost:5003",
     },
   ],
-  graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
+  graphqlNodes: [{
+    url:
+      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+  }],
 };
 
 describe("Client", () => {
@@ -98,7 +110,7 @@ describe("Client", () => {
   });
 
   afterAll(async () => {
-    await ganacheSetup.stop()
+    await ganacheSetup.stop();
   });
 
   describe("Client instances", () => {
@@ -123,13 +135,12 @@ describe("Client", () => {
       await client.graphql.ensureOnline();
       const graphqlStatus = await client.graphql.isUp();
       expect(graphqlStatus).toEqual(true);
-
     });
 
     it("Should create a failing client", async () => {
-      contextParams.web3Providers = web3endpoints.failing
-      contextParams.ipfsNodes = ipfsEndpoints.failing
-      contextParams.graphqlNodes = grapqhlEndpoints.failing
+      contextParams.web3Providers = web3endpoints.failing;
+      contextParams.ipfsNodes = ipfsEndpoints.failing;
+      contextParams.graphqlNodes = grapqhlEndpoints.failing;
       const ctx = new ContextPlugin(contextParams);
       const client = new ClientErc20(ctx);
 
@@ -152,44 +163,43 @@ describe("Client", () => {
   });
   describe("Proposal Creation", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress: "0x123456789012345678901234567890123456789012",
         metadata: {
-          title: 'Best Proposal',
-          summary: 'this is the sumnary',
-          description: 'This is a very long description',
+          title: "Best Proposal",
+          summary: "this is the sumnary",
+          description: "This is a very long description",
           resources: [{
             name: "Website",
-            url: "https://the.website"
+            url: "https://the.website",
           }],
           media: {
-            header: 'https://no.media/media.jpeg',
-            logo: 'https://no.media/media.jpeg'
-          }
+            header: "https://no.media/media.jpeg",
+            logo: "https://no.media/media.jpeg",
+          },
         },
         actions: [],
         creatorVote: VoteValues.YES,
         startDate: new Date(),
         endDate: new Date(),
-        executeOnPass: true
-      }
+        executeOnPass: true,
+      };
 
-      const estimation = await client.estimation.createProposal(proposalParams)
+      const estimation = await client.estimation.createProposal(proposalParams);
 
-      expect(typeof estimation).toEqual("object")
+      expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");
       expect(typeof estimation.max).toEqual("bigint");
       expect(estimation.max).toBeGreaterThan(BigInt(0));
       expect(estimation.max).toBeGreaterThan(estimation.average);
-
-    })
+    });
     it("Should create a new proposal locally", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const erc20Client = new ClientErc20(context)
-      const client = new Client(context)
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const erc20Client = new ClientErc20(context);
+      const client = new Client(context);
 
       // generate actions
       const action = await client.encoding.withdrawAction(
@@ -197,32 +207,35 @@ describe("Client", () => {
         {
           recipientAddress: "0x1234567890123456789012345678901234567890",
           amount: BigInt(1),
-          reference: 'test'
-        })
+          reference: "test",
+        },
+      );
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress: "0x123456789012345678901234567890123456789012",
         metadata: {
-          title: 'Best Proposal',
-          summary: 'this is the sumnary',
-          description: 'This is a very long description',
+          title: "Best Proposal",
+          summary: "this is the sumnary",
+          description: "This is a very long description",
           resources: [{
             name: "Website",
-            url: "https://the.website"
+            url: "https://the.website",
           }],
           media: {
-            header: 'https://no.media/media.jpeg',
-            logo: 'https://no.media/media.jpeg'
-          }
+            header: "https://no.media/media.jpeg",
+            logo: "https://no.media/media.jpeg",
+          },
         },
         actions: [action],
         creatorVote: VoteValues.YES,
         startDate: new Date(),
         endDate: new Date(),
-        executeOnPass: true
-      }
+        executeOnPass: true,
+      };
 
-      for await (const step of erc20Client.methods.createProposal(proposalParams)) {
+      for await (
+        const step of erc20Client.methods.createProposal(proposalParams)
+      ) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");
@@ -234,42 +247,42 @@ describe("Client", () => {
             break;
           default:
             throw new Error(
-              "Unexpected proposal creation step: " + Object.keys(step).join(", "),
+              "Unexpected proposal creation step: " +
+                Object.keys(step).join(", "),
             );
         }
       }
-    })
+    });
   });
 
   describe("Vote on a proposal", () => {
     it("Should estimate the gas fees for casting a vote", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
 
       const voteParams: IVoteProposalParams = {
         pluginAddress: "0x123456789012345678901234567890123456789012",
-        proposalId: '0x1234567890123456789012345678901234567890',
-        vote: VoteValues.YES
-      }
-      const estimation = await client.estimation.voteProposal(voteParams)
+        proposalId: "0x1234567890123456789012345678901234567890",
+        vote: VoteValues.YES,
+      };
+      const estimation = await client.estimation.voteProposal(voteParams);
 
-      expect(typeof estimation).toEqual("object")
+      expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");
       expect(typeof estimation.max).toEqual("bigint");
       expect(estimation.max).toBeGreaterThan(BigInt(0));
       expect(estimation.max).toBeGreaterThan(estimation.average);
-
-    })
+    });
 
     it("Should vote on a proposal locally", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
 
       const voteParams: IVoteProposalParams = {
         pluginAddress: "0x123456789012345678901234567890123456789012",
-        proposalId: '0x1234567890123456789012345678901234567890',
-        vote: VoteValues.YES
-      }
+        proposalId: "0x1234567890123456789012345678901234567890",
+        vote: VoteValues.YES,
+      };
 
       for await (const step of client.methods.voteProposal(voteParams)) {
         switch (step.key) {
@@ -287,38 +300,35 @@ describe("Client", () => {
             );
         }
       }
-
-    })
-  })
+    });
+  });
 
   describe("Execute proposal", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
-
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x123456789012345678901234567890123456789012",
-        proposalId: '0x1234567890123456789012345678901234567890',
-      }
-      const estimation = await client.estimation.executeProposal(executeParams)
+        proposalId: "0x1234567890123456789012345678901234567890",
+      };
+      const estimation = await client.estimation.executeProposal(executeParams);
 
-      expect(typeof estimation).toEqual("object")
+      expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");
       expect(typeof estimation.max).toEqual("bigint");
       expect(estimation.max).toBeGreaterThan(BigInt(0));
       expect(estimation.max).toBeGreaterThan(estimation.average);
-
-    })
+    });
 
     it("Should execute a local proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain)
-      const client = new ClientErc20(context)
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x123456789012345678901234567890123456789012",
-        proposalId: '0x1234567890123456789012345678901234567890',
-      }
+        proposalId: "0x1234567890123456789012345678901234567890",
+      };
 
       for await (const step of client.methods.executeProposal(executeParams)) {
         switch (step.key) {
@@ -330,81 +340,158 @@ describe("Client", () => {
             break;
           default:
             throw new Error(
-              "Unexpected execute proposal step: " + Object.keys(step).join(", "),
+              "Unexpected execute proposal step: " +
+                Object.keys(step).join(", "),
             );
         }
       }
+    });
+  });
 
-    })
-  })
-
-  describe('Action generators', () => {
+  describe("Action generators", () => {
     it("Should create a Erc20 client and generate a install entry", async () => {
       const initParams: IErc20PluginInstall = {
         settings: {
           minDuration: 7200,
           minTurnout: 0.5,
-          minSupport: 0.5
+          minSupport: 0.5,
         },
         useToken: {
-          address: AddressZero
+          address: AddressZero,
         },
       };
-      const erc20InstallPluginItem = ClientErc20.encoding.getPluginInstallItem(initParams);
+      const erc20InstallPluginItem = ClientErc20.encoding.getPluginInstallItem(
+        initParams,
+      );
 
       expect(typeof erc20InstallPluginItem).toBe("object");
       // what does this should be
       expect(erc20InstallPluginItem.data).toBeInstanceOf(Uint8Array);
     });
-  })
+    it("Should encode an update plugin settings action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const params: IPluginSettings = {
+        minDuration: 7200,
+        minTurnout: 0.5,
+        minSupport: 0.5,
+      };
+      const updatePluginSettingsAction = client.encoding
+        .updatePluginSettingsAction(params);
 
-  describe('Data retrieval', () => {
+      expect(typeof updatePluginSettingsAction).toBe("object");
+      // what does this should be
+      expect(updatePluginSettingsAction.data).toBeInstanceOf(Uint8Array);
+    });
+  });
+
+  describe("Action decoders", () => {
+    it("Should decode the plugin settings from an update plugin settings action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const params: IPluginSettings = {
+        minDuration: 7200,
+        minTurnout: 0.5,
+        minSupport: 0.5,
+      };
+      const updatePluginSettingsAction = client.encoding
+        .updatePluginSettingsAction(params);
+      const decodedParams: IPluginSettings = client.decoding
+        .updatePluginSettingsAction(updatePluginSettingsAction.data);
+
+      expect(decodedParams.minDuration).toBe(params.minDuration);
+      expect(decodedParams.minSupport).toBe(params.minSupport);
+      expect(decodedParams.minTurnout).toBe(params.minTurnout);
+    });
+
+    it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
+
+      expect(() =>
+        client.decoding
+          .updatePluginSettingsAction(data)
+      )
+        .toThrow(
+          `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`,
+        );
+    });
+
+    it("Should get the function for a given action data", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const params: IPluginSettings = {
+        minDuration: 7200,
+        minTurnout: 0.5,
+        minSupport: 0.5,
+      };
+      const updatePluginSettingsAction = client.encoding
+        .updatePluginSettingsAction(params);
+      const iface = client.decoding.findInterface(
+        updatePluginSettingsAction.data,
+      );
+      expect(iface?.id).toBe("function changeVoteConfig(uint64,uint64,uint64)");
+      expect(iface?.functionName).toBe("changeVoteConfig");
+      expect(iface?.hash).toBe("0x634fe2fb");
+    });
+
+    it("Should try to get the function of an invalid data and return null", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
+      const iface = client.decoding.findInterface(data);
+      expect(iface).toBe(null);
+    });
+  });
+
+  describe("Data retrieval", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
 
-      const daoAddress = "0x1234567890123456789012345678901234567890"
-      const wallets = await client.methods.getMembers(daoAddress)
+      const daoAddress = "0x1234567890123456789012345678901234567890";
+      const wallets = await client.methods.getMembers(daoAddress);
 
       expect(Array.isArray(wallets)).toBe(true);
       expect(wallets.length).toBeGreaterThan(0);
-      expect(typeof wallets[0]).toBe('string');
+      expect(typeof wallets[0]).toBe("string");
       expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-    })
+    });
     it("Should fetch the given proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
 
-      const proposalId = "0x1234567890123456789012345678901234567890_0x55"
-      const proposal = await client.methods.getProposal(proposalId)
+      const proposalId = "0x1234567890123456789012345678901234567890_0x55";
+      const proposal = await client.methods.getProposal(proposalId);
 
-      expect(typeof proposal).toBe('object');
+      expect(typeof proposal).toBe("object");
       expect(proposal.id).toBe(proposalId);
       expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
-    })
+    });
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
-      const limit = 5
+      const limit = 5;
       const params: IProposalQueryParams = {
-        limit
-      }
-      const proposals = await client.methods.getProposals(params)
+        limit,
+      };
+      const proposals = await client.methods.getProposals(params);
 
-      expect(Array.isArray(proposals)).toBe(true)
-      expect(proposals.length <= limit).toBe(true)
-    })
+      expect(Array.isArray(proposals)).toBe(true);
+      expect(proposals.length <= limit).toBe(true);
+    });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
-      
-      const pluginAddress: string = "0x12345678901234567890º1234567890123456789012"
-      const proposals = await client.methods.getSettings(pluginAddress)
 
-      expect(typeof proposals.minDuration).toBe('number')
-      expect(typeof proposals.minSupport).toBe('number')
-      expect(typeof proposals.minTurnout).toBe('number')
-    })
-  })
+      const pluginAddress: string =
+        "0x12345678901234567890º1234567890123456789012";
+      const proposals = await client.methods.getSettings(pluginAddress);
 
-})
+      expect(typeof proposals.minDuration).toBe("number");
+      expect(typeof proposals.minSupport).toBe("number");
+      expect(typeof proposals.minTurnout).toBe("number");
+    });
+  });
+});

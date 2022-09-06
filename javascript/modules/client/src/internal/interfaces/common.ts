@@ -87,3 +87,9 @@ export enum ProposalStatus {
   DEFEATED = "Defeated",
 }
 
+export interface IInterfaceParams {
+  id: string
+  functionName: string
+  hash: string
+}
+

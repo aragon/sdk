@@ -4,6 +4,7 @@ import { IClientCore } from "./core";
 import {
   DaoAction,
   GasFeeEstimation,
+  IInterfaceParams,
   IPagination,
 } from "./common";
 
@@ -22,11 +23,15 @@ export interface IClientErc20 extends IClientCore {
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<Erc20Proposal>
     getProposals: (params?: IProposalQueryParams) => Promise<Erc20ProposalListItem[]>
-    getSettings: (pluginAddress: string) => Promise<IPluginSettings> 
+    getSettings: (pluginAddress: string) => Promise<IPluginSettings>
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     updatePluginSettingsAction: (params: IPluginSettings) => DaoAction;
+  };
+  decoding: {
+    updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings
+    findInterface: (data: Uint8Array) => IInterfaceParams | null
   };
   estimation: {
     createProposal: (
@@ -50,11 +55,15 @@ export interface IClientAddressList extends IClientCore {
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<AddressListProposal>
     getProposals: (params?: IProposalQueryParams) => Promise<AddressListProposalListItem[]>
-    getSettings: (pluginAddress: string) => Promise<IPluginSettings> 
+    getSettings: (pluginAddress: string) => Promise<IPluginSettings>
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     updatePluginSettingsAction: (params: IPluginSettings) => DaoAction;
+  };
+  decoding: {
+    updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings
+    findInterface: (data: Uint8Array) => IInterfaceParams | null
   };
   estimation: {
     createProposal: (params: ICreateProposalParams) => Promise<GasFeeEstimation>;
