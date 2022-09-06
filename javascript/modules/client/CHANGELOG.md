@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## 0.4.0-alpha
+On 2022-09-06 16:34:24
 ### Added
 - Add decoders for the following actions:
   - **Client**
