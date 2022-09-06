@@ -1,10 +1,9 @@
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { bytesToHex, hexToBytes, strip0x } from "@aragon/sdk-common";
-import { Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
-import { FunctionFragment, Interface } from "@ethersproject/abi";
+import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { IWithdrawParams } from "../interfaces/client";
 
 export function getFunctionFragment(data: Uint8Array): FunctionFragment {

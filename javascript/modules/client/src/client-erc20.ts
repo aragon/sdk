@@ -31,6 +31,7 @@ import {
   decodeUpdatePluginSettingsAction,
   encodeErc20ActionInit,
   encodeUpdatePluginSettingsAction,
+  getFunctionFragment,
 } from "./internal/encoding/plugins";
 import { bytesToHex, Random } from "@aragon/sdk-common";
 import {
@@ -38,7 +39,6 @@ import {
   getDummyErc20ProposalListItem,
 } from "./internal/temp-mock";
 import { AddressZero } from "@ethersproject/constants";
-import { getFunctionFragment } from "./internal/encoding/plugins";
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890";

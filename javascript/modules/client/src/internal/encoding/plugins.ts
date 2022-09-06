@@ -10,7 +10,6 @@ import {
   hexToBytes,
   strip0x,
 } from "@aragon/sdk-common";
-import { Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import {
@@ -19,9 +18,8 @@ import {
   IPluginSettings,
 } from "../interfaces/plugins";
 
-import { FunctionFragment, Interface } from "@ethersproject/abi";
+import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { AVAILABLE_PLUGIN_FUNCTION_SIGNATURES } from "../constants/encoding";
-
 
 export function getFunctionFragment(data: Uint8Array): FunctionFragment {
   const hexBytes = bytesToHex(data, true);

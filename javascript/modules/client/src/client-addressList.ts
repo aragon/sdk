@@ -2,11 +2,11 @@ import { bytesToHex, Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
-import { getFunctionFragment } from "./internal/encoding/plugins";
 import {
   decodeUpdatePluginSettingsAction,
   encodeAddressListActionInit,
   encodeUpdatePluginSettingsAction,
+  getFunctionFragment,
 } from "./internal/encoding/plugins";
 import {
   DaoAction,
@@ -315,7 +315,7 @@ export class ClientAddressList extends ClientCore
       BigInt(proposal.result.no),
     );
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (proposal)
+      () => (proposal),
     );
   }
 
@@ -344,7 +344,7 @@ export class ClientAddressList extends ClientCore
       proposals.push(proposal);
     }
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (proposals)
+      () => (proposals),
     );
   }
 
@@ -415,7 +415,7 @@ export class ClientAddressList extends ClientCore
       minSupport: 0.25,
     };
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (pluginSettings)
+      () => (pluginSettings),
     );
   }
 
