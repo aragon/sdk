@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Changed
+- Make signer parameter optional
 ### Fixed
 - Fixed names not appearing in mock calls
 ## 0.4.0-alpha
