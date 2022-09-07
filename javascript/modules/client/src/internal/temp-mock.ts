@@ -26,7 +26,7 @@ export function getDummyAddressListProposal(proposalId?: string): AddressListPro
   const yes = Math.floor(Random.getFloat() * 1001)
   const no = Math.floor(Random.getFloat() * 1001)
   const abstain = Math.floor(Random.getFloat() * 1001)
-  const index = Math.floor(Random.getFloat() * dummyDaoNames.length + 1)
+  const index = Math.floor(Random.getFloat() * dummyDaoNames.length)
   let address = Random.getFloat() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
 
   const dateWithinThisYear = new Date(
@@ -109,7 +109,7 @@ export function getDummyAddressListProposalListItem(proposalId?: string): Addres
   const yes = Math.floor(Random.getFloat() * 1001)
   const no = Math.floor(Random.getFloat() * 1001)
   const abstain = Math.floor(Random.getFloat() * 1001)
-  const index = Math.floor(Random.getFloat() * dummyDaoNames.length + 1)
+  const index = Math.floor(Random.getFloat() * dummyDaoNames.length)
   let address = Random.getFloat() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
 
   const dateWithinThisYear = new Date(
@@ -166,7 +166,7 @@ export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
   const yes = Math.floor(Random.getFloat() * 1001)
   const no = Math.floor(Random.getFloat() * 1001)
   const abstain = Math.floor(Random.getFloat() * 1001)
-  const index = Math.floor(Random.getFloat() * dummyDaoNames.length + 1)
+  const index = Math.floor(Random.getFloat() * dummyDaoNames.length)
   let address = Random.getFloat() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
 
   const dateWithinThisYear = new Date(
@@ -259,7 +259,7 @@ export function getDummyErc20ProposalListItem(proposalId?: string): Erc20Proposa
   const yes = Math.floor(Random.getFloat() * 1001)
   const no = Math.floor(Random.getFloat() * 1001)
   const abstain = Math.floor(Random.getFloat() * 1001)
-  const index = Math.floor(Random.getFloat() * dummyDaoNames.length + 1)
+  const index = Math.floor(Random.getFloat() * dummyDaoNames.length)
   let address = Random.getFloat() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
 
   const dateWithinThisYear = new Date(
@@ -312,7 +312,7 @@ export function getDummyDao(address?: string): DaoDetails {
     "spartadao.dao.eth",
     "yggdrasil.dao.eth",
   ];
-  const daoIndex = Math.floor(Random.getFloat() * dummyDaoNames.length + 1)
+  const daoIndex = Math.floor(Random.getFloat() * dummyDaoNames.length)
 
   const fromDate = new Date(
     new Date().setFullYear(new Date().getFullYear() - 1),
@@ -364,7 +364,7 @@ export function getDummyDaoListItem(address?: string): DaoListItem {
     "spartadao.dao.eth",
     "yggdrasil.dao.eth",
   ];
-  const daoIndex = Math.floor(Random.getFloat() * dummyDaoNames.length + 1)
+  const daoIndex = Math.floor(Random.getFloat() * dummyDaoNames.length)
 
   return {
     address: address ?? "0x1234567890123456789012345678901234567890",
