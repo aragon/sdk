@@ -17,7 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-
+### Fixed
+- Encoding flow when updating plugin settings
 ## 0.4.2-alpha
 On 2022-09-07 11:19:55
 
