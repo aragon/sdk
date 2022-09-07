@@ -405,7 +405,6 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   }
 
   private _getMembers(_addressOrEns: string): Promise<string[]> {
-    const a = TokenFactory__factory.createInterface().encodeFunctionData()
     // TODO: Implement
 
     const mockAddresses = [
