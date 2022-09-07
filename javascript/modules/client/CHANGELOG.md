@@ -17,8 +17,6 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-### Added
-- Action decoders
 ### Fixed
 - Fixed names not appearing in mock calls
 ## 0.4.0-alpha
