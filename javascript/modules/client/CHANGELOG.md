@@ -17,7 +17,10 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-
+### Added
+- Action decoders
+### Fixed
+- Fixed names not appearing in mock calls
 ## 0.4.0-alpha
 On 2022-09-06 16:34:24
 ### Added
