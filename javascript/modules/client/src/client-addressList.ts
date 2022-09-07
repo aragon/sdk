@@ -35,6 +35,7 @@ import {
   getDummyAddressListProposalListItem,
 } from "./internal/temp-mock";
 import { getProposalStatus } from "./internal/utils/plugins";
+import { isAddress } from "@ethersproject/address";
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
@@ -355,6 +356,9 @@ export class ClientAddressList extends ClientCore
     pluginAddress: string,
     params: IPluginSettings,
   ): DaoAction {
+    if (!isAddress(pluginAddress)) {
+      throw new Error("invalid plugin address");
+    }
     // TODO: check if to and value are correct
     return {
       to: pluginAddress,

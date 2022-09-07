@@ -371,6 +371,25 @@ describe("Client", () => {
       expect(installPluginItemItem.data).toBeInstanceOf(Uint8Array);
     });
 
+    it("Should create an AddressList client and fail to generate a plugin config action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const pluginConfigParams: IPluginSettings = {
+        minDuration: 100000,
+        minTurnout: 0.25,
+        minSupport: 0.51,
+      };
+
+      const pluginAddress = "0xinvalid_address";
+      expect(() =>
+        client.encoding.updatePluginSettingsAction(
+          pluginAddress,
+          pluginConfigParams,
+        )
+      ).toThrow("invalid plugin address");
+    });
+
     it("Should create an AddressList client and generate a plugin config action action", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);

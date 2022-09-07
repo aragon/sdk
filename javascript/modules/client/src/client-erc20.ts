@@ -38,6 +38,7 @@ import {
   getDummyErc20Proposal,
   getDummyErc20ProposalListItem,
 } from "./internal/temp-mock";
+import { isAddress } from "@ethersproject/address";
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
@@ -329,6 +330,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     pluginAddress: string,
     params: IPluginSettings,
   ): DaoAction {
+    if (!isAddress(pluginAddress)) {
+      throw new Error("invalid plugin address")
+    }
     // TODO: check if to and value are correct
     return {
       to: pluginAddress,

@@ -368,6 +368,23 @@ describe("Client", () => {
       // what does this should be
       expect(erc20InstallPluginItem.data).toBeInstanceOf(Uint8Array);
     });
+    it("Should encode an update plugin settings action and fail", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const params: IPluginSettings = {
+        minDuration: 7200,
+        minTurnout: 0.5,
+        minSupport: 0.5,
+      };
+
+      const pluginAddress = "0xinvalid_address";
+      expect(() =>
+        client.encoding.updatePluginSettingsAction(
+          pluginAddress,
+          params,
+        )
+      ).toThrow("invalid plugin address");
+    });
     it("Should encode an update plugin settings action", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
@@ -437,7 +454,7 @@ describe("Client", () => {
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
       const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(pluginAddress,params);
+        .updatePluginSettingsAction(pluginAddress, params);
       const iface = client.decoding.findInterface(
         updatePluginSettingsAction.data,
       );
@@ -496,7 +513,7 @@ describe("Client", () => {
       const client = new ClientErc20(context);
 
       const pluginAddress: string =
-        "0x123456789012345678901234567890123456789012";
+        "0x1234567890123456789012345678901234567890";
       const proposals = await client.methods.getSettings(pluginAddress);
 
       expect(typeof proposals.minDuration).toBe("number");
