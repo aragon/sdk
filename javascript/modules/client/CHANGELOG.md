@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+## 0.4.2-alpha
+On 2022-09-07 11:19:55
+
 ### Changed
 - Make the signer parameter optional
 
