@@ -368,7 +368,7 @@ describe("Client", () => {
       // what does this should be
       expect(erc20InstallPluginItem.data).toBeInstanceOf(Uint8Array);
     });
-    it("Should encode an update plugin settings action and fail", async () => {
+    it("Should encode an update plugin settings action and fail with an invalid address", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
       const params: IPluginSettings = {
@@ -383,7 +383,7 @@ describe("Client", () => {
           pluginAddress,
           params,
         )
-      ).toThrow("invalid plugin address");
+      ).toThrow("Invalid plugin address");
     });
     it("Should encode an update plugin settings action", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);

@@ -357,7 +357,7 @@ export class ClientAddressList extends ClientCore
     params: IPluginSettings,
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
-      throw new Error("invalid plugin address");
+      throw new Error("Invalid plugin address");
     }
     // TODO: check if to and value are correct
     return {

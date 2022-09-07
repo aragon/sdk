@@ -371,7 +371,7 @@ describe("Client", () => {
       expect(installPluginItemItem.data).toBeInstanceOf(Uint8Array);
     });
 
-    it("Should create an AddressList client and fail to generate a plugin config action", async () => {
+    it("Should create an AddressList client and fail to generate a plugin config action with an invalid address", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);
 
@@ -387,7 +387,7 @@ describe("Client", () => {
           pluginAddress,
           pluginConfigParams,
         )
-      ).toThrow("invalid plugin address");
+      ).toThrow("Invalid plugin address");
     });
 
     it("Should create an AddressList client and generate a plugin config action action", async () => {

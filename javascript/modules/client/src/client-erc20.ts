@@ -17,7 +17,7 @@ import {
   VoteProposalStepValue,
   VoteValues,
 } from "./internal/interfaces/plugins";
-import { IDAO } from "@aragon/core-contracts-ethers";
+import { IDAO, TokenFactory__factory } from "@aragon/core-contracts-ethers";
 import { ClientCore } from "./internal/core";
 import {
   DaoAction,
@@ -331,7 +331,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     params: IPluginSettings,
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
-      throw new Error("invalid plugin address")
+      throw new Error("Invalid plugin address")
     }
     // TODO: check if to and value are correct
     return {
@@ -405,6 +405,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   }
 
   private _getMembers(_addressOrEns: string): Promise<string[]> {
+    const a = TokenFactory__factory.createInterface().encodeFunctionData()
     // TODO: Implement
 
     const mockAddresses = [
