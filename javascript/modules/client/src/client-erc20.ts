@@ -17,7 +17,7 @@ import {
   VoteProposalStepValue,
   VoteValues,
 } from "./internal/interfaces/plugins";
-import { IDAO, TokenFactory__factory } from "@aragon/core-contracts-ethers";
+import { IDAO } from "@aragon/core-contracts-ethers";
 import { ClientCore } from "./internal/core";
 import {
   DaoAction,
