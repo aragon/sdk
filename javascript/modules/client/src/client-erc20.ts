@@ -38,7 +38,7 @@ import {
   getDummyErc20Proposal,
   getDummyErc20ProposalListItem,
 } from "./internal/temp-mock";
-import { AddressZero } from "@ethersproject/constants";
+import { isAddress } from "@ethersproject/address";
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
@@ -141,13 +141,17 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /**
      * Computes the parameters to be given when creating a proposal that updates the governance configuration
      *
+     * @param {string} pluginAddress
      * @param {IPluginSettings} params
      * @return {*}  {DaoAction}
      * @memberof ClientErc20
      */
     // updatePluginSettings()     not setConfig()
-    updatePluginSettingsAction: (params: IPluginSettings): DaoAction =>
-      this._buildUpdatePluginSettingsAction(params),
+    updatePluginSettingsAction: (
+      pluginAddress: string,
+      params: IPluginSettings,
+    ): DaoAction =>
+      this._buildUpdatePluginSettingsAction(pluginAddress, params),
   };
   decoding = {
     /**
@@ -322,10 +326,16 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   }
 
   //// PRIVATE ACTION BUILDER HANDLERS
-  private _buildUpdatePluginSettingsAction(params: IPluginSettings): DaoAction {
+  private _buildUpdatePluginSettingsAction(
+    pluginAddress: string,
+    params: IPluginSettings,
+  ): DaoAction {
+    if (!isAddress(pluginAddress)) {
+      throw new Error("Invalid plugin address")
+    }
     // TODO: check if to and value are correct
     return {
-      to: AddressZero,
+      to: pluginAddress,
       value: BigInt(0),
       data: encodeUpdatePluginSettingsAction(params),
     };

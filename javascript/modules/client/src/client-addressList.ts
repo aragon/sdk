@@ -1,5 +1,4 @@
 import { bytesToHex, Random } from "@aragon/sdk-common";
-import { AddressZero } from "@ethersproject/constants";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
 import {
@@ -36,6 +35,7 @@ import {
   getDummyAddressListProposalListItem,
 } from "./internal/temp-mock";
 import { getProposalStatus } from "./internal/utils/plugins";
+import { isAddress } from "@ethersproject/address";
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
@@ -132,12 +132,16 @@ export class ClientAddressList extends ClientCore
     /**
      * Computes the parameters to be given when creating a proposal that updates the governance configuration
      *
+     * @param {string} pluginAddress
      * @param {IPluginSettings} params
      * @return {*}  {DaoAction}
      * @memberof ClientAddressList
      */
-    updatePluginSettingsAction: (params: IPluginSettings): DaoAction =>
-      this._buildUpdatePluginSettingsAction(params),
+    updatePluginSettingsAction: (
+      pluginAddress: string,
+      params: IPluginSettings,
+    ): DaoAction =>
+      this._buildUpdatePluginSettingsAction(pluginAddress, params),
   };
   decoding = {
     /**
@@ -348,10 +352,16 @@ export class ClientAddressList extends ClientCore
     );
   }
 
-  private _buildUpdatePluginSettingsAction(params: IPluginSettings): DaoAction {
+  private _buildUpdatePluginSettingsAction(
+    pluginAddress: string,
+    params: IPluginSettings,
+  ): DaoAction {
+    if (!isAddress(pluginAddress)) {
+      throw new Error("Invalid plugin address");
+    }
     // TODO: check if to and value are correct
     return {
-      to: AddressZero,
+      to: pluginAddress,
       value: BigInt(0),
       data: encodeUpdatePluginSettingsAction(params),
     };

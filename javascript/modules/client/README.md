@@ -659,7 +659,10 @@ const configActionPrarms: IProposalSettings = {
   minTurnout: 0.5, // 50%
 };
 
+const pluginAddress = "0x1234567890123456789012345678901234567890";
+
 const configAction = client.encoding.updatePluginSettingsAction(
+  pluginAddress,
   configActionPrarms,
 );
 
@@ -1180,7 +1183,10 @@ const configActionPrarms: IProposalSettings = {
   minTurnout: 0.5, // 50%
 };
 
+const pluginAddress = "0x1234567890123456789012345678901234567890";
+
 const configAction = client.encoding.updatePluginSettingsAction(
+  pluginAddress,
   configActionPrarms,
 );
 
@@ -1580,7 +1586,11 @@ const configActionPrarms: IProposalSettings = {
   minSupport: 0.3, // 30%
   minTurnout: 0.5, // 50%
 };
+
+const pluginAddress = "0x1234567890123456789012345678901234567890";
+
 const configAction = client.encoding.updatePluginSettingsAction(
+  pluginAddress,
   configActionPrarms,
 );
 ```
@@ -1609,7 +1619,11 @@ const configActionPrarms: IProposalSettings = {
   minSupport: 0.3, // 30%
   minTurnout: 0.5, // 50%
 };
+
+const pluginAddress = "0x1234567890123456789012345678901234567890";
+
 const configAction = client.encoding.updatePluginSettingsAction(
+  pluginAddress,
   configActionPrarms,
 );
 ```
