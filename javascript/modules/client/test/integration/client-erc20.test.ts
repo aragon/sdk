@@ -376,12 +376,16 @@ describe("Client", () => {
         minTurnout: 0.5,
         minSupport: 0.5,
       };
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+
       const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(params);
+        .updatePluginSettingsAction(pluginAddress, params);
 
       expect(typeof updatePluginSettingsAction).toBe("object");
       // what does this should be
       expect(updatePluginSettingsAction.data).toBeInstanceOf(Uint8Array);
+      expect(updatePluginSettingsAction.to).toBe(pluginAddress);
     });
   });
 
@@ -394,8 +398,11 @@ describe("Client", () => {
         minTurnout: 0.5,
         minSupport: 0.5,
       };
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+
       const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(params);
+        .updatePluginSettingsAction(pluginAddress, params);
       const decodedParams: IPluginSettings = client.decoding
         .updatePluginSettingsAction(updatePluginSettingsAction.data);
 
@@ -426,8 +433,11 @@ describe("Client", () => {
         minTurnout: 0.5,
         minSupport: 0.5,
       };
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+
       const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(params);
+        .updatePluginSettingsAction(pluginAddress,params);
       const iface = client.decoding.findInterface(
         updatePluginSettingsAction.data,
       );
@@ -486,7 +496,7 @@ describe("Client", () => {
       const client = new ClientErc20(context);
 
       const pluginAddress: string =
-        "0x12345678901234567890º1234567890123456789012";
+        "0x123456789012345678901234567890123456789012";
       const proposals = await client.methods.getSettings(pluginAddress);
 
       expect(typeof proposals.minDuration).toBe("number");

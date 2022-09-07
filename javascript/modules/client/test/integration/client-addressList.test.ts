@@ -381,13 +381,17 @@ describe("Client", () => {
         minSupport: 0.51,
       };
 
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+
       const installPluginItemItem = client.encoding.updatePluginSettingsAction(
+        pluginAddress,
         pluginConfigParams,
       );
 
       expect(typeof installPluginItemItem).toBe("object");
       // what does this should be
       expect(installPluginItemItem.data).toBeInstanceOf(Uint8Array);
+      expect(installPluginItemItem.to).toBe(pluginAddress);
     });
   });
 
@@ -400,8 +404,11 @@ describe("Client", () => {
         minTurnout: 0.5,
         minSupport: 0.5,
       };
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+
       const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(params);
+        .updatePluginSettingsAction(pluginAddress, params);
       const decodedParams: IPluginSettings = client.decoding
         .updatePluginSettingsAction(updatePluginSettingsAction.data);
 
@@ -432,8 +439,11 @@ describe("Client", () => {
         minTurnout: 0.5,
         minSupport: 0.5,
       };
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+
       const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(params);
+        .updatePluginSettingsAction(pluginAddress, params);
       const iface = client.decoding.findInterface(
         updatePluginSettingsAction.data,
       );
