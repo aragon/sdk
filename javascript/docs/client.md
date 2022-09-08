@@ -48,11 +48,14 @@
     * [.getMembers()](#ClientAddressList.getMembers) ⇒ <code>\*</code>
     * [.getProposal(proposalId)](#ClientAddressList.getProposal) ⇒ <code>\*</code>
     * [.getProposals()](#ClientAddressList.getProposals) ⇒ <code>\*</code>
-    * [.updatePluginSettingsAction(params)](#ClientAddressList.updatePluginSettingsAction) ⇒ <code>\*</code>
+    * [.getSettings(pluginAddress)](#ClientAddressList.getSettings) ⇒ <code>\*</code>
+    * [.updatePluginSettingsAction(pluginAddress, params)](#ClientAddressList.updatePluginSettingsAction) ⇒ <code>\*</code>
+    * [.updatePluginSettingsAction(data)](#ClientAddressList.updatePluginSettingsAction) ⇒ <code>\*</code>
+    * [.findInterface(data)](#ClientAddressList.findInterface) ⇒ <code>\*</code>
     * [.createProposal(params)](#ClientAddressList.createProposal) ⇒ <code>\*</code>
     * [.voteProposal(params, vote)](#ClientAddressList.voteProposal) ⇒ <code>\*</code>
     * [.executeProposal(params)](#ClientAddressList.executeProposal) ⇒ <code>\*</code>
-    * [.updatePluginSettingsAction(params)](#ClientAddressList.updatePluginSettingsAction) ⇒ <code>\*</code>
+    * [.getPluginInstallItem(params)](#ClientAddressList.getPluginInstallItem) ⇒ <code>\*</code>
 
 <a name="ClientAddressList.createProposal"></a>
 
@@ -122,9 +125,21 @@
 | --- |
 | <code>IProposalQueryParams</code> | 
 
+<a name="ClientAddressList.getSettings"></a>
+
+### ClientAddressList.getSettings(pluginAddress) ⇒ <code>\*</code>
+<p>Returns the settings of a plugin given the address of the plugin instance</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{Promise<IPluginSettings>}</p>  
+
+| Param | Type |
+| --- | --- |
+| pluginAddress | <code>string</code> | 
+
 <a name="ClientAddressList.updatePluginSettingsAction"></a>
 
-### ClientAddressList.updatePluginSettingsAction(params) ⇒ <code>\*</code>
+### ClientAddressList.updatePluginSettingsAction(pluginAddress, params) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating a proposal that updates the governance configuration</p>
 
 **Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
@@ -132,7 +147,32 @@
 
 | Param | Type |
 | --- | --- |
+| pluginAddress | <code>string</code> | 
 | params | <code>IPluginSettings</code> | 
+
+<a name="ClientAddressList.updatePluginSettingsAction"></a>
+
+### ClientAddressList.updatePluginSettingsAction(data) ⇒ <code>\*</code>
+<p>Decodes a dao metadata from an encoded update metadata action</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{IPluginSettings}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="ClientAddressList.findInterface"></a>
+
+### ClientAddressList.findInterface(data) ⇒ <code>\*</code>
+<p>Returns the decoded function info given the encoded data of an action</p>
+
+**Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
+**Returns**: <code>\*</code> - <p>{IInterfaceParams | null}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
 
 <a name="ClientAddressList.createProposal"></a>
 
@@ -171,17 +211,18 @@
 | --- | --- |
 | params | <code>params</code> | 
 
-<a name="ClientAddressList.updatePluginSettingsAction"></a>
+<a name="ClientAddressList.getPluginInstallItem"></a>
 
-### ClientAddressList.updatePluginSettingsAction(params) ⇒ <code>\*</code>
-<p>Computes the parameters to be given when creating a proposal that updates the governance configuration</p>
+### ClientAddressList.getPluginInstallItem(params) ⇒ <code>\*</code>
+<p>Computes the parameters to be given when creating the DAO,
+so that the plugin is configured</p>
 
 **Kind**: static method of [<code>ClientAddressList</code>](#ClientAddressList)  
-**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+**Returns**: <code>\*</code> - <p>{FactoryInitParams}</p>  
 
 | Param | Type |
 | --- | --- |
-| params | <code>IPluginSettings</code> | 
+| params | <code>IErc20PluginInstall</code> | 
 
 <a name="ClientErc20"></a>
 
@@ -194,13 +235,16 @@
     * _instance_
         * [._createProposal()](#ClientErc20+_createProposal)
     * _static_
-        * [.getPluginInstallItem(params)](#ClientErc20.getPluginInstallItem) ⇒ <code>\*</code>
         * [.createProposal(params)](#ClientErc20.createProposal) ⇒ <code>\*</code>
         * [.voteProposal(params, vote)](#ClientErc20.voteProposal) ⇒ <code>\*</code>
         * [.executeProposal(params)](#ClientErc20.executeProposal) ⇒ <code>\*</code>
         * [.getMembers()](#ClientErc20.getMembers) ⇒ <code>\*</code>
         * [.getProposal(proposalId)](#ClientErc20.getProposal) ⇒ <code>\*</code>
         * [.getProposals(params)](#ClientErc20.getProposals) ⇒ <code>\*</code>
+        * [.getSettings(pluginAddress)](#ClientErc20.getSettings) ⇒ <code>\*</code>
+        * [.updatePluginSettingsAction(pluginAddress, params)](#ClientErc20.updatePluginSettingsAction) ⇒ <code>\*</code>
+        * [.updatePluginSettingsAction(data)](#ClientErc20.updatePluginSettingsAction) ⇒ <code>\*</code>
+        * [.findInterface(data)](#ClientErc20.findInterface) ⇒ <code>\*</code>
         * [.createProposal(params)](#ClientErc20.createProposal) ⇒ <code>\*</code>
         * [.voteProposal(params, vote)](#ClientErc20.voteProposal) ⇒ <code>\*</code>
         * [.executeProposal(params)](#ClientErc20.executeProposal) ⇒ <code>\*</code>
@@ -212,19 +256,6 @@
 <p>Contains all the generic high level methods to interact with a DAO</p>
 
 **Kind**: instance method of [<code>ClientErc20</code>](#ClientErc20)  
-<a name="ClientErc20.getPluginInstallItem"></a>
-
-### ClientErc20.getPluginInstallItem(params) ⇒ <code>\*</code>
-<p>Computes the parameters to be given when creating the DAO,
-so that the plugin is configured</p>
-
-**Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
-**Returns**: <code>\*</code> - <p>{FactoryInitParams}</p>  
-
-| Param | Type |
-| --- | --- |
-| params | <code>IErc20PluginInstall</code> | 
-
 <a name="ClientErc20.createProposal"></a>
 
 ### ClientErc20.createProposal(params) ⇒ <code>\*</code>
@@ -293,6 +324,55 @@ so that the plugin is configured</p>
 | --- | --- |
 | params | <code>IProposalQueryParams</code> | 
 
+<a name="ClientErc20.getSettings"></a>
+
+### ClientErc20.getSettings(pluginAddress) ⇒ <code>\*</code>
+<p>Returns the settings of a plugin given the address of the plugin instance</p>
+
+**Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
+**Returns**: <code>\*</code> - <p>{Promise<IPluginSettings>}</p>  
+
+| Param | Type |
+| --- | --- |
+| pluginAddress | <code>string</code> | 
+
+<a name="ClientErc20.updatePluginSettingsAction"></a>
+
+### ClientErc20.updatePluginSettingsAction(pluginAddress, params) ⇒ <code>\*</code>
+<p>Computes the parameters to be given when creating a proposal that updates the governance configuration</p>
+
+**Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param | Type |
+| --- | --- |
+| pluginAddress | <code>string</code> | 
+| params | <code>IPluginSettings</code> | 
+
+<a name="ClientErc20.updatePluginSettingsAction"></a>
+
+### ClientErc20.updatePluginSettingsAction(data) ⇒ <code>\*</code>
+<p>Decodes a dao metadata from an encoded update metadata action</p>
+
+**Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
+**Returns**: <code>\*</code> - <p>{IPluginSettings}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="ClientErc20.findInterface"></a>
+
+### ClientErc20.findInterface(data) ⇒ <code>\*</code>
+<p>Returns the decoded function info given the encoded data of an action</p>
+
+**Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
+**Returns**: <code>\*</code> - <p>{IInterfaceParams | null}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
 <a name="ClientErc20.createProposal"></a>
 
 ### ClientErc20.createProposal(params) ⇒ <code>\*</code>
@@ -359,6 +439,11 @@ so that the plugin is configured</p>
     * [.getDaos(params)](#Client.getDaos) ⇒ <code>\*</code>
     * [.hasPermission(where, who, role, data)](#Client.hasPermission) ⇒ <code>\*</code>
     * [.withdrawAction(daoAddresOrEns, params)](#Client.withdrawAction) ⇒ <code>\*</code>
+    * [.updateMetadataAction(daoAddresOrEns, params)](#Client.updateMetadataAction) ⇒ <code>\*</code>
+    * [.withdrawAction(data)](#Client.withdrawAction) ⇒ <code>\*</code>
+    * [.updateMetadataRawAction(data)](#Client.updateMetadataRawAction) ⇒ <code>\*</code>
+    * [.updateMetadataAction(data)](#Client.updateMetadataAction) ⇒ <code>\*</code>
+    * [.findInterface(data)](#Client.findInterface) ⇒ <code>\*</code>
     * [.create(params)](#Client.create) ⇒ <code>\*</code>
     * [.deposit(params)](#Client.deposit) ⇒ <code>\*</code>
 
@@ -461,6 +546,67 @@ so that the plugin is configured</p>
 | --- | --- |
 | daoAddresOrEns | <code>string</code> | 
 | params | <code>IWithdrawParams</code> | 
+
+<a name="Client.updateMetadataAction"></a>
+
+### Client.updateMetadataAction(daoAddresOrEns, params) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that updates the metadata the DAO</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<DaoAction>}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddresOrEns | <code>string</code> | 
+| params | <code>IMetadata</code> | 
+
+<a name="Client.withdrawAction"></a>
+
+### Client.withdrawAction(data) ⇒ <code>\*</code>
+<p>Decodes the withdraw parameters from an encoded withdraw action</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{IWithdrawParams}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="Client.updateMetadataRawAction"></a>
+
+### Client.updateMetadataRawAction(data) ⇒ <code>\*</code>
+<p>Decodes a dao metadata ipfs uri from an encoded update metadata action</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{string}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="Client.updateMetadataAction"></a>
+
+### Client.updateMetadataAction(data) ⇒ <code>\*</code>
+<p>Decodes a dao metadata from an encoded update metadata raw action</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<IMetadata>}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="Client.findInterface"></a>
+
+### Client.findInterface(data) ⇒ <code>\*</code>
+<p>Returns the decoded function info given the encoded data of an action</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{IInterfaceParams | null}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
 
 <a name="Client.create"></a>
 
