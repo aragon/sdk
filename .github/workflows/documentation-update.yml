@@ -62,7 +62,7 @@ jobs:
           committer: "Arabot <arabot-1@users.noreply.github.com>"
           branch: patch/sdks-docs
           delete-branch: true
-          title: Updates docs for smart contracts
+          title: Updates docs for sdk
           body: "Automated update by Github actions (Run: [${{ github.run_id }}](https://github.com/aragon/sdk/actions/runs/${{ github.run_id }}))"
           reviewers: ${{ github.actor }}
           team-reviewers: devrel
