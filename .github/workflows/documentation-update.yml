@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ARABOT_PAT }}
       - name: Install node
         uses: actions/setup-node@v1
         with:
@@ -44,7 +46,7 @@ jobs:
           git pull
           git config --global user.name "Arabot-1"
           git config --global user.email "arabot-1@users.noreply.github.com"
-          git add **/docs/**/*.*
+          git add javascript/docs/**/*.*
           git commit -am "Updates docs from commit $SHA_SHORT"
           git push
         env:
