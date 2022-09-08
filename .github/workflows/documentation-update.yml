@@ -31,7 +31,9 @@ jobs:
           path: builders-portal
           token: ${{ secrets.ARABOT_PAT }}
       - name: Copy docs (Javascript)
-        run: cp -R javascript/docs/* $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
+          cp -R javascript/docs/* $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
       - name: Get short commit hash
         id: hash
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
