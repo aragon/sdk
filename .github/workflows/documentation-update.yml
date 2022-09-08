@@ -39,16 +39,18 @@ jobs:
       - name: Get short commit hash
         id: hash
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-      - name: Commit updated docs
+      - name: Commit updated docsdddd
         id: commit
         run: |
           git fetch
           git pull
           git config --global user.name "Arabot-1"
           git config --global user.email "arabot-1@users.noreply.github.com"
-          git add javascript/docs/**/*.*
-          git commit -am "Updates docs from commit $SHA_SHORT"
-          git push
+          if [ $(git diff-index HEAD javascript/docs | wc -l) -gt 0 ]; then
+            git add -A javascript/docs/
+            git commit -am "Updates docs from commit $SHA_SHORT"
+            git push
+          fi
         env:
           SHA_SHORT: ${{ steps.hash.outputs.sha_short }}
       - name: Create Pull Request
