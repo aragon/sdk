@@ -25,17 +25,6 @@ jobs:
       - name: Generate Docs (Javascript)
         run: yarn run docs:client
         working-directory: javascript/
-      - name: Checkout builders-portal
-        uses: actions/checkout@v3
-        with:
-          repository: aragon/builders-portal
-          ref: staging
-          path: builders-portal
-          token: ${{ secrets.ARABOT_PAT }}
-      - name: Copy docs (Javascript)
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
-          cp -R javascript/docs/* $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
       - name: Get short commit hash
         id: hash
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
@@ -53,6 +42,17 @@ jobs:
           fi
         env:
           SHA_SHORT: ${{ steps.hash.outputs.sha_short }}
+      - name: Checkout builders-portal
+        uses: actions/checkout@v3
+        with:
+          repository: aragon/builders-portal
+          ref: staging
+          path: builders-portal
+          token: ${{ secrets.ARABOT_PAT }}
+      - name: Copy docs (Javascript)
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
+          cp -R javascript/docs/* $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
