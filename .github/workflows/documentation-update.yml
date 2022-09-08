@@ -39,7 +39,7 @@ jobs:
       - name: Get short commit hash
         id: hash
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-      - name: Commit updated docsdddd
+      - name: Commit updated docs
         id: commit
         run: |
           git fetch
