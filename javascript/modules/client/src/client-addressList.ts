@@ -229,13 +229,18 @@ export class ClientAddressList extends ClientCore
     }
 
     // TODO: Implement
-
+    const isTest = typeof process !== "undefined";
+    if (!isTest) {
+      await delay(1000);
+    }
     yield {
       key: ProposalCreationSteps.CREATING,
       txHash:
         "0x0123456789012345678901234567890123456789012345678901234567890123",
     };
-    await delay(3000);
+    if (!isTest) {
+      await delay(3000);
+    }
     yield {
       key: ProposalCreationSteps.DONE,
       proposalId:
@@ -254,13 +259,18 @@ export class ClientAddressList extends ClientCore
     }
 
     // TODO: Implement
-
+    const isTest = typeof process !== "undefined";
+    if (!isTest) {
+      await delay(1000);
+    }
     yield {
       key: VoteProposalStep.VOTING,
       txHash:
         "0x0123456789012345678901234567890123456789012345678901234567890123",
     };
-    await delay(3000);
+    if (!isTest) {
+      await delay(3000);
+    }
     yield {
       key: VoteProposalStep.DONE,
       voteId:
@@ -279,13 +289,18 @@ export class ClientAddressList extends ClientCore
     }
 
     // TODO: Implement
-
+    const isTest = typeof process !== "undefined";
+    if (!isTest) {
+      await delay(1000);
+    }
     yield {
       key: ExecuteProposalStep.EXECUTING,
       txHash:
         "0x0123456789012345678901234567890123456789012345678901234567890123",
     };
-    await delay(3000);
+    if (!isTest) {
+      await delay(3000);
+    }
     yield {
       key: ExecuteProposalStep.DONE,
     };

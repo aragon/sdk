@@ -301,13 +301,19 @@ export class Client extends ClientCore implements IClient {
     const registryAddress = await daoFactoryInstance.registry();
 
     // TODO: Remove mock result
-
+    const isTest = typeof process !== "undefined";
+    if (!isTest) {
+      await delay(1000);
+    }
     yield {
       key: DaoCreationSteps.CREATING,
       txHash:
         "0x1298376517236498176239851762938512359817623985761239486128937461",
     };
-    await delay(3000);
+
+    if (!isTest) {
+      await delay(3000);
+    }
     yield {
       key: DaoCreationSteps.DONE,
       address: "0x6592568247592378465987126349817263958713",

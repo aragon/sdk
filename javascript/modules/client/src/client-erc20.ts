@@ -240,13 +240,18 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
 
     // TODO: Remove below as the new contracts are ready
-
+    const isTest = typeof process !== "undefined";
+    if (!isTest) {
+      await delay(1000);
+    }
     yield {
       key: ProposalCreationSteps.CREATING,
       txHash:
         "0x0123456789012345678901234567890123456789012345678901234567890123",
     };
-    await delay(3000);
+    if (!isTest) {
+      await delay(3000);
+    }
     yield {
       key: ProposalCreationSteps.DONE,
       proposalId:
@@ -291,13 +296,18 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
 
     // TODO: Implement
-
+    const isTest = typeof process !== "undefined";
+    if (!isTest) {
+      await delay(1000);
+    }
     yield {
       key: VoteProposalStep.VOTING,
       txHash:
         "0x0123456789012345678901234567890123456789012345678901234567890123",
     };
-    await delay(3000);
+    if (!isTest) {
+      await delay(3000);
+    }
     yield {
       key: VoteProposalStep.DONE,
       voteId:
@@ -316,13 +326,18 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     }
 
     // TODO: Implement
-
+    const isTest = typeof process !== "undefined";
+    if (!isTest) {
+      await delay(1000);
+    }
     yield {
       key: ExecuteProposalStep.EXECUTING,
       txHash:
         "0x0123456789012345678901234567890123456789012345678901234567890123",
     };
-    await delay(3000);
+    if (!isTest) {
+      await delay(3000);
+    }
     yield {
       key: ExecuteProposalStep.DONE,
     };
@@ -334,7 +349,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     params: IPluginSettings,
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
-      throw new Error("Invalid plugin address")
+      throw new Error("Invalid plugin address");
     }
     // TODO: check if to and value are correct
     return {
