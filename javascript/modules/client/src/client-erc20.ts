@@ -500,17 +500,17 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       const { erc20VotingPackage } = await client.request(QueryToken, {
         address: pluginAddress,
       });
-      if (erc20VotingPackage !== null) {
-        return {
-          address: erc20VotingPackage.token.id,
-          decimals: parseInt(erc20VotingPackage.token.decimals),
-          name: erc20VotingPackage.token.name,
-          symbol: erc20VotingPackage.token.symbol,
-        };
+      if (!erc20VotingPackage){
+        return null
       }
-      return null;
+      return {
+        address: erc20VotingPackage.token.id,
+        decimals: parseInt(erc20VotingPackage.token.decimals),
+        name: erc20VotingPackage.token.name,
+        symbol: erc20VotingPackage.token.symbol,
+      };
     } catch (err) {
-      throw new Error("cannot fetch data from graphql");
+      throw new Error("Cannot fetch the token data from GraphQL");
     }
   }
 
