@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+- Delays between yields
 
 ## 0.4.3-alpha
 On 2022-09-07 14:47:58
