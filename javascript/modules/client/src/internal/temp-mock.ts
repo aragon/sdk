@@ -1,9 +1,21 @@
 import { Random } from "@aragon/sdk-common";
 import { DaoDetails, DaoListItem } from "./interfaces/client";
 import { ProposalStatus } from "./interfaces/common";
-import { Erc20Proposal, AddressListProposal, VoteValues, AddressListProposalListItem, Erc20ProposalListItem } from "./interfaces/plugins";
+import {
+  AddressListProposal,
+  AddressListProposalListItem,
+  Erc20Proposal,
+  Erc20ProposalListItem,
+  VoteValues,
+} from "./interfaces/plugins";
 
-export function getDummyAddressListProposal(proposalId?: string): AddressListProposal {
+export const delay = (delayInms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, delayInms));
+};
+
+export function getDummyAddressListProposal(
+  proposalId?: string,
+): AddressListProposal {
   const dummyDaoNames = [
     "Patito Dao",
     "One World Dao",
@@ -22,26 +34,29 @@ export function getDummyAddressListProposal(proposalId?: string): AddressListPro
     "Yet another proposal...",
     "Donation so some DAO",
     "Buy more NFTs?",
-  ]
-  const yes = Math.floor(Random.getFloat() * 1001)
-  const no = Math.floor(Random.getFloat() * 1001)
-  const abstain = Math.floor(Random.getFloat() * 1001)
-  const index = Math.floor(Random.getFloat() * dummyDaoNames.length)
-  let address = Random.getFloat() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
+  ];
+  const yes = Math.floor(Random.getFloat() * 1001);
+  const no = Math.floor(Random.getFloat() * 1001);
+  const abstain = Math.floor(Random.getFloat() * 1001);
+  const index = Math.floor(Random.getFloat() * dummyDaoNames.length);
+  let address = Random.getFloat() < 0.5
+    ? "0x1234567890123456789012345678901234567890"
+    : dummyDaoEns[index];
 
   const dateWithinThisYear = new Date(
-    new Date().setFullYear(new Date().getFullYear() - 1)
+    new Date().setFullYear(new Date().getFullYear() - 1),
   ).getTime();
 
   const startDate = new Date(
-    dateWithinThisYear + Random.getFloat() * (Date.now() - dateWithinThisYear)
+    dateWithinThisYear + Random.getFloat() * (Date.now() - dateWithinThisYear),
   );
-  const voteId = Math.floor(Random.getFloat() * 101).toString(16)
+  const voteId = Math.floor(Random.getFloat() * 101).toString(16);
   return {
-    id: proposalId ?? ("0x1234567890123456789012345678901234567890" + '_0x' + voteId),
+    id: proposalId ??
+      ("0x1234567890123456789012345678901234567890" + "_0x" + voteId),
     dao: {
       address,
-      name: dummyDaoNames[index]
+      name: dummyDaoNames[index],
     },
     creatorAddress: "0x1234567890123456789012345678901234567890",
     startDate,
@@ -54,9 +69,9 @@ export function getDummyAddressListProposal(proposalId?: string): AddressListPro
       description: "This is the super important proposal body",
       resources: [{ url: "https://example.com", name: "Example" }],
       media: {
-        logo: 'https://example.com/logo.jpeg',
-        header: 'https://example.com/header.jpeg'
-      }
+        logo: "https://example.com/logo.jpeg",
+        header: "https://example.com/header.jpeg",
+      },
     },
     status: ProposalStatus.ACTIVE,
     result: {
@@ -67,7 +82,7 @@ export function getDummyAddressListProposal(proposalId?: string): AddressListPro
     settings: {
       duration: Math.floor((Random.getFloat() * 5001) + 5000),
       minSupport: Random.getFloat(),
-      minTurnout: Random.getFloat()
+      minTurnout: Random.getFloat(),
     },
     votes: [
       {
@@ -83,10 +98,12 @@ export function getDummyAddressListProposal(proposalId?: string): AddressListPro
         vote: VoteValues.ABSTAIN,
       },
     ],
-    actions: []
-  }
+    actions: [],
+  };
 }
-export function getDummyAddressListProposalListItem(proposalId?: string): AddressListProposalListItem {
+export function getDummyAddressListProposalListItem(
+  proposalId?: string,
+): AddressListProposalListItem {
   const dummyDaoNames = [
     "Patito Dao",
     "One World Dao",
@@ -105,26 +122,29 @@ export function getDummyAddressListProposalListItem(proposalId?: string): Addres
     "Yet another proposal...",
     "Donation so some DAO",
     "Buy more NFTs?",
-  ]
-  const yes = Math.floor(Random.getFloat() * 1001)
-  const no = Math.floor(Random.getFloat() * 1001)
-  const abstain = Math.floor(Random.getFloat() * 1001)
-  const index = Math.floor(Random.getFloat() * dummyDaoNames.length)
-  let address = Random.getFloat() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
+  ];
+  const yes = Math.floor(Random.getFloat() * 1001);
+  const no = Math.floor(Random.getFloat() * 1001);
+  const abstain = Math.floor(Random.getFloat() * 1001);
+  const index = Math.floor(Random.getFloat() * dummyDaoNames.length);
+  let address = Random.getFloat() < 0.5
+    ? "0x1234567890123456789012345678901234567890"
+    : dummyDaoEns[index];
 
   const dateWithinThisYear = new Date(
-    new Date().setFullYear(new Date().getFullYear() - 1)
+    new Date().setFullYear(new Date().getFullYear() - 1),
   ).getTime();
 
   const startDate = new Date(
-    dateWithinThisYear + Random.getFloat() * (Date.now() - dateWithinThisYear)
+    dateWithinThisYear + Random.getFloat() * (Date.now() - dateWithinThisYear),
   );
-  const voteId = Math.floor(Random.getFloat() * 101).toString(16)
+  const voteId = Math.floor(Random.getFloat() * 101).toString(16);
   return {
-    id: proposalId ?? ("0x1234567890123456789012345678901234567890" + '_0x' + voteId),
+    id: proposalId ??
+      ("0x1234567890123456789012345678901234567890" + "_0x" + voteId),
     dao: {
       address,
-      name: dummyDaoNames[index]
+      name: dummyDaoNames[index],
     },
     creatorAddress: "0x1234567890123456789012345678901234567890",
     startDate,
@@ -140,7 +160,7 @@ export function getDummyAddressListProposalListItem(proposalId?: string): Addres
       no,
       abstain,
     },
-  }
+  };
 }
 
 export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
@@ -162,26 +182,29 @@ export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
     "Yet another proposal...",
     "Donation so some DAO",
     "Buy more NFTs?",
-  ]
-  const yes = Math.floor(Random.getFloat() * 1001)
-  const no = Math.floor(Random.getFloat() * 1001)
-  const abstain = Math.floor(Random.getFloat() * 1001)
-  const index = Math.floor(Random.getFloat() * dummyDaoNames.length)
-  let address = Random.getFloat() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
+  ];
+  const yes = Math.floor(Random.getFloat() * 1001);
+  const no = Math.floor(Random.getFloat() * 1001);
+  const abstain = Math.floor(Random.getFloat() * 1001);
+  const index = Math.floor(Random.getFloat() * dummyDaoNames.length);
+  let address = Random.getFloat() < 0.5
+    ? "0x1234567890123456789012345678901234567890"
+    : dummyDaoEns[index];
 
   const dateWithinThisYear = new Date(
-    new Date().setFullYear(new Date().getFullYear() - 1)
+    new Date().setFullYear(new Date().getFullYear() - 1),
   ).getTime();
 
   const startDate = new Date(
-    dateWithinThisYear + Random.getFloat() * (Date.now() - dateWithinThisYear)
+    dateWithinThisYear + Random.getFloat() * (Date.now() - dateWithinThisYear),
   );
-  const voteId = Math.floor(Random.getFloat() * 101).toString(16)
+  const voteId = Math.floor(Random.getFloat() * 101).toString(16);
   return {
-    id: proposalId ?? ("0x1234567890123456789012345678901234567890" + '_0x' + voteId),
+    id: proposalId ??
+      ("0x1234567890123456789012345678901234567890" + "_0x" + voteId),
     dao: {
       address,
-      name: dummyDaoNames[index]
+      name: dummyDaoNames[index],
     },
     creatorAddress: "0x1234567890123456789012345678901234567890",
     startDate,
@@ -194,9 +217,9 @@ export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
       description: "This is the super important proposal body",
       resources: [{ url: "https://example.com", name: "Example" }],
       media: {
-        logo: 'https://example.com/logo.jpeg',
-        header: 'https://example.com/header.jpeg'
-      }
+        logo: "https://example.com/logo.jpeg",
+        header: "https://example.com/header.jpeg",
+      },
     },
     status: ProposalStatus.ACTIVE,
     result: {
@@ -207,36 +230,38 @@ export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
     settings: {
       duration: Math.floor((Random.getFloat() * 5001) + 5000),
       minSupport: Random.getFloat(),
-      minTurnout: Random.getFloat()
+      minTurnout: Random.getFloat(),
     },
     votes: [
       {
         address: "0x1234567890123456789012345678901234567890",
         vote: VoteValues.YES,
-        weight: BigInt(yes)
+        weight: BigInt(yes),
       },
       {
         address: "0x2345678901234567890123456789012345678901",
         vote: VoteValues.NO,
-        weight: BigInt(no)
+        weight: BigInt(no),
       },
       {
         address: "0x3456789012345678901234567890123456789012",
         vote: VoteValues.ABSTAIN,
-        weight: BigInt(abstain)
-      }
+        weight: BigInt(abstain),
+      },
     ],
     token: {
-      name: 'The Token',
-      address: '0x1234567890123456789012345678901234567890',
-      symbol: 'TOK',
-      decimals: 18
+      name: "The Token",
+      address: "0x1234567890123456789012345678901234567890",
+      symbol: "TOK",
+      decimals: 18,
     },
     usedVotingWeight: BigInt(yes + no + abstain),
-    actions: []
-  }
+    actions: [],
+  };
 }
-export function getDummyErc20ProposalListItem(proposalId?: string): Erc20ProposalListItem {
+export function getDummyErc20ProposalListItem(
+  proposalId?: string,
+): Erc20ProposalListItem {
   const dummyDaoNames = [
     "Patito Dao",
     "One World Dao",
@@ -255,26 +280,29 @@ export function getDummyErc20ProposalListItem(proposalId?: string): Erc20Proposa
     "Yet another proposal...",
     "Donation so some DAO",
     "Buy more NFTs?",
-  ]
-  const yes = Math.floor(Random.getFloat() * 1001)
-  const no = Math.floor(Random.getFloat() * 1001)
-  const abstain = Math.floor(Random.getFloat() * 1001)
-  const index = Math.floor(Random.getFloat() * dummyDaoNames.length)
-  let address = Random.getFloat() < 0.5 ? "0x1234567890123456789012345678901234567890" : dummyDaoEns[index]
+  ];
+  const yes = Math.floor(Random.getFloat() * 1001);
+  const no = Math.floor(Random.getFloat() * 1001);
+  const abstain = Math.floor(Random.getFloat() * 1001);
+  const index = Math.floor(Random.getFloat() * dummyDaoNames.length);
+  let address = Random.getFloat() < 0.5
+    ? "0x1234567890123456789012345678901234567890"
+    : dummyDaoEns[index];
 
   const dateWithinThisYear = new Date(
-    new Date().setFullYear(new Date().getFullYear() - 1)
+    new Date().setFullYear(new Date().getFullYear() - 1),
   ).getTime();
 
   const startDate = new Date(
-    dateWithinThisYear + Random.getFloat() * (Date.now() - dateWithinThisYear)
+    dateWithinThisYear + Random.getFloat() * (Date.now() - dateWithinThisYear),
   );
-  const voteId = Math.floor(Random.getFloat() * 101).toString(16)
+  const voteId = Math.floor(Random.getFloat() * 101).toString(16);
   return {
-    id: proposalId ?? ("0x1234567890123456789012345678901234567890" + '_0x' + voteId),
+    id: proposalId ??
+      ("0x1234567890123456789012345678901234567890" + "_0x" + voteId),
     dao: {
       address,
-      name: dummyDaoNames[index]
+      name: dummyDaoNames[index],
     },
     creatorAddress: "0x1234567890123456789012345678901234567890",
     startDate,
@@ -291,12 +319,12 @@ export function getDummyErc20ProposalListItem(proposalId?: string): Erc20Proposa
       abstain: BigInt(abstain),
     },
     token: {
-      name: 'The Token',
-      address: '0x1234567890123456789012345678901234567890',
-      symbol: 'TOK',
-      decimals: 18
+      name: "The Token",
+      address: "0x1234567890123456789012345678901234567890",
+      symbol: "TOK",
+      decimals: 18,
     },
-  }
+  };
 }
 
 export function getDummyDao(address?: string): DaoDetails {
@@ -312,7 +340,7 @@ export function getDummyDao(address?: string): DaoDetails {
     "spartadao.dao.eth",
     "yggdrasil.dao.eth",
   ];
-  const daoIndex = Math.floor(Random.getFloat() * dummyDaoNames.length)
+  const daoIndex = Math.floor(Random.getFloat() * dummyDaoNames.length);
 
   const fromDate = new Date(
     new Date().setFullYear(new Date().getFullYear() - 1),
@@ -323,7 +351,8 @@ export function getDummyDao(address?: string): DaoDetails {
     ensDomain: dummyDaoEns[daoIndex],
     metadata: {
       name: dummyDaoNames[daoIndex],
-      description: `We are a community that loves trees and the planet. We track where forestation is increasing (or shrinking), fund people who are growing and protecting trees...`,
+      description:
+        `We are a community that loves trees and the planet. We track where forestation is increasing (or shrinking), fund people who are growing and protecting trees...`,
       avatar: "",
       links: [
         {
@@ -334,22 +363,24 @@ export function getDummyDao(address?: string): DaoDetails {
           name: "Discord",
           url: "https://google.com",
         },
-      ]
+      ],
     },
-    creationDate: new Date(fromDate + Random.getFloat() * (Date.now() - fromDate)),
+    creationDate: new Date(
+      fromDate + Random.getFloat() * (Date.now() - fromDate),
+    ),
     plugins: [
       {
-        id: 'addresslistvoting.dao.eth',
+        id: "addresslistvoting.dao.eth",
         instanceAddress: "0x1234567890123456789012345678901234567890",
-        version: "1.0.0"
+        version: "1.0.0",
       },
       {
-        id: 'erc20voting.dao.eth',
+        id: "erc20voting.dao.eth",
         instanceAddress: "0x1234567890123456789012345678901234567890",
-        version: "1.0.0"
-      }
-    ]
-  }
+        version: "1.0.0",
+      },
+    ],
+  };
 }
 export function getDummyDaoListItem(address?: string): DaoListItem {
   const dummyDaoNames = [
@@ -364,7 +395,7 @@ export function getDummyDaoListItem(address?: string): DaoListItem {
     "spartadao.dao.eth",
     "yggdrasil.dao.eth",
   ];
-  const daoIndex = Math.floor(Random.getFloat() * dummyDaoNames.length)
+  const daoIndex = Math.floor(Random.getFloat() * dummyDaoNames.length);
 
   return {
     address: address ?? "0x1234567890123456789012345678901234567890",
@@ -375,15 +406,15 @@ export function getDummyDaoListItem(address?: string): DaoListItem {
     },
     plugins: [
       {
-        id: 'addresslistvoting.dao.eth',
+        id: "addresslistvoting.dao.eth",
         instanceAddress: "0x1234567890123456789012345678901234567890",
-        version: "1.0.0"
+        version: "1.0.0",
       },
       {
-        id: 'erc20voting.dao.eth',
+        id: "erc20voting.dao.eth",
         instanceAddress: "0x1234567890123456789012345678901234567890",
-        version: "1.0.0"
-      }
-    ]
-  }
+        version: "1.0.0",
+      },
+    ],
+  };
 }

@@ -45,7 +45,7 @@ import {
   encodeWithdrawActionData,
   getFunctionFragment,
 } from "./internal/encoding/client";
-import { getDummyDao } from "./internal/temp-mock";
+import { delay, getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
 
 export { DaoCreationSteps, DaoDepositSteps };
@@ -301,11 +301,13 @@ export class Client extends ClientCore implements IClient {
     const registryAddress = await daoFactoryInstance.registry();
 
     // TODO: Remove mock result
+
     yield {
       key: DaoCreationSteps.CREATING,
       txHash:
         "0x1298376517236498176239851762938512359817623985761239486128937461",
     };
+    await delay(3000);
     yield {
       key: DaoCreationSteps.DONE,
       address: "0x6592568247592378465987126349817263958713",
