@@ -19,6 +19,7 @@ TEMPLATE:
 ## [UPCOMING]
 ### Added
 - Delays between yields
+- Add getToken function to the erc20-client
 
 ## 0.4.3-alpha
 On 2022-09-07 14:47:58
