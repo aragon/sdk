@@ -242,6 +242,7 @@ so that the plugin is configured</p>
         * [.getProposal(proposalId)](#ClientErc20.getProposal) ⇒ <code>\*</code>
         * [.getProposals(params)](#ClientErc20.getProposals) ⇒ <code>\*</code>
         * [.getSettings(pluginAddress)](#ClientErc20.getSettings) ⇒ <code>\*</code>
+        * [.getToken(pluginAddress)](#ClientErc20.getToken) ⇒ <code>\*</code>
         * [.updatePluginSettingsAction(pluginAddress, params)](#ClientErc20.updatePluginSettingsAction) ⇒ <code>\*</code>
         * [.updatePluginSettingsAction(data)](#ClientErc20.updatePluginSettingsAction) ⇒ <code>\*</code>
         * [.findInterface(data)](#ClientErc20.findInterface) ⇒ <code>\*</code>
@@ -331,6 +332,18 @@ so that the plugin is configured</p>
 
 **Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
 **Returns**: <code>\*</code> - <p>{Promise<IPluginSettings>}</p>  
+
+| Param | Type |
+| --- | --- |
+| pluginAddress | <code>string</code> | 
+
+<a name="ClientErc20.getToken"></a>
+
+### ClientErc20.getToken(pluginAddress) ⇒ <code>\*</code>
+<p>Returns the details of the token used in a specific plugin instance</p>
+
+**Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
+**Returns**: <code>\*</code> - <p>{Promise&lt;Erc20TokenDetails | null&gt;}</p>  
 
 | Param | Type |
 | --- | --- |
