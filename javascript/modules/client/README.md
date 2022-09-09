@@ -587,7 +587,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientErc20(contextPlugin);
 
 const proposalParams: ICreateProposalParams = {
-  pluginAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -667,7 +667,7 @@ const configAction = client.encoding.updatePluginSettingsAction(
 );
 
 const proposalParams: ICreateProposalParams = {
-  pluginAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -731,7 +731,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientErc20(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  pluginAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890",
   vote: VoteValues.YES,
 };
@@ -987,7 +987,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an ERC20 client
 const client = new ClientErc20(contextPlugin);
 
-const pluginAddress: string = "0x123456789012345678901234567890123456789012";
+const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
 const settings: IPluginSettings = await client.methods.getSettings(
   pluginAddress,
@@ -998,6 +998,39 @@ console.log(settings);
     minDuration: 7200,
     minTurnout: 0.55,
     minSupport: 0.25
+  }
+*/
+```
+
+### Loading a plugin's token details
+
+```ts
+import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
+  erc20TokenDetails,
+} from "@aragon/sdk-client";
+
+// Create a simple context
+const context: Context = new Context(params);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an ERC20 client
+const client = new ClientErc20(contextPlugin);
+
+const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+
+const token: Erc20TokenDetails = await client.methods.getToken(
+  pluginAddress,
+);
+console.log(token);
+/*
+  {
+    address: "0x123456789000987654323112345678900987654321",
+    name: "Token",
+    decimals: 18,
+    symbol: "TOK"
   }
 */
 ```
@@ -1111,7 +1144,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientAddressList(contextPlugin);
 
 const proposalParams: ICreateProposalParams = {
-  pluginAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -1191,7 +1224,7 @@ const configAction = client.encoding.updatePluginSettingsAction(
 );
 
 const proposalParams: ICreateProposalParams = {
-  pluginAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
     summary: "This is a short description",
@@ -1255,7 +1288,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientAddressList(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  pluginAddress: "0x123456789012345678901234567890123456789012",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890",
   vote: VoteValues.YES,
 };
@@ -1485,7 +1518,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an addres list client
 const client = new ClientAddressList(contextPlugin);
 
-const pluginAddress: string = "0x123456789012345678901234567890123456789012";
+const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
 const settings: IPluginSettings = await client.methods.getSettings(
   pluginAddress,

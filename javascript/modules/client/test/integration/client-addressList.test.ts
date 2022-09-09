@@ -166,7 +166,7 @@ describe("Client", () => {
       const client = new ClientAddressList(context);
 
       const proposalParams: ICreateProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         metadata: {
           title: "Best Proposal",
           summary: "this is the sumnary",
@@ -211,7 +211,7 @@ describe("Client", () => {
       );
 
       const proposalParams: ICreateProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         metadata: {
           title: "Best Proposal",
           summary: "this is the sumnary",
@@ -260,7 +260,7 @@ describe("Client", () => {
       const client = new ClientAddressList(context);
 
       const voteParams: IVoteProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId: "0x1234567890123456789012345678901234567890",
         vote: VoteValues.YES,
       };
@@ -279,7 +279,7 @@ describe("Client", () => {
       const client = new ClientAddressList(context);
 
       const voteParams: IVoteProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId: "0x1234567890123456789012345678901234567890",
         vote: VoteValues.YES,
       };
@@ -309,7 +309,7 @@ describe("Client", () => {
       const client = new ClientAddressList(context);
 
       const executeParams: IExecuteProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId: "0x1234567890123456789012345678901234567890",
       };
       const estimation = await client.estimation.executeProposal(executeParams);
@@ -326,7 +326,7 @@ describe("Client", () => {
       const client = new ClientAddressList(context);
 
       const executeParams: IExecuteProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId: "0x1234567890123456789012345678901234567890",
       };
       for await (const step of client.methods.executeProposal(executeParams)) {

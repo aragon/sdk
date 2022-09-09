@@ -167,7 +167,7 @@ describe("Client", () => {
       const client = new ClientErc20(context);
 
       const proposalParams: ICreateProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         metadata: {
           title: "Best Proposal",
           summary: "this is the sumnary",
@@ -212,7 +212,7 @@ describe("Client", () => {
       );
 
       const proposalParams: ICreateProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         metadata: {
           title: "Best Proposal",
           summary: "this is the sumnary",
@@ -261,7 +261,7 @@ describe("Client", () => {
       const client = new ClientErc20(context);
 
       const voteParams: IVoteProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId: "0x1234567890123456789012345678901234567890",
         vote: VoteValues.YES,
       };
@@ -279,7 +279,7 @@ describe("Client", () => {
       const client = new ClientErc20(context);
 
       const voteParams: IVoteProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId: "0x1234567890123456789012345678901234567890",
         vote: VoteValues.YES,
       };
@@ -309,7 +309,7 @@ describe("Client", () => {
       const client = new ClientErc20(context);
 
       const executeParams: IExecuteProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId: "0x1234567890123456789012345678901234567890",
       };
       const estimation = await client.estimation.executeProposal(executeParams);
@@ -326,7 +326,7 @@ describe("Client", () => {
       const client = new ClientErc20(context);
 
       const executeParams: IExecuteProposalParams = {
-        pluginAddress: "0x123456789012345678901234567890123456789012",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId: "0x1234567890123456789012345678901234567890",
       };
 
@@ -519,6 +519,27 @@ describe("Client", () => {
       expect(typeof proposals.minDuration).toBe("number");
       expect(typeof proposals.minSupport).toBe("number");
       expect(typeof proposals.minTurnout).toBe("number");
+    });
+    it("Should get the token details of a plugin given a plugin instance address", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+
+      const pluginAddress: string =
+        "0x12470f7e1b075efbbed95b85c0858aea1257566d";
+      const token = await client.methods.getToken(pluginAddress);
+      expect(typeof token?.address).toBe("string");
+      expect(typeof token?.decimals).toBe("number");
+      expect(typeof token?.symbol).toBe("string");
+      expect(typeof token?.name).toBe("string");
+    });
+    it("Should return null token details for nonexistent plugin addresses", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+
+      const pluginAddress: string =
+        "0x1234567890123456789012345678901234567890";
+      const token = await client.methods.getToken(pluginAddress);
+      expect(token).toBe(null);
     });
   });
 });

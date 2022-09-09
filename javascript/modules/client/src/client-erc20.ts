@@ -1,6 +1,7 @@
 import {
   Erc20Proposal,
   Erc20ProposalListItem,
+  Erc20TokenDetails,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   IClientErc20,
@@ -40,6 +41,7 @@ import {
   getDummyErc20ProposalListItem,
 } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
+import { QueryToken } from "./internal/graphql-queries/token";
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
@@ -133,6 +135,15 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      */
     getSettings: (pluginAddress: string): Promise<IPluginSettings> =>
       this._getSettings(pluginAddress),
+    /**
+     * Returns the details of the token used in a specific plugin instance
+     *
+     * @param {string} pluginAddress
+     * @return {*}  {Promise<Erc20TokenDetails | null>}
+     * @memberof ClientErc20
+     */
+    getToken: (pluginAddress: string): Promise<Erc20TokenDetails | null> =>
+      this._getToken(pluginAddress),
   };
 
   //// ACTION BUILDERS
@@ -478,6 +489,29 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(
       () => (pluginSettings),
     );
+  }
+
+  private async _getToken(
+    pluginAddress: string,
+  ): Promise<Erc20TokenDetails | null> {
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { erc20VotingPackage } = await client.request(QueryToken, {
+        address: pluginAddress,
+      });
+      if (!erc20VotingPackage){
+        return null
+      }
+      return {
+        address: erc20VotingPackage.token.id,
+        decimals: parseInt(erc20VotingPackage.token.decimals),
+        name: erc20VotingPackage.token.name,
+        symbol: erc20VotingPackage.token.symbol,
+      };
+    } catch (err) {
+      throw new Error("Cannot fetch the token data from GraphQL");
+    }
   }
 
   private _findInterfaceParams(data: Uint8Array): IInterfaceParams | null {

@@ -30,6 +30,7 @@ export interface IClientErc20 extends IClientCore {
       params?: IProposalQueryParams,
     ) => Promise<Erc20ProposalListItem[]>;
     getSettings: (pluginAddress: string) => Promise<IPluginSettings>;
+    getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
@@ -299,7 +300,7 @@ export type AddressListProposalResult = {
   abstain: number;
 };
 
-type Erc20TokenDetails = {
+export type Erc20TokenDetails = {
   address: string;
   name: string;
   symbol: string;
