@@ -12,7 +12,9 @@ import {
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
+  IFreezeParams,
   IMetadata,
+  IPermissionParams,
   IWithdrawParams,
 } from "./internal/interfaces/client";
 import {
@@ -39,14 +41,21 @@ import { bytesToHex, Random, strip0x } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
 import {
+  decodeFreezeActionData,
+  decodeGrantActionData,
+  decodeRevokeActionData,
   decodeUpdateMetadataAction,
   decodeWithdrawActionData,
+  encodeFreezeAction,
+  encodeGrantActionData,
+  encodeRevokeActionData,
   encodeUpdateMetadataAction,
   encodeWithdrawActionData,
   getFunctionFragment,
 } from "./internal/encoding/client";
 import { delay, getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
+import { resolveEns } from "./internal/utils/common";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -180,6 +189,33 @@ export class Client extends ClientCore implements IClient {
 
   encoding = {
     /**
+     * Computes the payload to be given when creating a proposal that grants a permission in a dao
+     *
+     * @param {IPermissionParams} params
+     * @return {*}  {Promise<DaoAction>}
+     * @memberof Client
+     */
+    grantAction: (params: IPermissionParams): Promise<DaoAction> =>
+      this._buildGrantAction(params),
+    /**
+     * Computes the payload to be given when creating a proposal that revokes a permission in a dao
+     *
+     * @param {IPermissionParams} params
+     * @return {*}  {Promise<DaoAction>}
+     * @memberof Client
+     */
+    revokeAction: (params: IPermissionParams): Promise<DaoAction> =>
+      this._buildRevokeAction(params),
+    /**
+     * Computes the payload to be given when creating a proposal that freezes a permission in a dao
+     *
+     * @param {IFreezeParams} params
+     * @return {*}  {Promise<DaoAction>}
+     * @memberof Client
+     */
+    freezeAction: (params: IFreezeParams): Promise<DaoAction> =>
+      this._buildFreezeAction(params),
+    /**
      * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
      *
      * @param {string} daoAddresOrEns
@@ -208,6 +244,33 @@ export class Client extends ClientCore implements IClient {
   };
 
   decoding = {
+    /**
+     * Decodes the permission parameters from an encoded grant action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IPermissionParams}
+     * @memberof Client
+     */
+    grantAction: (data: Uint8Array): IPermissionParams =>
+      decodeGrantActionData(data),
+    /**
+     * Decodes the permission parameters from an encoded revoke action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IPermissionParams}
+     * @memberof Client
+     */
+    revokeAction: (data: Uint8Array): IPermissionParams =>
+      decodeRevokeActionData(data),
+    /**
+     * Decodes the freezee parameters from an encoded freeze action
+     *
+     * @param {Uint8Array} data
+     * @return {*}  {IFreezeParams}
+     * @memberof Client
+     */
+    freezeAction: (data: Uint8Array): IFreezeParams =>
+      decodeFreezeActionData(data),
     /**
      * Decodes the withdraw parameters from an encoded withdraw action
      *
@@ -628,6 +691,88 @@ export class Client extends ClientCore implements IClient {
     const withdrawals: AssetWithdrawal[] = [];
 
     return Promise.resolve({ deposits, withdrawals });
+  }
+
+  private async _buildGrantAction(
+    params: IPermissionParams,
+  ): Promise<DaoAction> {
+    let where = params.where;
+    let who = params.who;
+    const signer = this.web3.getSigner();
+    if (!signer) {
+      throw new Error("A signer is needed");
+    }
+    if (!isAddress(params.where)) {
+      where = await resolveEns(signer, params.where);
+    }
+
+    if (!isAddress(params.where)) {
+      who = await resolveEns(signer, params.who);
+    }
+    return {
+      to: where,
+      value: BigInt(0),
+      data: encodeGrantActionData(
+        {
+          who,
+          where,
+          permission: params.permission,
+        },
+      ),
+    };
+  }
+
+  private async _buildRevokeAction(
+    params: IPermissionParams,
+  ): Promise<DaoAction> {
+    let where = params.where;
+    let who = params.who;
+    const signer = this.web3.getSigner();
+    if (!signer) {
+      throw new Error("A signer is needed");
+    }
+    if (!isAddress(params.where)) {
+      where = await resolveEns(signer, params.where);
+    }
+
+    if (!isAddress(params.where)) {
+      who = await resolveEns(signer, params.who);
+    }
+    return {
+      to: where,
+      value: BigInt(0),
+      data: encodeRevokeActionData(
+        {
+          who,
+          where,
+          permission: params.permission,
+        },
+      ),
+    };
+  }
+
+  private async _buildFreezeAction(
+    params: IFreezeParams,
+  ): Promise<DaoAction> {
+    let where = params.where;
+    const signer = this.web3.getSigner();
+    if (!signer) {
+      throw new Error("A signer is needed");
+    }
+    if (!isAddress(params.where)) {
+      where = await resolveEns(signer, params.where);
+    }
+
+    return {
+      to: where,
+      value: BigInt(0),
+      data: encodeFreezeAction(
+        {
+          where,
+          permission: params.permission,
+        },
+      ),
+    };
   }
 
   private async _buildWithdrawAction(
