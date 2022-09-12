@@ -9,10 +9,6 @@ import {
   IPagination,
   IPluginInstallItem,
 } from "./common";
-
-import { toUtf8Bytes } from "@ethersproject/strings";
-import { keccak256 } from "@ethersproject/keccak256";
-
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
   methods: {
