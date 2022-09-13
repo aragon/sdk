@@ -5,6 +5,7 @@ import { AddressZero } from "@ethersproject/constants";
 import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import {
+  DaoPermission,
   DaoPermissions,
   IFreezeParams,
   IPermissionParams,
@@ -55,7 +56,7 @@ function wrapFreezeParams(
 ): IFreezeParams {
   return {
     where: result[0],
-    permission: result[1] as DaoPermissions,
+    permission: result[1] as DaoPermission,
   };
 }
 
