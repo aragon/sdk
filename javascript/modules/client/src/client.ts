@@ -189,7 +189,7 @@ export class Client extends ClientCore implements IClient {
 
   encoding = {
     /**
-     * Computes the payload to be given when creating a proposal that grants a permission in a dao
+     * Computes the payload to be given when creating a proposal that grants a permission within a DAO
      *
      * @param {IPermissionParams} params
      * @return {*}  {Promise<DaoAction>}
@@ -198,7 +198,7 @@ export class Client extends ClientCore implements IClient {
     grantAction: (params: IPermissionParams): Promise<DaoAction> =>
       this._buildGrantAction(params),
     /**
-     * Computes the payload to be given when creating a proposal that revokes a permission in a dao
+     * Computes the payload to be given when creating a proposal that revokes a permission within a DAO
      *
      * @param {IPermissionParams} params
      * @return {*}  {Promise<DaoAction>}
@@ -207,7 +207,7 @@ export class Client extends ClientCore implements IClient {
     revokeAction: (params: IPermissionParams): Promise<DaoAction> =>
       this._buildRevokeAction(params),
     /**
-     * Computes the payload to be given when creating a proposal that freezes a permission in a dao
+     * Computes the payload to be given when creating a proposal that freezes a permission within a DAO
      *
      * @param {IFreezeParams} params
      * @return {*}  {Promise<DaoAction>}
@@ -696,18 +696,17 @@ export class Client extends ClientCore implements IClient {
   private async _buildGrantAction(
     params: IPermissionParams,
   ): Promise<DaoAction> {
-    let where = params.where;
-    let who = params.who;
     const signer = this.web3.getSigner();
     if (!signer) {
       throw new Error("A signer is needed");
     }
-    if (!isAddress(params.where)) {
-      where = await resolveEns(signer, params.where);
+    let { where, who } = params;
+    if (!isAddress(where)) {
+      throw new Error("Invalid address");
     }
 
-    if (!isAddress(params.where)) {
-      who = await resolveEns(signer, params.who);
+    if (!isAddress(who)) {
+      throw new Error("Invalid address");
     }
     return {
       to: where,
@@ -725,18 +724,17 @@ export class Client extends ClientCore implements IClient {
   private async _buildRevokeAction(
     params: IPermissionParams,
   ): Promise<DaoAction> {
-    let where = params.where;
-    let who = params.who;
     const signer = this.web3.getSigner();
     if (!signer) {
       throw new Error("A signer is needed");
     }
-    if (!isAddress(params.where)) {
-      where = await resolveEns(signer, params.where);
+    let { where, who } = params;
+    if (!isAddress(where)) {
+      throw new Error("Invalid address");
     }
 
-    if (!isAddress(params.where)) {
-      who = await resolveEns(signer, params.who);
+    if (!isAddress(who)) {
+      throw new Error("Invalid address");
     }
     return {
       to: where,
@@ -754,13 +752,13 @@ export class Client extends ClientCore implements IClient {
   private async _buildFreezeAction(
     params: IFreezeParams,
   ): Promise<DaoAction> {
-    let where = params.where;
     const signer = this.web3.getSigner();
     if (!signer) {
       throw new Error("A signer is needed");
     }
-    if (!isAddress(params.where)) {
-      where = await resolveEns(signer, params.where);
+    let { where } = params;
+    if (!isAddress(where)) {
+      throw new Error("Invalid address");
     }
 
     return {

@@ -432,13 +432,32 @@ describe("Client", () => {
         where: "0x1234567890123456789012345678901234567890",
         permission: DaoPermissions.UPGRADE_PERMISSION,
       };
+      const grantParams2: IPermissionParams = {
+        who: "0x0987654321098765432109876543210987654321",
+        where: "0x0987654321098765432109876543210987654321",
+        permission: DaoPermissions.EXECUTE_PERMISSION,
+      };
 
       const grantAction = await client.encoding.grantAction(
         grantParams,
       );
+      const grantAction2 = await client.encoding.grantAction(
+        grantParams2,
+      );
+      const decoder = new TextDecoder()
 
       expect(typeof grantAction).toBe("object");
+      expect(grantAction.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(grantAction.to).toBe(grantParams.where);
       expect(grantAction.data).toBeInstanceOf(Uint8Array);
+
+      expect(typeof grantAction2).toBe("object");
+      expect(grantAction2.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(grantAction2.to).toBe(grantParams2.where);
+      expect(grantAction2.data).toBeInstanceOf(Uint8Array);
+
+      expect(grantAction.to === grantAction2.to).toBe(false)
+      expect(decoder.decode(grantAction.data) === decoder.decode(grantAction2.data)).toBe(false)
     });
     it("Should create a client and generate a revoke action", async () => {
       const context = new Context(contextParamsLocalChain);
@@ -450,29 +469,67 @@ describe("Client", () => {
         permission: DaoPermissions.UPGRADE_PERMISSION,
       };
 
+      const revokeParams2: IPermissionParams = {
+        who: "0x0987654321098765432109876543210987654321",
+        where: "0x0987654321098765432109876543210987654321",
+        permission: DaoPermissions.EXECUTE_PERMISSION,
+      };
+
       const revokeAction = await client.encoding.revokeAction(
         revokeParams,
       );
 
+      const revokeAction2 = await client.encoding.revokeAction(
+        revokeParams2,
+      );
+      const decoder = new TextDecoder()
+
       expect(typeof revokeAction).toBe("object");
+      expect(revokeAction.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(revokeAction.to).toBe(revokeParams.where);
       expect(revokeAction.data).toBeInstanceOf(Uint8Array);
+
+      expect(typeof revokeAction2).toBe("object");
+      expect(revokeAction2.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(revokeAction2.to).toBe(revokeParams2.where);
+      expect(revokeAction2.data).toBeInstanceOf(Uint8Array);
+
+      expect(revokeAction.to === revokeAction2.to).toBe(false)
+      expect(decoder.decode(revokeAction.data) === decoder.decode(revokeAction2.data)).toBe(false)
     });
     it("Should create a client and generate a freeze action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const permissionParams: IPermissionParams = {
-        who: "0x1234567890123456789012345678901234567890",
+      const freezeParams: IFreezeParams = {
         where: "0x1234567890123456789012345678901234567890",
         permission: DaoPermissions.UPGRADE_PERMISSION,
       };
+      const freezeParams2: IFreezeParams = {
+        where: "0x0987654321098765432109876543210987654321",
+        permission: DaoPermissions.EXECUTE_PERMISSION,
+      };
 
       const freezeAction = await client.encoding.freezeAction(
-        permissionParams,
+        freezeParams,
       );
+      const freezeAction2 = await client.encoding.freezeAction(
+        freezeParams2,
+      );
+      const decoder = new TextDecoder()
 
       expect(typeof freezeAction).toBe("object");
+      expect(freezeAction.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(freezeAction.to).toBe(freezeParams.where);
       expect(freezeAction.data).toBeInstanceOf(Uint8Array);
+
+      expect(typeof freezeAction2).toBe("object");
+      expect(freezeAction2.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(freezeAction2.to).toBe(freezeParams2.where);
+      expect(freezeAction2.data).toBeInstanceOf(Uint8Array);
+
+      expect(freezeAction2.to == freezeAction2.to).toBe(false)
+      expect(decoder.decode(freezeAction.data) === decoder.decode(freezeAction2.data)).toBe(false)
     });
     it("Should encode an update metadata raw action", async () => {
       const context = new Context(contextParamsLocalChain);
@@ -520,7 +577,7 @@ describe("Client", () => {
       const decodedGrantParams: IPermissionParams = client.decoding
         .grantAction(grantAction.data);
 
-      expect(decodedGrantParams.permission).toBe(grantParams.permission);
+      expect(decodedGrantParams.permission).toBe(DaoPermissions.UPGRADE_PERMISSION);
       expect(decodedGrantParams.where).toBe(
         decodedGrantParams.where,
       );
@@ -542,7 +599,7 @@ describe("Client", () => {
       const decodedRevokeParams: IPermissionParams = client.decoding
         .revokeAction(revokeAction.data);
 
-      expect(decodedRevokeParams.permission).toBe(revokeParams.permission);
+      expect(decodedRevokeParams.permission).toBe(DaoPermissions.UPGRADE_PERMISSION);
       expect(decodedRevokeParams.where).toBe(
         decodedRevokeParams.where,
       );
@@ -563,7 +620,7 @@ describe("Client", () => {
       const decodedFreezeParams: IFreezeParams = client.decoding
         .freezeAction(freezeAction.data);
 
-      expect(decodedFreezeParams.permission).toBe(freezeParams.permission);
+      expect(decodedFreezeParams.permission).toBe(DaoPermissions.UPGRADE_PERMISSION);
       expect(decodedFreezeParams.where).toBe(
         decodedFreezeParams.where,
       );

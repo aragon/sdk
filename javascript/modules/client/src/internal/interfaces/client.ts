@@ -9,6 +9,8 @@ import {
   IPagination,
   IPluginInstallItem,
 } from "./common";
+import { keccak256 } from "@ethersproject/keccak256";
+import { toUtf8String } from "@ethersproject/strings";
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
   methods: {
@@ -96,7 +98,6 @@ export interface IFreezeParams {
   where: string;
   permission: DaoPermissions;
 }
-
 export enum DaoPermissions {
   UPGRADE_PERMISSION =
     "0xd5a14b802580ed4dd25c37f4587d65235454a7d1c553c5226e9ae8a88921c15d",
