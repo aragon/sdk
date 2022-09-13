@@ -21,12 +21,12 @@ import {
   Registry__factory,
 } from "@aragon/core-contracts-ethers";
 import {
-  DaoPermissions,
   DaoSortBy,
   IDaoQueryParams,
   IFreezeParams,
   IMetadata,
   IPermissionParams,
+  Permissions,
 } from "../../src/internal/interfaces/client";
 import { SortDirection } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/client";
@@ -430,12 +430,12 @@ describe("Client", () => {
       const grantParams: IPermissionParams = {
         who: "0x1234567890123456789012345678901234567890",
         where: "0x1234567890123456789012345678901234567890",
-        permission: DaoPermissions.UPGRADE_PERMISSION,
+        permission: Permissions.UPGRADE_PERMISSION,
       };
       const grantParams2: IPermissionParams = {
         who: "0x0987654321098765432109876543210987654321",
         where: "0x0987654321098765432109876543210987654321",
-        permission: DaoPermissions.EXECUTE_PERMISSION,
+        permission: Permissions.EXECUTE_PERMISSION,
       };
 
       const grantAction = client.encoding.grantAction(
@@ -468,13 +468,13 @@ describe("Client", () => {
       const revokeParams: IPermissionParams = {
         who: "0x1234567890123456789012345678901234567890",
         where: "0x1234567890123456789012345678901234567890",
-        permission: DaoPermissions.UPGRADE_PERMISSION,
+        permission: Permissions.UPGRADE_PERMISSION,
       };
 
       const revokeParams2: IPermissionParams = {
         who: "0x0987654321098765432109876543210987654321",
         where: "0x0987654321098765432109876543210987654321",
-        permission: DaoPermissions.EXECUTE_PERMISSION,
+        permission: Permissions.EXECUTE_PERMISSION,
       };
 
       const revokeAction = client.encoding.revokeAction(
@@ -508,11 +508,11 @@ describe("Client", () => {
 
       const freezeParams: IFreezeParams = {
         where: "0x1234567890123456789012345678901234567890",
-        permission: DaoPermissions.UPGRADE_PERMISSION,
+        permission: Permissions.UPGRADE_PERMISSION,
       };
       const freezeParams2: IFreezeParams = {
         where: "0x0987654321098765432109876543210987654321",
-        permission: DaoPermissions.EXECUTE_PERMISSION,
+        permission: Permissions.EXECUTE_PERMISSION,
       };
 
       const freezeAction = client.encoding.freezeAction(
@@ -576,7 +576,7 @@ describe("Client", () => {
       const grantParams: IPermissionParams = {
         who: "0x1234567890123456789012345678901234567890",
         where: "0x1234567890123456789012345678901234567890",
-        permission: DaoPermissions.UPGRADE_PERMISSION,
+        permission: Permissions.UPGRADE_PERMISSION,
       };
 
       const grantAction = client.encoding.grantAction(
@@ -586,7 +586,7 @@ describe("Client", () => {
         .grantAction(grantAction.data);
 
       expect(decodedGrantParams.permission).toBe(
-        DaoPermissions.UPGRADE_PERMISSION,
+        Permissions.UPGRADE_PERMISSION,
       );
       expect(decodedGrantParams.where).toBe(
         decodedGrantParams.where,
@@ -600,7 +600,7 @@ describe("Client", () => {
       const revokeParams: IPermissionParams = {
         who: "0x1234567890123456789012345678901234567890",
         where: "0x1234567890123456789012345678901234567890",
-        permission: DaoPermissions.UPGRADE_PERMISSION,
+        permission: Permissions.UPGRADE_PERMISSION,
       };
 
       const revokeAction = client.encoding.revokeAction(
@@ -610,7 +610,7 @@ describe("Client", () => {
         .revokeAction(revokeAction.data);
 
       expect(decodedRevokeParams.permission).toBe(
-        DaoPermissions.UPGRADE_PERMISSION,
+        Permissions.UPGRADE_PERMISSION,
       );
       expect(decodedRevokeParams.where).toBe(
         decodedRevokeParams.where,
@@ -623,7 +623,7 @@ describe("Client", () => {
 
       const freezeParams: IFreezeParams = {
         where: "0x1234567890123456789012345678901234567890",
-        permission: DaoPermissions.UPGRADE_PERMISSION,
+        permission: Permissions.UPGRADE_PERMISSION,
       };
 
       const freezeAction = client.encoding.freezeAction(
@@ -633,7 +633,7 @@ describe("Client", () => {
         .freezeAction(freezeAction.data);
 
       expect(decodedFreezeParams.permission).toBe(
-        DaoPermissions.UPGRADE_PERMISSION,
+        Permissions.UPGRADE_PERMISSION,
       );
       expect(decodedFreezeParams.where).toBe(
         decodedFreezeParams.where,
@@ -642,7 +642,6 @@ describe("Client", () => {
     it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-
       const withdrawParams: IWithdrawParams = {
         recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),

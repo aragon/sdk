@@ -1546,7 +1546,7 @@ The helpers above help encoding the most typical DAO operations.
 import {
   Client,
   Context,
-  DaoPermissions,
+  Permissions,
   IPermissionParams,
 } from "@aragon/sdk-client";
 
@@ -1556,7 +1556,7 @@ const client: Client = new Client(context);
 const grantParams: IPermissionParams = {
   who: "0x1234567890123456789012345678901234567890",
   where: "0x1234567890123456789012345678901234567890",
-  permission: DaoPermissions.UPGRADE_PERMISSION,
+  permission: Permissions.UPGRADE_PERMISSION,
 };
 
 const grantAction = await client.encoding.grantAction(
@@ -1578,7 +1578,7 @@ console.log(grantAction);
 import {
   Client,
   Context,
-  DaoPermissions,
+  Permissions,
   IPermissionParams,
 } from "@aragon/sdk-client";
 
@@ -1588,7 +1588,7 @@ const client: Client = new Client(context);
 const revokeParams: IPermissionParams = {
   who: "0x1234567890123456789012345678901234567890",
   where: "0x1234567890123456789012345678901234567890",
-  permission: DaoPermissions.UPGRADE_PERMISSION,
+  permission: Permissions.UPGRADE_PERMISSION,
 };
 
 const revokeAction = await client.encoding.revokeAction(
@@ -1610,7 +1610,7 @@ console.log(revokeAction);
 import {
   Client,
   Context,
-  DaoPermissions,
+  Permissions,
   IFreezeParams,
 } from "@aragon/sdk-client";
 
@@ -1619,7 +1619,7 @@ const client: Client = new Client(context);
 
 const freezeParams: IFreezePArams = {
   where: "0x1234567890123456789012345678901234567890",
-  permission: DaoPermissions.UPGRADE_PERMISSION,
+  permission: Permissions.UPGRADE_PERMISSION,
 };
 
 const freezeAction = await client.encoding.freezeAction(
@@ -1761,7 +1761,7 @@ const configAction = client.encoding.updatePluginSettingsAction(
 ### Decode action grant permission
 
 ```ts
-import { Client, Context, IPermissionParams, DaoPermissions } from "@aragon/sdk-client";
+import { Client, Context, IPermissionParams, Permissions } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
@@ -1776,7 +1776,7 @@ console.log(grantParams);
 {
   who: "0x1234567890...",
   where: "0x1234567890...",
-  permission: "0x1234567890...", // DaoPermission
+  permission: "UPGRADE_PERMISSION",
   }
 */
 ```
@@ -1784,7 +1784,7 @@ console.log(grantParams);
 ### Decode action revoke permission
 
 ```ts
-import { Client, Context, IPermissionParams, DaoPermissions } from "@aragon/sdk-client";
+import { Client, Context, IPermissionParams, Permissions } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
@@ -1799,7 +1799,7 @@ console.log(revokeParams);
 {
   who: "0x1234567890...",
   where: "0x1234567890...",
-  permission: "0x1234567890...", // DaoPermission
+  permission: "UPGRADE_PERMISSION",
   }
 */
 ```
@@ -1807,7 +1807,7 @@ console.log(revokeParams);
 ### Decode action freeze permission
 
 ```ts
-import { Client, Context, IPermissionParams, DaoPermissions } from "@aragon/sdk-client";
+import { Client, Context, IPermissionParams, Permissions } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
@@ -1821,7 +1821,7 @@ console.log(freezeParams);
 /*
 {
   where: "0x1234567890...",
-  permission: "0x1234567890...", // DaoPermission
+  permission: "UPGRADE_PERMISSION",
   }
 */
 ```

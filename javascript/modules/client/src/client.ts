@@ -703,7 +703,6 @@ export class Client extends ClientCore implements IClient {
     if (!isAddress(where)) {
       throw new Error("Invalid address");
     }
-
     if (!isAddress(who)) {
       throw new Error("Invalid address");
     }

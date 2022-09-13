@@ -5,12 +5,13 @@ import { AddressZero } from "@ethersproject/constants";
 import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import {
-  DaoPermission,
-  DaoPermissions,
   IFreezeParams,
   IPermissionParams,
   IWithdrawParams,
+  PermissionIds,
 } from "../interfaces/client";
+import { keccak256 } from "@ethersproject/keccak256";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 export function getFunctionFragment(data: Uint8Array): FunctionFragment {
   const hexBytes = bytesToHex(data, true);
@@ -48,7 +49,7 @@ function unwrapFreezeParams(
 ): [string, string] {
   return [
     params.where,
-    params.permission,
+    keccak256(toUtf8Bytes(params.permission)),
   ];
 }
 function wrapFreezeParams(
@@ -56,7 +57,10 @@ function wrapFreezeParams(
 ): IFreezeParams {
   return {
     where: result[0],
-    permission: result[1] as DaoPermission,
+    permission:
+      // @ts-ignore
+      Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[1])
+        .replace("_ID", "") || "",
   };
 }
 
@@ -118,7 +122,7 @@ function unwrapPermissionParams(
   return [
     params.where,
     params.who,
-    params.permission,
+    keccak256(toUtf8Bytes(params.permission)),
   ];
 }
 function wrapPermissionParams(
@@ -127,7 +131,10 @@ function wrapPermissionParams(
   return {
     where: result[0],
     who: result[1],
-    permission: result[2] as DaoPermissions,
+    permission:
+      // @ts-ignore
+      Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[2])
+        .replace("_ID", "") || "",
   };
 }
 
