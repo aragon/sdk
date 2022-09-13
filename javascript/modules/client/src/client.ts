@@ -55,7 +55,6 @@ import {
 } from "./internal/encoding/client";
 import { delay, getDummyDao } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
-import { resolveEns } from "./internal/utils/common";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -195,7 +194,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    grantAction: (params: IPermissionParams): Promise<DaoAction> =>
+    grantAction: (params: IPermissionParams): DaoAction =>
       this._buildGrantAction(params),
     /**
      * Computes the payload to be given when creating a proposal that revokes a permission within a DAO
@@ -204,7 +203,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    revokeAction: (params: IPermissionParams): Promise<DaoAction> =>
+    revokeAction: (params: IPermissionParams): DaoAction =>
       this._buildRevokeAction(params),
     /**
      * Computes the payload to be given when creating a proposal that freezes a permission within a DAO
@@ -213,7 +212,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    freezeAction: (params: IFreezeParams): Promise<DaoAction> =>
+    freezeAction: (params: IFreezeParams): DaoAction =>
       this._buildFreezeAction(params),
     /**
      * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
@@ -693,9 +692,9 @@ export class Client extends ClientCore implements IClient {
     return Promise.resolve({ deposits, withdrawals });
   }
 
-  private async _buildGrantAction(
+  private _buildGrantAction(
     params: IPermissionParams,
-  ): Promise<DaoAction> {
+  ): DaoAction {
     const signer = this.web3.getSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -721,9 +720,9 @@ export class Client extends ClientCore implements IClient {
     };
   }
 
-  private async _buildRevokeAction(
+  private _buildRevokeAction(
     params: IPermissionParams,
-  ): Promise<DaoAction> {
+  ): DaoAction {
     const signer = this.web3.getSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -749,9 +748,9 @@ export class Client extends ClientCore implements IClient {
     };
   }
 
-  private async _buildFreezeAction(
+  private _buildFreezeAction(
     params: IFreezeParams,
-  ): Promise<DaoAction> {
+  ): DaoAction {
     const signer = this.web3.getSigner();
     if (!signer) {
       throw new Error("A signer is needed");

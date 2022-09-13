@@ -9,8 +9,6 @@ import {
   IPagination,
   IPluginInstallItem,
 } from "./common";
-import { keccak256 } from "@ethersproject/keccak256";
-import { toUtf8String } from "@ethersproject/strings";
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
   methods: {
@@ -39,9 +37,9 @@ export interface IClient extends IClientCore {
   };
   encoding: {
     /** Computes the withdraw action payload */
-    grantAction: (params: IPermissionParams) => Promise<DaoAction>;
-    revokeAction: (params: IPermissionParams) => Promise<DaoAction>;
-    freezeAction: (params: IPermissionParams) => Promise<DaoAction>;
+    grantAction: (params: IPermissionParams) => DaoAction;
+    revokeAction: (params: IPermissionParams) => DaoAction;
+    freezeAction: (params: IPermissionParams) => DaoAction;
     withdrawAction: (
       daoAddresOrEns: string,
       params: IWithdrawParams,
