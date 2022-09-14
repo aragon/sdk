@@ -24,14 +24,18 @@ import {
   DaoSortBy,
   IDaoQueryParams,
   IFreezeParams,
+  IFreezeResponse,
   IMetadata,
   IPermissionParams,
+  IPermissionResponse,
   Permissions,
 } from "../../src/internal/interfaces/client";
 import { DaoAction, SortDirection } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/client";
 import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
+import { keccak256 } from "@ethersproject/keccak256";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -447,10 +451,9 @@ describe("Client", () => {
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
         expect(typeof action).toBe("object");
-        expect(action.to).toBe(paramsArray[i].where);
+        expect(action.to).toBe(daoAddress);
         expect(action.data).toBeInstanceOf(Uint8Array);
       }
-      expect(actions[0].to === actions[1].to).toBe(false);
       expect(
         decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
       ).toBe(false);
@@ -479,10 +482,9 @@ describe("Client", () => {
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
         expect(typeof action).toBe("object");
-        expect(action.to).toBe(paramsArray[i].where);
+        expect(action.to).toBe(daoAddress);
         expect(action.data).toBeInstanceOf(Uint8Array);
       }
-      expect(actions[0].to === actions[1].to).toBe(false);
       expect(
         decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
       ).toBe(false);
@@ -510,10 +512,9 @@ describe("Client", () => {
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
         expect(typeof action).toBe("object");
-        expect(action.to).toBe(paramsArray[i].where);
+        expect(action.to).toBe(daoAddress);
         expect(action.data).toBeInstanceOf(Uint8Array);
       }
-      expect(actions[0].to === actions[1].to).toBe(false);
       expect(
         decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
       ).toBe(false);
@@ -567,7 +568,7 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.grantAction(daoAddress, params);
-        const decodedParams: IPermissionParams = client.decoding
+        const decodedParams: IPermissionResponse = client.decoding
           .grantAction(action.data);
 
         expect(decodedParams.permission).toBe(
@@ -575,6 +576,9 @@ describe("Client", () => {
         );
         expect(decodedParams.where).toBe(
           params.where,
+        );
+        expect(decodedParams.permissionId).toBe(
+          keccak256(toUtf8Bytes(params.permission)),
         );
         expect(decodedParams.who).toBe(params.who);
       }
@@ -598,14 +602,17 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.revokeAction(daoAddress, params);
-        const decodedParams: IPermissionParams = client.decoding
-          .grantAction(action.data);
+        const decodedParams: IPermissionResponse = client.decoding
+          .revokeAction(action.data);
 
         expect(decodedParams.permission).toBe(
           params.permission,
         );
         expect(decodedParams.where).toBe(
           params.where,
+        );
+        expect(decodedParams.permissionId).toBe(
+          keccak256(toUtf8Bytes(params.permission)),
         );
         expect(decodedParams.who).toBe(params.who);
       }
@@ -627,11 +634,14 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.freezeAction(daoAddress, params);
-        const decodedParams: IPermissionParams = client.decoding
-          .grantAction(action.data);
+        const decodedParams: IFreezeResponse = client.decoding
+          .freezeAction(action.data);
 
         expect(decodedParams.permission).toBe(
           params.permission,
+        );
+        expect(decodedParams.permissionId).toBe(
+          keccak256(toUtf8Bytes(params.permission)),
         );
         expect(decodedParams.where).toBe(
           params.where,

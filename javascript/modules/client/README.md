@@ -1784,6 +1784,7 @@ console.log(grantParams);
   who: "0x1234567890...",
   where: "0x1234567890...",
   permission: "UPGRADE_PERMISSION",
+  permissionId: "0x12345..."
 }
 */
 ```
@@ -1807,6 +1808,7 @@ console.log(revokeParams);
   who: "0x1234567890...",
   where: "0x1234567890...",
   permission: "UPGRADE_PERMISSION",
+  permissionId: "0x12345..."
 }
 */
 ```
@@ -1829,6 +1831,7 @@ console.log(freezeParams);
 {
   where: "0x1234567890...",
   permission: "UPGRADE_PERMISSION",
+  permissionId: "0x12345..."
 }
 */
 ```

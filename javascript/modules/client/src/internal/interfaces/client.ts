@@ -52,9 +52,9 @@ export interface IClient extends IClientCore {
     ) => Promise<DaoAction>;
   };
   decoding: {
-    grantAction: (data: Uint8Array) => IPermissionParams;
-    revokeAction: (data: Uint8Array) => IPermissionParams;
-    freezeAction: (data: Uint8Array) => IFreezeParams;
+    grantAction: (data: Uint8Array) => IPermissionResponse;
+    revokeAction: (data: Uint8Array) => IPermissionResponse;
+    freezeAction: (data: Uint8Array) => IFreezeResponse;
     withdrawAction: (data: Uint8Array) => IWithdrawParams;
     updateMetadataRawAction: (data: Uint8Array) => string;
     updateMetadataAction: (data: Uint8Array) => Promise<IMetadata>;
@@ -94,9 +94,15 @@ export interface IPermissionParams {
   who: string;
   permission: string;
 }
+export interface IPermissionResponse extends IPermissionParams {
+  permissionId: string;
+}
 export interface IFreezeParams {
   where: string;
   permission: string;
+}
+export interface IFreezeResponse extends IFreezeParams {
+  permissionId: string;
 }
 const Permissions = {
   UPGRADE_PERMISSION: "UPGRADE_PERMISSION",
@@ -107,12 +113,9 @@ const Permissions = {
   SET_TRUSTED_FORWARDER_PERMISSION: "SET_TRUSTED_FORWARDER_PERMISSION",
   ROOT_PERMISSION: "ROOT_PERMISSION",
   CREATE_VERSION_PERMISSION: "CREATE_VERSION_PERMISSION",
-  MULTIPLY_PERMISSION: "MULTIPLY_PERMISSION",
   REGISTER_PERMISSION: "REGISTER_PERMISSION",
   REGISTER_DAO_PERMISSION: "REGISTER_DAO_PERMISSION",
   REGISTER_ENS_SUBDOMAIN_PERMISSION: "REGISTER_ENS_SUBDOMAIN_PERMISSION",
-  DO_SOMETHING_PERMISSION: "DO_SOMETHING_PERMISSION",
-  ID_GATED_ACTION_PERMISSION: "ID_GATED_ACTION_PERMISSION",
   MINT_PERMISSION: "MINT_PERMISSION",
   MERKLE_MINT_PERMISSION: "MERKLE_MINT_PERMISSION",
   MODIFY_ALLOWLIST_PERMISSION: "MODIFY_ALLOWLIST_PERMISSION",

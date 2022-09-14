@@ -6,7 +6,9 @@ import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import {
   IFreezeParams,
+  IFreezeResponse,
   IPermissionParams,
+  IPermissionResponse,
   IWithdrawParams,
   PermissionIds,
 } from "../interfaces/client";
@@ -28,7 +30,7 @@ export function encodeFreezeAction(
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeFreezeActionData(data: Uint8Array): IFreezeParams {
+export function decodeFreezeActionData(data: Uint8Array): IFreezeResponse {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
@@ -54,9 +56,10 @@ function unwrapFreezeParams(
 }
 function wrapFreezeParams(
   result: Result,
-): IFreezeParams {
+): IFreezeResponse {
   return {
     where: result[0],
+    permissionId: result[1],
     permission:
       Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[1])
         ?.replace(/_ID$/, "") || "",
@@ -73,7 +76,7 @@ export function encodeGrantActionData(
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeGrantActionData(data: Uint8Array): IPermissionParams {
+export function decodeGrantActionData(data: Uint8Array): IPermissionResponse {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
@@ -99,7 +102,7 @@ export function encodeRevokeActionData(
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeRevokeActionData(data: Uint8Array): IPermissionParams {
+export function decodeRevokeActionData(data: Uint8Array): IPermissionResponse {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
@@ -126,10 +129,11 @@ function unwrapPermissionParams(
 }
 function wrapPermissionParams(
   result: Result,
-): IPermissionParams {
+): IPermissionResponse {
   return {
     where: result[0],
     who: result[1],
+    permissionId: result[2],
     permission:
       Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[2])
         ?.replace(/_ID$/, "") || "",

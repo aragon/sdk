@@ -13,8 +13,10 @@ import {
   IDaoQueryParams,
   IDepositParams,
   IFreezeParams,
+  IFreezeResponse,
   IMetadata,
   IPermissionParams,
+  IPermissionResponse,
   IWithdrawParams,
 } from "./internal/interfaces/client";
 import {
@@ -253,7 +255,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {IPermissionParams}
      * @memberof Client
      */
-    grantAction: (data: Uint8Array): IPermissionParams =>
+    grantAction: (data: Uint8Array): IPermissionResponse =>
       decodeGrantActionData(data),
     /**
      * Decodes the permission parameters from an encoded revoke action
@@ -262,7 +264,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {IPermissionParams}
      * @memberof Client
      */
-    revokeAction: (data: Uint8Array): IPermissionParams =>
+    revokeAction: (data: Uint8Array): IPermissionResponse =>
       decodeRevokeActionData(data),
     /**
      * Decodes the freezee parameters from an encoded freeze action
@@ -271,7 +273,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {IFreezeParams}
      * @memberof Client
      */
-    freezeAction: (data: Uint8Array): IFreezeParams =>
+    freezeAction: (data: Uint8Array): IFreezeResponse =>
       decodeFreezeActionData(data),
     /**
      * Decodes the withdraw parameters from an encoded withdraw action
