@@ -28,7 +28,7 @@ import {
   IPermissionParams,
   Permissions,
 } from "../../src/internal/interfaces/client";
-import { SortDirection } from "../../src/internal/interfaces/common";
+import { DaoAction, SortDirection } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/client";
 import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
@@ -426,117 +426,96 @@ describe("Client", () => {
     it("Should create a client and generate a grant action", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-
-      const grantParams: IPermissionParams = {
-        who: "0x1234567890123456789012345678901234567890",
-        where: "0x1234567890123456789012345678901234567890",
-        permission: Permissions.UPGRADE_PERMISSION,
-      };
-      const grantParams2: IPermissionParams = {
-        who: "0x0987654321098765432109876543210987654321",
-        where: "0x0987654321098765432109876543210987654321",
-        permission: Permissions.EXECUTE_PERMISSION,
-      };
-
-      const grantAction = client.encoding.grantAction(
-        grantParams,
-      );
-      const grantAction2 = client.encoding.grantAction(
-        grantParams2,
-      );
+      const paramsArray: IPermissionParams[] = [
+        {
+          who: "0x0987654321098765432109876543210987654321",
+          where: "0x0987654321098765432109876543210987654321",
+          permission: Permissions.EXECUTE_PERMISSION,
+        },
+        {
+          who: "0x1234567890123456789012345678901234567890",
+          where: "0x1234567890123456789012345678901234567890",
+          permission: Permissions.UPGRADE_PERMISSION,
+        },
+      ];
+      let actions: DaoAction[] = [];
+      for (let i = 0; i < paramsArray.length; i++) {
+        const params = paramsArray[i];
+        actions.push(client.encoding.grantAction(params));
+      }
       const decoder = new TextDecoder();
-
-      expect(typeof grantAction).toBe("object");
-      expect(grantAction.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-      expect(grantAction.to).toBe(grantParams.where);
-      expect(grantAction.data).toBeInstanceOf(Uint8Array);
-
-      expect(typeof grantAction2).toBe("object");
-      expect(grantAction2.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-      expect(grantAction2.to).toBe(grantParams2.where);
-      expect(grantAction2.data).toBeInstanceOf(Uint8Array);
-
-      expect(grantAction.to === grantAction2.to).toBe(false);
+      for (let i = 0; i < actions.length; i++) {
+        const action = actions[i];
+        expect(typeof action).toBe("object");
+        expect(action.to).toBe(paramsArray[i].where);
+        expect(action.data).toBeInstanceOf(Uint8Array);
+      }
+      expect(actions[0].to === actions[1].to).toBe(false);
       expect(
-        decoder.decode(grantAction.data) === decoder.decode(grantAction2.data),
+        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
       ).toBe(false);
     });
     it("Should create a client and generate a revoke action", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-
-      const revokeParams: IPermissionParams = {
-        who: "0x1234567890123456789012345678901234567890",
-        where: "0x1234567890123456789012345678901234567890",
-        permission: Permissions.UPGRADE_PERMISSION,
-      };
-
-      const revokeParams2: IPermissionParams = {
-        who: "0x0987654321098765432109876543210987654321",
-        where: "0x0987654321098765432109876543210987654321",
-        permission: Permissions.EXECUTE_PERMISSION,
-      };
-
-      const revokeAction = client.encoding.revokeAction(
-        revokeParams,
-      );
-
-      const revokeAction2 = client.encoding.revokeAction(
-        revokeParams2,
-      );
+      const paramsArray: IPermissionParams[] = [
+        {
+          who: "0x0987654321098765432109876543210987654321",
+          where: "0x0987654321098765432109876543210987654321",
+          permission: Permissions.EXECUTE_PERMISSION,
+        },
+        {
+          who: "0x1234567890123456789012345678901234567890",
+          where: "0x1234567890123456789012345678901234567890",
+          permission: Permissions.UPGRADE_PERMISSION,
+        },
+      ];
+      let actions: DaoAction[] = [];
+      for (let i = 0; i < paramsArray.length; i++) {
+        const params = paramsArray[i];
+        actions.push(client.encoding.revokeAction(params));
+      }
       const decoder = new TextDecoder();
-
-      expect(typeof revokeAction).toBe("object");
-      expect(revokeAction.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-      expect(revokeAction.to).toBe(revokeParams.where);
-      expect(revokeAction.data).toBeInstanceOf(Uint8Array);
-
-      expect(typeof revokeAction2).toBe("object");
-      expect(revokeAction2.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-      expect(revokeAction2.to).toBe(revokeParams2.where);
-      expect(revokeAction2.data).toBeInstanceOf(Uint8Array);
-
-      expect(revokeAction.to === revokeAction2.to).toBe(false);
+      for (let i = 0; i < actions.length; i++) {
+        const action = actions[i];
+        expect(typeof action).toBe("object");
+        expect(action.to).toBe(paramsArray[i].where);
+        expect(action.data).toBeInstanceOf(Uint8Array);
+      }
+      expect(actions[0].to === actions[1].to).toBe(false);
       expect(
-        decoder.decode(revokeAction.data) ===
-          decoder.decode(revokeAction2.data),
+        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
       ).toBe(false);
     });
     it("Should create a client and generate a freeze action", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const freezeParams: IFreezeParams = {
-        where: "0x1234567890123456789012345678901234567890",
-        permission: Permissions.UPGRADE_PERMISSION,
-      };
-      const freezeParams2: IFreezeParams = {
-        where: "0x0987654321098765432109876543210987654321",
-        permission: Permissions.EXECUTE_PERMISSION,
-      };
-
-      const freezeAction = client.encoding.freezeAction(
-        freezeParams,
-      );
-      const freezeAction2 = client.encoding.freezeAction(
-        freezeParams2,
-      );
+      const paramsArray: IFreezeParams[] = [
+        {
+          where: "0x1234567890123456789012345678901234567890",
+          permission: Permissions.UPGRADE_PERMISSION,
+        },
+        {
+          where: "0x0987654321098765432109876543210987654321",
+          permission: Permissions.EXECUTE_PERMISSION,
+        },
+      ];
+      let actions: DaoAction[] = [];
+      for (let i = 0; i < paramsArray.length; i++) {
+        const params = paramsArray[i];
+        actions.push(client.encoding.freezeAction(params));
+      }
       const decoder = new TextDecoder();
-
-      expect(typeof freezeAction).toBe("object");
-      expect(freezeAction.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-      expect(freezeAction.to).toBe(freezeParams.where);
-      expect(freezeAction.data).toBeInstanceOf(Uint8Array);
-
-      expect(typeof freezeAction2).toBe("object");
-      expect(freezeAction2.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-      expect(freezeAction2.to).toBe(freezeParams2.where);
-      expect(freezeAction2.data).toBeInstanceOf(Uint8Array);
-
-      expect(freezeAction.to == freezeAction2.to).toBe(false);
+      for (let i = 0; i < actions.length; i++) {
+        const action = actions[i];
+        expect(typeof action).toBe("object");
+        expect(action.to).toBe(paramsArray[i].where);
+        expect(action.data).toBeInstanceOf(Uint8Array);
+      }
+      expect(actions[0].to === actions[1].to).toBe(false);
       expect(
-        decoder.decode(freezeAction.data) ===
-          decoder.decode(freezeAction2.data),
+        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
       ).toBe(false);
     });
     it("Should encode an update metadata raw action", async () => {

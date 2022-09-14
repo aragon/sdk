@@ -60,7 +60,7 @@ function wrapFreezeParams(
     permission:
       // @ts-ignore
       Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[1])
-        .replace("_ID", "") || "",
+        .replace(/_ID$/, "") || "",
   };
 }
 
@@ -134,7 +134,7 @@ function wrapPermissionParams(
     permission:
       // @ts-ignore
       Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[2])
-        .replace("_ID", "") || "",
+        ?.replace(/_ID$/, "") || "",
   };
 }
 

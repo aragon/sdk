@@ -1546,8 +1546,8 @@ The helpers above help encoding the most typical DAO operations.
 import {
   Client,
   Context,
-  Permissions,
   IPermissionParams,
+  Permissions,
 } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
@@ -1578,8 +1578,8 @@ console.log(grantAction);
 import {
   Client,
   Context,
-  Permissions,
   IPermissionParams,
+  Permissions,
 } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
@@ -1610,14 +1610,14 @@ console.log(revokeAction);
 import {
   Client,
   Context,
-  Permissions,
   IFreezeParams,
+  Permissions,
 } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
 
-const freezeParams: IFreezePArams = {
+const freezeParams: IFreezeParams = {
   where: "0x1234567890123456789012345678901234567890",
   permission: Permissions.UPGRADE_PERMISSION,
 };
@@ -1777,7 +1777,7 @@ console.log(grantParams);
   who: "0x1234567890...",
   where: "0x1234567890...",
   permission: "UPGRADE_PERMISSION",
-  }
+}
 */
 ```
 
@@ -1800,7 +1800,7 @@ console.log(revokeParams);
   who: "0x1234567890...",
   where: "0x1234567890...",
   permission: "UPGRADE_PERMISSION",
-  }
+}
 */
 ```
 
@@ -1822,7 +1822,7 @@ console.log(freezeParams);
 {
   where: "0x1234567890...",
   permission: "UPGRADE_PERMISSION",
-  }
+}
 */
 ```
 

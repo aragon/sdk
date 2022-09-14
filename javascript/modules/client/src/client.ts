@@ -696,14 +696,10 @@ export class Client extends ClientCore implements IClient {
     params: IPermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
+    const { where, who } = params;
     if (!signer) {
       throw new Error("A signer is needed");
-    }
-    let { where, who } = params;
-    if (!isAddress(where)) {
-      throw new Error("Invalid address");
-    }
-    if (!isAddress(who)) {
+    } else if (!isAddress(where) || !isAddress(who)) {
       throw new Error("Invalid address");
     }
     return {
@@ -723,15 +719,10 @@ export class Client extends ClientCore implements IClient {
     params: IPermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
+    const { where, who } = params;
     if (!signer) {
       throw new Error("A signer is needed");
-    }
-    let { where, who } = params;
-    if (!isAddress(where)) {
-      throw new Error("Invalid address");
-    }
-
-    if (!isAddress(who)) {
+    } else if (!isAddress(where) || !isAddress(who)) {
       throw new Error("Invalid address");
     }
     return {
@@ -751,14 +742,12 @@ export class Client extends ClientCore implements IClient {
     params: IFreezeParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
+    const { where } = params;
     if (!signer) {
       throw new Error("A signer is needed");
-    }
-    let { where } = params;
-    if (!isAddress(where)) {
+    } else if (!isAddress(where)) {
       throw new Error("Invalid address");
     }
-
     return {
       to: where,
       value: BigInt(0),
