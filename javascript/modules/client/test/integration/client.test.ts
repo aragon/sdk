@@ -24,10 +24,10 @@ import {
   DaoSortBy,
   IDaoQueryParams,
   IFreezeParams,
-  IFreezeResponse,
+  IFreezeDecodedParams,
   IMetadata,
   IPermissionParams,
-  IPermissionResponse,
+  IPermissionDecodedParams,
   Permissions,
 } from "../../src/internal/interfaces/client";
 import { DaoAction, SortDirection } from "../../src/internal/interfaces/common";
@@ -568,7 +568,7 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.grantAction(daoAddress, params);
-        const decodedParams: IPermissionResponse = client.decoding
+        const decodedParams: IPermissionDecodedParams = client.decoding
           .grantAction(action.data);
 
         expect(decodedParams.permission).toBe(
@@ -602,7 +602,7 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.revokeAction(daoAddress, params);
-        const decodedParams: IPermissionResponse = client.decoding
+        const decodedParams: IPermissionDecodedParams = client.decoding
           .revokeAction(action.data);
 
         expect(decodedParams.permission).toBe(
@@ -634,7 +634,7 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.freezeAction(daoAddress, params);
-        const decodedParams: IFreezeResponse = client.decoding
+        const decodedParams: IFreezeDecodedParams = client.decoding
           .freezeAction(action.data);
 
         expect(decodedParams.permission).toBe(

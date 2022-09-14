@@ -6,9 +6,9 @@ import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import {
   IFreezeParams,
-  IFreezeResponse,
+  IFreezeDecodedParams,
   IPermissionParams,
-  IPermissionResponse,
+  IPermissionDecodedParams,
   IWithdrawParams,
   PermissionIds,
 } from "../interfaces/client";
@@ -30,7 +30,7 @@ export function encodeFreezeAction(
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeFreezeActionData(data: Uint8Array): IFreezeResponse {
+export function decodeFreezeActionData(data: Uint8Array): IFreezeDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
@@ -56,7 +56,7 @@ function unwrapFreezeParams(
 }
 function wrapFreezeParams(
   result: Result,
-): IFreezeResponse {
+): IFreezeDecodedParams {
   return {
     where: result[0],
     permissionId: result[1],
@@ -76,7 +76,7 @@ export function encodeGrantActionData(
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeGrantActionData(data: Uint8Array): IPermissionResponse {
+export function decodeGrantActionData(data: Uint8Array): IPermissionDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
@@ -102,7 +102,7 @@ export function encodeRevokeActionData(
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeRevokeActionData(data: Uint8Array): IPermissionResponse {
+export function decodeRevokeActionData(data: Uint8Array): IPermissionDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
@@ -129,7 +129,7 @@ function unwrapPermissionParams(
 }
 function wrapPermissionParams(
   result: Result,
-): IPermissionResponse {
+): IPermissionDecodedParams {
   return {
     where: result[0],
     who: result[1],

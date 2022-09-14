@@ -52,9 +52,9 @@ export interface IClient extends IClientCore {
     ) => Promise<DaoAction>;
   };
   decoding: {
-    grantAction: (data: Uint8Array) => IPermissionResponse;
-    revokeAction: (data: Uint8Array) => IPermissionResponse;
-    freezeAction: (data: Uint8Array) => IFreezeResponse;
+    grantAction: (data: Uint8Array) => IPermissionDecodedParams;
+    revokeAction: (data: Uint8Array) => IPermissionDecodedParams;
+    freezeAction: (data: Uint8Array) => IFreezeDecodedParams;
     withdrawAction: (data: Uint8Array) => IWithdrawParams;
     updateMetadataRawAction: (data: Uint8Array) => string;
     updateMetadataAction: (data: Uint8Array) => Promise<IMetadata>;
@@ -94,14 +94,14 @@ export interface IPermissionParams {
   who: string;
   permission: string;
 }
-export interface IPermissionResponse extends IPermissionParams {
+export interface IPermissionDecodedParams extends IPermissionParams {
   permissionId: string;
 }
 export interface IFreezeParams {
   where: string;
   permission: string;
 }
-export interface IFreezeResponse extends IFreezeParams {
+export interface IFreezeDecodedParams extends IFreezeParams {
   permissionId: string;
 }
 const Permissions = {
