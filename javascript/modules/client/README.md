@@ -1773,7 +1773,6 @@ const context: Context = new Context(params);
 const client: Client = new Client(context);
 
 const data: Uint8Array =  new Uint8Array([12, ..., 56])
-const daoAddress = "0x1234567890123456789012345678901234567890"
 
 const grantParams = client.decoding.grantAction(
   data
