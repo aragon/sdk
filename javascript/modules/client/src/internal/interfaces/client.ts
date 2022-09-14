@@ -39,9 +39,9 @@ export interface IClient extends IClientCore {
   };
   encoding: {
     /** Computes the withdraw action payload */
-    grantAction: (params: IPermissionParams) => DaoAction;
-    revokeAction: (params: IPermissionParams) => DaoAction;
-    freezeAction: (params: IPermissionParams) => DaoAction;
+    grantAction: (daoAddress: string, params: IPermissionParams) => DaoAction;
+    revokeAction: (daoAddress: string, params: IPermissionParams) => DaoAction;
+    freezeAction: (daoAddress: string, params: IPermissionParams) => DaoAction;
     withdrawAction: (
       daoAddresOrEns: string,
       params: IWithdrawParams,
@@ -121,7 +121,7 @@ const Permissions = {
 
 const PermissionIds = Object.entries(Permissions).reduce(
   (acc, [k, v]) => ({ ...acc, [k + "_ID"]: keccak256(toUtf8Bytes(v)) }),
-  {},
+  {} as { [k: string]: string },
 );
 Object.freeze(Permissions);
 export { Permissions };

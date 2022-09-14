@@ -190,30 +190,33 @@ export class Client extends ClientCore implements IClient {
     /**
      * Computes the payload to be given when creating a proposal that grants a permission within a DAO
      *
+     * @param {string} daoAddress
      * @param {IPermissionParams} params
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    grantAction: (params: IPermissionParams): DaoAction =>
-      this._buildGrantAction(params),
+    grantAction: (daoAddress: string, params: IPermissionParams): DaoAction =>
+      this._buildGrantAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that revokes a permission within a DAO
      *
+     * @param {string} daoAddress
      * @param {IPermissionParams} params
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    revokeAction: (params: IPermissionParams): DaoAction =>
-      this._buildRevokeAction(params),
+    revokeAction: (daoAddress: string, params: IPermissionParams): DaoAction =>
+      this._buildRevokeAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that freezes a permission within a DAO
      *
+     * @param {string} daoAddress
      * @param {IFreezeParams} params
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    freezeAction: (params: IFreezeParams): DaoAction =>
-      this._buildFreezeAction(params),
+    freezeAction: (daoAddress: string, params: IFreezeParams): DaoAction =>
+      this._buildFreezeAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
      *
@@ -693,17 +696,20 @@ export class Client extends ClientCore implements IClient {
   }
 
   private _buildGrantAction(
+    daoAddreess: string,
     params: IPermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where, who } = params;
     if (!signer) {
       throw new Error("A signer is needed");
-    } else if (!isAddress(where) || !isAddress(who)) {
+    } else if (
+      !isAddress(where) || !isAddress(who) || !isAddress(daoAddreess)
+    ) {
       throw new Error("Invalid address");
     }
     return {
-      to: where,
+      to: daoAddreess,
       value: BigInt(0),
       data: encodeGrantActionData(
         {
@@ -716,17 +722,20 @@ export class Client extends ClientCore implements IClient {
   }
 
   private _buildRevokeAction(
+    daoAddreess: string,
     params: IPermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where, who } = params;
     if (!signer) {
       throw new Error("A signer is needed");
-    } else if (!isAddress(where) || !isAddress(who)) {
+    } else if (
+      !isAddress(where) || !isAddress(who) || !isAddress(daoAddreess)
+    ) {
       throw new Error("Invalid address");
     }
     return {
-      to: where,
+      to: daoAddreess,
       value: BigInt(0),
       data: encodeRevokeActionData(
         {
@@ -739,17 +748,18 @@ export class Client extends ClientCore implements IClient {
   }
 
   private _buildFreezeAction(
+    daoAddreess: string,
     params: IFreezeParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where } = params;
     if (!signer) {
       throw new Error("A signer is needed");
-    } else if (!isAddress(where)) {
+    } else if (!isAddress(where) || !isAddress(daoAddreess)) {
       throw new Error("Invalid address");
     }
     return {
-      to: where,
+      to: daoAddreess,
       value: BigInt(0),
       data: encodeFreezeAction(
         {

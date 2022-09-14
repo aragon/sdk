@@ -58,9 +58,8 @@ function wrapFreezeParams(
   return {
     where: result[0],
     permission:
-      // @ts-ignore
       Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[1])
-        .replace(/_ID$/, "") || "",
+        ?.replace(/_ID$/, "") || "",
   };
 }
 
@@ -132,7 +131,6 @@ function wrapPermissionParams(
     where: result[0],
     who: result[1],
     permission:
-      // @ts-ignore
       Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[2])
         ?.replace(/_ID$/, "") || "",
   };
