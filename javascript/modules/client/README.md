@@ -1558,8 +1558,10 @@ const grantParams: IPermissionParams = {
   where: "0x1234567890123456789012345678901234567890",
   permission: Permissions.UPGRADE_PERMISSION,
 };
+const daoAddress = "0x1234567890123456789012345678901234567890"
 
 const grantAction = await client.encoding.grantAction(
+  daoAddress
   grantParams,
 );
 console.log(grantAction);
@@ -1590,8 +1592,10 @@ const revokeParams: IPermissionParams = {
   where: "0x1234567890123456789012345678901234567890",
   permission: Permissions.UPGRADE_PERMISSION,
 };
+const daoAddress = "0x1234567890123456789012345678901234567890"
 
 const revokeAction = await client.encoding.revokeAction(
+  daoAddress,
   revokeParams,
 );
 console.log(revokeAction);
@@ -1621,8 +1625,10 @@ const freezeParams: IFreezeParams = {
   where: "0x1234567890123456789012345678901234567890",
   permission: Permissions.UPGRADE_PERMISSION,
 };
+const daoAddress = "0x1234567890123456789012345678901234567890"
 
 const freezeAction = await client.encoding.freezeAction(
+  daoAddress,
   freezeParams,
 );
 console.log(freezeAction);
@@ -1767,6 +1773,7 @@ const context: Context = new Context(params);
 const client: Client = new Client(context);
 
 const data: Uint8Array =  new Uint8Array([12, ..., 56])
+const daoAddress = "0x1234567890123456789012345678901234567890"
 
 const grantParams = client.decoding.grantAction(
   data
