@@ -39,9 +39,18 @@ export interface IClient extends IClientCore {
   };
   encoding: {
     /** Computes the withdraw action payload */
-    grantAction: (daoAddress: string, params: IPermissionParams) => DaoAction;
-    revokeAction: (daoAddress: string, params: IPermissionParams) => DaoAction;
-    freezeAction: (daoAddress: string, params: IPermissionParams) => DaoAction;
+    grantAction: (
+      daoAddress: string,
+      params: IGrantPermissionParams,
+    ) => DaoAction;
+    revokeAction: (
+      daoAddress: string,
+      params: IRevokePermissionParams,
+    ) => DaoAction;
+    freezeAction: (
+      daoAddress: string,
+      params: IFreezePermissionParams,
+    ) => DaoAction;
     withdrawAction: (
       daoAddresOrEns: string,
       params: IWithdrawParams,
@@ -52,9 +61,9 @@ export interface IClient extends IClientCore {
     ) => Promise<DaoAction>;
   };
   decoding: {
-    grantAction: (data: Uint8Array) => IPermissionDecodedParams;
-    revokeAction: (data: Uint8Array) => IPermissionDecodedParams;
-    freezeAction: (data: Uint8Array) => IFreezeDecodedParams;
+    grantAction: (data: Uint8Array) => IGrantPermissionDecodedParams;
+    revokeAction: (data: Uint8Array) => IRevokePermissionParams;
+    freezeAction: (data: Uint8Array) => IFreezePermissionDecodedParams;
     withdrawAction: (data: Uint8Array) => IWithdrawParams;
     updateMetadataRawAction: (data: Uint8Array) => string;
     updateMetadataAction: (data: Uint8Array) => Promise<IMetadata>;
@@ -89,21 +98,29 @@ export interface IWithdrawParams {
   tokenAddress?: string;
   reference?: string;
 }
-export interface IPermissionParams {
+interface IPermissionParamsBase {
   where: string;
   who: string;
   permission: string;
 }
-export interface IPermissionDecodedParams extends IPermissionParams {
+interface IPermissionDecodedParamsBase extends IPermissionParamsBase {
   permissionId: string;
 }
-export interface IFreezeParams {
+export interface IGrantPermissionParams extends IPermissionParamsBase {}
+export interface IRevokePermissionParams extends IPermissionParamsBase {}
+export interface IGrantPermissionDecodedParams
+  extends IPermissionDecodedParamsBase {}
+export interface IRevokePermissionDecodedParams
+  extends IPermissionDecodedParamsBase {}
+export interface IFreezePermissionParams {
   where: string;
   permission: string;
 }
-export interface IFreezeDecodedParams extends IFreezeParams {
+export interface IFreezePermissionDecodedParams
+  extends IFreezePermissionParams {
   permissionId: string;
 }
+
 const Permissions = {
   UPGRADE_PERMISSION: "UPGRADE_PERMISSION",
   SET_METADATA_PERMISSION: "SET_METADATA_PERMISSION",

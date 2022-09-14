@@ -1546,14 +1546,14 @@ The helpers above help encoding the most typical DAO operations.
 import {
   Client,
   Context,
-  IPermissionParams,
+  IGrantPermissionParams,
   Permissions,
 } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
 
-const grantParams: IPermissionParams = {
+const grantParams: IGrantPermissionParams = {
   who: "0x1234567890123456789012345678901234567890",
   where: "0x1234567890123456789012345678901234567890",
   permission: Permissions.UPGRADE_PERMISSION,
@@ -1580,19 +1580,19 @@ console.log(grantAction);
 import {
   Client,
   Context,
-  IPermissionParams,
+  IRevokePermissionParams,
   Permissions,
 } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
 
-const revokeParams: IPermissionParams = {
+const revokeParams: IRevokePermissionParams = {
   who: "0x1234567890123456789012345678901234567890",
   where: "0x1234567890123456789012345678901234567890",
   permission: Permissions.UPGRADE_PERMISSION,
 };
-const daoAddress = "0x1234567890123456789012345678901234567890"
+const daoAddress = "0x1234567890123456789012345678901234567890";
 
 const revokeAction = await client.encoding.revokeAction(
   daoAddress,
@@ -1614,18 +1614,18 @@ console.log(revokeAction);
 import {
   Client,
   Context,
-  IFreezeParams,
+  IFreezePermissionParams,
   Permissions,
 } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
 
-const freezeParams: IFreezeParams = {
+const freezeParams: IFreezePermissionParams = {
   where: "0x1234567890123456789012345678901234567890",
   permission: Permissions.UPGRADE_PERMISSION,
 };
-const daoAddress = "0x1234567890123456789012345678901234567890"
+const daoAddress = "0x1234567890123456789012345678901234567890";
 
 const freezeAction = await client.encoding.freezeAction(
   daoAddress,
@@ -1767,14 +1767,14 @@ const configAction = client.encoding.updatePluginSettingsAction(
 ### Decode action grant permission
 
 ```ts
-import { Client, Context, IPermissionParams, Permissions } from "@aragon/sdk-client";
+import { Client, Context, IGrantPermissionDecodedParams } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
 
 const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
-const grantParams = client.decoding.grantAction(
+const grantParams:IGrantPermissionDecodedParams = client.decoding.grantAction(
   data
 );
 console.log(grantParams);
@@ -1791,14 +1791,14 @@ console.log(grantParams);
 ### Decode action revoke permission
 
 ```ts
-import { Client, Context, IPermissionParams, Permissions } from "@aragon/sdk-client";
+import { Client, Context, IRevokePermissionDecodedParams } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
 
 const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
-const revokeParams = client.decoding.revokeAction(
+const revokeParams:IRevokePermissionDecodedParams = client.decoding.revokeAction(
   data
 );
 console.log(revokeParams);
@@ -1815,14 +1815,14 @@ console.log(revokeParams);
 ### Decode action freeze permission
 
 ```ts
-import { Client, Context, IPermissionParams, Permissions } from "@aragon/sdk-client";
+import { Client, Context, IFreezePermissionDecodedParams } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
 
 const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
-const freezeParams = client.decoding.freezeAction(
+const freezeParams:IFreezePermissionDecodedParams = client.decoding.freezeAction(
   data
 );
 console.log(freezeParams);

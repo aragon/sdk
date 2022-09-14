@@ -5,10 +5,12 @@ import { AddressZero } from "@ethersproject/constants";
 import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import {
-  IFreezeParams,
-  IFreezeDecodedParams,
-  IPermissionParams,
-  IPermissionDecodedParams,
+  IFreezePermissionDecodedParams,
+  IFreezePermissionParams,
+  IGrantPermissionDecodedParams,
+  IGrantPermissionParams,
+  IRevokePermissionDecodedParams,
+  IRevokePermissionParams,
   IWithdrawParams,
   PermissionIds,
 } from "../interfaces/client";
@@ -21,7 +23,7 @@ export function getFunctionFragment(data: Uint8Array): FunctionFragment {
   return inter.getFunction(hexBytes.substring(0, 10));
 }
 export function encodeFreezeAction(
-  params: IFreezeParams,
+  params: IFreezePermissionParams,
 ): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
   const args = unwrapFreezeParams(params);
@@ -30,7 +32,9 @@ export function encodeFreezeAction(
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeFreezeActionData(data: Uint8Array): IFreezeDecodedParams {
+export function decodeFreezeActionData(
+  data: Uint8Array,
+): IFreezePermissionDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
@@ -47,7 +51,7 @@ export function decodeFreezeActionData(data: Uint8Array): IFreezeDecodedParams {
 }
 
 function unwrapFreezeParams(
-  params: IFreezeParams,
+  params: IFreezePermissionParams,
 ): [string, string] {
   return [
     params.where,
@@ -56,7 +60,7 @@ function unwrapFreezeParams(
 }
 function wrapFreezeParams(
   result: Result,
-): IFreezeDecodedParams {
+): IFreezePermissionDecodedParams {
   return {
     where: result[0],
     permissionId: result[1],
@@ -67,7 +71,7 @@ function wrapFreezeParams(
 }
 
 export function encodeGrantActionData(
-  params: IPermissionParams,
+  params: IGrantPermissionParams,
 ): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
   const args = unwrapPermissionParams(params);
@@ -76,7 +80,9 @@ export function encodeGrantActionData(
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeGrantActionData(data: Uint8Array): IPermissionDecodedParams {
+export function decodeGrantActionData(
+  data: Uint8Array,
+): IGrantPermissionDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
@@ -93,7 +99,7 @@ export function decodeGrantActionData(data: Uint8Array): IPermissionDecodedParam
 }
 
 export function encodeRevokeActionData(
-  params: IPermissionParams,
+  params: IRevokePermissionParams,
 ): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
   const args = unwrapPermissionParams(params);
@@ -102,7 +108,9 @@ export function encodeRevokeActionData(
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeRevokeActionData(data: Uint8Array): IPermissionDecodedParams {
+export function decodeRevokeActionData(
+  data: Uint8Array,
+): IRevokePermissionDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
@@ -119,7 +127,7 @@ export function decodeRevokeActionData(data: Uint8Array): IPermissionDecodedPara
 }
 
 function unwrapPermissionParams(
-  params: IPermissionParams,
+  params: IGrantPermissionParams | IRevokePermissionParams,
 ): [string, string, string] {
   return [
     params.where,
@@ -129,7 +137,7 @@ function unwrapPermissionParams(
 }
 function wrapPermissionParams(
   result: Result,
-): IPermissionDecodedParams {
+): IGrantPermissionDecodedParams | IRevokePermissionDecodedParams {
   return {
     where: result[0],
     who: result[1],

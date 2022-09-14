@@ -12,12 +12,14 @@ import {
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
-  IFreezeParams,
-  IFreezeDecodedParams,
   IMetadata,
-  IPermissionParams,
-  IPermissionDecodedParams,
   IWithdrawParams,
+  IGrantPermissionParams,
+  IRevokePermissionParams,
+  IFreezePermissionParams,
+  IGrantPermissionDecodedParams,
+  IRevokePermissionDecodedParams,
+  IFreezePermissionDecodedParams,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -193,31 +195,31 @@ export class Client extends ClientCore implements IClient {
      * Computes the payload to be given when creating a proposal that grants a permission within a DAO
      *
      * @param {string} daoAddress
-     * @param {IPermissionParams} params
+     * @param {IGrantPermissionParams} params
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    grantAction: (daoAddress: string, params: IPermissionParams): DaoAction =>
+    grantAction: (daoAddress: string, params: IGrantPermissionParams): DaoAction =>
       this._buildGrantAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that revokes a permission within a DAO
      *
      * @param {string} daoAddress
-     * @param {IPermissionParams} params
+     * @param {IRevokePermissionParams} params
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    revokeAction: (daoAddress: string, params: IPermissionParams): DaoAction =>
+    revokeAction: (daoAddress: string, params: IRevokePermissionParams): DaoAction =>
       this._buildRevokeAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that freezes a permission within a DAO
      *
      * @param {string} daoAddress
-     * @param {IFreezeParams} params
+     * @param {IFreezePermissionParams} params
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    freezeAction: (daoAddress: string, params: IFreezeParams): DaoAction =>
+    freezeAction: (daoAddress: string, params: IFreezePermissionParams): DaoAction =>
       this._buildFreezeAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
@@ -252,28 +254,28 @@ export class Client extends ClientCore implements IClient {
      * Decodes the permission parameters from an encoded grant action
      *
      * @param {Uint8Array} data
-     * @return {*}  {IPermissionParams}
+     * @return {*}  {IGrantPermissionDecodedParams}
      * @memberof Client
      */
-    grantAction: (data: Uint8Array): IPermissionDecodedParams =>
+    grantAction: (data: Uint8Array): IGrantPermissionDecodedParams =>
       decodeGrantActionData(data),
     /**
      * Decodes the permission parameters from an encoded revoke action
      *
      * @param {Uint8Array} data
-     * @return {*}  {IPermissionParams}
+     * @return {*}  {IRevokePermissionDecodedParams}
      * @memberof Client
      */
-    revokeAction: (data: Uint8Array): IPermissionDecodedParams =>
+    revokeAction: (data: Uint8Array): IRevokePermissionDecodedParams =>
       decodeRevokeActionData(data),
     /**
      * Decodes the freezee parameters from an encoded freeze action
      *
      * @param {Uint8Array} data
-     * @return {*}  {IFreezeParams}
+     * @return {*}  {IFreezePermissionDecodedParams}
      * @memberof Client
      */
-    freezeAction: (data: Uint8Array): IFreezeDecodedParams =>
+    freezeAction: (data: Uint8Array): IFreezePermissionDecodedParams =>
       decodeFreezeActionData(data),
     /**
      * Decodes the withdraw parameters from an encoded withdraw action
@@ -699,7 +701,7 @@ export class Client extends ClientCore implements IClient {
 
   private _buildGrantAction(
     daoAddreess: string,
-    params: IPermissionParams,
+    params: IGrantPermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where, who } = params;
@@ -725,7 +727,7 @@ export class Client extends ClientCore implements IClient {
 
   private _buildRevokeAction(
     daoAddreess: string,
-    params: IPermissionParams,
+    params: IRevokePermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where, who } = params;
@@ -751,7 +753,7 @@ export class Client extends ClientCore implements IClient {
 
   private _buildFreezeAction(
     daoAddreess: string,
-    params: IFreezeParams,
+    params: IFreezePermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where } = params;

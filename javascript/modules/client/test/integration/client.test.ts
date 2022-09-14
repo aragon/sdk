@@ -23,11 +23,13 @@ import {
 import {
   DaoSortBy,
   IDaoQueryParams,
-  IFreezeParams,
-  IFreezeDecodedParams,
+  IFreezePermissionDecodedParams,
+  IFreezePermissionParams,
+  IGrantPermissionDecodedParams,
+  IGrantPermissionParams,
   IMetadata,
-  IPermissionParams,
-  IPermissionDecodedParams,
+  IRevokePermissionDecodedParams,
+  IRevokePermissionParams,
   Permissions,
 } from "../../src/internal/interfaces/client";
 import { DaoAction, SortDirection } from "../../src/internal/interfaces/common";
@@ -430,7 +432,11 @@ describe("Client", () => {
     it("Should create a client and generate a grant action", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const paramsArray: IPermissionParams[] = [
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IGrantPermissionParams[] = [
         {
           who: "0x0987654321098765432109876543210987654321",
           where: "0x0987654321098765432109876543210987654321",
@@ -445,13 +451,13 @@ describe("Client", () => {
       let actions: DaoAction[] = [];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
-        actions.push(client.encoding.grantAction(daoAddress, params));
+        actions.push(client.encoding.grantAction(daoAddresses[i], params));
       }
       const decoder = new TextDecoder();
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
         expect(typeof action).toBe("object");
-        expect(action.to).toBe(daoAddress);
+        expect(action.to).toBe(daoAddresses[i]);
         expect(action.data).toBeInstanceOf(Uint8Array);
       }
       expect(
@@ -461,7 +467,11 @@ describe("Client", () => {
     it("Should create a client and generate a revoke action", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const paramsArray: IPermissionParams[] = [
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IRevokePermissionParams[] = [
         {
           who: "0x0987654321098765432109876543210987654321",
           where: "0x0987654321098765432109876543210987654321",
@@ -476,13 +486,13 @@ describe("Client", () => {
       let actions: DaoAction[] = [];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
-        actions.push(client.encoding.revokeAction(daoAddress, params));
+        actions.push(client.encoding.revokeAction(daoAddresses[i], params));
       }
       const decoder = new TextDecoder();
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
         expect(typeof action).toBe("object");
-        expect(action.to).toBe(daoAddress);
+        expect(action.to).toBe(daoAddresses[i]);
         expect(action.data).toBeInstanceOf(Uint8Array);
       }
       expect(
@@ -493,7 +503,12 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const paramsArray: IFreezeParams[] = [
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+
+      const paramsArray: IFreezePermissionParams[] = [
         {
           where: "0x1234567890123456789012345678901234567890",
           permission: Permissions.UPGRADE_PERMISSION,
@@ -506,13 +521,13 @@ describe("Client", () => {
       let actions: DaoAction[] = [];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
-        actions.push(client.encoding.freezeAction(daoAddress, params));
+        actions.push(client.encoding.freezeAction(daoAddresses[i], params));
       }
       const decoder = new TextDecoder();
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
         expect(typeof action).toBe("object");
-        expect(action.to).toBe(daoAddress);
+        expect(action.to).toBe(daoAddresses[i]);
         expect(action.data).toBeInstanceOf(Uint8Array);
       }
       expect(
@@ -552,8 +567,11 @@ describe("Client", () => {
     it("Should decode an encoded grant action", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-
-      const paramsArray: IPermissionParams[] = [
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IGrantPermissionParams[] = [
         {
           who: "0x1234567890123456789012345678901234567890",
           where: "0x1234567890123456789012345678901234567890",
@@ -567,8 +585,8 @@ describe("Client", () => {
       ];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
-        const action = client.encoding.grantAction(daoAddress, params);
-        const decodedParams: IPermissionDecodedParams = client.decoding
+        const action = client.encoding.grantAction(daoAddresses[i], params);
+        const decodedParams: IGrantPermissionDecodedParams = client.decoding
           .grantAction(action.data);
 
         expect(decodedParams.permission).toBe(
@@ -587,7 +605,11 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const paramsArray: IPermissionParams[] = [
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IRevokePermissionParams[] = [
         {
           who: "0x1234567890123456789012345678901234567890",
           where: "0x1234567890123456789012345678901234567890",
@@ -601,8 +623,8 @@ describe("Client", () => {
       ];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
-        const action = client.encoding.revokeAction(daoAddress, params);
-        const decodedParams: IPermissionDecodedParams = client.decoding
+        const action = client.encoding.revokeAction(daoAddresses[i], params);
+        const decodedParams: IRevokePermissionDecodedParams = client.decoding
           .revokeAction(action.data);
 
         expect(decodedParams.permission).toBe(
@@ -621,7 +643,11 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const paramsArray: IFreezeParams[] = [
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IFreezePermissionParams[] = [
         {
           where: "0x1234567890123456789012345678901234567890",
           permission: Permissions.UPGRADE_PERMISSION,
@@ -633,8 +659,8 @@ describe("Client", () => {
       ];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
-        const action = client.encoding.freezeAction(daoAddress, params);
-        const decodedParams: IFreezeDecodedParams = client.decoding
+        const action = client.encoding.freezeAction(daoAddresses[i], params);
+        const decodedParams: IFreezePermissionDecodedParams = client.decoding
           .freezeAction(action.data);
 
         expect(decodedParams.permission).toBe(
