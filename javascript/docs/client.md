@@ -451,8 +451,14 @@ so that the plugin is configured</p>
     * [.getDao(daoAddressOrEns)](#Client.getDao) ⇒ <code>\*</code>
     * [.getDaos(params)](#Client.getDaos) ⇒ <code>\*</code>
     * [.hasPermission(where, who, role, data)](#Client.hasPermission) ⇒ <code>\*</code>
+    * [.grantAction(daoAddress, params)](#Client.grantAction) ⇒ <code>\*</code>
+    * [.revokeAction(daoAddress, params)](#Client.revokeAction) ⇒ <code>\*</code>
+    * [.freezeAction(daoAddress, params)](#Client.freezeAction) ⇒ <code>\*</code>
     * [.withdrawAction(daoAddresOrEns, params)](#Client.withdrawAction) ⇒ <code>\*</code>
     * [.updateMetadataAction(daoAddresOrEns, params)](#Client.updateMetadataAction) ⇒ <code>\*</code>
+    * [.grantAction(data)](#Client.grantAction) ⇒ <code>\*</code>
+    * [.revokeAction(data)](#Client.revokeAction) ⇒ <code>\*</code>
+    * [.freezeAction(data)](#Client.freezeAction) ⇒ <code>\*</code>
     * [.withdrawAction(data)](#Client.withdrawAction) ⇒ <code>\*</code>
     * [.updateMetadataRawAction(data)](#Client.updateMetadataRawAction) ⇒ <code>\*</code>
     * [.updateMetadataAction(data)](#Client.updateMetadataAction) ⇒ <code>\*</code>
@@ -547,6 +553,45 @@ so that the plugin is configured</p>
 | role | <code>DaoRole</code> | 
 | data | <code>Uint8Array</code> | 
 
+<a name="Client.grantAction"></a>
+
+### Client.grantAction(daoAddress, params) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that grants a permission within a DAO</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<DaoAction>}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddress | <code>string</code> | 
+| params | <code>IGrantPermissionParams</code> | 
+
+<a name="Client.revokeAction"></a>
+
+### Client.revokeAction(daoAddress, params) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that revokes a permission within a DAO</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<DaoAction>}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddress | <code>string</code> | 
+| params | <code>IRevokePermissionParams</code> | 
+
+<a name="Client.freezeAction"></a>
+
+### Client.freezeAction(daoAddress, params) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that freezes a permission within a DAO</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{Promise<DaoAction>}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddress | <code>string</code> | 
+| params | <code>IFreezePermissionParams</code> | 
+
 <a name="Client.withdrawAction"></a>
 
 ### Client.withdrawAction(daoAddresOrEns, params) ⇒ <code>\*</code>
@@ -572,6 +617,42 @@ so that the plugin is configured</p>
 | --- | --- |
 | daoAddresOrEns | <code>string</code> | 
 | params | <code>IMetadata</code> | 
+
+<a name="Client.grantAction"></a>
+
+### Client.grantAction(data) ⇒ <code>\*</code>
+<p>Decodes the permission parameters from an encoded grant action</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{IGrantPermissionDecodedParams}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="Client.revokeAction"></a>
+
+### Client.revokeAction(data) ⇒ <code>\*</code>
+<p>Decodes the permission parameters from an encoded revoke action</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{IRevokePermissionDecodedParams}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="Client.freezeAction"></a>
+
+### Client.freezeAction(data) ⇒ <code>\*</code>
+<p>Decodes the freezee parameters from an encoded freeze action</p>
+
+**Kind**: static method of [<code>Client</code>](#Client)  
+**Returns**: <code>\*</code> - <p>{IFreezePermissionDecodedParams}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
 
 <a name="Client.withdrawAction"></a>
 
