@@ -1,15 +1,36 @@
 import { gql } from "graphql-request";
 
-export const QueryDaoByAddress = gql`
-  query daoByAddress($address: ID!) {
+export const QueryDao = gql`
+  query dao($address: ID!) {
     dao(id: $address){
       id
       name
       metadata
-      creationDate
+      createdAt
+      packages{
+        pkg{
+          id
+          __typename
+        }
+      }
     }
   }
-`
+`;
+export const QueryDaos = gql`
+  query daos ($limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: Dao_orderBy!) {
+    daos(first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
+      id
+      name
+      metadata
+      packages{
+        pkg{
+          id
+          __typename
+        }
+      }
+    }
+  }
+`;
 
 export const QueryDaoTransfersByAddress = gql`
 query daoTransfersByAddress($address: ID!) {
@@ -50,4 +71,4 @@ query daoTransfersByAddress($address: ID!) {
     }
   }
 }
-`
+`;

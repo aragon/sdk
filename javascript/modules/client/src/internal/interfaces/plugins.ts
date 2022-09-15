@@ -25,7 +25,7 @@ export interface IClientErc20 extends IClientCore {
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
-    getProposal: (propoosalId: string) => Promise<Erc20Proposal>;
+    getProposal: (propoosalId: string) => Promise<Erc20Proposal | null>;
     getProposals: (
       params?: IProposalQueryParams,
     ) => Promise<Erc20ProposalListItem[]>;
@@ -208,6 +208,7 @@ export type ProposalBase = {
   creationDate: Date;
   actions: Array<DaoAction>;
   status: ProposalStatus;
+  totalVotingWeight: bigint
 };
 
 export type Erc20Proposal = ProposalBase & {

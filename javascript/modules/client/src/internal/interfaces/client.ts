@@ -20,7 +20,7 @@ export interface IClient extends IClientCore {
     getBalances: (
       daoAddressOrEns: string,
       tokenAddresses: string[],
-    ) => Promise<AssetBalance[]>;
+    ) => Promise<AssetBalance[] | null>;
     /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string) => Promise<IAssetTransfers>;
     /** Checks whether a role is granted by the current DAO's ACL settings */
@@ -33,7 +33,7 @@ export interface IClient extends IClientCore {
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getDao: (daoAddressOrEns: string) => Promise<DaoDetails>;
+    getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
     /** Retrieves metadata for many daos */
     getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
   };
@@ -274,7 +274,7 @@ export interface IDaoQueryParams extends IPagination {
 }
 
 export enum DaoSortBy {
-  CREATED_AT,
-  NAME,
-  POPULARITY, // currently defined as number of proposals
+  CREATED_AT = 'created_at',
+  NAME = 'name',
+  POPULARITY = 'totalProposals', // currently defined as number of proposals
 }

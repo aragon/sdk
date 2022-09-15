@@ -7,12 +7,15 @@ import {
   DaoDepositSteps,
   DaoDepositStepValue,
   DaoDetails,
+  DaoListItem,
+  DaoSortBy,
   IAssetTransfers,
   IClient,
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
   IMetadata,
+  InstalledPluginListItem,
   IWithdrawParams,
   IGrantPermissionParams,
   IRevokePermissionParams,
@@ -38,6 +41,7 @@ import {
   DaoAction,
   DaoRole,
   IInterfaceParams,
+  SortDirection,
 } from "./internal/interfaces/common";
 import { pack } from "@ethersproject/solidity";
 
@@ -57,8 +61,10 @@ import {
   encodeWithdrawActionData,
   getFunctionFragment,
 } from "./internal/encoding/client";
-import { delay, getDummyDao } from "./internal/temp-mock";
+import { delay } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
+import { QueryBalances } from "./internal/graphql-queries/balances";
+import { QueryDao, QueryDaos } from "./internal/graphql-queries";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -142,7 +148,7 @@ export class Client extends ClientCore implements IClient {
     getBalances: (
       daoAddressOrEns: string,
       tokenAddresses: string[] = [],
-    ): Promise<AssetBalance[]> =>
+    ): Promise<AssetBalance[] | null> =>
       this._getBalances(daoAddressOrEns, tokenAddresses),
     /**
      * Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)
@@ -160,7 +166,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<IAssetTransfers>}
      * @memberof Client
      */
-    getDao: (daoAddressOrEns: string): Promise<DaoDetails> =>
+    getDao: (daoAddressOrEns: string): Promise<DaoDetails | null> =>
       this._getDao(daoAddressOrEns),
     /**
      * Retrieves metadata for DAO with given identifier (address or ens domain)
@@ -169,7 +175,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoDetails[]>}
      * @memberof Client
      */
-    getDaos: (params?: IDaoQueryParams): Promise<DaoDetails[]> =>
+    getDaos: (params?: IDaoQueryParams): Promise<DaoListItem[]> =>
       this._getDaos(params ?? {}),
 
     /**
@@ -365,6 +371,14 @@ export class Client extends ClientCore implements IClient {
       this.web3.getDaoFactoryAddress(),
       signer,
     );
+
+    // @ts-ignore
+    let cid: string;
+    try {
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
+    } catch {
+      throw new Error("Could not pin the metadata on IPFS");
+    }
 
     // @ts-ignore  TODO: Remove this comment when used
     const registryAddress = await daoFactoryInstance.registry();
@@ -579,50 +593,152 @@ export class Client extends ClientCore implements IClient {
 
   //// PRIVATE METHODS METADATA
 
-  private _getDao(daoAddressOrEns: string): Promise<DaoDetails> {
-    // TODO: Implement actual fetch logic using subgraph.
-
-    if (!daoAddressOrEns) {
-      throw new Error("Invalid DAO address or ENS");
+  private async _getDao(daoAddressOrEns: string): Promise<DaoDetails | null> {
+    if (!isAddress(daoAddressOrEns)) {
+      // TODO
+      // ens resolve
+      throw new Error("Invalid address");
     }
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
-      getDummyDao(daoAddressOrEns)
-    );
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { dao } = await client.request(QueryDao, {
+        address: daoAddressOrEns,
+      });
+      if (!dao) {
+        return null;
+      }
+      // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
+      // TODO
+      // this is a temporal fix and should be changed by the line above
+      // but the current daos in subgraph dont have a proper metadata
+      const stringMetadata = await this.ipfs.fetchString(
+        "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr",
+      );
+      const metadata = JSON.parse(stringMetadata);
+      return {
+        address: dao.id,
+        ensDomain: dao.name,
+        metadata: {
+          name: metadata.name,
+          description: metadata.description,
+          avatar: metadata.avatar || null,
+          links: metadata.links,
+        },
+        creationDate: new Date(parseInt(dao.createdAt) * 1000),
+        // TODO update when new subgraph schema is deployed
+        plugins: dao.packages.map(
+          (
+            pkg: { pkg: { id: string; __typename: string } },
+          ): InstalledPluginListItem => {
+            return {
+              instanceAddress: pkg.pkg.id,
+              id: pkg.pkg.__typename,
+              version: "0.0.1",
+            };
+          },
+        ),
+      };
+    } catch (err) {
+      throw new Error("Cannot fetch the dao details data from GraphQL");
+    }
   }
 
-  private _getDaos({
+  private async _getDaos({
     limit = 10,
-    // TODO
-    // uncomment this
-    // skip = 0,
-    // direction = SortDirection.ASC,
-    // sortBy = DaoSortBy.CREATED_AT
-  }: IDaoQueryParams): Promise<DaoDetails[]> {
-    const metadataMany: DaoDetails[] = [];
-    for (let index = 0; index < limit; index++) {
-      metadataMany.push(getDummyDao());
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = DaoSortBy.CREATED_AT,
+  }: IDaoQueryParams): Promise<DaoListItem[]> {
+    const daosDetails: DaoListItem[] = [];
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { daos } = await client.request(QueryDaos, {
+        limit,
+        skip,
+        direction,
+        sortBy,
+      });
+      for (let i = 0; i < daos.length; i++) {
+        const dao = daos[i];
+        // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
+        // TODO
+        // this is a temporal fix and should be changed by the line above
+        // but the current daos in subgraph dont have a proper metadata
+        const stringMetadata = await this.ipfs.fetchString(
+          "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr",
+        );
+        const metadata = JSON.parse(stringMetadata);
+        daosDetails.push({
+          address: dao.id,
+          ensDomain: dao.name,
+          metadata: {
+            name: metadata.name,
+            avatar: metadata.avatar || null,
+          },
+          // TODO update when new subgraph schema is deployed
+          plugins: dao.packages.map(
+            (
+              pkg: { pkg: { id: string; __typename: string } },
+            ): InstalledPluginListItem => {
+              return {
+                instanceAddress: pkg.pkg.id,
+                id: pkg.pkg.__typename,
+                version: "0.0.1",
+              };
+            },
+          ),
+        });
+      }
+      return daosDetails;
+    } catch (err) {
+      throw new Error("Cannot fetch the dao details data from GraphQL");
     }
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (metadataMany),
-    );
   }
 
-  private _getBalances(
-    daoIdentifier: string,
+  private async _getBalances(
+    daoAddress: string,
     _tokenAddresses: string[],
-  ): Promise<AssetBalance[]> {
-    // TODO: Implement actual fetch logic using subgraph.
-    // Note: it would be nice if the client could be instantiated with dao identifier
-
-    if (!daoIdentifier) {
-      throw new Error("Invalid DAO address or ENS");
+  ): Promise<AssetBalance[] | null> {
+    // TODO check address
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { dao } = await client.request(QueryBalances, {
+        address: daoAddress,
+      });
+      if (!dao) {
+        return null;
+      }
+      if (dao.balances.length === 0) {
+        return [];
+      }
+      const balances: AssetBalance[] = [];
+      for (let i = 0; i < dao.balances.length; i++) {
+        const balance = dao.balances[i];
+        if (balance.token.symbol === "ETH") {
+          balances.push({
+            type: "native",
+            balance: BigInt(balance.balance),
+            lastUpdate: new Date(parseInt(balance.lastUpdated) * 1000),
+          });
+          continue;
+        }
+        balances.push({
+          type: "erc20",
+          address: balance.token.id,
+          name: balance.token.name,
+          symbol: balance.token.symbol,
+          decimals: parseInt(balance.token.decimals),
+          balance: BigInt(balance.balance),
+          lastUpdate: new Date(parseInt(balance.lastUpdated) * 1000),
+        });
+      }
+      return balances;
+    } catch (err) {
+      throw new Error("Cannot fetch the balance data from GraphQL");
     }
-
-    const AssetBalances: AssetBalance[] = assetList.map((token) => ({
-      ...token,
-    }));
-
-    return Promise.resolve(AssetBalances);
   }
   private async _getTransfers(
     daoAddressOrEns: string,

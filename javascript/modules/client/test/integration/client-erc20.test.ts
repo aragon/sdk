@@ -87,6 +87,12 @@ const contextParamsLocalChain: ContextPluginParams = {
   pluginAddress: "0x2345678901234567890123456789012345678901",
   ipfsNodes: [
     {
+      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: {
+        "X-API-KEY": IPFS_API_KEY || "",
+      },
+    },
+    {
       url: "http:localhost:5001",
     },
     {
@@ -489,12 +495,91 @@ describe("Client", () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
 
-      const proposalId = "0x1234567890123456789012345678901234567890_0x55";
+      const proposalId = "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(typeof proposal).toBe("object");
-      expect(proposal.id).toBe(proposalId);
-      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+      expect(proposal === null).toBe(false);
+      if (proposal) {
+        expect(proposal.id).toBe(proposalId);
+        expect(typeof proposal.id).toBe("string");
+        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+        expect(typeof proposal.dao.address).toBe("string");
+        expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof proposal.dao.name).toBe("string");
+        expect(typeof proposal.creatorAddress).toBe("string");
+        expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        // check metadata
+        expect(typeof proposal.metadata.title).toBe("string");
+        expect(typeof proposal.metadata.summary).toBe("string");
+        expect(typeof proposal.metadata.description).toBe("string");
+        expect(Array.isArray(proposal.metadata.resources)).toBe(true);
+        for (let i = 0; i < proposal.metadata.resources.length; i++) {
+          const resource = proposal.metadata.resources[i];
+          expect(typeof resource.name).toBe("string");
+          expect(typeof resource.url).toBe("string");
+        }
+        if (proposal.metadata.media) {
+          if (proposal.metadata.media.header) {
+            expect(typeof proposal.metadata.media.header).toBe("string");
+          }
+          if (proposal.metadata.media.logo) {
+            expect(typeof proposal.metadata.media.logo).toBe("string");
+          }
+        }
+        expect(proposal.startDate instanceof Date).toBe(true);
+        expect(proposal.endDate instanceof Date).toBe(true);
+        expect(proposal.creationDate instanceof Date).toBe(true);
+        expect(Array.isArray(proposal.actions)).toBe(true);
+        // actions
+        for (let i = 0; i < proposal.actions.length; i++) {
+          const action = proposal.actions[i];
+          expect(action.data instanceof Uint8Array).toBe(true);
+          expect(typeof action.to).toBe("string");
+          expect(typeof action.value).toBe("bigint");
+        }
+        // result
+        expect(typeof proposal.result.yes).toBe("bigint");
+        expect(typeof proposal.result.no).toBe("bigint");
+        expect(typeof proposal.result.abstain).toBe("bigint");
+        // setttings
+        expect(typeof proposal.settings.duration).toBe("number");
+        expect(typeof proposal.settings.minSupport).toBe("number");
+        expect(typeof proposal.settings.minTurnout).toBe("number");
+        expect(
+          proposal.settings.minSupport >= 0 &&
+            proposal.settings.minSupport <= 1,
+        ).toBe(true);
+        expect(
+          proposal.settings.minTurnout >= 0 &&
+            proposal.settings.minTurnout <= 1,
+        ).toBe(true);
+        // token
+        expect(typeof proposal.token.name).toBe("string");
+        expect(typeof proposal.token.symbol).toBe("string");
+        expect(typeof proposal.token.decimals).toBe("number");
+        expect(typeof proposal.token.address).toBe("string");
+        expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof proposal.usedVotingWeight).toBe("bigint");
+        expect(typeof proposal.totalVotingWeight).toBe("bigint");
+        expect(Array.isArray(proposal.votes)).toBe(true);
+        for (let i = 0; i < proposal.votes.length; i++) {
+          const vote = proposal.votes[i];
+          expect(typeof vote.address).toBe("string");
+          expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+          expect(typeof vote.vote).toBe("number");
+          expect(typeof vote.weight).toBe("bigint");
+        }
+      }
+    });
+    it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+
+      const proposalId = "0x1234567890123456789012345678901234567890_0x0";
+      const proposal = await client.methods.getProposal(proposalId);
+
+      expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);

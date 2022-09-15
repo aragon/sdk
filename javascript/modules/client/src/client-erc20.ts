@@ -34,14 +34,12 @@ import {
   encodeUpdatePluginSettingsAction,
   getFunctionFragment,
 } from "./internal/encoding/plugins";
-import { bytesToHex, Random } from "@aragon/sdk-common";
-import {
-  delay,
-  getDummyErc20Proposal,
-  getDummyErc20ProposalListItem,
-} from "./internal/temp-mock";
+import { bytesToHex, hexToBytes, Random, strip0x } from "@aragon/sdk-common";
+import { delay, getDummyErc20ProposalListItem } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
 import { QueryToken } from "./internal/graphql-queries/token";
+import { QueryErc20Proposal } from "./internal/graphql-queries/proposal";
+import { formatEther } from "@ethersproject/units";
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
@@ -114,7 +112,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @return {*}  {Promise<Erc20Proposal>}
      * @memberof ClientErc20
      */
-    getProposal: (proposalId: string): Promise<Erc20Proposal> =>
+    getProposal: (proposalId: string): Promise<Erc20Proposal | null> =>
       this._getProposal(proposalId),
     /**
      * Returns a list of proposals on the Plugin, filtered by the given criteria
@@ -434,21 +432,140 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     );
   }
 
-  private _getProposal(proposalId: string): Promise<Erc20Proposal> {
+  private async _getProposal(
+    proposalId: string,
+  ): Promise<Erc20Proposal | null> {
     if (!proposalId) {
       throw new Error("Invalid proposalId");
     }
-    const proposal = getDummyErc20Proposal(proposalId);
-    proposal.status = getProposalStatus(
-      proposal.startDate,
-      proposal.endDate,
-      true,
-      proposal.result.yes,
-      proposal.result.no,
-    );
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (proposal),
-    );
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { erc20VotingProposal } = await client.request(QueryErc20Proposal, {
+        proposalId,
+      });
+      if (!erc20VotingProposal) {
+        return null;
+      }
+      // TODO
+      // delete this cid once the proposals in subgraph have the correct
+      // format in the metadata field
+      const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
+      const metadataString = await this.ipfs.fetchString(test_cid);
+      const metadata = JSON.parse(metadataString) as ProposalMetadata;
+      const startDate = new Date(
+        parseInt(erc20VotingProposal.startDate) * 1000,
+      );
+      const endDate = new Date(parseInt(erc20VotingProposal.endDate) * 1000);
+      const creationDate = new Date(
+        parseInt(erc20VotingProposal.createdAt) * 1000,
+      );
+      let usedVotingWeight: bigint = BigInt(0);
+      erc20VotingProposal.voters.forEach(
+        (voter: { voter: { id: string }; vote: string; weight: string }) => {
+          usedVotingWeight = usedVotingWeight + BigInt(voter.weight);
+        },
+      );
+      // get status
+      const status = getProposalStatus(
+        startDate,
+        endDate,
+        erc20VotingProposal.executed,
+        erc20VotingProposal
+          .yea,
+        erc20VotingProposal.nay,
+      );
+      // get start and end date
+      return {
+        id: erc20VotingProposal.id,
+        dao: {
+          address: erc20VotingProposal.dao.id,
+          name: erc20VotingProposal.dao.name,
+        },
+        creatorAddress: erc20VotingProposal.creator,
+        metadata: {
+          title: metadata.title,
+          summary: metadata.summary,
+          description: metadata.description,
+          resources: metadata.resources,
+          media: metadata.media,
+        },
+        startDate,
+        endDate,
+        creationDate,
+        actions: erc20VotingProposal.actions.map(
+          (action: { data: string; to: string; value: string }): DaoAction => {
+            return {
+              data: hexToBytes(strip0x(action.data)),
+              to: action.to,
+              value: BigInt(action.value),
+            };
+          },
+        ),
+        status,
+        result: {
+          yes: BigInt(erc20VotingProposal.yea),
+          no: BigInt(erc20VotingProposal.nay),
+          abstain: BigInt(erc20VotingProposal.abstain),
+        },
+        settings: {
+          // TODO
+          // this should be decoded using the number of decimals that we want
+          // right now the encoders/recoders use 2 digit precission but the actual
+          // subgraph values are 18 digits precision. Uncomment below for 2 digits
+          // precision
+
+          // minSupport: decodeRatio(
+          //   BigInt(erc20VotingProposal.supportRequiredPct),
+          //   2,
+          // ),
+          // minTurnout: decodeRatio(
+          //   BigInt(erc20VotingProposal.participationRequiredPct),
+          //   2,
+          // ),
+          // TODO DELETE ME
+          minSupport: parseFloat(
+            formatEther(erc20VotingProposal.supportRequiredPct),
+          ),
+          minTurnout: parseFloat(
+            formatEther(erc20VotingProposal.participationRequiredPct),
+          ),
+          duration: parseInt(erc20VotingProposal.endDate) -
+            parseInt(erc20VotingProposal.startDate),
+        },
+        token: {
+          address: erc20VotingProposal.pkg.token.id,
+          symbol: erc20VotingProposal.pkg.token.symbol,
+          name: erc20VotingProposal.pkg.token.name,
+          decimals: parseInt(erc20VotingProposal.pkg.token.decimals),
+        },
+        usedVotingWeight,
+        totalVotingWeight: BigInt(erc20VotingProposal.votingPower),
+        votes: erc20VotingProposal.voters.map(
+          (voter: { voter: { id: string }; vote: string; weight: string }) => {
+            let vote;
+            switch (voter.vote) {
+              case "Yea":
+                vote = VoteValues.YES;
+                break;
+              case "Nay":
+                vote = VoteValues.NO;
+                break;
+              case "Abstain":
+                vote = VoteValues.ABSTAIN;
+                break;
+            }
+            return {
+              address: voter.voter.id,
+              vote,
+              weight: BigInt(voter.weight),
+            };
+          },
+        ),
+      };
+    } catch (err) {
+      throw new Error("Cannot fetch the proposal data from GraphQL");
+    }
   }
 
   private _getProposals({
@@ -500,8 +617,8 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       const { erc20VotingPackage } = await client.request(QueryToken, {
         address: pluginAddress,
       });
-      if (!erc20VotingPackage){
-        return null
+      if (!erc20VotingPackage) {
+        return null;
       }
       return {
         address: erc20VotingPackage.token.id,

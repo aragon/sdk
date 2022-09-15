@@ -879,34 +879,132 @@ describe("Client", () => {
       const daoAddress = "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61";
       const dao = await client.methods.getDao(daoAddress);
       expect(typeof dao).toBe("object");
-      expect(dao.address).toBe(daoAddress);
-      expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(dao === null).toBe(false);
+      if (dao) {
+        expect(dao.address).toBe(daoAddress);
+        expect(typeof dao.address).toBe("string");
+        expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof dao.ensDomain).toBe("string");
+        expect(Array.isArray(dao.plugins)).toBe(true);
+        if (dao.plugins.length > 0) {
+          for (let i = 0; i < dao.plugins.length; i++) {
+            const plugin = dao.plugins[i];
+            expect(typeof plugin.id).toBe("string");
+            expect(typeof plugin.instanceAddress).toBe("string");
+            expect(plugin.instanceAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(typeof plugin.version).toBe("string");
+          }
+        }
+        expect(typeof dao.metadata.name).toBe("string");
+        expect(typeof dao.metadata.description).toBe("string");
+        expect(Array.isArray(dao.metadata.links)).toBe(true);
+        if (dao.metadata.links.length > 0) {
+          for (let i = 0; i < dao.metadata.links.length; i++) {
+            const link = dao.metadata.links[i];
+            expect(typeof link.name).toBe("string");
+            expect(typeof link.url).toBe("string");
+          }
+        }
+        if (dao.metadata.avatar) {
+          expect(typeof dao.metadata.avatar).toBe("string");
+        }
+      }
+    });
+    it("Should get a DAO's metadata of an non existent dao and receive null", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx);
+      const daoAddress = "0x1234567890123456789012345678901234567890";
+      const dao = await client.methods.getDao(daoAddress);
+      expect(dao === null).toBe(true);
+    });
+
+    it("Should get a DAO's metadata of an invalid dao address and throw an error", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx);
+      const daoAddress = "thisisinvalid";
+      await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
+        "Invalid address",
+      );
     });
 
     it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
+      const limit = 3;
       const params: IDaoQueryParams = {
-        limit: 10,
+        limit,
         skip: 0,
         direction: SortDirection.ASC,
         sortBy: DaoSortBy.NAME,
       };
       const daos = await client.methods.getDaos(params);
       expect(Array.isArray(daos)).toBe(true);
-      expect(daos.length <= 10).toBe(true);
+      expect(daos.length <= limit).toBe(true);
+      daos.reduce((prevDao, currentDao) => {
+        if (prevDao && currentDao) {
+          expect(currentDao.ensDomain.localeCompare(prevDao.ensDomain) === -1)
+            .toBe(false);
+        }
+        return currentDao;
+      });
+      for (let i = 0; i < daos.length; i++) {
+        const dao = daos[i];
+        expect(typeof dao.address).toBe("string");
+        expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof dao.ensDomain).toBe("string");
+        expect(Array.isArray(dao.plugins)).toBe(true);
+        for (let j = 0; j < dao.plugins.length; j++) {
+          const plugin = dao.plugins[j];
+          expect(typeof plugin.id).toBe("string");
+          expect(typeof plugin.instanceAddress).toBe("string");
+          expect(plugin.instanceAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+          expect(typeof plugin.version).toBe("string");
+        }
+        expect(typeof dao.metadata.name).toBe("string");
+        if (dao.metadata.avatar) {
+          expect(typeof dao.metadata.avatar).toBe("string");
+        }
+      }
     });
 
     it("Should get DAOs balances", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx);
-      const balances = await client.methods.getBalances(
-        "0x1234567890123456789012345678901234567890",
-      );
+      const daoAddress = "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61";
+      const balances = await client.methods.getBalances(daoAddress);
       expect(Array.isArray(balances)).toBe(true);
-      if (balances.length > 0) {
-        expect(typeof balances[0].balance).toBe("bigint");
+      expect(balances === null).toBe(false);
+      if (balances) {
+        expect(balances.length > 0).toBe(true);
+        for (let i = 0; i < balances.length; i++) {
+          const balance = balances[i];
+          expect(typeof balance.balance).toBe("bigint");
+          expect(balance.lastUpdate instanceof Date).toBe(true);
+          if (balance.type === "erc20") {
+            expect(typeof balance.balance).toBe("bigint");
+            expect(typeof balance.decimals).toBe("number");
+            expect(typeof balance.address).toBe("string");
+            expect(balance.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(typeof balance.name).toBe("string");
+            expect(typeof balance.symbol).toBe("string");
+          }
+        }
       }
+    });
+    it("Should get DAOs balances from a dao that does not exist", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx);
+      const daoAddress = "0x1234567890123456789012345678901234567890";
+      const balances = await client.methods.getBalances(daoAddress);
+      expect(balances === null).toBe(true);
+    });
+    it("Should get DAOs balances from a dao with no balances", async () => {
+      const ctx = new Context(contextParams);
+      const client = new Client(ctx);
+      const daoAddress = "0x0028807509712aa45eafd5fdd0982c4db36fbe50";
+      const balances = await client.methods.getBalances(daoAddress);
+      expect(Array.isArray(balances)).toBe(true);
+      expect(balances?.length).toBe(0);
     });
 
     it("Should get the transfers of a dao", async () => {
