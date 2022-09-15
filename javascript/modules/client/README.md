@@ -1774,9 +1774,7 @@ const client: Client = new Client(context);
 
 const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
-const grantParams:IGrantPermissionDecodedParams = client.decoding.grantAction(
-  data
-);
+const grantParams: IGrantPermissionDecodedParams = client.decoding.grantAction(data);
 console.log(grantParams);
 /*
 {
@@ -1798,9 +1796,7 @@ const client: Client = new Client(context);
 
 const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
-const revokeParams:IRevokePermissionDecodedParams = client.decoding.revokeAction(
-  data
-);
+const revokeParams: IRevokePermissionDecodedParams = client.decoding.revokeAction(data);
 console.log(revokeParams);
 /*
 {
@@ -1822,9 +1818,7 @@ const client: Client = new Client(context);
 
 const data: Uint8Array =  new Uint8Array([12, ..., 56])
 
-const freezeParams:IFreezePermissionDecodedParams = client.decoding.freezeAction(
-  data
-);
+const freezeParams: IFreezePermissionDecodedParams = client.decoding.freezeAction(data);
 console.log(freezeParams);
 /*
 {
