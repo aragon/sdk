@@ -89,6 +89,7 @@ export function getDummyAddressListProposal(
       minSupport: Random.getFloat(),
       minTurnout: Random.getFloat(),
     },
+    totalVotingWeight: BigInt(0),
     votes: [
       {
         address: "0x1234567890123456789012345678901234567890",
@@ -260,6 +261,7 @@ export function getDummyErc20Proposal(proposalId?: string): Erc20Proposal {
       symbol: "TOK",
       decimals: 18,
     },
+    totalVotingWeight: BigInt(0),
     usedVotingWeight: BigInt(yes + no + abstain),
     actions: [],
   };
