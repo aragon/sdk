@@ -23,12 +23,21 @@ import {
 import {
   DaoSortBy,
   IDaoQueryParams,
+  IFreezePermissionDecodedParams,
+  IFreezePermissionParams,
+  IGrantPermissionDecodedParams,
+  IGrantPermissionParams,
   IMetadata,
+  IRevokePermissionDecodedParams,
+  IRevokePermissionParams,
+  Permissions,
 } from "../../src/internal/interfaces/client";
-import { SortDirection } from "../../src/internal/interfaces/common";
+import { DaoAction, SortDirection } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/client";
 import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
+import { keccak256 } from "@ethersproject/keccak256";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -420,6 +429,111 @@ describe("Client", () => {
       expect(typeof withdrawAction).toBe("object");
       expect(withdrawAction.data).toBeInstanceOf(Uint8Array);
     });
+    it("Should create a client and generate a grant action", () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IGrantPermissionParams[] = [
+        {
+          who: "0x0987654321098765432109876543210987654321",
+          where: "0x0987654321098765432109876543210987654321",
+          permission: Permissions.EXECUTE_PERMISSION,
+        },
+        {
+          who: "0x1234567890123456789012345678901234567890",
+          where: "0x1234567890123456789012345678901234567890",
+          permission: Permissions.UPGRADE_PERMISSION,
+        },
+      ];
+      let actions: DaoAction[] = [];
+      for (let i = 0; i < paramsArray.length; i++) {
+        const params = paramsArray[i];
+        actions.push(client.encoding.grantAction(daoAddresses[i], params));
+      }
+      const decoder = new TextDecoder();
+      for (let i = 0; i < actions.length; i++) {
+        const action = actions[i];
+        expect(typeof action).toBe("object");
+        expect(action.to).toBe(daoAddresses[i]);
+        expect(action.data).toBeInstanceOf(Uint8Array);
+      }
+      expect(
+        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
+      ).toBe(false);
+    });
+    it("Should create a client and generate a revoke action", () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IRevokePermissionParams[] = [
+        {
+          who: "0x0987654321098765432109876543210987654321",
+          where: "0x0987654321098765432109876543210987654321",
+          permission: Permissions.EXECUTE_PERMISSION,
+        },
+        {
+          who: "0x1234567890123456789012345678901234567890",
+          where: "0x1234567890123456789012345678901234567890",
+          permission: Permissions.UPGRADE_PERMISSION,
+        },
+      ];
+      let actions: DaoAction[] = [];
+      for (let i = 0; i < paramsArray.length; i++) {
+        const params = paramsArray[i];
+        actions.push(client.encoding.revokeAction(daoAddresses[i], params));
+      }
+      const decoder = new TextDecoder();
+      for (let i = 0; i < actions.length; i++) {
+        const action = actions[i];
+        expect(typeof action).toBe("object");
+        expect(action.to).toBe(daoAddresses[i]);
+        expect(action.data).toBeInstanceOf(Uint8Array);
+      }
+      expect(
+        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
+      ).toBe(false);
+    });
+    it("Should create a client and generate a freeze action", () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+
+      const paramsArray: IFreezePermissionParams[] = [
+        {
+          where: "0x1234567890123456789012345678901234567890",
+          permission: Permissions.UPGRADE_PERMISSION,
+        },
+        {
+          where: "0x0987654321098765432109876543210987654321",
+          permission: Permissions.EXECUTE_PERMISSION,
+        },
+      ];
+      let actions: DaoAction[] = [];
+      for (let i = 0; i < paramsArray.length; i++) {
+        const params = paramsArray[i];
+        actions.push(client.encoding.freezeAction(daoAddresses[i], params));
+      }
+      const decoder = new TextDecoder();
+      for (let i = 0; i < actions.length; i++) {
+        const action = actions[i];
+        expect(typeof action).toBe("object");
+        expect(action.to).toBe(daoAddresses[i]);
+        expect(action.data).toBeInstanceOf(Uint8Array);
+      }
+      expect(
+        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
+      ).toBe(false);
+    });
     it("Should encode an update metadata raw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
@@ -450,10 +564,119 @@ describe("Client", () => {
     });
   });
   describe("Action decoders", () => {
-    it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
+    it("Should decode an encoded grant action", () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IGrantPermissionParams[] = [
+        {
+          who: "0x1234567890123456789012345678901234567890",
+          where: "0x1234567890123456789012345678901234567890",
+          permission: Permissions.UPGRADE_PERMISSION,
+        },
+        {
+          who: "0x0987654321098765432109876543210987654321",
+          where: "0x0987654321098765432109876543210987654321",
+          permission: Permissions.EXECUTE_PERMISSION,
+        },
+      ];
+      for (let i = 0; i < paramsArray.length; i++) {
+        const params = paramsArray[i];
+        const action = client.encoding.grantAction(daoAddresses[i], params);
+        const decodedParams: IGrantPermissionDecodedParams = client.decoding
+          .grantAction(action.data);
+
+        expect(decodedParams.permission).toBe(
+          params.permission,
+        );
+        expect(decodedParams.where).toBe(
+          params.where,
+        );
+        expect(decodedParams.permissionId).toBe(
+          keccak256(toUtf8Bytes(params.permission)),
+        );
+        expect(decodedParams.who).toBe(params.who);
+      }
+    });
+    it("Should decode an encoded revoke action", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IRevokePermissionParams[] = [
+        {
+          who: "0x1234567890123456789012345678901234567890",
+          where: "0x1234567890123456789012345678901234567890",
+          permission: Permissions.UPGRADE_PERMISSION,
+        },
+        {
+          who: "0x0987654321098765432109876543210987654321",
+          where: "0x0987654321098765432109876543210987654321",
+          permission: Permissions.EXECUTE_PERMISSION,
+        },
+      ];
+      for (let i = 0; i < paramsArray.length; i++) {
+        const params = paramsArray[i];
+        const action = client.encoding.revokeAction(daoAddresses[i], params);
+        const decodedParams: IRevokePermissionDecodedParams = client.decoding
+          .revokeAction(action.data);
+
+        expect(decodedParams.permission).toBe(
+          params.permission,
+        );
+        expect(decodedParams.where).toBe(
+          params.where,
+        );
+        expect(decodedParams.permissionId).toBe(
+          keccak256(toUtf8Bytes(params.permission)),
+        );
+        expect(decodedParams.who).toBe(params.who);
+      }
+    });
+    it("Should decode an encoded freeze action", () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const daoAddresses = [
+        "0x2468013579246801357924680135792468013579",
+        "0x1357924680135792468013579246801357924680",
+      ];
+      const paramsArray: IFreezePermissionParams[] = [
+        {
+          where: "0x1234567890123456789012345678901234567890",
+          permission: Permissions.UPGRADE_PERMISSION,
+        },
+        {
+          where: "0x0987654321098765432109876543210987654321",
+          permission: Permissions.EXECUTE_PERMISSION,
+        },
+      ];
+      for (let i = 0; i < paramsArray.length; i++) {
+        const params = paramsArray[i];
+        const action = client.encoding.freezeAction(daoAddresses[i], params);
+        const decodedParams: IFreezePermissionDecodedParams = client.decoding
+          .freezeAction(action.data);
+
+        expect(decodedParams.permission).toBe(
+          params.permission,
+        );
+        expect(decodedParams.permissionId).toBe(
+          keccak256(toUtf8Bytes(params.permission)),
+        );
+        expect(decodedParams.where).toBe(
+          params.where,
+        );
+      }
+    });
+    it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
       const withdrawParams: IWithdrawParams = {
         recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),

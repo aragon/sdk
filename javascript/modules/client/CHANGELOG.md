@@ -20,7 +20,7 @@ TEMPLATE:
 ### Added
 - Delays between yields
 - Add getToken function to the erc20-client
-
+- Encode and decode of Grant, Revoke and Freeze actions
 ## 0.4.3-alpha
 On 2022-09-07 14:47:58
 ### Fixed
