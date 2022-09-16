@@ -615,6 +615,7 @@ export class Client extends ClientCore implements IClient {
       const stringMetadata = await this.ipfs.fetchString(
         "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr",
       );
+      // TODO: Parse and validate schema
       const metadata = JSON.parse(stringMetadata);
       return {
         address: dao.id,
