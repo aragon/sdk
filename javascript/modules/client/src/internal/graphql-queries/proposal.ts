@@ -24,7 +24,6 @@ query erc20Proposal($proposalId: ID!) {
     startDate
     endDate
     executed
-    votingPower
     voters{
       voter{
         id
@@ -44,8 +43,6 @@ query erc20Proposal($proposalId: ID!) {
   }
 }
 `;
-//, $sortBy: ERC20VotingProposal_orderBy!
-//, orderBy: $sortBy
 export const QueryErc20Proposals = gql`
 query erc20Proposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: ERC20VotingProposal_orderBy!) {
   erc20VotingProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
@@ -103,14 +100,11 @@ query addressListProposal($proposalId: ID!) {
         id
       }
       vote
-      weight
     }
     votingPower
   }
 }
 `;
-//, $sortBy: ERC20VotingProposal_orderBy!
-//, orderBy: $sortBy
 export const QueryAddressListProposals = gql`
 query addressListProposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: ERC20VotingProposal_orderBy!) {
   whitelistProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){

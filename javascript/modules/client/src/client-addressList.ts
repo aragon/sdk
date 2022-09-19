@@ -1,13 +1,11 @@
 import {
   bytesToHex,
   GraphQLError,
-  hexToBytes,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
+  NoProviderError,
   Random,
-  RequiredProviderError,
-  strip0x,
 } from "@aragon/sdk-common";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
@@ -35,6 +33,8 @@ import {
   IExecuteProposalParams,
   IPluginSettings,
   IProposalQueryParams,
+  ISubgraphAddressListProposal,
+  ISubgraphAddressListProposalListItem,
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
@@ -42,10 +42,12 @@ import {
   ProposalSortBy,
   VoteProposalStep,
   VoteProposalStepValue,
-  VoteValues,
 } from "./internal/interfaces/plugins";
 import { delay } from "./internal/temp-mock";
-import { computeProposalStatus } from "./internal/utils/plugins";
+import {
+  toAddressListProposal,
+  toAddressListProposalListItem,
+} from "./internal/utils/plugins";
 import { isAddress } from "@ethersproject/address";
 import {
   QueryAddressListProposal,
@@ -331,13 +333,15 @@ export class ClientAddressList extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { whitelistProposal } = await client.request(
+      const { whitelistProposal: addressListProposal }: {
+        whitelistProposal: ISubgraphAddressListProposal;
+      } = await client.request(
         QueryAddressListProposal,
         {
           proposalId,
         },
       );
-      if (!whitelistProposal) {
+      if (!addressListProposal) {
         return null;
       }
       // TODO
@@ -347,104 +351,7 @@ export class ClientAddressList extends ClientCore
       const metadataString = await this.ipfs.fetchString(test_cid);
       // TODO: Parse and validate schema
       const metadata = JSON.parse(metadataString) as ProposalMetadata;
-      const startDate = new Date(
-        parseInt(whitelistProposal.startDate) * 1000,
-      );
-      const endDate = new Date(parseInt(whitelistProposal.endDate) * 1000);
-      const creationDate = new Date(
-        parseInt(whitelistProposal.createdAt) * 1000,
-      );
-      // get status
-      const status = computeProposalStatus(
-        startDate,
-        endDate,
-        whitelistProposal.executed,
-        whitelistProposal
-          .yea,
-        whitelistProposal.nay,
-      );
-      // get start and end date
-      return {
-        id: whitelistProposal.id,
-        dao: {
-          address: whitelistProposal.dao.id,
-          name: whitelistProposal.dao.name,
-        },
-        creatorAddress: whitelistProposal.creator,
-        metadata: {
-          title: metadata.title,
-          summary: metadata.summary,
-          description: metadata.description,
-          resources: metadata.resources,
-          media: metadata.media,
-        },
-        startDate,
-        endDate,
-        creationDate,
-        actions: whitelistProposal.actions.map(
-          (action: { data: string; to: string; value: string }): DaoAction => {
-            return {
-              data: hexToBytes(strip0x(action.data)),
-              to: action.to,
-              value: BigInt(action.value),
-            };
-          },
-        ),
-        status,
-        result: {
-          yes: whitelistProposal.yea ? parseInt(whitelistProposal.yea) : 0,
-          no: whitelistProposal.yea ? parseInt(whitelistProposal.nay) : 0,
-          abstain: whitelistProposal.yea
-            ? parseInt(whitelistProposal.abstain)
-            : 0,
-        },
-        settings: {
-          // TODO
-          // this should be decoded using the number of decimals that we want
-          // right now the encoders/recoders use 2 digit precission but the actual
-          // subgraph values are 18 digits precision. Uncomment below for 2 digits
-          // precision
-
-          // minSupport: decodeRatio(
-          //   BigInt(whitelistProposal.supportRequiredPct),
-          //   2,
-          // ),
-          // minTurnout: decodeRatio(
-          //   BigInt(whitelistProposal.participationRequiredPct),
-          //   2,
-          // ),
-          // TODO DELETE ME
-          minSupport: parseFloat(
-            whitelistProposal.supportRequiredPct,
-          ),
-          minTurnout: parseFloat(
-            whitelistProposal.participationRequiredPct,
-          ),
-          duration: parseInt(whitelistProposal.endDate) -
-            parseInt(whitelistProposal.startDate),
-        },
-        totalVotingWeight: parseInt(whitelistProposal.votingPower),
-        votes: whitelistProposal.voters.map(
-          (voter: { voter: { id: string }; vote: string; weight: string }) => {
-            let vote;
-            switch (voter.vote) {
-              case "Yea":
-                vote = VoteValues.YES;
-                break;
-              case "Nay":
-                vote = VoteValues.NO;
-                break;
-              case "Abstain":
-                vote = VoteValues.ABSTAIN;
-                break;
-            }
-            return {
-              address: voter.voter.id,
-              vote,
-            };
-          },
-        ),
-      };
+      return toAddressListProposal(addressListProposal, metadata);
     } catch (err) {
       throw new GraphQLError("AddressList proposal");
     }
@@ -461,10 +368,10 @@ export class ClientAddressList extends ClientCore
     let address = daoAddressOrEns;
     if (address) {
       if (!isAddress(address)) {
-        await this.web3.ensureOnline()
+        await this.web3.ensureOnline();
         const provider = this.web3.getProvider();
         if (!provider) {
-          throw new RequiredProviderError();
+          throw new NoProviderError();
         }
         const resolvedAddress = await provider.resolveName(address);
         if (!resolvedAddress) {
@@ -477,7 +384,9 @@ export class ClientAddressList extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { whitelistProposals } = await client.request(
+      const { whitelistProposals: addressListProposals }: {
+        whitelistProposals: ISubgraphAddressListProposalListItem[];
+      } = await client.request(
         QueryAddressListProposals,
         {
           where,
@@ -489,8 +398,10 @@ export class ClientAddressList extends ClientCore
       );
       await this.ipfs.ensureOnline();
       return Promise.all(
-        whitelistProposals.map(
-          async (proposal: any): Promise<AddressListProposalListItem> => {
+        addressListProposals.map(
+          async (
+            proposal: ISubgraphAddressListProposalListItem,
+          ): Promise<AddressListProposalListItem> => {
             // TODO
             // delete this cid once the proposals in subgraph have the correct
             // format in the metadata field
@@ -498,40 +409,8 @@ export class ClientAddressList extends ClientCore
             const metadataString = await this.ipfs.fetchString(test_cid);
             // TODO: Parse and validate schema
             const metadata = JSON.parse(metadataString) as ProposalMetadata;
-            const startDate = new Date(
-              parseInt(proposal.startDate) * 1000,
-            );
-            const endDate = new Date(parseInt(proposal.endDate) * 1000);
-            // get status
-            const status = computeProposalStatus(
-              startDate,
-              endDate,
-              proposal.executed,
-              proposal
-                .yea,
-              proposal.nay,
-            );
             // add proposal to list
-            return {
-              id: proposal.id,
-              dao: {
-                address: proposal.dao.id,
-                name: proposal.dao.name,
-              },
-              creatorAddress: proposal.creator,
-              metadata: {
-                title: metadata.title,
-                summary: metadata.summary,
-              },
-              startDate,
-              endDate,
-              status,
-              result: {
-                yes: proposal.yea ? parseInt(proposal.yea) : 0,
-                no: proposal.yea ? parseInt(proposal.nay) : 0,
-                abstain: proposal.yea ? parseInt(proposal.abstain) : 0,
-              },
-            };
+            return toAddressListProposalListItem(proposal, metadata);
           },
         ),
       );

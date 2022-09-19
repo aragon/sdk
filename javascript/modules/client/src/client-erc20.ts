@@ -10,13 +10,13 @@ import {
   IExecuteProposalParams,
   IPluginSettings,
   IProposalQueryParams,
-  ISubgraphErc20Voter,
+  ISubgraphErc20Proposal,
+  ISubgraphErc20ProposalListItem,
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
   ProposalSortBy,
-  SubgraphVoteValuesMap,
   VoteProposalStep,
   VoteProposalStepValue,
   VoteValues,
@@ -31,7 +31,11 @@ import {
   SortDirection,
 } from "./internal/interfaces/common";
 import { ContextPlugin } from "./context-plugin";
-import { computeProposalStatus, isProposalId } from "./internal/utils/plugins";
+import {
+  isProposalId,
+  toErc20Proposal,
+  toErc20ProposalListItem,
+} from "./internal/utils/plugins";
 import {
   decodeUpdatePluginSettingsAction,
   encodeErc20ActionInit,
@@ -41,13 +45,11 @@ import {
 import {
   bytesToHex,
   GraphQLError,
-  hexToBytes,
+  InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
+  NoProviderError,
   Random,
-  strip0x,
-  RequiredProviderError,
-  InvalidAddressError
 } from "@aragon/sdk-common";
 import { delay } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
@@ -459,7 +461,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { erc20VotingProposal } = await client.request(QueryErc20Proposal, {
+      const { erc20VotingProposal }: {
+        erc20VotingProposal: ISubgraphErc20Proposal;
+      } = await client.request(QueryErc20Proposal, {
         proposalId,
       });
       if (!erc20VotingProposal) {
@@ -472,109 +476,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       const metadataString = await this.ipfs.fetchString(test_cid);
       // TODO: Parse and validate schema
       const metadata = JSON.parse(metadataString) as ProposalMetadata;
-      const startDate = new Date(
-        parseInt(erc20VotingProposal.startDate) * 1000,
-      );
-      const endDate = new Date(parseInt(erc20VotingProposal.endDate) * 1000);
-      const creationDate = new Date(
-        parseInt(erc20VotingProposal.createdAt) * 1000,
-      );
-      let usedVotingWeight: bigint = BigInt(0);
-      for (let i = 0; i < erc20VotingProposal.voters.length; i++) {
-        const voter = erc20VotingProposal.voters[i];
-        usedVotingWeight += BigInt(voter.weight);
-      }
-      // get status
-      const status = computeProposalStatus(
-        startDate,
-        endDate,
-        erc20VotingProposal.executed,
-        erc20VotingProposal
-          .yea,
-        erc20VotingProposal.nay,
-      );
-      // get start and end date
-      return {
-        id: erc20VotingProposal.id,
-        dao: {
-          address: erc20VotingProposal.dao.id,
-          name: erc20VotingProposal.dao.name,
-        },
-        creatorAddress: erc20VotingProposal.creator,
-        metadata: {
-          title: metadata.title,
-          summary: metadata.summary,
-          description: metadata.description,
-          resources: metadata.resources,
-          media: metadata.media,
-        },
-        startDate,
-        endDate,
-        creationDate,
-        actions: erc20VotingProposal.actions.map(
-          (action: { data: string; to: string; value: string }): DaoAction => {
-            return {
-              data: hexToBytes(strip0x(action.data)),
-              to: action.to,
-              value: BigInt(action.value),
-            };
-          },
-        ),
-        status,
-        result: {
-          yes: erc20VotingProposal.yea
-            ? BigInt(erc20VotingProposal.yea)
-            : BigInt(0),
-          no: erc20VotingProposal.yea
-            ? BigInt(erc20VotingProposal.nay)
-            : BigInt(0),
-          abstain: erc20VotingProposal.yea
-            ? BigInt(erc20VotingProposal.abstain)
-            : BigInt(0),
-        },
-        settings: {
-          // TODO
-          // this should be decoded using the number of decimals that we want
-          // right now the encoders/recoders use 2 digit precission but the actual
-          // subgraph values are 18 digits precision. Uncomment below for 2 digits
-          // precision
-
-          // minSupport: decodeRatio(
-          //   BigInt(erc20VotingProposal.supportRequiredPct),
-          //   2,
-          // ),
-          // minTurnout: decodeRatio(
-          //   BigInt(erc20VotingProposal.participationRequiredPct),
-          //   2,
-          // ),
-          // TODO DELETE ME
-          minSupport: parseFloat(
-            formatEther(erc20VotingProposal.supportRequiredPct),
-          ),
-          minTurnout: parseFloat(
-            formatEther(erc20VotingProposal.participationRequiredPct),
-          ),
-          duration: parseInt(erc20VotingProposal.endDate) -
-            parseInt(erc20VotingProposal.startDate),
-        },
-        token: {
-          address: erc20VotingProposal.pkg.token.id,
-          symbol: erc20VotingProposal.pkg.token.symbol,
-          name: erc20VotingProposal.pkg.token.name,
-          decimals: parseInt(erc20VotingProposal.pkg.token.decimals),
-        },
-        usedVotingWeight,
-        totalVotingWeight: BigInt(erc20VotingProposal.votingPower),
-        votes: erc20VotingProposal.voters.map(
-          (voter: ISubgraphErc20Voter) => {
-            return {
-              address: voter.voter.id,
-              vote: SubgraphVoteValuesMap.get(voter.vote),
-              weight: BigInt(voter.weight),
-            };
-          },
-        ),
-      };
+      return toErc20Proposal(erc20VotingProposal, metadata);
     } catch (err) {
       throw new GraphQLError("ERC20 proposal");
     }
@@ -591,10 +493,10 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     let address = daoAddressOrEns;
     if (address) {
       if (!isAddress(address)) {
-        await this.web3.ensureOnline()
+        await this.web3.ensureOnline();
         const provider = this.web3.getProvider();
         if (!provider) {
-          throw new RequiredProviderError();
+          throw new NoProviderError();
         }
         const resolvedAddress = await provider.resolveName(address);
         if (!resolvedAddress) {
@@ -607,7 +509,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { erc20VotingProposals } = await client.request(
+      const { erc20VotingProposals }: {
+        erc20VotingProposals: ISubgraphErc20ProposalListItem[];
+      } = await client.request(
         QueryErc20Proposals,
         {
           where,
@@ -620,7 +524,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       await this.ipfs.ensureOnline();
       return Promise.all(
         erc20VotingProposals.map(
-          async (proposal: any): Promise<Erc20ProposalListItem> => {
+          async (
+            proposal: ISubgraphErc20ProposalListItem,
+          ): Promise<Erc20ProposalListItem> => {
             // TODO
             // delete this cid once the proposals in subgraph have the correct
             // format in the metadata field
@@ -628,46 +534,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
             const metadataString = await this.ipfs.fetchString(test_cid);
             // TODO: Parse and validate schema
             const metadata = JSON.parse(metadataString) as ProposalMetadata;
-            const startDate = new Date(
-              parseInt(proposal.startDate) * 1000,
-            );
-            const endDate = new Date(parseInt(proposal.endDate) * 1000);
-            // get status
-            const status = computeProposalStatus(
-              startDate,
-              endDate,
-              proposal.executed,
-              proposal
-                .yea,
-              proposal.nay,
-            );
-            // add proposal to list
-            return {
-              id: proposal.id,
-              dao: {
-                address: proposal.dao.id,
-                name: proposal.dao.name,
-              },
-              creatorAddress: proposal.creator,
-              metadata: {
-                title: metadata.title,
-                summary: metadata.summary,
-              },
-              startDate,
-              endDate,
-              status,
-              token: {
-                address: proposal.pkg.token.id,
-                symbol: proposal.pkg.token.symbol,
-                name: proposal.pkg.token.name,
-                decimals: parseInt(proposal.pkg.token.decimals),
-              },
-              result: {
-                yes: proposal.yea ? BigInt(proposal.yea) : BigInt(0),
-                no: proposal.yea ? BigInt(proposal.nay) : BigInt(0),
-                abstain: proposal.yea ? BigInt(proposal.abstain) : BigInt(0),
-              },
-            };
+            return toErc20ProposalListItem(proposal, metadata);
           },
         ),
       );

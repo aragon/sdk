@@ -48,6 +48,7 @@ const IPFS_API_KEY = process.env.IPFS_API_KEY ||
 const web3endpoints = {
   working: [
     "https://mainnet.infura.io/v3/94d2e8caf1bc4c4884af830d96f927ca",
+    "https://cloudflare-eth.com/",
   ],
   failing: ["https://bad-url-gateway.io/"],
 };
@@ -922,7 +923,7 @@ describe("Client", () => {
       const client = new Client(ctx);
       const daoAddress = "thisisinvalid";
       await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
-        new InvalidAddressOrEnsError()
+        new InvalidAddressOrEnsError(),
       );
     });
 
@@ -978,7 +979,7 @@ describe("Client", () => {
         for (let i = 0; i < balances.length; i++) {
           const balance = balances[i];
           expect(typeof balance.balance).toBe("bigint");
-          expect(balance.lastUpdate instanceof Date).toBe(true);
+          expect(balance.updateDate instanceof Date).toBe(true);
           if (balance.type === "erc20") {
             expect(typeof balance.balance).toBe("bigint");
             expect(typeof balance.decimals).toBe("number");

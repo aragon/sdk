@@ -205,7 +205,7 @@ type Erc20TokenBalance = Erc20TokenBase & {
 };
 
 export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & {
-  lastUpdate: Date;
+  updateDate: Date;
 };
 
 // Token transfers
@@ -246,15 +246,17 @@ export type InstalledPluginListItem = {
   version: string;
 };
 
+export type DaoMetadata = {
+  name: string;
+  description: string;
+  avatar?: string;
+  links: DaoResourceLink[];
+};
+
 export type DaoDetails = {
   address: string;
   ensDomain: string;
-  metadata: {
-    name: string;
-    description: string;
-    avatar?: string;
-    links: DaoResourceLink[];
-  };
+  metadata: DaoMetadata;
   creationDate: Date;
   plugins: InstalledPluginListItem[];
 };
@@ -279,6 +281,41 @@ export enum DaoSortBy {
   POPULARITY = "totalProposals", // currently defined as number of proposals
 }
 
-export interface SubgraphPlugin {
-  pkg: { id: string; __typename: string };
+export interface SubgraphPluginListItem {
+  pkg: { id: string; __typename: SubgraphPluginTypeName };
+}
+export enum SubgraphPluginTypeName {
+  ERC20 = "ERC20VotingPackage",
+  ADDRESS_LIST = "WhitelistPackage",
+}
+
+export const SubgraphPluginTypeMap: Map<SubgraphPluginTypeName, string> =
+  new Map([
+    [SubgraphPluginTypeName.ERC20, "erc20voting.dao.eth"],
+    [SubgraphPluginTypeName.ADDRESS_LIST, "addreslistvoting.dao.eth"],
+  ]);
+
+export interface ISubgraphDao {
+  id: string;
+  name: string;
+  metadata: string;
+  createdAt: string;
+  packages: SubgraphPluginListItem[];
+}
+export interface ISubgraphDaoListItem {
+  id: string;
+  name: string;
+  metadata: string;
+  packages: SubgraphPluginListItem[];
+}
+
+export interface ISubgraphBalance {
+  token: {
+    id: string;
+    name: string;
+    symbol: string;
+    decimals: string;
+  };
+  balance: string;
+  lastUpdated: string;
 }

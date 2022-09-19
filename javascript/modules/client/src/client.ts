@@ -19,11 +19,12 @@ import {
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
   IMetadata,
-  InstalledPluginListItem,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
+  ISubgraphBalance,
+  ISubgraphDao,
+  ISubgraphDaoListItem,
   IWithdrawParams,
-  SubgraphPlugin,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -49,10 +50,10 @@ import { pack } from "@ethersproject/solidity";
 import {
   bytesToHex,
   GraphQLError,
+  InvalidAddressOrEnsError,
+  NoProviderError,
   Random,
   strip0x,
-  RequiredProviderError,
-  InvalidAddressOrEnsError
 } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
@@ -73,6 +74,11 @@ import { delay } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
 import { QueryBalances } from "./internal/graphql-queries/balances";
 import { QueryDao, QueryDaos } from "./internal/graphql-queries";
+import {
+  toAssetBalance,
+  toDaoDetails,
+  toDaoListItem,
+} from "./internal/utils/client";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -82,7 +88,7 @@ const assetList: AssetBalance[] = [
   {
     type: "native",
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(
+    updateDate: new Date(
       +new Date() - Math.floor(Random.getFloat() * 10000000000),
     ),
   },
@@ -93,7 +99,7 @@ const assetList: AssetBalance[] = [
     symbol: "JOJ",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(
+    updateDate: new Date(
       +new Date() - Math.floor(Random.getFloat() * 10000000000),
     ),
   },
@@ -104,7 +110,7 @@ const assetList: AssetBalance[] = [
     symbol: "DTT",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(
+    updateDate: new Date(
       +new Date() - Math.floor(Random.getFloat() * 10000000000),
     ),
   },
@@ -115,7 +121,7 @@ const assetList: AssetBalance[] = [
     symbol: "TTK",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(
+    updateDate: new Date(
       +new Date() - Math.floor(Random.getFloat() * 10000000000),
     ),
   },
@@ -610,10 +616,10 @@ export class Client extends ClientCore implements IClient {
   private async _getDao(daoAddressOrEns: string): Promise<DaoDetails | null> {
     let address = daoAddressOrEns;
     if (!isAddress(address)) {
-      await this.web3.ensureOnline()
+      await this.web3.ensureOnline();
       const provider = this.web3.getProvider();
       if (!provider) {
-        throw new RequiredProviderError();
+        throw new NoProviderError();
       }
       const resolvedAddress = await provider.resolveName(address);
       if (!resolvedAddress) {
@@ -624,7 +630,7 @@ export class Client extends ClientCore implements IClient {
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { dao } = await client.request(QueryDao, {
+      const { dao }: { dao: ISubgraphDao } = await client.request(QueryDao, {
         address,
       });
       if (!dao) {
@@ -639,37 +645,9 @@ export class Client extends ClientCore implements IClient {
       );
       // TODO: Parse and validate schema
       const metadata = JSON.parse(stringMetadata);
-      return {
-        address: dao.id,
-        ensDomain: dao.name,
-        metadata: {
-          name: metadata.name,
-          description: metadata.description,
-          avatar: metadata.avatar || null,
-          links: metadata.links,
-        },
-        creationDate: new Date(parseInt(dao.createdAt) * 1000),
-        // TODO update when new subgraph schema is deployed
-        plugins: dao.packages.map(
-          (
-            plugin: SubgraphPlugin,
-          ): InstalledPluginListItem => {
-            return {
-              instanceAddress: plugin.pkg.id,
-              // TODO
-              // this should be the address of the parent plugin
-              // or the ens name, subgraph does not have this info
-              // at this moment so for now, the __typename
-              // will do the job to differentitate between
-              // plugins, however, this will eventually change
-              id: plugin.pkg.__typename + ".plugin.dao.eth",
-              version: "0.0.1",
-            };
-          },
-        ),
-      };
+      return toDaoDetails(dao, metadata);
     } catch (err) {
-      throw new GraphQLError("dao");
+      throw new GraphQLError("DAO");
     }
   }
 
@@ -682,52 +660,31 @@ export class Client extends ClientCore implements IClient {
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { daos } = await client.request(QueryDaos, {
-        limit,
-        skip,
-        direction,
-        sortBy,
-      });
+      const { daos }: { daos: ISubgraphDaoListItem[] } = await client.request(
+        QueryDaos,
+        {
+          limit,
+          skip,
+          direction,
+          sortBy,
+        },
+      );
       await this.ipfs.ensureOnline();
-      return Promise.all(daos.map(async (dao: any): Promise<DaoListItem> => {
-        // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
-        // TODO
-        // this is a temporal fix and should be changed by the line above
-        // but the current daos in subgraph dont have a proper metadata
-        const stringMetadata = await this.ipfs.fetchString(
-          "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr",
-        );
-        const metadata = JSON.parse(stringMetadata);
-        return {
-          address: dao.id,
-          ensDomain: dao.name,
-          metadata: {
-            name: metadata.name,
-            avatar: metadata.avatar || null,
-          },
-          // TODO update when new subgraph schema is deployed
-          plugins: dao.packages.map(
-            (
-              plugin: SubgraphPlugin,
-            ): InstalledPluginListItem => {
-              return {
-                instanceAddress: plugin.pkg.id,
-                // TODO
-                // this should be the address of the parent plugin
-                // or the ens name, subgraph does not have this info
-                // at this moment so for now, the __typename
-                // will do the job to differentitate between
-                // plugins, however, this will eventually change
-                id: plugin.pkg.__typename + "plugin.dao.eth",
-                version: "0.0.1",
-              };
-            },
-          ),
-        };
-      }));
-      // return daosDetails;
+      return Promise.all(
+        daos.map(async (dao: ISubgraphDaoListItem): Promise<DaoListItem> => {
+          // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
+          // TODO
+          // this is a temporal fix and should be changed by the line above
+          // but the current daos in subgraph dont have a proper metadata
+          const stringMetadata = await this.ipfs.fetchString(
+            "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr",
+          );
+          const metadata = JSON.parse(stringMetadata);
+          return toDaoListItem(dao, metadata);
+        }),
+      );
     } catch (err) {
-      throw new GraphQLError("dao");
+      throw new GraphQLError("DAO");
     }
   }
 
@@ -738,10 +695,10 @@ export class Client extends ClientCore implements IClient {
     // TODO check address
     let address = daoAddressorEns;
     if (!isAddress(address)) {
-      await this.web3.ensureOnline()
+      await this.web3.ensureOnline();
       const provider = this.web3.getProvider();
       if (!provider) {
-        throw new RequiredProviderError();
+        throw new NoProviderError();
       }
       const resolvedAddress = await provider.resolveName(address);
       if (!resolvedAddress) {
@@ -752,9 +709,10 @@ export class Client extends ClientCore implements IClient {
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { balances } = await client.request(QueryBalances, {
-        address,
-      });
+      const { balances }: { balances: ISubgraphBalance[] } = await client
+        .request(QueryBalances, {
+          address,
+        });
       if (balances.length === 0) {
         return [];
       }
@@ -762,24 +720,10 @@ export class Client extends ClientCore implements IClient {
       // handle other tokens that are not ERC20 or eth
       await this.ipfs.ensureOnline();
       return Promise.all(
-        balances.map(async (balance: any): Promise<AssetBalance> => {
-          if (balance.token.symbol === "ETH") {
-            return {
-              type: "native",
-              balance: BigInt(balance.balance),
-              lastUpdate: new Date(parseInt(balance.lastUpdated) * 1000),
-            };
-          }
-          return {
-            type: "erc20",
-            address: balance.token.id,
-            name: balance.token.name,
-            symbol: balance.token.symbol,
-            decimals: parseInt(balance.token.decimals),
-            balance: BigInt(balance.balance),
-            lastUpdate: new Date(parseInt(balance.lastUpdated) * 1000),
-          };
-        }),
+        balances.map(
+          async (balance: ISubgraphBalance): Promise<AssetBalance> =>
+            toAssetBalance(balance),
+        ),
       );
     } catch (err) {
       throw new GraphQLError("balance");
