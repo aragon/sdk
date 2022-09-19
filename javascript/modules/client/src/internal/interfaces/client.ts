@@ -274,7 +274,11 @@ export interface IDaoQueryParams extends IPagination {
 }
 
 export enum DaoSortBy {
-  CREATED_AT = 'created_at',
-  NAME = 'name',
-  POPULARITY = 'totalProposals', // currently defined as number of proposals
+  CREATED_AT = "created_at",
+  NAME = "name",
+  POPULARITY = "totalProposals", // currently defined as number of proposals
+}
+
+export interface SubgraphPlugin {
+  pkg: { id: string; __typename: string };
 }

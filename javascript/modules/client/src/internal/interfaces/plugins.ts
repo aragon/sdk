@@ -29,7 +29,7 @@ export interface IClientErc20 extends IClientCore {
     getProposals: (
       params?: IProposalQueryParams,
     ) => Promise<Erc20ProposalListItem[]>;
-    getSettings: (pluginAddress: string) => Promise<IPluginSettings>;
+    getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
     getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
   };
   encoding: {
@@ -69,11 +69,11 @@ export interface IClientAddressList extends IClientCore {
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
-    getProposal: (propoosalId: string) => Promise<AddressListProposal>;
+    getProposal: (propoosalId: string) => Promise<AddressListProposal | null>;
     getProposals: (
       params?: IProposalQueryParams,
     ) => Promise<AddressListProposalListItem[]>;
-    getSettings: (pluginAddress: string) => Promise<IPluginSettings>;
+    getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
@@ -208,7 +208,6 @@ export type ProposalBase = {
   creationDate: Date;
   actions: Array<DaoAction>;
   status: ProposalStatus;
-  totalVotingWeight: bigint
 };
 
 export type Erc20Proposal = ProposalBase & {
@@ -217,12 +216,14 @@ export type Erc20Proposal = ProposalBase & {
   token: Erc20TokenDetails;
   usedVotingWeight: bigint;
   votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
+  totalVotingWeight: bigint;
 };
 
 export type AddressListProposal = ProposalBase & {
   result: AddressListProposalResult;
   settings: IProposalSettings;
   votes: Array<{ address: string; vote: VoteValues }>;
+  totalVotingWeight: number;
 };
 
 /**
@@ -310,12 +311,32 @@ export type Erc20TokenDetails = {
 
 export interface IProposalQueryParams extends IPagination {
   sortBy?: ProposalSortBy;
-  addressOrEns?: string;
+  daoAddressOrEns?: string;
 }
 
 export enum ProposalSortBy {
-  CREATED_AT,
-  NAME,
-  POPULARITY,
-  VOTES, // currently defined as number of proposals
+  CREATED_AT = "createdAt",
+  NAME = "name",
+  POPULARITY = "popularity",
+  VOTES = "votes", // currently defined as number of proposals
 }
+
+export interface ISubgraphErc20Voter {
+  voter: {
+    id: string;
+  };
+  vote: SubgraphVoteValues;
+  weight: string;
+}
+
+export enum SubgraphVoteValues {
+  YES = "Yea",
+  NO = "Nay",
+  ABSTAIN = "Abstain",
+}
+export const SubgraphVoteValuesMap: Map<SubgraphVoteValues, VoteValues> =
+  new Map([
+    [SubgraphVoteValues.YES, VoteValues.YES],
+    [SubgraphVoteValues.NO, VoteValues.NO],
+    [SubgraphVoteValues.ABSTAIN, VoteValues.ABSTAIN],
+  ]);

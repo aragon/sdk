@@ -8,6 +8,7 @@ import {
   ClientErc20,
   ContextPlugin,
   ContextPluginParams,
+  SortDirection,
 } from "../../src";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
@@ -23,10 +24,12 @@ import {
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
+  ProposalSortBy,
   VoteProposalStep,
   VoteValues,
 } from "../../src/internal/interfaces/plugins";
 import { AddressZero } from "@ethersproject/constants";
+import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -37,7 +40,6 @@ const IPFS_API_KEY = process.env.IPFS_API_KEY ||
 const web3endpoints = {
   working: [
     "https://mainnet.infura.io/v3/94d2e8caf1bc4c4884af830d96f927ca",
-    "https://cloudflare-eth.com/",
   ],
   failing: ["https://bad-url-gateway.io/"],
 };
@@ -78,6 +80,15 @@ const contextParams: ContextPluginParams = {
   ipfsNodes: ipfsEndpoints.working,
   graphqlNodes: grapqhlEndpoints.working,
 };
+const contextParamsFailing: ContextPluginParams = {
+  network: "mainnet",
+  signer: new Wallet(TEST_WALLET),
+  daoFactoryAddress: "0x0123456789012345678901234567890123456789",
+  web3Providers: web3endpoints.failing,
+  pluginAddress: "0x2345678901234567890123456789012345678901",
+  ipfsNodes: ipfsEndpoints.failing,
+  graphqlNodes: grapqhlEndpoints.failing,
+};
 
 const contextParamsLocalChain: ContextPluginParams = {
   network: 31337,
@@ -86,12 +97,6 @@ const contextParamsLocalChain: ContextPluginParams = {
   web3Providers: ["http://localhost:8545"],
   pluginAddress: "0x2345678901234567890123456789012345678901",
   ipfsNodes: [
-    {
-      url: "https://testing-ipfs-0.aragon.network/api/v0",
-      headers: {
-        "X-API-KEY": IPFS_API_KEY || "",
-      },
-    },
     {
       url: "http:localhost:5001",
     },
@@ -144,10 +149,7 @@ describe("Client", () => {
     });
 
     it("Should create a failing client", async () => {
-      contextParams.web3Providers = web3endpoints.failing;
-      contextParams.ipfsNodes = ipfsEndpoints.failing;
-      contextParams.graphqlNodes = grapqhlEndpoints.failing;
-      const ctx = new ContextPlugin(contextParams);
+      const ctx = new ContextPlugin(contextParamsFailing);
       const client = new ClientErc20(ctx);
 
       expect(client).toBeInstanceOf(ClientErc20);
@@ -480,7 +482,7 @@ describe("Client", () => {
 
   describe("Data retrieval", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientErc20(context);
 
       const daoAddress = "0x1234567890123456789012345678901234567890";
@@ -492,7 +494,7 @@ describe("Client", () => {
       expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     });
     it("Should fetch the given proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientErc20(context);
 
       const proposalId = "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0";
@@ -573,7 +575,7 @@ describe("Client", () => {
       }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientErc20(context);
 
       const proposalId = "0x1234567890123456789012345678901234567890_0x0";
@@ -582,31 +584,106 @@ describe("Client", () => {
       expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientErc20(context);
       const limit = 5;
       const params: IProposalQueryParams = {
         limit,
+        sortBy: ProposalSortBy.CREATED_AT,
+        direction: SortDirection.ASC,
       };
       const proposals = await client.methods.getProposals(params);
 
       expect(Array.isArray(proposals)).toBe(true);
       expect(proposals.length <= limit).toBe(true);
+      for (let i = 0; i < proposals.length; i++) {
+        const proposal = proposals[i];
+        expect(typeof proposal.id).toBe("string");
+        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+        expect(typeof proposal.dao.address).toBe("string");
+        expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof proposal.dao.name).toBe("string");
+        expect(typeof proposal.creatorAddress).toBe("string");
+        expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof proposal.metadata.title).toBe("string");
+        expect(typeof proposal.metadata.summary).toBe("string");
+        expect(proposal.startDate instanceof Date).toBe(true);
+        expect(proposal.endDate instanceof Date).toBe(true);
+        // result
+        expect(typeof proposal.result.yes).toBe("bigint");
+        expect(typeof proposal.result.no).toBe("bigint");
+        expect(typeof proposal.result.abstain).toBe("bigint");
+        // token
+        expect(typeof proposal.token.name).toBe("string");
+        expect(typeof proposal.token.symbol).toBe("string");
+        expect(typeof proposal.token.decimals).toBe("number");
+        expect(typeof proposal.token.address).toBe("string");
+        expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      }
+    });
+    it("Should get a list of proposals from a specific dao", async () => {
+      const context = new ContextPlugin(contextParams);
+      const client = new ClientErc20(context);
+      const limit = 5;
+      const address = "0x663ac3c648548eb8ccd292b41a8ff829631c846d";
+      const params: IProposalQueryParams = {
+        limit,
+        sortBy: ProposalSortBy.CREATED_AT,
+        direction: SortDirection.ASC,
+        daoAddressOrEns: address,
+      };
+      const proposals = await client.methods.getProposals(params);
+
+      expect(Array.isArray(proposals)).toBe(true);
+      expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
+    });
+    it("Should get a list of proposals from a dao that has no proposals", async () => {
+      const context = new ContextPlugin(contextParams);
+      const client = new ClientErc20(context);
+      const limit = 5;
+      const address = "0x1234567890123456789012345678901234567890";
+      const params: IProposalQueryParams = {
+        limit,
+        sortBy: ProposalSortBy.CREATED_AT,
+        direction: SortDirection.ASC,
+        daoAddressOrEns: address,
+      };
+      const proposals = await client.methods.getProposals(params);
+
+      expect(Array.isArray(proposals)).toBe(true);
+      expect(proposals.length === 0).toBe(true);
+    });
+    it("Should get a list of proposals from an invalid address", async () => {
+      const context = new ContextPlugin(contextParams);
+      const client = new ClientErc20(context);
+      const limit = 5;
+      const address = "0xn0tv4l1d";
+      const params: IProposalQueryParams = {
+        limit,
+        sortBy: ProposalSortBy.CREATED_AT,
+        direction: SortDirection.ASC,
+        daoAddressOrEns: address,
+      };
+      await expect(() => client.methods.getProposals(params)).rejects.toThrow(
+        new InvalidAddressOrEnsError(),
+      );
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientErc20(context);
 
       const pluginAddress: string =
-        "0x1234567890123456789012345678901234567890";
-      const proposals = await client.methods.getSettings(pluginAddress);
-
-      expect(typeof proposals.minDuration).toBe("number");
-      expect(typeof proposals.minSupport).toBe("number");
-      expect(typeof proposals.minTurnout).toBe("number");
+        "0x12470f7e1b075efbbed95b85c0858aea1257566d";
+      const settings = await client.methods.getSettings(pluginAddress);
+      expect(settings === null).toBe(false);
+      if (settings) {
+        expect(typeof settings.minDuration).toBe("number");
+        expect(typeof settings.minSupport).toBe("number");
+        expect(typeof settings.minTurnout).toBe("number");
+      }
     });
     it("Should get the token details of a plugin given a plugin instance address", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientErc20(context);
 
       const pluginAddress: string =
@@ -618,7 +695,7 @@ describe("Client", () => {
       expect(typeof token?.name).toBe("string");
     });
     it("Should return null token details for nonexistent plugin addresses", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientErc20(context);
 
       const pluginAddress: string =

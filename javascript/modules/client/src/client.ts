@@ -14,15 +14,16 @@ import {
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
-  IMetadata,
-  InstalledPluginListItem,
-  IWithdrawParams,
-  IGrantPermissionParams,
-  IRevokePermissionParams,
+  IFreezePermissionDecodedParams,
   IFreezePermissionParams,
   IGrantPermissionDecodedParams,
+  IGrantPermissionParams,
+  IMetadata,
+  InstalledPluginListItem,
   IRevokePermissionDecodedParams,
-  IFreezePermissionDecodedParams,
+  IRevokePermissionParams,
+  IWithdrawParams,
+  SubgraphPlugin,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -45,7 +46,14 @@ import {
 } from "./internal/interfaces/common";
 import { pack } from "@ethersproject/solidity";
 
-import { bytesToHex, Random, strip0x } from "@aragon/sdk-common";
+import {
+  bytesToHex,
+  GraphQLError,
+  Random,
+  strip0x,
+  RequiredProviderError,
+  InvalidAddressOrEnsError
+} from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
 import {
@@ -205,8 +213,10 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    grantAction: (daoAddress: string, params: IGrantPermissionParams): DaoAction =>
-      this._buildGrantAction(daoAddress, params),
+    grantAction: (
+      daoAddress: string,
+      params: IGrantPermissionParams,
+    ): DaoAction => this._buildGrantAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that revokes a permission within a DAO
      *
@@ -215,8 +225,10 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    revokeAction: (daoAddress: string, params: IRevokePermissionParams): DaoAction =>
-      this._buildRevokeAction(daoAddress, params),
+    revokeAction: (
+      daoAddress: string,
+      params: IRevokePermissionParams,
+    ): DaoAction => this._buildRevokeAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that freezes a permission within a DAO
      *
@@ -225,8 +237,10 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    freezeAction: (daoAddress: string, params: IFreezePermissionParams): DaoAction =>
-      this._buildFreezeAction(daoAddress, params),
+    freezeAction: (
+      daoAddress: string,
+      params: IFreezePermissionParams,
+    ): DaoAction => this._buildFreezeAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
      *
@@ -373,7 +387,7 @@ export class Client extends ClientCore implements IClient {
     );
 
     // @ts-ignore
-    let cid: string;
+    let cid = "";
     try {
       cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
@@ -594,16 +608,24 @@ export class Client extends ClientCore implements IClient {
   //// PRIVATE METHODS METADATA
 
   private async _getDao(daoAddressOrEns: string): Promise<DaoDetails | null> {
-    if (!isAddress(daoAddressOrEns)) {
-      // TODO
-      // ens resolve
-      throw new Error("Invalid address");
+    let address = daoAddressOrEns;
+    if (!isAddress(address)) {
+      await this.web3.ensureOnline()
+      const provider = this.web3.getProvider();
+      if (!provider) {
+        throw new RequiredProviderError();
+      }
+      const resolvedAddress = await provider.resolveName(address);
+      if (!resolvedAddress) {
+        throw new InvalidAddressOrEnsError();
+      }
+      address = resolvedAddress;
     }
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { dao } = await client.request(QueryDao, {
-        address: daoAddressOrEns,
+        address,
       });
       if (!dao) {
         return null;
@@ -615,6 +637,7 @@ export class Client extends ClientCore implements IClient {
       const stringMetadata = await this.ipfs.fetchString(
         "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr",
       );
+      // TODO: Parse and validate schema
       const metadata = JSON.parse(stringMetadata);
       return {
         address: dao.id,
@@ -629,18 +652,24 @@ export class Client extends ClientCore implements IClient {
         // TODO update when new subgraph schema is deployed
         plugins: dao.packages.map(
           (
-            pkg: { pkg: { id: string; __typename: string } },
+            plugin: SubgraphPlugin,
           ): InstalledPluginListItem => {
             return {
-              instanceAddress: pkg.pkg.id,
-              id: pkg.pkg.__typename,
+              instanceAddress: plugin.pkg.id,
+              // TODO
+              // this should be the address of the parent plugin
+              // or the ens name, subgraph does not have this info
+              // at this moment so for now, the __typename
+              // will do the job to differentitate between
+              // plugins, however, this will eventually change
+              id: plugin.pkg.__typename + ".plugin.dao.eth",
               version: "0.0.1",
             };
           },
         ),
       };
     } catch (err) {
-      throw new Error("Cannot fetch the dao details data from GraphQL");
+      throw new GraphQLError("dao");
     }
   }
 
@@ -650,7 +679,6 @@ export class Client extends ClientCore implements IClient {
     direction = SortDirection.ASC,
     sortBy = DaoSortBy.CREATED_AT,
   }: IDaoQueryParams): Promise<DaoListItem[]> {
-    const daosDetails: DaoListItem[] = [];
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -660,8 +688,8 @@ export class Client extends ClientCore implements IClient {
         direction,
         sortBy,
       });
-      for (let i = 0; i < daos.length; i++) {
-        const dao = daos[i];
+      await this.ipfs.ensureOnline();
+      return Promise.all(daos.map(async (dao: any): Promise<DaoListItem> => {
         // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
         // TODO
         // this is a temporal fix and should be changed by the line above
@@ -670,7 +698,7 @@ export class Client extends ClientCore implements IClient {
           "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr",
         );
         const metadata = JSON.parse(stringMetadata);
-        daosDetails.push({
+        return {
           address: dao.id,
           ensDomain: dao.name,
           metadata: {
@@ -680,64 +708,81 @@ export class Client extends ClientCore implements IClient {
           // TODO update when new subgraph schema is deployed
           plugins: dao.packages.map(
             (
-              pkg: { pkg: { id: string; __typename: string } },
+              plugin: SubgraphPlugin,
             ): InstalledPluginListItem => {
               return {
-                instanceAddress: pkg.pkg.id,
-                id: pkg.pkg.__typename,
+                instanceAddress: plugin.pkg.id,
+                // TODO
+                // this should be the address of the parent plugin
+                // or the ens name, subgraph does not have this info
+                // at this moment so for now, the __typename
+                // will do the job to differentitate between
+                // plugins, however, this will eventually change
+                id: plugin.pkg.__typename + "plugin.dao.eth",
                 version: "0.0.1",
               };
             },
           ),
-        });
-      }
-      return daosDetails;
+        };
+      }));
+      // return daosDetails;
     } catch (err) {
-      throw new Error("Cannot fetch the dao details data from GraphQL");
+      throw new GraphQLError("dao");
     }
   }
 
   private async _getBalances(
-    daoAddress: string,
+    daoAddressorEns: string,
     _tokenAddresses: string[],
   ): Promise<AssetBalance[] | null> {
     // TODO check address
+    let address = daoAddressorEns;
+    if (!isAddress(address)) {
+      await this.web3.ensureOnline()
+      const provider = this.web3.getProvider();
+      if (!provider) {
+        throw new RequiredProviderError();
+      }
+      const resolvedAddress = await provider.resolveName(address);
+      if (!resolvedAddress) {
+        throw new InvalidAddressOrEnsError();
+      }
+      address = resolvedAddress;
+    }
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { dao } = await client.request(QueryBalances, {
-        address: daoAddress,
+      const { balances } = await client.request(QueryBalances, {
+        address,
       });
-      if (!dao) {
-        return null;
-      }
-      if (dao.balances.length === 0) {
+      if (balances.length === 0) {
         return [];
       }
-      const balances: AssetBalance[] = [];
-      for (let i = 0; i < dao.balances.length; i++) {
-        const balance = dao.balances[i];
-        if (balance.token.symbol === "ETH") {
-          balances.push({
-            type: "native",
+      // TODO
+      // handle other tokens that are not ERC20 or eth
+      await this.ipfs.ensureOnline();
+      return Promise.all(
+        balances.map(async (balance: any): Promise<AssetBalance> => {
+          if (balance.token.symbol === "ETH") {
+            return {
+              type: "native",
+              balance: BigInt(balance.balance),
+              lastUpdate: new Date(parseInt(balance.lastUpdated) * 1000),
+            };
+          }
+          return {
+            type: "erc20",
+            address: balance.token.id,
+            name: balance.token.name,
+            symbol: balance.token.symbol,
+            decimals: parseInt(balance.token.decimals),
             balance: BigInt(balance.balance),
             lastUpdate: new Date(parseInt(balance.lastUpdated) * 1000),
-          });
-          continue;
-        }
-        balances.push({
-          type: "erc20",
-          address: balance.token.id,
-          name: balance.token.name,
-          symbol: balance.token.symbol,
-          decimals: parseInt(balance.token.decimals),
-          balance: BigInt(balance.balance),
-          lastUpdate: new Date(parseInt(balance.lastUpdated) * 1000),
-        });
-      }
-      return balances;
+          };
+        }),
+      );
     } catch (err) {
-      throw new Error("Cannot fetch the balance data from GraphQL");
+      throw new GraphQLError("balance");
     }
   }
   private async _getTransfers(

@@ -2,8 +2,7 @@ import { gql } from "graphql-request";
 
 export const QueryBalances = gql`
 query balances($address: ID!, $limit: Int = 10, $skip: Int = 0) {
-  dao(id: $address){
-    balances {
+    balances(where:{dao:$address}) {
       token {
         id
         name
@@ -14,5 +13,4 @@ query balances($address: ID!, $limit: Int = 10, $skip: Int = 0) {
       lastUpdated
     }
   }
-}
 `;

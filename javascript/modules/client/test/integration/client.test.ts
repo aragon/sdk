@@ -34,10 +34,10 @@ import {
 } from "../../src/internal/interfaces/client";
 import { DaoAction, SortDirection } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/client";
-import { Random } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { InvalidAddressOrEnsError, Random } from "@aragon/sdk-common";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -48,7 +48,6 @@ const IPFS_API_KEY = process.env.IPFS_API_KEY ||
 const web3endpoints = {
   working: [
     "https://mainnet.infura.io/v3/94d2e8caf1bc4c4884af830d96f927ca",
-    "https://cloudflare-eth.com/",
   ],
   failing: ["https://bad-url-gateway.io/"],
 };
@@ -923,7 +922,7 @@ describe("Client", () => {
       const client = new Client(ctx);
       const daoAddress = "thisisinvalid";
       await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
-        "Invalid address",
+        new InvalidAddressOrEnsError()
       );
     });
 
@@ -990,13 +989,6 @@ describe("Client", () => {
           }
         }
       }
-    });
-    it("Should get DAOs balances from a dao that does not exist", async () => {
-      const ctx = new Context(contextParams);
-      const client = new Client(ctx);
-      const daoAddress = "0x1234567890123456789012345678901234567890";
-      const balances = await client.methods.getBalances(daoAddress);
-      expect(balances === null).toBe(true);
     });
     it("Should get DAOs balances from a dao with no balances", async () => {
       const ctx = new Context(contextParams);

@@ -8,6 +8,7 @@ import {
   ClientAddressList,
   ContextPlugin,
   ContextPluginParams,
+  SortDirection,
 } from "../../src";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
@@ -23,9 +24,11 @@ import {
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
+  ProposalSortBy,
   VoteProposalStep,
   VoteValues,
 } from "../../src/internal/interfaces/plugins";
+import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -36,7 +39,6 @@ const IPFS_API_KEY = process.env.IPFS_API_KEY ||
 const web3endpoints = {
   working: [
     "https://mainnet.infura.io/v3/94d2e8caf1bc4c4884af830d96f927ca",
-    "https://cloudflare-eth.com/",
   ],
   failing: ["https://bad-url-gateway.io/"],
 };
@@ -76,6 +78,16 @@ const contextParams: ContextPluginParams = {
   pluginAddress: "0x2345678901234567890123456789012345678901",
   ipfsNodes: ipfsEndpoints.working,
   graphqlNodes: grapqhlEndpoints.working,
+};
+
+const contextParamsFailing: ContextPluginParams = {
+  network: "mainnet",
+  signer: new Wallet(TEST_WALLET),
+  daoFactoryAddress: "0x0123456789012345678901234567890123456789",
+  web3Providers: web3endpoints.failing,
+  pluginAddress: "0x2345678901234567890123456789012345678901",
+  ipfsNodes: ipfsEndpoints.failing,
+  graphqlNodes: grapqhlEndpoints.failing,
 };
 
 const contextParamsLocalChain: ContextPluginParams = {
@@ -137,10 +149,7 @@ describe("Client", () => {
     });
 
     it("Should create a failing client", async () => {
-      contextParams.web3Providers = web3endpoints.failing;
-      contextParams.ipfsNodes = ipfsEndpoints.failing;
-      contextParams.graphqlNodes = grapqhlEndpoints.failing;
-      const ctx = new ContextPlugin(contextParams);
+      const ctx = new ContextPlugin(contextParamsFailing);
       const client = new ClientAddressList(ctx);
 
       expect(client).toBeInstanceOf(ClientAddressList);
@@ -482,7 +491,7 @@ describe("Client", () => {
 
   describe("Data retrieval", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientAddressList(context);
 
       const wallets = await client.methods.getMembers(
@@ -495,51 +504,183 @@ describe("Client", () => {
       expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     });
     it("Should fetch the given proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientAddressList(context);
 
-      const proposalId = "0x1234567890123456789012345678901234567890_0x55";
+      const proposalId = "0xbb90da4858c658f9701ecb18a3db758a74664ea4_0x0";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(typeof proposal).toBe("object");
-      expect(proposal.id).toBe(proposalId);
-      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+      expect(proposal === null).toBe(false);
+      if (proposal) {
+        expect(proposal.id).toBe(proposalId);
+        expect(typeof proposal.id).toBe("string");
+        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+        expect(typeof proposal.dao.address).toBe("string");
+        expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof proposal.dao.name).toBe("string");
+        expect(typeof proposal.creatorAddress).toBe("string");
+        expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        // check metadata
+        expect(typeof proposal.metadata.title).toBe("string");
+        expect(typeof proposal.metadata.summary).toBe("string");
+        expect(typeof proposal.metadata.description).toBe("string");
+        expect(Array.isArray(proposal.metadata.resources)).toBe(true);
+        for (let i = 0; i < proposal.metadata.resources.length; i++) {
+          const resource = proposal.metadata.resources[i];
+          expect(typeof resource.name).toBe("string");
+          expect(typeof resource.url).toBe("string");
+        }
+        if (proposal.metadata.media) {
+          if (proposal.metadata.media.header) {
+            expect(typeof proposal.metadata.media.header).toBe("string");
+          }
+          if (proposal.metadata.media.logo) {
+            expect(typeof proposal.metadata.media.logo).toBe("string");
+          }
+        }
+        expect(proposal.startDate instanceof Date).toBe(true);
+        expect(proposal.endDate instanceof Date).toBe(true);
+        expect(proposal.creationDate instanceof Date).toBe(true);
+        expect(Array.isArray(proposal.actions)).toBe(true);
+        // actions
+        for (let i = 0; i < proposal.actions.length; i++) {
+          const action = proposal.actions[i];
+          expect(action.data instanceof Uint8Array).toBe(true);
+          expect(typeof action.to).toBe("string");
+          expect(typeof action.value).toBe("bigint");
+        }
+        // result
+        expect(typeof proposal.result.yes).toBe("number");
+        expect(typeof proposal.result.no).toBe("number");
+        expect(typeof proposal.result.abstain).toBe("number");
+        // setttings
+        expect(typeof proposal.settings.duration).toBe("number");
+        expect(typeof proposal.settings.minSupport).toBe("number");
+        expect(typeof proposal.settings.minTurnout).toBe("number");
+        // TODO
+        // enable this tests when the subgrph have the correcto precision digits
+        // expect(
+        //   proposal.settings.minSupport >= 0 &&
+        //     proposal.settings.minSupport <= 1,
+        // ).toBe(true);
+        // expect(
+        //   proposal.settings.minTurnout >= 0 &&
+        //     proposal.settings.minTurnout <= 1,
+        // ).toBe(true);
+        // token
+        expect(typeof proposal.totalVotingWeight).toBe("number");
+        expect(Array.isArray(proposal.votes)).toBe(true);
+        for (let i = 0; i < proposal.votes.length; i++) {
+          const vote = proposal.votes[i];
+          expect(typeof vote.address).toBe("string");
+          expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+          expect(typeof vote.vote).toBe("number");
+        }
+      }
+    });
+    it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
+      const context = new ContextPlugin(contextParams);
+      const client = new ClientAddressList(context);
+
+      const proposalId = "0x1234567890123456789012345678901234567890_0x0";
+      const proposal = await client.methods.getProposal(proposalId);
+
+      expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientAddressList(context);
-      let proposals = await client.methods.getProposals();
-
-      expect(Array.isArray(proposals)).toBe(true);
-      expect(proposals.length <= 10).toBe(true);
-
-      let limit = 1;
+      const limit = 5;
       const params: IProposalQueryParams = {
         limit,
+        sortBy: ProposalSortBy.CREATED_AT,
+        direction: SortDirection.ASC,
       };
-      proposals = await client.methods.getProposals(params);
+      const proposals = await client.methods.getProposals(params);
 
       expect(Array.isArray(proposals)).toBe(true);
       expect(proposals.length <= limit).toBe(true);
-
-      limit = 5;
-      params.limit = limit;
-      proposals = await client.methods.getProposals(params);
+      for (let i = 0; i < proposals.length; i++) {
+        const proposal = proposals[i];
+        expect(typeof proposal.id).toBe("string");
+        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+        expect(typeof proposal.dao.address).toBe("string");
+        expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof proposal.dao.name).toBe("string");
+        expect(typeof proposal.creatorAddress).toBe("string");
+        expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof proposal.metadata.title).toBe("string");
+        expect(typeof proposal.metadata.summary).toBe("string");
+        expect(proposal.startDate instanceof Date).toBe(true);
+        expect(proposal.endDate instanceof Date).toBe(true);
+        // result
+        expect(typeof proposal.result.yes).toBe("number");
+        expect(typeof proposal.result.no).toBe("number");
+        expect(typeof proposal.result.abstain).toBe("number");
+      }
+    });
+    it("Should get a list of proposals from a specific dao", async () => {
+      const context = new ContextPlugin(contextParams);
+      const client = new ClientAddressList(context);
+      const limit = 5;
+      const address = "0x22effb00975f81a88f8fd4c0305b959053908cc8";
+      const params: IProposalQueryParams = {
+        limit,
+        sortBy: ProposalSortBy.CREATED_AT,
+        direction: SortDirection.ASC,
+        daoAddressOrEns: address,
+      };
+      const proposals = await client.methods.getProposals(params);
 
       expect(Array.isArray(proposals)).toBe(true);
-      expect(proposals.length <= limit).toBe(true);
+      expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
+    });
+    it("Should get a list of proposals from a dao that has no proposals", async () => {
+      const context = new ContextPlugin(contextParams);
+      const client = new ClientAddressList(context);
+      const limit = 5;
+      const address = "0x1234567890123456789012345678901234567890";
+      const params: IProposalQueryParams = {
+        limit,
+        sortBy: ProposalSortBy.CREATED_AT,
+        direction: SortDirection.ASC,
+        daoAddressOrEns: address,
+      };
+      const proposals = await client.methods.getProposals(params);
+
+      expect(Array.isArray(proposals)).toBe(true);
+      expect(proposals.length === 0).toBe(true);
+    });
+    it("Should get a list of proposals from an invalid address", async () => {
+      const context = new ContextPlugin(contextParams);
+      const client = new ClientAddressList(context);
+      const limit = 5;
+      const address = "0xn0tv4l1d";
+      const params: IProposalQueryParams = {
+        limit,
+        sortBy: ProposalSortBy.CREATED_AT,
+        direction: SortDirection.ASC,
+        daoAddressOrEns: address,
+      };
+      await expect(() => client.methods.getProposals(params)).rejects.toThrow(
+        new InvalidAddressOrEnsError(),
+      );
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
+      const context = new ContextPlugin(contextParams);
       const client = new ClientAddressList(context);
 
       const pluginAddress: string =
-        "0x12345678901234567890º1234567890123456789012";
-      const proposals = await client.methods.getSettings(pluginAddress);
+        "0x04e2518146781aa2299ca95b1716ff545cbafdb3";
+      const settings = await client.methods.getSettings(pluginAddress);
 
-      expect(typeof proposals.minDuration).toBe("number");
-      expect(typeof proposals.minSupport).toBe("number");
-      expect(typeof proposals.minTurnout).toBe("number");
+      expect(settings === null).toBe(false);
+      if (settings) {
+        expect(typeof settings.minDuration).toBe("number");
+        expect(typeof settings.minSupport).toBe("number");
+        expect(typeof settings.minTurnout).toBe("number");
+      }
     });
   });
 });

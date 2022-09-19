@@ -1,18 +1,27 @@
 import { ProposalStatus } from "../interfaces/common";
 
-
-export function getProposalStatus(startDate: Date, endDate: Date, executed: boolean, yes?: bigint, no?: bigint): ProposalStatus {
+export function computeProposalStatus(
+  startDate: Date,
+  endDate: Date,
+  executed: boolean,
+  yes?: bigint,
+  no?: bigint,
+): ProposalStatus {
   const now = new Date();
   if (startDate >= now) {
-    return ProposalStatus.PENDING
+    return ProposalStatus.PENDING;
   } else if (endDate >= now) {
-    return ProposalStatus.ACTIVE
+    return ProposalStatus.ACTIVE;
   } else if (executed) {
-    return ProposalStatus.EXECUTED
+    return ProposalStatus.EXECUTED;
   } else if (yes && no && yes > no) {
-    return ProposalStatus.SUCCEEDED
+    return ProposalStatus.SUCCEEDED;
   } else {
-    return ProposalStatus.DEFEATED
+    return ProposalStatus.DEFEATED;
   }
 }
 
+export function isProposalId(propoosalId: string): boolean {
+  const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+  return regex.test(propoosalId);
+}
