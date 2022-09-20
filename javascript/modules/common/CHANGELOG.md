@@ -16,7 +16,10 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [UPCOMING] 
+## [UPCOMING]
+
+## 0.3.0-alpha
+On 2022-09-20 12:08:47 
 ### Added
 - New error types
 ### Fixed
