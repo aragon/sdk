@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## 0.6.0-alpha
+On 2022-09-20 12:08:58
 ### Added
 - Use real IPFS data
 - Use real subgraph data
