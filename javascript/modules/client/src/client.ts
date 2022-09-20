@@ -671,16 +671,18 @@ export class Client extends ClientCore implements IClient {
       );
       await this.ipfs.ensureOnline();
       return Promise.all(
-        daos.map(async (dao: ISubgraphDaoListItem): Promise<DaoListItem> => {
+        daos.map((dao: ISubgraphDaoListItem): Promise<DaoListItem> => {
           // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
           // TODO
           // this is a temporal fix and should be changed by the line above
           // but the current daos in subgraph dont have a proper metadata
-          const stringMetadata = await this.ipfs.fetchString(
-            "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr",
-          );
-          const metadata = JSON.parse(stringMetadata);
-          return toDaoListItem(dao, metadata);
+          const test_cid = "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr";
+          return this.ipfs.fetchString(
+            test_cid,
+          ).then((stringMetadata) => {
+            const metadata = JSON.parse(stringMetadata);
+            return toDaoListItem(dao, metadata);
+          });
         }),
       );
     } catch (err) {
@@ -721,7 +723,7 @@ export class Client extends ClientCore implements IClient {
       await this.ipfs.ensureOnline();
       return Promise.all(
         balances.map(
-          async (balance: ISubgraphBalance): Promise<AssetBalance> =>
+          (balance: ISubgraphBalance): AssetBalance =>
             toAssetBalance(balance),
         ),
       );

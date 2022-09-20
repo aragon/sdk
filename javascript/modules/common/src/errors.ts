@@ -28,7 +28,7 @@ export class InvalidProposalIdError extends Error {
     super("Invalid proposal ID");
   }
 }
-export class RequiredProviderError extends Error {
+export class NoProviderError extends Error {
   constructor() {
     super("A web3 provider is needed");
   }

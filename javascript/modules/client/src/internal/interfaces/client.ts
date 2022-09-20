@@ -88,8 +88,8 @@ export interface ICreateParams {
 export interface IMetadata {
   name: string;
   description: string;
-  avatar: string;
-  links: { name: string; url: string }[];
+  avatar?: string;
+  links: DaoResourceLink[];
 }
 
 export interface IWithdrawParams {
@@ -246,17 +246,10 @@ export type InstalledPluginListItem = {
   version: string;
 };
 
-export type DaoMetadata = {
-  name: string;
-  description: string;
-  avatar?: string;
-  links: DaoResourceLink[];
-};
-
 export type DaoDetails = {
   address: string;
   ensDomain: string;
-  metadata: DaoMetadata;
+  metadata: IMetadata;
   creationDate: Date;
   plugins: InstalledPluginListItem[];
 };

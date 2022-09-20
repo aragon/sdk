@@ -171,8 +171,7 @@ export function toErc20Proposal(
     parseInt(proposal.createdAt) * 1000,
   );
   let usedVotingWeight: bigint = BigInt(0);
-  for (let i = 0; i < proposal.voters.length; i++) {
-    const voter = proposal.voters[i];
+  for (const voter of proposal.voters) {
     usedVotingWeight += BigInt(voter.weight);
   }
   return {

@@ -399,18 +399,20 @@ export class ClientAddressList extends ClientCore
       await this.ipfs.ensureOnline();
       return Promise.all(
         addressListProposals.map(
-          async (
+          (
             proposal: ISubgraphAddressListProposalListItem,
           ): Promise<AddressListProposalListItem> => {
             // TODO
             // delete this cid once the proposals in subgraph have the correct
             // format in the metadata field
             const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
-            const metadataString = await this.ipfs.fetchString(test_cid);
-            // TODO: Parse and validate schema
-            const metadata = JSON.parse(metadataString) as ProposalMetadata;
-            // add proposal to list
-            return toAddressListProposalListItem(proposal, metadata);
+            return this.ipfs.fetchString(test_cid).then(
+              (stringMetadata: string) => {
+                // TODO: Parse and validate schema
+                const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
+                return toAddressListProposalListItem(proposal, metadata);
+              },
+            );
           },
         ),
       );

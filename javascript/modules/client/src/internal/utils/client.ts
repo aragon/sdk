@@ -2,7 +2,7 @@ import {
   AssetBalance,
   DaoDetails,
   DaoListItem,
-  DaoMetadata,
+  IMetadata,
   InstalledPluginListItem,
   ISubgraphBalance,
   ISubgraphDao,
@@ -13,7 +13,7 @@ import {
 
 export function toDaoDetails(
   dao: ISubgraphDao,
-  metadata: DaoMetadata,
+  metadata: IMetadata,
 ): DaoDetails {
   return {
     address: dao.id,
@@ -48,7 +48,7 @@ export function toDaoDetails(
 
 export function toDaoListItem(
   dao: ISubgraphDaoListItem,
-  metadata: DaoMetadata,
+  metadata: IMetadata,
 ): DaoListItem {
   return {
     address: dao.id,
@@ -79,12 +79,12 @@ export function toDaoListItem(
 }
 
 export function toAssetBalance(balance: ISubgraphBalance): AssetBalance {
-  const updateDate = new Date(parseInt(balance.lastUpdated) * 1000) 
+  const updateDate = new Date(parseInt(balance.lastUpdated) * 1000);
   if (balance.token.symbol === "ETH") {
     return {
       type: "native",
       balance: BigInt(balance.balance),
-      updateDate
+      updateDate,
     };
   }
   return {
@@ -94,6 +94,6 @@ export function toAssetBalance(balance: ISubgraphBalance): AssetBalance {
     symbol: balance.token.symbol,
     decimals: parseInt(balance.token.decimals),
     balance: BigInt(balance.balance),
-    updateDate
+    updateDate,
   };
 }

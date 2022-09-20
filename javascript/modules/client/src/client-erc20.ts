@@ -524,17 +524,20 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       await this.ipfs.ensureOnline();
       return Promise.all(
         erc20VotingProposals.map(
-          async (
+          (
             proposal: ISubgraphErc20ProposalListItem,
           ): Promise<Erc20ProposalListItem> => {
             // TODO
             // delete this cid once the proposals in subgraph have the correct
             // format in the metadata field
             const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
-            const metadataString = await this.ipfs.fetchString(test_cid);
-            // TODO: Parse and validate schema
-            const metadata = JSON.parse(metadataString) as ProposalMetadata;
-            return toErc20ProposalListItem(proposal, metadata);
+            return this.ipfs.fetchString(test_cid).then(
+              (stringMetadata: string) => {
+                // TODO: Parse and validate schema¡
+                const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
+                return toErc20ProposalListItem(proposal, metadata);
+              },
+            );
           },
         ),
       );
