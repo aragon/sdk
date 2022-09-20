@@ -720,7 +720,6 @@ export class Client extends ClientCore implements IClient {
       }
       // TODO
       // handle other tokens that are not ERC20 or eth
-      await this.ipfs.ensureOnline();
       return Promise.all(
         balances.map(
           (balance: ISubgraphBalance): AssetBalance =>
