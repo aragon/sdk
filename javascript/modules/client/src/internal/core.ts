@@ -114,6 +114,19 @@ export abstract class ClientCore implements IClientCore {
         .then(() => true)
         .catch(() => false);
     },
+    
+    ensureOnline: async () => {
+      if (!this._web3Providers?.length) {
+        return Promise.reject(new Error("No provider"));
+      }
+
+      for (var i = 0; i < this._web3Providers?.length; i++) {
+        if (await this.web3.isUp()) return;
+
+        this.web3.shiftProvider();
+      }
+      throw new Error("No providers available");
+    },
 
     /**
      * Returns a contract instance at the given address

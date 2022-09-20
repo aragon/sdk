@@ -20,7 +20,7 @@ export interface IClient extends IClientCore {
     getBalances: (
       daoAddressOrEns: string,
       tokenAddresses: string[],
-    ) => Promise<AssetBalance[]>;
+    ) => Promise<AssetBalance[] | null>;
     /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (daoAddressOrEns: string) => Promise<IAssetTransfers>;
     /** Checks whether a role is granted by the current DAO's ACL settings */
@@ -33,7 +33,7 @@ export interface IClient extends IClientCore {
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
     /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-    getDao: (daoAddressOrEns: string) => Promise<DaoDetails>;
+    getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
     /** Retrieves metadata for many daos */
     getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
   };
@@ -88,8 +88,8 @@ export interface ICreateParams {
 export interface IMetadata {
   name: string;
   description: string;
-  avatar: string;
-  links: { name: string; url: string }[];
+  avatar?: string;
+  links: DaoResourceLink[];
 }
 
 export interface IWithdrawParams {
@@ -205,7 +205,7 @@ type Erc20TokenBalance = Erc20TokenBase & {
 };
 
 export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & {
-  lastUpdate: Date;
+  updateDate: Date;
 };
 
 // Token transfers
@@ -249,12 +249,7 @@ export type InstalledPluginListItem = {
 export type DaoDetails = {
   address: string;
   ensDomain: string;
-  metadata: {
-    name: string;
-    description: string;
-    avatar?: string;
-    links: DaoResourceLink[];
-  };
+  metadata: IMetadata;
   creationDate: Date;
   plugins: InstalledPluginListItem[];
 };
@@ -274,7 +269,49 @@ export interface IDaoQueryParams extends IPagination {
 }
 
 export enum DaoSortBy {
-  CREATED_AT,
-  NAME,
-  POPULARITY, // currently defined as number of proposals
+  CREATED_AT = "createdAt",
+  NAME = "name",
+  POPULARITY = "totalProposals", // currently defined as number of proposals
 }
+
+export enum SubgraphPluginTypeName {
+  ERC20 = "ERC20VotingPackage",
+  ADDRESS_LIST = "WhitelistPackage",
+}
+
+export const SubgraphPluginTypeMap: Map<SubgraphPluginTypeName, string> =
+  new Map([
+    [SubgraphPluginTypeName.ERC20, "erc20voting.dao.eth"],
+    [SubgraphPluginTypeName.ADDRESS_LIST, "addreslistvoting.dao.eth"],
+  ]);
+
+export type SubgraphPluginListItem = {
+  pkg: {
+    id: string;
+    __typename: SubgraphPluginTypeName;
+  };
+};
+
+type SubgraphDaoBase = {
+  id: string;
+  name: string;
+  metadata: string;
+  packages: SubgraphPluginListItem[];
+};
+
+export type SubgraphDao = SubgraphDaoBase & {
+  createdAt: string;
+};
+
+export type SubgraphDaoListItem = SubgraphDaoBase;
+
+export type SubgraphBalance = {
+  token: {
+    id: string;
+    name: string;
+    symbol: string;
+    decimals: string;
+  };
+  balance: string;
+  lastUpdated: string;
+};

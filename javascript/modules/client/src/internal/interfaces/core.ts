@@ -15,6 +15,7 @@ export interface IClientWeb3Core {
   getProvider: () => JsonRpcProvider | null;
   getMaxFeePerGas: () => Promise<bigint>;
   isUp: () => Promise<boolean>;
+  ensureOnline: () => Promise<void>;
   attachContract: <T>(
     address: string,
     abi: ContractInterface,

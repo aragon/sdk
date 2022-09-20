@@ -25,11 +25,11 @@ export interface IClientErc20 extends IClientCore {
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
-    getProposal: (propoosalId: string) => Promise<Erc20Proposal>;
+    getProposal: (propoosalId: string) => Promise<Erc20Proposal | null>;
     getProposals: (
       params?: IProposalQueryParams,
     ) => Promise<Erc20ProposalListItem[]>;
-    getSettings: (pluginAddress: string) => Promise<IPluginSettings>;
+    getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
     getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
   };
   encoding: {
@@ -69,11 +69,11 @@ export interface IClientAddressList extends IClientCore {
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
-    getProposal: (propoosalId: string) => Promise<AddressListProposal>;
+    getProposal: (propoosalId: string) => Promise<AddressListProposal | null>;
     getProposals: (
       params?: IProposalQueryParams,
     ) => Promise<AddressListProposalListItem[]>;
-    getSettings: (pluginAddress: string) => Promise<IPluginSettings>;
+    getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
   };
   encoding: {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
@@ -216,12 +216,14 @@ export type Erc20Proposal = ProposalBase & {
   token: Erc20TokenDetails;
   usedVotingWeight: bigint;
   votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
+  totalVotingWeight: bigint;
 };
 
 export type AddressListProposal = ProposalBase & {
   result: AddressListProposalResult;
   settings: IProposalSettings;
   votes: Array<{ address: string; vote: VoteValues }>;
+  totalVotingWeight: number;
 };
 
 /**
@@ -309,12 +311,95 @@ export type Erc20TokenDetails = {
 
 export interface IProposalQueryParams extends IPagination {
   sortBy?: ProposalSortBy;
-  addressOrEns?: string;
+  daoAddressOrEns?: string;
 }
 
 export enum ProposalSortBy {
-  CREATED_AT,
-  NAME,
-  POPULARITY,
-  VOTES, // currently defined as number of proposals
+  CREATED_AT = "createdAt",
+  NAME = "name",
+  POPULARITY = "popularity",
+  VOTES = "votes", // currently defined as number of proposals
+}
+
+export enum SubgraphVoteValues {
+  YES = "Yea",
+  NO = "Nay",
+  ABSTAIN = "Abstain",
+}
+export const SubgraphVoteValuesMap: Map<SubgraphVoteValues, VoteValues> =
+  new Map([
+    [SubgraphVoteValues.YES, VoteValues.YES],
+    [SubgraphVoteValues.NO, VoteValues.NO],
+    [SubgraphVoteValues.ABSTAIN, VoteValues.ABSTAIN],
+  ]);
+
+type SubgraphVoterListItemBase = {
+  voter: {
+    id: string;
+  };
+  vote: SubgraphVoteValues;
+};
+export type SubgraphAddressListVoterListItem = SubgraphVoterListItemBase;
+
+export type SubgraphErc20VoterListItem = SubgraphVoterListItemBase & {
+  weight: string;
+};
+
+export type SubgraphAction = {
+  to: string;
+  value: string;
+  data: string;
+};
+
+type SubgraphProposalBase = {
+  id: string;
+  dao: {
+    id: string;
+    name: string;
+  };
+  creator: string;
+  metadata: string;
+  yea: string;
+  nay: string;
+  abstain: string;
+  startDate: string;
+  endDate: string;
+  executed: boolean;
+};
+
+export type SubgraphErc20ProposalListItem = SubgraphProposalBase & {
+  pkg: {
+    token: {
+      symbol: string;
+      name: string;
+      id: string;
+      decimals: string;
+    };
+  };
+};
+
+export type SubgraphErc20Proposal = SubgraphErc20ProposalListItem & {
+  createdAt: string;
+  actions: SubgraphAction[];
+  supportRequiredPct: string;
+  participationRequiredPct: string;
+  voters: SubgraphErc20VoterListItem[];
+  votingPower: string;
+};
+export type SubgraphAddressListProposalListItem = SubgraphProposalBase;
+export type SubgraphAddressListProposal = SubgraphProposalBase & {
+  createdAt: string;
+  actions: SubgraphAction[];
+  supportRequiredPct: string;
+  participationRequired: string;
+  voters: SubgraphAddressListVoterListItem[];
+  votingPower: string;
+};
+
+export interface IComputeStatusProposal {
+  startDate: string;
+  endDate: string;
+  yea: string;
+  nay: string;
+  executed: boolean;
 }
