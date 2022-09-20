@@ -33,8 +33,8 @@ import {
   IExecuteProposalParams,
   IPluginSettings,
   IProposalQueryParams,
-  ISubgraphAddressListProposal,
-  ISubgraphAddressListProposalListItem,
+  SubgraphAddressListProposal,
+  SubgraphAddressListProposalListItem,
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
@@ -334,7 +334,7 @@ export class ClientAddressList extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { whitelistProposal: addressListProposal }: {
-        whitelistProposal: ISubgraphAddressListProposal;
+        whitelistProposal: SubgraphAddressListProposal;
       } = await client.request(
         QueryAddressListProposal,
         {
@@ -385,7 +385,7 @@ export class ClientAddressList extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { whitelistProposals: addressListProposals }: {
-        whitelistProposals: ISubgraphAddressListProposalListItem[];
+        whitelistProposals: SubgraphAddressListProposalListItem[];
       } = await client.request(
         QueryAddressListProposals,
         {
@@ -400,7 +400,7 @@ export class ClientAddressList extends ClientCore
       return Promise.all(
         addressListProposals.map(
           (
-            proposal: ISubgraphAddressListProposalListItem,
+            proposal: SubgraphAddressListProposalListItem,
           ): Promise<AddressListProposalListItem> => {
             // TODO
             // delete this cid once the proposals in subgraph have the correct

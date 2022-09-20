@@ -4,15 +4,15 @@ import {
   DaoListItem,
   IMetadata,
   InstalledPluginListItem,
-  ISubgraphBalance,
-  ISubgraphDao,
-  ISubgraphDaoListItem,
+  SubgraphBalance,
+  SubgraphDao,
+  SubgraphDaoListItem,
   SubgraphPluginListItem,
   SubgraphPluginTypeMap,
 } from "../interfaces/client";
 
 export function toDaoDetails(
-  dao: ISubgraphDao,
+  dao: SubgraphDao,
   metadata: IMetadata,
 ): DaoDetails {
   return {
@@ -47,7 +47,7 @@ export function toDaoDetails(
 }
 
 export function toDaoListItem(
-  dao: ISubgraphDaoListItem,
+  dao: SubgraphDaoListItem,
   metadata: IMetadata,
 ): DaoListItem {
   return {
@@ -78,7 +78,7 @@ export function toDaoListItem(
   };
 }
 
-export function toAssetBalance(balance: ISubgraphBalance): AssetBalance {
+export function toAssetBalance(balance: SubgraphBalance): AssetBalance {
   const updateDate = new Date(parseInt(balance.lastUpdated) * 1000);
   if (balance.token.symbol === "ETH") {
     return {

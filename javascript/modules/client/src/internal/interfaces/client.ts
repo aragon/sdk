@@ -274,9 +274,6 @@ export enum DaoSortBy {
   POPULARITY = "totalProposals", // currently defined as number of proposals
 }
 
-export interface SubgraphPluginListItem {
-  pkg: { id: string; __typename: SubgraphPluginTypeName };
-}
 export enum SubgraphPluginTypeName {
   ERC20 = "ERC20VotingPackage",
   ADDRESS_LIST = "WhitelistPackage",
@@ -288,21 +285,27 @@ export const SubgraphPluginTypeMap: Map<SubgraphPluginTypeName, string> =
     [SubgraphPluginTypeName.ADDRESS_LIST, "addreslistvoting.dao.eth"],
   ]);
 
-export interface ISubgraphDao {
-  id: string;
-  name: string;
-  metadata: string;
-  createdAt: string;
-  packages: SubgraphPluginListItem[];
-}
-export interface ISubgraphDaoListItem {
-  id: string;
-  name: string;
-  metadata: string;
-  packages: SubgraphPluginListItem[];
-}
+export type SubgraphPluginListItem = {
+  pkg: {
+    id: string;
+    __typename: SubgraphPluginTypeName;
+  };
+};
 
-export interface ISubgraphBalance {
+type SubgraphDaoBase = {
+  id: string;
+  name: string;
+  metadata: string;
+  packages: SubgraphPluginListItem[];
+};
+
+export type SubgraphDao = SubgraphDaoBase & {
+  createdAt: string;
+};
+
+export type SubgraphDaoListItem = SubgraphDaoBase;
+
+export type SubgraphBalance = {
   token: {
     id: string;
     name: string;
@@ -311,4 +314,4 @@ export interface ISubgraphBalance {
   };
   balance: string;
   lastUpdated: string;
-}
+};

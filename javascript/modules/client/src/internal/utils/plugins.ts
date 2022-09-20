@@ -5,25 +5,22 @@ import {
   AddressListProposalListItem,
   Erc20Proposal,
   Erc20ProposalListItem,
-  ISubgraphAction,
-  ISubgraphAddressListProposal,
-  ISubgraphAddressListProposalListItem,
-  ISubgraphAddressListVoterListItem,
-  ISubgraphErc20Proposal,
-  ISubgraphErc20ProposalListItem,
-  ISubgraphErc20VoterListItem,
+  IComputeStatusProposal,
   ProposalMetadata,
+  SubgraphAction,
+  SubgraphAddressListProposal,
+  SubgraphAddressListProposalListItem,
+  SubgraphAddressListVoterListItem,
+  SubgraphErc20Proposal,
+  SubgraphErc20ProposalListItem,
+  SubgraphErc20VoterListItem,
   SubgraphVoteValuesMap,
   VoteValues,
 } from "../interfaces/plugins";
 import { formatEther } from "@ethersproject/units";
 
 export function computeProposalStatus(
-  proposal:
-    | ISubgraphErc20Proposal
-    | ISubgraphAddressListProposal
-    | ISubgraphErc20ProposalListItem
-    | ISubgraphAddressListProposalListItem,
+  proposal: IComputeStatusProposal,
 ): ProposalStatus {
   const now = new Date();
   const startDate = new Date(
@@ -51,7 +48,7 @@ export function isProposalId(propoosalId: string): boolean {
 }
 
 export function toAddressListProposal(
-  proposal: ISubgraphAddressListProposal,
+  proposal: SubgraphAddressListProposal,
   metadata: ProposalMetadata,
 ): AddressListProposal {
   const startDate = new Date(
@@ -79,7 +76,7 @@ export function toAddressListProposal(
     endDate,
     creationDate,
     actions: proposal.actions.map(
-      (action: ISubgraphAction): DaoAction => {
+      (action: SubgraphAction): DaoAction => {
         return {
           data: hexToBytes(strip0x(action.data)),
           to: action.to,
@@ -120,7 +117,7 @@ export function toAddressListProposal(
     },
     totalVotingWeight: parseInt(proposal.votingPower),
     votes: proposal.voters.map(
-      (voter: ISubgraphAddressListVoterListItem) => {
+      (voter: SubgraphAddressListVoterListItem) => {
         return {
           address: voter.voter.id,
           vote: SubgraphVoteValuesMap.get(voter.vote) as VoteValues,
@@ -130,7 +127,7 @@ export function toAddressListProposal(
   };
 }
 export function toAddressListProposalListItem(
-  proposal: ISubgraphAddressListProposalListItem,
+  proposal: SubgraphAddressListProposalListItem,
   metadata: ProposalMetadata,
 ): AddressListProposalListItem {
   const startDate = new Date(
@@ -160,7 +157,7 @@ export function toAddressListProposalListItem(
 }
 
 export function toErc20Proposal(
-  proposal: ISubgraphErc20Proposal,
+  proposal: SubgraphErc20Proposal,
   metadata: ProposalMetadata,
 ): Erc20Proposal {
   const startDate = new Date(
@@ -192,7 +189,7 @@ export function toErc20Proposal(
     endDate,
     creationDate,
     actions: proposal.actions.map(
-      (action: ISubgraphAction): DaoAction => {
+      (action: SubgraphAction): DaoAction => {
         return {
           data: hexToBytes(strip0x(action.data)),
           to: action.to,
@@ -240,7 +237,7 @@ export function toErc20Proposal(
     usedVotingWeight,
     totalVotingWeight: BigInt(proposal.votingPower),
     votes: proposal.voters.map(
-      (voter: ISubgraphErc20VoterListItem) => {
+      (voter: SubgraphErc20VoterListItem) => {
         return {
           address: voter.voter.id,
           vote: SubgraphVoteValuesMap.get(voter.vote) as VoteValues,
@@ -252,7 +249,7 @@ export function toErc20Proposal(
 }
 
 export function toErc20ProposalListItem(
-  proposal: ISubgraphErc20ProposalListItem,
+  proposal: SubgraphErc20ProposalListItem,
   metadata: ProposalMetadata,
 ): Erc20ProposalListItem {
   const startDate = new Date(

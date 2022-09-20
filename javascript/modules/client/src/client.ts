@@ -21,9 +21,9 @@ import {
   IMetadata,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
-  ISubgraphBalance,
-  ISubgraphDao,
-  ISubgraphDaoListItem,
+  SubgraphBalance,
+  SubgraphDao,
+  SubgraphDaoListItem,
   IWithdrawParams,
 } from "./internal/interfaces/client";
 import {
@@ -630,7 +630,7 @@ export class Client extends ClientCore implements IClient {
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { dao }: { dao: ISubgraphDao } = await client.request(QueryDao, {
+      const { dao }: { dao: SubgraphDao } = await client.request(QueryDao, {
         address,
       });
       if (!dao) {
@@ -660,7 +660,7 @@ export class Client extends ClientCore implements IClient {
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { daos }: { daos: ISubgraphDaoListItem[] } = await client.request(
+      const { daos }: { daos: SubgraphDaoListItem[] } = await client.request(
         QueryDaos,
         {
           limit,
@@ -671,7 +671,7 @@ export class Client extends ClientCore implements IClient {
       );
       await this.ipfs.ensureOnline();
       return Promise.all(
-        daos.map((dao: ISubgraphDaoListItem): Promise<DaoListItem> => {
+        daos.map((dao: SubgraphDaoListItem): Promise<DaoListItem> => {
           // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
           // TODO
           // this is a temporal fix and should be changed by the line above
@@ -711,7 +711,7 @@ export class Client extends ClientCore implements IClient {
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { balances }: { balances: ISubgraphBalance[] } = await client
+      const { balances }: { balances: SubgraphBalance[] } = await client
         .request(QueryBalances, {
           address,
         });
@@ -722,7 +722,7 @@ export class Client extends ClientCore implements IClient {
       // handle other tokens that are not ERC20 or eth
       return Promise.all(
         balances.map(
-          (balance: ISubgraphBalance): AssetBalance =>
+          (balance: SubgraphBalance): AssetBalance =>
             toAssetBalance(balance),
         ),
       );

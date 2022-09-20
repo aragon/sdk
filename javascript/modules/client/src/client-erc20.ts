@@ -10,13 +10,13 @@ import {
   IExecuteProposalParams,
   IPluginSettings,
   IProposalQueryParams,
-  ISubgraphErc20Proposal,
-  ISubgraphErc20ProposalListItem,
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
   ProposalSortBy,
+  SubgraphErc20Proposal,
+  SubgraphErc20ProposalListItem,
   VoteProposalStep,
   VoteProposalStepValue,
   VoteValues,
@@ -462,7 +462,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { erc20VotingProposal }: {
-        erc20VotingProposal: ISubgraphErc20Proposal;
+        erc20VotingProposal: SubgraphErc20Proposal;
       } = await client.request(QueryErc20Proposal, {
         proposalId,
       });
@@ -510,7 +510,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { erc20VotingProposals }: {
-        erc20VotingProposals: ISubgraphErc20ProposalListItem[];
+        erc20VotingProposals: SubgraphErc20ProposalListItem[];
       } = await client.request(
         QueryErc20Proposals,
         {
@@ -525,7 +525,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       return Promise.all(
         erc20VotingProposals.map(
           (
-            proposal: ISubgraphErc20ProposalListItem,
+            proposal: SubgraphErc20ProposalListItem,
           ): Promise<Erc20ProposalListItem> => {
             // TODO
             // delete this cid once the proposals in subgraph have the correct
@@ -566,6 +566,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       }
       return {
         minDuration: parseInt(erc20VotingPackage.minDuration),
+        // TODO: use decodeRatio() when ready
         minSupport: parseFloat(
           formatEther(erc20VotingPackage.supportRequiredPct),
         ),

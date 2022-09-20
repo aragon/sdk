@@ -321,20 +321,6 @@ export enum ProposalSortBy {
   VOTES = "votes", // currently defined as number of proposals
 }
 
-export interface ISubgraphErc20VoterListItem {
-  voter: {
-    id: string;
-  };
-  vote: SubgraphVoteValues;
-  weight: string;
-}
-export interface ISubgraphAddressListVoterListItem {
-  voter: {
-    id: string;
-  };
-  vote: SubgraphVoteValues;
-}
-
 export enum SubgraphVoteValues {
   YES = "Yea",
   NO = "Nay",
@@ -347,12 +333,25 @@ export const SubgraphVoteValuesMap: Map<SubgraphVoteValues, VoteValues> =
     [SubgraphVoteValues.ABSTAIN, VoteValues.ABSTAIN],
   ]);
 
-export interface ISubgraphAction {
+type SubgraphVoterListItemBase = {
+  voter: {
+    id: string;
+  };
+  vote: SubgraphVoteValues;
+};
+export type SubgraphAddressListVoterListItem = SubgraphVoterListItemBase;
+
+export type SubgraphErc20VoterListItem = SubgraphVoterListItemBase & {
+  weight: string;
+};
+
+export type SubgraphAction = {
   to: string;
   value: string;
   data: string;
-}
-export interface ISubgraphErc20Proposal {
+};
+
+type SubgraphProposalBase = {
   id: string;
   dao: {
     id: string;
@@ -360,83 +359,47 @@ export interface ISubgraphErc20Proposal {
   };
   creator: string;
   metadata: string;
-  createdAt: string;
-  actions: ISubgraphAction[];
   yea: string;
   nay: string;
   abstain: string;
+  startDate: string;
+  endDate: string;
+  executed: boolean;
+};
+
+export type SubgraphErc20ProposalListItem = SubgraphProposalBase & {
+  pkg: {
+    token: {
+      symbol: string;
+      name: string;
+      id: string;
+      decimals: string;
+    };
+  };
+};
+
+export type SubgraphErc20Proposal = SubgraphErc20ProposalListItem & {
+  createdAt: string;
+  actions: SubgraphAction[];
   supportRequiredPct: string;
   participationRequiredPct: string;
-  startDate: string;
-  endDate: string;
-  executed: boolean;
-  voters: ISubgraphErc20VoterListItem[];
-  pkg: {
-    token: {
-      symbol: string;
-      name: string;
-      id: string;
-      decimals: string;
-    };
-  };
+  voters: SubgraphErc20VoterListItem[];
   votingPower: string;
-}
-export interface ISubgraphErc20ProposalListItem {
-  id: string;
-  dao: {
-    id: string;
-    name: string;
-  };
-  creator: string;
-  metadata: string;
-  yea: string;
-  nay: string;
-  abstain: string;
-  startDate: string;
-  endDate: string;
-  executed: boolean;
-  pkg: {
-    token: {
-      symbol: string;
-      name: string;
-      id: string;
-      decimals: string;
-    };
-  };
-}
-export interface ISubgraphAddressListProposal {
-  id: string;
-  dao: {
-    id: string;
-    name: string;
-  };
-  creator: string;
-  metadata: string;
+};
+export type SubgraphAddressListProposalListItem = SubgraphProposalBase;
+export type SubgraphAddressListProposal = SubgraphProposalBase & {
   createdAt: string;
-  actions: ISubgraphAction[];
-  yea: string;
-  nay: string;
-  abstain: string;
+  actions: SubgraphAction[];
   supportRequiredPct: string;
   participationRequired: string;
+  voters: SubgraphAddressListVoterListItem[];
+  votingPower: string;
+};
+
+export interface IComputeStatusProposal {
   startDate: string;
   endDate: string;
-  executed: boolean;
-  voters: ISubgraphAddressListVoterListItem[];
-  votingPower: string;
-}
-export interface ISubgraphAddressListProposalListItem {
-  id: string;
-  dao: {
-    id: string;
-    name: string;
-  };
-  creator: string;
-  metadata: string;
   yea: string;
   nay: string;
-  abstain: string;
-  startDate: string;
-  endDate: string;
   executed: boolean;
 }
