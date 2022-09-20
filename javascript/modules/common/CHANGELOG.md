@@ -18,7 +18,7 @@ TEMPLATE:
 
 ## [UPCOMING] 
 ### Added
-- New errors
+- New error types
 ### Fixed
 - `Buffer` being used not compatible with web environments
 ### Updated
