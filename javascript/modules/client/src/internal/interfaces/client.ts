@@ -269,7 +269,7 @@ export interface IDaoQueryParams extends IPagination {
 }
 
 export enum DaoSortBy {
-  CREATED_AT = "created_at",
+  CREATED_AT = "createdAt",
   NAME = "name",
   POPULARITY = "totalProposals", // currently defined as number of proposals
 }
