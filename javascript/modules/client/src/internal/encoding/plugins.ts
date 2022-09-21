@@ -1,5 +1,6 @@
 import {
   ERC20Voting__factory,
+  IERC20MintableUpgradeable__factory,
   MajorityVoting__factory,
   WhitelistVoting__factory,
 } from "@aragon/core-contracts-ethers";
@@ -15,8 +16,11 @@ import { AddressZero } from "@ethersproject/constants";
 import {
   IAddressListPluginInstall,
   IErc20PluginInstall,
+  IMintTokenParams,
   IPluginSettings,
 } from "../interfaces/plugins";
+
+import { UnexpectedActionError } from "@aragon/sdk-common";
 
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { AVAILABLE_PLUGIN_FUNCTION_SIGNATURES } from "../constants/encoding";
@@ -116,15 +120,12 @@ export function decodeUpdatePluginSettingsAction(
 ): IPluginSettings {
   const votingInterface = MajorityVoting__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
-  // @ts-ignore
   const receivedFunction = votingInterface.getFunction(
     hexBytes.substring(0, 10) as any,
   );
   const expectedfunction = votingInterface.getFunction("changeVoteConfig");
   if (receivedFunction.name !== expectedfunction.name) {
-    throw new Error(
-      "The received action is different from the expected one",
-    );
+    throw new UnexpectedActionError();
   }
   const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
   return wrapUpdatePluginSettings(result);
@@ -136,4 +137,98 @@ function wrapUpdatePluginSettings(result: Result): IPluginSettings {
     minSupport: decodeRatio(result[0], 2),
     minDuration: result[2].toNumber(),
   };
+}
+
+// MINT ACTION
+export function encodeMintTokenAction(params: IMintTokenParams): Uint8Array {
+  const votingInterface = IERC20MintableUpgradeable__factory.createInterface();
+  const args = unwrapMintToken(params);
+  // get hex bytes
+  const hexBytes = votingInterface.encodeFunctionData("mint", args);
+  return hexToBytes(strip0x(hexBytes));
+}
+function unwrapMintToken(params: IMintTokenParams): [string, bigint] {
+  return [params.address, params.amount];
+}
+export function decodeMintTokenAction(
+  data: Uint8Array,
+): IMintTokenParams {
+  const votingInterface = IERC20MintableUpgradeable__factory.createInterface();
+  const hexBytes = bytesToHex(data, true);
+  const receivedFunction = votingInterface.getFunction(
+    hexBytes.substring(0, 10) as any,
+  );
+  const expectedfunction = votingInterface.getFunction("mint");
+  if (receivedFunction.name !== expectedfunction.name) {
+    throw new UnexpectedActionError();
+  }
+  const result = votingInterface.decodeFunctionData("mint", data);
+  return wrapMintToken(result);
+}
+
+function wrapMintToken(result: Result): IMintTokenParams {
+  return {
+    address: result[0],
+    amount: BigInt(result[1]),
+  };
+}
+
+// ADD MEMBERS ACTION
+export function encodeAddMembersAction(members: string[]): Uint8Array {
+  const votingInterface = WhitelistVoting__factory.createInterface();
+  // get hex bytes
+  const hexBytes = votingInterface.encodeFunctionData(
+    "addWhitelistedUsers",
+    [members],
+  );
+  return hexToBytes(strip0x(hexBytes));
+}
+
+export function decodeAddMemebersAction(
+  data: Uint8Array,
+): string[] {
+  const votingInterface = WhitelistVoting__factory.createInterface();
+  const hexBytes = bytesToHex(data, true);
+  const receivedFunction = votingInterface.getFunction(
+    hexBytes.substring(0, 10) as any,
+  );
+  const expectedfunction = votingInterface.getFunction("addWhitelistedUsers");
+  if (receivedFunction.name !== expectedfunction.name) {
+    throw new UnexpectedActionError();
+  }
+  const result = votingInterface.decodeFunctionData(
+    "addWhitelistedUsers",
+    data,
+  );
+  return result[0];
+}
+// REMOVE MEMBERS ACTION
+export function encodeRemoveMembersAction(members: string[]): Uint8Array {
+  const votingInterface = WhitelistVoting__factory.createInterface();
+  // get hex bytes
+  const hexBytes = votingInterface.encodeFunctionData(
+    "removeWhitelistedUsers",
+    [members],
+  );
+  return hexToBytes(strip0x(hexBytes));
+}
+export function decodeRemoveMemebersAction(
+  data: Uint8Array,
+): string[] {
+  const votingInterface = WhitelistVoting__factory.createInterface();
+  const hexBytes = bytesToHex(data, true);
+  const receivedFunction = votingInterface.getFunction(
+    hexBytes.substring(0, 10) as any,
+  );
+  const expectedfunction = votingInterface.getFunction(
+    "removeWhitelistedUsers",
+  );
+  if (receivedFunction.name !== expectedfunction.name) {
+    throw new UnexpectedActionError();
+  }
+  const result = votingInterface.decodeFunctionData(
+    "removeWhitelistedUsers",
+    data,
+  );
+  return result[0];
 }

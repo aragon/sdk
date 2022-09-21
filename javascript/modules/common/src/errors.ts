@@ -33,3 +33,8 @@ export class NoProviderError extends Error {
     super("A web3 provider is needed");
   }
 }
+export class UnexpectedActionError extends Error {
+  constructor() {
+    super("The received action is different from the expected one");
+  }
+}

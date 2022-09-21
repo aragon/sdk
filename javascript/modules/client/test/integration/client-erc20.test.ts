@@ -20,6 +20,7 @@ import {
   ICreateProposalParams,
   IErc20PluginInstall,
   IExecuteProposalParams,
+  IMintTokenParams,
   IPluginSettings,
   IProposalQueryParams,
   IVoteProposalParams,
@@ -29,7 +30,10 @@ import {
   VoteValues,
 } from "../../src/internal/interfaces/plugins";
 import { AddressZero } from "@ethersproject/constants";
-import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
+import {
+  InvalidAddressError,
+  InvalidAddressOrEnsError,
+} from "@aragon/sdk-common";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -374,7 +378,6 @@ describe("Client", () => {
       );
 
       expect(typeof erc20InstallPluginItem).toBe("object");
-      // what does this should be
       expect(erc20InstallPluginItem.data).toBeInstanceOf(Uint8Array);
     });
     it("Should encode an update plugin settings action and fail with an invalid address", async () => {
@@ -409,9 +412,54 @@ describe("Client", () => {
         .updatePluginSettingsAction(pluginAddress, params);
 
       expect(typeof updatePluginSettingsAction).toBe("object");
-      // what does this should be
       expect(updatePluginSettingsAction.data).toBeInstanceOf(Uint8Array);
       expect(updatePluginSettingsAction.to).toBe(pluginAddress);
+    });
+    it("Should encode a mint action with an invalid recipient address and fail", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const params: IMintTokenParams = {
+        address: "0xinvalid_address",
+        amount: BigInt(10),
+      };
+
+      const tokenAddress = "0x1234567890123456789012345678901234567890";
+      expect(() =>
+        client.encoding.mintTokenAction(
+          tokenAddress,
+          params,
+        )
+      ).toThrow(new InvalidAddressError());
+    });
+    it("Should encode a mint action with an invalid token address and fail", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const params: IMintTokenParams = {
+        address: "0x1234567890123456789012345678901234567890",
+        amount: BigInt(10),
+      };
+
+      const tokenAddress = "0xinvalid_address";
+      expect(() =>
+        client.encoding.mintTokenAction(
+          tokenAddress,
+          params,
+        )
+      ).toThrow(new InvalidAddressError());
+    });
+    it("Should encode a mint action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const params: IMintTokenParams = {
+        address: "0x1234567890123456789012345678901234567890",
+        amount: BigInt(10),
+      };
+
+      const tokenAddress = "0x0987654321098765432109876543210987654321";
+      const action = client.encoding.mintTokenAction(tokenAddress, params);
+      expect(typeof action).toBe("object");
+      expect(action.data).toBeInstanceOf(Uint8Array);
+      expect(action.to).toBe(tokenAddress);
     });
   });
 
@@ -435,6 +483,20 @@ describe("Client", () => {
       expect(decodedParams.minDuration).toBe(params.minDuration);
       expect(decodedParams.minSupport).toBe(params.minSupport);
       expect(decodedParams.minTurnout).toBe(params.minTurnout);
+    });
+    it("Should decode a mint action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+      const params: IMintTokenParams = {
+        address: "0x1234567890123456789012345678901234567890",
+        amount: BigInt(10),
+      };
+
+      const tokenAddress = "0x0987654321098765432109876543210987654321";
+      const action = client.encoding.mintTokenAction(tokenAddress, params);
+      const decodedParams = client.decoding.mintTokenAction(action.data);
+      expect(decodedParams.address).toBe(params.address);
+      expect(decodedParams.amount).toBe(params.amount);
     });
 
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {

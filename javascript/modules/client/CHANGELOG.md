@@ -17,7 +17,10 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-
+### Added
+- Add mint token encoders and decoders
+- Add add members encoders and decoders
+- Add remove members encoders and decoders
 ## 0.6.0-alpha
 On 2022-09-20 12:08:58
 ### Added

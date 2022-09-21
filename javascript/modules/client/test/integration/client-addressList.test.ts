@@ -28,7 +28,10 @@ import {
   VoteProposalStep,
   VoteValues,
 } from "../../src/internal/interfaces/plugins";
-import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
+import {
+  InvalidAddressError,
+  InvalidAddressOrEnsError,
+} from "@aragon/sdk-common";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -422,6 +425,116 @@ describe("Client", () => {
       expect(installPluginItemItem.data).toBeInstanceOf(Uint8Array);
       expect(installPluginItemItem.to).toBe(pluginAddress);
     });
+
+    it("Should encode a add members action with an invalid plugin address and fail", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const members: string[] = [
+        "0x1357924680135792468013579246801357924680",
+        "0x2468013579246801357924680135792468013579",
+        "0x0987654321098765432109876543210987654321",
+      ];
+
+      const pluginAddress = "0xinvalid_address";
+      expect(() =>
+        client.encoding.addMembersAction(
+          pluginAddress,
+          members,
+        )
+      ).toThrow(new InvalidAddressError());
+    });
+    it("Should encode a add members action with an invalid member address and fail", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const members: string[] = [
+        "0xinvalid_address",
+        "0x2468013579246801357924680135792468013579",
+        "0x0987654321098765432109876543210987654321",
+      ];
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+      expect(() =>
+        client.encoding.addMembersAction(
+          pluginAddress,
+          members,
+        )
+      ).toThrow(new InvalidAddressError());
+    });
+    it("Should encode a add members action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const members: string[] = [
+        "0x1357924680135792468013579246801357924680",
+        "0x2468013579246801357924680135792468013579",
+        "0x0987654321098765432109876543210987654321",
+      ];
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+      const action = client.encoding.addMembersAction(pluginAddress, members);
+
+      expect(typeof action).toBe("object");
+      expect(action.data).toBeInstanceOf(Uint8Array);
+      expect(action.to).toBe(pluginAddress);
+    });
+    it("Should encode a remove members action with an invalid plugin address and fail", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const members: string[] = [
+        "0x1357924680135792468013579246801357924680",
+        "0x2468013579246801357924680135792468013579",
+        "0x0987654321098765432109876543210987654321",
+      ];
+
+      const pluginAddress = "0xinvalid_address";
+      expect(() =>
+        client.encoding.removeMembersAction(
+          pluginAddress,
+          members,
+        )
+      ).toThrow(new InvalidAddressError());
+    });
+    it("Should encode a remove members action with an invalid member address and fail", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const members: string[] = [
+        "0xinvalid_address",
+        "0x2468013579246801357924680135792468013579",
+        "0x0987654321098765432109876543210987654321",
+      ];
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+      expect(() =>
+        client.encoding.removeMembersAction(
+          pluginAddress,
+          members,
+        )
+      ).toThrow(new InvalidAddressError());
+    });
+    it("Should encode a remove members action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const members: string[] = [
+        "0x1357924680135792468013579246801357924680",
+        "0x2468013579246801357924680135792468013579",
+        "0x0987654321098765432109876543210987654321",
+      ];
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+      const action = client.encoding.removeMembersAction(
+        pluginAddress,
+        members,
+      );
+
+      expect(typeof action).toBe("object");
+      expect(action.data).toBeInstanceOf(Uint8Array);
+      expect(action.to).toBe(pluginAddress);
+    });
   });
 
   describe("Action decoders", () => {
@@ -458,6 +571,47 @@ describe("Client", () => {
         .toThrow(
           `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`,
         );
+    });
+    it("Should decode a add members action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const members: string[] = [
+        "0x1357924680135792468013579246801357924680",
+        "0x2468013579246801357924680135792468013579",
+        "0x0987654321098765432109876543210987654321",
+      ];
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+      const action = client.encoding.addMembersAction(pluginAddress, members);
+      const decodedMembers = client.decoding.addMembersAction(action.data);
+      expect(Array.isArray(decodedMembers)).toBe(true);
+      for (let i = 0; i < decodedMembers.length; i++) {
+        expect(typeof decodedMembers[i]).toBe("string");
+        expect(decodedMembers[i]).toBe(members[i]);
+      }
+    });
+    it("Should decode a remove members action", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientAddressList(context);
+
+      const members: string[] = [
+        "0x1357924680135792468013579246801357924680",
+        "0x2468013579246801357924680135792468013579",
+        "0x0987654321098765432109876543210987654321",
+      ];
+
+      const pluginAddress = "0x1234567890123456789012345678901234567890";
+      const action = client.encoding.removeMembersAction(
+        pluginAddress,
+        members,
+      );
+      const decodedMembers = client.decoding.removeMembersAction(action.data);
+      expect(Array.isArray(decodedMembers)).toBe(true);
+      for (let i = 0; i < decodedMembers.length; i++) {
+        expect(typeof decodedMembers[i]).toBe("string");
+        expect(decodedMembers[i]).toBe(members[i]);
+      }
     });
 
     it("Should get the function for a given action data", async () => {
