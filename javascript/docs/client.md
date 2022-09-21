@@ -34,6 +34,21 @@
 <dd><p>Getter for the GraphQL client</p></dd>
 </dl>
 
+## Functions
+
+<dl>
+<dt><a href="#addMembersAction">addMembersAction(pluginAddress, members)</a> ⇒ <code>*</code></dt>
+<dd><p>Computes the parameters to be given when creating a proposal that adds addresses to address list</p></dd>
+<dt><a href="#removeMembersAction">removeMembersAction(pluginAddress, members)</a> ⇒ <code>*</code></dt>
+<dd><p>Computes the parameters to be given when creating a proposal that removes addresses from the address list</p></dd>
+<dt><a href="#addMembersAction">addMembersAction(data)</a> ⇒ <code>*</code></dt>
+<dd><p>Decodes a list of addresses from an encoded add members action</p></dd>
+<dt><a href="#removeMembersAction">removeMembersAction(data)</a> ⇒ <code>*</code></dt>
+<dd><p>Decodes a list of addresses from an encoded remove members action</p></dd>
+<dt><a href="#mintTokenAction">mintTokenAction(data)</a> ⇒ <code>*</code></dt>
+<dd><p>Decodes the mint token params from an encoded mint token action</p></dd>
+</dl>
+
 <a name="ClientAddressList"></a>
 
 ## ClientAddressList
@@ -244,6 +259,7 @@ so that the plugin is configured</p>
         * [.getSettings(pluginAddress)](#ClientErc20.getSettings) ⇒ <code>\*</code>
         * [.getToken(pluginAddress)](#ClientErc20.getToken) ⇒ <code>\*</code>
         * [.updatePluginSettingsAction(pluginAddress, params)](#ClientErc20.updatePluginSettingsAction) ⇒ <code>\*</code>
+        * [.mintTokenAction(minterAddress, params)](#ClientErc20.mintTokenAction) ⇒ <code>\*</code>
         * [.updatePluginSettingsAction(data)](#ClientErc20.updatePluginSettingsAction) ⇒ <code>\*</code>
         * [.findInterface(data)](#ClientErc20.findInterface) ⇒ <code>\*</code>
         * [.createProposal(params)](#ClientErc20.createProposal) ⇒ <code>\*</code>
@@ -361,6 +377,19 @@ so that the plugin is configured</p>
 | --- | --- |
 | pluginAddress | <code>string</code> | 
 | params | <code>IPluginSettings</code> | 
+
+<a name="ClientErc20.mintTokenAction"></a>
+
+### ClientErc20.mintTokenAction(minterAddress, params) ⇒ <code>\*</code>
+<p>Computes the parameters to be given when creating a proposal that mints an amount of ERC-20 tokens to an address</p>
+
+**Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param |
+| --- |
+| minterAddress | 
+| params | 
 
 <a name="ClientErc20.updatePluginSettingsAction"></a>
 
@@ -824,3 +853,65 @@ so that the plugin is configured</p>
 
 **Kind**: global variable  
 **Access**: public  
+<a name="addMembersAction"></a>
+
+## addMembersAction(pluginAddress, members) ⇒ <code>\*</code>
+<p>Computes the parameters to be given when creating a proposal that adds addresses to address list</p>
+
+**Kind**: global function  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param |
+| --- |
+| pluginAddress | 
+| members | 
+
+<a name="removeMembersAction"></a>
+
+## removeMembersAction(pluginAddress, members) ⇒ <code>\*</code>
+<p>Computes the parameters to be given when creating a proposal that removes addresses from the address list</p>
+
+**Kind**: global function  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param |
+| --- |
+| pluginAddress | 
+| members | 
+
+<a name="addMembersAction"></a>
+
+## addMembersAction(data) ⇒ <code>\*</code>
+<p>Decodes a list of addresses from an encoded add members action</p>
+
+**Kind**: global function  
+**Returns**: <code>\*</code> - <p>{string[]}</p>  
+
+| Param |
+| --- |
+| data | 
+
+<a name="removeMembersAction"></a>
+
+## removeMembersAction(data) ⇒ <code>\*</code>
+<p>Decodes a list of addresses from an encoded remove members action</p>
+
+**Kind**: global function  
+**Returns**: <code>\*</code> - <p>{string[]}</p>  
+
+| Param |
+| --- |
+| data | 
+
+<a name="mintTokenAction"></a>
+
+## mintTokenAction(data) ⇒ <code>\*</code>
+<p>Decodes the mint token params from an encoded mint token action</p>
+
+**Kind**: global function  
+**Returns**: <code>\*</code> - <p>{IMintTokenParams}</p>  
+
+| Param |
+| --- |
+| data | 
+
