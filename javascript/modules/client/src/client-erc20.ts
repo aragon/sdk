@@ -187,15 +187,15 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     /**
      * Computes the parameters to be given when creating a proposal that mints an amount of ERC-20 tokens to an address
      *
-     * @param tokenAddress
+     * @param minterAddress
      * @param params
      * @returns {*}  {DaoAction}
      * @memberof ClientErc20
      */
     mintTokenAction: (
-      tokenAddress: string,
+      minterAddress: string,
       params: IMintTokenParams,
-    ): DaoAction => this._buildMintTokenAction(tokenAddress, params),
+    ): DaoAction => this._buildMintTokenAction(minterAddress, params),
   };
   decoding = {
     /**
@@ -395,14 +395,14 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   }
 
   private _buildMintTokenAction(
-    tokenAddress: string,
+    minterAddress: string,
     params: IMintTokenParams,
   ): DaoAction {
-    if (!isAddress(tokenAddress) || !isAddress(params.address)) {
+    if (!isAddress(minterAddress) || !isAddress(params.address)) {
       throw new InvalidAddressError();
     }
     return {
-      to: tokenAddress,
+      to: minterAddress,
       value: BigInt(0),
       data: encodeMintTokenAction(params),
     };

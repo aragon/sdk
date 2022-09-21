@@ -29,10 +29,10 @@ import {
   VoteValues,
 } from "../../src/internal/interfaces/plugins";
 import {
+  bytesToHex,
   InvalidAddressError,
   InvalidAddressOrEnsError,
 } from "@aragon/sdk-common";
-import { getFunctionFragment } from "../../src/internal/encoding/plugins";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -476,11 +476,11 @@ describe("Client", () => {
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const action = client.encoding.addMembersAction(pluginAddress, members);
 
-      const functionFragment = getFunctionFragment(action.data)
-
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
-      expect(functionFragment.name).toBe("addWhitelistedUsers");
+      expect(bytesToHex(action.data, true)).toBe(
+        "0x6496d3fc00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
+      );
       expect(action.to).toBe(pluginAddress);
     });
     it("Should encode a remove members action with an invalid plugin address and fail", async () => {
@@ -534,11 +534,12 @@ describe("Client", () => {
         pluginAddress,
         members,
       );
-      const functionFragment = getFunctionFragment(action.data)
 
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
-      expect(functionFragment.name).toBe("removeWhitelistedUsers");
+      expect(bytesToHex(action.data, true)).toBe(
+        "0xeff42f2e00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
+      );
       expect(action.to).toBe(pluginAddress);
     });
   });

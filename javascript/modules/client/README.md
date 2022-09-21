@@ -1781,8 +1781,8 @@ const params: IMintTokenParams = {
   amount: BigInt(10),
 };
 
-const tokenAddress = "0x0987654321098765432109876543210987654321";
-const action = client.encoding.mintTokenAction(tokenAddress, params);
+const minterAddress = "0x0987654321098765432109876543210987654321";
+const action = client.encoding.mintTokenAction(minterAddress, params);
 console.log(action);
 /*
 {

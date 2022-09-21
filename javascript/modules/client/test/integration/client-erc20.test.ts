@@ -31,10 +31,10 @@ import {
 } from "../../src/internal/interfaces/plugins";
 import { AddressZero } from "@ethersproject/constants";
 import {
+  bytesToHex,
   InvalidAddressError,
   InvalidAddressOrEnsError,
 } from "@aragon/sdk-common";
-import { getFunctionFragment } from "../../src/internal/encoding/plugins";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -424,10 +424,10 @@ describe("Client", () => {
         amount: BigInt(10),
       };
 
-      const tokenAddress = "0x1234567890123456789012345678901234567890";
+      const minterAddress = "0x1234567890123456789012345678901234567890";
       expect(() =>
         client.encoding.mintTokenAction(
-          tokenAddress,
+          minterAddress,
           params,
         )
       ).toThrow(new InvalidAddressError());
@@ -440,10 +440,10 @@ describe("Client", () => {
         amount: BigInt(10),
       };
 
-      const tokenAddress = "0xinvalid_address";
+      const minterAddress = "0xinvalid_address";
       expect(() =>
         client.encoding.mintTokenAction(
-          tokenAddress,
+          minterAddress,
           params,
         )
       ).toThrow(new InvalidAddressError());
@@ -456,11 +456,11 @@ describe("Client", () => {
         amount: BigInt(10),
       };
 
-      const tokenAddress = "0x0987654321098765432109876543210987654321";
-      const action = client.encoding.mintTokenAction(tokenAddress, params);
+      const minterAddress = "0x0987654321098765432109876543210987654321";
+      const action = client.encoding.mintTokenAction(minterAddress, params);
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
-      expect(action.to).toBe(tokenAddress);
+      expect(action.to).toBe(minterAddress);
     });
   });
 
@@ -493,13 +493,14 @@ describe("Client", () => {
         amount: BigInt(10),
       };
 
-      const tokenAddress = "0x0987654321098765432109876543210987654321";
-      const action = client.encoding.mintTokenAction(tokenAddress, params);
+      const minterAddress = "0x0987654321098765432109876543210987654321";
+      const action = client.encoding.mintTokenAction(minterAddress, params);
       const decodedParams = client.decoding.mintTokenAction(action.data);
-      const functionFragment = getFunctionFragment(action.data);
 
       expect(decodedParams.address).toBe(params.address);
-      expect(functionFragment.name).toBe("mint");
+      expect(bytesToHex(action.data, true)).toBe(
+        "0x40c10f190000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a",
+      );
       expect(decodedParams.amount).toBe(params.amount);
     });
 
