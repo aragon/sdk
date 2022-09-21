@@ -1786,7 +1786,7 @@ const action = client.encoding.mintTokenAction(tokenAddress, params);
 console.log(action);
 /*
 {
-  to: "0x1234567890...",
+  to: "0x0987654321098765432...",
   value: 0n,
   data: Uint8Array[12,34,45...]
 }
@@ -1797,7 +1797,7 @@ console.log(action);
 
 ```ts
 import {
-  ClientErc20,
+  ClientAddressList,
   Context,
   ContextPlugin,
   IMintTokenParams,
@@ -1805,7 +1805,7 @@ import {
 
 const context: Context = new Context(params);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientErc20(contextPlugin);
+const client = new ClientAddressList(contextPlugin);
 
 const members: string[] = [
   "0x1357924680135792468013579246801357924680",
@@ -2016,26 +2016,6 @@ console.log(params)
 }
 */
 ```
-### Decode Mint Token Action (ERC-20)
-
-```ts
-import { Client, Context, ClientErc20, ContextPlugin, IMintParams } from "@aragon/sdk-client";
-const context: Context = new Context(params)
-// Create a plugin context from the simple context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
-const clientErc20 = ClientErc20(contextPlugin)
-const data: Uint8Array =  new Uint8Array([12, ..., 56])
-
-const params: IMintParams = clientErc20.decoding.mintTokenAction(data)
-
-console.log(params)
-/*
-{
-  address: "0x12345...", 
-  amount: 10n
-}
-*/
-```
 
 ### Decode Update Plugin Settings Action (Address List)
 
@@ -2055,6 +2035,50 @@ console.log(params)
   minDuration: 7200, // seconds
   minTurnout: 0.25, // 25%
   minSupport: 0.5 // 50%
+}
+*/
+```
+
+### Get Function Parameters from an encoded action
+
+```ts
+import { Client, Context } from "@aragon/sdk-client";
+import { Wallet } from 'ethers'
+
+const context: Context = new Context(params)
+const client = new Client(context)
+
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
+
+const functionParams = client.decoding.findInterface(data)
+
+console.log(functionParams)
+
+/*
+{
+  id: "function functionName(param1, param2)"
+  functionName: "functionName"
+  hash: "0x12345678"
+}
+*/
+```
+### Decode Mint Token Action (ERC-20)
+
+```ts
+import { Client, Context, ClientErc20, ContextPlugin, IMintParams } from "@aragon/sdk-client";
+const context: Context = new Context(params)
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
+const clientErc20 = ClientErc20(contextPlugin)
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
+
+const params: IMintParams = clientErc20.decoding.mintTokenAction(data)
+
+console.log(params)
+/*
+{
+  address: "0x12345...", 
+  amount: 10n
 }
 */
 ```
@@ -2098,30 +2122,6 @@ console.log(params)
   "0x56789...",
   "0x13579...",
 ]
-*/
-```
-
-### Get Function Parameters from an encoded action
-
-```ts
-import { Client, Context } from "@aragon/sdk-client";
-import { Wallet } from 'ethers'
-
-const context: Context = new Context(params)
-const client = new Client(context)
-
-const data: Uint8Array =  new Uint8Array([12, ..., 56])
-
-const functionParams = client.decoding.findInterface(data)
-
-console.log(functionParams)
-
-/*
-{
-  id: "function functionName(param1, param2)"
-  functionName: "functionName"
-  hash: "0x12345678"
-}
 */
 ```
 

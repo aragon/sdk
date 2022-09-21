@@ -34,6 +34,7 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
 } from "@aragon/sdk-common";
+import { getFunctionFragment } from "../../src/internal/encoding/plugins";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -447,7 +448,7 @@ describe("Client", () => {
         )
       ).toThrow(new InvalidAddressError());
     });
-    it("Should encode a mint action", async () => {
+    it("Should encode an ERC20 token mint action", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
       const params: IMintTokenParams = {
@@ -495,7 +496,10 @@ describe("Client", () => {
       const tokenAddress = "0x0987654321098765432109876543210987654321";
       const action = client.encoding.mintTokenAction(tokenAddress, params);
       const decodedParams = client.decoding.mintTokenAction(action.data);
+      const functionFragment = getFunctionFragment(action.data);
+
       expect(decodedParams.address).toBe(params.address);
+      expect(functionFragment.name).toBe("mint");
       expect(decodedParams.amount).toBe(params.amount);
     });
 

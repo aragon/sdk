@@ -10,7 +10,7 @@ import {
   encodeRatio,
   hexToBytes,
   strip0x,
-  UnexpectedActionError
+  UnexpectedActionError,
 } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -177,6 +177,7 @@ export function encodeAddMembersAction(members: string[]): Uint8Array {
   const votingInterface = WhitelistVoting__factory.createInterface();
   // get hex bytes
   const hexBytes = votingInterface.encodeFunctionData(
+    // TODO: Rename to `addAddresses` as soon as the plugin is updated
     "addWhitelistedUsers",
     [members],
   );
@@ -191,11 +192,13 @@ export function decodeAddMemebersAction(
   const receivedFunction = votingInterface.getFunction(
     hexBytes.substring(0, 10) as any,
   );
+  // TODO: Rename to `addAddresses` as soon as the plugin is updated
   const expectedfunction = votingInterface.getFunction("addWhitelistedUsers");
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
   }
   const result = votingInterface.decodeFunctionData(
+    // TODO: Rename to `addAddresses` as soon as the plugin is updated
     "addWhitelistedUsers",
     data,
   );
@@ -206,6 +209,7 @@ export function encodeRemoveMembersAction(members: string[]): Uint8Array {
   const votingInterface = WhitelistVoting__factory.createInterface();
   // get hex bytes
   const hexBytes = votingInterface.encodeFunctionData(
+    // TODO: Rename to `removeAddresses` as soon as the plugin is updated
     "removeWhitelistedUsers",
     [members],
   );
@@ -220,12 +224,14 @@ export function decodeRemoveMemebersAction(
     hexBytes.substring(0, 10) as any,
   );
   const expectedfunction = votingInterface.getFunction(
+    // TODO: Rename to `removeAddresses` as soon as the plugin is updated
     "removeWhitelistedUsers",
   );
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
   }
   const result = votingInterface.decodeFunctionData(
+    // TODO: Rename to `removeAddresses` as soon as the plugin is updated
     "removeWhitelistedUsers",
     data,
   );

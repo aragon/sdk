@@ -32,6 +32,7 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
 } from "@aragon/sdk-common";
+import { getFunctionFragment } from "../../src/internal/encoding/plugins";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -475,8 +476,11 @@ describe("Client", () => {
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const action = client.encoding.addMembersAction(pluginAddress, members);
 
+      const functionFragment = getFunctionFragment(action.data)
+
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
+      expect(functionFragment.name).toBe("addWhitelistedUsers");
       expect(action.to).toBe(pluginAddress);
     });
     it("Should encode a remove members action with an invalid plugin address and fail", async () => {
@@ -530,9 +534,11 @@ describe("Client", () => {
         pluginAddress,
         members,
       );
+      const functionFragment = getFunctionFragment(action.data)
 
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
+      expect(functionFragment.name).toBe("removeWhitelistedUsers");
       expect(action.to).toBe(pluginAddress);
     });
   });
