@@ -1,9 +1,21 @@
-import { bytesToHex, Random } from "@aragon/sdk-common";
+import {
+  bytesToHex,
+  GraphQLError,
+  InvalidAddressError,
+  InvalidAddressOrEnsError,
+  InvalidProposalIdError,
+  NoProviderError,
+  Random,
+} from "@aragon/sdk-common";
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
 import {
+  decodeAddMemebersAction,
+  decodeRemoveMemebersAction,
   decodeUpdatePluginSettingsAction,
+  encodeAddMembersAction,
   encodeAddressListActionInit,
+  encodeRemoveMembersAction,
   encodeUpdatePluginSettingsAction,
   getFunctionFragment,
 } from "./internal/encoding/plugins";
@@ -12,6 +24,7 @@ import {
   GasFeeEstimation,
   IInterfaceParams,
   IPluginInstallItem,
+  SortDirection,
 } from "./internal/interfaces/common";
 import {
   AddressListProposal,
@@ -27,16 +40,24 @@ import {
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
+  ProposalMetadata,
+  ProposalSortBy,
+  SubgraphAddressListProposal,
+  SubgraphAddressListProposalListItem,
   VoteProposalStep,
   VoteProposalStepValue,
 } from "./internal/interfaces/plugins";
+import { delay } from "./internal/temp-mock";
 import {
-  delay,
-  getDummyAddressListProposal,
-  getDummyAddressListProposalListItem,
-} from "./internal/temp-mock";
-import { getProposalStatus } from "./internal/utils/plugins";
+  toAddressListProposal,
+  toAddressListProposalListItem,
+} from "./internal/utils/plugins";
 import { isAddress } from "@ethersproject/address";
+import {
+  QueryAddressListProposal,
+  QueryAddressListProposals,
+} from "./internal/graphql-queries/proposal";
+import { QueryAddressListPluginSettings } from "./internal/graphql-queries/settings";
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
@@ -97,8 +118,8 @@ export class ClientAddressList extends ClientCore
      * @return {*}  {Promise<string[]>}
      * @memberof ClientAddressList
      */
-    getMembers: (addressOrEns: string): Promise<string[]> =>
-      this._getMemebers(addressOrEns),
+    getMembers: (daoAddressOrEns: string): Promise<string[]> =>
+      this._getMemebers(daoAddressOrEns),
     /**
      * Returns the details of the given proposal
      *
@@ -106,7 +127,7 @@ export class ClientAddressList extends ClientCore
      * @return {*}  {Promise<AddressListProposal>}
      * @memberof ClientAddressList
      */
-    getProposal: (proposalId: string): Promise<AddressListProposal> =>
+    getProposal: (proposalId: string): Promise<AddressListProposal | null> =>
       this._getProposal(proposalId),
     /**
      * Returns a list of proposals on the Plugin, filtered by the given criteria
@@ -126,7 +147,7 @@ export class ClientAddressList extends ClientCore
      * @return {*}  {Promise<IPluginSettings>}
      * @memberof ClientAddressList
      */
-    getSettings: (pluginAddress: string): Promise<IPluginSettings> =>
+    getSettings: (pluginAddress: string): Promise<IPluginSettings | null> =>
       this._getSettings(pluginAddress),
   };
   encoding = {
@@ -143,6 +164,26 @@ export class ClientAddressList extends ClientCore
       params: IPluginSettings,
     ): DaoAction =>
       this._buildUpdatePluginSettingsAction(pluginAddress, params),
+    /**
+     * Computes the parameters to be given when creating a proposal that adds addresses to address list
+     *
+     * @param pluginAddress
+     * @param members
+     * @returns {*} {DaoAction}
+     */
+    addMembersAction: (pluginAddress: string, members: string[]): DaoAction =>
+      this._buildAddMembersAction(pluginAddress, members),
+    /**
+     * Computes the parameters to be given when creating a proposal that removes addresses from the address list
+     *
+     * @param pluginAddress
+     * @param members
+     * @returns {*} {DaoAction}
+     */
+    removeMembersAction: (
+      pluginAddress: string,
+      members: string[],
+    ): DaoAction => this._buildRemoveMembersAction(pluginAddress, members),
   };
   decoding = {
     /**
@@ -154,6 +195,24 @@ export class ClientAddressList extends ClientCore
      */
     updatePluginSettingsAction: (data: Uint8Array): IPluginSettings =>
       decodeUpdatePluginSettingsAction(data),
+
+    /**
+     * Decodes a list of addresses from an encoded add members action
+     *
+     * @param data
+     * @returns {*}  {string[]}
+     */
+    addMembersAction: (data: Uint8Array): string[] =>
+      decodeAddMemebersAction(data),
+
+    /**
+     * Decodes a list of addresses from an encoded remove members action
+     *
+     * @param data
+     * @returns {*}  {string[]}
+     */
+    removeMembersAction: (data: Uint8Array): string[] =>
+      decodeRemoveMemebersAction(data),
 
     /**
      * Returns the decoded function info given the encoded data of an action
@@ -307,53 +366,101 @@ export class ClientAddressList extends ClientCore
     );
   }
 
-  private _getProposal(proposalId: string): Promise<AddressListProposal> {
+  private async _getProposal(
+    proposalId: string,
+  ): Promise<AddressListProposal | null> {
     if (!proposalId) {
-      throw new Error("Invalid proposalId");
+      throw new InvalidProposalIdError();
     }
-
-    // TODO: Implement
-
-    const proposal = getDummyAddressListProposal(proposalId);
-    proposal.status = getProposalStatus(
-      proposal.startDate,
-      proposal.endDate,
-      true,
-      BigInt(proposal.result.yes),
-      BigInt(proposal.result.no),
-    );
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (proposal),
-    );
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { whitelistProposal: addressListProposal }: {
+        whitelistProposal: SubgraphAddressListProposal;
+      } = await client.request(
+        QueryAddressListProposal,
+        {
+          proposalId,
+        },
+      );
+      if (!addressListProposal) {
+        return null;
+      }
+      // TODO
+      // delete this cid once the proposals in subgraph have the correct
+      // format in the metadata field
+      const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
+      const metadataString = await this.ipfs.fetchString(test_cid);
+      // TODO: Parse and validate schema
+      const metadata = JSON.parse(metadataString) as ProposalMetadata;
+      return toAddressListProposal(addressListProposal, metadata);
+    } catch (err) {
+      throw new GraphQLError("AddressList proposal");
+    }
   }
 
-  private _getProposals({
-    // TODO
-    // uncomment when querying to subgraph
-    // daoAddressOrEns,
+  private async _getProposals({
+    daoAddressOrEns,
     limit = 0,
-    // skip = 0,
-    // direction = SortDirection.ASC,
-    // sortBy = AddressListProposalSortBy.CREATED_AT
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = ProposalSortBy.CREATED_AT,
   }: IProposalQueryParams): Promise<AddressListProposalListItem[]> {
-    let proposals: AddressListProposalListItem[] = [];
-
-    // TODO: Implement
-
-    for (let index = 0; index < limit; index++) {
-      const proposal = getDummyAddressListProposalListItem();
-      proposal.status = getProposalStatus(
-        proposal.startDate,
-        proposal.endDate,
-        true,
-        BigInt(proposal.result.yes),
-        BigInt(proposal.result.no),
-      );
-      proposals.push(proposal);
+    let where = {};
+    let address = daoAddressOrEns;
+    if (address) {
+      if (!isAddress(address)) {
+        await this.web3.ensureOnline();
+        const provider = this.web3.getProvider();
+        if (!provider) {
+          throw new NoProviderError();
+        }
+        const resolvedAddress = await provider.resolveName(address);
+        if (!resolvedAddress) {
+          throw new InvalidAddressOrEnsError();
+        }
+        address = resolvedAddress;
+      }
+      where = { dao: address };
     }
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (proposals),
-    );
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { whitelistProposals: addressListProposals }: {
+        whitelistProposals: SubgraphAddressListProposalListItem[];
+      } = await client.request(
+        QueryAddressListProposals,
+        {
+          where,
+          limit,
+          skip,
+          direction,
+          sortBy,
+        },
+      );
+      await this.ipfs.ensureOnline();
+      return Promise.all(
+        addressListProposals.map(
+          (
+            proposal: SubgraphAddressListProposalListItem,
+          ): Promise<AddressListProposalListItem> => {
+            // TODO
+            // delete this cid once the proposals in subgraph have the correct
+            // format in the metadata field
+            const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
+            return this.ipfs.fetchString(test_cid).then(
+              (stringMetadata: string) => {
+                // TODO: Parse and validate schema
+                const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
+                return toAddressListProposalListItem(proposal, metadata);
+              },
+            );
+          },
+        ),
+      );
+    } catch {
+      throw new GraphQLError("AddressList proposals");
+    }
   }
 
   private _buildUpdatePluginSettingsAction(
@@ -368,6 +475,44 @@ export class ClientAddressList extends ClientCore
       to: pluginAddress,
       value: BigInt(0),
       data: encodeUpdatePluginSettingsAction(params),
+    };
+  }
+
+  private _buildAddMembersAction(
+    pluginAddress: string,
+    members: string[],
+  ): DaoAction {
+    if (!isAddress(pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    for (const member of members) {
+      if (!isAddress(member)) {
+        throw new InvalidAddressError();
+      }
+    }
+    return {
+      to: pluginAddress,
+      value: BigInt(0),
+      data: encodeAddMembersAction(members),
+    };
+  }
+
+  private _buildRemoveMembersAction(
+    pluginAddress: string,
+    members: string[],
+  ): DaoAction {
+    if (!isAddress(pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    for (const member of members) {
+      if (!isAddress(member)) {
+        throw new InvalidAddressError();
+      }
+    }
+    return {
+      to: pluginAddress,
+      value: BigInt(0),
+      data: encodeRemoveMembersAction(members),
     };
   }
 
@@ -422,15 +567,35 @@ export class ClientAddressList extends ClientCore
     );
   }
 
-  private _getSettings(_pluginAddress: string): Promise<IPluginSettings> {
-    const pluginSettings: IPluginSettings = {
-      minDuration: 7200,
-      minTurnout: 0.55,
-      minSupport: 0.25,
-    };
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (pluginSettings),
-    );
+  private async _getSettings(
+    pluginAddress: string,
+  ): Promise<IPluginSettings | null> {
+    if (!isAddress(pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { whitelistPackage } = await client.request(
+        QueryAddressListPluginSettings,
+        {
+          address: pluginAddress,
+        },
+      );
+      if (!whitelistPackage) {
+        return null;
+      }
+      return {
+        // TODO
+        // the number of decimals in the minSupport and minTurnout
+        // is wrong, they have no precision
+        minDuration: parseInt(whitelistPackage.minDuration),
+        minSupport: parseFloat(whitelistPackage.supportRequiredPct),
+        minTurnout: parseFloat(whitelistPackage.participationRequiredPct),
+      };
+    } catch {
+      throw new Error("Cannot fetch the settings data from GraphQL");
+    }
   }
 
   private _findInterfaceParams(data: Uint8Array): IInterfaceParams | null {

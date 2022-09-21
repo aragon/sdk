@@ -21,6 +21,17 @@ TEMPLATE:
 ### Changed
 - splitted `internal/core.ts` logic into multiple modules `internal/modules/graphql.ts`,`internal/modules/ipfs.ts` and `internal/modules/web3.ts`
 
+## 0.7.0-alpha
+On 2022-09-21 14:50:29
+### Added
+- Add mint token encoders and decoders
+- Add add members encoders and decoders
+- Add remove members encoders and decoders
+## 0.6.0-alpha
+On 2022-09-20 12:08:58
+### Added
+- Use real IPFS data
+- Use real subgraph data
 ## 0.5.0-alpha
 On 2022-09-15 08:45:35
 ### Added

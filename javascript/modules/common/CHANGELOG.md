@@ -16,7 +16,16 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [UPCOMING] 
+## [UPCOMING]
+
+## 0.4.0-alpha
+On 2022-09-21 14:49:57
+### Added
+- New error types
+## 0.3.0-alpha
+On 2022-09-20 12:08:47 
+### Added
+- New error types
 ### Fixed
 - `Buffer` being used not compatible with web environments
 ### Updated

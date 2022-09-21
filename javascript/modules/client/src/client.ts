@@ -7,19 +7,24 @@ import {
   DaoDepositSteps,
   DaoDepositStepValue,
   DaoDetails,
+  DaoListItem,
+  DaoSortBy,
   IAssetTransfers,
   IClient,
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
-  IMetadata,
-  IWithdrawParams,
-  IGrantPermissionParams,
-  IRevokePermissionParams,
+  IFreezePermissionDecodedParams,
   IFreezePermissionParams,
   IGrantPermissionDecodedParams,
+  IGrantPermissionParams,
+  IMetadata,
   IRevokePermissionDecodedParams,
-  IFreezePermissionDecodedParams,
+  IRevokePermissionParams,
+  SubgraphBalance,
+  SubgraphDao,
+  SubgraphDaoListItem,
+  IWithdrawParams,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -38,10 +43,18 @@ import {
   DaoAction,
   DaoRole,
   IInterfaceParams,
+  SortDirection,
 } from "./internal/interfaces/common";
 import { pack } from "@ethersproject/solidity";
 
-import { bytesToHex, Random, strip0x } from "@aragon/sdk-common";
+import {
+  bytesToHex,
+  GraphQLError,
+  InvalidAddressOrEnsError,
+  NoProviderError,
+  Random,
+  strip0x,
+} from "@aragon/sdk-common";
 import { erc20ContractAbi } from "./internal/abi/erc20";
 import { Signer } from "@ethersproject/abstract-signer";
 import {
@@ -57,8 +70,15 @@ import {
   encodeWithdrawActionData,
   getFunctionFragment,
 } from "./internal/encoding/client";
-import { delay, getDummyDao } from "./internal/temp-mock";
+import { delay } from "./internal/temp-mock";
 import { isAddress } from "@ethersproject/address";
+import { QueryBalances } from "./internal/graphql-queries/balances";
+import { QueryDao, QueryDaos } from "./internal/graphql-queries";
+import {
+  toAssetBalance,
+  toDaoDetails,
+  toDaoListItem,
+} from "./internal/utils/client";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
@@ -68,7 +88,7 @@ const assetList: AssetBalance[] = [
   {
     type: "native",
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(
+    updateDate: new Date(
       +new Date() - Math.floor(Random.getFloat() * 10000000000),
     ),
   },
@@ -79,7 +99,7 @@ const assetList: AssetBalance[] = [
     symbol: "JOJ",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(
+    updateDate: new Date(
       +new Date() - Math.floor(Random.getFloat() * 10000000000),
     ),
   },
@@ -90,7 +110,7 @@ const assetList: AssetBalance[] = [
     symbol: "DTT",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(
+    updateDate: new Date(
       +new Date() - Math.floor(Random.getFloat() * 10000000000),
     ),
   },
@@ -101,7 +121,7 @@ const assetList: AssetBalance[] = [
     symbol: "TTK",
     decimals: 18,
     balance: BigInt("100000000000000000000"),
-    lastUpdate: new Date(
+    updateDate: new Date(
       +new Date() - Math.floor(Random.getFloat() * 10000000000),
     ),
   },
@@ -142,7 +162,7 @@ export class Client extends ClientCore implements IClient {
     getBalances: (
       daoAddressOrEns: string,
       tokenAddresses: string[] = [],
-    ): Promise<AssetBalance[]> =>
+    ): Promise<AssetBalance[] | null> =>
       this._getBalances(daoAddressOrEns, tokenAddresses),
     /**
      * Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)
@@ -160,7 +180,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<IAssetTransfers>}
      * @memberof Client
      */
-    getDao: (daoAddressOrEns: string): Promise<DaoDetails> =>
+    getDao: (daoAddressOrEns: string): Promise<DaoDetails | null> =>
       this._getDao(daoAddressOrEns),
     /**
      * Retrieves metadata for DAO with given identifier (address or ens domain)
@@ -169,7 +189,7 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoDetails[]>}
      * @memberof Client
      */
-    getDaos: (params?: IDaoQueryParams): Promise<DaoDetails[]> =>
+    getDaos: (params?: IDaoQueryParams): Promise<DaoListItem[]> =>
       this._getDaos(params ?? {}),
 
     /**
@@ -199,8 +219,10 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    grantAction: (daoAddress: string, params: IGrantPermissionParams): DaoAction =>
-      this._buildGrantAction(daoAddress, params),
+    grantAction: (
+      daoAddress: string,
+      params: IGrantPermissionParams,
+    ): DaoAction => this._buildGrantAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that revokes a permission within a DAO
      *
@@ -209,8 +231,10 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    revokeAction: (daoAddress: string, params: IRevokePermissionParams): DaoAction =>
-      this._buildRevokeAction(daoAddress, params),
+    revokeAction: (
+      daoAddress: string,
+      params: IRevokePermissionParams,
+    ): DaoAction => this._buildRevokeAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that freezes a permission within a DAO
      *
@@ -219,8 +243,10 @@ export class Client extends ClientCore implements IClient {
      * @return {*}  {Promise<DaoAction>}
      * @memberof Client
      */
-    freezeAction: (daoAddress: string, params: IFreezePermissionParams): DaoAction =>
-      this._buildFreezeAction(daoAddress, params),
+    freezeAction: (
+      daoAddress: string,
+      params: IFreezePermissionParams,
+    ): DaoAction => this._buildFreezeAction(daoAddress, params),
     /**
      * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
      *
@@ -365,6 +391,14 @@ export class Client extends ClientCore implements IClient {
       this.web3.getDaoFactoryAddress(),
       signer,
     );
+
+    // @ts-ignore
+    let cid = "";
+    try {
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
+    } catch {
+      throw new Error("Could not pin the metadata on IPFS");
+    }
 
     // @ts-ignore  TODO: Remove this comment when used
     const registryAddress = await daoFactoryInstance.registry();
@@ -579,50 +613,122 @@ export class Client extends ClientCore implements IClient {
 
   //// PRIVATE METHODS METADATA
 
-  private _getDao(daoAddressOrEns: string): Promise<DaoDetails> {
-    // TODO: Implement actual fetch logic using subgraph.
-
-    if (!daoAddressOrEns) {
-      throw new Error("Invalid DAO address or ENS");
+  private async _getDao(daoAddressOrEns: string): Promise<DaoDetails | null> {
+    let address = daoAddressOrEns;
+    if (!isAddress(address)) {
+      await this.web3.ensureOnline();
+      const provider = this.web3.getProvider();
+      if (!provider) {
+        throw new NoProviderError();
+      }
+      const resolvedAddress = await provider.resolveName(address);
+      if (!resolvedAddress) {
+        throw new InvalidAddressOrEnsError();
+      }
+      address = resolvedAddress;
     }
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
-      getDummyDao(daoAddressOrEns)
-    );
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { dao }: { dao: SubgraphDao } = await client.request(QueryDao, {
+        address,
+      });
+      if (!dao) {
+        return null;
+      }
+      // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
+      // TODO
+      // this is a temporal fix and should be changed by the line above
+      // but the current daos in subgraph dont have a proper metadata
+      const stringMetadata = await this.ipfs.fetchString(
+        "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr",
+      );
+      // TODO: Parse and validate schema
+      const metadata = JSON.parse(stringMetadata);
+      return toDaoDetails(dao, metadata);
+    } catch (err) {
+      throw new GraphQLError("DAO");
+    }
   }
 
-  private _getDaos({
+  private async _getDaos({
     limit = 10,
-    // TODO
-    // uncomment this
-    // skip = 0,
-    // direction = SortDirection.ASC,
-    // sortBy = DaoSortBy.CREATED_AT
-  }: IDaoQueryParams): Promise<DaoDetails[]> {
-    const metadataMany: DaoDetails[] = [];
-    for (let index = 0; index < limit; index++) {
-      metadataMany.push(getDummyDao());
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = DaoSortBy.CREATED_AT,
+  }: IDaoQueryParams): Promise<DaoListItem[]> {
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { daos }: { daos: SubgraphDaoListItem[] } = await client.request(
+        QueryDaos,
+        {
+          limit,
+          skip,
+          direction,
+          sortBy,
+        },
+      );
+      await this.ipfs.ensureOnline();
+      return Promise.all(
+        daos.map((dao: SubgraphDaoListItem): Promise<DaoListItem> => {
+          // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
+          // TODO
+          // this is a temporal fix and should be changed by the line above
+          // but the current daos in subgraph dont have a proper metadata
+          const test_cid = "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr";
+          return this.ipfs.fetchString(
+            test_cid,
+          ).then((stringMetadata) => {
+            const metadata = JSON.parse(stringMetadata);
+            return toDaoListItem(dao, metadata);
+          });
+        }),
+      );
+    } catch (err) {
+      throw new GraphQLError("DAO");
     }
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(
-      () => (metadataMany),
-    );
   }
 
-  private _getBalances(
-    daoIdentifier: string,
+  private async _getBalances(
+    daoAddressorEns: string,
     _tokenAddresses: string[],
-  ): Promise<AssetBalance[]> {
-    // TODO: Implement actual fetch logic using subgraph.
-    // Note: it would be nice if the client could be instantiated with dao identifier
-
-    if (!daoIdentifier) {
-      throw new Error("Invalid DAO address or ENS");
+  ): Promise<AssetBalance[] | null> {
+    // TODO check address
+    let address = daoAddressorEns;
+    if (!isAddress(address)) {
+      await this.web3.ensureOnline();
+      const provider = this.web3.getProvider();
+      if (!provider) {
+        throw new NoProviderError();
+      }
+      const resolvedAddress = await provider.resolveName(address);
+      if (!resolvedAddress) {
+        throw new InvalidAddressOrEnsError();
+      }
+      address = resolvedAddress;
     }
-
-    const AssetBalances: AssetBalance[] = assetList.map((token) => ({
-      ...token,
-    }));
-
-    return Promise.resolve(AssetBalances);
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { balances }: { balances: SubgraphBalance[] } = await client
+        .request(QueryBalances, {
+          address,
+        });
+      if (balances.length === 0) {
+        return [];
+      }
+      // TODO
+      // handle other tokens that are not ERC20 or eth
+      return Promise.all(
+        balances.map(
+          (balance: SubgraphBalance): AssetBalance =>
+            toAssetBalance(balance),
+        ),
+      );
+    } catch (err) {
+      throw new GraphQLError("balance");
+    }
   }
   private async _getTransfers(
     daoAddressOrEns: string,

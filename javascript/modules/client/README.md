@@ -1762,6 +1762,101 @@ const configAction = client.encoding.updatePluginSettingsAction(
 );
 ```
 
+### Mint Token (ERC-20)
+
+```ts
+import {
+  ClientErc20,
+  Context,
+  ContextPlugin,
+  IMintTokenParams,
+} from "@aragon/sdk-client";
+
+const context: Context = new Context(params);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new ClientErc20(contextPlugin);
+
+const params: IMintTokenParams = {
+  address: "0x1234567890123456789012345678901234567890",
+  amount: BigInt(10),
+};
+
+const minterAddress = "0x0987654321098765432109876543210987654321";
+const action = client.encoding.mintTokenAction(minterAddress, params);
+console.log(action);
+/*
+{
+  to: "0x0987654321098765432...",
+  value: 0n,
+  data: Uint8Array[12,34,45...]
+}
+*/
+```
+
+### Add Members (AddressList)
+
+```ts
+import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
+  IMintTokenParams,
+} from "@aragon/sdk-client";
+
+const context: Context = new Context(params);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new ClientAddressList(contextPlugin);
+
+const members: string[] = [
+  "0x1357924680135792468013579246801357924680",
+  "0x2468013579246801357924680135792468013579",
+  "0x0987654321098765432109876543210987654321",
+];
+
+const pluginAddress = "0x0987654321098765432109876543210987654321";
+const action = client.encoding.addMembersAction(pluginAddress, members);
+console.log(action);
+/*
+{
+  to: "0x1234567890...",
+  value: 0n,
+  data: Uint8Array[12,34,45...]
+}
+*/
+```
+
+### Remove Members (AddressList)
+
+```ts
+import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
+  IMintTokenParams,
+} from "@aragon/sdk-client";
+
+const context: Context = new Context(params);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new ClientAddressList(contextPlugin);
+
+const members: string[] = [
+  "0x1357924680135792468013579246801357924680",
+  "0x2468013579246801357924680135792468013579",
+  "0x0987654321098765432109876543210987654321",
+];
+
+const pluginAddress = "0x0987654321098765432109876543210987654321";
+const action = client.encoding.removeMembersAction(pluginAddress, members);
+console.log(action);
+/*
+{
+  to: "0x1234567890...",
+  value: 0n,
+  data: Uint8Array[12,34,45...]
+}
+*/
+```
+
 ## Action decoders
 
 ### Decode action grant permission
@@ -1965,6 +2060,68 @@ console.log(functionParams)
   functionName: "functionName"
   hash: "0x12345678"
 }
+*/
+```
+### Decode Mint Token Action (ERC-20)
+
+```ts
+import { Client, Context, ClientErc20, ContextPlugin, IMintParams } from "@aragon/sdk-client";
+const context: Context = new Context(params)
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
+const clientErc20 = ClientErc20(contextPlugin)
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
+
+const params: IMintParams = clientErc20.decoding.mintTokenAction(data)
+
+console.log(params)
+/*
+{
+  address: "0x12345...", 
+  amount: 10n
+}
+*/
+```
+### Decode Add Members Action (Address List)
+
+```ts
+import { Client, Context, ClientAddressList, ContextPlugin } from "@aragon/sdk-client";
+const context: Context = new Context(params)
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
+const clientAddressList = ClientAddressList(contextPlugin)
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
+
+const members: string[] = clientAddressList.decoding.addMembersAction(data)
+
+console.log(params)
+/*
+[
+  "0x12345...",
+  "0x56789...",
+  "0x13579...",
+]
+*/
+```
+### Decode Remove Members Action (Address List)
+
+```ts
+import { Client, Context, ClientAddressList, ContextPlugin } from "@aragon/sdk-client";
+const context: Context = new Context(params)
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context)
+const clientAddressList = ClientAddressList(contextPlugin)
+const data: Uint8Array =  new Uint8Array([12, ..., 56])
+
+const members: string[] = clientAddressList.decoding.removeMembersAction(data)
+
+console.log(params)
+/*
+[
+  "0x12345...",
+  "0x56789...",
+  "0x13579...",
+]
 */
 ```
 
