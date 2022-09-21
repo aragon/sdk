@@ -70,7 +70,7 @@ export class IPFSModule implements IClientIpfsCore {
         try {
             const res = await client.add(input)
             return res.hash
-        } catch (e: any) {
+        } catch (e) {
             throw new Error("Could not upload data: " + (e?.message || ""));
         }
     }
