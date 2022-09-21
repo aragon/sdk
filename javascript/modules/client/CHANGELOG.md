@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Changed
+- splitted `internal/core.ts` logic into multiple modules `internal/modules/graphql.ts`,`internal/modules/ipfs.ts` and `internal/modules/web3.ts`
+
 ## 0.5.0-alpha
 On 2022-09-15 08:45:35
 ### Added
