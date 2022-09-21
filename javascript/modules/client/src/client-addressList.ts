@@ -10,8 +10,12 @@ import {
 import { ContextPlugin } from "./context-plugin";
 import { ClientCore } from "./internal/core";
 import {
+  decodeAddMemebersAction,
+  decodeRemoveMemebersAction,
   decodeUpdatePluginSettingsAction,
+  encodeAddMembersAction,
   encodeAddressListActionInit,
+  encodeRemoveMembersAction,
   encodeUpdatePluginSettingsAction,
   getFunctionFragment,
 } from "./internal/encoding/plugins";
@@ -33,13 +37,13 @@ import {
   IExecuteProposalParams,
   IPluginSettings,
   IProposalQueryParams,
-  SubgraphAddressListProposal,
-  SubgraphAddressListProposalListItem,
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
   ProposalSortBy,
+  SubgraphAddressListProposal,
+  SubgraphAddressListProposalListItem,
   VoteProposalStep,
   VoteProposalStepValue,
 } from "./internal/interfaces/plugins";
@@ -160,6 +164,26 @@ export class ClientAddressList extends ClientCore
       params: IPluginSettings,
     ): DaoAction =>
       this._buildUpdatePluginSettingsAction(pluginAddress, params),
+    /**
+     * Computes the parameters to be given when creating a proposal that adds addresses to address list
+     *
+     * @param pluginAddress
+     * @param members
+     * @returns {*} {DaoAction}
+     */
+    addMembersAction: (pluginAddress: string, members: string[]): DaoAction =>
+      this._buildAddMembersAction(pluginAddress, members),
+    /**
+     * Computes the parameters to be given when creating a proposal that removes addresses from the address list
+     *
+     * @param pluginAddress
+     * @param members
+     * @returns {*} {DaoAction}
+     */
+    removeMembersAction: (
+      pluginAddress: string,
+      members: string[],
+    ): DaoAction => this._buildRemoveMembersAction(pluginAddress, members),
   };
   decoding = {
     /**
@@ -171,6 +195,24 @@ export class ClientAddressList extends ClientCore
      */
     updatePluginSettingsAction: (data: Uint8Array): IPluginSettings =>
       decodeUpdatePluginSettingsAction(data),
+
+    /**
+     * Decodes a list of addresses from an encoded add members action
+     *
+     * @param data
+     * @returns {*}  {string[]}
+     */
+    addMembersAction: (data: Uint8Array): string[] =>
+      decodeAddMemebersAction(data),
+
+    /**
+     * Decodes a list of addresses from an encoded remove members action
+     *
+     * @param data
+     * @returns {*}  {string[]}
+     */
+    removeMembersAction: (data: Uint8Array): string[] =>
+      decodeRemoveMemebersAction(data),
 
     /**
      * Returns the decoded function info given the encoded data of an action
@@ -433,6 +475,44 @@ export class ClientAddressList extends ClientCore
       to: pluginAddress,
       value: BigInt(0),
       data: encodeUpdatePluginSettingsAction(params),
+    };
+  }
+
+  private _buildAddMembersAction(
+    pluginAddress: string,
+    members: string[],
+  ): DaoAction {
+    if (!isAddress(pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    for (const member of members) {
+      if (!isAddress(member)) {
+        throw new InvalidAddressError();
+      }
+    }
+    return {
+      to: pluginAddress,
+      value: BigInt(0),
+      data: encodeAddMembersAction(members),
+    };
+  }
+
+  private _buildRemoveMembersAction(
+    pluginAddress: string,
+    members: string[],
+  ): DaoAction {
+    if (!isAddress(pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    for (const member of members) {
+      if (!isAddress(member)) {
+        throw new InvalidAddressError();
+      }
+    }
+    return {
+      to: pluginAddress,
+      value: BigInt(0),
+      data: encodeRemoveMembersAction(members),
     };
   }
 

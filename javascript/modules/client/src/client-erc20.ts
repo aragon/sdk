@@ -8,6 +8,7 @@ import {
   ICreateProposalParams,
   IErc20PluginInstall,
   IExecuteProposalParams,
+  IMintTokenParams,
   IPluginSettings,
   IProposalQueryParams,
   IVoteProposalParams,
@@ -37,8 +38,10 @@ import {
   toErc20ProposalListItem,
 } from "./internal/utils/plugins";
 import {
+  decodeMintTokenAction,
   decodeUpdatePluginSettingsAction,
   encodeErc20ActionInit,
+  encodeMintTokenAction,
   encodeUpdatePluginSettingsAction,
   getFunctionFragment,
 } from "./internal/encoding/plugins";
@@ -176,12 +179,23 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * @return {*}  {DaoAction}
      * @memberof ClientErc20
      */
-    // updatePluginSettings()     not setConfig()
     updatePluginSettingsAction: (
       pluginAddress: string,
       params: IPluginSettings,
     ): DaoAction =>
       this._buildUpdatePluginSettingsAction(pluginAddress, params),
+    /**
+     * Computes the parameters to be given when creating a proposal that mints an amount of ERC-20 tokens to an address
+     *
+     * @param minterAddress
+     * @param params
+     * @returns {*}  {DaoAction}
+     * @memberof ClientErc20
+     */
+    mintTokenAction: (
+      minterAddress: string,
+      params: IMintTokenParams,
+    ): DaoAction => this._buildMintTokenAction(minterAddress, params),
   };
   decoding = {
     /**
@@ -193,7 +207,14 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      */
     updatePluginSettingsAction: (data: Uint8Array): IPluginSettings =>
       decodeUpdatePluginSettingsAction(data),
-
+    /**
+     * Decodes the mint token params from an encoded mint token action
+     * 
+     * @param data 
+     * @returns {*}  {IMintTokenParams}
+     */
+    mintTokenAction: (data: Uint8Array): IMintTokenParams =>
+      decodeMintTokenAction(data),
     /**
      * Returns the decoded function info given the encoded data of an action
      *
@@ -370,6 +391,20 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       to: pluginAddress,
       value: BigInt(0),
       data: encodeUpdatePluginSettingsAction(params),
+    };
+  }
+
+  private _buildMintTokenAction(
+    minterAddress: string,
+    params: IMintTokenParams,
+  ): DaoAction {
+    if (!isAddress(minterAddress) || !isAddress(params.address)) {
+      throw new InvalidAddressError();
+    }
+    return {
+      to: minterAddress,
+      value: BigInt(0),
+      data: encodeMintTokenAction(params),
     };
   }
 

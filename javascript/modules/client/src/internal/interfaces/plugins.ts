@@ -403,3 +403,8 @@ export interface IComputeStatusProposal {
   nay: string;
   executed: boolean;
 }
+
+export interface IMintTokenParams{
+  address: string
+  amount: bigint
+}
