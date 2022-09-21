@@ -10,6 +10,7 @@ import {
   encodeRatio,
   hexToBytes,
   strip0x,
+  UnexpectedActionError
 } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -19,8 +20,6 @@ import {
   IMintTokenParams,
   IPluginSettings,
 } from "../interfaces/plugins";
-
-import { UnexpectedActionError } from "@aragon/sdk-common";
 
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { AVAILABLE_PLUGIN_FUNCTION_SIGNATURES } from "../constants/encoding";

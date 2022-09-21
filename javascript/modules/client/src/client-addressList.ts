@@ -485,8 +485,7 @@ export class ClientAddressList extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    for (let i = 0; i < members.length; i++) {
-      const member = members[i];
+    for (const member of members) {
       if (!isAddress(member)) {
         throw new InvalidAddressError();
       }
@@ -505,8 +504,7 @@ export class ClientAddressList extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    for (let i = 0; i < members.length; i++) {
-      const member = members[i];
+    for (const member of members) {
       if (!isAddress(member)) {
         throw new InvalidAddressError();
       }
