@@ -107,9 +107,7 @@ export class Web3Module implements IClientWeb3Core {
         else if (!abi) throw new Error("Invalid contract ABI");
 
         const signer = this.getSigner();
-        if (!signer) {
-            throw new Error("No signer");
-        } else if (!this.getProvider()) {
+        if (!signer && !this.getProvider()) {
             throw new Error("No signer");
         }
 
