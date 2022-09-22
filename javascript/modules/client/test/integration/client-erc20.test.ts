@@ -16,7 +16,9 @@ import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 
 import {
+  CanVoteStep,
   ExecuteProposalStep,
+  ICanVoteParams,
   ICreateProposalParams,
   IErc20PluginInstall,
   IExecuteProposalParams,
@@ -351,6 +353,54 @@ describe("Client", () => {
             expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             break;
           case ExecuteProposalStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected execute proposal step: " +
+                Object.keys(step).join(", "),
+            );
+        }
+      }
+    });
+  });
+
+  describe("Can vote", () => {
+    it("Should estimate the gas fees for checking if an address can vote", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+
+      const params: ICanVoteParams = {
+        address: "0x1234567890123456789012345678901234567890",
+        proposalId: "0x1234567890123456789012345678901234567890_0x1",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
+      };
+      const estimation = await client.estimation.canVote(params);
+
+      expect(typeof estimation).toEqual("object");
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+    });
+
+    it("Should check if an user can vote", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+
+      const params: ICanVoteParams = {
+        address: "0x1234567890123456789012345678901234567890",
+        proposalId: "0x1234567890123456789012345678901234567890_0x1",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
+      };
+
+      for await (const step of client.methods.canVote(params)) {
+        switch (step.key) {
+          case CanVoteStep.CHECKING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case CanVoteStep.DONE:
+            expect(typeof step.canVote).toBe("boolean");
             break;
           default:
             throw new Error(

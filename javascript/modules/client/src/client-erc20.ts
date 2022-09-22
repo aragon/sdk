@@ -1,9 +1,12 @@
 import {
+  CanVoteStep,
+  CanVoteStepValue,
   Erc20Proposal,
   Erc20ProposalListItem,
   Erc20TokenDetails,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
+  ICanVoteParams,
   IClientErc20,
   ICreateProposalParams,
   IErc20PluginInstall,
@@ -52,6 +55,7 @@ import {
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
   NoProviderError,
+  NoSignerError,
   Random,
 } from "@aragon/sdk-common";
 import { delay } from "./internal/temp-mock";
@@ -119,6 +123,16 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       params: IExecuteProposalParams,
     ): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(params),
+
+    /**
+     * Checks if an user can vote in a proposal
+     *
+     * @param {ICanVoteParams} params
+     * @returns {*}  {AsyncGenerator<CanVoteStepValue>}
+     */
+    canVote: (
+      params: ICanVoteParams,
+    ): AsyncGenerator<CanVoteStepValue> => this._canVote(params),
 
     /**
      * Returns the list of wallet addresses holding tokens from the underlying ERC20 contract used by the plugin
@@ -209,8 +223,8 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       decodeUpdatePluginSettingsAction(data),
     /**
      * Decodes the mint token params from an encoded mint token action
-     * 
-     * @param data 
+     *
+     * @param data
      * @returns {*}  {IMintTokenParams}
      */
     mintTokenAction: (data: Uint8Array): IMintTokenParams =>
@@ -256,6 +270,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     createProposal: (
       params: ICreateProposalParams,
     ): Promise<GasFeeEstimation> => this._estimateCreateProposal(params),
+
     /**
      * Estimates the gas fee of casting a vote on a proposal
      *
@@ -266,6 +281,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      */
     voteProposal: (params: IVoteProposalParams): Promise<GasFeeEstimation> =>
       this._estimateVoteProposal(params),
+
     /**
      * Estimates the gas fee of executing an ERC20 proposal
      *
@@ -276,6 +292,17 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     executeProposal: (
       params: IExecuteProposalParams,
     ): Promise<GasFeeEstimation> => this._estimateExecuteProposal(params),
+
+    /**
+     * Estimates the gas fee of checkin if an address can vote in an ERC20 proopsal
+     *
+     * @param {ICanVoteParams} params
+     * @return {*}  {Promise<GasFeeEstimation>}
+     * @memberof ClientErc20
+     */
+    canVote: (
+      params: ICanVoteParams,
+    ): Promise<GasFeeEstimation> => this._estimateCanVote(params),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -378,6 +405,36 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     };
   }
 
+  private async *_canVote(
+    params: ICanVoteParams,
+  ): AsyncGenerator<CanVoteStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+
+    // TODO: Implement
+    await delay(1000);
+    yield {
+      key: CanVoteStep.CHECKING,
+      txHash:
+        "0x0123456789012345678901234567890123456789012345678901234567890123",
+    };
+    await delay(3000);
+    yield {
+      key: CanVoteStep.DONE,
+      canVote: parseInt(params.address.slice(-1), 16) % 2 === 1,
+    };
+  }
+
   //// PRIVATE ACTION BUILDER HANDLERS
   private _buildUpdatePluginSettingsAction(
     pluginAddress: string,
@@ -464,6 +521,26 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       throw new Error("A signer is needed");
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
+    }
+    // TODO: remove this
+    return Promise.resolve(
+      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+    );
+  }
+  private _estimateCanVote(
+    params: ICanVoteParams,
+  ): Promise<GasFeeEstimation> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
     }
     // TODO: remove this
     return Promise.resolve(

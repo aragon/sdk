@@ -5,6 +5,7 @@ import {
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
   NoProviderError,
+  NoSignerError,
   Random,
 } from "@aragon/sdk-common";
 import { ContextPlugin } from "./context-plugin";
@@ -29,9 +30,12 @@ import {
 import {
   AddressListProposal,
   AddressListProposalListItem,
+  CanVoteStep,
+  CanVoteStepValue,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   IAddressListPluginInstall,
+  ICanVoteParams,
   IClientAddressList,
   ICreateProposalParams,
   IExecuteProposalParams,
@@ -49,6 +53,7 @@ import {
 } from "./internal/interfaces/plugins";
 import { delay } from "./internal/temp-mock";
 import {
+  isProposalId,
   toAddressListProposal,
   toAddressListProposalListItem,
 } from "./internal/utils/plugins";
@@ -113,6 +118,15 @@ export class ClientAddressList extends ClientCore
     ): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(params),
     /**
+     * Checks if an user can vote in a proposal
+     *
+     * @param {ICanVoteParams} params
+     * @returns {*}  {AsyncGenerator<CanVoteStepValue>}
+     */
+    canVote: (
+      params: ICanVoteParams,
+    ): AsyncGenerator<CanVoteStepValue> => this._canVote(params),
+    /**
      * Returns the list of wallet addresses with signing capabilities on the plugin
      *
      * @return {*}  {Promise<string[]>}
@@ -164,6 +178,7 @@ export class ClientAddressList extends ClientCore
       params: IPluginSettings,
     ): DaoAction =>
       this._buildUpdatePluginSettingsAction(pluginAddress, params),
+
     /**
      * Computes the parameters to be given when creating a proposal that adds addresses to address list
      *
@@ -173,6 +188,7 @@ export class ClientAddressList extends ClientCore
      */
     addMembersAction: (pluginAddress: string, members: string[]): DaoAction =>
       this._buildAddMembersAction(pluginAddress, members),
+
     /**
      * Computes the parameters to be given when creating a proposal that removes addresses from the address list
      *
@@ -275,6 +291,17 @@ export class ClientAddressList extends ClientCore
     executeProposal: (
       params: IExecuteProposalParams,
     ): Promise<GasFeeEstimation> => this._estimateExecuteProposal(params),
+    
+    /**
+     * Estimates the gas fee of checkin if an address can vote in an address list proposal
+     *
+     * @param {ICanVoteParams} params
+     * @return {*}  {Promise<GasFeeEstimation>}
+     * @memberof ClientErc20
+     */
+    canVote: (
+      params: ICanVoteParams,
+    ): Promise<GasFeeEstimation> => this._estimateCanVote(params),
   };
 
   private async *_createProposal(
@@ -347,6 +374,36 @@ export class ClientAddressList extends ClientCore
     await delay(3000);
     yield {
       key: ExecuteProposalStep.DONE,
+    };
+  }
+
+  private async *_canVote(
+    params: ICanVoteParams,
+  ): AsyncGenerator<CanVoteStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+
+    // TODO: Implement
+    await delay(1000);
+    yield {
+      key: CanVoteStep.CHECKING,
+      txHash:
+        "0x0123456789012345678901234567890123456789012345678901234567890123",
+    };
+    await delay(3000);
+    yield {
+      key: CanVoteStep.DONE,
+      canVote: parseInt(params.address.slice(-1), 16) % 2 === 1,
     };
   }
 
@@ -562,6 +619,27 @@ export class ClientAddressList extends ClientCore
 
     // TODO: Implement
 
+    return Promise.resolve(
+      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+    );
+  }
+
+  private _estimateCanVote(
+    params: ICanVoteParams,
+  ): Promise<GasFeeEstimation> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    // TODO: remove this
     return Promise.resolve(
       this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
     );

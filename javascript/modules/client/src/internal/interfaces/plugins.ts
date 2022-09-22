@@ -24,6 +24,9 @@ export interface IClientErc20 extends IClientCore {
     executeProposal: (
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
+    canVote: (
+      params: ICanVoteParams,
+    ) => AsyncGenerator<CanVoteStepValue>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<Erc20Proposal | null>;
     getProposals: (
@@ -51,6 +54,9 @@ export interface IClientErc20 extends IClientCore {
     executeProposal: (
       params: IExecuteProposalParams,
     ) => Promise<GasFeeEstimation>;
+    canVote: (
+      params: ICanVoteParams,
+    ) => Promise<GasFeeEstimation>;
   };
 }
 
@@ -68,6 +74,9 @@ export interface IClientAddressList extends IClientCore {
     executeProposal: (
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
+    canVote: (
+      params: ICanVoteParams,
+    ) => AsyncGenerator<CanVoteStepValue>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<AddressListProposal | null>;
     getProposals: (
@@ -93,6 +102,9 @@ export interface IClientAddressList extends IClientCore {
     voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
     executeProposal: (
       params: IExecuteProposalParams,
+    ) => Promise<GasFeeEstimation>;
+    canVote: (
+      params: ICanVoteParams,
     ) => Promise<GasFeeEstimation>;
   };
 }
@@ -133,6 +145,12 @@ export interface IVoteProposalParams {
 export interface IExecuteProposalParams {
   pluginAddress: string;
   proposalId: string;
+}
+
+export interface ICanVoteParams {
+  pluginAddress: string;
+  proposalId: string;
+  address: string;
 }
 
 // Factory init params
@@ -191,6 +209,14 @@ export enum ExecuteProposalStep {
 export type ExecuteProposalStepValue =
   | { key: ExecuteProposalStep.EXECUTING; txHash: string }
   | { key: ExecuteProposalStep.DONE };
+// CAN VOTE
+export enum CanVoteStep {
+  CHECKING = "checking",
+  DONE = "done",
+}
+export type CanVoteStepValue =
+  | { key: CanVoteStep.CHECKING; txHash: string }
+  | { key: CanVoteStep.DONE; canVote: boolean };
 
 // PROPOSAL RETRIEVAL
 
@@ -404,7 +430,7 @@ export interface IComputeStatusProposal {
   executed: boolean;
 }
 
-export interface IMintTokenParams{
-  address: string
-  amount: bigint
+export interface IMintTokenParams {
+  address: string;
+  amount: bigint;
 }
