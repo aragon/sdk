@@ -776,21 +776,11 @@ const params: ICanVoteParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
 };
 
-const steps = client.methods.canVote(voteParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case CanVoteStep.CHECKING:
-        console.log(step.txHash);
-        break;
-      case CanVoteStep.DONE:
-        console.log(step.canVote);
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
+const canVote = await client.methods.canVote(voteParams);
+consoloe.log(canVote)
+/*
+true
+*/
 ```
 
 
@@ -1375,21 +1365,11 @@ const params: ICanVoteParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
 };
 
-const steps = client.methods.canVote(voteParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case CanVoteStep.CHECKING:
-        console.log(step.txHash);
-        break;
-      case CanVoteStep.DONE:
-        console.log(step.canVote);
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
+const canVote = await client.methods.canVote(voteParams);
+consoloe.log(canVote)
+/*
+true
+*/
 ```
 
 ### Loading the list of members (address list plugin)

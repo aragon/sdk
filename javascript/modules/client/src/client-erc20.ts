@@ -1,6 +1,4 @@
 import {
-  CanVoteStep,
-  CanVoteStepValue,
   Erc20Proposal,
   Erc20ProposalListItem,
   Erc20TokenDetails,
@@ -132,7 +130,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      */
     canVote: (
       params: ICanVoteParams,
-    ): AsyncGenerator<CanVoteStepValue> => this._canVote(params),
+    ): Promise<boolean> => this._canVote(params),
 
     /**
      * Returns the list of wallet addresses holding tokens from the underlying ERC20 contract used by the plugin
@@ -292,17 +290,6 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     executeProposal: (
       params: IExecuteProposalParams,
     ): Promise<GasFeeEstimation> => this._estimateExecuteProposal(params),
-
-    /**
-     * Estimates the gas fee of checkin if an address can vote in an ERC20 proopsal
-     *
-     * @param {ICanVoteParams} params
-     * @return {*}  {Promise<GasFeeEstimation>}
-     * @memberof ClientErc20
-     */
-    canVote: (
-      params: ICanVoteParams,
-    ): Promise<GasFeeEstimation> => this._estimateCanVote(params),
   };
 
   //// PRIVATE METHOD IMPLEMENTATIONS
@@ -405,34 +392,23 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     };
   }
 
-  private async *_canVote(
+  private async _canVote(
     params: ICanVoteParams,
-  ): AsyncGenerator<CanVoteStepValue> {
+  ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
-    }
-    if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+    } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
-    }
-    if (!isProposalId(params.proposalId)) {
+    } else if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
 
     // TODO: Implement
     await delay(1000);
-    yield {
-      key: CanVoteStep.CHECKING,
-      txHash:
-        "0x0123456789012345678901234567890123456789012345678901234567890123",
-    };
-    await delay(3000);
-    yield {
-      key: CanVoteStep.DONE,
-      canVote: parseInt(params.address.slice(-1), 16) % 2 === 1,
-    };
+    return parseInt(params.address.slice(-1), 16) % 2 === 1;
   }
 
   //// PRIVATE ACTION BUILDER HANDLERS
@@ -521,26 +497,6 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       throw new Error("A signer is needed");
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
-    }
-    // TODO: remove this
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
-    );
-  }
-  private _estimateCanVote(
-    params: ICanVoteParams,
-  ): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
-    if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
-    if (!isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
     }
     // TODO: remove this
     return Promise.resolve(
