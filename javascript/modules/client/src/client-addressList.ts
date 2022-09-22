@@ -5,7 +5,6 @@ import {
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
   NoProviderError,
-  NoSignerError,
   Random,
 } from "@aragon/sdk-common";
 import { ContextPlugin } from "./context-plugin";

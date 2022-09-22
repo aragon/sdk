@@ -53,7 +53,6 @@ import {
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
   NoProviderError,
-  NoSignerError,
   Random,
 } from "@aragon/sdk-common";
 import { delay } from "./internal/temp-mock";
