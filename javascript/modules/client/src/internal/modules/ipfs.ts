@@ -50,7 +50,7 @@ export class IPFSModule implements IClientIpfsCore {
             return Promise.reject(new Error("IPFS client is not initialized"));
         }
 
-        for (var i = 0; i < this._ipfs?.length; i++) {
+        for (let i = 0; i < this._ipfs?.length; i++) {
             if (await this.isUp()) return;
 
             this.shiftClient();

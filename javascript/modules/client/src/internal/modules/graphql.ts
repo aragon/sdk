@@ -71,7 +71,7 @@ export class GraphqlModule implements IClientGraphQLCore {
             return Promise.reject(new Error("graphql client is not initialized"));
         }
 
-        for (var i = 0; i < this._graphql?.length; i++) {
+        for (let i = 0; i < this._graphql?.length; i++) {
             if (await this.isUp()) return;
 
             this.shiftClient();
