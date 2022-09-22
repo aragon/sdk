@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## 0.8.0-alpha
+On 2022-09-22 11:09:46
 ### Added
 - Adding the `canVote` getter to the address list and ERC20 clients
 ## 0.7.0-alpha
