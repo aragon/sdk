@@ -4,6 +4,7 @@ import {
   Erc20TokenDetails,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
+  ICanVoteParams,
   IClientErc20,
   ICreateProposalParams,
   IErc20PluginInstall,
@@ -121,6 +122,16 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       this._executeProposal(params),
 
     /**
+     * Checks if an user can vote in a proposal
+     *
+     * @param {ICanVoteParams} params
+     * @returns {*}  {AsyncGenerator<CanVoteStepValue>}
+     */
+    canVote: (
+      params: ICanVoteParams,
+    ): Promise<boolean> => this._canVote(params),
+
+    /**
      * Returns the list of wallet addresses holding tokens from the underlying ERC20 contract used by the plugin
      *
      * @return {*}  {Promise<string[]>}
@@ -209,8 +220,8 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
       decodeUpdatePluginSettingsAction(data),
     /**
      * Decodes the mint token params from an encoded mint token action
-     * 
-     * @param data 
+     *
+     * @param data
      * @returns {*}  {IMintTokenParams}
      */
     mintTokenAction: (data: Uint8Array): IMintTokenParams =>
@@ -256,6 +267,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     createProposal: (
       params: ICreateProposalParams,
     ): Promise<GasFeeEstimation> => this._estimateCreateProposal(params),
+
     /**
      * Estimates the gas fee of casting a vote on a proposal
      *
@@ -266,6 +278,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      */
     voteProposal: (params: IVoteProposalParams): Promise<GasFeeEstimation> =>
       this._estimateVoteProposal(params),
+
     /**
      * Estimates the gas fee of executing an ERC20 proposal
      *
@@ -376,6 +389,23 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     yield {
       key: ExecuteProposalStep.DONE,
     };
+  }
+
+  private async _canVote(
+    params: ICanVoteParams,
+  ): Promise<boolean> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer.provider) {
+      throw new NoProviderError();
+    } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    } else if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+
+    // TODO: Implement
+    await delay(1000);
+    return parseInt(params.address.slice(-1), 16) % 2 === 1;
   }
 
   //// PRIVATE ACTION BUILDER HANDLERS

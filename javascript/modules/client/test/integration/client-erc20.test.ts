@@ -17,6 +17,7 @@ import { GraphQLClient } from "graphql-request";
 
 import {
   ExecuteProposalStep,
+  ICanVoteParams,
   ICreateProposalParams,
   IErc20PluginInstall,
   IExecuteProposalParams,
@@ -359,6 +360,21 @@ describe("Client", () => {
             );
         }
       }
+    });
+  });
+
+  describe("Can vote", () => {
+    it("Should check if an user can vote in an ERC20 proposal", async () => {
+      const context = new ContextPlugin(contextParamsLocalChain);
+      const client = new ClientErc20(context);
+
+      const params: ICanVoteParams = {
+        address: "0x1234567890123456789012345678901234567890",
+        proposalId: "0x1234567890123456789012345678901234567890_0x1",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
+      };
+      const canVote = await client.methods.canVote(params);
+      expect(typeof canVote).toBe("boolean");
     });
   });
 

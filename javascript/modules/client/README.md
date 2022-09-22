@@ -752,6 +752,37 @@ for await (const step of steps) {
   }
 }
 ```
+### Checking if user can vote in an ERC20 proposal
+
+```ts
+import {
+  ClientErc20,
+  Context,
+  ContextPlugin,
+  CanVoteStep,
+  ICanVoteParams,
+} from "@aragon/sdk-client";
+
+// Create a simple context
+const context: Context = new Context(params);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an address list client
+const client = new ClientErc20(contextPlugin);
+
+const params: ICanVoteParams = {
+  address: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x1",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
+};
+
+const canVote = await client.methods.canVote(voteParams);
+console.log(canVote)
+/*
+true
+*/
+```
+
 
 ### Loading the list of members (ERC20)
 
@@ -1308,6 +1339,37 @@ for await (const step of steps) {
     console.error(err);
   }
 }
+```
+
+### Checking if user can vote in a address list proposal
+
+```ts
+import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
+  CanVoteStep,
+  ICanVoteParams,
+} from "@aragon/sdk-client";
+
+// Create a simple context
+const context: Context = new Context(params);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an address list client
+const client = new ClientAddressList(contextPlugin);
+
+const params: ICanVoteParams = {
+  address: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x1",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
+};
+
+const canVote = await client.methods.canVote(voteParams);
+console.log(canVote)
+/*
+true
+*/
 ```
 
 ### Loading the list of members (address list plugin)
@@ -2062,6 +2124,7 @@ console.log(functionParams)
 }
 */
 ```
+
 ### Decode Mint Token Action (ERC-20)
 
 ```ts
@@ -2082,6 +2145,7 @@ console.log(params)
 }
 */
 ```
+
 ### Decode Add Members Action (Address List)
 
 ```ts
@@ -2103,6 +2167,7 @@ console.log(params)
 ]
 */
 ```
+
 ### Decode Remove Members Action (Address List)
 
 ```ts
