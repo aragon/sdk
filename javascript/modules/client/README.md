@@ -777,7 +777,7 @@ const params: ICanVoteParams = {
 };
 
 const canVote = await client.methods.canVote(voteParams);
-consoloe.log(canVote)
+console.log(canVote)
 /*
 true
 */
@@ -1366,7 +1366,7 @@ const params: ICanVoteParams = {
 };
 
 const canVote = await client.methods.canVote(voteParams);
-consoloe.log(canVote)
+console.log(canVote)
 /*
 true
 */

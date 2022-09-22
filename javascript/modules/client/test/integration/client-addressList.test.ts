@@ -363,7 +363,7 @@ describe("Client", () => {
   });
 
   describe("Can vote", () => {
-    it("Should check if an user can vote", async () => {
+    it("Should check if an user can vote in an Address List proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientAddressList(context);
 

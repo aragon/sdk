@@ -364,7 +364,7 @@ describe("Client", () => {
   });
 
   describe("Can vote", () => {
-    it("Should check if an user can vote", async () => {
+    it("Should check if an user can vote in an ERC20 proposal", async () => {
       const context = new ContextPlugin(contextParamsLocalChain);
       const client = new ClientErc20(context);
 

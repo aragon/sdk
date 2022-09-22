@@ -18,7 +18,7 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Added
-- Add canVote method and estimation to address list client and erc20 client
+- Adding the `canVote` getter to the address list and ERC20 clients
 ## 0.7.0-alpha
 On 2022-09-21 14:50:29
 ### Added
