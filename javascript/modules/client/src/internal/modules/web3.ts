@@ -153,4 +153,17 @@ export class Web3Module implements IClientWeb3Core {
     public getDaoFactoryAddress(): string {
         return this._daoFactoryAddress;
     }
+
+    public async ensureOnline(): Promise<void> {
+        if (!this._web3Providers?.length) {
+            return Promise.reject(new Error("No provider"));
+        }
+
+        for (var i = 0; i < this._web3Providers?.length; i++) {
+            if (await this.isUp()) return;
+
+            this.shiftProvider();
+        }
+        throw new Error("No providers available");
+    }
 }
