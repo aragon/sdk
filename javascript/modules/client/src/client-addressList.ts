@@ -368,9 +368,7 @@ export class ClientAddressList extends ClientCore
     params: ICanVoteParams,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
+    if (!signer.provider) {
       throw new NoProviderError();
     } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
