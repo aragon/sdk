@@ -44,8 +44,9 @@ export class Web3Module implements IClientWeb3Core {
 
     /** Starts using the next available Web3 provider */
     public shiftProvider(): void {
-        if (!this._web3Providers.length) throw new Error("No endpoints");
-        else if (this._web3Providers.length <= 1) {
+        if (!this._web3Providers.length) {
+            throw new Error("No endpoints");
+        } else if (this._web3Providers.length <= 1) {
             throw new Error("No other endpoints");
         }
 
@@ -117,8 +118,9 @@ export class Web3Module implements IClientWeb3Core {
 
         const contract = new Contract(address, abi, provider);
 
-        if (!signer) return contract as Contract & T;
-        else if (signer instanceof Wallet) {
+        if (!signer) {
+            return contract as Contract & T;
+        } else if (signer instanceof Wallet) {
             return contract.connect(signer.connect(provider)) as Contract & T;
         }
 
@@ -162,7 +164,7 @@ export class Web3Module implements IClientWeb3Core {
             return Promise.reject(new Error("No provider"));
         }
 
-        for (var i = 0; i < this._web3Providers?.length; i++) {
+        for (let i = 0; i < this._web3Providers?.length; i++) {
             if (await this.isUp()) return;
 
             this.shiftProvider();

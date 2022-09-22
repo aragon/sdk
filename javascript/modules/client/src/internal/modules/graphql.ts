@@ -33,8 +33,9 @@ export class GraphqlModule implements IClientGraphQLCore {
      * @returns {void}
      */
     public shiftClient(): void {
-        if (!this._graphql?.length) throw new Error("No graphql endpoints available");
-        else if (this._graphql?.length < 2) {
+        if (!this._graphql?.length) {
+            throw new Error("No graphql endpoints available");
+        } else if (this._graphql?.length < 2) {
             throw new Error("No other endpoints");
         }
         this._graphqlIdx = (this._graphqlIdx + 1) % this._graphql?.length;
