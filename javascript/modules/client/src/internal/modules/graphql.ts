@@ -47,7 +47,7 @@ export class GraphqlModule implements IClientGraphQLCore {
      */
     public isUp(): Promise<boolean> {
         return this.getClient().request(QueryStatus).then(res => {
-            return res._meta?.deployment
+            return !!res._meta?.deployment
         }).catch(() => {
             return false
         })

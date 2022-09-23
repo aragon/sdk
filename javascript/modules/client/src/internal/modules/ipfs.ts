@@ -59,13 +59,11 @@ export class IPFSModule implements IClientIpfsCore {
     // IPFS METHODS
 
     public async add(input: string | Uint8Array): Promise<string> {
-        const client = await this.getOnlineClient();
-        try {
-            const res = await client.add(input)
-            return res.hash
-        } catch (e) {
-            throw new Error("Could not upload data: " + (e?.message || ""));
-        }
+        return this.getOnlineClient().then(
+            client => client.add(input).then(res => res.hash)
+        ).catch(e => {
+            throw new Error(`Could not upload data: ${e?.message || ''}`)
+        })
     }
 
     public fetchBytes(cid: string): Promise<Uint8Array | undefined> {
@@ -76,9 +74,7 @@ export class IPFSModule implements IClientIpfsCore {
         return this.fetchBytes(cid)
             .then((bytes) => new TextDecoder().decode(bytes))
             .catch((e) => {
-                throw new Error(
-                    "Error while fetching and decoding bytes: " + (e?.message || ""),
-                );
+                throw new Error(`Could not upload data: ${e?.message || ''}`)
             });
     }
 }
