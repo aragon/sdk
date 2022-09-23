@@ -24,6 +24,9 @@ export interface IClientErc20 extends IClientCore {
     executeProposal: (
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
+    canVote: (
+      params: ICanVoteParams,
+    ) => Promise<boolean>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<Erc20Proposal | null>;
     getProposals: (
@@ -68,6 +71,9 @@ export interface IClientAddressList extends IClientCore {
     executeProposal: (
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
+    canVote: (
+      params: ICanVoteParams,
+    ) => Promise<boolean>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<AddressListProposal | null>;
     getProposals: (
@@ -133,6 +139,12 @@ export interface IVoteProposalParams {
 export interface IExecuteProposalParams {
   pluginAddress: string;
   proposalId: string;
+}
+
+export interface ICanVoteParams {
+  pluginAddress: string;
+  proposalId: string;
+  address: string;
 }
 
 // Factory init params
@@ -404,7 +416,7 @@ export interface IComputeStatusProposal {
   executed: boolean;
 }
 
-export interface IMintTokenParams{
-  address: string
-  amount: bigint
+export interface IMintTokenParams {
+  address: string;
+  amount: bigint;
 }

@@ -32,6 +32,7 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   IAddressListPluginInstall,
+  ICanVoteParams,
   IClientAddressList,
   ICreateProposalParams,
   IExecuteProposalParams,
@@ -49,6 +50,7 @@ import {
 } from "./internal/interfaces/plugins";
 import { delay } from "./internal/temp-mock";
 import {
+  isProposalId,
   toAddressListProposal,
   toAddressListProposalListItem,
 } from "./internal/utils/plugins";
@@ -113,6 +115,15 @@ export class ClientAddressList extends ClientCore
     ): AsyncGenerator<ExecuteProposalStepValue> =>
       this._executeProposal(params),
     /**
+     * Checks if an user can vote in a proposal
+     *
+     * @param {ICanVoteParams} params
+     * @returns {*}  {Promise<boolean>}
+     */
+    canVote: (
+      params: ICanVoteParams,
+    ): Promise<boolean> => this._canVote(params),
+    /**
      * Returns the list of wallet addresses with signing capabilities on the plugin
      *
      * @return {*}  {Promise<string[]>}
@@ -164,6 +175,7 @@ export class ClientAddressList extends ClientCore
       params: IPluginSettings,
     ): DaoAction =>
       this._buildUpdatePluginSettingsAction(pluginAddress, params),
+
     /**
      * Computes the parameters to be given when creating a proposal that adds addresses to address list
      *
@@ -173,6 +185,7 @@ export class ClientAddressList extends ClientCore
      */
     addMembersAction: (pluginAddress: string, members: string[]): DaoAction =>
       this._buildAddMembersAction(pluginAddress, members),
+
     /**
      * Computes the parameters to be given when creating a proposal that removes addresses from the address list
      *
@@ -348,6 +361,23 @@ export class ClientAddressList extends ClientCore
     yield {
       key: ExecuteProposalStep.DONE,
     };
+  }
+
+  private async _canVote(
+    params: ICanVoteParams,
+  ): Promise<boolean> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer.provider) {
+      throw new NoProviderError();
+    } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    } else if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+
+    // TODO: Implement
+    await delay(1000);
+    return parseInt(params.address.slice(-1), 16) % 2 === 1;
   }
 
   private _getMemebers(_addressOrEns: string): Promise<string[]> {

@@ -18,6 +18,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+## 0.5.0-alpha
+On 2022-09-22 11:10:24
+### Added
+- New error types
 ## 0.4.0-alpha
 On 2022-09-21 14:49:57
 ### Added

@@ -21,6 +21,11 @@ TEMPLATE:
 ### Changed
 - splitted `internal/core.ts` logic into multiple modules `internal/modules/graphql.ts`,`internal/modules/ipfs.ts` and `internal/modules/web3.ts`
 
+## 0.8.0-alpha
+On 2022-09-22 11:09:46
+### Added
+- Adding the `canVote` getter to the address list and ERC20 clients
+
 ## 0.7.0-alpha
 On 2022-09-21 14:50:29
 ### Added

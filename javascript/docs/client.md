@@ -37,6 +37,8 @@
 ## Functions
 
 <dl>
+<dt><a href="#canVote">canVote(params)</a> ⇒ <code>*</code></dt>
+<dd><p>Checks if an user can vote in a proposal</p></dd>
 <dt><a href="#addMembersAction">addMembersAction(pluginAddress, members)</a> ⇒ <code>*</code></dt>
 <dd><p>Computes the parameters to be given when creating a proposal that adds addresses to address list</p></dd>
 <dt><a href="#removeMembersAction">removeMembersAction(pluginAddress, members)</a> ⇒ <code>*</code></dt>
@@ -45,6 +47,8 @@
 <dd><p>Decodes a list of addresses from an encoded add members action</p></dd>
 <dt><a href="#removeMembersAction">removeMembersAction(data)</a> ⇒ <code>*</code></dt>
 <dd><p>Decodes a list of addresses from an encoded remove members action</p></dd>
+<dt><a href="#canVote">canVote(params)</a> ⇒ <code>*</code></dt>
+<dd><p>Checks if an user can vote in a proposal</p></dd>
 <dt><a href="#mintTokenAction">mintTokenAction(data)</a> ⇒ <code>*</code></dt>
 <dd><p>Decodes the mint token params from an encoded mint token action</p></dd>
 </dl>
@@ -853,6 +857,18 @@ so that the plugin is configured</p>
 
 **Kind**: global variable  
 **Access**: public  
+<a name="canVote"></a>
+
+## canVote(params) ⇒ <code>\*</code>
+<p>Checks if an user can vote in a proposal</p>
+
+**Kind**: global function  
+**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>ICanVoteParams</code> | 
+
 <a name="addMembersAction"></a>
 
 ## addMembersAction(pluginAddress, members) ⇒ <code>\*</code>
@@ -902,6 +918,18 @@ so that the plugin is configured</p>
 | Param |
 | --- |
 | data | 
+
+<a name="canVote"></a>
+
+## canVote(params) ⇒ <code>\*</code>
+<p>Checks if an user can vote in a proposal</p>
+
+**Kind**: global function  
+**Returns**: <code>\*</code> - <p>{AsyncGenerator<CanVoteStepValue>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>ICanVoteParams</code> | 
 
 <a name="mintTokenAction"></a>
 
