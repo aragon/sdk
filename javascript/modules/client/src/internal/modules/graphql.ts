@@ -45,16 +45,12 @@ export class GraphqlModule implements IClientGraphQLCore {
      * Checks if the current node is online
      * @returns {Promise<boolean>}
      */
-    public async isUp(): Promise<boolean> {
-        try {
-            const res = await this.getClient().request(QueryStatus)
-            if (res._meta?.deployment) {
-                return true
-            }
+    public isUp(): Promise<boolean> {
+        return this.getClient().request(QueryStatus).then(res => {
+            return res._meta?.deployment
+        }).catch(() => {
             return false
-        } catch (e) {
-            return false
-        }
+        })
     }
 
     /**

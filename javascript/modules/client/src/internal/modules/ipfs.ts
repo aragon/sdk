@@ -34,15 +34,9 @@ export class IPFSModule implements IClientIpfsCore {
     }
 
     /** Returns `true` if the current client is on line */
-    public async isUp(): Promise<boolean> {
+    public isUp(): Promise<boolean> {
         if (!this._ipfs?.length) return Promise.resolve(false);
-
-        try {
-            await this.getClient().nodeInfo()
-            return true
-        } catch (e) {
-            return false
-        }
+        return this.getClient().nodeInfo().then(() => true).catch(() => false)
     }
 
     public async ensureOnline(): Promise<void> {
@@ -58,9 +52,8 @@ export class IPFSModule implements IClientIpfsCore {
         throw new Error("No IPFS nodes available");
     }
 
-    public async getOnlineClient(): Promise<IpfsClient> {
-        await this.ensureOnline();
-        return this.getClient();
+    public getOnlineClient(): Promise<IpfsClient> {
+        return this.ensureOnline().then(() => this.getClient());
     }
 
     // IPFS METHODS
@@ -75,9 +68,8 @@ export class IPFSModule implements IClientIpfsCore {
         }
     }
 
-    public async fetchBytes(cid: string): Promise<Uint8Array | undefined> {
-        const client = await this.getOnlineClient();
-        return client.cat(cid);
+    public fetchBytes(cid: string): Promise<Uint8Array | undefined> {
+        return this.getOnlineClient().then(client => client.cat(cid));
     }
 
     public fetchString(cid: string): Promise<string> {

@@ -92,6 +92,19 @@ export class Web3Module implements IClientWeb3Core {
             .catch(() => false);
     }
 
+    public async ensureOnline(): Promise<void> {
+        if (!this._web3Providers?.length) {
+            return Promise.reject(new Error("No provider"));
+        }
+
+        for (let i = 0; i < this._web3Providers?.length; i++) {
+            if (await this.isUp()) return;
+
+            this.shiftProvider();
+        }
+        throw new Error("No providers available");
+    }
+
     /**
      * Returns a contract instance at the given address
      *
@@ -155,18 +168,5 @@ export class Web3Module implements IClientWeb3Core {
     /** Returns the current DAO factory address */
     public getDaoFactoryAddress(): string {
         return this._daoFactoryAddress;
-    }
-
-    public async ensureOnline(): Promise<void> {
-        if (!this._web3Providers?.length) {
-            return Promise.reject(new Error("No provider"));
-        }
-
-        for (let i = 0; i < this._web3Providers?.length; i++) {
-            if (await this.isUp()) return;
-
-            this.shiftProvider();
-        }
-        throw new Error("No providers available");
     }
 }
