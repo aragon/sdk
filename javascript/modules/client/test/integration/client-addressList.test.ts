@@ -6,8 +6,9 @@ import { Wallet } from "@ethersproject/wallet";
 import {
   Client,
   ClientAddressList,
+  Context,
+  ContextParams,
   ContextPlugin,
-  ContextPluginParams,
   SortDirection,
 } from "../../src";
 import * as ganacheSetup from "../../../../helpers/ganache-setup";
@@ -76,32 +77,29 @@ const grapqhlEndpoints = {
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
-const contextParams: ContextPluginParams = {
+const contextParams: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
-  pluginAddress: "0x2345678901234567890123456789012345678901",
   ipfsNodes: ipfsEndpoints.working,
   graphqlNodes: grapqhlEndpoints.working,
 };
 
-const contextParamsFailing: ContextPluginParams = {
+const contextParamsFailing: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.failing,
-  pluginAddress: "0x2345678901234567890123456789012345678901",
   ipfsNodes: ipfsEndpoints.failing,
   graphqlNodes: grapqhlEndpoints.failing,
 };
 
-const contextParamsLocalChain: ContextPluginParams = {
+const contextParamsLocalChain: ContextParams = {
   network: 31337,
   signer: new Wallet(TEST_WALLET),
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: ["http://localhost:8545"],
-  pluginAddress: "0x2345678901234567890123456789012345678901",
   ipfsNodes: [
     {
       url: "http:localhost:5001",
@@ -132,8 +130,9 @@ describe("Client", () => {
 
   describe("Client instances", () => {
     it("Should create a working client", async () => {
-      const ctx = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(ctx);
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       expect(client).toBeInstanceOf(ClientAddressList);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
@@ -155,8 +154,9 @@ describe("Client", () => {
     });
 
     it("Should create a failing client", async () => {
-      const ctx = new ContextPlugin(contextParamsFailing);
-      const client = new ClientAddressList(ctx);
+      const ctx = new Context(contextParamsFailing);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       expect(client).toBeInstanceOf(ClientAddressList);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
@@ -177,8 +177,9 @@ describe("Client", () => {
   });
   describe("Proposal Creation", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -211,9 +212,10 @@ describe("Client", () => {
       expect(estimation.max).toBeGreaterThan(estimation.average);
     });
     it("Should create a new proposal locally", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const addressListClient = new ClientAddressList(context);
-      const client = new Client(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const addressListClient = new ClientAddressList(ctxPlugin);
+      const client = new Client(ctx);
 
       // generate actions
       const action = await client.encoding.withdrawAction(
@@ -271,8 +273,9 @@ describe("Client", () => {
 
   describe("Vote on a proposal", () => {
     it("Should estimate the gas fees for casting a vote", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -290,8 +293,9 @@ describe("Client", () => {
     });
 
     it("Should vote on a proposal locally", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -320,8 +324,9 @@ describe("Client", () => {
 
   describe("Execute proposal", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -337,8 +342,9 @@ describe("Client", () => {
     });
 
     it("Should execute a local proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -364,8 +370,9 @@ describe("Client", () => {
 
   describe("Can vote", () => {
     it("Should check if an user can vote in an Address List proposal", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const params: ICanVoteParams = {
         address: "0x1234567890123456789012345678901234567890",
@@ -402,8 +409,9 @@ describe("Client", () => {
     });
 
     it("Should create an AddressList client and fail to generate a plugin config action with an invalid address", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const pluginConfigParams: IPluginSettings = {
         minDuration: 100000,
@@ -421,8 +429,9 @@ describe("Client", () => {
     });
 
     it("Should create an AddressList client and generate a plugin config action action", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const pluginConfigParams: IPluginSettings = {
         minDuration: 100000,
@@ -444,8 +453,9 @@ describe("Client", () => {
     });
 
     it("Should encode a add members action with an invalid plugin address and fail", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -462,8 +472,9 @@ describe("Client", () => {
       ).toThrow(new InvalidAddressError());
     });
     it("Should encode a add members action with an invalid member address and fail", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const members: string[] = [
         "0xinvalid_address",
@@ -480,8 +491,9 @@ describe("Client", () => {
       ).toThrow(new InvalidAddressError());
     });
     it("Should encode a add members action", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -500,8 +512,9 @@ describe("Client", () => {
       expect(action.to).toBe(pluginAddress);
     });
     it("Should encode a remove members action with an invalid plugin address and fail", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -518,8 +531,9 @@ describe("Client", () => {
       ).toThrow(new InvalidAddressError());
     });
     it("Should encode a remove members action with an invalid member address and fail", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const members: string[] = [
         "0xinvalid_address",
@@ -536,8 +550,9 @@ describe("Client", () => {
       ).toThrow(new InvalidAddressError());
     });
     it("Should encode a remove members action", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -562,8 +577,9 @@ describe("Client", () => {
 
   describe("Action decoders", () => {
     it("Should decode the plugin settings from an update plugin settings action", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
         minTurnout: 0.5,
@@ -583,8 +599,9 @@ describe("Client", () => {
     });
 
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() =>
@@ -596,8 +613,9 @@ describe("Client", () => {
         );
     });
     it("Should decode a add members action", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -615,8 +633,9 @@ describe("Client", () => {
       }
     });
     it("Should decode a remove members action", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -638,8 +657,9 @@ describe("Client", () => {
     });
 
     it("Should get the function for a given action data", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
         minTurnout: 0.5,
@@ -659,8 +679,9 @@ describe("Client", () => {
     });
 
     it("Should try to get the function of an invalid data and return null", async () => {
-      const context = new ContextPlugin(contextParamsLocalChain);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
       const iface = client.decoding.findInterface(data);
       expect(iface).toBe(null);
@@ -669,8 +690,9 @@ describe("Client", () => {
 
   describe("Data retrieval", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
-      const context = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const wallets = await client.methods.getMembers(
         "0x1234567890123456789012345678901234567890",
@@ -682,8 +704,9 @@ describe("Client", () => {
       expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     });
     it("Should fetch the given proposal", async () => {
-      const context = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const proposalId = "0xbb90da4858c658f9701ecb18a3db758a74664ea4_0x0";
       const proposal = await client.methods.getProposal(proposalId);
@@ -758,8 +781,9 @@ describe("Client", () => {
       }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-      const context = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const proposalId = "0x1234567890123456789012345678901234567890_0x0";
       const proposal = await client.methods.getProposal(proposalId);
@@ -767,8 +791,9 @@ describe("Client", () => {
       expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const context = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
       const limit = 5;
       const params: IProposalQueryParams = {
         limit,
@@ -799,8 +824,9 @@ describe("Client", () => {
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {
-      const context = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
       const limit = 5;
       const address = "0x22effb00975f81a88f8fd4c0305b959053908cc8";
       const params: IProposalQueryParams = {
@@ -815,8 +841,9 @@ describe("Client", () => {
       expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
     });
     it("Should get a list of proposals from a dao that has no proposals", async () => {
-      const context = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
       const limit = 5;
       const address = "0x1234567890123456789012345678901234567890";
       const params: IProposalQueryParams = {
@@ -831,8 +858,9 @@ describe("Client", () => {
       expect(proposals.length === 0).toBe(true);
     });
     it("Should get a list of proposals from an invalid address", async () => {
-      const context = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
       const limit = 5;
       const address = "0xn0tv4l1d";
       const params: IProposalQueryParams = {
@@ -846,8 +874,9 @@ describe("Client", () => {
       );
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
-      const context = new ContextPlugin(contextParams);
-      const client = new ClientAddressList(context);
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const client = new ClientAddressList(ctxPlugin);
 
       const pluginAddress: string =
         "0x04e2518146781aa2299ca95b1716ff545cbafdb3";

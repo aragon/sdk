@@ -71,16 +71,8 @@ const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
  * Provider a generic client with high level methods to manage and interact an ERC20 Voting plugin installed in a DAO
  */
 export class ClientErc20 extends ClientCore implements IClientErc20 {
-  // @ts-ignore TODO: Remove
-  private _pluginAddress: string;
-
   constructor(context: ContextPlugin) {
     super(context);
-
-    if (!context.pluginAddress) {
-      throw new Error("An address for the plugin is required");
-    }
-    this._pluginAddress = context.pluginAddress;
   }
 
   //// HIGH LEVEL HANDLERS
