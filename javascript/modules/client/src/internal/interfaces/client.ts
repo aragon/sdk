@@ -282,7 +282,7 @@ export enum SubgraphPluginTypeName {
 export const SubgraphPluginTypeMap: Map<SubgraphPluginTypeName, string> =
   new Map([
     [SubgraphPluginTypeName.ERC20, "erc20voting.dao.eth"],
-    [SubgraphPluginTypeName.ADDRESS_LIST, "addreslistvoting.dao.eth"],
+    [SubgraphPluginTypeName.ADDRESS_LIST, "addresslistvoting.dao.eth"],
   ]);
 
 export type SubgraphPluginListItem = {
