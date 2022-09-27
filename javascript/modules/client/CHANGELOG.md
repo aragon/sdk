@@ -21,6 +21,11 @@ TEMPLATE:
 ### Changed
 - splitted `internal/core.ts` logic into multiple modules `internal/modules/graphql.ts`,`internal/modules/ipfs.ts` and `internal/modules/web3.ts`
 
+- Remove puginAddress from `PluginContext` class
+
+### Fixed
+- Fix `fromContext` function
+- Typo in `addreslistvoting.dao.eth` string
 ## 0.8.0-alpha
 On 2022-09-22 11:09:46
 ### Added
