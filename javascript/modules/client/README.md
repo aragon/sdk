@@ -760,6 +760,7 @@ for await (const step of steps) {
 
 ```ts
 import {
+  CanVoteStep,
   ClientErc20,
   Context,
   ContextPlugin,
@@ -923,6 +924,7 @@ import {
   Erc20ProposalListItem,
   IProposalQueryParams,
   ProposalSortBy,
+  ProposalStatus,
   SortDirection,
 } from "@aragon/sdk-client";
 import { Wallet } from "ethers";
@@ -939,6 +941,8 @@ const queryParams: IProposalQueryParams = {
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
   sortBy: ProposalSortBy.POPULARITY, //optional
+  status: ProposalStatus.ACTIVE, // optional
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890", // optional
 };
 
 const proposals: Erc20ProposalListItem[] = await client.methods.getProposals(
@@ -1347,6 +1351,7 @@ for await (const step of steps) {
 
 ```ts
 import {
+  CanVoteStep,
   ClientAddressList,
   Context,
   ContextPlugin,
@@ -1513,6 +1518,8 @@ const queryParams: IProposalQueryParams = {
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
   sortBy: ProposalSortBy.POPULARITY, //optional
+  status: ProposalStatus.ACTIVE, // optional
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890", // optional
 };
 
 const proposals: AddressListProposalListItem[] = await client.methods

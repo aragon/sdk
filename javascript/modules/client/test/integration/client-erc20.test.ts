@@ -28,6 +28,7 @@ import {
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalSortBy,
+  ProposalStatus,
   VoteProposalStep,
   VoteValues,
 } from "../../src/internal/interfaces/plugins";
@@ -692,10 +693,12 @@ describe("Client", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx)
       const client = new ClientErc20(ctxPlugin);
       const limit = 5;
+      const status =  ProposalStatus.EXECUTED
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
+        status
       };
       const proposals = await client.methods.getProposals(params);
 
@@ -714,6 +717,7 @@ describe("Client", () => {
         expect(typeof proposal.metadata.summary).toBe("string");
         expect(proposal.startDate instanceof Date).toBe(true);
         expect(proposal.endDate instanceof Date).toBe(true);
+        expect(proposal.status).toBe(status);
         // result
         expect(typeof proposal.result.yes).toBe("bigint");
         expect(typeof proposal.result.no).toBe("bigint");

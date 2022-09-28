@@ -42,6 +42,37 @@ export function computeProposalStatus(
   }
 }
 
+export function computeProposalStatusFilter(
+  status: ProposalStatus,
+): Object {
+  let where = {};
+  const now = Math.round(new Date().getTime() / 1000).toString();
+  switch (status) {
+    case ProposalStatus.PENDING:
+      where = { startDate_gte: now };
+      break;
+    case ProposalStatus.ACTIVE:
+      where = { startDate_lt: now, endDate_gte: now };
+      break;
+    case ProposalStatus.EXECUTED:
+      where = { executed: true };
+      break;
+    case ProposalStatus.SUCCEEDED:
+      // TODO
+      // add suceeded property on subgraph
+      where = { winningOption: VoteValues.YES, endDate_lt: now };
+      break;
+    case ProposalStatus.DEFEATED:
+      // TODO
+      // add suceeded property on subgraph
+      where = { winningOption: VoteValues.NO, endDate_lt: now };
+      break;
+    default:
+      throw new Error("invalid proposal status");
+  }
+  return where;
+}
+
 export function isProposalId(propoosalId: string): boolean {
   const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
   return regex.test(propoosalId);

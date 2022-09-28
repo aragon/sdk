@@ -323,6 +323,7 @@ export type Erc20TokenDetails = {
 
 export interface IProposalQueryParams extends IPagination {
   sortBy?: ProposalSortBy;
+  status?: ProposalStatus;
   daoAddressOrEns?: string;
 }
 
