@@ -69,16 +69,8 @@ const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
  */
 export class ClientAddressList extends ClientCore
   implements IClientAddressList {
-  //@ts-ignore TODO: Remove
-  private _pluginAddress: string;
-
   constructor(context: ContextPlugin) {
     super(context);
-
-    if (!context.pluginAddress) {
-      throw new Error("An address for the plugin is required");
-    }
-    this._pluginAddress = context.pluginAddress;
   }
   methods = {
     /**

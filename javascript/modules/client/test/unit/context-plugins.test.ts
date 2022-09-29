@@ -26,7 +26,6 @@ describe("ContextPlugin instances", () => {
       daoFactoryAddress: "0x1234",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
-      pluginAddress: "0x2345",
       graphqlNodes: []
     };
   });
@@ -42,7 +41,6 @@ describe("ContextPlugin instances", () => {
     expect(context.signer).toEqual(undefined);
     expect(context.daoFactoryAddress).toEqual(undefined);
     expect(context.gasFeeEstimationFactor).toEqual(0.625);
-    expect(context.pluginAddress).toEqual("");
   });
   it("Should create a context and have the correct values", () => {
     const context = new ContextPlugin(contextParams);
@@ -55,7 +53,6 @@ describe("ContextPlugin instances", () => {
       expect(provider).toBeInstanceOf(JsonRpcProvider)
     );
     expect(context.gasFeeEstimationFactor).toEqual(0.1);
-    expect(context.pluginAddress).toEqual("0x2345");
   });
   it("Should create a context with invalid network and fail", () => {
     contextParams.network = "notexistingnetwork";
