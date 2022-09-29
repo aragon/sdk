@@ -16,8 +16,6 @@
 ## Members
 
 <dl>
-<dt><a href="#pluginAddress">pluginAddress</a> ⇒ <code>string</code></dt>
-<dd><p>Returns the plugin contract address used to interact with</p></dd>
 <dt><a href="#network">network</a> ⇒ <code>Networkish</code></dt>
 <dd><p>Getter for the network</p></dd>
 <dt><a href="#signer">signer</a> ⇒ <code>Signer</code></dt>
@@ -801,13 +799,6 @@ so that the plugin is configured</p>
 | --- | --- |
 | params | <code>Object</code> | 
 
-<a name="pluginAddress"></a>
-
-## pluginAddress ⇒ <code>string</code>
-<p>Returns the plugin contract address used to interact with</p>
-
-**Kind**: global variable  
-**Access**: public  
 <a name="network"></a>
 
 ## network ⇒ <code>Networkish</code>
