@@ -1,5 +1,5 @@
 // @ts-ignore
-declare const describe, it, beforeAll, afterAll, expect, test;
+declare const describe, it, beforeAll, afterAll, expect, test, fail;
 
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
@@ -16,6 +16,7 @@ import * as ganacheSetup from "../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../helpers/deployContracts";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
+import { isAddress } from "@ethersproject/address";
 import {
   DAOFactory__factory,
   Registry__factory,
@@ -30,7 +31,11 @@ import {
   IMetadata,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
+  ITransferQueryParams,
   Permissions,
+  TokenType,
+  TransferSortBy,
+  TransferType,
 } from "../../src/internal/interfaces/client";
 import { DaoAction, SortDirection } from "../../src/internal/interfaces/common";
 import { IWithdrawParams } from "../../src/internal/interfaces/client";
@@ -71,7 +76,8 @@ const contextParams: ContextParams = {
   ],
   graphqlNodes: [{
     url:
-      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+      // "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+      "https://api.thegraph.com/subgraphs/name/josemarinas/josemarinas-core-rinkeby",
   }],
 };
 
@@ -99,7 +105,8 @@ const contextParamsLocalChain: ContextParams = {
   ],
   graphqlNodes: [{
     url:
-      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+      "https://api.thegraph.com/subgraphs/name/josemarinas/josemarinas-core-rinkeby",
+    // "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
   }],
 };
 
@@ -876,7 +883,7 @@ describe("Client", () => {
     it("Should get a DAO's metadata with a specific address", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx);
-      const daoAddress = "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61";
+      const daoAddress = "0x680533bff2e194e52df204685d9aed5b874c4f63";
       const dao = await client.methods.getDao(daoAddress);
       expect(typeof dao).toBe("object");
       expect(dao === null).toBe(false);
@@ -887,8 +894,7 @@ describe("Client", () => {
         expect(typeof dao.ensDomain).toBe("string");
         expect(Array.isArray(dao.plugins)).toBe(true);
         if (dao.plugins.length > 0) {
-          for (let i = 0; i < dao.plugins.length; i++) {
-            const plugin = dao.plugins[i];
+          for (const plugin of dao.plugins) {
             expect(typeof plugin.id).toBe("string");
             expect(typeof plugin.instanceAddress).toBe("string");
             expect(plugin.instanceAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
@@ -899,8 +905,7 @@ describe("Client", () => {
         expect(typeof dao.metadata.description).toBe("string");
         expect(Array.isArray(dao.metadata.links)).toBe(true);
         if (dao.metadata.links.length > 0) {
-          for (let i = 0; i < dao.metadata.links.length; i++) {
-            const link = dao.metadata.links[i];
+          for (const link of dao.metadata.links) {
             expect(typeof link.name).toBe("string");
             expect(typeof link.url).toBe("string");
           }
@@ -970,7 +975,7 @@ describe("Client", () => {
     it("Should get DAOs balances", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx);
-      const daoAddress = "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61";
+      const daoAddress = "0x680533bff2e194e52df204685d9aed5b874c4f63";
       const balances = await client.methods.getBalances(daoAddress);
       expect(Array.isArray(balances)).toBe(true);
       expect(balances === null).toBe(false);
@@ -1003,11 +1008,78 @@ describe("Client", () => {
     it("Should get the transfers of a dao", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const client = new Client(ctx);
-      const daoAddress = "0x04d9a0f3f7cf5f9f1220775d48478adfacceff61";
-      const transfers = await client.methods.getTransfers(daoAddress);
-      expect(Array.isArray(transfers.deposits)).toBe(true);
-      expect(Array.isArray(transfers.withdrawals)).toBe(true);
+      const params: ITransferQueryParams = {
+        daoAddressOrEns: "0x680533bff2e194e52df204685d9aed5b874c4f63",
+        sortBy: TransferSortBy.CREATED_AT,
+        limit: 10,
+        skip: 0,
+        direction: SortDirection.ASC,
+      };
+      const transfers = await client.methods.getTransfers(params);
+      expect(Array.isArray(transfers)).toBe(true);
+      if (transfers) {
+        expect(transfers.length > 0).toBe(true);
+        for (const transfer of transfers) {
+          expect(transfer.amount).toBeGreaterThan(BigInt(0));
+          expect(typeof transfer.amount).toBe("bigint");
+          expect(transfer.creationDate).toBeInstanceOf(Date);
+          expect(typeof transfer.reference).toBe("string");
+          expect(transfer.transactionId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          if (transfer.tokenType === TokenType.NATIVE) {
+            if (transfer.type === TransferType.DEPOSIT) {
+              // ETH deposit
+              expect(isAddress(transfer.from)).toBe(true);
+            } else if (transfer.type === TransferType.WITHDRAW) {
+              // ETH withdraw
+              expect(isAddress(transfer.to)).toBe(true);
+            } else {
+              fail("invalid transfer type");
+            }
+          } else if (transfer.tokenType === TokenType.ERC20) {
+            expect(isAddress(transfer.token.address)).toBe(true);
+            expect(typeof transfer.token.decimals).toBe("number");
+            expect(typeof transfer.token.name).toBe("string");
+            expect(typeof transfer.token.symbol).toBe("string");
+            if (transfer.type === TransferType.DEPOSIT) {
+              // ERC20 deposit
+              expect(isAddress(transfer.from)).toBe(true);
+            } else if (transfer.type === TransferType.WITHDRAW) {
+              // ERC20 withdraw
+              expect(isAddress(transfer.to)).toBe(true);
+            } else {
+              fail("invalid transfer type");
+            }
+          } else {
+            fail("invalid token type");
+          }
+        }
+      } else {
+        fail("no transfers");
+      }
     });
+    it("Should get the transfers filtered by type", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx);
+      const transferType = TransferType.DEPOSIT
+      const params: ITransferQueryParams = {
+        sortBy: TransferSortBy.CREATED_AT,
+        limit: 10,
+        skip: 0,
+        direction: SortDirection.ASC,
+        type: transferType
+      };
+      const transfers = await client.methods.getTransfers(params);
+      expect(Array.isArray(transfers)).toBe(true);
+      if (transfers) {
+        expect(transfers.length > 0).toBe(true);
+        for (const transfer of transfers) {
+          expect(transfer.type).toBe(transferType)
+        }
+      } else {
+        fail("no transfers");
+      }
+    });
+
 
     test.todo(
       "Should return an empty array when getting the transfers of a DAO that does not exist",

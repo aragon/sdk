@@ -600,7 +600,7 @@ describe("Client", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx)
       const client = new ClientErc20(ctxPlugin);
 
-      const proposalId = "0x56fb7bd9491ff76f2eda54724c84c8b87a5a5fd7_0x0";
+      const proposalId = "0xb7bf1249ddf62e7196f21c4a12f9ef39e09c1632_0x0";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(typeof proposal).toBe("object");
@@ -731,7 +731,7 @@ describe("Client", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx)
       const client = new ClientErc20(ctxPlugin);
       const limit = 5;
-      const address = "0x663ac3c648548eb8ccd292b41a8ff829631c846d";
+      const address = "0xe0eb147d59f964a79cffc3736d5c620c4cb9c778";
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
@@ -782,7 +782,7 @@ describe("Client", () => {
       const client = new ClientErc20(ctxPlugin);
 
       const pluginAddress: string =
-        "0x12470f7e1b075efbbed95b85c0858aea1257566d";
+        "0xb7bf1249ddf62e7196f21c4a12f9ef39e09c1632";
       const settings = await client.methods.getSettings(pluginAddress);
       expect(settings === null).toBe(false);
       if (settings) {
@@ -797,7 +797,7 @@ describe("Client", () => {
       const client = new ClientErc20(ctxPlugin);
 
       const pluginAddress: string =
-        "0x12470f7e1b075efbbed95b85c0858aea1257566d";
+        "0xb7bf1249ddf62e7196f21c4a12f9ef39e09c1632";
       const token = await client.methods.getToken(pluginAddress);
       expect(typeof token?.address).toBe("string");
       expect(typeof token?.decimals).toBe("number");

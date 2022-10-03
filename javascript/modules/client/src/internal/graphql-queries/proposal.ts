@@ -16,8 +16,8 @@ query erc20Proposal($proposalId: ID!) {
       value
       data
     }
-    yea,
-    nay,
+    yes,
+    no,
     abstain
     supportRequiredPct,
     participationRequiredPct,
@@ -53,8 +53,8 @@ query erc20Proposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: In
     }
     creator
     metadata
-    yea,
-    nay,
+    yes,
+    no,
     abstain
     startDate
     endDate
@@ -73,7 +73,7 @@ query erc20Proposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: In
 
 export const QueryAddressListProposal = gql`
 query addressListProposal($proposalId: ID!) {
-  whitelistProposal(id: $proposalId){
+  allowlistProposal(id: $proposalId){
     id
     dao {
       id
@@ -87,8 +87,8 @@ query addressListProposal($proposalId: ID!) {
       value
       data
     }
-    yea,
-    nay,
+    yes,
+    no,
     abstain
     supportRequiredPct,
     participationRequired,
@@ -107,7 +107,7 @@ query addressListProposal($proposalId: ID!) {
 `;
 export const QueryAddressListProposals = gql`
 query addressListProposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: ERC20VotingProposal_orderBy!) {
-  whitelistProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
+  allowlistProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     dao {
       id
@@ -115,8 +115,8 @@ query addressListProposals($where: ERC20VotingProposal_filter!, $limit:Int!, $sk
     }
     creator
     metadata
-    yea,
-    nay,
+    yes,
+    no,
     abstain
     startDate
     endDate

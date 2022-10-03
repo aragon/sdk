@@ -1,7 +1,5 @@
 import {
   AssetBalance,
-  AssetDeposit,
-  AssetWithdrawal,
   DaoCreationSteps,
   DaoCreationStepValue,
   DaoDepositSteps,
@@ -9,7 +7,6 @@ import {
   DaoDetails,
   DaoListItem,
   DaoSortBy,
-  IAssetTransfers,
   IClient,
   ICreateParams,
   IDaoQueryParams,
@@ -21,10 +18,14 @@ import {
   IMetadata,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
+  ITransferQueryParams,
+  IWithdrawParams,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
-  IWithdrawParams,
+  SubgraphTransferListItem,
+  Transfer,
+  TransferSortBy,
 } from "./internal/interfaces/client";
 import {
   DAO__factory,
@@ -78,54 +79,12 @@ import {
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
+  toTransfer,
 } from "./internal/utils/client";
+import { QueryTransfers } from "./internal/graphql-queries/transfer";
 
 export { DaoCreationSteps, DaoDepositSteps };
 export { ICreateParams, IDepositParams };
-
-// This is a temporary token list, needs to remove later
-const assetList: AssetBalance[] = [
-  {
-    type: "native",
-    balance: BigInt("100000000000000000000"),
-    updateDate: new Date(
-      +new Date() - Math.floor(Random.getFloat() * 10000000000),
-    ),
-  },
-  {
-    type: "erc20",
-    address: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
-    name: "myjooje",
-    symbol: "JOJ",
-    decimals: 18,
-    balance: BigInt("100000000000000000000"),
-    updateDate: new Date(
-      +new Date() - Math.floor(Random.getFloat() * 10000000000),
-    ),
-  },
-  {
-    type: "erc20",
-    address: "0x35f7a3379b8d0613c3f753863edc85997d8d0968",
-    name: "Dummy Test Token",
-    symbol: "DTT",
-    decimals: 18,
-    balance: BigInt("100000000000000000000"),
-    updateDate: new Date(
-      +new Date() - Math.floor(Random.getFloat() * 10000000000),
-    ),
-  },
-  {
-    type: "erc20",
-    address: "0xd783d0f9d8f5c956b808d641dea2038b050389d1",
-    name: "Test Token",
-    symbol: "TTK",
-    decimals: 18,
-    balance: BigInt("100000000000000000000"),
-    updateDate: new Date(
-      +new Date() - Math.floor(Random.getFloat() * 10000000000),
-    ),
-  },
-];
 
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
@@ -167,12 +126,12 @@ export class Client extends ClientCore implements IClient {
     /**
      * Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)
      *
-     * @param {string} daoAddressOrEns
-     * @return {*}  {Promise<IAssetTransfers>}
+     * @param {ITransferQueryParams} params
+     * @return {*}  {Promise<Transfer[]>}
      * @memberof Client
      */
-    getTransfers: (daoAddressOrEns: string): Promise<IAssetTransfers> =>
-      this._getTransfers(daoAddressOrEns),
+    getTransfers: (params: ITransferQueryParams): Promise<Transfer[] | null> =>
+      this._getTransfers(params),
     /**
      * Retrieves metadata for DAO with given identifier (address or ens domain)
      *
@@ -694,7 +653,6 @@ export class Client extends ClientCore implements IClient {
     daoAddressorEns: string,
     _tokenAddresses: string[],
   ): Promise<AssetBalance[] | null> {
-    // TODO check address
     let address = daoAddressorEns;
     if (!isAddress(address)) {
       await this.web3.ensureOnline();
@@ -722,87 +680,64 @@ export class Client extends ClientCore implements IClient {
       // handle other tokens that are not ERC20 or eth
       return Promise.all(
         balances.map(
-          (balance: SubgraphBalance): AssetBalance =>
-            toAssetBalance(balance),
+          (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
         ),
       );
     } catch (err) {
       throw new GraphQLError("balance");
     }
   }
-  private async _getTransfers(
-    daoAddressOrEns: string,
-  ): Promise<IAssetTransfers> {
-    // TODO: Implement actual fetch logic using subgraph.
-    // Note: it would be nice if the client could be instantiated with dao identifier
-
-    if (!daoAddressOrEns) {
-      throw new Error("Invalid DAO address or ENS");
-    }
-
-    // This is a temporary transfer list, needs to remove later
-    const transfers = [
-      {
-        from: "0x9370ef1a59ad9cbaea30b92a6ae9dd82006c7ac0",
-        transactionId:
-          "0x4c97c60f499dc69918b1b77ab7504eeacbd1e1a536e10471e12c184885dafc05",
-      },
-      {
-        from: "0xb1dc5d0881eea99a61d28be66fc491aae2a13d6a",
-        transactionId:
-          "0x6b0b8b815d78b83a5a69a883244a3ca2bdc25832edee2bc45e7b6392ad57fd94",
-      },
-      {
-        from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
-        transactionId:
-          "0x08525a68b342be200c220f5a22d30425a262c5603e63c210b7664f26b8418bcc",
-      },
-      {
-        from: "0x2db75d8404144cd5918815a44b8ac3f4db2a7faf",
-        transactionId:
-          "0x8269a60f658e33393d3f20d065cd5107d410d41c5dba9e5c467efcd3f98db015",
-      },
-    ];
-
-    const deposits: AssetDeposit[] = assetList.map(
-      (assetBalance, index: number) => {
-        if (assetBalance.type === "erc20") {
-          const result: AssetDeposit = {
-            type: "erc20",
-            address: assetBalance.address,
-            name: assetBalance.name,
-            symbol: assetBalance.symbol,
-            decimals: assetBalance.decimals,
-            from: transfers[index].from,
-            amount: assetBalance.balance,
-            reference: "Some reference",
-            transactionId: transfers[index].transactionId,
-            // Generate a random date in the past
-            date: new Date(
-              +new Date() - Math.floor(Random.getFloat() * 10000000000),
-            ),
-          };
-          return result;
+  private async _getTransfers({
+    daoAddressOrEns,
+    type,
+    limit = 10,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = TransferSortBy.CREATED_AT,
+  }: ITransferQueryParams): Promise<Transfer[] | null> {
+    let where = {};
+    let address = daoAddressOrEns;
+    if (address) {
+      if (!isAddress(address)) {
+        await this.web3.ensureOnline();
+        const provider = this.web3.getProvider();
+        if (!provider) {
+          throw new NoProviderError();
         }
-        const result: AssetDeposit = {
-          type: "native",
-          from: transfers[index].from,
-          amount: assetBalance.balance,
-          reference: "Some reference",
-          transactionId: transfers[index].transactionId,
-          // Generate a random date in the past
-          date: new Date(
-            +new Date() - Math.floor(Random.getFloat() * 10000000000),
-          ),
-        };
-        return result;
-      },
-    );
-
-    // Withdraw data structure would be similar to deposit list
-    const withdrawals: AssetWithdrawal[] = [];
-
-    return Promise.resolve({ deposits, withdrawals });
+        const resolvedAddress = await provider.resolveName(address);
+        if (!resolvedAddress) {
+          throw new InvalidAddressOrEnsError();
+        }
+        address = resolvedAddress;
+      }
+      where = { dao: address };
+    }
+    if (type) {
+      where = { ...where, type: type };
+    }
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { vaultTransfers }: { vaultTransfers: SubgraphTransferListItem[] } =
+        await client.request(QueryTransfers, {
+          where,
+          limit,
+          skip,
+          direction,
+          sortBy,
+        });
+      if (!vaultTransfers) {
+        return null;
+      }
+      return Promise.all(
+        vaultTransfers.map(
+          (transfer: SubgraphTransferListItem): Transfer =>
+            toTransfer(transfer),
+        ),
+      );
+    } catch {
+      throw new GraphQLError("transfer");
+    }
   }
 
   private _buildGrantAction(

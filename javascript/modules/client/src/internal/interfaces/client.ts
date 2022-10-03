@@ -22,7 +22,7 @@ export interface IClient extends IClientCore {
       tokenAddresses: string[],
     ) => Promise<AssetBalance[] | null>;
     /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
-    getTransfers: (daoAddressOrEns: string) => Promise<IAssetTransfers>;
+    getTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
     /** Checks whether a role is granted by the current DAO's ACL settings */
     hasPermission: (
       where: string,
@@ -209,33 +209,47 @@ export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & {
 };
 
 // Token transfers
-
-type NativeTokenTransfer = NativeTokenBase & {
-  amount: bigint;
-  date: Date;
-  reference: string;
-  transactionId: string;
-};
-
-type Erc20TokenTransfer = Erc20TokenBase & {
-  amount: bigint;
-  date: Date;
-  reference: string;
-  transactionId: string;
-};
-
-export type AssetDeposit = (NativeTokenTransfer | Erc20TokenTransfer) & {
-  from: string;
-};
-
-export type AssetWithdrawal = (NativeTokenTransfer | Erc20TokenTransfer) & {
-  to: string;
-};
-
-export interface IAssetTransfers {
-  deposits: AssetDeposit[];
-  withdrawals: AssetWithdrawal[];
+export enum TransferType {
+  DEPOSIT = "Deposit",
+  WITHDRAW = "Withdraw",
 }
+export enum TokenType {
+  NATIVE = "native",
+  ERC20 = "erc20",
+}
+
+type BaseTokenTransfer = {
+  amount: bigint;
+  creationDate: Date;
+  reference: string;
+  transactionId: string;
+};
+
+type NativeTokenTransfer = BaseTokenTransfer & {
+  tokenType: TokenType.NATIVE;
+};
+
+type Erc20TokenTransfer = BaseTokenTransfer & {
+  tokenType: TokenType.ERC20;
+  token: {
+    address: string;
+    name: string;
+    symbol: string;
+    decimals: number;
+  };
+};
+
+export type Deposit = (NativeTokenTransfer | Erc20TokenTransfer) & {
+  from: string;
+  type: TransferType.DEPOSIT;
+};
+
+export type Withdraw = (NativeTokenTransfer | Erc20TokenTransfer) & {
+  to: string;
+  type: TransferType.WITHDRAW;
+};
+
+export type Transfer = Deposit | Withdraw;
 
 // DAO details
 
@@ -267,6 +281,15 @@ export type DaoListItem = {
 export interface IDaoQueryParams extends IPagination {
   sortBy?: DaoSortBy;
 }
+export interface ITransferQueryParams extends IPagination {
+  sortBy?: TransferSortBy;
+  type?: TransferType;
+  daoAddressOrEns?: string;
+}
+
+export enum TransferSortBy {
+  CREATED_AT = "createdAt", // currently defined as number of proposals
+}
 
 export enum DaoSortBy {
   CREATED_AT = "createdAt",
@@ -276,7 +299,7 @@ export enum DaoSortBy {
 
 export enum SubgraphPluginTypeName {
   ERC20 = "ERC20VotingPackage",
-  ADDRESS_LIST = "WhitelistPackage",
+  ADDRESS_LIST = "AllowlistPackage",
 }
 
 export const SubgraphPluginTypeMap: Map<SubgraphPluginTypeName, string> =
@@ -314,4 +337,25 @@ export type SubgraphBalance = {
   };
   balance: string;
   lastUpdated: string;
+};
+
+export enum SubgraphTransferType {
+  DEPOSIT = "Deposit",
+  WITHDRAW = "Withdraw",
+}
+export type SubgraphTransferListItem = {
+  amount: string;
+  createdAt: string;
+  reference: string;
+  transaction: string;
+  type: SubgraphTransferType;
+  to: string;
+  sender: string;
+  token: SubgraphErc20Token;
+};
+export type SubgraphErc20Token = {
+  id: string;
+  name: string;
+  symbol: string;
+  decimals: string;
 };

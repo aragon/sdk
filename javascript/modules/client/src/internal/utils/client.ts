@@ -9,6 +9,11 @@ import {
   SubgraphDaoListItem,
   SubgraphPluginListItem,
   SubgraphPluginTypeMap,
+  SubgraphTransferListItem,
+  SubgraphTransferType,
+  TokenType,
+  Transfer,
+  TransferType,
 } from "../interfaces/client";
 
 export function toDaoDetails(
@@ -95,5 +100,63 @@ export function toAssetBalance(balance: SubgraphBalance): AssetBalance {
     decimals: parseInt(balance.token.decimals),
     balance: BigInt(balance.balance),
     updateDate,
+  };
+}
+
+export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
+  const creationDate = new Date(parseInt(transfer.createdAt) * 1000);
+  if (transfer.token.symbol === "ETH") {
+    if (transfer.type === SubgraphTransferType.DEPOSIT) {
+      return {
+        type: TransferType.DEPOSIT,
+        tokenType: TokenType.NATIVE,
+        amount: BigInt(transfer.amount),
+        creationDate,
+        reference: transfer.reference,
+        transactionId: transfer.transaction,
+        from: transfer.sender,
+      };
+    }
+    return {
+      type: TransferType.WITHDRAW,
+      tokenType: TokenType.NATIVE,
+      amount: BigInt(transfer.amount),
+      creationDate,
+      reference: transfer.reference,
+      transactionId: transfer.transaction,
+      to: transfer.to,
+    };
+  }
+  if (transfer.type === SubgraphTransferType.DEPOSIT) {
+    return {
+      type: TransferType.DEPOSIT,
+      tokenType: TokenType.ERC20,
+      token: {
+        address: transfer.token.id,
+        name: transfer.token.name,
+        symbol: transfer.token.symbol,
+        decimals: parseInt(transfer.token.decimals),
+      },
+      amount: BigInt(transfer.amount),
+      creationDate,
+      reference: transfer.reference,
+      transactionId: transfer.transaction,
+      from: transfer.sender,
+    };
+  }
+  return {
+    type: TransferType.WITHDRAW,
+    tokenType: TokenType.ERC20,
+    token: {
+      address: transfer.token.id,
+      name: transfer.token.name,
+      symbol: transfer.token.symbol,
+      decimals: parseInt(transfer.token.decimals),
+    },
+    amount: BigInt(transfer.amount),
+    creationDate,
+    reference: transfer.reference,
+    transactionId: transfer.transaction,
+    to: transfer.to,
   };
 }
