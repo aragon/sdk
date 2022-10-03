@@ -76,7 +76,6 @@ const contextParams: ContextParams = {
   ],
   graphqlNodes: [{
     url:
-      // "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
       "https://api.thegraph.com/subgraphs/name/josemarinas/josemarinas-core-rinkeby",
   }],
 };
@@ -106,7 +105,6 @@ const contextParamsLocalChain: ContextParams = {
   graphqlNodes: [{
     url:
       "https://api.thegraph.com/subgraphs/name/josemarinas/josemarinas-core-rinkeby",
-    // "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
   }],
 };
 
