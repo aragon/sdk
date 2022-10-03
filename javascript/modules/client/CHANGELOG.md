@@ -17,6 +17,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+- Transfers as an unique object
+- Filtering on `getTransfers`
+### Fixed
+- Dao subgraph queries
+- Proposal subgraph queries
 
 ## 0.9.0-alpha
 On 2022-09-29 12:58:04
