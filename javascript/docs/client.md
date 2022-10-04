@@ -478,7 +478,7 @@ so that the plugin is configured</p>
     * [.create(params)](#Client.create) ⇒ <code>\*</code>
     * [.deposit(params)](#Client.deposit) ⇒ <code>\*</code>
     * [.getBalances(daoAddressOrEns, tokenAddresses)](#Client.getBalances) ⇒ <code>\*</code>
-    * [.getTransfers(daoAddressOrEns)](#Client.getTransfers) ⇒ <code>\*</code>
+    * [.getTransfers(params)](#Client.getTransfers) ⇒ <code>\*</code>
     * [.getDao(daoAddressOrEns)](#Client.getDao) ⇒ <code>\*</code>
     * [.getDaos(params)](#Client.getDaos) ⇒ <code>\*</code>
     * [.hasPermission(where, who, role, data)](#Client.hasPermission) ⇒ <code>\*</code>
@@ -536,15 +536,15 @@ so that the plugin is configured</p>
 
 <a name="Client.getTransfers"></a>
 
-### Client.getTransfers(daoAddressOrEns) ⇒ <code>\*</code>
+### Client.getTransfers(params) ⇒ <code>\*</code>
 <p>Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)</p>
 
 **Kind**: static method of [<code>Client</code>](#Client)  
-**Returns**: <code>\*</code> - <p>{Promise<IAssetTransfers>}</p>  
+**Returns**: <code>\*</code> - <p>{Promise&lt;Transfer[]&gt;}</p>  
 
 | Param | Type |
 | --- | --- |
-| daoAddressOrEns | <code>string</code> | 
+| params | <code>ITransferQueryParams</code> | 
 
 <a name="Client.getDao"></a>
 
