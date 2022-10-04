@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+## 0.10.2-alpha
+On 2022-10-04 16:58:38
+
 ## 0.10.1-alpha
 On 2022-10-04 15:35:36
 ### Fixed
