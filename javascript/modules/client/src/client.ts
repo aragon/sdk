@@ -83,8 +83,6 @@ import {
 } from "./internal/utils/client";
 import { QueryTransfers } from "./internal/graphql-queries/transfer";
 
-export { DaoCreationSteps, DaoDepositSteps };
-export { ICreateParams, IDepositParams };
 
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
