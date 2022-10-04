@@ -4,35 +4,57 @@ export * from "./client-addressList";
 export * from "./context";
 export * from "./context-plugin";
 export {
+  AssetBalance,
+  DaoCreationSteps,
+  DaoDepositSteps,
   DaoDetails,
   DaoListItem,
   DaoSortBy,
+  Deposit,
+  ICreateParams,
   IDaoQueryParams,
-  AssetBalance,
+  IDepositParams,
+  IFreezePermissionDecodedParams,
+  IFreezePermissionParams,
+  IGrantPermissionDecodedParams,
+  IGrantPermissionParams,
+  IMetadata,
   InstalledPluginListItem,
-  IWithdrawParams
+  IRevokePermissionDecodedParams,
+  IRevokePermissionParams,
+  ITransferQueryParams,
+  IWithdrawParams,
+  Transfer,
+  TransferSortBy,
+  TransferType,
+  Withdraw,
 } from "./internal/interfaces/client";
 
 export {
+  GasFeeEstimation,
+  IInterfaceParams,
   SortDirection,
-  GasFeeEstimation
 } from "./internal/interfaces/common";
 
 export {
-  IErc20PluginInstall,
-  ICreateProposalParams,
-  ProposalCreationSteps,
-  VoteValues,
-  VoteProposalStep,
-  ExecuteProposalStep,
-  IProposalQueryParams,
-  ProposalSortBy,
-  Erc20ProposalListItem,
-  AddressListProposalListItem,
   AddressListProposal,
+  AddressListProposalListItem,
+  Erc20Proposal,
+  Erc20ProposalListItem,
+  Erc20TokenDetails,
+  ExecuteProposalStep,
   IAddressListPluginInstall,
+  ICanVoteParams,
+  ICreateProposalParams,
+  IErc20PluginInstall,
+  IExecuteProposalParams,
+  IMintTokenParams,
+  IPluginSettings,
+  IProposalQueryParams,
   IProposalSettings,
-  Erc20Proposal
+  IVoteProposalParams,
+  ProposalCreationSteps,
+  ProposalSortBy,
+  VoteProposalStep,
+  VoteValues,
 } from "./internal/interfaces/plugins";
-
-
