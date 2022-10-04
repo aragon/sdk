@@ -423,7 +423,7 @@ export class ClientAddressList extends ClientCore
 
   private async _getProposals({
     daoAddressOrEns,
-    limit = 0,
+    limit = 10,
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = ProposalSortBy.CREATED_AT,
