@@ -353,60 +353,66 @@ Retrieves the list of asset transfers to and from the given DAO (by default,
 from ETH, DAI, USDC and USDT, on Mainnet)
 
 ```ts
-import { Client, Context } from "@aragon/sdk-client";
-import { Wallet } from "ethers";
+import { Client, Context, ITransferQueryParams } from "@aragon/sdk-client";
 
 const context: Context = new Context(params);
 const client: Client = new Client(context);
-const daoAddressOrEns = "0x12345...";
-const transfers = await client.methods.getTransfers(daoAddressOrEns);
+const params: ITransferQueryParams = {
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890",
+  sortBy: TransferSortBy.CREATED_AT,
+  limit: 10,
+  skip: 0,
+  direction: SortDirection.ASC,
+  type: transferType,
+};
+const transfers = await client.methods.getTransfers(params);
 console.log(transfers);
 
 /*
- deposits: [
+[
   {
-    type: "erc20",
-    address: "0x1234567890...",
-    name: "Token",
-    symbol: "TOK",
-    decimals: 10,
-    from: "0x123456789...",
-    amount: 10n,
-    reference: "Some reference",
-    transactionId: "0x1234567890...",
-    date: <Date>
+    type: "Withdraw",
+    tokenType: "erc20",
+    token: {
+      address: "0xc7ad46e0b8a400bb3c915120d284aafba8fc4735",
+      name: "Dai Stablecoin",
+      symbol: "DAI",
+      decimals: 18,
+    },
+    amount: 1000000000000000n,
+    creationDate: {
+    },
+    reference: "withdrawing from dao to:0xc8541aAE19C5069482239735AD64FAC3dCc52Ca2",
+    transactionId: "0xdb0f9422b5c3199021481c98a655741ca16119ff8a59571854a94a6f31dad7ba",
+    to: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
   },
   {
-    type: "native",
-    from: "0x123456789...",
-    amount: 100n,
-    reference: "Some reference 2",
-    transactionId: "0x1234567890...",
-    date: <Date>
-  }
- ],
- withdrawals: [
-  {
-    type: "erc20",
-    address: "0x1234567890...",
-    name: "Token",
-    symbol: "TOK",
-    decimals: 10,
-    from: "0x123456789...",
-    amount: 10n,
-    reference: "Some reference",
-    transactionId: "0x1234567890...",
-    date: <Date>
+    type: "Deposit",
+    tokenType: "native",
+    amount: 1000000000000000n,
+    creationDate: {
+    },
+    reference: "dummy deposit of ETH, amount:0.001",
+    transactionId: "0xc18b310b2f8cf427d95fa905dc842df2cf999075f18579afbcbdce19f8db0a30",
+    from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
   },
   {
-    type: "native",
-    from: "0x123456789...",
-    amount: 100n,
-    reference: "Some reference 2",
-    transactionId: "0x1234567890...",
-    date: <Date>
-  }
- ]
+    type: "Deposit",
+    tokenType: "erc20",
+    token: {
+      address: "0xc7ad46e0b8a400bb3c915120d284aafba8fc4735",
+      name: "Dai Stablecoin",
+      symbol: "DAI",
+      decimals: 18,
+    },
+    amount: 1000000000000000n,
+    creationDate: {
+    },
+    reference: "dummy deposit of:Daiamount:0.001",
+    transactionId: "0xdd8fff77c1f3e819d4224f8d02a00583c7e5d55475b8a9d70867aee0d6d16f07",
+    from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
+  },
+]
  */
 ```
 
@@ -752,14 +758,15 @@ for await (const step of steps) {
   }
 }
 ```
+
 ### Checking if user can vote in an ERC20 proposal
 
 ```ts
 import {
+  CanVoteStep,
   ClientErc20,
   Context,
   ContextPlugin,
-  CanVoteStep,
   ICanVoteParams,
 } from "@aragon/sdk-client";
 
@@ -777,12 +784,11 @@ const params: ICanVoteParams = {
 };
 
 const canVote = await client.methods.canVote(voteParams);
-console.log(canVote)
+console.log(canVote);
 /*
 true
 */
 ```
-
 
 ### Loading the list of members (ERC20)
 
@@ -1345,10 +1351,10 @@ for await (const step of steps) {
 
 ```ts
 import {
+  CanVoteStep,
   ClientAddressList,
   Context,
   ContextPlugin,
-  CanVoteStep,
   ICanVoteParams,
 } from "@aragon/sdk-client";
 
@@ -1366,7 +1372,7 @@ const params: ICanVoteParams = {
 };
 
 const canVote = await client.methods.canVote(voteParams);
-console.log(canVote)
+console.log(canVote);
 /*
 true
 */

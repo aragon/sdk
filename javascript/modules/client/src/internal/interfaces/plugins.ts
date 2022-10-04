@@ -334,8 +334,8 @@ export enum ProposalSortBy {
 }
 
 export enum SubgraphVoteValues {
-  YES = "Yea",
-  NO = "Nay",
+  YES = "Yes",
+  NO = "No",
   ABSTAIN = "Abstain",
 }
 export const SubgraphVoteValuesMap: Map<SubgraphVoteValues, VoteValues> =
@@ -371,8 +371,8 @@ type SubgraphProposalBase = {
   };
   creator: string;
   metadata: string;
-  yea: string;
-  nay: string;
+  yes: string;
+  no: string;
   abstain: string;
   startDate: string;
   endDate: string;
@@ -411,8 +411,8 @@ export type SubgraphAddressListProposal = SubgraphProposalBase & {
 export interface IComputeStatusProposal {
   startDate: string;
   endDate: string;
-  yea: string;
-  nay: string;
+  yes: string;
+  no: string;
   executed: boolean;
 }
 

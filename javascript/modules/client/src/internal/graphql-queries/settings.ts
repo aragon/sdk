@@ -11,7 +11,7 @@ query erc20PluginSettings($address: ID!) {
 `;
 export const QueryAddressListPluginSettings = gql`
 query AddressListPluginSettings($address: ID!) {
-  whitelistPackage(id: $address){
+  allowlistPackage(id: $address){
     supportRequiredPct
     participationRequiredPct
     minDuration

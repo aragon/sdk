@@ -397,8 +397,8 @@ export class ClientAddressList extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { whitelistProposal: addressListProposal }: {
-        whitelistProposal: SubgraphAddressListProposal;
+      const { allowlistProposal: addressListProposal }: {
+        allowlistProposal: SubgraphAddressListProposal;
       } = await client.request(
         QueryAddressListProposal,
         {
@@ -448,8 +448,8 @@ export class ClientAddressList extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { whitelistProposals: addressListProposals }: {
-        whitelistProposals: SubgraphAddressListProposalListItem[];
+      const { allowlistProposals: addressListProposals }: {
+        allowlistProposals: SubgraphAddressListProposalListItem[];
       } = await client.request(
         QueryAddressListProposals,
         {
@@ -598,22 +598,22 @@ export class ClientAddressList extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { whitelistPackage } = await client.request(
+      const { allowlistPackage } = await client.request(
         QueryAddressListPluginSettings,
         {
           address: pluginAddress,
         },
       );
-      if (!whitelistPackage) {
+      if (!allowlistPackage) {
         return null;
       }
       return {
         // TODO
         // the number of decimals in the minSupport and minTurnout
         // is wrong, they have no precision
-        minDuration: parseInt(whitelistPackage.minDuration),
-        minSupport: parseFloat(whitelistPackage.supportRequiredPct),
-        minTurnout: parseFloat(whitelistPackage.participationRequiredPct),
+        minDuration: parseInt(allowlistPackage.minDuration),
+        minSupport: parseFloat(allowlistPackage.supportRequiredPct),
+        minTurnout: parseFloat(allowlistPackage.participationRequiredPct),
       };
     } catch {
       throw new Error("Cannot fetch the settings data from GraphQL");

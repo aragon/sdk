@@ -34,7 +34,7 @@ export function computeProposalStatus(
   } else if (proposal.executed) {
     return ProposalStatus.EXECUTED;
   } else if (
-    proposal.yea && proposal.nay && BigInt(proposal.yea) > BigInt(proposal.nay)
+    proposal.yes && proposal.no && BigInt(proposal.yes) > BigInt(proposal.no)
   ) {
     return ProposalStatus.SUCCEEDED;
   } else {
@@ -86,8 +86,8 @@ export function toAddressListProposal(
     ),
     status: computeProposalStatus(proposal),
     result: {
-      yes: proposal.yea ? parseInt(proposal.yea) : 0,
-      no: proposal.nay ? parseInt(proposal.nay) : 0,
+      yes: proposal.yes ? parseInt(proposal.yes) : 0,
+      no: proposal.no ? parseInt(proposal.no) : 0,
       abstain: proposal.abstain ? parseInt(proposal.abstain) : 0,
     },
     settings: {
@@ -149,8 +149,8 @@ export function toAddressListProposalListItem(
     endDate,
     status: computeProposalStatus(proposal),
     result: {
-      yes: proposal.yea ? parseInt(proposal.yea) : 0,
-      no: proposal.nay ? parseInt(proposal.nay) : 0,
+      yes: proposal.yes ? parseInt(proposal.yes) : 0,
+      no: proposal.no ? parseInt(proposal.no) : 0,
       abstain: proposal.abstain ? parseInt(proposal.abstain) : 0,
     },
   };
@@ -199,8 +199,8 @@ export function toErc20Proposal(
     ),
     status: computeProposalStatus(proposal),
     result: {
-      yes: proposal.yea ? BigInt(proposal.yea) : BigInt(0),
-      no: proposal.nay ? BigInt(proposal.nay) : BigInt(0),
+      yes: proposal.yes ? BigInt(proposal.yes) : BigInt(0),
+      no: proposal.no ? BigInt(proposal.no) : BigInt(0),
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     settings: {
@@ -271,8 +271,8 @@ export function toErc20ProposalListItem(
     endDate,
     status: computeProposalStatus(proposal),
     result: {
-      yes: proposal.yea ? BigInt(proposal.yea) : BigInt(0),
-      no: proposal.nay ? BigInt(proposal.nay) : BigInt(0),
+      yes: proposal.yes ? BigInt(proposal.yes) : BigInt(0),
+      no: proposal.no ? BigInt(proposal.no) : BigInt(0),
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     token: {
