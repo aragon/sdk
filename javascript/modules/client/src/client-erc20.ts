@@ -541,7 +541,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
 
   private async _getProposals({
     daoAddressOrEns,
-    limit = 0,
+    limit = 10,
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = ProposalSortBy.CREATED_AT,
