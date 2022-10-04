@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## 0.10.0-alpha
+On 2022-10-04 10:32:59
 ### Added
 - Transfers as an unique object
 - Filtering on `getTransfers`
