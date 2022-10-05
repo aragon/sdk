@@ -36,8 +36,12 @@ export function computeProposalStatus(
   } else if (
     proposal.yes && proposal.no && BigInt(proposal.yes) > BigInt(proposal.no)
   ) {
+    // TODO
+    // review this status because it is not correct
     return ProposalStatus.SUCCEEDED;
   } else {
+    // TODO
+    // review this status because it is not correct
     return ProposalStatus.DEFEATED;
   }
 }
@@ -58,14 +62,10 @@ export function computeProposalStatusFilter(
       where = { executed: true };
       break;
     case ProposalStatus.SUCCEEDED:
-      // TODO
-      // add suceeded property on subgraph
-      where = { winningOption: VoteValues.YES, endDate_lt: now };
+      where = { executable: true, endDate_lt: now };
       break;
     case ProposalStatus.DEFEATED:
-      // TODO
-      // add suceeded property on subgraph
-      where = { winningOption: VoteValues.NO, endDate_lt: now };
+      where = { executable: false, endDate_lt: now };
       break;
     default:
       throw new Error("invalid proposal status");
