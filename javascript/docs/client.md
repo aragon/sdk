@@ -916,7 +916,7 @@ so that the plugin is configured</p>
 <p>Checks if an user can vote in a proposal</p>
 
 **Kind**: global function  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<CanVoteStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
 
 | Param | Type |
 | --- | --- |
