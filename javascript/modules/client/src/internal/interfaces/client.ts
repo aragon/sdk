@@ -247,6 +247,7 @@ export type Deposit = (NativeTokenTransfer | Erc20TokenTransfer) & {
 export type Withdraw = (NativeTokenTransfer | Erc20TokenTransfer) & {
   to: string;
   type: TransferType.WITHDRAW;
+  proposalId: string;
 };
 
 export type Transfer = Deposit | Withdraw;
@@ -353,6 +354,9 @@ export type SubgraphTransferListItem = {
   to: string;
   sender: string;
   token: SubgraphErc20Token;
+  proposal: {
+    id: string | null;
+  };
 };
 
 export type SubgraphErc20Token = {

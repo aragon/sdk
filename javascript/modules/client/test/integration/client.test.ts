@@ -1030,6 +1030,7 @@ describe("Client", () => {
             } else if (transfer.type === TransferType.WITHDRAW) {
               // ETH withdraw
               expect(isAddress(transfer.to)).toBe(true);
+              expect(transfer.proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
             } else {
               fail("invalid transfer type");
             }
@@ -1044,6 +1045,7 @@ describe("Client", () => {
             } else if (transfer.type === TransferType.WITHDRAW) {
               // ERC20 withdraw
               expect(isAddress(transfer.to)).toBe(true);
+              expect(transfer.proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
             } else {
               fail("invalid transfer type");
             }
