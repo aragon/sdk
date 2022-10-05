@@ -24,6 +24,7 @@ import {
   SubgraphDao,
   SubgraphDaoListItem,
   SubgraphTransferListItem,
+  SubgraphTransferTypeMap,
   Transfer,
   TransferSortBy,
 } from "./internal/interfaces/client";
@@ -711,7 +712,7 @@ export class Client extends ClientCore implements IClient {
       where = { dao: address };
     }
     if (type) {
-      where = { ...where, type: type };
+      where = { ...where, type: SubgraphTransferTypeMap.get(type)};
     }
     try {
       await this.graphql.ensureOnline();

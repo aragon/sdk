@@ -361,3 +361,8 @@ export type SubgraphErc20Token = {
   symbol: string;
   decimals: string;
 };
+export const SubgraphTransferTypeMap: Map<TransferType, SubgraphTransferType> =
+  new Map([
+    [TransferType.DEPOSIT, SubgraphTransferType.DEPOSIT],
+    [TransferType.WITHDRAW, SubgraphTransferType.WITHDRAW],
+  ]);
