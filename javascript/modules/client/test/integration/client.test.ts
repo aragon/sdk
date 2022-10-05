@@ -76,7 +76,7 @@ const contextParams: ContextParams = {
   ],
   graphqlNodes: [{
     url:
-      "https://api.thegraph.com/subgraphs/name/josemarinas/josemarinas-core-rinkeby",
+      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
   }],
 };
 
@@ -104,7 +104,7 @@ const contextParamsLocalChain: ContextParams = {
   ],
   graphqlNodes: [{
     url:
-      "https://api.thegraph.com/subgraphs/name/josemarinas/josemarinas-core-rinkeby",
+      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
   }],
 };
 
@@ -1058,26 +1058,25 @@ describe("Client", () => {
     it("Should get the transfers filtered by type", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const client = new Client(ctx);
-      const transferType = TransferType.DEPOSIT
+      const transferType = TransferType.DEPOSIT;
       const params: ITransferQueryParams = {
         sortBy: TransferSortBy.CREATED_AT,
         limit: 10,
         skip: 0,
         direction: SortDirection.ASC,
-        type: transferType
+        type: transferType,
       };
       const transfers = await client.methods.getTransfers(params);
       expect(Array.isArray(transfers)).toBe(true);
       if (transfers) {
         expect(transfers.length > 0).toBe(true);
         for (const transfer of transfers) {
-          expect(transfer.type).toBe(transferType)
+          expect(transfer.type).toBe(transferType);
         }
       } else {
         fail("no transfers");
       }
     });
-
 
     test.todo(
       "Should return an empty array when getting the transfers of a DAO that does not exist",

@@ -210,8 +210,8 @@ export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & {
 
 // Token transfers
 export enum TransferType {
-  DEPOSIT = "Deposit",
-  WITHDRAW = "Withdraw",
+  DEPOSIT = "deposit",
+  WITHDRAW = "withdraw",
 }
 export enum TokenType {
   NATIVE = "native",
@@ -343,6 +343,7 @@ export enum SubgraphTransferType {
   DEPOSIT = "Deposit",
   WITHDRAW = "Withdraw",
 }
+
 export type SubgraphTransferListItem = {
   amount: string;
   createdAt: string;
@@ -353,6 +354,7 @@ export type SubgraphTransferListItem = {
   sender: string;
   token: SubgraphErc20Token;
 };
+
 export type SubgraphErc20Token = {
   id: string;
   name: string;
