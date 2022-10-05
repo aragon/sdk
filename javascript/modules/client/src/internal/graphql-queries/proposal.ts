@@ -24,6 +24,7 @@ query erc20Proposal($proposalId: ID!) {
     startDate
     endDate
     executed
+    executable
     voters{
       voter{
         id
@@ -59,6 +60,7 @@ query erc20Proposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: In
     startDate
     endDate
     executed
+    executable
     pkg{
 			token{
         symbol
@@ -95,6 +97,7 @@ query addressListProposal($proposalId: ID!) {
     startDate
     endDate
     executed
+    executable
     voters{
       voter{
         id
@@ -121,6 +124,7 @@ query addressListProposals($where: ERC20VotingProposal_filter!, $limit:Int!, $sk
     startDate
     endDate
     executed
+    executable
   }
 }
 `;

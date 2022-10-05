@@ -34,14 +34,10 @@ export function computeProposalStatus(
   } else if (proposal.executed) {
     return ProposalStatus.EXECUTED;
   } else if (
-    proposal.yes && proposal.no && BigInt(proposal.yes) > BigInt(proposal.no)
+    proposal.executable
   ) {
-    // TODO
-    // review this status because it is not correct
     return ProposalStatus.SUCCEEDED;
   } else {
-    // TODO
-    // review this status because it is not correct
     return ProposalStatus.DEFEATED;
   }
 }
