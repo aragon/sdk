@@ -408,7 +408,7 @@ console.log(transfers);
     reference: "dummy deposit of:Daiamount:0.001",
     transactionId: "0xdd8fff77c1f3e819d4224f8d02a00583c7e5d55475b8a9d70867aee0d6d16f07",
     from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
-  },d
+  }
 ]
  */
 ```
