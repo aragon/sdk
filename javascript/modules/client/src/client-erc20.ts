@@ -117,7 +117,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * Checks if an user can vote in a proposal
      *
      * @param {ICanVoteParams} params
-     * @returns {*}  {AsyncGenerator<CanVoteStepValue>}
+     * @returns {*}  {Promise<boolean>}
      */
     canVote: (
       params: ICanVoteParams,

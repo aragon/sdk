@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+- Fixed APP-1032 comments
 
 ## 0.10.2-alpha
 On 2022-10-04 16:58:38

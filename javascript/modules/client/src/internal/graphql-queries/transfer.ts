@@ -9,6 +9,9 @@ query transfers($where: VaultTransfer_filter!, $limit:Int!, $skip: Int!, $direct
       symbol
       decimals
     }
+    proposal{
+      id
+    }
     type
     amount
     createdAt
