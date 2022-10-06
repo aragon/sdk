@@ -760,7 +760,6 @@ for await (const step of steps) {
 
 ```ts
 import {
-  CanVoteStep,
   ClientErc20,
   Context,
   ContextPlugin,
@@ -1351,7 +1350,6 @@ for await (const step of steps) {
 
 ```ts
 import {
-  CanVoteStep,
   ClientAddressList,
   Context,
   ContextPlugin,
