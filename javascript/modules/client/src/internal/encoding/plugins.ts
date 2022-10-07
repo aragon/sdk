@@ -15,6 +15,10 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import {
+  ContractAddressListInitParams,
+  ContractErc20InitParams,
+  ContractMintTokenParams,
+  ContractPluginSettings,
   IAddressListPluginInstall,
   IErc20PluginInstall,
   IMintTokenParams,
@@ -31,22 +35,22 @@ export function getFunctionFragment(data: Uint8Array): FunctionFragment {
 }
 
 export function encodeAddressListActionInit(
-  params: IAddressListPluginInstall,
+  params: IAddressListPluginInstall
 ): Uint8Array {
   const addressListVotingInterface = WhitelistVoting__factory.createInterface();
-  const args = unwrapAddressListInitParams(params);
+  const args = addressListInitParamsToContract(params);
   // get hex bytes
   const hexBytes = addressListVotingInterface.encodeFunctionData(
     "initialize",
-    args,
+    args
   );
   // Strip 0x => encode in Uint8Array
   return hexToBytes(strip0x(hexBytes));
 }
 
-function unwrapAddressListInitParams(
-  params: IAddressListPluginInstall,
-): [string, string, BigNumber, BigNumber, BigNumber, string[]] {
+function addressListInitParamsToContract(
+  params: IAddressListPluginInstall
+): ContractAddressListInitParams {
   // TODO
   // not sure if the IDao and gsn params will be needed after
   // this is converted into a plugin
@@ -62,16 +66,16 @@ function unwrapAddressListInitParams(
 
 export function encodeErc20ActionInit(params: IErc20PluginInstall): Uint8Array {
   const erc20votingInterface = ERC20Voting__factory.createInterface();
-  const args = unwrapErc20InitParams(params);
+  const args = erc20InitParamsToContract(params);
   // get hex bytes
   const hexBytes = erc20votingInterface.encodeFunctionData("initialize", args);
   // Strip 0x => encode in Uint8Array
   return hexToBytes(strip0x(hexBytes));
 }
 
-function unwrapErc20InitParams(
-  params: IErc20PluginInstall,
-): [string, string, BigNumber, BigNumber, BigNumber, string] {
+function erc20InitParamsToContract(
+  params: IErc20PluginInstall
+): ContractErc20InitParams {
   // TODO
   // the SC specifies a token field but there is not format on thhis field
   // or how data should be passed to this in case it is using an existing
@@ -94,19 +98,19 @@ function unwrapErc20InitParams(
 }
 
 export function encodeUpdatePluginSettingsAction(
-  params: IPluginSettings,
+  params: IPluginSettings
 ): Uint8Array {
   const votingInterface = MajorityVoting__factory.createInterface();
-  const args = unwrapUpdatePluginSettings(params);
+  const args = pluginSettingsToContract(params);
   // get hex bytes
   const hexBytes = votingInterface.encodeFunctionData("changeVoteConfig", args);
   // Strip 0x => encode in Uint8Array
   return hexToBytes(strip0x(hexBytes));
 }
 
-function unwrapUpdatePluginSettings(
-  params: IPluginSettings,
-): [BigNumber, BigNumber, BigNumber] {
+function pluginSettingsToContract(
+  params: IPluginSettings
+): ContractPluginSettings {
   return [
     BigNumber.from(encodeRatio(params.minTurnout, 2)),
     BigNumber.from(encodeRatio(params.minSupport, 2)),
@@ -115,22 +119,22 @@ function unwrapUpdatePluginSettings(
 }
 
 export function decodeUpdatePluginSettingsAction(
-  data: Uint8Array,
+  data: Uint8Array
 ): IPluginSettings {
   const votingInterface = MajorityVoting__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = votingInterface.getFunction(
-    hexBytes.substring(0, 10) as any,
+    hexBytes.substring(0, 10) as any
   );
   const expectedfunction = votingInterface.getFunction("changeVoteConfig");
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
   }
   const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
-  return wrapUpdatePluginSettings(result);
+  return pluginSettingsFromContract(result);
 }
 
-function wrapUpdatePluginSettings(result: Result): IPluginSettings {
+function pluginSettingsFromContract(result: Result): IPluginSettings {
   return {
     minTurnout: decodeRatio(result[0], 2),
     minSupport: decodeRatio(result[0], 2),
@@ -141,31 +145,31 @@ function wrapUpdatePluginSettings(result: Result): IPluginSettings {
 // MINT ACTION
 export function encodeMintTokenAction(params: IMintTokenParams): Uint8Array {
   const votingInterface = IERC20MintableUpgradeable__factory.createInterface();
-  const args = unwrapMintToken(params);
+  const args = mintTokenParamsToContract(params);
   // get hex bytes
   const hexBytes = votingInterface.encodeFunctionData("mint", args);
   return hexToBytes(strip0x(hexBytes));
 }
-function unwrapMintToken(params: IMintTokenParams): [string, bigint] {
-  return [params.address, params.amount];
+function mintTokenParamsToContract(
+  params: IMintTokenParams
+): ContractMintTokenParams {
+  return [params.address, BigNumber.from(params.amount)];
 }
-export function decodeMintTokenAction(
-  data: Uint8Array,
-): IMintTokenParams {
+export function decodeMintTokenAction(data: Uint8Array): IMintTokenParams {
   const votingInterface = IERC20MintableUpgradeable__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = votingInterface.getFunction(
-    hexBytes.substring(0, 10) as any,
+    hexBytes.substring(0, 10) as any
   );
   const expectedfunction = votingInterface.getFunction("mint");
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
   }
   const result = votingInterface.decodeFunctionData("mint", data);
-  return wrapMintToken(result);
+  return mintTokenParamsFromContract(result);
 }
 
-function wrapMintToken(result: Result): IMintTokenParams {
+function mintTokenParamsFromContract(result: Result): IMintTokenParams {
   return {
     address: result[0],
     amount: BigInt(result[1]),
@@ -179,18 +183,16 @@ export function encodeAddMembersAction(members: string[]): Uint8Array {
   const hexBytes = votingInterface.encodeFunctionData(
     // TODO: Rename to `addAddresses` as soon as the plugin is updated
     "addWhitelistedUsers",
-    [members],
+    [members]
   );
   return hexToBytes(strip0x(hexBytes));
 }
 
-export function decodeAddMemebersAction(
-  data: Uint8Array,
-): string[] {
+export function decodeAddMemebersAction(data: Uint8Array): string[] {
   const votingInterface = WhitelistVoting__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = votingInterface.getFunction(
-    hexBytes.substring(0, 10) as any,
+    hexBytes.substring(0, 10) as any
   );
   // TODO: Rename to `addAddresses` as soon as the plugin is updated
   const expectedfunction = votingInterface.getFunction("addWhitelistedUsers");
@@ -200,7 +202,7 @@ export function decodeAddMemebersAction(
   const result = votingInterface.decodeFunctionData(
     // TODO: Rename to `addAddresses` as soon as the plugin is updated
     "addWhitelistedUsers",
-    data,
+    data
   );
   return result[0];
 }
@@ -211,21 +213,19 @@ export function encodeRemoveMembersAction(members: string[]): Uint8Array {
   const hexBytes = votingInterface.encodeFunctionData(
     // TODO: Rename to `removeAddresses` as soon as the plugin is updated
     "removeWhitelistedUsers",
-    [members],
+    [members]
   );
   return hexToBytes(strip0x(hexBytes));
 }
-export function decodeRemoveMemebersAction(
-  data: Uint8Array,
-): string[] {
+export function decodeRemoveMemebersAction(data: Uint8Array): string[] {
   const votingInterface = WhitelistVoting__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = votingInterface.getFunction(
-    hexBytes.substring(0, 10) as any,
+    hexBytes.substring(0, 10) as any
   );
   const expectedfunction = votingInterface.getFunction(
     // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-    "removeWhitelistedUsers",
+    "removeWhitelistedUsers"
   );
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
@@ -233,7 +233,7 @@ export function decodeRemoveMemebersAction(
   const result = votingInterface.decodeFunctionData(
     // TODO: Rename to `removeAddresses` as soon as the plugin is updated
     "removeWhitelistedUsers",
-    data,
+    data
   );
   return result[0];
 }

@@ -11,6 +11,7 @@ import {
 } from "./common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { BigNumber } from "@ethersproject/bignumber";
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
   methods: {
@@ -19,7 +20,7 @@ export interface IClient extends IClientCore {
     /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
     getBalances: (
       daoAddressOrEns: string,
-      tokenAddresses: string[],
+      tokenAddresses: string[]
     ) => Promise<AssetBalance[] | null>;
     /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
     getTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
@@ -28,7 +29,7 @@ export interface IClient extends IClientCore {
       where: string,
       who: string,
       role: DaoRole,
-      data: Uint8Array,
+      data: Uint8Array
     ) => Promise<void>;
     /** Deposits ether or an ERC20 token */
     deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
@@ -41,23 +42,23 @@ export interface IClient extends IClientCore {
     /** Computes the withdraw action payload */
     grantAction: (
       daoAddress: string,
-      params: IGrantPermissionParams,
+      params: IGrantPermissionParams
     ) => DaoAction;
     revokeAction: (
       daoAddress: string,
-      params: IRevokePermissionParams,
+      params: IRevokePermissionParams
     ) => DaoAction;
     freezeAction: (
       daoAddress: string,
-      params: IFreezePermissionParams,
+      params: IFreezePermissionParams
     ) => DaoAction;
     withdrawAction: (
       daoAddresOrEns: string,
-      params: IWithdrawParams,
+      params: IWithdrawParams
     ) => Promise<DaoAction>;
     updateMetadataAction: (
       daoAddressOrEns: string,
-      params: IMetadata,
+      params: IMetadata
     ) => Promise<DaoAction>;
   };
   decoding: {
@@ -141,7 +142,7 @@ const Permissions = {
 
 const PermissionIds = Object.entries(Permissions).reduce(
   (acc, [k, v]) => ({ ...acc, [k + "_ID"]: keccak256(toUtf8Bytes(v)) }),
-  {} as { [k: string]: string },
+  {} as { [k: string]: string }
 );
 Object.freeze(Permissions);
 export { Permissions };
@@ -303,11 +304,13 @@ export enum SubgraphPluginTypeName {
   ADDRESS_LIST = "AllowlistPackage",
 }
 
-export const SubgraphPluginTypeMap: Map<SubgraphPluginTypeName, string> =
-  new Map([
-    [SubgraphPluginTypeName.ERC20, "erc20voting.dao.eth"],
-    [SubgraphPluginTypeName.ADDRESS_LIST, "addresslistvoting.dao.eth"],
-  ]);
+export const SubgraphPluginTypeMap: Map<
+  SubgraphPluginTypeName,
+  string
+> = new Map([
+  [SubgraphPluginTypeName.ERC20, "erc20voting.dao.eth"],
+  [SubgraphPluginTypeName.ADDRESS_LIST, "addresslistvoting.dao.eth"],
+]);
 
 export type SubgraphPluginListItem = {
   pkg: {
@@ -365,8 +368,14 @@ export type SubgraphErc20Token = {
   symbol: string;
   decimals: string;
 };
-export const SubgraphTransferTypeMap: Map<TransferType, SubgraphTransferType> =
-  new Map([
-    [TransferType.DEPOSIT, SubgraphTransferType.DEPOSIT],
-    [TransferType.WITHDRAW, SubgraphTransferType.WITHDRAW],
-  ]);
+export const SubgraphTransferTypeMap: Map<
+  TransferType,
+  SubgraphTransferType
+> = new Map([
+  [TransferType.DEPOSIT, SubgraphTransferType.DEPOSIT],
+  [TransferType.WITHDRAW, SubgraphTransferType.WITHDRAW],
+]);
+
+export type ContractFreezeParams = [string, string];
+export type ContractPermissionParams = [string, string, string];
+export type ContractWithdrawParams = [string, string, BigNumber, string];
