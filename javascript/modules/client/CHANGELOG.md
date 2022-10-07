@@ -21,6 +21,9 @@ TEMPLATE:
 - Fix README for `finInterface` function
 ### Added
 - Filtering by status and daoAddress in getProposals
+- Types for contract params
+### Changed
+- Naming in wrap/unwrap function
 
 ## 0.10.3-alpha
 On 2022-10-05 13:13:17
