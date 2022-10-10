@@ -31,7 +31,7 @@ const contextParams: ContextParams = {
             },
         },
     ],
-    graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
+    graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli" }]
 };
 
 describe("GraphQL core module", () => {
@@ -57,7 +57,7 @@ describe("GraphQL core module", () => {
                 graphqlNodes: [
                     { url: "https://the.wrong/url" },
                     { url: "https://the.wrong/url" },
-                    { url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" },
+                    { url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli" },
                     { url: "https://the.wrong/url" },
                     { url: "https://the.wrong/url" },
                     { url: "https://the.wrong/url" },

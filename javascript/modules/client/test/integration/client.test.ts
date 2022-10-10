@@ -61,6 +61,11 @@ const web3endpoints = {
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
+const TEST_DAO_ADDDRESS = "0xa40fd495c454d19c87c4d615100307f0283c017c";
+const TEST_NO_BASLANCES_DAO_ADDRESS = "0xacb269a20d28f4e6b9fc75353cdf24418117859d";
+const TEST_INVALID_ADDRESS = "0x1nv4l1d_4ddr355";
+const TEST_NON_EXISTING_ADDRESS = "0x1234567890123456789012345678901234567890";
+
 const contextParams: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
@@ -76,7 +81,7 @@ const contextParams: ContextParams = {
   ],
   graphqlNodes: [{
     url:
-      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli",
   }],
 };
 
@@ -104,7 +109,7 @@ const contextParamsLocalChain: ContextParams = {
   ],
   graphqlNodes: [{
     url:
-      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli",
   }],
 };
 
@@ -881,7 +886,7 @@ describe("Client", () => {
     it("Should get a DAO's metadata with a specific address", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx);
-      const daoAddress = "0x680533bff2e194e52df204685d9aed5b874c4f63";
+      const daoAddress = TEST_DAO_ADDDRESS;
       const dao = await client.methods.getDao(daoAddress);
       expect(typeof dao).toBe("object");
       expect(dao === null).toBe(false);
@@ -916,7 +921,7 @@ describe("Client", () => {
     it("Should get a DAO's metadata of an non existent dao and receive null", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx);
-      const daoAddress = "0x1234567890123456789012345678901234567890";
+      const daoAddress = TEST_NON_EXISTING_ADDRESS;
       const dao = await client.methods.getDao(daoAddress);
       expect(dao === null).toBe(true);
     });
@@ -924,7 +929,7 @@ describe("Client", () => {
     it("Should get a DAO's metadata of an invalid dao address and throw an error", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx);
-      const daoAddress = "thisisinvalid";
+      const daoAddress = TEST_INVALID_ADDRESS;
       await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
         new InvalidAddressOrEnsError(),
       );
@@ -973,7 +978,7 @@ describe("Client", () => {
     it("Should get DAOs balances", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx);
-      const daoAddress = "0x680533bff2e194e52df204685d9aed5b874c4f63";
+      const daoAddress = TEST_DAO_ADDDRESS;
       const balances = await client.methods.getBalances(daoAddress);
       expect(Array.isArray(balances)).toBe(true);
       expect(balances === null).toBe(false);
@@ -997,7 +1002,7 @@ describe("Client", () => {
     it("Should get DAOs balances from a dao with no balances", async () => {
       const ctx = new Context(contextParams);
       const client = new Client(ctx);
-      const daoAddress = "0x0028807509712aa45eafd5fdd0982c4db36fbe50";
+      const daoAddress = TEST_NO_BASLANCES_DAO_ADDRESS;
       const balances = await client.methods.getBalances(daoAddress);
       expect(Array.isArray(balances)).toBe(true);
       expect(balances?.length).toBe(0);
@@ -1007,7 +1012,7 @@ describe("Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const client = new Client(ctx);
       const params: ITransferQueryParams = {
-        daoAddressOrEns: "0x680533bff2e194e52df204685d9aed5b874c4f63",
+        daoAddressOrEns: TEST_DAO_ADDDRESS,
         sortBy: TransferSortBy.CREATED_AT,
         limit: 10,
         skip: 0,

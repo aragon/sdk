@@ -31,7 +31,7 @@ const contextParams: ContextParams = {
             },
         },
     ],
-    graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby" }]
+    graphqlNodes: [{ url: "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli" }]
 };
 
 describe("IPFS core module", () => {

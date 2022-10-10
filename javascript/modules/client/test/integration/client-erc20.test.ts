@@ -39,11 +39,14 @@ import {
   InvalidAddressOrEnsError,
 } from "@aragon/sdk-common";
 
-const IPFS_API_KEY = process.env.IPFS_API_KEY ||
+const IPFS_API_KEY =
+  process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
-    "base64",
-  ).toString().trim();
+    "base64"
+  )
+    .toString()
+    .trim();
 
 const web3endpoints = {
   working: [
@@ -71,7 +74,7 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+        "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli",
     },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],
@@ -79,6 +82,12 @@ const grapqhlEndpoints = {
 
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
+
+const TEST_PROPOSAL_ID = "0x3e16a08ad61500b2bc77ddcc04387f0fabc04469_0x0";
+const TEST_DAO_ADDDRESS = "0x1cab6f621a41438639e1f1b51c274ae65d41b8cb";
+const TEST_PLUGIN_ADDRESS = "0x3e16a08ad61500b2bc77ddcc04387f0fabc04469";
+const TEST_INVALID_ADDRESS = "0x1nv4l1d_4ddr355";
+const TEST_NON_EXISTING_ADDRESS = "0x1234567890123456789012345678901234567890";
 
 const contextParams: ContextParams = {
   network: "mainnet",
@@ -113,10 +122,12 @@ const contextParamsLocalChain: ContextParams = {
       url: "http:localhost:5003",
     },
   ],
-  graphqlNodes: [{
-    url:
-      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
-  }],
+  graphqlNodes: [
+    {
+      url:
+        "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli",
+    },
+  ],
 };
 
 describe("Client", () => {
@@ -133,7 +144,7 @@ describe("Client", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
       expect(client).toBeInstanceOf(ClientErc20);
@@ -157,7 +168,7 @@ describe("Client", () => {
 
     it("Should create a failing client", async () => {
       const ctx = new Context(contextParamsFailing);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
       expect(client).toBeInstanceOf(ClientErc20);
@@ -180,7 +191,7 @@ describe("Client", () => {
   describe("Proposal Creation", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
       const proposalParams: ICreateProposalParams = {
@@ -189,10 +200,12 @@ describe("Client", () => {
           title: "Best Proposal",
           summary: "this is the sumnary",
           description: "This is a very long description",
-          resources: [{
-            name: "Website",
-            url: "https://the.website",
-          }],
+          resources: [
+            {
+              name: "Website",
+              url: "https://the.website",
+            },
+          ],
           media: {
             header: "https://no.media/media.jpeg",
             logo: "https://no.media/media.jpeg",
@@ -215,7 +228,7 @@ describe("Client", () => {
     });
     it("Should create a new proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const erc20Client = new ClientErc20(ctxPlugin);
       const client = new Client(ctx);
 
@@ -226,7 +239,7 @@ describe("Client", () => {
           recipientAddress: "0x1234567890123456789012345678901234567890",
           amount: BigInt(1),
           reference: "test",
-        },
+        }
       );
 
       const proposalParams: ICreateProposalParams = {
@@ -235,10 +248,12 @@ describe("Client", () => {
           title: "Best Proposal",
           summary: "this is the sumnary",
           description: "This is a very long description",
-          resources: [{
-            name: "Website",
-            url: "https://the.website",
-          }],
+          resources: [
+            {
+              name: "Website",
+              url: "https://the.website",
+            },
+          ],
           media: {
             header: "https://no.media/media.jpeg",
             logo: "https://no.media/media.jpeg",
@@ -251,9 +266,9 @@ describe("Client", () => {
         executeOnPass: true,
       };
 
-      for await (
-        const step of erc20Client.methods.createProposal(proposalParams)
-      ) {
+      for await (const step of erc20Client.methods.createProposal(
+        proposalParams
+      )) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");
@@ -266,7 +281,7 @@ describe("Client", () => {
           default:
             throw new Error(
               "Unexpected proposal creation step: " +
-                Object.keys(step).join(", "),
+                Object.keys(step).join(", ")
             );
         }
       }
@@ -276,7 +291,7 @@ describe("Client", () => {
   describe("Vote on a proposal", () => {
     it("Should estimate the gas fees for casting a vote", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
@@ -295,7 +310,7 @@ describe("Client", () => {
 
     it("Should vote on a proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
@@ -316,7 +331,7 @@ describe("Client", () => {
             break;
           default:
             throw new Error(
-              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+              "Unexpected vote proposal step: " + Object.keys(step).join(", ")
             );
         }
       }
@@ -326,7 +341,7 @@ describe("Client", () => {
   describe("Execute proposal", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
@@ -344,7 +359,7 @@ describe("Client", () => {
 
     it("Should execute a local proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
@@ -363,7 +378,7 @@ describe("Client", () => {
           default:
             throw new Error(
               "Unexpected execute proposal step: " +
-                Object.keys(step).join(", "),
+                Object.keys(step).join(", ")
             );
         }
       }
@@ -373,7 +388,7 @@ describe("Client", () => {
   describe("Can vote", () => {
     it("Should check if an user can vote in an ERC20 proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
       const params: ICanVoteParams = {
@@ -399,7 +414,7 @@ describe("Client", () => {
         },
       };
       const erc20InstallPluginItem = ClientErc20.encoding.getPluginInstallItem(
-        initParams,
+        initParams
       );
 
       expect(typeof erc20InstallPluginItem).toBe("object");
@@ -407,7 +422,7 @@ describe("Client", () => {
     });
     it("Should encode an update plugin settings action and fail with an invalid address", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
@@ -417,15 +432,12 @@ describe("Client", () => {
 
       const pluginAddress = "0xinvalid_address";
       expect(() =>
-        client.encoding.updatePluginSettingsAction(
-          pluginAddress,
-          params,
-        )
+        client.encoding.updatePluginSettingsAction(pluginAddress, params)
       ).toThrow("Invalid plugin address");
     });
     it("Should encode an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
@@ -435,8 +447,10 @@ describe("Client", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(pluginAddress, params);
+      const updatePluginSettingsAction = client.encoding.updatePluginSettingsAction(
+        pluginAddress,
+        params
+      );
 
       expect(typeof updatePluginSettingsAction).toBe("object");
       expect(updatePluginSettingsAction.data).toBeInstanceOf(Uint8Array);
@@ -444,7 +458,7 @@ describe("Client", () => {
     });
     it("Should encode a mint action with an invalid recipient address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0xinvalid_address",
@@ -453,15 +467,12 @@ describe("Client", () => {
 
       const minterAddress = "0x1234567890123456789012345678901234567890";
       expect(() =>
-        client.encoding.mintTokenAction(
-          minterAddress,
-          params,
-        )
+        client.encoding.mintTokenAction(minterAddress, params)
       ).toThrow(new InvalidAddressError());
     });
     it("Should encode a mint action with an invalid token address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
@@ -470,15 +481,12 @@ describe("Client", () => {
 
       const minterAddress = "0xinvalid_address";
       expect(() =>
-        client.encoding.mintTokenAction(
-          minterAddress,
-          params,
-        )
+        client.encoding.mintTokenAction(minterAddress, params)
       ).toThrow(new InvalidAddressError());
     });
     it("Should encode an ERC20 token mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
@@ -496,7 +504,7 @@ describe("Client", () => {
   describe("Action decoders", () => {
     it("Should decode the plugin settings from an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
@@ -506,10 +514,13 @@ describe("Client", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(pluginAddress, params);
-      const decodedParams: IPluginSettings = client.decoding
-        .updatePluginSettingsAction(updatePluginSettingsAction.data);
+      const updatePluginSettingsAction = client.encoding.updatePluginSettingsAction(
+        pluginAddress,
+        params
+      );
+      const decodedParams: IPluginSettings = client.decoding.updatePluginSettingsAction(
+        updatePluginSettingsAction.data
+      );
 
       expect(decodedParams.minDuration).toBe(params.minDuration);
       expect(decodedParams.minSupport).toBe(params.minSupport);
@@ -517,7 +528,7 @@ describe("Client", () => {
     });
     it("Should decode a mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
@@ -530,29 +541,25 @@ describe("Client", () => {
 
       expect(decodedParams.address).toBe(params.address);
       expect(bytesToHex(action.data, true)).toBe(
-        "0x40c10f190000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a",
+        "0x40c10f190000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a"
       );
       expect(decodedParams.amount).toBe(params.amount);
     });
 
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
-      expect(() =>
-        client.decoding
-          .updatePluginSettingsAction(data)
-      )
-        .toThrow(
-          `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`,
-        );
+      expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow(
+        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`
+      );
     });
 
     it("Should get the function for a given action data", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
@@ -562,10 +569,12 @@ describe("Client", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(pluginAddress, params);
+      const updatePluginSettingsAction = client.encoding.updatePluginSettingsAction(
+        pluginAddress,
+        params
+      );
       const iface = client.decoding.findInterface(
-        updatePluginSettingsAction.data,
+        updatePluginSettingsAction.data
       );
       expect(iface?.id).toBe("function changeVoteConfig(uint64,uint64,uint64)");
       expect(iface?.functionName).toBe("changeVoteConfig");
@@ -574,7 +583,7 @@ describe("Client", () => {
 
     it("Should try to get the function of an invalid data and return null", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
       const iface = client.decoding.findInterface(data);
@@ -585,10 +594,10 @@ describe("Client", () => {
   describe("Data retrieval", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
-      const daoAddress = "0x1234567890123456789012345678901234567890";
+      const daoAddress = TEST_DAO_ADDDRESS;
       const wallets = await client.methods.getMembers(daoAddress);
 
       expect(Array.isArray(wallets)).toBe(true);
@@ -598,10 +607,10 @@ describe("Client", () => {
     });
     it("Should fetch the given proposal", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
-      const proposalId = "0xb7bf1249ddf62e7196f21c4a12f9ef39e09c1632_0x0";
+      const proposalId = TEST_PROPOSAL_ID;
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(typeof proposal).toBe("object");
@@ -653,12 +662,10 @@ describe("Client", () => {
         expect(typeof proposal.settings.minSupport).toBe("number");
         expect(typeof proposal.settings.minTurnout).toBe("number");
         expect(
-          proposal.settings.minSupport >= 0 &&
-            proposal.settings.minSupport <= 1,
+          proposal.settings.minSupport >= 0 && proposal.settings.minSupport <= 1
         ).toBe(true);
         expect(
-          proposal.settings.minTurnout >= 0 &&
-            proposal.settings.minTurnout <= 1,
+          proposal.settings.minTurnout >= 0 && proposal.settings.minTurnout <= 1
         ).toBe(true);
         // token
         expect(typeof proposal.token.name).toBe("string");
@@ -680,25 +687,25 @@ describe("Client", () => {
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
-      const proposalId = "0x1234567890123456789012345678901234567890_0x0";
+      const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x0";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const limit = 5;
-      const status =  ProposalStatus.EXECUTED
+      const status = ProposalStatus.EXECUTED;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
-        status
+        status,
       };
       const proposals = await client.methods.getProposals(params);
 
@@ -732,10 +739,10 @@ describe("Client", () => {
     });
     it("Should get a list of proposals from a specific dao", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const limit = 5;
-      const address = "0xe0eb147d59f964a79cffc3736d5c620c4cb9c778";
+      const address = TEST_DAO_ADDDRESS;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
@@ -749,10 +756,10 @@ describe("Client", () => {
     });
     it("Should get a list of proposals from a dao that has no proposals", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const limit = 5;
-      const address = "0x1234567890123456789012345678901234567890";
+      const address = TEST_NON_EXISTING_ADDRESS;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
@@ -766,10 +773,10 @@ describe("Client", () => {
     });
     it("Should get a list of proposals from an invalid address", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
       const limit = 5;
-      const address = "0xn0tv4l1d";
+      const address = TEST_INVALID_ADDRESS;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
@@ -777,16 +784,15 @@ describe("Client", () => {
         daoAddressOrEns: address,
       };
       await expect(() => client.methods.getProposals(params)).rejects.toThrow(
-        new InvalidAddressOrEnsError(),
+        new InvalidAddressOrEnsError()
       );
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
-      const pluginAddress: string =
-        "0xb7bf1249ddf62e7196f21c4a12f9ef39e09c1632";
+      const pluginAddress: string = TEST_PLUGIN_ADDRESS;
       const settings = await client.methods.getSettings(pluginAddress);
       expect(settings === null).toBe(false);
       if (settings) {
@@ -797,11 +803,10 @@ describe("Client", () => {
     });
     it("Should get the token details of a plugin given a plugin instance address", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
-      const pluginAddress: string =
-        "0xb7bf1249ddf62e7196f21c4a12f9ef39e09c1632";
+      const pluginAddress: string = TEST_PLUGIN_ADDRESS;
       const token = await client.methods.getToken(pluginAddress);
       expect(typeof token?.address).toBe("string");
       expect(typeof token?.decimals).toBe("number");
@@ -810,11 +815,10 @@ describe("Client", () => {
     });
     it("Should return null token details for nonexistent plugin addresses", async () => {
       const ctx = new Context(contextParams);
-      const ctxPlugin = ContextPlugin.fromContext(ctx)
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
 
-      const pluginAddress: string =
-        "0x1234567890123456789012345678901234567890";
+      const pluginAddress: string = TEST_NON_EXISTING_ADDRESS;
       const token = await client.methods.getToken(pluginAddress);
       expect(token).toBe(null);
     });
