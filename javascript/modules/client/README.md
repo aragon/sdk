@@ -494,7 +494,7 @@ const pluginInitParams1: IErc20PluginInstall = {
   },
   useToken: {
     address: "0x...",
-  },
+  }, 
 };
 // Mint a new token
 const pluginInitParams2: IErc20PluginInstall = {

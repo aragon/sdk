@@ -1,4 +1,175 @@
 
+
+# Aragon JS SDK Client
+
+`@aragon/sdk-client` provides easy access to the high level interactions to be
+made with an Aragon DAO. It consists of three different components:
+
+- General-purpose DAO client
+- Custom clients for specific DAO plugins
+- Context for holding inheritable configuration
+
+Contributors: See [development](#development) below
+
+# Installation
+
+Use [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/) to install
+@aragon/sdk-client.
+
+```bash
+npm install @aragon/sdk-client
+yarn add @aragon/sdk-client
+```
+
+# Usage
+
+
+## Context
+
+The [Context](../../context.ts) class is an utility component that holds the
+configuration passed to any [Client](../../client.ts) instance.
+
+
+```ts
+
+import { Context } from "@aragon/sdk-client";
+import { Wallet } from "@ethersproject/wallet";
+import { contextParams } from "../context";
+
+// Instantiate
+const context = new Context(contextParams);
+
+// Update
+context.set({ network: 1 });
+context.set({ signer: new Wallet("other private key") });
+context.setFull(contextParams);
+
+```
+
+## General purpose client
+
+The [Client](./src/client.ts) class allows to perform operations that apply to
+all DAO's, regardless of the plugins they use.
+
+
+```ts
+
+import { Client, Context } from "@aragon/sdk-client";
+import { contextParams } from "../context";
+// Can be stored in a singleton and inherited from there
+const context: Context = new Context(contextParams);
+
+const client = new Client(context);
+
+console.log(client);
+
+```
+
+## Creating a DAO
+
+
+```ts
+
+import {
+  Client,
+  Context,
+  DaoCreationSteps,
+  GasFeeEstimation,
+  ICreateParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
+
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+const createParams: ICreateParams = {
+  metadata: {
+    name: "My DAO",
+    description: "This is a description",
+    avatar: "",
+    links: [{
+      name: "Web site",
+      url: "https://...",
+    }],
+  },
+  ensSubdomain: "my-org", // my-org.dao.eth,
+  plugins: [],
+};
+
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.create(
+  createParams,
+);
+console.log(estimatedGas.average);
+console.log(estimatedGas.max);
+
+const steps = client.methods.create(createParams);
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case DaoCreationSteps.CREATING:
+        console.log(step.txHash);
+        break;
+      case DaoCreationSteps.DONE:
+        console.log(step.address);
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+```
+
+## Depositing ETH to a DAO
+
+Handles the flow of depositing the native EVM token to an Aragon DAO.
+
+
+```ts
+
+import {
+  Client,
+  Context,
+  DaoDepositSteps,
+  GasFeeEstimation,
+  IDepositParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
+
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+const depositParams: IDepositParams = {
+  daoAddress: "0x1234567890123456789012345678901234567890",
+  amount: BigInt(10), // amount in wei
+  reference: "test deposit", // optional
+};
+
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
+  depositParams
+);
+console.log(estimatedGas.average);
+console.log(estimatedGas.max);
+
+const steps = client.methods.deposit(depositParams);
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case DaoDepositSteps.DEPOSITING:
+        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+        break;
+      case DaoDepositSteps.DONE:
+        console.log(step.amount); // 10n
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+
+```
+
 ## Depositing ERC20 tokens to a DAO
 
 Handles the flow of depositing ERC20 tokens to a DAO.
@@ -18,7 +189,7 @@ import {
   GasFeeEstimation,
   IDepositParams,
 } from "@aragon/sdk-client";
-import { contextParams } from "../constants";
+import { contextParams } from "../context";
 
 const context = new Context(contextParams);
 const client = new Client(context);
@@ -61,6 +232,7 @@ for await (const step of steps) {
   }
 }
 
+
 ```
 
 ## Loading Multiple DAOs
@@ -78,7 +250,7 @@ import {
   IDaoQueryParams,
   SortDirection,
 } from "@aragon/sdk-client";
-import { contextParams } from "../constants";
+import { contextParams } from "../context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
@@ -90,7 +262,8 @@ const queryParams: IDaoQueryParams = {
 };
 const daos: DaoListItem[] = await client.methods.getDaos(queryParams);
 console.log(daos);
-/* Result
+
+/*
 [
   {
     address: "0x12345...",
@@ -136,131 +309,6 @@ console.log(daos);
   }
 ]
 */
-```
-
-## Depositing ETH to a DAO
-
-Handles the flow of depositing the native EVM token to an Aragon DAO.
-
-
-```ts
-
-import {
-  Client,
-  Context,
-  DaoDepositSteps,
-  GasFeeEstimation,
-  IDepositParams,
-} from "@aragon/sdk-client";
-import { contextParams } from "../constants";
-
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-const depositParams: IDepositParams = {
-  daoAddress: "0x1234567890123456789012345678901234567890",
-  amount: BigInt(10), // amount in wei
-  reference: "test deposit", // optional
-};
-
-// gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
-  depositParams
-);
-console.log(estimatedGas.average);
-console.log(estimatedGas.max);
-
-const steps = client.methods.deposit(depositParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case DaoDepositSteps.DEPOSITING:
-        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-        break;
-      case DaoDepositSteps.DONE:
-        console.log(step.amount); // 10n
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-```
-
-## Context
-
-The [Context](../../context.ts) class is an utility component that holds the
-configuration passed to any [Client](../../client.ts) instance.
-
-
-```ts
-
-import { Context } from "@aragon/sdk-client";
-import { Wallet } from "@ethersproject/wallet";
-import { contextParams } from "../constants";
-
-// Instantiate
-const context = new Context(contextParams);
-
-// Update
-context.set({ network: 1 });
-context.set({ signer: new Wallet("other private key") });
-context.setFull(contextParams);
-
-```
-
-## Creating a DAO
-
-
-```ts
-
-import {
-  Client,
-  Context,
-  DaoCreationSteps,
-  GasFeeEstimation,
-  ICreateParams,
-} from "@aragon/sdk-client";
-import { contextParams } from "../constants";
-
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-const createParams: ICreateParams = {
-  metadata: {
-    name: "My DAO",
-    description: "This is a description",
-    avatar: "",
-    links: [{
-      name: "Web site",
-      url: "https://...",
-    }],
-  },
-  ensSubdomain: "my-org", // my-org.dao.eth,
-  plugins: [],
-};
-
-// gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.create(
-  createParams,
-);
-console.log(estimatedGas.average);
-console.log(estimatedGas.max);
-
-const steps = client.methods.create(createParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case DaoCreationSteps.CREATING:
-        console.log(step.txHash);
-        break;
-      case DaoCreationSteps.DONE:
-        console.log(step.address);
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
 
 ```
 
@@ -272,14 +320,15 @@ Handles retrieving DAO metadata using its address or ENS domain.
 ```ts
 
 import { Client, Context, DaoDetails } from "@aragon/sdk-client";
-import { contextParams } from "../constants";
+import { contextParams } from "../context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const daoAddressOrEns = "0x1234567890123456789012345678901234567890" // test.dao.eth
 const dao: DaoDetails | null = await client.methods.getDao(daoAddressOrEns);
 console.log(dao);
-/* Result
+
+/*
 {
   address: "0x1234567890123456789012345678901234567890",
   ensDomain: "test.dao.eth",
@@ -307,6 +356,7 @@ console.log(dao);
   ]
 }
 */
+
 ```
 
 ## Loading DAO activity
@@ -325,7 +375,7 @@ import {
   TransferType,
 } from "@aragon/sdk-client";
 import { SortDirection } from "../../src";
-import { contextParams } from "../constants";
+import { contextParams } from "../context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
@@ -339,7 +389,8 @@ const params: ITransferQueryParams = {
 };
 const transfers: Transfer[] | null = await client.methods.getTransfers(params);
 console.log(transfers);
-/* Result
+
+/*
 [
   {
     type: "withdraw",
@@ -383,6 +434,7 @@ console.log(transfers);
   }
 ]
 */
+
 ```
 
 ## Context Plugin AddressList
@@ -391,6 +443,7 @@ console.log(transfers);
 ```ts
 
 console.log("hello")
+
 
 ```
 
@@ -401,14 +454,6 @@ console.log("hello")
 
 console.log("hello")
 
-```
-
-## Context Plugin Erc20
-
-
-```ts
-
-console.log("hello")
 
 ```
 
@@ -418,5 +463,16 @@ console.log("hello")
 ```ts
 
 console.log("hello")
+
+
+```
+
+## Context Plugin Erc20
+
+
+```ts
+
+console.log("hello")
+
 
 ```

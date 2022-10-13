@@ -1,11 +1,9 @@
-/* Header
-## Depositing ETH to a DAO
+/* MARKDOWN
+### Depositing ETH to a DAO
 
 Handles the flow of depositing the native EVM token to an Aragon DAO.
 
 */
-
-/* Code */
 import {
   Client,
   Context,
@@ -13,7 +11,7 @@ import {
   GasFeeEstimation,
   IDepositParams,
 } from "@aragon/sdk-client";
-import { contextParams } from "../constants";
+import { contextParams } from "../context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
@@ -25,7 +23,7 @@ const depositParams: IDepositParams = {
 
 // gas estimation
 const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
-  depositParams
+  depositParams,
 );
 console.log(estimatedGas.average);
 console.log(estimatedGas.max);
@@ -45,4 +43,3 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-/* - */

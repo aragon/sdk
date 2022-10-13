@@ -1,11 +1,9 @@
-/* Header
-## Loading Multiple DAOs
+/* MARKDOWN
+### Loading Multiple DAOs
 
 Handles retrieving list of DAO metadata.
 
 */
-
-/* Code */
 import {
   Client,
   Context,
@@ -14,7 +12,7 @@ import {
   IDaoQueryParams,
   SortDirection,
 } from "@aragon/sdk-client";
-import { contextParams } from "../constants";
+import { contextParams } from "../context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
@@ -26,8 +24,8 @@ const queryParams: IDaoQueryParams = {
 };
 const daos: DaoListItem[] = await client.methods.getDaos(queryParams);
 console.log(daos);
-/* - */
-/* Result
+
+/*
 [
   {
     address: "0x12345...",

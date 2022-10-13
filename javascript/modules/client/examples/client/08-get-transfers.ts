@@ -1,11 +1,9 @@
-/* Header
-## Loading DAO activity
+/* MARKDOWN
+### Loading DAO activity
 
 Retrieves the list of asset transfers to and from the given DAO (by default,
 from ETH, DAI, USDC and USDT, on Mainnet)
 */
-
-/* Code */
 import {
   Client,
   Context,
@@ -15,7 +13,7 @@ import {
   TransferType,
 } from "@aragon/sdk-client";
 import { SortDirection } from "../../src";
-import { contextParams } from "../constants";
+import { contextParams } from "../context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
@@ -29,8 +27,8 @@ const params: ITransferQueryParams = {
 };
 const transfers: Transfer[] | null = await client.methods.getTransfers(params);
 console.log(transfers);
-/* - */
-/* Result
+
+/*
 [
   {
     type: "withdraw",

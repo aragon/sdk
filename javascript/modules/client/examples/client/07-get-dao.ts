@@ -1,21 +1,19 @@
-/* Header
-## Loading DAO details
+/* MARKDOWN
+### Loading DAO details
 
 Handles retrieving DAO metadata using its address or ENS domain.
 
 */
-
-/* Code */
 import { Client, Context, DaoDetails } from "@aragon/sdk-client";
-import { contextParams } from "../constants";
+import { contextParams } from "../context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
-const daoAddressOrEns = "0x1234567890123456789012345678901234567890" // test.dao.eth
+const daoAddressOrEns = "0x1234567890123456789012345678901234567890"; // test.dao.eth
 const dao: DaoDetails | null = await client.methods.getDao(daoAddressOrEns);
 console.log(dao);
-/* - */
-/* Result
+
+/*
 {
   address: "0x1234567890123456789012345678901234567890",
   ensDomain: "test.dao.eth",

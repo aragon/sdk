@@ -1,41 +1,38 @@
 const fs = require("fs");
 const { argv } = require("process");
-const path = argv[2];
-const outputFile = argv[3];
-const headerRegex = /(\/\* Header)(.|\n)*?(\*\/)/;
-const codeRegex = /(\/\* Code \*\/)(.|\n)*?(\/\* - \*\/)/;
-const resultRegex = /(\/\* Result)(.|\n)*?(\*\/)/;
-const files = getFileNames(path);
-for (const file of files) {
-  fs.readFile(file, async (err, data) => {
-    if (err) throw err;
-    try {
-      if (fs.existsSync(outputFile)) {
-        await fs.promises.rm(outputFile);
+
+generateReadme();
+
+async function generateReadme() {
+  const path = argv[2];
+  const outputFile = argv[3];
+  const mdRegex = /(\/\* MARKDOWN)(.|\n)*?(\*\/)/;
+  const files = getFileNames(path);
+  if (fs.existsSync(outputFile)) {
+    await fs.promises.rm(outputFile);
+  }
+  for (const file of files) {
+    fs.readFile(file, async (err, data) => {
+      if (err) throw err;
+      try {
+        const md = getText(
+          data.toString(),
+          mdRegex,
+          ["/* MARKDOWN", "*/"],
+          true
+        );
+        const code = data.toString().replace(mdRegex, "");
+        let readmeStr = md;
+        if (code) {
+          readmeStr = md + `\n\`\`\`ts\n` + code + `\n\`\`\`\n`;
+        }
+        await fs.promises.appendFile(outputFile, readmeStr);
+      } catch (error) {
+        console.error(file);
+        console.error(error);
       }
-      const header = getText(
-        data.toString(),
-        headerRegex,
-        ["/* Header", "*/"],
-        true
-      );
-      const code = getText(
-        data.toString(),
-        codeRegex,
-        ["/* Code */", "/* - */"],
-        true
-      );
-      const result = getText(data.toString(), resultRegex, [], false);
-      let readmeStr = header + `\n\`\`\`ts\n` + code + `\n\`\`\`\n`;
-      if (result) {
-        readmeStr = header + `\n\`\`\`ts\n` + code + result + `\n\`\`\`\n`;
-      }
-      await fs.promises.appendFile(outputFile, readmeStr);
-    } catch (error) {
-      console.error(file);
-      console.error(error);
-    }
-  });
+    });
+  }
 }
 
 function getText(
@@ -58,6 +55,7 @@ function getText(
   }
   return res;
 }
+
 function getFileNames(rootPath) {
   let ret = [];
   let paths = fs.readdirSync(rootPath, { withFileTypes: true });

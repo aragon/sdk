@@ -1,5 +1,5 @@
-/* Header
-## Depositing ERC20 tokens to a DAO
+/* MARKDOWN
+### Depositing ERC20 tokens to a DAO
 
 Handles the flow of depositing ERC20 tokens to a DAO.
 
@@ -9,7 +9,6 @@ Handles the flow of depositing ERC20 tokens to a DAO.
 - More intermediate steps are yielded
 
 */
-/* Code */
 import {
   Client,
   Context,
@@ -17,7 +16,7 @@ import {
   GasFeeEstimation,
   IDepositParams,
 } from "@aragon/sdk-client";
-import { contextParams } from "../constants";
+import { contextParams } from "../context";
 
 const context = new Context(contextParams);
 const client = new Client(context);
@@ -59,4 +58,3 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-/* - */
