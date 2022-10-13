@@ -23,7 +23,7 @@ export class ContextPlugin extends Context {
    */
   constructor(params: Partial<ContextPluginParams>) {
     super(params);
-    
+
     this.set(params);
   }
 

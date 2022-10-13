@@ -62,7 +62,8 @@ const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
 const TEST_DAO_ADDDRESS = "0xa40fd495c454d19c87c4d615100307f0283c017c";
-const TEST_NO_BASLANCES_DAO_ADDRESS = "0xacb269a20d28f4e6b9fc75353cdf24418117859d";
+const TEST_NO_BASLANCES_DAO_ADDRESS =
+  "0xacb269a20d28f4e6b9fc75353cdf24418117859d";
 const TEST_INVALID_ADDRESS = "0x1nv4l1d_4ddr355";
 const TEST_NON_EXISTING_ADDRESS = "0x1234567890123456789012345678901234567890";
 
@@ -1035,7 +1036,9 @@ describe("Client", () => {
             } else if (transfer.type === TransferType.WITHDRAW) {
               // ETH withdraw
               expect(isAddress(transfer.to)).toBe(true);
-              expect(transfer.proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+              expect(transfer.proposalId).toMatch(
+                /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
+              );
             } else {
               fail("invalid transfer type");
             }
@@ -1050,7 +1053,9 @@ describe("Client", () => {
             } else if (transfer.type === TransferType.WITHDRAW) {
               // ERC20 withdraw
               expect(isAddress(transfer.to)).toBe(true);
-              expect(transfer.proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+              expect(transfer.proposalId).toMatch(
+                /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
+              );
             } else {
               fail("invalid transfer type");
             }

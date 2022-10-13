@@ -39,11 +39,10 @@ import {
   InvalidAddressOrEnsError,
 } from "@aragon/sdk-common";
 
-const IPFS_API_KEY =
-  process.env.IPFS_API_KEY ||
+const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
-    "base64"
+    "base64",
   )
     .toString()
     .trim();
@@ -239,7 +238,7 @@ describe("Client", () => {
           recipientAddress: "0x1234567890123456789012345678901234567890",
           amount: BigInt(1),
           reference: "test",
-        }
+        },
       );
 
       const proposalParams: ICreateProposalParams = {
@@ -266,9 +265,11 @@ describe("Client", () => {
         executeOnPass: true,
       };
 
-      for await (const step of erc20Client.methods.createProposal(
-        proposalParams
-      )) {
+      for await (
+        const step of erc20Client.methods.createProposal(
+          proposalParams,
+        )
+      ) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");
@@ -281,7 +282,7 @@ describe("Client", () => {
           default:
             throw new Error(
               "Unexpected proposal creation step: " +
-                Object.keys(step).join(", ")
+                Object.keys(step).join(", "),
             );
         }
       }
@@ -331,7 +332,7 @@ describe("Client", () => {
             break;
           default:
             throw new Error(
-              "Unexpected vote proposal step: " + Object.keys(step).join(", ")
+              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
             );
         }
       }
@@ -378,7 +379,7 @@ describe("Client", () => {
           default:
             throw new Error(
               "Unexpected execute proposal step: " +
-                Object.keys(step).join(", ")
+                Object.keys(step).join(", "),
             );
         }
       }
@@ -414,7 +415,7 @@ describe("Client", () => {
         },
       };
       const erc20InstallPluginItem = ClientErc20.encoding.getPluginInstallItem(
-        initParams
+        initParams,
       );
 
       expect(typeof erc20InstallPluginItem).toBe("object");
@@ -447,10 +448,11 @@ describe("Client", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const updatePluginSettingsAction = client.encoding.updatePluginSettingsAction(
-        pluginAddress,
-        params
-      );
+      const updatePluginSettingsAction = client.encoding
+        .updatePluginSettingsAction(
+          pluginAddress,
+          params,
+        );
 
       expect(typeof updatePluginSettingsAction).toBe("object");
       expect(updatePluginSettingsAction.data).toBeInstanceOf(Uint8Array);
@@ -466,9 +468,8 @@ describe("Client", () => {
       };
 
       const minterAddress = "0x1234567890123456789012345678901234567890";
-      expect(() =>
-        client.encoding.mintTokenAction(minterAddress, params)
-      ).toThrow(new InvalidAddressError());
+      expect(() => client.encoding.mintTokenAction(minterAddress, params))
+        .toThrow(new InvalidAddressError());
     });
     it("Should encode a mint action with an invalid token address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -480,9 +481,8 @@ describe("Client", () => {
       };
 
       const minterAddress = "0xinvalid_address";
-      expect(() =>
-        client.encoding.mintTokenAction(minterAddress, params)
-      ).toThrow(new InvalidAddressError());
+      expect(() => client.encoding.mintTokenAction(minterAddress, params))
+        .toThrow(new InvalidAddressError());
     });
     it("Should encode an ERC20 token mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -514,13 +514,15 @@ describe("Client", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const updatePluginSettingsAction = client.encoding.updatePluginSettingsAction(
-        pluginAddress,
-        params
-      );
-      const decodedParams: IPluginSettings = client.decoding.updatePluginSettingsAction(
-        updatePluginSettingsAction.data
-      );
+      const updatePluginSettingsAction = client.encoding
+        .updatePluginSettingsAction(
+          pluginAddress,
+          params,
+        );
+      const decodedParams: IPluginSettings = client.decoding
+        .updatePluginSettingsAction(
+          updatePluginSettingsAction.data,
+        );
 
       expect(decodedParams.minDuration).toBe(params.minDuration);
       expect(decodedParams.minSupport).toBe(params.minSupport);
@@ -541,7 +543,7 @@ describe("Client", () => {
 
       expect(decodedParams.address).toBe(params.address);
       expect(bytesToHex(action.data, true)).toBe(
-        "0x40c10f190000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a"
+        "0x40c10f190000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a",
       );
       expect(decodedParams.amount).toBe(params.amount);
     });
@@ -553,7 +555,7 @@ describe("Client", () => {
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow(
-        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`
+        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.6.0)`,
       );
     });
 
@@ -569,12 +571,13 @@ describe("Client", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const updatePluginSettingsAction = client.encoding.updatePluginSettingsAction(
-        pluginAddress,
-        params
-      );
+      const updatePluginSettingsAction = client.encoding
+        .updatePluginSettingsAction(
+          pluginAddress,
+          params,
+        );
       const iface = client.decoding.findInterface(
-        updatePluginSettingsAction.data
+        updatePluginSettingsAction.data,
       );
       expect(iface?.id).toBe("function changeVoteConfig(uint64,uint64,uint64)");
       expect(iface?.functionName).toBe("changeVoteConfig");
@@ -662,10 +665,12 @@ describe("Client", () => {
         expect(typeof proposal.settings.minSupport).toBe("number");
         expect(typeof proposal.settings.minTurnout).toBe("number");
         expect(
-          proposal.settings.minSupport >= 0 && proposal.settings.minSupport <= 1
+          proposal.settings.minSupport >= 0 &&
+            proposal.settings.minSupport <= 1,
         ).toBe(true);
         expect(
-          proposal.settings.minTurnout >= 0 && proposal.settings.minTurnout <= 1
+          proposal.settings.minTurnout >= 0 &&
+            proposal.settings.minTurnout <= 1,
         ).toBe(true);
         // token
         expect(typeof proposal.token.name).toBe("string");
@@ -784,7 +789,7 @@ describe("Client", () => {
         daoAddressOrEns: address,
       };
       await expect(() => client.methods.getProposals(params)).rejects.toThrow(
-        new InvalidAddressOrEnsError()
+        new InvalidAddressOrEnsError(),
       );
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {

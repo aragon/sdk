@@ -84,7 +84,6 @@ import {
 } from "./internal/utils/client";
 import { QueryTransfers } from "./internal/graphql-queries/transfer";
 
-
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's
  */
@@ -712,7 +711,7 @@ export class Client extends ClientCore implements IClient {
       where = { dao: address };
     }
     if (type) {
-      where = { ...where, type: SubgraphTransferTypeMap.get(type)};
+      where = { ...where, type: SubgraphTransferTypeMap.get(type) };
     }
     try {
       await this.graphql.ensureOnline();

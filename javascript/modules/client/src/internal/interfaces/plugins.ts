@@ -16,19 +16,19 @@ import {
 export interface IClientErc20 extends IClientCore {
   methods: {
     createProposal: (
-      params: ICreateProposalParams
+      params: ICreateProposalParams,
     ) => AsyncGenerator<ProposalCreationStepValue>;
     voteProposal: (
-      params: IVoteProposalParams
+      params: IVoteProposalParams,
     ) => AsyncGenerator<VoteProposalStepValue>;
     executeProposal: (
-      params: IExecuteProposalParams
+      params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
     canVote: (params: ICanVoteParams) => Promise<boolean>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<Erc20Proposal | null>;
     getProposals: (
-      params?: IProposalQueryParams
+      params?: IProposalQueryParams,
     ) => Promise<Erc20ProposalListItem[]>;
     getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
     getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
@@ -37,7 +37,7 @@ export interface IClientErc20 extends IClientCore {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     updatePluginSettingsAction: (
       pluginAddress: string,
-      params: IPluginSettings
+      params: IPluginSettings,
     ) => DaoAction;
   };
   decoding: {
@@ -46,11 +46,11 @@ export interface IClientErc20 extends IClientCore {
   };
   estimation: {
     createProposal: (
-      params: ICreateProposalParams
+      params: ICreateProposalParams,
     ) => Promise<GasFeeEstimation>;
     voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
     executeProposal: (
-      params: IExecuteProposalParams
+      params: IExecuteProposalParams,
     ) => Promise<GasFeeEstimation>;
   };
 }
@@ -61,19 +61,19 @@ export interface IClientErc20 extends IClientCore {
 export interface IClientAddressList extends IClientCore {
   methods: {
     createProposal: (
-      params: ICreateProposalParams
+      params: ICreateProposalParams,
     ) => AsyncGenerator<ProposalCreationStepValue>;
     voteProposal: (
-      params: IVoteProposalParams
+      params: IVoteProposalParams,
     ) => AsyncGenerator<VoteProposalStepValue>;
     executeProposal: (
-      params: IExecuteProposalParams
+      params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
     canVote: (params: ICanVoteParams) => Promise<boolean>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<AddressListProposal | null>;
     getProposals: (
-      params?: IProposalQueryParams
+      params?: IProposalQueryParams,
     ) => Promise<AddressListProposalListItem[]>;
     getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
   };
@@ -81,7 +81,7 @@ export interface IClientAddressList extends IClientCore {
     /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
     updatePluginSettingsAction: (
       pluginAddress: string,
-      params: IPluginSettings
+      params: IPluginSettings,
     ) => DaoAction;
   };
   decoding: {
@@ -90,11 +90,11 @@ export interface IClientAddressList extends IClientCore {
   };
   estimation: {
     createProposal: (
-      params: ICreateProposalParams
+      params: ICreateProposalParams,
     ) => Promise<GasFeeEstimation>;
     voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
     executeProposal: (
-      params: IExecuteProposalParams
+      params: IExecuteProposalParams,
     ) => Promise<GasFeeEstimation>;
   };
 }
