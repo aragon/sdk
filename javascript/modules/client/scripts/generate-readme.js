@@ -23,7 +23,7 @@ async function generateReadme() {
         );
         const code = data.toString().replace(mdRegex, "");
         let readmeStr = md;
-        if (code) {
+        if (code && code !== "\n") {
           readmeStr = md + `\n\`\`\`ts\n` + code + `\n\`\`\`\n`;
         }
         await fs.promises.appendFile(outputFile, readmeStr);

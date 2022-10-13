@@ -24,6 +24,7 @@ export {
   IRevokePermissionParams,
   ITransferQueryParams,
   IWithdrawParams,
+  Permissions,
   Transfer,
   TransferSortBy,
   TransferType,

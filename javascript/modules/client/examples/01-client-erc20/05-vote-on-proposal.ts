@@ -1,4 +1,4 @@
-/*
+/* MARKDOWN
 ### Voting on an ERC20 proposal
 */
 import {

@@ -1,4 +1,4 @@
-/*
+/* MARKDOWN
 ### Loading a plugin's settings
 */
 import {
