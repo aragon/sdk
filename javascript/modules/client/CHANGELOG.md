@@ -17,11 +17,13 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-
+### Changed
+- Examples folder and files
+- Automatic generated README from examples
 ## 0.11.0-alpha
 On 2022-10-17 09:26:34
 ### Fixed
-- Fix README for `finInterface` function
+- Fix README for `findInterface` function
 ### Added
 - Filtering by status and daoAddress in getProposals
 - Types for contract params
