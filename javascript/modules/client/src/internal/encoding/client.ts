@@ -26,7 +26,7 @@ export function getFunctionFragment(data: Uint8Array): FunctionFragment {
   return inter.getFunction(hexBytes.substring(0, 10));
 }
 export function encodeFreezeAction(
-  params: IFreezePermissionParams
+  params: IFreezePermissionParams,
 ): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
   const args = freezeParamsToContract(params);
@@ -36,12 +36,12 @@ export function encodeFreezeAction(
 }
 
 export function decodeFreezeActionData(
-  data: Uint8Array
+  data: Uint8Array,
 ): IFreezePermissionDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
-    hexBytes.substring(0, 10) as any
+    hexBytes.substring(0, 10) as any,
   );
   const expectedFunction = daoInterface.getFunction("freeze");
   if (receivedFunction.name !== expectedFunction.name) {
@@ -52,25 +52,24 @@ export function decodeFreezeActionData(
 }
 
 function freezeParamsToContract(
-  params: IFreezePermissionParams
+  params: IFreezePermissionParams,
 ): ContractFreezeParams {
   return [params.where, keccak256(toUtf8Bytes(params.permission))];
 }
 function freezeParamsFromContract(
-  result: Result
+  result: Result,
 ): IFreezePermissionDecodedParams {
   return {
     where: result[0],
     permissionId: result[1],
-    permission:
-      Object.keys(PermissionIds)
-        .find(k => PermissionIds[k] === result[1])
-        ?.replace(/_ID$/, "") || "",
+    permission: Object.keys(PermissionIds)
+      .find((k) => PermissionIds[k] === result[1])
+      ?.replace(/_ID$/, "") || "",
   };
 }
 
 export function encodeGrantActionData(
-  params: IGrantPermissionParams
+  params: IGrantPermissionParams,
 ): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
   const args = permissionParamsToContract(params);
@@ -80,12 +79,12 @@ export function encodeGrantActionData(
 }
 
 export function decodeGrantActionData(
-  data: Uint8Array
+  data: Uint8Array,
 ): IGrantPermissionDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
-    hexBytes.substring(0, 10) as any
+    hexBytes.substring(0, 10) as any,
   );
   const expectedFunction = daoInterface.getFunction("grant");
   if (receivedFunction.name !== expectedFunction.name) {
@@ -96,7 +95,7 @@ export function decodeGrantActionData(
 }
 
 export function encodeRevokeActionData(
-  params: IRevokePermissionParams
+  params: IRevokePermissionParams,
 ): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
   const args = permissionParamsToContract(params);
@@ -106,12 +105,12 @@ export function encodeRevokeActionData(
 }
 
 export function decodeRevokeActionData(
-  data: Uint8Array
+  data: Uint8Array,
 ): IRevokePermissionDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
-    hexBytes.substring(0, 10) as any
+    hexBytes.substring(0, 10) as any,
   );
   const expectedFunction = daoInterface.getFunction("revoke");
   if (receivedFunction.name !== expectedFunction.name) {
@@ -122,21 +121,20 @@ export function decodeRevokeActionData(
 }
 
 function permissionParamsToContract(
-  params: IGrantPermissionParams | IRevokePermissionParams
+  params: IGrantPermissionParams | IRevokePermissionParams,
 ): ContractPermissionParams {
   return [params.where, params.who, keccak256(toUtf8Bytes(params.permission))];
 }
 function permissionParamsFromContract(
-  result: Result
+  result: Result,
 ): IGrantPermissionDecodedParams | IRevokePermissionDecodedParams {
   return {
     where: result[0],
     who: result[1],
     permissionId: result[2],
-    permission:
-      Object.keys(PermissionIds)
-        .find(k => PermissionIds[k] === result[2])
-        ?.replace(/_ID$/, "") || "",
+    permission: Object.keys(PermissionIds)
+      .find((k) => PermissionIds[k] === result[2])
+      ?.replace(/_ID$/, "") || "",
   };
 }
 
@@ -152,7 +150,7 @@ export function decodeWithdrawActionData(data: Uint8Array): IWithdrawParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
-    hexBytes.substring(0, 10) as any
+    hexBytes.substring(0, 10) as any,
   );
   const expectedFunction = daoInterface.getFunction("withdraw");
   if (receivedFunction.name !== expectedFunction.name) {
@@ -172,7 +170,7 @@ function withdrawParamsFromContract(result: Result): IWithdrawParams {
 }
 
 function withdrawParamsToContract(
-  params: IWithdrawParams
+  params: IWithdrawParams,
 ): ContractWithdrawParams {
   return [
     params.tokenAddress ?? AddressZero,
@@ -193,7 +191,7 @@ export function decodeUpdateMetadataAction(data: Uint8Array): string {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = daoInterface.getFunction(
-    hexBytes.substring(0, 10) as any
+    hexBytes.substring(0, 10) as any,
   );
   const expectedFunction = daoInterface.getFunction("setMetadata");
   if (receivedFunction.name !== expectedFunction.name) {
@@ -202,7 +200,8 @@ export function decodeUpdateMetadataAction(data: Uint8Array): string {
   const result = daoInterface.decodeFunctionData("setMetadata", data);
   const bytes = hexToBytes(result[0]);
   const cid = new TextDecoder().decode(bytes);
-  const ipfsRegex = /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
+  const ipfsRegex =
+    /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
   if (!ipfsRegex.test(cid)) {
     throw new Error("The metadata URL defined on the DAO is invalid");
   }
