@@ -23,7 +23,7 @@
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why",
-    "readme": "node ./scripts/generate-readme.js ./examples ./README.generated.md"
+    "examples": "node ./scripts/generate-examples-md.js ./examples ./examples.md"
   },
   "husky": {
     "hooks": {
