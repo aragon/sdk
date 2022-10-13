@@ -21,7 +21,7 @@ yarn add @aragon/sdk-client
 
 # Usage
 
-[See examples file](./examples.md)
+An exhaustive list of the SDK features and methods can be found on the **[examples.md](examples.md) file**.
 
 # Development
 

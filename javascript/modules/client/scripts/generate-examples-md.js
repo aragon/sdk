@@ -1,11 +1,17 @@
 const fs = require("fs");
 const { argv } = require("process");
 
-generateReadme();
+generateExamplesMd();
 
-async function generateReadme() {
+async function generateExamplesMd() {
   const path = argv[2];
   const outputFile = argv[3];
+  if (!path || !outputFile) {
+    console.error(
+      "Usage:  node generate-examples-md.js <examples-folder> <output-file.md>"
+    );
+    process.exit(1);
+  }
   const mdRegex = /(\/\* MARKDOWN)(.|\n)*?(\*\/)/;
   const files = getFileNames(path);
   if (fs.existsSync(outputFile)) {
