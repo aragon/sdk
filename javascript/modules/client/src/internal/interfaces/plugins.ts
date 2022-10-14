@@ -7,6 +7,7 @@ import {
   IInterfaceParams,
   IPagination,
 } from "./common";
+import { BigNumber } from "@ethersproject/bignumber";
 
 // NOTE: These 2 clients will eventually be moved to their own package
 
@@ -419,3 +420,22 @@ export interface IMintTokenParams {
   address: string;
   amount: bigint;
 }
+
+export type ContractMintTokenParams = [string, BigNumber];
+export type ContractErc20InitParams = [
+  string,
+  string,
+  BigNumber,
+  BigNumber,
+  BigNumber,
+  string,
+];
+export type ContractAddressListInitParams = [
+  string,
+  string,
+  BigNumber,
+  BigNumber,
+  BigNumber,
+  string[],
+];
+export type ContractPluginSettings = [BigNumber, BigNumber, BigNumber];

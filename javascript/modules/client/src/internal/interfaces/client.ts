@@ -11,6 +11,7 @@ import {
 } from "./common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { BigNumber } from "@ethersproject/bignumber";
 /** Defines the shape of the general purpose Client class */
 export interface IClient extends IClientCore {
   methods: {
@@ -303,11 +304,13 @@ export enum SubgraphPluginTypeName {
   ADDRESS_LIST = "AllowlistPackage",
 }
 
-export const SubgraphPluginTypeMap: Map<SubgraphPluginTypeName, string> =
-  new Map([
-    [SubgraphPluginTypeName.ERC20, "erc20voting.dao.eth"],
-    [SubgraphPluginTypeName.ADDRESS_LIST, "addresslistvoting.dao.eth"],
-  ]);
+export const SubgraphPluginTypeMap: Map<
+  SubgraphPluginTypeName,
+  string
+> = new Map([
+  [SubgraphPluginTypeName.ERC20, "erc20voting.dao.eth"],
+  [SubgraphPluginTypeName.ADDRESS_LIST, "addresslistvoting.dao.eth"],
+]);
 
 export type SubgraphPluginListItem = {
   pkg: {
@@ -365,8 +368,14 @@ export type SubgraphErc20Token = {
   symbol: string;
   decimals: string;
 };
-export const SubgraphTransferTypeMap: Map<TransferType, SubgraphTransferType> =
-  new Map([
-    [TransferType.DEPOSIT, SubgraphTransferType.DEPOSIT],
-    [TransferType.WITHDRAW, SubgraphTransferType.WITHDRAW],
-  ]);
+export const SubgraphTransferTypeMap: Map<
+  TransferType,
+  SubgraphTransferType
+> = new Map([
+  [TransferType.DEPOSIT, SubgraphTransferType.DEPOSIT],
+  [TransferType.WITHDRAW, SubgraphTransferType.WITHDRAW],
+]);
+
+export type ContractFreezeParams = [string, string];
+export type ContractPermissionParams = [string, string, string];
+export type ContractWithdrawParams = [string, string, BigNumber, string];

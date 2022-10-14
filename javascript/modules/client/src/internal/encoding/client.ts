@@ -5,6 +5,9 @@ import { AddressZero } from "@ethersproject/constants";
 import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import {
+  ContractFreezeParams,
+  ContractPermissionParams,
+  ContractWithdrawParams,
   IFreezePermissionDecodedParams,
   IFreezePermissionParams,
   IGrantPermissionDecodedParams,
@@ -26,7 +29,7 @@ export function encodeFreezeAction(
   params: IFreezePermissionParams,
 ): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
-  const args = unwrapFreezeParams(params);
+  const args = freezeParamsToContract(params);
   // get hex bytes
   const hexBytes = daoInterface.encodeFunctionData("freeze", args);
   return hexToBytes(strip0x(hexBytes));
@@ -42,31 +45,26 @@ export function decodeFreezeActionData(
   );
   const expectedFunction = daoInterface.getFunction("freeze");
   if (receivedFunction.name !== expectedFunction.name) {
-    throw new Error(
-      "The received action is different from the expected one",
-    );
+    throw new Error("The received action is different from the expected one");
   }
   const result = daoInterface.decodeFunctionData("freeze", data);
-  return wrapFreezeParams(result);
+  return freezeParamsFromContract(result);
 }
 
-function unwrapFreezeParams(
+function freezeParamsToContract(
   params: IFreezePermissionParams,
-): [string, string] {
-  return [
-    params.where,
-    keccak256(toUtf8Bytes(params.permission)),
-  ];
+): ContractFreezeParams {
+  return [params.where, keccak256(toUtf8Bytes(params.permission))];
 }
-function wrapFreezeParams(
+function freezeParamsFromContract(
   result: Result,
 ): IFreezePermissionDecodedParams {
   return {
     where: result[0],
     permissionId: result[1],
-    permission:
-      Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[1])
-        ?.replace(/_ID$/, "") || "",
+    permission: Object.keys(PermissionIds)
+      .find((k) => PermissionIds[k] === result[1])
+      ?.replace(/_ID$/, "") || "",
   };
 }
 
@@ -74,7 +72,7 @@ export function encodeGrantActionData(
   params: IGrantPermissionParams,
 ): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
-  const args = unwrapPermissionParams(params);
+  const args = permissionParamsToContract(params);
   // get hex bytes
   const hexBytes = daoInterface.encodeFunctionData("grant", args);
   return hexToBytes(strip0x(hexBytes));
@@ -90,19 +88,17 @@ export function decodeGrantActionData(
   );
   const expectedFunction = daoInterface.getFunction("grant");
   if (receivedFunction.name !== expectedFunction.name) {
-    throw new Error(
-      "The received action is different from the expected one",
-    );
+    throw new Error("The received action is different from the expected one");
   }
   const result = daoInterface.decodeFunctionData("grant", data);
-  return wrapPermissionParams(result);
+  return permissionParamsFromContract(result);
 }
 
 export function encodeRevokeActionData(
   params: IRevokePermissionParams,
 ): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
-  const args = unwrapPermissionParams(params);
+  const args = permissionParamsToContract(params);
   // get hex bytes
   const hexBytes = daoInterface.encodeFunctionData("revoke", args);
   return hexToBytes(strip0x(hexBytes));
@@ -118,39 +114,33 @@ export function decodeRevokeActionData(
   );
   const expectedFunction = daoInterface.getFunction("revoke");
   if (receivedFunction.name !== expectedFunction.name) {
-    throw new Error(
-      "The received action is different from the expected one",
-    );
+    throw new Error("The received action is different from the expected one");
   }
   const result = daoInterface.decodeFunctionData("revoke", data);
-  return wrapPermissionParams(result);
+  return permissionParamsFromContract(result);
 }
 
-function unwrapPermissionParams(
+function permissionParamsToContract(
   params: IGrantPermissionParams | IRevokePermissionParams,
-): [string, string, string] {
-  return [
-    params.where,
-    params.who,
-    keccak256(toUtf8Bytes(params.permission)),
-  ];
+): ContractPermissionParams {
+  return [params.where, params.who, keccak256(toUtf8Bytes(params.permission))];
 }
-function wrapPermissionParams(
+function permissionParamsFromContract(
   result: Result,
 ): IGrantPermissionDecodedParams | IRevokePermissionDecodedParams {
   return {
     where: result[0],
     who: result[1],
     permissionId: result[2],
-    permission:
-      Object.keys(PermissionIds).find((k) => PermissionIds[k] === result[2])
-        ?.replace(/_ID$/, "") || "",
+    permission: Object.keys(PermissionIds)
+      .find((k) => PermissionIds[k] === result[2])
+      ?.replace(/_ID$/, "") || "",
   };
 }
 
 export function encodeWithdrawActionData(params: IWithdrawParams): Uint8Array {
   const daoInterface = DAO__factory.createInterface();
-  const args = unwrapWithdrawParams(params);
+  const args = withdrawParamsToContract(params);
   // get hex bytes
   const hexBytes = daoInterface.encodeFunctionData("withdraw", args);
   return hexToBytes(strip0x(hexBytes));
@@ -164,17 +154,13 @@ export function decodeWithdrawActionData(data: Uint8Array): IWithdrawParams {
   );
   const expectedFunction = daoInterface.getFunction("withdraw");
   if (receivedFunction.name !== expectedFunction.name) {
-    throw new Error(
-      "The received action is different from the expected one",
-    );
+    throw new Error("The received action is different from the expected one");
   }
   const result = daoInterface.decodeFunctionData("withdraw", data);
-  return wrapWithdrawParams(result);
+  return withdrawParamsFromContract(result);
 }
 
-function wrapWithdrawParams(
-  result: Result,
-): IWithdrawParams {
+function withdrawParamsFromContract(result: Result): IWithdrawParams {
   return {
     tokenAddress: result[0],
     recipientAddress: result[1],
@@ -183,9 +169,9 @@ function wrapWithdrawParams(
   };
 }
 
-function unwrapWithdrawParams(
+function withdrawParamsToContract(
   params: IWithdrawParams,
-): [string, string, BigNumber, string] {
+): ContractWithdrawParams {
   return [
     params.tokenAddress ?? AddressZero,
     params.recipientAddress,
@@ -209,9 +195,7 @@ export function decodeUpdateMetadataAction(data: Uint8Array): string {
   );
   const expectedFunction = daoInterface.getFunction("setMetadata");
   if (receivedFunction.name !== expectedFunction.name) {
-    throw new Error(
-      "The received action is different from the expected one",
-    );
+    throw new Error("The received action is different from the expected one");
   }
   const result = daoInterface.decodeFunctionData("setMetadata", data);
   const bytes = hexToBytes(result[0]);
@@ -219,9 +203,7 @@ export function decodeUpdateMetadataAction(data: Uint8Array): string {
   const ipfsRegex =
     /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
   if (!ipfsRegex.test(cid)) {
-    throw new Error(
-      "The metadata URL defined on the DAO is invalid",
-    );
+    throw new Error("The metadata URL defined on the DAO is invalid");
   }
   return cid;
 }
