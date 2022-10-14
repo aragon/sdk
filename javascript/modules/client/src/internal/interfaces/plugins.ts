@@ -421,7 +421,21 @@ export interface IMintTokenParams {
   amount: bigint;
 }
 
-export type ContractMintTokenParams = [string, BigNumber] 
-export type ContractErc20InitParams = [string, string, BigNumber, BigNumber, BigNumber, string]
-export type ContractAddressListInitParams = [string, string, BigNumber, BigNumber, BigNumber, string[]]
-export type ContractPluginSettings = [BigNumber, BigNumber, BigNumber]
+export type ContractMintTokenParams = [string, BigNumber];
+export type ContractErc20InitParams = [
+  string,
+  string,
+  BigNumber,
+  BigNumber,
+  BigNumber,
+  string,
+];
+export type ContractAddressListInitParams = [
+  string,
+  string,
+  BigNumber,
+  BigNumber,
+  BigNumber,
+  string[],
+];
+export type ContractPluginSettings = [BigNumber, BigNumber, BigNumber];
