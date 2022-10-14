@@ -37,6 +37,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import {
   Contract,
+  ContractFactory,
   ContractReceipt,
   ContractTransaction,
 } from "@ethersproject/contracts";
@@ -54,6 +55,7 @@ import {
   GraphQLError,
   InvalidAddressOrEnsError,
   NoProviderError,
+  NoSignerError,
   Random,
   strip0x,
 } from "@aragon/sdk-common";
@@ -555,16 +557,41 @@ export class Client extends ClientCore implements IClient {
       });
   }
 
-  _estimateUpdateAllowance(_params: IDepositParams) {
+  async _estimateUpdateAllowance(params: IDepositParams) {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
+    } else if (!params.tokenAddress) {
+      throw new NoTokenAddress();
     }
-    // TODO: remove this
+    // resolve ens
+    let daoAddreess = params.daoAddress;
+    if (!isAddress(daoAddreess)) {
+      await this.web3.ensureOnline();
+      const provider = this.web3.getProvider();
+      if (!provider) {
+        throw new NoProviderError();
+      }
+      const resolvedAddress = await provider.resolveName(daoAddreess);
+      if (!resolvedAddress) {
+        throw new InvalidAddressOrEnsError();
+      }
+      daoAddreess = resolvedAddress;
+    }
+
+    const contract = new Contract(
+      params.tokenAddress,
+      erc20ContractAbi,
+      signer,
+    );
+    const estimation = await contract.estimateGas.approve(
+      params.daoAddress,
+      params.amount,
+    );
     return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+      this.web3.getApproximateGasFee(estimation.toBigInt()),
     );
   }
 
