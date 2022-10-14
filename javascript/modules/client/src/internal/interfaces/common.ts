@@ -23,8 +23,8 @@ export type DaoAction = {
  * plugins can be initialized
  */
 export interface IPluginInstallItem {
-  id: string // ENS domain or address of the plugin's Repo
-  data: Uint8Array
+  id: string; // ENS domain or address of the plugin's Repo
+  data: Uint8Array;
 }
 
 /**
@@ -65,14 +65,14 @@ export type Proposal = {
 };
 
 export interface IPagination {
-  skip?: number
-  limit?: number
-  direction?: SortDirection
+  skip?: number;
+  limit?: number;
+  direction?: SortDirection;
 }
 
 export enum SortDirection {
   ASC = "asc",
-  DESC = "desc"
+  DESC = "desc",
 }
 
 /**
@@ -88,8 +88,7 @@ export enum ProposalStatus {
 }
 
 export interface IInterfaceParams {
-  id: string
-  functionName: string
-  hash: string
+  id: string;
+  functionName: string;
+  hash: string;
 }
-

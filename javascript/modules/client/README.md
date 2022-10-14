@@ -42,7 +42,7 @@ const contextParams: ContextParams = {
   }],
   graphqlNodes: [{
     url:
-      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-rinkeby",
+      "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli",
   }],
 };
 
@@ -923,6 +923,7 @@ import {
   Erc20ProposalListItem,
   IProposalQueryParams,
   ProposalSortBy,
+  ProposalStatus,
   SortDirection,
 } from "@aragon/sdk-client";
 import { Wallet } from "ethers";
@@ -939,6 +940,8 @@ const queryParams: IProposalQueryParams = {
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
   sortBy: ProposalSortBy.POPULARITY, //optional
+  status: ProposalStatus.ACTIVE, // optional
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890", // optional
 };
 
 const proposals: Erc20ProposalListItem[] = await client.methods.getProposals(
@@ -1513,6 +1516,8 @@ const queryParams: IProposalQueryParams = {
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
   sortBy: ProposalSortBy.POPULARITY, //optional
+  status: ProposalStatus.ACTIVE, // optional
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890", // optional
 };
 
 const proposals: AddressListProposalListItem[] = await client.methods

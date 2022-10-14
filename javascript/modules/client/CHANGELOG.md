@@ -19,6 +19,8 @@ TEMPLATE:
 ## [UPCOMING]
 ### Fixed
 - Fix README for `finInterface` function
+### Added
+- Filtering by status and daoAddress in getProposals
 
 ## 0.10.3-alpha
 On 2022-10-05 13:13:17

@@ -24,9 +24,7 @@ export interface IClientErc20 extends IClientCore {
     executeProposal: (
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
-    canVote: (
-      params: ICanVoteParams,
-    ) => Promise<boolean>;
+    canVote: (params: ICanVoteParams) => Promise<boolean>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<Erc20Proposal | null>;
     getProposals: (
@@ -71,9 +69,7 @@ export interface IClientAddressList extends IClientCore {
     executeProposal: (
       params: IExecuteProposalParams,
     ) => AsyncGenerator<ExecuteProposalStepValue>;
-    canVote: (
-      params: ICanVoteParams,
-    ) => Promise<boolean>;
+    canVote: (params: ICanVoteParams) => Promise<boolean>;
     getMembers: (addressOrEns: string) => Promise<string[]>;
     getProposal: (propoosalId: string) => Promise<AddressListProposal | null>;
     getProposals: (
@@ -323,6 +319,7 @@ export type Erc20TokenDetails = {
 
 export interface IProposalQueryParams extends IPagination {
   sortBy?: ProposalSortBy;
+  status?: ProposalStatus;
   daoAddressOrEns?: string;
 }
 
@@ -338,12 +335,14 @@ export enum SubgraphVoteValues {
   NO = "No",
   ABSTAIN = "Abstain",
 }
-export const SubgraphVoteValuesMap: Map<SubgraphVoteValues, VoteValues> =
-  new Map([
-    [SubgraphVoteValues.YES, VoteValues.YES],
-    [SubgraphVoteValues.NO, VoteValues.NO],
-    [SubgraphVoteValues.ABSTAIN, VoteValues.ABSTAIN],
-  ]);
+export const SubgraphVoteValuesMap: Map<
+  SubgraphVoteValues,
+  VoteValues
+> = new Map([
+  [SubgraphVoteValues.YES, VoteValues.YES],
+  [SubgraphVoteValues.NO, VoteValues.NO],
+  [SubgraphVoteValues.ABSTAIN, VoteValues.ABSTAIN],
+]);
 
 type SubgraphVoterListItemBase = {
   voter: {
@@ -377,6 +376,7 @@ type SubgraphProposalBase = {
   startDate: string;
   endDate: string;
   executed: boolean;
+  executable: boolean;
 };
 
 export type SubgraphErc20ProposalListItem = SubgraphProposalBase & {
@@ -411,9 +411,8 @@ export type SubgraphAddressListProposal = SubgraphProposalBase & {
 export interface IComputeStatusProposal {
   startDate: string;
   endDate: string;
-  yes: string;
-  no: string;
   executed: boolean;
+  executable: boolean;
 }
 
 export interface IMintTokenParams {

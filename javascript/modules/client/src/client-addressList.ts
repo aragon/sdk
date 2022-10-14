@@ -50,6 +50,7 @@ import {
 } from "./internal/interfaces/plugins";
 import { delay } from "./internal/temp-mock";
 import {
+  computeProposalStatusFilter,
   isProposalId,
   toAddressListProposal,
   toAddressListProposalListItem,
@@ -424,6 +425,7 @@ export class ClientAddressList extends ClientCore
   private async _getProposals({
     daoAddressOrEns,
     limit = 10,
+    status,
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = ProposalSortBy.CREATED_AT,
@@ -444,6 +446,9 @@ export class ClientAddressList extends ClientCore
         address = resolvedAddress;
       }
       where = { dao: address };
+    }
+    if (status) {
+      where = { ...where, ...computeProposalStatusFilter(status) };
     }
     try {
       await this.graphql.ensureOnline();

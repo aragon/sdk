@@ -34,6 +34,7 @@ import {
 } from "./internal/interfaces/common";
 import { ContextPlugin } from "./context-plugin";
 import {
+  computeProposalStatusFilter,
   isProposalId,
   toErc20Proposal,
   toErc20ProposalListItem,
@@ -542,6 +543,7 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
   private async _getProposals({
     daoAddressOrEns,
     limit = 10,
+    status,
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = ProposalSortBy.CREATED_AT,
@@ -562,6 +564,9 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
         address = resolvedAddress;
       }
       where = { dao: address };
+    }
+    if (status) {
+      where = { ...where, ...computeProposalStatusFilter(status) };
     }
     try {
       await this.graphql.ensureOnline();

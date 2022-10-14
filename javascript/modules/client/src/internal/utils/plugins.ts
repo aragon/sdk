@@ -34,12 +34,39 @@ export function computeProposalStatus(
   } else if (proposal.executed) {
     return ProposalStatus.EXECUTED;
   } else if (
-    proposal.yes && proposal.no && BigInt(proposal.yes) > BigInt(proposal.no)
+    proposal.executable
   ) {
     return ProposalStatus.SUCCEEDED;
   } else {
     return ProposalStatus.DEFEATED;
   }
+}
+
+export function computeProposalStatusFilter(
+  status: ProposalStatus,
+): Object {
+  let where = {};
+  const now = Math.round(new Date().getTime() / 1000).toString();
+  switch (status) {
+    case ProposalStatus.PENDING:
+      where = { startDate_gte: now };
+      break;
+    case ProposalStatus.ACTIVE:
+      where = { startDate_lt: now, endDate_gte: now };
+      break;
+    case ProposalStatus.EXECUTED:
+      where = { executed: true };
+      break;
+    case ProposalStatus.SUCCEEDED:
+      where = { executable: true, endDate_lt: now };
+      break;
+    case ProposalStatus.DEFEATED:
+      where = { executable: false, endDate_lt: now };
+      break;
+    default:
+      throw new Error("invalid proposal status");
+  }
+  return where;
 }
 
 export function isProposalId(propoosalId: string): boolean {

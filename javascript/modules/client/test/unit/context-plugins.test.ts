@@ -26,7 +26,7 @@ describe("ContextPlugin instances", () => {
       daoFactoryAddress: "0x1234",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
-      graphqlNodes: []
+      graphqlNodes: [],
     };
   });
   it("Should create an empty context", () => {
