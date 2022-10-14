@@ -8,7 +8,6 @@ import {
   ContextPlugin,
   Erc20Proposal,
 } from "@aragon/sdk-client";
-import { Wallet } from "ethers";
 import { contextParams } from "../context";
 
 // Create a simple context

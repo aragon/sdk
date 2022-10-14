@@ -7,7 +7,6 @@ import {
   ContextPlugin,
   ICreateProposalParams,
   IPluginSettings,
-  IProposalSettings,
   ProposalCreationSteps,
   VoteValues,
 } from "@aragon/sdk-client";

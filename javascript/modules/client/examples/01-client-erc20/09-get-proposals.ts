@@ -11,6 +11,7 @@ import {
   IProposalQueryParams,
   ProposalSortBy,
   SortDirection,
+  ProposalStatus,
 } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -25,7 +26,8 @@ const queryParams: IProposalQueryParams = {
   skip: 0, // optional
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
-  sortBy: ProposalSortBy.POPULARITY, //optional
+  sortBy: ProposalSortBy.POPULARITY, // optional
+  status: ProposalStatus.ACTIVE, // optional
 };
 
 const proposals: Erc20ProposalListItem[] = await client.methods.getProposals(

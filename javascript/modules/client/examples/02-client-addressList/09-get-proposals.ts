@@ -8,9 +8,9 @@ import {
   ContextPlugin,
   IProposalQueryParams,
   ProposalSortBy,
+  ProposalStatus,
   SortDirection,
 } from "@aragon/sdk-client";
-import { Wallet } from "ethers";
 import { contextParams } from "../context";
 
 // Create a simple context
@@ -25,6 +25,7 @@ const queryParams: IProposalQueryParams = {
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
   sortBy: ProposalSortBy.POPULARITY, //optional
+  status: ProposalStatus.ACTIVE, // optional
 };
 
 const proposals: AddressListProposalListItem[] = await client.methods

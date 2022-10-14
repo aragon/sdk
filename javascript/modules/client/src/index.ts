@@ -56,6 +56,7 @@ export {
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalSortBy,
+  ProposalStatus,
   VoteProposalStep,
   VoteValues,
 } from "./internal/interfaces/plugins";
