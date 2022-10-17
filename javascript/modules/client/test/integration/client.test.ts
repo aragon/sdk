@@ -264,6 +264,28 @@ describe("Client", () => {
       expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
       expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
     });
+    it("Should estimate gas fees updating allowance", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const tokenContract = await deployErc20(client);
+
+      const depositParams: IDepositParams = {
+        daoAddress: daoAddress,
+        amount: BigInt(1234),
+        tokenAddress: tokenContract.address,
+      };
+
+      const gasFeesEstimation = await client.estimation.updateAllowance(
+        depositParams,
+      );
+
+      expect(typeof gasFeesEstimation).toEqual("object");
+      expect(typeof gasFeesEstimation.average).toEqual("bigint");
+      expect(typeof gasFeesEstimation.max).toEqual("bigint");
+      expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
+      expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
+    });
     it("Should allow to deposit Ether", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
