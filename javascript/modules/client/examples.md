@@ -1,12 +1,11 @@
-
 ## Context
 
 The [Context](../../context.ts) class is an utility component that holds the
 configuration passed to any [Client](../../client.ts) instance.
 
 
-```ts
 
+```ts
 import { Context } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";
 import { contextParams } from "../context";
@@ -20,15 +19,14 @@ context.set({ signer: new Wallet("other private key") });
 context.setFull(contextParams);
 
 ```
-
 ## General purpose client
 
 The [Client](./src/client.ts) class allows to perform operations that apply to
 all DAO's, regardless of the plugins they use.
 
 
-```ts
 
+```ts
 import { Client, Context } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 // Can be stored in a singleton and inherited from there
@@ -39,12 +37,11 @@ const client = new Client(context);
 console.log(client);
 
 ```
-
 ### Creating a DAO
 
 
-```ts
 
+```ts
 import {
   Client,
   Context,
@@ -94,78 +91,13 @@ for await (const step of steps) {
 }
 
 ```
-
-### Depositing ERC20 tokens to a DAO
-
-Handles the flow of depositing ERC20 tokens to a DAO.
-
-- Similar to the example above
-- The `tokenAddress` field is required
-- Will attempt to increase the ERC20 allowance if not sufficient
-- More intermediate steps are yielded
-
-
-```ts
-
-import {
-  Client,
-  Context,
-  DaoDepositSteps,
-  GasFeeEstimation,
-  IDepositParams,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context = new Context(contextParams);
-const client = new Client(context);
-const depositParams: IDepositParams = {
-  daoAddress: "0x1234567890123456789012345678901234567890",
-  amount: BigInt(10), // amount
-  tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
-  reference: "test deposit", // optional
-};
-
-// gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
-  depositParams,
-);
-console.log(estimatedGas.average);
-console.log(estimatedGas.max);
-
-const steps = client.methods.deposit(depositParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case DaoDepositSteps.CHECKED_ALLOWANCE:
-        console.log(step.allowance); // 0n
-        break;
-      case DaoDepositSteps.UPDATING_ALLOWANCE:
-        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-        break;
-      case DaoDepositSteps.UPDATED_ALLOWANCE:
-        console.log(step.allowance); // 10n
-        break;
-      case DaoDepositSteps.DEPOSITING:
-        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-        break;
-      case DaoDepositSteps.DONE:
-        console.log(step.amount); // 10n
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-```
-
 ### Loading Multiple DAOs
 
 Handles retrieving list of DAO metadata.
 
 
-```ts
 
+```ts
 import {
   Client,
   Context,
@@ -235,63 +167,13 @@ console.log(daos);
 */
 
 ```
-
-### Depositing ETH to a DAO
-
-Handles the flow of depositing the native EVM token to an Aragon DAO.
-
-
-```ts
-
-import {
-  Client,
-  Context,
-  DaoDepositSteps,
-  GasFeeEstimation,
-  IDepositParams,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-const depositParams: IDepositParams = {
-  daoAddress: "0x1234567890123456789012345678901234567890",
-  amount: BigInt(10), // amount in wei
-  reference: "test deposit", // optional
-};
-
-// gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
-  depositParams,
-);
-console.log(estimatedGas.average);
-console.log(estimatedGas.max);
-
-const steps = client.methods.deposit(depositParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case DaoDepositSteps.DEPOSITING:
-        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-        break;
-      case DaoDepositSteps.DONE:
-        console.log(step.amount); // 10n
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-```
-
 ### Loading DAO activity
 
 Retrieves the list of asset transfers to and from the given DAO (by default,
 from ETH, DAI, USDC and USDT, on Mainnet)
 
-```ts
 
+```ts
 import {
   Client,
   Context,
@@ -362,14 +244,13 @@ console.log(transfers);
 */
 
 ```
-
 ### Loading DAO details
 
 Handles retrieving DAO metadata using its address or ENS domain.
 
 
-```ts
 
+```ts
 import { Client, Context, DaoDetails } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -409,13 +290,12 @@ console.log(dao);
 */
 
 ```
-
 ### Loading DAO financial data
 
 Handles retrieving DAO asset balances using the DAO address or its ENS domain.
 
-```ts
 
+```ts
 import { AssetBalance, Client, Context } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -454,7 +334,136 @@ console.log(balances);
 */
 
 ```
+### Create an ERC20 context
 
+
+```ts
+import { Context, ContextPlugin } from "@aragon/sdk-client";
+import { Wallet } from "@ethersproject/wallet";
+import { contextParams } from "../context";
+
+const context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
+// update
+contextPlugin.set({ network: 1 });
+contextPlugin.set({ signer: new Wallet("other private key") });
+contextPlugin.setFull(contextParams);
+
+console.log(contextPlugin)
+
+```
+### Depositing ERC20 tokens to a DAO
+
+Handles the flow of depositing ERC20 tokens to a DAO.
+
+- Similar to the example above
+- The `tokenAddress` field is required
+- Will attempt to increase the ERC20 allowance if not sufficient
+- More intermediate steps are yielded
+
+
+
+```ts
+import {
+  Client,
+  Context,
+  DaoDepositSteps,
+  GasFeeEstimation,
+  IDepositParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
+
+const context = new Context(contextParams);
+const client = new Client(context);
+const depositParams: IDepositParams = {
+  daoAddress: "0x1234567890123456789012345678901234567890",
+  amount: BigInt(10), // amount
+  tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
+  reference: "test deposit", // optional
+};
+
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
+  depositParams,
+);
+console.log(estimatedGas.average);
+console.log(estimatedGas.max);
+
+const steps = client.methods.deposit(depositParams);
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case DaoDepositSteps.CHECKED_ALLOWANCE:
+        console.log(step.allowance); // 0n
+        break;
+      case DaoDepositSteps.UPDATING_ALLOWANCE:
+        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+        break;
+      case DaoDepositSteps.UPDATED_ALLOWANCE:
+        console.log(step.allowance); // 10n
+        break;
+      case DaoDepositSteps.DEPOSITING:
+        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+        break;
+      case DaoDepositSteps.DONE:
+        console.log(step.amount); // 10n
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+```
+### Depositing ETH to a DAO
+
+Handles the flow of depositing the native EVM token to an Aragon DAO.
+
+
+
+```ts
+import {
+  Client,
+  Context,
+  DaoDepositSteps,
+  GasFeeEstimation,
+  IDepositParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
+
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+const depositParams: IDepositParams = {
+  daoAddress: "0x1234567890123456789012345678901234567890",
+  amount: BigInt(10), // amount in wei
+  reference: "test deposit", // optional
+};
+
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
+  depositParams,
+);
+console.log(estimatedGas.average);
+console.log(estimatedGas.max);
+
+const steps = client.methods.deposit(depositParams);
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case DaoDepositSteps.DEPOSITING:
+        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+        break;
+      case DaoDepositSteps.DONE:
+        console.log(step.amount); // 10n
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+```
 ## ERC20 governance plugin client
 
 This is a `Client`-like class, tailored to suit the specific use cases of the
@@ -465,8 +474,8 @@ underlying network requests.
 
 ### Creating a DAO with an ERC20 plugin
 
-```ts
 
+```ts
 import {
   Client,
   ClientErc20,
@@ -567,47 +576,10 @@ for await (const step of steps) {
 }
 
 ```
-
-### Create an ERC20 context
-
-```ts
-
-import { Context, ContextPlugin } from "@aragon/sdk-client";
-import { Wallet } from "@ethersproject/wallet";
-import { contextParams } from "../context";
-
-const context = new Context(contextParams);
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
-// update
-contextPlugin.set({ network: 1 });
-contextPlugin.set({ signer: new Wallet("other private key") });
-contextPlugin.setFull(contextParams);
-
-console.log(contextPlugin)
-
-```
-
-### Create an ERC20 client
-
-```ts
-
-import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context = new Context(contextParams);
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
-const client = new ClientErc20(contextPlugin);
-
-console.log(client);
-
-```
-
 ### Creating an ERC20 proposal
 
-```ts
 
+```ts
 import {
   ClientErc20,
   Context,
@@ -670,16 +642,17 @@ for await (const step of steps) {
 }
 
 ```
+### Voting on an ERC20 proposal
 
-### Checking if user can vote in an ERC20 proposal
 
 ```ts
-
 import {
   ClientErc20,
   Context,
   ContextPlugin,
-  ICanVoteParams,
+  IVoteProposalParams,
+  VoteProposalStep,
+  VoteValues,
 } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -687,27 +660,36 @@ import { contextParams } from "../context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an address list client
+// Create an ERC20 client
 const client = new ClientErc20(contextPlugin);
 
-const voteParams: ICanVoteParams = {
-  address: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890_0x1",
+const voteParams: IVoteProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890",
+  vote: VoteValues.YES,
 };
 
-const canVote = await client.methods.canVote(voteParams);
-console.log(canVote);
-/*
-true
-*/
+const steps = client.methods.voteProposal(voteParams);
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case VoteProposalStep.VOTING:
+        console.log(step.txHash);
+        break;
+      case VoteProposalStep.DONE:
+        console.log(step.voteId);
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
 
 ```
-
 ### Creating an ERC20 proposal with an action
 
-```ts
 
+```ts
 import {
   ClientErc20,
   Context,
@@ -785,93 +767,27 @@ for await (const step of steps) {
 }
 
 ```
+### Create an ERC20 client
 
-### Voting on an ERC20 proposal
 
 ```ts
-
-import {
-  ClientErc20,
-  Context,
-  ContextPlugin,
-  IVoteProposalParams,
-  VoteProposalStep,
-  VoteValues,
-} from "@aragon/sdk-client";
+import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+const context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
+
 const client = new ClientErc20(contextPlugin);
 
-const voteParams: IVoteProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890",
-  vote: VoteValues.YES,
-};
-
-const steps = client.methods.voteProposal(voteParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case VoteProposalStep.VOTING:
-        console.log(step.txHash);
-        break;
-      case VoteProposalStep.DONE:
-        console.log(step.voteId);
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
+console.log(client);
 
 ```
-
-### Loading a plugin's settings
-
-```ts
-
-import {
-  ClientAddressList,
-  Context,
-  ContextPlugin,
-  IPluginSettings,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an addres list client
-const client = new ClientAddressList(contextPlugin);
-
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
-
-const settings: IPluginSettings | null = await client.methods.getSettings(
-  pluginAddress,
-);
-console.log(settings);
-/*
-  {
-    minDuration: 7200,
-    minTurnout: 0.55,
-    minSupport: 0.25
-  }
-*/
-
-```
-
 ### Loading the list of members (ERC20)
 
 Retrieving all the members of an ERC20 DAO.
 
-```ts
 
+```ts
 import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -897,92 +813,53 @@ console.log(memebers);
 */
 
 ```
+### Checking if user can vote in an ERC20 proposal
 
-## Address List governance plugin client
-### Creating a DAO with a addressList plugin
-
-```ts
-
-import {
-  Client,
-  ClientAddressList,
-  Context,
-  DaoCreationSteps,
-  GasFeeEstimation,
-  IAddressListPluginInstall,
-  ICreateParams,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-
-// Define the plugins to install and their params
-
-const pluginInitParams: IAddressListPluginInstall = {
-  settings: {
-    minDuration: 60 * 60 * 24, // seconds
-    minTurnout: 0.25, // 25%
-    minSupport: 0.5, // 50%
-  },
-  addresses: [
-    "0x1234567890123456789012345678901234567890",
-    "0x2345678901234567890123456789012345678901",
-    "0x3456789012345678901234567890123456789012",
-    "0x4567890123456789012345678901234567890123",
-  ],
-};
-
-const addressListInstallPluginItem = ClientAddressList.encoding
-  .getPluginInstallItem(pluginInitParams);
-
-const createParams: ICreateParams = {
-  metadata: {
-    name: "My DAO",
-    description: "This is a description",
-    avatar: "",
-    links: [{
-      name: "Web site",
-      url: "https://...",
-    }],
-  },
-  ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [addressListInstallPluginItem],
-};
-
-// gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.create(
-  createParams,
-);
-console.log(estimatedGas.average);
-console.log(estimatedGas.max);
-
-const steps = client.methods.create(createParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case DaoCreationSteps.CREATING:
-        console.log(step.txHash);
-        break;
-      case DaoCreationSteps.DONE:
-        console.log(step.address);
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-```
-
-### Loading a plugin's token details
 
 ```ts
-
 import {
   ClientErc20,
   Context,
   ContextPlugin,
-  Erc20TokenDetails,
+  ICanVoteParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
+
+// Create a simple context
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an address list client
+const client = new ClientErc20(contextPlugin);
+
+const voteParams: ICanVoteParams = {
+  address: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x1",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
+};
+
+const canVote = await client.methods.canVote(voteParams);
+console.log(canVote);
+/*
+true
+*/
+
+```
+### Loading the list of proposals (ERC20)
+
+Retrieving the proposals of an ERC20 DAO.
+
+
+```ts
+import {
+  ClientErc20,
+  Context,
+  ContextPlugin,
+  Erc20ProposalListItem,
+  IProposalQueryParams,
+  ProposalSortBy,
+  SortDirection,
+  ProposalStatus,
 } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -993,29 +870,81 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an ERC20 client
 const client = new ClientErc20(contextPlugin);
 
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+const queryParams: IProposalQueryParams = {
+  skip: 0, // optional
+  limit: 10, // optional,
+  direction: SortDirection.ASC, // optional
+  sortBy: ProposalSortBy.POPULARITY, // optional
+  status: ProposalStatus.ACTIVE, // optional
+};
 
-const token: Erc20TokenDetails | null = await client.methods.getToken(
-  pluginAddress,
+const proposals: Erc20ProposalListItem[] = await client.methods.getProposals(
+  queryParams,
 );
-console.log(token);
+console.log(proposals);
 /*
+[
   {
-    address: "0x123456789000987654323112345678900987654321",
-    name: "Token",
-    decimals: 18,
-    symbol: "TOK"
+    id: "0x12345...",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal",
+      summary: "test proposal summary"
+    };
+    startDate: <Date>,
+    endDate: <Date>,
+    status: "Executed",
+    token: {
+      address: "0x1234567890123456789012345678901234567890,
+      name: "The Token",
+      symbol: "TOK",
+      decimals: 18
+    },
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
+    }
+  },
+  {
+    id: "0x12345...",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal 2",
+      summary: "test proposal summary 2"
+    };
+    startDate: <Date>,
+    endDate: <Date>,
+    status: "Pending",
+    token: {
+      address: "0x1234567890123456789012345678901234567890,
+      name: "The Token",
+      symbol: "TOK",
+      decimals: 18
+    },
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
+    }
   }
+]
 */
-
 ```
-
 ### Retrieve a proposal by proposalID (ERC20)
 
 Retrieving the proposals of an ERC20 DAO.
 
-```ts
 
+```ts
 import {
   ClientErc20,
   Context,
@@ -1108,22 +1037,49 @@ console.log(proposal);
 */
 
 ```
+### Loading a plugin's settings
 
-### Loading the list of proposals (ERC20)
-
-Retrieving the proposals of an ERC20 DAO.
 
 ```ts
+import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
+  IPluginSettings,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
 
+// Create a simple context
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an addres list client
+const client = new ClientAddressList(contextPlugin);
+
+const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+
+const settings: IPluginSettings | null = await client.methods.getSettings(
+  pluginAddress,
+);
+console.log(settings);
+/*
+  {
+    minDuration: 7200,
+    minTurnout: 0.55,
+    minSupport: 0.25
+  }
+*/
+
+```
+### Loading a plugin's token details
+
+
+```ts
 import {
   ClientErc20,
   Context,
   ContextPlugin,
-  Erc20ProposalListItem,
-  IProposalQueryParams,
-  ProposalSortBy,
-  SortDirection,
-  ProposalStatus,
+  Erc20TokenDetails,
 } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -1134,80 +1090,120 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an ERC20 client
 const client = new ClientErc20(contextPlugin);
 
-const queryParams: IProposalQueryParams = {
-  skip: 0, // optional
-  limit: 10, // optional,
-  direction: SortDirection.ASC, // optional
-  sortBy: ProposalSortBy.POPULARITY, // optional
-  status: ProposalStatus.ACTIVE, // optional
-};
+const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const proposals: Erc20ProposalListItem[] = await client.methods.getProposals(
-  queryParams,
+const token: Erc20TokenDetails | null = await client.methods.getToken(
+  pluginAddress,
 );
-console.log(proposals);
+console.log(token);
 /*
-[
   {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal",
-      summary: "test proposal summary"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Executed",
-    token: {
-      address: "0x1234567890123456789012345678901234567890,
-      name: "The Token",
-      symbol: "TOK",
-      decimals: 18
-    },
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  },
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal 2",
-      summary: "test proposal summary 2"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Pending",
-    token: {
-      address: "0x1234567890123456789012345678901234567890,
-      name: "The Token",
-      symbol: "TOK",
-      decimals: 18
-    },
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
+    address: "0x123456789000987654323112345678900987654321",
+    name: "Token",
+    decimals: 18,
+    symbol: "TOK"
   }
-]
 */
-```
 
-### Create an Address List client
+```
+## Address List governance plugin client
+### Creating a DAO with a addressList plugin
+
 
 ```ts
+import {
+  Client,
+  ClientAddressList,
+  Context,
+  DaoCreationSteps,
+  GasFeeEstimation,
+  IAddressListPluginInstall,
+  ICreateParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
 
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+
+// Define the plugins to install and their params
+
+const pluginInitParams: IAddressListPluginInstall = {
+  settings: {
+    minDuration: 60 * 60 * 24, // seconds
+    minTurnout: 0.25, // 25%
+    minSupport: 0.5, // 50%
+  },
+  addresses: [
+    "0x1234567890123456789012345678901234567890",
+    "0x2345678901234567890123456789012345678901",
+    "0x3456789012345678901234567890123456789012",
+    "0x4567890123456789012345678901234567890123",
+  ],
+};
+
+const addressListInstallPluginItem = ClientAddressList.encoding
+  .getPluginInstallItem(pluginInitParams);
+
+const createParams: ICreateParams = {
+  metadata: {
+    name: "My DAO",
+    description: "This is a description",
+    avatar: "",
+    links: [{
+      name: "Web site",
+      url: "https://...",
+    }],
+  },
+  ensSubdomain: "my-org", // my-org.dao.eth
+  plugins: [addressListInstallPluginItem],
+};
+
+// gas estimation
+const estimatedGas: GasFeeEstimation = await client.estimation.create(
+  createParams,
+);
+console.log(estimatedGas.average);
+console.log(estimatedGas.max);
+
+const steps = client.methods.create(createParams);
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case DaoCreationSteps.CREATING:
+        console.log(step.txHash);
+        break;
+      case DaoCreationSteps.DONE:
+        console.log(step.address);
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+```
+### Create an Address List context
+
+
+```ts
+import { Context, ContextPlugin } from "@aragon/sdk-client";
+import { Wallet } from "@ethersproject/wallet";
+import { contextParams } from "../context";
+
+const context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
+// update
+contextPlugin.set({ network: 1 });
+contextPlugin.set({ signer: new Wallet("other private key") });
+contextPlugin.setFull(contextParams);
+
+console.log(contextPlugin)
+
+```
+### Create an Address List client
+
+
+```ts
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -1219,11 +1215,10 @@ const client = new ClientAddressList(contextPlugin);
 console.log(client);
 
 ```
-
 ### Creating a address list proposal
 
-```ts
 
+```ts
 import {
   ClientAddressList,
   Context,
@@ -1286,76 +1281,10 @@ for await (const step of steps) {
 }
 
 ```
-
-### Voting on a address list proposal
-
-```ts
-
-import {
-  ClientAddressList,
-  Context,
-  ContextPlugin,
-  IVoteProposalParams,
-  VoteProposalStep,
-  VoteValues,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an address list client
-const client = new ClientAddressList(contextPlugin);
-
-const voteParams: IVoteProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890",
-  vote: VoteValues.YES,
-};
-
-const steps = client.methods.voteProposal(voteParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case VoteProposalStep.VOTING:
-        console.log(step.txHash);
-        break;
-      case VoteProposalStep.DONE:
-        console.log(step.voteId);
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-```
-
-### Create an Address List context
-
-```ts
-
-import { Context, ContextPlugin } from "@aragon/sdk-client";
-import { Wallet } from "@ethersproject/wallet";
-import { contextParams } from "../context";
-
-const context = new Context(contextParams);
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
-// update
-contextPlugin.set({ network: 1 });
-contextPlugin.set({ signer: new Wallet("other private key") });
-contextPlugin.setFull(contextParams);
-
-console.log(contextPlugin)
-
-```
-
 ### Creating a address list proposal with an action
 
-```ts
 
+```ts
 import {
   ClientAddressList,
   Context,
@@ -1433,11 +1362,195 @@ for await (const step of steps) {
 }
 
 ```
+### Checking if user can vote in a address list proposal
 
-### Loading the a proposal by proposalId (address list plugin)
 
 ```ts
+import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
+  ICanVoteParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
 
+// Create a simple context
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an address list client
+const client = new ClientAddressList(contextPlugin);
+
+const voteParams: ICanVoteParams = {
+  address: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x1",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
+};
+
+const canVote = await client.methods.canVote(voteParams);
+console.log(canVote);
+/*
+true
+*/
+
+```
+### Voting on a address list proposal
+
+
+```ts
+import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
+  IVoteProposalParams,
+  VoteProposalStep,
+  VoteValues,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
+
+// Create a simple context
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an address list client
+const client = new ClientAddressList(contextPlugin);
+
+const voteParams: IVoteProposalParams = {
+  pluginAddress: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890",
+  vote: VoteValues.YES,
+};
+
+const steps = client.methods.voteProposal(voteParams);
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case VoteProposalStep.VOTING:
+        console.log(step.txHash);
+        break;
+      case VoteProposalStep.DONE:
+        console.log(step.voteId);
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+```
+### Loading the list of proposals (address list plugin)
+
+
+```ts
+import {
+  AddressListProposalListItem,
+  ClientAddressList,
+  Context,
+  ContextPlugin,
+  IProposalQueryParams,
+  ProposalSortBy,
+  ProposalStatus,
+  SortDirection,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
+
+// Create a simple context
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an address list client
+const client = new ClientAddressList(contextPlugin);
+
+const queryParams: IProposalQueryParams = {
+  skip: 0, // optional
+  limit: 10, // optional,
+  direction: SortDirection.ASC, // optional
+  sortBy: ProposalSortBy.POPULARITY, //optional
+  status: ProposalStatus.ACTIVE, // optional
+};
+
+const proposals: AddressListProposalListItem[] = await client.methods
+  .getProposals(queryParams);
+console.log(proposals);
+/*
+[
+  {
+    id: "0x12345...",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal",
+      summary: "test proposal summary"
+    };
+    startDate: <Date>,
+    endDate: <Date>,
+    status: "Executed",
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
+    }
+  },
+  {
+    id: "0x12345...",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal 2",
+      summary: "test proposal summary 2"
+    };
+    startDate: <Date>,
+    endDate: <Date>,
+    status: "Pending",
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
+    }
+  }
+]
+*/
+
+```
+### Loading the list of members (address list plugin)
+
+
+```ts
+import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../context";
+
+// Create a simple context
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an ERC20 client
+const client = new ClientAddressList(contextPlugin);
+
+const daoAddressorEns = "0x12345...";
+
+const memebers: string[] = await client.methods.getMembers(daoAddressorEns);
+console.log(memebers);
+/*
+[
+  "0x1234567890123456789012345678901234567890",
+  "0x2345678901234567890123456789012345678901",
+  "0x3456789012345678901234567890123456789012",
+  "0x4567890123456789012345678901234567890123",
+  "0x5678901234567890123456789012345678901234",
+]
+*/
+
+```
+### Loading the a proposal by proposalId (address list plugin)
+
+
+```ts
 import {
   AddressListProposal,
   ClientAddressList,
@@ -1522,155 +1635,10 @@ console.log(proposal);
 */
 
 ```
-
-### Loading the list of members (address list plugin)
-
-```ts
-
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientAddressList(contextPlugin);
-
-const daoAddressorEns = "0x12345...";
-
-const memebers: string[] = await client.methods.getMembers(daoAddressorEns);
-console.log(memebers);
-/*
-[
-  "0x1234567890123456789012345678901234567890",
-  "0x2345678901234567890123456789012345678901",
-  "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123",
-  "0x5678901234567890123456789012345678901234",
-]
-*/
-
-```
-
-### Checking if user can vote in a address list proposal
-
-```ts
-
-import {
-  ClientAddressList,
-  Context,
-  ContextPlugin,
-  ICanVoteParams,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an address list client
-const client = new ClientAddressList(contextPlugin);
-
-const voteParams: ICanVoteParams = {
-  address: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890_0x1",
-  pluginAddress: "0x1234567890123456789012345678901234567890",
-};
-
-const canVote = await client.methods.canVote(voteParams);
-console.log(canVote);
-/*
-true
-*/
-
-```
-
-### Loading the list of proposals (address list plugin)
-
-```ts
-
-import {
-  AddressListProposalListItem,
-  ClientAddressList,
-  Context,
-  ContextPlugin,
-  IProposalQueryParams,
-  ProposalSortBy,
-  ProposalStatus,
-  SortDirection,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an address list client
-const client = new ClientAddressList(contextPlugin);
-
-const queryParams: IProposalQueryParams = {
-  skip: 0, // optional
-  limit: 10, // optional,
-  direction: SortDirection.ASC, // optional
-  sortBy: ProposalSortBy.POPULARITY, //optional
-  status: ProposalStatus.ACTIVE, // optional
-};
-
-const proposals: AddressListProposalListItem[] = await client.methods
-  .getProposals(queryParams);
-console.log(proposals);
-/*
-[
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal",
-      summary: "test proposal summary"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Executed",
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  },
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal 2",
-      summary: "test proposal summary 2"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Pending",
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  }
-]
-*/
-
-```
-
 ### Loading a plugin's settings
 
-```ts
 
+```ts
 import {
   ClientErc20,
   Context,
@@ -1701,7 +1669,6 @@ console.log(settings);
 */
 
 ```
-
 ## Action encoders
 
 Proposals will eventually need to execute some action on behalf of the DAO,
@@ -1711,8 +1678,8 @@ The helpers above help encoding the most typical DAO operations.
 
 ### Grant permission
 
-```ts
 
+```ts
 import {
   Client,
   Context,
@@ -1745,11 +1712,78 @@ console.log(grantAction);
 */
 
 ```
+### Update Metadata
 
-### Revoke permission
 
 ```ts
+import { Client, Context, IMetadata } from "@aragon/sdk-client";
+import { contextParams } from "../context";
 
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+
+const metadataParams: IMetadata = {
+  name: "New Name",
+  description: "New description",
+  avatar: "https://theavatar.com/image.jpg",
+  links: [
+    {
+      url: "https://discord.com/...",
+      name: "Discord",
+    },
+    {
+      url: "https://twitter.com/...",
+      name: "Twitter",
+    },
+  ],
+};
+const daoAddressOrEns = "0x12345";
+
+const updateMetadataAction = await client.encoding.updateMetadataAction(
+  daoAddressOrEns,
+  metadataParams,
+);
+console.log(updateMetadataAction);
+
+```
+### Freeze permission
+
+
+```ts
+import {
+  Client,
+  Context,
+  IFreezePermissionParams,
+  Permissions,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
+
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+
+const freezeParams: IFreezePermissionParams = {
+  where: "0x1234567890123456789012345678901234567890",
+  permission: Permissions.UPGRADE_PERMISSION,
+};
+const daoAddress = "0x1234567890123456789012345678901234567890";
+
+const freezeAction = await client.encoding.freezeAction(
+  daoAddress,
+  freezeParams,
+);
+console.log(freezeAction);
+/*
+{
+  to: "0x1234567890...",
+  value: 0n,
+  data: Uint8Array[12,34,45...]
+}
+*/
+```
+### Revoke permission
+
+
+```ts
 import {
   Client,
   Context,
@@ -1782,140 +1816,10 @@ console.log(revokeAction);
 */
 
 ```
-
-### Freeze permission
-
-```ts
-
-import {
-  Client,
-  Context,
-  IFreezePermissionParams,
-  Permissions,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-
-const freezeParams: IFreezePermissionParams = {
-  where: "0x1234567890123456789012345678901234567890",
-  permission: Permissions.UPGRADE_PERMISSION,
-};
-const daoAddress = "0x1234567890123456789012345678901234567890";
-
-const freezeAction = await client.encoding.freezeAction(
-  daoAddress,
-  freezeParams,
-);
-console.log(freezeAction);
-/*
-{
-  to: "0x1234567890...",
-  value: 0n,
-  data: Uint8Array[12,34,45...]
-}
-*/
-```
-
-### Withdrawals
-
-```ts
-
-import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-
-const withdrawParams: IWithdrawParams = {
-  recipientAddress: "0x1234567890123456789012345678901234567890",
-  amount: BigInt(10),
-  tokenAddress: "0x1234567890123456789012345678901234567890",
-  reference: "test",
-};
-const daoAddress = "0x1234567890123456789012345678901234567890";
-
-const withdrawAction = await client.encoding.withdrawAction(
-  daoAddress,
-  withdrawParams,
-);
-console.log(withdrawAction);
-
-```
-
-### Update Metadata
-
-```ts
-
-import { Client, Context, IMetadata } from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-
-const metadataParams: IMetadata = {
-  name: "New Name",
-  description: "New description",
-  avatar: "https://theavatar.com/image.jpg",
-  links: [
-    {
-      url: "https://discord.com/...",
-      name: "Discord",
-    },
-    {
-      url: "https://twitter.com/...",
-      name: "Twitter",
-    },
-  ],
-};
-const daoAddressOrEns = "0x12345";
-
-const updateMetadataAction = await client.encoding.updateMetadataAction(
-  daoAddressOrEns,
-  metadataParams,
-);
-console.log(updateMetadataAction);
-
-```
-
-### Set Plugin Config (Address List)
-
-```ts
-
-import {
-  ClientAddressList,
-  Context,
-  ContextPlugin,
-  IPluginSettings,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context: Context = new Context(contextParams);
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientAddressList(contextPlugin);
-
-// create config action
-const configActionPrarms: IPluginSettings = {
-  minDuration: 60 * 60 * 24,
-  minSupport: 0.3, // 30%
-  minTurnout: 0.5, // 50%
-};
-
-const pluginAddress = "0x1234567890123456789012345678901234567890";
-
-const configAction = client.encoding.updatePluginSettingsAction(
-  pluginAddress,
-  configActionPrarms,
-);
-console.log(configAction);
-
-```
-
 ### Set Plugin Config (ERC-20)
 
-```ts
 
+```ts
 import {
   ClientErc20,
   Context,
@@ -1944,11 +1848,35 @@ const configAction = client.encoding.updatePluginSettingsAction(
 console.log(configAction);
 
 ```
+### Withdrawals
 
-### Mint Token (ERC-20)
 
 ```ts
+import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
+import { contextParams } from "../context";
 
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+
+const withdrawParams: IWithdrawParams = {
+  recipientAddress: "0x1234567890123456789012345678901234567890",
+  amount: BigInt(10),
+  tokenAddress: "0x1234567890123456789012345678901234567890",
+  reference: "test",
+};
+const daoAddress = "0x1234567890123456789012345678901234567890";
+
+const withdrawAction = await client.encoding.withdrawAction(
+  daoAddress,
+  withdrawParams,
+);
+console.log(withdrawAction);
+
+```
+### Mint Token (ERC-20)
+
+
+```ts
 import {
   ClientErc20,
   Context,
@@ -1978,11 +1906,42 @@ console.log(action);
 */
 
 ```
+### Set Plugin Config (Address List)
 
-### Remove Members (AddressList)
 
 ```ts
+import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
+  IPluginSettings,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
 
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new ClientAddressList(contextPlugin);
+
+// create config action
+const configActionPrarms: IPluginSettings = {
+  minDuration: 60 * 60 * 24,
+  minSupport: 0.3, // 30%
+  minTurnout: 0.5, // 50%
+};
+
+const pluginAddress = "0x1234567890123456789012345678901234567890";
+
+const configAction = client.encoding.updatePluginSettingsAction(
+  pluginAddress,
+  configActionPrarms,
+);
+console.log(configAction);
+
+```
+### Remove Members (AddressList)
+
+
+```ts
 import {
   ClientAddressList,
   Context,
@@ -2012,13 +1971,10 @@ console.log(action);
 */
 
 ```
-
-## Action decoders
-
 ### Add Members (AddressList)
 
-```ts
 
+```ts
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -2044,11 +2000,38 @@ console.log(action);
 */
 
 ```
+### Decode action freeze permission
 
-### Decode action grant permission
 
 ```ts
+import {
+  Client,
+  Context,
+  IFreezePermissionDecodedParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
 
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+
+const data: Uint8Array = new Uint8Array([12, 56]);
+
+const freezeParams: IFreezePermissionDecodedParams = client.decoding
+  .freezeAction(data);
+console.log(freezeParams);
+/*
+{
+  where: "0x1234567890...",
+  permission: "UPGRADE_PERMISSION",
+  permissionId: "0x12345..."
+}
+*/
+
+```
+### Decode action grant permission
+
+
+```ts
 import {
   Client,
   Context,
@@ -2075,91 +2058,12 @@ console.log(grantParams);
 */
 
 ```
-
-### Decode action revoke permission
-
-```ts
-
-import {
-  Client,
-  Context,
-  IRevokePermissionDecodedParams,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const revokeParams: IRevokePermissionDecodedParams = client.decoding
-  .revokeAction(data);
-console.log(revokeParams);
-/*
-{
-  who: "0x1234567890...",
-  where: "0x1234567890...",
-  permission: "UPGRADE_PERMISSION",
-  permissionId: "0x12345..."
-}
-*/
-
-```
-
-### Decode action freeze permission
-
-```ts
-
-import {
-  Client,
-  Context,
-  IFreezePermissionDecodedParams,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const freezeParams: IFreezePermissionDecodedParams = client.decoding
-  .freezeAction(data);
-console.log(freezeParams);
-/*
-{
-  where: "0x1234567890...",
-  permission: "UPGRADE_PERMISSION",
-  permissionId: "0x12345..."
-}
-*/
-
-```
-
-### Decode Update Metadata Raw Action
-
-Decode an update metadata action and expect an IPFS uri containing the cid
-
-```ts
-
-import { Client, Context, IMetadata } from "@aragon/sdk-client";
-import { contextParams } from "../context";
-const context: Context = new Context(contextParams);
-const client: Client = new Client(context);
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const params: string = client.decoding.updateMetadataRawAction(data);
-
-console.log(params);
-/*
-ipfs://Qm...
-*/
-
-```
+## Action decoders
 
 ### Decode Withdraw Action
 
-```ts
 
+```ts
 import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 const context: Context = new Context(contextParams);
@@ -2179,13 +2083,42 @@ console.log(params);
 */
 
 ```
+### Decode Update Plugin Settings Action (ERC-20)
 
+
+```ts
+import {
+  ClientErc20,
+  Context,
+  ContextPlugin,
+  IPluginSettings,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const clientAddressList = new ClientErc20(contextPlugin);
+const data: Uint8Array = new Uint8Array([12, 56]);
+
+const params: IPluginSettings = clientAddressList.decoding
+  .updatePluginSettingsAction(data);
+
+console.log(params);
+/*
+{
+  minDuration: 7200, // seconds
+  minTurnout: 0.25, // 25%
+  minSupport: 0.5 // 50%
+}
+*/
+
+```
 ### Decode Update Metadata Action
 
 Decode an update metadata action and expect the metadata
 
-```ts
 
+```ts
 import { Client, Context, IMetadata } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 const context: Context = new Context(contextParams);
@@ -2214,42 +2147,10 @@ console.log(params);
 */
 
 ```
-
-### Decode Update Plugin Settings Action (ERC-20)
-
-```ts
-
-import {
-  ClientErc20,
-  Context,
-  ContextPlugin,
-  IPluginSettings,
-} from "@aragon/sdk-client";
-import { contextParams } from "../context";
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientAddressList = new ClientErc20(contextPlugin);
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const params: IPluginSettings = clientAddressList.decoding
-  .updatePluginSettingsAction(data);
-
-console.log(params);
-/*
-{
-  minDuration: 7200, // seconds
-  minTurnout: 0.25, // 25%
-  minSupport: 0.5 // 50%
-}
-*/
-
-```
-
 ### Decode Update Plugin Settings Action (Address List)
 
-```ts
 
+```ts
 import {
   ClientAddressList,
   Context,
@@ -2276,11 +2177,59 @@ console.log(params);
 */
 
 ```
+### Decode action revoke permission
 
-### Get Function Parameters from an encoded action (Address List)
 
 ```ts
+import {
+  Client,
+  Context,
+  IRevokePermissionDecodedParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../context";
 
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+
+const data: Uint8Array = new Uint8Array([12, 56]);
+
+const revokeParams: IRevokePermissionDecodedParams = client.decoding
+  .revokeAction(data);
+console.log(revokeParams);
+/*
+{
+  who: "0x1234567890...",
+  where: "0x1234567890...",
+  permission: "UPGRADE_PERMISSION",
+  permissionId: "0x12345..."
+}
+*/
+
+```
+### Decode Update Metadata Raw Action
+
+Decode an update metadata action and expect an IPFS uri containing the cid
+
+
+```ts
+import { Client, Context, IMetadata } from "@aragon/sdk-client";
+import { contextParams } from "../context";
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+const data: Uint8Array = new Uint8Array([12, 56]);
+
+const params: string = client.decoding.updateMetadataRawAction(data);
+
+console.log(params);
+/*
+ipfs://Qm...
+*/
+
+```
+### Get Function Parameters from an encoded action (Address List)
+
+
+```ts
 import {
   ClientAddressList,
   Context,
@@ -2308,11 +2257,10 @@ console.log(functionParams);
 */
 
 ```
-
 ### Get Function Parameters from an encoded action
 
-```ts
 
+```ts
 import { Client, Context } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -2334,11 +2282,10 @@ console.log(functionParams);
 */
 
 ```
-
 ### Get Function Parameters from an encoded action (ERC-20)
 
-```ts
 
+```ts
 import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 
@@ -2362,11 +2309,34 @@ console.log(functionParams);
 */
 
 ```
+### Decode Remove Members Action (Address List)
 
-### Decode Add Members Action (Address List)
 
 ```ts
+import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../context";
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const clientAddressList = new ClientAddressList(contextPlugin);
+const data: Uint8Array = new Uint8Array([12, 56]);
 
+const members: string[] = clientAddressList.decoding.removeMembersAction(data);
+
+console.log(members);
+/*
+[
+  "0x12345...",
+  "0x56789...",
+  "0x13579...",
+]
+*/
+
+```
+### Decode Add Members Action (Address List)
+
+
+```ts
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
 const context: Context = new Context(contextParams);
@@ -2387,11 +2357,10 @@ console.log(members);
 */
 
 ```
-
 ### Decode Mint Token Action (ERC-20)
 
-```ts
 
+```ts
 import {
   ClientErc20,
   Context,
@@ -2413,31 +2382,6 @@ console.log(params);
   address: "0x12345...",
   amount: 10n
 }
-*/
-
-```
-
-### Decode Remove Members Action (Address List)
-
-```ts
-
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
-import { contextParams } from "../context";
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientAddressList = new ClientAddressList(contextPlugin);
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const members: string[] = clientAddressList.decoding.removeMembersAction(data);
-
-console.log(members);
-/*
-[
-  "0x12345...",
-  "0x56789...",
-  "0x13579...",
-]
 */
 
 ```
