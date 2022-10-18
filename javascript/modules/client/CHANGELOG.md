@@ -20,8 +20,10 @@ TEMPLATE:
 ### Changed
 - Examples folder and files
 - Automatic generated README from examples
+- Split clients into modules
 ### Added
 - Update Allowance estimation
+
 ## 0.11.0-alpha
 On 2022-10-17 09:26:34
 ### Fixed
