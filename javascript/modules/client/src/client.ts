@@ -565,20 +565,20 @@ export class Client extends ClientCore implements IClient {
     } else if (!params.tokenAddress) {
       throw new NoTokenAddress();
     }
-    
+
     // resolve ens
-    let daoAddreess = params.daoAddress;
-    if (!isAddress(daoAddreess)) {
+    let daoAddress = params.daoAddress;
+    if (!isAddress(daoAddress)) {
       await this.web3.ensureOnline();
       const provider = this.web3.getProvider();
       if (!provider) {
         throw new NoProviderError();
       }
-      const resolvedAddress = await provider.resolveName(daoAddreess);
+      const resolvedAddress = await provider.resolveName(daoAddress);
       if (!resolvedAddress) {
         throw new InvalidAddressOrEnsError();
       }
-      daoAddreess = resolvedAddress;
+      daoAddress = resolvedAddress;
     }
 
     const contract = new Contract(
@@ -587,7 +587,7 @@ export class Client extends ClientCore implements IClient {
       signer,
     );
     return contract.estimateGas.approve(
-      params.daoAddress,
+      daoAddress,
       params.amount,
     ).then((gasLimit) => {
       return this.web3.getApproximateGasFee(gasLimit.toBigInt());
