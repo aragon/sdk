@@ -1,5 +1,5 @@
-import { Context } from "../context";
-import { ClientCore } from "../internal/core";
+import { Context } from "../../context";
+import { ClientCore } from "../core";
 import {
   IClientEncoding,
   IFreezePermissionParams,
@@ -7,8 +7,8 @@ import {
   IMetadata,
   IRevokePermissionParams,
   IWithdrawParams,
-} from "../internal/interfaces/client";
-import { DaoAction } from "../internal/interfaces/common";
+} from "../interfaces/client";
+import { DaoAction } from "../interfaces/common";
 import { isAddress } from "@ethersproject/address";
 import {
   encodeFreezeAction,
@@ -16,9 +16,9 @@ import {
   encodeRevokeActionData,
   encodeUpdateMetadataAction,
   encodeWithdrawActionData,
-} from "../internal/encoding/client";
+} from "../encoding/client";
 
-export class IClientEncodingModule extends ClientCore
+export class ClientEncoding extends ClientCore
   implements IClientEncoding {
   constructor(context: Context) {
     super(context);
@@ -29,7 +29,7 @@ export class IClientEncodingModule extends ClientCore
    * @param {string} daoAddress
    * @param {IGrantPermissionParams} params
    * @return {*}  {DaoAction}
-   * @memberof IClientEncodingModule
+   * @memberof ClientEncoding
    */
   public grantAction(
     daoAddress: string,
@@ -62,7 +62,7 @@ export class IClientEncodingModule extends ClientCore
    * @param {string} daoAddress
    * @param {IRevokePermissionParams} params
    * @return {*}  {DaoAction}
-   * @memberof IClientEncodingModule
+   * @memberof ClientEncoding
    */
   public revokeAction(
     daoAddress: string,
@@ -95,7 +95,7 @@ export class IClientEncodingModule extends ClientCore
    * @param {string} daoAddress
    * @param {IFreezePermissionParams} params
    * @return {*}  {DaoAction}
-   * @memberof IClientEncodingModule
+   * @memberof ClientEncoding
    */
   public freezeAction(
     daoAddress: string,
@@ -125,7 +125,7 @@ export class IClientEncodingModule extends ClientCore
    * @param {string} daoAddressOrEns
    * @param {IWithdrawParams} params
    * @return {*}  {Promise<DaoAction>}
-   * @memberof IClientEncodingModule
+   * @memberof ClientEncoding
    */
   public async withdrawAction(
     daoAddressOrEns: string,
@@ -154,7 +154,7 @@ export class IClientEncodingModule extends ClientCore
    * @param {string} daoAddressOrEns
    * @param {IMetadata} params
    * @return {*}  {Promise<DaoAction>}
-   * @memberof IClientEncodingModule
+   * @memberof ClientEncoding
    */
   public async updateMetadataAction(
     daoAddressOrEns: string,

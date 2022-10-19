@@ -6,8 +6,8 @@ import {
   NoProviderError,
   Random,
 } from "@aragon/sdk-common";
-import { ContextPlugin } from "../context-plugin";
-import { ClientCore } from "../internal/core";
+import { ContextPlugin } from "../../context-plugin";
+import { ClientCore } from "../core";
 import {
   AddressListProposal,
   AddressListProposalListItem,
@@ -28,23 +28,23 @@ import {
   SubgraphAddressListProposalListItem,
   VoteProposalStep,
   VoteProposalStepValue,
-} from "../internal/interfaces/plugins";
-import { delay } from "../internal/temp-mock";
+} from "../interfaces/plugins";
+import { delay } from "../temp-mock";
 import {
   computeProposalStatusFilter,
   isProposalId,
   toAddressListProposal,
   toAddressListProposalListItem,
-} from "../internal/utils/plugins";
+} from "../utils/plugins";
 import { isAddress } from "@ethersproject/address";
 import {
   QueryAddressListPluginSettings,
   QueryAddressListProposal,
   QueryAddressListProposals,
-} from "../internal/graphql-queries";
-import { SortDirection } from "../internal/interfaces/common";
+} from "../graphql-queries";
+import { SortDirection } from "../interfaces/common";
 
-export class IClientAddressListMethodsModule extends ClientCore
+export class ClientAddressListMethods extends ClientCore
   implements IClientAddressListMethods {
   constructor(context: ContextPlugin) {
     super(context);
@@ -54,7 +54,7 @@ export class IClientAddressListMethodsModule extends ClientCore
    *
    * @param {ICreateProposalParams} _params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
-   * @memberof IClientAddressListMethodsModule
+   * @memberof ClientAddressListMethods
    */
   public async *createProposal(
     _params: ICreateProposalParams,
@@ -85,7 +85,7 @@ export class IClientAddressListMethodsModule extends ClientCore
    *
    * @param {IVoteProposalParams} _params
    * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
-   * @memberof IClientAddressListMethodsModule
+   * @memberof ClientAddressListMethods
    */
   public async *voteProposal(
     _params: IVoteProposalParams,
@@ -111,13 +111,13 @@ export class IClientAddressListMethodsModule extends ClientCore
         "0x0123456789012345678901234567890123456789012345678901234567890123",
     };
   }
-  
+
   /**
    * Executes the given proposal, provided that it has already passed
    *
    * @param {IExecuteProposalParams} _params
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
-   * @memberof IClientAddressListMethodsModule
+   * @memberof ClientAddressListMethods
    */
   public async *executeProposal(
     _params: IExecuteProposalParams,
@@ -146,7 +146,7 @@ export class IClientAddressListMethodsModule extends ClientCore
    *
    * @param {ICanVoteParams} params
    * @return {*}  {Promise<boolean>}
-   * @memberof IClientAddressListMethodsModule
+   * @memberof ClientAddressListMethods
    */
   public async canVote(
     params: ICanVoteParams,
@@ -169,7 +169,7 @@ export class IClientAddressListMethodsModule extends ClientCore
    *
    * @param {string} _daoAddressOrEns
    * @return {*}  {Promise<string[]>}
-   * @memberof IClientAddressListMethodsModule
+   * @memberof ClientAddressListMethods
    */
   public getMembers(_daoAddressOrEns: string): Promise<string[]> {
     const mockAddresses: string[] = [
@@ -191,7 +191,7 @@ export class IClientAddressListMethodsModule extends ClientCore
    *
    * @param {string} proposalId
    * @return {*}  {(Promise<AddressListProposal | null>)}
-   * @memberof IClientAddressListMethodsModule
+   * @memberof ClientAddressListMethods
    */
   public async getProposal(
     proposalId: string,
@@ -225,7 +225,7 @@ export class IClientAddressListMethodsModule extends ClientCore
       throw new GraphQLError("AddressList proposal");
     }
   }
-  
+
   /**
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
@@ -238,7 +238,7 @@ export class IClientAddressListMethodsModule extends ClientCore
    *       sortBy = ProposalSortBy.CREATED_AT,
    *     }
    * @return {*}  {Promise<AddressListProposalListItem[]>}
-   * @memberof IClientAddressListMethodsModule
+   * @memberof ClientAddressListMethods
    */
   public async getProposals(
     {
@@ -309,13 +309,13 @@ export class IClientAddressListMethodsModule extends ClientCore
       throw new GraphQLError("AddressList proposals");
     }
   }
-  
+
   /**
    * Returns the settings of a plugin given the address of the plugin instance
    *
    * @param {string} pluginAddress
    * @return {*}  {(Promise<IPluginSettings | null>)}
-   * @memberof IClientAddressListMethodsModule
+   * @memberof ClientAddressListMethods
    */
   public async getSettings(
     pluginAddress: string,

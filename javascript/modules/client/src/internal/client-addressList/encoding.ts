@@ -1,22 +1,43 @@
 import { InvalidAddressError } from "@aragon/sdk-common";
-import { ContextPlugin } from "../context-plugin";
-import { ClientCore } from "../internal/core";
+import { ContextPlugin } from "../../context-plugin";
+import { ClientCore } from "../core";
 import {
   encodeAddMembersAction,
+  encodeAddressListActionInit,
   encodeRemoveMembersAction,
   encodeUpdatePluginSettingsAction,
-} from "../internal/encoding/plugins";
-import { DaoAction } from "../internal/interfaces/common";
+} from "../encoding/plugins";
+import { DaoAction, IPluginInstallItem } from "../interfaces/common";
 import {
+  IAddressListPluginInstall,
   IClientAddressListEncoding,
   IPluginSettings,
-} from "../internal/interfaces/plugins";
+} from "../interfaces/plugins";
 import { isAddress } from "@ethersproject/address";
 
-export class IClientAddressListEncodingModule extends ClientCore
+const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
+
+export class ClientAddressListEncoding extends ClientCore
   implements IClientAddressListEncoding {
   constructor(context: ContextPlugin) {
     super(context);
+  }
+
+  /**
+   * Computes the parameters to be given when creating the DAO,
+   * so that the plugin is configured
+   *
+   * @param {IAddressListPluginInstall} params
+   * @return {*}  {IPluginInstallItem}
+   * @memberof ClientAddressListEncoding
+   */
+   static getPluginInstallItem (
+    params: IAddressListPluginInstall,
+  ): IPluginInstallItem {
+    return {
+      id: PLUGIN_ID,
+      data: encodeAddressListActionInit(params),
+    };
   }
   
   /**
@@ -25,7 +46,7 @@ export class IClientAddressListEncodingModule extends ClientCore
    * @param {string} pluginAddress
    * @param {IPluginSettings} params
    * @return {*}  {DaoAction}
-   * @memberof IClientAddressListEncodingModule
+   * @memberof ClientAddressListEncoding
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
@@ -47,7 +68,7 @@ export class IClientAddressListEncodingModule extends ClientCore
    * @param {string} pluginAddress
    * @param {string[]} members
    * @return {*}  {DaoAction}
-   * @memberof IClientAddressListEncodingModule
+   * @memberof ClientAddressListEncoding
    */
   public addMembersAction(
     pluginAddress: string,
@@ -73,7 +94,7 @@ export class IClientAddressListEncodingModule extends ClientCore
    * @param {string} pluginAddress
    * @param {string[]} members
    * @return {*}  {DaoAction}
-   * @memberof IClientAddressListEncodingModule
+   * @memberof ClientAddressListEncoding
    */
   public removeMembersAction(
     pluginAddress: string,

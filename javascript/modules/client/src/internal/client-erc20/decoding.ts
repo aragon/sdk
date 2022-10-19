@@ -1,19 +1,19 @@
 import { bytesToHex } from "@aragon/sdk-common";
-import { ContextPlugin } from "../context-plugin";
-import { ClientCore } from "../internal/core";
+import { ContextPlugin } from "../../context-plugin";
+import { ClientCore } from "../core";
 import {
   decodeMintTokenAction,
   decodeUpdatePluginSettingsAction,
   getFunctionFragment,
-} from "../internal/encoding/plugins";
-import { IInterfaceParams } from "../internal/interfaces/common";
+} from "../encoding/plugins";
+import { IInterfaceParams } from "../interfaces/common";
 import {
   IClientErc20Decoding,
   IMintTokenParams,
   IPluginSettings,
-} from "../internal/interfaces/plugins";
+} from "../interfaces/plugins";
 
-export class IClientErc20DecodingModule extends ClientCore
+export class ClientErc20Decoding extends ClientCore
   implements IClientErc20Decoding {
   constructor(context: ContextPlugin) {
     super(context);
@@ -23,7 +23,7 @@ export class IClientErc20DecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IPluginSettings}
-   * @memberof IClientErc20DecodingModule
+   * @memberof ClientErc20Decoding
    */
   public updatePluginSettingsAction(data: Uint8Array): IPluginSettings {
     return decodeUpdatePluginSettingsAction(data);
@@ -33,7 +33,7 @@ export class IClientErc20DecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IMintTokenParams}
-   * @memberof IClientErc20DecodingModule
+   * @memberof ClientErc20Decoding
    */
   public mintTokenAction(data: Uint8Array): IMintTokenParams {
     return decodeMintTokenAction(data);
@@ -43,7 +43,7 @@ export class IClientErc20DecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {(IInterfaceParams | null)}
-   * @memberof IClientErc20DecodingModule
+   * @memberof ClientErc20Decoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
     try {

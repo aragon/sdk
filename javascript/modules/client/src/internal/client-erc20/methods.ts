@@ -1,5 +1,5 @@
-import { ContextPlugin } from "../context-plugin";
-import { ClientCore } from "../internal/core";
+import { ContextPlugin } from "../../context-plugin";
+import { ClientCore } from "../core";
 import {
   Erc20Proposal,
   Erc20ProposalListItem,
@@ -21,14 +21,14 @@ import {
   SubgraphErc20ProposalListItem,
   VoteProposalStep,
   VoteProposalStepValue,
-} from "../internal/interfaces/plugins";
+} from "../interfaces/plugins";
 import { isAddress } from "@ethersproject/address";
 import {
   QueryErc20PluginSettings,
   QueryErc20Proposal,
   QueryErc20Proposals,
   QueryToken,
-} from "../internal/graphql-queries";
+} from "../graphql-queries";
 import {
   GraphQLError,
   InvalidAddressError,
@@ -43,11 +43,11 @@ import {
   isProposalId,
   toErc20Proposal,
   toErc20ProposalListItem,
-} from "../internal/utils/plugins";
-import { SortDirection } from "../internal/interfaces/common";
-import { delay } from "../internal/temp-mock";
+} from "../utils/plugins";
+import { SortDirection } from "../interfaces/common";
+import { delay } from "../temp-mock";
 
-export class IClientErc20MethodsModule extends ClientCore
+export class ClientErc20Methods extends ClientCore
   implements IClientErc20Methods {
   constructor(context: ContextPlugin) {
     super(context);

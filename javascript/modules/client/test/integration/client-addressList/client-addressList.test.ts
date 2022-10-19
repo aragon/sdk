@@ -3,19 +3,20 @@ declare const describe, it, expect;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientErc20, Context, ContextPlugin } from "../../src";
+import { ClientAddressList, Context, ContextPlugin } from "../../../src";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-import { contextParams, contextParamsFailing } from "./constants";
+
+import { contextParams, contextParamsFailing } from "../constants";
 
 describe("Client", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientErc20(ctxPlugin);
+      const client = new ClientAddressList(ctxPlugin);
 
-      expect(client).toBeInstanceOf(ClientErc20);
+      expect(client).toBeInstanceOf(ClientAddressList);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
@@ -37,9 +38,9 @@ describe("Client", () => {
     it("Should create a failing client", async () => {
       const ctx = new Context(contextParamsFailing);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientErc20(ctxPlugin);
+      const client = new ClientAddressList(ctxPlugin);
 
-      expect(client).toBeInstanceOf(ClientErc20);
+      expect(client).toBeInstanceOf(ClientAddressList);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);

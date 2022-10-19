@@ -1,15 +1,15 @@
 import { Random } from "@aragon/sdk-common";
-import { ContextPlugin } from "../context-plugin";
-import { ClientCore } from "../internal/core";
-import { GasFeeEstimation } from "../internal/interfaces/common";
+import { ContextPlugin } from "../../context-plugin";
+import { ClientCore } from "../core";
+import { GasFeeEstimation } from "../interfaces/common";
 import {
   IClientAddressListEstimation,
   ICreateProposalParams,
   IExecuteProposalParams,
   IVoteProposalParams,
-} from "../internal/interfaces/plugins";
+} from "../interfaces/plugins";
 
-export class IClientAddressListEstimationModule extends ClientCore
+export class ClientAddressListEstimation extends ClientCore
   implements IClientAddressListEstimation {
   constructor(context: ContextPlugin) {
     super(context);
@@ -20,7 +20,7 @@ export class IClientAddressListEstimationModule extends ClientCore
    *
    * @param {ICreateProposalParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof IClientAddressListEstimationModule
+   * @memberof ClientAddressListEstimation
    */
   public createProposal(
     _params: ICreateProposalParams,
@@ -42,7 +42,7 @@ export class IClientAddressListEstimationModule extends ClientCore
    *
    * @param {IVoteProposalParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof IClientAddressListEstimationModule
+   * @memberof ClientAddressListEstimation
    */
   public voteProposal(_params: IVoteProposalParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -62,7 +62,7 @@ export class IClientAddressListEstimationModule extends ClientCore
    *
    * @param {IExecuteProposalParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof IClientAddressListEstimationModule
+   * @memberof ClientAddressListEstimation
    */
   public executeProposal(
     _params: IExecuteProposalParams,

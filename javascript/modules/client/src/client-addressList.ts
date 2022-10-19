@@ -7,16 +7,12 @@ import {
   IClientAddressListEstimation,
   IClientAddressListMethods,
 } from "./internal/interfaces/plugins";
-import { IClientAddressListMethodsModule } from "./modules-addressList/methods";
-import { IClientAddressListEncodingModule } from "./modules-addressList/encoding";
-import { IClientAddressListDecodingModule } from "./modules-addressList/decoding";
-import { IClientAddressListEstimationModule } from "./modules-addressList/estimation";
+import { ClientAddressListMethods } from "./internal/client-addressList/methods";
+import { ClientAddressListEncoding } from "./internal/client-addressList/encoding";
+import { ClientAddressListDecoding } from "./internal/client-addressList/decoding";
+import { ClientAddressListEstimation } from "./internal/client-addressList/estimation";
 import { IPluginInstallItem } from "./internal/interfaces/common";
-import { encodeAddressListActionInit } from "./internal/encoding/plugins";
 import { ClientCore } from "./internal/core";
-
-// NOTE: This address needs to be set when the plugin has been published and the ID is known
-const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
 
 /**
  * Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO
@@ -30,10 +26,14 @@ export class ClientAddressList extends ClientCore
 
   constructor(context: ContextPlugin) {
     super(context);
-    this.methods = new IClientAddressListMethodsModule(context);
-    this.encoding = new IClientAddressListEncodingModule(context);
-    this.decoding = new IClientAddressListDecodingModule(context);
-    this.estimation = new IClientAddressListEstimationModule(context);
+    this.methods = new ClientAddressListMethods(context);
+    this.encoding = new ClientAddressListEncoding(context);
+    this.decoding = new ClientAddressListDecoding(context);
+    this.estimation = new ClientAddressListEstimation(context);
+    Object.freeze(this.methods);
+    Object.freeze(this.encoding);
+    Object.freeze(this.decoding);
+    Object.freeze(this.estimation);
   }
   static encoding = {
     /**
@@ -46,11 +46,7 @@ export class ClientAddressList extends ClientCore
      */
     getPluginInstallItem: (
       params: IAddressListPluginInstall,
-    ): IPluginInstallItem => {
-      return {
-        id: PLUGIN_ID,
-        data: encodeAddressListActionInit(params),
-      };
-    },
+    ): IPluginInstallItem =>
+      ClientAddressListEncoding.getPluginInstallItem(params),
   };
 }

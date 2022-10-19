@@ -12,13 +12,13 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { ContractReceipt } from "ethers";
-import { erc20ContractAbi } from "../internal/abi/erc20";
+import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryBalances,
   QueryDao,
   QueryDaos,
   QueryTransfers,
-} from "../internal/graphql-queries";
+} from "../graphql-queries";
 import {
   AssetBalance,
   DaoCreationSteps,
@@ -40,21 +40,21 @@ import {
   SubgraphTransferTypeMap,
   Transfer,
   TransferSortBy,
-} from "../internal/interfaces/client";
-import { DaoRole, SortDirection } from "../internal/interfaces/common";
-import { delay } from "../internal/temp-mock";
+} from "../interfaces/client";
+import { DaoRole, SortDirection } from "../interfaces/common";
+import { delay } from "../temp-mock";
 import {
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
   toTransfer,
   unwrapDepositParams,
-} from "../internal/utils/client";
+} from "../utils/client";
 import { isAddress } from "@ethersproject/address";
-import { Context } from "../context";
-import { ClientCore } from "../internal/core";
+import { Context } from "../../context";
+import { ClientCore } from "../core";
 
-export class IClientMethodsModule extends ClientCore implements IClientMethods {
+export class ClientMethods extends ClientCore implements IClientMethods {
   constructor(context: Context) {
     super(context);
   }
@@ -63,7 +63,7 @@ export class IClientMethodsModule extends ClientCore implements IClientMethods {
    *
    * @param {ICreateParams} params
    * @return {*}  {AsyncGenerator<DaoCreationStepValue>}
-   * @memberof IClientMethodsModule
+   * @memberof ClientMethods
    */
   public async *create(
     params: ICreateParams,
@@ -136,7 +136,7 @@ export class IClientMethodsModule extends ClientCore implements IClientMethods {
    *
    * @param {IDepositParams} params
    * @return {*}  {AsyncGenerator<DaoDepositStepValue>}
-   * @memberof IClientMethodsModule
+   * @memberof ClientMethods
    */
   public async *deposit(
     params: IDepositParams,
@@ -246,7 +246,7 @@ export class IClientMethodsModule extends ClientCore implements IClientMethods {
    * @param {DaoRole} _role
    * @param {Uint8Array} _data
    * @return {*}
-   * @memberof IClientMethodsModule
+   * @memberof ClientMethods
    */
   public hasPermission(
     _where: string,
@@ -262,7 +262,7 @@ export class IClientMethodsModule extends ClientCore implements IClientMethods {
    *
    * @param {string} daoAddressOrEns
    * @return {*}  {(Promise<DaoDetails | null>)}
-   * @memberof IClientMethodsModule
+   * @memberof ClientMethods
    */
   public async getDao(daoAddressOrEns: string): Promise<DaoDetails | null> {
     let address = daoAddressOrEns;
@@ -311,7 +311,7 @@ export class IClientMethodsModule extends ClientCore implements IClientMethods {
    *     sortBy = DaoSortBy.CREATED_AT,
    *   }
    * @return {*}  {Promise<DaoListItem[]>}
-   * @memberof IClientMethodsModule
+   * @memberof ClientMethods
    */
   public async getDaos({
     limit = 10,
@@ -357,7 +357,7 @@ export class IClientMethodsModule extends ClientCore implements IClientMethods {
    * @param {string} daoAddressorEns
    * @param {string[]} _tokenAddresses
    * @return {*}  {(Promise<AssetBalance[] | null>)}
-   * @memberof IClientMethodsModule
+   * @memberof ClientMethods
    */
   public async getBalances(
     daoAddressorEns: string,
@@ -409,7 +409,7 @@ export class IClientMethodsModule extends ClientCore implements IClientMethods {
    *     sortBy = TransferSortBy.CREATED_AT,
    *   }
    * @return {*}  {(Promise<Transfer[] | null>)}
-   * @memberof IClientMethodsModule
+   * @memberof ClientMethods
    */
   public async getTransfers({
     daoAddressOrEns,

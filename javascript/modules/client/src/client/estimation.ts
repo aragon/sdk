@@ -2,17 +2,17 @@ import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { Random } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { Context } from "../context";
-import { ClientCore } from "../internal/core";
+import { Context } from "../../context";
+import { ClientCore } from "../core";
 import {
   IClientEstimation,
   ICreateParams,
   IDepositParams,
-} from "../internal/interfaces/client";
-import { GasFeeEstimation } from "../internal/interfaces/common";
-import { unwrapDepositParams } from "../internal/utils/client";
+} from "../interfaces/client";
+import { GasFeeEstimation } from "../interfaces/common";
+import { unwrapDepositParams } from "../utils/client";
 
-export class IClientEstimationModule extends ClientCore
+export class ClientEstimation extends ClientCore
   implements IClientEstimation {
   constructor(context: Context) {
     super(context);
@@ -22,7 +22,7 @@ export class IClientEstimationModule extends ClientCore
    *
    * @param {ICreateParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof IClientEstimationModule
+   * @memberof ClientEstimation
    */
   public create(_params: ICreateParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -41,7 +41,7 @@ export class IClientEstimationModule extends ClientCore
    *
    * @param {IDepositParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof IClientEstimationModule
+   * @memberof ClientEstimation
    */
   public deposit(params: IDepositParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -74,7 +74,7 @@ export class IClientEstimationModule extends ClientCore
    *
    * @param {IDepositParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof IClientEstimationModule
+   * @memberof ClientEstimation
    */
   public updateAllowance(_params: IDepositParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();

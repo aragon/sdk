@@ -1,6 +1,6 @@
 import { bytesToHex } from "@aragon/sdk-common";
-import { Context } from "../context";
-import { ClientCore } from "../internal/core";
+import { Context } from "../../context";
+import { ClientCore } from "../core";
 import {
   decodeFreezeActionData,
   decodeGrantActionData,
@@ -8,7 +8,7 @@ import {
   decodeUpdateMetadataAction,
   decodeWithdrawActionData,
   getFunctionFragment,
-} from "../internal/encoding/client";
+} from "../encoding/client";
 import {
   IClientDecoding,
   IFreezePermissionDecodedParams,
@@ -16,10 +16,10 @@ import {
   IMetadata,
   IRevokePermissionDecodedParams,
   IWithdrawParams,
-} from "../internal/interfaces/client";
-import { IInterfaceParams } from "../internal/interfaces/common";
+} from "../interfaces/client";
+import { IInterfaceParams } from "../interfaces/common";
 
-export class IClientDecodingModule extends ClientCore
+export class ClientDecoding extends ClientCore
   implements IClientDecoding {
   constructor(context: Context) {
     super(context);
@@ -29,7 +29,7 @@ export class IClientDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IGrantPermissionDecodedParams}
-   * @memberof IClientDecodingModule
+   * @memberof ClientDecoding
    */
   public grantAction(data: Uint8Array): IGrantPermissionDecodedParams {
     return decodeGrantActionData(data);
@@ -39,7 +39,7 @@ export class IClientDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IRevokePermissionDecodedParams}
-   * @memberof IClientDecodingModule
+   * @memberof ClientDecoding
    */
   public revokeAction(data: Uint8Array): IRevokePermissionDecodedParams {
     return decodeRevokeActionData(data);
@@ -49,7 +49,7 @@ export class IClientDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IFreezePermissionDecodedParams}
-   * @memberof IClientDecodingModule
+   * @memberof ClientDecoding
    */
   public freezeAction(data: Uint8Array): IFreezePermissionDecodedParams {
     return decodeFreezeActionData(data);
@@ -59,7 +59,7 @@ export class IClientDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IWithdrawParams}
-   * @memberof IClientDecodingModule
+   * @memberof ClientDecoding
    */
   public withdrawAction(data: Uint8Array): IWithdrawParams {
     return decodeWithdrawActionData(data);
@@ -69,7 +69,7 @@ export class IClientDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {string}
-   * @memberof IClientDecodingModule
+   * @memberof ClientDecoding
    */
   public updateMetadataRawAction(data: Uint8Array): string {
     return "ipfs://" + decodeUpdateMetadataAction(data);
@@ -79,7 +79,7 @@ export class IClientDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {Promise<IMetadata>}
-   * @memberof IClientDecodingModule
+   * @memberof ClientDecoding
    */
   public async updateMetadataAction(data: Uint8Array): Promise<IMetadata> {
     const cid = decodeUpdateMetadataAction(data);
@@ -95,7 +95,7 @@ export class IClientDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {(IInterfaceParams | null)}
-   * @memberof IClientDecodingModule
+   * @memberof ClientDecoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
     try {

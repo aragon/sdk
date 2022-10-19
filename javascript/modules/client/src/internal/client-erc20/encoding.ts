@@ -1,22 +1,41 @@
 import { InvalidAddressError } from "@aragon/sdk-common";
-import { ContextPlugin } from "../context-plugin";
-import { ClientCore } from "../internal/core";
+import { ContextPlugin } from "../../context-plugin";
+import { ClientCore } from "../core";
 import {
+  encodeErc20ActionInit,
   encodeMintTokenAction,
   encodeUpdatePluginSettingsAction,
-} from "../internal/encoding/plugins";
-import { DaoAction } from "../internal/interfaces/common";
+} from "../encoding/plugins";
+import { DaoAction, IPluginInstallItem } from "../interfaces/common";
 import {
   IClientErc20Encoding,
+  IErc20PluginInstall,
   IMintTokenParams,
   IPluginSettings,
-} from "../internal/interfaces/plugins";
+} from "../interfaces/plugins";
 import { isAddress } from "@ethersproject/address";
 
-export class IClientErc20EncodingModule extends ClientCore
+// NOTE: This address needs to be set when the plugin has been published and the ID is known
+const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
+
+export class ClientErc20Encoding extends ClientCore
   implements IClientErc20Encoding {
   constructor(context: ContextPlugin) {
     super(context);
+  }
+  /**
+   * Computes the parameters to be given when creating the DAO,
+   * so that the plugin is configured
+   *
+   * @param {IErc20PluginInstall} params
+   * @return {*}  {IPluginInstallItem}
+   * @memberof ClientErc20Encoding
+   */
+  static getPluginInstallItem(params: IErc20PluginInstall): IPluginInstallItem {
+    return {
+      id: PLUGIN_ID,
+      data: encodeErc20ActionInit(params),
+    };
   }
   /**
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
@@ -24,7 +43,7 @@ export class IClientErc20EncodingModule extends ClientCore
    * @param {string} pluginAddress
    * @param {IPluginSettings} params
    * @return {*}  {DaoAction}
-   * @memberof IClientErc20EncodingModule
+   * @memberof ClientErc20Encoding
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
@@ -47,7 +66,7 @@ export class IClientErc20EncodingModule extends ClientCore
    * @param {string} minterAddress
    * @param {IMintTokenParams} params
    * @return {*}  {DaoAction}
-   * @memberof IClientErc20EncodingModule
+   * @memberof ClientErc20Encoding
    */
   public mintTokenAction(
     minterAddress: string,

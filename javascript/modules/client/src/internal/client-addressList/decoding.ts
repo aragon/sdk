@@ -1,19 +1,19 @@
 import { bytesToHex } from "@aragon/sdk-common";
-import { ContextPlugin } from "../context-plugin";
-import { ClientCore } from "../internal/core";
+import { ContextPlugin } from "../../context-plugin";
+import { ClientCore } from "../core";
 import {
   decodeAddMemebersAction,
   decodeRemoveMemebersAction,
   decodeUpdatePluginSettingsAction,
   getFunctionFragment,
-} from "../internal/encoding/plugins";
-import { IInterfaceParams } from "../internal/interfaces/common";
+} from "../encoding/plugins";
+import { IInterfaceParams } from "../interfaces/common";
 import {
   IClientAddressListDecoding,
   IPluginSettings,
-} from "../internal/interfaces/plugins";
+} from "../interfaces/plugins";
 
-export class IClientAddressListDecodingModule extends ClientCore
+export class ClientAddressListDecoding extends ClientCore
   implements IClientAddressListDecoding {
   constructor(context: ContextPlugin) {
     super(context);
@@ -24,7 +24,7 @@ export class IClientAddressListDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IPluginSettings}
-   * @memberof IClientAddressListDecodingModule
+   * @memberof ClientAddressListDecoding
    */
   public updatePluginSettingsAction(data: Uint8Array): IPluginSettings {
     return decodeUpdatePluginSettingsAction(data);
@@ -34,7 +34,7 @@ export class IClientAddressListDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {string[]}
-   * @memberof IClientAddressListDecodingModule
+   * @memberof ClientAddressListDecoding
    */
   public addMembersAction(data: Uint8Array): string[] {
     return decodeAddMemebersAction(data);
@@ -44,7 +44,7 @@ export class IClientAddressListDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {string[]}
-   * @memberof IClientAddressListDecodingModule
+   * @memberof ClientAddressListDecoding
    */
   public removeMembersAction(data: Uint8Array): string[] {
     return decodeRemoveMemebersAction(data);
@@ -54,7 +54,7 @@ export class IClientAddressListDecodingModule extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {(IInterfaceParams | null)}
-   * @memberof IClientAddressListDecodingModule
+   * @memberof ClientAddressListDecoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
     try {

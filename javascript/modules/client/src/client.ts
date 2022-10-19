@@ -1,8 +1,8 @@
 import { Context } from "./context";
-import { IClientMethodsModule } from "./modules/methods";
-import { IClientEncodingModule } from "./modules/encoding";
-import { IClientEstimationModule } from "./modules/estimation";
-import { IClientDecodingModule } from "./modules/decoding";
+import { ClientMethods } from "./internal/client/methods";
+import { ClientEncoding } from "./internal/client/encoding";
+import { ClientEstimation } from "./internal/client/estimation";
+import { ClientDecoding } from "./internal/client/decoding";
 import {
   IClient,
   IClientDecoding,
@@ -23,9 +23,13 @@ export class Client extends ClientCore implements IClient {
 
   constructor(context: Context) {
     super(context);
-    this.methods = new IClientMethodsModule(context);
-    this.encoding = new IClientEncodingModule(context);
-    this.decoding = new IClientDecodingModule(context);
-    this.estimation = new IClientEstimationModule(context);
+    this.methods = new ClientMethods(context);
+    this.encoding = new ClientEncoding(context);
+    this.decoding = new ClientDecoding(context);
+    this.estimation = new ClientEstimation(context);
+    Object.freeze(this.methods);
+    Object.freeze(this.encoding);
+    Object.freeze(this.decoding);
+    Object.freeze(this.estimation);
   }
 }
