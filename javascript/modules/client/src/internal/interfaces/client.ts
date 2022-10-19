@@ -161,6 +161,8 @@ export type DaoCreationStepValue =
 // DEPOSIT
 
 export interface IDepositParams {
+  // TODO
+  // update naming to daoAddressOrEns
   daoAddress: string;
   amount: bigint;
   tokenAddress?: string;
