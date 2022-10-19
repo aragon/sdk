@@ -19,24 +19,14 @@ async function generateExamplesMd() {
     process.exit(1);
   }
   glob(path + "/**/*.ts", {}, async (err, files) => {
-    if (err) throw err;
-    if (fs.existsSync(outputFile)) {
-      await fs.promises.rm(outputFile);
-    }
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      fs.readFile(file, async (err, data) => {
-        if (err) throw err;
-        try {
-          const tokens = parseData(data);
-          const content = processTokens(tokens);
-          await fs.promises.appendFile(outputFile, content);
-        } catch (error) {
-          console.error(file);
-          console.error(error);
-        }
-      });
-    }
+    const proms = files.map(file => {
+      return fs.promises
+        .readFile(file)
+        .then(data => parseData(data))
+        .then(tokens => processTokens(tokens));
+    });
+    const segments = await Promise.all(proms);
+    fs.promises.writeFile(outputFile, segments.join(""));
   });
 }
 
