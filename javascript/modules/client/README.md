@@ -23,6 +23,8 @@ yarn add @aragon/sdk-client
 
 An exhaustive list of the SDK features and methods can be found on the **[examples.md](examples.md) file**.
 
+To generate the `examples.md` file run `yarn examples`
+
 # Development
 
 The building blocks are defined within the `src/internal` folder. The high level

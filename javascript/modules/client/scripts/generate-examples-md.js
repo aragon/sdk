@@ -2,8 +2,12 @@ const fs = require("fs");
 const { argv } = require("process");
 const regex = /(\/\* MARKDOWN)(.|\n)*?(\*\/\n)/g;
 const removeStrings = ["/* MARKDOWN\n", "*/"];
+const glob = require("glob");
 
-generateExamplesMd();
+generateExamplesMd().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
 
 async function generateExamplesMd() {
   const path = argv[2];
@@ -14,24 +18,26 @@ async function generateExamplesMd() {
     );
     process.exit(1);
   }
-  const files = getFileNames(path);
-  if (fs.existsSync(outputFile)) {
-    await fs.promises.rm(outputFile);
-  }
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    fs.readFile(file, async (err, data) => {
-      if (err) throw err;
-      try {
-        const tokens = parseData(data);
-        const content = processTokens(tokens);
-        await fs.promises.appendFile(outputFile, content);
-      } catch (error) {
-        console.error(file);
-        console.error(error);
-      }
-    });
-  }
+  glob(path + "/**/*.ts", {}, async (err, files) => {
+    if (err) throw err;
+    if (fs.existsSync(outputFile)) {
+      await fs.promises.rm(outputFile);
+    }
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      fs.readFile(file, async (err, data) => {
+        if (err) throw err;
+        try {
+          const tokens = parseData(data);
+          const content = processTokens(tokens);
+          await fs.promises.appendFile(outputFile, content);
+        } catch (error) {
+          console.error(file);
+          console.error(error);
+        }
+      });
+    }
+  });
 }
 
 function processTokens(tokens) {
@@ -81,25 +87,4 @@ function parseData(data) {
     });
   }
   return tokens;
-}
-
-function getFileNames(rootPath) {
-  let ret = [];
-  let paths = fs.readdirSync(rootPath, { withFileTypes: true });
-  for (const path of paths) {
-    if (path.isDirectory()) {
-      const folderPath = rootPath + "/" + path.name;
-      let files = fs.readdirSync(folderPath);
-      files = prependString(folderPath + "/", files);
-      ret = [...ret, ...files];
-    }
-  }
-  return ret;
-}
-
-function prependString(str = "", arr = []) {
-  for (let i = 0; i < arr.length; i++) {
-    arr[i] = str + arr[i];
-  }
-  return arr;
 }
