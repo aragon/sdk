@@ -32,8 +32,7 @@ async function generateExamplesMd() {
 
 function processTokens(tokens) {
   let content = "";
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i];
+  for (const token of tokens) {
     switch (token.type) {
       case "code":
         content += `\n\`\`\`ts\n` + token.content + `\n\`\`\`\n`;
