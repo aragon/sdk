@@ -250,7 +250,7 @@ describe("Client", () => {
       const client = new Client(context);
 
       const depositParams: IDepositParams = {
-        daoAddress: daoAddress,
+        daoAddressOrEns: daoAddress,
         amount: BigInt(1234),
       };
 
@@ -271,7 +271,7 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: daoAddress,
+        daoAddressOrEns: daoAddress,
         amount: BigInt(1234),
         tokenAddress: tokenContract.address,
       };
@@ -291,7 +291,7 @@ describe("Client", () => {
       const client = new Client(context);
 
       const depositParams: IDepositParams = {
-        daoAddress: daoAddress,
+        daoAddressOrEns: daoAddress,
         amount: BigInt(1234),
       };
 
@@ -299,7 +299,7 @@ describe("Client", () => {
       if (!provider) throw new Error("No provider");
 
       expect(
-        (await provider.getBalance(depositParams.daoAddress))
+        (await provider.getBalance(depositParams.daoAddressOrEns))
           .toString(),
       ).toBe("0");
 
@@ -321,7 +321,7 @@ describe("Client", () => {
       }
 
       expect(
-        (await provider.getBalance(depositParams.daoAddress))
+        (await provider.getBalance(depositParams.daoAddressOrEns))
           .toString(),
       ).toBe("1234");
     });
@@ -333,14 +333,14 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: daoAddress,
+        daoAddressOrEns: daoAddress,
         amount: BigInt(5),
         tokenAddress: tokenContract.address,
         reference: "My reference",
       };
 
       expect(
-        (await tokenContract.functions.balanceOf(depositParams.daoAddress))
+        (await tokenContract.functions.balanceOf(depositParams.daoAddressOrEns))
           .toString(),
       ).toBe("0");
 
@@ -374,7 +374,7 @@ describe("Client", () => {
       }
 
       expect(
-        (await tokenContract.functions.balanceOf(depositParams.daoAddress))
+        (await tokenContract.functions.balanceOf(depositParams.daoAddressOrEns))
           .toString(),
       ).toBe("5");
     });
@@ -386,14 +386,14 @@ describe("Client", () => {
       const tokenContract = await deployErc20(client);
 
       const depositParams: IDepositParams = {
-        daoAddress: daoAddress,
+        daoAddressOrEns: daoAddress,
         amount: BigInt(7),
         tokenAddress: tokenContract.address,
         reference: "My reference",
       };
 
       expect(
-        (await tokenContract.functions.balanceOf(depositParams.daoAddress))
+        (await tokenContract.functions.balanceOf(depositParams.daoAddressOrEns))
           .toString(),
       ).toBe("0");
 
@@ -401,17 +401,17 @@ describe("Client", () => {
       expect(
         (await tokenContract.functions.allowance(
           await client.web3.getSigner()?.getAddress(),
-          depositParams.daoAddress,
+          depositParams.daoAddressOrEns,
         )).toString(),
       ).toBe("0");
 
-      await tokenContract.functions.approve(depositParams.daoAddress, 10)
+      await tokenContract.functions.approve(depositParams.daoAddressOrEns, 10)
         .then((tx) => tx.wait());
 
       expect(
         (await tokenContract.functions.allowance(
           await client.web3.getSigner()?.getAddress(),
-          depositParams.daoAddress,
+          depositParams.daoAddressOrEns,
         )).toString(),
       ).toBe("10");
 
@@ -438,7 +438,7 @@ describe("Client", () => {
       }
 
       expect(
-        (await tokenContract.functions.balanceOf(depositParams.daoAddress))
+        (await tokenContract.functions.balanceOf(depositParams.daoAddressOrEns))
           .toString(),
       ).toBe("7");
     });
