@@ -2,7 +2,7 @@
 ### Get Function Parameters from an encoded action
 */
 import { Client, Context } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const client = new Client(context);

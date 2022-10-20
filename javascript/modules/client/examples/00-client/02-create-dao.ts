@@ -9,7 +9,7 @@ import {
   GasFeeEstimation,
   ICreateParams,
 } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);

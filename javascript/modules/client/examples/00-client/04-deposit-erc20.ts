@@ -16,7 +16,7 @@ import {
   GasFeeEstimation,
   IDepositParams,
 } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "./00-context";
 
 const context = new Context(contextParams);
 const client = new Client(context);

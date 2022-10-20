@@ -4,7 +4,7 @@
 Handles retrieving DAO asset balances using the DAO address or its ENS domain.
 */
 import { AssetBalance, Client, Context } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);

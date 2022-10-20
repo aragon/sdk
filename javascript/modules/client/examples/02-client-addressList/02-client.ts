@@ -2,7 +2,7 @@
 ### Create an Address List client
 */
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "../00-client/00-context";
 
 const context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

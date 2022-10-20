@@ -4,7 +4,7 @@
 Retrieving all the members of an ERC20 DAO.
 */
 import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
 const context: Context = new Context(contextParams);

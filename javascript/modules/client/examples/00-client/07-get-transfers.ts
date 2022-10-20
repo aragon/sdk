@@ -13,7 +13,7 @@ import {
   TransferType,
 } from "@aragon/sdk-client";
 import { SortDirection } from "../../src";
-import { contextParams } from "../context";
+import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);

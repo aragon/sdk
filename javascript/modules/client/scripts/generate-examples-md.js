@@ -35,7 +35,7 @@ function processTokens(tokens) {
   for (const token of tokens) {
     switch (token.type) {
       case "code":
-        content += `\n\`\`\`ts\n` + token.content.trim() + `\n\`\`\`\n`;
+        content += `\n\n\`\`\`ts\n` + token.content.trim() + `\n\`\`\`\n`;
         break;
       case "markdown":
         content += token.content.trim();

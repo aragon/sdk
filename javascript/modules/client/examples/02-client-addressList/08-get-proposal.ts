@@ -8,7 +8,7 @@ import {
   ContextPlugin,
   Erc20Proposal,
 } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
 const context: Context = new Context(contextParams);

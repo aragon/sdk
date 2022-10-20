@@ -6,7 +6,7 @@ all DAO's, regardless of the plugins they use.
 
 */
 import { Client, Context } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "./00-context";
 // Can be stored in a singleton and inherited from there
 const context: Context = new Context(contextParams);
 

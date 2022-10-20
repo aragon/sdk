@@ -2,7 +2,7 @@
 ### Decode Withdraw Action
 */
 import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const data: Uint8Array = new Uint8Array([12, 56]);

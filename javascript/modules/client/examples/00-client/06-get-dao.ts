@@ -5,7 +5,7 @@ Handles retrieving DAO metadata using its address or ENS domain.
 
 */
 import { Client, Context, DaoDetails } from "@aragon/sdk-client";
-import { contextParams } from "../context";
+import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
