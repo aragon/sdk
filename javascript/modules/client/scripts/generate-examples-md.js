@@ -26,7 +26,7 @@ async function generateExamplesMd() {
         .then(tokens => processTokens(tokens));
     });
     const segments = await Promise.all(proms);
-    fs.promises.writeFile(outputFile, segments.join(""));
+    fs.promises.writeFile(outputFile, segments.join("\n"));
   });
 }
 
@@ -35,10 +35,10 @@ function processTokens(tokens) {
   for (const token of tokens) {
     switch (token.type) {
       case "code":
-        content += `\n\`\`\`ts\n` + token.content + `\n\`\`\`\n`;
+        content += `\n\`\`\`ts\n` + token.content.trim() + `\n\`\`\`\n`;
         break;
       case "markdown":
-        content += token.content;
+        content += token.content.trim();
         break;
       default:
         throw new Error("invalid token type");

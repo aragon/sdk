@@ -2,9 +2,6 @@
 
 The [Context](../../context.ts) class is an utility component that holds the
 configuration passed to any [Client](../../client.ts) instance.
-
-
-
 ```ts
 import { Context } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";
@@ -17,15 +14,12 @@ const context = new Context(contextParams);
 context.set({ network: 1 });
 context.set({ signer: new Wallet("other private key") });
 context.setFull(contextParams);
-
 ```
+
 ## General purpose client
 
 The [Client](./src/client.ts) class allows to perform operations that apply to
 all DAO's, regardless of the plugins they use.
-
-
-
 ```ts
 import { Client, Context } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -35,12 +29,9 @@ const context: Context = new Context(contextParams);
 const client = new Client(context);
 
 console.log(client);
-
 ```
+
 ### Creating a DAO
-
-
-
 ```ts
 import {
   Client,
@@ -89,14 +80,11 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Depositing ETH to a DAO
 
 Handles the flow of depositing the native EVM token to an Aragon DAO.
-
-
-
 ```ts
 import {
   Client,
@@ -137,8 +125,8 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Depositing ERC20 tokens to a DAO
 
 Handles the flow of depositing ERC20 tokens to a DAO.
@@ -147,9 +135,6 @@ Handles the flow of depositing ERC20 tokens to a DAO.
 - The `tokenAddress` field is required
 - Will attempt to increase the ERC20 allowance if not sufficient
 - More intermediate steps are yielded
-
-
-
 ```ts
 import {
   Client,
@@ -200,14 +185,11 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Loading Multiple DAOs
 
 Handles retrieving list of DAO metadata.
-
-
-
 ```ts
 import {
   Client,
@@ -276,14 +258,11 @@ console.log(daos);
   }
 ]
 */
-
 ```
+
 ### Loading DAO details
 
 Handles retrieving DAO metadata using its address or ENS domain.
-
-
-
 ```ts
 import { Client, Context, DaoDetails } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -322,14 +301,12 @@ console.log(dao);
   ]
 }
 */
-
 ```
+
 ### Loading DAO activity
 
 Retrieves the list of asset transfers to and from the given DAO (by default,
 from ETH, DAI, USDC and USDT, on Mainnet)
-
-
 ```ts
 import {
   Client,
@@ -399,13 +376,11 @@ console.log(transfers);
   }
 ]
 */
-
 ```
+
 ### Loading DAO financial data
 
 Handles retrieving DAO asset balances using the DAO address or its ENS domain.
-
-
 ```ts
 import { AssetBalance, Client, Context } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -443,8 +418,8 @@ console.log(balances);
     ...
   ]
 */
-
 ```
+
 ## ERC20 governance plugin client
 
 This is a `Client`-like class, tailored to suit the specific use cases of the
@@ -454,8 +429,6 @@ Similarly to the above class, it provides high level methods that abstract the
 underlying network requests.
 
 ### Creating a DAO with an ERC20 plugin
-
-
 ```ts
 import {
   Client,
@@ -555,11 +528,9 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Create an ERC20 context
-
-
 ```ts
 import { Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";
@@ -574,11 +545,9 @@ contextPlugin.set({ signer: new Wallet("other private key") });
 contextPlugin.setFull(contextParams);
 
 console.log(contextPlugin)
-
 ```
+
 ### Create an ERC20 client
-
-
 ```ts
 import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -589,11 +558,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientErc20(contextPlugin);
 
 console.log(client);
-
 ```
+
 ### Creating an ERC20 proposal
-
-
 ```ts
 import {
   ClientErc20,
@@ -655,11 +622,9 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Creating an ERC20 proposal with an action
-
-
 ```ts
 import {
   ClientErc20,
@@ -736,11 +701,9 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Voting on an ERC20 proposal
-
-
 ```ts
 import {
   ClientErc20,
@@ -780,11 +743,9 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Checking if user can vote in an ERC20 proposal
-
-
 ```ts
 import {
   ClientErc20,
@@ -812,13 +773,11 @@ console.log(canVote);
 /*
 true
 */
-
 ```
+
 ### Loading the list of members (ERC20)
 
 Retrieving all the members of an ERC20 DAO.
-
-
 ```ts
 import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -843,13 +802,11 @@ console.log(memebers);
   "0x5678901234567890123456789012345678901234",
 ]
 */
-
 ```
+
 ### Retrieve a proposal by proposalID (ERC20)
 
 Retrieving the proposals of an ERC20 DAO.
-
-
 ```ts
 import {
   ClientErc20,
@@ -941,13 +898,11 @@ console.log(proposal);
   status: "Executed",
 }
 */
-
 ```
+
 ### Loading the list of proposals (ERC20)
 
 Retrieving the proposals of an ERC20 DAO.
-
-
 ```ts
 import {
   ClientErc20,
@@ -1037,9 +992,8 @@ console.log(proposals);
 ]
 */
 ```
+
 ### Loading a plugin's settings
-
-
 ```ts
 import {
   ClientAddressList,
@@ -1069,11 +1023,9 @@ console.log(settings);
     minSupport: 0.25
   }
 */
-
 ```
+
 ### Loading a plugin's token details
-
-
 ```ts
 import {
   ClientErc20,
@@ -1104,12 +1056,10 @@ console.log(token);
     symbol: "TOK"
   }
 */
-
 ```
+
 ## Address List governance plugin client
 ### Creating a DAO with a addressList plugin
-
-
 ```ts
 import {
   Client,
@@ -1181,9 +1131,8 @@ for await (const step of steps) {
   }
 }
 ```
+
 ### Create an Address List context
-
-
 ```ts
 import { Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";
@@ -1198,11 +1147,9 @@ contextPlugin.set({ signer: new Wallet("other private key") });
 contextPlugin.setFull(contextParams);
 
 console.log(contextPlugin)
-
 ```
+
 ### Create an Address List client
-
-
 ```ts
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -1213,11 +1160,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientAddressList(contextPlugin);
 
 console.log(client);
-
 ```
+
 ### Creating a address list proposal
-
-
 ```ts
 import {
   ClientAddressList,
@@ -1279,11 +1224,9 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Creating a address list proposal with an action
-
-
 ```ts
 import {
   ClientAddressList,
@@ -1360,11 +1303,9 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Voting on a address list proposal
-
-
 ```ts
 import {
   ClientAddressList,
@@ -1404,11 +1345,9 @@ for await (const step of steps) {
     console.error(err);
   }
 }
-
 ```
+
 ### Checking if user can vote in a address list proposal
-
-
 ```ts
 import {
   ClientAddressList,
@@ -1436,11 +1375,9 @@ console.log(canVote);
 /*
 true
 */
-
 ```
+
 ### Loading the list of members (address list plugin)
-
-
 ```ts
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -1465,11 +1402,9 @@ console.log(memebers);
   "0x5678901234567890123456789012345678901234",
 ]
 */
-
 ```
+
 ### Loading the a proposal by proposalId (address list plugin)
-
-
 ```ts
 import {
   AddressListProposal,
@@ -1553,11 +1488,9 @@ console.log(proposal);
   ]
 }
 */
-
 ```
+
 ### Loading the list of proposals (address list plugin)
-
-
 ```ts
 import {
   AddressListProposalListItem,
@@ -1633,11 +1566,9 @@ console.log(proposals);
   }
 ]
 */
-
 ```
+
 ### Loading a plugin's settings
-
-
 ```ts
 import {
   ClientErc20,
@@ -1667,18 +1598,15 @@ console.log(settings);
     minSupport: 0.25
   }
 */
-
 ```
+
 ## Action encoders
 
 Proposals will eventually need to execute some action on behalf of the DAO,
 which needs to be encoded in a low level format.
 
 The helpers above help encoding the most typical DAO operations.
-
 ### Grant permission
-
-
 ```ts
 import {
   Client,
@@ -1710,11 +1638,9 @@ console.log(grantAction);
   data: Uint8Array[12,34,45...]
 }
 */
-
 ```
+
 ### Revoke permission
-
-
 ```ts
 import {
   Client,
@@ -1746,11 +1672,9 @@ console.log(revokeAction);
   data: Uint8Array[12,34,45...]
 }
 */
-
 ```
+
 ### Freeze permission
-
-
 ```ts
 import {
   Client,
@@ -1782,9 +1706,8 @@ console.log(freezeAction);
 }
 */
 ```
+
 ### Withdrawals
-
-
 ```ts
 import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -1805,11 +1728,9 @@ const withdrawAction = await client.encoding.withdrawAction(
   withdrawParams,
 );
 console.log(withdrawAction);
-
 ```
+
 ### Update Metadata
-
-
 ```ts
 import { Client, Context, IMetadata } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -1839,11 +1760,9 @@ const updateMetadataAction = await client.encoding.updateMetadataAction(
   metadataParams,
 );
 console.log(updateMetadataAction);
-
 ```
+
 ### Set Plugin Config (Address List)
-
-
 ```ts
 import {
   ClientAddressList,
@@ -1871,11 +1790,9 @@ const configAction = client.encoding.updatePluginSettingsAction(
   configActionPrarms,
 );
 console.log(configAction);
-
 ```
+
 ### Set Plugin Config (ERC-20)
-
-
 ```ts
 import {
   ClientErc20,
@@ -1903,11 +1820,9 @@ const configAction = client.encoding.updatePluginSettingsAction(
   configActionPrarms,
 );
 console.log(configAction);
-
 ```
+
 ### Mint Token (ERC-20)
-
-
 ```ts
 import {
   ClientErc20,
@@ -1936,11 +1851,9 @@ console.log(action);
   data: Uint8Array[12,34,45...]
 }
 */
-
 ```
+
 ### Add Members (AddressList)
-
-
 ```ts
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -1965,11 +1878,9 @@ console.log(action);
   data: Uint8Array[12,34,45...]
 }
 */
-
 ```
+
 ### Remove Members (AddressList)
-
-
 ```ts
 import {
   ClientAddressList,
@@ -1998,13 +1909,10 @@ console.log(action);
   data: Uint8Array[12,34,45...]
 }
 */
-
 ```
+
 ## Action decoders
-
 ### Decode action grant permission
-
-
 ```ts
 import {
   Client,
@@ -2030,11 +1938,9 @@ console.log(grantParams);
   permissionId: "0x12345..."
 }
 */
-
 ```
+
 ### Decode action revoke permission
-
-
 ```ts
 import {
   Client,
@@ -2059,11 +1965,9 @@ console.log(revokeParams);
   permissionId: "0x12345..."
 }
 */
-
 ```
+
 ### Decode action freeze permission
-
-
 ```ts
 import {
   Client,
@@ -2087,11 +1991,9 @@ console.log(freezeParams);
   permissionId: "0x12345..."
 }
 */
-
 ```
+
 ### Decode Withdraw Action
-
-
 ```ts
 import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -2110,13 +2012,11 @@ console.log(params);
   reference: "test",
 }
 */
-
 ```
+
 ### Decode Update Metadata Action
 
 Decode an update metadata action and expect the metadata
-
-
 ```ts
 import { Client, Context, IMetadata } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -2144,13 +2044,11 @@ console.log(params);
   ]
 }
 */
-
 ```
+
 ### Decode Update Metadata Raw Action
 
 Decode an update metadata action and expect an IPFS uri containing the cid
-
-
 ```ts
 import { Client, Context, IMetadata } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -2164,11 +2062,9 @@ console.log(params);
 /*
 ipfs://Qm...
 */
-
 ```
+
 ### Decode Update Plugin Settings Action (Address List)
-
-
 ```ts
 import {
   ClientAddressList,
@@ -2194,11 +2090,9 @@ console.log(params);
   minSupport: 0.5 // 50%
 }
 */
-
 ```
+
 ### Decode Update Plugin Settings Action (ERC-20)
-
-
 ```ts
 import {
   ClientErc20,
@@ -2224,11 +2118,9 @@ console.log(params);
   minSupport: 0.5 // 50%
 }
 */
-
 ```
+
 ### Get Function Parameters from an encoded action
-
-
 ```ts
 import { Client, Context } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -2249,11 +2141,9 @@ console.log(functionParams);
   hash: "0x12345678"
 }
 */
-
 ```
+
 ### Get Function Parameters from an encoded action (Address List)
-
-
 ```ts
 import {
   ClientAddressList,
@@ -2280,11 +2170,9 @@ console.log(functionParams);
   hash: "0x12345678"
 }
 */
-
 ```
+
 ### Get Function Parameters from an encoded action (ERC-20)
-
-
 ```ts
 import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -2307,11 +2195,9 @@ console.log(functionParams);
   hash: "0x12345678"
 }
 */
-
 ```
+
 ### Decode Mint Token Action (ERC-20)
-
-
 ```ts
 import {
   ClientErc20,
@@ -2335,11 +2221,9 @@ console.log(params);
   amount: 10n
 }
 */
-
 ```
+
 ### Decode Add Members Action (Address List)
-
-
 ```ts
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -2359,11 +2243,9 @@ console.log(members);
   "0x13579...",
 ]
 */
-
 ```
+
 ### Decode Remove Members Action (Address List)
-
-
 ```ts
 import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../context";
@@ -2383,8 +2265,8 @@ console.log(members);
   "0x13579...",
 ]
 */
-
 ```
+
 
 ```ts
 import { Wallet } from "@ethersproject/wallet";
