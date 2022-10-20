@@ -161,7 +161,7 @@ export type DaoCreationStepValue =
 // DEPOSIT
 
 export interface IDepositParams {
-  daoAddress: string;
+  daoAddressOrEns: string;
   amount: bigint;
   tokenAddress?: string;
   reference?: string;

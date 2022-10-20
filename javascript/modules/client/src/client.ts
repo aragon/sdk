@@ -54,6 +54,8 @@ import {
   GraphQLError,
   InvalidAddressOrEnsError,
   NoProviderError,
+  NoSignerError,
+  NoTokenAddress,
   Random,
   strip0x,
 } from "@aragon/sdk-common";
@@ -316,6 +318,7 @@ export class Client extends ClientCore implements IClient {
 
     /**
      * Estimates the gas fee of depositing ether or an ERC20 token into the DAO
+     * This does not estimate the gas cost of updating the allowance of an ERC20 token
      *
      * @param {IDepositParams} params
      * @return {*}  {Promise<GasFeeEstimation>}
@@ -531,7 +534,9 @@ export class Client extends ClientCore implements IClient {
   _estimateDeposit(params: IDepositParams) {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed for estimating the gas cost");
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
     }
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
@@ -545,9 +550,6 @@ export class Client extends ClientCore implements IClient {
       override.value = amount;
     }
 
-    // TODO: If the approved ERC20 amount is not enough,
-    // estimate the cose of increasing the allowance
-
     return daoInstance.estimateGas
       .deposit(tokenAddress, amount, reference, override)
       .then((gasLimit) => {
@@ -555,17 +557,42 @@ export class Client extends ClientCore implements IClient {
       });
   }
 
-  _estimateUpdateAllowance(_params: IDepositParams) {
+  async _estimateUpdateAllowance(params: IDepositParams) {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
+    } else if (!params.tokenAddress) {
+      throw new NoTokenAddress();
     }
-    // TODO: remove this
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+
+    // resolve ens
+    let daoAddress = params.daoAddressOrEns;
+    if (!isAddress(daoAddress)) {
+      await this.web3.ensureOnline();
+      const provider = this.web3.getProvider();
+      if (!provider) {
+        throw new NoProviderError();
+      }
+      const resolvedAddress = await provider.resolveName(daoAddress);
+      if (!resolvedAddress) {
+        throw new InvalidAddressOrEnsError();
+      }
+      daoAddress = resolvedAddress;
+    }
+
+    const contract = new Contract(
+      params.tokenAddress,
+      erc20ContractAbi,
+      signer,
     );
+    return contract.estimateGas.approve(
+      daoAddress,
+      params.amount,
+    ).then((gasLimit) => {
+      return this.web3.getApproximateGasFee(gasLimit.toBigInt());
+    });
   }
 
   //// PRIVATE METHODS METADATA
@@ -939,7 +966,7 @@ function unwrapDepositParams(
   params: IDepositParams,
 ): [string, BigNumber, string, string] {
   return [
-    params.daoAddress,
+    params.daoAddressOrEns,
     BigNumber.from(params.amount),
     params.tokenAddress ?? AddressZero,
     params.reference ?? "",

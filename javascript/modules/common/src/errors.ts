@@ -43,3 +43,9 @@ export class UnexpectedActionError extends Error {
     super("The received action is different from the expected one");
   }
 }
+
+export class NoTokenAddress extends Error {
+  constructor() {
+    super("A token address is needed");
+  }
+}
