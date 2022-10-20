@@ -24,6 +24,7 @@ export {
   IRevokePermissionParams,
   ITransferQueryParams,
   IWithdrawParams,
+  Permissions,
   Transfer,
   TransferSortBy,
   TransferType,
@@ -55,6 +56,7 @@ export {
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalSortBy,
+  ProposalStatus,
   VoteProposalStep,
   VoteValues,
 } from "./internal/interfaces/plugins";

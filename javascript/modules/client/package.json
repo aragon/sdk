@@ -22,7 +22,8 @@
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "examples": "node ./scripts/generate-examples-md.js ./examples ./examples.md"
   },
   "husky": {
     "hooks": {
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@size-limit/preset-small-lib": "^7.0.8",
     "@types/jest": "^29.0.3",
+    "glob": "^8.0.3",
     "husky": "^7.0.4",
     "size-limit": "^7.0.8",
     "tsdx": "^0.14.1",
