@@ -748,7 +748,8 @@ so that the plugin is configured</p>
 <a name="Client.deposit"></a>
 
 ### Client.deposit(params) ⇒ <code>\*</code>
-<p>Estimates the gas fee of depositing ether or an ERC20 token into the DAO</p>
+<p>Estimates the gas fee of depositing ether or an ERC20 token into the DAO
+This does not estimate the gas cost of updating the allowance of an ERC20 token</p>
 
 **Kind**: static method of [<code>Client</code>](#Client)  
 **Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
