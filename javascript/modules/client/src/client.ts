@@ -318,6 +318,7 @@ export class Client extends ClientCore implements IClient {
 
     /**
      * Estimates the gas fee of depositing ether or an ERC20 token into the DAO
+     * This does not estimate the gas cost of updating the allowance of an ERC20 token
      *
      * @param {IDepositParams} params
      * @return {*}  {Promise<GasFeeEstimation>}
@@ -567,7 +568,7 @@ export class Client extends ClientCore implements IClient {
     }
 
     // resolve ens
-    let daoAddress = params.daoAddress;
+    let daoAddress = params.daoAddressOrEns;
     if (!isAddress(daoAddress)) {
       await this.web3.ensureOnline();
       const provider = this.web3.getProvider();
