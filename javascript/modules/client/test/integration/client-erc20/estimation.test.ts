@@ -12,7 +12,7 @@ import {
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../../helpers/deployContracts";
-describe("Client ERC20 decoders", () => {
+describe("Client ERC20", () => {
   describe("Estimation Module", () => {
     beforeAll(async () => {
       const server = await ganacheSetup.start();

@@ -8,7 +8,7 @@ import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 import { contextParams, contextParamsFailing } from "../constants";
 
-describe("Client ERC20 decoders", () => {
+describe("Client ERC20", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParams);

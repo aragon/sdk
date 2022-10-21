@@ -10,7 +10,7 @@ import {
 import { bytesToHex } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 
-describe("Client ERC20 decoders", () => {
+describe("Client ERC20", () => {
   describe("Action decoders", () => {
     it("Should decode the plugin settings from an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);

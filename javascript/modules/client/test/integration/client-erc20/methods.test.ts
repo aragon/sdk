@@ -36,7 +36,7 @@ import {
   TEST_NON_EXISTING_ADDRESS,
 } from "../constants";
 
-describe("Client ERC20 decoders", () => {
+describe("Client ERC20", () => {
   beforeAll(async () => {
     const server = await ganacheSetup.start();
     const daoFactory = await deployContracts.deploy(server);

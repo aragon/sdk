@@ -11,7 +11,7 @@ import {
 import { AddressZero } from "@ethersproject/constants";
 import { InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
-describe("Client ERC20 decoders", () => {
+describe("Client ERC20", () => {
   describe("Encoding module", () => {
     it("Should create a Erc20 client and generate a install entry", async () => {
       const initParams: IErc20PluginInstall = {
