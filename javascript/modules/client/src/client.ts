@@ -16,20 +16,28 @@ import { ClientCore } from "./internal/core";
  * Provider a generic client with high level methods to manage and interact with DAO's
  */
 export class Client extends ClientCore implements IClient {
-  public methods: IClientMethods;
-  public encoding: IClientEncoding;
-  public decoding: IClientDecoding;
-  public estimation: IClientEstimation;
+  private privateMethods: IClientMethods;
+  private privateEncoding: IClientEncoding;
+  private privateDecoding: IClientDecoding;
+  private privateEstimation: IClientEstimation;
 
   constructor(context: Context) {
     super(context);
-    this.methods = new ClientMethods(context);
-    this.encoding = new ClientEncoding(context);
-    this.decoding = new ClientDecoding(context);
-    this.estimation = new ClientEstimation(context);
-    Object.freeze(this.methods);
-    Object.freeze(this.encoding);
-    Object.freeze(this.decoding);
-    Object.freeze(this.estimation);
+    this.privateMethods = new ClientMethods(context);
+    this.privateEncoding = new ClientEncoding(context);
+    this.privateDecoding = new ClientDecoding(context);
+    this.privateEstimation = new ClientEstimation(context);
+  }
+  get methods(): IClientMethods {
+    return this.privateMethods;
+  }
+  get encoding(): IClientEncoding {
+    return this.privateEncoding;
+  }
+  get decoding(): IClientDecoding {
+    return this.privateDecoding;
+  }
+  get estimation(): IClientEstimation {
+    return this.privateEstimation;
   }
 }

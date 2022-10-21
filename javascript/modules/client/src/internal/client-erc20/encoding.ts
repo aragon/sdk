@@ -14,9 +14,7 @@ import {
   IPluginSettings,
 } from "../interfaces/plugins";
 import { isAddress } from "@ethersproject/address";
-
-// NOTE: This address needs to be set when the plugin has been published and the ID is known
-const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
+import { ERC20_PLUGIN_ID } from "../constants";
 
 export class ClientErc20Encoding extends ClientCore
   implements IClientErc20Encoding {
@@ -33,7 +31,7 @@ export class ClientErc20Encoding extends ClientCore
    */
   static getPluginInstallItem(params: IErc20PluginInstall): IPluginInstallItem {
     return {
-      id: PLUGIN_ID,
+      id: ERC20_PLUGIN_ID,
       data: encodeErc20ActionInit(params),
     };
   }

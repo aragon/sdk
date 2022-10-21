@@ -19,22 +19,31 @@ import { ClientCore } from "./internal/core";
  */
 export class ClientAddressList extends ClientCore
   implements IClientAddressList {
-  public methods: IClientAddressListMethods;
-  public encoding: IClientAddressListEncoding;
-  public decoding: IClientAddressListDecoding;
-  public estimation: IClientAddressListEstimation;
+  private privateMethods: IClientAddressListMethods;
+  private privateEncoding: IClientAddressListEncoding;
+  private privateDecoding: IClientAddressListDecoding;
+  private privateEstimation: IClientAddressListEstimation;
 
   constructor(context: ContextPlugin) {
     super(context);
-    this.methods = new ClientAddressListMethods(context);
-    this.encoding = new ClientAddressListEncoding(context);
-    this.decoding = new ClientAddressListDecoding(context);
-    this.estimation = new ClientAddressListEstimation(context);
-    Object.freeze(this.methods);
-    Object.freeze(this.encoding);
-    Object.freeze(this.decoding);
-    Object.freeze(this.estimation);
+    this.privateMethods = new ClientAddressListMethods(context);
+    this.privateEncoding = new ClientAddressListEncoding(context);
+    this.privateDecoding = new ClientAddressListDecoding(context);
+    this.privateEstimation = new ClientAddressListEstimation(context);
   }
+  get methods(): IClientAddressListMethods {
+    return this.privateMethods;
+  }
+  get encoding(): IClientAddressListEncoding {
+    return this.privateEncoding;
+  }
+  get decoding(): IClientAddressListDecoding {
+    return this.privateDecoding;
+  }
+  get estimation(): IClientAddressListEstimation {
+    return this.privateEstimation;
+  }
+
   static encoding = {
     /**
      * Computes the parameters to be given when creating the DAO,

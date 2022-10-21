@@ -14,8 +14,7 @@ import {
   IPluginSettings,
 } from "../interfaces/plugins";
 import { isAddress } from "@ethersproject/address";
-
-const PLUGIN_ID = "0x1234567890123456789012345678901234567890";
+import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 
 export class ClientAddressListEncoding extends ClientCore
   implements IClientAddressListEncoding {
@@ -35,7 +34,7 @@ export class ClientAddressListEncoding extends ClientCore
     params: IAddressListPluginInstall,
   ): IPluginInstallItem {
     return {
-      id: PLUGIN_ID,
+      id: ADDRESSLIST_PLUGIN_ID,
       data: encodeAddressListActionInit(params),
     };
   }
