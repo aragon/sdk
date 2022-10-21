@@ -6,6 +6,7 @@ import { Client, Context, ICreateParams, IDepositParams } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../../helpers/deployContracts";
+import { deployErc20 } from "./methods.test";
 
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
@@ -55,11 +56,34 @@ describe("Client", () => {
       const client = new Client(context);
 
       const depositParams: IDepositParams = {
-        daoAddress: daoAddress,
+        daoAddressOrEns: daoAddress,
         amount: BigInt(1234),
       };
 
       const gasFeesEstimation = await client.estimation.deposit(
+        depositParams,
+      );
+
+      expect(typeof gasFeesEstimation).toEqual("object");
+      expect(typeof gasFeesEstimation.average).toEqual("bigint");
+      expect(typeof gasFeesEstimation.max).toEqual("bigint");
+      expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
+      expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
+    });
+
+    it("Should estimate gas fees updating allowance", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const tokenContract = await deployErc20(client);
+
+      const depositParams: IDepositParams = {
+        daoAddressOrEns: daoAddress,
+        amount: BigInt(1234),
+        tokenAddress: tokenContract.address,
+      };
+
+      const gasFeesEstimation = await client.estimation.updateAllowance(
         depositParams,
       );
 

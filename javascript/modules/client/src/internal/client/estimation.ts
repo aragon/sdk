@@ -1,8 +1,16 @@
 import { DAO__factory } from "@aragon/core-contracts-ethers";
-import { Random } from "@aragon/sdk-common";
+import {
+  InvalidAddressOrEnsError,
+  NoProviderError,
+  NoSignerError,
+  NoTokenAddress,
+  Random,
+} from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
+import { Contract } from "@ethersproject/contracts";
 import { Context } from "../../context";
+import { erc20ContractAbi } from "../abi/erc20";
 import { ClientCore } from "../core";
 import {
   IClientEstimation,
@@ -11,9 +19,9 @@ import {
 } from "../interfaces/client";
 import { GasFeeEstimation } from "../interfaces/common";
 import { unwrapDepositParams } from "../utils/client";
+import { isAddress } from "@ethersproject/address";
 
-export class ClientEstimation extends ClientCore
-  implements IClientEstimation {
+export class ClientEstimation extends ClientCore implements IClientEstimation {
   constructor(context: Context) {
     super(context);
   }
@@ -38,7 +46,8 @@ export class ClientEstimation extends ClientCore
   }
   /**
    * Estimates the gas fee of depositing ether or an ERC20 token into the DAO
-   *
+   * This does not estimate the gas cost of updating the allowance of an ERC20 token
+   * 
    * @param {IDepositParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
@@ -46,7 +55,9 @@ export class ClientEstimation extends ClientCore
   public deposit(params: IDepositParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed for estimating the gas cost");
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
     }
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
@@ -59,9 +70,6 @@ export class ClientEstimation extends ClientCore
     if (tokenAddress === AddressZero) {
       override.value = amount;
     }
-
-    // TODO: If the approved ERC20 amount is not enough,
-    // estimate the cose of increasing the allowance
 
     return daoInstance.estimateGas
       .deposit(tokenAddress, amount, reference, override)
@@ -76,16 +84,43 @@ export class ClientEstimation extends ClientCore
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
-  public updateAllowance(_params: IDepositParams): Promise<GasFeeEstimation> {
+  public async updateAllowance(
+    params: IDepositParams,
+  ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
+    } else if (!params.tokenAddress) {
+      throw new NoTokenAddress();
     }
-    // TODO: remove this
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+
+    // resolve ens
+    let daoAddress = params.daoAddressOrEns;
+    if (!isAddress(daoAddress)) {
+      await this.web3.ensureOnline();
+      const provider = this.web3.getProvider();
+      if (!provider) {
+        throw new NoProviderError();
+      }
+      const resolvedAddress = await provider.resolveName(daoAddress);
+      if (!resolvedAddress) {
+        throw new InvalidAddressOrEnsError();
+      }
+      daoAddress = resolvedAddress;
+    }
+
+    const contract = new Contract(
+      params.tokenAddress,
+      erc20ContractAbi,
+      signer,
     );
+    return contract.estimateGas.approve(
+      daoAddress,
+      params.amount,
+    ).then((gasLimit) => {
+      return this.web3.getApproximateGasFee(gasLimit.toBigInt());
+    });
   }
 }

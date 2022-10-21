@@ -65,7 +65,7 @@ export function  unwrapDepositParams(
   params: IDepositParams,
 ): [string, BigNumber, string, string] {
   return [
-    params.daoAddress,
+    params.daoAddressOrEns,
     BigNumber.from(params.amount),
     params.tokenAddress ?? AddressZero,
     params.reference ?? "",
