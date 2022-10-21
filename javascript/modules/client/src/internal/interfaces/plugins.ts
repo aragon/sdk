@@ -13,91 +13,114 @@ import { BigNumber } from "@ethersproject/bignumber";
 
 // ERC20
 
-/** Defines the shape of the ERC20 client class */
-export interface IClientErc20 extends IClientCore {
-  methods: {
-    createProposal: (
-      params: ICreateProposalParams,
-    ) => AsyncGenerator<ProposalCreationStepValue>;
-    voteProposal: (
-      params: IVoteProposalParams,
-    ) => AsyncGenerator<VoteProposalStepValue>;
-    executeProposal: (
-      params: IExecuteProposalParams,
-    ) => AsyncGenerator<ExecuteProposalStepValue>;
-    canVote: (params: ICanVoteParams) => Promise<boolean>;
-    getMembers: (addressOrEns: string) => Promise<string[]>;
-    getProposal: (propoosalId: string) => Promise<Erc20Proposal | null>;
-    getProposals: (
-      params?: IProposalQueryParams,
-    ) => Promise<Erc20ProposalListItem[]>;
-    getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
-    getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
-  };
-  encoding: {
-    /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    updatePluginSettingsAction: (
-      pluginAddress: string,
-      params: IPluginSettings,
-    ) => DaoAction;
-  };
-  decoding: {
-    updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings;
-    findInterface: (data: Uint8Array) => IInterfaceParams | null;
-  };
-  estimation: {
-    createProposal: (
-      params: ICreateProposalParams,
-    ) => Promise<GasFeeEstimation>;
-    voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
-    executeProposal: (
-      params: IExecuteProposalParams,
-    ) => Promise<GasFeeEstimation>;
-  };
+export interface IClientErc20Methods extends IClientCore {
+  createProposal: (
+    params: ICreateProposalParams,
+  ) => AsyncGenerator<ProposalCreationStepValue>;
+  voteProposal: (
+    params: IVoteProposalParams,
+  ) => AsyncGenerator<VoteProposalStepValue>;
+  executeProposal: (
+    params: IExecuteProposalParams,
+  ) => AsyncGenerator<ExecuteProposalStepValue>;
+  canVote: (params: ICanVoteParams) => Promise<boolean>;
+  getMembers: (addressOrEns: string) => Promise<string[]>;
+  getProposal: (propoosalId: string) => Promise<Erc20Proposal | null>;
+  getProposals: (
+    params: IProposalQueryParams,
+  ) => Promise<Erc20ProposalListItem[]>;
+  getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
+  getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
 }
 
+export interface IClientErc20Encoding extends IClientCore {
+  updatePluginSettingsAction: (
+    pluginAddress: string,
+    params: IPluginSettings,
+  ) => DaoAction;
+  mintTokenAction: (
+    minterAddress: string,
+    params: IMintTokenParams,
+  ) => DaoAction;
+}
+export interface IClientErc20Decoding extends IClientCore {
+  updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings;
+  mintTokenAction: (data: Uint8Array) => IMintTokenParams;
+  findInterface: (data: Uint8Array) => IInterfaceParams | null;
+}
+export interface IClientErc20Estimation extends IClientCore {
+  createProposal: (
+    params: ICreateProposalParams,
+  ) => Promise<GasFeeEstimation>;
+  voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
+  executeProposal: (
+    params: IExecuteProposalParams,
+  ) => Promise<GasFeeEstimation>;
+}
+
+/** Defines the shape of the ERC20 client class */
+export interface IClientErc20 {
+  methods: IClientErc20Methods;
+  encoding: IClientErc20Encoding;
+  decoding: IClientErc20Decoding;
+  estimation: IClientErc20Estimation;
+}
 // Address List
 
+export interface IClientAddressListMethods extends IClientCore {
+  createProposal: (
+    params: ICreateProposalParams,
+  ) => AsyncGenerator<ProposalCreationStepValue>;
+  voteProposal: (
+    params: IVoteProposalParams,
+  ) => AsyncGenerator<VoteProposalStepValue>;
+  executeProposal: (
+    params: IExecuteProposalParams,
+  ) => AsyncGenerator<ExecuteProposalStepValue>;
+  canVote: (params: ICanVoteParams) => Promise<boolean>;
+  getMembers: (addressOrEns: string) => Promise<string[]>;
+  getProposal: (propoosalId: string) => Promise<AddressListProposal | null>;
+  getProposals: (
+    params: IProposalQueryParams,
+  ) => Promise<AddressListProposalListItem[]>;
+  getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
+}
+
+export interface IClientAddressListEncoding extends IClientCore {
+  updatePluginSettingsAction: (
+    pluginAddress: string,
+    params: IPluginSettings,
+  ) => DaoAction;
+  addMembersAction: (
+    pluginAddress: string,
+    members: string[],
+  ) => DaoAction;
+  removeMembersAction: (
+    pluginAddress: string,
+    members: string[],
+  ) => DaoAction;
+}
+export interface IClientAddressListDecoding extends IClientCore {
+  updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings;
+  addMembersAction: (data: Uint8Array) => string[];
+  removeMembersAction: (data: Uint8Array) => string[];
+  findInterface: (data: Uint8Array) => IInterfaceParams | null;
+}
+export interface IClientAddressListEstimation extends IClientCore {
+  createProposal: (
+    params: ICreateProposalParams,
+  ) => Promise<GasFeeEstimation>;
+  voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
+  executeProposal: (
+    params: IExecuteProposalParams,
+  ) => Promise<GasFeeEstimation>;
+}
 /** Defines the shape of the AddressList client class */
-export interface IClientAddressList extends IClientCore {
-  methods: {
-    createProposal: (
-      params: ICreateProposalParams,
-    ) => AsyncGenerator<ProposalCreationStepValue>;
-    voteProposal: (
-      params: IVoteProposalParams,
-    ) => AsyncGenerator<VoteProposalStepValue>;
-    executeProposal: (
-      params: IExecuteProposalParams,
-    ) => AsyncGenerator<ExecuteProposalStepValue>;
-    canVote: (params: ICanVoteParams) => Promise<boolean>;
-    getMembers: (addressOrEns: string) => Promise<string[]>;
-    getProposal: (propoosalId: string) => Promise<AddressListProposal | null>;
-    getProposals: (
-      params?: IProposalQueryParams,
-    ) => Promise<AddressListProposalListItem[]>;
-    getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
-  };
-  encoding: {
-    /** Computes the parameters to be given when creating the DAO, so that the plugin is configured */
-    updatePluginSettingsAction: (
-      pluginAddress: string,
-      params: IPluginSettings,
-    ) => DaoAction;
-  };
-  decoding: {
-    updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings;
-    findInterface: (data: Uint8Array) => IInterfaceParams | null;
-  };
-  estimation: {
-    createProposal: (
-      params: ICreateProposalParams,
-    ) => Promise<GasFeeEstimation>;
-    voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
-    executeProposal: (
-      params: IExecuteProposalParams,
-    ) => Promise<GasFeeEstimation>;
-  };
+export interface IClientAddressList {
+  methods: IClientAddressListMethods;
+  encoding: IClientAddressListEncoding;
+  decoding: IClientAddressListDecoding;
+  estimation: IClientAddressListEstimation;
 }
 
 // TYPES

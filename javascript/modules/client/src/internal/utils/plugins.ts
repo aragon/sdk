@@ -6,6 +6,7 @@ import {
   Erc20Proposal,
   Erc20ProposalListItem,
   IComputeStatusProposal,
+  ICreateProposalParams,
   ProposalMetadata,
   SubgraphAction,
   SubgraphAddressListProposal,
@@ -18,6 +19,22 @@ import {
   VoteValues,
 } from "../interfaces/plugins";
 import { formatEther } from "@ethersproject/units";
+import { IDAO } from "@aragon/core-contracts-ethers";
+
+export function unwrapProposalParams(
+  params: ICreateProposalParams,
+): [ProposalMetadata, IDAO.ActionStruct[], number, number, boolean, number] {
+  return [
+    params.metadata,
+    params.actions ?? [],
+    // TODO: Verify => seconds?
+    params.startDate ? Math.floor(params.startDate.getTime() / 1000) : 0,
+    // TODO: Verify => seconds?
+    params.endDate ? Math.floor(params.endDate.getTime() / 1000) : 0,
+    params.executeOnPass ?? false,
+    params.creatorVote ?? VoteValues.ABSTAIN,
+  ];
+}
 
 export function computeProposalStatus(
   proposal: IComputeStatusProposal,
