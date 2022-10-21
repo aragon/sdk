@@ -35,7 +35,7 @@ import {
   TEST_NON_EXISTING_ADDRESS,
 } from "../constants";
 
-describe("Client", () => {
+describe("Client Address List", () => {
   beforeAll(async () => {
     const server = await ganacheSetup.start();
     const daoFactory = await deployContracts.deploy(server);

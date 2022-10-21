@@ -9,7 +9,7 @@ import { GraphQLClient } from "graphql-request";
 
 import { contextParams, contextParamsFailing } from "../constants";
 
-describe("Client", () => {
+describe("Client Address List", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParams);

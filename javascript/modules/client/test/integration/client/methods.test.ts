@@ -43,434 +43,440 @@ import { AddressZero } from "@ethersproject/constants";
 import { isAddress } from "@ethersproject/address";
 
 let daoAddress = "0x1234567890123456789012345678901234567890";
-describe("Methods Module tests", () => {
-  beforeAll(async () => {
-    const server = await ganacheSetup.start();
-    const daoFactory = await deployContracts.deploy(server);
-    contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
-    const addr = await createLegacyDao(contextParamsLocalChain);
-    daoAddress = addr;
-  });
-
-  afterAll(async () => {
-    await ganacheSetup.stop();
-  });
-
-  describe("DAO Creation", () => {
-    it("Should estimate gas fees for creating a DAO", async () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
-
-      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) +
-        1;
-
-      const daoCreationParams: ICreateParams = {
-        metadata: {
-          name: daoName,
-          description: "this is a dao",
-          avatar: "https://...",
-          links: [],
-        },
-        ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-        plugins: [
-          { id: "0x1234", data: new Uint8Array([11, 11]) },
-        ],
-      };
-
-      const gasFeesEstimation = await client.estimation.create(
-        daoCreationParams,
-      );
-
-      expect(typeof gasFeesEstimation).toEqual("object");
-      expect(typeof gasFeesEstimation.average).toEqual("bigint");
-      expect(typeof gasFeesEstimation.max).toEqual("bigint");
-      expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
-      expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
+describe("Client", () => {
+  describe("Methods Module tests", () => {
+    beforeAll(async () => {
+      const server = await ganacheSetup.start();
+      const daoFactory = await deployContracts.deploy(server);
+      contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
+      const addr = await createLegacyDao(contextParamsLocalChain);
+      daoAddress = addr;
     });
 
-    it("Should create a DAO locally", async () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
+    afterAll(async () => {
+      await ganacheSetup.stop();
+    });
 
-      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) +
-        1;
+    describe("DAO Creation", () => {
+      it("Should estimate gas fees for creating a DAO", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
 
-      const daoCreationParams: ICreateParams = {
-        metadata: {
-          name: daoName,
-          description: "this is a dao",
-          avatar: "https://...",
-          links: [],
-        },
-        ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-        plugins: [
-          { id: "0x1234", data: new Uint8Array([11, 11]) },
-        ],
-      };
+        const daoName = "ERC20VotingDAO_" +
+          Math.floor(Random.getFloat() * 9999) +
+          1;
 
-      for await (const step of client.methods.create(daoCreationParams)) {
-        switch (step.key) {
-          case DaoCreationSteps.CREATING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case DaoCreationSteps.DONE:
-            expect(typeof step.address).toBe("string");
-            expect(step.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-            break;
-          default:
-            throw new Error(
-              "Unexpected DAO creation step: " + JSON.stringify(step, null, 2),
-            );
+        const daoCreationParams: ICreateParams = {
+          metadata: {
+            name: daoName,
+            description: "this is a dao",
+            avatar: "https://...",
+            links: [],
+          },
+          ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
+          plugins: [
+            { id: "0x1234", data: new Uint8Array([11, 11]) },
+          ],
+        };
+
+        const gasFeesEstimation = await client.estimation.create(
+          daoCreationParams,
+        );
+
+        expect(typeof gasFeesEstimation).toEqual("object");
+        expect(typeof gasFeesEstimation.average).toEqual("bigint");
+        expect(typeof gasFeesEstimation.max).toEqual("bigint");
+        expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
+        expect(gasFeesEstimation.max).toBeGreaterThan(
+          gasFeesEstimation.average,
+        );
+      });
+
+      it("Should create a DAO locally", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+
+        const daoName = "ERC20VotingDAO_" +
+          Math.floor(Random.getFloat() * 9999) +
+          1;
+
+        const daoCreationParams: ICreateParams = {
+          metadata: {
+            name: daoName,
+            description: "this is a dao",
+            avatar: "https://...",
+            links: [],
+          },
+          ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
+          plugins: [
+            { id: "0x1234", data: new Uint8Array([11, 11]) },
+          ],
+        };
+
+        for await (const step of client.methods.create(daoCreationParams)) {
+          switch (step.key) {
+            case DaoCreationSteps.CREATING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoCreationSteps.DONE:
+              expect(typeof step.address).toBe("string");
+              expect(step.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              break;
+            default:
+              throw new Error(
+                "Unexpected DAO creation step: " +
+                  JSON.stringify(step, null, 2),
+              );
+          }
         }
-      }
+      });
     });
-  });
 
-  describe("DAO deposit", () => {
-    it("Should allow to deposit ERC20 (no prior allowance)", async () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
+    describe("DAO deposit", () => {
+      it("Should allow to deposit ERC20 (no prior allowance)", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
 
-      const tokenContract = await deployErc20(client);
+        const tokenContract = await deployErc20(client);
 
-      const depositParams: IDepositParams = {
-        daoAddress: daoAddress,
-        amount: BigInt(5),
-        tokenAddress: tokenContract.address,
-        reference: "My reference",
-      };
+        const depositParams: IDepositParams = {
+          daoAddress: daoAddress,
+          amount: BigInt(5),
+          tokenAddress: tokenContract.address,
+          reference: "My reference",
+        };
 
-      expect(
-        (await tokenContract.functions.balanceOf(depositParams.daoAddress))
-          .toString(),
-      ).toBe("0");
+        expect(
+          (await tokenContract.functions.balanceOf(depositParams.daoAddress))
+            .toString(),
+        ).toBe("0");
 
-      for await (const step of client.methods.deposit(depositParams)) {
-        switch (step.key) {
-          case DaoDepositSteps.CHECKED_ALLOWANCE:
-            expect(typeof step.allowance).toBe("bigint");
-            expect(step.allowance).toBe(BigInt(0));
-            break;
-          case DaoDepositSteps.UPDATING_ALLOWANCE:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case DaoDepositSteps.UPDATED_ALLOWANCE:
-            expect(typeof step.allowance).toBe("bigint");
-            expect(step.allowance).toBe(BigInt(5));
-            break;
-          case DaoDepositSteps.DEPOSITING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case DaoDepositSteps.DONE:
-            expect(typeof step.amount).toBe("bigint");
-            expect(step.amount).toBe(BigInt(5));
-            break;
-          default:
-            throw new Error(
-              "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
-            );
+        for await (const step of client.methods.deposit(depositParams)) {
+          switch (step.key) {
+            case DaoDepositSteps.CHECKED_ALLOWANCE:
+              expect(typeof step.allowance).toBe("bigint");
+              expect(step.allowance).toBe(BigInt(0));
+              break;
+            case DaoDepositSteps.UPDATING_ALLOWANCE:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoDepositSteps.UPDATED_ALLOWANCE:
+              expect(typeof step.allowance).toBe("bigint");
+              expect(step.allowance).toBe(BigInt(5));
+              break;
+            case DaoDepositSteps.DEPOSITING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoDepositSteps.DONE:
+              expect(typeof step.amount).toBe("bigint");
+              expect(step.amount).toBe(BigInt(5));
+              break;
+            default:
+              throw new Error(
+                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
+              );
+          }
         }
-      }
 
-      expect(
-        (await tokenContract.functions.balanceOf(depositParams.daoAddress))
-          .toString(),
-      ).toBe("5");
-    });
+        expect(
+          (await tokenContract.functions.balanceOf(depositParams.daoAddress))
+            .toString(),
+        ).toBe("5");
+      });
 
-    it("Should allow to deposit ERC20 (with existing allowance)", async () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
+      it("Should allow to deposit ERC20 (with existing allowance)", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
 
-      const tokenContract = await deployErc20(client);
+        const tokenContract = await deployErc20(client);
 
-      const depositParams: IDepositParams = {
-        daoAddress: daoAddress,
-        amount: BigInt(7),
-        tokenAddress: tokenContract.address,
-        reference: "My reference",
-      };
+        const depositParams: IDepositParams = {
+          daoAddress: daoAddress,
+          amount: BigInt(7),
+          tokenAddress: tokenContract.address,
+          reference: "My reference",
+        };
 
-      expect(
-        (await tokenContract.functions.balanceOf(depositParams.daoAddress))
-          .toString(),
-      ).toBe("0");
+        expect(
+          (await tokenContract.functions.balanceOf(depositParams.daoAddress))
+            .toString(),
+        ).toBe("0");
 
-      // Prior allowance
-      expect(
-        (await tokenContract.functions.allowance(
-          await client.web3.getSigner()?.getAddress(),
-          depositParams.daoAddress,
-        )).toString(),
-      ).toBe("0");
+        // Prior allowance
+        expect(
+          (await tokenContract.functions.allowance(
+            await client.web3.getSigner()?.getAddress(),
+            depositParams.daoAddress,
+          )).toString(),
+        ).toBe("0");
 
-      await tokenContract.functions.approve(depositParams.daoAddress, 10)
-        .then((tx) => tx.wait());
+        await tokenContract.functions.approve(depositParams.daoAddress, 10)
+          .then((tx) => tx.wait());
 
-      expect(
-        (await tokenContract.functions.allowance(
-          await client.web3.getSigner()?.getAddress(),
-          depositParams.daoAddress,
-        )).toString(),
-      ).toBe("10");
+        expect(
+          (await tokenContract.functions.allowance(
+            await client.web3.getSigner()?.getAddress(),
+            depositParams.daoAddress,
+          )).toString(),
+        ).toBe("10");
 
-      // Deposit
-      for await (const step of client.methods.deposit(depositParams)) {
-        switch (step.key) {
-          case DaoDepositSteps.CHECKED_ALLOWANCE:
-            expect(typeof step.allowance).toBe("bigint");
-            expect(step.allowance).toBe(BigInt(10));
-            break;
-          case DaoDepositSteps.DEPOSITING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case DaoDepositSteps.DONE:
-            expect(typeof step.amount).toBe("bigint");
-            expect(step.amount).toBe(BigInt(7));
-            break;
-          default:
-            throw new Error(
-              "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
-            );
+        // Deposit
+        for await (const step of client.methods.deposit(depositParams)) {
+          switch (step.key) {
+            case DaoDepositSteps.CHECKED_ALLOWANCE:
+              expect(typeof step.allowance).toBe("bigint");
+              expect(step.allowance).toBe(BigInt(10));
+              break;
+            case DaoDepositSteps.DEPOSITING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoDepositSteps.DONE:
+              expect(typeof step.amount).toBe("bigint");
+              expect(step.amount).toBe(BigInt(7));
+              break;
+            default:
+              throw new Error(
+                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
+              );
+          }
         }
-      }
 
-      expect(
-        (await tokenContract.functions.balanceOf(depositParams.daoAddress))
-          .toString(),
-      ).toBe("7");
+        expect(
+          (await tokenContract.functions.balanceOf(depositParams.daoAddress))
+            .toString(),
+        ).toBe("7");
+      });
     });
-  });
 
-  describe("Data retrieval", () => {
-    it("Should get a DAO's metadata with a specific address", async () => {
-      const ctx = new Context(contextParams);
-      const client = new Client(ctx);
-      const daoAddress = TEST_DAO_ADDRESS;
-      const dao = await client.methods.getDao(daoAddress);
-      expect(typeof dao).toBe("object");
-      expect(dao === null).toBe(false);
-      if (dao) {
-        expect(dao.address).toBe(daoAddress);
-        expect(typeof dao.address).toBe("string");
-        expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-        expect(typeof dao.ensDomain).toBe("string");
-        expect(Array.isArray(dao.plugins)).toBe(true);
-        if (dao.plugins.length > 0) {
-          for (const plugin of dao.plugins) {
+    describe("Data retrieval", () => {
+      it("Should get a DAO's metadata with a specific address", async () => {
+        const ctx = new Context(contextParams);
+        const client = new Client(ctx);
+        const daoAddress = TEST_DAO_ADDRESS;
+        const dao = await client.methods.getDao(daoAddress);
+        expect(typeof dao).toBe("object");
+        expect(dao === null).toBe(false);
+        if (dao) {
+          expect(dao.address).toBe(daoAddress);
+          expect(typeof dao.address).toBe("string");
+          expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+          expect(typeof dao.ensDomain).toBe("string");
+          expect(Array.isArray(dao.plugins)).toBe(true);
+          if (dao.plugins.length > 0) {
+            for (const plugin of dao.plugins) {
+              expect(typeof plugin.id).toBe("string");
+              expect(typeof plugin.instanceAddress).toBe("string");
+              expect(plugin.instanceAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof plugin.version).toBe("string");
+            }
+          }
+          expect(typeof dao.metadata.name).toBe("string");
+          expect(typeof dao.metadata.description).toBe("string");
+          expect(Array.isArray(dao.metadata.links)).toBe(true);
+          if (dao.metadata.links.length > 0) {
+            for (const link of dao.metadata.links) {
+              expect(typeof link.name).toBe("string");
+              expect(typeof link.url).toBe("string");
+            }
+          }
+          if (dao.metadata.avatar) {
+            expect(typeof dao.metadata.avatar).toBe("string");
+          }
+        }
+      });
+      it("Should get a DAO's metadata of an non existent dao and receive null", async () => {
+        const ctx = new Context(contextParams);
+        const client = new Client(ctx);
+        const daoAddress = TEST_NON_EXISTING_ADDRESS;
+        const dao = await client.methods.getDao(daoAddress);
+        expect(dao === null).toBe(true);
+      });
+
+      it("Should get a DAO's metadata of an invalid dao address and throw an error", async () => {
+        const ctx = new Context(contextParams);
+        const client = new Client(ctx);
+        const daoAddress = TEST_INVALID_ADDRESS;
+        await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
+          new InvalidAddressOrEnsError(),
+        );
+      });
+
+      it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const limit = 3;
+        const params: IDaoQueryParams = {
+          limit,
+          skip: 0,
+          direction: SortDirection.ASC,
+          sortBy: DaoSortBy.NAME,
+        };
+        const daos = await client.methods.getDaos(params);
+        expect(Array.isArray(daos)).toBe(true);
+        expect(daos.length <= limit).toBe(true);
+        daos.reduce((prevDao, currentDao) => {
+          if (prevDao && currentDao) {
+            expect(currentDao.ensDomain.localeCompare(prevDao.ensDomain) === -1)
+              .toBe(false);
+          }
+          return currentDao;
+        });
+        for (let i = 0; i < daos.length; i++) {
+          const dao = daos[i];
+          expect(typeof dao.address).toBe("string");
+          expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+          expect(typeof dao.ensDomain).toBe("string");
+          expect(Array.isArray(dao.plugins)).toBe(true);
+          for (let j = 0; j < dao.plugins.length; j++) {
+            const plugin = dao.plugins[j];
             expect(typeof plugin.id).toBe("string");
             expect(typeof plugin.instanceAddress).toBe("string");
             expect(plugin.instanceAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
             expect(typeof plugin.version).toBe("string");
           }
-        }
-        expect(typeof dao.metadata.name).toBe("string");
-        expect(typeof dao.metadata.description).toBe("string");
-        expect(Array.isArray(dao.metadata.links)).toBe(true);
-        if (dao.metadata.links.length > 0) {
-          for (const link of dao.metadata.links) {
-            expect(typeof link.name).toBe("string");
-            expect(typeof link.url).toBe("string");
+          expect(typeof dao.metadata.name).toBe("string");
+          if (dao.metadata.avatar) {
+            expect(typeof dao.metadata.avatar).toBe("string");
           }
         }
-        if (dao.metadata.avatar) {
-          expect(typeof dao.metadata.avatar).toBe("string");
-        }
-      }
-    });
-    it("Should get a DAO's metadata of an non existent dao and receive null", async () => {
-      const ctx = new Context(contextParams);
-      const client = new Client(ctx);
-      const daoAddress = TEST_NON_EXISTING_ADDRESS;
-      const dao = await client.methods.getDao(daoAddress);
-      expect(dao === null).toBe(true);
-    });
-
-    it("Should get a DAO's metadata of an invalid dao address and throw an error", async () => {
-      const ctx = new Context(contextParams);
-      const client = new Client(ctx);
-      const daoAddress = TEST_INVALID_ADDRESS;
-      await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
-        new InvalidAddressOrEnsError(),
-      );
-    });
-
-    it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
-      const limit = 3;
-      const params: IDaoQueryParams = {
-        limit,
-        skip: 0,
-        direction: SortDirection.ASC,
-        sortBy: DaoSortBy.NAME,
-      };
-      const daos = await client.methods.getDaos(params);
-      expect(Array.isArray(daos)).toBe(true);
-      expect(daos.length <= limit).toBe(true);
-      daos.reduce((prevDao, currentDao) => {
-        if (prevDao && currentDao) {
-          expect(currentDao.ensDomain.localeCompare(prevDao.ensDomain) === -1)
-            .toBe(false);
-        }
-        return currentDao;
       });
-      for (let i = 0; i < daos.length; i++) {
-        const dao = daos[i];
-        expect(typeof dao.address).toBe("string");
-        expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-        expect(typeof dao.ensDomain).toBe("string");
-        expect(Array.isArray(dao.plugins)).toBe(true);
-        for (let j = 0; j < dao.plugins.length; j++) {
-          const plugin = dao.plugins[j];
-          expect(typeof plugin.id).toBe("string");
-          expect(typeof plugin.instanceAddress).toBe("string");
-          expect(plugin.instanceAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-          expect(typeof plugin.version).toBe("string");
-        }
-        expect(typeof dao.metadata.name).toBe("string");
-        if (dao.metadata.avatar) {
-          expect(typeof dao.metadata.avatar).toBe("string");
-        }
-      }
-    });
 
-    it("Should get DAOs balances", async () => {
-      const ctx = new Context(contextParams);
-      const client = new Client(ctx);
-      const daoAddress = TEST_DAO_ADDRESS;
-      const balances = await client.methods.getBalances(daoAddress, []);
-      expect(Array.isArray(balances)).toBe(true);
-      expect(balances === null).toBe(false);
-      if (balances) {
-        expect(balances.length > 0).toBe(true);
-        for (let i = 0; i < balances.length; i++) {
-          const balance = balances[i];
-          expect(typeof balance.balance).toBe("bigint");
-          expect(balance.updateDate instanceof Date).toBe(true);
-          if (balance.type === "erc20") {
+      it("Should get DAOs balances", async () => {
+        const ctx = new Context(contextParams);
+        const client = new Client(ctx);
+        const daoAddress = TEST_DAO_ADDRESS;
+        const balances = await client.methods.getBalances(daoAddress, []);
+        expect(Array.isArray(balances)).toBe(true);
+        expect(balances === null).toBe(false);
+        if (balances) {
+          expect(balances.length > 0).toBe(true);
+          for (let i = 0; i < balances.length; i++) {
+            const balance = balances[i];
             expect(typeof balance.balance).toBe("bigint");
-            expect(typeof balance.decimals).toBe("number");
-            expect(typeof balance.address).toBe("string");
-            expect(balance.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-            expect(typeof balance.name).toBe("string");
-            expect(typeof balance.symbol).toBe("string");
+            expect(balance.updateDate instanceof Date).toBe(true);
+            if (balance.type === "erc20") {
+              expect(typeof balance.balance).toBe("bigint");
+              expect(typeof balance.decimals).toBe("number");
+              expect(typeof balance.address).toBe("string");
+              expect(balance.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof balance.name).toBe("string");
+              expect(typeof balance.symbol).toBe("string");
+            }
           }
         }
-      }
-    });
-    it("Should get DAOs balances from a dao with no balances", async () => {
-      const ctx = new Context(contextParams);
-      const client = new Client(ctx);
-      const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
-      const balances = await client.methods.getBalances(daoAddress, []);
-      expect(Array.isArray(balances)).toBe(true);
-      expect(balances?.length).toBe(0);
-    });
+      });
+      it("Should get DAOs balances from a dao with no balances", async () => {
+        const ctx = new Context(contextParams);
+        const client = new Client(ctx);
+        const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
+        const balances = await client.methods.getBalances(daoAddress, []);
+        expect(Array.isArray(balances)).toBe(true);
+        expect(balances?.length).toBe(0);
+      });
 
-    it("Should get the transfers of a dao", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const client = new Client(ctx);
-      const params: ITransferQueryParams = {
-        daoAddressOrEns: TEST_DAO_ADDRESS,
-        sortBy: TransferSortBy.CREATED_AT,
-        limit: 10,
-        skip: 0,
-        direction: SortDirection.ASC,
-      };
-      const transfers = await client.methods.getTransfers(params);
-      expect(Array.isArray(transfers)).toBe(true);
-      if (transfers) {
-        expect(transfers.length > 0).toBe(true);
-        for (const transfer of transfers) {
-          expect(transfer.amount).toBeGreaterThan(BigInt(0));
-          expect(typeof transfer.amount).toBe("bigint");
-          expect(transfer.creationDate).toBeInstanceOf(Date);
-          expect(typeof transfer.reference).toBe("string");
-          expect(transfer.transactionId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-          if (transfer.tokenType === TokenType.NATIVE) {
-            if (transfer.type === TransferType.DEPOSIT) {
-              // ETH deposit
-              expect(isAddress(transfer.from)).toBe(true);
-            } else if (transfer.type === TransferType.WITHDRAW) {
-              // ETH withdraw
-              expect(isAddress(transfer.to)).toBe(true);
-              expect(transfer.proposalId).toMatch(
-                /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
-              );
+      it("Should get the transfers of a dao", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+        const params: ITransferQueryParams = {
+          daoAddressOrEns: TEST_DAO_ADDRESS,
+          sortBy: TransferSortBy.CREATED_AT,
+          limit: 10,
+          skip: 0,
+          direction: SortDirection.ASC,
+        };
+        const transfers = await client.methods.getTransfers(params);
+        expect(Array.isArray(transfers)).toBe(true);
+        if (transfers) {
+          expect(transfers.length > 0).toBe(true);
+          for (const transfer of transfers) {
+            expect(transfer.amount).toBeGreaterThan(BigInt(0));
+            expect(typeof transfer.amount).toBe("bigint");
+            expect(transfer.creationDate).toBeInstanceOf(Date);
+            expect(typeof transfer.reference).toBe("string");
+            expect(transfer.transactionId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            if (transfer.tokenType === TokenType.NATIVE) {
+              if (transfer.type === TransferType.DEPOSIT) {
+                // ETH deposit
+                expect(isAddress(transfer.from)).toBe(true);
+              } else if (transfer.type === TransferType.WITHDRAW) {
+                // ETH withdraw
+                expect(isAddress(transfer.to)).toBe(true);
+                expect(transfer.proposalId).toMatch(
+                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
+                );
+              } else {
+                fail("invalid transfer type");
+              }
+            } else if (transfer.tokenType === TokenType.ERC20) {
+              expect(isAddress(transfer.token.address)).toBe(true);
+              expect(typeof transfer.token.decimals).toBe("number");
+              expect(typeof transfer.token.name).toBe("string");
+              expect(typeof transfer.token.symbol).toBe("string");
+              if (transfer.type === TransferType.DEPOSIT) {
+                // ERC20 deposit
+                expect(isAddress(transfer.from)).toBe(true);
+              } else if (transfer.type === TransferType.WITHDRAW) {
+                // ERC20 withdraw
+                expect(isAddress(transfer.to)).toBe(true);
+                expect(transfer.proposalId).toMatch(
+                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
+                );
+              } else {
+                fail("invalid transfer type");
+              }
             } else {
-              fail("invalid transfer type");
+              fail("invalid token type");
             }
-          } else if (transfer.tokenType === TokenType.ERC20) {
-            expect(isAddress(transfer.token.address)).toBe(true);
-            expect(typeof transfer.token.decimals).toBe("number");
-            expect(typeof transfer.token.name).toBe("string");
-            expect(typeof transfer.token.symbol).toBe("string");
-            if (transfer.type === TransferType.DEPOSIT) {
-              // ERC20 deposit
-              expect(isAddress(transfer.from)).toBe(true);
-            } else if (transfer.type === TransferType.WITHDRAW) {
-              // ERC20 withdraw
-              expect(isAddress(transfer.to)).toBe(true);
-              expect(transfer.proposalId).toMatch(
-                /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
-              );
-            } else {
-              fail("invalid transfer type");
-            }
-          } else {
-            fail("invalid token type");
           }
+        } else {
+          fail("no transfers");
         }
-      } else {
-        fail("no transfers");
-      }
-    });
-    it("Should get the transfers filtered by type", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const client = new Client(ctx);
-      const transferType = TransferType.DEPOSIT;
-      const params: ITransferQueryParams = {
-        sortBy: TransferSortBy.CREATED_AT,
-        limit: 10,
-        skip: 0,
-        direction: SortDirection.ASC,
-        type: transferType,
-      };
-      const transfers = await client.methods.getTransfers(params);
-      expect(Array.isArray(transfers)).toBe(true);
-      if (transfers) {
-        expect(transfers.length > 0).toBe(true);
-        for (const transfer of transfers) {
-          expect(transfer.type).toBe(transferType);
+      });
+      it("Should get the transfers filtered by type", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+        const transferType = TransferType.DEPOSIT;
+        const params: ITransferQueryParams = {
+          sortBy: TransferSortBy.CREATED_AT,
+          limit: 10,
+          skip: 0,
+          direction: SortDirection.ASC,
+          type: transferType,
+        };
+        const transfers = await client.methods.getTransfers(params);
+        expect(Array.isArray(transfers)).toBe(true);
+        if (transfers) {
+          expect(transfers.length > 0).toBe(true);
+          for (const transfer of transfers) {
+            expect(transfer.type).toBe(transferType);
+          }
+        } else {
+          fail("no transfers");
         }
-      } else {
-        fail("no transfers");
-      }
-    });
+      });
 
-    test.todo(
-      "Should return an empty array when getting the transfers of a DAO that does not exist",
-    ); //, async () => {
-    //   const ctx = new Context(contextParamsLocalChain);
-    //   const client = new Client(ctx)
-    //   const res = await client.methods.getTransfers(contextParamsLocalChain.dao)
-    //   expect(res.length).toBe(0)
-    // })
-    test.todo("Should fail if the given ENS is invalid"); // async () => {
-    // const ctx = new Context(contextParamsLocalChain);
-    // const client = new Client(ctx)
-    // // will fail when tested on local chain
-    // await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
-    //   "Invalid ENS name"
-    // );
+      test.todo(
+        "Should return an empty array when getting the transfers of a DAO that does not exist",
+      ); //, async () => {
+      //   const ctx = new Context(contextParamsLocalChain);
+      //   const client = new Client(ctx)
+      //   const res = await client.methods.getTransfers(contextParamsLocalChain.dao)
+      //   expect(res.length).toBe(0)
+      // })
+      test.todo("Should fail if the given ENS is invalid"); // async () => {
+      // const ctx = new Context(contextParamsLocalChain);
+      // const client = new Client(ctx)
+      // // will fail when tested on local chain
+      // await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
+      //   "Invalid ENS name"
+      // );
+    });
   });
 });
-
 // HELPERS
 
 function deployErc20(client: Client) {
