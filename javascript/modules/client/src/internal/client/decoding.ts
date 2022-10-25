@@ -8,7 +8,7 @@ import {
   decodeUpdateMetadataAction,
   decodeWithdrawActionData,
   getFunctionFragment,
-} from "../encoding/client";
+} from "../encoding";
 import {
   IClientDecoding,
   IFreezePermissionDecodedParams,

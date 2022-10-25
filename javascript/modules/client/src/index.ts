@@ -1,8 +1,8 @@
 export * from "./client";
-export * from "./client-erc20";
-export * from "./client-addressList";
+export * from "./client-addressList/index";
+export * from "./client-erc20/index";
 export * from "./context";
-export * from "./context-plugin";
+export * from "./plugin-common";
 export {
   AssetBalance,
   DaoCreationSteps,
@@ -40,23 +40,25 @@ export {
 export {
   AddressListProposal,
   AddressListProposalListItem,
-  Erc20Proposal,
-  Erc20ProposalListItem,
-  Erc20TokenDetails,
-  ExecuteProposalStep,
   IAddressListPluginInstall,
-  ICanVoteParams,
-  ICreateProposalParams,
-  IErc20PluginInstall,
-  IExecuteProposalParams,
-  IMintTokenParams,
-  IPluginSettings,
-  IProposalQueryParams,
-  IProposalSettings,
-  IVoteProposalParams,
-  ProposalCreationSteps,
-  ProposalSortBy,
-  ProposalStatus,
-  VoteProposalStep,
-  VoteValues,
-} from "./internal/interfaces/plugins";
+} from "./client-addressList/internal/interfaces/client";
+
+// Erc20Proposal,
+// Erc20ProposalListItem,
+// Erc20TokenDetails,
+// ExecuteProposalStep,
+// IAddressListPluginInstall,
+// ICanVoteParams,
+// ICreateProposalParams,
+// IErc20PluginInstall,
+// IExecuteProposalParams,
+// IMintTokenParams,
+// IPluginSettings,
+// IProposalQueryParams,
+// IProposalSettings,
+// IVoteProposalParams,
+// ProposalCreationSteps,
+// ProposalSortBy,
+// ProposalStatus,
+// VoteProposalStep,
+// VoteValues,

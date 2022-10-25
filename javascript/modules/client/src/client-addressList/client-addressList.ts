@@ -1,4 +1,3 @@
-import { ContextPlugin } from "./context-plugin";
 import {
   IAddressListPluginInstall,
   IClientAddressList,
@@ -6,13 +5,14 @@ import {
   IClientAddressListEncoding,
   IClientAddressListEstimation,
   IClientAddressListMethods,
-} from "./internal/interfaces/plugins";
+} from "./internal/interfaces/client";
 import { ClientAddressListMethods } from "./internal/client-addressList/methods";
 import { ClientAddressListEncoding } from "./internal/client-addressList/encoding";
 import { ClientAddressListDecoding } from "./internal/client-addressList/decoding";
 import { ClientAddressListEstimation } from "./internal/client-addressList/estimation";
-import { IPluginInstallItem } from "./internal/interfaces/common";
-import { ClientCore } from "./internal/core";
+import { ClientCore } from "../internal/core";
+import { ContextPlugin } from "../plugin-common";
+import { IPluginInstallItem } from "../internal/interfaces/common";
 
 /**
  * Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO

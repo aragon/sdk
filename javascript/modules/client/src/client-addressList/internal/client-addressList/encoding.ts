@@ -1,20 +1,25 @@
 import { InvalidAddressError } from "@aragon/sdk-common";
-import { ContextPlugin } from "../../context-plugin";
-import { ClientCore } from "../core";
+import { isAddress } from "@ethersproject/address";
+import { ClientCore } from "../../../internal/core";
+import {
+  DaoAction,
+  IPluginInstallItem,
+} from "../../../internal/interfaces/common";
+import {
+  ContextPlugin,
+  encodeUpdatePluginSettingsAction,
+  IPluginSettings,
+} from "../../../plugin-common";
+import { ADDRESSLIST_PLUGIN_ID } from "../constant";
 import {
   encodeAddMembersAction,
   encodeAddressListActionInit,
   encodeRemoveMembersAction,
-  encodeUpdatePluginSettingsAction,
-} from "../encoding/plugins";
-import { DaoAction, IPluginInstallItem } from "../interfaces/common";
+} from "../encoding";
 import {
   IAddressListPluginInstall,
   IClientAddressListEncoding,
-  IPluginSettings,
-} from "../interfaces/plugins";
-import { isAddress } from "@ethersproject/address";
-import { ADDRESSLIST_PLUGIN_ID } from "../constants";
+} from "../interfaces/client";
 
 export class ClientAddressListEncoding extends ClientCore
   implements IClientAddressListEncoding {
@@ -30,7 +35,7 @@ export class ClientAddressListEncoding extends ClientCore
    * @return {*}  {IPluginInstallItem}
    * @memberof ClientAddressListEncoding
    */
-   static getPluginInstallItem (
+  static getPluginInstallItem(
     params: IAddressListPluginInstall,
   ): IPluginInstallItem {
     return {
@@ -38,7 +43,7 @@ export class ClientAddressListEncoding extends ClientCore
       data: encodeAddressListActionInit(params),
     };
   }
-  
+
   /**
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *

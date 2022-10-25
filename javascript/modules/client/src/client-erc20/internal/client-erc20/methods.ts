@@ -1,3 +1,5 @@
+import { ClientCore } from "../../../internal/core";
+import { isAddress } from "@ethersproject/address";
 import {
   GraphQLError,
   InvalidAddressError,
@@ -6,55 +8,55 @@ import {
   NoProviderError,
   Random,
 } from "@aragon/sdk-common";
-import { ContextPlugin } from "../../context-plugin";
-import { ClientCore } from "../core";
+import { formatEther } from "@ethersproject/units";
 import {
-  AddressListProposal,
-  AddressListProposalListItem,
+  computeProposalStatusFilter,
+  ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   ICanVoteParams,
-  IClientAddressListMethods,
   ICreateProposalParams,
   IExecuteProposalParams,
   IPluginSettings,
   IProposalQueryParams,
+  isProposalId,
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
   ProposalSortBy,
-  SubgraphAddressListProposal,
-  SubgraphAddressListProposalListItem,
   VoteProposalStep,
   VoteProposalStepValue,
-} from "../interfaces/plugins";
-import { delay } from "../temp-mock";
+} from "../../../plugin-common";
+import { SortDirection } from "../../../internal/interfaces/common";
+import { delay } from "../../../internal/temp-mock";
 import {
-  computeProposalStatusFilter,
-  isProposalId,
-  toAddressListProposal,
-  toAddressListProposalListItem,
-} from "../utils/plugins";
-import { isAddress } from "@ethersproject/address";
+  Erc20Proposal,
+  Erc20ProposalListItem,
+  Erc20TokenDetails,
+  IClientErc20Methods,
+  SubgraphErc20Proposal,
+  SubgraphErc20ProposalListItem,
+} from "../interfaces/client";
 import {
-  QueryAddressListPluginSettings,
-  QueryAddressListProposal,
-  QueryAddressListProposals,
-} from "../graphql-queries";
-import { SortDirection } from "../interfaces/common";
+  QueryErc20Proposal,
+  QueryErc20Proposals,
+} from "../graphql-queries/proposal";
+import { toErc20Proposal, toErc20ProposalListItem } from "../utils";
+import { QueryErc20PluginSettings } from "../graphql-queries/settings";
+import { QueryToken } from "../graphql-queries/token";
 
-export class ClientAddressListMethods extends ClientCore
-  implements IClientAddressListMethods {
+export class ClientErc20Methods extends ClientCore
+  implements IClientErc20Methods {
   constructor(context: ContextPlugin) {
     super(context);
   }
   /**
-   * Creates a new proposal on the given AddressList plugin contract
+   * Creates a new proposal on the given ERC20 plugin contract
    *
-   * @param {ICreateProposalParams} _params
+   * @param {ICreateProposalParams} params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
-   * @memberof ClientAddressListMethods
+   * @memberof ClientErc20
    */
   public async *createProposal(
     _params: ICreateProposalParams,
@@ -66,7 +68,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    // TODO: Implement
+    // TODO: Remove below as the new contracts are ready
     await delay(1000);
     yield {
       key: ProposalCreationSteps.CREATING,
@@ -77,15 +79,42 @@ export class ClientAddressListMethods extends ClientCore
     yield {
       key: ProposalCreationSteps.DONE,
       proposalId:
-        "0x0123456789012345678901234567890123456789012345678901234567890123",
+        "0x1234567890123456789012345678901234567890123456789012345678901234",
     };
+
+    // TODO: Uncomment as the new contracts are ready
+
+    /*
+    const erc20VotingInstance = ERC20Voting__factory.connect(
+      this._pluginAddress,
+      signer
+    );
+
+    const tx = await erc20VotingInstance.newVote(
+      ...unwrapProposalParams(params)
+    );
+
+    yield { key: ProposalCreationSteps.CREATING, txHash: tx.hash };
+
+    const receipt = await tx.wait();
+    const startVoteEvent = receipt.events?.find(e => e.event === "StartVote");
+    if (!startVoteEvent || startVoteEvent.args?.voteId) {
+      return Promise.reject(new Error("Could not read the proposal ID"));
+    }
+
+    yield {
+      key: ProposalCreationSteps.DONE,
+      proposalId: startVoteEvent.args?.voteId,
+    };
+    */
   }
   /**
    * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
    *
-   * @param {IVoteProposalParams} _params
+   * @param {IVoteProposalParams} params
+   * @param {VoteValues} vote
    * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
-   * @memberof ClientAddressListMethods
+   * @memberof ClientErc20
    */
   public async *voteProposal(
     _params: IVoteProposalParams,
@@ -111,13 +140,12 @@ export class ClientAddressListMethods extends ClientCore
         "0x0123456789012345678901234567890123456789012345678901234567890123",
     };
   }
-
   /**
    * Executes the given proposal, provided that it has already passed
    *
-   * @param {IExecuteProposalParams} _params
+   * @param {IExecuteProposalParams} params
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
-   * @memberof ClientAddressListMethods
+   * @memberof ClientErc20
    */
   public async *executeProposal(
     _params: IExecuteProposalParams,
@@ -141,12 +169,12 @@ export class ClientAddressListMethods extends ClientCore
       key: ExecuteProposalStep.DONE,
     };
   }
+
   /**
    * Checks if an user can vote in a proposal
    *
    * @param {ICanVoteParams} params
-   * @return {*}  {Promise<boolean>}
-   * @memberof ClientAddressListMethods
+   * @returns {*}  {Promise<boolean>}
    */
   public async canVote(
     params: ICanVoteParams,
@@ -164,53 +192,49 @@ export class ClientAddressListMethods extends ClientCore
     await delay(1000);
     return parseInt(params.address.slice(-1), 16) % 2 === 1;
   }
+
   /**
-   * Returns the list of wallet addresses with signing capabilities on the plugin
+   * Returns the list of wallet addresses holding tokens from the underlying ERC20 contract used by the plugin
    *
-   * @param {string} _daoAddressOrEns
    * @return {*}  {Promise<string[]>}
-   * @memberof ClientAddressListMethods
+   * @memberof ClientErc20
    */
   public getMembers(_daoAddressOrEns: string): Promise<string[]> {
-    const mockAddresses: string[] = [
-      "0x0123456789012345678901234567890123456789",
-      "0x1234567890123456789012345678901234567890",
-      "0x2345678901234567890123456789012345678901",
-      "0x3456789012345678901234567890123456789012",
-      "0x4567890123456789012345678901234567890123",
-    ];
-
     // TODO: Implement
+
+    const mockAddresses = [
+      "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
+      "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
+      "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
+      "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
+      "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
+    ];
 
     return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
       mockAddresses.filter(() => Random.getFloat() > 0.4)
     );
   }
+
   /**
    * Returns the details of the given proposal
    *
    * @param {string} proposalId
-   * @return {*}  {(Promise<AddressListProposal | null>)}
-   * @memberof ClientAddressListMethods
+   * @return {*}  {Promise<Erc20Proposal>}
+   * @memberof ClientErc20
    */
-  public async getProposal(
-    proposalId: string,
-  ): Promise<AddressListProposal | null> {
-    if (!proposalId) {
+  public async getProposal(proposalId: string): Promise<Erc20Proposal | null> {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { allowlistProposal: addressListProposal }: {
-        allowlistProposal: SubgraphAddressListProposal;
-      } = await client.request(
-        QueryAddressListProposal,
-        {
-          proposalId,
-        },
-      );
-      if (!addressListProposal) {
+      const { erc20VotingProposal }: {
+        erc20VotingProposal: SubgraphErc20Proposal;
+      } = await client.request(QueryErc20Proposal, {
+        proposalId,
+      });
+      if (!erc20VotingProposal) {
         return null;
       }
       // TODO
@@ -220,36 +244,26 @@ export class ClientAddressListMethods extends ClientCore
       const metadataString = await this.ipfs.fetchString(test_cid);
       // TODO: Parse and validate schema
       const metadata = JSON.parse(metadataString) as ProposalMetadata;
-      return toAddressListProposal(addressListProposal, metadata);
+      return toErc20Proposal(erc20VotingProposal, metadata);
     } catch (err) {
-      throw new GraphQLError("AddressList proposal");
+      throw new GraphQLError("ERC20 proposal");
     }
   }
-
   /**
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
-   * @param {IProposalQueryParams} {
-   *       daoAddressOrEns,
-   *       limit = 10,
-   *       status,
-   *       skip = 0,
-   *       direction = SortDirection.ASC,
-   *       sortBy = ProposalSortBy.CREATED_AT,
-   *     }
-   * @return {*}  {Promise<AddressListProposalListItem[]>}
-   * @memberof ClientAddressListMethods
+   * @param {IProposalQueryParams} params
+   * @return {*}  {Promise<Erc20ProposalListItem[]>}
+   * @memberof ClientErc20
    */
-  public async getProposals(
-    {
-      daoAddressOrEns,
-      limit = 10,
-      status,
-      skip = 0,
-      direction = SortDirection.ASC,
-      sortBy = ProposalSortBy.CREATED_AT,
-    }: IProposalQueryParams,
-  ): Promise<AddressListProposalListItem[]> {
+  public async getProposals({
+    daoAddressOrEns,
+    limit = 10,
+    status,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = ProposalSortBy.CREATED_AT,
+  }: IProposalQueryParams): Promise<Erc20ProposalListItem[]> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {
@@ -273,10 +287,10 @@ export class ClientAddressListMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { allowlistProposals: addressListProposals }: {
-        allowlistProposals: SubgraphAddressListProposalListItem[];
+      const { erc20VotingProposals }: {
+        erc20VotingProposals: SubgraphErc20ProposalListItem[];
       } = await client.request(
-        QueryAddressListProposals,
+        QueryErc20Proposals,
         {
           where,
           limit,
@@ -287,26 +301,26 @@ export class ClientAddressListMethods extends ClientCore
       );
       await this.ipfs.ensureOnline();
       return Promise.all(
-        addressListProposals.map(
+        erc20VotingProposals.map(
           (
-            proposal: SubgraphAddressListProposalListItem,
-          ): Promise<AddressListProposalListItem> => {
+            proposal: SubgraphErc20ProposalListItem,
+          ): Promise<Erc20ProposalListItem> => {
             // TODO
             // delete this cid once the proposals in subgraph have the correct
             // format in the metadata field
             const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
             return this.ipfs.fetchString(test_cid).then(
               (stringMetadata: string) => {
-                // TODO: Parse and validate schema
+                // TODO: Parse and validate schema¡
                 const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
-                return toAddressListProposalListItem(proposal, metadata);
+                return toErc20ProposalListItem(proposal, metadata);
               },
             );
           },
         ),
       );
     } catch {
-      throw new GraphQLError("AddressList proposals");
+      throw new GraphQLError("ERC20 proposals");
     }
   }
 
@@ -314,8 +328,8 @@ export class ClientAddressListMethods extends ClientCore
    * Returns the settings of a plugin given the address of the plugin instance
    *
    * @param {string} pluginAddress
-   * @return {*}  {(Promise<IPluginSettings | null>)}
-   * @memberof ClientAddressListMethods
+   * @return {*}  {Promise<IPluginSettings>}
+   * @memberof ClientErc20
    */
   public async getSettings(
     pluginAddress: string,
@@ -326,25 +340,63 @@ export class ClientAddressListMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { allowlistPackage } = await client.request(
-        QueryAddressListPluginSettings,
+      const { erc20VotingPackage } = await client.request(
+        QueryErc20PluginSettings,
         {
           address: pluginAddress,
         },
       );
-      if (!allowlistPackage) {
+      if (!erc20VotingPackage) {
         return null;
       }
       return {
-        // TODO
-        // the number of decimals in the minSupport and minTurnout
-        // is wrong, they have no precision
-        minDuration: parseInt(allowlistPackage.minDuration),
-        minSupport: parseFloat(allowlistPackage.supportRequiredPct),
-        minTurnout: parseFloat(allowlistPackage.participationRequiredPct),
+        minDuration: parseInt(erc20VotingPackage.minDuration),
+        // TODO: use decodeRatio() when ready
+        minSupport: parseFloat(
+          formatEther(erc20VotingPackage.supportRequiredPct),
+        ),
+        minTurnout: parseFloat(
+          formatEther(erc20VotingPackage.participationRequiredPct),
+        ),
       };
     } catch {
-      throw new Error("Cannot fetch the settings data from GraphQL");
+      throw new GraphQLError("plugin settings");
+    }
+  }
+
+  /**
+   * Returns the details of the token used in a specific plugin instance
+   *
+   * @param {string} pluginAddress
+   * @return {*}  {Promise<Erc20TokenDetails | null>}
+   * @memberof ClientErc20
+   */
+  public async getToken(
+    pluginAddress: string,
+  ): Promise<Erc20TokenDetails | null> {
+    if (!isAddress(pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { erc20VotingPackage } = await client.request(
+        QueryToken,
+        {
+          address: pluginAddress,
+        },
+      );
+      if (!erc20VotingPackage) {
+        return null;
+      }
+      return {
+        address: erc20VotingPackage.token.id,
+        decimals: parseInt(erc20VotingPackage.token.decimals),
+        name: erc20VotingPackage.token.name,
+        symbol: erc20VotingPackage.token.symbol,
+      };
+    } catch (err) {
+      throw new GraphQLError("token");
     }
   }
 }

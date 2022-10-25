@@ -1,5 +1,5 @@
-import { Context, ContextParams as MainContextParams } from "./context";
-import { ContextState } from "./internal/interfaces/context";
+import { Context, ContextParams as MainContextParams } from "../context";
+import { ContextState } from "../internal/interfaces/context";
 
 type ContextPluginState = {};
 export type ContextPluginParams = MainContextParams;

@@ -8,7 +8,7 @@ import {
   IExecuteProposalParams,
   IVoteProposalParams,
   VoteValues,
-} from "../../../src/internal/interfaces/plugins";
+} from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../../helpers/deployContracts";

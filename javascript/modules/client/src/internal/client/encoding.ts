@@ -16,7 +16,7 @@ import {
   encodeRevokeActionData,
   encodeUpdateMetadataAction,
   encodeWithdrawActionData,
-} from "../encoding/client";
+} from "../encoding";
 
 export class ClientEncoding extends ClientCore
   implements IClientEncoding {

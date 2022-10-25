@@ -1,16 +1,12 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { ClientErc20, Context, ContextPlugin } from "../../../src";
+import { ClientErc20, Context, ContextPlugin, IPluginSettings } from "../../../src";
 
-import {
-  IErc20PluginInstall,
-  IMintTokenParams,
-  IPluginSettings,
-} from "../../../src/internal/interfaces/plugins";
 import { AddressZero } from "@ethersproject/constants";
 import { InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
+import { IErc20PluginInstall, IMintTokenParams } from "../../../src/client-erc20/internal/interfaces/client";
 describe("Client ERC20", () => {
   describe("Encoding module", () => {
     it("Should create a Erc20 client and generate a install entry", async () => {

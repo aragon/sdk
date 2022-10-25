@@ -1,26 +1,25 @@
 import { Random } from "@aragon/sdk-common";
-import { ContextPlugin } from "../../context-plugin";
-import { ClientCore } from "../core";
-import { GasFeeEstimation } from "../interfaces/common";
+import { ClientCore } from "../../../internal/core";
+import { GasFeeEstimation } from "../../../internal/interfaces/common";
 import {
-  IClientAddressListEstimation,
+  ContextPlugin,
   ICreateProposalParams,
   IExecuteProposalParams,
   IVoteProposalParams,
-} from "../interfaces/plugins";
+} from "../../../plugin-common";
+import { IClientErc20Estimation } from "../interfaces/client";
 
-export class ClientAddressListEstimation extends ClientCore
-  implements IClientAddressListEstimation {
+export class ClientErc20Estimation extends ClientCore
+  implements IClientErc20Estimation {
   constructor(context: ContextPlugin) {
     super(context);
   }
-  
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *
    * @param {ICreateProposalParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientAddressListEstimation
+   * @memberof ClientErc20Estimation
    */
   public createProposal(
     _params: ICreateProposalParams,
@@ -31,18 +30,33 @@ export class ClientAddressListEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: Implement
+
+    // TODO: Remove below as the new contracts are ready
+
     return Promise.resolve(
       this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
     );
-  }
 
+    // TODO: Uncomment below as the new contracts are ready
+    /*
+    const erc20VotingInstance = ERC20Voting__factory.connect(
+      this._pluginAddress,
+      signer
+    );
+
+    return erc20VotingInstance.estimateGas.newVote(
+      ...unwrapProposalParams(params),
+    ).then((gasLimit) => {
+      return this.web3.getApproximateGasFee(gasLimit.toBigInt());
+    });
+    */
+  }
   /**
    * Estimates the gas fee of casting a vote on a proposal
    *
    * @param {IVoteProposalParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientAddressListEstimation
+   * @memberof ClientErc20Estimation
    */
   public voteProposal(_params: IVoteProposalParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -51,18 +65,18 @@ export class ClientAddressListEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: Implement
+    // TODO: remove this
     return Promise.resolve(
       this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
     );
   }
 
   /**
-   * Estimates the gas fee of executing an AddressList proposal
+   * Estimates the gas fee of executing an ERC20 proposal
    *
    * @param {IExecuteProposalParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientAddressListEstimation
+   * @memberof ClientErc20Estimation
    */
   public executeProposal(
     _params: IExecuteProposalParams,
@@ -73,7 +87,7 @@ export class ClientAddressListEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: Implement
+    // TODO: remove this
     return Promise.resolve(
       this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
     );

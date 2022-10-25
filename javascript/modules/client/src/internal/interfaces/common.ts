@@ -9,6 +9,14 @@ export enum DaoRole {
 }
 
 /**
+ * Contains the payload passed to the global DAO factory so that
+ * plugins can be initialized
+ */
+ export interface IPluginInstallItem {
+  id: string; // ENS domain or address of the plugin's Repo
+  data: Uint8Array;
+}
+/**
  * Contains the payload passed to governance contracts, serializing
  * the actions to do upon approval
  */
@@ -18,14 +26,6 @@ export type DaoAction = {
   data: Uint8Array;
 };
 
-/**
- * Contains the payload passed to the global DAO factory so that
- * plugins can be initialized
- */
-export interface IPluginInstallItem {
-  id: string; // ENS domain or address of the plugin's Repo
-  data: Uint8Array;
-}
 
 /**
  * Contains the general human readable information about the DAO
@@ -40,29 +40,6 @@ export type GasFeeEstimation = {
   max: bigint;
 };
 
-/**
- * Contains the base structure of a proposal
- */
-export type Proposal = {
-  id: string;
-  daoAddress: string;
-  daoName: string;
-  creatorAddress: string;
-
-  // date
-  endDate: Date;
-  startDate: Date;
-  creationDate: Date;
-
-  // metadata
-  title: string;
-  summary: string;
-  description: string;
-  resources: { url: string; description: string }[];
-
-  actions?: DaoAction[];
-  status: ProposalStatus;
-};
 
 export interface IPagination {
   skip?: number;
@@ -75,17 +52,6 @@ export enum SortDirection {
   DESC = "desc",
 }
 
-/**
- * Contains the states of a proposal. Note that on chain
- * proposals cannot be in draft state
- */
-export enum ProposalStatus {
-  ACTIVE = "Active",
-  PENDING = "Pending",
-  SUCCEEDED = "Succeeded",
-  EXECUTED = "Executed",
-  DEFEATED = "Defeated",
-}
 
 export interface IInterfaceParams {
   id: string;

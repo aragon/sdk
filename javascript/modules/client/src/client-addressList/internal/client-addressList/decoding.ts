@@ -1,17 +1,17 @@
 import { bytesToHex } from "@aragon/sdk-common";
-import { ContextPlugin } from "../../context-plugin";
-import { ClientCore } from "../core";
+import { ClientCore } from "../../../internal/core";
+import { IInterfaceParams } from "../../../internal/interfaces/common";
+import {
+  ContextPlugin,
+  decodeUpdatePluginSettingsAction,
+  getFunctionFragment,
+  IPluginSettings,
+} from "../../../plugin-common";
 import {
   decodeAddMemebersAction,
   decodeRemoveMemebersAction,
-  decodeUpdatePluginSettingsAction,
-  getFunctionFragment,
-} from "../encoding/plugins";
-import { IInterfaceParams } from "../interfaces/common";
-import {
-  IClientAddressListDecoding,
-  IPluginSettings,
-} from "../interfaces/plugins";
+} from "../encoding";
+import { IClientAddressListDecoding } from "../interfaces/client";
 
 export class ClientAddressListDecoding extends ClientCore
   implements IClientAddressListDecoding {

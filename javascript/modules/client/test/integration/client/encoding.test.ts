@@ -12,7 +12,7 @@ import {
   IMetadata,
   IRevokePermissionParams,
   Permissions,
-} from "../../../src/internal/interfaces/client";
+} from "../../../src";
 import { DaoAction } from "../../../src/internal/interfaces/common";
 import { contextParamsLocalChain } from "../constants";
 describe("Client", () => {

@@ -3,10 +3,10 @@ declare const describe, it, expect;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientErc20, Context, ContextPlugin } from "../../../src";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 import { contextParams, contextParamsFailing } from "../constants";
+import { ClientErc20, Context, ContextPlugin } from "../../../src";
 
 describe("Client ERC20", () => {
   describe("Client instances", () => {

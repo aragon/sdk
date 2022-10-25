@@ -1,20 +1,22 @@
 import { InvalidAddressError } from "@aragon/sdk-common";
-import { ContextPlugin } from "../../context-plugin";
-import { ClientCore } from "../core";
+import { ClientCore } from "../../../internal/core";
 import {
-  encodeErc20ActionInit,
-  encodeMintTokenAction,
-  encodeUpdatePluginSettingsAction,
-} from "../encoding/plugins";
-import { DaoAction, IPluginInstallItem } from "../interfaces/common";
+  DaoAction,
+  IPluginInstallItem,
+} from "../../../internal/interfaces/common";
+import { isAddress } from "@ethersproject/address";
 import {
   IClientErc20Encoding,
   IErc20PluginInstall,
   IMintTokenParams,
+} from "../interfaces/client";
+import {
+  ContextPlugin,
+  encodeUpdatePluginSettingsAction,
   IPluginSettings,
-} from "../interfaces/plugins";
-import { isAddress } from "@ethersproject/address";
+} from "../../../plugin-common";
 import { ERC20_PLUGIN_ID } from "../constants";
+import { encodeErc20ActionInit, encodeMintTokenAction } from "../encoding";
 
 export class ClientErc20Encoding extends ClientCore
   implements IClientErc20Encoding {

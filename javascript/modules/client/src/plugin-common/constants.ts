@@ -1,5 +1,4 @@
 import {
-  DAO__factory,
   IERC20MintableUpgradeable__factory,
   MajorityVoting__factory,
   WhitelistVoting__factory,
@@ -15,11 +14,4 @@ export const AVAILABLE_PLUGIN_FUNCTION_SIGNATURES: string[] = [
   WhitelistVoting__factory.createInterface().getFunction(
     "removeWhitelistedUsers",
   ).format("minimal"),
-];
-export const AVAILABLE_CLIENT_FUNCTION_SIGNATURES: string[] = [
-  DAO__factory.createInterface().getFunction("withdraw").format("minimal"),
-  DAO__factory.createInterface().getFunction("setMetadata").format("minimal"),
-  DAO__factory.createInterface().getFunction("revoke").format("minimal"),
-  DAO__factory.createInterface().getFunction("grant").format("minimal"),
-  DAO__factory.createInterface().getFunction("freeze").format("minimal"),
 ];

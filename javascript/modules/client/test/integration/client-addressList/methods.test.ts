@@ -23,7 +23,7 @@ import {
   ProposalStatus,
   VoteProposalStep,
   VoteValues,
-} from "../../../src/internal/interfaces/plugins";
+} from "../../../src";
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParams,

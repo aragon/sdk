@@ -9,12 +9,3 @@ query erc20PluginSettings($address: ID!) {
   }
 }
 `;
-export const QueryAddressListPluginSettings = gql`
-query AddressListPluginSettings($address: ID!) {
-  allowlistPackage(id: $address){
-    supportRequiredPct
-    participationRequiredPct
-    minDuration
-  }
-}
-`;

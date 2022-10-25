@@ -5,14 +5,14 @@ import {
   IClientErc20Estimation,
   IClientErc20Methods,
   IErc20PluginInstall,
-} from "./internal/interfaces/plugins";
+} from "./internal/interfaces/client";
 import { ClientErc20Methods } from "./internal/client-erc20/methods";
-import { ContextPlugin } from "./context-plugin";
 import { ClientErc20Encoding } from "./internal/client-erc20/encoding";
 import { ClientErc20Decoding } from "./internal/client-erc20/decoding";
 import { ClientErc20Estimation } from "./internal/client-erc20/estimation";
-import { IPluginInstallItem } from "./internal/interfaces/common";
-import { ClientCore } from "./internal/core";
+import { ClientCore } from "../internal/core";
+import { ContextPlugin } from "../plugin-common";
+import { IPluginInstallItem } from "../internal/interfaces/common";
 
 /**
  * Provider a generic client with high level methods to manage and interact an ERC20 Voting plugin installed in a DAO

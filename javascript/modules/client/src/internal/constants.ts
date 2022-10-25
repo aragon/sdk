@@ -1,4 +1,9 @@
-// NOTE: This address needs to be set when the plugin has been published and the ID is known
-export const ERC20_PLUGIN_ID = "0x1234567890123456789012345678901234567890";
-// NOTE: This address needs to be set when the plugin has been published and the ID is known
-export const ADDRESSLIST_PLUGIN_ID = "0x1234567890123456789012345678901234567890";
+import { DAO__factory } from "@aragon/core-contracts-ethers";
+
+export const AVAILABLE_CLIENT_FUNCTION_SIGNATURES: string[] = [
+  DAO__factory.createInterface().getFunction("withdraw").format("minimal"),
+  DAO__factory.createInterface().getFunction("setMetadata").format("minimal"),
+  DAO__factory.createInterface().getFunction("revoke").format("minimal"),
+  DAO__factory.createInterface().getFunction("grant").format("minimal"),
+  DAO__factory.createInterface().getFunction("freeze").format("minimal"),
+];

@@ -1,14 +1,11 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { ClientErc20, Context, ContextPlugin } from "../../../src";
+import { ClientErc20, Context, ContextPlugin, IPluginSettings } from "../../../src";
 
-import {
-  IMintTokenParams,
-  IPluginSettings,
-} from "../../../src/internal/interfaces/plugins";
 import { bytesToHex } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
+import { IMintTokenParams } from "../../../src/client-erc20/internal/interfaces/client";
 
 describe("Client ERC20", () => {
   describe("Action decoders", () => {

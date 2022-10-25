@@ -2,7 +2,6 @@ import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { bytesToHex, hexToBytes, strip0x } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "../constants/encoding";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import {
   ContractFreezeParams,
@@ -16,9 +15,10 @@ import {
   IRevokePermissionParams,
   IWithdrawParams,
   PermissionIds,
-} from "../interfaces/client";
+} from "./interfaces/client";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { AVAILABLE_CLIENT_FUNCTION_SIGNATURES } from "./constants";
 
 export function getFunctionFragment(data: Uint8Array): FunctionFragment {
   const hexBytes = bytesToHex(data, true);

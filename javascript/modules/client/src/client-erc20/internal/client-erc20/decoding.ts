@@ -1,17 +1,14 @@
 import { bytesToHex } from "@aragon/sdk-common";
-import { ContextPlugin } from "../../context-plugin";
-import { ClientCore } from "../core";
+import { ClientCore } from "../../../internal/core";
+import { IInterfaceParams } from "../../../internal/interfaces/common";
 import {
-  decodeMintTokenAction,
+  ContextPlugin,
   decodeUpdatePluginSettingsAction,
   getFunctionFragment,
-} from "../encoding/plugins";
-import { IInterfaceParams } from "../interfaces/common";
-import {
-  IClientErc20Decoding,
-  IMintTokenParams,
   IPluginSettings,
-} from "../interfaces/plugins";
+} from "../../../plugin-common";
+import { decodeMintTokenAction } from "../encoding";
+import { IClientErc20Decoding, IMintTokenParams } from "../interfaces/client";
 
 export class ClientErc20Decoding extends ClientCore
   implements IClientErc20Decoding {
