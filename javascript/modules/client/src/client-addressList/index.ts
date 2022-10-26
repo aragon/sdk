@@ -1,1 +1,8 @@
-export * from './client-addressList'
+export { ClientAddressList } from "./client";
+
+export {
+  AddressListProposal,
+  AddressListProposalListItem,
+  AddressListProposalResult,
+  IAddressListPluginInstall,
+} from "./internal/interfaces";

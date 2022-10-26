@@ -1,19 +1,19 @@
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
-import { DaoAction } from "../../internal/interfaces/common";
 import {
+  computeProposalStatus,
+  DaoAction,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,
-} from "../../plugin-common";
-import { computeProposalStatus } from "../../plugin-common/utils";
+} from "../../client-common";
 import {
   AddressListProposal,
   AddressListProposalListItem,
   SubgraphAddressListProposal,
   SubgraphAddressListProposalListItem,
   SubgraphAddressListVoterListItem,
-} from "./interfaces/client";
+} from "./interfaces";
 
 export function toAddressListProposal(
   proposal: SubgraphAddressListProposal,

@@ -6,7 +6,6 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
-  Erc20Proposal,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 

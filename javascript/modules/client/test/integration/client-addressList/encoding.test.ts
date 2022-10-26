@@ -1,9 +1,10 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { ClientAddressList, Context, ContextPlugin } from "../../../src";
-
 import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
   IAddressListPluginInstall,
   IPluginSettings,
 } from "../../../src";

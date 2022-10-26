@@ -1,7 +1,24 @@
 // @ts-ignore
 declare const describe, it, beforeAll, afterAll, expect, test;
 
-import { Client, ClientErc20, Context, ContextPlugin, ExecuteProposalStep, ICanVoteParams, ICreateProposalParams, IExecuteProposalParams, IProposalQueryParams, IVoteProposalParams, ProposalCreationSteps, ProposalSortBy, ProposalStatus, SortDirection, VoteProposalStep, VoteValues } from "../../../src";
+import {
+  Client,
+  ClientErc20,
+  Context,
+  ContextPlugin,
+  ExecuteProposalStep,
+  ICanVoteParams,
+  ICreateProposalParams,
+  IExecuteProposalParams,
+  IProposalQueryParams,
+  IVoteProposalParams,
+  ProposalCreationSteps,
+  ProposalSortBy,
+  ProposalStatus,
+  SortDirection,
+  VoteProposalStep,
+  VoteValues,
+} from "../../../src";
 import * as ganacheSetup from "../../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../../helpers/deployContracts";
 

@@ -1,13 +1,10 @@
 import { bytesToHex } from "@aragon/sdk-common";
-import { Context } from "../../context";
-import { ClientCore } from "../core";
 import {
   decodeFreezeActionData,
   decodeGrantActionData,
   decodeRevokeActionData,
   decodeUpdateMetadataAction,
   decodeWithdrawActionData,
-  getFunctionFragment,
 } from "../encoding";
 import {
   IClientDecoding,
@@ -16,11 +13,16 @@ import {
   IMetadata,
   IRevokePermissionDecodedParams,
   IWithdrawParams,
-} from "../interfaces/client";
-import { IInterfaceParams } from "../interfaces/common";
+} from "../interfaces";
+import {
+  ClientCore,
+  Context,
+  getFunctionFragment,
+  IInterfaceParams,
+} from "../../client-common";
+import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 
-export class ClientDecoding extends ClientCore
-  implements IClientDecoding {
+export class ClientDecoding extends ClientCore implements IClientDecoding {
   constructor(context: Context) {
     super(context);
   }
@@ -99,7 +101,7 @@ export class ClientDecoding extends ClientCore
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
     try {
-      const func = getFunctionFragment(data);
+      const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
       return {
         id: func.format("minimal"),
         functionName: func.name,

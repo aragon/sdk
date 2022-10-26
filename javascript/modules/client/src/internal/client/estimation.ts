@@ -9,16 +9,14 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
-import { Context } from "../../context";
 import { erc20ContractAbi } from "../abi/erc20";
-import { ClientCore } from "../core";
+import { ClientCore, Context, GasFeeEstimation } from "../../client-common";
 import {
   IClientEstimation,
   ICreateParams,
   IDepositParams,
-} from "../interfaces/client";
-import { GasFeeEstimation } from "../interfaces/common";
-import { unwrapDepositParams } from "../utils/client";
+} from "../interfaces";
+import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";
 
 export class ClientEstimation extends ClientCore implements IClientEstimation {
@@ -47,7 +45,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
   /**
    * Estimates the gas fee of depositing ether or an ERC20 token into the DAO
    * This does not estimate the gas cost of updating the allowance of an ERC20 token
-   * 
+   *
    * @param {IDepositParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation

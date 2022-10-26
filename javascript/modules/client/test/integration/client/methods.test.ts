@@ -25,13 +25,11 @@ import {
   IDepositParams,
   ITransferQueryParams,
   SortDirection,
+  TokenType,
   TransferSortBy,
+  TransferType,
 } from "../../../src";
 import { InvalidAddressOrEnsError, Random } from "@aragon/sdk-common";
-import {
-  TokenType,
-  TransferType,
-} from "../../../src/internal/interfaces/client";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
 import {
@@ -148,7 +146,9 @@ describe("Client", () => {
         };
 
         expect(
-          (await tokenContract.functions.balanceOf(depositParams.daoAddressOrEns))
+          (await tokenContract.functions.balanceOf(
+            depositParams.daoAddressOrEns,
+          ))
             .toString(),
         ).toBe("0");
 
@@ -182,7 +182,9 @@ describe("Client", () => {
         }
 
         expect(
-          (await tokenContract.functions.balanceOf(depositParams.daoAddressOrEns))
+          (await tokenContract.functions.balanceOf(
+            depositParams.daoAddressOrEns,
+          ))
             .toString(),
         ).toBe("5");
       });
@@ -201,7 +203,9 @@ describe("Client", () => {
         };
 
         expect(
-          (await tokenContract.functions.balanceOf(depositParams.daoAddressOrEns))
+          (await tokenContract.functions.balanceOf(
+            depositParams.daoAddressOrEns,
+          ))
             .toString(),
         ).toBe("0");
 
@@ -246,7 +250,9 @@ describe("Client", () => {
         }
 
         expect(
-          (await tokenContract.functions.balanceOf(depositParams.daoAddressOrEns))
+          (await tokenContract.functions.balanceOf(
+            depositParams.daoAddressOrEns,
+          ))
             .toString(),
         ).toBe("7");
       });

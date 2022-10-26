@@ -1,6 +1,4 @@
-import {
-  WhitelistVoting__factory,
-} from "@aragon/core-contracts-ethers";
+import { WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
 import {
   bytesToHex,
   encodeRatio,
@@ -10,9 +8,10 @@ import {
 } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { ContractAddressListInitParams, IAddressListPluginInstall } from "./interfaces/client";
-
-
+import {
+  ContractAddressListInitParams,
+  IAddressListPluginInstall,
+} from "./interfaces";
 
 export function encodeAddressListActionInit(
   params: IAddressListPluginInstall,

@@ -1,11 +1,20 @@
 // @ts-ignore
 declare const describe, it, expect, beforeAll, afterAll;
 
-import { ClientErc20, Context, ContextPlugin, ICreateProposalParams, IExecuteProposalParams, IVoteProposalParams, VoteValues } from "../../../src";
+import {
+  ClientErc20,
+  Context,
+  ContextPlugin,
+  ICreateProposalParams,
+  IExecuteProposalParams,
+  IVoteProposalParams,
+  VoteValues,
+} from "../../../src";
 
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../../helpers/deployContracts";
+
 describe("Client ERC20", () => {
   describe("Estimation Module", () => {
     beforeAll(async () => {

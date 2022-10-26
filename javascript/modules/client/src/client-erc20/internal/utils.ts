@@ -1,19 +1,19 @@
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
-import { DaoAction } from "../../internal/interfaces/common";
 import {
+  computeProposalStatus,
+  DaoAction,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,
-} from "../../plugin-common";
-import { computeProposalStatus } from "../../plugin-common/utils";
+} from "../../client-common";
 import {
   Erc20Proposal,
   Erc20ProposalListItem,
   SubgraphErc20Proposal,
   SubgraphErc20ProposalListItem,
   SubgraphErc20VoterListItem,
-} from "./interfaces/client";
+} from "./interfaces";
 import { formatEther } from "@ethersproject/units";
 
 export function toErc20Proposal(

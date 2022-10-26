@@ -1,11 +1,13 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { Client, Context, IGrantPermissionParams } from "../../../src";
 import {
+  Client,
+  Context,
   IFreezePermissionDecodedParams,
   IFreezePermissionParams,
   IGrantPermissionDecodedParams,
+  IGrantPermissionParams,
   IMetadata,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,

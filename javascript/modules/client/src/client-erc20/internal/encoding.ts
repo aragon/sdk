@@ -13,9 +13,12 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 
 import { Result } from "@ethersproject/abi";
-import { ContractErc20InitParams, ContractMintTokenParams, IErc20PluginInstall, IMintTokenParams } from "./interfaces/client";
-
-
+import {
+  ContractErc20InitParams,
+  ContractMintTokenParams,
+  IErc20PluginInstall,
+  IMintTokenParams,
+} from "./interfaces";
 
 export function encodeErc20ActionInit(params: IErc20PluginInstall): Uint8Array {
   const erc20votingInterface = ERC20Voting__factory.createInterface();

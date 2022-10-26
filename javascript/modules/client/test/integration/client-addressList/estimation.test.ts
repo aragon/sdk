@@ -1,9 +1,10 @@
 // @ts-ignore
 declare const describe, it, expect, beforeAll, afterAll;
 
-import { ClientAddressList, Context, ContextPlugin } from "../../../src";
-
 import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
   ICreateProposalParams,
   IExecuteProposalParams,
   IVoteProposalParams,

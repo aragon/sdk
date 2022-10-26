@@ -1,5 +1,3 @@
-import { Context } from "../../context";
-import { ClientCore } from "../core";
 import {
   IClientEncoding,
   IFreezePermissionParams,
@@ -7,8 +5,8 @@ import {
   IMetadata,
   IRevokePermissionParams,
   IWithdrawParams,
-} from "../interfaces/client";
-import { DaoAction } from "../interfaces/common";
+} from "../interfaces";
+import { ClientCore, Context, DaoAction } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import {
   encodeFreezeAction,
@@ -18,8 +16,7 @@ import {
   encodeWithdrawActionData,
 } from "../encoding";
 
-export class ClientEncoding extends ClientCore
-  implements IClientEncoding {
+export class ClientEncoding extends ClientCore implements IClientEncoding {
   constructor(context: Context) {
     super(context);
   }
