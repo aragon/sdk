@@ -32,6 +32,8 @@ export class ClientAddressList extends ClientCore
     this.privateEncoding = new ClientAddressListEncoding(context);
     this.privateDecoding = new ClientAddressListDecoding(context);
     this.privateEstimation = new ClientAddressListEstimation(context);
+    Object.freeze(ClientAddressList.prototype);
+    Object.freeze(this);
   }
   get methods(): IClientAddressListMethods {
     return this.privateMethods;

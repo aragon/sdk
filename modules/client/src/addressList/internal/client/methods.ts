@@ -47,6 +47,8 @@ export class ClientAddressListMethods extends ClientCore
   implements IClientAddressListMethods {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(ClientAddressListMethods.prototype);
+    Object.freeze(this);
   }
   /**
    * Creates a new proposal on the given AddressList plugin contract

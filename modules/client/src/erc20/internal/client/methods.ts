@@ -50,6 +50,8 @@ export class ClientErc20Methods extends ClientCore
   implements IClientErc20Methods {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(ClientErc20Methods.prototype);
+    Object.freeze(this);
   }
   /**
    * Creates a new proposal on the given ERC20 plugin contract
