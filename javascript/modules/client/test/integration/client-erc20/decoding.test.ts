@@ -1,12 +1,14 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { ClientErc20, Context, ContextPlugin } from "../../../src";
-
 import {
-  IMintTokenParams,
+  ClientErc20,
+  Context,
+  ContextPlugin,
   IPluginSettings,
-} from "../../../src/internal/interfaces/plugins";
+  IMintTokenParams,
+} from "../../../src";
+
 import { bytesToHex } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 

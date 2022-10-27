@@ -1,4 +1,4 @@
-import { Context } from "./context";
+import { Context } from "./client-common/context";
 import { ClientMethods } from "./internal/client/methods";
 import { ClientEncoding } from "./internal/client/encoding";
 import { ClientEstimation } from "./internal/client/estimation";
@@ -9,8 +9,8 @@ import {
   IClientEncoding,
   IClientEstimation,
   IClientMethods,
-} from "./internal/interfaces/client";
-import { ClientCore } from "./internal/core";
+} from "./interfaces";
+import { ClientCore } from "./client-common/core";
 
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's

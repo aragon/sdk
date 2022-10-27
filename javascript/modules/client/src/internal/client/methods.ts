@@ -40,19 +40,22 @@ import {
   SubgraphTransferTypeMap,
   Transfer,
   TransferSortBy,
-} from "../interfaces/client";
-import { DaoRole, SortDirection } from "../interfaces/common";
-import { delay } from "../temp-mock";
+} from "../../interfaces";
+import {
+  ClientCore,
+  Context,
+  DaoRole,
+  delay,
+  SortDirection,
+} from "../../client-common";
 import {
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
   toTransfer,
   unwrapDepositParams,
-} from "../utils/client";
+} from "../utils";
 import { isAddress } from "@ethersproject/address";
-import { Context } from "../../context";
-import { ClientCore } from "../core";
 
 export class ClientMethods extends ClientCore implements IClientMethods {
   constructor(context: Context) {

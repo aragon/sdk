@@ -4,16 +4,14 @@ declare const describe, it, expect;
 import {
   Client,
   Context,
-  IGrantPermissionParams,
-  IWithdrawParams,
-} from "../../../src";
-import {
   IFreezePermissionParams,
+  IGrantPermissionParams,
   IMetadata,
   IRevokePermissionParams,
+  IWithdrawParams,
   Permissions,
-} from "../../../src/internal/interfaces/client";
-import { DaoAction } from "../../../src/internal/interfaces/common";
+} from "../../../src";
+import { DaoAction } from "../../../src/client-common/interfaces/common";
 import { contextParamsLocalChain } from "../constants";
 describe("Client", () => {
   describe("Action generators", () => {

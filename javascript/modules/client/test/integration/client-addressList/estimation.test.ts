@@ -1,14 +1,15 @@
 // @ts-ignore
 declare const describe, it, expect, beforeAll, afterAll;
 
-import { ClientAddressList, Context, ContextPlugin } from "../../../src";
-
 import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
   ICreateProposalParams,
   IExecuteProposalParams,
   IVoteProposalParams,
   VoteValues,
-} from "../../../src/internal/interfaces/plugins";
+} from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../../helpers/deployContracts";

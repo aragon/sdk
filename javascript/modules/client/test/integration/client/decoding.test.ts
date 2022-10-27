@@ -1,17 +1,19 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { Client, Context, IGrantPermissionParams } from "../../../src";
 import {
+  Client,
+  Context,
   IFreezePermissionDecodedParams,
   IFreezePermissionParams,
   IGrantPermissionDecodedParams,
+  IGrantPermissionParams,
   IMetadata,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
   IWithdrawParams,
   Permissions,
-} from "../../../src/internal/interfaces/client";
+} from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";

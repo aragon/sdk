@@ -1,12 +1,13 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { ClientAddressList, Context, ContextPlugin } from "../../../src";
-
 import {
+  ClientAddressList,
+  Context,
+  ContextPlugin,
   IAddressListPluginInstall,
   IPluginSettings,
-} from "../../../src/internal/interfaces/plugins";
+} from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 describe("Client Address List", () => {
