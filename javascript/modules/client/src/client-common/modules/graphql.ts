@@ -12,6 +12,7 @@ export class GraphqlModule implements IClientGraphQLCore {
     if (context.graphql?.length) {
       this._graphql = context.graphql;
       this._graphqlIdx = Math.floor(Random.getFloat() * context.graphql.length);
+      Object.freeze(GraphqlModule.prototype);
     }
   }
 

@@ -32,6 +32,7 @@ export class Web3Module implements IClientWeb3Core {
     if (context.gasFeeEstimationFactor) {
       this._gasFeeEstimationFactor = context.gasFeeEstimationFactor;
     }
+    Object.freeze(Web3Module.prototype);
   }
 
   /** Replaces the current signer by the given one */
