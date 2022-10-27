@@ -11,6 +11,7 @@ export class IPFSModule implements IClientIpfsCore {
     if (context.ipfs?.length) {
       this._ipfs = context.ipfs;
       this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
+      Object.freeze(IPFSModule.prototype);
     }
   }
 
