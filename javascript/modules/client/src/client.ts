@@ -9,7 +9,7 @@ import {
   IClientEncoding,
   IClientEstimation,
   IClientMethods,
-} from "./internal/interfaces";
+} from "./interfaces";
 import { ClientCore } from "./client-common/core";
 
 /**

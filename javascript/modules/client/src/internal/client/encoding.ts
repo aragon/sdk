@@ -5,16 +5,12 @@ import {
   IMetadata,
   IRevokePermissionParams,
   IWithdrawParams,
-} from "../interfaces";
+} from "../../interfaces";
 import { ClientCore, Context, DaoAction } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
-import {
-  encodeFreezeAction,
-  encodeGrantActionData,
-  encodeRevokeActionData,
-  encodeUpdateMetadataAction,
-  encodeWithdrawActionData,
-} from "../encoding";
+import { DAO__factory } from "@aragon/core-contracts-ethers";
+import { hexToBytes, strip0x } from "@aragon/sdk-common";
+import { freezeParamsToContract, permissionParamsToContract, withdrawParamsToContract } from "../utils";
 
 export class ClientEncoding extends ClientCore implements IClientEncoding {
   constructor(context: Context) {
@@ -41,16 +37,21 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     ) {
       throw new Error("Invalid address");
     }
+    const daoInterface = DAO__factory.createInterface();
+    const args = permissionParamsToContract(
+      {
+        who,
+        where,
+        permission: params.permission,
+      },
+    );
+    // get hex bytes
+    const hexBytes = daoInterface.encodeFunctionData("grant", args);
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: daoAddress,
       value: BigInt(0),
-      data: encodeGrantActionData(
-        {
-          who,
-          where,
-          permission: params.permission,
-        },
-      ),
+      data,
     };
   }
   /**
@@ -74,16 +75,21 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     ) {
       throw new Error("Invalid address");
     }
+    const daoInterface = DAO__factory.createInterface();
+    const args = permissionParamsToContract(
+      {
+        who,
+        where,
+        permission: params.permission,
+      },
+    );
+    // get hex bytes
+    const hexBytes = daoInterface.encodeFunctionData("revoke", args);
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: daoAddress,
       value: BigInt(0),
-      data: encodeRevokeActionData(
-        {
-          who,
-          where,
-          permission: params.permission,
-        },
-      ),
+      data,
     };
   }
   /**
@@ -105,15 +111,20 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     } else if (!isAddress(where) || !isAddress(daoAddress)) {
       throw new Error("Invalid address");
     }
+    const daoInterface = DAO__factory.createInterface();
+    const args = freezeParamsToContract(
+      {
+        where,
+        permission: params.permission,
+      },
+    );
+    // get hex bytes
+    const hexBytes = daoInterface.encodeFunctionData("freeze", args);
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: daoAddress,
       value: BigInt(0),
-      data: encodeFreezeAction(
-        {
-          where,
-          permission: params.permission,
-        },
-      ),
+      data,
     };
   }
   /**
@@ -138,11 +149,15 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       }
       address = resolvedAddress;
     }
-
+    const daoInterface = DAO__factory.createInterface();
+    const args = withdrawParamsToContract(params);
+    // get hex bytes
+    const hexBytes = daoInterface.encodeFunctionData("withdraw", args);
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: address,
       value: BigInt(0),
-      data: encodeWithdrawActionData(params),
+      data,
     };
   }
   /**
@@ -174,10 +189,14 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     } catch {
       throw new Error("Could not pin the metadata on IPFS");
     }
+    const daoInterface = DAO__factory.createInterface();
+    const args = new TextEncoder().encode(cid);
+    const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: address,
       value: BigInt(0),
-      data: encodeUpdateMetadataAction(cid),
+      data,
     };
   }
 }

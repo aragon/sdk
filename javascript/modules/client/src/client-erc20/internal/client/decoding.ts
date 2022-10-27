@@ -1,15 +1,16 @@
-import { bytesToHex } from "@aragon/sdk-common";
+import { bytesToHex, UnexpectedActionError } from "@aragon/sdk-common";
 import {
-  IInterfaceParams,
   ClientCore,
   ContextPlugin,
   decodeUpdatePluginSettingsAction,
   getFunctionFragment,
+  IInterfaceParams,
   IPluginSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { decodeMintTokenAction } from "../encoding";
-import { IClientErc20Decoding, IMintTokenParams } from "../interfaces";
+import { IClientErc20Decoding, IMintTokenParams } from "../../interfaces";
+import { IERC20MintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
+import { mintTokenParamsFromContract } from "../utils";
 
 export class ClientErc20Decoding extends ClientCore
   implements IClientErc20Decoding {
@@ -34,7 +35,18 @@ export class ClientErc20Decoding extends ClientCore
    * @memberof ClientErc20Decoding
    */
   public mintTokenAction(data: Uint8Array): IMintTokenParams {
-    return decodeMintTokenAction(data);
+    const votingInterface = IERC20MintableUpgradeable__factory
+      .createInterface();
+    const hexBytes = bytesToHex(data, true);
+    const receivedFunction = votingInterface.getFunction(
+      hexBytes.substring(0, 10) as any,
+    );
+    const expectedfunction = votingInterface.getFunction("mint");
+    if (receivedFunction.name !== expectedfunction.name) {
+      throw new UnexpectedActionError();
+    }
+    const result = votingInterface.decodeFunctionData("mint", data);
+    return mintTokenParamsFromContract(result);
   }
   /**
    * Returns the decoded function info given the encoded data of an action

@@ -1,4 +1,4 @@
-import { InvalidAddressError } from "@aragon/sdk-common";
+import { hexToBytes, InvalidAddressError, strip0x } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -12,9 +12,13 @@ import {
   IClientErc20Encoding,
   IErc20PluginInstall,
   IMintTokenParams,
-} from "../interfaces";
+} from "../../interfaces";
 import { ERC20_PLUGIN_ID } from "../constants";
-import { encodeErc20ActionInit, encodeMintTokenAction } from "../encoding";
+import {
+  ERC20Voting__factory,
+  IERC20MintableUpgradeable__factory,
+} from "@aragon/core-contracts-ethers";
+import { erc20InitParamsToContract, mintTokenParamsToContract } from "../utils";
 
 export class ClientErc20Encoding extends ClientCore
   implements IClientErc20Encoding {
@@ -30,9 +34,18 @@ export class ClientErc20Encoding extends ClientCore
    * @memberof ClientErc20Encoding
    */
   static getPluginInstallItem(params: IErc20PluginInstall): IPluginInstallItem {
+    const erc20votingInterface = ERC20Voting__factory.createInterface();
+    const args = erc20InitParamsToContract(params);
+    // get hex bytes
+    const hexBytes = erc20votingInterface.encodeFunctionData(
+      "initialize",
+      args,
+    );
+    // Strip 0x => encode in Uint8Array
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: ERC20_PLUGIN_ID,
-      data: encodeErc20ActionInit(params),
+      data,
     };
   }
   /**
@@ -73,10 +86,16 @@ export class ClientErc20Encoding extends ClientCore
     if (!isAddress(minterAddress) || !isAddress(params.address)) {
       throw new InvalidAddressError();
     }
+    const votingInterface = IERC20MintableUpgradeable__factory
+      .createInterface();
+    const args = mintTokenParamsToContract(params);
+    // get hex bytes
+    const hexBytes = votingInterface.encodeFunctionData("mint", args);
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: minterAddress,
       value: BigInt(0),
-      data: encodeMintTokenAction(params),
+      data,
     };
   }
 }

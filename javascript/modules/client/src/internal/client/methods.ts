@@ -40,7 +40,7 @@ import {
   SubgraphTransferTypeMap,
   Transfer,
   TransferSortBy,
-} from "../interfaces";
+} from "../../interfaces";
 import {
   ClientCore,
   Context,

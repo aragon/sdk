@@ -5,4 +5,4 @@ export {
   AddressListProposalListItem,
   AddressListProposalResult,
   IAddressListPluginInstall,
-} from "./internal/interfaces";
+} from "./interfaces";

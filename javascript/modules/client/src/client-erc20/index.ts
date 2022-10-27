@@ -6,4 +6,4 @@ export {
   Erc20TokenDetails,
   IErc20PluginInstall,
   IMintTokenParams,
-} from "./internal/interfaces";
+} from "./interfaces";

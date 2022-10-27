@@ -1,4 +1,6 @@
-import { hexToBytes, strip0x } from "@aragon/sdk-common";
+import { encodeRatio, hexToBytes, strip0x } from "@aragon/sdk-common";
+import { BigNumber } from "@ethersproject/bignumber";
+import { AddressZero } from "@ethersproject/constants";
 import {
   computeProposalStatus,
   DaoAction,
@@ -10,10 +12,12 @@ import {
 import {
   AddressListProposal,
   AddressListProposalListItem,
+  ContractAddressListInitParams,
+  IAddressListPluginInstall,
   SubgraphAddressListProposal,
   SubgraphAddressListProposalListItem,
   SubgraphAddressListVoterListItem,
-} from "./interfaces";
+} from "../interfaces";
 
 export function toAddressListProposal(
   proposal: SubgraphAddressListProposal,
@@ -122,4 +126,20 @@ export function toAddressListProposalListItem(
       abstain: proposal.abstain ? parseInt(proposal.abstain) : 0,
     },
   };
+}
+
+export function addressListInitParamsToContract(
+  params: IAddressListPluginInstall,
+): ContractAddressListInitParams {
+  // TODO
+  // not sure if the IDao and gsn params will be needed after
+  // this is converted into a plugin
+  return [
+    AddressZero,
+    AddressZero,
+    BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
+    BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
+    BigNumber.from(params.settings.minDuration),
+    params.addresses,
+  ];
 }

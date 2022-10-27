@@ -7,7 +7,7 @@ import {
   IExecuteProposalParams,
   IVoteProposalParams,
 } from "../../../client-common";
-import { IClientErc20Estimation } from "../interfaces";
+import { IClientErc20Estimation } from "../../interfaces";
 
 export class ClientErc20Estimation extends ClientCore
   implements IClientErc20Estimation {

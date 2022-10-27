@@ -5,12 +5,23 @@ import { AddressZero } from "@ethersproject/constants";
 import { pack } from "@ethersproject/solidity";
 import {
   AssetBalance,
+  ContractFreezeParams,
+  ContractPermissionParams,
+  ContractWithdrawParams,
   DaoDetails,
   DaoListItem,
   ICreateParams,
   IDepositParams,
+  IFreezePermissionDecodedParams,
+  IFreezePermissionParams,
+  IGrantPermissionDecodedParams,
+  IGrantPermissionParams,
   IMetadata,
   InstalledPluginListItem,
+  IRevokePermissionDecodedParams,
+  IRevokePermissionParams,
+  IWithdrawParams,
+  PermissionIds,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
@@ -21,7 +32,10 @@ import {
   TokenType,
   Transfer,
   TransferType,
-} from "./interfaces";
+} from "../interfaces";
+import { Result } from "@ethersproject/abi";
+import { keccak256 } from "@ethersproject/keccak256";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 export function unwrapCreateDaoParams(
   params: ICreateParams,
@@ -61,7 +75,7 @@ export function unwrapCreateDaoParams(
   ];
 }
 
-export function  unwrapDepositParams(
+export function unwrapDepositParams(
   params: IDepositParams,
 ): [string, BigNumber, string, string] {
   return [
@@ -217,4 +231,60 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
     to: transfer.to,
     proposalId: transfer.proposal.id || "",
   };
+}
+
+export function freezeParamsToContract(
+  params: IFreezePermissionParams,
+): ContractFreezeParams {
+  return [params.where, keccak256(toUtf8Bytes(params.permission))];
+}
+export function freezeParamsFromContract(
+  result: Result,
+): IFreezePermissionDecodedParams {
+  return {
+    where: result[0],
+    permissionId: result[1],
+    permission: Object.keys(PermissionIds)
+      .find((k) => PermissionIds[k] === result[1])
+      ?.replace(/_ID$/, "") || "",
+  };
+}
+
+export function permissionParamsToContract(
+  params: IGrantPermissionParams | IRevokePermissionParams,
+): ContractPermissionParams {
+  return [params.where, params.who, keccak256(toUtf8Bytes(params.permission))];
+}
+
+export function permissionParamsFromContract(
+  result: Result,
+): IGrantPermissionDecodedParams | IRevokePermissionDecodedParams {
+  return {
+    where: result[0],
+    who: result[1],
+    permissionId: result[2],
+    permission: Object.keys(PermissionIds)
+      .find((k) => PermissionIds[k] === result[2])
+      ?.replace(/_ID$/, "") || "",
+  };
+}
+
+export function withdrawParamsFromContract(result: Result): IWithdrawParams {
+  return {
+    tokenAddress: result[0],
+    recipientAddress: result[1],
+    amount: BigInt(result[2]),
+    reference: result[3],
+  };
+}
+
+export function withdrawParamsToContract(
+  params: IWithdrawParams,
+): ContractWithdrawParams {
+  return [
+    params.tokenAddress ?? AddressZero,
+    params.recipientAddress,
+    BigNumber.from(params.amount),
+    params.reference ?? "",
+  ];
 }

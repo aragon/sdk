@@ -7,7 +7,7 @@ import {
   IExecuteProposalParams,
   IVoteProposalParams,
 } from "../../../client-common";
-import { IClientAddressListEstimation } from "../interfaces";
+import { IClientAddressListEstimation } from "../../interfaces";
 
 export class ClientAddressListEstimation extends ClientCore
   implements IClientAddressListEstimation {

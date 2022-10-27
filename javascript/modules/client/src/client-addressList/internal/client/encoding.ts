@@ -1,4 +1,4 @@
-import { InvalidAddressError } from "@aragon/sdk-common";
+import { hexToBytes, InvalidAddressError, strip0x } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
@@ -10,14 +10,11 @@ import {
 } from "../../../client-common";
 import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
-  encodeAddMembersAction,
-  encodeAddressListActionInit,
-  encodeRemoveMembersAction,
-} from "../encoding";
-import {
   IAddressListPluginInstall,
   IClientAddressListEncoding,
-} from "../interfaces";
+} from "../../interfaces";
+import { WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
+import { addressListInitParamsToContract } from "../utils";
 
 export class ClientAddressListEncoding extends ClientCore
   implements IClientAddressListEncoding {
@@ -36,9 +33,18 @@ export class ClientAddressListEncoding extends ClientCore
   static getPluginInstallItem(
     params: IAddressListPluginInstall,
   ): IPluginInstallItem {
+    const addressListVotingInterface = WhitelistVoting__factory.createInterface();
+    const args = addressListInitParamsToContract(params);
+    // get hex bytes
+    const hexBytes = addressListVotingInterface.encodeFunctionData(
+      "initialize",
+      args,
+    );
+    // Strip 0x => encode in Uint8Array
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: ADDRESSLIST_PLUGIN_ID,
-      data: encodeAddressListActionInit(params),
+      data,
     };
   }
 
@@ -84,10 +90,18 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
+    const votingInterface = WhitelistVoting__factory.createInterface();
+    // get hex bytes
+    const hexBytes = votingInterface.encodeFunctionData(
+      // TODO: Rename to `addAddresses` as soon as the plugin is updated
+      "addWhitelistedUsers",
+      [members],
+    );
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data: encodeAddMembersAction(members),
+      data,
     };
   }
   /**
@@ -110,10 +124,18 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
+    const votingInterface = WhitelistVoting__factory.createInterface();
+    // get hex bytes
+    const hexBytes = votingInterface.encodeFunctionData(
+      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
+      "removeWhitelistedUsers",
+      [members],
+    );
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data: encodeRemoveMembersAction(members),
+      data,
     };
   }
 }

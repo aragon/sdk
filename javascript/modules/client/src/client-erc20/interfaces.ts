@@ -21,7 +21,7 @@ import {
   SubgraphVoterListItemBase,
   VoteProposalStepValue,
   VoteValues,
-} from "../../client-common";
+} from "../client-common";
 
 // ERC20
 

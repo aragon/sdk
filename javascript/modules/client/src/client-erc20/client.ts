@@ -5,7 +5,7 @@ import {
   IClientErc20Estimation,
   IClientErc20Methods,
   IErc20PluginInstall,
-} from "./internal/interfaces";
+} from "./interfaces";
 import { ClientErc20Methods } from "./internal/client/methods";
 import { ClientErc20Encoding } from "./internal/client/encoding";
 import { ClientErc20Decoding } from "./internal/client/decoding";

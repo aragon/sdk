@@ -15,7 +15,7 @@ import {
   IClientEstimation,
   ICreateParams,
   IDepositParams,
-} from "../interfaces";
+} from "../../interfaces";
 import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";
 

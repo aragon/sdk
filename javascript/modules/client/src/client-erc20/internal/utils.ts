@@ -1,4 +1,4 @@
-import { hexToBytes, strip0x } from "@aragon/sdk-common";
+import { encodeRatio, hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
   DaoAction,
@@ -8,13 +8,20 @@ import {
   VoteValues,
 } from "../../client-common";
 import {
+  ContractErc20InitParams,
+  ContractMintTokenParams,
   Erc20Proposal,
   Erc20ProposalListItem,
+  IErc20PluginInstall,
+  IMintTokenParams,
   SubgraphErc20Proposal,
   SubgraphErc20ProposalListItem,
   SubgraphErc20VoterListItem,
-} from "./interfaces";
+} from "../interfaces";
 import { formatEther } from "@ethersproject/units";
+import { BigNumber } from "@ethersproject/bignumber";
+import { Result } from "@ethersproject/abi";
+import { AddressZero } from "@ethersproject/constants";
 
 export function toErc20Proposal(
   proposal: SubgraphErc20Proposal,
@@ -142,4 +149,43 @@ export function toErc20ProposalListItem(
       decimals: parseInt(proposal.pkg.token.decimals),
     },
   };
+}
+
+
+export function mintTokenParamsToContract(
+  params: IMintTokenParams,
+): ContractMintTokenParams {
+  return [params.address, BigNumber.from(params.amount)];
+}
+
+export function mintTokenParamsFromContract(result: Result): IMintTokenParams {
+  return {
+    address: result[0],
+    amount: BigInt(result[1]),
+  };
+}
+
+
+export function erc20InitParamsToContract(
+  params: IErc20PluginInstall,
+): ContractErc20InitParams {
+  // TODO
+  // the SC specifies a token field but there is not format on thhis field
+  // or how data should be passed to this in case it is using an existing
+  // token or miniting a new one
+
+  let token = "";
+  if (params.newToken) {
+    token = params.newToken.name;
+  } else if (params.useToken) {
+    token = params.useToken.address;
+  }
+  return [
+    AddressZero,
+    AddressZero,
+    BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
+    BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
+    BigNumber.from(params.settings.minDuration),
+    token,
+  ];
 }

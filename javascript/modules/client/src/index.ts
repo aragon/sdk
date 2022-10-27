@@ -29,4 +29,4 @@ export {
   TransferSortBy,
   TransferType,
   Withdraw,
-} from "./internal/interfaces";
+} from "./interfaces";

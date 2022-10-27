@@ -1,4 +1,4 @@
-import { bytesToHex } from "@aragon/sdk-common";
+import { bytesToHex, UnexpectedActionError } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -8,11 +8,8 @@ import {
   IPluginSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import {
-  decodeAddMemebersAction,
-  decodeRemoveMemebersAction,
-} from "../encoding";
-import { IClientAddressListDecoding } from "../interfaces";
+import { IClientAddressListDecoding } from "../../interfaces";
+import { WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
 
 export class ClientAddressListDecoding extends ClientCore
   implements IClientAddressListDecoding {
@@ -38,7 +35,22 @@ export class ClientAddressListDecoding extends ClientCore
    * @memberof ClientAddressListDecoding
    */
   public addMembersAction(data: Uint8Array): string[] {
-    return decodeAddMemebersAction(data);
+    const votingInterface = WhitelistVoting__factory.createInterface();
+    const hexBytes = bytesToHex(data, true);
+    const receivedFunction = votingInterface.getFunction(
+      hexBytes.substring(0, 10) as any,
+    );
+    // TODO: Rename to `addAddresses` as soon as the plugin is updated
+    const expectedfunction = votingInterface.getFunction("addWhitelistedUsers");
+    if (receivedFunction.name !== expectedfunction.name) {
+      throw new UnexpectedActionError();
+    }
+    const result = votingInterface.decodeFunctionData(
+      // TODO: Rename to `addAddresses` as soon as the plugin is updated
+      "addWhitelistedUsers",
+      data,
+    );
+    return result[0];
   }
   /**
    * Decodes a list of addresses from an encoded remove members action
@@ -48,7 +60,24 @@ export class ClientAddressListDecoding extends ClientCore
    * @memberof ClientAddressListDecoding
    */
   public removeMembersAction(data: Uint8Array): string[] {
-    return decodeRemoveMemebersAction(data);
+    const votingInterface = WhitelistVoting__factory.createInterface();
+    const hexBytes = bytesToHex(data, true);
+    const receivedFunction = votingInterface.getFunction(
+      hexBytes.substring(0, 10) as any,
+    );
+    const expectedfunction = votingInterface.getFunction(
+      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
+      "removeWhitelistedUsers",
+    );
+    if (receivedFunction.name !== expectedfunction.name) {
+      throw new UnexpectedActionError();
+    }
+    const result = votingInterface.decodeFunctionData(
+      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
+      "removeWhitelistedUsers",
+      data,
+    );
+    return result[0];
   }
   /**
    * Returns the decoded function info given the encoded data of an action

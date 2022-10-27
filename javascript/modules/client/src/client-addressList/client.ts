@@ -5,7 +5,7 @@ import {
   IClientAddressListEncoding,
   IClientAddressListEstimation,
   IClientAddressListMethods,
-} from "./internal/interfaces";
+} from "./interfaces";
 import { ClientAddressListMethods } from "./internal/client/methods";
 import { ClientAddressListEncoding } from "./internal/client/encoding";
 import { ClientAddressListDecoding } from "./internal/client/decoding";

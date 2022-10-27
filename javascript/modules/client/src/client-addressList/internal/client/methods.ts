@@ -14,7 +14,7 @@ import {
   IClientAddressListMethods,
   SubgraphAddressListProposal,
   SubgraphAddressListProposalListItem,
-} from "../interfaces";
+} from "../../interfaces";
 import {
   ClientCore,
   computeProposalStatusFilter,

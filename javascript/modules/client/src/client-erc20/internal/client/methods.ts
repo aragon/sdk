@@ -37,7 +37,7 @@ import {
   IClientErc20Methods,
   SubgraphErc20Proposal,
   SubgraphErc20ProposalListItem,
-} from "../interfaces";
+} from "../../interfaces";
 import {
   QueryErc20PluginSettings,
   QueryErc20Proposal,

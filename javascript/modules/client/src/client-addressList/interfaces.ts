@@ -22,7 +22,7 @@ import {
   SubgraphVoterListItemBase,
   VoteProposalStepValue,
   VoteValues,
-} from "../../client-common";
+} from "../client-common";
 
 // Address List
 export interface IClientAddressListMethods extends IClientCore {
