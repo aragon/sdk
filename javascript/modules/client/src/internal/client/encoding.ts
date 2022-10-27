@@ -10,11 +10,17 @@ import { ClientCore, Context, DaoAction } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
-import { freezeParamsToContract, permissionParamsToContract, withdrawParamsToContract } from "../utils";
+import {
+  freezeParamsToContract,
+  permissionParamsToContract,
+  withdrawParamsToContract,
+} from "../utils";
 
 export class ClientEncoding extends ClientCore implements IClientEncoding {
   constructor(context: Context) {
     super(context);
+    Object.freeze(ClientEncoding.prototype);
+    Object.freeze(this);
   }
   /**
    * Computes the payload to be given when creating a proposal that grants a permission within a DAO

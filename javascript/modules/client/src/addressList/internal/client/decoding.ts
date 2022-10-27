@@ -15,6 +15,8 @@ export class ClientAddressListDecoding extends ClientCore
   implements IClientAddressListDecoding {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(ClientAddressListDecoding.prototype);
+    Object.freeze(this);
   }
 
   /**

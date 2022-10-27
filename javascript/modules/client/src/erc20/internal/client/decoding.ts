@@ -16,6 +16,8 @@ export class ClientErc20Decoding extends ClientCore
   implements IClientErc20Decoding {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(ClientErc20Decoding.prototype);
+    Object.freeze(this);
   }
   /**
    * Decodes a dao metadata from an encoded update metadata action
