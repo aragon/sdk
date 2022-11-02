@@ -9,7 +9,7 @@ import { IClientWeb3Core } from "../interfaces/core";
 const daoFactoryAddressMap = new Map<Web3Module, string>();
 const gasFeeEstimationFactorMap = new Map<Web3Module, number>();
 const providersMap = new Map<Web3Module, JsonRpcProvider[]>();
-const providersIdxMap = new Map<Web3Module, number>();
+const providerIdxMap = new Map<Web3Module, number>();
 const signerMap = new Map<Web3Module, Signer>();
 
 export class Web3Module implements IClientWeb3Core {
@@ -19,7 +19,7 @@ export class Web3Module implements IClientWeb3Core {
     // Storing client data in the private module's scope to prevent external mutation
     if (context.web3Providers) {
       providersMap.set(this, context.web3Providers);
-      providersIdxMap.set(this, 0);
+      providerIdxMap.set(this, 0);
     }
 
     if (context.signer) {
@@ -43,11 +43,11 @@ export class Web3Module implements IClientWeb3Core {
   private get gasFeeEstimationFactor(): number {
     return gasFeeEstimationFactorMap.get(this) || 1;
   }
-  private get web3Providers(): JsonRpcProvider[] {
+  private get providers(): JsonRpcProvider[] {
     return providersMap.get(this) || [];
   }
-  private get web3Idx(): number {
-    const idx = providersIdxMap.get(this);
+  private get providerIdx(): number {
+    const idx = providerIdxMap.get(this);
     if (idx === undefined) {
       return -1;
     }
@@ -67,12 +67,12 @@ export class Web3Module implements IClientWeb3Core {
 
   /** Starts using the next available Web3 provider */
   public shiftProvider(): void {
-    if (!this.web3Providers.length) {
+    if (!this.providers.length) {
       throw new Error("No endpoints");
-    } else if (this.web3Providers.length <= 1) {
+    } else if (this.providers.length <= 1) {
       throw new Error("No other endpoints");
     }
-    providersIdxMap.set(this, (this.web3Idx + 1) % this.web3Providers.length);
+    providerIdxMap.set(this, (this.providerIdx + 1) % this.providers.length);
   }
 
   /** Retrieves the current signer */
@@ -100,7 +100,7 @@ export class Web3Module implements IClientWeb3Core {
 
   /** Returns the currently active network provider */
   public getProvider(): JsonRpcProvider | null {
-    return this.web3Providers[this.web3Idx] || null;
+    return this.providers[this.providerIdx] || null;
   }
 
   /** Returns whether the current provider is functional or not */
@@ -115,11 +115,11 @@ export class Web3Module implements IClientWeb3Core {
   }
 
   public async ensureOnline(): Promise<void> {
-    if (!this.web3Providers.length) {
+    if (!this.providers.length) {
       return Promise.reject(new Error("No provider"));
     }
 
-    for (let i = 0; i < this.web3Providers.length; i++) {
+    for (let i = 0; i < this.providers.length; i++) {
       if (await this.isUp()) return;
 
       this.shiftProvider();
