@@ -16,6 +16,7 @@ export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
 
   constructor(context: Context) {
+    providerIdxMap.set(this, -1);
     // Storing client data in the private module's scope to prevent external mutation
     if (context.web3Providers) {
       providersMap.set(this, context.web3Providers);
@@ -47,11 +48,7 @@ export class Web3Module implements IClientWeb3Core {
     return providersMap.get(this) || [];
   }
   private get providerIdx(): number {
-    const idx = providerIdxMap.get(this);
-    if (idx === undefined) {
-      return -1;
-    }
-    return idx;
+    return providerIdxMap.get(this)!;
   }
   private get signer(): Signer | undefined {
     return signerMap.get(this);

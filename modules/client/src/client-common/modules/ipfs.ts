@@ -8,6 +8,7 @@ const clientsIdxMap = new Map<IPFSModule, number>();
 
 export class IPFSModule implements IClientIpfsCore {
   constructor(context: Context) {
+    clientsIdxMap.set(this, -1);
     // Storing client data in the private module's scope to prevent external mutation
     if (context.ipfs?.length) {
       clientsIdxMap.set(
@@ -24,11 +25,7 @@ export class IPFSModule implements IClientIpfsCore {
     return clientsMap.get(this) || [];
   }
   private get clientsIdx(): number {
-    const idx = clientsIdxMap.get(this);
-    if (idx === undefined) {
-      return -1;
-    }
-    return idx;
+    return clientsIdxMap.get(this)!;
   }
 
   public getClient(): IpfsClient {
