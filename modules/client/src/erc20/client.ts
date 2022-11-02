@@ -31,6 +31,8 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
     this.privateEncoding = new ClientErc20Encoding(context);
     this.privateDecoding = new ClientErc20Decoding(context);
     this.privateEstimation = new ClientErc20Estimation(context);
+    Object.freeze(ClientErc20.prototype);
+    Object.freeze(this);
   }
   get methods(): IClientErc20Methods {
     return this.privateMethods;

@@ -24,6 +24,8 @@ export class ClientErc20Encoding extends ClientCore
   implements IClientErc20Encoding {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(ClientErc20Encoding.prototype);
+    Object.freeze(this);
   }
   /**
    * Computes the parameters to be given when creating the DAO,

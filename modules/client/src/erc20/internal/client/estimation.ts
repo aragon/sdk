@@ -13,6 +13,8 @@ export class ClientErc20Estimation extends ClientCore
   implements IClientErc20Estimation {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(ClientErc20Estimation.prototype);
+    Object.freeze(this);
   }
   /**
    * Estimates the gas fee of creating a proposal on the plugin

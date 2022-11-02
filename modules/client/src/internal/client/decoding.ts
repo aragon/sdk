@@ -20,6 +20,8 @@ import { freezeParamsFromContract, permissionParamsFromContract, withdrawParamsF
 export class ClientDecoding extends ClientCore implements IClientDecoding {
   constructor(context: Context) {
     super(context);
+    Object.freeze(ClientDecoding.prototype);
+    Object.freeze(this);
   }
   /**
    * Decodes the permission parameters from an encoded grant action

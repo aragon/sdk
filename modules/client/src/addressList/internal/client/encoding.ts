@@ -20,6 +20,8 @@ export class ClientAddressListEncoding extends ClientCore
   implements IClientAddressListEncoding {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(ClientAddressListEncoding.prototype);
+    Object.freeze(this);
   }
 
   /**

@@ -13,6 +13,8 @@ export class ClientAddressListEstimation extends ClientCore
   implements IClientAddressListEstimation {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(ClientAddressListEstimation.prototype);
+    Object.freeze(this);
   }
 
   /**
