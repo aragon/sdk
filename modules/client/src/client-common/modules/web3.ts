@@ -6,19 +6,34 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { GasFeeEstimation } from "../../client-common/interfaces/common";
 import { IClientWeb3Core } from "../interfaces/core";
 
+enum Keys {
+  DaoFactoryAddress,
+  GasFeeEstimationFactor,
+  Web3Providers,
+  Web3Idx,
+  Signer,
+}
+const Web3ModuleMap = new Map<Keys, any>([
+  [Keys.DaoFactoryAddress, ""],
+  [Keys.GasFeeEstimationFactor, 1],
+  [Keys.Web3Providers, [] as JsonRpcProvider[]],
+  [Keys.GasFeeEstimationFactor, 1],
+  [Keys.Web3Idx, -1],
+  [Keys.Signer, undefined],
+]);
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
 
-  private _daoFactoryAddress = "";
-  private _gasFeeEstimationFactor = 1;
-  private _web3Providers: JsonRpcProvider[] = [];
-  private _web3Idx = -1;
-  private _signer: Signer | undefined;
+  // private _daoFactoryAddress = "";
+  // private _gasFeeEstimationFactor = 1;
+  // private _web3Providers: JsonRpcProvider[] = [];
+  // private _web3Idx = -1;
+  // private _signer: Signer | undefined;
 
   constructor(context: Context) {
     if (context.web3Providers) {
-      this._web3Providers = context.web3Providers;
-      this._web3Idx = 0;
+      Web3ModuleMap.set(Keys.Web3Providers, context.web3Providers);
+      Web3ModuleMap.set(Keys.Web3Idx, 0);
     }
 
     if (context.signer) {
@@ -26,11 +41,14 @@ export class Web3Module implements IClientWeb3Core {
     }
 
     if (context.daoFactoryAddress) {
-      this._daoFactoryAddress = context.daoFactoryAddress;
+      Web3ModuleMap.set(Keys.DaoFactoryAddress, context.daoFactoryAddress);
     }
 
     if (context.gasFeeEstimationFactor) {
-      this._gasFeeEstimationFactor = context.gasFeeEstimationFactor;
+      Web3ModuleMap.set(
+        Keys.GasFeeEstimationFactor,
+        context.gasFeeEstimationFactor,
+      );
     }
     Object.freeze(Web3Module.prototype);
   }
@@ -40,23 +58,24 @@ export class Web3Module implements IClientWeb3Core {
     if (!signer) {
       throw new Error("Empty wallet or signer");
     }
-    this._signer = signer;
+    Web3ModuleMap.set(Keys.Signer, signer);
   }
 
   /** Starts using the next available Web3 provider */
   public shiftProvider(): void {
-    if (!this._web3Providers.length) {
+    const web3Providers = Web3ModuleMap.get(Keys.Web3Providers);
+    const web3Idx = Web3ModuleMap.get(Keys.Web3Providers);
+    if (web3Providers.length) {
       throw new Error("No endpoints");
-    } else if (this._web3Providers.length <= 1) {
+    } else if (web3Providers.length <= 1) {
       throw new Error("No other endpoints");
     }
-
-    this._web3Idx = (this._web3Idx + 1) % this._web3Providers.length;
+    Web3ModuleMap.set(Keys.Web3Idx, (web3Idx + 1) % web3Providers.length);
   }
 
   /** Retrieves the current signer */
   public getSigner(): Signer | null {
-    return this._signer || null;
+    return Web3ModuleMap.get(Keys.Signer) || null;
   }
 
   /** Returns a signer connected to the current network provider */
@@ -79,7 +98,9 @@ export class Web3Module implements IClientWeb3Core {
 
   /** Returns the currently active network provider */
   public getProvider(): JsonRpcProvider | null {
-    return this._web3Providers[this._web3Idx] || null;
+    return Web3ModuleMap.get(
+      Keys.Web3Providers,
+    )[Web3ModuleMap.get(Keys.Web3Idx)] || null;
   }
 
   /** Returns whether the current provider is functional or not */
@@ -94,11 +115,12 @@ export class Web3Module implements IClientWeb3Core {
   }
 
   public async ensureOnline(): Promise<void> {
-    if (!this._web3Providers?.length) {
+    const web3Providers = Web3ModuleMap.get(Keys.Web3Providers);
+    if (web3Providers?.length) {
       return Promise.reject(new Error("No provider"));
     }
 
-    for (let i = 0; i < this._web3Providers?.length; i++) {
+    for (let i = 0; i < web3Providers?.length; i++) {
       if (await this.isUp()) return;
 
       this.shiftProvider();
@@ -156,7 +178,7 @@ export class Web3Module implements IClientWeb3Core {
       .then((maxFeePerGas) => {
         const max = estimatedFee * maxFeePerGas;
 
-        const factor = this._gasFeeEstimationFactor *
+        const factor = Web3ModuleMap.get(Keys.GasFeeEstimationFactor) *
           Web3Module.PRECISION_FACTOR_BASE;
 
         const average = (max * BigInt(Math.trunc(factor))) /
@@ -168,6 +190,6 @@ export class Web3Module implements IClientWeb3Core {
 
   /** Returns the current DAO factory address */
   public getDaoFactoryAddress(): string {
-    return this._daoFactoryAddress;
+    return Web3ModuleMap.get(Keys.DaoFactoryAddress);
   }
 }

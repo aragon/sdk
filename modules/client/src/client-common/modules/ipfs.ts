@@ -3,49 +3,62 @@ import { Context } from "../../client-common/context";
 import { IClientIpfsCore } from "../interfaces/core";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 
+enum Keys {
+  IPFS,
+  IPFSIdx,
+}
+const IPFSModuleMap = new Map<Keys, any>([
+  [Keys.IPFS, [] as IpfsClient[]],
+  [Keys.IPFSIdx, -1],
+]);
 export class IPFSModule implements IClientIpfsCore {
-  private _ipfs: IpfsClient[] = [];
-  private _ipfsIdx: number = -1;
-
   constructor(context: Context) {
     if (context.ipfs?.length) {
-      this._ipfs = context.ipfs;
-      this._ipfsIdx = Math.floor(Random.getFloat() * context.ipfs.length);
-      Object.freeze(IPFSModule.prototype);
+      IPFSModuleMap.set(Keys.IPFS, context.ipfs);
+      IPFSModuleMap.set(
+        Keys.IPFSIdx,
+        Math.floor(Random.getFloat() * context.ipfs.length),
+      );
     }
+    Object.freeze(IPFSModule.prototype);
   }
 
   public getClient(): IpfsClient {
-    if (!this._ipfs[this._ipfsIdx]) {
+    const ipfs = IPFSModuleMap.get(Keys.IPFS);
+    const ipfsIdx = IPFSModuleMap.get(Keys.IPFSIdx);
+    if (!ipfs[ipfsIdx]) {
       throw new Error("No IPFS endpoints available");
     }
-    return this._ipfs[this._ipfsIdx];
+    return ipfs[ipfsIdx];
   }
 
   /**
    * Starts using the next available IPFS endpoint
    */
   public shiftClient(): void {
-    if (!this._ipfs?.length) {
+    const ipfs = IPFSModuleMap.get(Keys.IPFS);
+    const ipfsIdx = IPFSModuleMap.get(Keys.IPFSIdx);
+    if (!ipfs?.length) {
       throw new Error("No IPFS endpoints available");
-    } else if (this._ipfs?.length < 2) {
+    } else if (ipfs?.length < 2) {
       throw new Error("No other endpoints");
     }
-    this._ipfsIdx = (this._ipfsIdx + 1) % this._ipfs?.length;
+    IPFSModuleMap.set(Keys.IPFSIdx, (ipfsIdx + 1) % ipfs?.length);
   }
 
   /** Returns `true` if the current client is on line */
   public isUp(): Promise<boolean> {
-    if (!this._ipfs?.length) return Promise.resolve(false);
+    if (!IPFSModuleMap.get(Keys.IPFS)?.length) return Promise.resolve(false);
     return this.getClient().nodeInfo().then(() => true).catch(() => false);
   }
 
   public async ensureOnline(): Promise<void> {
-    if (!this._ipfs?.length) {
+    const ipfs = IPFSModuleMap.get(Keys.IPFS);
+    if (!ipfs?.length) {
       return Promise.reject(new Error("IPFS client is not initialized"));
     }
 
-    for (let i = 0; i < this._ipfs?.length; i++) {
+    for (let i = 0; i < ipfs?.length; i++) {
       if (await this.isUp()) return;
 
       this.shiftClient();
