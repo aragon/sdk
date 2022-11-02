@@ -13,9 +13,6 @@ on:
   push:
     branches-ignore:
       - develop
-    paths:
-      - './**'
-      - '.github/workflows/javascript_*'
 
 jobs:
   build-js:
