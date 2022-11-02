@@ -6,34 +6,19 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { GasFeeEstimation } from "../../client-common/interfaces/common";
 import { IClientWeb3Core } from "../interfaces/core";
 
-enum Keys {
-  DaoFactoryAddress,
-  GasFeeEstimationFactor,
-  Web3Providers,
-  Web3Idx,
-  Signer,
-}
-const Web3ModuleMap = new Map<Keys, any>([
-  [Keys.DaoFactoryAddress, ""],
-  [Keys.GasFeeEstimationFactor, 1],
-  [Keys.Web3Providers, [] as JsonRpcProvider[]],
-  [Keys.GasFeeEstimationFactor, 1],
-  [Keys.Web3Idx, -1],
-  [Keys.Signer, undefined],
-]);
+const DaoFactoryAddressMap = new Map<Web3Module, string>();
+const GasFeeEstimationFactorMap = new Map<Web3Module, number>();
+const Web3ProvidersMap = new Map<Web3Module, JsonRpcProvider[]>();
+const Web3IdxMap = new Map<Web3Module, number>();
+const SignerMap = new Map<Web3Module, Signer>();
+
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
 
-  // private _daoFactoryAddress = "";
-  // private _gasFeeEstimationFactor = 1;
-  // private _web3Providers: JsonRpcProvider[] = [];
-  // private _web3Idx = -1;
-  // private _signer: Signer | undefined;
-
   constructor(context: Context) {
     if (context.web3Providers) {
-      Web3ModuleMap.set(Keys.Web3Providers, context.web3Providers);
-      Web3ModuleMap.set(Keys.Web3Idx, 0);
+      Web3ProvidersMap.set(this, context.web3Providers);
+      Web3IdxMap.set(this, 0);
     }
 
     if (context.signer) {
@@ -41,16 +26,34 @@ export class Web3Module implements IClientWeb3Core {
     }
 
     if (context.daoFactoryAddress) {
-      Web3ModuleMap.set(Keys.DaoFactoryAddress, context.daoFactoryAddress);
+      DaoFactoryAddressMap.set(this, context.daoFactoryAddress);
     }
 
     if (context.gasFeeEstimationFactor) {
-      Web3ModuleMap.set(
-        Keys.GasFeeEstimationFactor,
-        context.gasFeeEstimationFactor,
-      );
+      GasFeeEstimationFactorMap.set(this, context.gasFeeEstimationFactor);
     }
     Object.freeze(Web3Module.prototype);
+    Object.freeze(this);
+  }
+
+  get daoFactoryAddress(): string {
+    return DaoFactoryAddressMap.get(this) || "";
+  }
+  get gasFeeEstimationFactor(): number {
+    return GasFeeEstimationFactorMap.get(this) || 1;
+  }
+  get web3Providers(): JsonRpcProvider[] {
+    return Web3ProvidersMap.get(this) || [];
+  }
+  get web3Idx(): number {
+    const idx = Web3IdxMap.get(this);
+    if (idx === undefined) {
+      return -1;
+    }
+    return idx;
+  }
+  get signer(): Signer | undefined {
+    return SignerMap.get(this);
   }
 
   /** Replaces the current signer by the given one */
@@ -58,24 +61,22 @@ export class Web3Module implements IClientWeb3Core {
     if (!signer) {
       throw new Error("Empty wallet or signer");
     }
-    Web3ModuleMap.set(Keys.Signer, signer);
+    SignerMap.set(this, signer);
   }
 
   /** Starts using the next available Web3 provider */
   public shiftProvider(): void {
-    const web3Providers = Web3ModuleMap.get(Keys.Web3Providers);
-    const web3Idx = Web3ModuleMap.get(Keys.Web3Providers);
-    if (web3Providers.length) {
+    if (!this.web3Providers.length) {
       throw new Error("No endpoints");
-    } else if (web3Providers.length <= 1) {
+    } else if (this.web3Providers.length <= 1) {
       throw new Error("No other endpoints");
     }
-    Web3ModuleMap.set(Keys.Web3Idx, (web3Idx + 1) % web3Providers.length);
+    Web3IdxMap.set(this, (this.web3Idx + 1) % this.web3Providers.length);
   }
 
   /** Retrieves the current signer */
   public getSigner(): Signer | null {
-    return Web3ModuleMap.get(Keys.Signer) || null;
+    return this.signer || null;
   }
 
   /** Returns a signer connected to the current network provider */
@@ -98,9 +99,7 @@ export class Web3Module implements IClientWeb3Core {
 
   /** Returns the currently active network provider */
   public getProvider(): JsonRpcProvider | null {
-    return Web3ModuleMap.get(
-      Keys.Web3Providers,
-    )[Web3ModuleMap.get(Keys.Web3Idx)] || null;
+    return this.web3Providers[this.web3Idx] || null;
   }
 
   /** Returns whether the current provider is functional or not */
@@ -115,12 +114,11 @@ export class Web3Module implements IClientWeb3Core {
   }
 
   public async ensureOnline(): Promise<void> {
-    const web3Providers = Web3ModuleMap.get(Keys.Web3Providers);
-    if (web3Providers?.length) {
+    if (!this.web3Providers.length) {
       return Promise.reject(new Error("No provider"));
     }
 
-    for (let i = 0; i < web3Providers?.length; i++) {
+    for (let i = 0; i < this.web3Providers.length; i++) {
       if (await this.isUp()) return;
 
       this.shiftProvider();
@@ -178,7 +176,7 @@ export class Web3Module implements IClientWeb3Core {
       .then((maxFeePerGas) => {
         const max = estimatedFee * maxFeePerGas;
 
-        const factor = Web3ModuleMap.get(Keys.GasFeeEstimationFactor) *
+        const factor = this.gasFeeEstimationFactor *
           Web3Module.PRECISION_FACTOR_BASE;
 
         const average = (max * BigInt(Math.trunc(factor))) /
@@ -190,6 +188,6 @@ export class Web3Module implements IClientWeb3Core {
 
   /** Returns the current DAO factory address */
   public getDaoFactoryAddress(): string {
-    return Web3ModuleMap.get(Keys.DaoFactoryAddress);
+    return this.daoFactoryAddress;
   }
 }
