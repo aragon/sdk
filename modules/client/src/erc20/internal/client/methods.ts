@@ -45,7 +45,9 @@ import {
   QueryToken,
 } from "../graphql-queries";
 import { toErc20Proposal, toErc20ProposalListItem } from "../utils";
-
+/**
+ * Methods module the SDK ERC20 Client
+ */
 export class ClientErc20Methods extends ClientCore
   implements IClientErc20Methods {
   constructor(context: ContextPlugin) {

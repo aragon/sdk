@@ -43,6 +43,9 @@ import {
 import { toAddressListProposal, toAddressListProposalListItem } from "../utils";
 import { QueryAddressListPluginSettings } from "../graphql-queries/settings";
 
+/**
+ * Methods module the SDK Address List Client
+ */
 export class ClientAddressListMethods extends ClientCore
   implements IClientAddressListMethods {
   constructor(context: ContextPlugin) {

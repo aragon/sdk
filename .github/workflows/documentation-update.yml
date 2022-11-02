@@ -21,8 +21,12 @@ jobs:
           node-version: 16
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Generate Docs (Javascript)
+      - name: Generate Client Docs (Javascript)
         run: yarn run docs:client
+      - name: Generate Erc20 Client Docs (Javascript)
+        run: yarn run docs:erc20
+      - name: Generate Address List Client Docs (Javascript)
+        run: yarn run docs:addressList
       - name: Get short commit hash
         id: hash
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"

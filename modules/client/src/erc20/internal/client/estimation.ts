@@ -8,7 +8,9 @@ import {
   IVoteProposalParams,
 } from "../../../client-common";
 import { IClientErc20Estimation } from "../../interfaces";
-
+/**
+ * Estimation module the SDK ERC20 Client
+ */
 export class ClientErc20Estimation extends ClientCore
   implements IClientErc20Estimation {
   constructor(context: ContextPlugin) {

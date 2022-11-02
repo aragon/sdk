@@ -19,7 +19,9 @@ import {
   IERC20MintableUpgradeable__factory,
 } from "@aragon/core-contracts-ethers";
 import { erc20InitParamsToContract, mintTokenParamsToContract } from "../utils";
-
+/**
+ * Encoding module the SDK ERC20 Client
+ */
 export class ClientErc20Encoding extends ClientCore
   implements IClientErc20Encoding {
   constructor(context: ContextPlugin) {

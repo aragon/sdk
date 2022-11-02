@@ -21,7 +21,9 @@
     "lint": "tsdx lint modules/*/src",
     "build": "yarn turbo run build",
     "test": "TESTING=true tsdx test --verbose --runInBand",
-    "docs:client": "jsdoc2md --files ./modules/client/src/*.ts --configure ./jsdoc2md.json > ./docs/client.md"
+    "docs:client": "jsdoc2md --files ./modules/client/src/*.ts ./modules/client/src/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/client.md",
+    "docs:addressList": "jsdoc2md --files ./modules/client/src/addressList/*.ts ./modules/client/src/addressList/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/addressList.md",
+    "docs:erc20": "jsdoc2md --files ./modules/client/src/erc20/*.ts ./modules/client/src/erc20/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/erc20.md"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.18.6",

@@ -12,6 +12,9 @@ import { IClientErc20Decoding, IMintTokenParams } from "../../interfaces";
 import { IERC20MintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
 import { mintTokenParamsFromContract } from "../utils";
 
+/**
+ * Decoding module the SDK ERC20 Client
+ */
 export class ClientErc20Decoding extends ClientCore
   implements IClientErc20Decoding {
   constructor(context: ContextPlugin) {
