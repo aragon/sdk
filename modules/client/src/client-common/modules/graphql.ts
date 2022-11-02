@@ -4,14 +4,14 @@ import { Context } from "../../client-common/context";
 import { QueryStatus } from "../graphql-queries";
 import { IClientGraphQLCore } from "../interfaces/core";
 
-const GraphqlMap = new Map<GraphqlModule, GraphQLClient[]>();
-const GraphqlIdxMap = new Map<GraphqlModule, number>();
+const clientsMap = new Map<GraphqlModule, GraphQLClient[]>();
+const clientsIdxMap = new Map<GraphqlModule, number>();
 
 export class GraphqlModule implements IClientGraphQLCore {
   constructor(context: Context) {
     if (context.graphql?.length) {
-      GraphqlMap.set(this, context.graphql);
-      GraphqlIdxMap.set(
+      clientsMap.set(this, context.graphql);
+      clientsIdxMap.set(
         this,
         Math.floor(Random.getFloat() * context.graphql.length),
       );
@@ -20,11 +20,11 @@ export class GraphqlModule implements IClientGraphQLCore {
     Object.freeze(this);
   }
 
-  get graphql(): GraphQLClient[] {
-    return GraphqlMap.get(this) || [];
+  private get clients(): GraphQLClient[] {
+    return clientsMap.get(this) || [];
   }
-  get graphqlIdx(): number {
-    const idx = GraphqlIdxMap.get(this);
+  private get clientIdx(): number {
+    const idx = clientsIdxMap.get(this);
     if (idx === undefined) {
       return -1;
     }
@@ -36,10 +36,10 @@ export class GraphqlModule implements IClientGraphQLCore {
    * @returns {GraphQLClient}
    */
   public getClient(): GraphQLClient {
-    if (!this.graphql.length) {
+    if (!this.clients.length) {
       throw new Error("No graphql endpoints available");
     }
-    return this.graphql[this.graphqlIdx];
+    return this.clients[this.clientIdx];
   }
 
   /**
@@ -47,12 +47,12 @@ export class GraphqlModule implements IClientGraphQLCore {
    * @returns {void}
    */
   public shiftClient(): void {
-    if (!this.graphql.length) {
+    if (!this.clients.length) {
       throw new Error("No graphql endpoints available");
-    } else if (this.graphql.length < 2) {
+    } else if (this.clients.length < 2) {
       throw new Error("No other endpoints");
     }
-    GraphqlIdxMap.set(this, (this.graphqlIdx + 1) % this.graphql.length);
+    clientsIdxMap.set(this, (this.clientIdx + 1) % this.clients.length);
   }
 
   /**
@@ -78,11 +78,11 @@ export class GraphqlModule implements IClientGraphQLCore {
    * @returns {Promise<void>}
    */
   public async ensureOnline(): Promise<void> {
-    if (!this.graphql.length) {
+    if (!this.clients.length) {
       return Promise.reject(new Error("graphql client is not initialized"));
     }
 
-    for (let i = 0; i < this.graphql.length; i++) {
+    for (let i = 0; i < this.clients.length; i++) {
       if (await this.isUp()) return;
 
       this.shiftClient();

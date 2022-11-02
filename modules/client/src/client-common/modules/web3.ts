@@ -6,19 +6,19 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { GasFeeEstimation } from "../../client-common/interfaces/common";
 import { IClientWeb3Core } from "../interfaces/core";
 
-const DaoFactoryAddressMap = new Map<Web3Module, string>();
-const GasFeeEstimationFactorMap = new Map<Web3Module, number>();
-const Web3ProvidersMap = new Map<Web3Module, JsonRpcProvider[]>();
-const Web3IdxMap = new Map<Web3Module, number>();
-const SignerMap = new Map<Web3Module, Signer>();
+const daoFactoryAddressMap = new Map<Web3Module, string>();
+const gasFeeEstimationFactorMap = new Map<Web3Module, number>();
+const providersMap = new Map<Web3Module, JsonRpcProvider[]>();
+const providersIdxMap = new Map<Web3Module, number>();
+const signerMap = new Map<Web3Module, Signer>();
 
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
 
   constructor(context: Context) {
     if (context.web3Providers) {
-      Web3ProvidersMap.set(this, context.web3Providers);
-      Web3IdxMap.set(this, 0);
+      providersMap.set(this, context.web3Providers);
+      providersIdxMap.set(this, 0);
     }
 
     if (context.signer) {
@@ -26,34 +26,34 @@ export class Web3Module implements IClientWeb3Core {
     }
 
     if (context.daoFactoryAddress) {
-      DaoFactoryAddressMap.set(this, context.daoFactoryAddress);
+      daoFactoryAddressMap.set(this, context.daoFactoryAddress);
     }
 
     if (context.gasFeeEstimationFactor) {
-      GasFeeEstimationFactorMap.set(this, context.gasFeeEstimationFactor);
+      gasFeeEstimationFactorMap.set(this, context.gasFeeEstimationFactor);
     }
     Object.freeze(Web3Module.prototype);
     Object.freeze(this);
   }
 
-  get daoFactoryAddress(): string {
-    return DaoFactoryAddressMap.get(this) || "";
+  private get daoFactoryAddress(): string {
+    return daoFactoryAddressMap.get(this) || "";
   }
-  get gasFeeEstimationFactor(): number {
-    return GasFeeEstimationFactorMap.get(this) || 1;
+  private get gasFeeEstimationFactor(): number {
+    return gasFeeEstimationFactorMap.get(this) || 1;
   }
-  get web3Providers(): JsonRpcProvider[] {
-    return Web3ProvidersMap.get(this) || [];
+  private get web3Providers(): JsonRpcProvider[] {
+    return providersMap.get(this) || [];
   }
-  get web3Idx(): number {
-    const idx = Web3IdxMap.get(this);
+  private get web3Idx(): number {
+    const idx = providersIdxMap.get(this);
     if (idx === undefined) {
       return -1;
     }
     return idx;
   }
-  get signer(): Signer | undefined {
-    return SignerMap.get(this);
+  private get signer(): Signer | undefined {
+    return signerMap.get(this);
   }
 
   /** Replaces the current signer by the given one */
@@ -61,7 +61,7 @@ export class Web3Module implements IClientWeb3Core {
     if (!signer) {
       throw new Error("Empty wallet or signer");
     }
-    SignerMap.set(this, signer);
+    signerMap.set(this, signer);
   }
 
   /** Starts using the next available Web3 provider */
@@ -71,7 +71,7 @@ export class Web3Module implements IClientWeb3Core {
     } else if (this.web3Providers.length <= 1) {
       throw new Error("No other endpoints");
     }
-    Web3IdxMap.set(this, (this.web3Idx + 1) % this.web3Providers.length);
+    providersIdxMap.set(this, (this.web3Idx + 1) % this.web3Providers.length);
   }
 
   /** Retrieves the current signer */
