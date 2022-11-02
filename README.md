@@ -1,9 +1,25 @@
-# Aragon SDK
+# Aragon JS SDK
 
-This repository contains the Softward Development Kit to interact with the Aragon protocol.
+This folder contains all the JS packages available on NPM:
 
-It currently provides support for:
-- [JavaScript - TypeScript](./javascript)
+- [Client](./modules/client)
+- [IPFS](./modules/ipfs)
+- [Common](./modules/common)
+
+## Available scripts
+
+- `yarn build`
+  - Compiles all the modules, respecting their internal dependencies
+- `yarn clean`
+  - Removes the existing artifacts
+- `yarn lint`
+  - Checks the current code for inconsistencies
+- `yarn test`
+  - Runs the test suite on all modules
+
+## Development
+
+Run `yarn build` to compile the individual packages. Run `yarn test` on them.
 
 ## Automatic publishing
 
@@ -12,9 +28,9 @@ It currently provides support for:
 To automatically publish the new version on pull request merge, the relevant labels:
 | Label Name | Component getting published | NPM package name |
 | --- | --- | --- |
-| client-release | `javascript/modules/client/` | `@aragon/sdk-client` |
-| ipfs-release | `javascript/modules/ipfs/` | `@aragon/sdk-ipfs` |
-| common-release | `javascript/modules/common/` | `@aragon/sdk-common` |
+| client-release | `modules/client/` | `@aragon/sdk-client` |
+| ipfs-release | `modules/ipfs/` | `@aragon/sdk-ipfs` |
+| common-release | `modules/common/` | `@aragon/sdk-common` |
 
 ### With tags
 

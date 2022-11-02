@@ -14,12 +14,12 @@ on:
     branches-ignore:
       - develop
     paths:
-      - 'javascript/**'
+      - './**'
       - '.github/workflows/javascript_*'
 
 defaults:
   run:
-    working-directory: './javascript'
+    working-directory: './'
 
 jobs:
   build-js:

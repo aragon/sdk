@@ -48,7 +48,7 @@ jobs:
         run: | 
           VERSION=$(cat package.json | jq -r .version)
           echo "::set-output name=version::$VERSION"
-        working-directory: 'javascript/modules/${{ matrix.package }}'
+        working-directory: './modules/${{ matrix.package }}'
       - name: create tag
         uses: actions/github-script@v5
         with:

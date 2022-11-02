@@ -21,10 +21,10 @@ jobs:
           node-version: 16
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-        working-directory: javascript/
+        working-directory: ./
       - name: Generate Docs (Javascript)
         run: yarn run docs:client
-        working-directory: javascript/
+        working-directory: ./
       - name: Get short commit hash
         id: hash
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
@@ -35,8 +35,8 @@ jobs:
           git pull
           git config --global user.name "Arabot-1"
           git config --global user.email "arabot-1@users.noreply.github.com"
-          git add -A javascript/docs/
-          if [ $(git diff-index HEAD javascript/docs | wc -l) -gt 0 ]; then
+          git add -A ./docs/
+          if [ $(git diff-index HEAD ./docs | wc -l) -gt 0 ]; then
             git commit -am "Updates docs from commit $SHA_SHORT"
             git push
           fi
@@ -52,7 +52,7 @@ jobs:
       - name: Copy docs (Javascript)
         run: |
           mkdir -p $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
-          cp -R javascript/docs/* $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
+          cp -R ./docs/* $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:

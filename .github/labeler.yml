@@ -1,15 +1,15 @@
 javascript:
-- javascript/**/*
-- javascript/*
+- ./**/*
+- ./*
 
 javascript-common:
-- javascript/modules/common/**/*
-- javascript/modules/common/*
+- ./modules/common/**/*
+- ./modules/common/*
 
 javascript-client:
-- javascript/modules/client/**/*
-- javascript/modules/client/*
+- ./modules/client/**/*
+- ./modules/client/*
 
 javascript-ipfs:
-- javascript/modules/ipfs/**/*
-- javascript/modules/ipfs/*
+- ./modules/ipfs/**/*
+- ./modules/ipfs/*
