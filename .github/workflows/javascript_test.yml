@@ -17,10 +17,6 @@ on:
       - './**'
       - '.github/workflows/javascript_*'
 
-defaults:
-  run:
-    working-directory: './'
-
 jobs:
   build-js:
     if: ${{ github.actor != 'arabot-1' || inputs.run }}
