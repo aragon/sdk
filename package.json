@@ -20,7 +20,7 @@
     "clean": "rm -Rf node_modules ./modules/*/node_modules ./modules/*/dist",
     "lint": "tsdx lint modules/*/src",
     "build": "yarn turbo run build",
-    "test": "TESTING=true tsdx test --verbose",
+    "test": "TESTING=true tsdx test --verbose --runInBand",
     "docs:client": "jsdoc2md --files ./modules/client/src/*.ts --configure ./jsdoc2md.json > ./docs/client.md"
   },
   "devDependencies": {
