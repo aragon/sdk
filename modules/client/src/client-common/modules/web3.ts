@@ -16,6 +16,7 @@ export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
 
   constructor(context: Context) {
+    // Storing client data in the private module's scope to prevent external mutation
     if (context.web3Providers) {
       providersMap.set(this, context.web3Providers);
       providersIdxMap.set(this, 0);

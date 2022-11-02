@@ -9,6 +9,7 @@ const clientsIdxMap = new Map<GraphqlModule, number>();
 
 export class GraphqlModule implements IClientGraphQLCore {
   constructor(context: Context) {
+    // Storing client data in the private module's scope to prevent external mutation
     if (context.graphql?.length) {
       clientsMap.set(this, context.graphql);
       clientsIdxMap.set(
