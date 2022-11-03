@@ -10,6 +10,7 @@ import {
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { IClientAddressListDecoding } from "../../interfaces";
 import { WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
+
 /**
  * Decoding module the SDK Address List Client
  */
