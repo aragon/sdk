@@ -19,6 +19,9 @@ import {
 import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";
 
+/**
+ * Estimation module the SDK Generic Client
+ */
 export class ClientEstimation extends ClientCore implements IClientEstimation {
   constructor(context: Context) {
     super(context);

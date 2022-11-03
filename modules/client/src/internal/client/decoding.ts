@@ -17,6 +17,9 @@ import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { freezeParamsFromContract, permissionParamsFromContract, withdrawParamsFromContract } from "../utils";
 
+/**
+ * Decoding module the SDK Generic Client
+ */
 export class ClientDecoding extends ClientCore implements IClientDecoding {
   constructor(context: Context) {
     super(context);

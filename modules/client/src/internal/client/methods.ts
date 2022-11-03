@@ -57,6 +57,9 @@ import {
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
 
+/**
+ * Methods module the SDK Generic Client
+ */
 export class ClientMethods extends ClientCore implements IClientMethods {
   constructor(context: Context) {
     super(context);

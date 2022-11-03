@@ -16,6 +16,9 @@ import {
 import { WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
 import { addressListInitParamsToContract } from "../utils";
 
+/**
+ * Encoding module for the SDK AddressList Client
+ */
 export class ClientAddressListEncoding extends ClientCore
   implements IClientAddressListEncoding {
   constructor(context: ContextPlugin) {

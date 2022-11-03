@@ -16,6 +16,9 @@ import {
   withdrawParamsToContract,
 } from "../utils";
 
+/**
+ * Encoding module the SDK Generic Client
+ */
 export class ClientEncoding extends ClientCore implements IClientEncoding {
   constructor(context: Context) {
     super(context);

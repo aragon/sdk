@@ -9,6 +9,9 @@ import {
 } from "../../../client-common";
 import { IClientAddressListEstimation } from "../../interfaces";
 
+/**
+ * Estimation module the SDK Address List Client
+ */
 export class ClientAddressListEstimation extends ClientCore
   implements IClientAddressListEstimation {
   constructor(context: ContextPlugin) {
