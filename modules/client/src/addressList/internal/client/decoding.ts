@@ -12,7 +12,7 @@ import { IClientAddressListDecoding } from "../../interfaces";
 import { WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
 
 /**
- * Decoding module the SDK Address List Client
+ * Decoding module for the SDK AddressList Client
  */
 export class ClientAddressListDecoding extends ClientCore
   implements IClientAddressListDecoding {
