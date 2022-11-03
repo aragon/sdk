@@ -4,9 +4,9 @@
 <dt><a href="#ClientAddressList">ClientAddressList</a></dt>
 <dd><p>Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO</p></dd>
 <dt><a href="#ClientAddressListDecoding">ClientAddressListDecoding</a></dt>
-<dd><p>Decoding module the SDK Address List Client</p></dd>
+<dd><p>Decoding module for the SDK AddressList Client</p></dd>
 <dt><a href="#ClientAddressListEncoding">ClientAddressListEncoding</a></dt>
-<dd><p>Encoding module the SDK Address List Client</p></dd>
+<dd><p>Encoding module for the SDK AddressList Client</p></dd>
 <dt><a href="#ClientAddressListEstimation">ClientAddressListEstimation</a></dt>
 <dd><p>Estimation module the SDK Address List Client</p></dd>
 <dt><a href="#ClientAddressListMethods">ClientAddressListMethods</a></dt>
@@ -35,7 +35,7 @@ so that the plugin is configured</p>
 <a name="ClientAddressListDecoding"></a>
 
 ## ClientAddressListDecoding
-<p>Decoding module the SDK Address List Client</p>
+<p>Decoding module for the SDK AddressList Client</p>
 
 **Kind**: global class  
 
@@ -96,7 +96,7 @@ so that the plugin is configured</p>
 <a name="ClientAddressListEncoding"></a>
 
 ## ClientAddressListEncoding
-<p>Encoding module the SDK Address List Client</p>
+<p>Encoding module for the SDK AddressList Client</p>
 
 **Kind**: global class  
 
