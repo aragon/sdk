@@ -13,7 +13,7 @@ import {
   IAddressListPluginInstall,
   IClientAddressListEncoding,
 } from "../../interfaces";
-import { WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 import { addressListInitParamsToContract } from "../utils";
 
 /**
@@ -38,7 +38,7 @@ export class ClientAddressListEncoding extends ClientCore
   static getPluginInstallItem(
     params: IAddressListPluginInstall,
   ): IPluginInstallItem {
-    const addressListVotingInterface = WhitelistVoting__factory.createInterface();
+    const addressListVotingInterface = AllowlistVoting__factory.createInterface();
     const args = addressListInitParamsToContract(params);
     // get hex bytes
     const hexBytes = addressListVotingInterface.encodeFunctionData(
@@ -95,11 +95,11 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = WhitelistVoting__factory.createInterface();
+    const votingInterface = AllowlistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
       // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addWhitelistedUsers",
+      "addAllowedUsers",
       [members],
     );
     const data = hexToBytes(strip0x(hexBytes));
@@ -129,11 +129,11 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = WhitelistVoting__factory.createInterface();
+    const votingInterface = AllowlistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
       // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeWhitelistedUsers",
+      "removeAllowedUsers",
       [members],
     );
     const data = hexToBytes(strip0x(hexBytes));

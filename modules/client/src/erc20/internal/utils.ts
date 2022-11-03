@@ -182,7 +182,6 @@ export function erc20InitParamsToContract(
   }
   return [
     AddressZero,
-    AddressZero,
     BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
     BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
     BigNumber.from(params.settings.minDuration),

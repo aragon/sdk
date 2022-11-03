@@ -110,12 +110,11 @@ export type SubgraphAddressListProposal = SubgraphProposalBase & {
 };
 
 export type ContractAddressListInitParams = [
-  string,
-  string,
-  BigNumber,
-  BigNumber,
-  BigNumber,
-  string[],
+  string, // dao Address
+  BigNumber, // min participation
+  BigNumber, // min support
+  BigNumber, // min duration
+  string[], // addresses
 ];
 
 export type IAddressListPluginInstall = {

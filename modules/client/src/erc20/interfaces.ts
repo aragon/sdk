@@ -156,10 +156,9 @@ export interface IMintTokenParams {
 
 export type ContractMintTokenParams = [string, BigNumber];
 export type ContractErc20InitParams = [
-  string,
-  string,
-  BigNumber,
-  BigNumber,
-  BigNumber,
-  string,
+  string, // dao address
+  BigNumber, // participation
+  BigNumber, // support
+  BigNumber, // duration
+  string, // token address
 ];
