@@ -1,4 +1,4 @@
-import ganache, {Server} from "ganache";
+import ganache, { Server } from "ganache";
 
 export let server: Server;
 
@@ -9,6 +9,7 @@ export async function start() {
     },
     miner: {
       blockGasLimit: 80000000,
+      defaultGasPrice: 8000000000,
     },
     logging: {
       quiet: true,

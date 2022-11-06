@@ -13,8 +13,8 @@ describe("Client", () => {
   describe("Estimation module", () => {
     beforeAll(async () => {
       const server = await ganacheSetup.start();
-      const daoFactory = await deployContracts.deploy(server);
-      contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
+      const deployment = await deployContracts.deploy(server);
+      contextParamsLocalChain.daoFactoryAddress = deployment.dao.address;
     });
 
     afterAll(async () => {

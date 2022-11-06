@@ -6,12 +6,13 @@ import {
   GraphQLError,
   InvalidAddressOrEnsError,
   NoProviderError,
+  NoSignerError,
 } from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
-import { ContractReceipt } from "ethers";
+import { ContractReceipt } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryBalances,
@@ -45,7 +46,6 @@ import {
   ClientCore,
   Context,
   DaoRole,
-  delay,
   SortDirection,
 } from "../../client-common";
 import {
@@ -78,9 +78,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): AsyncGenerator<DaoCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
     const daoFactoryInstance = DAOFactory__factory.connect(
@@ -96,22 +96,65 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       throw new Error("Could not pin the metadata on IPFS");
     }
 
-    // @ts-ignore  TODO: Remove this comment when used
-    const registryAddress = await daoFactoryInstance.registry();
+    const tx = await daoFactoryInstance.createDao(
+      {
+        name: params.ensSubdomain,
+        metadata: cid,
+        trustedForwarder: "",
+      },
+      [],
+      // params.plugins.map((plugin) => {
+      //   return {
+      //     data: plugin.data,
+      //     pluginSetup: plugin.id,
+      //     pluginSetupRepo: plugin.id,
+      //   };
+      // }),
+      // overrides
+      {
+        from: signer.getAddress(),
+      },
+    );
 
-    // TODO: Remove mock result
-    await delay(1000);
     yield {
       key: DaoCreationSteps.CREATING,
-      txHash:
-        "0x1298376517236498176239851762938512359817623985761239486128937461",
+      txHash: tx.hash,
     };
+    // get dao registry address
+    const daoRegistryAddress = await daoFactoryInstance.daoRegistry();
+    // start tx
+    const receipt = await tx.wait();
+    // find dao address using the dao registry address
+    const newDaoAddress = receipt.events?.find(
+      (e) => e.address === daoRegistryAddress,
+    )?.topics[1];
 
-    await delay(3000);
+    if (!newDaoAddress) {
+      // throw new CannotCreateDaoError()
+      throw new Error("oopsie");
+    }
+
     yield {
       key: DaoCreationSteps.DONE,
-      address: "0x6592568247592378465987126349817263958713",
+      address: "0x" + newDaoAddress.slice(newDaoAddress.length - 40),
     };
+
+    // // @ts-ignore  TODO: Remove this comment when used
+    // const registryAddress = await daoFactoryInstance.registry();
+
+    // // TODO: Remove mock result
+    // await delay(1000);
+    // yield {
+    //   key: DaoCreationSteps.CREATING,
+    //   txHash:
+    //     "0x1298376517236498176239851762938512359817623985761239486128937461",
+    // };
+
+    // await delay(3000);
+    // yield {
+    //   key: DaoCreationSteps.DONE,
+    //   address: "0x6592568247592378465987126349817263958713",
+    // };
 
     // TODO: Uncomment when the new DAO factory is available
 
