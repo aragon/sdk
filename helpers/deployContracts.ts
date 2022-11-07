@@ -1,5 +1,5 @@
 import * as aragonContracts from "@aragon/core-contracts-ethers";
-import {ethers, Signer, BigNumberish, Contract, ContractFactory} from "ethers";
+import {ethers, Signer, BigNumberish, Contract} from "ethers";
 
 import ENSRegistry from "@ensdomains/ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json";
 import PublicResolver from "@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json";

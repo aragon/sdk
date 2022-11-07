@@ -32,7 +32,7 @@ describe("Client ERC20", () => {
       );
 
       expect(typeof erc20InstallPluginItem).toBe("object");
-      expect(erc20InstallPluginItem.data).toBeInstanceOf(Uint8Array);
+      expect(typeof erc20InstallPluginItem.data).toBe("string");
     });
     it("Should encode an update plugin settings action and fail with an invalid address", async () => {
       const ctx = new Context(contextParamsLocalChain);
