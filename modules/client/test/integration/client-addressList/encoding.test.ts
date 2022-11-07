@@ -34,7 +34,7 @@ describe("Client Address List", () => {
 
       expect(typeof installPluginItemItem).toBe("object");
       // what does this should be
-      expect(installPluginItemItem.data).toBeInstanceOf(Uint8Array);
+      expect(typeof installPluginItemItem.data).toBe("string");
     });
 
     it("Should create an AddressList client and fail to generate a plugin config action with an invalid address", async () => {

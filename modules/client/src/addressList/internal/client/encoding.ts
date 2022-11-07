@@ -45,11 +45,9 @@ export class ClientAddressListEncoding extends ClientCore
       "initialize",
       args,
     );
-    // Strip 0x => encode in Uint8Array
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: ADDRESSLIST_PLUGIN_ID,
-      data,
+      data: hexBytes,
     };
   }
 
