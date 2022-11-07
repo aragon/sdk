@@ -37,15 +37,19 @@ import { ethers } from "ethers";
 
 describe("Client", () => {
   let daoAddress: string;
+  let deployment: deployContracts.Deployment;
 
   describe("Methods Module tests", () => {
     let server: Server;
 
     beforeAll(async () => {
       server = await ganacheSetup.start();
-      const deployment = await deployContracts.deploy();
+      deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      daoAddress = await deployContracts.createAllowlistDAO(deployment, "testDAO")
+      daoAddress = await deployContracts.createAllowlistDAO(
+        deployment,
+        "testDAO"
+      );
     });
 
     afterAll(async () => {
@@ -68,7 +72,15 @@ describe("Client", () => {
             links: [],
           },
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-          plugins: [{ id: "0x1234", data: new Uint8Array([11, 11]) }],
+          plugins: [
+            {
+              id: deployment.allowListPluginSetup.address,
+              data: ethers.utils.defaultAbiCoder.encode(
+                ["uint64", "uint64", "uint64", "address[]"],
+                [1, 1, 1, []]
+              ),
+            },
+          ],
         };
 
         const gasFeesEstimation = await client.estimation.create(
@@ -99,7 +111,15 @@ describe("Client", () => {
             links: [],
           },
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-          plugins: [{ id: "0x1234", data: new Uint8Array([11, 11]) }],
+          plugins: [
+            {
+              id: deployment.allowListRepo.address,
+              data: ethers.utils.defaultAbiCoder.encode(
+                ["uint64", "uint64", "uint64", "address[]"],
+                [1, 1, 1, []]
+              ),
+            },
+          ],
         };
 
         for await (const step of client.methods.create(daoCreationParams)) {

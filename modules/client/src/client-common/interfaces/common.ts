@@ -14,7 +14,7 @@ export enum DaoRole {
  */
 export interface IPluginInstallItem {
   id: string; // ENS domain or address of the plugin's Repo
-  data: Uint8Array;
+  data: string;
 }
 /**
  * Contains the payload passed to governance contracts, serializing

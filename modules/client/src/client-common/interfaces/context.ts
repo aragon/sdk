@@ -11,6 +11,8 @@ type Web3ContextParams = {
   network: Networkish;
   signer?: Signer;
   daoFactoryAddress?: string;
+  daoRegistryAddress?: string;
+  pluginRepoRegistryAddress?: string;
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   gasFeeEstimationFactor?: number;
 };
@@ -21,10 +23,9 @@ type GraphQLContextParams = {
   graphqlNodes: { url: string }[];
 };
 
-export type ContextParams =
-  & Web3ContextParams
-  & IpfsContextParams
-  & GraphQLContextParams;
+export type ContextParams = Web3ContextParams &
+  IpfsContextParams &
+  GraphQLContextParams;
 
 // Context state data
 
@@ -32,6 +33,8 @@ type Web3ContextState = {
   network: Networkish;
   signer?: Signer;
   daoFactoryAddress?: string;
+  daoRegistryAddress?: string;
+  pluginRepoRegistryAddress?: string;
   web3Providers: JsonRpcProvider[];
   gasFeeEstimationFactor: number;
 };
@@ -42,10 +45,9 @@ type GraphQLContextState = {
   graphql?: GraphQLClient[];
 };
 
-export type ContextState =
-  & Web3ContextState
-  & IpfsContextState
-  & GraphQLContextState;
+export type ContextState = Web3ContextState &
+  IpfsContextState &
+  GraphQLContextState;
 
 export type ContextPluginState = {};
 export type ContextPluginParams = ContextParams;
