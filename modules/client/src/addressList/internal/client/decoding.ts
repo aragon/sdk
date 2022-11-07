@@ -52,7 +52,7 @@ export class ClientAddressListDecoding extends ClientCore
     }
     const result = votingInterface.decodeFunctionData(
       // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addWhitelistedUsers",
+      "addAllowedUsers",
       data,
     );
     return result[0];

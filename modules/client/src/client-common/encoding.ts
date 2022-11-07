@@ -23,7 +23,7 @@ export function decodeUpdatePluginSettingsAction(
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
   }
-  const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
+  const result = votingInterface.decodeFunctionData("setConfiguration", data);
   return pluginSettingsFromContract(result);
 }
 
