@@ -61,3 +61,9 @@ export class NoPluginRepoRegistry extends Error {
     super("A plugin repo registry address is needed");
   }
 }
+
+export class NoDaoRegistry extends Error {
+  constructor() {
+    super("A dao registry address is needed");
+  }
+}

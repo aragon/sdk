@@ -5,7 +5,7 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { Signer } from "@ethersproject/abstract-signer";
 import { GasFeeEstimation } from "../../client-common/interfaces/common";
 import { IClientWeb3Core } from "../interfaces/core";
-import { NoDaoFactory, NoPluginRepoRegistry } from "@aragon/sdk-common";
+import { NoDaoFactory, NoPluginRepoRegistry, NoDaoRegistry } from "@aragon/sdk-common";
 
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
@@ -177,16 +177,23 @@ export class Web3Module implements IClientWeb3Core {
 
   /** Returns the current DAO factory address */
   public getDaoFactoryAddress(): string {
-    if(!this.daoFactoryAddress) {
-      throw new NoDaoFactory()
+    if (!this.daoFactoryAddress) {
+      throw new NoDaoFactory();
     }
     return this.daoFactoryAddress;
   }
 
   public getPluginRepoRegistryAddress(): string {
-    if(!this.pluginRepoRegistryAddress) {
-      throw new NoPluginRepoRegistry()
+    if (!this.pluginRepoRegistryAddress) {
+      throw new NoPluginRepoRegistry();
     }
     return this.pluginRepoRegistryAddress;
+  }
+
+  public getDaoRegistry(): string {
+    if (!this.daoRegistryAddress) {
+      throw new NoDaoRegistry();
+    }
+    return this.daoRegistryAddress;
   }
 }

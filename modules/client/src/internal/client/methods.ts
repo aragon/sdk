@@ -13,8 +13,7 @@ import {
 import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { Contract, ContractTransaction } from "@ethersproject/contracts";
-import { ContractReceipt } from "@ethersproject/contracts";
+import { Contract, ContractTransaction, ContractReceipt } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryBalances,
