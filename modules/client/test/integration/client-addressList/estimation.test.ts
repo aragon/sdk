@@ -13,18 +13,21 @@ import {
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../../helpers/deployContracts";
+import { Server } from "ganache";
+
 describe("Client Address List", () => {
   describe("Estimation module", () => {
+    let server: Server;
+
     beforeAll(async () => {
-      const server = await ganacheSetup.start();
-      const deployment = await deployContracts.deploy(server);
+      server = await ganacheSetup.start();
+      const deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.dao.address;
     });
 
     afterAll(async () => {
-      await ganacheSetup.stop();
+      await server.close();
     });
-
     it("Should estimate the gas fees for creating a new proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);

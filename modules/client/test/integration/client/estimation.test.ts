@@ -7,26 +7,29 @@ import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../../helpers/deployContracts";
 import { deployErc20 } from "./methods.test";
+import { Server } from "ganache";
 
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
   describe("Estimation module", () => {
+    let server: Server;
+
     beforeAll(async () => {
-      const server = await ganacheSetup.start();
-      const deployment = await deployContracts.deploy(server);
+      server = await ganacheSetup.start();
+      const deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.dao.address;
     });
 
     afterAll(async () => {
-      await ganacheSetup.stop();
+      await server.close();
     });
 
     it("Should estimate gas fees for creating a DAO", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) +
-        1;
+      const daoName =
+        "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1;
 
       const daoCreationParams: ICreateParams = {
         metadata: {
@@ -36,13 +39,11 @@ describe("Client", () => {
           links: [],
         },
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-        plugins: [
-          { id: "0x1234", data: new Uint8Array([11, 11]) },
-        ],
+        plugins: [{ id: "0x1234", data: new Uint8Array([11, 11]) }],
       };
 
       const gasFeesEstimation = await client.estimation.create(
-        daoCreationParams,
+        daoCreationParams
       );
 
       expect(typeof gasFeesEstimation).toEqual("object");
@@ -60,9 +61,7 @@ describe("Client", () => {
         amount: BigInt(1234),
       };
 
-      const gasFeesEstimation = await client.estimation.deposit(
-        depositParams,
-      );
+      const gasFeesEstimation = await client.estimation.deposit(depositParams);
 
       expect(typeof gasFeesEstimation).toEqual("object");
       expect(typeof gasFeesEstimation.average).toEqual("bigint");
@@ -84,7 +83,7 @@ describe("Client", () => {
       };
 
       const gasFeesEstimation = await client.estimation.updateAllowance(
-        depositParams,
+        depositParams
       );
 
       expect(typeof gasFeesEstimation).toEqual("object");

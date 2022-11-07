@@ -32,16 +32,19 @@ import {
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
 } from "../constants";
+import { Server } from "ganache";
 
 describe("Client Address List", () => {
+  let server: Server;
+
   beforeAll(async () => {
-    const server = await ganacheSetup.start();
-    const deployment = await deployContracts.deploy(server);
+    server = await ganacheSetup.start();
+    const deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.dao.address;
   });
 
   afterAll(async () => {
-    await ganacheSetup.stop();
+    await server.close();
   });
 
   describe("Proposal Creation", () => {
@@ -58,7 +61,7 @@ describe("Client Address List", () => {
           recipientAddress: "0x1234567890123456789012345678901234567890",
           amount: BigInt(1),
           reference: "test",
-        },
+        }
       );
 
       const proposalParams: ICreateProposalParams = {
@@ -85,11 +88,9 @@ describe("Client Address List", () => {
         executeOnPass: true,
       };
 
-      for await (
-        const step of addressListClient.methods.createProposal(
-          proposalParams,
-        )
-      ) {
+      for await (const step of addressListClient.methods.createProposal(
+        proposalParams
+      )) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");
@@ -102,7 +103,7 @@ describe("Client Address List", () => {
           default:
             throw new Error(
               "Unexpected proposal creation step: " +
-                Object.keys(step).join(", "),
+                Object.keys(step).join(", ")
             );
         }
       }
@@ -133,7 +134,7 @@ describe("Client Address List", () => {
             break;
           default:
             throw new Error(
-              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+              "Unexpected vote proposal step: " + Object.keys(step).join(", ")
             );
         }
       }
@@ -161,7 +162,7 @@ describe("Client Address List", () => {
           default:
             throw new Error(
               "Unexpected execute proposal step: " +
-                Object.keys(step).join(", "),
+                Object.keys(step).join(", ")
             );
         }
       }
@@ -191,7 +192,7 @@ describe("Client Address List", () => {
       const client = new ClientAddressList(ctxPlugin);
 
       const wallets = await client.methods.getMembers(
-        TEST_ADDRESSLIST_DAO_ADDDRESS,
+        TEST_ADDRESSLIST_DAO_ADDDRESS
       );
 
       expect(Array.isArray(wallets)).toBe(true);
@@ -369,7 +370,7 @@ describe("Client Address List", () => {
         daoAddressOrEns: address,
       };
       await expect(() => client.methods.getProposals(params)).rejects.toThrow(
-        new InvalidAddressOrEnsError(),
+        new InvalidAddressOrEnsError()
       );
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
