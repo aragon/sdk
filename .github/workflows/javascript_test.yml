@@ -41,11 +41,11 @@ jobs:
         run: yarn run build
 
       - name: Integration test
-        run: yarn test test/integration --ci --coverage --passWithNoTests
+        run: yarn test modules/client/test/integration --ci --coverage --passWithNoTests
         env:
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
 
       - name: Unit test
-        run: yarn test --testPathIgnorePatterns=test/integration --ci --coverage  --passWithNoTests
+        run: yarn test --testPathIgnorePatterns=modules/client/test/integration --ci --coverage  --passWithNoTests
         env:
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
