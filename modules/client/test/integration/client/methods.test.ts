@@ -33,9 +33,11 @@ import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
 import { isAddress } from "@ethersproject/address";
 import { Server } from "ganache";
+import { ethers } from "ethers";
 
-let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
+  let daoAddress: string;
+
   describe("Methods Module tests", () => {
     let server: Server;
 
@@ -43,8 +45,7 @@ describe("Client", () => {
       server = await ganacheSetup.start();
       const deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      // const addr = await createLegacyDao(contextParamsLocalChain);
-      // daoAddress = addr;
+      daoAddress = await deployContracts.createAllowlistDAO(deployment, "testDAO")
     });
 
     afterAll(async () => {

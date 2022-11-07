@@ -6,11 +6,15 @@ import PublicResolver from "@ensdomains/ens-contracts/artifacts/contracts/resolv
 
 const WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 
-export async function deploy(): Promise<{
+export interface Deployment {
   daoFactory: aragonContracts.DAOFactory;
-  erc20: aragonContracts.ERC20VotingSetup;
-  allowList: aragonContracts.AllowlistVotingSetup;
-}> {
+  erc20Repo: aragonContracts.PluginRepo;
+  erc20PluginSetup: aragonContracts.ERC20VotingSetup;
+  allowListRepo: aragonContracts.PluginRepo;
+  allowListPluginSetup: aragonContracts.AllowlistVotingSetup;
+}
+
+export async function deploy(): Promise<Deployment> {
   const provider = new ethers.providers.JsonRpcProvider(
     "http://127.0.0.1:8545"
   );
@@ -60,30 +64,6 @@ export async function deploy(): Promise<{
       ethers.utils.namehash("plugin.eth")
     );
 
-    // token
-    const tokenFactory = new aragonContracts.TokenFactory__factory();
-    const token = await tokenFactory.connect(owner).deploy();
-    // dao registry
-    const daoRegistryFactory = new aragonContracts.DAORegistry__factory();
-    const daoRegistry = await daoRegistryFactory.connect(owner).deploy();
-    await daoRegistry.initialize(managingDao.address, daoRegistrar.address);
-    await managingDao.grant(
-      daoRegistrar.address,
-      daoRegistry.address,
-      await daoRegistrar.REGISTER_ENS_SUBDOMAIN_PERMISSION_ID()
-    );
-
-    // dao
-    const daoFactoryFactory = new aragonContracts.DAOFactory__factory();
-    const daoFactory = await daoFactoryFactory
-      .connect(owner)
-      .deploy(daoRegistry.address, token.address);
-    await managingDao.grant(
-      daoRegistry.address,
-      daoFactory.address,
-      await daoRegistry.REGISTER_DAO_PERMISSION_ID()
-    );
-
     const pluginRepoRegistryFactory = new aragonContracts.PluginRepoRegistry__factory();
     const pluginRepoRegistry = await pluginRepoRegistryFactory
       .connect(owner)
@@ -110,25 +90,57 @@ export async function deploy(): Promise<{
       await pluginRepoRegistry.REGISTER_PLUGIN_REPO_PERMISSION_ID()
     );
 
-    const erc20Factory = new aragonContracts.ERC20VotingSetup__factory();
+    const pluginSetupProcessorFacotry = new aragonContracts.PluginSetupProcessor__factory();
+    const pluginSetupProcessor = await pluginSetupProcessorFacotry
+      .connect(owner)
+      .deploy(managingDao.address, pluginRepoRegistry.address);
+
+    // dao registry
+    const daoRegistryFactory = new aragonContracts.DAORegistry__factory();
+    const daoRegistry = await daoRegistryFactory.connect(owner).deploy();
+    await daoRegistry.initialize(managingDao.address, daoRegistrar.address);
+    await managingDao.grant(
+      daoRegistrar.address,
+      daoRegistry.address,
+      await daoRegistrar.REGISTER_ENS_SUBDOMAIN_PERMISSION_ID()
+    );
+
+    // dao
+    const daoFactoryFactory = new aragonContracts.DAOFactory__factory();
+    const daoFactory = await daoFactoryFactory
+      .connect(owner)
+      .deploy(daoRegistry.address, pluginSetupProcessor.address);
+    await managingDao.grant(
+      daoRegistry.address,
+      daoFactory.address,
+      await daoRegistry.REGISTER_DAO_PERMISSION_ID()
+    );
+
+    const pluginRepo_Factory = new aragonContracts.PluginRepo__factory();
+
+    const erc20SetupFactory = new aragonContracts.ERC20VotingSetup__factory();
+    const erc20PluginSetup = await erc20SetupFactory.connect(owner).deploy();
     const erc20RepoAddr = await deployPlugin(
       pluginRepoFactory,
-      erc20Factory,
+      erc20PluginSetup.address,
       "ERC20Voting",
       [1, 0, 0],
       owner
     );
-    const erc20 = erc20Factory.connect(owner).attach(erc20RepoAddr);
+    const erc20Repo = pluginRepo_Factory.connect(owner).attach(erc20RepoAddr);
 
     const allowListFactory = new aragonContracts.AllowlistVotingSetup__factory();
+    const allowListPluginSetup = await allowListFactory.connect(owner).deploy();
     const allowListRepoAddr = await deployPlugin(
       pluginRepoFactory,
-      allowListFactory,
+      allowListPluginSetup.address,
       "AllowlistVoting",
       [1, 0, 0],
       owner
     );
-    const allowList = allowListFactory.connect(owner).attach(allowListRepoAddr);
+    const allowListRepo = pluginRepo_Factory
+      .connect(owner)
+      .attach(allowListRepoAddr);
 
     // send ETH to hardcoded wallet in tests
     await owner.sendTransaction({
@@ -138,8 +150,10 @@ export async function deploy(): Promise<{
 
     return {
       daoFactory,
-      erc20,
-      allowList,
+      erc20Repo,
+      erc20PluginSetup,
+      allowListRepo,
+      allowListPluginSetup,
     };
   } catch (e) {
     throw e;
@@ -148,25 +162,27 @@ export async function deploy(): Promise<{
 
 async function deployPlugin(
   pluginRepoFactory: aragonContracts.PluginRepoFactory,
-  setupFactory: ContractFactory,
+  setupAddr: string,
   name: string,
   version: [BigNumberish, BigNumberish, BigNumberish],
   owner: Signer
 ) {
-  try {
-    const setup = await setupFactory.connect(owner).deploy();
-    const repoaddr = await pluginRepoFactory.callStatic.createPluginRepoWithVersion(
-      name,
-      version,
-      setup.address,
-      "0x",
-      await owner.getAddress()
-    );
-    return repoaddr;
-  } catch (e) {
-    console.log(e);
-    return "asdf";
-  }
+  const repoaddr = await pluginRepoFactory.callStatic.createPluginRepoWithVersion(
+    name,
+    version,
+    setupAddr,
+    "0x",
+    await owner.getAddress()
+  );
+  const tx = await pluginRepoFactory.createPluginRepoWithVersion(
+    name,
+    version,
+    setupAddr,
+    "0x",
+    await owner.getAddress()
+  );
+  await tx.wait();
+  return repoaddr;
 }
 
 async function deployEnsContracts(owner: Signer) {
@@ -224,4 +240,38 @@ export async function registerEnsName(
   } catch (e) {
     throw e;
   }
+}
+
+export async function createDAO(
+  daoFactory: aragonContracts.DAOFactory,
+  daoSettings: aragonContracts.DAOFactory.DAOSettingsStruct,
+  pluginSettings: aragonContracts.DAOFactory.PluginSettingsStruct[]
+) {
+  let daoAddress = await daoFactory.callStatic.createDao(
+    daoSettings,
+    pluginSettings
+  );
+  await daoFactory.createDao(daoSettings, pluginSettings);
+  return daoAddress;
+}
+
+export async function createAllowlistDAO(deployment: Deployment, name: string) {
+  return createDAO(
+    deployment.daoFactory,
+    {
+      metadata: "0x0000",
+      name: name,
+      trustedForwarder: ethers.constants.AddressZero,
+    },
+    [
+      {
+        pluginSetup: deployment.allowListPluginSetup.address,
+        pluginSetupRepo: deployment.allowListRepo.address,
+        data: ethers.utils.defaultAbiCoder.encode(
+          ["uint64", "uint64", "uint64", "address[]"],
+          [1, 1, 1, []]
+        ),
+      },
+    ]
+  );
 }
