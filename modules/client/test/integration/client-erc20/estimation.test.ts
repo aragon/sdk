@@ -23,7 +23,7 @@ describe("Client ERC20", () => {
     beforeAll(async () => {
       server = await ganacheSetup.start();
       const deployment = await deployContracts.deploy();
-      contextParamsLocalChain.daoFactoryAddress = deployment.dao.address;
+      contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
     });
 
     afterAll(async () => {

@@ -1,15 +1,13 @@
-import ganache, { Server } from "ganache";
-
-export let server: Server;
+import ganache from "ganache";
 
 export async function start() {
-  server = ganache.server({
+  const server = ganache.server({
     chain: {
       chainId: 31337,
     },
     miner: {
       blockGasLimit: 80000000,
-      defaultGasPrice: 8000000000,
+      defaultGasPrice: 800,
     },
     logging: {
       quiet: true,
@@ -17,10 +15,4 @@ export async function start() {
   });
   await server.listen(8545);
   return server;
-}
-
-export async function stop() {
-  if (server) {
-    server.close();
-  }
 }

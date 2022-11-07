@@ -42,8 +42,7 @@ describe("Client", () => {
     beforeAll(async () => {
       server = await ganacheSetup.start();
       const deployment = await deployContracts.deploy();
-      console.log(deployment);
-      contextParamsLocalChain.daoFactoryAddress = deployment.dao.address;
+      contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
       // const addr = await createLegacyDao(contextParamsLocalChain);
       // daoAddress = addr;
     });
