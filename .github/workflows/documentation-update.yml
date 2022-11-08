@@ -16,8 +16,9 @@ jobs:
         with:
           token: ${{ secrets.ARABOT_PAT }}
       - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
+          cache: "yarn"
           node-version: 16
       - name: Install dependencies
         run: yarn install --frozen-lockfile
