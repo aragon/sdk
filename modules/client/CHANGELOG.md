@@ -22,7 +22,7 @@ TEMPLATE:
 - Automatic generated README from examples
 - Split clients into modules
 - Removed `javascript` folders
-- Updates `@aragon/core-contracts-ethers` to `v0.4.0-alpha`
+- Updates `@aragon/core-contracts-ethers` to `v0.4.1-alpha`
 - Parameters types for DAO creation
 ### Added
 - Update Allowance estimation

@@ -57,7 +57,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "@aragon/core-contracts-ethers": "^0.4.0-alpha",
+    "@aragon/core-contracts-ethers": "^0.4.1-alpha",
     "@aragon/sdk-common": "^0.6.0-alpha",
     "@aragon/sdk-ipfs": "^0.2.0-alpha",
     "@ethersproject/abstract-signer": "^5.5.0",
