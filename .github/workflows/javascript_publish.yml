@@ -21,8 +21,8 @@ jobs:
           VERSION=$(echo "$TAG" | grep -woP "([0-9]+\.[0-9]+\.[0-9]+)-\w+" | sed 's/-javascript//')
           PACKAGE=$(echo "$TAG" | grep -oP "javascript-(.+)" | sed 's/javascript-//')
           if [ -d "./modules/$PACKAGE" ]; then
-            echo "::set-output name=package::$PACKAGE"
-            echo "::set-output name=version::$VERSION"
+            echo "package=$PACKAGE" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
           fi
   test:
     uses: ./.github/workflows/javascript_test.yml
