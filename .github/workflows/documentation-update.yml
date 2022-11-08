@@ -16,8 +16,9 @@ jobs:
         with:
           token: ${{ secrets.ARABOT_PAT }}
       - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
+          cache: "yarn"
           node-version: 16
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -29,7 +30,7 @@ jobs:
         run: yarn run docs:addressList
       - name: Get short commit hash
         id: hash
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - name: Commit updated docs
         id: commit
         run: |

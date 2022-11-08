@@ -21,8 +21,8 @@ jobs:
           VERSION=$(echo "$TAG" | grep -woP "([0-9]+\.[0-9]+\.[0-9]+)-\w+" | sed 's/-javascript//')
           PACKAGE=$(echo "$TAG" | grep -oP "javascript-(.+)" | sed 's/javascript-//')
           if [ -d "./modules/$PACKAGE" ]; then
-            echo "::set-output name=package::$PACKAGE"
-            echo "::set-output name=version::$VERSION"
+            echo "package=$PACKAGE" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
           fi
   test:
     uses: ./.github/workflows/javascript_test.yml
@@ -49,8 +49,9 @@ jobs:
         with:
           token: ${{ secrets.ARABOT_PAT }}
       - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
+          cache: "yarn"
           node-version: 16
           registry-url: "https://registry.npmjs.org"
 
