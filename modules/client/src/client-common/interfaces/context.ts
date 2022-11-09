@@ -21,10 +21,9 @@ type GraphQLContextParams = {
   graphqlNodes: { url: string }[];
 };
 
-export type ContextParams =
-  & Web3ContextParams
-  & IpfsContextParams
-  & GraphQLContextParams;
+export type ContextParams = Web3ContextParams &
+  IpfsContextParams &
+  GraphQLContextParams;
 
 // Context state data
 
@@ -42,10 +41,9 @@ type GraphQLContextState = {
   graphql?: GraphQLClient[];
 };
 
-export type ContextState =
-  & Web3ContextState
-  & IpfsContextState
-  & GraphQLContextState;
+export type ContextState = Web3ContextState &
+  IpfsContextState &
+  GraphQLContextState;
 
 export type ContextPluginState = {};
 export type ContextPluginParams = ContextParams;

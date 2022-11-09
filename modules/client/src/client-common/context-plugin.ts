@@ -7,9 +7,9 @@ import {
 // State
 const defaultState: ContextPluginState = {};
 
-export class ContextPlugin extends Context {
-  protected state: ContextState & ContextPluginState = Object.assign(
-    {},
+export class ContextPlugin<T extends {} = {}> extends Context {
+  protected state: ContextState & T = Object.assign(
+    {} as T,
     Context.getDefault(),
     defaultState,
   );
