@@ -18,24 +18,24 @@ export async function deploy(): Promise<Deployment> {
   const provider = new ethers.providers.JsonRpcProvider(
     "http://127.0.0.1:8545"
   );
-  const owner = provider.getSigner();
-  const {ensRegistry, ensResolver} = await deployEnsContracts(owner);
+  const deployOwnerWallet = provider.getSigner();
+  const {ensRegistry, ensResolver} = await deployEnsContracts(deployOwnerWallet);
 
   try {
     const managingDaoFactory = new aragonContracts.DAO__factory();
-    const managingDao = await managingDaoFactory.connect(owner).deploy();
+    const managingDao = await managingDaoFactory.connect(deployOwnerWallet).deploy();
     await managingDao.initialize(
       "0x",
-      await owner.getAddress(),
+      await deployOwnerWallet.getAddress(),
       ethers.constants.AddressZero
     );
 
     const ensSubdomainRegistrarFactory = new aragonContracts.ENSSubdomainRegistrar__factory();
     const daoRegistrar = await ensSubdomainRegistrarFactory
-      .connect(owner)
+      .connect(deployOwnerWallet)
       .deploy();
     const pluginRegistrar = await ensSubdomainRegistrarFactory
-      .connect(owner)
+      .connect(deployOwnerWallet)
       .deploy();
 
     await registerEnsName(
@@ -66,7 +66,7 @@ export async function deploy(): Promise<Deployment> {
 
     const pluginRepoRegistryFactory = new aragonContracts.PluginRepoRegistry__factory();
     const pluginRepoRegistry = await pluginRepoRegistryFactory
-      .connect(owner)
+      .connect(deployOwnerWallet)
       .deploy();
 
     await pluginRepoRegistry.initialize(
@@ -81,7 +81,7 @@ export async function deploy(): Promise<Deployment> {
 
     const pluginRepoFactoryFactory = new aragonContracts.PluginRepoFactory__factory();
     const pluginRepoFactory = await pluginRepoFactoryFactory
-      .connect(owner)
+      .connect(deployOwnerWallet)
       .deploy(pluginRepoRegistry.address);
 
     await managingDao.grant(
@@ -92,12 +92,12 @@ export async function deploy(): Promise<Deployment> {
 
     const pluginSetupProcessorFacotry = new aragonContracts.PluginSetupProcessor__factory();
     const pluginSetupProcessor = await pluginSetupProcessorFacotry
-      .connect(owner)
+      .connect(deployOwnerWallet)
       .deploy(managingDao.address, pluginRepoRegistry.address);
 
     // dao registry
     const daoRegistryFactory = new aragonContracts.DAORegistry__factory();
-    const daoRegistry = await daoRegistryFactory.connect(owner).deploy();
+    const daoRegistry = await daoRegistryFactory.connect(deployOwnerWallet).deploy();
     await daoRegistry.initialize(managingDao.address, daoRegistrar.address);
     await managingDao.grant(
       daoRegistrar.address,
@@ -108,7 +108,7 @@ export async function deploy(): Promise<Deployment> {
     // dao
     const daoFactoryFactory = new aragonContracts.DAOFactory__factory();
     const daoFactory = await daoFactoryFactory
-      .connect(owner)
+      .connect(deployOwnerWallet)
       .deploy(daoRegistry.address, pluginSetupProcessor.address);
     await managingDao.grant(
       daoRegistry.address,
@@ -119,31 +119,31 @@ export async function deploy(): Promise<Deployment> {
     const pluginRepo_Factory = new aragonContracts.PluginRepo__factory();
 
     const erc20SetupFactory = new aragonContracts.ERC20VotingSetup__factory();
-    const erc20PluginSetup = await erc20SetupFactory.connect(owner).deploy();
+    const erc20PluginSetup = await erc20SetupFactory.connect(deployOwnerWallet).deploy();
     const erc20RepoAddr = await deployPlugin(
       pluginRepoFactory,
       erc20PluginSetup.address,
       "ERC20Voting",
       [1, 0, 0],
-      owner
+      deployOwnerWallet
     );
-    const erc20Repo = pluginRepo_Factory.connect(owner).attach(erc20RepoAddr);
+    const erc20Repo = pluginRepo_Factory.connect(deployOwnerWallet).attach(erc20RepoAddr);
 
     const allowListFactory = new aragonContracts.AllowlistVotingSetup__factory();
-    const allowListPluginSetup = await allowListFactory.connect(owner).deploy();
+    const allowListPluginSetup = await allowListFactory.connect(deployOwnerWallet).deploy();
     const allowListRepoAddr = await deployPlugin(
       pluginRepoFactory,
       allowListPluginSetup.address,
       "AllowlistVoting",
       [1, 0, 0],
-      owner
+      deployOwnerWallet
     );
     const allowListRepo = pluginRepo_Factory
-      .connect(owner)
+      .connect(deployOwnerWallet)
       .attach(allowListRepoAddr);
 
     // send ETH to hardcoded wallet in tests
-    await owner.sendTransaction({
+    await deployOwnerWallet.sendTransaction({
       to: WALLET_ADDRESS,
       value: ethers.utils.parseEther("50.0"),
     });
@@ -165,27 +165,27 @@ async function deployPlugin(
   setupAddr: string,
   name: string,
   version: [BigNumberish, BigNumberish, BigNumberish],
-  owner: Signer
+  deployOwnerWallet: Signer
 ) {
   const repoaddr = await pluginRepoFactory.callStatic.createPluginRepoWithVersion(
     name,
     version,
     setupAddr,
     "0x",
-    await owner.getAddress()
+    await deployOwnerWallet.getAddress()
   );
   const tx = await pluginRepoFactory.createPluginRepoWithVersion(
     name,
     version,
     setupAddr,
     "0x",
-    await owner.getAddress()
+    await deployOwnerWallet.getAddress()
   );
   await tx.wait();
   return repoaddr;
 }
 
-async function deployEnsContracts(owner: Signer) {
+async function deployEnsContracts(deployOwnerWallet: Signer) {
   try {
     const registryFactory = new ethers.ContractFactory(
       ENSRegistry.abi,
@@ -196,11 +196,11 @@ async function deployEnsContracts(owner: Signer) {
       PublicResolver.bytecode
     );
 
-    const registry = await registryFactory.connect(owner).deploy();
+    const registry = await registryFactory.connect(deployOwnerWallet).deploy();
     await registry.deployed();
 
     const publicResolver = await publicResolverFactory
-      .connect(owner)
+      .connect(deployOwnerWallet)
       .deploy(
         registry.address,
         ethers.constants.AddressZero,
@@ -213,7 +213,7 @@ async function deployEnsContracts(owner: Signer) {
       "",
       "eth",
       registry,
-      await owner.getAddress(),
+      await deployOwnerWallet.getAddress(),
       publicResolver.address
     );
     return {ensRegistry: registry, ensResolver: publicResolver};
