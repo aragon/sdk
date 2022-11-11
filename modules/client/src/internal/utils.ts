@@ -7,7 +7,6 @@ import {
   ContractWithdrawParams,
   DaoDetails,
   DaoListItem,
-  ICreateParams,
   IDepositParams,
   IFreezePermissionDecodedParams,
   IFreezePermissionParams,
@@ -33,15 +32,6 @@ import {
 import { Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
-
-export function unwrapCreateDaoParams(
-  // @ts-ignore
-  params: ICreateParams,
-  // @ts-ignore
-  metadataCid: string,
-) {
-  // TODO
-}
 
 export function unwrapDepositParams(
   params: IDepositParams,

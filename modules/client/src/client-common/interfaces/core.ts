@@ -21,6 +21,7 @@ export interface IClientWeb3Core {
     abi: ContractInterface,
   ) => Contract & T;
   getDaoFactoryAddress: () => string;
+  getPluginRepoRegistryAddress: () => string;
   getApproximateGasFee: (estimatedFee: bigint) => Promise<GasFeeEstimation>;
 }
 export interface IClientIpfsCore {

@@ -64,12 +64,14 @@ export class Context {
       network: contextParams.network,
       signer: contextParams.signer,
       daoFactoryAddress: contextParams.daoFactoryAddress,
+      daoRegistryAddress: contextParams.daoRegistryAddress,
+      pluginRepoRegistryAddress: contextParams.pluginRepoRegistryAddress,
       web3Providers: Context.resolveWeb3Providers(
         contextParams.web3Providers,
-        contextParams.network,
+        contextParams.network
       ),
       gasFeeEstimationFactor: Context.resolveGasFeeEstimationFactor(
-        contextParams.gasFeeEstimationFactor,
+        contextParams.gasFeeEstimationFactor
       ),
       ipfs: Context.resolveIpfs(contextParams.ipfsNodes),
       graphql: Context.resolveGraphql(contextParams.graphqlNodes),
@@ -83,9 +85,10 @@ export class Context {
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
     } else if (this.state.network.toString() in activeContractsList) {
-      this.state.daoFactoryAddress = activeContractsList[
-        this.state.network.toString() as keyof typeof activeContractsList
-      ].DAOFactory;
+      this.state.daoFactoryAddress =
+        activeContractsList[
+          this.state.network.toString() as keyof typeof activeContractsList
+        ].DAOFactory;
     }
     if (contextParams.signer) {
       this.state.signer = contextParams.signer;
@@ -93,12 +96,12 @@ export class Context {
     if (contextParams.web3Providers) {
       this.state.web3Providers = Context.resolveWeb3Providers(
         contextParams.web3Providers,
-        this.state.network,
+        this.state.network
       );
     }
     if (contextParams.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
-        contextParams.gasFeeEstimationFactor,
+        contextParams.gasFeeEstimationFactor
       );
     }
 
@@ -164,6 +167,32 @@ export class Context {
   }
 
   /**
+   * Getter for daoFactoryAddress property
+   *
+   * @var daoFactoryAddress
+   *
+   * @returns {string}
+   *
+   * @public
+   */
+  get daoRegistryAddress(): string | undefined {
+    return this.state.daoRegistryAddress;
+  }
+
+  /**
+   * Getter for daoFactoryAddress property
+   *
+   * @var daoFactoryAddress
+   *
+   * @returns {string}
+   *
+   * @public
+   */
+  get pluginRepoRegistryAddress(): string | undefined {
+    return this.state.pluginRepoRegistryAddress;
+  }
+
+  /**
    * Getter for the gas fee reducer used in estimations
    *
    * @var gasFeeEstimationFactor
@@ -221,10 +250,10 @@ export class Context {
 
   private static resolveWeb3Providers(
     endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-    network: Networkish,
+    network: Networkish
   ): JsonRpcProvider[] {
     if (Array.isArray(endpoints)) {
-      return endpoints.map((item) => {
+      return endpoints.map(item => {
         if (typeof item === "string") {
           const url = new URL(item);
           if (!supportedProtocols.includes(url.protocol)) {
@@ -249,10 +278,10 @@ export class Context {
     configs: {
       url: string;
       headers?: Record<string, string>;
-    }[],
+    }[]
   ): IpfsClient[] {
     let clients: IpfsClient[] = [];
-    configs.forEach((config) => {
+    configs.forEach(config => {
       const url = new URL(config.url);
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
@@ -262,11 +291,9 @@ export class Context {
     return clients;
   }
 
-  private static resolveGraphql(
-    endpoints: { url: string }[],
-  ): GraphQLClient[] {
+  private static resolveGraphql(endpoints: { url: string }[]): GraphQLClient[] {
     let clients: GraphQLClient[] = [];
-    endpoints.forEach((endpoint) => {
+    endpoints.forEach(endpoint => {
       const url = new URL(endpoint.url);
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
@@ -277,12 +304,12 @@ export class Context {
   }
 
   private static resolveGasFeeEstimationFactor(
-    gasFeeEstimationFactor: number,
+    gasFeeEstimationFactor: number
   ): number {
     if (typeof gasFeeEstimationFactor === "undefined") return 1;
     else if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
       throw new Error(
-        "Gas estimation factor value should be a number between 0 and 1",
+        "Gas estimation factor value should be a number between 0 and 1"
       );
     }
     return gasFeeEstimationFactor;

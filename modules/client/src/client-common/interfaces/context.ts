@@ -11,6 +11,8 @@ type Web3ContextParams = {
   network: Networkish;
   signer?: Signer;
   daoFactoryAddress?: string;
+  daoRegistryAddress?: string;
+  pluginRepoRegistryAddress?: string;
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   gasFeeEstimationFactor?: number;
 };
@@ -31,6 +33,8 @@ type Web3ContextState = {
   network: Networkish;
   signer?: Signer;
   daoFactoryAddress?: string;
+  daoRegistryAddress?: string;
+  pluginRepoRegistryAddress?: string;
   web3Providers: JsonRpcProvider[];
   gasFeeEstimationFactor: number;
 };
