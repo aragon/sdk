@@ -36,18 +36,19 @@ export class ClientAddressListEncoding extends ClientCore
    * @memberof ClientAddressListEncoding
    */
   static getPluginInstallItem(
-    params: IAddressListPluginInstall,
+    params: IAddressListPluginInstall
   ): IPluginInstallItem {
     const addressListVotingInterface = AllowlistVoting__factory.createInterface();
     const args = addressListInitParamsToContract(params);
     // get hex bytes
     const hexBytes = addressListVotingInterface.encodeFunctionData(
       "initialize",
-      args,
+      args
     );
+    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: ADDRESSLIST_PLUGIN_ID,
-      data: hexBytes,
+      data,
     };
   }
 
@@ -61,7 +62,7 @@ export class ClientAddressListEncoding extends ClientCore
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
-    params: IPluginSettings,
+    params: IPluginSettings
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new Error("Invalid plugin address");
@@ -81,10 +82,7 @@ export class ClientAddressListEncoding extends ClientCore
    * @return {*}  {DaoAction}
    * @memberof ClientAddressListEncoding
    */
-  public addMembersAction(
-    pluginAddress: string,
-    members: string[],
-  ): DaoAction {
+  public addMembersAction(pluginAddress: string, members: string[]): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -98,7 +96,7 @@ export class ClientAddressListEncoding extends ClientCore
     const hexBytes = votingInterface.encodeFunctionData(
       // TODO: Rename to `addAddresses` as soon as the plugin is updated
       "addAllowedUsers",
-      [members],
+      [members]
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
@@ -117,7 +115,7 @@ export class ClientAddressListEncoding extends ClientCore
    */
   public removeMembersAction(
     pluginAddress: string,
-    members: string[],
+    members: string[]
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -132,7 +130,7 @@ export class ClientAddressListEncoding extends ClientCore
     const hexBytes = votingInterface.encodeFunctionData(
       // TODO: Rename to `removeAddresses` as soon as the plugin is updated
       "removeAllowedUsers",
-      [members],
+      [members]
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
