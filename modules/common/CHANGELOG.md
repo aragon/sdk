@@ -16,7 +16,7 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [UPCOMING]
+## [0.6.0-alpha]
 ### Added
 - New error types
 ## 0.5.0-alpha
