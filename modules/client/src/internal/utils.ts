@@ -1,6 +1,5 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-// import { pack } from "@ethersproject/solidity";
 import {
   AssetBalance,
   ContractFreezeParams,
@@ -34,43 +33,6 @@ import { Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 
-// export function unwrapCreateDaoParams(
-//   params: ICreateParams,
-//   metadataCid: string,
-// ): [DAOFactory.DAOConfigStruct, DAOFactory.VoteConfigStruct, string, string] {
-//   // TODO: Serialize plugin params into a buffer
-//   const pluginDataBytes = "0x" +
-//     params.plugins
-//       .map((entry) => {
-//         const item = pack(["uint256", "bytes[]"], [entry.id, entry.data]);
-//         return strip0x(item);
-//       })
-//       .join("");
-
-//   return [
-//     {
-//       name: params.ensSubdomain,
-//       metadata: "ipfs://" + metadataCid,
-//     },
-//     {
-//       // TODO: Adapt the DAO creation parameters
-//       participationRequiredPct: BigInt(10), // BigInt(params.votingConfig.minParticipation),
-//       supportRequiredPct: BigInt(50), // BigInt(params.votingConfig.minSupport),
-//       minDuration: BigInt(50), // BigInt(params.votingConfig.minDuration),
-//     },
-//     // {
-//     //   addr: params.tokenConfig.address,
-//     //   name: params.tokenConfig.name,
-//     //   symbol: params.tokenConfig.symbol,
-//     // },
-//     // {
-//     //   receivers: params.mintConfig.map((receiver) => receiver.address),
-//     //   amounts: params.mintConfig.map((receiver) => receiver.balance),
-//     // },
-//     pluginDataBytes,
-//     AddressZero, // TODO: Remove when the new contract version is available
-//   ];
-// }
 
 export function unwrapDepositParams(
   params: IDepositParams,

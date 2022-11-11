@@ -1,8 +1,15 @@
 import * as aragonContracts from "@aragon/core-contracts-ethers";
-import {ethers, Signer, BigNumberish, Contract} from "ethers";
 
 import ENSRegistry from "@ensdomains/ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json";
 import PublicResolver from "@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json";
+import { AddressZero, HashZero } from "@ethersproject/constants";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import { namehash, id } from "@ethersproject/hash";
+import { parseEther } from "@ethersproject/units";
+import { BigNumberish } from "@ethersproject/bignumber";
+import { Signer } from "@ethersproject/abstract-signer";
+import { Contract, ContractFactory } from "@ethersproject/contracts";
+import { defaultAbiCoder } from "@ethersproject/abi";
 
 const WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 
@@ -15,19 +22,21 @@ export interface Deployment {
 }
 
 export async function deploy(): Promise<Deployment> {
-  const provider = new ethers.providers.JsonRpcProvider(
-    "http://127.0.0.1:8545"
-  );
+  const provider = new JsonRpcProvider("http://127.0.0.1:8545");
   const deployOwnerWallet = provider.getSigner();
-  const {ensRegistry, ensResolver} = await deployEnsContracts(deployOwnerWallet);
+  const { ensRegistry, ensResolver } = await deployEnsContracts(
+    deployOwnerWallet
+  );
 
   try {
     const managingDaoFactory = new aragonContracts.DAO__factory();
-    const managingDao = await managingDaoFactory.connect(deployOwnerWallet).deploy();
+    const managingDao = await managingDaoFactory
+      .connect(deployOwnerWallet)
+      .deploy();
     await managingDao.initialize(
       "0x",
       await deployOwnerWallet.getAddress(),
-      ethers.constants.AddressZero
+      AddressZero
     );
 
     const ensSubdomainRegistrarFactory = new aragonContracts.ENSSubdomainRegistrar__factory();
@@ -56,12 +65,12 @@ export async function deploy(): Promise<Deployment> {
     await daoRegistrar.initialize(
       managingDao.address,
       ensRegistry.address,
-      ethers.utils.namehash("dao.eth")
+      namehash("dao.eth")
     );
     await pluginRegistrar.initialize(
       managingDao.address,
       ensRegistry.address,
-      ethers.utils.namehash("plugin.eth")
+      namehash("plugin.eth")
     );
 
     const pluginRepoRegistryFactory = new aragonContracts.PluginRepoRegistry__factory();
@@ -97,7 +106,9 @@ export async function deploy(): Promise<Deployment> {
 
     // dao registry
     const daoRegistryFactory = new aragonContracts.DAORegistry__factory();
-    const daoRegistry = await daoRegistryFactory.connect(deployOwnerWallet).deploy();
+    const daoRegistry = await daoRegistryFactory
+      .connect(deployOwnerWallet)
+      .deploy();
     await daoRegistry.initialize(managingDao.address, daoRegistrar.address);
     await managingDao.grant(
       daoRegistrar.address,
@@ -119,7 +130,9 @@ export async function deploy(): Promise<Deployment> {
     const pluginRepo_Factory = new aragonContracts.PluginRepo__factory();
 
     const erc20SetupFactory = new aragonContracts.ERC20VotingSetup__factory();
-    const erc20PluginSetup = await erc20SetupFactory.connect(deployOwnerWallet).deploy();
+    const erc20PluginSetup = await erc20SetupFactory
+      .connect(deployOwnerWallet)
+      .deploy();
     const erc20RepoAddr = await deployPlugin(
       pluginRepoFactory,
       erc20PluginSetup.address,
@@ -127,10 +140,14 @@ export async function deploy(): Promise<Deployment> {
       [1, 0, 0],
       deployOwnerWallet
     );
-    const erc20Repo = pluginRepo_Factory.connect(deployOwnerWallet).attach(erc20RepoAddr);
+    const erc20Repo = pluginRepo_Factory
+      .connect(deployOwnerWallet)
+      .attach(erc20RepoAddr);
 
     const allowListFactory = new aragonContracts.AllowlistVotingSetup__factory();
-    const allowListPluginSetup = await allowListFactory.connect(deployOwnerWallet).deploy();
+    const allowListPluginSetup = await allowListFactory
+      .connect(deployOwnerWallet)
+      .deploy();
     const allowListRepoAddr = await deployPlugin(
       pluginRepoFactory,
       allowListPluginSetup.address,
@@ -145,7 +162,7 @@ export async function deploy(): Promise<Deployment> {
     // send ETH to hardcoded wallet in tests
     await deployOwnerWallet.sendTransaction({
       to: WALLET_ADDRESS,
-      value: ethers.utils.parseEther("50.0"),
+      value: parseEther("50.0"),
     });
 
     return {
@@ -187,11 +204,11 @@ async function deployPlugin(
 
 async function deployEnsContracts(deployOwnerWallet: Signer) {
   try {
-    const registryFactory = new ethers.ContractFactory(
+    const registryFactory = new ContractFactory(
       ENSRegistry.abi,
       ENSRegistry.bytecode
     );
-    const publicResolverFactory = new ethers.ContractFactory(
+    const publicResolverFactory = new ContractFactory(
       PublicResolver.abi,
       PublicResolver.bytecode
     );
@@ -201,12 +218,7 @@ async function deployEnsContracts(deployOwnerWallet: Signer) {
 
     const publicResolver = await publicResolverFactory
       .connect(deployOwnerWallet)
-      .deploy(
-        registry.address,
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero
-      );
+      .deploy(registry.address, AddressZero, AddressZero, AddressZero);
     await publicResolver.deployed();
 
     await registerEnsName(
@@ -216,7 +228,7 @@ async function deployEnsContracts(deployOwnerWallet: Signer) {
       await deployOwnerWallet.getAddress(),
       publicResolver.address
     );
-    return {ensRegistry: registry, ensResolver: publicResolver};
+    return { ensRegistry: registry, ensResolver: publicResolver };
   } catch (e) {
     throw e;
   }
@@ -231,8 +243,8 @@ export async function registerEnsName(
 ) {
   try {
     await registry.setSubnodeRecord(
-      tld !== "" ? ethers.utils.namehash(tld) : ethers.constants.HashZero,
-      ethers.utils.id(name),
+      tld !== "" ? namehash(tld) : HashZero,
+      id(name),
       owner,
       resolver,
       0
@@ -261,13 +273,13 @@ export async function createAllowlistDAO(deployment: Deployment, name: string) {
     {
       metadata: "0x0000",
       name: name,
-      trustedForwarder: ethers.constants.AddressZero,
+      trustedForwarder: AddressZero,
     },
     [
       {
         pluginSetup: deployment.allowListPluginSetup.address,
         pluginSetupRepo: deployment.allowListRepo.address,
-        data: ethers.utils.defaultAbiCoder.encode(
+        data: defaultAbiCoder.encode(
           ["uint64", "uint64", "uint64", "address[]"],
           [1, 1, 1, []]
         ),

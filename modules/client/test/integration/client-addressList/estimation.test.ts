@@ -11,8 +11,8 @@ import {
   VoteValues,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
-import * as ganacheSetup from "../../../../../helpers/ganache-setup";
-import * as deployContracts from "../../../../../helpers/deployContracts";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 
 describe("Client Address List", () => {

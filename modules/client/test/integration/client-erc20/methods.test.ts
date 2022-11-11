@@ -19,8 +19,8 @@ import {
   VoteProposalStep,
   VoteValues,
 } from "../../../src";
-import * as ganacheSetup from "../../../../../helpers/ganache-setup";
-import * as deployContracts from "../../../../../helpers/deployContracts";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
 
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {

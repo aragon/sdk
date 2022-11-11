@@ -47,6 +47,7 @@
     }
   ],
   "devDependencies": {
+    "@ensdomains/ens-contracts": "^0.0.15",
     "@size-limit/preset-small-lib": "^7.0.8",
     "@types/jest": "^29.0.3",
     "glob": "^8.0.3",

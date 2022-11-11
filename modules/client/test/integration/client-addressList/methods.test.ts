@@ -1,8 +1,8 @@
 // @ts-ignore
 declare const describe, it, beforeAll, afterAll, expect;
 
-import * as ganacheSetup from "../../../../../helpers/ganache-setup";
-import * as deployContracts from "../../../../../helpers/deployContracts";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   Client,

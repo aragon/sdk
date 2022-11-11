@@ -4,8 +4,8 @@ declare const describe, it, expect, beforeAll, afterAll;
 import { Random } from "@aragon/sdk-common";
 import { Client, Context, ICreateParams, IDepositParams } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
-import * as ganacheSetup from "../../../../../helpers/ganache-setup";
-import * as deployContracts from "../../../../../helpers/deployContracts";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
 import { deployErc20 } from "./methods.test";
 import { Server } from "ganache";
 

@@ -1,8 +1,8 @@
 // @ts-ignore
 declare const describe, it, beforeAll, afterAll, expect, test, fail;
 
-import * as ganacheSetup from "../../../../../helpers/ganache-setup";
-import * as deployContracts from "../../../../../helpers/deployContracts";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
 import {
   contextParams,
   contextParamsLocalChain,
@@ -32,8 +32,8 @@ import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
 import { isAddress } from "@ethersproject/address";
 import { Server } from "ganache";
-import { ethers } from "ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { defaultAbiCoder } from "@ethersproject/abi";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -76,7 +76,7 @@ describe("Client", () => {
             {
               id: deployment.allowListPluginSetup.address,
               data: toUtf8Bytes(
-                ethers.utils.defaultAbiCoder.encode(
+                defaultAbiCoder.encode(
                   ["uint64", "uint64", "uint64", "address[]"],
                   [1, 1, 1, []]
                 )
@@ -117,7 +117,7 @@ describe("Client", () => {
             {
               id: deployment.allowListRepo.address,
               data: toUtf8Bytes(
-                ethers.utils.defaultAbiCoder.encode(
+                defaultAbiCoder.encode(
                   ["uint64", "uint64", "uint64", "address[]"],
                   [1, 1, 1, []]
                 )
