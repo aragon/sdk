@@ -5,23 +5,29 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { Signer } from "@ethersproject/abstract-signer";
 import { GasFeeEstimation } from "../../client-common/interfaces/common";
 import { IClientWeb3Core } from "../interfaces/core";
-import { NoDaoFactory, NoPluginRepoRegistry, NoDaoRegistry } from "@aragon/sdk-common";
+import {
+  NoDaoFactory,
+  NoPluginRepoRegistry,
+  NoDaoRegistry,
+} from "@aragon/sdk-common";
+
+const daoFactoryAddressMap = new Map<Web3Module, string>();
+const daoRegistryAddressMap = new Map<Web3Module, string>();
+const pluginRepoRegistryAddressMap = new Map<Web3Module, string>();
+const gasFeeEstimationFactorMap = new Map<Web3Module, number>();
+const providersMap = new Map<Web3Module, JsonRpcProvider[]>();
+const providerIdxMap = new Map<Web3Module, number>();
+const signerMap = new Map<Web3Module, Signer>();
 
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
-  private providerIdx = -1;
-  private providers: JsonRpcProvider[] = [];
-  private signer?: Signer;
-  private daoFactoryAddress?: string;
-  private daoRegistryAddress?: string;
-  private pluginRepoRegistryAddress?: string;
-  private gasFeeEstimationFactor = 1;
 
   constructor(context: Context) {
+    providerIdxMap.set(this, -1);
     // Storing client data in the private module's scope to prevent external mutation
     if (context.web3Providers) {
-      this.providerIdx = 0;
-      this.providers = context.web3Providers;
+      providersMap.set(this, context.web3Providers);
+      providerIdxMap.set(this, 0);
     }
 
     if (context.signer) {
@@ -29,20 +35,44 @@ export class Web3Module implements IClientWeb3Core {
     }
 
     if (context.daoFactoryAddress) {
-      this.daoFactoryAddress = context.daoFactoryAddress;
+      daoFactoryAddressMap.set(this, context.daoFactoryAddress);
     }
 
     if (context.daoRegistryAddress) {
-      this.daoRegistryAddress = context.daoRegistryAddress;
+      daoRegistryAddressMap.set(this, context.daoRegistryAddress);
     }
 
     if (context.pluginRepoRegistryAddress) {
-      this.pluginRepoRegistryAddress = context.pluginRepoRegistryAddress;
+      pluginRepoRegistryAddressMap.set(this, context.pluginRepoRegistryAddress);
     }
 
     if (context.gasFeeEstimationFactor) {
-      this.gasFeeEstimationFactor = context.gasFeeEstimationFactor;
+      gasFeeEstimationFactorMap.set(this, context.gasFeeEstimationFactor);
     }
+    Object.freeze(Web3Module.prototype);
+    Object.freeze(this);
+  }
+
+  private get daoFactoryAddress(): string {
+    return daoFactoryAddressMap.get(this) || "";
+  }
+  private get daoRegistryAddress(): string {
+    return daoRegistryAddressMap.get(this) || "";
+  }
+  private get pluginRepoRegistryAddress(): string {
+    return pluginRepoRegistryAddressMap.get(this) || "";
+  }
+  private get gasFeeEstimationFactor(): number {
+    return gasFeeEstimationFactorMap.get(this) || 1;
+  }
+  private get providers(): JsonRpcProvider[] {
+    return providersMap.get(this) || [];
+  }
+  private get providerIdx(): number {
+    return providerIdxMap.get(this)!;
+  }
+  private get signer(): Signer | undefined {
+    return signerMap.get(this);
   }
 
   /** Replaces the current signer by the given one */
@@ -50,7 +80,7 @@ export class Web3Module implements IClientWeb3Core {
     if (!signer) {
       throw new Error("Empty wallet or signer");
     }
-    this.signer = signer;
+    signerMap.set(this, signer);
   }
 
   /** Starts using the next available Web3 provider */
@@ -60,7 +90,7 @@ export class Web3Module implements IClientWeb3Core {
     } else if (this.providers.length <= 1) {
       throw new Error("No other endpoints");
     }
-    this.providerIdx = (this.providerIdx + 1) % this.providers.length;
+    providerIdxMap.set(this, (this.providerIdx + 1) % this.providers.length);
   }
 
   /** Retrieves the current signer */

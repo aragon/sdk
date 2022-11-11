@@ -3,6 +3,7 @@ import {
   DAOFactory__factory,
   DAOFactory,
   PluginRepo__factory,
+  DAORegistry__factory,
 } from "@aragon/core-contracts-ethers";
 import {
   GraphQLError,
@@ -13,7 +14,11 @@ import {
 import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { Contract, ContractTransaction, ContractReceipt } from "@ethersproject/contracts";
+import {
+  Contract,
+  ContractTransaction,
+  ContractReceipt,
+} from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryBalances,
@@ -58,6 +63,7 @@ import {
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { id } from "ethers/lib/utils";
 
 /**
  * Methods module the SDK Generic Client
@@ -103,7 +109,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       });
     }
 
-    // @ts-ignore
     let cid = "";
     try {
       cid = await this.ipfs.add(JSON.stringify(params.metadata));
@@ -124,67 +129,29 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       key: DaoCreationSteps.CREATING,
       txHash: tx.hash,
     };
-    // get dao registry address
-    const daoRegistryAddress = await daoFactoryInstance.daoRegistry();
     // start tx
     const receipt = await tx.wait();
+    const daoFactoryInterface = DAORegistry__factory.createInterface();
     // find dao address using the dao registry address
-    const newDaoAddress = receipt.events?.find(
-      e => e.address === daoRegistryAddress
-    )?.topics[1];
-
-    if (!newDaoAddress) {
-      // throw new CannotCreateDaoError()
-      throw new Error("oopsie");
-    }
-
-    yield {
-      key: DaoCreationSteps.DONE,
-      address: "0x" + newDaoAddress.slice(newDaoAddress.length - 40),
-    };
-
-    // // @ts-ignore  TODO: Remove this comment when used
-    // const registryAddress = await daoFactoryInstance.registry();
-
-    // // TODO: Remove mock result
-    // await delay(1000);
-    // yield {
-    //   key: DaoCreationSteps.CREATING,
-    //   txHash:
-    //     "0x1298376517236498176239851762938512359817623985761239486128937461",
-    // };
-
-    // await delay(3000);
-    // yield {
-    //   key: DaoCreationSteps.DONE,
-    //   address: "0x6592568247592378465987126349817263958713",
-    // };
-
-    // TODO: Uncomment when the new DAO factory is available
-
-    /**
-    // TODO: Use the new factory method
-    const tx = await daoFactoryInstance.createDao(
-      ...unwrapCreateDaoParams(params)
+    const log = receipt.logs?.find(
+      e =>
+        e.topics[0] ===
+        id(daoFactoryInterface.getEvent("DAORegistered").format("sighash"))
     );
+    if (!log) {
+      throw new Error("Failed to create DAO");
+    }
 
-    yield {
-      key: DaoCreationSteps.CREATING,
-      txHash: tx.hash,
-    };
-    const receipt = await tx.wait();
-    const newDaoAddress = receipt.events?.find(
-      e => e.address === registryAddress
-    )?.topics[1];
-    if (!newDaoAddress) {
-      return Promise.reject(new Error("Could not create DAO"));
+    const parsedLog = daoFactoryInterface.parseLog(log);
+
+    if (!parsedLog.args["dao"]) {
+      throw new Error("Failed to create DAO");
     }
 
     yield {
       key: DaoCreationSteps.DONE,
-      address: "0x" + newDaoAddress.slice(newDaoAddress.length - 40),
+      address: parsedLog.args["dao"],
     };
-     */
   }
   /**
    * Deposits ether or an ERC20 token into the DAO
@@ -348,7 +315,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       const stringMetadata = await this.ipfs.fetchString(
         "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr"
       );
-      // TODO: Parse and validate schema
       const metadata = JSON.parse(stringMetadata);
       return toDaoDetails(dao, metadata);
     } catch (err) {

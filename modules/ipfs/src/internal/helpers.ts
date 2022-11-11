@@ -163,8 +163,8 @@ export namespace Helpers {
     });
   }
 
-  function encodeParams<T>(
-    options: ArrayLike<T> | {}
+  function encodeParams<T extends {}>(
+    options: T
   ): { [K in keyof T]: Exclude<T[K], undefined> } {
     // @ts-ignore
     return Object.fromEntries(
