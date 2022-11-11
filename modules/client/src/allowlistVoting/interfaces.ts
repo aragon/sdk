@@ -1,4 +1,5 @@
-import { BigNumber, BigNumberish, BytesLike } from "ethers";
+import { BigNumberish } from "@ethersproject/bignumber";
+import { BytesLike } from "@ethersproject/bytes";
 
 interface IAllowlistVoting {
   pluginAddress: string;
@@ -18,15 +19,15 @@ export class Vote {
   [index: string]: any;
   public open!: boolean;
   public executed!: boolean;
-  public startDate!: BigNumber;
-  public endDate!: BigNumber;
-  public snapshotBlock!: BigNumber;
-  public supportRequired!: BigNumber;
-  public participationRequired!: BigNumber;
-  public votingPower!: BigNumber;
-  public yes!: BigNumber;
-  public no!: BigNumber;
-  public abstain!: BigNumber;
+  public startDate!: BigNumberish;
+  public endDate!: BigNumberish;
+  public snapshotBlock!: BigNumberish;
+  public supportRequired!: BigNumberish;
+  public participationRequired!: BigNumberish;
+  public votingPower!: BigNumberish;
+  public yes!: BigNumberish;
+  public no!: BigNumberish;
+  public abstain!: BigNumberish;
   public actions!: VoteAction[];
 }
 
@@ -42,7 +43,7 @@ export type VoteCreationValueCreating = {
 
 export type VoteCreationValueDone = {
   key: Steps.DONE;
-  voteId: BigNumber;
+  voteId: BigNumberish;
 };
 
 export type VoteCreationValue =

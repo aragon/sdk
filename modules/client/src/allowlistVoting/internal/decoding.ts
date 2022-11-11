@@ -1,5 +1,5 @@
-import { ethers, BytesLike } from "ethers";
-import { isBytesLike } from "ethers/lib/utils";
+import { BytesLike, isBytesLike } from "@ethersproject/bytes";
+import { UnsignedTransaction } from "@ethersproject/transactions";
 import { AllowlistVoting } from "../client";
 import {
   IAddAllowedUsersParams,
@@ -19,7 +19,7 @@ export class AllowlistVotingDecoding {
 
   private getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
-    txOrData: ethers.UnsignedTransaction | BytesLike
+    txOrData: UnsignedTransaction | BytesLike
   ): T {
     let data: BytesLike | undefined = txOrData as BytesLike;
     if (!isBytesLike(txOrData)) {
@@ -37,36 +37,34 @@ export class AllowlistVotingDecoding {
   }
 
   public addAllowedUsers(
-    txOrData: ethers.UnsignedTransaction | BytesLike
+    txOrData: UnsignedTransaction | BytesLike
   ): IAddAllowedUsersParams {
     return this.getDecodedData("addAllowedUsers", txOrData);
   }
 
   public createVote(
-    txOrData: ethers.UnsignedTransaction | BytesLike
+    txOrData: UnsignedTransaction | BytesLike
   ): ICreateVoteParams {
     return this.getDecodedData("addAllowedUsers", txOrData);
   }
 
-  public execute(
-    txOrData: ethers.UnsignedTransaction | BytesLike
-  ): IExecuteParams {
+  public execute(txOrData: UnsignedTransaction | BytesLike): IExecuteParams {
     return this.getDecodedData("execute", txOrData);
   }
 
   public removeAllowedUsers(
-    txOrData: ethers.UnsignedTransaction | BytesLike
+    txOrData: UnsignedTransaction | BytesLike
   ): IRemoveAllowedUsersParams {
     return this.getDecodedData("removeAllowedUsers", txOrData);
   }
 
   public setConfiguration(
-    txOrData: ethers.UnsignedTransaction | BytesLike
+    txOrData: UnsignedTransaction | BytesLike
   ): ISetConfigurationParams {
     return this.getDecodedData("setConfiguration", txOrData);
   }
 
-  public vote(txOrData: ethers.UnsignedTransaction | BytesLike): IVoteParams {
+  public vote(txOrData: UnsignedTransaction | BytesLike): IVoteParams {
     return this.getDecodedData("vote", txOrData);
   }
 }

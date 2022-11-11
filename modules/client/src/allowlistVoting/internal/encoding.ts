@@ -1,4 +1,6 @@
-import { BigNumberish, BytesLike, ethers } from "ethers";
+import { BigNumberish } from "@ethersproject/bignumber";
+import { BytesLike } from "@ethersproject/bytes";
+import { UnsignedTransaction } from "@ethersproject/transactions";
 import { AllowlistVoting } from "../client";
 import { VoteAction } from "../interfaces";
 
@@ -12,7 +14,7 @@ export class AllowlistVotingEncoding {
   private getUnsignedTransaction(
     functionName: string,
     ...args: any[]
-  ): ethers.UnsignedTransaction {
+  ): UnsignedTransaction {
     const pluginInstance = this.allowlistVoting.pluginInstance;
     const data = pluginInstance.interface.encodeFunctionData(
       // @ts-ignore functionName is hardcoded by us
@@ -26,7 +28,7 @@ export class AllowlistVotingEncoding {
     };
   }
 
-  public addAllowedUsers(_users: string[]): ethers.UnsignedTransaction {
+  public addAllowedUsers(_users: string[]): UnsignedTransaction {
     return this.getUnsignedTransaction("addAllowedUsers", _users);
   }
 
@@ -37,7 +39,7 @@ export class AllowlistVotingEncoding {
     _endDate: BigNumberish,
     _executeIfDecided: boolean,
     _choice: BigNumberish
-  ): ethers.UnsignedTransaction {
+  ): UnsignedTransaction {
     return this.getUnsignedTransaction(
       "createVote",
       _proposalMetadata,
@@ -49,11 +51,11 @@ export class AllowlistVotingEncoding {
     );
   }
 
-  public execute(_voteId: BigNumberish): ethers.UnsignedTransaction {
+  public execute(_voteId: BigNumberish): UnsignedTransaction {
     return this.getUnsignedTransaction("execute", _voteId);
   }
 
-  public removeAllowedUsers(_users: string[]): ethers.UnsignedTransaction {
+  public removeAllowedUsers(_users: string[]): UnsignedTransaction {
     return this.getUnsignedTransaction("removeAllowedUsers", _users);
   }
 
@@ -61,7 +63,7 @@ export class AllowlistVotingEncoding {
     _participationRequiredPct: BigNumberish,
     _supportRequiredPct: BigNumberish,
     _minDuration: BigNumberish
-  ): ethers.UnsignedTransaction {
+  ): UnsignedTransaction {
     return this.getUnsignedTransaction(
       "setConfiguration",
       _participationRequiredPct,
@@ -74,7 +76,7 @@ export class AllowlistVotingEncoding {
     _voteId: BigNumberish,
     _choice: BigNumberish,
     _executesIfDecided: boolean
-  ): ethers.UnsignedTransaction {
+  ): UnsignedTransaction {
     return this.getUnsignedTransaction(
       "vote",
       _voteId,
