@@ -34,6 +34,7 @@ import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
 import { isAddress } from "@ethersproject/address";
 import { Server } from "ganache";
 import { ethers } from "ethers";
+import { toUtf8Bytes } from "ethers/lib/utils";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -75,9 +76,11 @@ describe("Client", () => {
           plugins: [
             {
               id: deployment.allowListPluginSetup.address,
-              data: ethers.utils.defaultAbiCoder.encode(
-                ["uint64", "uint64", "uint64", "address[]"],
-                [1, 1, 1, []]
+              data: toUtf8Bytes(
+                ethers.utils.defaultAbiCoder.encode(
+                  ["uint64", "uint64", "uint64", "address[]"],
+                  [1, 1, 1, []]
+                )
               ),
             },
           ],
@@ -114,9 +117,11 @@ describe("Client", () => {
           plugins: [
             {
               id: deployment.allowListRepo.address,
-              data: ethers.utils.defaultAbiCoder.encode(
-                ["uint64", "uint64", "uint64", "address[]"],
-                [1, 1, 1, []]
+              data: toUtf8Bytes(
+                ethers.utils.defaultAbiCoder.encode(
+                  ["uint64", "uint64", "uint64", "address[]"],
+                  [1, 1, 1, []]
+                )
               ),
             },
           ],

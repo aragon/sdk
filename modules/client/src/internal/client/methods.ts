@@ -63,7 +63,7 @@ import {
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { id } from "ethers/lib/utils";
+import { id, toUtf8String } from "ethers/lib/utils";
 
 /**
  * Methods module the SDK Generic Client
@@ -105,7 +105,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       pluginInstallationData.push({
         pluginSetup: latestVersion[1],
         pluginSetupRepo: plugin.id,
-        data: plugin.data,
+        data: toUtf8String(plugin.data),
       });
     }
 
