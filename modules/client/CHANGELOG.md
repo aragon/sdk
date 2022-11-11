@@ -16,7 +16,7 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [UPCOMING]
+## 0.12.0-alpha
 ### Changed
 - Examples folder and files
 - Automatic generated README from examples
