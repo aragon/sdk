@@ -1,38 +1,49 @@
+import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 import { BigNumberish } from "@ethersproject/bignumber";
 import { BytesLike } from "@ethersproject/bytes";
 import { UnsignedTransaction } from "@ethersproject/transactions";
-import { AllowlistVoting } from "../client";
 import { VoteAction } from "../interfaces";
 
 export class AllowlistVotingEncoding {
-  private allowlistVoting: AllowlistVoting;
-
-  constructor(allowlistVoting: AllowlistVoting) {
-    this.allowlistVoting = allowlistVoting;
+  private pluginAddr: string;
+  constructor(pluginAddr: string) {
+    this.pluginAddr = pluginAddr;
   }
 
-  private getUnsignedTransaction(
+  private static getUnsignedTransaction(
+    pluginAddr: string,
     functionName: string,
     ...args: any[]
   ): UnsignedTransaction {
-    const pluginInstance = this.allowlistVoting.pluginInstance;
-    const data = pluginInstance.interface.encodeFunctionData(
+    const data = AllowlistVoting__factory.createInterface().encodeFunctionData(
       // @ts-ignore functionName is hardcoded by us
       functionName,
       args
     );
     return {
-      to: pluginInstance.address,
+      to: pluginAddr,
       value: 0,
       data,
     };
   }
 
-  public addAllowedUsers(_users: string[]): UnsignedTransaction {
-    return this.getUnsignedTransaction("addAllowedUsers", _users);
+  public static addAllowedUsers(
+    pluginAddr: string,
+    _users: string[]
+  ): UnsignedTransaction {
+    return AllowlistVotingEncoding.getUnsignedTransaction(
+      pluginAddr,
+      "addAllowedUsers",
+      _users
+    );
   }
 
-  public createVote(
+  public addAllowedUsers(_users: string[]): UnsignedTransaction {
+    return AllowlistVotingEncoding.addAllowedUsers(this.pluginAddr, _users);
+  }
+
+  public static createProposal(
+    pluginAddr: string,
     _proposalMetadata: BytesLike,
     _actions: VoteAction[],
     _startDate: BigNumberish,
@@ -41,6 +52,7 @@ export class AllowlistVotingEncoding {
     _choice: BigNumberish
   ): UnsignedTransaction {
     return this.getUnsignedTransaction(
+      pluginAddr,
       "createVote",
       _proposalMetadata,
       _actions,
@@ -51,12 +63,68 @@ export class AllowlistVotingEncoding {
     );
   }
 
+  public createProposal(
+    _proposalMetadata: BytesLike,
+    _actions: VoteAction[],
+    _startDate: BigNumberish,
+    _endDate: BigNumberish,
+    _executeIfDecided: boolean,
+    _choice: BigNumberish
+  ): UnsignedTransaction {
+    return AllowlistVotingEncoding.createProposal(
+      this.pluginAddr,
+      _proposalMetadata,
+      _actions,
+      _startDate,
+      _endDate,
+      _executeIfDecided,
+      _choice
+    );
+  }
+
+  public static execute(
+    pluginAddr: string,
+    _voteId: BigNumberish
+  ): UnsignedTransaction {
+    return AllowlistVotingEncoding.getUnsignedTransaction(
+      pluginAddr,
+      "execute",
+      _voteId
+    );
+  }
+
   public execute(_voteId: BigNumberish): UnsignedTransaction {
-    return this.getUnsignedTransaction("execute", _voteId);
+    return AllowlistVotingEncoding.execute(this.pluginAddr, _voteId);
+  }
+
+  public static removeAllowedUsers(
+    pluginAddr: string,
+    _users: string[]
+  ): UnsignedTransaction {
+    return AllowlistVotingEncoding.getUnsignedTransaction(
+      pluginAddr,
+      "removeAllowedUsers",
+      _users
+    );
   }
 
   public removeAllowedUsers(_users: string[]): UnsignedTransaction {
-    return this.getUnsignedTransaction("removeAllowedUsers", _users);
+    return AllowlistVotingEncoding.removeAllowedUsers(this.pluginAddr, _users);
+  }
+
+  public static setConfiguration(
+    pluginAddr: string,
+    _participationRequiredPct: BigNumberish,
+    _supportRequiredPct: BigNumberish,
+    _minDuration: BigNumberish
+  ): UnsignedTransaction {
+    return AllowlistVotingEncoding.getUnsignedTransaction(
+      pluginAddr,
+      "setConfiguration",
+      _participationRequiredPct,
+      _supportRequiredPct,
+      _minDuration
+    );
   }
 
   public setConfiguration(
@@ -64,11 +132,26 @@ export class AllowlistVotingEncoding {
     _supportRequiredPct: BigNumberish,
     _minDuration: BigNumberish
   ): UnsignedTransaction {
-    return this.getUnsignedTransaction(
-      "setConfiguration",
+    return AllowlistVotingEncoding.setConfiguration(
+      this.pluginAddr,
       _participationRequiredPct,
       _supportRequiredPct,
       _minDuration
+    );
+  }
+
+  public static vote(
+    pluginAddr: string,
+    _voteId: BigNumberish,
+    _choice: BigNumberish,
+    _executesIfDecided: boolean
+  ): UnsignedTransaction {
+    return AllowlistVotingEncoding.getUnsignedTransaction(
+      pluginAddr,
+      "vote",
+      _voteId,
+      _choice,
+      _executesIfDecided
     );
   }
 
@@ -77,8 +160,8 @@ export class AllowlistVotingEncoding {
     _choice: BigNumberish,
     _executesIfDecided: boolean
   ): UnsignedTransaction {
-    return this.getUnsignedTransaction(
-      "vote",
+    return AllowlistVotingEncoding.vote(
+      this.pluginAddr,
       _voteId,
       _choice,
       _executesIfDecided

@@ -1,7 +1,18 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { BytesLike } from "@ethersproject/bytes";
+import {
+  ContractReceipt,
+  Event as EthersEvent,
+} from "@ethersproject/contracts";
 import { AllowlistVoting } from "../client";
-import { Steps, Vote, VoteAction, VoteCreationValue } from "../interfaces";
+import {
+  Steps,
+  Vote,
+  VoteAction,
+  VoteCreationValue,
+  VoteStepsValue,
+} from "../interfaces";
+import { CreateVoteError } from "./errors";
 
 export class AllowlistVotingMethods {
   private allowlistVoting: AllowlistVoting;
@@ -32,13 +43,20 @@ export class AllowlistVotingMethods {
       .UPGRADE_PLUGIN_PERMISSION_ID();
   }
 
-  public async *addAllowedUsers(_users: string[]): AsyncGenerator<Steps> {
+  public async *addAllowedUsers(
+    _users: string[]
+  ): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
       .getConnectedPluginInstance()
       .addAllowedUsers(_users);
-    yield Steps.PENDING;
+    yield {
+      key: Steps.PENDING,
+      txHash: tx.hash,
+    };
     await tx.wait();
-    yield Steps.DONE;
+    yield {
+      key: Steps.DONE,
+    };
   }
 
   public allowedUserCount(blockNumber: BigNumberish): Promise<BigNumber> {
@@ -59,7 +77,7 @@ export class AllowlistVotingMethods {
       .canVote(_voteId, _voter);
   }
 
-  public async *createVote(
+  public async *createProposal(
     _proposalMetadata: BytesLike,
     _actions: VoteAction[],
     _startDate: BigNumberish,
@@ -84,24 +102,30 @@ export class AllowlistVotingMethods {
     };
 
     const receipt = await tx.wait();
-    const voteCreatedEvent = receipt.events?.find(
-      event => event.event === "VoteCreated"
-    );
-    console.log(voteCreatedEvent);
+    const voteCreatedEvents = this.getEventsByName(receipt, "VoteCreated");
+
+    if (voteCreatedEvents.length !== 1) {
+      throw new CreateVoteError();
+    }
 
     yield {
       key: Steps.DONE,
-      voteId: BigNumber.from("1"),
+      voteId: parseInt(voteCreatedEvents[0].topics[1]),
     };
   }
 
-  public async *execute(_voteId: BigNumberish): AsyncGenerator<Steps> {
+  public async *execute(_voteId: BigNumberish): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
       .getConnectedPluginInstance()
       .execute(_voteId);
-    yield Steps.PENDING;
+    yield {
+      key: Steps.PENDING,
+      txHash: tx.hash,
+    };
     await tx.wait();
-    yield Steps.DONE;
+    yield {
+      key: Steps.DONE,
+    };
   }
 
   public getDAO(): Promise<string> {
@@ -160,20 +184,27 @@ export class AllowlistVotingMethods {
     return this.allowlistVoting.getConnectedPluginInstance().proxiableUUID();
   }
 
-  public async *removeAllowedUsers(_users: string[]): AsyncGenerator<Steps> {
+  public async *removeAllowedUsers(
+    _users: string[]
+  ): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
       .getConnectedPluginInstance()
       .removeAllowedUsers(_users);
-    yield Steps.PENDING;
+    yield {
+      key: Steps.PENDING,
+      txHash: tx.hash,
+    };
     await tx.wait();
-    yield Steps.DONE;
+    yield {
+      key: Steps.DONE,
+    };
   }
 
   public async *setConfiguration(
     _participationRequiredPct: BigNumberish,
     _supportRequiredPct: BigNumberish,
     _minDuration: BigNumberish
-  ): AsyncGenerator<Steps> {
+  ): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
       .getConnectedPluginInstance()
       .setConfiguration(
@@ -181,9 +212,14 @@ export class AllowlistVotingMethods {
         _supportRequiredPct,
         _minDuration
       );
-    yield Steps.PENDING;
+    yield {
+      key: Steps.PENDING,
+      txHash: tx.hash,
+    };
     await tx.wait();
-    yield Steps.DONE;
+    yield {
+      key: Steps.DONE,
+    };
   }
 
   public supportRequiredPct(): Promise<BigNumber> {
@@ -196,16 +232,33 @@ export class AllowlistVotingMethods {
     _voteId: BigNumberish,
     _choice: BigNumberish,
     _executesIfDecided: boolean
-  ): AsyncGenerator<Steps> {
+  ): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
       .getConnectedPluginInstance()
       .vote(_voteId, _choice, _executesIfDecided);
-    yield Steps.PENDING;
+    yield {
+      key: Steps.PENDING,
+      txHash: tx.hash,
+    };
     await tx.wait();
-    yield Steps.DONE;
+    yield {
+      key: Steps.DONE,
+    };
   }
 
   public votesLength(): Promise<BigNumber> {
     return this.allowlistVoting.getConnectedPluginInstance().votesLength();
+  }
+
+  private getEventsByName(
+    receipt: ContractReceipt,
+    eventName: string
+  ): EthersEvent[] {
+    const eventTopic = this.allowlistVoting.pluginInstance.interface.getEventTopic(
+      eventName
+    );
+    return (
+      receipt.events?.filter(event => event.topics[0] === eventTopic) || []
+    );
   }
 }

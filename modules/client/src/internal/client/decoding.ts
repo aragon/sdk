@@ -1,6 +1,5 @@
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import {
-  IClientDecoding,
   IFreezePermissionDecodedParams,
   IGrantPermissionDecodedParams,
   IMetadata,
@@ -20,7 +19,7 @@ import { freezeParamsFromContract, permissionParamsFromContract, withdrawParamsF
 /**
  * Decoding module the SDK Generic Client
  */
-export class ClientDecoding extends ClientCore implements IClientDecoding {
+export class ClientDecoding extends ClientCore {
   constructor(context: Context) {
     super(context);
     Object.freeze(ClientDecoding.prototype);

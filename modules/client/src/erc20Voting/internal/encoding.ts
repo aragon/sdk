@@ -26,7 +26,7 @@ export class ERC20VotingEncoding {
     };
   }
 
-  public createVote(
+  public createProposal(
     _proposalMetadata: BytesLike,
     _actions: VoteAction[],
     _startDate: BigNumberish,

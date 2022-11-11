@@ -16,15 +16,6 @@ export interface IPluginInstallItem {
   id: string; // ENS domain or address of the plugin's Repo
   data: Uint8Array;
 }
-/**
- * Contains the payload passed to governance contracts, serializing
- * the actions to do upon approval
- */
-export type DaoAction = {
-  to: string;
-  value: bigint;
-  data: Uint8Array;
-};
 
 /**
  * Contains the general human readable information about the DAO

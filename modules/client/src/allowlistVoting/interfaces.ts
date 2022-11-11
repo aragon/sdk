@@ -36,19 +36,22 @@ export enum Steps {
   DONE = "done",
 }
 
-export type VoteCreationValueCreating = {
+export type VoteStepsValue = VoteStepsValueCreating | VoteStepsValueDone;
+
+export type VoteStepsValueCreating = {
   key: Steps.PENDING;
   txHash: string;
 };
 
-export type VoteCreationValueDone = {
+export type VoteStepsValueDone = {
   key: Steps.DONE;
-  voteId: BigNumberish;
 };
 
-export type VoteCreationValue =
-  | VoteCreationValueCreating
-  | VoteCreationValueDone;
+export type VoteCreationValueDone = VoteStepsValueDone & {
+  voteId: number;
+};
+
+export type VoteCreationValue = VoteStepsValueCreating | VoteCreationValueDone;
 
 export interface IAddAllowedUsersParams {
   _users: string[];

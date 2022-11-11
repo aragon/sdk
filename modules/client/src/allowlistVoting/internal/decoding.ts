@@ -1,6 +1,5 @@
 import { BytesLike, isBytesLike } from "@ethersproject/bytes";
 import { UnsignedTransaction } from "@ethersproject/transactions";
-import { AllowlistVoting } from "../client";
 import {
   IAddAllowedUsersParams,
   ICreateVoteParams,
@@ -9,15 +8,10 @@ import {
   ISetConfigurationParams,
   IVoteParams,
 } from "../interfaces";
+import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 
 export class AllowlistVotingDecoding {
-  private allowlistVoting: AllowlistVoting;
-
-  constructor(allowlistVoting: AllowlistVoting) {
-    this.allowlistVoting = allowlistVoting;
-  }
-
-  private getDecodedData<T extends { [key: string]: any }>(
+  private static getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
     txOrData: UnsignedTransaction | BytesLike
   ): T {
@@ -30,41 +24,48 @@ export class AllowlistVotingDecoding {
     }
 
     // @ts-ignore we know that we get an readonly Array and an object which is fine
-    return this.allowlistVoting.pluginInstance.interface.decodeFunctionData(
+    return AllowlistVoting__factory.createInterface().decodeFunctionData(
       functionFragment,
       data
     );
   }
 
-  public addAllowedUsers(
+  public static addAllowedUsers(
     txOrData: UnsignedTransaction | BytesLike
   ): IAddAllowedUsersParams {
-    return this.getDecodedData("addAllowedUsers", txOrData);
+    return AllowlistVotingDecoding.getDecodedData("addAllowedUsers", txOrData);
   }
 
-  public createVote(
+  public static createProposal(
     txOrData: UnsignedTransaction | BytesLike
   ): ICreateVoteParams {
-    return this.getDecodedData("addAllowedUsers", txOrData);
+    return AllowlistVotingDecoding.getDecodedData("addAllowedUsers", txOrData);
   }
 
-  public execute(txOrData: UnsignedTransaction | BytesLike): IExecuteParams {
-    return this.getDecodedData("execute", txOrData);
+  public static execute(
+    txOrData: UnsignedTransaction | BytesLike
+  ): IExecuteParams {
+    return AllowlistVotingDecoding.getDecodedData("execute", txOrData);
   }
 
-  public removeAllowedUsers(
+  public static removeAllowedUsers(
     txOrData: UnsignedTransaction | BytesLike
   ): IRemoveAllowedUsersParams {
-    return this.getDecodedData("removeAllowedUsers", txOrData);
+    return AllowlistVotingDecoding.getDecodedData(
+      "removeAllowedUsers",
+      txOrData
+    );
   }
 
-  public setConfiguration(
+  public static setConfiguration(
     txOrData: UnsignedTransaction | BytesLike
   ): ISetConfigurationParams {
-    return this.getDecodedData("setConfiguration", txOrData);
+    return AllowlistVotingDecoding.getDecodedData("setConfiguration", txOrData);
   }
 
-  public vote(txOrData: UnsignedTransaction | BytesLike): IVoteParams {
-    return this.getDecodedData("vote", txOrData);
+  public static vote(
+    txOrData: UnsignedTransaction | BytesLike
+  ): IVoteParams {
+    return AllowlistVotingDecoding.getDecodedData("vote", txOrData);
   }
 }

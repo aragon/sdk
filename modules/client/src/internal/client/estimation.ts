@@ -12,7 +12,6 @@ import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import { ClientCore, Context, GasFeeEstimation } from "../../client-common";
 import {
-  IClientEstimation,
   ICreateParams,
   IDepositParams,
 } from "../../interfaces";
@@ -22,7 +21,7 @@ import { isAddress } from "@ethersproject/address";
 /**
  * Estimation module the SDK Generic Client
  */
-export class ClientEstimation extends ClientCore implements IClientEstimation {
+export class ClientEstimation extends ClientCore {
   constructor(context: Context) {
     super(context);
     Object.freeze(ClientEstimation.prototype);

@@ -1,5 +1,5 @@
 import { BigNumber } from "@ethersproject/bignumber";
-import { DaoAction, IPagination } from "./common";
+import { IPagination } from "./common";
 
 
 /**
@@ -40,16 +40,6 @@ export interface IPluginSettings {
   minDuration: number;
 }
 
-export interface ICreateProposalParams {
-  pluginAddress: string;
-  metadata: ProposalMetadata;
-  actions?: DaoAction[];
-  startDate?: Date;
-  endDate?: Date;
-  executeOnPass?: boolean;
-  creatorVote?: VoteValues;
-}
-
 export interface IVoteProposalParams {
   pluginAddress: string;
   vote: VoteValues;
@@ -87,22 +77,6 @@ export type ProposalMetadata = {
 export type ProposalMetadataSummary = {
   title: string;
   summary: string;
-};
-
-// Long version
-export type ProposalBase = {
-  id: string;
-  dao: {
-    address: string;
-    name: string;
-  };
-  creatorAddress: string;
-  metadata: ProposalMetadata;
-  startDate: Date;
-  endDate: Date;
-  creationDate: Date;
-  actions: Array<DaoAction>;
-  status: ProposalStatus;
 };
 
 // Short version

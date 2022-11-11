@@ -34,7 +34,7 @@ export class ERC20VotingDecoding {
     );
   }
 
-  public createVote(
+  public createProposal(
     txOrData: ethers.UnsignedTransaction | BytesLike
   ): ICreateVoteParams {
     return this.getDecodedData("addAllowedUsers", txOrData);

@@ -1,87 +1,12 @@
 // This file contains the definitions of the general purpose DAO client
 
 import {
-  DaoAction,
-  DaoRole,
-  GasFeeEstimation,
-  IInterfaceParams,
   IPagination,
   IPluginInstallItem,
 } from "./client-common/interfaces/common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { BigNumber } from "@ethersproject/bignumber";
-import { IClientCore } from "./client-common/interfaces/core";
-/** Defines the shape of the general purpose Client class */
-export interface IClientMethods extends IClientCore {
-  create: (params: ICreateParams) => AsyncGenerator<DaoCreationStepValue>;
-  /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
-  getBalances: (
-    daoAddressOrEns: string,
-    tokenAddresses: string[],
-  ) => Promise<AssetBalance[] | null>;
-  /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
-  getTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
-  /** Checks whether a role is granted by the current DAO's ACL settings */
-  hasPermission: (
-    where: string,
-    who: string,
-    role: DaoRole,
-    data: Uint8Array,
-  ) => Promise<void>;
-  /** Deposits ether or an ERC20 token */
-  deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
-  /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-  getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
-  /** Retrieves metadata for many daos */
-  getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
-}
-
-export interface IClientEncoding extends IClientCore {
-  grantAction: (
-    daoAddress: string,
-    params: IGrantPermissionParams,
-  ) => DaoAction;
-  revokeAction: (
-    daoAddress: string,
-    params: IRevokePermissionParams,
-  ) => DaoAction;
-  freezeAction: (
-    daoAddress: string,
-    params: IFreezePermissionParams,
-  ) => DaoAction;
-  withdrawAction: (
-    daoAddresOrEns: string,
-    params: IWithdrawParams,
-  ) => Promise<DaoAction>;
-  updateMetadataAction: (
-    daoAddressOrEns: string,
-    params: IMetadata,
-  ) => Promise<DaoAction>;
-}
-
-export interface IClientDecoding {
-  grantAction: (data: Uint8Array) => IGrantPermissionDecodedParams;
-  revokeAction: (data: Uint8Array) => IRevokePermissionDecodedParams;
-  freezeAction: (data: Uint8Array) => IFreezePermissionDecodedParams;
-  withdrawAction: (data: Uint8Array) => IWithdrawParams;
-  updateMetadataRawAction: (data: Uint8Array) => string;
-  updateMetadataAction: (data: Uint8Array) => Promise<IMetadata>;
-  findInterface: (data: Uint8Array) => IInterfaceParams | null;
-}
-
-export interface IClientEstimation {
-  create: (params: ICreateParams) => Promise<GasFeeEstimation>;
-  deposit: (params: IDepositParams) => Promise<GasFeeEstimation>;
-  updateAllowance: (params: IDepositParams) => Promise<GasFeeEstimation>;
-}
-
-export interface IClient {
-  methods: IClientMethods;
-  encoding: IClientEncoding;
-  decoding: IClientDecoding;
-  estimation: IClientEstimation;
-}
 
 // DAO CREATION
 
@@ -149,7 +74,7 @@ const Permissions = {
 
 const PermissionIds = Object.entries(Permissions).reduce(
   (acc, [k, v]) => ({ ...acc, [k + "_ID"]: keccak256(toUtf8Bytes(v)) }),
-  {} as { [k: string]: string },
+  {} as { [k: string]: string }
 );
 Object.freeze(Permissions);
 export { Permissions };
@@ -164,6 +89,22 @@ export enum DaoCreationSteps {
 export type DaoCreationStepValue =
   | { key: DaoCreationSteps.CREATING; txHash: string }
   | { key: DaoCreationSteps.DONE; address: string };
+
+export enum DaoSteps {
+  PENDING = 'pending',
+  DONE = 'done'
+}
+
+export type DaoStepsValue = DaoStepsValuePending | DaoStepsValueDone
+
+export type DaoStepsValuePending = {
+  key: DaoSteps.PENDING,
+  txHash: string
+}
+
+export type DaoStepsValueDone = {
+  key: DaoSteps.DONE
+}
 
 // DEPOSIT
 

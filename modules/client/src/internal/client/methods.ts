@@ -11,6 +11,7 @@ import {
   NoProviderError,
   NoSignerError,
 } from "@aragon/sdk-common";
+import { id } from "@ethersproject/hash";
 import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -35,7 +36,6 @@ import {
   DaoDetails,
   DaoListItem,
   DaoSortBy,
-  IClientMethods,
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
@@ -62,13 +62,12 @@ import {
   unwrapDepositParams,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
-import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
-import { id } from "@ethersproject/hash";
+import { toUtf8String, toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Methods module the SDK Generic Client
  */
-export class ClientMethods extends ClientCore implements IClientMethods {
+export class ClientMethods extends ClientCore {
   constructor(context: Context) {
     super(context);
     Object.freeze(ClientMethods.prototype);
@@ -153,6 +152,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       address: parsedLog.args["dao"],
     };
   }
+
   /**
    * Deposits ether or an ERC20 token into the DAO
    *
@@ -202,26 +202,15 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
 
     await depositTx.wait().then(cr => {
-      if (!cr.logs?.length) {
+      if (!cr.events?.length) {
         throw new Error("The deposit was not properly registered");
       }
 
-      const daoInterface = DAO__factory.createInterface();
-      const log = cr.logs?.find(
-        e =>
-          e?.topics[0] ===
-          id(daoInterface.getEvent("Deposited").format("sighash"))
-      );
-      if (!log) {
-        throw new Error("Failed to deposit");
-      }
-
-      const logParsed = daoInterface.parseLog(log);
-      if (!amount.eq(logParsed.args["amount"])) {
+      const eventAmount = cr.events?.find(e => e?.event === "Deposited")?.args
+        ?.amount;
+      if (!amount.eq(eventAmount)) {
         throw new Error(
-          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${logParsed.args[
-            "amount"
-          ].toBigInt()}`
+          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`
         );
       }
     });
@@ -259,13 +248,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     };
 
     await tx.wait().then((cr: ContractReceipt) => {
-      const log = cr.logs?.find(
-        e => e?.topics[0] === id("Approval(address,address,uint256)")
-      );
-      if (!log) {
-        throw new Error("Could not find the Approval event");
-      }
-      const value = parseInt(log.data);
+      const value = cr.events?.find(e => e?.event === "Approval")?.args?.value;
       if (!value || BigNumber.from(amount).gt(value)) {
         throw new Error("Could not update allowance");
       }
@@ -276,6 +259,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       allowance: amount,
     };
   }
+
   /**
    * Checks whether a role is granted by the current DAO's ACL settings
    *

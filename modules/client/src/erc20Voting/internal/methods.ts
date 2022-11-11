@@ -35,7 +35,7 @@ export class ERC20VotingMethods {
       .canVote(_voteId, _voter);
   }
 
-  public async *createVote(
+  public async *createProposal(
     _proposalMetadata: BytesLike,
     _actions: VoteAction[],
     _startDate: BigNumberish,

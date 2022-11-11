@@ -24,8 +24,8 @@ export class AllowlistVoting extends ClientCore {
     );
     this.methods = new AllowlistVotingMethods(this);
     this.estimation = new AllowlistVotingEstimation(this);
-    this.encoding = new AllowlistVotingEncoding(this);
-    this.decoding = new AllowlistVotingDecoding(this);
+    this.encoding = new AllowlistVotingEncoding(context.pluginAddress);
+    this.decoding = AllowlistVotingDecoding;
   }
 
   public getConnectedPluginInstance(): AllowlistVotingContract {
