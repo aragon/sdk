@@ -27,7 +27,7 @@ export namespace Helpers {
   }
 
   export async function streamToUInt8Array(
-    stream: AsyncGenerator<Uint8Array>,
+    stream: AsyncGenerator<Uint8Array>
   ): Promise<Uint8Array> {
     const chunks: Uint8Array[] = [];
     let byteCount = 0;
@@ -102,7 +102,7 @@ export namespace Helpers {
   }
 
   export function getVersionParams(
-    options: VersionOptions = {},
+    options: VersionOptions = {}
   ): GenericRecord {
     return encodeParams({
       number: options.number,
@@ -112,7 +112,7 @@ export namespace Helpers {
   }
 
   export function getNodeInfoParams(
-    options: NodeInfoOptions = {},
+    options: NodeInfoOptions = {}
   ): GenericRecord {
     return encodeParams({
       arg: options.arg,
@@ -163,12 +163,12 @@ export namespace Helpers {
     });
   }
 
-  function encodeParams<T>(
-    options: T,
+  function encodeParams<T extends {}>(
+    options: T
   ): { [K in keyof T]: Exclude<T[K], undefined> } {
     // @ts-ignore
     return Object.fromEntries(
-      Object.entries(options).filter(([, v]) => v != null),
+      Object.entries(options).filter(([, v]) => v != null)
     );
   }
 }

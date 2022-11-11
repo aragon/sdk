@@ -136,7 +136,6 @@ export function addressListInitParamsToContract(
   // this is converted into a plugin
   return [
     AddressZero,
-    AddressZero,
     BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
     BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
     BigNumber.from(params.settings.minDuration),

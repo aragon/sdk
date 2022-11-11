@@ -13,7 +13,7 @@ import {
   IAddressListPluginInstall,
   IClientAddressListEncoding,
 } from "../../interfaces";
-import { WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 import { addressListInitParamsToContract } from "../utils";
 
 /**
@@ -36,16 +36,15 @@ export class ClientAddressListEncoding extends ClientCore
    * @memberof ClientAddressListEncoding
    */
   static getPluginInstallItem(
-    params: IAddressListPluginInstall,
+    params: IAddressListPluginInstall
   ): IPluginInstallItem {
-    const addressListVotingInterface = WhitelistVoting__factory.createInterface();
+    const addressListVotingInterface = AllowlistVoting__factory.createInterface();
     const args = addressListInitParamsToContract(params);
     // get hex bytes
     const hexBytes = addressListVotingInterface.encodeFunctionData(
       "initialize",
-      args,
+      args
     );
-    // Strip 0x => encode in Uint8Array
     const data = hexToBytes(strip0x(hexBytes));
     return {
       id: ADDRESSLIST_PLUGIN_ID,
@@ -63,7 +62,7 @@ export class ClientAddressListEncoding extends ClientCore
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
-    params: IPluginSettings,
+    params: IPluginSettings
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new Error("Invalid plugin address");
@@ -83,10 +82,7 @@ export class ClientAddressListEncoding extends ClientCore
    * @return {*}  {DaoAction}
    * @memberof ClientAddressListEncoding
    */
-  public addMembersAction(
-    pluginAddress: string,
-    members: string[],
-  ): DaoAction {
+  public addMembersAction(pluginAddress: string, members: string[]): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -95,12 +91,12 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = WhitelistVoting__factory.createInterface();
+    const votingInterface = AllowlistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
       // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addWhitelistedUsers",
-      [members],
+      "addAllowedUsers",
+      [members]
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
@@ -119,7 +115,7 @@ export class ClientAddressListEncoding extends ClientCore
    */
   public removeMembersAction(
     pluginAddress: string,
-    members: string[],
+    members: string[]
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -129,12 +125,12 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = WhitelistVoting__factory.createInterface();
+    const votingInterface = AllowlistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
       // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeWhitelistedUsers",
-      [members],
+      "removeAllowedUsers",
+      [members]
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {

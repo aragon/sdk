@@ -1,4 +1,4 @@
-import { MajorityVoting__factory } from "@aragon/core-contracts-ethers";
+import { MajorityVotingBase__factory } from "@aragon/core-contracts-ethers";
 import {
   bytesToHex,
   decodeRatio,
@@ -14,26 +14,26 @@ import { BigNumber } from "@ethersproject/bignumber";
 export function decodeUpdatePluginSettingsAction(
   data: Uint8Array,
 ): IPluginSettings {
-  const votingInterface = MajorityVoting__factory.createInterface();
+  const votingInterface = MajorityVotingBase__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = votingInterface.getFunction(
     hexBytes.substring(0, 10) as any,
   );
-  const expectedfunction = votingInterface.getFunction("changeVoteConfig");
+  const expectedfunction = votingInterface.getFunction("setConfiguration");
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
   }
-  const result = votingInterface.decodeFunctionData("changeVoteConfig", data);
+  const result = votingInterface.decodeFunctionData("setConfiguration", data);
   return pluginSettingsFromContract(result);
 }
 
 export function encodeUpdatePluginSettingsAction(
   params: IPluginSettings,
 ): Uint8Array {
-  const votingInterface = MajorityVoting__factory.createInterface();
+  const votingInterface = MajorityVotingBase__factory.createInterface();
   const args = pluginSettingsToContract(params);
   // get hex bytes
-  const hexBytes = votingInterface.encodeFunctionData("changeVoteConfig", args);
+  const hexBytes = votingInterface.encodeFunctionData("setConfiguration", args);
   // Strip 0x => encode in Uint8Array
   return hexToBytes(strip0x(hexBytes));
 }

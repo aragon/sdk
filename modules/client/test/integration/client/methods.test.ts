@@ -1,9 +1,8 @@
 // @ts-ignore
 declare const describe, it, beforeAll, afterAll, expect, test, fail;
 
-import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
-import * as ganacheSetup from "../../../../../helpers/ganache-setup";
-import * as deployContracts from "../../../../../helpers/deployContracts";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
 import {
   contextParams,
   contextParamsLocalChain,
@@ -11,12 +10,11 @@ import {
   TEST_INVALID_ADDRESS,
   TEST_NO_BALANCES_DAO_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
-  TEST_WALLET,
+  // TEST_WALLET,
 } from "../constants";
 import {
   Client,
   Context,
-  ContextParams,
   DaoCreationSteps,
   DaoDepositSteps,
   DaoSortBy,
@@ -32,27 +30,30 @@ import {
 import { InvalidAddressOrEnsError, Random } from "@aragon/sdk-common";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
-import {
-  DAOFactory__factory,
-  Registry__factory,
-} from "@aragon/core-contracts-ethers";
-import { Wallet } from "@ethersproject/wallet";
-import { AddressZero } from "@ethersproject/constants";
 import { isAddress } from "@ethersproject/address";
+import { Server } from "ganache";
+import { toUtf8Bytes } from "@ethersproject/strings";
+import { defaultAbiCoder } from "@ethersproject/abi";
 
-let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
+  let daoAddress: string;
+  let deployment: deployContracts.Deployment;
+
   describe("Methods Module tests", () => {
+    let server: Server;
+
     beforeAll(async () => {
-      const server = await ganacheSetup.start();
-      const daoFactory = await deployContracts.deploy(server);
-      contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
-      const addr = await createLegacyDao(contextParamsLocalChain);
-      daoAddress = addr;
+      server = await ganacheSetup.start();
+      deployment = await deployContracts.deploy();
+      contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      daoAddress = await deployContracts.createAllowlistDAO(
+        deployment,
+        "testDAO"
+      );
     });
 
     afterAll(async () => {
-      await ganacheSetup.stop();
+      await server.close();
     });
 
     describe("DAO Creation", () => {
@@ -60,9 +61,8 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const daoName = "ERC20VotingDAO_" +
-          Math.floor(Random.getFloat() * 9999) +
-          1;
+        const daoName =
+          "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1;
 
         const daoCreationParams: ICreateParams = {
           metadata: {
@@ -73,12 +73,20 @@ describe("Client", () => {
           },
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
-            { id: "0x1234", data: new Uint8Array([11, 11]) },
+            {
+              id: deployment.allowListPluginSetup.address,
+              data: toUtf8Bytes(
+                defaultAbiCoder.encode(
+                  ["uint64", "uint64", "uint64", "address[]"],
+                  [1, 1, 1, []]
+                )
+              ),
+            },
           ],
         };
 
         const gasFeesEstimation = await client.estimation.create(
-          daoCreationParams,
+          daoCreationParams
         );
 
         expect(typeof gasFeesEstimation).toEqual("object");
@@ -86,7 +94,7 @@ describe("Client", () => {
         expect(typeof gasFeesEstimation.max).toEqual("bigint");
         expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
         expect(gasFeesEstimation.max).toBeGreaterThan(
-          gasFeesEstimation.average,
+          gasFeesEstimation.average
         );
       });
 
@@ -94,9 +102,8 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const daoName = "ERC20VotingDAO_" +
-          Math.floor(Random.getFloat() * 9999) +
-          1;
+        const daoName =
+          "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1;
 
         const daoCreationParams: ICreateParams = {
           metadata: {
@@ -107,7 +114,15 @@ describe("Client", () => {
           },
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
-            { id: "0x1234", data: new Uint8Array([11, 11]) },
+            {
+              id: deployment.allowListRepo.address,
+              data: toUtf8Bytes(
+                defaultAbiCoder.encode(
+                  ["uint64", "uint64", "uint64", "address[]"],
+                  [1, 1, 1, []]
+                )
+              ),
+            },
           ],
         };
 
@@ -123,8 +138,7 @@ describe("Client", () => {
               break;
             default:
               throw new Error(
-                "Unexpected DAO creation step: " +
-                  JSON.stringify(step, null, 2),
+                "Unexpected DAO creation step: " + JSON.stringify(step, null, 2)
               );
           }
         }
@@ -146,10 +160,11 @@ describe("Client", () => {
         };
 
         expect(
-          (await tokenContract.functions.balanceOf(
-            depositParams.daoAddressOrEns,
-          ))
-            .toString(),
+          (
+            await tokenContract.functions.balanceOf(
+              depositParams.daoAddressOrEns
+            )
+          ).toString()
         ).toBe("0");
 
         for await (const step of client.methods.deposit(depositParams)) {
@@ -176,16 +191,17 @@ describe("Client", () => {
               break;
             default:
               throw new Error(
-                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
+                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2)
               );
           }
         }
 
         expect(
-          (await tokenContract.functions.balanceOf(
-            depositParams.daoAddressOrEns,
-          ))
-            .toString(),
+          (
+            await tokenContract.functions.balanceOf(
+              depositParams.daoAddressOrEns
+            )
+          ).toString()
         ).toBe("5");
       });
 
@@ -203,28 +219,34 @@ describe("Client", () => {
         };
 
         expect(
-          (await tokenContract.functions.balanceOf(
-            depositParams.daoAddressOrEns,
-          ))
-            .toString(),
+          (
+            await tokenContract.functions.balanceOf(
+              depositParams.daoAddressOrEns
+            )
+          ).toString()
         ).toBe("0");
 
         // Prior allowance
         expect(
-          (await tokenContract.functions.allowance(
-            await client.web3.getSigner()?.getAddress(),
-            depositParams.daoAddressOrEns,
-          )).toString(),
+          (
+            await tokenContract.functions.allowance(
+              await client.web3.getSigner()?.getAddress(),
+              depositParams.daoAddressOrEns
+            )
+          ).toString()
         ).toBe("0");
 
-        await tokenContract.functions.approve(depositParams.daoAddressOrEns, 10)
-          .then((tx) => tx.wait());
+        await tokenContract.functions
+          .approve(depositParams.daoAddressOrEns, 10)
+          .then(tx => tx.wait());
 
         expect(
-          (await tokenContract.functions.allowance(
-            await client.web3.getSigner()?.getAddress(),
-            depositParams.daoAddressOrEns,
-          )).toString(),
+          (
+            await tokenContract.functions.allowance(
+              await client.web3.getSigner()?.getAddress(),
+              depositParams.daoAddressOrEns
+            )
+          ).toString()
         ).toBe("10");
 
         // Deposit
@@ -244,16 +266,17 @@ describe("Client", () => {
               break;
             default:
               throw new Error(
-                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
+                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2)
               );
           }
         }
 
         expect(
-          (await tokenContract.functions.balanceOf(
-            depositParams.daoAddressOrEns,
-          ))
-            .toString(),
+          (
+            await tokenContract.functions.balanceOf(
+              depositParams.daoAddressOrEns
+            )
+          ).toString()
         ).toBe("7");
       });
     });
@@ -307,7 +330,7 @@ describe("Client", () => {
         const client = new Client(ctx);
         const daoAddress = TEST_INVALID_ADDRESS;
         await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
-          new InvalidAddressOrEnsError(),
+          new InvalidAddressOrEnsError()
         );
       });
 
@@ -326,8 +349,9 @@ describe("Client", () => {
         expect(daos.length <= limit).toBe(true);
         daos.reduce((prevDao, currentDao) => {
           if (prevDao && currentDao) {
-            expect(currentDao.ensDomain.localeCompare(prevDao.ensDomain) === -1)
-              .toBe(false);
+            expect(
+              currentDao.ensDomain.localeCompare(prevDao.ensDomain) === -1
+            ).toBe(false);
           }
           return currentDao;
         });
@@ -412,7 +436,7 @@ describe("Client", () => {
                 // ETH withdraw
                 expect(isAddress(transfer.to)).toBe(true);
                 expect(transfer.proposalId).toMatch(
-                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
+                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i
                 );
               } else {
                 fail("invalid transfer type");
@@ -429,7 +453,7 @@ describe("Client", () => {
                 // ERC20 withdraw
                 expect(isAddress(transfer.to)).toBe(true);
                 expect(transfer.proposalId).toMatch(
-                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
+                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i
                 );
               } else {
                 fail("invalid transfer type");
@@ -466,7 +490,7 @@ describe("Client", () => {
       });
 
       test.todo(
-        "Should return an empty array when getting the transfers of a DAO that does not exist",
+        "Should return an empty array when getting the transfers of a DAO that does not exist"
       ); //, async () => {
       //   const ctx = new Context(contextParamsLocalChain);
       //   const client = new Client(ctx)
@@ -492,138 +516,9 @@ export function deployErc20(client: Client) {
   const factory = new ContractFactory(
     erc20ContractAbi,
     ercBytecode,
-    client.web3.getConnectedSigner(),
+    client.web3.getConnectedSigner()
   );
 
   // If your contract requires constructor args, you can specify them here
   return factory.deploy();
-}
-
-/* TODO:
-This code creates a dao with the legacy method
-to be able to test the deposit, please remove
-everything from here once the new dao creation works
-*/
-async function createLegacyDao(params: ContextParams) {
-  if (!params.web3Providers) {
-    throw new Error("A provider is needed");
-  }
-  if (!params.daoFactoryAddress) {
-    throw new Error("A dao factory is needed");
-  }
-  const provider = useWeb3Providers(params.web3Providers, params.network);
-  const signer = new Wallet(TEST_WALLET, provider[0]);
-  const daoFactoryInstance = DAOFactory__factory.connect(
-    params.daoFactoryAddress,
-    signer,
-  );
-
-  const daoCreationParams: ICreateDaoERC20Voting = {
-    daoConfig: {
-      name: "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1,
-      metadata: "0x1234",
-    },
-    tokenConfig: {
-      addr: "0x0000000000000000000000000000000000000000",
-      name: "TestToken" +
-        (Random.getFloat() + 1)
-          .toString(36)
-          .substring(4)
-          .toUpperCase(),
-      symbol: "TEST" +
-        (Random.getFloat() + 1)
-          .toString(36)
-          .substring(4)
-          .toUpperCase(),
-    },
-    mintConfig: {
-      receivers: [Wallet.createRandom().address, Wallet.createRandom().address],
-      amounts: [
-        BigInt(Math.floor(Random.getFloat() * 9999) + 1),
-        BigInt(Math.floor(Random.getFloat() * 9999) + 1),
-      ],
-    },
-    votingConfig: {
-      supportRequiredPct: Math.floor(Random.getFloat() * 100) + 1,
-      participationRequiredPct: Math.floor(Random.getFloat() * 100) + 1,
-      minDuration: Math.floor(Random.getFloat() * 9999) + 1,
-    },
-    // gsnForwarder: Wallet.createRandom().address,
-  };
-  const registryInstance = await daoFactoryInstance
-    .registry()
-    .then((registryAddress) => {
-      return Registry__factory.connect(registryAddress, provider[0]);
-    });
-  return daoFactoryInstance.newERC20VotingDAO(
-    daoCreationParams.daoConfig,
-    daoCreationParams.votingConfig,
-    daoCreationParams.tokenConfig,
-    daoCreationParams.mintConfig,
-    daoCreationParams.gsnForwarder ?? AddressZero,
-  )
-    .then((tx) => tx.wait())
-    .then((cr) => {
-      const newDaoAddress = cr.events?.find(
-        (e) => e.address === registryInstance.address,
-      )?.topics[1];
-      if (!newDaoAddress) {
-        return Promise.reject(new Error("Could not create DAO"));
-      }
-
-      return "0x" + newDaoAddress.slice(newDaoAddress.length - 40);
-    });
-}
-
-interface ICreateDaoERC20Voting {
-  daoConfig: DaoConfig;
-  tokenConfig: TokenConfig;
-  mintConfig: MintConfig;
-  votingConfig: VotingConfig;
-  gsnForwarder?: string;
-}
-
-interface DaoConfig {
-  name: string;
-  metadata: string;
-}
-
-interface TokenConfig {
-  addr: string;
-  name: string;
-  symbol: string;
-}
-
-interface MintConfig {
-  receivers: string[];
-  amounts: bigint[];
-}
-
-interface VotingConfig {
-  /** 0-100 as a percentage */
-  supportRequiredPct: number;
-  /** 0-100 as a percentage */
-  participationRequiredPct: number;
-  /** In seconds */
-  minDuration: number;
-}
-
-function useWeb3Providers(
-  endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-  network: Networkish,
-): JsonRpcProvider[] {
-  if (Array.isArray(endpoints)) {
-    return endpoints.map((item) => {
-      if (typeof item === "string") {
-        const url = new URL(item);
-        return new JsonRpcProvider(url.href, network);
-      }
-      return item;
-    });
-  } else if (typeof endpoints === "string") {
-    const url = new URL(endpoints);
-    return [new JsonRpcProvider(url.href, network)];
-  } else {
-    return [endpoints];
-  }
 }

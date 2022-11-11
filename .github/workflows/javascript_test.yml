@@ -42,13 +42,11 @@ jobs:
         run: yarn run build
 
       - name: Integration test
-        run: yarn test modules/client/test/integration --ci --coverage
+        run: yarn test modules/client/test/integration --ci --coverage --passWithNoTests
         env:
-          DAO_FACTORY: ${{ steps.contracts.outputs.dao }}
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
 
       - name: Unit test
-        run: yarn test --testPathIgnorePatterns=modules/client/test/integration --ci --coverage
+        run: yarn test --testPathIgnorePatterns=modules/client/test/integration --ci --coverage  --passWithNoTests
         env:
-          DAO_FACTORY: ${{ steps.contracts.outputs.dao }}
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}

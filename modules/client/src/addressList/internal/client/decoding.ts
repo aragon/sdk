@@ -9,7 +9,7 @@ import {
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { IClientAddressListDecoding } from "../../interfaces";
-import { WhitelistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 
 /**
  * Decoding module for the SDK AddressList Client
@@ -40,19 +40,19 @@ export class ClientAddressListDecoding extends ClientCore
    * @memberof ClientAddressListDecoding
    */
   public addMembersAction(data: Uint8Array): string[] {
-    const votingInterface = WhitelistVoting__factory.createInterface();
+    const votingInterface = AllowlistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
     // TODO: Rename to `addAddresses` as soon as the plugin is updated
-    const expectedfunction = votingInterface.getFunction("addWhitelistedUsers");
+    const expectedfunction = votingInterface.getFunction("addAllowedUsers");
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
     const result = votingInterface.decodeFunctionData(
       // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addWhitelistedUsers",
+      "addAllowedUsers",
       data,
     );
     return result[0];
@@ -65,21 +65,21 @@ export class ClientAddressListDecoding extends ClientCore
    * @memberof ClientAddressListDecoding
    */
   public removeMembersAction(data: Uint8Array): string[] {
-    const votingInterface = WhitelistVoting__factory.createInterface();
+    const votingInterface = AllowlistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
     const expectedfunction = votingInterface.getFunction(
       // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeWhitelistedUsers",
+      "removeAllowedUsers",
     );
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
     const result = votingInterface.decodeFunctionData(
       // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeWhitelistedUsers",
+      "removeAllowedUsers",
       data,
     );
     return result[0];

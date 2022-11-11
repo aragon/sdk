@@ -49,3 +49,21 @@ export class NoTokenAddress extends Error {
     super("A token address is needed");
   }
 }
+
+export class NoDaoFactory extends Error {
+  constructor() {
+    super("A dao factory address is needed");
+  }
+}
+
+export class NoPluginRepoRegistry extends Error {
+  constructor() {
+    super("A plugin repo registry address is needed");
+  }
+}
+
+export class NoDaoRegistry extends Error {
+  constructor() {
+    super("A dao registry address is needed");
+  }
+}

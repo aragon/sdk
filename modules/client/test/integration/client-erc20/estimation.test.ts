@@ -12,19 +12,22 @@ import {
 } from "../../../src";
 
 import { contextParamsLocalChain } from "../constants";
-import * as ganacheSetup from "../../../../../helpers/ganache-setup";
-import * as deployContracts from "../../../../../helpers/deployContracts";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
+import { Server } from "ganache";
 
 describe("Client ERC20", () => {
   describe("Estimation Module", () => {
+    let server: Server;
+
     beforeAll(async () => {
-      const server = await ganacheSetup.start();
-      const daoFactory = await deployContracts.deploy(server);
-      contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
+      server = await ganacheSetup.start();
+      const deployment = await deployContracts.deploy();
+      contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
     });
 
     afterAll(async () => {
-      await ganacheSetup.stop();
+      await server.close();
     });
 
     it("Should estimate the gas fees for creating a new proposal", async () => {

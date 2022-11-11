@@ -1,7 +1,7 @@
 {
   "name": "@aragon/sdk-client",
   "author": "Aragon Association",
-  "version": "0.11.0-alpha",
+  "version": "0.12.0-alpha",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/sdk-client.esm.js",
@@ -47,6 +47,7 @@
     }
   ],
   "devDependencies": {
+    "@ensdomains/ens-contracts": "^0.0.15",
     "@size-limit/preset-small-lib": "^7.0.8",
     "@types/jest": "^29.0.3",
     "glob": "^8.0.3",
@@ -57,7 +58,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "@aragon/core-contracts-ethers": "^0.2.1-alpha",
+    "@aragon/core-contracts-ethers": "^0.4.1-alpha",
     "@aragon/sdk-common": "^0.6.0-alpha",
     "@aragon/sdk-ipfs": "^0.2.0-alpha",
     "@ethersproject/abstract-signer": "^5.5.0",

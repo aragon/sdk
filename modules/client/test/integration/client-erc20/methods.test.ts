@@ -19,8 +19,8 @@ import {
   VoteProposalStep,
   VoteValues,
 } from "../../../src";
-import * as ganacheSetup from "../../../../../helpers/ganache-setup";
-import * as deployContracts from "../../../../../helpers/deployContracts";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
 
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
@@ -33,16 +33,19 @@ import {
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
 } from "../constants";
+import { Server } from "ganache";
 
 describe("Client ERC20", () => {
+  let server: Server;
+
   beforeAll(async () => {
-    const server = await ganacheSetup.start();
-    const daoFactory = await deployContracts.deploy(server);
-    contextParamsLocalChain.daoFactoryAddress = daoFactory.address;
+    server = await ganacheSetup.start();
+    const deployment = await deployContracts.deploy();
+    contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
   });
 
   afterAll(async () => {
-    await ganacheSetup.stop();
+    await server.close();
   });
 
   describe("Client instances", () => {
@@ -60,7 +63,7 @@ describe("Client ERC20", () => {
             recipientAddress: "0x1234567890123456789012345678901234567890",
             amount: BigInt(1),
             reference: "test",
-          },
+          }
         );
 
         const proposalParams: ICreateProposalParams = {
@@ -87,11 +90,9 @@ describe("Client ERC20", () => {
           executeOnPass: true,
         };
 
-        for await (
-          const step of erc20Client.methods.createProposal(
-            proposalParams,
-          )
-        ) {
+        for await (const step of erc20Client.methods.createProposal(
+          proposalParams
+        )) {
           switch (step.key) {
             case ProposalCreationSteps.CREATING:
               expect(typeof step.txHash).toBe("string");
@@ -104,7 +105,7 @@ describe("Client ERC20", () => {
             default:
               throw new Error(
                 "Unexpected proposal creation step: " +
-                  Object.keys(step).join(", "),
+                  Object.keys(step).join(", ")
               );
           }
         }
@@ -135,8 +136,7 @@ describe("Client ERC20", () => {
               break;
             default:
               throw new Error(
-                "Unexpected vote proposal step: " +
-                  Object.keys(step).join(", "),
+                "Unexpected vote proposal step: " + Object.keys(step).join(", ")
               );
           }
         }
@@ -154,9 +154,9 @@ describe("Client ERC20", () => {
           proposalId: "0x1234567890123456789012345678901234567890",
         };
 
-        for await (
-          const step of client.methods.executeProposal(executeParams)
-        ) {
+        for await (const step of client.methods.executeProposal(
+          executeParams
+        )) {
           switch (step.key) {
             case ExecuteProposalStep.EXECUTING:
               expect(typeof step.txHash).toBe("string");
@@ -167,7 +167,7 @@ describe("Client ERC20", () => {
             default:
               throw new Error(
                 "Unexpected execute proposal step: " +
-                  Object.keys(step).join(", "),
+                  Object.keys(step).join(", ")
               );
           }
         }
@@ -262,11 +262,11 @@ describe("Client ERC20", () => {
           expect(typeof proposal.settings.minTurnout).toBe("number");
           expect(
             proposal.settings.minSupport >= 0 &&
-              proposal.settings.minSupport <= 1,
+              proposal.settings.minSupport <= 1
           ).toBe(true);
           expect(
             proposal.settings.minTurnout >= 0 &&
-              proposal.settings.minTurnout <= 1,
+              proposal.settings.minTurnout <= 1
           ).toBe(true);
           // token
           expect(typeof proposal.token.name).toBe("string");
@@ -385,7 +385,7 @@ describe("Client ERC20", () => {
           daoAddressOrEns: address,
         };
         await expect(() => client.methods.getProposals(params)).rejects.toThrow(
-          new InvalidAddressOrEnsError(),
+          new InvalidAddressOrEnsError()
         );
       });
       it("Should get the settings of a plugin given a plugin instance address", async () => {

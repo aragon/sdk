@@ -89,6 +89,7 @@ export interface IClient {
 export interface ICreateParams {
   metadata: IMetadata;
   ensSubdomain: string;
+  trustedForwarder?: string;
   plugins: IPluginInstallItem[];
 }
 

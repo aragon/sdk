@@ -5,8 +5,15 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { Signer } from "@ethersproject/abstract-signer";
 import { GasFeeEstimation } from "../../client-common/interfaces/common";
 import { IClientWeb3Core } from "../interfaces/core";
+import {
+  NoDaoFactory,
+  NoPluginRepoRegistry,
+  NoDaoRegistry,
+} from "@aragon/sdk-common";
 
 const daoFactoryAddressMap = new Map<Web3Module, string>();
+const daoRegistryAddressMap = new Map<Web3Module, string>();
+const pluginRepoRegistryAddressMap = new Map<Web3Module, string>();
 const gasFeeEstimationFactorMap = new Map<Web3Module, number>();
 const providersMap = new Map<Web3Module, JsonRpcProvider[]>();
 const providerIdxMap = new Map<Web3Module, number>();
@@ -31,6 +38,14 @@ export class Web3Module implements IClientWeb3Core {
       daoFactoryAddressMap.set(this, context.daoFactoryAddress);
     }
 
+    if (context.daoRegistryAddress) {
+      daoRegistryAddressMap.set(this, context.daoRegistryAddress);
+    }
+
+    if (context.pluginRepoRegistryAddress) {
+      pluginRepoRegistryAddressMap.set(this, context.pluginRepoRegistryAddress);
+    }
+
     if (context.gasFeeEstimationFactor) {
       gasFeeEstimationFactorMap.set(this, context.gasFeeEstimationFactor);
     }
@@ -40,6 +55,12 @@ export class Web3Module implements IClientWeb3Core {
 
   private get daoFactoryAddress(): string {
     return daoFactoryAddressMap.get(this) || "";
+  }
+  private get daoRegistryAddress(): string {
+    return daoRegistryAddressMap.get(this) || "";
+  }
+  private get pluginRepoRegistryAddress(): string {
+    return pluginRepoRegistryAddressMap.get(this) || "";
   }
   private get gasFeeEstimationFactor(): number {
     return gasFeeEstimationFactorMap.get(this) || 1;
@@ -133,7 +154,7 @@ export class Web3Module implements IClientWeb3Core {
    */
   public attachContract<T>(
     address: string,
-    abi: ContractInterface,
+    abi: ContractInterface
   ): Contract & T {
     if (!address) throw new Error("Invalid contract address");
     else if (!abi) throw new Error("Invalid contract ABI");
@@ -161,7 +182,7 @@ export class Web3Module implements IClientWeb3Core {
   public getMaxFeePerGas(): Promise<bigint> {
     return this.getConnectedSigner()
       .getFeeData()
-      .then((feeData) => {
+      .then(feeData => {
         if (!feeData.maxFeePerGas) {
           return Promise.reject(new Error("Cannot estimate gas"));
         }
@@ -170,22 +191,39 @@ export class Web3Module implements IClientWeb3Core {
   }
 
   public getApproximateGasFee(estimatedFee: bigint): Promise<GasFeeEstimation> {
-    return this.getMaxFeePerGas()
-      .then((maxFeePerGas) => {
-        const max = estimatedFee * maxFeePerGas;
+    return this.getMaxFeePerGas().then(maxFeePerGas => {
+      const max = estimatedFee * maxFeePerGas;
 
-        const factor = this.gasFeeEstimationFactor *
-          Web3Module.PRECISION_FACTOR_BASE;
+      const factor =
+        this.gasFeeEstimationFactor * Web3Module.PRECISION_FACTOR_BASE;
 
-        const average = (max * BigInt(Math.trunc(factor))) /
-          BigInt(Web3Module.PRECISION_FACTOR_BASE);
+      const average =
+        (max * BigInt(Math.trunc(factor))) /
+        BigInt(Web3Module.PRECISION_FACTOR_BASE);
 
-        return { average, max };
-      });
+      return { average, max };
+    });
   }
 
   /** Returns the current DAO factory address */
   public getDaoFactoryAddress(): string {
+    if (!this.daoFactoryAddress) {
+      throw new NoDaoFactory();
+    }
     return this.daoFactoryAddress;
+  }
+
+  public getPluginRepoRegistryAddress(): string {
+    if (!this.pluginRepoRegistryAddress) {
+      throw new NoPluginRepoRegistry();
+    }
+    return this.pluginRepoRegistryAddress;
+  }
+
+  public getDaoRegistry(): string {
+    if (!this.daoRegistryAddress) {
+      throw new NoDaoRegistry();
+    }
+    return this.daoRegistryAddress;
   }
 }
