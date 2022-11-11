@@ -34,7 +34,7 @@ import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
 import { isAddress } from "@ethersproject/address";
 import { Server } from "ganache";
 import { ethers } from "ethers";
-import { toUtf8Bytes } from "ethers/lib/utils";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 describe("Client", () => {
   let daoAddress: string;

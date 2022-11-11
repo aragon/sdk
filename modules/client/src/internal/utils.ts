@@ -1,5 +1,3 @@
-// import { DAOFactory } from "@aragon/core-contracts-ethers";
-// import { strip0x } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 // import { pack } from "@ethersproject/solidity";
