@@ -263,7 +263,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         e => e?.topics[0] === id("Approval(address,address,uint256)")
       );
       if (!log) {
-        throw new Error("Failed to find log");
+        throw new Error("Could not find the Approval event");
       }
       const value = parseInt(log.data);
       if (!value || BigNumber.from(amount).gt(value)) {
