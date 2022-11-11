@@ -64,7 +64,6 @@ import {
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
-import { defaultAbiCoder } from "ethers/lib/utils";
 
 /**
  * Methods module the SDK Generic Client
@@ -261,12 +260,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     await tx.wait().then((cr: ContractReceipt) => {
       const log = cr.logs?.find(
-        e => e?.topics[0] === id("Approval(owner, spender, value)")
+        e => e?.topics[0] === id("Approval(address,address,uint256)")
       );
-      const value = defaultAbiCoder.decode(
-        ["address", "address", "uint"],
-        log?.data || ""
-      )[2];
+      if (!log) {
+        throw new Error("Failed to find log");
+      }
+      const value = parseInt(log.data);
       if (!value || BigNumber.from(amount).gt(value)) {
         throw new Error("Could not update allowance");
       }
