@@ -1,7 +1,6 @@
 // @ts-ignore
 declare const describe, it, beforeAll, afterAll, expect, test, fail;
 
-// import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import * as ganacheSetup from "../../../../../helpers/ganache-setup";
 import * as deployContracts from "../../../../../helpers/deployContracts";
 import {
