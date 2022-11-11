@@ -39,7 +39,7 @@ describe("Client", () => {
           links: [],
         },
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-        plugins: [{ id: "0x1234", data: 'test' }],
+        plugins: [{ id: "0x1234", data: new Uint8Array() }],
       };
 
       const gasFeesEstimation = await client.estimation.create(
