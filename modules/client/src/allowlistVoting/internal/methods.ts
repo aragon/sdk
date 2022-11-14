@@ -9,7 +9,7 @@ import {
   ISetConfigurationParams,
   IVoteParams,
   Steps,
-  Vote,
+  Proposal,
   VoteCreationValue,
   VoteStepsValue,
 } from "../interfaces";
@@ -133,11 +133,11 @@ export class AllowlistVotingMethods {
       .getImplementationAddress();
   }
 
-  public async getVote(_voteId: BigNumberish): Promise<Vote> {
+  public async getVote(_voteId: BigNumberish): Promise<Proposal> {
     const voteData = await this.allowlistVoting
       .getPluginInstanceWithSigner()
       .getVote(_voteId);
-    const vote: Vote = {
+    const vote: Proposal = {
       id: _voteId,
       open: voteData.open,
       executed: voteData.executed,

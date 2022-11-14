@@ -9,13 +9,13 @@ export interface IAllowlistVotingContextParams extends IAllowlistVoting {}
 
 export interface IAllowlistVotingContextPluginState extends IAllowlistVoting {}
 
-export interface VoteAction {
+export interface ProposalAction {
   to: string;
   value: BigNumberish;
   data: BytesLike;
 }
 
-export interface Vote {
+export interface Proposal {
   id: BigNumberish;
   open: boolean;
   executed: boolean;
@@ -28,7 +28,7 @@ export interface Vote {
   yes: BigNumberish;
   no: BigNumberish;
   abstain: BigNumberish;
-  actions: VoteAction[];
+  actions: ProposalAction[];
 }
 
 export enum Steps {
@@ -55,7 +55,7 @@ export type VoteCreationValue = VoteStepsValueCreating | VoteCreationValueDone;
 
 export interface ICreateProposalParams {
   _proposalMetadata: BytesLike;
-  _actions: VoteAction[];
+  _actions: ProposalAction[];
   _startDate: BigNumberish;
   _endDate: BigNumberish;
   _executeIfDecided: boolean;
