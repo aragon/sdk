@@ -258,16 +258,38 @@ export async function createDAO(
   daoFactory: aragonContracts.DAOFactory,
   daoSettings: aragonContracts.DAOFactory.DAOSettingsStruct,
   pluginSettings: aragonContracts.DAOFactory.PluginSettingsStruct[]
-) {
-  let daoAddress = await daoFactory.callStatic.createDao(
-    daoSettings,
-    pluginSettings
+): Promise<{ daoAddr: string; pluginAddrs: string[] }> {
+  const tx = await daoFactory.createDao(daoSettings, pluginSettings);
+  const receipt = await tx.wait();
+  const registryInterface = aragonContracts.DAORegistry__factory.createInterface();
+  const registeredLog = receipt.logs.find(
+    log =>
+      log.topics[0] ===
+      id(registryInterface.getEvent("DAORegistered").format("sighash"))
   );
-  await daoFactory.createDao(daoSettings, pluginSettings);
-  return daoAddress;
+
+  const pluginSetupProcessorInterface = aragonContracts.PluginSetupProcessor__factory.createInterface();
+  const installedLogs = receipt.logs.filter(
+    log =>
+      log.topics[0] ===
+      id(
+        pluginSetupProcessorInterface
+          .getEvent("InstallationApplied")
+          .format("sighash")
+      )
+  );
+  if (!registeredLog) {
+    throw new Error("Failed to find log");
+  }
+
+  const registeredParsed = registryInterface.parseLog(registeredLog);
+  return {
+    daoAddr: registeredParsed.args[0],
+    pluginAddrs: installedLogs.map(log => pluginSetupProcessorInterface.parseLog(log).args[1]),
+  };
 }
 
-export async function createAllowlistDAO(deployment: Deployment, name: string) {
+export async function createAllowlistDAO(deployment: Deployment, name: string, addresses: string[] = []) {
   return createDAO(
     deployment.daoFactory,
     {
@@ -281,7 +303,7 @@ export async function createAllowlistDAO(deployment: Deployment, name: string) {
         pluginSetupRepo: deployment.allowListRepo.address,
         data: defaultAbiCoder.encode(
           ["uint64", "uint64", "uint64", "address[]"],
-          [1, 1, 1, []]
+          [1, 1, 1, addresses]
         ),
       },
     ]

@@ -139,15 +139,24 @@ export class AllowlistVotingMethods {
   }
 
   public async getVote(_voteId: BigNumberish): Promise<Vote> {
-    const voteData = (await this.allowlistVoting
+    const voteData = await this.allowlistVoting
       .getConnectedPluginInstance()
-      .getVote(_voteId)) as Vote;
-    const vote = new Vote();
-    for (const key of Object.keys(vote)) {
-      if (vote.hasOwnProperty(key) && voteData.hasOwnProperty(key)) {
-        vote[key] = voteData[key];
-      }
-    }
+      .getVote(_voteId);
+    const vote = new Vote(
+      _voteId,
+      voteData.open,
+      voteData.executed,
+      voteData.startDate,
+      voteData.endDate,
+      voteData.snapshotBlock,
+      voteData.supportRequired,
+      voteData.participationRequired,
+      voteData.votingPower,
+      voteData.yes,
+      voteData.no,
+      voteData.abstain,
+      voteData.actions
+    );
     return vote;
   }
 

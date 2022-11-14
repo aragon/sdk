@@ -46,10 +46,11 @@ describe("Client", () => {
       server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      daoAddress = await deployContracts.createAllowlistDAO(
+      const daoDeployment = await deployContracts.createAllowlistDAO(
         deployment,
         "testDAO"
       );
+      daoAddress = daoDeployment.daoAddr
     });
 
     afterAll(async () => {

@@ -16,19 +16,49 @@ export interface VoteAction {
 }
 
 export class Vote {
-  [index: string]: any;
-  public open!: boolean;
-  public executed!: boolean;
-  public startDate!: BigNumberish;
-  public endDate!: BigNumberish;
-  public snapshotBlock!: BigNumberish;
-  public supportRequired!: BigNumberish;
-  public participationRequired!: BigNumberish;
-  public votingPower!: BigNumberish;
-  public yes!: BigNumberish;
-  public no!: BigNumberish;
-  public abstain!: BigNumberish;
-  public actions!: VoteAction[];
+  public id: BigNumberish;
+  public open: boolean;
+  public executed: boolean;
+  public startDate: BigNumberish;
+  public endDate: BigNumberish;
+  public snapshotBlock: BigNumberish;
+  public supportRequired: BigNumberish;
+  public participationRequired: BigNumberish;
+  public votingPower: BigNumberish;
+  public yes: BigNumberish;
+  public no: BigNumberish;
+  public abstain: BigNumberish;
+  public actions: VoteAction[];
+
+  constructor(
+    id: BigNumberish,
+    open: boolean,
+    executed: boolean,
+    startDate: BigNumberish,
+    endDate: BigNumberish,
+    snapshotBlock: BigNumberish,
+    supportRequired: BigNumberish,
+    participationRequired: BigNumberish,
+    votingPower: BigNumberish,
+    yes: BigNumberish,
+    no: BigNumberish,
+    abstain: BigNumberish,
+    actions: VoteAction[]
+  ) {
+    this.id = id;
+    this.open = open;
+    this.executed = executed;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.snapshotBlock = snapshotBlock;
+    this.supportRequired = supportRequired;
+    this.participationRequired = participationRequired;
+    this.votingPower = votingPower;
+    this.yes = yes;
+    this.no = no;
+    this.abstain = abstain;
+    this.actions = actions;
+  }
 }
 
 export enum Steps {
