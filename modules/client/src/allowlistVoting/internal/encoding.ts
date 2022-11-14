@@ -1,8 +1,12 @@
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 import { BigNumberish } from "@ethersproject/bignumber";
-import { BytesLike } from "@ethersproject/bytes";
-import { UnsignedTransaction } from "@ethersproject/transactions";
-import { VoteAction } from "../interfaces";
+import {
+  ICreateProposalParams,
+  ISetConfigurationParams,
+  IVoteParams,
+} from "../interfaces";
+import { IEncodingResult } from "../../client-common";
+import { arrayify } from "@ethersproject/bytes";
 
 export class AllowlistVotingEncoding {
   private pluginAddr: string;
@@ -10,11 +14,11 @@ export class AllowlistVotingEncoding {
     this.pluginAddr = pluginAddr;
   }
 
-  private static getUnsignedTransaction(
+  private static getIEncodingResult(
     pluginAddr: string,
     functionName: string,
     ...args: any[]
-  ): UnsignedTransaction {
+  ): IEncodingResult {
     const data = AllowlistVoting__factory.createInterface().encodeFunctionData(
       // @ts-ignore functionName is hardcoded by us
       functionName,
@@ -23,148 +27,103 @@ export class AllowlistVotingEncoding {
     return {
       to: pluginAddr,
       value: 0,
-      data,
+      data: arrayify(data),
     };
   }
 
   public static addAllowedUsers(
     pluginAddr: string,
     _users: string[]
-  ): UnsignedTransaction {
-    return AllowlistVotingEncoding.getUnsignedTransaction(
+  ): IEncodingResult {
+    return AllowlistVotingEncoding.getIEncodingResult(
       pluginAddr,
       "addAllowedUsers",
       _users
     );
   }
 
-  public addAllowedUsers(_users: string[]): UnsignedTransaction {
+  public addAllowedUsers(_users: string[]): IEncodingResult {
     return AllowlistVotingEncoding.addAllowedUsers(this.pluginAddr, _users);
   }
 
   public static createProposal(
     pluginAddr: string,
-    _proposalMetadata: BytesLike,
-    _actions: VoteAction[],
-    _startDate: BigNumberish,
-    _endDate: BigNumberish,
-    _executeIfDecided: boolean,
-    _choice: BigNumberish
-  ): UnsignedTransaction {
-    return this.getUnsignedTransaction(
+    params: ICreateProposalParams
+  ): IEncodingResult {
+    return this.getIEncodingResult(
       pluginAddr,
       "createVote",
-      _proposalMetadata,
-      _actions,
-      _startDate,
-      _endDate,
-      _executeIfDecided,
-      _choice
+      params._proposalMetadata,
+      params._actions,
+      params._startDate,
+      params._endDate,
+      params._executeIfDecided,
+      params._choice
     );
   }
 
-  public createProposal(
-    _proposalMetadata: BytesLike,
-    _actions: VoteAction[],
-    _startDate: BigNumberish,
-    _endDate: BigNumberish,
-    _executeIfDecided: boolean,
-    _choice: BigNumberish
-  ): UnsignedTransaction {
-    return AllowlistVotingEncoding.createProposal(
-      this.pluginAddr,
-      _proposalMetadata,
-      _actions,
-      _startDate,
-      _endDate,
-      _executeIfDecided,
-      _choice
-    );
+  public createProposal(params: ICreateProposalParams): IEncodingResult {
+    return AllowlistVotingEncoding.createProposal(this.pluginAddr, params);
   }
 
   public static execute(
     pluginAddr: string,
     _voteId: BigNumberish
-  ): UnsignedTransaction {
-    return AllowlistVotingEncoding.getUnsignedTransaction(
+  ): IEncodingResult {
+    return AllowlistVotingEncoding.getIEncodingResult(
       pluginAddr,
       "execute",
       _voteId
     );
   }
 
-  public execute(_voteId: BigNumberish): UnsignedTransaction {
+  public execute(_voteId: BigNumberish): IEncodingResult {
     return AllowlistVotingEncoding.execute(this.pluginAddr, _voteId);
   }
 
   public static removeAllowedUsers(
     pluginAddr: string,
     _users: string[]
-  ): UnsignedTransaction {
-    return AllowlistVotingEncoding.getUnsignedTransaction(
+  ): IEncodingResult {
+    return AllowlistVotingEncoding.getIEncodingResult(
       pluginAddr,
       "removeAllowedUsers",
       _users
     );
   }
 
-  public removeAllowedUsers(_users: string[]): UnsignedTransaction {
+  public removeAllowedUsers(_users: string[]): IEncodingResult {
     return AllowlistVotingEncoding.removeAllowedUsers(this.pluginAddr, _users);
   }
 
   public static setConfiguration(
     pluginAddr: string,
-    _participationRequiredPct: BigNumberish,
-    _supportRequiredPct: BigNumberish,
-    _minDuration: BigNumberish
-  ): UnsignedTransaction {
-    return AllowlistVotingEncoding.getUnsignedTransaction(
+    params: ISetConfigurationParams
+  ): IEncodingResult {
+    return AllowlistVotingEncoding.getIEncodingResult(
       pluginAddr,
       "setConfiguration",
-      _participationRequiredPct,
-      _supportRequiredPct,
-      _minDuration
+      params._participationRequiredPct,
+      params._supportRequiredPct,
+      params._minDuration
     );
   }
 
-  public setConfiguration(
-    _participationRequiredPct: BigNumberish,
-    _supportRequiredPct: BigNumberish,
-    _minDuration: BigNumberish
-  ): UnsignedTransaction {
-    return AllowlistVotingEncoding.setConfiguration(
-      this.pluginAddr,
-      _participationRequiredPct,
-      _supportRequiredPct,
-      _minDuration
-    );
+  public setConfiguration(params: ISetConfigurationParams): IEncodingResult {
+    return AllowlistVotingEncoding.setConfiguration(this.pluginAddr, params);
   }
 
-  public static vote(
-    pluginAddr: string,
-    _voteId: BigNumberish,
-    _choice: BigNumberish,
-    _executesIfDecided: boolean
-  ): UnsignedTransaction {
-    return AllowlistVotingEncoding.getUnsignedTransaction(
+  public static vote(pluginAddr: string, params: IVoteParams): IEncodingResult {
+    return AllowlistVotingEncoding.getIEncodingResult(
       pluginAddr,
       "vote",
-      _voteId,
-      _choice,
-      _executesIfDecided
+      params._voteId,
+      params._choice,
+      params._executesIfDecided
     );
   }
 
-  public vote(
-    _voteId: BigNumberish,
-    _choice: BigNumberish,
-    _executesIfDecided: boolean
-  ): UnsignedTransaction {
-    return AllowlistVotingEncoding.vote(
-      this.pluginAddr,
-      _voteId,
-      _choice,
-      _executesIfDecided
-    );
+  public vote(params: IVoteParams): IEncodingResult {
+    return AllowlistVotingEncoding.vote(this.pluginAddr, params);
   }
 }

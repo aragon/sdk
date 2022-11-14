@@ -17,7 +17,7 @@ export class Client extends ClientCore {
   constructor(context: Context) {
     super(context);
     this.privateMethods = new ClientMethods(context);
-    this.privateEncoding = new ClientEncoding(context);
+    this.privateEncoding = new ClientEncoding();
     this.privateDecoding = new ClientDecoding(context);
     this.privateEstimation = new ClientEstimation(context);
     Object.freeze(Client.prototype);

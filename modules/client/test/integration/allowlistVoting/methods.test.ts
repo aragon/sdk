@@ -151,20 +151,20 @@ describe("AllowlistVoting", () => {
     });
 
     it("should create a proposal", async () => {
-      const generator = allowlistVoting.methods.createProposal(
-        "0x000001",
-        [
+      const generator = allowlistVoting.methods.createProposal({
+        _proposalMetadata: "0x000001",
+        _actions: [
           {
             data: "0x",
             to: daoAddr,
             value: 0,
           },
         ],
-        0,
-        Math.round(Date.now() / 1000) + 3600,
-        false,
-        1
-      );
+        _startDate: 0,
+        _endDate: Math.round(Date.now() / 1000) + 3600,
+        _executeIfDecided: false,
+        _choice: 1,
+      });
 
       for await (const step of generator) {
         switch (step.key) {
@@ -222,7 +222,11 @@ describe("AllowlistVoting", () => {
       let vote = await allowlistVoting.methods.getVoteOption(voteId, voterAddr);
       expect(vote).toBe(2);
 
-      const voting = await allowlistVoting.methods.vote(voteId, 3, false);
+      const voting = await allowlistVoting.methods.vote({
+        _voteId: voteId,
+        _choice: 3,
+        _executesIfDecided: false,
+      });
       await voting.next();
       await voting.next();
 
@@ -292,7 +296,11 @@ describe("AllowlistVoting", () => {
         id("SET_CONFIGURATION_PERMISSION")
       );
 
-      const steps = await allowlistVoting.methods.setConfiguration(20, 30, 40);
+      const steps = await allowlistVoting.methods.setConfiguration({
+        _participationRequiredPct: 20,
+        _supportRequiredPct: 30,
+        _minDuration: 40,
+      });
       await steps.next();
       await steps.next();
 
@@ -313,20 +321,20 @@ async function createProposal(
   startDate: number = 0,
   endDate: number = 0
 ): Promise<number> {
-  const generator = allowlistVoting.methods.createProposal(
-    "0x00",
-    [
+  const generator = allowlistVoting.methods.createProposal({
+    _proposalMetadata: "0x00",
+    _actions: [
       {
         data: "0x00",
         to,
         value: 0,
       },
     ],
-    startDate,
-    endDate,
-    false,
-    2
-  );
+    _startDate: startDate,
+    _endDate: endDate,
+    _executeIfDecided: false,
+    _choice: 2,
+  });
 
   for await (const step of generator) {
     switch (step.key) {
@@ -348,20 +356,20 @@ async function becomeRoot(
     who,
     id("ROOT_PERMISSION"),
   ]);
-  const voteGenerator = allowlistVoting.methods.createProposal(
-    "0x00",
-    [
+  const voteGenerator = allowlistVoting.methods.createProposal({
+    _proposalMetadata: "0x00",
+    _actions: [
       {
         to: daoAddr,
         data: encodedGrant,
         value: 0,
       },
     ],
-    0,
-    0,
-    true,
-    2
-  );
+    _startDate: 0,
+    _endDate: 0,
+    _executeIfDecided: true,
+    _choice: 2,
+  });
 
   await voteGenerator.next();
   await voteGenerator.next();

@@ -188,24 +188,9 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const params: IMetadata = {
-        name: "New Name",
-        description: "New description",
-        avatar: "https://theavatar.com/image.jpg",
-        links: [
-          {
-            url: "https://discord.com/...",
-            name: "Discord",
-          },
-          {
-            url: "https://twitter.com/...",
-            name: "Twitter",
-          },
-        ],
-      };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
       );
       const recoveredIpfsUri: string = await client.decoding
         .updateMetadataRawAction(updateMetadataAction.data);
@@ -221,24 +206,10 @@ describe("Client", () => {
     it("Should try to decode an encoded update metadata action with the withdraws decoder and return an error", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const params: IMetadata = {
-        name: "New Name",
-        description: "New description",
-        avatar: "https://theavatar.com/image.jpg",
-        links: [
-          {
-            url: "https://discord.com/...",
-            name: "Discord",
-          },
-          {
-            url: "https://twitter.com/...",
-            name: "Twitter",
-          },
-        ],
-      };
+
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
       );
 
       expect(() => client.decoding.withdrawAction(updateMetadataAction.data))
@@ -258,24 +229,9 @@ describe("Client", () => {
     it("Should get the function for a given action data", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const params: IMetadata = {
-        name: "New Name",
-        description: "New description",
-        avatar: "https://theavatar.com/image.jpg",
-        links: [
-          {
-            url: "https://discord.com/...",
-            name: "Discord",
-          },
-          {
-            url: "https://twitter.com/...",
-            name: "Twitter",
-          },
-        ],
-      };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        "Qma6w3ykbH9qHhzQAKCggekgZGqJbruKJthkUGaWBdJUW2",
       );
       const iface = client.decoding.findInterface(updateMetadataAction.data);
       expect(iface?.id).toBe("function setMetadata(bytes)");
@@ -312,7 +268,7 @@ describe("Client", () => {
       };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
       );
 
       const decodedParams: IMetadata = await client.decoding

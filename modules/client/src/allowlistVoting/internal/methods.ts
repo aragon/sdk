@@ -1,18 +1,18 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
-import { BytesLike } from "@ethersproject/bytes";
 import {
   ContractReceipt,
   Event as EthersEvent,
 } from "@ethersproject/contracts";
 import { AllowlistVoting } from "../client";
 import {
+  ICreateProposalParams,
+  ISetConfigurationParams,
+  IVoteParams,
   Steps,
   Vote,
-  VoteAction,
   VoteCreationValue,
   VoteStepsValue,
 } from "../interfaces";
-import { CreateVoteError } from "./errors";
 
 export class AllowlistVotingMethods {
   private allowlistVoting: AllowlistVoting;
@@ -23,23 +23,23 @@ export class AllowlistVotingMethods {
 
   public MODIFY_ALLOWLIST_PERMISSION_ID(): Promise<string> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .MODIFY_ALLOWLIST_PERMISSION_ID();
   }
 
   public PCT_BASE(): Promise<BigNumber> {
-    return this.allowlistVoting.getConnectedPluginInstance().PCT_BASE();
+    return this.allowlistVoting.getPluginInstanceWithSigner().PCT_BASE();
   }
 
   public SET_CONFIGURATION_PERMISSION_ID(): Promise<string> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .SET_CONFIGURATION_PERMISSION_ID();
   }
 
   public UPGRADE_PLUGIN_PERMISSION_ID(): Promise<string> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .UPGRADE_PLUGIN_PERMISSION_ID();
   }
 
@@ -47,7 +47,7 @@ export class AllowlistVotingMethods {
     _users: string[]
   ): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .addAllowedUsers(_users);
     yield {
       key: Steps.PENDING,
@@ -61,39 +61,34 @@ export class AllowlistVotingMethods {
 
   public allowedUserCount(blockNumber: BigNumberish): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .allowedUserCount(blockNumber);
   }
 
   public canExecute(_voteId: BigNumberish): Promise<boolean> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .canExecute(_voteId);
   }
 
   public canVote(_voteId: BigNumberish, _voter: string): Promise<boolean> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .canVote(_voteId, _voter);
   }
 
   public async *createProposal(
-    _proposalMetadata: BytesLike,
-    _actions: VoteAction[],
-    _startDate: BigNumberish,
-    _endDate: BigNumberish,
-    _executeIfDecided: boolean,
-    _choice: BigNumberish
+    params: ICreateProposalParams
   ): AsyncGenerator<VoteCreationValue> {
     const tx = await this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .createVote(
-        _proposalMetadata,
-        _actions,
-        _startDate,
-        _endDate,
-        _executeIfDecided,
-        _choice
+        params._proposalMetadata,
+        params._actions,
+        params._startDate,
+        params._endDate,
+        params._executeIfDecided,
+        params._choice
       );
 
     yield {
@@ -105,7 +100,7 @@ export class AllowlistVotingMethods {
     const voteCreatedEvents = this.getEventsByName(receipt, "VoteCreated");
 
     if (voteCreatedEvents.length !== 1) {
-      throw new CreateVoteError();
+      throw new Error("Failed to create proposal");
     }
 
     yield {
@@ -116,7 +111,7 @@ export class AllowlistVotingMethods {
 
   public async *execute(_voteId: BigNumberish): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .execute(_voteId);
     yield {
       key: Steps.PENDING,
@@ -129,40 +124,40 @@ export class AllowlistVotingMethods {
   }
 
   public getDAO(): Promise<string> {
-    return this.allowlistVoting.getConnectedPluginInstance().getDAO();
+    return this.allowlistVoting.getPluginInstanceWithSigner().getDAO();
   }
 
   public getImplementationAddress(): Promise<string> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .getImplementationAddress();
   }
 
   public async getVote(_voteId: BigNumberish): Promise<Vote> {
     const voteData = await this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .getVote(_voteId);
-    const vote = new Vote(
-      _voteId,
-      voteData.open,
-      voteData.executed,
-      voteData.startDate,
-      voteData.endDate,
-      voteData.snapshotBlock,
-      voteData.supportRequired,
-      voteData.participationRequired,
-      voteData.votingPower,
-      voteData.yes,
-      voteData.no,
-      voteData.abstain,
-      voteData.actions
-    );
+    const vote: Vote = {
+      id: _voteId,
+      open: voteData.open,
+      executed: voteData.executed,
+      startDate: voteData.startDate,
+      endDate: voteData.endDate,
+      snapshotBlock: voteData.snapshotBlock,
+      supportRequired: voteData.supportRequired,
+      participationRequired: voteData.participationRequired,
+      votingPower: voteData.votingPower,
+      yes: voteData.yes,
+      no: voteData.no,
+      abstain: voteData.abstain,
+      actions: voteData.actions,
+    };
     return vote;
   }
 
   public getVoteOption(_voteId: BigNumberish, _voter: string): Promise<number> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .getVoteOption(_voteId, _voter);
   }
 
@@ -171,33 +166,33 @@ export class AllowlistVotingMethods {
     blockNumber: BigNumberish
   ): Promise<boolean> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .isAllowed(account, blockNumber);
   }
 
   public minDuration(): Promise<BigNumber> {
-    return this.allowlistVoting.getConnectedPluginInstance().minDuration();
+    return this.allowlistVoting.getPluginInstanceWithSigner().minDuration();
   }
 
   public participationRequiredPct(): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .participationRequiredPct();
   }
 
   public pluginType(): Promise<number> {
-    return this.allowlistVoting.getConnectedPluginInstance().pluginType();
+    return this.allowlistVoting.getPluginInstanceWithSigner().pluginType();
   }
 
   public proxiableUUID(): Promise<string> {
-    return this.allowlistVoting.getConnectedPluginInstance().proxiableUUID();
+    return this.allowlistVoting.getPluginInstanceWithSigner().proxiableUUID();
   }
 
   public async *removeAllowedUsers(
     _users: string[]
   ): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .removeAllowedUsers(_users);
     yield {
       key: Steps.PENDING,
@@ -210,16 +205,14 @@ export class AllowlistVotingMethods {
   }
 
   public async *setConfiguration(
-    _participationRequiredPct: BigNumberish,
-    _supportRequiredPct: BigNumberish,
-    _minDuration: BigNumberish
+    params: ISetConfigurationParams
   ): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .setConfiguration(
-        _participationRequiredPct,
-        _supportRequiredPct,
-        _minDuration
+        params._participationRequiredPct,
+        params._supportRequiredPct,
+        params._minDuration
       );
     yield {
       key: Steps.PENDING,
@@ -233,18 +226,14 @@ export class AllowlistVotingMethods {
 
   public supportRequiredPct(): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstanceWithSigner()
       .supportRequiredPct();
   }
 
-  public async *vote(
-    _voteId: BigNumberish,
-    _choice: BigNumberish,
-    _executesIfDecided: boolean
-  ): AsyncGenerator<VoteStepsValue> {
+  public async *vote(params: IVoteParams): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
-      .getConnectedPluginInstance()
-      .vote(_voteId, _choice, _executesIfDecided);
+      .getPluginInstanceWithSigner()
+      .vote(params._voteId, params._choice, params._executesIfDecided);
     yield {
       key: Steps.PENDING,
       txHash: tx.hash,
@@ -256,7 +245,7 @@ export class AllowlistVotingMethods {
   }
 
   public votesLength(): Promise<BigNumber> {
-    return this.allowlistVoting.getConnectedPluginInstance().votesLength();
+    return this.allowlistVoting.getPluginInstanceWithSigner().votesLength();
   }
 
   private getEventsByName(

@@ -1,58 +1,83 @@
-import { BigNumber, BigNumberish, BytesLike } from "ethers";
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import {
+  ContractReceipt,
+  Event as EthersEvent,
+} from "@ethersproject/contracts";
 import { ERC20Voting } from "../client";
-import { Steps, Vote, VoteAction, VoteCreationValue } from "../interfaces";
+import {
+  ICreateProposalParams,
+  ISetConfigurationParams,
+  IVoteParams,
+  Steps,
+  Proposal,
+  VoteCreationValue,
+  VoteStepsValue,
+} from "../interfaces";
 
 export class ERC20VotingMethods {
-  private erc20Voting: ERC20Voting;
+  private ERC20Voting: ERC20Voting;
 
-  constructor(erc20Voting: ERC20Voting) {
-    this.erc20Voting = erc20Voting;
+  constructor(ERC20Voting: ERC20Voting) {
+    this.ERC20Voting = ERC20Voting;
   }
 
   public PCT_BASE(): Promise<BigNumber> {
-    return this.erc20Voting.getConnectedPluginInstance().PCT_BASE();
+    return this.ERC20Voting.getPluginInstanceWithSigner().PCT_BASE();
   }
 
   public SET_CONFIGURATION_PERMISSION_ID(): Promise<string> {
-    return this.erc20Voting
-      .getConnectedPluginInstance()
-      .SET_CONFIGURATION_PERMISSION_ID();
+    return this.ERC20Voting.getPluginInstanceWithSigner().SET_CONFIGURATION_PERMISSION_ID();
   }
 
   public UPGRADE_PLUGIN_PERMISSION_ID(): Promise<string> {
-    return this.erc20Voting
-      .getConnectedPluginInstance()
-      .UPGRADE_PLUGIN_PERMISSION_ID();
+    return this.ERC20Voting.getPluginInstanceWithSigner().UPGRADE_PLUGIN_PERMISSION_ID();
   }
 
   public canExecute(_voteId: BigNumberish): Promise<boolean> {
-    return this.erc20Voting.getConnectedPluginInstance().canExecute(_voteId);
+    return this.ERC20Voting.getPluginInstanceWithSigner().canExecute(_voteId);
   }
 
   public canVote(_voteId: BigNumberish, _voter: string): Promise<boolean> {
-    return this.erc20Voting
-      .getConnectedPluginInstance()
-      .canVote(_voteId, _voter);
+    return this.ERC20Voting.getPluginInstanceWithSigner().canVote(
+      _voteId,
+      _voter
+    );
   }
 
   public async *createProposal(
-    _proposalMetadata: BytesLike,
-    _actions: VoteAction[],
-    _startDate: BigNumberish,
-    _endDate: BigNumberish,
-    _executeIfDecided: boolean,
-    _choice: BigNumberish
+    params: ICreateProposalParams
   ): AsyncGenerator<VoteCreationValue> {
-    const tx = await this.erc20Voting
-      .getConnectedPluginInstance()
-      .createVote(
-        _proposalMetadata,
-        _actions,
-        _startDate,
-        _endDate,
-        _executeIfDecided,
-        _choice
-      );
+    const tx = await this.ERC20Voting.getPluginInstanceWithSigner().createVote(
+      params._proposalMetadata,
+      params._actions,
+      params._startDate,
+      params._endDate,
+      params._executeIfDecided,
+      params._choice
+    );
+
+    yield {
+      key: Steps.PENDING,
+      txHash: tx.hash,
+    };
+
+    const receipt = await tx.wait();
+    const voteCreatedEvents = this.getEventsByName(receipt, "VoteCreated");
+
+    if (voteCreatedEvents.length !== 1) {
+      throw new Error("Failed to create proposal");
+    }
+
+    yield {
+      key: Steps.DONE,
+      voteId: parseInt(voteCreatedEvents[0].topics[1]),
+    };
+  }
+
+  public async *execute(_voteId: BigNumberish): AsyncGenerator<VoteStepsValue> {
+    const tx = await this.ERC20Voting.getPluginInstanceWithSigner().execute(
+      _voteId
+    );
     yield {
       key: Steps.PENDING,
       txHash: tx.hash,
@@ -60,105 +85,113 @@ export class ERC20VotingMethods {
     await tx.wait();
     yield {
       key: Steps.DONE,
-      voteId: BigNumber.from("1"),
     };
   }
 
-  public async *execute(_voteId: BigNumberish): AsyncGenerator<Steps> {
-    const tx = await this.erc20Voting
-      .getConnectedPluginInstance()
-      .execute(_voteId);
-    yield Steps.PENDING;
-    await tx.wait();
-    yield Steps.DONE;
-  }
-
   public getDAO(): Promise<string> {
-    return this.erc20Voting.getConnectedPluginInstance().getDAO();
+    return this.ERC20Voting.getPluginInstanceWithSigner().getDAO();
   }
 
   public getImplementationAddress(): Promise<string> {
-    return this.erc20Voting
-      .getConnectedPluginInstance()
-      .getImplementationAddress();
+    return this.ERC20Voting.getPluginInstanceWithSigner().getImplementationAddress();
   }
 
-  public async getVote(_voteId: BigNumberish): Promise<Vote> {
-    const voteData = (await this.erc20Voting
-      .getConnectedPluginInstance()
-      .getVote(_voteId)) as Vote;
-    const vote = new Vote();
-    for (const key of Object.keys(vote)) {
-      if (vote.hasOwnProperty(key) && voteData.hasOwnProperty(key)) {
-        vote[key] = voteData[key];
-      }
-    }
+  public async getVote(_voteId: BigNumberish): Promise<Proposal> {
+    const voteData = await this.ERC20Voting.getPluginInstanceWithSigner().getVote(
+      _voteId
+    );
+    const vote: Proposal = {
+      id: _voteId,
+      open: voteData.open,
+      executed: voteData.executed,
+      startDate: voteData.startDate,
+      endDate: voteData.endDate,
+      snapshotBlock: voteData.snapshotBlock,
+      supportRequired: voteData.supportRequired,
+      participationRequired: voteData.participationRequired,
+      votingPower: voteData.votingPower,
+      yes: voteData.yes,
+      no: voteData.no,
+      abstain: voteData.abstain,
+      actions: voteData.actions,
+    };
     return vote;
   }
 
   public getVoteOption(_voteId: BigNumberish, _voter: string): Promise<number> {
-    return this.erc20Voting
-      .getConnectedPluginInstance()
-      .getVoteOption(_voteId, _voter);
-  }
-
-  public getVotingToken(): Promise<string> {
-    return this.erc20Voting.getConnectedPluginInstance().getVotingToken();
+    return this.ERC20Voting.getPluginInstanceWithSigner().getVoteOption(
+      _voteId,
+      _voter
+    );
   }
 
   public minDuration(): Promise<BigNumber> {
-    return this.erc20Voting.getConnectedPluginInstance().minDuration();
+    return this.ERC20Voting.getPluginInstanceWithSigner().minDuration();
   }
 
   public participationRequiredPct(): Promise<BigNumber> {
-    return this.erc20Voting
-      .getConnectedPluginInstance()
-      .participationRequiredPct();
+    return this.ERC20Voting.getPluginInstanceWithSigner().participationRequiredPct();
   }
 
   public pluginType(): Promise<number> {
-    return this.erc20Voting.getConnectedPluginInstance().pluginType();
+    return this.ERC20Voting.getPluginInstanceWithSigner().pluginType();
   }
 
   public proxiableUUID(): Promise<string> {
-    return this.erc20Voting.getConnectedPluginInstance().proxiableUUID();
+    return this.ERC20Voting.getPluginInstanceWithSigner().proxiableUUID();
   }
 
   public async *setConfiguration(
-    _participationRequiredPct: BigNumberish,
-    _supportRequiredPct: BigNumberish,
-    _minDuration: BigNumberish
-  ): AsyncGenerator<Steps> {
-    const tx = await this.erc20Voting
-      .getConnectedPluginInstance()
-      .setConfiguration(
-        _participationRequiredPct,
-        _supportRequiredPct,
-        _minDuration
-      );
-    yield Steps.PENDING;
+    params: ISetConfigurationParams
+  ): AsyncGenerator<VoteStepsValue> {
+    const tx = await this.ERC20Voting.getPluginInstanceWithSigner().setConfiguration(
+      params._participationRequiredPct,
+      params._supportRequiredPct,
+      params._minDuration
+    );
+    yield {
+      key: Steps.PENDING,
+      txHash: tx.hash,
+    };
     await tx.wait();
-    yield Steps.DONE;
+    yield {
+      key: Steps.DONE,
+    };
   }
 
   public supportRequiredPct(): Promise<BigNumber> {
-    return this.erc20Voting.getConnectedPluginInstance().supportRequiredPct();
+    return this.ERC20Voting.getPluginInstanceWithSigner().supportRequiredPct();
   }
 
-  public async *vote(
-    _voteId: BigNumberish,
-    _choice: BigNumberish,
-    _executesIfDecided: boolean
-  ): AsyncGenerator<Steps> {
-    const tx = await this.erc20Voting
-      .getConnectedPluginInstance()
-      .vote(_voteId, _choice, _executesIfDecided);
-    yield Steps.PENDING;
+  public async *vote(params: IVoteParams): AsyncGenerator<VoteStepsValue> {
+    const tx = await this.ERC20Voting.getPluginInstanceWithSigner().vote(
+      params._voteId,
+      params._choice,
+      params._executesIfDecided
+    );
+    yield {
+      key: Steps.PENDING,
+      txHash: tx.hash,
+    };
     await tx.wait();
-    yield Steps.DONE;
+    yield {
+      key: Steps.DONE,
+    };
   }
 
   public votesLength(): Promise<BigNumber> {
-    return this.erc20Voting.getConnectedPluginInstance().votesLength();
+    return this.ERC20Voting.getPluginInstanceWithSigner().votesLength();
+  }
+
+  private getEventsByName(
+    receipt: ContractReceipt,
+    eventName: string
+  ): EthersEvent[] {
+    const eventTopic = this.ERC20Voting.pluginInstance.interface.getEventTopic(
+      eventName
+    );
+    return (
+      receipt.events?.filter(event => event.topics[0] === eventTopic) || []
+    );
   }
 }

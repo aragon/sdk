@@ -285,11 +285,17 @@ export async function createDAO(
   const registeredParsed = registryInterface.parseLog(registeredLog);
   return {
     daoAddr: registeredParsed.args[0],
-    pluginAddrs: installedLogs.map(log => pluginSetupProcessorInterface.parseLog(log).args[1]),
+    pluginAddrs: installedLogs.map(
+      log => pluginSetupProcessorInterface.parseLog(log).args[1]
+    ),
   };
 }
 
-export async function createAllowlistDAO(deployment: Deployment, name: string, addresses: string[] = []) {
+export async function createAllowlistDAO(
+  deployment: Deployment,
+  name: string,
+  addresses: string[] = []
+) {
   return createDAO(
     deployment.daoFactory,
     {
@@ -304,6 +310,43 @@ export async function createAllowlistDAO(deployment: Deployment, name: string, a
         data: defaultAbiCoder.encode(
           ["uint64", "uint64", "uint64", "address[]"],
           [1, 1, 1, addresses]
+        ),
+      },
+    ]
+  );
+}
+
+export async function createERC20DAO(
+  deployment: Deployment,
+  name: string,
+  addresses: string[] = []
+) {
+  return createDAO(
+    deployment.daoFactory,
+    {
+      metadata: "0x0000",
+      name,
+      trustedForwarder: AddressZero,
+    },
+    [
+      {
+        pluginSetup: deployment.erc20PluginSetup.address,
+        pluginSetupRepo: deployment.erc20Repo.address,
+        data: defaultAbiCoder.encode(
+          [
+            "uint64",
+            "uint64",
+            "uint64",
+            "tuple(address, string, string)",
+            "tuple(address[], uint256[])",
+          ],
+          [
+            1,
+            1,
+            1,
+            [AddressZero, "erc20", "e20"],
+            [addresses, addresses.map(() => parseEther("1"))],
+          ]
         ),
       },
     ]

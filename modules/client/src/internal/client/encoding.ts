@@ -4,7 +4,6 @@ import {
   IRevokePermissionParams,
   IWithdrawParams,
 } from "../../interfaces";
-import { ClientCore, Context } from "../../client-common";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
@@ -12,30 +11,25 @@ import {
   permissionParamsToContract,
   withdrawParamsToContract,
 } from "../utils";
-import { UnsignedTransaction } from "@ethersproject/transactions";
+import { IEncodingResult } from "../../client-common";
+import { arrayify } from "@ethersproject/bytes";
 
 /**
  * Encoding module the SDK Generic Client
  */
-export class ClientEncoding extends ClientCore {
-  constructor(context: Context) {
-    super(context);
-    Object.freeze(ClientEncoding.prototype);
-    Object.freeze(this);
-  }
+export class ClientEncoding {
   /**
    * Computes the payload to be given when creating a proposal that grants a permission within a DAO
    *
-   * @static
    * @param {string} daoAddress
    * @param {IGrantPermissionParams} params
-   * @return {*}  {ethers.UnsignedTransaction}
+   * @return {*}  {IEncodingResult}
    * @memberof ClientEncoding
    */
-  public static grantAction(
+  public grantAction(
     daoAddress: string,
     params: IGrantPermissionParams
-  ): UnsignedTransaction {
+  ): IEncodingResult {
     const daoInterface = DAO__factory.createInterface();
     const args = permissionParamsToContract({
       who: params.who,
@@ -44,25 +38,25 @@ export class ClientEncoding extends ClientCore {
     });
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("grant", args);
+    const data = arrayify(hexBytes);
     return {
       to: daoAddress,
       value: BigInt(0),
-      data: hexBytes,
+      data,
     };
   }
   /**
    * Computes the payload to be given when creating a proposal that revokes a permission within a DAO
    *
-   * @static
    * @param {string} daoAddress
    * @param {IRevokePermissionParams} params
-   * @return {*}  {ethers.UnsignedTransaction}
+   * @return {*}  {IEncodingResult}
    * @memberof ClientEncoding
    */
-  public static revokeAction(
+  public revokeAction(
     daoAddress: string,
     params: IRevokePermissionParams
-  ): UnsignedTransaction {
+  ): IEncodingResult {
     const daoInterface = DAO__factory.createInterface();
     const args = permissionParamsToContract({
       who: params.who,
@@ -81,16 +75,15 @@ export class ClientEncoding extends ClientCore {
   /**
    * Computes the payload to be given when creating a proposal that freezes a permission within a DAO
    *
-   * @static
    * @param {string} daoAddress
    * @param {IFreezePermissionParams} params
-   * @return {*}  {ethers.UnsignedTransaction}
+   * @return {*}  {IEncodingResult}
    * @memberof ClientEncoding
    */
-  public static freezeAction(
+  public freezeAction(
     daoAddress: string,
     params: IFreezePermissionParams
-  ): UnsignedTransaction {
+  ): IEncodingResult {
     const daoInterface = DAO__factory.createInterface();
     const args = freezeParamsToContract({
       where: params.where,
@@ -108,16 +101,15 @@ export class ClientEncoding extends ClientCore {
   /**
    * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
    *
-   * @static
    * @param {string} daoAddress
    * @param {IWithdrawParams} params
-   * @return {*}  {ethers.UnsignedTransaction}
+   * @return {*}  {IEncodingResult}
    * @memberof ClientEncoding
    */
-  public static withdrawAction(
+  public withdrawAction(
     daoAddress: string,
     params: IWithdrawParams
-  ): UnsignedTransaction {
+  ): IEncodingResult {
     const daoInterface = DAO__factory.createInterface();
     const args = withdrawParamsToContract(params);
     // get hex bytes
@@ -133,24 +125,24 @@ export class ClientEncoding extends ClientCore {
   /**
    * Computes the payload to be given when creating a proposal that updates the metadata the DAO
    *
-   * @static
    * @param {string} daoAddress
    * @param {IPFSModule} ipfs
    * @param {IMetadata} params
-   * @return {*}  {UnsignedTransaction}
+   * @return {*}  {IEncodingResult}
    * @memberof ClientEncoding
    */
-  public static updateMetadataAction(
+  public updateMetadataAction(
     daoAddress: string,
     cid: string
-  ): UnsignedTransaction {
+  ): IEncodingResult {
     const daoInterface = DAO__factory.createInterface();
     const args = new TextEncoder().encode(cid);
     const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
+    const data = arrayify(hexBytes);
     return {
       to: daoAddress,
       value: BigInt(0),
-      data: hexBytes,
+      data,
     };
   }
 }

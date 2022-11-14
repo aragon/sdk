@@ -1,7 +1,10 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
-import { BytesLike } from "@ethersproject/bytes";
 import { AllowlistVoting } from "../client";
-import { VoteAction } from "../interfaces";
+import {
+  ICreateProposalParams,
+  ISetConfigurationParams,
+  IVoteParams,
+} from "../interfaces";
 
 export class AllowlistVotingEstimation {
   private allowlistVoting: AllowlistVoting;
@@ -12,93 +15,84 @@ export class AllowlistVotingEstimation {
 
   public MODIFY_ALLOWLIST_PERMISSION_ID(): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.MODIFY_ALLOWLIST_PERMISSION_ID();
   }
 
   public PCT_BASE(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getConnectedPluginInstance()
-      .estimateGas.PCT_BASE();
+    return this.allowlistVoting.getPluginInstance().estimateGas.PCT_BASE();
   }
 
   public SET_CONFIGURATION_PERMISSION_ID(): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.SET_CONFIGURATION_PERMISSION_ID();
   }
 
   public UPGRADE_PLUGIN_PERMISSION_ID(): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.UPGRADE_PLUGIN_PERMISSION_ID();
   }
 
   public async addAllowedUsers(_users: string[]): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.addAllowedUsers(_users);
   }
 
   public allowedUserCount(blockNumber: BigNumberish): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.allowedUserCount(blockNumber);
   }
 
   public canExecute(_voteId: BigNumberish): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.canExecute(_voteId);
   }
 
   public canVote(_voteId: BigNumberish, _voter: string): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.canVote(_voteId, _voter);
   }
 
   public async createProposal(
-    _proposalMetadata: BytesLike,
-    _actions: VoteAction[],
-    _startDate: BigNumberish,
-    _endDate: BigNumberish,
-    _executeIfDecided: boolean,
-    _choice: BigNumberish
+    params: ICreateProposalParams
   ): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.createVote(
-        _proposalMetadata,
-        _actions,
-        _startDate,
-        _endDate,
-        _executeIfDecided,
-        _choice
+        params._proposalMetadata,
+        params._actions,
+        params._startDate,
+        params._endDate,
+        params._executeIfDecided,
+        params._choice
       );
   }
 
   public async execute(_voteId: BigNumberish): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.execute(_voteId);
   }
 
   public getDAO(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getConnectedPluginInstance()
-      .estimateGas.getDAO();
+    return this.allowlistVoting.getPluginInstance().estimateGas.getDAO();
   }
 
   public getImplementationAddress(): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.getImplementationAddress();
   }
 
   public async getVote(_voteId: BigNumberish): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.getVote(_voteId);
   }
 
@@ -107,7 +101,7 @@ export class AllowlistVotingEstimation {
     _voter: string
   ): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.getVoteOption(_voteId, _voter);
   }
 
@@ -116,73 +110,63 @@ export class AllowlistVotingEstimation {
     blockNumber: BigNumberish
   ): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.isAllowed(account, blockNumber);
   }
 
   public minDuration(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getConnectedPluginInstance()
-      .estimateGas.minDuration();
+    return this.allowlistVoting.getPluginInstance().estimateGas.minDuration();
   }
 
   public participationRequiredPct(): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.participationRequiredPct();
   }
 
   public pluginType(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getConnectedPluginInstance()
-      .estimateGas.pluginType();
+    return this.allowlistVoting.getPluginInstance().estimateGas.pluginType();
   }
 
   public proxiableUUID(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getConnectedPluginInstance()
-      .estimateGas.proxiableUUID();
+    return this.allowlistVoting.getPluginInstance().estimateGas.proxiableUUID();
   }
 
   public async removeAllowedUsers(_users: string[]): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.removeAllowedUsers(_users);
   }
 
   public async setConfiguration(
-    _participationRequiredPct: BigNumberish,
-    _supportRequiredPct: BigNumberish,
-    _minDuration: BigNumberish
+    params: ISetConfigurationParams
   ): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.setConfiguration(
-        _participationRequiredPct,
-        _supportRequiredPct,
-        _minDuration
+        params._participationRequiredPct,
+        params._supportRequiredPct,
+        params._minDuration
       );
   }
 
   public supportRequiredPct(): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
+      .getPluginInstance()
       .estimateGas.supportRequiredPct();
   }
 
-  public async vote(
-    _voteId: BigNumberish,
-    _choice: BigNumberish,
-    _executesIfDecided: boolean
-  ): Promise<BigNumber> {
+  public async vote(params: IVoteParams): Promise<BigNumber> {
     return this.allowlistVoting
-      .getConnectedPluginInstance()
-      .estimateGas.vote(_voteId, _choice, _executesIfDecided);
+      .getPluginInstance()
+      .estimateGas.vote(
+        params._voteId,
+        params._choice,
+        params._executesIfDecided
+      );
   }
 
   public votesLength(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getConnectedPluginInstance()
-      .estimateGas.votesLength();
+    return this.allowlistVoting.getPluginInstance().estimateGas.votesLength();
   }
 }

@@ -4,15 +4,15 @@ declare const describe, it, expect;
 import {
   Client,
   Context,
+  IEncodingResult,
   IFreezePermissionParams,
   IGrantPermissionParams,
-  IMetadata,
   IRevokePermissionParams,
   IWithdrawParams,
   Permissions,
 } from "../../../src";
-import { DaoAction } from "../../../src/client-common/interfaces/common";
 import { contextParamsLocalChain } from "../constants";
+
 describe("Client", () => {
   describe("Action generators", () => {
     it("Should create a client and generate a withdraw action", async () => {
@@ -27,7 +27,7 @@ describe("Client", () => {
 
       const withdrawAction = await client.encoding.withdrawAction(
         "0x1234567890123456789012345678901234567890",
-        withdrawParams,
+        withdrawParams
       );
 
       expect(typeof withdrawAction).toBe("object");
@@ -52,21 +52,19 @@ describe("Client", () => {
           permission: Permissions.UPGRADE_PERMISSION,
         },
       ];
-      let actions: DaoAction[] = [];
+      let actions: IEncodingResult[] = [];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         actions.push(client.encoding.grantAction(daoAddresses[i], params));
       }
-      const decoder = new TextDecoder();
+
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
         expect(typeof action).toBe("object");
         expect(action.to).toBe(daoAddresses[i]);
         expect(action.data).toBeInstanceOf(Uint8Array);
       }
-      expect(
-        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
-      ).toBe(false);
+      expect(actions[0].data === actions[1].data).toBe(false);
     });
     it("Should create a client and generate a revoke action", () => {
       const context = new Context(contextParamsLocalChain);
@@ -87,21 +85,19 @@ describe("Client", () => {
           permission: Permissions.UPGRADE_PERMISSION,
         },
       ];
-      let actions: DaoAction[] = [];
+      let actions: IEncodingResult[] = [];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         actions.push(client.encoding.revokeAction(daoAddresses[i], params));
       }
-      const decoder = new TextDecoder();
+
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
         expect(typeof action).toBe("object");
         expect(action.to).toBe(daoAddresses[i]);
         expect(action.data).toBeInstanceOf(Uint8Array);
       }
-      expect(
-        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
-      ).toBe(false);
+      expect(actions[0].data === actions[1].data).toBe(false);
     });
     it("Should create a client and generate a freeze action", () => {
       const context = new Context(contextParamsLocalChain);
@@ -122,45 +118,27 @@ describe("Client", () => {
           permission: Permissions.EXECUTE_PERMISSION,
         },
       ];
-      let actions: DaoAction[] = [];
+      let actions: IEncodingResult[] = [];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         actions.push(client.encoding.freezeAction(daoAddresses[i], params));
       }
-      const decoder = new TextDecoder();
+
       for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
         expect(typeof action).toBe("object");
         expect(action.to).toBe(daoAddresses[i]);
         expect(action.data).toBeInstanceOf(Uint8Array);
       }
-      expect(
-        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
-      ).toBe(false);
+      expect(actions[0].data === actions[1].data).toBe(false);
     });
     it("Should encode an update metadata raw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const params: IMetadata = {
-        name: "New Name",
-        description: "New description",
-        avatar: "https://theavatar.com/image.jpg",
-        links: [
-          {
-            url: "https://discord.com/...",
-            name: "Discord",
-          },
-          {
-            url: "https://twitter.com/...",
-            name: "Twitter",
-          },
-        ],
-      };
-
       const installEntry = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        "Qmfeqee"
       );
 
       expect(typeof installEntry).toBe("object");

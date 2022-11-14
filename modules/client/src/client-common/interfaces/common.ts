@@ -1,5 +1,7 @@
 // This file contains common types, interfaces, and enumerations
 
+import { BigNumberish } from "@ethersproject/bignumber";
+
 export enum DaoRole {
   UPGRADE_ROLE = "UPGRADE_ROLE",
   DAO_CONFIG_ROLE = "DAO_CONFIG_ROLE",
@@ -45,4 +47,10 @@ export interface IInterfaceParams {
   id: string;
   functionName: string;
   hash: string;
+}
+
+export interface IEncodingResult {
+  to: string;
+  value: BigNumberish;
+  data: Uint8Array;
 }

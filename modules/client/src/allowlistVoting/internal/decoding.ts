@@ -1,19 +1,16 @@
 import { BytesLike, isBytesLike } from "@ethersproject/bytes";
-import { UnsignedTransaction } from "@ethersproject/transactions";
 import {
-  IAddAllowedUsersParams,
-  ICreateVoteParams,
-  IExecuteParams,
-  IRemoveAllowedUsersParams,
+  ICreateProposalParams,
   ISetConfigurationParams,
   IVoteParams,
 } from "../interfaces";
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import { IEncodingResult } from "../../client-common";
 
 export class AllowlistVotingDecoding {
   private static getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
-    txOrData: UnsignedTransaction | BytesLike
+    txOrData: IEncodingResult | BytesLike
   ): T {
     let data: BytesLike | undefined = txOrData as BytesLike;
     if (!isBytesLike(txOrData)) {
@@ -31,26 +28,26 @@ export class AllowlistVotingDecoding {
   }
 
   public static addAllowedUsers(
-    txOrData: UnsignedTransaction | BytesLike
-  ): IAddAllowedUsersParams {
+    txOrData: IEncodingResult | BytesLike
+  ): { users: string[] } {
     return AllowlistVotingDecoding.getDecodedData("addAllowedUsers", txOrData);
   }
 
   public static createProposal(
-    txOrData: UnsignedTransaction | BytesLike
-  ): ICreateVoteParams {
+    txOrData: IEncodingResult | BytesLike
+  ): ICreateProposalParams {
     return AllowlistVotingDecoding.getDecodedData("addAllowedUsers", txOrData);
   }
 
   public static execute(
-    txOrData: UnsignedTransaction | BytesLike
-  ): IExecuteParams {
+    txOrData: IEncodingResult | BytesLike
+  ): { vote: string } {
     return AllowlistVotingDecoding.getDecodedData("execute", txOrData);
   }
 
   public static removeAllowedUsers(
-    txOrData: UnsignedTransaction | BytesLike
-  ): IRemoveAllowedUsersParams {
+    txOrData: IEncodingResult | BytesLike
+  ): { users: string[] } {
     return AllowlistVotingDecoding.getDecodedData(
       "removeAllowedUsers",
       txOrData
@@ -58,14 +55,12 @@ export class AllowlistVotingDecoding {
   }
 
   public static setConfiguration(
-    txOrData: UnsignedTransaction | BytesLike
+    txOrData: IEncodingResult | BytesLike
   ): ISetConfigurationParams {
     return AllowlistVotingDecoding.getDecodedData("setConfiguration", txOrData);
   }
 
-  public static vote(
-    txOrData: UnsignedTransaction | BytesLike
-  ): IVoteParams {
+  public static vote(txOrData: IEncodingResult | BytesLike): IVoteParams {
     return AllowlistVotingDecoding.getDecodedData("vote", txOrData);
   }
 }

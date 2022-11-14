@@ -24,11 +24,11 @@ export class ERC20Voting extends ClientCore {
     );
     this.methods = new ERC20VotingMethods(this);
     this.estimation = new ERC20VotingEstimation(this);
-    this.encoding = new ERC20VotingEncoding(this);
-    this.decoding = new ERC20VotingDecoding(this);
+    this.encoding = new ERC20VotingEncoding(context.pluginAddress);
+    this.decoding = ERC20VotingDecoding;
   }
 
-  public getConnectedPluginInstance(): ERC20VotingContract {
+  public getPluginInstanceWithSigner(): ERC20VotingContract {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -37,5 +37,13 @@ export class ERC20Voting extends ClientCore {
     }
 
     return this.pluginInstance.connect(signer);
+  }
+
+  public getPluginInstance(): ERC20VotingContract {
+    const provider = this.web3.getProvider();
+    if (!provider) {
+      throw new Error("A web3 provider is needed");
+    }
+    return this.pluginInstance.connect(provider);
   }
 }

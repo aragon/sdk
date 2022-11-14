@@ -28,7 +28,7 @@ export class AllowlistVoting extends ClientCore {
     this.decoding = AllowlistVotingDecoding;
   }
 
-  public getConnectedPluginInstance(): AllowlistVotingContract {
+  public getPluginInstanceWithSigner(): AllowlistVotingContract {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
@@ -37,5 +37,13 @@ export class AllowlistVoting extends ClientCore {
     }
 
     return this.pluginInstance.connect(signer);
+  }
+
+  public getPluginInstance(): AllowlistVotingContract {
+    const provider = this.web3.getProvider();
+    if (!provider) {
+      throw new Error("A web3 provider is needed");
+    }
+    return this.pluginInstance.connect(provider);
   }
 }

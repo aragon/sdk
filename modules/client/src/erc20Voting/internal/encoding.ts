@@ -1,77 +1,99 @@
-import { BigNumberish, BytesLike, ethers } from "ethers";
-import { ERC20Voting } from "../client";
-import { VoteAction } from "../interfaces";
+import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
+import { BigNumberish } from "@ethersproject/bignumber";
+import {
+  ICreateProposalParams,
+  ISetConfigurationParams,
+  IVoteParams,
+} from "../interfaces";
+import { IEncodingResult } from "../../client-common";
+import { arrayify } from "@ethersproject/bytes";
 
 export class ERC20VotingEncoding {
-  private erc20Voting: ERC20Voting;
-
-  constructor(erc20Voting: ERC20Voting) {
-    this.erc20Voting = erc20Voting;
+  private pluginAddr: string;
+  constructor(pluginAddr: string) {
+    this.pluginAddr = pluginAddr;
   }
 
-  private getUnsignedTransaction(
+  private static getIEncodingResult(
+    pluginAddr: string,
     functionName: string,
     ...args: any[]
-  ): ethers.UnsignedTransaction {
-    const pluginInstance = this.erc20Voting.pluginInstance;
-    const data = pluginInstance.interface.encodeFunctionData(
+  ): IEncodingResult {
+    const data = ERC20Voting__factory.createInterface().encodeFunctionData(
       // @ts-ignore functionName is hardcoded by us
       functionName,
       args
     );
     return {
-      to: pluginInstance.address,
+      to: pluginAddr,
       value: 0,
-      data,
+      data: arrayify(data),
     };
   }
 
-  public createProposal(
-    _proposalMetadata: BytesLike,
-    _actions: VoteAction[],
-    _startDate: BigNumberish,
-    _endDate: BigNumberish,
-    _executeIfDecided: boolean,
-    _choice: BigNumberish
-  ): ethers.UnsignedTransaction {
-    return this.getUnsignedTransaction(
+  public static createProposal(
+    pluginAddr: string,
+    params: ICreateProposalParams
+  ): IEncodingResult {
+    return this.getIEncodingResult(
+      pluginAddr,
       "createVote",
-      _proposalMetadata,
-      _actions,
-      _startDate,
-      _endDate,
-      _executeIfDecided,
-      _choice
+      params._proposalMetadata,
+      params._actions,
+      params._startDate,
+      params._endDate,
+      params._executeIfDecided,
+      params._choice
     );
   }
 
-  public execute(_voteId: BigNumberish): ethers.UnsignedTransaction {
-    return this.getUnsignedTransaction("execute", _voteId);
+  public createProposal(params: ICreateProposalParams): IEncodingResult {
+    return ERC20VotingEncoding.createProposal(this.pluginAddr, params);
   }
 
-  public setConfiguration(
-    _participationRequiredPct: BigNumberish,
-    _supportRequiredPct: BigNumberish,
-    _minDuration: BigNumberish
-  ): ethers.UnsignedTransaction {
-    return this.getUnsignedTransaction(
+  public static execute(
+    pluginAddr: string,
+    _voteId: BigNumberish
+  ): IEncodingResult {
+    return ERC20VotingEncoding.getIEncodingResult(
+      pluginAddr,
+      "execute",
+      _voteId
+    );
+  }
+
+  public execute(_voteId: BigNumberish): IEncodingResult {
+    return ERC20VotingEncoding.execute(this.pluginAddr, _voteId);
+  }
+
+  public static setConfiguration(
+    pluginAddr: string,
+    params: ISetConfigurationParams
+  ): IEncodingResult {
+    return ERC20VotingEncoding.getIEncodingResult(
+      pluginAddr,
       "setConfiguration",
-      _participationRequiredPct,
-      _supportRequiredPct,
-      _minDuration
+      params._participationRequiredPct,
+      params._supportRequiredPct,
+      params._minDuration
     );
   }
 
-  public vote(
-    _voteId: BigNumberish,
-    _choice: BigNumberish,
-    _executesIfDecided: boolean
-  ): ethers.UnsignedTransaction {
-    return this.getUnsignedTransaction(
+  public setConfiguration(params: ISetConfigurationParams): IEncodingResult {
+    return ERC20VotingEncoding.setConfiguration(this.pluginAddr, params);
+  }
+
+  public static vote(pluginAddr: string, params: IVoteParams): IEncodingResult {
+    return ERC20VotingEncoding.getIEncodingResult(
+      pluginAddr,
       "vote",
-      _voteId,
-      _choice,
-      _executesIfDecided
+      params._voteId,
+      params._choice,
+      params._executesIfDecided
     );
+  }
+
+  public vote(params: IVoteParams): IEncodingResult {
+    return ERC20VotingEncoding.vote(this.pluginAddr, params);
   }
 }

@@ -1,23 +1,17 @@
-import { ethers, BytesLike } from "ethers";
-import { isBytesLike } from "ethers/lib/utils";
-import { ERC20Voting } from "../client";
+import { BytesLike, isBytesLike } from "@ethersproject/bytes";
 import {
-  ICreateVoteParams,
-  IExecuteParams,
+  ICreateProposalParams,
   ISetConfigurationParams,
   IVoteParams,
 } from "../interfaces";
+import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
+import { BigNumberish } from "@ethersproject/bignumber";
+import { IEncodingResult } from "../../client-common";
 
 export class ERC20VotingDecoding {
-  private erc20Voting: ERC20Voting;
-
-  constructor(erc20Voting: ERC20Voting) {
-    this.erc20Voting = erc20Voting;
-  }
-
-  private getDecodedData<T extends { [key: string]: any }>(
+  private static getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
-    txOrData: ethers.UnsignedTransaction | BytesLike
+    txOrData: IEncodingResult | BytesLike
   ): T {
     let data: BytesLike | undefined = txOrData as BytesLike;
     if (!isBytesLike(txOrData)) {
@@ -28,31 +22,31 @@ export class ERC20VotingDecoding {
     }
 
     // @ts-ignore we know that we get an readonly Array and an object which is fine
-    return this.erc20Voting.pluginInstance.interface.decodeFunctionData(
+    return ERC20Voting__factory.createInterface().decodeFunctionData(
       functionFragment,
       data
     );
   }
 
-  public createProposal(
-    txOrData: ethers.UnsignedTransaction | BytesLike
-  ): ICreateVoteParams {
-    return this.getDecodedData("addAllowedUsers", txOrData);
+  public static createProposal(
+    txOrData: IEncodingResult | BytesLike
+  ): ICreateProposalParams {
+    return ERC20VotingDecoding.getDecodedData("addAllowedUsers", txOrData);
   }
 
-  public execute(
-    txOrData: ethers.UnsignedTransaction | BytesLike
-  ): IExecuteParams {
-    return this.getDecodedData("execute", txOrData);
+  public static execute(
+    txOrData: IEncodingResult | BytesLike
+  ): { voteId: BigNumberish } {
+    return ERC20VotingDecoding.getDecodedData("execute", txOrData);
   }
 
-  public setConfiguration(
-    txOrData: ethers.UnsignedTransaction | BytesLike
+  public static setConfiguration(
+    txOrData: IEncodingResult | BytesLike
   ): ISetConfigurationParams {
-    return this.getDecodedData("setConfiguration", txOrData);
+    return ERC20VotingDecoding.getDecodedData("setConfiguration", txOrData);
   }
 
-  public vote(txOrData: ethers.UnsignedTransaction | BytesLike): IVoteParams {
-    return this.getDecodedData("vote", txOrData);
+  public static vote(txOrData: IEncodingResult | BytesLike): IVoteParams {
+    return ERC20VotingDecoding.getDecodedData("vote", txOrData);
   }
 }
