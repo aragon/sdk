@@ -202,15 +202,26 @@ export class ClientMethods extends ClientCore {
     yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
 
     await depositTx.wait().then(cr => {
-      if (!cr.events?.length) {
+      if (!cr.logs?.length) {
         throw new Error("The deposit was not properly registered");
       }
 
-      const eventAmount = cr.events?.find(e => e?.event === "Deposited")?.args
-        ?.amount;
-      if (!amount.eq(eventAmount)) {
+      const daoInterface = DAO__factory.createInterface();
+      const log = cr.logs?.find(
+        e =>
+          e?.topics[0] ===
+          id(daoInterface.getEvent("Deposited").format("sighash"))
+      );
+      if (!log) {
+        throw new Error("Failed to deposit");
+      }
+
+      const logParsed = daoInterface.parseLog(log);
+      if (!amount.eq(logParsed.args["amount"])) {
         throw new Error(
-          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${eventAmount.toBigInt()}`
+          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${logParsed.args[
+            "amount"
+          ].toBigInt()}`
         );
       }
     });
@@ -248,7 +259,13 @@ export class ClientMethods extends ClientCore {
     };
 
     await tx.wait().then((cr: ContractReceipt) => {
-      const value = cr.events?.find(e => e?.event === "Approval")?.args?.value;
+      const log = cr.logs?.find(
+        e => e?.topics[0] === id("Approval(address,address,uint256)")
+      );
+      if (!log) {
+        throw new Error("Could not find the Approval event");
+      }
+      const value = parseInt(log.data);
       if (!value || BigNumber.from(amount).gt(value)) {
         throw new Error("Could not update allowance");
       }

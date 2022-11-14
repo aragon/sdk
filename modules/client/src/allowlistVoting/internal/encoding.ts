@@ -14,7 +14,7 @@ export class AllowlistVotingEncoding {
     this.pluginAddr = pluginAddr;
   }
 
-  private static getIEncodingResult(
+  private static getEncoding(
     pluginAddr: string,
     functionName: string,
     ...args: any[]
@@ -35,7 +35,7 @@ export class AllowlistVotingEncoding {
     pluginAddr: string,
     _users: string[]
   ): IEncodingResult {
-    return AllowlistVotingEncoding.getIEncodingResult(
+    return AllowlistVotingEncoding.getEncoding(
       pluginAddr,
       "addAllowedUsers",
       _users
@@ -50,7 +50,7 @@ export class AllowlistVotingEncoding {
     pluginAddr: string,
     params: ICreateProposalParams
   ): IEncodingResult {
-    return this.getIEncodingResult(
+    return this.getEncoding(
       pluginAddr,
       "createVote",
       params._proposalMetadata,
@@ -70,7 +70,7 @@ export class AllowlistVotingEncoding {
     pluginAddr: string,
     _voteId: BigNumberish
   ): IEncodingResult {
-    return AllowlistVotingEncoding.getIEncodingResult(
+    return AllowlistVotingEncoding.getEncoding(
       pluginAddr,
       "execute",
       _voteId
@@ -85,7 +85,7 @@ export class AllowlistVotingEncoding {
     pluginAddr: string,
     _users: string[]
   ): IEncodingResult {
-    return AllowlistVotingEncoding.getIEncodingResult(
+    return AllowlistVotingEncoding.getEncoding(
       pluginAddr,
       "removeAllowedUsers",
       _users
@@ -100,7 +100,7 @@ export class AllowlistVotingEncoding {
     pluginAddr: string,
     params: ISetConfigurationParams
   ): IEncodingResult {
-    return AllowlistVotingEncoding.getIEncodingResult(
+    return AllowlistVotingEncoding.getEncoding(
       pluginAddr,
       "setConfiguration",
       params._participationRequiredPct,
@@ -114,7 +114,7 @@ export class AllowlistVotingEncoding {
   }
 
   public static vote(pluginAddr: string, params: IVoteParams): IEncodingResult {
-    return AllowlistVotingEncoding.getIEncodingResult(
+    return AllowlistVotingEncoding.getEncoding(
       pluginAddr,
       "vote",
       params._voteId,

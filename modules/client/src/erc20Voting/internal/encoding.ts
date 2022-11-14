@@ -14,7 +14,7 @@ export class ERC20VotingEncoding {
     this.pluginAddr = pluginAddr;
   }
 
-  private static getIEncodingResult(
+  private static getEncoding(
     pluginAddr: string,
     functionName: string,
     ...args: any[]
@@ -35,7 +35,7 @@ export class ERC20VotingEncoding {
     pluginAddr: string,
     params: ICreateProposalParams
   ): IEncodingResult {
-    return this.getIEncodingResult(
+    return this.getEncoding(
       pluginAddr,
       "createVote",
       params._proposalMetadata,
@@ -55,7 +55,7 @@ export class ERC20VotingEncoding {
     pluginAddr: string,
     _voteId: BigNumberish
   ): IEncodingResult {
-    return ERC20VotingEncoding.getIEncodingResult(
+    return ERC20VotingEncoding.getEncoding(
       pluginAddr,
       "execute",
       _voteId
@@ -70,7 +70,7 @@ export class ERC20VotingEncoding {
     pluginAddr: string,
     params: ISetConfigurationParams
   ): IEncodingResult {
-    return ERC20VotingEncoding.getIEncodingResult(
+    return ERC20VotingEncoding.getEncoding(
       pluginAddr,
       "setConfiguration",
       params._participationRequiredPct,
@@ -84,7 +84,7 @@ export class ERC20VotingEncoding {
   }
 
   public static vote(pluginAddr: string, params: IVoteParams): IEncodingResult {
-    return ERC20VotingEncoding.getIEncodingResult(
+    return ERC20VotingEncoding.getEncoding(
       pluginAddr,
       "vote",
       params._voteId,
