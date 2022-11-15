@@ -152,6 +152,8 @@ describe("ERC20Voting", () => {
       let vote = await erc20Voting.methods.getVoteOption(proposalId, voterAddr);
       expect(vote).toBe(2);
 
+      // makes test more stable
+      await advanceBlocks(provider, 10)
       const voting = await erc20Voting.methods.vote({
         _proposalId: proposalId,
         _choice: 3,
