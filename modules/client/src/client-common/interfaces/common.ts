@@ -54,3 +54,10 @@ export interface IEncodingResult {
   value: BigNumberish;
   data: Uint8Array;
 }
+
+export interface IDecodingTX {
+  to?: string;
+  from?: string;
+  value?: BigNumberish;
+  data: Uint8Array;
+}

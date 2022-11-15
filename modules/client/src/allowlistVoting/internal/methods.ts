@@ -13,6 +13,7 @@ import {
   VoteCreationValue,
   VoteStepsValue,
 } from "../interfaces";
+import { arrayify } from "@ethersproject/bytes";
 
 export class AllowlistVotingMethods {
   private allowlistVoting: AllowlistVoting;
@@ -150,7 +151,11 @@ export class AllowlistVotingMethods {
       yes: voteData.yes,
       no: voteData.no,
       abstain: voteData.abstain,
-      actions: voteData.actions,
+      actions: voteData.actions.map(action => ({
+        to: action.to,
+        data: arrayify(action.data),
+        value: action.value,
+      })),
     };
     return vote;
   }

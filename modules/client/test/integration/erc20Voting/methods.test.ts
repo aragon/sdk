@@ -15,6 +15,7 @@ import {
 import { Signer } from "@ethersproject/abstract-signer";
 import { Wallet } from "@ethersproject/wallet";
 import { id } from "@ethersproject/hash";
+import { arrayify } from "@ethersproject/bytes";
 
 describe("ERC20Voting", () => {
   describe("Methods", () => {
@@ -66,7 +67,8 @@ describe("ERC20Voting", () => {
     it("should return the correct canVote", async () => {
       const voteId = await createProposal(erc20Voting);
       const signerAddress = await signer.getAddress();
-      await advanceBlocks(provider, 5);
+      // helps to get stable test results
+      await advanceBlocks(provider, 50);
       expect(await erc20Voting.methods.canVote(voteId, signerAddress)).toBe(
         true
       );
@@ -80,10 +82,10 @@ describe("ERC20Voting", () => {
 
     it("should create a proposal", async () => {
       const generator = erc20Voting.methods.createProposal({
-        _proposalMetadata: "0x000001",
+        _proposalMetadata: arrayify("0x000001"),
         _actions: [
           {
-            data: "0x",
+            data: arrayify("0x"),
             to: daoAddr,
             value: 0,
           },
@@ -203,10 +205,10 @@ async function createProposal(
   endDate: number = 0
 ): Promise<number> {
   const generator = erc20Voting.methods.createProposal({
-    _proposalMetadata: "0x00",
+    _proposalMetadata: arrayify("0x00"),
     _actions: [
       {
-        data: "0x00",
+        data: arrayify("0x00"),
         to,
         value: 0,
       },
@@ -238,11 +240,11 @@ async function becomeRoot(
     id("ROOT_PERMISSION"),
   ]);
   const voteGenerator = erc20Voting.methods.createProposal({
-    _proposalMetadata: "0x00",
+    _proposalMetadata: arrayify("0x00"),
     _actions: [
       {
         to: daoAddr,
-        data: encodedGrant,
+        data: arrayify(encodedGrant),
         value: 0,
       },
     ],

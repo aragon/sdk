@@ -1,16 +1,18 @@
-import { BytesLike, isBytesLike } from "@ethersproject/bytes";
+import { BytesLike, isBytesLike, arrayify } from "@ethersproject/bytes";
 import {
   ICreateProposalParams,
   ISetConfigurationParams,
   IVoteParams,
+  ProposalAction,
 } from "../interfaces";
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
-import { IEncodingResult } from "../../client-common";
+import { IDecodingTX } from "../../client-common";
+import { BigNumberish } from "@ethersproject/bignumber";
 
 export class AllowlistVotingDecoding {
   private static getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
-    txOrData: IEncodingResult | BytesLike
+    txOrData: IDecodingTX | BytesLike
   ): T {
     let data: BytesLike | undefined = txOrData as BytesLike;
     if (!isBytesLike(txOrData)) {
@@ -28,26 +30,32 @@ export class AllowlistVotingDecoding {
   }
 
   public static addAllowedUsers(
-    txOrData: IEncodingResult | BytesLike
-  ): { users: string[] } {
+    txOrData: IDecodingTX | BytesLike
+  ): { _users: string[] } {
     return AllowlistVotingDecoding.getDecodedData("addAllowedUsers", txOrData);
   }
 
   public static createProposal(
-    txOrData: IEncodingResult | BytesLike
+    txOrData: IDecodingTX | BytesLike
   ): ICreateProposalParams {
-    return AllowlistVotingDecoding.getDecodedData("addAllowedUsers", txOrData);
+    const decoded = AllowlistVotingDecoding.getDecodedData(
+      "createVote",
+      txOrData
+    );
+
+    return {
+      ...decoded,
+      _actions: AllowlistVotingDecoding.parseActions(decoded._actions),
+    } as ICreateProposalParams;
   }
 
-  public static execute(
-    txOrData: IEncodingResult | BytesLike
-  ): { vote: string } {
+  public static execute(txOrData: IDecodingTX | BytesLike): { _voteId: string } {
     return AllowlistVotingDecoding.getDecodedData("execute", txOrData);
   }
 
   public static removeAllowedUsers(
-    txOrData: IEncodingResult | BytesLike
-  ): { users: string[] } {
+    txOrData: IDecodingTX | BytesLike
+  ): { _users: string[] } {
     return AllowlistVotingDecoding.getDecodedData(
       "removeAllowedUsers",
       txOrData
@@ -55,12 +63,28 @@ export class AllowlistVotingDecoding {
   }
 
   public static setConfiguration(
-    txOrData: IEncodingResult | BytesLike
+    txOrData: IDecodingTX | BytesLike
   ): ISetConfigurationParams {
     return AllowlistVotingDecoding.getDecodedData("setConfiguration", txOrData);
   }
 
-  public static vote(txOrData: IEncodingResult | BytesLike): IVoteParams {
+  public static vote(txOrData: IDecodingTX | BytesLike): IVoteParams {
     return AllowlistVotingDecoding.getDecodedData("vote", txOrData);
+  }
+
+  private static parseActions(
+    data: Array<Array<string | BigNumberish>>
+  ): ProposalAction[] {
+    const actions: ProposalAction[] = [];
+    for (const i of data) {
+      if (i.length === 3) {
+        actions.push({
+          to: i[0] as string,
+          value: i[1],
+          data: arrayify(i[2] as string),
+        });
+      }
+    }
+    return actions;
   }
 }

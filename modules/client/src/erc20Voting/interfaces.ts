@@ -1,5 +1,4 @@
 import { BigNumberish } from "@ethersproject/bignumber";
-import { BytesLike } from "@ethersproject/bytes";
 
 interface IERC20Voting {
   pluginAddress: string;
@@ -12,7 +11,7 @@ export interface IERC20VotingContextPluginState extends IERC20Voting {}
 export interface ProposalAction {
   to: string;
   value: BigNumberish;
-  data: BytesLike;
+  data: Uint8Array;
 }
 
 export interface Proposal {
@@ -54,7 +53,7 @@ export type VoteCreationValueDone = VoteStepsValueDone & {
 export type VoteCreationValue = VoteStepsValueCreating | VoteCreationValueDone;
 
 export interface ICreateProposalParams {
-  _proposalMetadata: BytesLike;
+  _proposalMetadata: Uint8Array;
   _actions: ProposalAction[];
   _startDate: BigNumberish;
   _endDate: BigNumberish;

@@ -15,6 +15,7 @@ import {
 import { Signer } from "@ethersproject/abstract-signer";
 import { Wallet } from "@ethersproject/wallet";
 import { id } from "@ethersproject/hash";
+import { arrayify } from "@ethersproject/bytes";
 
 describe("AllowlistVoting", () => {
   describe("Methods", () => {
@@ -152,10 +153,10 @@ describe("AllowlistVoting", () => {
 
     it("should create a proposal", async () => {
       const generator = allowlistVoting.methods.createProposal({
-        _proposalMetadata: "0x000001",
+        _proposalMetadata: arrayify("0x000001"),
         _actions: [
           {
-            data: "0x",
+            data: arrayify("0x"),
             to: daoAddr,
             value: 0,
           },
@@ -322,10 +323,10 @@ async function createProposal(
   endDate: number = 0
 ): Promise<number> {
   const generator = allowlistVoting.methods.createProposal({
-    _proposalMetadata: "0x00",
+    _proposalMetadata: arrayify("0x00"),
     _actions: [
       {
-        data: "0x00",
+        data: arrayify("0x00"),
         to,
         value: 0,
       },
@@ -357,11 +358,11 @@ async function becomeRoot(
     id("ROOT_PERMISSION"),
   ]);
   const voteGenerator = allowlistVoting.methods.createProposal({
-    _proposalMetadata: "0x00",
+    _proposalMetadata: arrayify("0x00"),
     _actions: [
       {
         to: daoAddr,
-        data: encodedGrant,
+        data: arrayify(encodedGrant),
         value: 0,
       },
     ],

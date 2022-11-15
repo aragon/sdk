@@ -1,17 +1,18 @@
-import { BytesLike, isBytesLike } from "@ethersproject/bytes";
+import { BytesLike, isBytesLike, arrayify } from "@ethersproject/bytes";
 import {
   ICreateProposalParams,
   ISetConfigurationParams,
   IVoteParams,
+  ProposalAction,
 } from "../interfaces";
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { BigNumberish } from "@ethersproject/bignumber";
-import { IEncodingResult } from "../../client-common";
+import { IDecodingTX } from "../../client-common";
 
 export class ERC20VotingDecoding {
   private static getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
-    txOrData: IEncodingResult | BytesLike
+    txOrData: IDecodingTX | BytesLike
   ): T {
     let data: BytesLike | undefined = txOrData as BytesLike;
     if (!isBytesLike(txOrData)) {
@@ -29,24 +30,45 @@ export class ERC20VotingDecoding {
   }
 
   public static createProposal(
-    txOrData: IEncodingResult | BytesLike
+    txOrData: IDecodingTX | BytesLike
   ): ICreateProposalParams {
-    return ERC20VotingDecoding.getDecodedData("addAllowedUsers", txOrData);
+    const decoded = ERC20VotingDecoding.getDecodedData("createVote", txOrData);
+
+    return {
+      ...decoded,
+      _actions: ERC20VotingDecoding.parseActions(decoded._actions),
+    } as ICreateProposalParams;
   }
 
   public static execute(
-    txOrData: IEncodingResult | BytesLike
-  ): { voteId: BigNumberish } {
+    txOrData: IDecodingTX | BytesLike
+  ): { _voteId: BigNumberish } {
     return ERC20VotingDecoding.getDecodedData("execute", txOrData);
   }
 
   public static setConfiguration(
-    txOrData: IEncodingResult | BytesLike
+    txOrData: IDecodingTX | BytesLike
   ): ISetConfigurationParams {
     return ERC20VotingDecoding.getDecodedData("setConfiguration", txOrData);
   }
 
-  public static vote(txOrData: IEncodingResult | BytesLike): IVoteParams {
+  public static vote(txOrData: IDecodingTX | BytesLike): IVoteParams {
     return ERC20VotingDecoding.getDecodedData("vote", txOrData);
+  }
+
+  private static parseActions(
+    data: Array<Array<string | BigNumberish>>
+  ): ProposalAction[] {
+    const actions: ProposalAction[] = [];
+    for (const i of data) {
+      if (i.length === 3) {
+        actions.push({
+          to: i[0] as string,
+          value: i[1],
+          data: arrayify(i[2] as string),
+        });
+      }
+    }
+    return actions;
   }
 }

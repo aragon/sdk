@@ -13,6 +13,7 @@ import {
   VoteCreationValue,
   VoteStepsValue,
 } from "../interfaces";
+import { arrayify } from "@ethersproject/bytes";
 
 export class ERC20VotingMethods {
   private ERC20Voting: ERC20Voting;
@@ -113,7 +114,11 @@ export class ERC20VotingMethods {
       yes: voteData.yes,
       no: voteData.no,
       abstain: voteData.abstain,
-      actions: voteData.actions,
+      actions: voteData.actions.map(action => ({
+        to: action.to,
+        data: arrayify(action.data),
+        value: action.value,
+      })),
     };
     return vote;
   }
