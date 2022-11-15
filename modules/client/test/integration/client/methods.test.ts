@@ -21,7 +21,9 @@ import {
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
+  IHasPermissionParams,
   ITransferQueryParams,
+  Permissions,
   SortDirection,
   TokenType,
   TransferSortBy,
@@ -280,6 +282,33 @@ describe("Client", () => {
             )
           ).toString(),
         ).toBe("7");
+      });
+
+      it("Check if an user has a permission on a dao", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const params: IHasPermissionParams = {
+          who: deployment.daoRegistry.address,
+          where: deployment.daoFactory.address,
+          permission: Permissions.REGISTER_DAO_PERMISSION,
+        };
+
+        const hasPermission = await client.methods.hasPermission(params);
+        expect(hasPermission).toBe(true);
+      });
+
+      it("Check if an user has a permission on a dao", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const who  =  await contextParamsLocalChain.signer?.getAddress()
+        const params: IHasPermissionParams = {
+          who: who!,
+          where: daoAddress,
+          permission: Permissions.ROOT_PERMISSION,
+        };
+
+        const hasPermission = await client.methods.hasPermission(params);
+        expect(hasPermission).toBe(false);
       });
     });
 
