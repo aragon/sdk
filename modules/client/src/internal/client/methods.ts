@@ -417,7 +417,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    */
   public async getBalances(
     daoAddressorEns: string,
-    _tokenAddresses: string[],
+    _tokenAddresses?: string[]
   ): Promise<AssetBalance[] | null> {
     let address = daoAddressorEns;
     if (!isAddress(address)) {

@@ -58,6 +58,7 @@ On 2022-11-22 16:45:52
 - Removed `javascript` folders
 - Updates `@aragon/core-contracts-ethers` to `v0.4.1-alpha`
 - Parameters types for DAO creation
+- Make `tokenAdresses` optional on `getBalances`
 ### Added
 - Update Allowance estimation
 - Create dao using real contracts
