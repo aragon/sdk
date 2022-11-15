@@ -2,6 +2,7 @@ import {
   AllowlistVoting as AllowlistVotingContract,
   AllowlistVoting__factory,
 } from "@aragon/core-contracts-ethers";
+import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
 import { ClientCore } from "../client-common";
 import { AllowlistVotingContextPlugin } from "./context";
 import { AllowlistVotingDecoding } from "./internal/decoding";
@@ -31,9 +32,9 @@ export class AllowlistVoting extends ClientCore {
   public getPluginInstanceWithSigner(): AllowlistVotingContract {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
     return this.pluginInstance.connect(signer);
@@ -42,7 +43,7 @@ export class AllowlistVoting extends ClientCore {
   public getPluginInstance(): AllowlistVotingContract {
     const provider = this.web3.getProvider();
     if (!provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
     return this.pluginInstance.connect(provider);
   }

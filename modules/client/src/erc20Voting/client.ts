@@ -2,6 +2,7 @@ import {
   ERC20Voting as ERC20VotingContract,
   ERC20Voting__factory,
 } from "@aragon/core-contracts-ethers";
+import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
 import { ClientCore } from "../client-common";
 import { ERC20VotingContextPlugin } from "./context";
 import { ERC20VotingDecoding } from "./internal/decoding";
@@ -31,9 +32,9 @@ export class ERC20Voting extends ClientCore {
   public getPluginInstanceWithSigner(): ERC20VotingContract {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
     return this.pluginInstance.connect(signer);
@@ -42,7 +43,7 @@ export class ERC20Voting extends ClientCore {
   public getPluginInstance(): ERC20VotingContract {
     const provider = this.web3.getProvider();
     if (!provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
     return this.pluginInstance.connect(provider);
   }
