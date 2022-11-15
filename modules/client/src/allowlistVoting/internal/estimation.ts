@@ -13,52 +13,26 @@ export class AllowlistVotingEstimation {
     this.allowlistVoting = allowlistVoting;
   }
 
-  public MODIFY_ALLOWLIST_PERMISSION_ID(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.MODIFY_ALLOWLIST_PERMISSION_ID();
-  }
-
-  public PCT_BASE(): Promise<BigNumber> {
-    return this.allowlistVoting.getPluginInstance().estimateGas.PCT_BASE();
-  }
-
-  public SET_CONFIGURATION_PERMISSION_ID(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.SET_CONFIGURATION_PERMISSION_ID();
-  }
-
-  public UPGRADE_PLUGIN_PERMISSION_ID(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.UPGRADE_PLUGIN_PERMISSION_ID();
-  }
-
+  /**
+   * Returns a gas estimation for the function call to addAllowedUsers
+   *
+   * @param {string[]} _users
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof AllowlistVotingEstimation
+   */
   public async addAllowedUsers(_users: string[]): Promise<BigNumber> {
     return this.allowlistVoting
       .getPluginInstance()
       .estimateGas.addAllowedUsers(_users);
   }
 
-  public allowedUserCount(blockNumber: BigNumberish): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.allowedUserCount(blockNumber);
-  }
-
-  public canExecute(_voteId: BigNumberish): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.canExecute(_voteId);
-  }
-
-  public canVote(_voteId: BigNumberish, _voter: string): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.canVote(_voteId, _voter);
-  }
-
+  /**
+   * Returns a gas estimation for the function call to createProposal
+   *
+   * @param {ICreateProposalParams} params
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof AllowlistVotingEstimation
+   */
   public async createProposal(
     params: ICreateProposalParams
   ): Promise<BigNumber> {
@@ -74,70 +48,39 @@ export class AllowlistVotingEstimation {
       );
   }
 
+  /**
+   * Returns a gas estimation for the function call to execute
+   *
+   * @param {BigNumberish} _voteId
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof AllowlistVotingEstimation
+   */
   public async execute(_voteId: BigNumberish): Promise<BigNumber> {
     return this.allowlistVoting
       .getPluginInstance()
       .estimateGas.execute(_voteId);
   }
 
-  public getDAO(): Promise<BigNumber> {
-    return this.allowlistVoting.getPluginInstance().estimateGas.getDAO();
-  }
-
-  public getImplementationAddress(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.getImplementationAddress();
-  }
-
-  public async getVote(_voteId: BigNumberish): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.getVote(_voteId);
-  }
-
-  public getVoteOption(
-    _voteId: BigNumberish,
-    _voter: string
-  ): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.getVoteOption(_voteId, _voter);
-  }
-
-  public isAllowed(
-    account: string,
-    blockNumber: BigNumberish
-  ): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.isAllowed(account, blockNumber);
-  }
-
-  public minDuration(): Promise<BigNumber> {
-    return this.allowlistVoting.getPluginInstance().estimateGas.minDuration();
-  }
-
-  public participationRequiredPct(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.participationRequiredPct();
-  }
-
-  public pluginType(): Promise<BigNumber> {
-    return this.allowlistVoting.getPluginInstance().estimateGas.pluginType();
-  }
-
-  public proxiableUUID(): Promise<BigNumber> {
-    return this.allowlistVoting.getPluginInstance().estimateGas.proxiableUUID();
-  }
-
+  /**
+   * Returns a gas estimation for the function call to removeAllowedUsers
+   *
+   * @param {string[]} _users
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof AllowlistVotingEstimation
+   */
   public async removeAllowedUsers(_users: string[]): Promise<BigNumber> {
     return this.allowlistVoting
       .getPluginInstance()
       .estimateGas.removeAllowedUsers(_users);
   }
 
+  /**
+   * Returns a gas estimation for the function call to setConfiguration
+   *
+   * @param {ISetConfigurationParams} params
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof AllowlistVotingEstimation
+   */
   public async setConfiguration(
     params: ISetConfigurationParams
   ): Promise<BigNumber> {
@@ -150,12 +93,13 @@ export class AllowlistVotingEstimation {
       );
   }
 
-  public supportRequiredPct(): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.supportRequiredPct();
-  }
-
+  /**
+   * Returns a gas estimation for the function call to vote
+   *
+   * @param {IVoteParams} params
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof AllowlistVotingEstimation
+   */
   public async vote(params: IVoteParams): Promise<BigNumber> {
     return this.allowlistVoting
       .getPluginInstance()
@@ -164,9 +108,5 @@ export class AllowlistVotingEstimation {
         params._choice,
         params._executesIfDecided
       );
-  }
-
-  public votesLength(): Promise<BigNumber> {
-    return this.allowlistVoting.getPluginInstance().estimateGas.votesLength();
   }
 }

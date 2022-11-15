@@ -13,29 +13,13 @@ export class ERC20VotingEstimation {
     this.ERC20Voting = ERC20Voting;
   }
 
-  public PCT_BASE(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.PCT_BASE();
-  }
-
-  public SET_CONFIGURATION_PERMISSION_ID(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.SET_CONFIGURATION_PERMISSION_ID();
-  }
-
-  public UPGRADE_PLUGIN_PERMISSION_ID(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.UPGRADE_PLUGIN_PERMISSION_ID();
-  }
-
-  public canExecute(_voteId: BigNumberish): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.canExecute(_voteId);
-  }
-
-  public canVote(_voteId: BigNumberish, _voter: string): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.canVote(
-      _voteId,
-      _voter
-    );
-  }
-
+  /**
+   * Returns a gas estimation for the function call to createProposal
+   *
+   * @param {ICreateProposalParams} params
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof ERC20VotingEstimation
+   */
   public async createProposal(
     params: ICreateProposalParams
   ): Promise<BigNumber> {
@@ -49,48 +33,24 @@ export class ERC20VotingEstimation {
     );
   }
 
+  /**
+   * Returns a gas estimation for the function call to execute
+   *
+   * @param {BigNumberish} _voteId
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof ERC20VotingEstimation
+   */
   public async execute(_voteId: BigNumberish): Promise<BigNumber> {
     return this.ERC20Voting.getPluginInstance().estimateGas.execute(_voteId);
   }
 
-  public getDAO(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.getDAO();
-  }
-
-  public getImplementationAddress(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.getImplementationAddress();
-  }
-
-  public async getVote(_voteId: BigNumberish): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.getVote(_voteId);
-  }
-
-  public getVoteOption(
-    _voteId: BigNumberish,
-    _voter: string
-  ): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.getVoteOption(
-      _voteId,
-      _voter
-    );
-  }
-
-  public minDuration(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.minDuration();
-  }
-
-  public participationRequiredPct(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.participationRequiredPct();
-  }
-
-  public pluginType(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.pluginType();
-  }
-
-  public proxiableUUID(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.proxiableUUID();
-  }
-
+  /**
+   * Returns a gas estimation for the function call to setConfiguration
+   *
+   * @param {ISetConfigurationParams} params
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof ERC20VotingEstimation
+   */
   public async setConfiguration(
     params: ISetConfigurationParams
   ): Promise<BigNumber> {
@@ -101,19 +61,18 @@ export class ERC20VotingEstimation {
     );
   }
 
-  public supportRequiredPct(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.supportRequiredPct();
-  }
-
+  /**
+   * Returns a gas estimation for the function call to vote
+   *
+   * @param {IVoteParams} params
+   * @return {*}  {Promise<BigNumber>}
+   * @memberof ERC20VotingEstimation
+   */
   public async vote(params: IVoteParams): Promise<BigNumber> {
     return this.ERC20Voting.getPluginInstance().estimateGas.vote(
       params._voteId,
       params._choice,
       params._executesIfDecided
     );
-  }
-
-  public votesLength(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.votesLength();
   }
 }

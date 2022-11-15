@@ -10,6 +10,17 @@ import { BigNumberish } from "@ethersproject/bignumber";
 import { IDecodingTX } from "../../client-common";
 
 export class ERC20VotingDecoding {
+  /**
+   * Private helper to decode data or a TX for a function
+   *
+   * @private
+   * @static
+   * @template T
+   * @param {string} functionFragment
+   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @return {*}  {T}
+   * @memberof ERC20VotingDecoding
+   */
   private static getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
     txOrData: IDecodingTX | BytesLike
@@ -29,33 +40,15 @@ export class ERC20VotingDecoding {
     );
   }
 
-  public static createProposal(
-    txOrData: IDecodingTX | BytesLike
-  ): ICreateProposalParams {
-    const decoded = ERC20VotingDecoding.getDecodedData("createVote", txOrData);
-
-    return {
-      ...decoded,
-      _actions: ERC20VotingDecoding.parseActions(decoded._actions),
-    } as ICreateProposalParams;
-  }
-
-  public static execute(
-    txOrData: IDecodingTX | BytesLike
-  ): { _voteId: BigNumberish } {
-    return ERC20VotingDecoding.getDecodedData("execute", txOrData);
-  }
-
-  public static setConfiguration(
-    txOrData: IDecodingTX | BytesLike
-  ): ISetConfigurationParams {
-    return ERC20VotingDecoding.getDecodedData("setConfiguration", txOrData);
-  }
-
-  public static vote(txOrData: IDecodingTX | BytesLike): IVoteParams {
-    return ERC20VotingDecoding.getDecodedData("vote", txOrData);
-  }
-
+  /**
+   * Helper to parse actions from decoding proposal data
+   *
+   * @private
+   * @static
+   * @param {(Array<Array<string | BigNumberish>>)} data
+   * @return {*}  {ProposalAction[]}
+   * @memberof ERC20VotingDecoding
+   */
   private static parseActions(
     data: Array<Array<string | BigNumberish>>
   ): ProposalAction[] {
@@ -70,5 +63,64 @@ export class ERC20VotingDecoding {
       }
     }
     return actions;
+  }
+
+  /**
+   * Decoding encoded data or a TX for the createProposal function
+   *
+   * @static
+   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @return {*}  {ICreateProposalParams}
+   * @memberof ERC20VotingDecoding
+   */
+  public static createProposal(
+    txOrData: IDecodingTX | BytesLike
+  ): ICreateProposalParams {
+    const decoded = ERC20VotingDecoding.getDecodedData("createVote", txOrData);
+
+    return {
+      ...decoded,
+      _actions: ERC20VotingDecoding.parseActions(decoded._actions),
+    } as ICreateProposalParams;
+  }
+
+  /**
+   * Decoding encoded data or a TX for the execute function
+   *
+   * @static
+   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @return {*}  {{ _voteId: BigNumberish }}
+   * @memberof ERC20VotingDecoding
+   */
+  public static execute(
+    txOrData: IDecodingTX | BytesLike
+  ): { _voteId: BigNumberish } {
+    return ERC20VotingDecoding.getDecodedData("execute", txOrData);
+  }
+
+  /**
+   * Decoding encoded data or a TX for the setConfiguration function
+   *
+   * @static
+   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @return {*}  {ISetConfigurationParams}
+   * @memberof ERC20VotingDecoding
+   */
+  public static setConfiguration(
+    txOrData: IDecodingTX | BytesLike
+  ): ISetConfigurationParams {
+    return ERC20VotingDecoding.getDecodedData("setConfiguration", txOrData);
+  }
+
+  /**
+   * Decoding encoded data or a TX for the vote function
+   *
+   * @static
+   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @return {*}  {IVoteParams}
+   * @memberof ERC20VotingDecoding
+   */
+  public static vote(txOrData: IDecodingTX | BytesLike): IVoteParams {
+    return ERC20VotingDecoding.getDecodedData("vote", txOrData);
   }
 }

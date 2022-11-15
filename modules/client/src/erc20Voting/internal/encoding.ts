@@ -14,6 +14,17 @@ export class ERC20VotingEncoding {
     this.pluginAddr = pluginAddr;
   }
 
+  /**
+   * Private helper to encode function data
+   *
+   * @private
+   * @static
+   * @param {string} pluginAddr
+   * @param {string} functionName
+   * @param {...any[]} args
+   * @return {*}  {IEncodingResult}
+   * @memberof ERC20VotingEncoding
+   */
   private static getEncoding(
     pluginAddr: string,
     functionName: string,
@@ -31,6 +42,15 @@ export class ERC20VotingEncoding {
     };
   }
 
+  /**
+   * Encode parameters for the createProposal function
+   *
+   * @static
+   * @param {string} pluginAddr
+   * @param {ICreateProposalParams} params
+   * @return {*}  {IEncodingResult}
+   * @memberof ERC20VotingEncoding
+   */
   public static createProposal(
     pluginAddr: string,
     params: ICreateProposalParams
@@ -47,10 +67,26 @@ export class ERC20VotingEncoding {
     );
   }
 
+  /**
+   * Encode parameters for the createProposal function
+   *
+   * @param {ICreateProposalParams} params
+   * @return {*}  {IEncodingResult}
+   * @memberof ERC20VotingEncoding
+   */
   public createProposal(params: ICreateProposalParams): IEncodingResult {
     return ERC20VotingEncoding.createProposal(this.pluginAddr, params);
   }
 
+  /**
+   * Encode parameters for the execute function
+   *
+   * @static
+   * @param {string} pluginAddr
+   * @param {BigNumberish} _voteId
+   * @return {*}  {IEncodingResult}
+   * @memberof ERC20VotingEncoding
+   */
   public static execute(
     pluginAddr: string,
     _voteId: BigNumberish
@@ -62,10 +98,26 @@ export class ERC20VotingEncoding {
     );
   }
 
+  /**
+   * Encode parameters for the execute function
+   *
+   * @param {BigNumberish} _voteId
+   * @return {*}  {IEncodingResult}
+   * @memberof ERC20VotingEncoding
+   */
   public execute(_voteId: BigNumberish): IEncodingResult {
     return ERC20VotingEncoding.execute(this.pluginAddr, _voteId);
   }
 
+  /**
+   * Encode parameters for the setConfiguration function
+   *
+   * @static
+   * @param {string} pluginAddr
+   * @param {ISetConfigurationParams} params
+   * @return {*}  {IEncodingResult}
+   * @memberof ERC20VotingEncoding
+   */
   public static setConfiguration(
     pluginAddr: string,
     params: ISetConfigurationParams
@@ -79,10 +131,26 @@ export class ERC20VotingEncoding {
     );
   }
 
+  /**
+   * Encode parameters for the setConfiguration function
+   *
+   * @param {ISetConfigurationParams} params
+   * @return {*}  {IEncodingResult}
+   * @memberof ERC20VotingEncoding
+   */
   public setConfiguration(params: ISetConfigurationParams): IEncodingResult {
     return ERC20VotingEncoding.setConfiguration(this.pluginAddr, params);
   }
 
+  /**
+   * Encode parameters for the vote function
+   *
+   * @static
+   * @param {string} pluginAddr
+   * @param {IVoteParams} params
+   * @return {*}  {IEncodingResult}
+   * @memberof ERC20VotingEncoding
+   */
   public static vote(pluginAddr: string, params: IVoteParams): IEncodingResult {
     return ERC20VotingEncoding.getEncoding(
       pluginAddr,
@@ -93,6 +161,13 @@ export class ERC20VotingEncoding {
     );
   }
 
+  /**
+   * Encode parameters for the vote function
+   *
+   * @param {IVoteParams} params
+   * @return {*}  {IEncodingResult}
+   * @memberof ERC20VotingEncoding
+   */
   public vote(params: IVoteParams): IEncodingResult {
     return ERC20VotingEncoding.vote(this.pluginAddr, params);
   }
