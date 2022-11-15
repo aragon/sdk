@@ -313,12 +313,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       who = resolvedAddress;
     }
 
-    // resolve managing dao
-    const managingDao = await signer.provider.resolveName("dao.eth");
-    if (!managingDao) {
-      throw new InvalidAddressOrEnsError();
-    }
-
     // connect to the managing dao
     const daoInstance = DAO__factory.connect(
       "dao.eth",
