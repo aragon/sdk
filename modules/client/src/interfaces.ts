@@ -127,7 +127,7 @@ export interface IHasPermissionParams {
   daoAddressOrEns: string;
   where: string;
   who: string;
-  permission: string;
+  permission: string; // permission name
   data?: Uint8Array;
 }
 

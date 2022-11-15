@@ -284,20 +284,19 @@ describe("Client", () => {
         ).toBe("7");
       });
 
-      it("Check if dao registry has register dao permission in the dao factory", async () => {
+      it("Check if dao factory has register dao permission in the dao registry", async () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
         const params: IHasPermissionParams = {
           daoAddressOrEns: deployment.managingDaoAddress,
-          who: deployment.daoRegistry.address,
-          where: deployment.daoFactory.address,
+          who: deployment.daoFactory.address,
+          where: deployment.daoRegistry.address,
           permission: Permissions.REGISTER_DAO_PERMISSION,
         };
+        // this permission was granted on deployment
+        // so it must be true
         const hasPermission = await client.methods.hasPermission(params);
-        // TODO
-        // this permission is granted when the contracts are deployed so it must be true
-        // it should be true?
-        expect(hasPermission).toBe(false);
+        expect(hasPermission).toBe(true);
       });
 
       it("Check if an user has root permission in a dao", async () => {
