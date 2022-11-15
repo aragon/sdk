@@ -82,14 +82,3 @@ jobs:
         with:
           prerelease: false
           body_path: release-notes.txt
-      - name: Update Changelog
-        run: |
-          git fetch
-          git pull
-          git config --global user.name "Arabot-1"
-          git config --global user.email "arabot-1@users.noreply.github.com"
-          sed -i "s/^\#\# \[UPCOMING\]/## [UPCOMING]\n\n\## ${{ needs.checkTag.outputs.version }}\nOn $(date +'%Y-%m-%d %H:%M:%S')/" "./modules/${{ needs.checkTag.outputs.package }}/CHANGELOG.md"
-          git add "./modules/${{ needs.checkTag.outputs.package }}/CHANGELOG.md"
-          git add "./modules/${{ needs.checkTag.outputs.package }}/package.json"
-          git commit -am "Update Changelog and package.json for ${{ needs.checkTag.outputs.package }}"
-          git push
