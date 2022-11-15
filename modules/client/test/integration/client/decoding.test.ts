@@ -42,17 +42,14 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.grantAction(daoAddresses[i], params);
-        const decodedParams: IGrantPermissionDecodedParams = client.decoding
-          .grantAction(action.data);
+        const decodedParams: IGrantPermissionDecodedParams = client.decoding.grantAction(
+          action.data
+        );
 
-        expect(decodedParams.permission).toBe(
-          params.permission,
-        );
-        expect(decodedParams.where).toBe(
-          params.where,
-        );
+        expect(decodedParams.permission).toBe(params.permission);
+        expect(decodedParams.where).toBe(params.where);
         expect(decodedParams.permissionId).toBe(
-          keccak256(toUtf8Bytes(params.permission)),
+          keccak256(toUtf8Bytes(params.permission))
         );
         expect(decodedParams.who).toBe(params.who);
       }
@@ -80,17 +77,14 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.revokeAction(daoAddresses[i], params);
-        const decodedParams: IRevokePermissionDecodedParams = client.decoding
-          .revokeAction(action.data);
+        const decodedParams: IRevokePermissionDecodedParams = client.decoding.revokeAction(
+          action.data
+        );
 
-        expect(decodedParams.permission).toBe(
-          params.permission,
-        );
-        expect(decodedParams.where).toBe(
-          params.where,
-        );
+        expect(decodedParams.permission).toBe(params.permission);
+        expect(decodedParams.where).toBe(params.where);
         expect(decodedParams.permissionId).toBe(
-          keccak256(toUtf8Bytes(params.permission)),
+          keccak256(toUtf8Bytes(params.permission))
         );
         expect(decodedParams.who).toBe(params.who);
       }
@@ -116,18 +110,15 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.freezeAction(daoAddresses[i], params);
-        const decodedParams: IFreezePermissionDecodedParams = client.decoding
-          .freezeAction(action.data);
+        const decodedParams: IFreezePermissionDecodedParams = client.decoding.freezeAction(
+          action.data
+        );
 
-        expect(decodedParams.permission).toBe(
-          params.permission,
-        );
+        expect(decodedParams.permission).toBe(params.permission);
         expect(decodedParams.permissionId).toBe(
-          keccak256(toUtf8Bytes(params.permission)),
+          keccak256(toUtf8Bytes(params.permission))
         );
-        expect(decodedParams.where).toBe(
-          params.where,
-        );
+        expect(decodedParams.where).toBe(params.where);
       }
     });
     it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
@@ -142,18 +133,19 @@ describe("Client", () => {
 
       const withdrawAction = await client.encoding.withdrawAction(
         "0x1234567890123456789012345678901234567890",
-        withdrawParams,
+        withdrawParams
       );
-      const decodedWithdrawParams: IWithdrawParams = client.decoding
-        .withdrawAction(withdrawAction.data);
+      const decodedWithdrawParams: IWithdrawParams = client.decoding.withdrawAction(
+        withdrawAction.data
+      );
 
       expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
       expect(decodedWithdrawParams.recipientAddress).toBe(
-        withdrawParams.recipientAddress,
+        withdrawParams.recipientAddress
       );
       expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference);
       expect(decodedWithdrawParams.tokenAddress).toBe(
-        withdrawParams.tokenAddress,
+        withdrawParams.tokenAddress
       );
     });
 
@@ -169,19 +161,18 @@ describe("Client", () => {
 
       const withdrawAction = await client.encoding.withdrawAction(
         "0x1234567890123456789012345678901234567890",
-        withdrawParams,
+        withdrawParams
       );
-      const decodedWithdrawParams: IWithdrawParams = client.decoding
-        .withdrawAction(withdrawAction.data);
+      const decodedWithdrawParams: IWithdrawParams = client.decoding.withdrawAction(
+        withdrawAction.data
+      );
 
       expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
       expect(decodedWithdrawParams.recipientAddress).toBe(
-        withdrawParams.recipientAddress,
+        withdrawParams.recipientAddress
       );
       expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference);
-      expect(decodedWithdrawParams.tokenAddress).toBe(
-        AddressZero,
-      );
+      expect(decodedWithdrawParams.tokenAddress).toBe(AddressZero);
     });
 
     it("Should decode an encoded update metadata action", async () => {
@@ -190,12 +181,12 @@ describe("Client", () => {
 
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
+        "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ"
       );
-      const recoveredIpfsUri: string = await client.decoding
-        .updateMetadataRawAction(updateMetadataAction.data);
-      const ipfsRegex =
-        /^ipfs:\/\/(Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}))$/;
+      const recoveredIpfsUri: string = await client.decoding.updateMetadataRawAction(
+        updateMetadataAction.data
+      );
+      const ipfsRegex = /^ipfs:\/\/(Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}))$/;
 
       const expectedCid =
         "ipfs://QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ";
@@ -206,14 +197,29 @@ describe("Client", () => {
     it("Should try to decode an encoded update metadata action with the withdraws decoder and return an error", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-
+      const params: IMetadata = {
+        name: "New Name",
+        description: "New description",
+        avatar: "https://theavatar.com/image.jpg",
+        links: [
+          {
+            url: "https://discord.com/...",
+            name: "Discord",
+          },
+          {
+            url: "https://twitter.com/...",
+            name: "Twitter",
+          },
+        ],
+      };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
+        params
       );
 
-      expect(() => client.decoding.withdrawAction(updateMetadataAction.data))
-        .toThrow("The received action is different from the expected one");
+      expect(() =>
+        client.decoding.withdrawAction(updateMetadataAction.data)
+      ).toThrow("The received action is different from the expected one");
     });
 
     it("Should try to decode a invalid action and return an error", async () => {
@@ -222,16 +228,31 @@ describe("Client", () => {
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.withdrawAction(data)).toThrow(
-        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
+        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`
       );
     });
 
     it("Should get the function for a given action data", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
+      const params: IMetadata = {
+        name: "New Name",
+        description: "New description",
+        avatar: "https://theavatar.com/image.jpg",
+        links: [
+          {
+            url: "https://discord.com/...",
+            name: "Discord",
+          },
+          {
+            url: "https://twitter.com/...",
+            name: "Twitter",
+          },
+        ],
+      };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        "Qma6w3ykbH9qHhzQAKCggekgZGqJbruKJthkUGaWBdJUW2",
+        params
       );
       const iface = client.decoding.findInterface(updateMetadataAction.data);
       expect(iface?.id).toBe("function setMetadata(bytes)");
@@ -268,11 +289,12 @@ describe("Client", () => {
       };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
+        params
       );
 
-      const decodedParams: IMetadata = await client.decoding
-        .updateMetadataAction(updateMetadataAction.data);
+      const decodedParams: IMetadata = await client.decoding.updateMetadataAction(
+        updateMetadataAction.data
+      );
 
       expect(decodedParams.name).toBe(params.name);
       expect(decodedParams.description).toBe(params.description);
