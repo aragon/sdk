@@ -13,11 +13,11 @@ export interface ProposalAction {
 }
 
 export interface Proposal {
-  id: BigInt;
+  id: number;
   open: boolean;
   executed: boolean;
-  startDate: BigInt;
-  endDate: BigInt;
+  startDate: number;
+  endDate: number;
   snapshotBlock: BigInt;
   supportRequired: BigInt;
   participationRequired: BigInt;
@@ -53,20 +53,20 @@ export type ProposalCreationValue = VoteStepsValuePending | ProposalCreationValu
 export interface ICreateProposalParams {
   _proposalMetadata: Uint8Array;
   _actions: ProposalAction[];
-  _startDate: BigInt;
-  _endDate: BigInt;
+  _startDate: number;
+  _endDate: number;
   _executeIfDecided: boolean;
-  _choice: BigInt;
+  _choice: number;
 }
 
 export interface ISetConfigurationParams {
-  _participationRequiredPct: BigInt;
-  _supportRequiredPct: BigInt;
-  _minDuration: BigInt;
+  _participationRequiredPct: number;
+  _supportRequiredPct: number;
+  _minDuration: number;
 }
 
 export interface IVoteParams {
-  _proposalId: BigInt;
-  _choice: BigInt;
+  _proposalId: number;
+  _choice: number;
   _executesIfDecided: boolean;
 }

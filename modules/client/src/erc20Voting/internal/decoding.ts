@@ -80,6 +80,9 @@ export class ERC20VotingDecoding {
 
     return {
       ...decoded,
+      _choice: parseInt(decoded._choice.toString()),
+      _endDate: parseInt(decoded._endDate.toString()),
+      _startDate: parseInt(decoded._startDate.toString()),
       _actions: ERC20VotingDecoding.parseActions(decoded._actions),
     } as ICreateProposalParams;
   }
@@ -94,10 +97,10 @@ export class ERC20VotingDecoding {
    */
   public static execute(
     txOrData: DecodingTXType | BytesLike
-  ): { _proposalId: BigNumberish } {
+  ): { _proposalId: number } {
     const data = ERC20VotingDecoding.getDecodedData("execute", txOrData);
     return {
-      _proposalId: data._voteId,
+      _proposalId: parseInt(data._voteId.toString()),
     };
   }
 
@@ -112,7 +115,17 @@ export class ERC20VotingDecoding {
   public static setConfiguration(
     txOrData: DecodingTXType | BytesLike
   ): ISetConfigurationParams {
-    return ERC20VotingDecoding.getDecodedData("setConfiguration", txOrData);
+    const data = ERC20VotingDecoding.getDecodedData(
+      "setConfiguration",
+      txOrData
+    );
+    return {
+      _minDuration: parseInt(data._minDuration.toString()),
+      _participationRequiredPct: parseInt(
+        data._participationRequiredPct.toString()
+      ),
+      _supportRequiredPct: parseInt(data._supportRequiredPct.toString()),
+    };
   }
 
   /**
@@ -126,9 +139,9 @@ export class ERC20VotingDecoding {
   public static vote(txOrData: DecodingTXType | BytesLike): IVoteParams {
     const data = ERC20VotingDecoding.getDecodedData("vote", txOrData);
     return {
-      _choice: data._choice,
+      _choice: parseInt(data._choice.toString()),
       _executesIfDecided: data._executesIfDecided,
-      _proposalId: data._voteId,
+      _proposalId: parseInt(data._voteId.toString()),
     };
   }
 }

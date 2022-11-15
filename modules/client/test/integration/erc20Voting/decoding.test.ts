@@ -1,4 +1,3 @@
-import { BigNumber } from "@ethersproject/bignumber";
 import { arrayify } from "@ethersproject/bytes";
 import { ERC20VotingDecoding } from "../../../src/erc20Voting/internal/decoding";
 
@@ -11,15 +10,15 @@ describe("ERC20Voting", () => {
       expect(decoded._actions).toMatchObject([
         {
           to: "0x6b4584A05EB28016aDf0B0A692DD71073Fe4B593",
-          value: BigNumber.from("0"),
+          value: BigInt("0"),
           data: arrayify("0x123456"),
         },
       ]);
       expect(decoded._choice).toBe(3);
-      expect(decoded._endDate).toMatchObject(BigNumber.from("56789"));
+      expect(decoded._endDate).toBe(56789);
       expect(decoded._executeIfDecided).toBe(false);
       expect(decoded._proposalMetadata).toBe("0x11223344");
-      expect(decoded._startDate).toMatchObject(BigNumber.from("1234"));
+      expect(decoded._startDate).toBe(1234);
     });
 
     it("should decode createProposal (tx)", () => {
@@ -33,22 +32,22 @@ describe("ERC20Voting", () => {
       expect(decoded._actions).toMatchObject([
         {
           to: "0x6b4584A05EB28016aDf0B0A692DD71073Fe4B593",
-          value: BigNumber.from("0"),
+          value: BigInt("0"),
           data: arrayify("0x123456"),
         },
       ]);
       expect(decoded._choice).toBe(3);
-      expect(decoded._endDate).toMatchObject(BigNumber.from("56789"));
+      expect(decoded._endDate).toBe(56789);
       expect(decoded._executeIfDecided).toBe(false);
       expect(decoded._proposalMetadata).toBe("0x11223344");
-      expect(decoded._startDate).toMatchObject(BigNumber.from("1234"));
+      expect(decoded._startDate).toBe(1234);
     });
 
     it("should decode execute (data)", () => {
       const decoded = ERC20VotingDecoding.execute(
         "0xfe0d94c10000000000000000000000000000000000000000000000000000000000000005"
       );
-      expect(decoded._proposalId).toMatchObject(BigNumber.from("5"));
+      expect(decoded._proposalId).toBe(5);
     });
 
     it("should decode execute (tx)", () => {
@@ -59,18 +58,16 @@ describe("ERC20Voting", () => {
           "0xfe0d94c10000000000000000000000000000000000000000000000000000000000000005"
         ),
       });
-      expect(decoded._proposalId).toMatchObject(BigNumber.from("5"));
+      expect(decoded._proposalId).toBe(5);
     });
 
     it("should decode setConfiguration (data)", () => {
       const decoded = ERC20VotingDecoding.setConfiguration(
         "0x9b979e2f000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000220000000000000000000000000000000000000000000000000000000000000038"
       );
-      expect(decoded._participationRequiredPct).toMatchObject(
-        BigNumber.from("12")
-      );
-      expect(decoded._supportRequiredPct).toMatchObject(BigNumber.from("34"));
-      expect(decoded._minDuration).toMatchObject(BigNumber.from("56"));
+      expect(decoded._participationRequiredPct).toBe(12);
+      expect(decoded._supportRequiredPct).toBe(34);
+      expect(decoded._minDuration).toBe(56);
     });
 
     it("should decode setConfiguration (tx)", () => {
@@ -81,18 +78,16 @@ describe("ERC20Voting", () => {
           "0x9b979e2f000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000220000000000000000000000000000000000000000000000000000000000000038"
         ),
       });
-      expect(decoded._participationRequiredPct).toMatchObject(
-        BigNumber.from("12")
-      );
-      expect(decoded._supportRequiredPct).toMatchObject(BigNumber.from("34"));
-      expect(decoded._minDuration).toMatchObject(BigNumber.from("56"));
+      expect(decoded._participationRequiredPct).toBe(12);
+      expect(decoded._supportRequiredPct).toBe(34);
+      expect(decoded._minDuration).toBe(56);
     });
 
     it("should decode vote (data)", () => {
       const decoded = ERC20VotingDecoding.vote(
         "0xce6366c400000000000000000000000000000000000000000000000000000000000004d200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
       );
-      expect(decoded._proposalId).toMatchObject(BigNumber.from("1234"));
+      expect(decoded._proposalId).toBe(1234);
       expect(decoded._executesIfDecided).toBe(true);
       expect(decoded._choice).toBe(1);
     });
@@ -105,7 +100,7 @@ describe("ERC20Voting", () => {
           "0xce6366c400000000000000000000000000000000000000000000000000000000000004d200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
         ),
       });
-      expect(decoded._proposalId).toMatchObject(BigNumber.from("1234"));
+      expect(decoded._proposalId).toBe(1234);
       expect(decoded._executesIfDecided).toBe(true);
       expect(decoded._choice).toBe(1);
     });

@@ -87,7 +87,7 @@ describe("AllowlistVoting", () => {
       const blockNumber = await provider.getBlockNumber();
       for (const user of randomUsers) {
         expect(
-          await allowlistVoting.methods.isAllowed(user, blockNumber - 1)
+          await allowlistVoting.methods.isAllowed(user, BigInt(blockNumber - 1))
         ).toBe(true);
       }
     });
@@ -96,9 +96,9 @@ describe("AllowlistVoting", () => {
       await advanceBlocks(provider, 5);
       let blockNumber = await provider.getBlockNumber();
       let count = await allowlistVoting.methods.allowedUserCount(
-        blockNumber - 1
+        BigInt(blockNumber - 1)
       );
-      expect(count.toNumber()).toBe(1);
+      expect(count.toString()).toBe("1");
 
       await becomeRoot(
         allowlistVoting,
@@ -124,8 +124,10 @@ describe("AllowlistVoting", () => {
       await advanceBlocks(provider, 5);
 
       blockNumber = await provider.getBlockNumber();
-      count = await allowlistVoting.methods.allowedUserCount(blockNumber - 1);
-      expect(count.toNumber()).toBe(4);
+      count = await allowlistVoting.methods.allowedUserCount(
+        BigInt(blockNumber - 1)
+      );
+      expect(count.toString()).toBe("4");
     });
 
     it("should return the correct canExecute", async () => {
@@ -140,15 +142,15 @@ describe("AllowlistVoting", () => {
     it("should return the correct canVote", async () => {
       const proposalId = await createProposal(allowlistVoting);
       const signerAddress = await signer.getAddress();
-      expect(await allowlistVoting.methods.canVote(proposalId, signerAddress)).toBe(
-        true
-      );
+      expect(
+        await allowlistVoting.methods.canVote(proposalId, signerAddress)
+      ).toBe(true);
       const execute = await allowlistVoting.methods.execute(proposalId);
       await execute.next();
       await execute.next();
-      expect(await allowlistVoting.methods.canVote(proposalId, signerAddress)).toBe(
-        false
-      );
+      expect(
+        await allowlistVoting.methods.canVote(proposalId, signerAddress)
+      ).toBe(false);
     });
 
     it("should create a proposal", async () => {
@@ -158,13 +160,13 @@ describe("AllowlistVoting", () => {
           {
             data: arrayify("0x"),
             to: daoAddr,
-            value: 0,
+            value: BigInt(0),
           },
         ],
         _startDate: 0,
         _endDate: Math.round(Date.now() / 1000) + 3600,
         _executeIfDecided: false,
-        _choice: 1,
+        _choice: 0,
       });
 
       for await (const step of generator) {
@@ -220,7 +222,10 @@ describe("AllowlistVoting", () => {
       const proposalId = await createProposal(allowlistVoting);
 
       const voterAddr = await signer.getAddress();
-      let vote = await allowlistVoting.methods.getVoteOption(proposalId, voterAddr);
+      let vote = await allowlistVoting.methods.getVoteOption(
+        proposalId,
+        voterAddr
+      );
       expect(vote).toBe(2);
 
       const voting = await allowlistVoting.methods.vote({
@@ -264,7 +269,10 @@ describe("AllowlistVoting", () => {
       let blockNumber = await provider.getBlockNumber();
 
       expect(
-        await allowlistVoting.methods.isAllowed(randomUsers[0], blockNumber - 1)
+        await allowlistVoting.methods.isAllowed(
+          randomUsers[0],
+          BigInt(blockNumber - 1)
+        )
       ).toBe(true);
 
       const removeCall = await allowlistVoting.methods.removeAllowedUsers([
@@ -278,7 +286,10 @@ describe("AllowlistVoting", () => {
       blockNumber = await provider.getBlockNumber();
 
       expect(
-        await allowlistVoting.methods.isAllowed(randomUsers[0], blockNumber - 1)
+        await allowlistVoting.methods.isAllowed(
+          randomUsers[0],
+          BigInt(blockNumber - 1)
+        )
       ).toBe(false);
     });
 
@@ -305,13 +316,9 @@ describe("AllowlistVoting", () => {
       await steps.next();
       await steps.next();
 
-      expect(
-        (await allowlistVoting.methods.participationRequiredPct()).toNumber()
-      ).toBe(20);
-      expect(
-        (await allowlistVoting.methods.supportRequiredPct()).toNumber()
-      ).toBe(30);
-      expect((await allowlistVoting.methods.minDuration()).toNumber()).toBe(40);
+      expect(await allowlistVoting.methods.participationRequiredPct()).toBe(20);
+      expect(await allowlistVoting.methods.supportRequiredPct()).toBe(30);
+      expect(await allowlistVoting.methods.minDuration()).toBe(40);
     });
   });
 });
@@ -328,7 +335,7 @@ async function createProposal(
       {
         data: arrayify("0x00"),
         to,
-        value: 0,
+        value: BigInt(0),
       },
     ],
     _startDate: startDate,
@@ -363,7 +370,7 @@ async function becomeRoot(
       {
         to: daoAddr,
         data: arrayify(encodedGrant),
-        value: 0,
+        value: BigInt(0),
       },
     ],
     _startDate: 0,

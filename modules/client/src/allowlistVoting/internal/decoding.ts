@@ -97,6 +97,9 @@ export class AllowlistVotingDecoding {
 
     return {
       ...decoded,
+      _choice: parseInt(decoded._choice.toString()),
+      _endDate: parseInt(decoded._endDate.toString()),
+      _startDate: parseInt(decoded._startDate.toString()),
       _actions: AllowlistVotingDecoding.parseActions(decoded._actions),
     } as ICreateProposalParams;
   }
@@ -111,10 +114,10 @@ export class AllowlistVotingDecoding {
    */
   public static execute(
     txOrData: DecodingTXType | BytesLike
-  ): { _proposalId: string } {
+  ): { _proposalId: number } {
     const data = AllowlistVotingDecoding.getDecodedData("execute", txOrData);
     return {
-      _proposalId: data._voteId,
+      _proposalId: parseInt(data._voteId.toString()),
     };
   }
 
@@ -146,7 +149,17 @@ export class AllowlistVotingDecoding {
   public static setConfiguration(
     txOrData: DecodingTXType | BytesLike
   ): ISetConfigurationParams {
-    return AllowlistVotingDecoding.getDecodedData("setConfiguration", txOrData);
+    const data = AllowlistVotingDecoding.getDecodedData(
+      "setConfiguration",
+      txOrData
+    );
+    return {
+      _minDuration: parseInt(data._minDuration.toString()),
+      _participationRequiredPct: parseInt(
+        data._participationRequiredPct.toString()
+      ),
+      _supportRequiredPct: parseInt(data._supportRequiredPct.toString()),
+    };
   }
 
   /**
@@ -160,9 +173,9 @@ export class AllowlistVotingDecoding {
   public static vote(txOrData: DecodingTXType | BytesLike): IVoteParams {
     const data = AllowlistVotingDecoding.getDecodedData("vote", txOrData);
     return {
-      _choice: data._choice,
+      _choice: parseInt(data._choice.toString()),
       _executesIfDecided: data._executesIfDecided,
-      _proposalId: data._voteId,
+      _proposalId: parseInt(data._voteId.toString()),
     };
   }
 }

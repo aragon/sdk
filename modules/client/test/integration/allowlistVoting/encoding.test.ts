@@ -1,4 +1,3 @@
-import { BigNumber } from "@ethersproject/bignumber";
 import { arrayify } from "@ethersproject/bytes";
 import { AllowlistVotingEncoding } from "../../../src/allowlistVoting/internal/encoding";
 
@@ -50,7 +49,7 @@ describe("AllowlistVoting", () => {
           _actions: [
             {
               to: "0x6b4584A05EB28016aDf0B0A692DD71073Fe4B593",
-              value: BigNumber.from("0"),
+              value: BigInt("0"),
               data: arrayify("0x123456"),
             },
           ],

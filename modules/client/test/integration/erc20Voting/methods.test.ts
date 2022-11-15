@@ -87,7 +87,7 @@ describe("ERC20Voting", () => {
           {
             data: arrayify("0x"),
             to: daoAddr,
-            value: 0,
+            value: BigInt(0),
           },
         ],
         _startDate: 0,
@@ -153,7 +153,7 @@ describe("ERC20Voting", () => {
       expect(vote).toBe(2);
 
       // makes test more stable
-      await advanceBlocks(provider, 10)
+      await advanceBlocks(provider, 10);
       const voting = await erc20Voting.methods.vote({
         _proposalId: proposalId,
         _choice: 3,
@@ -189,13 +189,9 @@ describe("ERC20Voting", () => {
       await steps.next();
       await steps.next();
 
-      expect(
-        (await erc20Voting.methods.participationRequiredPct()).toNumber()
-      ).toBe(20);
-      expect((await erc20Voting.methods.supportRequiredPct()).toNumber()).toBe(
-        30
-      );
-      expect((await erc20Voting.methods.minDuration()).toNumber()).toBe(40);
+      expect(await erc20Voting.methods.participationRequiredPct()).toBe(20);
+      expect(await erc20Voting.methods.supportRequiredPct()).toBe(30);
+      expect(await erc20Voting.methods.minDuration()).toBe(40);
     });
   });
 });
@@ -212,7 +208,7 @@ async function createProposal(
       {
         data: arrayify("0x00"),
         to,
-        value: 0,
+        value: BigInt(0),
       },
     ],
     _startDate: startDate,
@@ -247,7 +243,7 @@ async function becomeRoot(
       {
         to: daoAddr,
         data: arrayify(encodedGrant),
-        value: 0,
+        value: BigInt(0),
       },
     ],
     _startDate: 0,
