@@ -35,9 +35,9 @@ export enum Steps {
   DONE = "done",
 }
 
-export type VoteStepsValue = VoteStepsValueCreating | VoteStepsValueDone;
+export type VoteStepsValue = VoteStepsValuePending | VoteStepsValueDone;
 
-export type VoteStepsValueCreating = {
+export type VoteStepsValuePending = {
   key: Steps.PENDING;
   txHash: string;
 };
@@ -46,11 +46,11 @@ export type VoteStepsValueDone = {
   key: Steps.DONE;
 };
 
-export type VoteCreationValueDone = VoteStepsValueDone & {
-  voteId: number;
+export type ProposalCreationValueDone = VoteStepsValueDone & {
+  proposalId: number;
 };
 
-export type VoteCreationValue = VoteStepsValueCreating | VoteCreationValueDone;
+export type ProposalCreationValue = VoteStepsValuePending | ProposalCreationValueDone;
 
 export interface ICreateProposalParams {
   _proposalMetadata: Uint8Array;
@@ -68,7 +68,7 @@ export interface ISetConfigurationParams {
 }
 
 export interface IVoteParams {
-  _voteId: BigNumberish;
+  _proposalId: BigNumberish;
   _choice: BigNumberish;
   _executesIfDecided: boolean;
 }

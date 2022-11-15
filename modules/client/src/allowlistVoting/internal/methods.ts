@@ -10,7 +10,7 @@ import {
   IVoteParams,
   Steps,
   Proposal,
-  VoteCreationValue,
+  ProposalCreationValue,
   VoteStepsValue,
 } from "../interfaces";
 import { arrayify } from "@ethersproject/bytes";
@@ -93,7 +93,7 @@ export class AllowlistVotingMethods {
   }
 
   /**
-   * Returns the amount of allowed users
+   * Returns the amount of allowed users at a given block
    *
    * @param {BigNumberish} blockNumber
    * @return {*}  {Promise<BigNumber>}
@@ -108,28 +108,28 @@ export class AllowlistVotingMethods {
   /**
    * Checks if a proposal can be executed
    *
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @return {*}  {Promise<boolean>}
    * @memberof AllowlistVotingMethods
    */
-  public canExecute(_voteId: BigNumberish): Promise<boolean> {
+  public canExecute(_proposalId: BigNumberish): Promise<boolean> {
     return this.allowlistVoting
       .getPluginInstanceWithSigner()
-      .canExecute(_voteId);
+      .canExecute(_proposalId);
   }
 
   /**
    * Checks if a voter can vote on a proposal
    *
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @param {string} _voter
    * @return {*}  {Promise<boolean>}
    * @memberof AllowlistVotingMethods
    */
-  public canVote(_voteId: BigNumberish, _voter: string): Promise<boolean> {
+  public canVote(_proposalId: BigNumberish, _voter: string): Promise<boolean> {
     return this.allowlistVoting
       .getPluginInstanceWithSigner()
-      .canVote(_voteId, _voter);
+      .canVote(_proposalId, _voter);
   }
 
   /**
@@ -142,7 +142,7 @@ export class AllowlistVotingMethods {
    */
   public async *createProposal(
     params: ICreateProposalParams
-  ): AsyncGenerator<VoteCreationValue> {
+  ): AsyncGenerator<ProposalCreationValue> {
     const tx = await this.allowlistVoting
       .getPluginInstanceWithSigner()
       .createVote(
@@ -168,7 +168,7 @@ export class AllowlistVotingMethods {
 
     yield {
       key: Steps.DONE,
-      voteId: parseInt(voteCreatedEvents[0].topics[1]),
+      proposalId: parseInt(voteCreatedEvents[0].topics[1]),
     };
   }
 
@@ -176,14 +176,14 @@ export class AllowlistVotingMethods {
    * Executes a proposal.
    * Returns a generator with 2 steps
    *
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @return {*}  {AsyncGenerator<VoteStepsValue>}
    * @memberof AllowlistVotingMethods
    */
-  public async *execute(_voteId: BigNumberish): AsyncGenerator<VoteStepsValue> {
+  public async *execute(_proposalId: BigNumberish): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
       .getPluginInstanceWithSigner()
-      .execute(_voteId);
+      .execute(_proposalId);
     yield {
       key: Steps.PENDING,
       txHash: tx.hash,
@@ -219,28 +219,28 @@ export class AllowlistVotingMethods {
   /**
    * Returns the proposal
    *
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @return {*}  {Promise<Proposal>}
    * @memberof AllowlistVotingMethods
    */
-  public async getVote(_voteId: BigNumberish): Promise<Proposal> {
-    const voteData = await this.allowlistVoting
+  public async getProposal(_proposalId: BigNumberish): Promise<Proposal> {
+    const proposalData = await this.allowlistVoting
       .getPluginInstanceWithSigner()
-      .getVote(_voteId);
+      .getVote(_proposalId);
     const vote: Proposal = {
-      id: _voteId,
-      open: voteData.open,
-      executed: voteData.executed,
-      startDate: voteData.startDate,
-      endDate: voteData.endDate,
-      snapshotBlock: voteData.snapshotBlock,
-      supportRequired: voteData.supportRequired,
-      participationRequired: voteData.participationRequired,
-      votingPower: voteData.votingPower,
-      yes: voteData.yes,
-      no: voteData.no,
-      abstain: voteData.abstain,
-      actions: voteData.actions.map(action => ({
+      id: _proposalId,
+      open: proposalData.open,
+      executed: proposalData.executed,
+      startDate: proposalData.startDate,
+      endDate: proposalData.endDate,
+      snapshotBlock: proposalData.snapshotBlock,
+      supportRequired: proposalData.supportRequired,
+      participationRequired: proposalData.participationRequired,
+      votingPower: proposalData.votingPower,
+      yes: proposalData.yes,
+      no: proposalData.no,
+      abstain: proposalData.abstain,
+      actions: proposalData.actions.map(action => ({
         to: action.to,
         data: arrayify(action.data),
         value: action.value,
@@ -252,15 +252,15 @@ export class AllowlistVotingMethods {
   /**
    * Returns what a voter voted on a proposal
    *
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @param {string} _voter
    * @return {*}  {Promise<number>}
    * @memberof AllowlistVotingMethods
    */
-  public getVoteOption(_voteId: BigNumberish, _voter: string): Promise<number> {
+  public getVoteOption(_proposalId: BigNumberish, _voter: string): Promise<number> {
     return this.allowlistVoting
       .getPluginInstanceWithSigner()
-      .getVoteOption(_voteId, _voter);
+      .getVoteOption(_proposalId, _voter);
   }
 
   /**
@@ -397,7 +397,7 @@ export class AllowlistVotingMethods {
   public async *vote(params: IVoteParams): AsyncGenerator<VoteStepsValue> {
     const tx = await this.allowlistVoting
       .getPluginInstanceWithSigner()
-      .vote(params._voteId, params._choice, params._executesIfDecided);
+      .vote(params._proposalId, params._choice, params._executesIfDecided);
     yield {
       key: Steps.PENDING,
       txHash: tx.hash,
@@ -414,7 +414,7 @@ export class AllowlistVotingMethods {
    * @return {*}  {Promise<BigNumber>}
    * @memberof AllowlistVotingMethods
    */
-  public votesLength(): Promise<BigNumber> {
+  public proposalsLength(): Promise<BigNumber> {
     return this.allowlistVoting.getPluginInstanceWithSigner().votesLength();
   }
 

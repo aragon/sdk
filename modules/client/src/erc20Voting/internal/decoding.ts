@@ -89,13 +89,16 @@ export class ERC20VotingDecoding {
    *
    * @static
    * @param {(IDecodingTX | BytesLike)} txOrData
-   * @return {*}  {{ _voteId: BigNumberish }}
+   * @return {*}  {{ _proposalId: BigNumberish }}
    * @memberof ERC20VotingDecoding
    */
   public static execute(
     txOrData: IDecodingTX | BytesLike
-  ): { _voteId: BigNumberish } {
-    return ERC20VotingDecoding.getDecodedData("execute", txOrData);
+  ): { _proposalId: BigNumberish } {
+    const data = ERC20VotingDecoding.getDecodedData("execute", txOrData);
+    return {
+      _proposalId: data._voteId,
+    };
   }
 
   /**
@@ -121,6 +124,11 @@ export class ERC20VotingDecoding {
    * @memberof ERC20VotingDecoding
    */
   public static vote(txOrData: IDecodingTX | BytesLike): IVoteParams {
-    return ERC20VotingDecoding.getDecodedData("vote", txOrData);
+    const data = ERC20VotingDecoding.getDecodedData("vote", txOrData);
+    return {
+      _choice: data._choice,
+      _executesIfDecided: data._executesIfDecided,
+      _proposalId: data._voteId,
+    };
   }
 }

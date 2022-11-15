@@ -83,30 +83,30 @@ export class ERC20VotingEncoding {
    *
    * @static
    * @param {string} pluginAddr
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @return {*}  {IEncodingResult}
    * @memberof ERC20VotingEncoding
    */
   public static execute(
     pluginAddr: string,
-    _voteId: BigNumberish
+    _proposalId: BigNumberish
   ): IEncodingResult {
     return ERC20VotingEncoding.getEncoding(
       pluginAddr,
       "execute",
-      _voteId
+      _proposalId
     );
   }
 
   /**
    * Encode parameters for the execute function
    *
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @return {*}  {IEncodingResult}
    * @memberof ERC20VotingEncoding
    */
-  public execute(_voteId: BigNumberish): IEncodingResult {
-    return ERC20VotingEncoding.execute(this.pluginAddr, _voteId);
+  public execute(_proposalId: BigNumberish): IEncodingResult {
+    return ERC20VotingEncoding.execute(this.pluginAddr, _proposalId);
   }
 
   /**
@@ -155,7 +155,7 @@ export class ERC20VotingEncoding {
     return ERC20VotingEncoding.getEncoding(
       pluginAddr,
       "vote",
-      params._voteId,
+      params._proposalId,
       params._choice,
       params._executesIfDecided
     );

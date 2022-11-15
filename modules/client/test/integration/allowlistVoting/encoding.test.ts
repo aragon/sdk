@@ -107,7 +107,7 @@ describe("AllowlistVoting", () => {
       const encoded = AllowlistVotingEncoding.vote(
         "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
         {
-          _voteId: 1234,
+          _proposalId: 1234,
           _executesIfDecided: true,
           _choice: 1,
         }

@@ -114,26 +114,26 @@ export class AllowlistVotingEncoding {
    *
    * @static
    * @param {string} pluginAddr
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @return {*}  {IEncodingResult}
    * @memberof AllowlistVotingEncoding
    */
   public static execute(
     pluginAddr: string,
-    _voteId: BigNumberish
+    _proposalId: BigNumberish
   ): IEncodingResult {
-    return AllowlistVotingEncoding.getEncoding(pluginAddr, "execute", _voteId);
+    return AllowlistVotingEncoding.getEncoding(pluginAddr, "execute", _proposalId);
   }
 
   /**
    * Encode parameters for the execute function
    *
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @return {*}  {IEncodingResult}
    * @memberof AllowlistVotingEncoding
    */
-  public execute(_voteId: BigNumberish): IEncodingResult {
-    return AllowlistVotingEncoding.execute(this.pluginAddr, _voteId);
+  public execute(_proposalId: BigNumberish): IEncodingResult {
+    return AllowlistVotingEncoding.execute(this.pluginAddr, _proposalId);
   }
 
   /**
@@ -213,7 +213,7 @@ export class AllowlistVotingEncoding {
     return AllowlistVotingEncoding.getEncoding(
       pluginAddr,
       "vote",
-      params._voteId,
+      params._proposalId,
       params._choice,
       params._executesIfDecided
     );

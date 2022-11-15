@@ -129,24 +129,24 @@ describe("AllowlistVoting", () => {
     });
 
     it("should return the correct canExecute", async () => {
-      const voteId = await createProposal(allowlistVoting);
-      expect(await allowlistVoting.methods.canExecute(voteId)).toBe(true);
-      const execute = await allowlistVoting.methods.execute(voteId);
+      const proposalId = await createProposal(allowlistVoting);
+      expect(await allowlistVoting.methods.canExecute(proposalId)).toBe(true);
+      const execute = await allowlistVoting.methods.execute(proposalId);
       await execute.next();
       await execute.next();
-      expect(await allowlistVoting.methods.canExecute(voteId)).toBe(false);
+      expect(await allowlistVoting.methods.canExecute(proposalId)).toBe(false);
     });
 
     it("should return the correct canVote", async () => {
-      const voteId = await createProposal(allowlistVoting);
+      const proposalId = await createProposal(allowlistVoting);
       const signerAddress = await signer.getAddress();
-      expect(await allowlistVoting.methods.canVote(voteId, signerAddress)).toBe(
+      expect(await allowlistVoting.methods.canVote(proposalId, signerAddress)).toBe(
         true
       );
-      const execute = await allowlistVoting.methods.execute(voteId);
+      const execute = await allowlistVoting.methods.execute(proposalId);
       await execute.next();
       await execute.next();
-      expect(await allowlistVoting.methods.canVote(voteId, signerAddress)).toBe(
+      expect(await allowlistVoting.methods.canVote(proposalId, signerAddress)).toBe(
         false
       );
     });
@@ -173,16 +173,16 @@ describe("AllowlistVoting", () => {
             expect(await validateTXHash(provider, step.txHash)).toBe(true);
             break;
           case Steps.DONE:
-            expect(step.voteId).not.toBeNaN();
-            expect(step.voteId).toBe(0);
+            expect(step.proposalId).not.toBeNaN();
+            expect(step.proposalId).toBe(0);
             break;
         }
       }
     });
 
     it("should execute", async () => {
-      const voteId = await createProposal(allowlistVoting);
-      const generator = allowlistVoting.methods.execute(voteId);
+      const proposalId = await createProposal(allowlistVoting);
+      const generator = allowlistVoting.methods.execute(proposalId);
       const pendingStep = await generator.next();
       const doneStep = await generator.next();
 
@@ -197,41 +197,41 @@ describe("AllowlistVoting", () => {
       const toAddr = Wallet.createRandom().address;
       const startDate = Date.now();
       const endDate = startDate + 3600;
-      const voteId = await createProposal(
+      const proposalId = await createProposal(
         allowlistVoting,
         toAddr,
         startDate,
         endDate
       );
       await advanceBlocks(provider, 2);
-      const vote = await allowlistVoting.methods.getVote(voteId);
-      expect(vote.id).toBe(voteId);
-      expect(vote.open).toBe(false);
-      expect(vote.executed).toBe(false);
-      expect(vote.startDate.toString()).toBe(startDate.toString());
-      expect(vote.endDate.toString()).toBe(endDate.toString());
-      expect(vote.yes.toString()).toBe("0");
-      expect(vote.no.toString()).toBe("0");
-      expect(vote.abstain.toString()).toBe("0");
+      const proposal = await allowlistVoting.methods.getProposal(proposalId);
+      expect(proposal.id).toBe(proposalId);
+      expect(proposal.open).toBe(false);
+      expect(proposal.executed).toBe(false);
+      expect(proposal.startDate.toString()).toBe(startDate.toString());
+      expect(proposal.endDate.toString()).toBe(endDate.toString());
+      expect(proposal.yes.toString()).toBe("0");
+      expect(proposal.no.toString()).toBe("0");
+      expect(proposal.abstain.toString()).toBe("0");
     });
 
     it("should allow to vote", async () => {
       await advanceBlocks(provider, 2);
-      const voteId = await createProposal(allowlistVoting);
+      const proposalId = await createProposal(allowlistVoting);
 
       const voterAddr = await signer.getAddress();
-      let vote = await allowlistVoting.methods.getVoteOption(voteId, voterAddr);
+      let vote = await allowlistVoting.methods.getVoteOption(proposalId, voterAddr);
       expect(vote).toBe(2);
 
       const voting = await allowlistVoting.methods.vote({
-        _voteId: voteId,
+        _proposalId: proposalId,
         _choice: 3,
         _executesIfDecided: false,
       });
       await voting.next();
       await voting.next();
 
-      vote = await allowlistVoting.methods.getVoteOption(voteId, voterAddr);
+      vote = await allowlistVoting.methods.getVoteOption(proposalId, voterAddr);
       expect(vote).toBe(3);
     });
 
@@ -340,7 +340,7 @@ async function createProposal(
   for await (const step of generator) {
     switch (step.key) {
       case Steps.DONE:
-        return step.voteId;
+        return step.proposalId;
     }
   }
   return 0;

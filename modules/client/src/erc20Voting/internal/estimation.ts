@@ -36,12 +36,12 @@ export class ERC20VotingEstimation {
   /**
    * Returns a gas estimation for the function call to execute
    *
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @return {*}  {Promise<BigNumber>}
    * @memberof ERC20VotingEstimation
    */
-  public async execute(_voteId: BigNumberish): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.execute(_voteId);
+  public async execute(_proposalId: BigNumberish): Promise<BigNumber> {
+    return this.ERC20Voting.getPluginInstance().estimateGas.execute(_proposalId);
   }
 
   /**
@@ -70,7 +70,7 @@ export class ERC20VotingEstimation {
    */
   public async vote(params: IVoteParams): Promise<BigNumber> {
     return this.ERC20Voting.getPluginInstance().estimateGas.vote(
-      params._voteId,
+      params._proposalId,
       params._choice,
       params._executesIfDecided
     );

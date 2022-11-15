@@ -116,7 +116,7 @@ describe("AllowlistVoting", () => {
       const decoded = AllowlistVotingDecoding.execute(
         "0xfe0d94c10000000000000000000000000000000000000000000000000000000000000005"
       );
-      expect(decoded._voteId).toMatchObject(BigNumber.from("5"));
+      expect(decoded._proposalId).toMatchObject(BigNumber.from("5"));
     });
 
     it("should decode execute (tx)", () => {
@@ -127,7 +127,7 @@ describe("AllowlistVoting", () => {
           "0xfe0d94c10000000000000000000000000000000000000000000000000000000000000005"
         ),
       });
-      expect(decoded._voteId).toMatchObject(BigNumber.from("5"));
+      expect(decoded._proposalId).toMatchObject(BigNumber.from("5"));
     });
 
     it("should decode setConfiguration (data)", () => {
@@ -160,7 +160,7 @@ describe("AllowlistVoting", () => {
       const decoded = AllowlistVotingDecoding.vote(
         "0xce6366c400000000000000000000000000000000000000000000000000000000000004d200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
       );
-      expect(decoded._voteId).toMatchObject(BigNumber.from("1234"));
+      expect(decoded._proposalId).toMatchObject(BigNumber.from("1234"));
       expect(decoded._executesIfDecided).toBe(true);
       expect(decoded._choice).toBe(1);
     });
@@ -173,7 +173,7 @@ describe("AllowlistVoting", () => {
           "0xce6366c400000000000000000000000000000000000000000000000000000000000004d200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
         ),
       });
-      expect(decoded._voteId).toMatchObject(BigNumber.from("1234"));
+      expect(decoded._proposalId).toMatchObject(BigNumber.from("1234"));
       expect(decoded._executesIfDecided).toBe(true);
       expect(decoded._choice).toBe(1);
     });

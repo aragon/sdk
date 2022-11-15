@@ -51,14 +51,14 @@ export class AllowlistVotingEstimation {
   /**
    * Returns a gas estimation for the function call to execute
    *
-   * @param {BigNumberish} _voteId
+   * @param {BigNumberish} _proposalId
    * @return {*}  {Promise<BigNumber>}
    * @memberof AllowlistVotingEstimation
    */
-  public async execute(_voteId: BigNumberish): Promise<BigNumber> {
+  public async execute(_proposalId: BigNumberish): Promise<BigNumber> {
     return this.allowlistVoting
       .getPluginInstance()
-      .estimateGas.execute(_voteId);
+      .estimateGas.execute(_proposalId);
   }
 
   /**
@@ -104,7 +104,7 @@ export class AllowlistVotingEstimation {
     return this.allowlistVoting
       .getPluginInstance()
       .estimateGas.vote(
-        params._voteId,
+        params._proposalId,
         params._choice,
         params._executesIfDecided
       );
