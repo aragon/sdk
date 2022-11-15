@@ -179,9 +179,24 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
+      const params: IMetadata = {
+        name: "New Name",
+        description: "New description",
+        avatar: "https://theavatar.com/image.jpg",
+        links: [
+          {
+            url: "https://discord.com/...",
+            name: "Discord",
+          },
+          {
+            url: "https://twitter.com/...",
+            name: "Twitter",
+          },
+        ],
+      };
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ"
+        params
       );
       const recoveredIpfsUri: string = await client.decoding.updateMetadataRawAction(
         updateMetadataAction.data
