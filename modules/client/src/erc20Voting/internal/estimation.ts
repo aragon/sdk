@@ -25,11 +25,14 @@ export class ERC20VotingEstimation {
   ): Promise<BigNumber> {
     return this.ERC20Voting.getPluginInstance().estimateGas.createVote(
       params._proposalMetadata,
-      params._actions,
-      params._startDate,
-      params._endDate,
+      params._actions.map(action => ({
+        ...action,
+        value: BigNumber.from(action.value),
+      })),
+      BigNumber.from(params._startDate),
+      BigNumber.from(params._endDate),
       params._executeIfDecided,
-      params._choice
+      BigNumber.from(params._choice)
     );
   }
 
@@ -41,7 +44,9 @@ export class ERC20VotingEstimation {
    * @memberof ERC20VotingEstimation
    */
   public async execute(_proposalId: BigNumberish): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstance().estimateGas.execute(_proposalId);
+    return this.ERC20Voting.getPluginInstance().estimateGas.execute(
+      _proposalId
+    );
   }
 
   /**
@@ -55,9 +60,9 @@ export class ERC20VotingEstimation {
     params: ISetConfigurationParams
   ): Promise<BigNumber> {
     return this.ERC20Voting.getPluginInstance().estimateGas.setConfiguration(
-      params._participationRequiredPct,
-      params._supportRequiredPct,
-      params._minDuration
+      BigNumber.from(params._participationRequiredPct),
+      BigNumber.from(params._supportRequiredPct),
+      BigNumber.from(params._minDuration)
     );
   }
 
@@ -70,8 +75,8 @@ export class ERC20VotingEstimation {
    */
   public async vote(params: IVoteParams): Promise<BigNumber> {
     return this.ERC20Voting.getPluginInstance().estimateGas.vote(
-      params._proposalId,
-      params._choice,
+      BigNumber.from(params._proposalId),
+      BigNumber.from(params._choice),
       params._executesIfDecided
     );
   }

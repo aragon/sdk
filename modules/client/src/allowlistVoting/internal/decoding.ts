@@ -57,7 +57,7 @@ export class AllowlistVotingDecoding {
       if (i.length === 3) {
         actions.push({
           to: i[0] as string,
-          value: i[1],
+          value: BigInt(i[1].toString()),
           data: arrayify(i[2] as string),
         });
       }

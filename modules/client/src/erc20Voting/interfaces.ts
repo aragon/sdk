@@ -1,5 +1,3 @@
-import { BigNumberish } from "@ethersproject/bignumber";
-
 interface IERC20Voting {
   pluginAddress: string;
 }
@@ -10,23 +8,23 @@ export interface IERC20VotingContextPluginState extends IERC20Voting {}
 
 export interface ProposalAction {
   to: string;
-  value: BigNumberish;
+  value: BigInt;
   data: Uint8Array;
 }
 
 export interface Proposal {
-  id: BigNumberish;
+  id: BigInt;
   open: boolean;
   executed: boolean;
-  startDate: BigNumberish;
-  endDate: BigNumberish;
-  snapshotBlock: BigNumberish;
-  supportRequired: BigNumberish;
-  participationRequired: BigNumberish;
-  votingPower: BigNumberish;
-  yes: BigNumberish;
-  no: BigNumberish;
-  abstain: BigNumberish;
+  startDate: BigInt;
+  endDate: BigInt;
+  snapshotBlock: BigInt;
+  supportRequired: BigInt;
+  participationRequired: BigInt;
+  votingPower: BigInt;
+  yes: BigInt;
+  no: BigInt;
+  abstain: BigInt;
   actions: ProposalAction[];
 }
 
@@ -55,20 +53,20 @@ export type ProposalCreationValue = VoteStepsValuePending | ProposalCreationValu
 export interface ICreateProposalParams {
   _proposalMetadata: Uint8Array;
   _actions: ProposalAction[];
-  _startDate: BigNumberish;
-  _endDate: BigNumberish;
+  _startDate: BigInt;
+  _endDate: BigInt;
   _executeIfDecided: boolean;
-  _choice: BigNumberish;
+  _choice: BigInt;
 }
 
 export interface ISetConfigurationParams {
-  _participationRequiredPct: BigNumberish;
-  _supportRequiredPct: BigNumberish;
-  _minDuration: BigNumberish;
+  _participationRequiredPct: BigInt;
+  _supportRequiredPct: BigInt;
+  _minDuration: BigInt;
 }
 
 export interface IVoteParams {
-  _proposalId: BigNumberish;
-  _choice: BigNumberish;
+  _proposalId: BigInt;
+  _choice: BigInt;
   _executesIfDecided: boolean;
 }

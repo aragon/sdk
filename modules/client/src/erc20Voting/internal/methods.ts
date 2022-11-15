@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import { BigNumber } from "@ethersproject/bignumber";
 import {
   ContractReceipt,
   Event as EthersEvent,
@@ -28,8 +28,10 @@ export class ERC20VotingMethods {
    * @return {*}  {Promise<BigNumber>}
    * @memberof ERC20VotingMethods
    */
-  public PCT_BASE(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().PCT_BASE();
+  public async PCT_BASE(): Promise<BigInt> {
+    return (
+      await this.ERC20Voting.getPluginInstanceWithSigner().PCT_BASE()
+    ).toBigInt();
   }
 
   /**
@@ -55,25 +57,27 @@ export class ERC20VotingMethods {
   /**
    * Checks if a proposal can be executed
    *
-   * @param {BigNumberish} _proposalId
+   * @param {BigInt} _proposalId
    * @return {*}  {Promise<boolean>}
    * @memberof ERC20VotingMethods
    */
-  public canExecute(_proposalId: BigNumberish): Promise<boolean> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().canExecute(_proposalId);
+  public canExecute(_proposalId: BigInt): Promise<boolean> {
+    return this.ERC20Voting.getPluginInstanceWithSigner().canExecute(
+      BigNumber.from(_proposalId)
+    );
   }
 
   /**
    * Checks if a voter can vote on a proposal
    *
-   * @param {BigNumberish} _proposalId
+   * @param {BigInt} _proposalId
    * @param {string} _voter
    * @return {*}  {Promise<boolean>}
    * @memberof ERC20VotingMethods
    */
-  public canVote(_proposalId: BigNumberish, _voter: string): Promise<boolean> {
+  public canVote(_proposalId: BigInt, _voter: string): Promise<boolean> {
     return this.ERC20Voting.getPluginInstanceWithSigner().canVote(
-      _proposalId,
+      BigNumber.from(_proposalId),
       _voter
     );
   }
@@ -91,11 +95,14 @@ export class ERC20VotingMethods {
   ): AsyncGenerator<ProposalCreationValue> {
     const tx = await this.ERC20Voting.getPluginInstanceWithSigner().createVote(
       params._proposalMetadata,
-      params._actions,
-      params._startDate,
-      params._endDate,
+      params._actions.map(action => ({
+        ...action,
+        value: BigNumber.from(action.value),
+      })),
+      BigNumber.from(params._startDate),
+      BigNumber.from(params._endDate),
       params._executeIfDecided,
-      params._choice
+      BigNumber.from(params._choice)
     );
 
     yield {
@@ -120,13 +127,13 @@ export class ERC20VotingMethods {
    * Executes a proposal.
    * Returns a generator with 2 steps
    *
-   * @param {BigNumberish} _proposalId
+   * @param {BigInt} _proposalId
    * @return {*}  {AsyncGenerator<VoteStepsValue>}
    * @memberof ERC20VotingMethods
    */
-  public async *execute(_proposalId: BigNumberish): AsyncGenerator<VoteStepsValue> {
+  public async *execute(_proposalId: BigInt): AsyncGenerator<VoteStepsValue> {
     const tx = await this.ERC20Voting.getPluginInstanceWithSigner().execute(
-      _proposalId
+      BigNumber.from(_proposalId)
     );
     yield {
       key: Steps.PENDING,
@@ -161,47 +168,49 @@ export class ERC20VotingMethods {
   /**
    * Returns the proposal
    *
-   * @param {BigNumberish} _proposalId
+   * @param {BigInt} _proposalId
    * @return {*}  {Promise<Proposal>}
    * @memberof ERC20VotingMethods
    */
-  public async getProposal(_proposalId: BigNumberish): Promise<Proposal> {
+  public async getProposal(_proposalId: BigInt): Promise<Proposal> {
     const proposalData = await this.ERC20Voting.getPluginInstanceWithSigner().getVote(
-      _proposalId
+      _proposalId.toString()
     );
-    const vote: Proposal = {
+    const proposal: Proposal = {
       id: _proposalId,
       open: proposalData.open,
       executed: proposalData.executed,
-      startDate: proposalData.startDate,
-      endDate: proposalData.endDate,
-      snapshotBlock: proposalData.snapshotBlock,
-      supportRequired: proposalData.supportRequired,
-      participationRequired: proposalData.participationRequired,
-      votingPower: proposalData.votingPower,
-      yes: proposalData.yes,
-      no: proposalData.no,
-      abstain: proposalData.abstain,
+      startDate: BigInt(proposalData.startDate.toString()),
+      endDate: BigInt(proposalData.endDate.toString()),
+      snapshotBlock: BigInt(proposalData.snapshotBlock.toString()),
+      supportRequired: BigInt(proposalData.supportRequired.toString()),
+      participationRequired: BigInt(
+        proposalData.participationRequired.toString()
+      ),
+      votingPower: BigInt(proposalData.votingPower.toString()),
+      yes: BigInt(proposalData.yes.toString()),
+      no: BigInt(proposalData.no.toString()),
+      abstain: BigInt(proposalData.abstain.toString()),
       actions: proposalData.actions.map(action => ({
         to: action.to,
         data: arrayify(action.data),
-        value: action.value,
+        value: BigInt(action.value.toString()),
       })),
     };
-    return vote;
+    return proposal;
   }
 
   /**
    * Returns what a voter voted on a proposal
    *
-   * @param {BigNumberish} _proposalId
+   * @param {BigInt} _proposalId
    * @param {string} _voter
    * @return {*}  {Promise<number>}
    * @memberof ERC20VotingMethods
    */
-  public getVoteOption(_proposalId: BigNumberish, _voter: string): Promise<number> {
+  public getVoteOption(_proposalId: BigInt, _voter: string): Promise<number> {
     return this.ERC20Voting.getPluginInstanceWithSigner().getVoteOption(
-      _proposalId,
+      BigNumber.from(_proposalId),
       _voter
     );
   }
@@ -209,21 +218,25 @@ export class ERC20VotingMethods {
   /**
    * Returns the configured minDuration
    *
-   * @return {*}  {Promise<BigNumber>}
+   * @return {*}  {Promise<BigInt>}
    * @memberof ERC20VotingMethods
    */
-  public minDuration(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().minDuration();
+  public async minDuration(): Promise<BigInt> {
+    return (
+      await this.ERC20Voting.getPluginInstanceWithSigner().minDuration()
+    ).toBigInt();
   }
 
   /**
    * Returns the configured participation requirement
    *
-   * @return {*}  {Promise<BigNumber>}
+   * @return {*}  {Promise<BigInt>}
    * @memberof ERC20VotingMethods
    */
-  public participationRequiredPct(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().participationRequiredPct();
+  public async participationRequiredPct(): Promise<BigInt> {
+    return (
+      await this.ERC20Voting.getPluginInstanceWithSigner().participationRequiredPct()
+    ).toBigInt();
   }
 
   /**
@@ -258,9 +271,9 @@ export class ERC20VotingMethods {
     params: ISetConfigurationParams
   ): AsyncGenerator<VoteStepsValue> {
     const tx = await this.ERC20Voting.getPluginInstanceWithSigner().setConfiguration(
-      params._participationRequiredPct,
-      params._supportRequiredPct,
-      params._minDuration
+      BigNumber.from(params._participationRequiredPct),
+      BigNumber.from(params._supportRequiredPct),
+      BigNumber.from(params._minDuration)
     );
     yield {
       key: Steps.PENDING,
@@ -275,11 +288,13 @@ export class ERC20VotingMethods {
   /**
    * Returns the configured required support
    *
-   * @return {*}  {Promise<BigNumber>}
+   * @return {*}  {Promise<BigInt>}
    * @memberof ERC20VotingMethods
    */
-  public supportRequiredPct(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().supportRequiredPct();
+  public async supportRequiredPct(): Promise<BigInt> {
+    return (
+      await this.ERC20Voting.getPluginInstanceWithSigner().supportRequiredPct()
+    ).toBigInt();
   }
 
   /**
@@ -292,8 +307,8 @@ export class ERC20VotingMethods {
    */
   public async *vote(params: IVoteParams): AsyncGenerator<VoteStepsValue> {
     const tx = await this.ERC20Voting.getPluginInstanceWithSigner().vote(
-      params._proposalId,
-      params._choice,
+      BigNumber.from(params._proposalId),
+      BigNumber.from(params._choice),
       params._executesIfDecided
     );
     yield {
@@ -309,11 +324,13 @@ export class ERC20VotingMethods {
   /**
    * Returns the amount of proposals
    *
-   * @return {*}  {Promise<BigNumber>}
+   * @return {*}  {Promise<BigInt>}
    * @memberof ERC20VotingMethods
    */
-  public proposalsLength(): Promise<BigNumber> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().votesLength();
+  public async proposalsLength(): Promise<BigInt> {
+    return (
+      await this.ERC20Voting.getPluginInstanceWithSigner().votesLength()
+    ).toBigInt();
   }
 
   /**

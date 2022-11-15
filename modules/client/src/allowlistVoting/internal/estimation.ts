@@ -36,16 +36,17 @@ export class AllowlistVotingEstimation {
   public async createProposal(
     params: ICreateProposalParams
   ): Promise<BigNumber> {
-    return this.allowlistVoting
-      .getPluginInstance()
-      .estimateGas.createVote(
-        params._proposalMetadata,
-        params._actions,
-        params._startDate,
-        params._endDate,
-        params._executeIfDecided,
-        params._choice
-      );
+    return this.allowlistVoting.getPluginInstance().estimateGas.createVote(
+      params._proposalMetadata,
+      params._actions.map(action => ({
+        ...action,
+        value: BigNumber.from(action.value),
+      })),
+      BigNumber.from(params._startDate),
+      BigNumber.from(params._endDate),
+      params._executeIfDecided,
+      BigNumber.from(params._choice)
+    );
   }
 
   /**
@@ -87,9 +88,9 @@ export class AllowlistVotingEstimation {
     return this.allowlistVoting
       .getPluginInstance()
       .estimateGas.setConfiguration(
-        params._participationRequiredPct,
-        params._supportRequiredPct,
-        params._minDuration
+        BigNumber.from(params._participationRequiredPct),
+        BigNumber.from(params._supportRequiredPct),
+        BigNumber.from(params._minDuration)
       );
   }
 
@@ -104,8 +105,8 @@ export class AllowlistVotingEstimation {
     return this.allowlistVoting
       .getPluginInstance()
       .estimateGas.vote(
-        params._proposalId,
-        params._choice,
+        BigNumber.from(params._proposalId),
+        BigNumber.from(params._choice),
         params._executesIfDecided
       );
   }
