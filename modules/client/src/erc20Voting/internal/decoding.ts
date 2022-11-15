@@ -7,7 +7,7 @@ import {
 } from "../interfaces";
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { BigNumberish } from "@ethersproject/bignumber";
-import { IDecodingTX } from "../../client-common";
+import { DecodingTXType } from "../../client-common";
 
 export class ERC20VotingDecoding {
   /**
@@ -17,13 +17,13 @@ export class ERC20VotingDecoding {
    * @static
    * @template T
    * @param {string} functionFragment
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {T}
    * @memberof ERC20VotingDecoding
    */
   private static getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): T {
     let data: BytesLike | undefined = txOrData as BytesLike;
     if (!isBytesLike(txOrData)) {
@@ -69,12 +69,12 @@ export class ERC20VotingDecoding {
    * Decoding encoded data or a TX for the createProposal function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {ICreateProposalParams}
    * @memberof ERC20VotingDecoding
    */
   public static createProposal(
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): ICreateProposalParams {
     const decoded = ERC20VotingDecoding.getDecodedData("createVote", txOrData);
 
@@ -88,12 +88,12 @@ export class ERC20VotingDecoding {
    * Decoding encoded data or a TX for the execute function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {{ _proposalId: BigNumberish }}
    * @memberof ERC20VotingDecoding
    */
   public static execute(
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): { _proposalId: BigNumberish } {
     const data = ERC20VotingDecoding.getDecodedData("execute", txOrData);
     return {
@@ -105,12 +105,12 @@ export class ERC20VotingDecoding {
    * Decoding encoded data or a TX for the setConfiguration function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {ISetConfigurationParams}
    * @memberof ERC20VotingDecoding
    */
   public static setConfiguration(
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): ISetConfigurationParams {
     return ERC20VotingDecoding.getDecodedData("setConfiguration", txOrData);
   }
@@ -119,11 +119,11 @@ export class ERC20VotingDecoding {
    * Decoding encoded data or a TX for the vote function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {IVoteParams}
    * @memberof ERC20VotingDecoding
    */
-  public static vote(txOrData: IDecodingTX | BytesLike): IVoteParams {
+  public static vote(txOrData: DecodingTXType | BytesLike): IVoteParams {
     const data = ERC20VotingDecoding.getDecodedData("vote", txOrData);
     return {
       _choice: data._choice,

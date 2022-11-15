@@ -49,13 +49,13 @@ export interface IInterfaceParams {
   hash: string;
 }
 
-export interface IEncodingResult {
+export type EncodingResultType {
   to: string;
   value: BigNumberish;
   data: Uint8Array;
 }
 
-export interface IDecodingTX {
+export type DecodingTXType {
   to?: string;
   from?: string;
   value?: BigNumberish;

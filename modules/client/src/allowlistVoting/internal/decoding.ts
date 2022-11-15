@@ -6,7 +6,7 @@ import {
   ProposalAction,
 } from "../interfaces";
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
-import { IDecodingTX } from "../../client-common";
+import { DecodingTXType } from "../../client-common";
 import { BigNumberish } from "@ethersproject/bignumber";
 
 export class AllowlistVotingDecoding {
@@ -17,13 +17,13 @@ export class AllowlistVotingDecoding {
    * @static
    * @template T
    * @param {string} functionFragment
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {T}
    * @memberof AllowlistVotingDecoding
    */
   private static getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): T {
     let data: BytesLike | undefined = txOrData as BytesLike;
     if (!isBytesLike(txOrData)) {
@@ -69,12 +69,12 @@ export class AllowlistVotingDecoding {
    * Decoding encoded data or a TX for the addAllowedUsers function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {{ _users: string[] }}
    * @memberof AllowlistVotingDecoding
    */
   public static addAllowedUsers(
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): { _users: string[] } {
     return AllowlistVotingDecoding.getDecodedData("addAllowedUsers", txOrData);
   }
@@ -83,12 +83,12 @@ export class AllowlistVotingDecoding {
    * Decoding encoded data or a TX for the createProposal function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {ICreateProposalParams}
    * @memberof AllowlistVotingDecoding
    */
   public static createProposal(
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): ICreateProposalParams {
     const decoded = AllowlistVotingDecoding.getDecodedData(
       "createVote",
@@ -105,12 +105,12 @@ export class AllowlistVotingDecoding {
    * Decoding encoded data or a TX for the execute function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {{ _proposalId: string }}
    * @memberof AllowlistVotingDecoding
    */
   public static execute(
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): { _proposalId: string } {
     const data = AllowlistVotingDecoding.getDecodedData("execute", txOrData);
     return {
@@ -122,12 +122,12 @@ export class AllowlistVotingDecoding {
    * Decoding encoded data or a TX for the removeAllowedUsers function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {{ _users: string[] }}
    * @memberof AllowlistVotingDecoding
    */
   public static removeAllowedUsers(
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): { _users: string[] } {
     return AllowlistVotingDecoding.getDecodedData(
       "removeAllowedUsers",
@@ -139,12 +139,12 @@ export class AllowlistVotingDecoding {
    * Decoding encoded data or a TX for the setConfiguration function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {ISetConfigurationParams}
    * @memberof AllowlistVotingDecoding
    */
   public static setConfiguration(
-    txOrData: IDecodingTX | BytesLike
+    txOrData: DecodingTXType | BytesLike
   ): ISetConfigurationParams {
     return AllowlistVotingDecoding.getDecodedData("setConfiguration", txOrData);
   }
@@ -153,11 +153,11 @@ export class AllowlistVotingDecoding {
    * Decoding encoded data or a TX for the vote function
    *
    * @static
-   * @param {(IDecodingTX | BytesLike)} txOrData
+   * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {IVoteParams}
    * @memberof AllowlistVotingDecoding
    */
-  public static vote(txOrData: IDecodingTX | BytesLike): IVoteParams {
+  public static vote(txOrData: DecodingTXType | BytesLike): IVoteParams {
     const data = AllowlistVotingDecoding.getDecodedData("vote", txOrData);
     return {
       _choice: data._choice,

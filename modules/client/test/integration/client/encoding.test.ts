@@ -4,9 +4,10 @@ declare const describe, it, expect;
 import {
   Client,
   Context,
-  IEncodingResult,
+  EncodingResultType,
   IFreezePermissionParams,
   IGrantPermissionParams,
+  IMetadata,
   IRevokePermissionParams,
   IWithdrawParams,
   Permissions,
@@ -52,7 +53,7 @@ describe("Client", () => {
           permission: Permissions.UPGRADE_PERMISSION,
         },
       ];
-      let actions: IEncodingResult[] = [];
+      let actions: EncodingResultType[] = [];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         actions.push(client.encoding.grantAction(daoAddresses[i], params));
@@ -85,7 +86,7 @@ describe("Client", () => {
           permission: Permissions.UPGRADE_PERMISSION,
         },
       ];
-      let actions: IEncodingResult[] = [];
+      let actions: EncodingResultType[] = [];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         actions.push(client.encoding.revokeAction(daoAddresses[i], params));
@@ -118,7 +119,7 @@ describe("Client", () => {
           permission: Permissions.EXECUTE_PERMISSION,
         },
       ];
-      let actions: IEncodingResult[] = [];
+      let actions: EncodingResultType[] = [];
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         actions.push(client.encoding.freezeAction(daoAddresses[i], params));
@@ -136,9 +137,25 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
+      const params: IMetadata = {
+        name: "New Name",
+        description: "New description",
+        avatar: "https://theavatar.com/image.jpg",
+        links: [
+          {
+            url: "https://discord.com/...",
+            name: "Discord",
+          },
+          {
+            url: "https://twitter.com/...",
+            name: "Twitter",
+          },
+        ],
+      };
+
       const installEntry = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        "Qmfeqee"
+        params
       );
 
       expect(typeof installEntry).toBe("object");
