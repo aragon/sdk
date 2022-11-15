@@ -294,28 +294,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // resolve ens for dao
-    let where = params.where
-    if (!isAddress(where)) {
-      const resolvedAddress = await signer.provider.resolveName(where);
-      if (!resolvedAddress) {
-        throw new InvalidAddressOrEnsError();
-      }
-      where = resolvedAddress;
-    }
-    // resolve ens for who
-    let who = params.who
-    if (!isAddress(who)) {
-      const resolvedAddress = await signer.provider.resolveName(who);
-      if (!resolvedAddress) {
-        throw new InvalidAddressOrEnsError();
-      }
-      who = resolvedAddress;
-    }
-
     // connect to the managing dao
     const daoInstance = DAO__factory.connect(
-      "dao.eth",
+      params.daoAddressOrEns,
       signer,
     );
     return daoInstance.hasPermission(

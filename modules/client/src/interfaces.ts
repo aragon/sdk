@@ -124,6 +124,7 @@ export interface IFreezePermissionDecodedParams
 }
 
 export interface IHasPermissionParams {
+  daoAddressOrEns: string;
   where: string;
   who: string;
   permission: string;
