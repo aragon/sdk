@@ -1,5 +1,5 @@
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
-import { Random, FailedToPinIPFS } from "@aragon/sdk-common";
+import { IpfsPinError, Random } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -49,7 +49,7 @@ export class ClientAddressListEstimation extends ClientCore
       // TODO: Compute the cid instead of uploading to the cluster
       cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
-      throw new FailedToPinIPFS()
+      throw new IpfsPinError();
     }
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;

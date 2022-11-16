@@ -68,8 +68,14 @@ export class NoDaoRegistry extends Error {
   }
 }
 
-export class FailedToPinIPFS extends Error {
+export class IpfsPinError extends Error {
   constructor() {
-    super("Failed to pin data on IPFS")
+    super("Failed to pin data on IPFS");
+  }
+}
+
+export class ProposalCreationError extends Error {
+  constructor() {
+    super("Failed to create proposal");
   }
 }

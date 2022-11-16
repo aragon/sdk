@@ -4,9 +4,10 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
+  IpfsPinError,
   NoProviderError,
+  ProposalCreationError,
   Random,
-  FailedToPinIPFS
 } from "@aragon/sdk-common";
 import { formatEther } from "@ethersproject/units";
 import {
@@ -87,7 +88,7 @@ export class ClientErc20Methods extends ClientCore
       // TODO: Compute the cid instead of uploading to the cluster
       cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
-      throw new FailedToPinIPFS()
+      throw new IpfsPinError();
     }
 
     const startTimestamp = params.startDate?.getTime() || 0;
@@ -119,12 +120,12 @@ export class ClientErc20Methods extends ClientCore
           ),
     );
     if (!log) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
     const parsedLog = erc20VotingContractInterface.parseLog(log);
     if (!parsedLog.args["voteId"]) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
     yield {

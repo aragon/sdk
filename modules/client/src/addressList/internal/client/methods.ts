@@ -3,9 +3,10 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
+  IpfsPinError,
   NoProviderError,
+  ProposalCreationError,
   Random,
-  FailedToPinIPFS
 } from "@aragon/sdk-common";
 import { delay } from "../../../client-common/temp-mock";
 import { isAddress } from "@ethersproject/address";
@@ -85,7 +86,7 @@ export class ClientAddressListMethods extends ClientCore
       // TODO: Compute the cid instead of uploading to the cluster
       cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
-      throw new FailedToPinIPFS()
+      throw new IpfsPinError();
     }
 
     const startTimestamp = params.startDate?.getTime() || 0;
@@ -118,12 +119,12 @@ export class ClientAddressListMethods extends ClientCore
           ),
     );
     if (!log) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
     if (!parsedLog.args["voteId"]) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
     yield {
