@@ -16,7 +16,7 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [Upcomfing]
+## [0.6.1-alpha]
 ### Added
 - New error type for failed pinning on IPFS
 
