@@ -69,16 +69,28 @@ export class ClientAddressListEstimation extends ClientCore
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientAddressListEstimation
    */
-  public voteProposal(_params: IVoteProposalParams): Promise<GasFeeEstimation> {
+  public async voteProposal(
+    _params: IVoteProposalParams,
+  ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: Implement
+
+    const addresslistContract = AllowlistVoting__factory.connect(
+      _params.pluginAddress,
+      signer,
+    );
+
+    const estimation = await addresslistContract.estimateGas.vote(
+      _params.proposalId,
+      _params.vote,
+      false,
+    );
     return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+      this.web3.getApproximateGasFee(estimation.toBigInt()),
     );
   }
 
