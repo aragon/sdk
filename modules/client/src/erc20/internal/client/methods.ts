@@ -98,12 +98,12 @@ export class ClientErc20Methods extends ClientCore
     };
 
     const receipt = await tx.wait();
-    const addresslistContractInterface = ERC20Voting__factory.createInterface();
+    const erc20VotingContractInterface = ERC20Voting__factory.createInterface();
     const log = receipt.logs.find(
       (log) =>
         log.topics[0] ===
           id(
-            addresslistContractInterface.getEvent("VoteCreated").format(
+            erc20VotingContractInterface.getEvent("VoteCreated").format(
               "sighash",
             ),
           ),
@@ -112,7 +112,7 @@ export class ClientErc20Methods extends ClientCore
       throw new Error("Failed to create proposal");
     }
 
-    const parsedLog = addresslistContractInterface.parseLog(log);
+    const parsedLog = erc20VotingContractInterface.parseLog(log);
     if (!parsedLog.args["voteId"]) {
       throw new Error("Failed to create proposal");
     }
