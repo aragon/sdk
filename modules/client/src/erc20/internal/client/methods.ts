@@ -45,6 +45,10 @@ import {
   QueryToken,
 } from "../graphql-queries";
 import { toErc20Proposal, toErc20ProposalListItem } from "../utils";
+import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
+import { id } from "@ethersproject/hash";
+import { toUtf8Bytes } from "@ethersproject/strings";
+import { hexZeroPad } from "@ethersproject/bytes";
 /**
  * Methods module the SDK ERC20 Client
  */
@@ -72,45 +76,56 @@ export class ClientErc20Methods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    // TODO: Remove below as the new contracts are ready
-    await delay(1000);
+    const erc20Contract = ERC20Voting__factory.connect(
+      _params.pluginAddress,
+      signer,
+    );
+
+    let cid = "";
+    try {
+      cid = await this.ipfs.add(JSON.stringify(_params.metadata));
+    } catch {
+      throw new Error("Could not pin the metadata on IPFS");
+    }
+
+    const tx = await erc20Contract.createVote(
+      toUtf8Bytes(cid),
+      _params.actions || [],
+      Math.round(_params.startDate?.getTime() || 0 / 1000),
+      Math.round(_params.endDate?.getTime() || 0 / 1000),
+      _params.executeOnPass || false,
+      _params.creatorVote || 0,
+    );
+
     yield {
       key: ProposalCreationSteps.CREATING,
-      txHash:
-        "0x0123456789012345678901234567890123456789012345678901234567890123",
+      txHash: tx.hash,
     };
-    await delay(3000);
-    yield {
-      key: ProposalCreationSteps.DONE,
-      proposalId:
-        "0x1234567890123456789012345678901234567890123456789012345678901234",
-    };
-
-    // TODO: Uncomment as the new contracts are ready
-
-    /*
-    const erc20VotingInstance = ERC20Voting__factory.connect(
-      this._pluginAddress,
-      signer
-    );
-
-    const tx = await erc20VotingInstance.newVote(
-      ...unwrapProposalParams(params)
-    );
-
-    yield { key: ProposalCreationSteps.CREATING, txHash: tx.hash };
 
     const receipt = await tx.wait();
-    const startVoteEvent = receipt.events?.find(e => e.event === "StartVote");
-    if (!startVoteEvent || startVoteEvent.args?.voteId) {
-      return Promise.reject(new Error("Could not read the proposal ID"));
+    const addresslistContractInterface = ERC20Voting__factory.createInterface();
+    const log = receipt.logs.find(
+      (log) =>
+        log.topics[0] ===
+          id(
+            addresslistContractInterface.getEvent("VoteCreated").format(
+              "sighash",
+            ),
+          ),
+    );
+    if (!log) {
+      throw new Error("Failed to create proposal");
+    }
+
+    const parsedLog = addresslistContractInterface.parseLog(log);
+    if (!parsedLog.args["voteId"]) {
+      throw new Error("Failed to create proposal");
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: startVoteEvent.args?.voteId,
+      proposalId: hexZeroPad(parsedLog.args["voteId"].toHexString(), 32),
     };
-    */
   }
   /**
    * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
@@ -180,9 +195,7 @@ export class ClientErc20Methods extends ClientCore
    * @param {ICanVoteParams} params
    * @returns {*}  {Promise<boolean>}
    */
-  public async canVote(
-    params: ICanVoteParams,
-  ): Promise<boolean> {
+  public async canVote(params: ICanVoteParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer.provider) {
       throw new NoProviderError();
@@ -233,7 +246,9 @@ export class ClientErc20Methods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { erc20VotingProposal }: {
+      const {
+        erc20VotingProposal,
+      }: {
         erc20VotingProposal: SubgraphErc20Proposal;
       } = await client.request(QueryErc20Proposal, {
         proposalId,
@@ -291,18 +306,17 @@ export class ClientErc20Methods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { erc20VotingProposals }: {
+      const {
+        erc20VotingProposals,
+      }: {
         erc20VotingProposals: SubgraphErc20ProposalListItem[];
-      } = await client.request(
-        QueryErc20Proposals,
-        {
-          where,
-          limit,
-          skip,
-          direction,
-          sortBy,
-        },
-      );
+      } = await client.request(QueryErc20Proposals, {
+        where,
+        limit,
+        skip,
+        direction,
+        sortBy,
+      });
       await this.ipfs.ensureOnline();
       return Promise.all(
         erc20VotingProposals.map(
@@ -313,13 +327,13 @@ export class ClientErc20Methods extends ClientCore
             // delete this cid once the proposals in subgraph have the correct
             // format in the metadata field
             const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
-            return this.ipfs.fetchString(test_cid).then(
-              (stringMetadata: string) => {
+            return this.ipfs
+              .fetchString(test_cid)
+              .then((stringMetadata: string) => {
                 // TODO: Parse and validate schema¡
                 const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
                 return toErc20ProposalListItem(proposal, metadata);
-              },
-            );
+              });
           },
         ),
       );
@@ -384,12 +398,9 @@ export class ClientErc20Methods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { erc20VotingPackage } = await client.request(
-        QueryToken,
-        {
-          address: pluginAddress,
-        },
-      );
+      const { erc20VotingPackage } = await client.request(QueryToken, {
+        address: pluginAddress,
+      });
       if (!erc20VotingPackage) {
         return null;
       }

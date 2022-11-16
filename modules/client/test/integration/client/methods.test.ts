@@ -46,10 +46,11 @@ describe("Client", () => {
       server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      daoAddress = await deployContracts.createAllowlistDAO(
+      const daoCreation = await deployContracts.createAddresslistDAO(
         deployment,
-        "testDAO"
+        "testDAO",
       );
+      daoAddress = daoCreation.daoAddr;
     });
 
     afterAll(async () => {
@@ -61,8 +62,8 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const daoName =
-          "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1;
+        const daoName = "ERC20VotingDAO_" +
+          Math.floor(Random.getFloat() * 9999) + 1;
 
         const daoCreationParams: ICreateParams = {
           metadata: {
@@ -74,19 +75,19 @@ describe("Client", () => {
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {
-              id: deployment.allowListPluginSetup.address,
+              id: deployment.addressListRepo.address,
               data: toUtf8Bytes(
                 defaultAbiCoder.encode(
                   ["uint64", "uint64", "uint64", "address[]"],
-                  [1, 1, 1, []]
-                )
+                  [1, 1, 1, []],
+                ),
               ),
             },
           ],
         };
 
         const gasFeesEstimation = await client.estimation.create(
-          daoCreationParams
+          daoCreationParams,
         );
 
         expect(typeof gasFeesEstimation).toEqual("object");
@@ -94,7 +95,7 @@ describe("Client", () => {
         expect(typeof gasFeesEstimation.max).toEqual("bigint");
         expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
         expect(gasFeesEstimation.max).toBeGreaterThan(
-          gasFeesEstimation.average
+          gasFeesEstimation.average,
         );
       });
 
@@ -102,8 +103,8 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const daoName =
-          "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1;
+        const daoName = "ERC20VotingDAO_" +
+          Math.floor(Random.getFloat() * 9999) + 1;
 
         const daoCreationParams: ICreateParams = {
           metadata: {
@@ -115,12 +116,12 @@ describe("Client", () => {
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {
-              id: deployment.allowListRepo.address,
+              id: deployment.addressListRepo.address,
               data: toUtf8Bytes(
                 defaultAbiCoder.encode(
                   ["uint64", "uint64", "uint64", "address[]"],
-                  [1, 1, 1, []]
-                )
+                  [1, 1, 1, []],
+                ),
               ),
             },
           ],
@@ -138,7 +139,8 @@ describe("Client", () => {
               break;
             default:
               throw new Error(
-                "Unexpected DAO creation step: " + JSON.stringify(step, null, 2)
+                "Unexpected DAO creation step: " +
+                  JSON.stringify(step, null, 2),
               );
           }
         }
@@ -162,9 +164,9 @@ describe("Client", () => {
         expect(
           (
             await tokenContract.functions.balanceOf(
-              depositParams.daoAddressOrEns
+              depositParams.daoAddressOrEns,
             )
-          ).toString()
+          ).toString(),
         ).toBe("0");
 
         for await (const step of client.methods.deposit(depositParams)) {
@@ -191,7 +193,7 @@ describe("Client", () => {
               break;
             default:
               throw new Error(
-                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2)
+                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
               );
           }
         }
@@ -199,9 +201,9 @@ describe("Client", () => {
         expect(
           (
             await tokenContract.functions.balanceOf(
-              depositParams.daoAddressOrEns
+              depositParams.daoAddressOrEns,
             )
-          ).toString()
+          ).toString(),
         ).toBe("5");
       });
 
@@ -221,9 +223,9 @@ describe("Client", () => {
         expect(
           (
             await tokenContract.functions.balanceOf(
-              depositParams.daoAddressOrEns
+              depositParams.daoAddressOrEns,
             )
-          ).toString()
+          ).toString(),
         ).toBe("0");
 
         // Prior allowance
@@ -231,22 +233,22 @@ describe("Client", () => {
           (
             await tokenContract.functions.allowance(
               await client.web3.getSigner()?.getAddress(),
-              depositParams.daoAddressOrEns
+              depositParams.daoAddressOrEns,
             )
-          ).toString()
+          ).toString(),
         ).toBe("0");
 
         await tokenContract.functions
           .approve(depositParams.daoAddressOrEns, 10)
-          .then(tx => tx.wait());
+          .then((tx) => tx.wait());
 
         expect(
           (
             await tokenContract.functions.allowance(
               await client.web3.getSigner()?.getAddress(),
-              depositParams.daoAddressOrEns
+              depositParams.daoAddressOrEns,
             )
-          ).toString()
+          ).toString(),
         ).toBe("10");
 
         // Deposit
@@ -266,7 +268,7 @@ describe("Client", () => {
               break;
             default:
               throw new Error(
-                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2)
+                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
               );
           }
         }
@@ -274,9 +276,9 @@ describe("Client", () => {
         expect(
           (
             await tokenContract.functions.balanceOf(
-              depositParams.daoAddressOrEns
+              depositParams.daoAddressOrEns,
             )
-          ).toString()
+          ).toString(),
         ).toBe("7");
       });
     });
@@ -330,7 +332,7 @@ describe("Client", () => {
         const client = new Client(ctx);
         const daoAddress = TEST_INVALID_ADDRESS;
         await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
-          new InvalidAddressOrEnsError()
+          new InvalidAddressOrEnsError(),
         );
       });
 
@@ -350,7 +352,7 @@ describe("Client", () => {
         daos.reduce((prevDao, currentDao) => {
           if (prevDao && currentDao) {
             expect(
-              currentDao.ensDomain.localeCompare(prevDao.ensDomain) === -1
+              currentDao.ensDomain.localeCompare(prevDao.ensDomain) === -1,
             ).toBe(false);
           }
           return currentDao;
@@ -436,7 +438,7 @@ describe("Client", () => {
                 // ETH withdraw
                 expect(isAddress(transfer.to)).toBe(true);
                 expect(transfer.proposalId).toMatch(
-                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i
+                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
                 );
               } else {
                 fail("invalid transfer type");
@@ -453,7 +455,7 @@ describe("Client", () => {
                 // ERC20 withdraw
                 expect(isAddress(transfer.to)).toBe(true);
                 expect(transfer.proposalId).toMatch(
-                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i
+                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
                 );
               } else {
                 fail("invalid transfer type");
@@ -490,7 +492,7 @@ describe("Client", () => {
       });
 
       test.todo(
-        "Should return an empty array when getting the transfers of a DAO that does not exist"
+        "Should return an empty array when getting the transfers of a DAO that does not exist",
       ); //, async () => {
       //   const ctx = new Context(contextParamsLocalChain);
       //   const client = new Client(ctx)
@@ -516,7 +518,7 @@ export function deployErc20(client: Client) {
   const factory = new ContractFactory(
     erc20ContractAbi,
     ercBytecode,
-    client.web3.getConnectedSigner()
+    client.web3.getConnectedSigner(),
   );
 
   // If your contract requires constructor args, you can specify them here

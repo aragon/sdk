@@ -1,4 +1,6 @@
+import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { Random } from "@aragon/sdk-common";
+import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   ClientCore,
   ContextPlugin,
@@ -25,7 +27,7 @@ export class ClientErc20Estimation extends ClientCore
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientErc20Estimation
    */
-  public createProposal(
+  public async createProposal(
     _params: ICreateProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -35,25 +37,27 @@ export class ClientErc20Estimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    // TODO: Remove below as the new contracts are ready
-
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+    const addresslistContract = ERC20Voting__factory.connect(
+      _params.pluginAddress,
+      signer,
     );
 
-    // TODO: Uncomment below as the new contracts are ready
-    /*
-    const erc20VotingInstance = ERC20Voting__factory.connect(
-      this._pluginAddress,
-      signer
-    );
+    let cid = "";
+    try {
+      cid = await this.ipfs.add(JSON.stringify(_params.metadata));
+    } catch {
+      throw new Error("Could not pin the metadata on IPFS");
+    }
 
-    return erc20VotingInstance.estimateGas.newVote(
-      ...unwrapProposalParams(params),
-    ).then((gasLimit) => {
-      return this.web3.getApproximateGasFee(gasLimit.toBigInt());
-    });
-    */
+    const estimatedGasFee = await addresslistContract.estimateGas.createVote(
+      toUtf8Bytes(cid),
+      _params.actions || [],
+      _params.startDate?.getDate() || 0,
+      _params.endDate?.getDate() || 0,
+      _params.executeOnPass || false,
+      _params.creatorVote || 0,
+    );
+    return this.web3.getApproximateGasFee(estimatedGasFee.toBigInt());
   }
   /**
    * Estimates the gas fee of casting a vote on a proposal
