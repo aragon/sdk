@@ -60,12 +60,12 @@ export class ClientAddressListMethods extends ClientCore
   /**
    * Creates a new proposal on the given AddressList plugin contract
    *
-   * @param {ICreateProposalParams} _params
+   * @param {ICreateProposalParams} params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
    * @memberof ClientAddressListMethods
    */
   public async *createProposal(
-    _params: ICreateProposalParams,
+    params: ICreateProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -75,7 +75,7 @@ export class ClientAddressListMethods extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
@@ -84,11 +84,11 @@ export class ClientAddressListMethods extends ClientCore
 
     const tx = await addresslistContract.createVote(
       toUtf8Bytes(cid),
-      _params.actions || [],
-      Math.round((_params.startDate?.getTime() || 0) / 1000),
-      Math.round((_params.endDate?.getTime() || 0) / 1000),
-      _params.executeOnPass || false,
-      _params.creatorVote || 0,
+      params.actions || [],
+      Math.round((params.startDate?.getTime() || 0) / 1000),
+      Math.round((params.endDate?.getTime() || 0) / 1000),
+      params.executeOnPass || false,
+      params.creatorVote || 0,
     );
 
     yield {
