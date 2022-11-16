@@ -76,12 +76,12 @@ export class ERC20VotingEstimation extends ClientCore {
    * Returns a gas estimation for the function call to setConfiguration
    *
    * @param {ISetConfigurationParams} params
-   * @return {*}  {Promise<bigintbigint>}
+   * @return {*}  {Promise<bigint>}
    * @memberof ERC20VotingEstimation
    */
   public async setConfiguration(
     params: ISetConfigurationParams
-  ): Promise<bigintbigint> {
+  ): Promise<bigint> {
     return (
       await this.getPluginInstance(
         params.pluginAddr

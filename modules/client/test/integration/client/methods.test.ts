@@ -46,7 +46,7 @@ describe("Client", () => {
       server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      const daoDeployment = await deployContracts.createAllowlistDAO(
+      const daoDeployment = await deployContracts.createAddresslistDAO(
         deployment,
         "testDAO"
       );
@@ -75,7 +75,7 @@ describe("Client", () => {
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {
-              id: deployment.allowListPluginSetup.address,
+              id: deployment.addresslistPluginSetup.address,
               data: toUtf8Bytes(
                 defaultAbiCoder.encode(
                   ["uint64", "uint64", "uint64", "address[]"],
@@ -116,7 +116,7 @@ describe("Client", () => {
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {
-              id: deployment.allowListRepo.address,
+              id: deployment.addresslistRepo.address,
               data: toUtf8Bytes(
                 defaultAbiCoder.encode(
                   ["uint64", "uint64", "uint64", "address[]"],
