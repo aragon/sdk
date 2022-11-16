@@ -1,5 +1,4 @@
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
-import { BigNumberish } from "@ethersproject/bignumber";
 import {
   ICreateProposalParams,
   ISetConfigurationParams,
