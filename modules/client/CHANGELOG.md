@@ -16,7 +16,7 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [Upcoming]
+## [0.13.0-alpha]
 ### Added
 - Added `createProposal()` using real contracts
 - Added `vote()` on proposals using real contracts
