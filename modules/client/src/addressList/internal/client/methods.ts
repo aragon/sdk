@@ -83,7 +83,7 @@ export class ClientAddressListMethods extends ClientCore
 
     const tx = await addresslistContract.createVote(
       [], // TODO: Compute the cid instead of hardcoded empty value
-      [],
+      params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
       params.executeOnPass || false,

@@ -46,7 +46,7 @@ export class ClientErc20Estimation extends ClientCore
 
     const estimatedGasFee = await erc20Contract.estimateGas.createVote(
       [], // TODO: Compute the cid instead of hardcoded empty value
-      [],
+      params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
       params.executeOnPass || false,

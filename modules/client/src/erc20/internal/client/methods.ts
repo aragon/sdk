@@ -85,7 +85,7 @@ export class ClientErc20Methods extends ClientCore
 
     const tx = await erc20Contract.createVote(
       [], // TODO: Compute the cid instead of hardcoded empty value
-      [],
+      params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
       params.executeOnPass || false,
