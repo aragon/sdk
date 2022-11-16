@@ -129,12 +129,12 @@ export class ClientAddressListMethods extends ClientCore
   /**
    * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
    *
-   * @param {IVoteProposalParams} _params
+   * @param {IVoteProposalParams} params
    * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
    * @memberof ClientAddressListMethods
    */
   public async *voteProposal(
-    _params: IVoteProposalParams,
+    params: IVoteProposalParams,
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -144,13 +144,13 @@ export class ClientAddressListMethods extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     const tx = await addresslistContract.vote(
-      _params.proposalId,
-      _params.vote,
+      params.proposalId,
+      params.vote,
       false,
     );
 
@@ -163,7 +163,7 @@ export class ClientAddressListMethods extends ClientCore
 
     yield {
       key: VoteProposalStep.DONE,
-      voteId: hexZeroPad(_params.proposalId, 32),
+      voteId: hexZeroPad(params.proposalId, 32),
     };
   }
 
