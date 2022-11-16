@@ -44,12 +44,8 @@ export class ClientAddressListEstimation extends ClientCore
       signer,
     );
 
+    // TODO: Compute the cid instead of pinning the data on the cluster
     let cid = "";
-    try {
-      cid = await this.ipfs.add(JSON.stringify(_params.metadata));
-    } catch {
-      throw new Error("Could not pin the metadata on IPFS");
-    }
 
     const estimatedGasFee = await addresslistContract.estimateGas.createVote(
       toUtf8Bytes(cid),

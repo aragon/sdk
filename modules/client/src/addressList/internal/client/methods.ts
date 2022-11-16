@@ -79,18 +79,14 @@ export class ClientAddressListMethods extends ClientCore
       signer,
     );
 
+    // TODO: Compute the cid instead of pinning the data on the cluster
     let cid = "";
-    try {
-      cid = await this.ipfs.add(JSON.stringify(_params.metadata));
-    } catch {
-      throw new Error("Could not pin the metadata on IPFS");
-    }
 
     const tx = await addresslistContract.createVote(
       toUtf8Bytes(cid),
       _params.actions || [],
-      Math.round(_params.startDate?.getTime() || 0 / 1000),
-      Math.round(_params.endDate?.getTime() || 0 / 1000),
+      Math.round((_params.startDate?.getTime() || 0) / 1000),
+      Math.round((_params.endDate?.getTime() || 0) / 1000),
       _params.executeOnPass || false,
       _params.creatorVote || 0,
     );
