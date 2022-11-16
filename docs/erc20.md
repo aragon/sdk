@@ -247,7 +247,7 @@ so that the plugin is configured</p>
 * [ClientErc20Estimation](#ClientErc20Estimation)
     * [.createProposal(params)](#ClientErc20Estimation+createProposal) ⇒ <code>\*</code>
     * [.voteProposal(params)](#ClientErc20Estimation+voteProposal) ⇒ <code>\*</code>
-    * [.executeProposal(_params)](#ClientErc20Estimation+executeProposal) ⇒ <code>\*</code>
+    * [.executeProposal(params)](#ClientErc20Estimation+executeProposal) ⇒ <code>\*</code>
 
 <a name="ClientErc20Estimation+createProposal"></a>
 
@@ -275,7 +275,7 @@ so that the plugin is configured</p>
 
 <a name="ClientErc20Estimation+executeProposal"></a>
 
-### clientErc20Estimation.executeProposal(_params) ⇒ <code>\*</code>
+### clientErc20Estimation.executeProposal(params) ⇒ <code>\*</code>
 <p>Estimates the gas fee of executing an ERC20 proposal</p>
 
 **Kind**: instance method of [<code>ClientErc20Estimation</code>](#ClientErc20Estimation)  
@@ -283,7 +283,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| _params | <code>IExecuteProposalParams</code> | 
+| params | <code>IExecuteProposalParams</code> | 
 
 <a name="ClientErc20Methods"></a>
 

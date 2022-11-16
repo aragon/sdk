@@ -170,7 +170,7 @@ so that the plugin is configured</p>
 * [ClientAddressListEstimation](#ClientAddressListEstimation)
     * [.createProposal(params)](#ClientAddressListEstimation+createProposal) ⇒ <code>\*</code>
     * [.voteProposal(params)](#ClientAddressListEstimation+voteProposal) ⇒ <code>\*</code>
-    * [.executeProposal(_params)](#ClientAddressListEstimation+executeProposal) ⇒ <code>\*</code>
+    * [.executeProposal(params)](#ClientAddressListEstimation+executeProposal) ⇒ <code>\*</code>
 
 <a name="ClientAddressListEstimation+createProposal"></a>
 
@@ -198,7 +198,7 @@ so that the plugin is configured</p>
 
 <a name="ClientAddressListEstimation+executeProposal"></a>
 
-### clientAddressListEstimation.executeProposal(_params) ⇒ <code>\*</code>
+### clientAddressListEstimation.executeProposal(params) ⇒ <code>\*</code>
 <p>Estimates the gas fee of executing an AddressList proposal</p>
 
 **Kind**: instance method of [<code>ClientAddressListEstimation</code>](#ClientAddressListEstimation)  
@@ -206,7 +206,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| _params | <code>IExecuteProposalParams</code> | 
+| params | <code>IExecuteProposalParams</code> | 
 
 <a name="ClientAddressListMethods"></a>
 
@@ -218,7 +218,7 @@ so that the plugin is configured</p>
 * [ClientAddressListMethods](#ClientAddressListMethods)
     * [.createProposal(params)](#ClientAddressListMethods+createProposal) ⇒ <code>\*</code>
     * [.voteProposal(params)](#ClientAddressListMethods+voteProposal) ⇒ <code>\*</code>
-    * [.executeProposal(_params)](#ClientAddressListMethods+executeProposal) ⇒ <code>\*</code>
+    * [.executeProposal(params)](#ClientAddressListMethods+executeProposal) ⇒ <code>\*</code>
     * [.canVote(params)](#ClientAddressListMethods+canVote) ⇒ <code>\*</code>
     * [.getMembers(_daoAddressOrEns)](#ClientAddressListMethods+getMembers) ⇒ <code>\*</code>
     * [.getProposal(proposalId)](#ClientAddressListMethods+getProposal) ⇒ <code>\*</code>
@@ -251,7 +251,7 @@ so that the plugin is configured</p>
 
 <a name="ClientAddressListMethods+executeProposal"></a>
 
-### clientAddressListMethods.executeProposal(_params) ⇒ <code>\*</code>
+### clientAddressListMethods.executeProposal(params) ⇒ <code>\*</code>
 <p>Executes the given proposal, provided that it has already passed</p>
 
 **Kind**: instance method of [<code>ClientAddressListMethods</code>](#ClientAddressListMethods)  
@@ -259,7 +259,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| _params | <code>IExecuteProposalParams</code> | 
+| params | <code>IExecuteProposalParams</code> | 
 
 <a name="ClientAddressListMethods+canVote"></a>
 
