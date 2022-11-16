@@ -1,4 +1,5 @@
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import { IpfsPinError } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -24,12 +25,12 @@ export class ClientAddressListEstimation extends ClientCore
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *
-   * @param {ICreateProposalParams} _params
+   * @param {ICreateProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientAddressListEstimation
    */
   public async createProposal(
-    _params: ICreateProposalParams,
+    params: ICreateProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -39,24 +40,27 @@ export class ClientAddressListEstimation extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     let cid = "";
     try {
-      cid = await this.ipfs.add(JSON.stringify(_params.metadata));
+      // TODO: Compute the cid instead of uploading to the cluster
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
-      throw new Error("Could not pin the metadata on IPFS");
+      throw new IpfsPinError();
     }
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
 
     const estimatedGasFee = await addresslistContract.estimateGas.createVote(
       toUtf8Bytes(cid),
-      _params.actions || [],
-      _params.startDate?.getDate() || 0,
-      _params.endDate?.getDate() || 0,
-      _params.executeOnPass || false,
-      _params.creatorVote || 0,
+      params.actions || [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
+      params.executeOnPass || false,
+      params.creatorVote || 0,
     );
     return this.web3.getApproximateGasFee(estimatedGasFee.toBigInt());
   }
@@ -64,12 +68,12 @@ export class ClientAddressListEstimation extends ClientCore
   /**
    * Estimates the gas fee of casting a vote on a proposal
    *
-   * @param {IVoteProposalParams} _params
+   * @param {IVoteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientAddressListEstimation
    */
   public async voteProposal(
-    _params: IVoteProposalParams,
+    params: IVoteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -79,29 +83,27 @@ export class ClientAddressListEstimation extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     const estimation = await addresslistContract.estimateGas.vote(
-      _params.proposalId,
-      _params.vote,
+      params.proposalId,
+      params.vote,
       false,
     );
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(estimation.toBigInt()),
-    );
+    return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
 
   /**
    * Estimates the gas fee of executing an AddressList proposal
    *
-   * @param {IExecuteProposalParams} _params
+   * @param {IExecuteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientAddressListEstimation
    */
   public async executeProposal(
-    _params: IExecuteProposalParams,
+    params: IExecuteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -110,11 +112,11 @@ export class ClientAddressListEstimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
     const estimation = await addresslistContract.estimateGas.execute(
-      _params.proposalId,
+      params.proposalId,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

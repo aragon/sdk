@@ -23,6 +23,7 @@ TEMPLATE:
 - Added `execute()` on proposals using real contracts
 - Added `canVote()` on proposals using real contracts
 
+
 ## 0.12.0-alpha
 ### Changed
 - Examples folder and files

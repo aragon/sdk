@@ -3,7 +3,9 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
+  IpfsPinError,
   NoProviderError,
+  ProposalCreationError,
   Random,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
@@ -58,12 +60,12 @@ export class ClientAddressListMethods extends ClientCore
   /**
    * Creates a new proposal on the given AddressList plugin contract
    *
-   * @param {ICreateProposalParams} _params
+   * @param {ICreateProposalParams} params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
    * @memberof ClientAddressListMethods
    */
   public async *createProposal(
-    _params: ICreateProposalParams,
+    params: ICreateProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -73,24 +75,28 @@ export class ClientAddressListMethods extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     let cid = "";
     try {
-      cid = await this.ipfs.add(JSON.stringify(_params.metadata));
+      // TODO: Compute the cid instead of uploading to the cluster
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
-      throw new Error("Could not pin the metadata on IPFS");
+      throw new IpfsPinError();
     }
+
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await addresslistContract.createVote(
       toUtf8Bytes(cid),
-      _params.actions || [],
-      Math.round(_params.startDate?.getTime() || 0 / 1000),
-      Math.round(_params.endDate?.getTime() || 0 / 1000),
-      _params.executeOnPass || false,
-      _params.creatorVote || 0,
+      params.actions || [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
+      params.executeOnPass || false,
+      params.creatorVote || 0,
     );
 
     yield {
@@ -111,12 +117,12 @@ export class ClientAddressListMethods extends ClientCore
           ),
     );
     if (!log) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
     if (!parsedLog.args["voteId"]) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
     yield {
@@ -127,12 +133,12 @@ export class ClientAddressListMethods extends ClientCore
   /**
    * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
    *
-   * @param {IVoteProposalParams} _params
+   * @param {IVoteProposalParams} params
    * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
    * @memberof ClientAddressListMethods
    */
   public async *voteProposal(
-    _params: IVoteProposalParams,
+    params: IVoteProposalParams,
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -142,13 +148,13 @@ export class ClientAddressListMethods extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     const tx = await addresslistContract.vote(
-      _params.proposalId,
-      _params.vote,
+      params.proposalId,
+      params.vote,
       false,
     );
 
@@ -161,19 +167,19 @@ export class ClientAddressListMethods extends ClientCore
 
     yield {
       key: VoteProposalStep.DONE,
-      voteId: hexZeroPad(_params.proposalId, 32),
+      voteId: hexZeroPad(params.proposalId, 32),
     };
   }
 
   /**
    * Executes the given proposal, provided that it has already passed
    *
-   * @param {IExecuteProposalParams} _params
+   * @param {IExecuteProposalParams} params
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
    * @memberof ClientAddressListMethods
    */
   public async *executeProposal(
-    _params: IExecuteProposalParams,
+    params: IExecuteProposalParams,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -183,10 +189,10 @@ export class ClientAddressListMethods extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
-    const tx = await addresslistContract.execute(_params.proposalId);
+    const tx = await addresslistContract.execute(params.proposalId);
 
     yield {
       key: ExecuteProposalStep.EXECUTING,
