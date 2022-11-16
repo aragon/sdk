@@ -169,7 +169,7 @@ so that the plugin is configured</p>
 
 * [ClientAddressListEstimation](#ClientAddressListEstimation)
     * [.createProposal(params)](#ClientAddressListEstimation+createProposal) ⇒ <code>\*</code>
-    * [.voteProposal(_params)](#ClientAddressListEstimation+voteProposal) ⇒ <code>\*</code>
+    * [.voteProposal(params)](#ClientAddressListEstimation+voteProposal) ⇒ <code>\*</code>
     * [.executeProposal(_params)](#ClientAddressListEstimation+executeProposal) ⇒ <code>\*</code>
 
 <a name="ClientAddressListEstimation+createProposal"></a>
@@ -186,7 +186,7 @@ so that the plugin is configured</p>
 
 <a name="ClientAddressListEstimation+voteProposal"></a>
 
-### clientAddressListEstimation.voteProposal(_params) ⇒ <code>\*</code>
+### clientAddressListEstimation.voteProposal(params) ⇒ <code>\*</code>
 <p>Estimates the gas fee of casting a vote on a proposal</p>
 
 **Kind**: instance method of [<code>ClientAddressListEstimation</code>](#ClientAddressListEstimation)  
@@ -194,7 +194,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| _params | <code>IVoteProposalParams</code> | 
+| params | <code>IVoteProposalParams</code> | 
 
 <a name="ClientAddressListEstimation+executeProposal"></a>
 
@@ -217,7 +217,7 @@ so that the plugin is configured</p>
 
 * [ClientAddressListMethods](#ClientAddressListMethods)
     * [.createProposal(params)](#ClientAddressListMethods+createProposal) ⇒ <code>\*</code>
-    * [.voteProposal(_params)](#ClientAddressListMethods+voteProposal) ⇒ <code>\*</code>
+    * [.voteProposal(params)](#ClientAddressListMethods+voteProposal) ⇒ <code>\*</code>
     * [.executeProposal(_params)](#ClientAddressListMethods+executeProposal) ⇒ <code>\*</code>
     * [.canVote(params)](#ClientAddressListMethods+canVote) ⇒ <code>\*</code>
     * [.getMembers(_daoAddressOrEns)](#ClientAddressListMethods+getMembers) ⇒ <code>\*</code>
@@ -239,7 +239,7 @@ so that the plugin is configured</p>
 
 <a name="ClientAddressListMethods+voteProposal"></a>
 
-### clientAddressListMethods.voteProposal(_params) ⇒ <code>\*</code>
+### clientAddressListMethods.voteProposal(params) ⇒ <code>\*</code>
 <p>Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.</p>
 
 **Kind**: instance method of [<code>ClientAddressListMethods</code>](#ClientAddressListMethods)  
@@ -247,7 +247,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| _params | <code>IVoteProposalParams</code> | 
+| params | <code>IVoteProposalParams</code> | 
 
 <a name="ClientAddressListMethods+executeProposal"></a>
 

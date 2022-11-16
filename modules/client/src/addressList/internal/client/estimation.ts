@@ -30,6 +30,7 @@ export class ClientAddressListEstimation extends ClientCore
    * @memberof ClientAddressListEstimation
    */
   public async createProposal(
+
     params: ICreateProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -68,12 +69,12 @@ export class ClientAddressListEstimation extends ClientCore
   /**
    * Estimates the gas fee of casting a vote on a proposal
    *
-   * @param {IVoteProposalParams} _params
+   * @param {IVoteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientAddressListEstimation
    */
   public async voteProposal(
-    _params: IVoteProposalParams,
+    params: IVoteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -83,18 +84,16 @@ export class ClientAddressListEstimation extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     const estimation = await addresslistContract.estimateGas.vote(
-      _params.proposalId,
-      _params.vote,
+      params.proposalId,
+      params.vote,
       false,
     );
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(estimation.toBigInt()),
-    );
+    return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
 
   /**

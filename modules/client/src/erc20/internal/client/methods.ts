@@ -142,7 +142,7 @@ export class ClientErc20Methods extends ClientCore
    * @memberof ClientErc20
    */
   public async *voteProposal(
-    _params: IVoteProposalParams,
+    params: IVoteProposalParams,
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -152,13 +152,13 @@ export class ClientErc20Methods extends ClientCore
     }
 
     const erc20VotingContract = ERC20Voting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     const tx = await erc20VotingContract.vote(
-      _params.proposalId,
-      _params.vote,
+      params.proposalId,
+      params.vote,
       false,
     );
 
@@ -171,7 +171,7 @@ export class ClientErc20Methods extends ClientCore
 
     yield {
       key: VoteProposalStep.DONE,
-      voteId: hexZeroPad(_params.proposalId, 32),
+      voteId: hexZeroPad(params.proposalId, 32),
     };
   }
   /**
