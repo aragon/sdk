@@ -47,7 +47,7 @@ import {
 import { toErc20Proposal, toErc20ProposalListItem } from "../utils";
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
-import { BytesLike, hexZeroPad } from "@ethersproject/bytes";
+import { hexZeroPad } from "@ethersproject/bytes";
 /**
  * Methods module the SDK ERC20 Client
  */
