@@ -7,15 +7,12 @@ import {
   Deployment,
 } from "../../helpers/deployContracts";
 import { start } from "../../helpers/ganache-setup";
-import {
-  Addresslist,
-  AddresslistContextPlugin,
-  Steps,
-} from "../../../src/addresslist";
+import { Addresslist, Steps } from "../../../src/addresslist";
 import { Signer } from "@ethersproject/abstract-signer";
 import { Wallet } from "@ethersproject/wallet";
 import { id } from "@ethersproject/hash";
 import { arrayify } from "@ethersproject/bytes";
+import { Context } from "../../../src/client-common";
 
 describe("Addresslist", () => {
   describe("Methods", () => {
@@ -25,6 +22,7 @@ describe("Addresslist", () => {
     let daoAddr: string;
     let signer: Signer;
     let provider: JsonRpcProvider;
+    let pluginAddr: string;
 
     beforeAll(async () => {
       server = await start();
@@ -40,8 +38,10 @@ describe("Addresslist", () => {
         Math.round(Math.random() * 2000).toString(16),
         [await signer.getAddress()]
       );
-      const context = new AddresslistContextPlugin({
-        pluginAddress: createDaoReturns.pluginAddrs[0],
+
+      pluginAddr = createDaoReturns.pluginAddrs[0];
+
+      const context = new Context({
         daoFactoryAddress: deployments.daoFactory.address,
         web3Providers: [provider],
         signer: signer,
@@ -58,8 +58,9 @@ describe("Addresslist", () => {
     it("should add users", async () => {
       await becomeRoot(
         addresslist,
+        pluginAddr,
         daoAddr,
-        addresslist.pluginInstance.address,
+        pluginAddr,
         await signer.getAddress()
       );
       const randomUsers: string[] = [];
@@ -68,12 +69,15 @@ describe("Addresslist", () => {
       randomUsers.push(Wallet.createRandom().address);
       const dao = getDAOInstance(daoAddr, signer);
       await dao.grant(
-        addresslist.pluginInstance.address,
+        pluginAddr,
         await signer.getAddress(),
         id("MODIFY_ALLOWLIST_PERMISSION")
       );
 
-      const call = await addresslist.methods.addAllowedUsers(randomUsers);
+      const call = await addresslist.methods.addAllowedUsers(
+        pluginAddr,
+        randomUsers
+      );
       const pendingStep = await call.next();
       const doneStep = await call.next();
 
@@ -87,7 +91,11 @@ describe("Addresslist", () => {
       const blockNumber = await provider.getBlockNumber();
       for (const user of randomUsers) {
         expect(
-          await addresslist.methods.isAllowed(user, BigInt(blockNumber - 1))
+          await addresslist.methods.isAllowed(
+            pluginAddr,
+            user,
+            BigInt(blockNumber - 1)
+          )
         ).toBe(true);
       }
     });
@@ -96,14 +104,16 @@ describe("Addresslist", () => {
       await advanceBlocks(provider, 5);
       let blockNumber = await provider.getBlockNumber();
       let count = await addresslist.methods.allowedUserCount(
+        pluginAddr,
         BigInt(blockNumber - 1)
       );
       expect(count.toString()).toBe("1");
 
       await becomeRoot(
         addresslist,
+        pluginAddr,
         daoAddr,
-        addresslist.pluginInstance.address,
+        pluginAddr,
         await signer.getAddress()
       );
       const randomUsers: string[] = [];
@@ -112,12 +122,15 @@ describe("Addresslist", () => {
       randomUsers.push(Wallet.createRandom().address);
       const dao = getDAOInstance(daoAddr, signer);
       await dao.grant(
-        addresslist.pluginInstance.address,
+        pluginAddr,
         await signer.getAddress(),
         id("MODIFY_ALLOWLIST_PERMISSION")
       );
 
-      const call = await addresslist.methods.addAllowedUsers(randomUsers);
+      const call = await addresslist.methods.addAllowedUsers(
+        pluginAddr,
+        randomUsers
+      );
       await call.next();
       await call.next();
 
@@ -125,36 +138,42 @@ describe("Addresslist", () => {
 
       blockNumber = await provider.getBlockNumber();
       count = await addresslist.methods.allowedUserCount(
+        pluginAddr,
         BigInt(blockNumber - 1)
       );
       expect(count.toString()).toBe("4");
     });
 
     it("should return the correct canExecute", async () => {
-      const proposalId = await createProposal(addresslist);
-      expect(await addresslist.methods.canExecute(proposalId)).toBe(true);
-      const execute = await addresslist.methods.execute(proposalId);
+      const proposalId = await createProposal(addresslist, pluginAddr);
+      expect(await addresslist.methods.canExecute(pluginAddr, proposalId)).toBe(
+        true
+      );
+      const execute = await addresslist.methods.execute(pluginAddr, proposalId);
       await execute.next();
       await execute.next();
-      expect(await addresslist.methods.canExecute(proposalId)).toBe(false);
+      expect(await addresslist.methods.canExecute(pluginAddr, proposalId)).toBe(
+        false
+      );
     });
 
     it("should return the correct canVote", async () => {
-      const proposalId = await createProposal(addresslist);
+      const proposalId = await createProposal(addresslist, pluginAddr);
       const signerAddress = await signer.getAddress();
       expect(
-        await addresslist.methods.canVote(proposalId, signerAddress)
+        await addresslist.methods.canVote(pluginAddr, proposalId, signerAddress)
       ).toBe(true);
-      const execute = await addresslist.methods.execute(proposalId);
+      const execute = await addresslist.methods.execute(pluginAddr, proposalId);
       await execute.next();
       await execute.next();
       expect(
-        await addresslist.methods.canVote(proposalId, signerAddress)
+        await addresslist.methods.canVote(pluginAddr, proposalId, signerAddress)
       ).toBe(false);
     });
 
     it("should create a proposal", async () => {
       const generator = addresslist.methods.createProposal({
+        pluginAddr,
         _proposalMetadata: arrayify("0x000001"),
         _actions: [
           {
@@ -183,8 +202,8 @@ describe("Addresslist", () => {
     });
 
     it("should execute", async () => {
-      const proposalId = await createProposal(addresslist);
-      const generator = addresslist.methods.execute(proposalId);
+      const proposalId = await createProposal(addresslist, pluginAddr);
+      const generator = addresslist.methods.execute(pluginAddr, proposalId);
       const pendingStep = await generator.next();
       const doneStep = await generator.next();
 
@@ -201,12 +220,16 @@ describe("Addresslist", () => {
       const endDate = startDate + 3600;
       const proposalId = await createProposal(
         addresslist,
+        pluginAddr,
         toAddr,
         startDate,
         endDate
       );
       await advanceBlocks(provider, 2);
-      const proposal = await addresslist.methods.getProposal(proposalId);
+      const proposal = await addresslist.methods.getProposal(
+        pluginAddr,
+        proposalId
+      );
       expect(proposal.id).toBe(proposalId);
       expect(proposal.open).toBe(false);
       expect(proposal.executed).toBe(false);
@@ -219,16 +242,18 @@ describe("Addresslist", () => {
 
     it("should allow to vote", async () => {
       await advanceBlocks(provider, 2);
-      const proposalId = await createProposal(addresslist);
+      const proposalId = await createProposal(addresslist, pluginAddr);
 
       const voterAddr = await signer.getAddress();
       let vote = await addresslist.methods.getVoteOption(
+        pluginAddr,
         proposalId,
         voterAddr
       );
       expect(vote).toBe(2);
 
       const voting = await addresslist.methods.vote({
+        pluginAddr,
         _proposalId: proposalId,
         _choice: 3,
         _executesIfDecided: false,
@@ -236,7 +261,11 @@ describe("Addresslist", () => {
       await voting.next();
       await voting.next();
 
-      vote = await addresslist.methods.getVoteOption(proposalId, voterAddr);
+      vote = await addresslist.methods.getVoteOption(
+        pluginAddr,
+        proposalId,
+        voterAddr
+      );
       expect(vote).toBe(3);
     });
 
@@ -245,8 +274,9 @@ describe("Addresslist", () => {
       await provider.getBlockNumber();
       await becomeRoot(
         addresslist,
+        pluginAddr,
         daoAddr,
-        addresslist.pluginInstance.address,
+        pluginAddr,
         await signer.getAddress()
       );
       const randomUsers: string[] = [];
@@ -255,12 +285,15 @@ describe("Addresslist", () => {
       randomUsers.push(Wallet.createRandom().address);
       const dao = getDAOInstance(daoAddr, signer);
       await dao.grant(
-        addresslist.pluginInstance.address,
+        pluginAddr,
         await signer.getAddress(),
         id("MODIFY_ALLOWLIST_PERMISSION")
       );
 
-      const call = await addresslist.methods.addAllowedUsers(randomUsers);
+      const call = await addresslist.methods.addAllowedUsers(
+        pluginAddr,
+        randomUsers
+      );
       await call.next();
       await call.next();
 
@@ -270,14 +303,16 @@ describe("Addresslist", () => {
 
       expect(
         await addresslist.methods.isAllowed(
+          pluginAddr,
           randomUsers[0],
           BigInt(blockNumber - 1)
         )
       ).toBe(true);
 
-      const removeCall = await addresslist.methods.removeAllowedUsers([
-        randomUsers[0],
-      ]);
+      const removeCall = await addresslist.methods.removeAllowedUsers(
+        pluginAddr,
+        [randomUsers[0]]
+      );
       await removeCall.next();
       await removeCall.next();
 
@@ -287,6 +322,7 @@ describe("Addresslist", () => {
 
       expect(
         await addresslist.methods.isAllowed(
+          pluginAddr,
           randomUsers[0],
           BigInt(blockNumber - 1)
         )
@@ -296,19 +332,21 @@ describe("Addresslist", () => {
     it("should change the configuration", async () => {
       await becomeRoot(
         addresslist,
+        pluginAddr,
         daoAddr,
-        addresslist.pluginInstance.address,
+        pluginAddr,
         await signer.getAddress()
       );
 
       const dao = getDAOInstance(daoAddr, signer);
       await dao.grant(
-        addresslist.pluginInstance.address,
+        pluginAddr,
         await signer.getAddress(),
         id("SET_CONFIGURATION_PERMISSION")
       );
 
       const steps = await addresslist.methods.setConfiguration({
+        pluginAddr,
         _participationRequiredPct: 20,
         _supportRequiredPct: 30,
         _minDuration: 40,
@@ -316,20 +354,24 @@ describe("Addresslist", () => {
       await steps.next();
       await steps.next();
 
-      expect(await addresslist.methods.participationRequiredPct()).toBe(20);
-      expect(await addresslist.methods.supportRequiredPct()).toBe(30);
-      expect(await addresslist.methods.minDuration()).toBe(40);
+      expect(
+        await addresslist.methods.participationRequiredPct(pluginAddr)
+      ).toBe(20);
+      expect(await addresslist.methods.supportRequiredPct(pluginAddr)).toBe(30);
+      expect(await addresslist.methods.minDuration(pluginAddr)).toBe(40);
     });
   });
 });
 
 async function createProposal(
   addresslist: Addresslist,
+  pluginAddr: string,
   to: string = Wallet.createRandom().address,
   startDate: number = 0,
   endDate: number = 0
 ): Promise<number> {
   const generator = addresslist.methods.createProposal({
+    pluginAddr,
     _proposalMetadata: arrayify("0x00"),
     _actions: [
       {
@@ -355,6 +397,7 @@ async function createProposal(
 
 async function becomeRoot(
   addresslist: Addresslist,
+  pluginAddr: string,
   daoAddr: string,
   where: string,
   who: string
@@ -365,6 +408,7 @@ async function becomeRoot(
     id("ROOT_PERMISSION"),
   ]);
   const voteGenerator = addresslist.methods.createProposal({
+    pluginAddr,
     _proposalMetadata: arrayify("0x00"),
     _actions: [
       {

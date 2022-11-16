@@ -9,11 +9,6 @@ import { EncodingResultType } from "../../client-common";
 import { arrayify } from "@ethersproject/bytes";
 
 export class AddresslistEncoding {
-  private pluginAddr: string;
-  constructor(pluginAddr: string) {
-    this.pluginAddr = pluginAddr;
-  }
-
   /**
    * Private helper to encode function data
    *
@@ -63,17 +58,6 @@ export class AddresslistEncoding {
   }
 
   /**
-   * Encode parameters for the addAllowedUsers function
-   *
-   * @param {string[]} _users
-   * @return {*}  {IEncodingResult}
-   * @memberof AddresslistEncoding
-   */
-  public addAllowedUsers(_users: string[]): EncodingResultType {
-    return AddresslistEncoding.addAllowedUsers(this.pluginAddr, _users);
-  }
-
-  /**
    * Encode parameters for the createProposal function
    *
    * @static
@@ -83,11 +67,10 @@ export class AddresslistEncoding {
    * @memberof AddresslistEncoding
    */
   public static createProposal(
-    pluginAddr: string,
     params: ICreateProposalParams
   ): EncodingResultType {
     return this.getEncoding(
-      pluginAddr,
+      params.pluginAddr,
       "createVote",
       params._proposalMetadata,
       params._actions,
@@ -99,41 +82,19 @@ export class AddresslistEncoding {
   }
 
   /**
-   * Encode parameters for the createProposal function
-   *
-   * @param {ICreateProposalParams} params
-   * @return {*}  {IEncodingResult}
-   * @memberof AddresslistEncoding
-   */
-  public createProposal(params: ICreateProposalParams): EncodingResultType {
-    return AddresslistEncoding.createProposal(this.pluginAddr, params);
-  }
-
-  /**
    * Encode parameters for the addAllowedUsers function
    *
    * @static
    * @param {string} pluginAddr
-   * @param {BigNumberish} _proposalId
+   * @param {number} _proposalId
    * @return {*}  {IEncodingResult}
    * @memberof AddresslistEncoding
    */
   public static execute(
     pluginAddr: string,
-    _proposalId: BigNumberish
+    _proposalId: number
   ): EncodingResultType {
     return AddresslistEncoding.getEncoding(pluginAddr, "execute", _proposalId);
-  }
-
-  /**
-   * Encode parameters for the execute function
-   *
-   * @param {BigNumberish} _proposalId
-   * @return {*}  {IEncodingResult}
-   * @memberof AddresslistEncoding
-   */
-  public execute(_proposalId: BigNumberish): EncodingResultType {
-    return AddresslistEncoding.execute(this.pluginAddr, _proposalId);
   }
 
   /**
@@ -157,17 +118,6 @@ export class AddresslistEncoding {
   }
 
   /**
-   * Encode parameters for the removeAllowedUsers function
-   *
-   * @param {string[]} _users
-   * @return {*}  {IEncodingResult}
-   * @memberof AddresslistEncoding
-   */
-  public removeAllowedUsers(_users: string[]): EncodingResultType {
-    return AddresslistEncoding.removeAllowedUsers(this.pluginAddr, _users);
-  }
-
-  /**
    * Encode parameters for the setConfiguration function
    *
    * @static
@@ -177,27 +127,15 @@ export class AddresslistEncoding {
    * @memberof AddresslistEncoding
    */
   public static setConfiguration(
-    pluginAddr: string,
     params: ISetConfigurationParams
   ): EncodingResultType {
     return AddresslistEncoding.getEncoding(
-      pluginAddr,
+      params.pluginAddr,
       "setConfiguration",
       params._participationRequiredPct,
       params._supportRequiredPct,
       params._minDuration
     );
-  }
-
-  /**
-   * Encode parameters for the setConfiguration function
-   *
-   * @param {ISetConfigurationParams} params
-   * @return {*}  {IEncodingResult}
-   * @memberof AddresslistEncoding
-   */
-  public setConfiguration(params: ISetConfigurationParams): EncodingResultType {
-    return AddresslistEncoding.setConfiguration(this.pluginAddr, params);
   }
 
   /**
@@ -210,26 +148,14 @@ export class AddresslistEncoding {
    * @memberof AddresslistEncoding
    */
   public static vote(
-    pluginAddr: string,
     params: IVoteParams
   ): EncodingResultType {
     return AddresslistEncoding.getEncoding(
-      pluginAddr,
+      params.pluginAddr,
       "vote",
       params._proposalId,
       params._choice,
       params._executesIfDecided
     );
-  }
-
-  /**
-   * Encode parameters for the vote function
-   *
-   * @param {IVoteParams} params
-   * @return {*}  {IEncodingResult}
-   * @memberof AddresslistEncoding
-   */
-  public vote(params: IVoteParams): EncodingResultType {
-    return AddresslistEncoding.vote(this.pluginAddr, params);
   }
 }

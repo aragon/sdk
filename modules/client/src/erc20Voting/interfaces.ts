@@ -8,7 +8,7 @@ export interface IERC20VotingContextPluginState extends IERC20Voting {}
 
 export interface ProposalAction {
   to: string;
-  value: BigInt;
+  value: bigint;
   data: Uint8Array;
 }
 
@@ -18,13 +18,13 @@ export interface Proposal {
   executed: boolean;
   startDate: number;
   endDate: number;
-  snapshotBlock: BigInt;
-  supportRequired: BigInt;
-  participationRequired: BigInt;
-  votingPower: BigInt;
-  yes: BigInt;
-  no: BigInt;
-  abstain: BigInt;
+  snapshotBlock: bigint;
+  supportRequired: bigint;
+  participationRequired: bigint;
+  votingPower: bigint;
+  yes: bigint;
+  no: bigint;
+  abstain: bigint;
   actions: ProposalAction[];
 }
 
@@ -48,9 +48,12 @@ export type ProposalCreationValueDone = VoteStepsValueDone & {
   proposalId: number;
 };
 
-export type ProposalCreationValue = VoteStepsValuePending | ProposalCreationValueDone;
+export type ProposalCreationValue =
+  | VoteStepsValuePending
+  | ProposalCreationValueDone;
 
 export interface ICreateProposalParams {
+  pluginAddr: string;
   _proposalMetadata: Uint8Array;
   _actions: ProposalAction[];
   _startDate: number;
@@ -59,14 +62,28 @@ export interface ICreateProposalParams {
   _choice: number;
 }
 
-export interface ISetConfigurationParams {
+export interface ISetConfigurationParamsDecoded {
   _participationRequiredPct: number;
   _supportRequiredPct: number;
   _minDuration: number;
 }
 
-export interface IVoteParams {
+export interface ISetConfigurationParams
+  extends ISetConfigurationParamsDecoded {
+  pluginAddr: string;
+}
+
+export interface IVoteParamsDecoded {
   _proposalId: number;
   _choice: number;
   _executesIfDecided: boolean;
+}
+
+export interface IVoteParams extends IVoteParamsDecoded {
+  pluginAddr: string;
+}
+
+export enum Permissions {
+  SET_CONFIGURATION_PERMISSION = "SET_CONFIGURATION_PERMISSION",
+  UPGRADE_PLUGIN_PERMISSION = "UPGRADE_PLUGIN_PERMISSION",
 }

@@ -1,8 +1,8 @@
 import { BytesLike, isBytesLike, arrayify } from "@ethersproject/bytes";
 import {
   ICreateProposalParams,
-  ISetConfigurationParams,
-  IVoteParams,
+  ISetConfigurationParamsDecoded,
+  IVoteParamsDecoded,
   ProposalAction,
 } from "../interfaces";
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
@@ -137,12 +137,12 @@ export class AddresslistDecoding {
    *
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
-   * @return {*}  {ISetConfigurationParams}
+   * @return {*}  {ISetConfigurationParamsDecoded}
    * @memberof AddresslistDecoding
    */
   public static setConfiguration(
     txOrData: DecodingTXType | BytesLike
-  ): ISetConfigurationParams {
+  ): ISetConfigurationParamsDecoded {
     const data = AddresslistDecoding.getDecodedData(
       "setConfiguration",
       txOrData
@@ -161,10 +161,10 @@ export class AddresslistDecoding {
    *
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
-   * @return {*}  {IVoteParams}
+   * @return {*}  {IVoteParamsDecoded}
    * @memberof AddresslistDecoding
    */
-  public static vote(txOrData: DecodingTXType | BytesLike): IVoteParams {
+  public static vote(txOrData: DecodingTXType | BytesLike): IVoteParamsDecoded {
     const data = AddresslistDecoding.getDecodedData("vote", txOrData);
     return {
       _choice: parseInt(data._choice.toString()),

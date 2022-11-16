@@ -1,8 +1,8 @@
 import { BytesLike, isBytesLike, arrayify } from "@ethersproject/bytes";
 import {
   ICreateProposalParams,
-  ISetConfigurationParams,
-  IVoteParams,
+  ISetConfigurationParamsDecoded,
+  IVoteParamsDecoded,
   ProposalAction,
 } from "../interfaces";
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
@@ -92,7 +92,7 @@ export class ERC20VotingDecoding {
    *
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
-   * @return {*}  {{ _proposalId: BigNumberish }}
+   * @return {*}  {{ _proposalId: number }}
    * @memberof ERC20VotingDecoding
    */
   public static execute(
@@ -109,12 +109,12 @@ export class ERC20VotingDecoding {
    *
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
-   * @return {*}  {ISetConfigurationParams}
+   * @return {*}  {ISetConfigurationParamsDecoded}
    * @memberof ERC20VotingDecoding
    */
   public static setConfiguration(
     txOrData: DecodingTXType | BytesLike
-  ): ISetConfigurationParams {
+  ): ISetConfigurationParamsDecoded {
     const data = ERC20VotingDecoding.getDecodedData(
       "setConfiguration",
       txOrData
@@ -133,10 +133,10 @@ export class ERC20VotingDecoding {
    *
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
-   * @return {*}  {IVoteParams}
+   * @return {*}  {IVoteParamsDecoded}
    * @memberof ERC20VotingDecoding
    */
-  public static vote(txOrData: DecodingTXType | BytesLike): IVoteParams {
+  public static vote(txOrData: DecodingTXType | BytesLike): IVoteParamsDecoded {
     const data = ERC20VotingDecoding.getDecodedData("vote", txOrData);
     return {
       _choice: parseInt(data._choice.toString()),

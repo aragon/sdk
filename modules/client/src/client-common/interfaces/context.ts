@@ -48,6 +48,3 @@ type GraphQLContextState = {
 export type ContextState = Web3ContextState &
   IpfsContextState &
   GraphQLContextState;
-
-export type ContextPluginState = {};
-export type ContextPluginParams = ContextParams;

@@ -3,7 +3,6 @@ import {
   ContractReceipt,
   Event as EthersEvent,
 } from "@ethersproject/contracts";
-import { ERC20Voting } from "../client";
 import {
   ICreateProposalParams,
   ISetConfigurationParams,
@@ -14,73 +13,79 @@ import {
   VoteStepsValue,
 } from "../interfaces";
 import { arrayify } from "@ethersproject/bytes";
+import { ClientCore, Context } from "../../client-common";
+import {
+  ERC20Voting,
+  ERC20Voting__factory,
+} from "@aragon/core-contracts-ethers";
+import { NoSignerError, NoProviderError } from "@aragon/sdk-common";
 
-export class ERC20VotingMethods {
-  private ERC20Voting: ERC20Voting;
-
-  constructor(ERC20Voting: ERC20Voting) {
-    this.ERC20Voting = ERC20Voting;
+export class ERC20VotingMethods extends ClientCore {
+  constructor(context: Context) {
+    super(context);
   }
 
   /**
-   * Returns the PCT_BASE
+   * Gets a plugin instance connected with a provider for the given address
    *
+   * @private
+   * @param {string} addr
+   * @return {*}  {ERC20Voting}
+   * @memberof ERC20VotingMethods
+   */
+  private getConnectedPluginInstance(addr: string): ERC20Voting {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+
+    return ERC20Voting__factory.connect(addr, signer);
+  }
+
+
+  /**
+   * Returns the basePrecentage used in the contract to compare percentages despite the lack of floating point arithmetic
+   *
+   * @param {string} pluginAddr
    * @return {*}  {Promise<number>}
    * @memberof ERC20VotingMethods
    */
-  public async PCT_BASE(): Promise<number> {
+   public async basePrecentage(pluginAddr: string): Promise<number> {
     return (
-      await this.ERC20Voting.getPluginInstanceWithSigner().PCT_BASE()
+      await this.getConnectedPluginInstance(pluginAddr).PCT_BASE()
     ).toNumber();
-  }
-
-  /**
-   * Returns the hash for the SET_CONFIGURATION_PERMISSION permission
-   *
-   * @return {*}  {Promise<string>}
-   * @memberof ERC20VotingMethods
-   */
-  public SET_CONFIGURATION_PERMISSION_ID(): Promise<string> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().SET_CONFIGURATION_PERMISSION_ID();
-  }
-
-  /**
-   * Returns the hash for the UPGRADE_PLUGIN_PERMISSION permission
-   *
-   * @return {*}  {Promise<string>}
-   * @memberof ERC20VotingMethods
-   */
-  public UPGRADE_PLUGIN_PERMISSION_ID(): Promise<string> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().UPGRADE_PLUGIN_PERMISSION_ID();
   }
 
   /**
    * Checks if a proposal can be executed
    *
-   * @param {BigInt | number} _proposalId
+   * @param {string} pluginAddr
+   * @param {number} _proposalId
    * @return {*}  {Promise<boolean>}
    * @memberof ERC20VotingMethods
    */
-  public canExecute(_proposalId: BigInt | number): Promise<boolean> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().canExecute(
-      BigNumber.from(_proposalId)
-    );
+  public canExecute(pluginAddr: string, _proposalId: number): Promise<boolean> {
+    return this.getConnectedPluginInstance(pluginAddr).canExecute(_proposalId);
   }
 
   /**
    * Checks if a voter can vote on a proposal
    *
-   * @param {BigInt | number} _proposalId
+   * @param {string} pluginAddr
+   * @param {number} _proposalId
    * @param {string} _voter
    * @return {*}  {Promise<boolean>}
    * @memberof ERC20VotingMethods
    */
   public canVote(
-    _proposalId: BigInt | number,
+    pluginAddr: string,
+    _proposalId: number,
     _voter: string
   ): Promise<boolean> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().canVote(
-      BigNumber.from(_proposalId),
+    return this.getConnectedPluginInstance(pluginAddr).canVote(
+      _proposalId,
       _voter
     );
   }
@@ -96,7 +101,9 @@ export class ERC20VotingMethods {
   public async *createProposal(
     params: ICreateProposalParams
   ): AsyncGenerator<ProposalCreationValue> {
-    const tx = await this.ERC20Voting.getPluginInstanceWithSigner().createVote(
+    const tx = await this.getConnectedPluginInstance(
+      params.pluginAddr
+    ).createVote(
       params._proposalMetadata,
       params._actions.map(action => ({
         ...action,
@@ -130,15 +137,17 @@ export class ERC20VotingMethods {
    * Executes a proposal.
    * Returns a generator with 2 steps
    *
-   * @param {BigInt | number} _proposalId
+   * @param {string} pluginAddr
+   * @param {number} _proposalId
    * @return {*}  {AsyncGenerator<VoteStepsValue>}
    * @memberof ERC20VotingMethods
    */
   public async *execute(
-    _proposalId: BigInt | number
+    pluginAddr: string,
+    _proposalId: number
   ): AsyncGenerator<VoteStepsValue> {
-    const tx = await this.ERC20Voting.getPluginInstanceWithSigner().execute(
-      BigNumber.from(_proposalId)
+    const tx = await this.getConnectedPluginInstance(pluginAddr).execute(
+      _proposalId
     );
     yield {
       key: Steps.PENDING,
@@ -153,36 +162,44 @@ export class ERC20VotingMethods {
   /**
    * Returns the DAO address this plugin belongs to
    *
+   * @param {string} pluginAddr
    * @return {*}  {Promise<string>}
    * @memberof ERC20VotingMethods
    */
-  public getDAO(): Promise<string> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().getDAO();
+  public getDAO(pluginAddr: string): Promise<string> {
+    return this.getConnectedPluginInstance(pluginAddr).getDAO();
   }
 
   /**
    * Returns the address of the implementation contract used for the proxy.
    *
+   * @param {string} pluginAddr
    * @return {*}  {Promise<string>}
    * @memberof ERC20VotingMethods
    */
-  public getImplementationAddress(): Promise<string> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().getImplementationAddress();
+  public getImplementationAddress(pluginAddr: string): Promise<string> {
+    return this.getConnectedPluginInstance(
+      pluginAddr
+    ).getImplementationAddress();
   }
 
   /**
    * Returns the proposal
    *
-   * @param {BigInt | number} _proposalId
+   * @param {string} pluginAddr
+   * @param {number} _proposalId
    * @return {*}  {Promise<Proposal>}
    * @memberof ERC20VotingMethods
    */
-  public async getProposal(_proposalId: BigInt | number): Promise<Proposal> {
-    const proposalData = await this.ERC20Voting.getPluginInstanceWithSigner().getVote(
-      _proposalId.toString()
-    );
+  public async getProposal(
+    pluginAddr: string,
+    _proposalId: number
+  ): Promise<Proposal> {
+    const proposalData = await this.getConnectedPluginInstance(
+      pluginAddr
+    ).getVote(_proposalId);
     const proposal: Proposal = {
-      id: parseInt(_proposalId.toString()),
+      id: _proposalId,
       open: proposalData.open,
       executed: proposalData.executed,
       startDate: parseInt(proposalData.startDate.toString()),
@@ -208,17 +225,19 @@ export class ERC20VotingMethods {
   /**
    * Returns what a voter voted on a proposal
    *
-   * @param {BigInt | number} _proposalId
+   * @param {string} pluginAddr
+   * @param {number} _proposalId
    * @param {string} _voter
    * @return {*}  {Promise<number>}
    * @memberof ERC20VotingMethods
    */
   public getVoteOption(
-    _proposalId: BigInt | number,
+    pluginAddr: string,
+    _proposalId: number,
     _voter: string
   ): Promise<number> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().getVoteOption(
-      BigNumber.from(_proposalId),
+    return this.getConnectedPluginInstance(pluginAddr).getVoteOption(
+      _proposalId,
       _voter
     );
   }
@@ -226,45 +245,51 @@ export class ERC20VotingMethods {
   /**
    * Returns the configured minDuration
    *
+   * @param {string} pluginAddr
    * @return {*}  {Promise<number>}
    * @memberof ERC20VotingMethods
    */
-  public async minDuration(): Promise<number> {
+  public async minDuration(pluginAddr: string): Promise<number> {
     return (
-      await this.ERC20Voting.getPluginInstanceWithSigner().minDuration()
+      await this.getConnectedPluginInstance(pluginAddr).minDuration()
     ).toNumber();
   }
 
   /**
    * Returns the configured participation requirement
    *
+   * @param {string} pluginAddr
    * @return {*}  {Promise<number>}
    * @memberof ERC20VotingMethods
    */
-  public async participationRequiredPct(): Promise<number> {
+  public async participationRequiredPct(pluginAddr: string): Promise<number> {
     return (
-      await this.ERC20Voting.getPluginInstanceWithSigner().participationRequiredPct()
+      await this.getConnectedPluginInstance(
+        pluginAddr
+      ).participationRequiredPct()
     ).toNumber();
   }
 
   /**
    * Returns the type of this plugin
    *
+   * @param {string} pluginAddr
    * @return {*}  {Promise<number>}
    * @memberof ERC20VotingMethods
    */
-  public pluginType(): Promise<number> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().pluginType();
+  public pluginType(pluginAddr: string): Promise<number> {
+    return this.getConnectedPluginInstance(pluginAddr).pluginType();
   }
 
   /**
    * Returns the proxable UUID
    *
+   * @param {string} pluginAddr
    * @return {*}  {Promise<string>}
    * @memberof ERC20VotingMethods
    */
-  public proxiableUUID(): Promise<string> {
-    return this.ERC20Voting.getPluginInstanceWithSigner().proxiableUUID();
+  public proxiableUUID(pluginAddr: string): Promise<string> {
+    return this.getConnectedPluginInstance(pluginAddr).proxiableUUID();
   }
 
   /**
@@ -278,7 +303,9 @@ export class ERC20VotingMethods {
   public async *setConfiguration(
     params: ISetConfigurationParams
   ): AsyncGenerator<VoteStepsValue> {
-    const tx = await this.ERC20Voting.getPluginInstanceWithSigner().setConfiguration(
+    const tx = await this.getConnectedPluginInstance(
+      params.pluginAddr
+    ).setConfiguration(
       BigNumber.from(params._participationRequiredPct),
       BigNumber.from(params._supportRequiredPct),
       BigNumber.from(params._minDuration)
@@ -296,12 +323,13 @@ export class ERC20VotingMethods {
   /**
    * Returns the configured required support
    *
+   * @param {string} pluginAddr
    * @return {*}  {Promise<number>}
    * @memberof ERC20VotingMethods
    */
-  public async supportRequiredPct(): Promise<number> {
+  public async supportRequiredPct(pluginAddr: string): Promise<number> {
     return (
-      await this.ERC20Voting.getPluginInstanceWithSigner().supportRequiredPct()
+      await this.getConnectedPluginInstance(pluginAddr).supportRequiredPct()
     ).toNumber();
   }
 
@@ -314,7 +342,7 @@ export class ERC20VotingMethods {
    * @memberof ERC20VotingMethods
    */
   public async *vote(params: IVoteParams): AsyncGenerator<VoteStepsValue> {
-    const tx = await this.ERC20Voting.getPluginInstanceWithSigner().vote(
+    const tx = await this.getConnectedPluginInstance(params.pluginAddr).vote(
       BigNumber.from(params._proposalId),
       BigNumber.from(params._choice),
       params._executesIfDecided
@@ -332,12 +360,13 @@ export class ERC20VotingMethods {
   /**
    * Returns the amount of proposals
    *
+   * @param {string} pluginAddr
    * @return {*}  {Promise<number>}
    * @memberof ERC20VotingMethods
    */
-  public async proposalsLength(): Promise<number> {
+  public async proposalsLength(pluginAddr: string): Promise<number> {
     return (
-      await this.ERC20Voting.getPluginInstanceWithSigner().votesLength()
+      await this.getConnectedPluginInstance(pluginAddr).votesLength()
     ).toNumber();
   }
 
@@ -354,9 +383,8 @@ export class ERC20VotingMethods {
     receipt: ContractReceipt,
     eventName: string
   ): EthersEvent[] {
-    const eventTopic = this.ERC20Voting.pluginInstance.interface.getEventTopic(
-      eventName
-    );
+    const contractInterface = ERC20Voting__factory.createInterface();
+    const eventTopic = contractInterface.getEventTopic(eventName);
     return (
       receipt.events?.filter(event => event.topics[0] === eventTopic) || []
     );

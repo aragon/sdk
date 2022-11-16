@@ -1,5 +1,4 @@
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
-import { BigNumberish } from "@ethersproject/bignumber";
 import {
   ICreateProposalParams,
   ISetConfigurationParams,
@@ -9,11 +8,6 @@ import { EncodingResultType } from "../../client-common";
 import { arrayify } from "@ethersproject/bytes";
 
 export class ERC20VotingEncoding {
-  private pluginAddr: string;
-  constructor(pluginAddr: string) {
-    this.pluginAddr = pluginAddr;
-  }
-
   /**
    * Private helper to encode function data
    *
@@ -46,17 +40,15 @@ export class ERC20VotingEncoding {
    * Encode parameters for the createProposal function
    *
    * @static
-   * @param {string} pluginAddr
    * @param {ICreateProposalParams} params
    * @return {*}  {IEncodingResult}
    * @memberof ERC20VotingEncoding
    */
   public static createProposal(
-    pluginAddr: string,
     params: ICreateProposalParams
   ): EncodingResultType {
     return this.getEncoding(
-      pluginAddr,
+      params.pluginAddr,
       "createVote",
       params._proposalMetadata,
       params._actions,
@@ -68,62 +60,34 @@ export class ERC20VotingEncoding {
   }
 
   /**
-   * Encode parameters for the createProposal function
-   *
-   * @param {ICreateProposalParams} params
-   * @return {*}  {IEncodingResult}
-   * @memberof ERC20VotingEncoding
-   */
-  public createProposal(params: ICreateProposalParams): EncodingResultType {
-    return ERC20VotingEncoding.createProposal(this.pluginAddr, params);
-  }
-
-  /**
    * Encode parameters for the execute function
    *
    * @static
    * @param {string} pluginAddr
-   * @param {BigNumberish} _proposalId
+   * @param {number} _proposalId
    * @return {*}  {IEncodingResult}
    * @memberof ERC20VotingEncoding
    */
   public static execute(
     pluginAddr: string,
-    _proposalId: BigNumberish
+    _proposalId: number
   ): EncodingResultType {
-    return ERC20VotingEncoding.getEncoding(
-      pluginAddr,
-      "execute",
-      _proposalId
-    );
-  }
-
-  /**
-   * Encode parameters for the execute function
-   *
-   * @param {BigNumberish} _proposalId
-   * @return {*}  {IEncodingResult}
-   * @memberof ERC20VotingEncoding
-   */
-  public execute(_proposalId: BigNumberish): EncodingResultType {
-    return ERC20VotingEncoding.execute(this.pluginAddr, _proposalId);
+    return ERC20VotingEncoding.getEncoding(pluginAddr, "execute", _proposalId);
   }
 
   /**
    * Encode parameters for the setConfiguration function
    *
    * @static
-   * @param {string} pluginAddr
    * @param {ISetConfigurationParams} params
    * @return {*}  {IEncodingResult}
    * @memberof ERC20VotingEncoding
    */
   public static setConfiguration(
-    pluginAddr: string,
     params: ISetConfigurationParams
   ): EncodingResultType {
     return ERC20VotingEncoding.getEncoding(
-      pluginAddr,
+      params.pluginAddr,
       "setConfiguration",
       params._participationRequiredPct,
       params._supportRequiredPct,
@@ -132,43 +96,20 @@ export class ERC20VotingEncoding {
   }
 
   /**
-   * Encode parameters for the setConfiguration function
-   *
-   * @param {ISetConfigurationParams} params
-   * @return {*}  {IEncodingResult}
-   * @memberof ERC20VotingEncoding
-   */
-  public setConfiguration(params: ISetConfigurationParams): EncodingResultType {
-    return ERC20VotingEncoding.setConfiguration(this.pluginAddr, params);
-  }
-
-  /**
    * Encode parameters for the vote function
    *
    * @static
-   * @param {string} pluginAddr
    * @param {IVoteParams} params
    * @return {*}  {IEncodingResult}
    * @memberof ERC20VotingEncoding
    */
-  public static vote(pluginAddr: string, params: IVoteParams): EncodingResultType {
+  public static vote(params: IVoteParams): EncodingResultType {
     return ERC20VotingEncoding.getEncoding(
-      pluginAddr,
+      params.pluginAddr,
       "vote",
       params._proposalId,
       params._choice,
       params._executesIfDecided
     );
-  }
-
-  /**
-   * Encode parameters for the vote function
-   *
-   * @param {IVoteParams} params
-   * @return {*}  {IEncodingResult}
-   * @memberof ERC20VotingEncoding
-   */
-  public vote(params: IVoteParams): EncodingResultType {
-    return ERC20VotingEncoding.vote(this.pluginAddr, params);
   }
 }

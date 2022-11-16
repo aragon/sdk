@@ -4,23 +4,21 @@ import { ERC20VotingEncoding } from "../../../src/erc20Voting/internal/encoding"
 describe("Erc20Voting", () => {
   describe("Encoding", () => {
     it("should encode createProposal", () => {
-      const encoded = ERC20VotingEncoding.createProposal(
-        "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
-        {
-          _actions: [
-            {
-              to: "0x6b4584A05EB28016aDf0B0A692DD71073Fe4B593",
-              value: BigInt("0"),
-              data: arrayify("0x123456"),
-            },
-          ],
-          _choice: 3,
-          _endDate: 56789,
-          _executeIfDecided: false,
-          _proposalMetadata: arrayify("0x11223344"),
-          _startDate: 1234,
-        }
-      );
+      const encoded = ERC20VotingEncoding.createProposal({
+        pluginAddr: "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
+        _actions: [
+          {
+            to: "0x6b4584A05EB28016aDf0B0A692DD71073Fe4B593",
+            value: BigInt("0"),
+            data: arrayify("0x123456"),
+          },
+        ],
+        _choice: 3,
+        _endDate: 56789,
+        _executeIfDecided: false,
+        _proposalMetadata: arrayify("0x11223344"),
+        _startDate: 1234,
+      });
 
       expect(encoded.to).toBe("0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822");
       expect(encoded.value).toBe(0);
@@ -46,14 +44,12 @@ describe("Erc20Voting", () => {
     });
 
     it("should encode setConfiguration", () => {
-      const encoded = ERC20VotingEncoding.setConfiguration(
-        "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
-        {
-          _minDuration: 56,
-          _supportRequiredPct: 34,
-          _participationRequiredPct: 12,
-        }
-      );
+      const encoded = ERC20VotingEncoding.setConfiguration({
+        pluginAddr: "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
+        _minDuration: 56,
+        _supportRequiredPct: 34,
+        _participationRequiredPct: 12,
+      });
       expect(encoded.to).toBe("0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822");
       expect(encoded.value).toBe(0);
       expect(encoded.data).toMatchObject(
@@ -64,14 +60,12 @@ describe("Erc20Voting", () => {
     });
 
     it("should encode vote", () => {
-      const encoded = ERC20VotingEncoding.vote(
-        "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
-        {
-          _proposalId: 1234,
-          _executesIfDecided: true,
-          _choice: 1,
-        }
-      );
+      const encoded = ERC20VotingEncoding.vote({
+        pluginAddr: "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
+        _proposalId: 1234,
+        _executesIfDecided: true,
+        _choice: 1,
+      });
 
       expect(encoded.to).toBe("0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822");
       expect(encoded.value).toBe(0);
