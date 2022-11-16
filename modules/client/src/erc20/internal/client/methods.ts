@@ -29,7 +29,6 @@ import {
   VoteProposalStep,
   VoteProposalStepValue,
 } from "../../../client-common";
-import { delay } from "../../../client-common/temp-mock";
 import {
   Erc20Proposal,
   Erc20ProposalListItem,
@@ -217,9 +216,14 @@ export class ClientErc20Methods extends ClientCore
       throw new InvalidProposalIdError();
     }
 
-    // TODO: Implement
-    await delay(1000);
-    return parseInt(params.address.slice(-1), 16) % 2 === 1;
+    const erc20VotingContract = ERC20Voting__factory.connect(
+      params.pluginAddress,
+      signer,
+    );
+    return erc20VotingContract.callStatic.canVote(
+      params.proposalId,
+      params.address,
+    );
   }
 
   /**

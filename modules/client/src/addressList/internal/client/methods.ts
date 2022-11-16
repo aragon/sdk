@@ -6,7 +6,6 @@ import {
   NoProviderError,
   Random,
 } from "@aragon/sdk-common";
-import { delay } from "../../../client-common/temp-mock";
 import { isAddress } from "@ethersproject/address";
 import {
   AddressListProposal,
@@ -216,9 +215,14 @@ export class ClientAddressListMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
 
-    // TODO: Implement
-    await delay(1000);
-    return parseInt(params.address.slice(-1), 16) % 2 === 1;
+    const addresslistContract = AllowlistVoting__factory.connect(
+      params.pluginAddress,
+      signer,
+    );
+    return addresslistContract.callStatic.canVote(
+      params.proposalId,
+      params.address,
+    );
   }
   /**
    * Returns the list of wallet addresses with signing capabilities on the plugin
