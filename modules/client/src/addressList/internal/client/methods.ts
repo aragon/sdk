@@ -3,7 +3,9 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
+  IpfsPinError,
   NoProviderError,
+  ProposalCreationError,
   Random,
 } from "@aragon/sdk-common";
 import { delay } from "../../../client-common/temp-mock";
@@ -60,12 +62,12 @@ export class ClientAddressListMethods extends ClientCore
   /**
    * Creates a new proposal on the given AddressList plugin contract
    *
-   * @param {ICreateProposalParams} _params
+   * @param {ICreateProposalParams} params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
    * @memberof ClientAddressListMethods
    */
   public async *createProposal(
-    _params: ICreateProposalParams,
+    params: ICreateProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -75,24 +77,28 @@ export class ClientAddressListMethods extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     let cid = "";
     try {
-      cid = await this.ipfs.add(JSON.stringify(_params.metadata));
+      // TODO: Compute the cid instead of uploading to the cluster
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
-      throw new Error("Could not pin the metadata on IPFS");
+      throw new IpfsPinError();
     }
+
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await addresslistContract.createVote(
       toUtf8Bytes(cid),
-      _params.actions || [],
-      Math.round(_params.startDate?.getTime() || 0 / 1000),
-      Math.round(_params.endDate?.getTime() || 0 / 1000),
-      _params.executeOnPass || false,
-      _params.creatorVote || 0,
+      params.actions || [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
+      params.executeOnPass || false,
+      params.creatorVote || 0,
     );
 
     yield {
@@ -113,12 +119,12 @@ export class ClientAddressListMethods extends ClientCore
           ),
     );
     if (!log) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
     if (!parsedLog.args["voteId"]) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
     yield {

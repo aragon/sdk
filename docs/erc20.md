@@ -245,13 +245,13 @@ so that the plugin is configured</p>
 **Kind**: global class  
 
 * [ClientErc20Estimation](#ClientErc20Estimation)
-    * [.createProposal(_params)](#ClientErc20Estimation+createProposal) ⇒ <code>\*</code>
+    * [.createProposal(params)](#ClientErc20Estimation+createProposal) ⇒ <code>\*</code>
     * [.voteProposal(_params)](#ClientErc20Estimation+voteProposal) ⇒ <code>\*</code>
     * [.executeProposal(_params)](#ClientErc20Estimation+executeProposal) ⇒ <code>\*</code>
 
 <a name="ClientErc20Estimation+createProposal"></a>
 
-### clientErc20Estimation.createProposal(_params) ⇒ <code>\*</code>
+### clientErc20Estimation.createProposal(params) ⇒ <code>\*</code>
 <p>Estimates the gas fee of creating a proposal on the plugin</p>
 
 **Kind**: instance method of [<code>ClientErc20Estimation</code>](#ClientErc20Estimation)  
@@ -259,7 +259,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| _params | <code>ICreateProposalParams</code> | 
+| params | <code>ICreateProposalParams</code> | 
 
 <a name="ClientErc20Estimation+voteProposal"></a>
 

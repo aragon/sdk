@@ -32,6 +32,7 @@ import {
   TEST_ERC20_PROPOSAL_ID,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
+  TEST_WALLET_ADDRESS,
 } from "../constants";
 import { EthereumProvider, Server } from "ganache";
 
@@ -46,10 +47,10 @@ describe("Client ERC20", () => {
     const daoCreation = await deployContracts.createERC20DAO(
       deployment,
       "testDAO",
-      [await contextParamsLocalChain.signer!.getAddress()],
+      [TEST_WALLET_ADDRESS],
     );
     pluginAddress = daoCreation.pluginAddrs[0];
-    // advance to get pass the voting checkpoint
+    // advance to get past the voting checkpoint
     await advanceBlocks(server.provider, 10);
   });
 
@@ -91,8 +92,7 @@ describe("Client ERC20", () => {
           },
           actions: [action],
           creatorVote: VoteValues.YES,
-          startDate: new Date(),
-          executeOnPass: true,
+          executeOnPass: false,
         };
 
         for await (

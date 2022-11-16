@@ -168,13 +168,13 @@ so that the plugin is configured</p>
 **Kind**: global class  
 
 * [ClientAddressListEstimation](#ClientAddressListEstimation)
-    * [.createProposal(_params)](#ClientAddressListEstimation+createProposal) ⇒ <code>\*</code>
+    * [.createProposal(params)](#ClientAddressListEstimation+createProposal) ⇒ <code>\*</code>
     * [.voteProposal(_params)](#ClientAddressListEstimation+voteProposal) ⇒ <code>\*</code>
     * [.executeProposal(_params)](#ClientAddressListEstimation+executeProposal) ⇒ <code>\*</code>
 
 <a name="ClientAddressListEstimation+createProposal"></a>
 
-### clientAddressListEstimation.createProposal(_params) ⇒ <code>\*</code>
+### clientAddressListEstimation.createProposal(params) ⇒ <code>\*</code>
 <p>Estimates the gas fee of creating a proposal on the plugin</p>
 
 **Kind**: instance method of [<code>ClientAddressListEstimation</code>](#ClientAddressListEstimation)  
@@ -182,7 +182,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| _params | <code>ICreateProposalParams</code> | 
+| params | <code>ICreateProposalParams</code> | 
 
 <a name="ClientAddressListEstimation+voteProposal"></a>
 
@@ -216,7 +216,7 @@ so that the plugin is configured</p>
 **Kind**: global class  
 
 * [ClientAddressListMethods](#ClientAddressListMethods)
-    * [.createProposal(_params)](#ClientAddressListMethods+createProposal) ⇒ <code>\*</code>
+    * [.createProposal(params)](#ClientAddressListMethods+createProposal) ⇒ <code>\*</code>
     * [.voteProposal(_params)](#ClientAddressListMethods+voteProposal) ⇒ <code>\*</code>
     * [.executeProposal(_params)](#ClientAddressListMethods+executeProposal) ⇒ <code>\*</code>
     * [.canVote(params)](#ClientAddressListMethods+canVote) ⇒ <code>\*</code>
@@ -227,7 +227,7 @@ so that the plugin is configured</p>
 
 <a name="ClientAddressListMethods+createProposal"></a>
 
-### clientAddressListMethods.createProposal(_params) ⇒ <code>\*</code>
+### clientAddressListMethods.createProposal(params) ⇒ <code>\*</code>
 <p>Creates a new proposal on the given AddressList plugin contract</p>
 
 **Kind**: instance method of [<code>ClientAddressListMethods</code>](#ClientAddressListMethods)  
@@ -235,7 +235,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| _params | <code>ICreateProposalParams</code> | 
+| params | <code>ICreateProposalParams</code> | 
 
 <a name="ClientAddressListMethods+voteProposal"></a>
 
