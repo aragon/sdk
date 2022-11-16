@@ -16,6 +16,10 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
+## [Upcoming]
+### Added
+- Added `createProposal()` using real contracts
+
 ## 0.12.0-alpha
 ### Changed
 - Examples folder and files
