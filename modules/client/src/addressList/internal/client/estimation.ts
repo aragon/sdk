@@ -9,6 +9,7 @@ import {
   IVoteProposalParams,
 } from "../../../client-common";
 import { IClientAddressListEstimation } from "../../interfaces";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Estimation module the SDK Address List Client
@@ -43,11 +44,18 @@ export class ClientAddressListEstimation extends ClientCore
       signer,
     );
 
+    let cid = "";
+    try {
+      // TODO: Compute the cid instead of uploading to the cluster
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
+    } catch {
+      throw new Error("Could not pin the metadata on IPFS");
+    }
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const estimatedGasFee = await addresslistContract.estimateGas.createVote(
-      [], // TODO: Compute the cid instead of hardcoded empty value
+      toUtf8Bytes(cid),
       params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),

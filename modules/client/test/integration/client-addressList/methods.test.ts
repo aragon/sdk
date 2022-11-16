@@ -31,6 +31,7 @@ import {
   TEST_ADDRESSLIST_PROPOSAL_ID,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
+  TEST_WALLET_ADDRESS,
 } from "../constants";
 import { EthereumProvider, Server } from "ganache";
 
@@ -45,10 +46,10 @@ describe("Client Address List", () => {
     const daoCreation = await deployContracts.createAddresslistDAO(
       deployment,
       "testDAO",
-      [await contextParamsLocalChain.signer!.getAddress()],
+      [TEST_WALLET_ADDRESS],
     );
     pluginAddress = daoCreation.pluginAddrs[0];
-    // advance to get pass the voting checkpoint
+    // advance to get past the voting checkpoint
     await advanceBlocks(server.provider, 10);
   });
 

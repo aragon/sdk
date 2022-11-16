@@ -48,6 +48,7 @@ import { toErc20Proposal, toErc20ProposalListItem } from "../utils";
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
+import { toUtf8Bytes } from "@ethersproject/strings";
 /**
  * Methods module the SDK ERC20 Client
  */
@@ -80,11 +81,19 @@ export class ClientErc20Methods extends ClientCore
       signer,
     );
 
+    let cid = "";
+    try {
+      // TODO: Compute the cid instead of uploading to the cluster
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
+    } catch {
+      throw new Error("Could not pin the metadata on IPFS");
+    }
+
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await erc20Contract.createVote(
-      [], // TODO: Compute the cid instead of hardcoded empty value
+      toUtf8Bytes(cid),
       params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
