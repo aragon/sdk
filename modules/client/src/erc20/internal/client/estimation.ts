@@ -66,21 +66,30 @@ export class ClientErc20Estimation extends ClientCore
   /**
    * Estimates the gas fee of casting a vote on a proposal
    *
-   * @param {IVoteProposalParams} _params
+   * @param {IVoteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientErc20Estimation
    */
-  public voteProposal(_params: IVoteProposalParams): Promise<GasFeeEstimation> {
+  public async voteProposal(
+    params: IVoteProposalParams,
+  ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new Error("A signer is needed");
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: remove this
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+    const erc20VotingContract = ERC20Voting__factory.connect(
+      params.pluginAddress,
+      signer,
     );
+
+    const estimation = await erc20VotingContract.estimateGas.vote(
+      params.proposalId,
+      params.vote,
+      false,
+    );
+    return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
 
   /**
