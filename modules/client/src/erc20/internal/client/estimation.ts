@@ -1,5 +1,5 @@
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
-import { Random } from "@aragon/sdk-common";
+import { Random,FailedToPinIPFS } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -47,7 +47,7 @@ export class ClientErc20Estimation extends ClientCore
       // TODO: Compute the cid instead of uploading to the cluster
       cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
-      throw new Error("Could not pin the metadata on IPFS");
+      throw new FailedToPinIPFS()
     }
 
     const startTimestamp = params.startDate?.getTime() || 0;

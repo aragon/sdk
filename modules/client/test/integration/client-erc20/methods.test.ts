@@ -92,7 +92,6 @@ describe("Client ERC20", () => {
           },
           actions: [action],
           creatorVote: VoteValues.YES,
-          startDate: new Date(),
           executeOnPass: false,
         };
 

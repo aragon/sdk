@@ -67,3 +67,9 @@ export class NoDaoRegistry extends Error {
     super("A dao registry address is needed");
   }
 }
+
+export class FailedToPinIPFS extends Error {
+  constructor() {
+    super("Failed to pin data on IPFS")
+  }
+}

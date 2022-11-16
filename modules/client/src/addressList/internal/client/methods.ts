@@ -5,6 +5,7 @@ import {
   InvalidProposalIdError,
   NoProviderError,
   Random,
+  FailedToPinIPFS
 } from "@aragon/sdk-common";
 import { delay } from "../../../client-common/temp-mock";
 import { isAddress } from "@ethersproject/address";
@@ -84,7 +85,7 @@ export class ClientAddressListMethods extends ClientCore
       // TODO: Compute the cid instead of uploading to the cluster
       cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
-      throw new Error("Could not pin the metadata on IPFS");
+      throw new FailedToPinIPFS()
     }
 
     const startTimestamp = params.startDate?.getTime() || 0;
