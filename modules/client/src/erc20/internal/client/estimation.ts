@@ -1,6 +1,5 @@
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { Random } from "@aragon/sdk-common";
-import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   ClientCore,
   ContextPlugin,
@@ -37,19 +36,19 @@ export class ClientErc20Estimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const addresslistContract = ERC20Voting__factory.connect(
+    const erc20Contract = ERC20Voting__factory.connect(
       params.pluginAddress,
       signer,
     );
 
-    // TODO: Compute the cid instead of pinning the data on the cluster
-    let cid = "";
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
 
-    const estimatedGasFee = await addresslistContract.estimateGas.createVote(
-      toUtf8Bytes(cid),
-      params.actions || [],
-      params.startDate?.getDate() || 0,
-      params.endDate?.getDate() || 0,
+    const estimatedGasFee = await erc20Contract.estimateGas.createVote(
+      [], // TODO: Compute the cid instead of hardcoded empty value
+      [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
       params.executeOnPass || false,
       params.creatorVote || 0,
     );

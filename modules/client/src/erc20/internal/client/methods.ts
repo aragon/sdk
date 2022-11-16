@@ -47,8 +47,7 @@ import {
 import { toErc20Proposal, toErc20ProposalListItem } from "../utils";
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
-import { toUtf8Bytes } from "@ethersproject/strings";
-import { hexZeroPad } from "@ethersproject/bytes";
+import { BytesLike, hexZeroPad } from "@ethersproject/bytes";
 /**
  * Methods module the SDK ERC20 Client
  */
@@ -81,14 +80,14 @@ export class ClientErc20Methods extends ClientCore
       signer,
     );
 
-    // TODO: Compute the cid instead of pinning the data on the cluster
-    let cid = "";
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await erc20Contract.createVote(
-      toUtf8Bytes(cid),
-      params.actions || [],
-      Math.round((params.startDate?.getTime() || 0) / 1000),
-      Math.round((params.endDate?.getTime() || 0) / 1000),
+      [], // TODO: Compute the cid instead of hardcoded empty value
+      [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
       params.executeOnPass || false,
       params.creatorVote || 0,
     );

@@ -9,7 +9,6 @@ import {
   IVoteProposalParams,
 } from "../../../client-common";
 import { IClientAddressListEstimation } from "../../interfaces";
-import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Estimation module the SDK Address List Client
@@ -44,14 +43,14 @@ export class ClientAddressListEstimation extends ClientCore
       signer,
     );
 
-    // TODO: Compute the cid instead of pinning the data on the cluster
-    let cid = "";
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
 
     const estimatedGasFee = await addresslistContract.estimateGas.createVote(
-      toUtf8Bytes(cid),
-      params.actions || [],
-      params.startDate?.getDate() || 0,
-      params.endDate?.getDate() || 0,
+      [], // TODO: Compute the cid instead of hardcoded empty value
+      [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
       params.executeOnPass || false,
       params.creatorVote || 0,
     );

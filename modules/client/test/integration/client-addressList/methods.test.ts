@@ -90,7 +90,7 @@ describe("Client Address List", () => {
         actions: [action],
         creatorVote: VoteValues.YES,
         startDate: new Date(),
-        executeOnPass: true,
+        executeOnPass: false,
       };
 
       for await (

@@ -45,7 +45,6 @@ import { QueryAddressListPluginSettings } from "../graphql-queries/settings";
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
-import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Methods module the SDK Address List Client
@@ -79,14 +78,14 @@ export class ClientAddressListMethods extends ClientCore
       signer,
     );
 
-    // TODO: Compute the cid instead of pinning the data on the cluster
-    let cid = "";
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await addresslistContract.createVote(
-      toUtf8Bytes(cid),
-      params.actions || [],
-      Math.round((params.startDate?.getTime() || 0) / 1000),
-      Math.round((params.endDate?.getTime() || 0) / 1000),
+      [], // TODO: Compute the cid instead of hardcoded empty value
+      [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
       params.executeOnPass || false,
       params.creatorVote || 0,
     );
