@@ -1,5 +1,4 @@
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
-import { Random } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   ClientCore,
@@ -97,7 +96,7 @@ export class ClientErc20Estimation extends ClientCore
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientErc20Estimation
    */
-  public executeProposal(
+  public async executeProposal(
     _params: IExecuteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -106,9 +105,14 @@ export class ClientErc20Estimation extends ClientCore
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: remove this
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+
+    const erc20VotingContract = ERC20Voting__factory.connect(
+      _params.pluginAddress,
+      signer,
     );
+    const estimation = await erc20VotingContract.estimateGas.execute(
+      _params.proposalId,
+    );
+    return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
 }

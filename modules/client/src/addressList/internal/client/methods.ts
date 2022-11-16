@@ -184,14 +184,17 @@ export class ClientAddressListMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    // TODO: Implement
-    await delay(1000);
+    const addresslistContract = AllowlistVoting__factory.connect(
+      _params.pluginAddress,
+      signer,
+    );
+    const tx = await addresslistContract.execute(_params.proposalId);
+
     yield {
       key: ExecuteProposalStep.EXECUTING,
-      txHash:
-        "0x0123456789012345678901234567890123456789012345678901234567890123",
+      txHash: tx.hash,
     };
-    await delay(3000);
+    await tx.wait();
     yield {
       key: ExecuteProposalStep.DONE,
     };

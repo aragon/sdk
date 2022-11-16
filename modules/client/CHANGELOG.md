@@ -20,6 +20,7 @@ TEMPLATE:
 ### Added
 - Added `createProposal()` using real contracts
 - Added `vote()` on proposals using real contracts
+- Added `execute()` on proposals using real contracts
 
 ## 0.12.0-alpha
 ### Changed
