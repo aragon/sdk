@@ -85,9 +85,7 @@ export class ClientErc20Estimation extends ClientCore
       _params.vote,
       false,
     );
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(estimation.toBigInt()),
-    );
+    return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
 
   /**
