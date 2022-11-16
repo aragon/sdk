@@ -176,12 +176,12 @@ export class ClientAddressListMethods extends ClientCore
   /**
    * Executes the given proposal, provided that it has already passed
    *
-   * @param {IExecuteProposalParams} _params
+   * @param {IExecuteProposalParams} params
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
    * @memberof ClientAddressListMethods
    */
   public async *executeProposal(
-    _params: IExecuteProposalParams,
+    params: IExecuteProposalParams,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -191,10 +191,10 @@ export class ClientAddressListMethods extends ClientCore
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
-    const tx = await addresslistContract.execute(_params.proposalId);
+    const tx = await addresslistContract.execute(params.proposalId);
 
     yield {
       key: ExecuteProposalStep.EXECUTING,

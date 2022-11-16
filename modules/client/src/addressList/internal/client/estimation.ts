@@ -30,7 +30,6 @@ export class ClientAddressListEstimation extends ClientCore
    * @memberof ClientAddressListEstimation
    */
   public async createProposal(
-
     params: ICreateProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -99,12 +98,12 @@ export class ClientAddressListEstimation extends ClientCore
   /**
    * Estimates the gas fee of executing an AddressList proposal
    *
-   * @param {IExecuteProposalParams} _params
+   * @param {IExecuteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientAddressListEstimation
    */
   public async executeProposal(
-    _params: IExecuteProposalParams,
+    params: IExecuteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -113,11 +112,11 @@ export class ClientAddressListEstimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
     const addresslistContract = AllowlistVoting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
     const estimation = await addresslistContract.estimateGas.execute(
-      _params.proposalId,
+      params.proposalId,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
