@@ -32,16 +32,26 @@ import {
   TEST_ERC20_PROPOSAL_ID,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
+  TEST_WALLET_ADDRESS,
 } from "../constants";
-import { Server } from "ganache";
+import { EthereumProvider, Server } from "ganache";
 
 describe("Client ERC20", () => {
+  let pluginAddress: string;
   let server: Server;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
     const deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    const daoCreation = await deployContracts.createERC20DAO(
+      deployment,
+      "testDAO",
+      [TEST_WALLET_ADDRESS],
+    );
+    pluginAddress = daoCreation.pluginAddrs[0];
+    // advance to get past the voting checkpoint
+    await advanceBlocks(server.provider, 10);
   });
 
   afterAll(async () => {
@@ -57,17 +67,14 @@ describe("Client ERC20", () => {
         const client = new Client(ctx);
 
         // generate actions
-        const action = await client.encoding.withdrawAction(
-          "0x1234567890123456789012345678901234567890",
-          {
-            recipientAddress: "0x1234567890123456789012345678901234567890",
-            amount: BigInt(1),
-            reference: "test",
-          }
-        );
+        const action = await client.encoding.withdrawAction(pluginAddress, {
+          recipientAddress: "0x1234567890123456789012345678901234567890",
+          amount: BigInt(1),
+          reference: "test",
+        });
 
         const proposalParams: ICreateProposalParams = {
-          pluginAddress: "0x1234567890123456789012345678901234567890",
+          pluginAddress,
           metadata: {
             title: "Best Proposal",
             summary: "this is the sumnary",
@@ -85,14 +92,14 @@ describe("Client ERC20", () => {
           },
           actions: [action],
           creatorVote: VoteValues.YES,
-          startDate: new Date(),
-          endDate: new Date(),
-          executeOnPass: true,
+          executeOnPass: false,
         };
 
-        for await (const step of erc20Client.methods.createProposal(
-          proposalParams
-        )) {
+        for await (
+          const step of erc20Client.methods.createProposal(
+            proposalParams,
+          )
+        ) {
           switch (step.key) {
             case ProposalCreationSteps.CREATING:
               expect(typeof step.txHash).toBe("string");
@@ -105,7 +112,7 @@ describe("Client ERC20", () => {
             default:
               throw new Error(
                 "Unexpected proposal creation step: " +
-                  Object.keys(step).join(", ")
+                  Object.keys(step).join(", "),
               );
           }
         }
@@ -136,7 +143,8 @@ describe("Client ERC20", () => {
               break;
             default:
               throw new Error(
-                "Unexpected vote proposal step: " + Object.keys(step).join(", ")
+                "Unexpected vote proposal step: " +
+                  Object.keys(step).join(", "),
               );
           }
         }
@@ -154,9 +162,11 @@ describe("Client ERC20", () => {
           proposalId: "0x1234567890123456789012345678901234567890",
         };
 
-        for await (const step of client.methods.executeProposal(
-          executeParams
-        )) {
+        for await (
+          const step of client.methods.executeProposal(
+            executeParams,
+          )
+        ) {
           switch (step.key) {
             case ExecuteProposalStep.EXECUTING:
               expect(typeof step.txHash).toBe("string");
@@ -167,7 +177,7 @@ describe("Client ERC20", () => {
             default:
               throw new Error(
                 "Unexpected execute proposal step: " +
-                  Object.keys(step).join(", ")
+                  Object.keys(step).join(", "),
               );
           }
         }
@@ -262,11 +272,11 @@ describe("Client ERC20", () => {
           expect(typeof proposal.settings.minTurnout).toBe("number");
           expect(
             proposal.settings.minSupport >= 0 &&
-              proposal.settings.minSupport <= 1
+              proposal.settings.minSupport <= 1,
           ).toBe(true);
           expect(
             proposal.settings.minTurnout >= 0 &&
-              proposal.settings.minTurnout <= 1
+              proposal.settings.minTurnout <= 1,
           ).toBe(true);
           // token
           expect(typeof proposal.token.name).toBe("string");
@@ -385,7 +395,7 @@ describe("Client ERC20", () => {
           daoAddressOrEns: address,
         };
         await expect(() => client.methods.getProposals(params)).rejects.toThrow(
-          new InvalidAddressOrEnsError()
+          new InvalidAddressOrEnsError(),
         );
       });
       it("Should get the settings of a plugin given a plugin instance address", async () => {
@@ -426,3 +436,12 @@ describe("Client ERC20", () => {
     });
   });
 });
+
+async function advanceBlocks(
+  provider: EthereumProvider,
+  amountOfBlocks: number,
+) {
+  for (let i = 0; i < amountOfBlocks; i++) {
+    await provider.send("evm_mine", []);
+  }
+}

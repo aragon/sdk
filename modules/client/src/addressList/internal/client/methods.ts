@@ -3,7 +3,9 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
+  IpfsPinError,
   NoProviderError,
+  ProposalCreationError,
   Random,
 } from "@aragon/sdk-common";
 import { delay } from "../../../client-common/temp-mock";
@@ -42,6 +44,10 @@ import {
 } from "../graphql-queries/proposal";
 import { toAddressListProposal, toAddressListProposalListItem } from "../utils";
 import { QueryAddressListPluginSettings } from "../graphql-queries/settings";
+import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import { id } from "@ethersproject/hash";
+import { hexZeroPad } from "@ethersproject/bytes";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Methods module the SDK Address List Client
@@ -56,12 +62,12 @@ export class ClientAddressListMethods extends ClientCore
   /**
    * Creates a new proposal on the given AddressList plugin contract
    *
-   * @param {ICreateProposalParams} _params
+   * @param {ICreateProposalParams} params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
    * @memberof ClientAddressListMethods
    */
   public async *createProposal(
-    _params: ICreateProposalParams,
+    params: ICreateProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -70,18 +76,60 @@ export class ClientAddressListMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    // TODO: Implement
-    await delay(1000);
+    const addresslistContract = AllowlistVoting__factory.connect(
+      params.pluginAddress,
+      signer,
+    );
+
+    let cid = "";
+    try {
+      // TODO: Compute the cid instead of uploading to the cluster
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
+    } catch {
+      throw new IpfsPinError();
+    }
+
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
+
+    const tx = await addresslistContract.createVote(
+      toUtf8Bytes(cid),
+      params.actions || [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
+      params.executeOnPass || false,
+      params.creatorVote || 0,
+    );
+
     yield {
       key: ProposalCreationSteps.CREATING,
-      txHash:
-        "0x0123456789012345678901234567890123456789012345678901234567890123",
+      txHash: tx.hash,
     };
-    await delay(3000);
+
+    const receipt = await tx.wait();
+    const addresslistContractInterface = AllowlistVoting__factory
+      .createInterface();
+    const log = receipt.logs.find(
+      (log) =>
+        log.topics[0] ===
+          id(
+            addresslistContractInterface.getEvent("VoteCreated").format(
+              "sighash",
+            ),
+          ),
+    );
+    if (!log) {
+      throw new ProposalCreationError();
+    }
+
+    const parsedLog = addresslistContractInterface.parseLog(log);
+    if (!parsedLog.args["voteId"]) {
+      throw new ProposalCreationError();
+    }
+
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId:
-        "0x0123456789012345678901234567890123456789012345678901234567890123",
+      proposalId: hexZeroPad(parsedLog.args["voteId"].toHexString(), 32),
     };
   }
   /**
@@ -152,9 +200,7 @@ export class ClientAddressListMethods extends ClientCore
    * @return {*}  {Promise<boolean>}
    * @memberof ClientAddressListMethods
    */
-  public async canVote(
-    params: ICanVoteParams,
-  ): Promise<boolean> {
+  public async canVote(params: ICanVoteParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer.provider) {
       throw new NoProviderError();
@@ -206,14 +252,13 @@ export class ClientAddressListMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { allowlistProposal: addressListProposal }: {
+      const {
+        allowlistProposal: addressListProposal,
+      }: {
         allowlistProposal: SubgraphAddressListProposal;
-      } = await client.request(
-        QueryAddressListProposal,
-        {
-          proposalId,
-        },
-      );
+      } = await client.request(QueryAddressListProposal, {
+        proposalId,
+      });
       if (!addressListProposal) {
         return null;
       }
@@ -244,16 +289,14 @@ export class ClientAddressListMethods extends ClientCore
    * @return {*}  {Promise<AddressListProposalListItem[]>}
    * @memberof ClientAddressListMethods
    */
-  public async getProposals(
-    {
-      daoAddressOrEns,
-      limit = 10,
-      status,
-      skip = 0,
-      direction = SortDirection.ASC,
-      sortBy = ProposalSortBy.CREATED_AT,
-    }: IProposalQueryParams,
-  ): Promise<AddressListProposalListItem[]> {
+  public async getProposals({
+    daoAddressOrEns,
+    limit = 10,
+    status,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = ProposalSortBy.CREATED_AT,
+  }: IProposalQueryParams): Promise<AddressListProposalListItem[]> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {
@@ -277,18 +320,17 @@ export class ClientAddressListMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { allowlistProposals: addressListProposals }: {
+      const {
+        allowlistProposals: addressListProposals,
+      }: {
         allowlistProposals: SubgraphAddressListProposalListItem[];
-      } = await client.request(
-        QueryAddressListProposals,
-        {
-          where,
-          limit,
-          skip,
-          direction,
-          sortBy,
-        },
-      );
+      } = await client.request(QueryAddressListProposals, {
+        where,
+        limit,
+        skip,
+        direction,
+        sortBy,
+      });
       await this.ipfs.ensureOnline();
       return Promise.all(
         addressListProposals.map(
@@ -299,13 +341,13 @@ export class ClientAddressListMethods extends ClientCore
             // delete this cid once the proposals in subgraph have the correct
             // format in the metadata field
             const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
-            return this.ipfs.fetchString(test_cid).then(
-              (stringMetadata: string) => {
+            return this.ipfs
+              .fetchString(test_cid)
+              .then((stringMetadata: string) => {
                 // TODO: Parse and validate schema
                 const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
                 return toAddressListProposalListItem(proposal, metadata);
-              },
-            );
+              });
           },
         ),
       );

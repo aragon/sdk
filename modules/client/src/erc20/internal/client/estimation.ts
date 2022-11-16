@@ -1,4 +1,5 @@
-import { Random } from "@aragon/sdk-common";
+import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
+import { IpfsPinError, Random } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -8,6 +9,7 @@ import {
   IVoteProposalParams,
 } from "../../../client-common";
 import { IClientErc20Estimation } from "../../interfaces";
+import { toUtf8Bytes } from "@ethersproject/strings";
 /**
  * Estimation module the SDK ERC20 Client
  */
@@ -21,12 +23,12 @@ export class ClientErc20Estimation extends ClientCore
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *
-   * @param {ICreateProposalParams} _params
+   * @param {ICreateProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientErc20Estimation
    */
-  public createProposal(
-    _params: ICreateProposalParams,
+  public async createProposal(
+    params: ICreateProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -35,25 +37,31 @@ export class ClientErc20Estimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    // TODO: Remove below as the new contracts are ready
-
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+    const erc20Contract = ERC20Voting__factory.connect(
+      params.pluginAddress,
+      signer,
     );
 
-    // TODO: Uncomment below as the new contracts are ready
-    /*
-    const erc20VotingInstance = ERC20Voting__factory.connect(
-      this._pluginAddress,
-      signer
-    );
+    let cid = "";
+    try {
+      // TODO: Compute the cid instead of uploading to the cluster
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
+    } catch {
+      throw new IpfsPinError();
+    }
 
-    return erc20VotingInstance.estimateGas.newVote(
-      ...unwrapProposalParams(params),
-    ).then((gasLimit) => {
-      return this.web3.getApproximateGasFee(gasLimit.toBigInt());
-    });
-    */
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
+
+    const estimatedGasFee = await erc20Contract.estimateGas.createVote(
+      toUtf8Bytes(cid),
+      params.actions || [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
+      params.executeOnPass || false,
+      params.creatorVote || 0,
+    );
+    return this.web3.getApproximateGasFee(estimatedGasFee.toBigInt());
   }
   /**
    * Estimates the gas fee of casting a vote on a proposal

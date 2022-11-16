@@ -31,16 +31,26 @@ import {
   TEST_ADDRESSLIST_PROPOSAL_ID,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
+  TEST_WALLET_ADDRESS,
 } from "../constants";
-import { Server } from "ganache";
+import { EthereumProvider, Server } from "ganache";
 
 describe("Client Address List", () => {
+  let pluginAddress: string;
   let server: Server;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
     const deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    const daoCreation = await deployContracts.createAddresslistDAO(
+      deployment,
+      "testDAO",
+      [TEST_WALLET_ADDRESS],
+    );
+    pluginAddress = daoCreation.pluginAddrs[0];
+    // advance to get past the voting checkpoint
+    await advanceBlocks(server.provider, 10);
   });
 
   afterAll(async () => {
@@ -55,17 +65,14 @@ describe("Client Address List", () => {
       const client = new Client(ctx);
 
       // generate actions
-      const action = await client.encoding.withdrawAction(
-        "0x1234567890123456789012345678901234567890",
-        {
-          recipientAddress: "0x1234567890123456789012345678901234567890",
-          amount: BigInt(1),
-          reference: "test",
-        }
-      );
+      const action = await client.encoding.withdrawAction(pluginAddress, {
+        recipientAddress: "0x1234567890123456789012345678901234567890",
+        amount: BigInt(1),
+        reference: "test",
+      });
 
       const proposalParams: ICreateProposalParams = {
-        pluginAddress: "0x1234567890123456789012345678901234567890",
+        pluginAddress,
         metadata: {
           title: "Best Proposal",
           summary: "this is the sumnary",
@@ -83,14 +90,14 @@ describe("Client Address List", () => {
         },
         actions: [action],
         creatorVote: VoteValues.YES,
-        startDate: new Date(),
-        endDate: new Date(),
-        executeOnPass: true,
+        executeOnPass: false,
       };
 
-      for await (const step of addressListClient.methods.createProposal(
-        proposalParams
-      )) {
+      for await (
+        const step of addressListClient.methods.createProposal(
+          proposalParams,
+        )
+      ) {
         switch (step.key) {
           case ProposalCreationSteps.CREATING:
             expect(typeof step.txHash).toBe("string");
@@ -103,7 +110,7 @@ describe("Client Address List", () => {
           default:
             throw new Error(
               "Unexpected proposal creation step: " +
-                Object.keys(step).join(", ")
+                Object.keys(step).join(", "),
             );
         }
       }
@@ -134,7 +141,7 @@ describe("Client Address List", () => {
             break;
           default:
             throw new Error(
-              "Unexpected vote proposal step: " + Object.keys(step).join(", ")
+              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
             );
         }
       }
@@ -162,7 +169,7 @@ describe("Client Address List", () => {
           default:
             throw new Error(
               "Unexpected execute proposal step: " +
-                Object.keys(step).join(", ")
+                Object.keys(step).join(", "),
             );
         }
       }
@@ -192,7 +199,7 @@ describe("Client Address List", () => {
       const client = new ClientAddressList(ctxPlugin);
 
       const wallets = await client.methods.getMembers(
-        TEST_ADDRESSLIST_DAO_ADDDRESS
+        TEST_ADDRESSLIST_DAO_ADDDRESS,
       );
 
       expect(Array.isArray(wallets)).toBe(true);
@@ -370,7 +377,7 @@ describe("Client Address List", () => {
         daoAddressOrEns: address,
       };
       await expect(() => client.methods.getProposals(params)).rejects.toThrow(
-        new InvalidAddressOrEnsError()
+        new InvalidAddressOrEnsError(),
       );
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
@@ -390,3 +397,12 @@ describe("Client Address List", () => {
     });
   });
 });
+
+async function advanceBlocks(
+  provider: EthereumProvider,
+  amountOfBlocks: number,
+) {
+  for (let i = 0; i < amountOfBlocks; i++) {
+    await provider.send("evm_mine", []);
+  }
+}
