@@ -4,7 +4,9 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidProposalIdError,
+  IpfsPinError,
   NoProviderError,
+  ProposalCreationError,
   Random,
 } from "@aragon/sdk-common";
 import { formatEther } from "@ethersproject/units";
@@ -47,8 +49,8 @@ import {
 import { toErc20Proposal, toErc20ProposalListItem } from "../utils";
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
-import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexZeroPad } from "@ethersproject/bytes";
+import { toUtf8Bytes } from "@ethersproject/strings";
 /**
  * Methods module the SDK ERC20 Client
  */
@@ -67,7 +69,7 @@ export class ClientErc20Methods extends ClientCore
    * @memberof ClientErc20
    */
   public async *createProposal(
-    _params: ICreateProposalParams,
+    params: ICreateProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -77,24 +79,28 @@ export class ClientErc20Methods extends ClientCore
     }
 
     const erc20Contract = ERC20Voting__factory.connect(
-      _params.pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     let cid = "";
     try {
-      cid = await this.ipfs.add(JSON.stringify(_params.metadata));
+      // TODO: Compute the cid instead of uploading to the cluster
+      cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
-      throw new Error("Could not pin the metadata on IPFS");
+      throw new IpfsPinError();
     }
+
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await erc20Contract.createVote(
       toUtf8Bytes(cid),
-      _params.actions || [],
-      Math.round(_params.startDate?.getTime() || 0 / 1000),
-      Math.round(_params.endDate?.getTime() || 0 / 1000),
-      _params.executeOnPass || false,
-      _params.creatorVote || 0,
+      params.actions || [],
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
+      params.executeOnPass || false,
+      params.creatorVote || 0,
     );
 
     yield {
@@ -103,23 +109,23 @@ export class ClientErc20Methods extends ClientCore
     };
 
     const receipt = await tx.wait();
-    const addresslistContractInterface = ERC20Voting__factory.createInterface();
+    const erc20VotingContractInterface = ERC20Voting__factory.createInterface();
     const log = receipt.logs.find(
       (log) =>
         log.topics[0] ===
           id(
-            addresslistContractInterface.getEvent("VoteCreated").format(
+            erc20VotingContractInterface.getEvent("VoteCreated").format(
               "sighash",
             ),
           ),
     );
     if (!log) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
-    const parsedLog = addresslistContractInterface.parseLog(log);
+    const parsedLog = erc20VotingContractInterface.parseLog(log);
     if (!parsedLog.args["voteId"]) {
-      throw new Error("Failed to create proposal");
+      throw new ProposalCreationError();
     }
 
     yield {

@@ -5,7 +5,9 @@ const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
     "base64",
-  ).toString().trim();
+  )
+    .toString()
+    .trim();
 
 export const web3endpoints = {
   working: [
@@ -50,6 +52,7 @@ const grapqhlEndpoints = {
   failing: [{ url: "https://bad-url-gateway.io/" }],
 };
 
+export const TEST_WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 export const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 export const TEST_ERC20_PROPOSAL_ID =
