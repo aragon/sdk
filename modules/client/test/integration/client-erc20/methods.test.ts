@@ -192,7 +192,7 @@ describe("Client ERC20", () => {
 
         const params: ICanVoteParams = {
           address: "0x1234567890123456789012345678901234567890",
-          proposalId: "0x1234567890123456789012345678901234567890_0x1",
+          proposalId: "0x1234567890123456789012345678901234567890",
           pluginAddress: "0x1234567890123456789012345678901234567890",
         };
         const canVote = await client.methods.canVote(params);
