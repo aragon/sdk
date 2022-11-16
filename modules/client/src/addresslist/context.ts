@@ -1,14 +1,14 @@
 import { ContextPlugin, ContextPluginParams } from "../client-common";
 import {
-  IAllowlistVotingContextParams,
-  IAllowlistVotingContextPluginState,
+  IAddresslistContextParams,
+  IAddresslistContextPluginState,
 } from "./interfaces";
 
-export class AllowlistVotingContextPlugin extends ContextPlugin<
-  IAllowlistVotingContextPluginState
+export class AddresslistContextPlugin extends ContextPlugin<
+  IAddresslistContextPluginState
 > {
   constructor(
-    params: Partial<ContextPluginParams> & IAllowlistVotingContextParams
+    params: Partial<ContextPluginParams> & IAddresslistContextParams
   ) {
     super(params);
     this.state.pluginAddress = params.pluginAddress;

@@ -1,5 +1,5 @@
 export { Client } from "./client";
-export * from "./allowlistVoting";
+export * from "./addresslist";
 export * from "./client-common";
 export {
   AssetBalance,

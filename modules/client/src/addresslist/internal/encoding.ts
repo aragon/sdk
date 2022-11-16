@@ -8,7 +8,7 @@ import {
 import { EncodingResultType } from "../../client-common";
 import { arrayify } from "@ethersproject/bytes";
 
-export class AllowlistVotingEncoding {
+export class AddresslistEncoding {
   private pluginAddr: string;
   constructor(pluginAddr: string) {
     this.pluginAddr = pluginAddr;
@@ -23,7 +23,7 @@ export class AllowlistVotingEncoding {
    * @param {string} functionName
    * @param {...any[]} args
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   private static getEncoding(
     pluginAddr: string,
@@ -49,13 +49,13 @@ export class AllowlistVotingEncoding {
    * @param {string} pluginAddr
    * @param {string[]} _users
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public static addAllowedUsers(
     pluginAddr: string,
     _users: string[]
   ): EncodingResultType {
-    return AllowlistVotingEncoding.getEncoding(
+    return AddresslistEncoding.getEncoding(
       pluginAddr,
       "addAllowedUsers",
       _users
@@ -67,10 +67,10 @@ export class AllowlistVotingEncoding {
    *
    * @param {string[]} _users
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public addAllowedUsers(_users: string[]): EncodingResultType {
-    return AllowlistVotingEncoding.addAllowedUsers(this.pluginAddr, _users);
+    return AddresslistEncoding.addAllowedUsers(this.pluginAddr, _users);
   }
 
   /**
@@ -80,7 +80,7 @@ export class AllowlistVotingEncoding {
    * @param {string} pluginAddr
    * @param {ICreateProposalParams} params
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public static createProposal(
     pluginAddr: string,
@@ -103,10 +103,10 @@ export class AllowlistVotingEncoding {
    *
    * @param {ICreateProposalParams} params
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public createProposal(params: ICreateProposalParams): EncodingResultType {
-    return AllowlistVotingEncoding.createProposal(this.pluginAddr, params);
+    return AddresslistEncoding.createProposal(this.pluginAddr, params);
   }
 
   /**
@@ -116,13 +116,13 @@ export class AllowlistVotingEncoding {
    * @param {string} pluginAddr
    * @param {BigNumberish} _proposalId
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public static execute(
     pluginAddr: string,
     _proposalId: BigNumberish
   ): EncodingResultType {
-    return AllowlistVotingEncoding.getEncoding(pluginAddr, "execute", _proposalId);
+    return AddresslistEncoding.getEncoding(pluginAddr, "execute", _proposalId);
   }
 
   /**
@@ -130,10 +130,10 @@ export class AllowlistVotingEncoding {
    *
    * @param {BigNumberish} _proposalId
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public execute(_proposalId: BigNumberish): EncodingResultType {
-    return AllowlistVotingEncoding.execute(this.pluginAddr, _proposalId);
+    return AddresslistEncoding.execute(this.pluginAddr, _proposalId);
   }
 
   /**
@@ -143,13 +143,13 @@ export class AllowlistVotingEncoding {
    * @param {string} pluginAddr
    * @param {string[]} _users
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public static removeAllowedUsers(
     pluginAddr: string,
     _users: string[]
   ): EncodingResultType {
-    return AllowlistVotingEncoding.getEncoding(
+    return AddresslistEncoding.getEncoding(
       pluginAddr,
       "removeAllowedUsers",
       _users
@@ -161,10 +161,10 @@ export class AllowlistVotingEncoding {
    *
    * @param {string[]} _users
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public removeAllowedUsers(_users: string[]): EncodingResultType {
-    return AllowlistVotingEncoding.removeAllowedUsers(this.pluginAddr, _users);
+    return AddresslistEncoding.removeAllowedUsers(this.pluginAddr, _users);
   }
 
   /**
@@ -174,13 +174,13 @@ export class AllowlistVotingEncoding {
    * @param {string} pluginAddr
    * @param {ISetConfigurationParams} params
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public static setConfiguration(
     pluginAddr: string,
     params: ISetConfigurationParams
   ): EncodingResultType {
-    return AllowlistVotingEncoding.getEncoding(
+    return AddresslistEncoding.getEncoding(
       pluginAddr,
       "setConfiguration",
       params._participationRequiredPct,
@@ -194,10 +194,10 @@ export class AllowlistVotingEncoding {
    *
    * @param {ISetConfigurationParams} params
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public setConfiguration(params: ISetConfigurationParams): EncodingResultType {
-    return AllowlistVotingEncoding.setConfiguration(this.pluginAddr, params);
+    return AddresslistEncoding.setConfiguration(this.pluginAddr, params);
   }
 
   /**
@@ -207,10 +207,13 @@ export class AllowlistVotingEncoding {
    * @param {string} pluginAddr
    * @param {IVoteParams} params
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
-  public static vote(pluginAddr: string, params: IVoteParams): EncodingResultType {
-    return AllowlistVotingEncoding.getEncoding(
+  public static vote(
+    pluginAddr: string,
+    params: IVoteParams
+  ): EncodingResultType {
+    return AddresslistEncoding.getEncoding(
       pluginAddr,
       "vote",
       params._proposalId,
@@ -224,9 +227,9 @@ export class AllowlistVotingEncoding {
    *
    * @param {IVoteParams} params
    * @return {*}  {IEncodingResult}
-   * @memberof AllowlistVotingEncoding
+   * @memberof AddresslistEncoding
    */
   public vote(params: IVoteParams): EncodingResultType {
-    return AllowlistVotingEncoding.vote(this.pluginAddr, params);
+    return AddresslistEncoding.vote(this.pluginAddr, params);
   }
 }

@@ -18,10 +18,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
-- Removes old `allowListVoting` and `ERC20Voting` implementations
+- Removes old `addresslist` and `ERC20Voting` implementations
 - Removes "Update Changelog" step from `javascript_publish.yaml` workflow
 ### Added
-- Adds support for `AllowlistVoting` and `ERC20Voting` plugins
+- Adds support for `Addresslist` and `ERC20Voting` plugins
 
 ## 0.12.0-alpha
 ### Changed

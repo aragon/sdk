@@ -1,10 +1,10 @@
 import { arrayify } from "@ethersproject/bytes";
-import { AllowlistVotingEncoding } from "../../../src/allowlistVoting/internal/encoding";
+import { AddresslistEncoding } from "../../../src/addresslist/internal/encoding";
 
-describe("AllowlistVoting", () => {
+describe("Addresslist", () => {
   describe("Encoding", () => {
     it("should encode addAllowedUsers", () => {
-      const encoded = AllowlistVotingEncoding.addAllowedUsers(
+      const encoded = AddresslistEncoding.addAllowedUsers(
         "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
         [
           "0x691cFABc66853b28173f32913AA1690B608Dde6E",
@@ -22,7 +22,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should encode removeAllowedUsers", () => {
-      const encoded = AllowlistVotingEncoding.removeAllowedUsers(
+      const encoded = AddresslistEncoding.removeAllowedUsers(
         "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
         [
           "0x691cFABc66853b28173f32913AA1690B608Dde6E",
@@ -43,7 +43,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should encode createProposal", () => {
-      const encoded = AllowlistVotingEncoding.createProposal(
+      const encoded = AddresslistEncoding.createProposal(
         "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
         {
           _actions: [
@@ -71,7 +71,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should encode execute", () => {
-      const encoded = AllowlistVotingEncoding.execute(
+      const encoded = AddresslistEncoding.execute(
         "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
         5
       );
@@ -85,7 +85,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should encode setConfiguration", () => {
-      const encoded = AllowlistVotingEncoding.setConfiguration(
+      const encoded = AddresslistEncoding.setConfiguration(
         "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
         {
           _minDuration: 56,
@@ -103,7 +103,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should encode vote", () => {
-      const encoded = AllowlistVotingEncoding.vote(
+      const encoded = AddresslistEncoding.vote(
         "0x52045E6f5161E817E2C4c4b1dD1dADACc0cb3822",
         {
           _proposalId: 1234,

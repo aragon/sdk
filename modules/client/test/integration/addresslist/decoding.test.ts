@@ -1,10 +1,10 @@
 import { arrayify } from "@ethersproject/bytes";
-import { AllowlistVotingDecoding } from "../../../src/allowlistVoting/internal/decoding";
+import { AddresslistDecoding } from "../../../src/addresslist/internal/decoding";
 
-describe("AllowlistVoting", () => {
+describe("Addresslist", () => {
   describe("Decoding", () => {
     it("should decode addAllowedUsers (data)", () => {
-      const decoded = AllowlistVotingDecoding.addAllowedUsers(
+      const decoded = AddresslistDecoding.addAllowedUsers(
         "0x49e61d3700000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000691cfabc66853b28173f32913aa1690b608dde6e00000000000000000000000033ceb226e9fd4a2bde59e5de69a2652bb964cb670000000000000000000000007f474647942755bf2dd8bb5ce62a70baed016601"
       );
       expect(decoded._users[0]).toBe(
@@ -19,7 +19,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode addAllowedUsers (tx)", () => {
-      const decoded = AllowlistVotingDecoding.addAllowedUsers({
+      const decoded = AddresslistDecoding.addAllowedUsers({
         to: "0x2A681D76E4E55920cf0761b9F5d50f35DF8c4dd0",
         value: 0,
         data: arrayify(
@@ -38,7 +38,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode removeAllowedUsers (data)", () => {
-      const decoded = AllowlistVotingDecoding.removeAllowedUsers(
+      const decoded = AddresslistDecoding.removeAllowedUsers(
         "0x28471eff00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000691cfabc66853b28173f32913aa1690b608dde6e00000000000000000000000033ceb226e9fd4a2bde59e5de69a2652bb964cb670000000000000000000000007f474647942755bf2dd8bb5ce62a70baed016601"
       );
       expect(decoded._users[0]).toBe(
@@ -53,7 +53,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode removeAllowedUsers (tx)", () => {
-      const decoded = AllowlistVotingDecoding.removeAllowedUsers({
+      const decoded = AddresslistDecoding.removeAllowedUsers({
         to: "0x2A681D76E4E55920cf0761b9F5d50f35DF8c4dd0",
         value: 0,
         data: arrayify(
@@ -72,7 +72,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode createProposal (data)", () => {
-      const decoded = AllowlistVotingDecoding.createProposal(
+      const decoded = AddresslistDecoding.createProposal(
         "0xe910689700000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000004d2000000000000000000000000000000000000000000000000000000000000ddd50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000041122334400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000006b4584a05eb28016adf0b0a692dd71073fe4b5930000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000031234560000000000000000000000000000000000000000000000000000000000"
       );
       expect(decoded._actions).toMatchObject([
@@ -90,7 +90,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode createProposal (tx)", () => {
-      const decoded = AllowlistVotingDecoding.createProposal({
+      const decoded = AddresslistDecoding.createProposal({
         to: "0x2A681D76E4E55920cf0761b9F5d50f35DF8c4dd0",
         value: 0,
         data: arrayify(
@@ -112,14 +112,14 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode execute (data)", () => {
-      const decoded = AllowlistVotingDecoding.execute(
+      const decoded = AddresslistDecoding.execute(
         "0xfe0d94c10000000000000000000000000000000000000000000000000000000000000005"
       );
       expect(decoded._proposalId).toBe(5);
     });
 
     it("should decode execute (tx)", () => {
-      const decoded = AllowlistVotingDecoding.execute({
+      const decoded = AddresslistDecoding.execute({
         to: "0x2A681D76E4E55920cf0761b9F5d50f35DF8c4dd0",
         value: 0,
         data: arrayify(
@@ -130,7 +130,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode setConfiguration (data)", () => {
-      const decoded = AllowlistVotingDecoding.setConfiguration(
+      const decoded = AddresslistDecoding.setConfiguration(
         "0x9b979e2f000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000220000000000000000000000000000000000000000000000000000000000000038"
       );
       expect(decoded._participationRequiredPct).toBe(12);
@@ -139,7 +139,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode setConfiguration (tx)", () => {
-      const decoded = AllowlistVotingDecoding.setConfiguration({
+      const decoded = AddresslistDecoding.setConfiguration({
         to: "0x2A681D76E4E55920cf0761b9F5d50f35DF8c4dd0",
         value: 0,
         data: arrayify(
@@ -152,7 +152,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode vote (data)", () => {
-      const decoded = AllowlistVotingDecoding.vote(
+      const decoded = AddresslistDecoding.vote(
         "0xce6366c400000000000000000000000000000000000000000000000000000000000004d200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
       );
       expect(decoded._proposalId).toBe(1234);
@@ -161,7 +161,7 @@ describe("AllowlistVoting", () => {
     });
 
     it("should decode vote (tx)", () => {
-      const decoded = AllowlistVotingDecoding.vote({
+      const decoded = AddresslistDecoding.vote({
         to: "0x2A681D76E4E55920cf0761b9F5d50f35DF8c4dd0",
         value: 0,
         data: arrayify(

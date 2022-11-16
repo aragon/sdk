@@ -1,10 +1,10 @@
-interface IAllowlistVoting {
+interface IAddresslist {
   pluginAddress: string;
 }
 
-export interface IAllowlistVotingContextParams extends IAllowlistVoting {}
+export interface IAddresslistContextParams extends IAddresslist {}
 
-export interface IAllowlistVotingContextPluginState extends IAllowlistVoting {}
+export interface IAddresslistContextPluginState extends IAddresslist {}
 
 export interface ProposalAction {
   to: string;

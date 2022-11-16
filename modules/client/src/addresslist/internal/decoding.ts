@@ -9,7 +9,7 @@ import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 import { DecodingTXType } from "../../client-common";
 import { BigNumberish } from "@ethersproject/bignumber";
 
-export class AllowlistVotingDecoding {
+export class AddresslistDecoding {
   /**
    * Private helper to decode data or a TX for a function
    *
@@ -19,7 +19,7 @@ export class AllowlistVotingDecoding {
    * @param {string} functionFragment
    * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {T}
-   * @memberof AllowlistVotingDecoding
+   * @memberof AddresslistDecoding
    */
   private static getDecodedData<T extends { [key: string]: any }>(
     functionFragment: string,
@@ -47,7 +47,7 @@ export class AllowlistVotingDecoding {
    * @static
    * @param {(Array<Array<string | BigNumberish>>)} data
    * @return {*}  {ProposalAction[]}
-   * @memberof AllowlistVotingDecoding
+   * @memberof AddresslistDecoding
    */
   private static parseActions(
     data: Array<Array<string | BigNumberish>>
@@ -71,12 +71,12 @@ export class AllowlistVotingDecoding {
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {{ _users: string[] }}
-   * @memberof AllowlistVotingDecoding
+   * @memberof AddresslistDecoding
    */
   public static addAllowedUsers(
     txOrData: DecodingTXType | BytesLike
   ): { _users: string[] } {
-    return AllowlistVotingDecoding.getDecodedData("addAllowedUsers", txOrData);
+    return AddresslistDecoding.getDecodedData("addAllowedUsers", txOrData);
   }
 
   /**
@@ -85,22 +85,19 @@ export class AllowlistVotingDecoding {
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {ICreateProposalParams}
-   * @memberof AllowlistVotingDecoding
+   * @memberof AddresslistDecoding
    */
   public static createProposal(
     txOrData: DecodingTXType | BytesLike
   ): ICreateProposalParams {
-    const decoded = AllowlistVotingDecoding.getDecodedData(
-      "createVote",
-      txOrData
-    );
+    const decoded = AddresslistDecoding.getDecodedData("createVote", txOrData);
 
     return {
       ...decoded,
       _choice: parseInt(decoded._choice.toString()),
       _endDate: parseInt(decoded._endDate.toString()),
       _startDate: parseInt(decoded._startDate.toString()),
-      _actions: AllowlistVotingDecoding.parseActions(decoded._actions),
+      _actions: AddresslistDecoding.parseActions(decoded._actions),
     } as ICreateProposalParams;
   }
 
@@ -110,12 +107,12 @@ export class AllowlistVotingDecoding {
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {{ _proposalId: string }}
-   * @memberof AllowlistVotingDecoding
+   * @memberof AddresslistDecoding
    */
   public static execute(
     txOrData: DecodingTXType | BytesLike
   ): { _proposalId: number } {
-    const data = AllowlistVotingDecoding.getDecodedData("execute", txOrData);
+    const data = AddresslistDecoding.getDecodedData("execute", txOrData);
     return {
       _proposalId: parseInt(data._voteId.toString()),
     };
@@ -127,15 +124,12 @@ export class AllowlistVotingDecoding {
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {{ _users: string[] }}
-   * @memberof AllowlistVotingDecoding
+   * @memberof AddresslistDecoding
    */
   public static removeAllowedUsers(
     txOrData: DecodingTXType | BytesLike
   ): { _users: string[] } {
-    return AllowlistVotingDecoding.getDecodedData(
-      "removeAllowedUsers",
-      txOrData
-    );
+    return AddresslistDecoding.getDecodedData("removeAllowedUsers", txOrData);
   }
 
   /**
@@ -144,12 +138,12 @@ export class AllowlistVotingDecoding {
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {ISetConfigurationParams}
-   * @memberof AllowlistVotingDecoding
+   * @memberof AddresslistDecoding
    */
   public static setConfiguration(
     txOrData: DecodingTXType | BytesLike
   ): ISetConfigurationParams {
-    const data = AllowlistVotingDecoding.getDecodedData(
+    const data = AddresslistDecoding.getDecodedData(
       "setConfiguration",
       txOrData
     );
@@ -168,10 +162,10 @@ export class AllowlistVotingDecoding {
    * @static
    * @param {(DecodingTXType | BytesLike)} txOrData
    * @return {*}  {IVoteParams}
-   * @memberof AllowlistVotingDecoding
+   * @memberof AddresslistDecoding
    */
   public static vote(txOrData: DecodingTXType | BytesLike): IVoteParams {
-    const data = AllowlistVotingDecoding.getDecodedData("vote", txOrData);
+    const data = AddresslistDecoding.getDecodedData("vote", txOrData);
     return {
       _choice: parseInt(data._choice.toString()),
       _executesIfDecided: data._executesIfDecided,

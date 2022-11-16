@@ -17,8 +17,8 @@ export interface Deployment {
   daoFactory: aragonContracts.DAOFactory;
   erc20Repo: aragonContracts.PluginRepo;
   erc20PluginSetup: aragonContracts.ERC20VotingSetup;
-  allowListRepo: aragonContracts.PluginRepo;
-  allowListPluginSetup: aragonContracts.AllowlistVotingSetup;
+  addresslistRepo: aragonContracts.PluginRepo;
+  addresslistPluginSetup: aragonContracts.AllowlistVotingSetup;
 }
 
 export async function deploy(): Promise<Deployment> {
@@ -144,20 +144,20 @@ export async function deploy(): Promise<Deployment> {
       .connect(deployOwnerWallet)
       .attach(erc20RepoAddr);
 
-    const allowListFactory = new aragonContracts.AllowlistVotingSetup__factory();
-    const allowListPluginSetup = await allowListFactory
+    const addresslistFactory = new aragonContracts.AllowlistVotingSetup__factory();
+    const addresslistPluginSetup = await addresslistFactory
       .connect(deployOwnerWallet)
       .deploy();
-    const allowListRepoAddr = await deployPlugin(
+    const addresslistRepoAddr = await deployPlugin(
       pluginRepoFactory,
-      allowListPluginSetup.address,
-      "AllowlistVoting",
+      addresslistPluginSetup.address,
+      "Addresslist",
       [1, 0, 0],
       deployOwnerWallet
     );
-    const allowListRepo = pluginRepo_Factory
+    const addresslistRepo = pluginRepo_Factory
       .connect(deployOwnerWallet)
-      .attach(allowListRepoAddr);
+      .attach(addresslistRepoAddr);
 
     // send ETH to hardcoded wallet in tests
     await deployOwnerWallet.sendTransaction({
@@ -169,8 +169,8 @@ export async function deploy(): Promise<Deployment> {
       daoFactory,
       erc20Repo,
       erc20PluginSetup,
-      allowListRepo,
-      allowListPluginSetup,
+      addresslistRepo,
+      addresslistPluginSetup,
     };
   } catch (e) {
     throw e;
@@ -291,7 +291,7 @@ export async function createDAO(
   };
 }
 
-export async function createAllowlistDAO(
+export async function createAddresslistDAO(
   deployment: Deployment,
   name: string,
   addresses: string[] = []
@@ -305,8 +305,8 @@ export async function createAllowlistDAO(
     },
     [
       {
-        pluginSetup: deployment.allowListPluginSetup.address,
-        pluginSetupRepo: deployment.allowListRepo.address,
+        pluginSetup: deployment.addresslistPluginSetup.address,
+        pluginSetupRepo: deployment.addresslistRepo.address,
         data: defaultAbiCoder.encode(
           ["uint64", "uint64", "uint64", "address[]"],
           [1, 1, 1, addresses]

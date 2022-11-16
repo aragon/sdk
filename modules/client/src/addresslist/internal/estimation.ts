@@ -1,16 +1,16 @@
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
-import { AllowlistVoting } from "../client";
+import { Addresslist } from "../client";
 import {
   ICreateProposalParams,
   ISetConfigurationParams,
   IVoteParams,
 } from "../interfaces";
 
-export class AllowlistVotingEstimation {
-  private allowlistVoting: AllowlistVoting;
+export class AddresslistEstimation {
+  private addresslist: Addresslist;
 
-  constructor(allowlistVoting: AllowlistVoting) {
-    this.allowlistVoting = allowlistVoting;
+  constructor(addresslist: Addresslist) {
+    this.addresslist = addresslist;
   }
 
   /**
@@ -18,10 +18,10 @@ export class AllowlistVotingEstimation {
    *
    * @param {string[]} _users
    * @return {*}  {Promise<BigNumber>}
-   * @memberof AllowlistVotingEstimation
+   * @memberof AddresslistEstimation
    */
   public async addAllowedUsers(_users: string[]): Promise<BigNumber> {
-    return this.allowlistVoting
+    return this.addresslist
       .getPluginInstance()
       .estimateGas.addAllowedUsers(_users);
   }
@@ -31,12 +31,12 @@ export class AllowlistVotingEstimation {
    *
    * @param {ICreateProposalParams} params
    * @return {*}  {Promise<BigNumber>}
-   * @memberof AllowlistVotingEstimation
+   * @memberof AddresslistEstimation
    */
   public async createProposal(
     params: ICreateProposalParams
   ): Promise<BigNumber> {
-    return this.allowlistVoting.getPluginInstance().estimateGas.createVote(
+    return this.addresslist.getPluginInstance().estimateGas.createVote(
       params._proposalMetadata,
       params._actions.map(action => ({
         ...action,
@@ -54,10 +54,10 @@ export class AllowlistVotingEstimation {
    *
    * @param {BigNumberish} _proposalId
    * @return {*}  {Promise<BigNumber>}
-   * @memberof AllowlistVotingEstimation
+   * @memberof AddresslistEstimation
    */
   public async execute(_proposalId: BigNumberish): Promise<BigNumber> {
-    return this.allowlistVoting
+    return this.addresslist
       .getPluginInstance()
       .estimateGas.execute(_proposalId);
   }
@@ -67,10 +67,10 @@ export class AllowlistVotingEstimation {
    *
    * @param {string[]} _users
    * @return {*}  {Promise<BigNumber>}
-   * @memberof AllowlistVotingEstimation
+   * @memberof AddresslistEstimation
    */
   public async removeAllowedUsers(_users: string[]): Promise<BigNumber> {
-    return this.allowlistVoting
+    return this.addresslist
       .getPluginInstance()
       .estimateGas.removeAllowedUsers(_users);
   }
@@ -80,12 +80,12 @@ export class AllowlistVotingEstimation {
    *
    * @param {ISetConfigurationParams} params
    * @return {*}  {Promise<BigNumber>}
-   * @memberof AllowlistVotingEstimation
+   * @memberof AddresslistEstimation
    */
   public async setConfiguration(
     params: ISetConfigurationParams
   ): Promise<BigNumber> {
-    return this.allowlistVoting
+    return this.addresslist
       .getPluginInstance()
       .estimateGas.setConfiguration(
         BigNumber.from(params._participationRequiredPct),
@@ -99,10 +99,10 @@ export class AllowlistVotingEstimation {
    *
    * @param {IVoteParams} params
    * @return {*}  {Promise<BigNumber>}
-   * @memberof AllowlistVotingEstimation
+   * @memberof AddresslistEstimation
    */
   public async vote(params: IVoteParams): Promise<BigNumber> {
-    return this.allowlistVoting
+    return this.addresslist
       .getPluginInstance()
       .estimateGas.vote(
         BigNumber.from(params._proposalId),

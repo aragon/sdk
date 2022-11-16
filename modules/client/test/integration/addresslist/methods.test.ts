@@ -2,26 +2,26 @@ import { DAO, DAO__factory } from "@aragon/core-contracts-ethers";
 import { JsonRpcProvider, Provider } from "@ethersproject/providers";
 import { Server } from "ganache";
 import {
-  createAllowlistDAO,
+  createAddresslistDAO,
   deploy,
   Deployment,
 } from "../../helpers/deployContracts";
 import { start } from "../../helpers/ganache-setup";
 import {
-  AllowlistVoting,
-  AllowlistVotingContextPlugin,
+  Addresslist,
+  AddresslistContextPlugin,
   Steps,
-} from "../../../src/allowlistVoting";
+} from "../../../src/addresslist";
 import { Signer } from "@ethersproject/abstract-signer";
 import { Wallet } from "@ethersproject/wallet";
 import { id } from "@ethersproject/hash";
 import { arrayify } from "@ethersproject/bytes";
 
-describe("AllowlistVoting", () => {
+describe("Addresslist", () => {
   describe("Methods", () => {
     let server: Server;
     let deployments: Deployment;
-    let allowlistVoting: AllowlistVoting;
+    let addresslist: Addresslist;
     let daoAddr: string;
     let signer: Signer;
     let provider: JsonRpcProvider;
@@ -35,19 +35,19 @@ describe("AllowlistVoting", () => {
       provider = new JsonRpcProvider("http://127.0.0.1:8545");
       signer = provider.getSigner();
 
-      let createDaoReturns = await createAllowlistDAO(
+      let createDaoReturns = await createAddresslistDAO(
         deployments,
         Math.round(Math.random() * 2000).toString(16),
         [await signer.getAddress()]
       );
-      const context = new AllowlistVotingContextPlugin({
+      const context = new AddresslistContextPlugin({
         pluginAddress: createDaoReturns.pluginAddrs[0],
         daoFactoryAddress: deployments.daoFactory.address,
         web3Providers: [provider],
         signer: signer,
       });
 
-      allowlistVoting = new AllowlistVoting(context);
+      addresslist = new Addresslist(context);
       daoAddr = createDaoReturns.daoAddr;
     });
 
@@ -57,9 +57,9 @@ describe("AllowlistVoting", () => {
 
     it("should add users", async () => {
       await becomeRoot(
-        allowlistVoting,
+        addresslist,
         daoAddr,
-        allowlistVoting.pluginInstance.address,
+        addresslist.pluginInstance.address,
         await signer.getAddress()
       );
       const randomUsers: string[] = [];
@@ -68,12 +68,12 @@ describe("AllowlistVoting", () => {
       randomUsers.push(Wallet.createRandom().address);
       const dao = getDAOInstance(daoAddr, signer);
       await dao.grant(
-        allowlistVoting.pluginInstance.address,
+        addresslist.pluginInstance.address,
         await signer.getAddress(),
         id("MODIFY_ALLOWLIST_PERMISSION")
       );
 
-      const call = await allowlistVoting.methods.addAllowedUsers(randomUsers);
+      const call = await addresslist.methods.addAllowedUsers(randomUsers);
       const pendingStep = await call.next();
       const doneStep = await call.next();
 
@@ -87,7 +87,7 @@ describe("AllowlistVoting", () => {
       const blockNumber = await provider.getBlockNumber();
       for (const user of randomUsers) {
         expect(
-          await allowlistVoting.methods.isAllowed(user, BigInt(blockNumber - 1))
+          await addresslist.methods.isAllowed(user, BigInt(blockNumber - 1))
         ).toBe(true);
       }
     });
@@ -95,15 +95,15 @@ describe("AllowlistVoting", () => {
     it("should return the correct user count", async () => {
       await advanceBlocks(provider, 5);
       let blockNumber = await provider.getBlockNumber();
-      let count = await allowlistVoting.methods.allowedUserCount(
+      let count = await addresslist.methods.allowedUserCount(
         BigInt(blockNumber - 1)
       );
       expect(count.toString()).toBe("1");
 
       await becomeRoot(
-        allowlistVoting,
+        addresslist,
         daoAddr,
-        allowlistVoting.pluginInstance.address,
+        addresslist.pluginInstance.address,
         await signer.getAddress()
       );
       const randomUsers: string[] = [];
@@ -112,49 +112,49 @@ describe("AllowlistVoting", () => {
       randomUsers.push(Wallet.createRandom().address);
       const dao = getDAOInstance(daoAddr, signer);
       await dao.grant(
-        allowlistVoting.pluginInstance.address,
+        addresslist.pluginInstance.address,
         await signer.getAddress(),
         id("MODIFY_ALLOWLIST_PERMISSION")
       );
 
-      const call = await allowlistVoting.methods.addAllowedUsers(randomUsers);
+      const call = await addresslist.methods.addAllowedUsers(randomUsers);
       await call.next();
       await call.next();
 
       await advanceBlocks(provider, 5);
 
       blockNumber = await provider.getBlockNumber();
-      count = await allowlistVoting.methods.allowedUserCount(
+      count = await addresslist.methods.allowedUserCount(
         BigInt(blockNumber - 1)
       );
       expect(count.toString()).toBe("4");
     });
 
     it("should return the correct canExecute", async () => {
-      const proposalId = await createProposal(allowlistVoting);
-      expect(await allowlistVoting.methods.canExecute(proposalId)).toBe(true);
-      const execute = await allowlistVoting.methods.execute(proposalId);
+      const proposalId = await createProposal(addresslist);
+      expect(await addresslist.methods.canExecute(proposalId)).toBe(true);
+      const execute = await addresslist.methods.execute(proposalId);
       await execute.next();
       await execute.next();
-      expect(await allowlistVoting.methods.canExecute(proposalId)).toBe(false);
+      expect(await addresslist.methods.canExecute(proposalId)).toBe(false);
     });
 
     it("should return the correct canVote", async () => {
-      const proposalId = await createProposal(allowlistVoting);
+      const proposalId = await createProposal(addresslist);
       const signerAddress = await signer.getAddress();
       expect(
-        await allowlistVoting.methods.canVote(proposalId, signerAddress)
+        await addresslist.methods.canVote(proposalId, signerAddress)
       ).toBe(true);
-      const execute = await allowlistVoting.methods.execute(proposalId);
+      const execute = await addresslist.methods.execute(proposalId);
       await execute.next();
       await execute.next();
       expect(
-        await allowlistVoting.methods.canVote(proposalId, signerAddress)
+        await addresslist.methods.canVote(proposalId, signerAddress)
       ).toBe(false);
     });
 
     it("should create a proposal", async () => {
-      const generator = allowlistVoting.methods.createProposal({
+      const generator = addresslist.methods.createProposal({
         _proposalMetadata: arrayify("0x000001"),
         _actions: [
           {
@@ -183,8 +183,8 @@ describe("AllowlistVoting", () => {
     });
 
     it("should execute", async () => {
-      const proposalId = await createProposal(allowlistVoting);
-      const generator = allowlistVoting.methods.execute(proposalId);
+      const proposalId = await createProposal(addresslist);
+      const generator = addresslist.methods.execute(proposalId);
       const pendingStep = await generator.next();
       const doneStep = await generator.next();
 
@@ -200,13 +200,13 @@ describe("AllowlistVoting", () => {
       const startDate = Date.now();
       const endDate = startDate + 3600;
       const proposalId = await createProposal(
-        allowlistVoting,
+        addresslist,
         toAddr,
         startDate,
         endDate
       );
       await advanceBlocks(provider, 2);
-      const proposal = await allowlistVoting.methods.getProposal(proposalId);
+      const proposal = await addresslist.methods.getProposal(proposalId);
       expect(proposal.id).toBe(proposalId);
       expect(proposal.open).toBe(false);
       expect(proposal.executed).toBe(false);
@@ -219,16 +219,16 @@ describe("AllowlistVoting", () => {
 
     it("should allow to vote", async () => {
       await advanceBlocks(provider, 2);
-      const proposalId = await createProposal(allowlistVoting);
+      const proposalId = await createProposal(addresslist);
 
       const voterAddr = await signer.getAddress();
-      let vote = await allowlistVoting.methods.getVoteOption(
+      let vote = await addresslist.methods.getVoteOption(
         proposalId,
         voterAddr
       );
       expect(vote).toBe(2);
 
-      const voting = await allowlistVoting.methods.vote({
+      const voting = await addresslist.methods.vote({
         _proposalId: proposalId,
         _choice: 3,
         _executesIfDecided: false,
@@ -236,7 +236,7 @@ describe("AllowlistVoting", () => {
       await voting.next();
       await voting.next();
 
-      vote = await allowlistVoting.methods.getVoteOption(proposalId, voterAddr);
+      vote = await addresslist.methods.getVoteOption(proposalId, voterAddr);
       expect(vote).toBe(3);
     });
 
@@ -244,9 +244,9 @@ describe("AllowlistVoting", () => {
       await advanceBlocks(provider, 5);
       await provider.getBlockNumber();
       await becomeRoot(
-        allowlistVoting,
+        addresslist,
         daoAddr,
-        allowlistVoting.pluginInstance.address,
+        addresslist.pluginInstance.address,
         await signer.getAddress()
       );
       const randomUsers: string[] = [];
@@ -255,12 +255,12 @@ describe("AllowlistVoting", () => {
       randomUsers.push(Wallet.createRandom().address);
       const dao = getDAOInstance(daoAddr, signer);
       await dao.grant(
-        allowlistVoting.pluginInstance.address,
+        addresslist.pluginInstance.address,
         await signer.getAddress(),
         id("MODIFY_ALLOWLIST_PERMISSION")
       );
 
-      const call = await allowlistVoting.methods.addAllowedUsers(randomUsers);
+      const call = await addresslist.methods.addAllowedUsers(randomUsers);
       await call.next();
       await call.next();
 
@@ -269,13 +269,13 @@ describe("AllowlistVoting", () => {
       let blockNumber = await provider.getBlockNumber();
 
       expect(
-        await allowlistVoting.methods.isAllowed(
+        await addresslist.methods.isAllowed(
           randomUsers[0],
           BigInt(blockNumber - 1)
         )
       ).toBe(true);
 
-      const removeCall = await allowlistVoting.methods.removeAllowedUsers([
+      const removeCall = await addresslist.methods.removeAllowedUsers([
         randomUsers[0],
       ]);
       await removeCall.next();
@@ -286,7 +286,7 @@ describe("AllowlistVoting", () => {
       blockNumber = await provider.getBlockNumber();
 
       expect(
-        await allowlistVoting.methods.isAllowed(
+        await addresslist.methods.isAllowed(
           randomUsers[0],
           BigInt(blockNumber - 1)
         )
@@ -295,20 +295,20 @@ describe("AllowlistVoting", () => {
 
     it("should change the configuration", async () => {
       await becomeRoot(
-        allowlistVoting,
+        addresslist,
         daoAddr,
-        allowlistVoting.pluginInstance.address,
+        addresslist.pluginInstance.address,
         await signer.getAddress()
       );
 
       const dao = getDAOInstance(daoAddr, signer);
       await dao.grant(
-        allowlistVoting.pluginInstance.address,
+        addresslist.pluginInstance.address,
         await signer.getAddress(),
         id("SET_CONFIGURATION_PERMISSION")
       );
 
-      const steps = await allowlistVoting.methods.setConfiguration({
+      const steps = await addresslist.methods.setConfiguration({
         _participationRequiredPct: 20,
         _supportRequiredPct: 30,
         _minDuration: 40,
@@ -316,20 +316,20 @@ describe("AllowlistVoting", () => {
       await steps.next();
       await steps.next();
 
-      expect(await allowlistVoting.methods.participationRequiredPct()).toBe(20);
-      expect(await allowlistVoting.methods.supportRequiredPct()).toBe(30);
-      expect(await allowlistVoting.methods.minDuration()).toBe(40);
+      expect(await addresslist.methods.participationRequiredPct()).toBe(20);
+      expect(await addresslist.methods.supportRequiredPct()).toBe(30);
+      expect(await addresslist.methods.minDuration()).toBe(40);
     });
   });
 });
 
 async function createProposal(
-  allowlistVoting: AllowlistVoting,
+  addresslist: Addresslist,
   to: string = Wallet.createRandom().address,
   startDate: number = 0,
   endDate: number = 0
 ): Promise<number> {
-  const generator = allowlistVoting.methods.createProposal({
+  const generator = addresslist.methods.createProposal({
     _proposalMetadata: arrayify("0x00"),
     _actions: [
       {
@@ -354,7 +354,7 @@ async function createProposal(
 }
 
 async function becomeRoot(
-  allowlistVoting: AllowlistVoting,
+  addresslist: Addresslist,
   daoAddr: string,
   where: string,
   who: string
@@ -364,7 +364,7 @@ async function becomeRoot(
     who,
     id("ROOT_PERMISSION"),
   ]);
-  const voteGenerator = allowlistVoting.methods.createProposal({
+  const voteGenerator = addresslist.methods.createProposal({
     _proposalMetadata: arrayify("0x00"),
     _actions: [
       {
