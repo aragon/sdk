@@ -185,7 +185,7 @@ describe("Client Address List", () => {
       const params: ICanVoteParams = {
         address: "0x1234567890123456789012345678901234567890",
         proposalId: "0x1234567890123456789012345678901234567890",
-        pluginAddress: "0x1234567890123456789012345678901234567890",
+        pluginAddress,
       };
       const canVote = await client.methods.canVote(params);
       expect(typeof canVote).toBe("boolean");
