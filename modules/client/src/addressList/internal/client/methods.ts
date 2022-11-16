@@ -211,8 +211,6 @@ export class ClientAddressListMethods extends ClientCore
       throw new NoProviderError();
     } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
-    } else if (!isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
     }
 
     const addresslistContract = AllowlistVoting__factory.connect(

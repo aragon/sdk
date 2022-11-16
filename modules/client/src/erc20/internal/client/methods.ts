@@ -212,8 +212,6 @@ export class ClientErc20Methods extends ClientCore
       throw new NoProviderError();
     } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
-    } else if (!isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
     }
 
     const erc20VotingContract = ERC20Voting__factory.connect(
