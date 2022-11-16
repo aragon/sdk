@@ -25,7 +25,6 @@ import {
   IExecuteProposalParams,
   IPluginSettings,
   IProposalQueryParams,
-  isProposalId,
   IVoteProposalParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
