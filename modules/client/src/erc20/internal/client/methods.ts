@@ -182,7 +182,7 @@ export class ClientErc20Methods extends ClientCore
    * @memberof ClientErc20
    */
   public async *executeProposal(
-    _params: IExecuteProposalParams,
+    params: IExecuteProposalParams,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -191,14 +191,17 @@ export class ClientErc20Methods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    // TODO: Implement
-    await delay(1000);
+    const erc20VotingContract = ERC20Voting__factory.connect(
+      params.pluginAddress,
+      signer,
+    );
+    const tx = await erc20VotingContract.execute(params.proposalId);
+
     yield {
       key: ExecuteProposalStep.EXECUTING,
-      txHash:
-        "0x0123456789012345678901234567890123456789012345678901234567890123",
+      txHash: tx.hash,
     };
-    await delay(3000);
+    await tx.wait();
     yield {
       key: ExecuteProposalStep.DONE,
     };

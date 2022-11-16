@@ -1,5 +1,5 @@
 import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
-import { IpfsPinError, Random } from "@aragon/sdk-common";
+import { IpfsPinError } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -30,7 +30,6 @@ export class ClientAddressListEstimation extends ClientCore
    * @memberof ClientAddressListEstimation
    */
   public async createProposal(
-
     params: ICreateProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
@@ -99,12 +98,12 @@ export class ClientAddressListEstimation extends ClientCore
   /**
    * Estimates the gas fee of executing an AddressList proposal
    *
-   * @param {IExecuteProposalParams} _params
+   * @param {IExecuteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientAddressListEstimation
    */
-  public executeProposal(
-    _params: IExecuteProposalParams,
+  public async executeProposal(
+    params: IExecuteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -112,9 +111,13 @@ export class ClientAddressListEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    // TODO: Implement
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+    const addresslistContract = AllowlistVoting__factory.connect(
+      params.pluginAddress,
+      signer,
     );
+    const estimation = await addresslistContract.estimateGas.execute(
+      params.proposalId,
+    );
+    return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
 }
