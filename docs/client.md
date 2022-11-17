@@ -257,7 +257,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 * [ClientMethods](#ClientMethods)
     * [.create(params)](#ClientMethods+create) ⇒ <code>\*</code>
     * [.deposit(params)](#ClientMethods+deposit) ⇒ <code>\*</code>
-    * [.hasPermission(_where, _who, _role, _data)](#ClientMethods+hasPermission) ⇒ <code>\*</code>
+    * [.hasPermission(params)](#ClientMethods+hasPermission) ⇒ <code>\*</code>
     * [.getDao(daoAddressOrEns)](#ClientMethods+getDao) ⇒ <code>\*</code>
     * [.getDaos({)](#ClientMethods+getDaos) ⇒ <code>\*</code>
     * [.getBalances(daoAddressorEns, _tokenAddresses)](#ClientMethods+getBalances) ⇒ <code>\*</code>
@@ -289,17 +289,15 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 <a name="ClientMethods+hasPermission"></a>
 
-### clientMethods.hasPermission(_where, _who, _role, _data) ⇒ <code>\*</code>
+### clientMethods.hasPermission(params) ⇒ <code>\*</code>
 <p>Checks whether a role is granted by the current DAO's ACL settings</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
+**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
 
 | Param | Type |
 | --- | --- |
-| _where | <code>string</code> | 
-| _who | <code>string</code> | 
-| _role | <code>DaoRole</code> | 
-| _data | <code>Uint8Array</code> | 
+| params | <code>IHasPermissionParams</code> | 
 
 <a name="ClientMethods+getDao"></a>
 
