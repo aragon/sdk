@@ -7,8 +7,8 @@ export const QueryDao = gql`
       name
       metadata
       createdAt
-      packages{
-        pkg{
+      plugins{
+        plugin{
           id
           __typename
         }
@@ -22,8 +22,8 @@ export const QueryDaos = gql`
       id
       name
       metadata
-      packages{
-        pkg{
+      plugins{
+        plugin{
           id
           __typename
         }

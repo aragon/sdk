@@ -46,7 +46,7 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli",
+        "https://api.thegraph.com/subgraphs/name/rekard0/rekard0-zaragoza-goerli",
     },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],

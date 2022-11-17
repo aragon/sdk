@@ -309,8 +309,8 @@ export enum DaoSortBy {
 }
 
 export enum SubgraphPluginTypeName {
-  ERC20 = "ERC20VotingPackage",
-  ADDRESS_LIST = "AllowlistPackage",
+  ERC20 = "ERC20VotingPlugin",
+  ADDRESS_LIST = "AddresslistPlugin",
 }
 
 export const SubgraphPluginTypeMap: Map<
@@ -322,7 +322,7 @@ export const SubgraphPluginTypeMap: Map<
 ]);
 
 export type SubgraphPluginListItem = {
-  pkg: {
+  plugin: {
     id: string;
     __typename: SubgraphPluginTypeName;
   };
@@ -332,7 +332,7 @@ type SubgraphDaoBase = {
   id: string;
   name: string;
   metadata: string;
-  packages: SubgraphPluginListItem[];
+  plugins: SubgraphPluginListItem[];
 };
 
 export type SubgraphDao = SubgraphDaoBase & {

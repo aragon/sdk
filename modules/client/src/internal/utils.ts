@@ -60,16 +60,16 @@ export function toDaoDetails(
     },
     creationDate: new Date(parseInt(dao.createdAt) * 1000),
     // TODO update when new subgraph schema is deployed
-    plugins: dao.packages.map(
+    plugins: dao.plugins.map(
       (
         plugin: SubgraphPluginListItem,
       ): InstalledPluginListItem => {
         return {
-          instanceAddress: plugin.pkg.id,
+          instanceAddress: plugin.plugin.id,
           // TODO
           // temporary ens addreses for the plugins
           id: SubgraphPluginTypeMap.get(
-            plugin.pkg.__typename,
+            plugin.plugin.__typename,
           ) as string,
           // TODO
           // update when subgraph returns version
@@ -92,16 +92,16 @@ export function toDaoListItem(
       avatar: metadata.avatar || undefined,
     },
     // TODO update when new subgraph schema is deployed
-    plugins: dao.packages.map(
+    plugins: dao.plugins.map(
       (
         plugin: SubgraphPluginListItem,
       ): InstalledPluginListItem => {
         return {
-          instanceAddress: plugin.pkg.id,
+          instanceAddress: plugin.plugin.id,
           // TODO
           // temporary ens addreses for the plugins
           id: SubgraphPluginTypeMap.get(
-            plugin.pkg.__typename,
+            plugin.plugin.__typename,
           ) as string,
           // TODO
           // update when subgraph returns version

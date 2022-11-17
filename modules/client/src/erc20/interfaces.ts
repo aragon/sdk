@@ -130,7 +130,7 @@ export type SubgraphErc20VoterListItem = SubgraphVoterListItemBase & {
 };
 
 export type SubgraphErc20ProposalListItem = SubgraphProposalBase & {
-  pkg: {
+  plugin: {
     token: {
       symbol: string;
       name: string;

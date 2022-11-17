@@ -266,9 +266,9 @@ export class ClientAddressListMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        allowlistProposal: addressListProposal,
+        addresslistProposals: addressListProposal,
       }: {
-        allowlistProposal: SubgraphAddressListProposal;
+        addresslistProposals: SubgraphAddressListProposal;
       } = await client.request(QueryAddressListProposal, {
         proposalId,
       });
@@ -334,9 +334,9 @@ export class ClientAddressListMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        allowlistProposals: addressListProposals,
+        addresslistProposals: addressListProposals,
       }: {
-        allowlistProposals: SubgraphAddressListProposalListItem[];
+        addresslistProposals: SubgraphAddressListProposalListItem[];
       } = await client.request(QueryAddressListProposals, {
         where,
         limit,
@@ -385,22 +385,22 @@ export class ClientAddressListMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { allowlistPackage } = await client.request(
+      const { addresslistPlugin } = await client.request(
         QueryAddressListPluginSettings,
         {
           address: pluginAddress,
         },
       );
-      if (!allowlistPackage) {
+      if (!addresslistPlugin) {
         return null;
       }
       return {
         // TODO
         // the number of decimals in the minSupport and minTurnout
         // is wrong, they have no precision
-        minDuration: parseInt(allowlistPackage.minDuration),
-        minSupport: parseFloat(allowlistPackage.supportRequiredPct),
-        minTurnout: parseFloat(allowlistPackage.participationRequiredPct),
+        minDuration: parseInt(addresslistPlugin.minDuration),
+        minSupport: parseFloat(addresslistPlugin.supportRequiredPct),
+        minTurnout: parseFloat(addresslistPlugin.participationRequiredPct),
       };
     } catch {
       throw new Error("Cannot fetch the settings data from GraphQL");

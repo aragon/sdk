@@ -96,10 +96,10 @@ export function toErc20Proposal(
         parseInt(proposal.startDate),
     },
     token: {
-      address: proposal.pkg.token.id,
-      symbol: proposal.pkg.token.symbol,
-      name: proposal.pkg.token.name,
-      decimals: parseInt(proposal.pkg.token.decimals),
+      address: proposal.plugin.token.id,
+      symbol: proposal.plugin.token.symbol,
+      name: proposal.plugin.token.name,
+      decimals: parseInt(proposal.plugin.token.decimals),
     },
     usedVotingWeight,
     totalVotingWeight: BigInt(proposal.votingPower),
@@ -143,10 +143,10 @@ export function toErc20ProposalListItem(
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     token: {
-      address: proposal.pkg.token.id,
-      symbol: proposal.pkg.token.symbol,
-      name: proposal.pkg.token.name,
-      decimals: parseInt(proposal.pkg.token.decimals),
+      address: proposal.plugin.token.id,
+      symbol: proposal.plugin.token.symbol,
+      name: proposal.plugin.token.name,
+      decimals: parseInt(proposal.plugin.token.decimals),
     },
   };
 }

@@ -32,7 +32,7 @@ query erc20Proposal($proposalId: ID!) {
       vote
       weight
     }
-    pkg{
+    plugin{
 			token{
         symbol
         name
@@ -61,7 +61,7 @@ query erc20Proposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: In
     endDate
     executed
     executable
-    pkg{
+    plugin{
 			token{
         symbol
         name
