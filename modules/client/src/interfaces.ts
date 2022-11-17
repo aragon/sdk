@@ -2,7 +2,6 @@
 
 import {
   DaoAction,
-  DaoRole,
   GasFeeEstimation,
   IInterfaceParams,
   IPagination,
@@ -23,12 +22,7 @@ export interface IClientMethods extends IClientCore {
   /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
   /** Checks whether a role is granted by the current DAO's ACL settings */
-  hasPermission: (
-    where: string,
-    who: string,
-    role: DaoRole,
-    data: Uint8Array,
-  ) => Promise<void>;
+  hasPermission: (params: IHasPermissionParams) => Promise<boolean>;
   /** Deposits ether or an ERC20 token */
   deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
@@ -127,6 +121,14 @@ export interface IFreezePermissionParams {
 export interface IFreezePermissionDecodedParams
   extends IFreezePermissionParams {
   permissionId: string;
+}
+
+export interface IHasPermissionParams {
+  daoAddressOrEns: string;
+  where: string;
+  who: string;
+  permission: string; // permission name
+  data?: Uint8Array;
 }
 
 const Permissions = {

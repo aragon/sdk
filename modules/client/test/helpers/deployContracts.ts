@@ -14,7 +14,9 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 const WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 
 export interface Deployment {
+  managingDaoAddress: string;
   daoFactory: aragonContracts.DAOFactory;
+  daoRegistry: aragonContracts.DAORegistry;
   erc20Repo: aragonContracts.PluginRepo;
   erc20PluginSetup: aragonContracts.ERC20VotingSetup;
   addressListRepo: aragonContracts.PluginRepo;
@@ -171,7 +173,9 @@ export async function deploy(): Promise<Deployment> {
     });
 
     return {
+      managingDaoAddress: managingDao.address,
       daoFactory,
+      daoRegistry,
       erc20Repo,
       erc20PluginSetup,
       addressListRepo,

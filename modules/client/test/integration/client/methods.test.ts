@@ -21,7 +21,9 @@ import {
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
+  IHasPermissionParams,
   ITransferQueryParams,
+  Permissions,
   SortDirection,
   TokenType,
   TransferSortBy,
@@ -280,6 +282,36 @@ describe("Client", () => {
             )
           ).toString(),
         ).toBe("7");
+      });
+
+      it("Check if dao factory has register dao permission in the dao registry", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const params: IHasPermissionParams = {
+          daoAddressOrEns: deployment.managingDaoAddress,
+          who: deployment.daoFactory.address,
+          where: deployment.daoRegistry.address,
+          permission: Permissions.REGISTER_DAO_PERMISSION,
+        };
+        // this permission was granted on deployment
+        // so it must be true
+        const hasPermission = await client.methods.hasPermission(params);
+        expect(hasPermission).toBe(true);
+      });
+
+      it("Check if an user has root permission in a dao", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const who = await contextParamsLocalChain.signer?.getAddress();
+        const params: IHasPermissionParams = {
+          daoAddressOrEns: daoAddress,
+          who: who!,
+          where: daoAddress,
+          permission: Permissions.ROOT_PERMISSION,
+        };
+
+        const hasPermission = await client.methods.hasPermission(params);
+        expect(hasPermission).toBe(false);
       });
     });
 

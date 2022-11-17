@@ -17,6 +17,7 @@ export {
   IFreezePermissionParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
+  IHasPermissionParams,
   IMetadata,
   InstalledPluginListItem,
   IRevokePermissionDecodedParams,
