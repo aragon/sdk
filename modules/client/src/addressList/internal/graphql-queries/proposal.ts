@@ -19,8 +19,8 @@ query addressListProposal($proposalId: ID!) {
     yes,
     no,
     abstain
-    supportRequiredPct,
-    participationRequired,
+    totalSupportThresholdPct,
+    relativeSupportThresholdPct,
     startDate
     endDate
     executed
@@ -31,7 +31,7 @@ query addressListProposal($proposalId: ID!) {
       }
       vote
     }
-    votingPower
+    census
   }
 }
 `;
@@ -45,8 +45,8 @@ query addressListProposals($where: ERC20VotingProposal_filter!, $limit:Int!, $sk
     }
     creator
     metadata
-    yes,
-    no,
+    yes
+    no
     abstain
     startDate
     endDate

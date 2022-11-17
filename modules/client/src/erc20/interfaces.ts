@@ -143,10 +143,10 @@ export type SubgraphErc20ProposalListItem = SubgraphProposalBase & {
 export type SubgraphErc20Proposal = SubgraphErc20ProposalListItem & {
   createdAt: string;
   actions: SubgraphAction[];
-  supportRequiredPct: string;
-  participationRequiredPct: string;
+  totalSupportThresholdPct: string;
+  relativeSupportThresholdPct: string;
   voters: SubgraphErc20VoterListItem[];
-  votingPower: string;
+  census: string;
 };
 
 export interface IMintTokenParams {

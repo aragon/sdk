@@ -78,19 +78,19 @@ export function toErc20Proposal(
       // precision
 
       // minSupport: decodeRatio(
-      //   BigInt(proposal.supportRequiredPct),
+      //   BigInt(proposal.totalSupportThresholdPct),
       //   2,
       // ),
       // minTurnout: decodeRatio(
-      //   BigInt(proposal.participationRequiredPct),
+      //   BigInt(proposal.relativeSupportThresholdPct),
       //   2,
       // ),
       // TODO DELETE ME
       minSupport: parseFloat(
-        formatEther(proposal.supportRequiredPct),
+        formatEther(proposal.totalSupportThresholdPct),
       ),
       minTurnout: parseFloat(
-        formatEther(proposal.participationRequiredPct),
+        formatEther(proposal.relativeSupportThresholdPct),
       ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
@@ -102,7 +102,7 @@ export function toErc20Proposal(
       decimals: parseInt(proposal.plugin.token.decimals),
     },
     usedVotingWeight,
-    totalVotingWeight: BigInt(proposal.votingPower),
+    totalVotingWeight: BigInt(proposal.census),
     votes: proposal.voters.map(
       (voter: SubgraphErc20VoterListItem) => {
         return {

@@ -391,10 +391,10 @@ export class ClientErc20Methods extends ClientCore
         minDuration: parseInt(erc20VotingPlugin.minDuration),
         // TODO: use decodeRatio() when ready
         minSupport: parseFloat(
-          formatEther(erc20VotingPlugin.supportRequiredPct),
+          formatEther(erc20VotingPlugin.totalSupportThresholdPct),
         ),
         minTurnout: parseFloat(
-          formatEther(erc20VotingPlugin.participationRequiredPct),
+          formatEther(erc20VotingPlugin.relativeSupportThresholdPct),
         ),
       };
     } catch {

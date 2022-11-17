@@ -19,8 +19,8 @@ query erc20Proposal($proposalId: ID!) {
     yes,
     no,
     abstain
-    supportRequiredPct,
-    participationRequiredPct,
+    totalSupportThresholdPct,
+    relativeSupportThresholdPct,
     startDate
     endDate
     executed
@@ -40,7 +40,7 @@ query erc20Proposal($proposalId: ID!) {
         decimals
       }
     }
-    votingPower
+    census
   }
 }
 `;

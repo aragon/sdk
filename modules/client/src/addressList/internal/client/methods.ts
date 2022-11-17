@@ -399,8 +399,8 @@ export class ClientAddressListMethods extends ClientCore
         // the number of decimals in the minSupport and minTurnout
         // is wrong, they have no precision
         minDuration: parseInt(addresslistPlugin.minDuration),
-        minSupport: parseFloat(addresslistPlugin.supportRequiredPct),
-        minTurnout: parseFloat(addresslistPlugin.participationRequiredPct),
+        minSupport: parseFloat(addresslistPlugin.totalSupportThresholdPct),
+        minTurnout: parseFloat(addresslistPlugin.relativeSupportThresholdPct),
       };
     } catch {
       throw new Error("Cannot fetch the settings data from GraphQL");
