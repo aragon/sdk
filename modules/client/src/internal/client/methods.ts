@@ -411,13 +411,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
    * @param {string} daoAddressorEns
-   * @param {string[]} _tokenAddresses
    * @return {*}  {(Promise<AssetBalance[] | null>)}
    * @memberof ClientMethods
    */
   public async getBalances(
     daoAddressorEns: string,
-    _tokenAddresses?: string[]
   ): Promise<AssetBalance[] | null> {
     let address = daoAddressorEns;
     if (!isAddress(address)) {
