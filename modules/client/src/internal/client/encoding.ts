@@ -199,7 +199,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       throw new Error("Could not pin the metadata on IPFS");
     }
     const daoInterface = DAO__factory.createInterface();
-    const args = new TextEncoder().encode(cid);
+    const args = new TextEncoder().encode(`ipfs://${cid}`);
     const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
     const data = hexToBytes(strip0x(hexBytes));
     return {

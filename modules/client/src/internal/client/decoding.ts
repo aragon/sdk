@@ -15,7 +15,11 @@ import {
 } from "../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
-import { freezeParamsFromContract, permissionParamsFromContract, withdrawParamsFromContract } from "../utils";
+import {
+  freezeParamsFromContract,
+  permissionParamsFromContract,
+  withdrawParamsFromContract,
+} from "../utils";
 
 /**
  * Decoding module the SDK Generic Client
@@ -125,7 +129,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     }
     const result = daoInterface.decodeFunctionData("setMetadata", data);
     const bytes = hexToBytes(result[0]);
-    const cid = new TextDecoder().decode(bytes);
+    const cid = new TextDecoder().decode(bytes).replace("ipfs://", "");
     const ipfsRegex =
       /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
     if (!ipfsRegex.test(cid)) {
@@ -152,7 +156,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     }
     const result = daoInterface.decodeFunctionData("setMetadata", data);
     const bytes = hexToBytes(result[0]);
-    const cid = new TextDecoder().decode(bytes);
+    const cid = new TextDecoder().decode(bytes).replace("ipfs://", "");
     const ipfsRegex =
       /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
     if (!ipfsRegex.test(cid)) {
