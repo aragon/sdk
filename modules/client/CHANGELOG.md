@@ -16,6 +16,10 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
+## [UPCOMING]
+### Changed
+- Stores CIDs with `ipfs://` prefix in contracts
+
 ## [0.13.0-alpha]
 ### Added
 - Added `createProposal()` using real contracts
