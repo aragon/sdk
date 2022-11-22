@@ -17,7 +17,7 @@ TEMPLATE:
 -->
 ## [UPCOMING]
 ### Fixed
-- Fix subgraph queries
+- Adapt the latest Subgraph query names
 ## [0.13.0-alpha]
 ### Added
 - Added `createProposal()` using real contracts
