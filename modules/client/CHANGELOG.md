@@ -15,7 +15,9 @@ TEMPLATE:
 ### Fixed
 - Fix 1, 2, 3
 -->
-
+## [UPCOMING]
+### Fixed
+- Fix subgraph queries
 ## [0.13.0-alpha]
 ### Added
 - Added `createProposal()` using real contracts
@@ -23,9 +25,6 @@ TEMPLATE:
 - Added `execute()` on proposals using real contracts
 - Added `canVote()` on proposals using real contracts
 - Added `hasPermission()` using real contract calls
-### Fixed
-- Fix subgraph queries
-
 
 ## 0.12.0-alpha
 ### Changed
