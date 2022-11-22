@@ -1,13 +1,7 @@
 import { Wallet } from "@ethersproject/wallet";
 import { ContextParams } from "../../src";
 
-const IPFS_API_KEY = process.env.IPFS_API_KEY ||
-  Buffer.from(
-    "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
-    "base64",
-  )
-    .toString()
-    .trim();
+const IPFS_API_KEY = process.env.IPFS_API_KEY || "";
 
 export const web3endpoints = {
   working: [
@@ -20,9 +14,9 @@ export const web3endpoints = {
 const ipfsEndpoints = {
   working: [
     {
-      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      url: process.env.IPFS_ENDPOINT || "https://ipfs.example.com/",
       headers: {
-        "X-API-KEY": IPFS_API_KEY || "",
+        "X-API-KEY": IPFS_API_KEY,
       },
     },
     {

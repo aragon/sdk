@@ -1,6 +1,9 @@
 // @ts-ignore
 declare const describe, it, expect, beforeAll, afterAll;
 
+// mocks need to be at the top of the imports
+import "../../mocks/aragon-sdk-ipfs";
+
 import {
   ClientErc20,
   Context,

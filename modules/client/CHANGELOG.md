@@ -16,6 +16,10 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
+## [UPCOMING]
+### Added
+- Mocking of the IPFS client during testing
+
 ## [0.13.0-alpha]
 ### Added
 - Added `createProposal()` using real contracts

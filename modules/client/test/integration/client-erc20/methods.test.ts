@@ -1,6 +1,9 @@
 // @ts-ignore
 declare const describe, it, beforeAll, afterAll, expect, test;
 
+// mocks need to be at the top of the imports
+import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
+
 import {
   Client,
   ClientErc20,
@@ -219,6 +222,20 @@ describe("Client ERC20", () => {
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new ClientErc20(ctxPlugin);
 
+        mockedIPFSClient.cat.mockResolvedValueOnce(
+          Buffer.from(
+            JSON.stringify({
+              title: "Title",
+              summary: "Summary",
+              description: "Description",
+              resources: [{
+                name: "Name",
+                url: "url",
+              }],
+            }),
+          ),
+        );
+
         const proposalId = TEST_ERC20_PROPOSAL_ID;
         const proposal = await client.methods.getProposal(proposalId);
 
@@ -318,6 +335,17 @@ describe("Client ERC20", () => {
           direction: SortDirection.ASC,
           status,
         };
+
+        const defaultCatImplementation = mockedIPFSClient.cat
+          .getMockImplementation();
+        mockedIPFSClient.cat.mockResolvedValue(
+          Buffer.from(
+            JSON.stringify({
+              title: "Title",
+              summary: "Summary",
+            }),
+          ),
+        );
         const proposals = await client.methods.getProposals(params);
 
         expect(Array.isArray(proposals)).toBe(true);
@@ -347,6 +375,8 @@ describe("Client ERC20", () => {
           expect(typeof proposal.token.address).toBe("string");
           expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         }
+
+        mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
       });
       it("Should get a list of proposals from a specific dao", async () => {
         const ctx = new Context(contextParams);
