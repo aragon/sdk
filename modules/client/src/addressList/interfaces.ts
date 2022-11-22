@@ -103,10 +103,10 @@ export type SubgraphAddressListProposalListItem = SubgraphProposalBase;
 export type SubgraphAddressListProposal = SubgraphProposalBase & {
   createdAt: string;
   actions: SubgraphAction[];
-  supportRequiredPct: string;
-  participationRequired: string;
+  totalSupportThresholdPct: string;
+  relativeSupportThresholdPct: string;
   voters: SubgraphAddressListVoterListItem[];
-  votingPower: string;
+  census: string;
 };
 
 export type ContractAddressListInitParams = [
