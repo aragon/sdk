@@ -33,7 +33,6 @@ import { Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 
-
 export function unwrapDepositParams(
   params: IDepositParams,
 ): [string, BigNumber, string, string] {

@@ -46,7 +46,7 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://api.thegraph.com/subgraphs/name/rekard0/rekard0-zaragoza-goerli",
+        "https://api.thegraph.com/subgraphs/name/josemarinas/josemarinas-core-goerli",
     },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],
@@ -56,23 +56,23 @@ export const TEST_WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 export const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 export const TEST_ERC20_PROPOSAL_ID =
-  "0x3e16a08ad61500b2bc77ddcc04387f0fabc04469_0x0";
+  "0x78f3cff73616cccb09ffc8b83521ed226615d88b_0x0";
 export const TEST_ERC20_DAO_ADDRESS =
-  "0x488830dd76585e72bcec4c8e8a9d1f5cfec02ac9";
-export const TEST_DAO_ADDRESS = "0xa40fd495c454d19c87c4d615100307f0283c017c";
+  "0x600bbcbb47990a4e243041cc45b6c0057ff7eba1";
+export const TEST_DAO_ADDRESS = "0x77be007138e9dd83e0e73f0196c6b6498965d093";
 export const TEST_NO_BALANCES_DAO_ADDRESS =
-  "0xacb269a20d28f4e6b9fc75353cdf24418117859d";
+  "0x600bbcbb47990a4e243041cc45b6c0057ff7eba1";
 export const TEST_INVALID_ADDRESS = "0x1nv4l1d_4ddr355";
 export const TEST_NON_EXISTING_ADDRESS =
   "0x1234567890123456789012345678901234567890";
 export const TEST_ERC20_PLUGIN_ADDRESS =
-  "0x3e16a08ad61500b2bc77ddcc04387f0fabc04469";
+  "0x7a5fde8ef6f8ef096fdb178a5afaae2fec701387";
 export const TEST_ADDRESSLIST_PROPOSAL_ID =
-  "0x0bcaeb2da9d8ce246ac0864f081b04d4380b6b9c_0x0";
+  "0xf91c316115605780d1a1d6cc7072556af197eaa9_0x0";
 export const TEST_ADDRESSLIST_DAO_ADDDRESS =
-  "0xa40fd495c454d19c87c4d615100307f0283c017c";
+  "0x77be007138e9dd83e0e73f0196c6b6498965d093";
 export const TEST_ADDRESSLIST_PLUGIN_ADDRESS =
-  "0x0bcaeb2da9d8ce246ac0864f081b04d4380b6b9c";
+  "0xf91c316115605780d1a1d6cc7072556af197eaa9";
 
 export const contextParams: ContextParams = {
   network: "mainnet",

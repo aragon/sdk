@@ -37,7 +37,7 @@ query addressListProposal($proposalId: ID!) {
 `;
 export const QueryAddressListProposals = gql`
 query addressListProposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: ERC20VotingProposal_orderBy!) {
-  addresslistProposal(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
+  addresslistProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     dao {
       id

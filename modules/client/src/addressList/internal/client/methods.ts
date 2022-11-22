@@ -266,9 +266,9 @@ export class ClientAddressListMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        addresslistProposals: addressListProposal,
+        addresslistProposal: addressListProposal,
       }: {
-        addresslistProposals: SubgraphAddressListProposal;
+        addresslistProposal: SubgraphAddressListProposal;
       } = await client.request(QueryAddressListProposal, {
         proposalId,
       });

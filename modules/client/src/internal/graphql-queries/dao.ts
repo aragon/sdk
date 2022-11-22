@@ -9,7 +9,7 @@ export const QueryDao = gql`
       createdAt
       plugins{
         plugin{
-          id
+        id
           __typename
         }
       }
@@ -24,7 +24,7 @@ export const QueryDaos = gql`
       metadata
       plugins{
         plugin{
-          id
+        id
           __typename
         }
       }
