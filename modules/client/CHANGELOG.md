@@ -16,6 +16,9 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## [UPCOMING]
+
+## 0.14.0-alpha
+On 2022-11-22 16:45:52
 ### Fixed
 - Adapt the latest Subgraph query names
 ## [0.13.0-alpha]
