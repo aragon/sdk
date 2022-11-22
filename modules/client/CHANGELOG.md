@@ -9,13 +9,16 @@ TEMPLATE:
 ### Added
 - Feature 1, 2, 3
 
-### Changed
 - Change 1, 2, 3
 
 ### Fixed
 - Fix 1, 2, 3
 -->
 
+## [UPCOMING]
+### Changed
+- Split `createDao()` and `pinMetadata()` 
+- Split `createProposal()` and `pinMetadata()` 
 ## [0.16.0-alpha]
 ### Added
 - Checks during DAO creation if at least 1 plugin requests exec permission
@@ -26,7 +29,6 @@ TEMPLATE:
 ### Fixed
 - Reading metadata back now parses the IPFS URI schema
 - Fix `resolveIpfsCid()` cross-browser compatibility
-
 
 ## 0.15.1-alpha
 On 2022-12-06 11:20:50

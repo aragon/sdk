@@ -3,13 +3,12 @@ import { VoteValues } from "../client-common/interfaces/plugin";
 import {
   IComputeStatusProposal,
   ICreateProposalParams,
-  ProposalMetadata,
   ProposalStatus,
 } from "./interfaces/plugin";
 
 export function unwrapProposalParams(
   params: ICreateProposalParams,
-): [ProposalMetadata, IDAO.ActionStruct[], number, number, boolean, number] {
+): [string, IDAO.ActionStruct[], number, number, boolean, number] {
   return [
     params.metadata,
     params.actions ?? [],
@@ -75,4 +74,11 @@ export function computeProposalStatusFilter(
 export function isProposalId(propoosalId: string): boolean {
   const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
   return regex.test(propoosalId);
+}
+
+export function isIpfsCid(hash: string): boolean {
+  const regex = new RegExp(
+    /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/,
+  );
+  return regex.test(hash);
 }

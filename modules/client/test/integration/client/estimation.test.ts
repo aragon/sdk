@@ -35,12 +35,7 @@ describe("Client", () => {
         1;
 
       const daoCreationParams: ICreateParams = {
-        metadata: {
-          name: daoName,
-          description: "this is a dao",
-          avatar: "https://...",
-          links: [],
-        },
+        metadata: "",
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [{ id: "0x1234", data: new Uint8Array() }],
       };

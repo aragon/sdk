@@ -90,3 +90,8 @@ export class MissingExecPermissionError extends Error {
     super("No plugin requests EXECUTE_PERMISSION");
   }
 }
+export class IpfsFetchError extends Error {
+  constructor() {
+    super("Failed to fetch data from IPFS");
+  }
+}

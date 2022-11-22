@@ -66,20 +66,23 @@ import {
   GasFeeEstimation,
   ICreateParams,
 } from "@aragon/sdk-client";
+import { IMetadata } from "../../src";
 import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
+const metadata: IMetadata = {
+  name: "My DAO",
+  description: "This is a description",
+  avatar: "",
+  links: [{
+    name: "Web site",
+    url: "https://...",
+  }],
+};
+const ipfsHash = await client.methods.pinMetadata(metadata);
 const createParams: ICreateParams = {
-  metadata: {
-    name: "My DAO",
-    description: "This is a description",
-    avatar: "",
-    links: [{
-      name: "Web site",
-      url: "https://...",
-    }],
-  },
+  metadata: ipfsHash,
   ensSubdomain: "my-org", // my-org.dao.eth,
   plugins: [],
 };
@@ -595,6 +598,7 @@ import {
   ContextPlugin,
   ICreateProposalParams,
   ProposalCreationSteps,
+  ProposalMetadata,
   VoteValues,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -606,27 +610,31 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an ERC20 client
 const client = new ClientErc20(contextPlugin);
 
+const metadata:ProposalMetadata= {
+  title: "Test Proposal",
+  summary: "This is a short description",
+  description: "This is a long description",
+  resources: [
+    {
+      name: "Discord",
+      url: "https://discord.com/...",
+    },
+    {
+      name: "Website",
+      url: "https://website...",
+    },
+  ],
+  media: {
+    logo: "https://...",
+    header: "https://...",
+  },
+}
+
+const cid = await client.methods.pinMetadata(metadata)
+
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadata: {
-    title: "Test Proposal",
-    summary: "This is a short description",
-    description: "This is a long description",
-    resources: [
-      {
-        name: "Discord",
-        url: "https://discord.com/...",
-      },
-      {
-        name: "Website",
-        url: "https://website...",
-      },
-    ],
-    media: {
-      logo: "https://...",
-      header: "https://...",
-    },
-  },
+  metadata:cid,
   actions: [],
   startDate: new Date(),
   endDate: new Date(),
@@ -1209,6 +1217,7 @@ import {
   ContextPlugin,
   ICreateProposalParams,
   ProposalCreationSteps,
+  ProposalMetadata,
   VoteValues,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -1220,27 +1229,31 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
 const client = new ClientAddressList(contextPlugin);
 
+const metadata: ProposalMetadata = {
+  title: "Test Proposal",
+  summary: "This is a short description",
+  description: "This is a long description",
+  resources: [
+    {
+      name: "Discord",
+      url: "https://discord.com/...",
+    },
+    {
+      name: "Website",
+      url: "https://website...",
+    },
+  ],
+  media: {
+    logo: "https://...",
+    header: "https://...",
+  },
+};
+
+const cid = await client.methods.pinMetadata(metadata);
+
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadata: {
-    title: "Test Proposal",
-    summary: "This is a short description",
-    description: "This is a long descrioption",
-    resources: [
-      {
-        name: "Discord",
-        url: "https://discord.com/...",
-      },
-      {
-        name: "Website",
-        url: "https://website...",
-      },
-    ],
-    media: {
-      logo: "https://...",
-      header: "https://...",
-    },
-  },
+  metadata: cid,
   actions: [],
   startDate: new Date(),
   endDate: new Date(),
@@ -1805,9 +1818,11 @@ const metadataParams: IMetadata = {
 };
 const daoAddressOrEns = "0x12345";
 
+const cid = await client.methods.pinMetadata(metadataParams);
+
 const updateMetadataAction = await client.encoding.updateMetadataAction(
   daoAddressOrEns,
-  metadataParams,
+  cid,
 );
 console.log(updateMetadataAction);
 ```
@@ -2084,7 +2099,9 @@ const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IMetadata = await client.decoding.updateMetadataAction(data);
+const cid: string = await client.decoding.updateMetadataAction(data);
+
+const params = await client.methods.fetchMetadata(cid);
 
 console.log(params);
 /*

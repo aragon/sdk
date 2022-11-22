@@ -38,21 +38,7 @@ describe("Client Address List", () => {
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
-        metadata: {
-          title: "Best Proposal",
-          summary: "this is the sumnary",
-          description: "This is a very long description",
-          resources: [
-            {
-              name: "Website",
-              url: "https://the.website",
-            },
-          ],
-          media: {
-            header: "https://no.media/media.jpeg",
-            logo: "https://no.media/media.jpeg",
-          },
-        },
+        metadata: "",
         actions: [],
         creatorVote: VoteValues.YES,
         startDate: new Date(),

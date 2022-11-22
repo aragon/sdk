@@ -42,7 +42,7 @@ export interface IPluginSettings {
 
 export interface ICreateProposalParams {
   pluginAddress: string;
-  metadata: ProposalMetadata;
+  metadata: string;
   actions?: DaoAction[];
   startDate?: Date;
   endDate?: Date;

@@ -7,7 +7,6 @@ import {
   IClientDecoding,
   IFreezePermissionDecodedParams,
   IGrantPermissionDecodedParams,
-  IMetadata,
   IRevokePermissionDecodedParams,
   IWithdrawParams,
 } from "../../interfaces";
@@ -153,7 +152,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @return {*}  {Promise<IMetadata>}
    * @memberof ClientDecoding
    */
-  public async updateMetadataAction(data: Uint8Array): Promise<IMetadata> {
+  public async updateMetadataAction(data: Uint8Array): Promise<string> {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
@@ -165,23 +164,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     }
     const result = daoInterface.decodeFunctionData("setMetadata", data);
     const bytes = hexToBytes(result[0]);
-    const contentUriText = new TextDecoder().decode(bytes);
-    const contentUri = new URL(contentUriText);
-    if (contentUri.protocol !== "ipfs:") {
-      throw new UnsupportedProtocolError(contentUri.protocol);
-    }
-    const cid = contentUri.host;
-    const ipfsRegex =
-      /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
-    if (!ipfsRegex.test(cid)) {
-      throw new Error("The metadata URL defined on the DAO is invalid");
-    }
-    try {
-      const stringMetadata = await this.ipfs.fetchString(cid);
-      return JSON.parse(stringMetadata);
-    } catch {
-      throw new Error("Error reading data from IPFS");
-    }
+    return new TextDecoder().decode(bytes);
   }
   /**
    * Returns the decoded function info given the encoded data of an action

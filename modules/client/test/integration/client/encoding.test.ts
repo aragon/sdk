@@ -162,10 +162,11 @@ describe("Client", () => {
           },
         ],
       };
+      const cid = await client.methods.pinMetadata(params)
 
       const installEntry = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        cid,
       );
 
       expect(typeof installEntry).toBe("object");

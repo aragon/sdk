@@ -74,14 +74,8 @@ describe("Client", () => {
 
         const daoName = "ERC20VotingDAO_" +
           Math.floor(Random.getFloat() * 9999) + 1;
-
         const daoCreationParams: ICreateParams = {
-          metadata: {
-            name: daoName,
-            description: "this is a dao",
-            avatar: "https://...",
-            links: [],
-          },
+          metadata: "",
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {
@@ -115,14 +109,16 @@ describe("Client", () => {
 
         const daoName = "ERC20VotingDAO_" +
           Math.floor(Random.getFloat() * 9999) + 1;
+        // pin metadata
+        const ipfsHash = await client.methods.pinMetadata({
+          name: daoName,
+          description: "this is a dao",
+          avatar: "https://...",
+          links: [],
+        });
 
         const daoCreationParams: ICreateParams = {
-          metadata: {
-            name: daoName,
-            description: "this is a dao",
-            avatar: "https://...",
-            links: [],
-          },
+          metadata: ipfsHash,
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {

@@ -207,9 +207,11 @@ describe("Client", () => {
         hash: "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
       });
 
+      const cid = await client.methods.pinMetadata(params);
+
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        cid,
       );
       const recoveredIpfsUri: string = await client.decoding
         .updateMetadataRawAction(
@@ -242,9 +244,10 @@ describe("Client", () => {
           },
         ],
       };
+      const cid = await client.methods.pinMetadata(params);
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        cid,
       );
 
       expect(() => client.decoding.withdrawAction(updateMetadataAction.data))
@@ -279,9 +282,11 @@ describe("Client", () => {
           },
         ],
       };
+
+      const cid = await client.methods.pinMetadata(params);
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        cid,
       );
       const iface = client.decoding.findInterface(updateMetadataAction.data);
       expect(iface?.id).toBe("function setMetadata(bytes)");
@@ -317,20 +322,24 @@ describe("Client", () => {
         ],
       };
 
+      mockedIPFSClient.add.mockResolvedValueOnce({
+        hash: "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
+      });
+
+      const cid = await client.methods.pinMetadata(params);
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        cid,
       );
 
       mockedIPFSClient.cat.mockResolvedValueOnce(
         Buffer.from(JSON.stringify(params)),
       );
 
-      const decodedParams: IMetadata = await client.decoding
-        .updateMetadataAction(
-          updateMetadataAction.data,
-        );
+      const recoveredCid = await client.decoding
+        .updateMetadataAction(updateMetadataAction.data);
 
+      const decodedParams = await client.methods.fetchMetadata(recoveredCid);
       expect(decodedParams.name).toBe(params.name);
       expect(decodedParams.description).toBe(params.description);
       expect(decodedParams.avatar).toBe(params.avatar);

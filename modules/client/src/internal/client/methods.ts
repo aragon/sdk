@@ -11,6 +11,8 @@ import {
   InvalidAddressOrEnsError,
   MissingExecPermissionError,
   InvalidCidError,
+  IpfsFetchError,
+  IpfsPinError,
   NoProviderError,
   NoSignerError,
   resolveIpfsCid,
@@ -55,7 +57,12 @@ import {
   Transfer,
   TransferSortBy,
 } from "../../interfaces";
-import { ClientCore, Context, SortDirection } from "../../client-common";
+import {
+  ClientCore,
+  Context,
+  isIpfsCid,
+  SortDirection,
+} from "../../client-common";
 import {
   toAssetBalance,
   toDaoDetails,
@@ -161,7 +168,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const tx = await daoFactoryInstance.connect(signer).createDao(
       {
         name: params.ensSubdomain,
-        metadata: toUtf8Bytes(cid),
+        metadata: toUtf8Bytes(params.metadata),
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
       pluginInstallationData,
@@ -194,6 +201,41 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       key: DaoCreationSteps.DONE,
       address: parsedLog.args["dao"],
     };
+  }
+  /**
+   * Pins a metadata object into IPFS and retruns the generated hash
+   *
+   * @param {IMetadata} params
+   * @return {*}  {Promise<string>}
+   * @memberof ClientMethods
+   */
+  public async pinMetadata(params: IMetadata): Promise<string> {
+    try {
+      const cid = await this.ipfs.add(JSON.stringify(params));
+      return cid;
+    } catch {
+      throw new IpfsPinError();
+    }
+  }
+  /**
+   * Fetches an IPFS cid and returns dao metadata
+   *
+   * @param {string}
+   * @return {*}  {Promise<string>}
+   * @memberof ClientMethods
+   */
+  public async fetchMetadata(cid: string): Promise<IMetadata> {
+    if (!isIpfsCid(cid)) {
+      throw new InvalidCidError();
+    }
+    try {
+      const stringMetadata = await this.ipfs.fetchString(cid);
+      // TODO
+      // parse this string with yup and thow an error if it is invalid
+      return JSON.parse(stringMetadata);
+    } catch {
+      throw new IpfsFetchError();
+    }
   }
   /**
    * Deposits ether or an ERC20 token into the DAO
