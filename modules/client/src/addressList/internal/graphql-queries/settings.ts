@@ -2,9 +2,9 @@ import { gql } from "graphql-request";
 
 export const QueryAddressListPluginSettings = gql`
 query AddressListPluginSettings($address: ID!) {
-  allowlistPackage(id: $address){
-    supportRequiredPct
-    participationRequiredPct
+  addresslistPlugin(id: $address){
+    totalSupportThresholdPct
+    relativeSupportThresholdPct
     minDuration
   }
 }

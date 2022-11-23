@@ -378,23 +378,23 @@ export class ClientErc20Methods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { erc20VotingPackage } = await client.request(
+      const { erc20VotingPlugin } = await client.request(
         QueryErc20PluginSettings,
         {
           address: pluginAddress,
         },
       );
-      if (!erc20VotingPackage) {
+      if (!erc20VotingPlugin) {
         return null;
       }
       return {
-        minDuration: parseInt(erc20VotingPackage.minDuration),
+        minDuration: parseInt(erc20VotingPlugin.minDuration),
         // TODO: use decodeRatio() when ready
         minSupport: parseFloat(
-          formatEther(erc20VotingPackage.supportRequiredPct),
+          formatEther(erc20VotingPlugin.totalSupportThresholdPct),
         ),
         minTurnout: parseFloat(
-          formatEther(erc20VotingPackage.participationRequiredPct),
+          formatEther(erc20VotingPlugin.relativeSupportThresholdPct),
         ),
       };
     } catch {
@@ -418,17 +418,17 @@ export class ClientErc20Methods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { erc20VotingPackage } = await client.request(QueryToken, {
+      const { erc20VotingPlugin } = await client.request(QueryToken, {
         address: pluginAddress,
       });
-      if (!erc20VotingPackage) {
+      if (!erc20VotingPlugin) {
         return null;
       }
       return {
-        address: erc20VotingPackage.token.id,
-        decimals: parseInt(erc20VotingPackage.token.decimals),
-        name: erc20VotingPackage.token.name,
-        symbol: erc20VotingPackage.token.symbol,
+        address: erc20VotingPlugin.token.id,
+        decimals: parseInt(erc20VotingPlugin.token.decimals),
+        name: erc20VotingPlugin.token.name,
+        symbol: erc20VotingPlugin.token.symbol,
       };
     } catch (err) {
       throw new GraphQLError("token");

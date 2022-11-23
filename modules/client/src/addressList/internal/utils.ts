@@ -70,24 +70,24 @@ export function toAddressListProposal(
       // precision
 
       // minSupport: decodeRatio(
-      //   BigInt(proposal.supportRequiredPct),
+      //   BigInt(proposal.totalSupportThresholdPct),
       //   2,
       // ),
       // minTurnout: decodeRatio(
-      //   BigInt(proposal.participationRequiredPct),
+      //   BigInt(proposal.relativeSupportThresholdPct),
       //   2,
       // ),
       // TODO DELETE ME
       minSupport: parseFloat(
-        proposal.supportRequiredPct,
+        proposal.totalSupportThresholdPct,
       ),
       minTurnout: parseFloat(
-        proposal.participationRequired,
+        proposal.relativeSupportThresholdPct,
       ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
     },
-    totalVotingWeight: parseInt(proposal.votingPower),
+    totalVotingWeight: parseInt(proposal.census),
     votes: proposal.voters.map(
       (voter: SubgraphAddressListVoterListItem) => {
         return {

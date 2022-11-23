@@ -78,31 +78,31 @@ export function toErc20Proposal(
       // precision
 
       // minSupport: decodeRatio(
-      //   BigInt(proposal.supportRequiredPct),
+      //   BigInt(proposal.totalSupportThresholdPct),
       //   2,
       // ),
       // minTurnout: decodeRatio(
-      //   BigInt(proposal.participationRequiredPct),
+      //   BigInt(proposal.relativeSupportThresholdPct),
       //   2,
       // ),
       // TODO DELETE ME
       minSupport: parseFloat(
-        formatEther(proposal.supportRequiredPct),
+        formatEther(proposal.totalSupportThresholdPct),
       ),
       minTurnout: parseFloat(
-        formatEther(proposal.participationRequiredPct),
+        formatEther(proposal.relativeSupportThresholdPct),
       ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
     },
     token: {
-      address: proposal.pkg.token.id,
-      symbol: proposal.pkg.token.symbol,
-      name: proposal.pkg.token.name,
-      decimals: parseInt(proposal.pkg.token.decimals),
+      address: proposal.plugin.token.id,
+      symbol: proposal.plugin.token.symbol,
+      name: proposal.plugin.token.name,
+      decimals: parseInt(proposal.plugin.token.decimals),
     },
     usedVotingWeight,
-    totalVotingWeight: BigInt(proposal.votingPower),
+    totalVotingWeight: BigInt(proposal.census),
     votes: proposal.voters.map(
       (voter: SubgraphErc20VoterListItem) => {
         return {
@@ -143,10 +143,10 @@ export function toErc20ProposalListItem(
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     token: {
-      address: proposal.pkg.token.id,
-      symbol: proposal.pkg.token.symbol,
-      name: proposal.pkg.token.name,
-      decimals: parseInt(proposal.pkg.token.decimals),
+      address: proposal.plugin.token.id,
+      symbol: proposal.plugin.token.symbol,
+      name: proposal.plugin.token.name,
+      decimals: parseInt(proposal.plugin.token.decimals),
     },
   };
 }
