@@ -25,7 +25,7 @@ const metadata: IMetadata = {
 };
 const ipfsHash = await client.methods.pinMetadata(metadata);
 const createParams: ICreateParams = {
-  metadata: ipfsHash,
+  metadataUri: ipfsHash,
   ensSubdomain: "my-org", // my-org.dao.eth,
   plugins: [],
 };

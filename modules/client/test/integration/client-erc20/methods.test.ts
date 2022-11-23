@@ -97,7 +97,7 @@ describe("Client ERC20", () => {
 
         const proposalParams: ICreateProposalParams = {
           pluginAddress,
-          metadata: cid,
+          metadataUri: cid,
           actions: [action],
           creatorVote: VoteValues.YES,
           executeOnPass: false,

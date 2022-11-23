@@ -10,7 +10,7 @@ export function unwrapProposalParams(
   params: ICreateProposalParams,
 ): [string, IDAO.ActionStruct[], number, number, boolean, number] {
   return [
-    params.metadata,
+    params.metadataUri,
     params.actions ?? [],
     // TODO: Verify => seconds?
     params.startDate ? Math.floor(params.startDate.getTime() / 1000) : 0,

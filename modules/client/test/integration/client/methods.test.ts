@@ -75,7 +75,7 @@ describe("Client", () => {
         const daoName = "ERC20VotingDAO_" +
           Math.floor(Random.getFloat() * 9999) + 1;
         const daoCreationParams: ICreateParams = {
-          metadata: "",
+          metadataUri: "",
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {
@@ -118,7 +118,7 @@ describe("Client", () => {
         });
 
         const daoCreationParams: ICreateParams = {
-          metadata: ipfsHash,
+          metadataUri: ipfsHash,
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {

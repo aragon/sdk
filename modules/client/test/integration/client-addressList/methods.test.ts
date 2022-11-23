@@ -95,7 +95,7 @@ describe("Client Address List", () => {
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress,
-        metadata: cid,
+        metadataUri: cid,
         actions: [action],
         creatorVote: VoteValues.YES,
         executeOnPass: false,

@@ -168,7 +168,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const tx = await daoFactoryInstance.connect(signer).createDao(
       {
         name: params.ensSubdomain,
-        metadata: toUtf8Bytes(params.metadata),
+        metadata: toUtf8Bytes(params.metadataUri),
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
       pluginInstallationData,

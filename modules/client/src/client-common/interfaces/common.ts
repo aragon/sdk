@@ -31,7 +31,7 @@ export type DaoAction = {
  */
 export type DaoConfig = {
   name: string;
-  metadata: string;
+  metadataUri: string;
 };
 
 export type GasFeeEstimation = {

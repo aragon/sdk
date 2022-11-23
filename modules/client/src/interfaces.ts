@@ -82,7 +82,7 @@ export interface IClient {
 
 /** Holds the parameters that the DAO will be created with */
 export interface ICreateParams {
-  metadata: string;
+  metadataUri: string;
   ensSubdomain: string;
   trustedForwarder?: string;
   plugins: IPluginInstallItem[];
