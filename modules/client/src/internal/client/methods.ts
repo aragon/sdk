@@ -62,7 +62,7 @@ import {
   unwrapDepositParams,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
-import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
+import { toUtf8Bytes } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
 
 /**
@@ -105,7 +105,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       pluginInstallationData.push({
         pluginSetup: latestVersion[1],
         pluginSetupRepo: plugin.id,
-        data: toUtf8String(plugin.data),
+        data: plugin.data,
       });
     }
 
