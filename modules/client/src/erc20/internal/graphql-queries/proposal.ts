@@ -19,8 +19,8 @@ query erc20Proposal($proposalId: ID!) {
     yes,
     no,
     abstain
-    supportRequiredPct,
-    participationRequiredPct,
+    totalSupportThresholdPct,
+    relativeSupportThresholdPct,
     startDate
     endDate
     executed
@@ -32,15 +32,15 @@ query erc20Proposal($proposalId: ID!) {
       vote
       weight
     }
-    pkg{
-			token{
+    plugin{
+      token{
         symbol
         name
         id
         decimals
       }
     }
-    votingPower
+    census
   }
 }
 `;
@@ -61,8 +61,8 @@ query erc20Proposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: In
     endDate
     executed
     executable
-    pkg{
-			token{
+    plugin{
+      token{
         symbol
         name
         id

@@ -408,14 +408,6 @@ describe("Client", () => {
         const daos = await client.methods.getDaos(params);
         expect(Array.isArray(daos)).toBe(true);
         expect(daos.length <= limit).toBe(true);
-        daos.reduce((prevDao, currentDao) => {
-          if (prevDao && currentDao) {
-            expect(
-              currentDao.ensDomain.localeCompare(prevDao.ensDomain) === -1,
-            ).toBe(false);
-          }
-          return currentDao;
-        });
         for (let i = 0; i < daos.length; i++) {
           const dao = daos[i];
           expect(typeof dao.address).toBe("string");

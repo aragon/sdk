@@ -2,7 +2,7 @@ import { gql } from "graphql-request";
 
 export const QueryAddressListProposal = gql`
 query addressListProposal($proposalId: ID!) {
-  allowlistProposal(id: $proposalId){
+  addresslistProposal(id: $proposalId){
     id
     dao {
       id
@@ -19,8 +19,8 @@ query addressListProposal($proposalId: ID!) {
     yes,
     no,
     abstain
-    supportRequiredPct,
-    participationRequired,
+    totalSupportThresholdPct,
+    relativeSupportThresholdPct,
     startDate
     endDate
     executed
@@ -31,13 +31,13 @@ query addressListProposal($proposalId: ID!) {
       }
       vote
     }
-    votingPower
+    census
   }
 }
 `;
 export const QueryAddressListProposals = gql`
 query addressListProposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: ERC20VotingProposal_orderBy!) {
-  allowlistProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
+  addresslistProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     dao {
       id
@@ -45,8 +45,8 @@ query addressListProposals($where: ERC20VotingProposal_filter!, $limit:Int!, $sk
     }
     creator
     metadata
-    yes,
-    no,
+    yes
+    no
     abstain
     startDate
     endDate

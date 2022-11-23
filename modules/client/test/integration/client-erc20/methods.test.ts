@@ -308,7 +308,9 @@ describe("Client ERC20", () => {
             const vote = proposal.votes[i];
             expect(typeof vote.address).toBe("string");
             expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-            expect(typeof vote.vote).toBe("number");
+            if (vote.vote) {
+              expect(typeof vote.vote).toBe("number");
+            }
             expect(typeof vote.weight).toBe("bigint");
           }
         }
