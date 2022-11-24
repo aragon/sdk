@@ -140,7 +140,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     if (!ipfsRegex.test(cid.replace("ipfs://", ""))) {
       throw new Error("The metadata URL defined on the DAO is invalid");
     }
-    return "ipfs://" + cid;
+    return cid;
   }
   /**
    * Decodes a dao metadata from an encoded update metadata raw action
