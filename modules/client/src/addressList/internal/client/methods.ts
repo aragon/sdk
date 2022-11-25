@@ -275,11 +275,8 @@ export class ClientAddressListMethods extends ClientCore
       if (!addressListProposal) {
         return null;
       }
-      // TODO
-      // delete this cid once the proposals in subgraph have the correct
       // format in the metadata field
-      const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
-      const metadataString = await this.ipfs.fetchString(test_cid);
+      const metadataString = await this.ipfs.fetchString(addressListProposal.metadata);
       // TODO: Parse and validate schema
       const metadata = JSON.parse(metadataString) as ProposalMetadata;
       return toAddressListProposal(addressListProposal, metadata);
@@ -350,12 +347,9 @@ export class ClientAddressListMethods extends ClientCore
           (
             proposal: SubgraphAddressListProposalListItem,
           ): Promise<AddressListProposalListItem> => {
-            // TODO
-            // delete this cid once the proposals in subgraph have the correct
             // format in the metadata field
-            const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
             return this.ipfs
-              .fetchString(test_cid)
+              .fetchString(proposal.metadata)
               .then((stringMetadata: string) => {
                 // TODO: Parse and validate schema
                 const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
