@@ -1,8 +1,11 @@
 // @ts-ignore
 declare const describe, it, expect;
 
+// mocks need to be at the top of the imports
+import "../../mocks/aragon-sdk-ipfs";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
+
 import {
   Client,
   Context,

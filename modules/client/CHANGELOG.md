@@ -15,9 +15,13 @@ TEMPLATE:
 ### Fixed
 - Fix 1, 2, 3
 -->
+
 ## [UPCOMING]
 ### Changed
 - Stores CIDs with `ipfs://` prefix in contracts
+
+### Added
+- Mocking of the IPFS client during testing
 
 ## 0.14.0-alpha
 On 2022-11-22 16:45:52
