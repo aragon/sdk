@@ -16,6 +16,10 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
+## [UPCOMING]
+### Added
+- Adds new error `MissingExecPermissionError`
+
 ## [0.7.0-alpha]
 ### Added
 - New error type for failed pinning on IPFS
