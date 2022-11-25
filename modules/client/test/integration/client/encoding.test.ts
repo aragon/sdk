@@ -1,6 +1,8 @@
 // @ts-ignore
 declare const describe, it, expect;
 
+import { DAO__factory } from "@aragon/core-contracts-ethers";
+import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import {
   Client,
   Context,
@@ -165,6 +167,17 @@ describe("Client", () => {
 
       expect(typeof installEntry).toBe("object");
       expect(installEntry.data).toBeInstanceOf(Uint8Array);
+
+      const daoInterface = DAO__factory.createInterface();
+      const argsBytes = bytesToHex(installEntry.data);
+      const argsDecoded = daoInterface.decodeFunctionData(
+        "setMetadata",
+        `0x${argsBytes}`,
+      );
+      expect(argsDecoded.length).toBe(1);
+      expect(new TextDecoder().decode(hexToBytes(argsDecoded[0]))).toBe(
+        "ipfs://QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
+      );
     });
   });
 });
