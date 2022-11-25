@@ -1,6 +1,9 @@
 // @ts-ignore
 declare const describe, it, expect, beforeAll, afterAll;
 
+// mocks need to be at the top of the imports
+import "../../mocks/aragon-sdk-ipfs";
+
 import { Random } from "@aragon/sdk-common";
 import { Client, Context, ICreateParams, IDepositParams } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
@@ -28,8 +31,8 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const daoName =
-        "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) + 1;
+      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) +
+        1;
 
       const daoCreationParams: ICreateParams = {
         metadata: {
@@ -43,7 +46,7 @@ describe("Client", () => {
       };
 
       const gasFeesEstimation = await client.estimation.create(
-        daoCreationParams
+        daoCreationParams,
       );
 
       expect(typeof gasFeesEstimation).toEqual("object");
@@ -83,7 +86,7 @@ describe("Client", () => {
       };
 
       const gasFeesEstimation = await client.estimation.updateAllowance(
-        depositParams
+        depositParams,
       );
 
       expect(typeof gasFeesEstimation).toEqual("object");

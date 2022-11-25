@@ -1,6 +1,9 @@
 // @ts-ignore
 declare const describe, it, expect;
 
+// mocks need to be at the top of the imports
+import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
+
 import {
   Client,
   Context,
@@ -43,14 +46,12 @@ describe("Client", () => {
         const params = paramsArray[i];
         const action = client.encoding.grantAction(daoAddresses[i], params);
         const decodedParams: IGrantPermissionDecodedParams = client.decoding
-          .grantAction(action.data);
+          .grantAction(
+            action.data,
+          );
 
-        expect(decodedParams.permission).toBe(
-          params.permission,
-        );
-        expect(decodedParams.where).toBe(
-          params.where,
-        );
+        expect(decodedParams.permission).toBe(params.permission);
+        expect(decodedParams.where).toBe(params.where);
         expect(decodedParams.permissionId).toBe(
           keccak256(toUtf8Bytes(params.permission)),
         );
@@ -81,14 +82,12 @@ describe("Client", () => {
         const params = paramsArray[i];
         const action = client.encoding.revokeAction(daoAddresses[i], params);
         const decodedParams: IRevokePermissionDecodedParams = client.decoding
-          .revokeAction(action.data);
+          .revokeAction(
+            action.data,
+          );
 
-        expect(decodedParams.permission).toBe(
-          params.permission,
-        );
-        expect(decodedParams.where).toBe(
-          params.where,
-        );
+        expect(decodedParams.permission).toBe(params.permission);
+        expect(decodedParams.where).toBe(params.where);
         expect(decodedParams.permissionId).toBe(
           keccak256(toUtf8Bytes(params.permission)),
         );
@@ -117,17 +116,15 @@ describe("Client", () => {
         const params = paramsArray[i];
         const action = client.encoding.freezeAction(daoAddresses[i], params);
         const decodedParams: IFreezePermissionDecodedParams = client.decoding
-          .freezeAction(action.data);
+          .freezeAction(
+            action.data,
+          );
 
-        expect(decodedParams.permission).toBe(
-          params.permission,
-        );
+        expect(decodedParams.permission).toBe(params.permission);
         expect(decodedParams.permissionId).toBe(
           keccak256(toUtf8Bytes(params.permission)),
         );
-        expect(decodedParams.where).toBe(
-          params.where,
-        );
+        expect(decodedParams.where).toBe(params.where);
       }
     });
     it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
@@ -145,7 +142,9 @@ describe("Client", () => {
         withdrawParams,
       );
       const decodedWithdrawParams: IWithdrawParams = client.decoding
-        .withdrawAction(withdrawAction.data);
+        .withdrawAction(
+          withdrawAction.data,
+        );
 
       expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
       expect(decodedWithdrawParams.recipientAddress).toBe(
@@ -172,16 +171,16 @@ describe("Client", () => {
         withdrawParams,
       );
       const decodedWithdrawParams: IWithdrawParams = client.decoding
-        .withdrawAction(withdrawAction.data);
+        .withdrawAction(
+          withdrawAction.data,
+        );
 
       expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
       expect(decodedWithdrawParams.recipientAddress).toBe(
         withdrawParams.recipientAddress,
       );
       expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference);
-      expect(decodedWithdrawParams.tokenAddress).toBe(
-        AddressZero,
-      );
+      expect(decodedWithdrawParams.tokenAddress).toBe(AddressZero);
     });
 
     it("Should decode an encoded update metadata action", async () => {
@@ -203,12 +202,19 @@ describe("Client", () => {
           },
         ],
       };
+
+      mockedIPFSClient.add.mockResolvedValueOnce({
+        hash: "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
+      });
+
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
         params,
       );
       const recoveredIpfsUri: string = await client.decoding
-        .updateMetadataRawAction(updateMetadataAction.data);
+        .updateMetadataRawAction(
+          updateMetadataAction.data,
+        );
       const ipfsRegex =
         /^ipfs:\/\/(Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}))$/;
 
@@ -310,13 +316,20 @@ describe("Client", () => {
           },
         ],
       };
+
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
         params,
       );
 
+      mockedIPFSClient.cat.mockResolvedValueOnce(
+        Buffer.from(JSON.stringify(params)),
+      );
+
       const decodedParams: IMetadata = await client.decoding
-        .updateMetadataAction(updateMetadataAction.data);
+        .updateMetadataAction(
+          updateMetadataAction.data,
+        );
 
       expect(decodedParams.name).toBe(params.name);
       expect(decodedParams.description).toBe(params.description);
