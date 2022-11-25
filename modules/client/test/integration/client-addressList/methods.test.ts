@@ -1,6 +1,9 @@
 // @ts-ignore
 declare const describe, it, beforeAll, afterAll, expect;
 
+// mocks need to be at the top of the imports
+import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
+
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 
@@ -213,6 +216,21 @@ describe("Client Address List", () => {
       const client = new ClientAddressList(ctxPlugin);
 
       const proposalId = TEST_ADDRESSLIST_PROPOSAL_ID;
+
+      mockedIPFSClient.cat.mockResolvedValue(
+        Buffer.from(
+          JSON.stringify({
+            title: "Title",
+            summary: "Summary",
+            description: "Description",
+            resources: [{
+              name: "Name",
+              url: "URL",
+            }],
+          }),
+        ),
+      );
+
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(typeof proposal).toBe("object");

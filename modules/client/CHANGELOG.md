@@ -15,14 +15,17 @@ TEMPLATE:
 ### Fixed
 - Fix 1, 2, 3
 -->
+
 ## [UPCOMING]
 ### Added
 - Checks if at least one plugin requests `EXECUTE_PERMISSION` during DAO creation
+- Mocking of the IPFS client during testing
 
 ## 0.14.0-alpha
 On 2022-11-22 16:45:52
 ### Fixed
 - Adapt the latest Subgraph query names
+
 ## [0.13.0-alpha]
 ### Added
 - Added `createProposal()` using real contracts

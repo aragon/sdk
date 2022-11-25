@@ -1,6 +1,9 @@
 // @ts-ignore
 declare const describe, it, beforeAll, afterAll, expect, test, fail;
 
+// mocks need to be at the top of the imports
+import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
+
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import {
@@ -365,6 +368,17 @@ describe("Client", () => {
         const ctx = new Context(contextParams);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
+
+        mockedIPFSClient.cat.mockResolvedValueOnce(
+          Buffer.from(
+            JSON.stringify({
+              name: "Name",
+              description: "Description",
+              links: [],
+            }),
+          ),
+        );
+
         const dao = await client.methods.getDao(daoAddress);
         expect(typeof dao).toBe("object");
         expect(dao === null).toBe(false);
@@ -423,6 +437,19 @@ describe("Client", () => {
           direction: SortDirection.ASC,
           sortBy: DaoSortBy.NAME,
         };
+
+        const defaultImplementation = mockedIPFSClient.cat
+          .getMockImplementation();
+        mockedIPFSClient.cat.mockResolvedValue(
+          Buffer.from(
+            JSON.stringify({
+              name: "Name",
+              description: "Description",
+              links: [],
+            }),
+          ),
+        );
+
         const daos = await client.methods.getDaos(params);
         expect(Array.isArray(daos)).toBe(true);
         expect(daos.length <= limit).toBe(true);
@@ -444,6 +471,8 @@ describe("Client", () => {
             expect(typeof dao.metadata.avatar).toBe("string");
           }
         }
+
+        mockedIPFSClient.cat.mockImplementation(defaultImplementation);
       });
 
       it("Should get DAOs balances", async () => {
