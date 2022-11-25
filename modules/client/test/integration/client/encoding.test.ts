@@ -179,7 +179,7 @@ describe("Client", () => {
       );
       expect(argsDecoded.length).toBe(1);
       expect(new TextDecoder().decode(hexToBytes(argsDecoded[0]))).toBe(
-        "ipfs://QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
+        "ipfs://QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo",
       );
     });
   });
