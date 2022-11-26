@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## 0.15.0-alpha
+On 2022-11-26 10:27:25
 ### Changed
 - Stores CIDs with `ipfs://` prefix in contracts
 
