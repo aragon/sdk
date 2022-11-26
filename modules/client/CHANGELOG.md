@@ -21,7 +21,7 @@ TEMPLATE:
 - Mocking of the IPFS client during testing
 
 ### Fixed
-- Removes hardcoded CIDs
+- Removes hardcoded IPFS CIDs
 
 ## 0.14.0-alpha
 On 2022-11-22 16:45:52
