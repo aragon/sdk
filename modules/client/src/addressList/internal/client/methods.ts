@@ -91,7 +91,7 @@ export class ClientAddressListMethods extends ClientCore
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await addresslistContract.createVote(
-      toUtf8Bytes(cid),
+      toUtf8Bytes(`ipfs://${cid}`),
       params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
