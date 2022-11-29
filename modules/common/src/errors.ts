@@ -93,6 +93,21 @@ export class MissingExecPermissionError extends Error {
 export class IpfsFetchError extends Error {
   constructor() {
     super("Failed to fetch data from IPFS");
+export class InvalidPermissionError extends Error {
+  constructor() {
+    super("The specified permission does not exist");
+  }
+}
+
+export class InvalidDataError extends Error {
+  constructor() {
+    super("Invalid type, an Uin8Array was expected");
+  }
+}
+
+export class InvalidBigintError extends Error {
+  constructor() {
+    super("Invalid type, BigInt was expected");
   }
 }
 export class InvalidVotingModeError extends Error {

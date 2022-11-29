@@ -14,6 +14,12 @@ import {
   permissionParamsToContract,
   withdrawParamsToContract,
 } from "../utils";
+import {
+  addressOrEnsSchema,
+  freezePermissionParamsSchema,
+  permissionParamsSchema,
+  withdrawParamsSchema,
+} from "../../schemas";
 
 /**
  * Encoding module the SDK Generic Client
@@ -37,22 +43,14 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     params: IGrantPermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
-    const { where, who } = params;
     if (!signer) {
       throw new Error("A signer is needed");
-    } else if (
-      !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
-    ) {
-      throw new Error("Invalid address");
     }
+    addressOrEnsSchema.validateSync(daoAddress);
+    const validParams = permissionParamsSchema.validateSync(params);
+
     const daoInterface = DAO__factory.createInterface();
-    const args = permissionParamsToContract(
-      {
-        who,
-        where,
-        permission: params.permission,
-      },
-    );
+    const args = permissionParamsToContract(validParams);
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("grant", args);
     const data = hexToBytes(strip0x(hexBytes));
@@ -75,22 +73,16 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     params: IRevokePermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
-    const { where, who } = params;
     if (!signer) {
       throw new Error("A signer is needed");
-    } else if (
-      !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
-    ) {
-      throw new Error("Invalid address");
     }
+    // validate dao address and params
+    addressOrEnsSchema.strict().validateSync(daoAddress);
+    permissionParamsSchema.strict().validateSync(params);
+
     const daoInterface = DAO__factory.createInterface();
-    const args = permissionParamsToContract(
-      {
-        who,
-        where,
-        permission: params.permission,
-      },
-    );
+
+    const args = permissionParamsToContract(params);
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("revoke", args);
     const data = hexToBytes(strip0x(hexBytes));
@@ -116,9 +108,11 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     const { where } = params;
     if (!signer) {
       throw new Error("A signer is needed");
-    } else if (!isAddress(where) || !isAddress(daoAddress)) {
-      throw new Error("Invalid address");
     }
+
+    addressOrEnsSchema.strict().validateSync(daoAddress);
+    freezePermissionParamsSchema.strict().validateSync(params);
+
     const daoInterface = DAO__factory.createInterface();
     const args = freezeParamsToContract(
       {
@@ -143,27 +137,20 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * @return {*}  {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
-  public async withdrawAction(
+  public withdrawAction(
     daoAddressOrEns: string,
     params: IWithdrawParams,
-  ): Promise<DaoAction> {
-    let address = daoAddressOrEns;
-    if (!isAddress(daoAddressOrEns)) {
-      const resolvedAddress = await this.web3.getSigner()?.resolveName(
-        daoAddressOrEns,
-      );
-      if (!resolvedAddress) {
-        throw new Error("invalid ens");
-      }
-      address = resolvedAddress;
-    }
+  ): DaoAction {
+    addressOrEnsSchema.strict().validateSync(daoAddressOrEns);
+    withdrawParamsSchema.strict().validateSync(params);
+
     const daoInterface = DAO__factory.createInterface();
     const args = withdrawParamsToContract(params);
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("withdraw", args);
     const data = hexToBytes(strip0x(hexBytes));
     return {
-      to: address,
+      to: daoAddressOrEns,
       value: BigInt(0),
       data,
     };

@@ -23,6 +23,7 @@ import {
 import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
+import { createParamsSchema, depositParamsSchema } from "../../schemas";
 
 /**
  * Estimation module the SDK Generic Client
@@ -64,6 +65,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
         data: toUtf8String(plugin.data),
       });
     }
+    createParamsSchema.strict().validateSync(params);
 
     const gasEstimation = await daoInstance.estimateGas.createDao(
       {
@@ -91,6 +93,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+    depositParamsSchema.strict().validateSync(params);
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
       params,
@@ -127,6 +130,8 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     } else if (!params.tokenAddress) {
       throw new NoTokenAddress();
     }
+
+    depositParamsSchema.strict().validateSync(params);
 
     // resolve ens
     let daoAddress = params.daoAddressOrEns;

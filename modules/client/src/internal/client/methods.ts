@@ -77,6 +77,11 @@ import {
   UNAVAILABLE_DAO_METADATA,
   UNSUPPORTED_DAO_METADATA_LINK,
 } from "../constants";
+import {
+  createParamsSchema,
+  depositParamsSchema,
+  hasPermissionParamsSchema,
+} from "../../schemas";
 
 /**
  * Methods module the SDK Generic Client
@@ -103,6 +108,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+    // validate params and throw error if incorrect
+    // and asserted version of the params if correct
+    createParamsSchema.strict().validate(params);
 
     const daoFactoryInstance = DAOFactory__factory.connect(
       this.web3.getDaoFactoryAddress(),
@@ -227,6 +235,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
+
+    depositParamsSchema.strict().validateSync(params);
+
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
       params,
     );
@@ -366,6 +377,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    hasPermissionParamsSchema.strict().validateSync(params);
+
     // connect to the managing dao
     const daoInstance = DAO__factory.connect(params.daoAddressOrEns, signer);
     return daoInstance.hasPermission(
