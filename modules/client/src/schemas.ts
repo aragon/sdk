@@ -1,76 +1,47 @@
+import { array, object, string } from "yup";
 import {
-  InvalidAddressError,
-  InvalidBigintError,
-  InvalidDataError,
-  InvalidPermissionError,
-} from "@aragon/sdk-common";
-import { isAddress } from "@ethersproject/address";
-import { array, mixed, object, string } from "yup";
-import { pluginInstallItemSchema } from "./client-common";
-import { Permissions } from "./interfaces";
-// common
+  addressOrEnsSchema,
+  addressSchema,
+  bigintSchema,
+  permissionSchema,
+  pluginInstallItemSchema,
+  uint8ArraySchema,
+} from "./client-common";
 
-//address
-export const addressSchema = string().test(
-  "address",
-  new InvalidAddressError().message,
-  (val) => isAddress(val || ""),
-);
+// DAO details
+const daoResourceLinkSchema = object({
+  name: string().required(),
+  url: string().required(),
+});
 
-// address list or ens
-export const addressOrEnsSchema = string().test(
-  "address",
-  new InvalidAddressError().message,
-  (val) => {
-    // todo check ens
-    return isAddress(val || "");
-  },
-);
-// permissions
-export const permissionSchema = string().test(
-  "permission",
-  new InvalidPermissionError().message,
-  (val) => Object.keys(Permissions).includes(val || ""),
-);
-
-// uint8array
-export const uint8ArraySchema = mixed().test(
-  "uint8Array",
-  new InvalidDataError().message,
-  (val) => val instanceof Uint8Array,
-);
-
-// bigint
-export const bigintSchema = mixed().test(
-  "bigint",
-  new InvalidBigintError().message,
-  (val) => {
-    return typeof val === "bigint";
-  },
-);
-
+export const metadataSchema = object({
+  name: string().required(),
+  description: string().required(),
+  avatar: string().optional(),
+  links: array(daoResourceLinkSchema).required(),
+});
 // Create proposal
 export const createParamsSchema = object({
-  metadata: string().required(),
+  metadata: metadataSchema.required(),
   ensSubdomain: string().required(),
   trustedForwarder: string().optional(),
-  plugins: array().of(pluginInstallItemSchema).required(),
+  plugins: array(pluginInstallItemSchema).required(),
 });
 
 // Withdraw
 export const withdrawParamsSchema = object({
-  recipientAddress: string().required(),
+  recipientAddress: addressOrEnsSchema.required(),
   amount: bigintSchema.required(),
-  tokenAddress: addressSchema.optional(),
-  reference: string().optional(),
+  tokenAddress: addressSchema,
+  reference: string(),
 });
 
 // deposit
 export const depositParamsSchema = object({
   daoAddressOrEns: addressOrEnsSchema.required(),
   amount: bigintSchema.required(),
-  tokenAddress: addressSchema.optional(),
-  reference: string().optional(),
+  tokenAddress: addressSchema,
+  reference: string(),
 });
 
 // has permission
@@ -79,19 +50,7 @@ export const hasPermissionParamsSchema = object({
   where: addressOrEnsSchema.required(),
   who: addressOrEnsSchema.required(),
   permission: permissionSchema.required(),
-  data: uint8ArraySchema.optional(),
-});
-
-// DAO details
-const daoResourceLinkSchema = object({
-  name: string().required(),
-  url: string().required(),
-});
-export const metadataSchema = object({
-  name: string().required(),
-  description: string().required(),
-  avatar: string().optional(),
-  links: array().of(daoResourceLinkSchema).required(),
+  data: uint8ArraySchema,
 });
 
 export const permissionParamsSchema = object({

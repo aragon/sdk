@@ -15,11 +15,11 @@ import {
   withdrawParamsToContract,
 } from "../utils";
 import {
-  addressOrEnsSchema,
   freezePermissionParamsSchema,
   permissionParamsSchema,
   withdrawParamsSchema,
 } from "../../schemas";
+import { addressOrEnsSchema } from "../../client-common";
 
 /**
  * Encoding module the SDK Generic Client

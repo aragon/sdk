@@ -19,9 +19,12 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../interfaces";
 import {
+  canVoteParamsSchema,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
+  createProposalParamsSchema,
+  executeProposalParamsSchema,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -37,6 +40,7 @@ import {
   ProposalSortBy,
   SortDirection,
   SubgraphVotingSettings,
+  voteProposalParamsSchema,
   VoteProposalStep,
   VoteProposalStepValue,
   VotingSettings,
@@ -84,6 +88,8 @@ export class AddresslistVotingClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    createProposalParamsSchema.validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -167,6 +173,8 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
+    voteProposalParamsSchema.validateSync(params);
+
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
@@ -207,6 +215,8 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
+    executeProposalParamsSchema.validateSync(params);
+
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
@@ -236,6 +246,8 @@ export class AddresslistVotingClientMethods extends ClientCore
     } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
+
+    canVoteParamsSchema.validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,

@@ -1,6 +1,6 @@
-import { hexToBytes, InvalidAddressError, strip0x } from "@aragon/sdk-common";
-import { isAddress } from "@ethersproject/address";
+import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
+  addressOrEnsSchema,
   ClientCore,
   ContextPlugin,
   ContractVotingSettings,
@@ -9,6 +9,7 @@ import {
   IPluginInstallItem,
   VotingSettings,
   votingSettingsToContract,
+  pluginSettingsSchema,
 } from "../../../client-common";
 import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
@@ -18,6 +19,7 @@ import {
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { addressListPluginInstallSchema, membersSchema } from "../../schemas";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -41,6 +43,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
   ): IPluginInstallItem {
+    addressListPluginInstallSchema.validateSync(params);
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], "members"]
       [
@@ -72,10 +75,8 @@ export class AddresslistVotingClientEncoding extends ClientCore
     pluginAddress: string,
     params: VotingSettings,
   ): DaoAction {
-    if (!isAddress(pluginAddress)) {
-      throw new InvalidAddressError();
-    }
-    // TODO: check if to and value are correct
+    addressOrEnsSchema.validateSync(pluginAddress);
+    pluginSettingsSchema.validateSync(params);
     return {
       to: pluginAddress,
       value: BigInt(0),
@@ -91,14 +92,8 @@ export class AddresslistVotingClientEncoding extends ClientCore
    * @memberof AddresslistVotingClientEncoding
    */
   public addMembersAction(pluginAddress: string, members: string[]): DaoAction {
-    if (!isAddress(pluginAddress)) {
-      throw new InvalidAddressError();
-    }
-    for (const member of members) {
-      if (!isAddress(member)) {
-        throw new InvalidAddressError();
-      }
-    }
+    addressOrEnsSchema.validateSync(pluginAddress);
+    membersSchema.validateSync(members);
     const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
@@ -124,14 +119,8 @@ export class AddresslistVotingClientEncoding extends ClientCore
     pluginAddress: string,
     members: string[],
   ): DaoAction {
-    if (!isAddress(pluginAddress)) {
-      throw new InvalidAddressError();
-    }
-    for (const member of members) {
-      if (!isAddress(member)) {
-        throw new InvalidAddressError();
-      }
-    }
+    addressOrEnsSchema.validateSync(pluginAddress);
+    membersSchema.validateSync(members);
     const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(

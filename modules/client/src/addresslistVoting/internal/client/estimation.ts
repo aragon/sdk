@@ -2,10 +2,13 @@ import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import {
   ClientCore,
   ContextPlugin,
+  createProposalParamsSchema,
+  executeProposalParamsSchema,
   GasFeeEstimation,
   ICreateProposalParams,
   IExecuteProposalParams,
   IVoteProposalParams,
+  voteProposalParamsSchema,
 } from "../../../client-common";
 import { IAddresslistVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -38,6 +41,8 @@ export class AddresslistVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    createProposalParamsSchema.validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -76,6 +81,8 @@ export class AddresslistVotingClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
+    voteProposalParamsSchema.validateSync(params);
+
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
@@ -105,6 +112,9 @@ export class AddresslistVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    executeProposalParamsSchema.validateSync(params);
+
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,

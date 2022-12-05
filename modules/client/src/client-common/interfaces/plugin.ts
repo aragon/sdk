@@ -86,6 +86,8 @@ export interface IExecuteProposalParams {
 export interface ICanVoteParams {
   pluginAddress: string;
   proposalId: string;
+  // TODO
+  // addressOrEns ??
   address: string;
 }
 

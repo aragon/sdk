@@ -1,10 +1,12 @@
 import { hexToBytes, InvalidAddressError, strip0x } from "@aragon/sdk-common";
 import {
+  addressOrEnsSchema,
   ClientCore,
   ContextPlugin,
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
+  pluginSettingsSchema,
   VotingSettings,
 } from "../../../client-common";
 import { isAddress } from "@ethersproject/address";
@@ -23,6 +25,7 @@ import {
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { erc20PluginInstallSchema } from "../../schemas";
 /**
  * Encoding module the SDK TokenVoting Client
  */
@@ -44,6 +47,7 @@ export class TokenVotingClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: ITokenVotingPluginInstall,
   ): IPluginInstallItem {
+    erc20PluginInstallSchema.validateSync(params);
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], ["address","name","symbol"][ "receivers","amount"]
@@ -71,9 +75,8 @@ export class TokenVotingClientEncoding extends ClientCore
     pluginAddress: string,
     params: VotingSettings,
   ): DaoAction {
-    if (!isAddress(pluginAddress)) {
-      throw new Error("Invalid plugin address");
-    }
+    addressOrEnsSchema.validateSync(pluginAddress);
+    pluginSettingsSchema.validateSync(params);
     // TODO: check if to and value are correct
     return {
       to: pluginAddress,

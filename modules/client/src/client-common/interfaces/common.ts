@@ -1,5 +1,4 @@
 // This file contains common types, interfaces, and enumerations
-import yup from "yup";
 
 export enum DaoRole {
   UPGRADE_ROLE = "UPGRADE_ROLE",
@@ -9,10 +8,6 @@ export enum DaoRole {
   SET_SIGNATURE_VALIDATOR_ROLE = "SET_SIGNATURE_VALIDATOR_ROLE",
 }
 
-export const pluginInstallItemSchema = yup.object({
-  id: yup.string().required(),
-  data: yup.mixed().required(),
-});
 /**
  * Contains the payload passed to the global DAO factory so that
  * plugins can be initialized

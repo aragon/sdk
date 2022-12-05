@@ -2,10 +2,13 @@ import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
 import {
   ClientCore,
   ContextPlugin,
+  createProposalParamsSchema,
+  executeProposalParamsSchema,
   GasFeeEstimation,
   ICreateProposalParams,
   IExecuteProposalParams,
   IVoteProposalParams,
+  voteProposalParamsSchema,
 } from "../../../client-common";
 import { ITokenVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -36,7 +39,7 @@ export class TokenVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-
+    createProposalParamsSchema.validateSync(params);
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
@@ -72,6 +75,7 @@ export class TokenVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+    voteProposalParamsSchema.validateSync(params);
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
@@ -101,7 +105,7 @@ export class TokenVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-
+    executeProposalParamsSchema.validateSync(params);
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,

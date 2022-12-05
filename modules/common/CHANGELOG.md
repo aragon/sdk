@@ -25,6 +25,9 @@ On 2022-12-13 15:57:38
 ### Fixed
 - IPFS uri resolving
 
+## [UPCOMING]
+### Added
+- New error types
 ## [0.9.0-alpha]
 ### Added
 - Adds new error `MissingExecPermissionError`

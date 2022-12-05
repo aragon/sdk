@@ -18,6 +18,7 @@ TEMPLATE:
 - Splits `getPluginSettings` in `getVotingSettings` and `getMembers`
 ## [0.18.0-alpha]
 ### Added
+- Input validation for onchain methods
 - Add `pinMetadata` examples
 ### Fixed
 - Fix `getVotingSettings` respoinse in tokenVoting and addresslistVoting clients

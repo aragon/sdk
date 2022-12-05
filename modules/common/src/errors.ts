@@ -93,6 +93,8 @@ export class MissingExecPermissionError extends Error {
 export class IpfsFetchError extends Error {
   constructor() {
     super("Failed to fetch data from IPFS");
+  }
+}
 export class InvalidPermissionError extends Error {
   constructor() {
     super("The specified permission does not exist");
@@ -101,7 +103,7 @@ export class InvalidPermissionError extends Error {
 
 export class InvalidDataError extends Error {
   constructor() {
-    super("Invalid type, an Uin8Array was expected");
+    super("Invalid type, an Uint8Array was expected");
   }
 }
 
@@ -123,5 +125,22 @@ export class EnsureAllowanceError extends Error {
 export class InvalidPrecisionError extends Error {
   constructor() {
     super("Invalid precision, number must be an integer greater than 0");
+  }
+}
+
+export class InvalidDateError extends Error {
+  constructor() {
+    super("Invalid type, Date was expected");
+  }
+}
+export class InvalidBigNumberishError extends Error {
+  constructor() {
+    super("Invalid type, BigNumberish was expected");
+  }
+}
+
+export class InvalidVoteValueError extends Error {
+  constructor() {
+    super("Invalid vote value");
   }
 }

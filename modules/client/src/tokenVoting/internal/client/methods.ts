@@ -12,9 +12,12 @@ import {
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import {
+  canVoteParamsSchema,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
+  createProposalParamsSchema,
+  executeProposalParamsSchema,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -31,6 +34,7 @@ import {
   ProposalSortBy,
   SortDirection,
   SubgraphVotingSettings,
+  voteProposalParamsSchema,
   VoteProposalStep,
   VoteProposalStepValue,
   VotingSettings,
@@ -88,6 +92,8 @@ export class TokenVotingClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    createProposalParamsSchema.validateSync(params);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
@@ -169,6 +175,8 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
+    voteProposalParamsSchema.validateSync(params);
+
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
@@ -206,6 +214,8 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
+    executeProposalParamsSchema.validateSync(params);
+
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
@@ -232,9 +242,9 @@ export class TokenVotingClientMethods extends ClientCore
     const signer = this.web3.getConnectedSigner();
     if (!signer.provider) {
       throw new NoProviderError();
-    } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
     }
+
+    canVoteParamsSchema.validateSync(params);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,

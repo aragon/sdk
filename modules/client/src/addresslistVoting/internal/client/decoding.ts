@@ -6,6 +6,8 @@ import {
   getFunctionFragment,
   IInterfaceParams,
   VotingSettings,
+  IPluginSettings,
+  uint8ArraySchema,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { IAddresslistVotingClientDecoding } from "../../interfaces";
@@ -30,6 +32,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * @memberof AddresslistVotingClientDecoding
    */
   public updatePluginSettingsAction(data: Uint8Array): VotingSettings {
+    uint8ArraySchema.validateSync(data);
     return decodeUpdatePluginSettingsAction(data);
   }
   /**
@@ -40,6 +43,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * @memberof AddresslistVotingClientDecoding
    */
   public addMembersAction(data: Uint8Array): string[] {
+    uint8ArraySchema.validateSync(data);
     const votingInterface = AddresslistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
@@ -63,6 +67,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * @memberof AddresslistVotingClientDecoding
    */
   public removeMembersAction(data: Uint8Array): string[] {
+    uint8ArraySchema.validateSync(data);
     const votingInterface = AddresslistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
@@ -88,6 +93,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * @memberof AddresslistVotingClientDecoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
+    uint8ArraySchema.validateSync(data);
     try {
       const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
       return {

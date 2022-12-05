@@ -24,6 +24,7 @@ import {
   withdrawParamsFromContract,
 } from "../utils";
 import { resolveIpfsCid } from "@aragon/sdk-common";
+import { uint8ArraySchema } from "../../client-common";
 
 /**
  * Decoding module the SDK Generic Client
@@ -42,6 +43,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public grantAction(data: Uint8Array): IGrantPermissionDecodedParams {
+    uint8ArraySchema.validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
@@ -62,6 +64,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public revokeAction(data: Uint8Array): IRevokePermissionDecodedParams {
+    uint8ArraySchema.validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
@@ -82,6 +85,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public freezeAction(data: Uint8Array): IFreezePermissionDecodedParams {
+    uint8ArraySchema.validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
@@ -102,6 +106,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public withdrawAction(data: Uint8Array): IWithdrawParams {
+    uint8ArraySchema.validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
@@ -122,6 +127,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public updateDaoMetadataRawAction(data: Uint8Array): string {
+    uint8ArraySchema.validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
@@ -145,6 +151,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public async updateDaoMetadataAction(data: Uint8Array): Promise<DaoMetadata> {
+    uint8ArraySchema.validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
