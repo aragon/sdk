@@ -212,6 +212,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async pinMetadata(params: IMetadata): Promise<string> {
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
+      await this.ipfs.pin(cid);
       return cid;
     } catch {
       throw new IpfsPinError();

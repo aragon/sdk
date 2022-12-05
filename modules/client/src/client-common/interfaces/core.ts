@@ -3,7 +3,7 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { Client as IpfsClient } from "@aragon/sdk-ipfs";
+import { Client as IpfsClient, PinResponse } from "@aragon/sdk-ipfs";
 import { GasFeeEstimation } from "./common";
 import { GraphQLClient } from "graphql-request";
 
@@ -30,6 +30,7 @@ export interface IClientIpfsCore {
   isUp: () => Promise<boolean>;
   ensureOnline: () => Promise<void>;
   add: (input: string | Uint8Array) => Promise<string>;
+  pin: (input: string) => Promise<PinResponse>;
   fetchString: (cid: string) => Promise<string>;
   fetchBytes: (cid: string) => Promise<Uint8Array | undefined>;
 }

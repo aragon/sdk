@@ -139,6 +139,7 @@ export class ClientAddressListMethods extends ClientCore
   public async pinMetadata(params: ProposalMetadata): Promise<string> {
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
+      await this.ipfs.pin(cid);
       return cid;
     } catch {
       throw new IpfsPinError();
