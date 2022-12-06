@@ -276,7 +276,9 @@ export class ClientAddressListMethods extends ClientCore
         return null;
       }
       // format in the metadata field
-      const metadataString = await this.ipfs.fetchString(addressListProposal.metadata);
+      const metadataUri = new URL(addressListProposal.metadata);
+      const metadataCid = metadataUri.host;
+      const metadataString = await this.ipfs.fetchString(metadataCid);
       // TODO: Parse and validate schema
       const metadata = JSON.parse(metadataString) as ProposalMetadata;
       return toAddressListProposal(addressListProposal, metadata);
@@ -348,8 +350,10 @@ export class ClientAddressListMethods extends ClientCore
             proposal: SubgraphAddressListProposalListItem,
           ): Promise<AddressListProposalListItem> => {
             // format in the metadata field
+            const metadataUri = new URL(proposal.metadata);
+            const metadataCid = metadataUri.host;
             return this.ipfs
-              .fetchString(proposal.metadata)
+              .fetchString(metadataCid)
               .then((stringMetadata: string) => {
                 // TODO: Parse and validate schema
                 const metadata = JSON.parse(stringMetadata) as ProposalMetadata;

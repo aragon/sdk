@@ -49,11 +49,7 @@ import {
   Transfer,
   TransferSortBy,
 } from "../../interfaces";
-import {
-  ClientCore,
-  Context,
-  SortDirection,
-} from "../../client-common";
+import { ClientCore, Context, SortDirection } from "../../client-common";
 import {
   toAssetBalance,
   toDaoDetails,
@@ -267,7 +263,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!log) {
         throw new Error("Could not find the Approval event");
       }
-      const value = log.data
+      const value = log.data;
       if (!value || BigNumber.from(amount).gt(BigNumber.from(value))) {
         throw new Error("Could not update allowance");
       }
@@ -336,9 +332,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!dao) {
         return null;
       }
-      const stringMetadata = await this.ipfs.fetchString(
-        dao.metadata,
-      );
+      const metadataUri = new URL(dao.metadata);
+      const metadataCid = metadataUri.host;
+      const stringMetadata = await this.ipfs.fetchString(metadataCid);
       const metadata = JSON.parse(stringMetadata);
       return toDaoDetails(dao, metadata);
     } catch (err) {
@@ -379,10 +375,14 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return Promise.all(
         daos.map(
           (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
-            return this.ipfs.fetchString(dao.metadata).then((stringMetadata) => {
-              const metadata = JSON.parse(stringMetadata);
-              return toDaoListItem(dao, metadata);
-            });
+            const metadataUri = new URL(dao.metadata);
+            const metadataCid = metadataUri.host;
+            return this.ipfs.fetchString(metadataCid).then(
+              (stringMetadata) => {
+                const metadata = JSON.parse(stringMetadata);
+                return toDaoListItem(dao, metadata);
+              },
+            );
           },
         ),
       );

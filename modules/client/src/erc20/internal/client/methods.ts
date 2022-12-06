@@ -277,7 +277,9 @@ export class ClientErc20Methods extends ClientCore
         return null;
       }
       // format in the metadata field
-      const metadataString = await this.ipfs.fetchString(erc20VotingProposal.metadata);
+      const metadataUri = new URL(erc20VotingProposal.metadata);
+      const metadataCid = metadataUri.host;
+      const metadataString = await this.ipfs.fetchString(metadataCid);
       // TODO: Parse and validate schema
       const metadata = JSON.parse(metadataString) as ProposalMetadata;
       return toErc20Proposal(erc20VotingProposal, metadata);
@@ -341,8 +343,10 @@ export class ClientErc20Methods extends ClientCore
             proposal: SubgraphErc20ProposalListItem,
           ): Promise<Erc20ProposalListItem> => {
             // format in the metadata field
+            const metadataUri = new URL(proposal.metadata);
+            const metadataCid = metadataUri.host;
             return this.ipfs
-              .fetchString(proposal.metadata)
+              .fetchString(metadataCid)
               .then((stringMetadata: string) => {
                 // TODO: Parse and validate schema¡
                 const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
