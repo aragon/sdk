@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## 0.15.1-alpha
+On 2022-12-06 11:20:50
 ### Fixed
 - Bigint overflow in deposit
 
