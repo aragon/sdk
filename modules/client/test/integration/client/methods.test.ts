@@ -158,10 +158,10 @@ describe("Client", () => {
         const client = new Client(context);
 
         const tokenContract = await deployErc20(client);
-
+        const amount = BigInt("1000000000000000000")
         const depositParams: IDepositParams = {
           daoAddressOrEns: daoAddress,
-          amount: BigInt(5),
+          amount,
           tokenAddress: tokenContract.address,
           reference: "My reference",
         };
@@ -186,7 +186,7 @@ describe("Client", () => {
               break;
             case DaoDepositSteps.UPDATED_ALLOWANCE:
               expect(typeof step.allowance).toBe("bigint");
-              expect(step.allowance).toBe(BigInt(5));
+              expect(step.allowance).toBe(amount);
               break;
             case DaoDepositSteps.DEPOSITING:
               expect(typeof step.txHash).toBe("string");
@@ -194,7 +194,7 @@ describe("Client", () => {
               break;
             case DaoDepositSteps.DONE:
               expect(typeof step.amount).toBe("bigint");
-              expect(step.amount).toBe(BigInt(5));
+              expect(step.amount).toBe(amount);
               break;
             default:
               throw new Error(
@@ -209,7 +209,7 @@ describe("Client", () => {
               depositParams.daoAddressOrEns,
             )
           ).toString(),
-        ).toBe("5");
+        ).toBe(amount.toString());
       });
 
       it("Should allow to deposit ERC20 (with existing allowance)", async () => {

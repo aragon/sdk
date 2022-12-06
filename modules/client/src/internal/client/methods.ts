@@ -178,7 +178,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       // Relay the yield steps to the caller as they are received
       yield* this.ensureAllowance(
         daoAddress,
-        amount.toBigInt(),
+        params.amount,
         tokenAddress,
         signer,
       );
@@ -267,8 +267,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!log) {
         throw new Error("Could not find the Approval event");
       }
-      const value = parseInt(log.data);
-      if (!value || BigNumber.from(amount).gt(value)) {
+      const value = log.data
+      if (!value || BigNumber.from(amount).gt(BigNumber.from(value))) {
         throw new Error("Could not update allowance");
       }
     });
