@@ -8,6 +8,7 @@ import {
   NoProviderError,
   ProposalCreationError,
   Random,
+  resolveIpfsCid,
 } from "@aragon/sdk-common";
 import { formatEther } from "@ethersproject/units";
 import {
@@ -277,8 +278,7 @@ export class ClientErc20Methods extends ClientCore
         return null;
       }
       // format in the metadata field
-      const metadataUri = new URL(erc20VotingProposal.metadata);
-      const metadataCid = metadataUri.host;
+      const metadataCid = resolveIpfsCid(erc20VotingProposal.metadata);
       const metadataString = await this.ipfs.fetchString(metadataCid);
       // TODO: Parse and validate schema
       const metadata = JSON.parse(metadataString) as ProposalMetadata;
@@ -343,8 +343,7 @@ export class ClientErc20Methods extends ClientCore
             proposal: SubgraphErc20ProposalListItem,
           ): Promise<Erc20ProposalListItem> => {
             // format in the metadata field
-            const metadataUri = new URL(proposal.metadata);
-            const metadataCid = metadataUri.host;
+            const metadataCid = resolveIpfsCid(proposal.metadata);
             return this.ipfs
               .fetchString(metadataCid)
               .then((stringMetadata: string) => {

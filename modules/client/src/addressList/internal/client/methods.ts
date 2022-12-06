@@ -7,6 +7,7 @@ import {
   NoProviderError,
   ProposalCreationError,
   Random,
+  resolveIpfsCid,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -276,8 +277,7 @@ export class ClientAddressListMethods extends ClientCore
         return null;
       }
       // format in the metadata field
-      const metadataUri = new URL(addressListProposal.metadata);
-      const metadataCid = metadataUri.host;
+      const metadataCid = resolveIpfsCid(addressListProposal.metadata);
       const metadataString = await this.ipfs.fetchString(metadataCid);
       // TODO: Parse and validate schema
       const metadata = JSON.parse(metadataString) as ProposalMetadata;
@@ -350,8 +350,7 @@ export class ClientAddressListMethods extends ClientCore
             proposal: SubgraphAddressListProposalListItem,
           ): Promise<AddressListProposalListItem> => {
             // format in the metadata field
-            const metadataUri = new URL(proposal.metadata);
-            const metadataCid = metadataUri.host;
+            const metadataCid = resolveIpfsCid(proposal.metadata);
             return this.ipfs
               .fetchString(metadataCid)
               .then((stringMetadata: string) => {

@@ -10,6 +10,7 @@ import {
   InvalidAddressOrEnsError,
   NoProviderError,
   NoSignerError,
+  resolveIpfsCid
 } from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -332,8 +333,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!dao) {
         return null;
       }
-      const metadataUri = new URL(dao.metadata);
-      const metadataCid = metadataUri.host;
+      const metadataCid = resolveIpfsCid(dao.metadata);
       const stringMetadata = await this.ipfs.fetchString(metadataCid);
       const metadata = JSON.parse(stringMetadata);
       return toDaoDetails(dao, metadata);
@@ -375,8 +375,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return Promise.all(
         daos.map(
           (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
-            const metadataUri = new URL(dao.metadata);
-            const metadataCid = metadataUri.host;
+            const metadataCid = resolveIpfsCid(dao.metadata);
             return this.ipfs.fetchString(metadataCid).then(
               (stringMetadata) => {
                 const metadata = JSON.parse(stringMetadata);
