@@ -394,12 +394,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
               const stringMetadata = await this.ipfs.fetchString(metadataCid)
               const metadata = JSON.parse(stringMetadata);
               return toDaoListItem(dao, metadata);
-              // return this.ipfs.fetchString(metadataCid).then(
-              //   (stringMetadata) => {
-              //     const metadata = JSON.parse(stringMetadata);
-              //     return toDaoListItem(dao, metadata);
-              //   },
-              // );
             } catch (err) {
               if (err instanceof InvalidCidError) {
                 return Promise.resolve(
