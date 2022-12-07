@@ -434,7 +434,7 @@ describe("Client", () => {
         const ctx = new Context(contextParams);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
-        const balances = await client.methods.getBalances(daoAddress, []);
+        const balances = await client.methods.getBalances(daoAddress);
         expect(Array.isArray(balances)).toBe(true);
         expect(balances === null).toBe(false);
         if (balances) {
@@ -458,7 +458,7 @@ describe("Client", () => {
         const ctx = new Context(contextParams);
         const client = new Client(ctx);
         const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
-        const balances = await client.methods.getBalances(daoAddress, []);
+        const balances = await client.methods.getBalances(daoAddress);
         expect(Array.isArray(balances)).toBe(true);
         expect(balances?.length).toBe(0);
       });

@@ -125,7 +125,7 @@ import { contextParams } from "./00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const depositParams: IDepositParams = {
-  daoAddress: "0x1234567890123456789012345678901234567890",
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount in wei
   reference: "test deposit", // optional
 };
@@ -176,7 +176,7 @@ import { contextParams } from "./00-context";
 const context = new Context(contextParams);
 const client = new Client(context);
 const depositParams: IDepositParams = {
-  daoAddress: "0x1234567890123456789012345678901234567890",
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
   reference: "test deposit", // optional
@@ -420,16 +420,7 @@ import { contextParams } from "./00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const daoAddressOrEns = "0x12345...";
-const tokenAddresses = [ // Optional: Token addresses in addition to the common ones
-  "0x1234567890123456789012345678901234567890",
-  "0x2345678901234567890123456789012345678901",
-  "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123",
-];
-const balances: AssetBalance[] | null = await client.methods.getBalances(
-  daoAddressOrEns,
-  tokenAddresses,
-);
+const balances: AssetBalance[] | null = await client.methods.getBalances(daoAddressOrEns);
 console.log(balances);
 /*
   [
@@ -1464,7 +1455,6 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
-  Erc20Proposal,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 

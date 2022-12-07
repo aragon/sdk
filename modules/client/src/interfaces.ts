@@ -17,7 +17,6 @@ export interface IClientMethods extends IClientCore {
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getBalances: (
     daoAddressOrEns: string,
-    tokenAddresses: string[],
   ) => Promise<AssetBalance[] | null>;
   /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
