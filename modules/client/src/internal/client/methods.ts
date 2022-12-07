@@ -345,7 +345,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       const metadataString = await this.ipfs.fetchString(metadataCid);
       const metadata = JSON.parse(metadataString) as IMetadata;
       return toDaoDetails(dao, metadata);
-    
     } catch (err) {
       throw new GraphQLError("DAO");
     }
@@ -383,12 +382,14 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       await this.ipfs.ensureOnline();
       return Promise.all(
         daos.map(
-          (dao: SubgraphDaoListItem): Promise<DaoListItem> | DaoListItem => {
+          (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
             let metadataCid = "";
             try {
               metadataCid = resolveIpfsCid(dao.metadata);
             } catch (err) {
-              return toDaoListItem(dao, UNSUPPORTED_DAO_METADATA_LINK);
+              return Promise.resolve(
+                toDaoListItem(dao, UNSUPPORTED_DAO_METADATA_LINK),
+              );
             }
             return this.ipfs.fetchString(metadataCid).then(
               (stringMetadata) => {

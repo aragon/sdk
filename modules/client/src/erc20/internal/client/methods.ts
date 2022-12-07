@@ -284,7 +284,6 @@ export class ClientErc20Methods extends ClientCore
         metadataCid = resolveIpfsCid(erc20VotingProposal.metadata);
         // TODO: Parse and validate schema
       } catch (err) {
-        
         return toErc20Proposal(
           erc20VotingProposal,
           UNSUPPORTED_PROPOSAL_METADATA_LINK,
@@ -351,26 +350,26 @@ export class ClientErc20Methods extends ClientCore
         erc20VotingProposals.map(
           (
             proposal: SubgraphErc20ProposalListItem,
-          ): Promise<Erc20ProposalListItem> | Erc20ProposalListItem => {
+          ): Promise<Erc20ProposalListItem> => {
             // format in the metadata field
-            let metadataCid = ""
+            let metadataCid = "";
             try {
               metadataCid = resolveIpfsCid(proposal.metadata);
             } catch (err) {
-              return toErc20ProposalListItem(
+              return Promise.resolve(toErc20ProposalListItem(
                 proposal,
                 UNSUPPORTED_PROPOSAL_METADATA_LINK,
-              );
+              ));
             }
             return this.ipfs
-                .fetchString(metadataCid)
-                .then((stringMetadata: string) => {
-                  // TODO: Parse and validate schema¡
-                  const metadata = JSON.parse(
-                    stringMetadata,
-                  ) as ProposalMetadata;
-                  return toErc20ProposalListItem(proposal, metadata);
-                });
+              .fetchString(metadataCid)
+              .then((stringMetadata: string) => {
+                // TODO: Parse and validate schema¡
+                const metadata = JSON.parse(
+                  stringMetadata,
+                ) as ProposalMetadata;
+                return toErc20ProposalListItem(proposal, metadata);
+              });
           },
         ),
       );

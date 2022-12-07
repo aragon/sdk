@@ -356,17 +356,17 @@ export class ClientAddressListMethods extends ClientCore
         addressListProposals.map(
           (
             proposal: SubgraphAddressListProposalListItem,
-          ):
-            | Promise<AddressListProposalListItem>
-            | AddressListProposalListItem => {
+          ): Promise<AddressListProposalListItem> => {
             let metadataCid = "";
             try {
               // format in the metadata field
               metadataCid = resolveIpfsCid(proposal.metadata);
             } catch (err) {
-              return toAddressListProposalListItem(
-                proposal,
-                UNSUPPORTED_PROPOSAL_METADATA_LINK,
+              return Promise.resolve(
+                toAddressListProposalListItem(
+                  proposal,
+                  UNSUPPORTED_PROPOSAL_METADATA_LINK,
+                ),
               );
             }
             return this.ipfs
