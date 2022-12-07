@@ -51,6 +51,7 @@ import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { UNSUPPORTED_PROTOCOL_PROPOSAL_METADATA } from "../../../client-common/constants";
 /**
  * Methods module the SDK ERC20 Client
  */
@@ -278,10 +279,15 @@ export class ClientErc20Methods extends ClientCore
         return null;
       }
       // format in the metadata field
-      const metadataCid = resolveIpfsCid(erc20VotingProposal.metadata);
-      const metadataString = await this.ipfs.fetchString(metadataCid);
-      // TODO: Parse and validate schema
-      const metadata = JSON.parse(metadataString) as ProposalMetadata;
+      let metadata: ProposalMetadata = UNSUPPORTED_PROTOCOL_PROPOSAL_METADATA;
+      try {
+        const metadataCid = resolveIpfsCid(erc20VotingProposal.metadata);
+        const metadataString = await this.ipfs.fetchString(metadataCid);
+        // TODO: Parse and validate schema
+        metadata = JSON.parse(metadataString) as ProposalMetadata;
+      } catch (err) {
+        console.warn(err);
+      }
       return toErc20Proposal(erc20VotingProposal, metadata);
     } catch (err) {
       throw new GraphQLError("ERC20 proposal");
@@ -341,16 +347,26 @@ export class ClientErc20Methods extends ClientCore
         erc20VotingProposals.map(
           (
             proposal: SubgraphErc20ProposalListItem,
-          ): Promise<Erc20ProposalListItem> => {
+          ): Promise<Erc20ProposalListItem> | Erc20ProposalListItem => {
             // format in the metadata field
-            const metadataCid = resolveIpfsCid(proposal.metadata);
-            return this.ipfs
-              .fetchString(metadataCid)
-              .then((stringMetadata: string) => {
-                // TODO: Parse and validate schema¡
-                const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
-                return toErc20ProposalListItem(proposal, metadata);
-              });
+            try {
+              const metadataCid = resolveIpfsCid(proposal.metadata);
+              return this.ipfs
+                .fetchString(metadataCid)
+                .then((stringMetadata: string) => {
+                  // TODO: Parse and validate schema¡
+                  const metadata = JSON.parse(
+                    stringMetadata,
+                  ) as ProposalMetadata;
+                  return toErc20ProposalListItem(proposal, metadata);
+                });
+            } catch (err) {
+              console.warn(err)
+              return toErc20ProposalListItem(
+                proposal,
+                UNSUPPORTED_PROTOCOL_PROPOSAL_METADATA,
+              );
+            }
           },
         ),
       );

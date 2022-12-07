@@ -10,7 +10,7 @@ import {
   InvalidAddressOrEnsError,
   NoProviderError,
   NoSignerError,
-  resolveIpfsCid
+  resolveIpfsCid,
 } from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -41,6 +41,7 @@ import {
   IDaoQueryParams,
   IDepositParams,
   IHasPermissionParams,
+  IMetadata,
   ITransferQueryParams,
   SubgraphBalance,
   SubgraphDao,
@@ -61,6 +62,7 @@ import {
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
+import { UNSUPPORTED_PROTOCOL_DAO_METADATA } from "../constants";
 
 /**
  * Methods module the SDK Generic Client
@@ -333,9 +335,18 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!dao) {
         return null;
       }
-      const metadataCid = resolveIpfsCid(dao.metadata);
-      const stringMetadata = await this.ipfs.fetchString(metadataCid);
-      const metadata = JSON.parse(stringMetadata);
+      // const metadataCid = resolveIpfsCid(dao.metadata);
+      // const stringMetadata = await this.ipfs.fetchString(metadataCid);
+      // const metadata = JSON.parse(stringMetadata);
+      let metadata: IMetadata = UNSUPPORTED_PROTOCOL_DAO_METADATA;
+      try {
+        const metadataCid = resolveIpfsCid(dao.metadata);
+        const metadataString = await this.ipfs.fetchString(metadataCid);
+        // TODO: Parse and validate schema
+        metadata = JSON.parse(metadataString) as IMetadata;
+      } catch (err) {
+        console.warn(err);
+      }
       return toDaoDetails(dao, metadata);
     } catch (err) {
       throw new GraphQLError("DAO");
@@ -374,14 +385,19 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       await this.ipfs.ensureOnline();
       return Promise.all(
         daos.map(
-          (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
-            const metadataCid = resolveIpfsCid(dao.metadata);
-            return this.ipfs.fetchString(metadataCid).then(
-              (stringMetadata) => {
-                const metadata = JSON.parse(stringMetadata);
-                return toDaoListItem(dao, metadata);
-              },
-            );
+          (dao: SubgraphDaoListItem): Promise<DaoListItem> | DaoListItem => {
+            try {
+              const metadataCid = resolveIpfsCid(dao.metadata);
+              return this.ipfs.fetchString(metadataCid).then(
+                (stringMetadata) => {
+                  const metadata = JSON.parse(stringMetadata);
+                  return toDaoListItem(dao, metadata);
+                },
+              );
+            } catch (err) {
+              console.warn(err);
+              return toDaoListItem(dao, UNSUPPORTED_PROTOCOL_DAO_METADATA);
+            }
           },
         ),
       );
