@@ -14,3 +14,9 @@ export const UNSUPPORTED_DAO_METADATA_LINK: IMetadata = {
   description: "Unsupported metadata link",
   links: [],
 };
+
+export const UNAVAILABLE_DAO_METADATA_LINK: IMetadata = {
+  name: "Unavailable metadata link",
+  description: "Unavailable metadata link",
+  links: [],
+};

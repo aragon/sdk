@@ -2,6 +2,7 @@ import {
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
+  InvalidCidError,
   InvalidProposalIdError,
   IpfsPinError,
   NoProviderError,
@@ -47,7 +48,10 @@ import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { UNSUPPORTED_PROPOSAL_METADATA_LINK } from "../../../client-common/constants";
+import {
+  UNAVAILABLE_PROPOSAL_METADATA_LINK,
+  UNSUPPORTED_PROPOSAL_METADATA_LINK,
+} from "../../../client-common/constants";
 
 /**
  * Methods module the SDK Address List Client
@@ -277,19 +281,24 @@ export class ClientAddressListMethods extends ClientCore
       if (!addressListProposal) {
         return null;
       }
-      let metadataCid = "";
       try {
-        metadataCid = resolveIpfsCid(addressListProposal.metadata);
+        const metadataCid = resolveIpfsCid(addressListProposal.metadata);
+        const metadataString = await this.ipfs.fetchString(metadataCid);
+        const metadata = JSON.parse(metadataString) as ProposalMetadata;
+        return toAddressListProposal(addressListProposal, metadata);
         // TODO: Parse and validate schema
       } catch (err) {
+        if (err instanceof InvalidCidError) {
+          return toAddressListProposal(
+            addressListProposal,
+            UNSUPPORTED_PROPOSAL_METADATA_LINK,
+          );
+        }
         return toAddressListProposal(
           addressListProposal,
-          UNSUPPORTED_PROPOSAL_METADATA_LINK,
+          UNAVAILABLE_PROPOSAL_METADATA_LINK,
         );
       }
-      const metadataString = await this.ipfs.fetchString(metadataCid);
-      const metadata = JSON.parse(metadataString) as ProposalMetadata;
-      return toAddressListProposal(addressListProposal, metadata);
     } catch (err) {
       throw new GraphQLError("AddressList proposal");
     }
@@ -354,30 +363,29 @@ export class ClientAddressListMethods extends ClientCore
       await this.ipfs.ensureOnline();
       return Promise.all(
         addressListProposals.map(
-          (
+          async (
             proposal: SubgraphAddressListProposalListItem,
           ): Promise<AddressListProposalListItem> => {
-            let metadataCid = "";
+            // format in the metadata field
             try {
-              // format in the metadata field
-              metadataCid = resolveIpfsCid(proposal.metadata);
+              const metadataCid = resolveIpfsCid(proposal.metadata);
+              const stringMetadata = await this.ipfs.fetchString(metadataCid);
+              const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
+              return toAddressListProposalListItem(proposal, metadata);
             } catch (err) {
-              return Promise.resolve(
-                toAddressListProposalListItem(
-                  proposal,
-                  UNSUPPORTED_PROPOSAL_METADATA_LINK,
-                ),
-              );
+              if (err instanceof InvalidCidError) {
+                return Promise.resolve(
+                  toAddressListProposalListItem(
+                    proposal,
+                    UNSUPPORTED_PROPOSAL_METADATA_LINK,
+                  ),
+                );
+              }
+              return Promise.resolve(toAddressListProposalListItem(
+                proposal,
+                UNAVAILABLE_PROPOSAL_METADATA_LINK,
+              ));
             }
-            return this.ipfs
-              .fetchString(metadataCid)
-              .then((stringMetadata: string) => {
-                // TODO: Parse and validate schema
-                const metadata = JSON.parse(
-                  stringMetadata,
-                ) as ProposalMetadata;
-                return toAddressListProposalListItem(proposal, metadata);
-              });
           },
         ),
       );

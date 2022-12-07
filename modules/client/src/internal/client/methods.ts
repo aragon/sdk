@@ -8,6 +8,7 @@ import {
 import {
   GraphQLError,
   InvalidAddressOrEnsError,
+  InvalidCidError,
   NoProviderError,
   NoSignerError,
   resolveIpfsCid,
@@ -62,7 +63,10 @@ import {
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
-import { UNSUPPORTED_DAO_METADATA_LINK } from "../constants";
+import {
+  UNAVAILABLE_DAO_METADATA_LINK,
+  UNSUPPORTED_DAO_METADATA_LINK,
+} from "../constants";
 
 /**
  * Methods module the SDK Generic Client
@@ -335,16 +339,18 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!dao) {
         return null;
       }
-      let metadataCid = "";
       try {
-        metadataCid = resolveIpfsCid(dao.metadata);
+        const metadataCid = resolveIpfsCid(dao.metadata);
+        const metadataString = await this.ipfs.fetchString(metadataCid);
+        const metadata = JSON.parse(metadataString) as IMetadata;
+        return toDaoDetails(dao, metadata);
         // TODO: Parse and validate schema
-      } catch {
-        return toDaoDetails(dao, UNSUPPORTED_DAO_METADATA_LINK);
+      } catch (err) {
+        if (err instanceof InvalidCidError) {
+          return toDaoDetails(dao, UNSUPPORTED_DAO_METADATA_LINK);
+        }
+        return toDaoDetails(dao, UNAVAILABLE_DAO_METADATA_LINK);
       }
-      const metadataString = await this.ipfs.fetchString(metadataCid);
-      const metadata = JSON.parse(metadataString) as IMetadata;
-      return toDaoDetails(dao, metadata);
     } catch (err) {
       throw new GraphQLError("DAO");
     }
@@ -382,21 +388,28 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       await this.ipfs.ensureOnline();
       return Promise.all(
         daos.map(
-          (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
-            let metadataCid = "";
+          async (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
             try {
-              metadataCid = resolveIpfsCid(dao.metadata);
+              const metadataCid = resolveIpfsCid(dao.metadata);
+              const stringMetadata = await this.ipfs.fetchString(metadataCid)
+              const metadata = JSON.parse(stringMetadata);
+              return toDaoListItem(dao, metadata);
+              // return this.ipfs.fetchString(metadataCid).then(
+              //   (stringMetadata) => {
+              //     const metadata = JSON.parse(stringMetadata);
+              //     return toDaoListItem(dao, metadata);
+              //   },
+              // );
             } catch (err) {
+              if (err instanceof InvalidCidError) {
+                return Promise.resolve(
+                  toDaoListItem(dao, UNSUPPORTED_DAO_METADATA_LINK),
+                );
+              }
               return Promise.resolve(
-                toDaoListItem(dao, UNSUPPORTED_DAO_METADATA_LINK),
+                toDaoListItem(dao, UNAVAILABLE_DAO_METADATA_LINK),
               );
             }
-            return this.ipfs.fetchString(metadataCid).then(
-              (stringMetadata) => {
-                const metadata = JSON.parse(stringMetadata);
-                return toDaoListItem(dao, metadata);
-              },
-            );
           },
         ),
       );
