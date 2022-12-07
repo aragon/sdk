@@ -9,9 +9,9 @@ import {
 import {
   GraphQLError,
   InvalidAddressOrEnsError,
+  MissingExecPermissionError,
   NoProviderError,
   NoSignerError,
-  MissingExecPermissionError
 } from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -81,7 +81,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async *create(
-    params: ICreateParams
+    params: ICreateParams,
   ): AsyncGenerator<DaoCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -92,14 +92,14 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     const daoFactoryInstance = DAOFactory__factory.connect(
       this.web3.getDaoFactoryAddress(),
-      signer
+      signer,
     );
 
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
     for (const plugin of params.plugins) {
       const latestVersion = await PluginRepo__factory.connect(
         plugin.id,
-        signer
+        signer,
       ).getLatestVersion();
       pluginInstallationData.push({
         pluginSetup: latestVersion[1],
@@ -118,25 +118,28 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // check if at least one plugin requests EXECUTE_PERMISSION on the DAO
     // This check isn't 100% correct all the time
     // simulate the DAO creation to get an address
-    const pluginSetupProcessorAddr = await daoFactoryInstance.pluginSetupProcessor();
+    const pluginSetupProcessorAddr = await daoFactoryInstance
+      .pluginSetupProcessor();
     const pluginSetupProcessor = PluginSetupProcessor__factory.connect(
       pluginSetupProcessorAddr,
-      signer
+      signer,
     );
     let execPermissionFound = false;
 
     // using the DAO base because it reflects a newly created DAO the best
-    const daoBaseAddr = await daoFactoryInstance.daoBase()
+    const daoBaseAddr = await daoFactoryInstance.daoBase();
     // simulates each plugin installation seperately to get the requested permissions
     for (const plugin of pluginInstallationData) {
-      const pluginSetupProcessorResponse = await pluginSetupProcessor.callStatic.prepareInstallation(
-        daoBaseAddr, 
-        plugin.pluginSetup,
-        plugin.pluginSetupRepo,
-        plugin.data
-      );
+      const pluginSetupProcessorResponse = await pluginSetupProcessor.callStatic
+        .prepareInstallation(
+          daoBaseAddr,
+          plugin.pluginSetup,
+          plugin.pluginSetupRepo,
+          plugin.data,
+        );
       const found = pluginSetupProcessorResponse.permissions.find(
-        permission => permission.permissionId === PermissionIds.EXECUTE_PERMISSION_ID
+        (permission) =>
+          permission.permissionId === PermissionIds.EXECUTE_PERMISSION_ID,
       );
       if (found) {
         execPermissionFound = true;
@@ -144,8 +147,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       }
     }
 
-    if(!execPermissionFound) {
-      throw new MissingExecPermissionError()
+    if (!execPermissionFound) {
+      throw new MissingExecPermissionError();
     }
 
     const tx = await daoFactoryInstance.connect(signer).createDao(
@@ -154,7 +157,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         metadata: toUtf8Bytes(cid),
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
-      pluginInstallationData
+      pluginInstallationData,
     );
 
     yield {
@@ -166,9 +169,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const daoFactoryInterface = DAORegistry__factory.createInterface();
     // find dao address using the dao registry address
     const log = receipt.logs?.find(
-      e =>
+      (e) =>
         e.topics[0] ===
-        id(daoFactoryInterface.getEvent("DAORegistered").format("sighash"))
+          id(daoFactoryInterface.getEvent("DAORegistered").format("sighash")),
     );
     if (!log) {
       throw new Error("Failed to create DAO");
@@ -193,7 +196,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async *deposit(
-    params: IDepositParams
+    params: IDepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -202,7 +205,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       throw new Error("A web3 provider is needed");
     }
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params
+      params,
     );
 
     if (tokenAddress && tokenAddress !== AddressZero) {
@@ -212,7 +215,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         daoAddress,
         params.amount,
         tokenAddress,
-        signer
+        signer,
       );
     }
 
@@ -229,20 +232,20 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       tokenAddress,
       amount,
       reference,
-      override
+      override,
     );
     yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
 
-    await depositTx.wait().then(cr => {
+    await depositTx.wait().then((cr) => {
       if (!cr.logs?.length) {
         throw new Error("The deposit was not properly registered");
       }
 
       const daoInterface = DAO__factory.createInterface();
       const log = cr.logs?.find(
-        e =>
+        (e) =>
           e?.topics[0] ===
-          id(daoInterface.getEvent("Deposited").format("sighash"))
+            id(daoInterface.getEvent("Deposited").format("sighash")),
       );
       if (!log) {
         throw new Error("Failed to deposit");
@@ -251,9 +254,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       const logParsed = daoInterface.parseLog(log);
       if (!amount.eq(logParsed.args["amount"])) {
         throw new Error(
-          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${logParsed.args[
-            "amount"
-          ].toBigInt()}`
+          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${
+            logParsed.args[
+              "amount"
+            ].toBigInt()
+          }`,
         );
       }
     });
@@ -264,13 +269,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     daoAddress: string,
     amount: bigint,
     tokenAddress: string,
-    signer: Signer
+    signer: Signer,
   ): AsyncGenerator<DaoDepositStepValue> {
     const tokenInstance = new Contract(tokenAddress, erc20ContractAbi, signer);
 
     const currentAllowance = await tokenInstance.allowance(
       await signer.getAddress(),
-      daoAddress
+      daoAddress,
     );
 
     yield {
@@ -282,7 +287,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     const tx: ContractTransaction = await tokenInstance.approve(
       daoAddress,
-      BigNumber.from(amount)
+      BigNumber.from(amount),
     );
 
     yield {
@@ -292,12 +297,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     await tx.wait().then((cr: ContractReceipt) => {
       const log = cr.logs?.find(
-        e => e?.topics[0] === id("Approval(address,address,uint256)")
+        (e) => e?.topics[0] === id("Approval(address,address,uint256)"),
       );
       if (!log) {
         throw new Error("Could not find the Approval event");
       }
-      const value = log.data
+      const value = log.data;
       if (!value || BigNumber.from(amount).gt(BigNumber.from(value))) {
         throw new Error("Could not update allowance");
       }
@@ -328,7 +333,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       params.where,
       params.who,
       id(params.permission),
-      params.data || new Uint8Array([])
+      params.data || new Uint8Array([]),
     );
   }
   /**
@@ -398,18 +403,20 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           skip,
           direction,
           sortBy,
-        }
+        },
       );
       await this.ipfs.ensureOnline();
       return Promise.all(
         daos.map(
           (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
-            return this.ipfs.fetchString(dao.metadata).then((stringMetadata) => {
-              const metadata = JSON.parse(stringMetadata);
-              return toDaoListItem(dao, metadata);
-            });
-          }
-        )
+            return this.ipfs.fetchString(dao.metadata).then(
+              (stringMetadata) => {
+                const metadata = JSON.parse(stringMetadata);
+                return toDaoListItem(dao, metadata);
+              },
+            );
+          },
+        ),
       );
     } catch (err) {
       throw new GraphQLError("DAO");
@@ -425,7 +432,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    */
   public async getBalances(
     daoAddressorEns: string,
-    _tokenAddresses: string[]
+    _tokenAddresses: string[],
   ): Promise<AssetBalance[] | null> {
     let address = daoAddressorEns;
     if (!isAddress(address)) {
@@ -455,8 +462,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       // handle other tokens that are not ERC20 or eth
       return Promise.all(
         balances.map(
-          (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance)
-        )
+          (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
+        ),
       );
     } catch (err) {
       throw new GraphQLError("balance");
@@ -517,15 +524,16 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           skip,
           direction,
           sortBy,
-        }
+        },
       );
       if (!vaultTransfers) {
         return null;
       }
       return Promise.all(
         vaultTransfers.map(
-          (transfer: SubgraphTransferListItem): Transfer => toTransfer(transfer)
-        )
+          (transfer: SubgraphTransferListItem): Transfer =>
+            toTransfer(transfer),
+        ),
       );
     } catch {
       throw new GraphQLError("transfer");

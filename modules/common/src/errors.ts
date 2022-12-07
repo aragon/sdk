@@ -82,6 +82,6 @@ export class ProposalCreationError extends Error {
 
 export class MissingExecPermissionError extends Error {
   constructor() {
-    super("No plugin requests EXECUTE_PERMISSION")
+    super("No plugin requests EXECUTE_PERMISSION");
   }
 }

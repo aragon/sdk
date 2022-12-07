@@ -32,7 +32,11 @@ import {
   TransferSortBy,
   TransferType,
 } from "../../../src";
-import { InvalidAddressOrEnsError, Random, MissingExecPermissionError } from "@aragon/sdk-common";
+import {
+  InvalidAddressOrEnsError,
+  MissingExecPermissionError,
+  Random,
+} from "@aragon/sdk-common";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
 import { isAddress } from "@ethersproject/address";
@@ -152,22 +156,26 @@ describe("Client", () => {
         }
       });
 
-      it('should fail if no execute_permission is requested', async () => {
-        const pluginSetupProcessorConnectSpy = jest.spyOn(PluginSetupProcessor__factory, 'connect')
-        const prepareInstallationMock = jest.fn().mockResolvedValue({permissions: []})
+      it("should fail if no execute_permission is requested", async () => {
+        const pluginSetupProcessorConnectSpy = jest.spyOn(
+          PluginSetupProcessor__factory,
+          "connect",
+        );
+        const prepareInstallationMock = jest.fn().mockResolvedValue({
+          permissions: [],
+        });
         // @ts-ignore Ignoring type to not mock the whole class
         pluginSetupProcessorConnectSpy.mockImplementation(() => ({
           callStatic: {
-            prepareInstallation: prepareInstallationMock
-          }
-        }))
+            prepareInstallation: prepareInstallationMock,
+          },
+        }));
 
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
         const daoName = "ERC20VotingDAO_" +
           Math.floor(Random.getFloat() * 9999) + 1;
-
 
         const daoCreationParams: ICreateParams = {
           metadata: {
@@ -190,11 +198,11 @@ describe("Client", () => {
           ],
         };
 
-        await expect(client.methods.create(daoCreationParams).next()).rejects.toMatchObject(new MissingExecPermissionError())
+        await expect(client.methods.create(daoCreationParams).next()).rejects
+          .toMatchObject(new MissingExecPermissionError());
 
-        pluginSetupProcessorConnectSpy.mockReset()
-      })
-
+        pluginSetupProcessorConnectSpy.mockReset();
+      });
     });
 
     describe("DAO deposit", () => {
@@ -203,7 +211,7 @@ describe("Client", () => {
         const client = new Client(context);
 
         const tokenContract = await deployErc20(client);
-        const amount = BigInt("1000000000000000000")
+        const amount = BigInt("1000000000000000000");
         const depositParams: IDepositParams = {
           daoAddressOrEns: daoAddress,
           amount,
