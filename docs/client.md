@@ -260,7 +260,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
     * [.hasPermission(params)](#ClientMethods+hasPermission) ⇒ <code>\*</code>
     * [.getDao(daoAddressOrEns)](#ClientMethods+getDao) ⇒ <code>\*</code>
     * [.getDaos({)](#ClientMethods+getDaos) ⇒ <code>\*</code>
-    * [.getBalances(daoAddressorEns, _tokenAddresses)](#ClientMethods+getBalances) ⇒ <code>\*</code>
+    * [.getBalances(daoAddressorEns)](#ClientMethods+getBalances) ⇒ <code>\*</code>
     * [.getTransfers({)](#ClientMethods+getTransfers) ⇒ <code>\*</code>
 
 <a name="ClientMethods+create"></a>
@@ -325,7 +325,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 <a name="ClientMethods+getBalances"></a>
 
-### clientMethods.getBalances(daoAddressorEns, _tokenAddresses) ⇒ <code>\*</code>
+### clientMethods.getBalances(daoAddressorEns) ⇒ <code>\*</code>
 <p>Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
@@ -334,7 +334,6 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 | Param | Type |
 | --- | --- |
 | daoAddressorEns | <code>string</code> | 
-| _tokenAddresses | <code>Array.&lt;string&gt;</code> | 
 
 <a name="ClientMethods+getTransfers"></a>
 
