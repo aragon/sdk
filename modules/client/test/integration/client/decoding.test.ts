@@ -207,6 +207,11 @@ describe("Client", () => {
         hash: "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
       });
 
+      mockedIPFSClient.pin.mockResolvedValueOnce({
+        pins: ["QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ"],
+        progress: undefined,
+      });
+
       const cid = await client.methods.pinMetadata(params);
 
       const updateMetadataAction = await client.encoding.updateMetadataAction(
@@ -324,6 +329,10 @@ describe("Client", () => {
 
       mockedIPFSClient.add.mockResolvedValueOnce({
         hash: "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
+      });
+      mockedIPFSClient.pin.mockResolvedValueOnce({
+        pins: ["QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ"],
+        progress: undefined,
       });
 
       const cid = await client.methods.pinMetadata(params);
