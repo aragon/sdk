@@ -64,7 +64,7 @@ import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
 import {
-  UNAVAILABLE_DAO_METADATA_LINK,
+  UNAVAILABLE_DAO_METADATA,
   UNSUPPORTED_DAO_METADATA_LINK,
 } from "../constants";
 
@@ -349,7 +349,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         if (err instanceof InvalidCidError) {
           return toDaoDetails(dao, UNSUPPORTED_DAO_METADATA_LINK);
         }
-        return toDaoDetails(dao, UNAVAILABLE_DAO_METADATA_LINK);
+        return toDaoDetails(dao, UNAVAILABLE_DAO_METADATA);
       }
     } catch (err) {
       throw new GraphQLError("DAO");
@@ -391,18 +391,14 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           async (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
             try {
               const metadataCid = resolveIpfsCid(dao.metadata);
-              const stringMetadata = await this.ipfs.fetchString(metadataCid)
+              const stringMetadata = await this.ipfs.fetchString(metadataCid);
               const metadata = JSON.parse(stringMetadata);
               return toDaoListItem(dao, metadata);
             } catch (err) {
               if (err instanceof InvalidCidError) {
-                return Promise.resolve(
-                  toDaoListItem(dao, UNSUPPORTED_DAO_METADATA_LINK),
-                );
+                return toDaoListItem(dao, UNSUPPORTED_DAO_METADATA_LINK);
               }
-              return Promise.resolve(
-                toDaoListItem(dao, UNAVAILABLE_DAO_METADATA_LINK),
-              );
+              return toDaoListItem(dao, UNAVAILABLE_DAO_METADATA);
             }
           },
         ),

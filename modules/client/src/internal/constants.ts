@@ -10,13 +10,13 @@ export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
 ];
 
 export const UNSUPPORTED_DAO_METADATA_LINK: IMetadata = {
-  name: "Unsupported metadata link",
-  description: "Unsupported metadata link",
+  name: "(unsupported metadata link)",
+  description: "(the metadata link is not supported)",
   links: [],
 };
 
-export const UNAVAILABLE_DAO_METADATA_LINK: IMetadata = {
-  name: "Unavailable metadata link",
-  description: "Unavailable metadata link",
+export const UNAVAILABLE_DAO_METADATA: IMetadata = {
+  name: "(unavailable metadata)",
+  description: "(the DAO metadata is not available)",
   links: [],
 };

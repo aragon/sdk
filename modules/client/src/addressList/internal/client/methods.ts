@@ -49,7 +49,7 @@ import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
-  UNAVAILABLE_PROPOSAL_METADATA_LINK,
+  UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
 
@@ -296,7 +296,7 @@ export class ClientAddressListMethods extends ClientCore
         }
         return toAddressListProposal(
           addressListProposal,
-          UNAVAILABLE_PROPOSAL_METADATA_LINK,
+          UNAVAILABLE_PROPOSAL_METADATA,
         );
       }
     } catch (err) {
@@ -374,17 +374,15 @@ export class ClientAddressListMethods extends ClientCore
               return toAddressListProposalListItem(proposal, metadata);
             } catch (err) {
               if (err instanceof InvalidCidError) {
-                return Promise.resolve(
-                  toAddressListProposalListItem(
-                    proposal,
-                    UNSUPPORTED_PROPOSAL_METADATA_LINK,
-                  ),
+                return toAddressListProposalListItem(
+                  proposal,
+                  UNSUPPORTED_PROPOSAL_METADATA_LINK,
                 );
               }
-              return Promise.resolve(toAddressListProposalListItem(
+              return toAddressListProposalListItem(
                 proposal,
-                UNAVAILABLE_PROPOSAL_METADATA_LINK,
-              ));
+                UNAVAILABLE_PROPOSAL_METADATA,
+              );
             }
           },
         ),

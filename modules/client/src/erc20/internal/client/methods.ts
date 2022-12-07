@@ -53,7 +53,7 @@ import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
-  UNAVAILABLE_PROPOSAL_METADATA_LINK,
+  UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
 /**
@@ -298,7 +298,7 @@ export class ClientErc20Methods extends ClientCore
         }
         return toErc20Proposal(
           erc20VotingProposal,
-          UNAVAILABLE_PROPOSAL_METADATA_LINK,
+          UNAVAILABLE_PROPOSAL_METADATA,
         );
       }
     } catch (err) {
@@ -368,15 +368,15 @@ export class ClientErc20Methods extends ClientCore
               return toErc20ProposalListItem(proposal, metadata);
             } catch (err) {
               if (err instanceof InvalidCidError) {
-                return Promise.resolve(toErc20ProposalListItem(
+                return toErc20ProposalListItem(
                   proposal,
                   UNSUPPORTED_PROPOSAL_METADATA_LINK,
-                ));
+                );
               }
-              return Promise.resolve(toErc20ProposalListItem(
+              return toErc20ProposalListItem(
                 proposal,
-                UNAVAILABLE_PROPOSAL_METADATA_LINK,
-              ));
+                UNAVAILABLE_PROPOSAL_METADATA,
+              );
             }
           },
         ),
