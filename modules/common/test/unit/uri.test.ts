@@ -1,4 +1,4 @@
-import { resolveIpfsCid } from "../../src";
+import { InvalidCidError, resolveIpfsCid } from "../../src";
 
 describe("IPFS metadata origin", () => {
   it("Should resolve IPFS CiD's", () => {
@@ -27,13 +27,13 @@ describe("IPFS metadata origin", () => {
   });
   it("Should fail to recognize a non-IPFS origin", () => {
     expect(() => resolveIpfsCid("hello")).toThrow(
-      "The value does not contain a valid CiD",
+      new InvalidCidError(),
     );
     expect(() => resolveIpfsCid("ipfs://hello")).toThrow(
-      "The value does not contain a valid CiD",
+      new InvalidCidError(),
     );
     expect(() => resolveIpfsCid("ipfs://hello/abc")).toThrow(
-      "The value does not contain a valid CiD",
+      new InvalidCidError(),
     );
   });
 });
