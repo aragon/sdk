@@ -23,6 +23,11 @@ export class InvalidAddressError extends Error {
     super("Invalid address");
   }
 }
+export class InvalidCidError extends Error {
+  constructor() {
+    super("The value does not contain a valid CiD");
+  }
+}
 export class InvalidProposalIdError extends Error {
   constructor() {
     super("Invalid proposal ID");

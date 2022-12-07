@@ -16,6 +16,10 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
+## [UPCOMING]
+### Added
+- Helper function to resolve IPFS CID's
+
 ## [0.7.0-alpha]
 ### Added
 - New error type for failed pinning on IPFS
