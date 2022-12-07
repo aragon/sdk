@@ -75,17 +75,3 @@ export function isProposalId(propoosalId: string): boolean {
   const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
   return regex.test(propoosalId);
 }
-
-/**
- * Checks is a string mathces an IPFS cid in both v0 and v1 versions
- *
- * @export
- * @param {string} hash
- * @return {*}  {boolean}
- */
-export function isIpfsCid(hash: string): boolean {
-  const regex = new RegExp(
-    /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/,
-  );
-  return regex.test(hash);
-}

@@ -60,7 +60,6 @@ import {
 import {
   ClientCore,
   Context,
-  isIpfsCid,
   SortDirection,
 } from "../../client-common";
 import {
@@ -226,11 +225,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async fetchMetadata(cid: string): Promise<IMetadata> {
-    if (!isIpfsCid(cid)) {
-      throw new InvalidCidError();
-    }
+    const resolvedCid = resolveIpfsCid(cid)
     try {
-      const stringMetadata = await this.ipfs.fetchString(cid);
+      const stringMetadata = await this.ipfs.fetchString(resolvedCid);
       // TODO
       // parse this string with yup and thow an error if it is invalid
       return JSON.parse(stringMetadata);
