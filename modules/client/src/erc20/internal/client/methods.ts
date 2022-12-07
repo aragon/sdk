@@ -94,7 +94,7 @@ export class ClientErc20Methods extends ClientCore
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await erc20Contract.createVote(
-      toUtf8Bytes(cid),
+      toUtf8Bytes(`ipfs://${cid}`),
       params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
@@ -276,11 +276,8 @@ export class ClientErc20Methods extends ClientCore
       if (!erc20VotingProposal) {
         return null;
       }
-      // TODO
-      // delete this cid once the proposals in subgraph have the correct
       // format in the metadata field
-      const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
-      const metadataString = await this.ipfs.fetchString(test_cid);
+      const metadataString = await this.ipfs.fetchString(erc20VotingProposal.metadata);
       // TODO: Parse and validate schema
       const metadata = JSON.parse(metadataString) as ProposalMetadata;
       return toErc20Proposal(erc20VotingProposal, metadata);
@@ -343,12 +340,9 @@ export class ClientErc20Methods extends ClientCore
           (
             proposal: SubgraphErc20ProposalListItem,
           ): Promise<Erc20ProposalListItem> => {
-            // TODO
-            // delete this cid once the proposals in subgraph have the correct
             // format in the metadata field
-            const test_cid = "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo";
             return this.ipfs
-              .fetchString(test_cid)
+              .fetchString(proposal.metadata)
               .then((stringMetadata: string) => {
                 // TODO: Parse and validate schema¡
                 const metadata = JSON.parse(stringMetadata) as ProposalMetadata;

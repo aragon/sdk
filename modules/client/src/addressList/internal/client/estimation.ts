@@ -55,7 +55,7 @@ export class ClientAddressListEstimation extends ClientCore
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const estimatedGasFee = await addresslistContract.estimateGas.createVote(
-      toUtf8Bytes(cid),
+      toUtf8Bytes(`ipfs://${cid}`),
       params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),

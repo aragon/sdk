@@ -3,6 +3,8 @@ declare const describe, it, expect;
 
 // mocks need to be at the top of the imports
 import "../../mocks/aragon-sdk-ipfs";
+import { DAO__factory } from "@aragon/core-contracts-ethers";
+import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 
 import {
   Client,
@@ -168,6 +170,17 @@ describe("Client", () => {
 
       expect(typeof installEntry).toBe("object");
       expect(installEntry.data).toBeInstanceOf(Uint8Array);
+
+      const daoInterface = DAO__factory.createInterface();
+      const argsBytes = bytesToHex(installEntry.data);
+      const argsDecoded = daoInterface.decodeFunctionData(
+        "setMetadata",
+        `0x${argsBytes}`,
+      );
+      expect(argsDecoded.length).toBe(1);
+      expect(new TextDecoder().decode(hexToBytes(argsDecoded[0]))).toBe(
+        "ipfs://QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo",
+      );
     });
   });
 });

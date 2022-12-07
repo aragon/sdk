@@ -210,7 +210,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       // Relay the yield steps to the caller as they are received
       yield* this.ensureAllowance(
         daoAddress,
-        amount.toBigInt(),
+        params.amount,
         tokenAddress,
         signer
       );
@@ -297,8 +297,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!log) {
         throw new Error("Could not find the Approval event");
       }
-      const value = parseInt(log.data);
-      if (!value || BigNumber.from(amount).gt(value)) {
+      const value = log.data
+      if (!value || BigNumber.from(amount).gt(BigNumber.from(value))) {
         throw new Error("Could not update allowance");
       }
     });
@@ -361,12 +361,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!dao) {
         return null;
       }
-      // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
-      // TODO
-      // this is a temporal fix and should be changed by the line above
-      // but the current daos in subgraph dont have a proper metadata
       const stringMetadata = await this.ipfs.fetchString(
-        "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr"
+        dao.metadata,
       );
       const metadata = JSON.parse(stringMetadata);
       return toDaoDetails(dao, metadata);
@@ -408,12 +404,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return Promise.all(
         daos.map(
           (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
-            // const stringMetadata = await this.ipfs.fetchString(dao.metadata);
-            // TODO
-            // this is a temporal fix and should be changed by the line above
-            // but the current daos in subgraph dont have a proper metadata
-            const test_cid = "QmebY8BGzWBUyVqZFMaFkFmz3JrfaDoFP5orDqzJ1uiEkr";
-            return this.ipfs.fetchString(test_cid).then(stringMetadata => {
+            return this.ipfs.fetchString(dao.metadata).then((stringMetadata) => {
               const metadata = JSON.parse(stringMetadata);
               return toDaoListItem(dao, metadata);
             });
