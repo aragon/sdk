@@ -47,7 +47,7 @@ import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { UNSUPPORTED_PROTOCOL_PROPOSAL_METADATA } from "../../../client-common/constants";
+import { UNSUPPORTED_PROPOSAL_METADATA_LINK } from "../../../client-common/constants";
 
 /**
  * Methods module the SDK Address List Client
@@ -277,16 +277,18 @@ export class ClientAddressListMethods extends ClientCore
       if (!addressListProposal) {
         return null;
       }
-      // format in the metadata field
-      let metadata: ProposalMetadata = UNSUPPORTED_PROTOCOL_PROPOSAL_METADATA;
+      let metadataCid = "";
       try {
-        const metadataCid = resolveIpfsCid(addressListProposal.metadata);
-        const metadataString = await this.ipfs.fetchString(metadataCid);
+        metadataCid = resolveIpfsCid(addressListProposal.metadata);
         // TODO: Parse and validate schema
-        metadata = JSON.parse(metadataString) as ProposalMetadata;
       } catch (err) {
-        console.warn(err);
+        return toAddressListProposal(
+          addressListProposal,
+          UNSUPPORTED_PROPOSAL_METADATA_LINK,
+        );
       }
+      const metadataString = await this.ipfs.fetchString(metadataCid);
+      const metadata = JSON.parse(metadataString) as ProposalMetadata;
       return toAddressListProposal(addressListProposal, metadata);
     } catch (err) {
       throw new GraphQLError("AddressList proposal");
@@ -357,25 +359,25 @@ export class ClientAddressListMethods extends ClientCore
           ):
             | Promise<AddressListProposalListItem>
             | AddressListProposalListItem => {
+            let metadataCid = "";
             try {
               // format in the metadata field
-              const metadataCid = resolveIpfsCid(proposal.metadata);
-              return this.ipfs
-                .fetchString(metadataCid)
-                .then((stringMetadata: string) => {
-                  // TODO: Parse and validate schema
-                  const metadata = JSON.parse(
-                    stringMetadata,
-                  ) as ProposalMetadata;
-                  return toAddressListProposalListItem(proposal, metadata);
-                });
+              metadataCid = resolveIpfsCid(proposal.metadata);
             } catch (err) {
-              console.warn(err);
               return toAddressListProposalListItem(
                 proposal,
-                UNSUPPORTED_PROTOCOL_PROPOSAL_METADATA,
+                UNSUPPORTED_PROPOSAL_METADATA_LINK,
               );
             }
+            return this.ipfs
+              .fetchString(metadataCid)
+              .then((stringMetadata: string) => {
+                // TODO: Parse and validate schema
+                const metadata = JSON.parse(
+                  stringMetadata,
+                ) as ProposalMetadata;
+                return toAddressListProposalListItem(proposal, metadata);
+              });
           },
         ),
       );

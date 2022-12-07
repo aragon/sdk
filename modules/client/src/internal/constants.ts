@@ -9,8 +9,8 @@ export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
   DAO__factory.createInterface().getFunction("freeze").format("minimal"),
 ];
 
-export const UNSUPPORTED_PROTOCOL_DAO_METADATA: IMetadata = {
-  name: "Unsupported protocol",
-  description: "Unsupported protocol",
+export const UNSUPPORTED_DAO_METADATA_LINK: IMetadata = {
+  name: "Unsupported metadata link",
+  description: "Unsupported metadata link",
   links: [],
 };
