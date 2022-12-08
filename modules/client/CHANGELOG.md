@@ -16,12 +16,16 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [UPCOMING]
+## [0.16.0-alpha]
+### Added
+- Checks during DAO creation if at least 1 plugin requests exec permission
+
+## [0.15.2-alpha]
+### Changed
+- Removed `tokenAddresses` param from `getBalances()` function
 ### Fixed
 - Reading metadata back now parses the IPFS URI schema
 
-### Changed
-- Removed `tokenAddresses` param from `getBalances()` function
 
 ## 0.15.1-alpha
 On 2022-12-06 11:20:50
