@@ -9,16 +9,7 @@ import { contextParams } from "./00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const daoAddressOrEns = "0x12345...";
-const tokenAddresses = [ // Optional: Token addresses in addition to the common ones
-  "0x1234567890123456789012345678901234567890",
-  "0x2345678901234567890123456789012345678901",
-  "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123",
-];
-const balances: AssetBalance[] | null = await client.methods.getBalances(
-  daoAddressOrEns,
-  tokenAddresses,
-);
+const balances: AssetBalance[] | null = await client.methods.getBalances(daoAddressOrEns);
 console.log(balances);
 /*
   [

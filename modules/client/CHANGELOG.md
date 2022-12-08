@@ -17,6 +17,11 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+- Reading metadata back now parses the IPFS URI schema
+
+### Changed
+- Removed `tokenAddresses` param from `getBalances()` function
 
 ## 0.15.1-alpha
 On 2022-12-06 11:20:50
@@ -56,6 +61,7 @@ On 2022-11-22 16:45:52
 - Removed `javascript` folders
 - Updates `@aragon/core-contracts-ethers` to `v0.4.1-alpha`
 - Parameters types for DAO creation
+- Make `tokenAdresses` optional on `getBalances`
 ### Added
 - Update Allowance estimation
 - Create dao using real contracts

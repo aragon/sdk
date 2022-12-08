@@ -3,11 +3,13 @@ import {
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
+  InvalidCidError,
   InvalidProposalIdError,
   IpfsPinError,
   NoProviderError,
   ProposalCreationError,
   Random,
+  resolveIpfsCid,
 } from "@aragon/sdk-common";
 import { formatEther } from "@ethersproject/units";
 import {
@@ -50,6 +52,10 @@ import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import {
+  UNAVAILABLE_PROPOSAL_METADATA,
+  UNSUPPORTED_PROPOSAL_METADATA_LINK,
+} from "../../../client-common/constants";
 /**
  * Methods module the SDK ERC20 Client
  */
@@ -277,10 +283,24 @@ export class ClientErc20Methods extends ClientCore
         return null;
       }
       // format in the metadata field
-      const metadataString = await this.ipfs.fetchString(erc20VotingProposal.metadata);
-      // TODO: Parse and validate schema
-      const metadata = JSON.parse(metadataString) as ProposalMetadata;
-      return toErc20Proposal(erc20VotingProposal, metadata);
+      try {
+        const metadataCid = resolveIpfsCid(erc20VotingProposal.metadata);
+        const metadataString = await this.ipfs.fetchString(metadataCid);
+        const metadata = JSON.parse(metadataString) as ProposalMetadata;
+        return toErc20Proposal(erc20VotingProposal, metadata);
+        // TODO: Parse and validate schema
+      } catch (err) {
+        if (err instanceof InvalidCidError) {
+          return toErc20Proposal(
+            erc20VotingProposal,
+            UNSUPPORTED_PROPOSAL_METADATA_LINK,
+          );
+        }
+        return toErc20Proposal(
+          erc20VotingProposal,
+          UNAVAILABLE_PROPOSAL_METADATA,
+        );
+      }
     } catch (err) {
       throw new GraphQLError("ERC20 proposal");
     }
@@ -337,17 +357,27 @@ export class ClientErc20Methods extends ClientCore
       await this.ipfs.ensureOnline();
       return Promise.all(
         erc20VotingProposals.map(
-          (
+          async (
             proposal: SubgraphErc20ProposalListItem,
           ): Promise<Erc20ProposalListItem> => {
             // format in the metadata field
-            return this.ipfs
-              .fetchString(proposal.metadata)
-              .then((stringMetadata: string) => {
-                // TODO: Parse and validate schema¡
-                const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
-                return toErc20ProposalListItem(proposal, metadata);
-              });
+            try {
+              const metadataCid = resolveIpfsCid(proposal.metadata);
+              const stringMetadata = await this.ipfs.fetchString(metadataCid);
+              const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
+              return toErc20ProposalListItem(proposal, metadata);
+            } catch (err) {
+              if (err instanceof InvalidCidError) {
+                return toErc20ProposalListItem(
+                  proposal,
+                  UNSUPPORTED_PROPOSAL_METADATA_LINK,
+                );
+              }
+              return toErc20ProposalListItem(
+                proposal,
+                UNAVAILABLE_PROPOSAL_METADATA,
+              );
+            }
           },
         ),
       );

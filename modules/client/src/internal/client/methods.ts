@@ -10,8 +10,10 @@ import {
   GraphQLError,
   InvalidAddressOrEnsError,
   MissingExecPermissionError,
+  InvalidCidError,
   NoProviderError,
   NoSignerError,
+  resolveIpfsCid,
 } from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -42,6 +44,7 @@ import {
   IDaoQueryParams,
   IDepositParams,
   IHasPermissionParams,
+  IMetadata,
   ITransferQueryParams,
   PermissionIds,
   SubgraphBalance,
@@ -63,6 +66,10 @@ import {
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
+import {
+  UNAVAILABLE_DAO_METADATA,
+  UNSUPPORTED_DAO_METADATA_LINK,
+} from "../constants";
 
 /**
  * Methods module the SDK Generic Client
@@ -366,11 +373,18 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!dao) {
         return null;
       }
-      const stringMetadata = await this.ipfs.fetchString(
-        dao.metadata,
-      );
-      const metadata = JSON.parse(stringMetadata);
-      return toDaoDetails(dao, metadata);
+      try {
+        const metadataCid = resolveIpfsCid(dao.metadata);
+        const metadataString = await this.ipfs.fetchString(metadataCid);
+        const metadata = JSON.parse(metadataString) as IMetadata;
+        return toDaoDetails(dao, metadata);
+        // TODO: Parse and validate schema
+      } catch (err) {
+        if (err instanceof InvalidCidError) {
+          return toDaoDetails(dao, UNSUPPORTED_DAO_METADATA_LINK);
+        }
+        return toDaoDetails(dao, UNAVAILABLE_DAO_METADATA);
+      }
     } catch (err) {
       throw new GraphQLError("DAO");
     }
@@ -408,13 +422,18 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       await this.ipfs.ensureOnline();
       return Promise.all(
         daos.map(
-          (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
-            return this.ipfs.fetchString(dao.metadata).then(
-              (stringMetadata) => {
-                const metadata = JSON.parse(stringMetadata);
-                return toDaoListItem(dao, metadata);
-              },
-            );
+          async (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
+            try {
+              const metadataCid = resolveIpfsCid(dao.metadata);
+              const stringMetadata = await this.ipfs.fetchString(metadataCid);
+              const metadata = JSON.parse(stringMetadata);
+              return toDaoListItem(dao, metadata);
+            } catch (err) {
+              if (err instanceof InvalidCidError) {
+                return toDaoListItem(dao, UNSUPPORTED_DAO_METADATA_LINK);
+              }
+              return toDaoListItem(dao, UNAVAILABLE_DAO_METADATA);
+            }
           },
         ),
       );
@@ -426,13 +445,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
    * @param {string} daoAddressorEns
-   * @param {string[]} _tokenAddresses
    * @return {*}  {(Promise<AssetBalance[] | null>)}
    * @memberof ClientMethods
    */
   public async getBalances(
     daoAddressorEns: string,
-    _tokenAddresses: string[],
   ): Promise<AssetBalance[] | null> {
     let address = daoAddressorEns;
     if (!isAddress(address)) {

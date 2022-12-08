@@ -19,6 +19,7 @@ TEMPLATE:
 ## [UPCOMING]
 ### Added
 - Adds new error `MissingExecPermissionError`
+- Helper function to resolve IPFS CID's
 
 ## [0.7.0-alpha]
 ### Added
