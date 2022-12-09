@@ -1,3 +1,4 @@
+import parseUrl from "parse-url";
 import { InvalidCidError } from "./errors";
 
 const IPFS_CID_REGEX =
@@ -14,10 +15,9 @@ export function resolveIpfsCid(data: string): string {
     }
     return data;
   }
-
-  const metadataCid = data.split(PROTOCOL_REGEX)[1];
-  if (!IPFS_CID_REGEX.test(metadataCid)) {
+  const url = parseUrl(data);
+  if (!IPFS_CID_REGEX.test(url.resource)) {
     throw new InvalidCidError();
   }
-  return metadataCid;
+  return url.resource;
 }
