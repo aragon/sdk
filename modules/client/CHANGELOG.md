@@ -19,6 +19,7 @@ TEMPLATE:
 ## [UPCOMING]
 ### Fixed
 - Reading metadata back now parses the IPFS URI schema
+- Fix `resolveIpfsCid()` cross-browser compatibility
 
 ### Changed
 - Removed `tokenAddresses` param from `getBalances()` function

@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+- Fix helper function to resolve IPFS CIDS
+## [0.8.0-alpha]
 ### Added
 - Helper function to resolve IPFS CID's
 
