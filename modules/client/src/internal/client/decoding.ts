@@ -1,6 +1,7 @@
 import {
   bytesToHex,
   hexToBytes,
+  resolveIpfsCid,
 } from "@aragon/sdk-common";
 import {
   IClientDecoding,
@@ -23,7 +24,6 @@ import {
   permissionParamsFromContract,
   withdrawParamsFromContract,
 } from "../utils";
-import { resolveIpfsCid } from "@aragon/sdk-common";
 import { uint8ArraySchema } from "../../client-common";
 
 /**
