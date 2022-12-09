@@ -178,7 +178,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public async updateMetadataAction(
     daoAddressOrEns: string,
-    params: string,
+    metadataUri: string,
   ): Promise<DaoAction> {
     let address = daoAddressOrEns;
     if (!isAddress(daoAddressOrEns)) {
@@ -192,7 +192,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     }
     // upload metadata to IPFS
     const daoInterface = DAO__factory.createInterface();
-    const args = new TextEncoder().encode(`ipfs://${params}`);
+    const args = new TextEncoder().encode(`ipfs://${metadataUri}`);
     const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
     const data = hexToBytes(strip0x(hexBytes));
     return {

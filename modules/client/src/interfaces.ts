@@ -50,7 +50,7 @@ export interface IClientEncoding extends IClientCore {
   ) => Promise<DaoAction>;
   updateMetadataAction: (
     daoAddressOrEns: string,
-    params: string,
+    metadataUri: string,
   ) => Promise<DaoAction>;
 }
 
