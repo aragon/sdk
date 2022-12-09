@@ -174,12 +174,7 @@ describe("Client", () => {
           Math.floor(Random.getFloat() * 9999) + 1;
 
         const daoCreationParams: ICreateParams = {
-          metadata: {
-            name: daoName,
-            description: "this is a dao",
-            avatar: "https://...",
-            links: [],
-          },
+          metadataUri: "QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {

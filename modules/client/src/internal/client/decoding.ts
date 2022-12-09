@@ -1,13 +1,9 @@
-import {
-  bytesToHex,
-  hexToBytes,
-  resolveIpfsCid,
-  UnsupportedProtocolError,
-} from "@aragon/sdk-common";
+import * as sdkCommon from "@aragon/sdk-common";
 import {
   IClientDecoding,
   IFreezePermissionDecodedParams,
   IGrantPermissionDecodedParams,
+  IMetadata,
   IRevokePermissionDecodedParams,
   IWithdrawParams,
 } from "../../interfaces";
@@ -43,7 +39,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public grantAction(data: Uint8Array): IGrantPermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
+    const hexBytes = sdkCommon.bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -63,7 +59,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public revokeAction(data: Uint8Array): IRevokePermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
+    const hexBytes = sdkCommon.bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -83,7 +79,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public freezeAction(data: Uint8Array): IFreezePermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
+    const hexBytes = sdkCommon.bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -103,7 +99,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public withdrawAction(data: Uint8Array): IWithdrawParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
+    const hexBytes = sdkCommon.bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -123,7 +119,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public updateMetadataRawAction(data: Uint8Array): string {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
+    const hexBytes = sdkCommon.bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -132,11 +128,11 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       throw new Error("The received action is different from the expected one");
     }
     const result = daoInterface.decodeFunctionData("setMetadata", data);
-    const bytes = hexToBytes(result[0]);
+    const bytes = sdkCommon.hexToBytes(result[0]);
     const contentUriText = new TextDecoder().decode(bytes);
     const contentUri = new URL(contentUriText);
     if (contentUri.protocol !== "ipfs:") {
-      throw new UnsupportedProtocolError(contentUri.protocol);
+      throw new sdkCommon.UnsupportedProtocolError(contentUri.protocol);
     }
     const cid = contentUri.host;
     const ipfsRegex =
@@ -153,9 +149,9 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @return {*}  {Promise<IMetadata>}
    * @memberof ClientDecoding
    */
-  public async updateMetadataAction(data: Uint8Array): Promise<string> {
+  public async updateMetadataAction(data: Uint8Array): Promise<IMetadata> {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
+    const hexBytes = sdkCommon.bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -164,9 +160,24 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       throw new Error("The received action is different from the expected one");
     }
     const result = daoInterface.decodeFunctionData("setMetadata", data);
-    const bytes = hexToBytes(result[0]);
-    const cid = new TextDecoder().decode(bytes);
-    return resolveIpfsCid(cid);
+    const bytes = sdkCommon.hexToBytes(result[0]);
+    const contentUriText = new TextDecoder().decode(bytes);
+    const contentUri = new URL(contentUriText);
+    if (contentUri.protocol !== "ipfs:") {
+      throw new sdkCommon.UnsupportedProtocolError(contentUri.protocol);
+    }
+    const cid = contentUri.host;
+    const ipfsRegex =
+      /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
+    if (!ipfsRegex.test(cid)) {
+      throw new Error("The metadata URL defined on the DAO is invalid");
+    }
+    try {
+      const stringMetadata = await this.ipfs.fetchString(cid);
+      return JSON.parse(stringMetadata);
+    } catch {
+      throw new Error("Error reading data from IPFS");
+    }
   }
   /**
    * Returns the decoded function info given the encoded data of an action
@@ -181,7 +192,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       return {
         id: func.format("minimal"),
         functionName: func.name,
-        hash: bytesToHex(data, true).substring(0, 10),
+        hash: sdkCommon.bytesToHex(data, true).substring(0, 10),
       };
     } catch {
       return null;

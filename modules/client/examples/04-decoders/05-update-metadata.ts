@@ -9,9 +9,7 @@ const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const cid: string = await client.decoding.updateMetadataAction(data);
-
-const params = await client.methods.fetchMetadata(cid);
+const params: string = await client.decoding.updateMetadataAction(data);
 
 console.log(params);
 /*

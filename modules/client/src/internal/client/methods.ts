@@ -11,7 +11,6 @@ import {
   InvalidAddressOrEnsError,
   MissingExecPermissionError,
   InvalidCidError,
-  IpfsFetchError,
   IpfsPinError,
   NoProviderError,
   NoSignerError,
@@ -121,13 +120,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       });
     }
 
-    let cid = "";
-    try {
-      cid = await this.ipfs.add(JSON.stringify(params.metadata));
-    } catch {
-      throw new Error("Could not pin the metadata on IPFS");
-    }
-
     // check if at least one plugin requests EXECUTE_PERMISSION on the DAO
     // This check isn't 100% correct all the time
     // simulate the DAO creation to get an address
@@ -167,7 +159,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const tx = await daoFactoryInstance.connect(signer).createDao(
       {
         name: params.ensSubdomain,
-        metadata: toUtf8Bytes(params.metadataUri),
+        metadata: toUtf8Bytes(`ipfs://${params.metadataUri}`),
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
       pluginInstallationData,
@@ -215,24 +207,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return cid;
     } catch {
       throw new IpfsPinError();
-    }
-  }
-  /**
-   * Fetches an IPFS cid and returns dao metadata
-   *
-   * @param {string}
-   * @return {*}  {Promise<string>}
-   * @memberof ClientMethods
-   */
-  public async fetchMetadata(cid: string): Promise<IMetadata> {
-    const resolvedCid = resolveIpfsCid(cid)
-    try {
-      const stringMetadata = await this.ipfs.fetchString(resolvedCid);
-      // TODO
-      // parse this string with yup and thow an error if it is invalid
-      return JSON.parse(stringMetadata);
-    } catch {
-      throw new IpfsFetchError();
     }
   }
   /**

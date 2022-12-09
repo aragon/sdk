@@ -345,10 +345,9 @@ describe("Client", () => {
         Buffer.from(JSON.stringify(params)),
       );
 
-      const recoveredCid = await client.decoding
+      const decodedParams = await client.decoding
         .updateMetadataAction(updateMetadataAction.data);
 
-      const decodedParams = await client.methods.fetchMetadata(recoveredCid);
       expect(decodedParams.name).toBe(params.name);
       expect(decodedParams.description).toBe(params.description);
       expect(decodedParams.avatar).toBe(params.avatar);
