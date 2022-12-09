@@ -265,6 +265,7 @@ describe("Client Address List", () => {
         expect(proposal.startDate instanceof Date).toBe(true);
         expect(proposal.endDate instanceof Date).toBe(true);
         expect(proposal.creationDate instanceof Date).toBe(true);
+        expect(typeof proposal.creationBlockNumber).toBe('number')
         expect(Array.isArray(proposal.actions)).toBe(true);
         // actions
         for (let i = 0; i < proposal.actions.length; i++) {
@@ -282,7 +283,7 @@ describe("Client Address List", () => {
         expect(typeof proposal.settings.minSupport).toBe("number");
         expect(typeof proposal.settings.minTurnout).toBe("number");
         // TODO
-        // enable this tests when the subgrph have the correcto precision digits
+        // enable this tests when the subgrph have the correct precision digits
         // expect(
         //   proposal.settings.minSupport >= 0 &&
         //     proposal.settings.minSupport <= 1,

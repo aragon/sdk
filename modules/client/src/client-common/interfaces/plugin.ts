@@ -101,6 +101,9 @@ export type ProposalBase = {
   startDate: Date;
   endDate: Date;
   creationDate: Date;
+  creationBlockNumber: number;
+  executionDate?: Date;
+  executionBlockNumber?: number;
   actions: Array<DaoAction>;
   status: ProposalStatus;
 };
@@ -161,6 +164,9 @@ export type SubgraphProposalBase = {
   endDate: string;
   executed: boolean;
   executable: boolean;
+  creationBlockNumber: string;
+  executionDate?: string;
+  executionBlockNumber?: string;
 };
 
 export interface IComputeStatusProposal {

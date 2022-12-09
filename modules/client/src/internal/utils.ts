@@ -88,6 +88,7 @@ export function toDaoListItem(
     ensDomain: dao.name,
     metadata: {
       name: metadata.name,
+      description: metadata.description,
       avatar: metadata.avatar || undefined,
     },
     // TODO update when new subgraph schema is deployed

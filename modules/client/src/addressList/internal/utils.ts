@@ -30,6 +30,15 @@ export function toAddressListProposal(
   const creationDate = new Date(
     parseInt(proposal.createdAt) * 1000,
   );
+  let executionDate: Date | undefined
+  if(proposal.executionDate) {
+    executionDate = new Date(parseInt(proposal.executionDate) * 1000)
+  }
+  let executionBlockNumber: number | undefined
+  if(proposal.executionBlockNumber) {
+    executionBlockNumber = parseInt(proposal.executionBlockNumber)
+  }
+
   return {
     id: proposal.id,
     dao: {
@@ -47,6 +56,9 @@ export function toAddressListProposal(
     startDate,
     endDate,
     creationDate,
+    creationBlockNumber: parseInt(proposal.creationBlockNumber),
+    executionDate,
+    executionBlockNumber,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {

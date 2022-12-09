@@ -11,6 +11,7 @@ query addressListProposal($proposalId: ID!) {
     creator
     metadata
     createdAt
+    creationBlockNumber
     actions {
       to
       value
@@ -25,6 +26,8 @@ query addressListProposal($proposalId: ID!) {
     endDate
     executed
     executable
+    executionDate
+    executionBlockNumber
     voters{
       voter{
         id

@@ -11,6 +11,7 @@ query erc20Proposal($proposalId: ID!) {
     creator
     metadata
     createdAt
+    creationDate
     actions {
       to
       value
@@ -25,6 +26,8 @@ query erc20Proposal($proposalId: ID!) {
     endDate
     executed
     executable
+    executionDate
+    executionBlockNumber
     voters{
       voter{
         id

@@ -283,6 +283,7 @@ export type DaoListItem = {
   ensDomain: string;
   metadata: {
     name: string;
+    description: string;
     avatar?: string;
   };
   plugins: InstalledPluginListItem[];

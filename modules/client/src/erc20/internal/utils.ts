@@ -38,6 +38,17 @@ export function toErc20Proposal(
   for (const voter of proposal.voters) {
     usedVotingWeight += BigInt(voter.weight);
   }
+
+  let executionDate: Date | undefined
+  if(proposal.executionDate) {
+    executionDate = new Date(parseInt(proposal.executionDate) * 1000)
+  }
+
+  let executionBlockNumber: number | undefined
+  if (proposal.executionBlockNumber) {
+    executionBlockNumber = parseInt(proposal.executionBlockNumber)
+  }
+
   return {
     id: proposal.id,
     dao: {
@@ -55,6 +66,9 @@ export function toErc20Proposal(
     startDate,
     endDate,
     creationDate,
+    creationBlockNumber: parseInt(proposal.creationBlockNumber),
+    executionDate,
+    executionBlockNumber,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {

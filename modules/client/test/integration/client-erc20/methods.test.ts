@@ -271,6 +271,7 @@ describe("Client ERC20", () => {
           expect(proposal.startDate instanceof Date).toBe(true);
           expect(proposal.endDate instanceof Date).toBe(true);
           expect(proposal.creationDate instanceof Date).toBe(true);
+          expect(typeof proposal.creationBlockNumber).toBe('number')
           expect(Array.isArray(proposal.actions)).toBe(true);
           // actions
           for (let i = 0; i < proposal.actions.length; i++) {
