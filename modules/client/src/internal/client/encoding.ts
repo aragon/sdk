@@ -192,7 +192,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     }
     // upload metadata to IPFS
     const daoInterface = DAO__factory.createInterface();
-    const args = new TextEncoder().encode(`ipfs://${metadataUri}`);
+    const args = new TextEncoder().encode(metadataUri);
     const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
     const data = hexToBytes(strip0x(hexBytes));
     return {

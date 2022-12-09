@@ -95,7 +95,7 @@ describe("Client Address List", () => {
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress,
-        metadataUri: cid,
+        metadataUri: `ipfs://${cid}`,
         actions: [action],
         creatorVote: VoteValues.YES,
         executeOnPass: false,

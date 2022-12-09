@@ -35,7 +35,7 @@ describe("Client", () => {
         1;
 
       const daoCreationParams: ICreateParams = {
-        metadataUri: "",
+        metadataUri: `ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK`,
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [{ id: "0x1234", data: new Uint8Array() }],
       };

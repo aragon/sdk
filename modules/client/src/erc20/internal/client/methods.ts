@@ -92,7 +92,7 @@ export class ClientErc20Methods extends ClientCore
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await erc20Contract.createVote(
-      toUtf8Bytes(`ipfs://${params.metadataUri}`),
+      toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),

@@ -40,7 +40,7 @@ describe("Client ERC20", () => {
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
-        metadataUri: "",
+        metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
       };
 
       const estimation = await client.estimation.createProposal(proposalParams);

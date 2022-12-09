@@ -82,7 +82,7 @@ const metadata: IMetadata = {
 };
 const ipfsHash = await client.methods.pinMetadata(metadata);
 const createParams: ICreateParams = {
-  metadataUri: ipfsHash,
+  metadataUri: `ipfs://${ipfsHash}`,
   ensSubdomain: "my-org", // my-org.dao.eth,
   plugins: [],
 };
@@ -634,7 +634,7 @@ const cid = await client.methods.pinMetadata(metadata)
 
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri:cid,
+  metadataUri: `ipfs://${cid}`,
   actions: [],
   startDate: new Date(),
   endDate: new Date(),
@@ -1253,7 +1253,7 @@ const cid = await client.methods.pinMetadata(metadata);
 
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri: cid,
+  metadataUri: `ipfs://${cid}`,
   actions: [],
   startDate: new Date(),
   endDate: new Date(),
