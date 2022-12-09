@@ -1,6 +1,7 @@
 import {
   bytesToHex,
   hexToBytes,
+  resolveIpfsCid,
   UnsupportedProtocolError,
 } from "@aragon/sdk-common";
 import {
@@ -164,7 +165,8 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     }
     const result = daoInterface.decodeFunctionData("setMetadata", data);
     const bytes = hexToBytes(result[0]);
-    return new TextDecoder().decode(bytes);
+    const cid = new TextDecoder().decode(bytes);
+    return resolveIpfsCid(cid);
   }
   /**
    * Returns the decoded function info given the encoded data of an action
