@@ -39,14 +39,14 @@ export function toErc20Proposal(
     usedVotingWeight += BigInt(voter.weight);
   }
 
-  let executionDate: Date | undefined
-  if(proposal.executionDate) {
-    executionDate = new Date(parseInt(proposal.executionDate) * 1000)
+  let executionDate: Date | undefined;
+  if (proposal.executionDate) {
+    executionDate = new Date(parseInt(proposal.executionDate) * 1000);
   }
 
-  let executionBlockNumber: number | undefined
+  let executionBlockNumber: number | undefined;
   if (proposal.executionBlockNumber) {
-    executionBlockNumber = parseInt(proposal.executionBlockNumber)
+    executionBlockNumber = parseInt(proposal.executionBlockNumber);
   }
 
   return {
@@ -165,7 +165,6 @@ export function toErc20ProposalListItem(
   };
 }
 
-
 export function mintTokenParamsToContract(
   params: IMintTokenParams,
 ): ContractMintTokenParams {
@@ -178,7 +177,6 @@ export function mintTokenParamsFromContract(result: Result): IMintTokenParams {
     amount: BigInt(result[1]),
   };
 }
-
 
 export function erc20InitParamsToContract(
   params: IErc20PluginInstall,

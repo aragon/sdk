@@ -1,7 +1,6 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { DaoAction, IPagination } from "./common";
 
-
 /**
  * Contains the states of a proposal. Note that on chain
  * proposals cannot be in draft state
