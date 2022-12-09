@@ -24,10 +24,10 @@ const metadataParams: IMetadata = {
 };
 const daoAddressOrEns = "0x12345";
 
-const cid = await client.methods.pinMetadata(metadataParams);
+const ipfsUri = await client.methods.pinMetadata(metadataParams);
 
 const updateMetadataAction = await client.encoding.updateMetadataAction(
   daoAddressOrEns,
-  cid,
+  ipfsUri,
 );
 console.log(updateMetadataAction);

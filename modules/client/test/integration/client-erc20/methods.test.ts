@@ -93,11 +93,11 @@ describe("Client ERC20", () => {
           },
         };
 
-        const cid = await erc20Client.methods.pinMetadata(metadata);
+        const ipfsUri = await erc20Client.methods.pinMetadata(metadata);
 
         const proposalParams: ICreateProposalParams = {
           pluginAddress,
-          metadataUri: `ipfs://${cid}`,
+          metadataUri: ipfsUri,
           actions: [action],
           creatorVote: VoteValues.YES,
           executeOnPass: false,

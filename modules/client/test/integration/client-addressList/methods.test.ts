@@ -91,11 +91,11 @@ describe("Client Address List", () => {
         },
       };
 
-      const cid = await addressListClient.methods.pinMetadata(metadata);
+      const ipfsUri = await addressListClient.methods.pinMetadata(metadata);
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress,
-        metadataUri: `ipfs://${cid}`,
+        metadataUri: ipfsUri,
         actions: [action],
         creatorVote: VoteValues.YES,
         executeOnPass: false,

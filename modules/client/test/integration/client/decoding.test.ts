@@ -212,11 +212,11 @@ describe("Client", () => {
         progress: undefined,
       });
 
-      const cid = await client.methods.pinMetadata(params);
+      const ipfsUri = await client.methods.pinMetadata(params);
 
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        cid,
+        ipfsUri,
       );
       const recoveredIpfsUri: string = await client.decoding
         .updateMetadataRawAction(
@@ -249,10 +249,10 @@ describe("Client", () => {
           },
         ],
       };
-      const cid = await client.methods.pinMetadata(params);
+      const ipfsUri = await client.methods.pinMetadata(params);
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        cid,
+        ipfsUri,
       );
 
       expect(() => client.decoding.withdrawAction(updateMetadataAction.data))
@@ -288,10 +288,10 @@ describe("Client", () => {
         ],
       };
 
-      const cid = await client.methods.pinMetadata(params);
+      const ipfsUri = await client.methods.pinMetadata(params);
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        cid,
+        ipfsUri,
       );
       const iface = client.decoding.findInterface(updateMetadataAction.data);
       expect(iface?.id).toBe("function setMetadata(bytes)");
@@ -335,10 +335,10 @@ describe("Client", () => {
         progress: undefined,
       });
 
-      const cid = await client.methods.pinMetadata(params);
+      const ipfsUri = await client.methods.pinMetadata(params);
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        cid,
+        ipfsUri,
       );
 
       mockedIPFSClient.cat.mockResolvedValueOnce(

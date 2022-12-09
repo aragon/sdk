@@ -142,7 +142,7 @@ export class ClientErc20Methods extends ClientCore
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);
-      return cid;
+      return `ipfs://${cid}`;
     } catch {
       throw new IpfsPinError();
     }

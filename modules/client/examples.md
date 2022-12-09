@@ -80,9 +80,9 @@ const metadata: IMetadata = {
     url: "https://...",
   }],
 };
-const ipfsHash = await client.methods.pinMetadata(metadata);
+const ipfsUri = await client.methods.pinMetadata(metadata);
 const createParams: ICreateParams = {
-  metadataUri: `ipfs://${ipfsHash}`,
+  metadataUri: ipfsUri,
   ensSubdomain: "my-org", // my-org.dao.eth,
   plugins: [],
 };
@@ -630,11 +630,11 @@ const metadata:ProposalMetadata= {
   },
 }
 
-const cid = await client.methods.pinMetadata(metadata)
+const ipfsUri = await client.methods.pinMetadata(metadata);
 
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri: `ipfs://${cid}`,
+  metadataUri: ipfsUri,
   actions: [],
   startDate: new Date(),
   endDate: new Date(),
@@ -1249,11 +1249,11 @@ const metadata: ProposalMetadata = {
   },
 };
 
-const cid = await client.methods.pinMetadata(metadata);
+const ipfsUri = await client.methods.pinMetadata(metadata);
 
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri: `ipfs://${cid}`,
+  metadataUri: ipfsUri,
   actions: [],
   startDate: new Date(),
   endDate: new Date(),
@@ -1818,11 +1818,11 @@ const metadataParams: IMetadata = {
 };
 const daoAddressOrEns = "0x12345";
 
-const cid = await client.methods.pinMetadata(metadataParams);
+const ipfsUri = await client.methods.pinMetadata(metadataParams);
 
 const updateMetadataAction = await client.encoding.updateMetadataAction(
   daoAddressOrEns,
-  cid,
+  ipfsUri,
 );
 console.log(updateMetadataAction);
 ```

@@ -23,9 +23,9 @@ const metadata: IMetadata = {
     url: "https://...",
   }],
 };
-const ipfsHash = await client.methods.pinMetadata(metadata);
+const ipfsUri = await client.methods.pinMetadata(metadata);
 const createParams: ICreateParams = {
-  metadataUri: `ipfs://${ipfsHash}`,
+  metadataUri: ipfsUri,
   ensSubdomain: "my-org", // my-org.dao.eth,
   plugins: [],
 };

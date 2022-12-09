@@ -39,11 +39,11 @@ const metadata: ProposalMetadata = {
   },
 };
 
-const cid = await client.methods.pinMetadata(metadata);
+const ipfsUri = await client.methods.pinMetadata(metadata);
 
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri: `ipfs://${cid}`,
+  metadataUri: ipfsUri,
   actions: [],
   startDate: new Date(),
   endDate: new Date(),
