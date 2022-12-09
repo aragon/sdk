@@ -15,9 +15,9 @@ export function resolveIpfsCid(data: string): string {
     return data;
   }
 
-  const metadataUri = new URL(data);
-  if (!IPFS_CID_REGEX.test(metadataUri.host)) {
+  const metadataCid = data.split(PROTOCOL_REGEX)[1];
+  if (!IPFS_CID_REGEX.test(metadataCid)) {
     throw new InvalidCidError();
   }
-  return metadataUri.host;
+  return metadataCid;
 }
