@@ -11,6 +11,7 @@ import {
   InvalidAddressOrEnsError,
   MissingExecPermissionError,
   InvalidCidError,
+  IpfsPinError,
   NoProviderError,
   NoSignerError,
   resolveIpfsCid,
@@ -55,7 +56,11 @@ import {
   Transfer,
   TransferSortBy,
 } from "../../interfaces";
-import { ClientCore, Context, SortDirection } from "../../client-common";
+import {
+  ClientCore,
+  Context,
+  SortDirection,
+} from "../../client-common";
 import {
   toAssetBalance,
   toDaoDetails,
@@ -115,13 +120,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       });
     }
 
-    let cid = "";
-    try {
-      cid = await this.ipfs.add(JSON.stringify(params.metadata));
-    } catch {
-      throw new Error("Could not pin the metadata on IPFS");
-    }
-
     // check if at least one plugin requests EXECUTE_PERMISSION on the DAO
     // This check isn't 100% correct all the time
     // simulate the DAO creation to get an address
@@ -161,7 +159,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const tx = await daoFactoryInstance.connect(signer).createDao(
       {
         name: params.ensSubdomain,
-        metadata: toUtf8Bytes(cid),
+        metadata: toUtf8Bytes(params.metadataUri),
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
       pluginInstallationData,
@@ -194,6 +192,22 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       key: DaoCreationSteps.DONE,
       address: parsedLog.args["dao"],
     };
+  }
+  /**
+   * Pins a metadata object into IPFS and retruns the generated hash
+   *
+   * @param {IMetadata} params
+   * @return {*}  {Promise<string>}
+   * @memberof ClientMethods
+   */
+  public async pinMetadata(params: IMetadata): Promise<string> {
+    try {
+      const cid = await this.ipfs.add(JSON.stringify(params));
+      await this.ipfs.pin(cid);
+      return `ipfs://${cid}`;
+    } catch {
+      throw new IpfsPinError();
+    }
   }
   /**
    * Deposits ether or an ERC20 token into the DAO

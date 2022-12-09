@@ -14,6 +14,7 @@ import { IClientCore } from "./client-common/interfaces/core";
 /** Defines the shape of the general purpose Client class */
 export interface IClientMethods extends IClientCore {
   create: (params: ICreateParams) => AsyncGenerator<DaoCreationStepValue>;
+  pinMetadata: (params: IMetadata) => Promise<string>;
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getBalances: (
     daoAddressOrEns: string,
@@ -49,7 +50,7 @@ export interface IClientEncoding extends IClientCore {
   ) => Promise<DaoAction>;
   updateMetadataAction: (
     daoAddressOrEns: string,
-    params: IMetadata,
+    metadataUri: string,
   ) => Promise<DaoAction>;
 }
 
@@ -80,7 +81,7 @@ export interface IClient {
 
 /** Holds the parameters that the DAO will be created with */
 export interface ICreateParams {
-  metadata: IMetadata;
+  metadataUri: string;
   ensSubdomain: string;
   trustedForwarder?: string;
   plugins: IPluginInstallItem[];

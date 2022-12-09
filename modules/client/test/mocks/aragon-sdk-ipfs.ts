@@ -4,6 +4,10 @@ export const mockedIPFSClient = {
     hash: "QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo",
   }),
   cat: jest.fn().mockImplementation(async () => Buffer.from("{}")),
+  pin: jest.fn().mockResolvedValue({
+    pins: ["QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo"],
+    progress: undefined,
+  }),
   __proto__: {},
 };
 

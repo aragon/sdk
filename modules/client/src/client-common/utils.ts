@@ -3,15 +3,14 @@ import { VoteValues } from "../client-common/interfaces/plugin";
 import {
   IComputeStatusProposal,
   ICreateProposalParams,
-  ProposalMetadata,
   ProposalStatus,
 } from "./interfaces/plugin";
 
 export function unwrapProposalParams(
   params: ICreateProposalParams,
-): [ProposalMetadata, IDAO.ActionStruct[], number, number, boolean, number] {
+): [string, IDAO.ActionStruct[], number, number, boolean, number] {
   return [
-    params.metadata,
+    params.metadataUri,
     params.actions ?? [],
     // TODO: Verify => seconds?
     params.startDate ? Math.floor(params.startDate.getTime() / 1000) : 0,

@@ -17,6 +17,7 @@ import {
   ProposalBase,
   ProposalCreationStepValue,
   ProposalListItemBase,
+  ProposalMetadata,
   SubgraphAction,
   SubgraphProposalBase,
   SubgraphVoterListItemBase,
@@ -29,6 +30,7 @@ export interface IClientAddressListMethods extends IClientCore {
   createProposal: (
     params: ICreateProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
+  pinMetadata: (params: ProposalMetadata) => Promise<string>;
   voteProposal: (
     params: IVoteProposalParams,
   ) => AsyncGenerator<VoteProposalStepValue>;

@@ -88,19 +88,11 @@ export class ClientErc20Methods extends ClientCore
       signer,
     );
 
-    let cid = "";
-    try {
-      // TODO: Compute the cid instead of uploading to the cluster
-      cid = await this.ipfs.add(JSON.stringify(params.metadata));
-    } catch {
-      throw new IpfsPinError();
-    }
-
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await erc20Contract.createVote(
-      toUtf8Bytes(`ipfs://${cid}`),
+      toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
@@ -137,6 +129,23 @@ export class ClientErc20Methods extends ClientCore
       key: ProposalCreationSteps.DONE,
       proposalId: hexZeroPad(parsedLog.args["voteId"].toHexString(), 32),
     };
+  }
+
+  /**
+   * Pins a metadata object into IPFS and retruns the generated hash
+   *
+   * @param {ProposalMetadata} params
+   * @return {*}  {Promise<string>}
+   * @memberof ClientMethods
+   */
+  public async pinMetadata(params: ProposalMetadata): Promise<string> {
+    try {
+      const cid = await this.ipfs.add(JSON.stringify(params));
+      await this.ipfs.pin(cid);
+      return `ipfs://${cid}`;
+    } catch {
+      throw new IpfsPinError();
+    }
   }
   /**
    * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.

@@ -16,6 +16,7 @@ import {
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
+  ProposalMetadata,
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
@@ -76,23 +77,27 @@ describe("Client ERC20", () => {
           reference: "test",
         });
 
+        const metadata: ProposalMetadata = {
+          title: "Best Proposal",
+          summary: "this is the sumnary",
+          description: "This is a very long description",
+          resources: [
+            {
+              name: "Website",
+              url: "https://the.website",
+            },
+          ],
+          media: {
+            header: "https://no.media/media.jpeg",
+            logo: "https://no.media/media.jpeg",
+          },
+        };
+
+        const ipfsUri = await erc20Client.methods.pinMetadata(metadata);
+
         const proposalParams: ICreateProposalParams = {
           pluginAddress,
-          metadata: {
-            title: "Best Proposal",
-            summary: "this is the sumnary",
-            description: "This is a very long description",
-            resources: [
-              {
-                name: "Website",
-                url: "https://the.website",
-              },
-            ],
-            media: {
-              header: "https://no.media/media.jpeg",
-              logo: "https://no.media/media.jpeg",
-            },
-          },
+          metadataUri: ipfsUri,
           actions: [action],
           creatorVote: VoteValues.YES,
           executeOnPass: false,

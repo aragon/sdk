@@ -9,20 +9,23 @@ import {
   GasFeeEstimation,
   ICreateParams,
 } from "@aragon/sdk-client";
+import { IMetadata } from "../../src";
 import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
+const metadata: IMetadata = {
+  name: "My DAO",
+  description: "This is a description",
+  avatar: "",
+  links: [{
+    name: "Web site",
+    url: "https://...",
+  }],
+};
+const ipfsUri = await client.methods.pinMetadata(metadata);
 const createParams: ICreateParams = {
-  metadata: {
-    name: "My DAO",
-    description: "This is a description",
-    avatar: "",
-    links: [{
-      name: "Web site",
-      url: "https://...",
-    }],
-  },
+  metadataUri: ipfsUri,
   ensSubdomain: "my-org", // my-org.dao.eth,
   plugins: [],
 };

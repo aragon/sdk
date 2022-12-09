@@ -2,7 +2,6 @@ import {
   IClientEncoding,
   IFreezePermissionParams,
   IGrantPermissionParams,
-  IMetadata,
   IRevokePermissionParams,
   IWithdrawParams,
 } from "../../interfaces";
@@ -179,7 +178,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public async updateMetadataAction(
     daoAddressOrEns: string,
-    params: IMetadata,
+    metadataUri: string,
   ): Promise<DaoAction> {
     let address = daoAddressOrEns;
     if (!isAddress(daoAddressOrEns)) {
@@ -192,14 +191,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       address = resolvedAddress;
     }
     // upload metadata to IPFS
-    let cid: string;
-    try {
-      cid = await this.ipfs.add(JSON.stringify(params));
-    } catch {
-      throw new Error("Could not pin the metadata on IPFS");
-    }
     const daoInterface = DAO__factory.createInterface();
-    const args = new TextEncoder().encode(`ipfs://${cid}`);
+    const args = new TextEncoder().encode(metadataUri);
     const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
     const data = hexToBytes(strip0x(hexBytes));
     return {

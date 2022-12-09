@@ -1,7 +1,7 @@
 import { Random } from "@aragon/sdk-common";
 import { Context } from "../../client-common/context";
 import { IClientIpfsCore } from "../interfaces/core";
-import { Client as IpfsClient } from "@aragon/sdk-ipfs";
+import { Client as IpfsClient, PinResponse } from "@aragon/sdk-ipfs";
 
 const clientsMap = new Map<IPFSModule, IpfsClient[]>();
 const clientsIdxMap = new Map<IPFSModule, number>();
@@ -77,6 +77,14 @@ export class IPFSModule implements IClientIpfsCore {
       (client) => client.add(input).then((res) => res.hash),
     ).catch((e) => {
       throw new Error(`Could not upload data: ${e?.message || ""}`);
+    });
+  }
+
+  public async pin(input: string): Promise<PinResponse> {
+    return this.getOnlineClient().then(
+      (client) => client.pin(input),
+    ).catch((e) => {
+      throw new Error(`Could not pin data: ${e?.message || ""}`);
     });
   }
 

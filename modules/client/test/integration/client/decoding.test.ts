@@ -207,9 +207,16 @@ describe("Client", () => {
         hash: "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
       });
 
+      mockedIPFSClient.pin.mockResolvedValueOnce({
+        pins: ["QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ"],
+        progress: undefined,
+      });
+
+      const ipfsUri = await client.methods.pinMetadata(params);
+
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        ipfsUri,
       );
       const recoveredIpfsUri: string = await client.decoding
         .updateMetadataRawAction(
@@ -242,9 +249,10 @@ describe("Client", () => {
           },
         ],
       };
+      const ipfsUri = await client.methods.pinMetadata(params);
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        ipfsUri,
       );
 
       expect(() => client.decoding.withdrawAction(updateMetadataAction.data))
@@ -279,9 +287,11 @@ describe("Client", () => {
           },
         ],
       };
+
+      const ipfsUri = await client.methods.pinMetadata(params);
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        ipfsUri,
       );
       const iface = client.decoding.findInterface(updateMetadataAction.data);
       expect(iface?.id).toBe("function setMetadata(bytes)");
@@ -317,19 +327,26 @@ describe("Client", () => {
         ],
       };
 
+      mockedIPFSClient.add.mockResolvedValueOnce({
+        hash: "QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ",
+      });
+      mockedIPFSClient.pin.mockResolvedValueOnce({
+        pins: ["QmTW9uFAcuJym8jWhubPTCdfpyPpK8Rx8trVcvzaSoWHqQ"],
+        progress: undefined,
+      });
+
+      const ipfsUri = await client.methods.pinMetadata(params);
       const updateMetadataAction = await client.encoding.updateMetadataAction(
         "0x1234567890123456789012345678901234567890",
-        params,
+        ipfsUri,
       );
 
       mockedIPFSClient.cat.mockResolvedValueOnce(
         Buffer.from(JSON.stringify(params)),
       );
 
-      const decodedParams: IMetadata = await client.decoding
-        .updateMetadataAction(
-          updateMetadataAction.data,
-        );
+      const decodedParams = await client.decoding
+        .updateMetadataAction(updateMetadataAction.data);
 
       expect(decodedParams.name).toBe(params.name);
       expect(decodedParams.description).toBe(params.description);

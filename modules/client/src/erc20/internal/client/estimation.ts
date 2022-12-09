@@ -1,5 +1,4 @@
 import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
-import { IpfsPinError } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -42,19 +41,11 @@ export class ClientErc20Estimation extends ClientCore
       signer,
     );
 
-    let cid = "";
-    try {
-      // TODO: Compute the cid instead of uploading to the cluster
-      cid = await this.ipfs.add(JSON.stringify(params.metadata));
-    } catch {
-      throw new IpfsPinError();
-    }
-
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const estimatedGasFee = await erc20Contract.estimateGas.createVote(
-      toUtf8Bytes(`ipfs://${cid}`),
+      toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),

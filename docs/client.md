@@ -256,6 +256,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 * [ClientMethods](#ClientMethods)
     * [.create(params)](#ClientMethods+create) ⇒ <code>\*</code>
+    * [.pinMetadata(params)](#ClientMethods+pinMetadata) ⇒ <code>\*</code>
     * [.deposit(params)](#ClientMethods+deposit) ⇒ <code>\*</code>
     * [.hasPermission(params)](#ClientMethods+hasPermission) ⇒ <code>\*</code>
     * [.getDao(daoAddressOrEns)](#ClientMethods+getDao) ⇒ <code>\*</code>
@@ -274,6 +275,18 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 | Param | Type |
 | --- | --- |
 | params | <code>ICreateParams</code> | 
+
+<a name="ClientMethods+pinMetadata"></a>
+
+### clientMethods.pinMetadata(params) ⇒ <code>\*</code>
+<p>Pins a metadata object into IPFS and retruns the generated hash</p>
+
+**Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
+**Returns**: <code>\*</code> - <p>{Promise<string>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>IMetadata</code> | 
 
 <a name="ClientMethods+deposit"></a>
 
