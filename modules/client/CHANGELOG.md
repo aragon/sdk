@@ -23,6 +23,10 @@ TEMPLATE:
 ### Changed
 - Removed `tokenAddresses` param from `getBalances()` function
 
+### Added
+- Adds field `description` to `DaoListItem`
+- Adds the fields `executionDate`, `creationBlockNumber` and `executionBlockNumber` to ERC20 and Addresslist proposals
+
 ## 0.15.1-alpha
 On 2022-12-06 11:20:50
 ### Fixed
