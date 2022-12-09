@@ -1,4 +1,8 @@
-import * as sdkCommon from "@aragon/sdk-common";
+import {
+  bytesToHex,
+  hexToBytes,
+  UnsupportedProtocolError,
+} from "@aragon/sdk-common";
 import {
   IClientDecoding,
   IFreezePermissionDecodedParams,
@@ -39,7 +43,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public grantAction(data: Uint8Array): IGrantPermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = sdkCommon.bytesToHex(data, true);
+    const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -59,7 +63,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public revokeAction(data: Uint8Array): IRevokePermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = sdkCommon.bytesToHex(data, true);
+    const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -79,7 +83,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public freezeAction(data: Uint8Array): IFreezePermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = sdkCommon.bytesToHex(data, true);
+    const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -99,7 +103,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public withdrawAction(data: Uint8Array): IWithdrawParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = sdkCommon.bytesToHex(data, true);
+    const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -119,7 +123,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public updateMetadataRawAction(data: Uint8Array): string {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = sdkCommon.bytesToHex(data, true);
+    const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -128,11 +132,11 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       throw new Error("The received action is different from the expected one");
     }
     const result = daoInterface.decodeFunctionData("setMetadata", data);
-    const bytes = sdkCommon.hexToBytes(result[0]);
+    const bytes = hexToBytes(result[0]);
     const contentUriText = new TextDecoder().decode(bytes);
     const contentUri = new URL(contentUriText);
     if (contentUri.protocol !== "ipfs:") {
-      throw new sdkCommon.UnsupportedProtocolError(contentUri.protocol);
+      throw new UnsupportedProtocolError(contentUri.protocol);
     }
     const cid = contentUri.host;
     const ipfsRegex =
@@ -151,7 +155,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public async updateMetadataAction(data: Uint8Array): Promise<IMetadata> {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = sdkCommon.bytesToHex(data, true);
+    const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
@@ -160,11 +164,11 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       throw new Error("The received action is different from the expected one");
     }
     const result = daoInterface.decodeFunctionData("setMetadata", data);
-    const bytes = sdkCommon.hexToBytes(result[0]);
+    const bytes = hexToBytes(result[0]);
     const contentUriText = new TextDecoder().decode(bytes);
     const contentUri = new URL(contentUriText);
     if (contentUri.protocol !== "ipfs:") {
-      throw new sdkCommon.UnsupportedProtocolError(contentUri.protocol);
+      throw new UnsupportedProtocolError(contentUri.protocol);
     }
     const cid = contentUri.host;
     const ipfsRegex =
@@ -192,7 +196,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       return {
         id: func.format("minimal"),
         functionName: func.name,
-        hash: sdkCommon.bytesToHex(data, true).substring(0, 10),
+        hash: bytesToHex(data, true).substring(0, 10),
       };
     } catch {
       return null;
