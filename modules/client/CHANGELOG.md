@@ -16,13 +16,17 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [UPCOMING]
+## [0.16.0-alpha]
+### Added
+- Checks during DAO creation if at least 1 plugin requests exec permission
+
+## [0.15.2-alpha]
+### Changed
+- Removed `tokenAddresses` param from `getBalances()` function
 ### Fixed
 - Reading metadata back now parses the IPFS URI schema
 - Fix `resolveIpfsCid()` cross-browser compatibility
 
-### Changed
-- Removed `tokenAddresses` param from `getBalances()` function
 
 ## 0.15.1-alpha
 On 2022-12-06 11:20:50
@@ -35,6 +39,7 @@ On 2022-11-26 10:27:25
 - Stores CIDs with `ipfs://` prefix in contracts
 
 ### Added
+- Checks if at least one plugin requests `EXECUTE_PERMISSION` during DAO creation
 - Mocking of the IPFS client during testing
 
 ### Fixed

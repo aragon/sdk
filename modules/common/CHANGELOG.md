@@ -16,9 +16,13 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [UPCOMING]
+## [0.9.0-alpha]
+### Added
+- Adds new error `MissingExecPermissionError`
+
 ### Fixed
 - Fix helper function to resolve IPFS CIDS
+
 ## [0.8.0-alpha]
 ### Added
 - Helper function to resolve IPFS CID's

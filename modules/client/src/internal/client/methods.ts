@@ -4,10 +4,12 @@ import {
   DAOFactory__factory,
   DAORegistry__factory,
   PluginRepo__factory,
+  PluginSetupProcessor__factory,
 } from "@aragon/core-contracts-ethers";
 import {
   GraphQLError,
   InvalidAddressOrEnsError,
+  MissingExecPermissionError,
   InvalidCidError,
   NoProviderError,
   NoSignerError,
@@ -44,6 +46,7 @@ import {
   IHasPermissionParams,
   IMetadata,
   ITransferQueryParams,
+  PermissionIds,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
@@ -117,6 +120,42 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       cid = await this.ipfs.add(JSON.stringify(params.metadata));
     } catch {
       throw new Error("Could not pin the metadata on IPFS");
+    }
+
+    // check if at least one plugin requests EXECUTE_PERMISSION on the DAO
+    // This check isn't 100% correct all the time
+    // simulate the DAO creation to get an address
+    const pluginSetupProcessorAddr = await daoFactoryInstance
+      .pluginSetupProcessor();
+    const pluginSetupProcessor = PluginSetupProcessor__factory.connect(
+      pluginSetupProcessorAddr,
+      signer,
+    );
+    let execPermissionFound = false;
+
+    // using the DAO base because it reflects a newly created DAO the best
+    const daoBaseAddr = await daoFactoryInstance.daoBase();
+    // simulates each plugin installation seperately to get the requested permissions
+    for (const plugin of pluginInstallationData) {
+      const pluginSetupProcessorResponse = await pluginSetupProcessor.callStatic
+        .prepareInstallation(
+          daoBaseAddr,
+          plugin.pluginSetup,
+          plugin.pluginSetupRepo,
+          plugin.data,
+        );
+      const found = pluginSetupProcessorResponse.permissions.find(
+        (permission) =>
+          permission.permissionId === PermissionIds.EXECUTE_PERMISSION_ID,
+      );
+      if (found) {
+        execPermissionFound = true;
+        break;
+      }
+    }
+
+    if (!execPermissionFound) {
+      throw new MissingExecPermissionError();
     }
 
     const tx = await daoFactoryInstance.connect(signer).createDao(
@@ -288,9 +327,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {Promise<boolean>}
    * @memberof ClientMethods
    */
-  public async hasPermission(
-    params: IHasPermissionParams,
-  ): Promise<boolean> {
+  public async hasPermission(params: IHasPermissionParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new NoSignerError();
@@ -298,10 +335,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       throw new NoProviderError();
     }
     // connect to the managing dao
-    const daoInstance = DAO__factory.connect(
-      params.daoAddressOrEns,
-      signer,
-    );
+    const daoInstance = DAO__factory.connect(params.daoAddressOrEns, signer);
     return daoInstance.hasPermission(
       params.where,
       params.who,
