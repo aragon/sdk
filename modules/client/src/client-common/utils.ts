@@ -1,5 +1,5 @@
 import { IDAO } from "@aragon/core-contracts-ethers";
-import { VoteValues } from "..";
+import { VoteValues } from "../client-common/interfaces/plugin";
 import {
   IComputeStatusProposal,
   ICreateProposalParams,
