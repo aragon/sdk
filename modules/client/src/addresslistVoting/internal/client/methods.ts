@@ -37,6 +37,7 @@ import {
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
+  proposalMetadataSchema,
   ProposalSortBy,
   SortDirection,
   SubgraphVotingSettings,
@@ -148,6 +149,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof ClientMethods
    */
   public async pinMetadata(params: ProposalMetadata): Promise<string> {
+    proposalMetadataSchema.validateSync(params);
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);

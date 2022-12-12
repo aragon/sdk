@@ -81,6 +81,7 @@ import {
   createParamsSchema,
   depositParamsSchema,
   hasPermissionParamsSchema,
+  metadataSchema,
 } from "../../schemas";
 
 /**
@@ -211,6 +212,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async pinMetadata(params: DaoMetadata): Promise<string> {
+    metadataSchema.validateSync(params);
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);

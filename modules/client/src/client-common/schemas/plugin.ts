@@ -3,13 +3,14 @@ import {
   InvalidVoteValueError,
 } from "@aragon/sdk-common";
 import { array, boolean, number, object, string } from "yup";
-import { isProposalId } from "..";
+import { isProposalId } from "../utils";
 import {
   addressOrEnsSchema,
   addressSchema,
   bigNumberishSchema,
   daoActionSchema,
   dateSchema,
+  ipfsUriSchema,
 } from "./common";
 import { VoteValues } from "../interfaces/plugin";
 
@@ -43,7 +44,7 @@ export const proposalMetadataSchema = object({
 
 export const createProposalParamsSchema = object({
   pluginAddress: addressOrEnsSchema.required(),
-  metadata: proposalMetadataSchema.required(),
+  metadata: ipfsUriSchema.required(),
   actions: array(daoActionSchema).default([]),
   startDate: dateSchema,
   endDate: dateSchema,

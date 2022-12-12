@@ -4,17 +4,25 @@ import {
   InvalidBigNumberishError,
   InvalidDataError,
   InvalidDateError,
+  InvalidIpfsUriError,
   InvalidPermissionError,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import { mixed, object, string } from "yup";
 import { Permissions } from "../../interfaces";
 import { isBigNumberish } from "@ethersproject/bignumber/lib/bignumber";
+import { isIpfsUri } from "../utils";
 
 export const addressSchema = string().notRequired().test(
   "isAddress",
   new InvalidAddressError().message,
   (value) => value ? isAddress(value) : true,
+);
+
+export const ipfsUriSchema = string().notRequired().test(
+  "isIpfsUri",
+  new InvalidIpfsUriError().message,
+  (value) => value ? isIpfsUri(value) : true,
 );
 
 // address list or ens

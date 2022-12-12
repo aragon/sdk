@@ -3,6 +3,7 @@ import {
   addressOrEnsSchema,
   addressSchema,
   bigintSchema,
+  ipfsUriSchema,
   permissionSchema,
   pluginInstallItemSchema,
   uint8ArraySchema,
@@ -22,7 +23,7 @@ export const metadataSchema = object({
 });
 // Create proposal
 export const createParamsSchema = object({
-  metadata: metadataSchema.required(),
+  metadata: ipfsUriSchema.required(),
   ensSubdomain: string().required(),
   trustedForwarder: string().optional(),
   plugins: array(pluginInstallItemSchema).required(),
