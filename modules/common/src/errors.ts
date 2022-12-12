@@ -144,3 +144,9 @@ export class InvalidVoteValueError extends Error {
     super("Invalid vote value");
   }
 }
+
+export class InvalidIpfsUriError extends Error {
+  constructor() {
+    super("Invalid ipfs uri");
+  }
+}
