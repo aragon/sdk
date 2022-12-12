@@ -30,7 +30,6 @@ import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParams,
   contextParamsLocalChain,
-  TEST_DAO_ADDRESS,
   TEST_ERC20_DAO_ADDRESS,
   TEST_ERC20_PLUGIN_ADDRESS,
   TEST_ERC20_PROPOSAL_ID,
