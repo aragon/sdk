@@ -214,7 +214,7 @@ describe("Client ERC20", () => {
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new ClientErc20(ctxPlugin);
 
-        const daoAddress = TEST_DAO_ADDRESS;
+        const daoAddress = TEST_ERC20_PLUGIN_ADDRESS;
         const wallets = await client.methods.getMembers(daoAddress);
 
         expect(Array.isArray(wallets)).toBe(true);
