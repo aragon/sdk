@@ -44,7 +44,7 @@ export const proposalMetadataSchema = object({
 
 export const createProposalParamsSchema = object({
   pluginAddress: addressOrEnsSchema.required(),
-  metadata: ipfsUriSchema.required(),
+  metadataUri: ipfsUriSchema.required(),
   actions: array(daoActionSchema).default([]),
   startDate: dateSchema,
   endDate: dateSchema,

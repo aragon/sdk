@@ -23,7 +23,7 @@ export const metadataSchema = object({
 });
 // Create proposal
 export const createParamsSchema = object({
-  metadata: ipfsUriSchema.required(),
+  metadataUri: ipfsUriSchema.required(),
   ensSubdomain: string().required(),
   trustedForwarder: string().optional(),
   plugins: array(pluginInstallItemSchema).required(),
