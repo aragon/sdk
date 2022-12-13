@@ -12,12 +12,12 @@ export class MultiUri {
       if (IPFS_CID_REGEX.test(item)) return item;
       else if (item.startsWith("ipfs://")) {
         item = item.substring(7);
-        const idx = item.indexOf("/");
-        const cid = (idx < 0) ? item : item.substring(0, idx);
-
-        if (!IPFS_CID_REGEX.test(cid)) continue;
-        return cid;
       }
+      const idx = item.indexOf("/");
+      const cid = (idx < 0) ? item : item.substring(0, idx);
+
+      if (!IPFS_CID_REGEX.test(cid)) continue;
+      return cid;
     }
     return null;
   }
@@ -26,32 +26,31 @@ export class MultiUri {
       if (IPFS_CID_REGEX.test(item)) return { cid: item, path: "" };
       else if (item.startsWith("ipfs://")) {
         item = item.substring(7);
+      }
+      let pathIdx = item.indexOf("/");
 
-        let pathIdx = item.indexOf("/");
-
-        let cid = item;
-        if (pathIdx < 0) {
-          if (!IPFS_CID_REGEX.test(cid)) continue;
-          return { cid, path: "" };
-        }
-        cid = item.substring(0, pathIdx);
+      let cid = item;
+      if (pathIdx < 0) {
         if (!IPFS_CID_REGEX.test(cid)) continue;
+        return { cid, path: "" };
+      }
+      cid = item.substring(0, pathIdx);
+      if (!IPFS_CID_REGEX.test(cid)) continue;
 
-        let searchIdx = item.indexOf("?");
-        if (searchIdx < 0) searchIdx = item.indexOf("#");
+      let searchIdx = item.indexOf("?");
+      if (searchIdx < 0) searchIdx = item.indexOf("#");
 
-        if (searchIdx < 0) {
-          return {
-            cid,
-            path: item.substring(pathIdx),
-          };
-        }
-
+      if (searchIdx < 0) {
         return {
           cid,
-          path: item.substring(pathIdx, searchIdx),
+          path: item.substring(pathIdx),
         };
       }
+
+      return {
+        cid,
+        path: item.substring(pathIdx, searchIdx),
+      };
     }
     return null;
   }
@@ -70,8 +69,9 @@ const IPFS_CID_REGEX =
  */
 export function resolveIpfsCid(data: string): string {
   const uri = new MultiUri(data);
-  if (!uri.ipfsCid) {
+  const cid = uri.ipfsCid;
+  if (!cid) {
     throw new InvalidCidError();
   }
-  return uri.ipfsCid;
+  return cid;
 }
