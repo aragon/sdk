@@ -7,7 +7,6 @@ import {
   IpfsPinError,
   NoProviderError,
   ProposalCreationError,
-  Random,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
@@ -52,6 +51,7 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
+import { QueryAddressListMembers } from "../graphql-queries/members";
 
 /**
  * Methods module the SDK Address List Client
@@ -245,24 +245,28 @@ export class ClientAddressListMethods extends ClientCore
   /**
    * Returns the list of wallet addresses with signing capabilities on the plugin
    *
-   * @param {string} _daoAddressOrEns
+   * @async
+   * @param {string} pluginAddress
    * @return {*}  {Promise<string[]>}
    * @memberof ClientAddressListMethods
    */
-  public getMembers(_daoAddressOrEns: string): Promise<string[]> {
-    const mockAddresses: string[] = [
-      "0x0123456789012345678901234567890123456789",
-      "0x1234567890123456789012345678901234567890",
-      "0x2345678901234567890123456789012345678901",
-      "0x3456789012345678901234567890123456789012",
-      "0x4567890123456789012345678901234567890123",
-    ];
+  public async getMembers(pluginAddress: string): Promise<string[]> {
+    if (!isAddress(pluginAddress)) {
+      throw new InvalidAddressError();
+    }
 
-    // TODO: Implement
-
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
-      mockAddresses.filter(() => Random.getFloat() > 0.4)
-    );
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const response = await client.request(QueryAddressListMembers, {
+        address: pluginAddress,
+      });
+      return response.addresslistPlugin.members.map((
+        member: { address: string },
+      ) => member.address);
+    } catch {
+      throw new GraphQLError("AddressList members");
+    }
   }
   /**
    * Returns the details of the given proposal

@@ -8,7 +8,6 @@ import {
   IpfsPinError,
   NoProviderError,
   ProposalCreationError,
-  Random,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import { formatEther } from "@ethersproject/units";
@@ -42,6 +41,7 @@ import {
   SubgraphErc20ProposalListItem,
 } from "../../interfaces";
 import {
+  QueryErc20Members,
   QueryErc20PluginSettings,
   QueryErc20Proposal,
   QueryErc20Proposals,
@@ -248,23 +248,28 @@ export class ClientErc20Methods extends ClientCore
   /**
    * Returns the list of wallet addresses holding tokens from the underlying ERC20 contract used by the plugin
    *
+   * @async
+   * @param {string} pluginAddress
    * @return {*}  {Promise<string[]>}
    * @memberof ClientErc20
    */
-  public getMembers(_daoAddressOrEns: string): Promise<string[]> {
-    // TODO: Implement
+  public async getMembers(pluginAddress: string): Promise<string[]> {
+    if (!isAddress(pluginAddress)) {
+      throw new InvalidAddressError();
+    }
 
-    const mockAddresses = [
-      "0x8367dc645e31321CeF3EeD91a10a5b7077e21f70",
-      "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
-      "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
-      "0x2dB75d8404144CD5918815A44B8ac3f4DB2a7FAf",
-      "0xc1d60f584879f024299DA0F19Cdb47B931E35b53",
-    ];
-
-    return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
-      mockAddresses.filter(() => Random.getFloat() > 0.4)
-    );
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const response = await client.request(QueryErc20Members, {
+        address: pluginAddress,
+      });
+      return response.erc20VotingPlugin.members.map((
+        member: { address: string },
+      ) => member.address);
+    } catch {
+      throw new GraphQLError("ERC20 members");
+    }
   }
 
   /**

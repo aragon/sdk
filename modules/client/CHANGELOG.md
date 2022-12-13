@@ -19,6 +19,10 @@ TEMPLATE:
 ### Changed
 - Split `createDao()` and `pinMetadata()` 
 - Split `createProposal()` and `pinMetadata()` 
+
+### Added
+- Graphql query in AddresslistPlugin and Erc20Plugin for `getMembers()`
+
 ## [0.16.0-alpha]
 ### Added
 - Checks during DAO creation if at least 1 plugin requests exec permission

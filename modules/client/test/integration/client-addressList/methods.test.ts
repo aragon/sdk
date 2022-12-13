@@ -207,7 +207,7 @@ describe("Client Address List", () => {
       const client = new ClientAddressList(ctxPlugin);
 
       const wallets = await client.methods.getMembers(
-        TEST_ADDRESSLIST_DAO_ADDDRESS,
+        TEST_ADDRESSLIST_PLUGIN_ADDRESS,
       );
 
       expect(Array.isArray(wallets)).toBe(true);
