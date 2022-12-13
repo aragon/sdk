@@ -220,7 +220,7 @@ so that the plugin is configured</p>
     * [.voteProposal(params)](#ClientAddressListMethods+voteProposal) ⇒ <code>\*</code>
     * [.executeProposal(params)](#ClientAddressListMethods+executeProposal) ⇒ <code>\*</code>
     * [.canVote(params)](#ClientAddressListMethods+canVote) ⇒ <code>\*</code>
-    * [.getMembers(_daoAddressOrEns)](#ClientAddressListMethods+getMembers) ⇒ <code>\*</code>
+    * [.getMembers(pluginAddress)](#ClientAddressListMethods+getMembers) ⇒ <code>\*</code>
     * [.getProposal(proposalId)](#ClientAddressListMethods+getProposal) ⇒ <code>\*</code>
     * [.getProposals({)](#ClientAddressListMethods+getProposals) ⇒ <code>\*</code>
     * [.getSettings(pluginAddress)](#ClientAddressListMethods+getSettings) ⇒ <code>\*</code>
@@ -275,7 +275,7 @@ so that the plugin is configured</p>
 
 <a name="ClientAddressListMethods+getMembers"></a>
 
-### clientAddressListMethods.getMembers(_daoAddressOrEns) ⇒ <code>\*</code>
+### clientAddressListMethods.getMembers(pluginAddress) ⇒ <code>\*</code>
 <p>Returns the list of wallet addresses with signing capabilities on the plugin</p>
 
 **Kind**: instance method of [<code>ClientAddressListMethods</code>](#ClientAddressListMethods)  
@@ -283,7 +283,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| _daoAddressOrEns | <code>string</code> | 
+| pluginAddress | <code>string</code> | 
 
 <a name="ClientAddressListMethods+getProposal"></a>
 

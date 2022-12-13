@@ -25,7 +25,7 @@
     * [.ClientErc20Methods#createProposal(params)](#ClientErc20.ClientErc20Methods+createProposal) ⇒ <code>\*</code>
     * [.ClientErc20Methods#voteProposal(params, vote)](#ClientErc20.ClientErc20Methods+voteProposal) ⇒ <code>\*</code>
     * [.ClientErc20Methods#executeProposal(params)](#ClientErc20.ClientErc20Methods+executeProposal) ⇒ <code>\*</code>
-    * [.ClientErc20Methods#getMembers()](#ClientErc20.ClientErc20Methods+getMembers) ⇒ <code>\*</code>
+    * [.ClientErc20Methods#getMembers(pluginAddress)](#ClientErc20.ClientErc20Methods+getMembers) ⇒ <code>\*</code>
     * [.ClientErc20Methods#getProposal(proposalId)](#ClientErc20.ClientErc20Methods+getProposal) ⇒ <code>\*</code>
     * [.ClientErc20Methods#getProposals(params)](#ClientErc20.ClientErc20Methods+getProposals) ⇒ <code>\*</code>
     * [.ClientErc20Methods#getSettings(pluginAddress)](#ClientErc20.ClientErc20Methods+getSettings) ⇒ <code>\*</code>
@@ -83,11 +83,16 @@ so that the plugin is configured</p>
 
 <a name="ClientErc20.ClientErc20Methods+getMembers"></a>
 
-### ClientErc20.ClientErc20Methods#getMembers() ⇒ <code>\*</code>
+### ClientErc20.ClientErc20Methods#getMembers(pluginAddress) ⇒ <code>\*</code>
 <p>Returns the list of wallet addresses holding tokens from the underlying ERC20 contract used by the plugin</p>
 
 **Kind**: static method of [<code>ClientErc20</code>](#ClientErc20)  
 **Returns**: <code>\*</code> - <p>{Promise&lt;string[]&gt;}</p>  
+
+| Param | Type |
+| --- | --- |
+| pluginAddress | <code>string</code> | 
+
 <a name="ClientErc20.ClientErc20Methods+getProposal"></a>
 
 ### ClientErc20.ClientErc20Methods#getProposal(proposalId) ⇒ <code>\*</code>
