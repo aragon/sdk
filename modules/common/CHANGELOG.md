@@ -15,6 +15,9 @@ TEMPLATE:
 ### Fixed
 - Fix 1, 2, 3
 -->
+## [UPCOMING]
+### Fixed
+- IPFS uri resolving
 
 ## [0.9.0-alpha]
 ### Added
