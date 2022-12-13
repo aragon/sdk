@@ -1,5 +1,18 @@
-import { InvalidCidError, resolveIpfsCid } from "../../src";
+import { InvalidCidError, MultiUri, resolveIpfsCid } from "../../src";
 
+describe("MultiUri Class", () => {
+  it("Should resolve IPFS CiD's", () => {
+    const uris = [
+      "ipfs://QmSH4tFQd6zqPW9b8ryvtrnbhr9HATyetmWxtGgWUJ33ik",
+      "https://example.com",
+    ];
+    const multiuri = new MultiUri(uris.join(","));
+    expect(multiuri.http.length).toBe(1);
+    expect(multiuri.http[0]).toBe(uris[1]);
+    expect(uris[0].includes(multiuri.ipfs!.cid)).toBe(true);
+    expect(uris[0].includes(multiuri.ipfsCid!)).toBe(true);
+  });
+});
 describe("IPFS metadata origin", () => {
   it("Should resolve IPFS CiD's", () => {
     let cid = "QmSH4tFQd6zqPW9b8ryvtrnbhr9HATyetmWxtGgWUJ3dik";
