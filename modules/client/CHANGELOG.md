@@ -16,6 +16,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## 0.16.1-alpha
+On 2022-12-13 15:58:04
 ### Changed
 - Split `createDao()` and `pinMetadata()` 
 - Split `createProposal()` and `pinMetadata()` 
