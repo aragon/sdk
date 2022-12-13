@@ -245,10 +245,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     const signer = this.web3.getConnectedSigner();
     if (!signer.provider) {
       throw new NoProviderError();
-    } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
     }
-
     canVoteParamsSchema.validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
@@ -257,7 +254,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     );
     return addresslistContract.callStatic.canVote(
       params.proposalId,
-      params.address,
+      params.addressOrEns,
     );
   }
   /**

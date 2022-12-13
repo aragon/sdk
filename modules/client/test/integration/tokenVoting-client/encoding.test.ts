@@ -11,7 +11,7 @@ import {
 } from "../../../src";
 
 import { AddressZero } from "@ethersproject/constants";
-import { InvalidAddressError } from "@aragon/sdk-common";
+import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 
 describe("Token Voting Client", () => {
@@ -48,7 +48,7 @@ describe("Token Voting Client", () => {
       const pluginAddress = "0xinvalid_address";
       expect(() =>
         client.encoding.updatePluginSettingsAction(pluginAddress, params)
-      ).toThrow(new InvalidAddressError().message);
+      ).toThrow(new InvalidAddressOrEnsError().message);
     });
     it("Should encode an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -77,33 +77,33 @@ describe("Token Voting Client", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
       const params: IMintTokenParams = {
-        address: "0xinvalid_address",
+        addressOrEns: "0xinvalid_address",
         amount: BigInt(10),
       };
 
       const minterAddress = "0x1234567890123456789012345678901234567890";
       expect(() => client.encoding.mintTokenAction(minterAddress, params))
-        .toThrow(new InvalidAddressError());
+        .toThrow(new InvalidAddressOrEnsError());
     });
     it("Should encode a mint action with an invalid token address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
       const params: IMintTokenParams = {
-        address: "0x1234567890123456789012345678901234567890",
+        addressOrEns: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
       };
 
       const minterAddress = "0xinvalid_address";
       expect(() => client.encoding.mintTokenAction(minterAddress, params))
-        .toThrow(new InvalidAddressError());
+        .toThrow(new InvalidAddressOrEnsError());
     });
     it("Should encode a TokenVoting token mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
       const params: IMintTokenParams = {
-        address: "0x1234567890123456789012345678901234567890",
+        addressOrEns: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
       };
 

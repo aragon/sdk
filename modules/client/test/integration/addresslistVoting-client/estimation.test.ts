@@ -62,7 +62,7 @@ describe("Client Address List", () => {
 
       const voteParams: IVoteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
-        proposalId: "0x0",
+        proposalId: BigInt(0),
         vote: VoteValues.YES,
       };
 
@@ -82,7 +82,7 @@ describe("Client Address List", () => {
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
-        proposalId: "0x0",
+        proposalId: BigInt(0),
       };
       const estimation = await client.estimation.executeProposal(executeParams);
 

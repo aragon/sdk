@@ -75,20 +75,18 @@ export type CreateProposalBaseParams = {
 export interface IVoteProposalParams {
   pluginAddress: string;
   vote: VoteValues;
-  proposalId: string;
+  proposalId: bigint;
 }
 
 export interface IExecuteProposalParams {
   pluginAddress: string;
-  proposalId: string;
+  proposalId: bigint;
 }
 
 export interface ICanVoteParams {
   pluginAddress: string;
-  proposalId: string;
-  // TODO
-  // addressOrEns ??
-  address: string;
+  proposalId: bigint;
+  addressOrEns: string;
 }
 
 export type CanExecuteParams = {

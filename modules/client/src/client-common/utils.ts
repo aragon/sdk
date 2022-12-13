@@ -85,7 +85,7 @@ export function isProposalId(proposalId: string): boolean {
 }
 export function isIpfsUri(ipfsUri: string): boolean {
   const regex = new RegExp(
-    /^ipfs:\/\/((Qm([1-9A-HJ-NP-Za-km-z]{44,})|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}))$/,
+    /^ipfs:\/\/((Qm([1-9A-HJ-NP-Za-km-z]{44,})|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}))(\/[A-Za-z0-9-._~!$&'()*+,;=:@]+)*$/,
   );
   return regex.test(ipfsUri);
 }
@@ -140,4 +140,11 @@ export function parseEtherRatio(ether: string, precision: number = 2): number {
       formatEther(ether),
     ).toFixed(precision),
   );
+}
+
+export function isEnsName(ensName: string): boolean {
+  const regex = new RegExp(
+    /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/ig,
+  );
+  return regex.test(ensName);
 }

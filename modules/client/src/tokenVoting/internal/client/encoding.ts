@@ -1,4 +1,4 @@
-import { hexToBytes, InvalidAddressError, strip0x } from "@aragon/sdk-common";
+import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
   addressOrEnsSchema,
   ClientCore,
@@ -9,7 +9,6 @@ import {
   pluginSettingsSchema,
   VotingSettings,
 } from "../../../client-common";
-import { isAddress } from "@ethersproject/address";
 import {
   IMintTokenParams,
   ITokenVotingClientEncoding,
@@ -25,7 +24,7 @@ import {
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { erc20PluginInstallSchema } from "../../schemas";
+import { erc20PluginInstallSchema, mintTokenSchema } from "../../schemas";
 /**
  * Encoding module the SDK TokenVoting Client
  */
@@ -97,9 +96,8 @@ export class TokenVotingClientEncoding extends ClientCore
     minterAddress: string,
     params: IMintTokenParams,
   ): DaoAction {
-    if (!isAddress(minterAddress) || !isAddress(params.address)) {
-      throw new InvalidAddressError();
-    }
+    addressOrEnsSchema.validateSync(minterAddress);
+    mintTokenSchema.validateSync(params);
     const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();
     const args = mintTokenParamsToContract(params);

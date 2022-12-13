@@ -50,7 +50,7 @@ describe("Token Voting Client", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
       const params: IMintTokenParams = {
-        address: "0x1234567890123456789012345678901234567890",
+        addressOrEns: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
       };
 
@@ -58,7 +58,7 @@ describe("Token Voting Client", () => {
       const action = client.encoding.mintTokenAction(minterAddress, params);
       const decodedParams = client.decoding.mintTokenAction(action.data);
 
-      expect(decodedParams.address).toBe(params.address);
+      expect(decodedParams.addressOrEns).toBe(params.addressOrEns);
       expect(bytesToHex(action.data, true)).toBe(
         "0x40c10f190000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a",
       );

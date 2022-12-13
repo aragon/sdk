@@ -8,7 +8,7 @@ import {
   IAddresslistVotingPluginInstall,
   VotingSettings,
 } from "../../../src";
-import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
+import { bytesToHex, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 describe("Client Address List", () => {
   describe("Action generators", () => {
@@ -54,7 +54,7 @@ describe("Client Address List", () => {
           pluginAddress,
           pluginConfigParams,
         )
-      ).toThrow(new InvalidAddressError());
+      ).toThrow(new InvalidAddressOrEnsError());
     });
 
     it("Should create an AddressList client and generate a plugin config action action", async () => {
@@ -94,7 +94,7 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0xinvalid_address";
       expect(() => client.encoding.addMembersAction(pluginAddress, members))
-        .toThrow(new InvalidAddressError());
+        .toThrow(new InvalidAddressOrEnsError());
     });
     it("Should encode a add members action with an invalid member address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -109,7 +109,7 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       expect(() => client.encoding.addMembersAction(pluginAddress, members))
-        .toThrow(new InvalidAddressError());
+        .toThrow(new InvalidAddressOrEnsError());
     });
     it("Should encode a add members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -145,7 +145,7 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0xinvalid_address";
       expect(() => client.encoding.removeMembersAction(pluginAddress, members))
-        .toThrow(new InvalidAddressError());
+        .toThrow(new InvalidAddressOrEnsError());
     });
     it("Should encode a remove members action with an invalid member address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -160,7 +160,7 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       expect(() => client.encoding.removeMembersAction(pluginAddress, members))
-        .toThrow(new InvalidAddressError());
+        .toThrow(new InvalidAddressOrEnsError());
     });
     it("Should encode a remove members action", async () => {
       const ctx = new Context(contextParamsLocalChain);

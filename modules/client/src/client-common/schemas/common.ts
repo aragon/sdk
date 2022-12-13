@@ -1,5 +1,6 @@
 import {
   InvalidAddressError,
+  InvalidAddressOrEnsError,
   InvalidBigintError,
   InvalidBigNumberishError,
   InvalidDataError,
@@ -11,7 +12,7 @@ import { isAddress } from "@ethersproject/address";
 import { mixed, object, string } from "yup";
 import { Permissions } from "../../interfaces";
 import { isBigNumberish } from "@ethersproject/bignumber/lib/bignumber";
-import { isIpfsUri } from "../utils";
+import { isEnsName, isIpfsUri } from "../utils";
 
 export const addressSchema = string().notRequired().test(
   "isAddress",
@@ -28,9 +29,8 @@ export const ipfsUriSchema = string().notRequired().test(
 // address list or ens
 export const addressOrEnsSchema = string().test(
   "isAddressOrEns",
-  new InvalidAddressError().message,
-  // check ens
-  (value) => value ? isAddress(value) : true,
+  new InvalidAddressOrEnsError().message,
+  (value) => value ? isEnsName(value) || isAddress(value) : true,
 );
 // permissions
 export const permissionSchema = string().test(

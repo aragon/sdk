@@ -6,8 +6,7 @@ import { array, boolean, number, object, string } from "yup";
 import { isProposalId } from "../utils";
 import {
   addressOrEnsSchema,
-  addressSchema,
-  bigNumberishSchema,
+  bigintSchema,
   daoActionSchema,
   dateSchema,
   ipfsUriSchema,
@@ -55,20 +54,18 @@ export const createProposalParamsSchema = object({
 export const voteProposalParamsSchema = object({
   pluginAddress: addressOrEnsSchema.required(),
   vote: voteValuesSchema.required(),
-  proposalId: bigNumberishSchema.required(),
+  proposalId: bigintSchema.required(),
 });
 
 export const executeProposalParamsSchema = object({
   pluginAddress: addressOrEnsSchema.required(),
-  proposalId: bigNumberishSchema.required(),
+  proposalId: bigintSchema.required(),
 });
 
 export const canVoteParamsSchema = object({
   pluginAddress: addressOrEnsSchema.required(),
-  proposalId: bigNumberishSchema.required(),
-  // TODO
-  // addressOrEns ??
-  address: addressSchema.required(),
+  proposalId: bigintSchema.required(),
+  addressOrEns: addressOrEnsSchema.required(),
 });
 
 export const pluginSettingsSchema = object({

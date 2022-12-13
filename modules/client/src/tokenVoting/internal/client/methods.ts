@@ -254,7 +254,7 @@ export class TokenVotingClientMethods extends ClientCore
     );
     return tokenVotingContract.callStatic.canVote(
       params.proposalId,
-      params.address,
+      params.addressOrEns,
     );
   }
 

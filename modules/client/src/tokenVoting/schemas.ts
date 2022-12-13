@@ -24,3 +24,8 @@ export const erc20PluginInstallSchema = object({
   newToken: newTokenParamsSchema.default(undefined),
   useToken: existingTokenParamsSchema.default(undefined),
 });
+
+export const mintTokenSchema = object({
+  addressOrEns: addressOrEnsSchema.required(),
+  amount: bigintSchema.required(),
+});
