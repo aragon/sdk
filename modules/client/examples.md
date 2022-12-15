@@ -611,13 +611,13 @@ const createParams: CreateDaoParams = {
 };
 
 // gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.create(
+const estimatedGas: GasFeeEstimation = await client.estimation.createDao(
   createParams,
 );
 console.log(estimatedGas.average);
 console.log(estimatedGas.max);
 
-const steps = client.methods.create(createParams);
+const steps = client.methods.createDao(createParams);
 for await (const step of steps) {
   try {
     switch (step.key) {

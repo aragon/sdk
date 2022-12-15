@@ -148,3 +148,10 @@ export function isEnsName(ensName: string): boolean {
   );
   return regex.test(ensName);
 }
+
+export function isPermission(permission: string): boolean {
+  const regex = new RegExp(
+    /(([A-Z])_?)*([A-Z])$/,
+  );
+  return regex.test(permission);
+}

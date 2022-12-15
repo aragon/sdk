@@ -2,7 +2,6 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidBigintError,
-  InvalidBigNumberishError,
   InvalidDataError,
   InvalidDateError,
   InvalidIpfsUriError,
@@ -10,61 +9,58 @@ import {
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import { mixed, object, string } from "yup";
-import { Permissions } from "../../interfaces";
-import { isBigNumberish } from "@ethersproject/bignumber/lib/bignumber";
-import { isEnsName, isIpfsUri } from "../utils";
+import { isEnsName, isIpfsUri, isPermission } from "../utils";
 
 export const addressSchema = string().notRequired().test(
   "isAddress",
   new InvalidAddressError().message,
-  (value) => value ? isAddress(value) : true,
+  (value) => value === undefined || value === null ? true : isAddress(value),
 );
 
 export const ipfsUriSchema = string().notRequired().test(
   "isIpfsUri",
   new InvalidIpfsUriError().message,
-  (value) => value ? isIpfsUri(value) : true,
+  (value) => value === undefined || value === null ? true : isIpfsUri(value),
 );
 
 // address list or ens
 export const addressOrEnsSchema = string().test(
   "isAddressOrEns",
   new InvalidAddressOrEnsError().message,
-  (value) => value ? isEnsName(value) || isAddress(value) : true,
+  (value) =>
+    value === undefined || value === null
+      ? true
+      : isEnsName(value) || isAddress(value),
 );
 // permissions
 export const permissionSchema = string().test(
   "isPermission",
   new InvalidPermissionError().message,
-  (value) => value ? Object.keys(Permissions).includes(value) : true,
+  (value) => value === undefined || value === null ? true : isPermission(value),
 );
 
 // uint8array
 export const uint8ArraySchema = mixed().test(
   "isUint8Array",
   new InvalidDataError().message,
-  (value) => value ? value instanceof Uint8Array : true,
-);
-
-// uint8array
-export const bigNumberishSchema = mixed().test(
-  "isBigNumberish",
-  new InvalidBigNumberishError().message,
-  (value) => value ? isBigNumberish(value) : true,
+  (value) =>
+    value === undefined || value === null ? true : value instanceof Uint8Array,
 );
 
 // date
 export const dateSchema = mixed().test(
   "isDate",
   new InvalidDateError().message,
-  (value) => value ? value instanceof Date : true,
+  (value) =>
+    value === undefined || value === null ? true : value instanceof Date,
 );
 
 // bigint
 export const bigintSchema = mixed().test(
   "isBigint",
   new InvalidBigintError().message,
-  (value) => value ? typeof value === "bigint" : true,
+  (value) =>
+    value === undefined || value === null ? true : typeof value === "bigint",
 );
 
 export const pluginInstallItemSchema = object({

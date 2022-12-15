@@ -133,11 +133,6 @@ export class InvalidDateError extends Error {
     super("Invalid type, Date was expected");
   }
 }
-export class InvalidBigNumberishError extends Error {
-  constructor() {
-    super("Invalid type, BigNumberish was expected");
-  }
-}
 
 export class InvalidVoteValueError extends Error {
   constructor() {

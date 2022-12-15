@@ -49,6 +49,8 @@ export const createProposalParamsSchema = object({
   endDate: dateSchema,
   executeOnPass: boolean(),
   creatorVote: voteValuesSchema,
+  earlyExecution: boolean(),
+  voteReplacement: boolean(),
 });
 
 export const voteProposalParamsSchema = object({

@@ -64,6 +64,8 @@ export interface ICreateProposalParams {
   endDate?: Date;
   executeOnPass?: boolean;
   creatorVote?: VoteValues;
+  voteReplacement?: boolean;
+  earlyExecution?: boolean;
 }
 
 export type CreateProposalBaseParams = {
