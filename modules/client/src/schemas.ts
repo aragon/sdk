@@ -15,7 +15,7 @@ const daoResourceLinkSchema = object({
   url: string().required(),
 });
 
-export const metadataSchema = object({
+export const daoMetadataSchema = object({
   name: string().required(),
   description: string().required(),
   avatar: string().optional(),
