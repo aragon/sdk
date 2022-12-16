@@ -11,15 +11,18 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { deployErc20 } from "./methods.test";
 import { Server } from "ganache";
+import { toUtf8Bytes } from "@ethersproject/strings";
+import { defaultAbiCoder } from "@ethersproject/abi";
 
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
+  let deployment: deployContracts.Deployment;
   describe("Estimation module", () => {
     let server: Server;
 
     beforeAll(async () => {
       server = await ganacheSetup.start();
-      const deployment = await deployContracts.deploy();
+      deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
     });
 
@@ -37,10 +40,17 @@ describe("Client", () => {
       const daoCreationParams: ICreateParams = {
         metadataUri: `ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK`,
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-        plugins: [{
-          id: "0x1234567890123456789012345678901234567890",
-          data: new Uint8Array(),
-        }],
+        plugins: [
+          {
+            id: deployment.addressListRepo.address,
+            data: toUtf8Bytes(
+              defaultAbiCoder.encode(
+                ["uint64", "uint64", "uint64", "address[]"],
+                [1, 1, 1, []],
+              ),
+            ),
+          },
+        ],
       };
 
       const gasFeesEstimation = await client.estimation.create(
