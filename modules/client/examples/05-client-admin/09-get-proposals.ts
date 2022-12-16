@@ -3,7 +3,7 @@
 */
 import {
   AdminProposalListItem,
-  ClientAdmin,
+  AdminClient,
   Context,
   ContextPlugin,
   IProposalQueryParams,
@@ -18,7 +18,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAdmin(contextPlugin);
+const client = new AdminClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional

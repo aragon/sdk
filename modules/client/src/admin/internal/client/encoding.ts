@@ -8,15 +8,15 @@ import {
   ContextPlugin,
   IPluginInstallItem,
 } from "../../../client-common";
-import { IClientAdminEncoding } from "../../interfaces";
+import { IAdminClientEncoding } from "../../interfaces";
 import { ADMIN_PLUGIN_ID } from "../constants";
 import { isAddress } from "@ethersproject/address";
 
 /**
  * Encoding module for the SDK Admin Client
  */
-export class ClientAdminEncoding extends ClientCore
-  implements IClientAdminEncoding {
+export class AdminClientEncoding extends ClientCore
+  implements IAdminClientEncoding {
   constructor(context: ContextPlugin) {
     super(context);
   }

@@ -4,7 +4,7 @@
 */
 import {
   Client,
-  ClientAdmin,
+  AdminClient,
   Context,
   ContextPlugin,
   ExecuteProposalParams,
@@ -21,7 +21,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const clientAdmin = new ClientAdmin(contextPlugin);
+const AdminClient = new AdminClient(contextPlugin);
 const client = new Client(context);
 
 const metadata: ProposalMetadata = {
@@ -44,7 +44,7 @@ const metadata: ProposalMetadata = {
   },
 };
 
-const ipfsUri = await clientAdmin.methods.pinMetadata(metadata);
+const ipfsUri = await AdminClient.methods.pinMetadata(metadata);
 
 const withdrawParams: IWithdrawParams = {
   recipientAddress: "0x1234567890123456789012345678901234567890",
@@ -61,7 +61,7 @@ const proposalParams: ExecuteProposalParams = {
   actions: [withdrawAction],
 };
 
-const steps = clientAdmin.methods.executeProposal(proposalParams);
+const steps = AdminClient.methods.executeProposal(proposalParams);
 for await (const step of steps) {
   try {
     switch (step.key) {

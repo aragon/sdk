@@ -5,7 +5,7 @@ declare const describe, it, expect, beforeAll, afterAll;
 import "../../mocks/aragon-sdk-ipfs";
 
 import {
-  ClientAdmin,
+  AdminClient,
   Context,
   ContextPlugin,
   ExecuteProposalParams,
@@ -34,7 +34,7 @@ describe("Client Admin", () => {
     it("Should estimate the gas fees for executing a ", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAdmin(ctxPlugin);
+      const client = new AdminClient(ctxPlugin);
 
       const proposalParams: ExecuteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",

@@ -4,7 +4,7 @@
 */
 import {
   Client,
-  ClientAdmin,
+  AdminClient,
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
@@ -15,7 +15,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 
-const adminInstallPluginItem = ClientAdmin.encoding
+const adminInstallPluginItem = AdminClient.encoding
   .getPluginInstallItem("0x1234567890123456789012345678901234567890");
 
 const metadataUri = await client.methods.pinMetadata({

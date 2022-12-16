@@ -25,7 +25,7 @@ import {
   AdminProposal,
   AdminProposalListItem,
   ExecuteProposalParams,
-  IClientAdminMethods,
+  IAdminClientMethods,
   IAdminProposalQueryParams,
   SubgraphAdminProposal,
   SubgraphAdminProposalListItem,
@@ -44,8 +44,8 @@ import { isAddress } from "@ethersproject/address";
 /**
  * Methods module for the SDK Admin Client
  */
-export class ClientAdminMethods extends ClientCore
-  implements IClientAdminMethods {
+export class AdminClientMethods extends ClientCore
+  implements IAdminClientMethods {
   constructor(context: ContextPlugin) {
     super(context);
   }
@@ -54,7 +54,7 @@ export class ClientAdminMethods extends ClientCore
    *
    * @param {ExecuteProposalParams} params
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
-   * @memberof ClientAdminMethods
+   * @memberof AdminClientMethods
    */
   public async *executeProposal(
     params: ExecuteProposalParams,
@@ -88,7 +88,7 @@ export class ClientAdminMethods extends ClientCore
    *
    * @param {ProposalMetadata} params
    * @return {*}  {Promise<string>}
-   * @memberof ClientAdminMethods
+   * @memberof AdminClientMethods
    */
   public async pinMetadata(
     params: ProposalMetadata,
@@ -149,7 +149,7 @@ export class ClientAdminMethods extends ClientCore
    *
    * @param {IAdminProposalQueryParams}
    * @return {*}  {Promise<AdminProposalListItem[]>}
-   * @memberof ClientAdminMethods
+   * @memberof AdminClientMethods
    */
   public async getProposals(
     {

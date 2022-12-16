@@ -1,27 +1,27 @@
 import { ClientCore, ContextPlugin, IPluginInstallItem } from "../client-common";
 import {
-  IClientAdmin,
-  IClientAdminEncoding,
-  IClientAdminEstimation,
-  IClientAdminMethods,
+  IAdminClient,
+  IAdminClientEncoding,
+  IAdminClientEstimation,
+  IAdminClientMethods,
 } from "./interfaces";
-import { ClientAdminEncoding } from "./internal/client/encoding";
-import { ClientAdminEstimation } from "./internal/client/estimation";
-import { ClientAdminMethods } from "./internal/client/methods";
+import { AdminClientEncoding } from "./internal/client/encoding";
+import { AdminClientEstimation } from "./internal/client/estimation";
+import { AdminClientMethods } from "./internal/client/methods";
 
 /**
  * Provides a generic client with high level methods to manage and interact an Admin plugin installed in a DAO
  */
-export class ClientAdmin extends ClientCore implements IClientAdmin {
-  public methods: IClientAdminMethods;
-  public encoding: IClientAdminEncoding;
-  public estimation: IClientAdminEstimation;
+export class AdminClient extends ClientCore implements IAdminClient {
+  public methods: IAdminClientMethods;
+  public encoding: IAdminClientEncoding;
+  public estimation: IAdminClientEstimation;
 
   constructor(context: ContextPlugin) {
     super(context);
-    this.methods = new ClientAdminMethods(context);
-    this.encoding = new ClientAdminEncoding(context);
-    this.estimation = new ClientAdminEstimation(context);
+    this.methods = new AdminClientMethods(context);
+    this.encoding = new AdminClientEncoding(context);
+    this.estimation = new AdminClientEstimation(context);
   }
 static encoding = {
     
@@ -31,9 +31,9 @@ static encoding = {
      *
      * @param {string} addressOrEns
      * @return {*}  {IPluginInstallItem}
-     * @memberof ClientAdmin
+     * @memberof AdminClient
      */
     getPluginInstallItem: (addressOrEns: string): IPluginInstallItem =>
-      ClientAdminEncoding.getPluginInstallItem(addressOrEns),
+      AdminClientEncoding.getPluginInstallItem(addressOrEns),
   };
 }

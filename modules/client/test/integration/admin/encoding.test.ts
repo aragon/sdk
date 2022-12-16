@@ -2,7 +2,7 @@
 declare const describe, it, expect;
 
 import {
-  ClientAdmin,
+  AdminClient,
 } from "../../../src";
 import {
   InvalidAddressOrEnsError,
@@ -11,7 +11,7 @@ import { TEST_INVALID_ADDRESS } from "../constants";
 describe("Client Admin", () => {
   describe("Action generators", () => {
     it("Should create an Admin client and generate a install entry", async () => {
-      const installPluginItemItem = ClientAdmin.encoding
+      const installPluginItemItem = AdminClient.encoding
         .getPluginInstallItem(
           "0x0123456789012345678901234567890123456789",
         );
@@ -21,7 +21,7 @@ describe("Client Admin", () => {
     });
     it("Should create an Admin client and fail to generate a install entry", async () => {
       expect(() =>
-        ClientAdmin.encoding
+        AdminClient.encoding
           .getPluginInstallItem(
             TEST_INVALID_ADDRESS,
           )

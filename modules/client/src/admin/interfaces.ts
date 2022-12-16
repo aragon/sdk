@@ -10,7 +10,7 @@ import {
   SubgraphAction,
 } from "../client-common";
 
-export interface IClientAdminMethods extends IClientCore {
+export interface IAdminClientMethods extends IClientCore {
   executeProposal: (
     params: ExecuteProposalParams,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
@@ -23,16 +23,16 @@ export interface IClientAdminMethods extends IClientCore {
   ) => Promise<AdminProposalListItem[]>;
 }
 
-export interface IClientAdminEncoding extends IClientCore {}
+export interface IAdminClientEncoding extends IClientCore {}
 
-export interface IClientAdminEstimation extends IClientCore {
+export interface IAdminClientEstimation extends IClientCore {
   executeProposal: (parms: ExecuteProposalParams) => Promise<GasFeeEstimation>;
 }
 
-export interface IClientAdmin {
-  methods: IClientAdminMethods;
-  encoding: IClientAdminEncoding;
-  estimation: IClientAdminEstimation;
+export interface IAdminClient {
+  methods: IAdminClientMethods;
+  encoding: IAdminClientEncoding;
+  estimation: IAdminClientEstimation;
 }
 
 export type ExecuteProposalParams = {

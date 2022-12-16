@@ -1,6 +1,6 @@
 import {
   ExecuteProposalParams,
-  IClientAdminEstimation,
+  IAdminClientEstimation,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -11,8 +11,8 @@ import {
 /**
  * Estimation module for the SDK Admin Client
  */
-export class ClientAdminEstimation extends ClientCore
-  implements IClientAdminEstimation {
+export class AdminClientEstimation extends ClientCore
+  implements IAdminClientEstimation {
   constructor(context: ContextPlugin) {
     super(context);
   }
@@ -21,7 +21,7 @@ export class ClientAdminEstimation extends ClientCore
    *
    * @param {ExecuteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientAdminEstimation
+   * @memberof AdminClientEstimation
    */
   public async executeProposal(
     params: ExecuteProposalParams,

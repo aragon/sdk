@@ -9,7 +9,7 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   Client,
-  ClientAdmin,
+  AdminClient,
   Context,
   ContextPlugin,
   ExecuteProposalParams,
@@ -56,7 +56,7 @@ describe("Client Admin", () => {
     it("Should create a new proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const adminClient = new ClientAdmin(ctxPlugin);
+      const adminClient = new AdminClient(ctxPlugin);
       const client = new Client(ctx);
 
       // generate actions
@@ -116,7 +116,7 @@ describe("Client Admin", () => {
     it("Should fetch the given proposal", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAdmin(ctxPlugin);
+      const client = new AdminClient(ctxPlugin);
 
       const proposalId = TEST_ADMIN_PROPOSAL_ID;
 
@@ -183,7 +183,7 @@ describe("Client Admin", () => {
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAdmin(ctxPlugin);
+      const client = new AdminClient(ctxPlugin);
 
       const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x0";
       const proposal = await client.methods.getProposal(proposalId);
@@ -193,7 +193,7 @@ describe("Client Admin", () => {
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAdmin(ctxPlugin);
+      const client = new AdminClient(ctxPlugin);
       const limit = 5;
       const status = ProposalStatus.EXECUTED;
       const params: IAdminProposalQueryParams = {
@@ -225,7 +225,7 @@ describe("Client Admin", () => {
     it("Should get a list of proposals from a specific admin", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAdmin(ctxPlugin);
+      const client = new AdminClient(ctxPlugin);
       const limit = 5;
       const address = TEST_ADMIN_ADDRESS;
       const params: IAdminProposalQueryParams = {
@@ -242,7 +242,7 @@ describe("Client Admin", () => {
     it("Should get a list of proposals from an invalid address", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAdmin(ctxPlugin);
+      const client = new AdminClient(ctxPlugin);
       const limit = 5;
       const address = TEST_INVALID_ADDRESS;
       const params: IAdminProposalQueryParams = {

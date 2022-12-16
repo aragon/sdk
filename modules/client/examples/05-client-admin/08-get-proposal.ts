@@ -3,7 +3,7 @@
 */
 import {
   AdminProposal,
-  ClientAdmin,
+  AdminClient,
   Context,
   ContextPlugin,
 } from "@aragon/sdk-client";
@@ -14,7 +14,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an ERC20 client
-const client = new ClientAdmin(contextPlugin);
+const client = new AdminClient(contextPlugin);
 
 const proposalId = "0x12345...";
 
