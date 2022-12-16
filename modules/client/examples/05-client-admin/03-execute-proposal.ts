@@ -1,12 +1,15 @@
 /* MARKDOWN
-### Creating a admin proposal
+### Creating and executing an admin proposal right away
+
 */
 import {
+  Client,
   ClientAdmin,
   Context,
   ContextPlugin,
   ExecuteProposalParams,
   ExecuteProposalStep,
+  IWithdrawParams,
   ProposalCreationSteps,
   ProposalMetadata,
   VoteValues,
@@ -18,7 +21,8 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAdmin(contextPlugin);
+const clientAdmin = new ClientAdmin(contextPlugin);
+const client = new Client(context);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
@@ -40,15 +44,24 @@ const metadata: ProposalMetadata = {
   },
 };
 
-const ipfsUri = await client.methods.pinMetadata(metadata);
+const ipfsUri = await clientAdmin.methods.pinMetadata(metadata);
+
+const withdrawParams: IWithdrawParams = {
+  recipientAddress: "0x1234567890123456789012345678901234567890",
+  amount: BigInt(5),
+};
+const withdrawAction = await client.encoding.withdrawAction(
+  "0x0987654321098765432109876543210987654321",
+  withdrawParams,
+);
 
 const proposalParams: ExecuteProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
-  actions: [],
+  actions: [withdrawAction],
 };
 
-const steps = client.methods.executeProposal(proposalParams);
+const steps = clientAdmin.methods.executeProposal(proposalParams);
 for await (const step of steps) {
   try {
     switch (step.key) {

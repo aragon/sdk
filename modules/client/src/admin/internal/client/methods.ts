@@ -153,7 +153,7 @@ export class ClientAdminMethods extends ClientCore
    */
   public async getProposals(
     {
-      administratorAddressOrEns,
+      adminAddressOrEns,
       limit = 10,
       status,
       skip = 0,
@@ -162,7 +162,7 @@ export class ClientAdminMethods extends ClientCore
     }: IAdminProposalQueryParams,
   ): Promise<AdminProposalListItem[]> {
     let where = {};
-    let address = administratorAddressOrEns;
+    let address = adminAddressOrEns;
     if (address) {
       if (!isAddress(address)) {
         await this.web3.ensureOnline();

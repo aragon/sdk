@@ -19,7 +19,7 @@ import {
   ProposalStatus,
   SortDirection,
 } from "../../../src";
-import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
+import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParams,
   contextParamsLocalChain,
@@ -138,47 +138,46 @@ describe("Client Admin", () => {
 
       expect(typeof proposal).toBe("object");
       expect(proposal === null).toBe(false);
-      if (proposal) {
-        expect(proposal.id).toBe(proposalId);
-        expect(typeof proposal.id).toBe("string");
-        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
-        expect(typeof proposal.dao.address).toBe("string");
-        expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-        expect(typeof proposal.dao.name).toBe("string");
-        expect(typeof proposal.creatorAddress).toBe("string");
-        expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-        // check metadata
-        expect(typeof proposal.metadata.title).toBe("string");
-        expect(typeof proposal.metadata.summary).toBe("string");
-        expect(typeof proposal.metadata.description).toBe("string");
-        expect(Array.isArray(proposal.metadata.resources)).toBe(true);
-        for (let i = 0; i < proposal.metadata.resources.length; i++) {
-          const resource = proposal.metadata.resources[i];
-          expect(typeof resource.name).toBe("string");
-          expect(typeof resource.url).toBe("string");
+      if (!proposal) throw new GraphQLError("Admin proposal");
+      expect(proposal.id).toBe(proposalId);
+      expect(typeof proposal.id).toBe("string");
+      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+      expect(typeof proposal.dao.address).toBe("string");
+      expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(typeof proposal.dao.name).toBe("string");
+      expect(typeof proposal.creatorAddress).toBe("string");
+      expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      // check metadata
+      expect(typeof proposal.metadata.title).toBe("string");
+      expect(typeof proposal.metadata.summary).toBe("string");
+      expect(typeof proposal.metadata.description).toBe("string");
+      expect(Array.isArray(proposal.metadata.resources)).toBe(true);
+      for (let i = 0; i < proposal.metadata.resources.length; i++) {
+        const resource = proposal.metadata.resources[i];
+        expect(typeof resource.name).toBe("string");
+        expect(typeof resource.url).toBe("string");
+      }
+      if (proposal.metadata.media) {
+        if (proposal.metadata.media.header) {
+          expect(typeof proposal.metadata.media.header).toBe("string");
         }
-        if (proposal.metadata.media) {
-          if (proposal.metadata.media.header) {
-            expect(typeof proposal.metadata.media.header).toBe("string");
-          }
-          if (proposal.metadata.media.logo) {
-            expect(typeof proposal.metadata.media.logo).toBe("string");
-          }
+        if (proposal.metadata.media.logo) {
+          expect(typeof proposal.metadata.media.logo).toBe("string");
         }
-        expect(proposal.creationDate instanceof Date).toBe(true);
-        expect(Array.isArray(proposal.actions)).toBe(true);
-        expect(typeof proposal.proposalId === "bigint").toBe(true);
-        expect(typeof proposal.pluginAddress === "string").toBe(true);
-        expect(proposal.pluginAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-        expect(typeof proposal.administratorAddress === "string").toBe(true);
-        expect(proposal.administratorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-        // actions
-        for (let i = 0; i < proposal.actions.length; i++) {
-          const action = proposal.actions[i];
-          expect(action.data instanceof Uint8Array).toBe(true);
-          expect(typeof action.to).toBe("string");
-          expect(typeof action.value).toBe("bigint");
-        }
+      }
+      expect(proposal.creationDate instanceof Date).toBe(true);
+      expect(Array.isArray(proposal.actions)).toBe(true);
+      expect(typeof proposal.proposalId === "bigint").toBe(true);
+      expect(typeof proposal.pluginAddress === "string").toBe(true);
+      expect(proposal.pluginAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(typeof proposal.adminAddress === "string").toBe(true);
+      expect(proposal.adminAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      // actions
+      for (let i = 0; i < proposal.actions.length; i++) {
+        const action = proposal.actions[i];
+        expect(action.data instanceof Uint8Array).toBe(true);
+        expect(typeof action.to).toBe("string");
+        expect(typeof action.value).toBe("bigint");
       }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
@@ -218,8 +217,8 @@ describe("Client Admin", () => {
         expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         expect(typeof proposal.metadata.title).toBe("string");
         expect(typeof proposal.metadata.summary).toBe("string");
-        expect(typeof proposal.administratorAddress === "string").toBe(true);
-        expect(proposal.administratorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(typeof proposal.adminAddress === "string").toBe(true);
+        expect(proposal.adminAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         expect(proposal.status).toBe(status);
       }
     });
@@ -233,7 +232,7 @@ describe("Client Admin", () => {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
-        administratorAddressOrEns: address,
+        adminAddressOrEns: address,
       };
       const proposals = await client.methods.getProposals(params);
 
@@ -250,7 +249,7 @@ describe("Client Admin", () => {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
-        administratorAddressOrEns: address,
+        adminAddressOrEns: address,
       };
       await expect(() => client.methods.getProposals(params)).rejects.toThrow(
         new InvalidAddressOrEnsError(),

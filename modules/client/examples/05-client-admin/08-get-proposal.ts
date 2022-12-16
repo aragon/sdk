@@ -58,7 +58,7 @@ console.log(proposal);
     }
   ],
   status: "Executed",
-  administratorAddress: "0x1234567890123456789012345678901234567890"
+  adminAddress: "0x1234567890123456789012345678901234567890"
   pluginAddress: "0x1234567890123456789012345678901234567890"
   proposalId: 0n
 }

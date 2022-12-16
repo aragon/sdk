@@ -50,7 +50,7 @@ type ProposalBase = {
   creatorAddress: string;
   metadata: ProposalMetadata;
   creationDate: Date;
-  administratorAddress: string;
+  adminAddress: string;
   status: ProposalStatus;
 };
 export type AdminProposal = ProposalBase & {
@@ -63,7 +63,7 @@ export type AdminProposalListItem = ProposalBase;
 export interface IAdminProposalQueryParams extends IPagination {
   sortBy?: ProposalSortBy;
   status?: ProposalStatus;
-  administratorAddressOrEns?: string;
+  adminAddressOrEns?: string;
 }
 
 type SubgraphAdminProposalBase = {

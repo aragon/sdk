@@ -28,7 +28,7 @@ export function toAdminProposal(
     creatorAddress: proposal.creator,
     metadata,
     creationDate,
-    administratorAddress: proposal.administrator.address,
+    adminAddress: proposal.administrator.address,
     status: proposal.executed
       ? ProposalStatus.EXECUTED
       : ProposalStatus.SUCCEEDED,
@@ -61,7 +61,7 @@ export function toAdminProposalListItem(
     creatorAddress: proposal.creator,
     metadata,
     creationDate,
-    administratorAddress: proposal.administrator.address,
+    adminAddress: proposal.administrator.address,
     status: proposal.executed
       ? ProposalStatus.EXECUTED
       : ProposalStatus.SUCCEEDED,

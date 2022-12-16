@@ -45,7 +45,7 @@ console.log(proposals);
       summary: "test proposal summary"
     };
     creationDate: <Date>,
-    administratorAddress: "0x1234567890123456789012345678901234567890",
+    adminAddress: "0x1234567890123456789012345678901234567890",
     status: "Executed"
   },
   {
@@ -60,7 +60,7 @@ console.log(proposals);
       summary: "test proposal summary 2"
     };
     creationDate: <Date>,
-    administratorAddress: "0x1234567890123456789012345678901234567890",
+    adminAddress: "0x1234567890123456789012345678901234567890",
     status: "Executed"
   }
 ]
