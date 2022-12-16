@@ -37,7 +37,10 @@ describe("Client", () => {
       const daoCreationParams: ICreateParams = {
         metadataUri: `ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK`,
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-        plugins: [{ id: "0x1234", data: new Uint8Array() }],
+        plugins: [{
+          id: "0x1234567890123456789012345678901234567890",
+          data: new Uint8Array(),
+        }],
       };
 
       const gasFeesEstimation = await client.estimation.create(
