@@ -78,6 +78,12 @@ export const TEST_INVALID_ADDRESS = "0x1nv4l1d_4ddr355";
 export const TEST_NON_EXISTING_ADDRESS =
   "0x1234567890123456789012345678901234567890";
 
+// TODO
+// changue this addresses for a valid one
+export const TEST_ADMIN_PROPOSAL_ID =
+  "0xf91c316115605780d1a1d6cc7072556af197eaa9_0x0";
+export const TEST_ADMIN_ADDRESS = "0xf91c316115605780d1a1d6cc7072556af197eaa9";
+
 export const contextParams: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),

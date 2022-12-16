@@ -24,7 +24,8 @@
     "docs:client": "jsdoc2md --files ./modules/client/src/*.ts ./modules/client/src/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/client.md",
     "docs:addresslistVoting": "jsdoc2md --files ./modules/client/src/addresslistVoting/*.ts ./modules/client/src/addresslistVoting/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/addresslistVoting.md",
     "docs:tokenVoting": "jsdoc2md --files ./modules/client/src/tokenVoting/*.ts ./modules/client/src/tokenVoting/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/tokenVoting.md",
-    "docs:multisig": "jsdoc2md --files ./modules/client/src/multisig/*.ts ./modules/client/src/multisig/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/multisig.md"
+    "docs:multisig": "jsdoc2md --files ./modules/client/src/multisig/*.ts ./modules/client/src/multisig/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/multisig.md",
+    "docs:admin": "jsdoc2md --files ./modules/client/src/admin/*.ts ./modules/client/src/admin/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/admin.md"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.18.6",
