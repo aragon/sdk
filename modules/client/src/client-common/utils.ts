@@ -151,7 +151,7 @@ export function isEnsName(ensName: string): boolean {
 
 export function isPermission(permission: string): boolean {
   const regex = new RegExp(
-    /(([A-Z])_?)*([A-Z])$/,
+    /^[A-Z]+(?:_[A-Z]+)*$/,
   );
   return regex.test(permission);
 }
