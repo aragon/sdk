@@ -15,10 +15,14 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [UPCOMING]
+## [0.16.2-alpha]
 
-## 0.16.1-alpha
-On 2022-12-13 15:58:04
+### Changed
+- Removes Changelog update from javascript publish workflow
+- Fix `minSupport` and `minTurnout` return values in `erc20.getSettings()`
+- Fix `minSupport` and `minTurnout` return values in `addresslist.getSettings()`
+
+## [0.16.1-alpha]
 ### Changed
 - Split `createDao()` and `pinMetadata()` 
 - Split `createProposal()` and `pinMetadata()` 

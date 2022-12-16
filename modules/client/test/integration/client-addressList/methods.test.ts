@@ -416,6 +416,8 @@ describe("Client Address List", () => {
         expect(typeof settings.minDuration).toBe("number");
         expect(typeof settings.minSupport).toBe("number");
         expect(typeof settings.minTurnout).toBe("number");
+        expect(settings.minSupport).toBeLessThanOrEqual(1);
+        expect(settings.minTurnout).toBeLessThanOrEqual(1);
       }
     });
   });

@@ -1,4 +1,5 @@
 import {
+  decodeRatio,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -431,12 +432,15 @@ export class ClientAddressListMethods extends ClientCore
         return null;
       }
       return {
-        // TODO
-        // the number of decimals in the minSupport and minTurnout
-        // is wrong, they have no precision
         minDuration: parseInt(addresslistPlugin.minDuration),
-        minSupport: parseFloat(addresslistPlugin.totalSupportThresholdPct),
-        minTurnout: parseFloat(addresslistPlugin.relativeSupportThresholdPct),
+        minSupport: decodeRatio(
+          parseFloat(addresslistPlugin.totalSupportThresholdPct),
+          2,
+        ),
+        minTurnout: decodeRatio(
+          parseFloat(addresslistPlugin.relativeSupportThresholdPct),
+          2,
+        ),
       };
     } catch {
       throw new Error("Cannot fetch the settings data from GraphQL");
