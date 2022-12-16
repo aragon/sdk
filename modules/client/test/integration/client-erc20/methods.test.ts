@@ -446,6 +446,8 @@ describe("Client ERC20", () => {
           expect(typeof settings.minDuration).toBe("number");
           expect(typeof settings.minSupport).toBe("number");
           expect(typeof settings.minTurnout).toBe("number");
+          expect(settings.minSupport).toBeLessThanOrEqual(1);
+          expect(settings.minTurnout).toBeLessThanOrEqual(1);
         }
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {

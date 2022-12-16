@@ -1,5 +1,6 @@
 import { isAddress } from "@ethersproject/address";
 import {
+  decodeRatio,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -10,7 +11,6 @@ import {
   ProposalCreationError,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
-import { formatEther } from "@ethersproject/units";
 import {
   ClientCore,
   computeProposalStatusFilter,
@@ -427,12 +427,17 @@ export class ClientErc20Methods extends ClientCore
       }
       return {
         minDuration: parseInt(erc20VotingPlugin.minDuration),
-        // TODO: use decodeRatio() when ready
-        minSupport: parseFloat(
-          formatEther(erc20VotingPlugin.totalSupportThresholdPct),
+        minSupport: decodeRatio(
+          parseFloat(
+            erc20VotingPlugin.totalSupportThresholdPct,
+          ),
+          2,
         ),
-        minTurnout: parseFloat(
-          formatEther(erc20VotingPlugin.relativeSupportThresholdPct),
+        minTurnout: decodeRatio(
+          parseFloat(
+            erc20VotingPlugin.relativeSupportThresholdPct,
+          ),
+          2,
         ),
       };
     } catch {
