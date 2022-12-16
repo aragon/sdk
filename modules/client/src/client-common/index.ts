@@ -7,4 +7,3 @@ export * from "./context";
 export * from "./context-plugin";
 export * from "./utils";
 export * from "./encoding";
-export * from "./temp-mock";

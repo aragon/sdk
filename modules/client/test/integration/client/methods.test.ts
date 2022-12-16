@@ -68,41 +68,6 @@ describe("Client", () => {
     });
 
     describe("DAO Creation", () => {
-      it("Should estimate gas fees for creating a DAO", async () => {
-        const context = new Context(contextParamsLocalChain);
-        const client = new Client(context);
-
-        const daoName = "ERC20VotingDAO_" +
-          Math.floor(Random.getFloat() * 9999) + 1;
-        const daoCreationParams: ICreateParams = {
-          metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
-          ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-          plugins: [
-            {
-              id: deployment.addressListRepo.address,
-              data: toUtf8Bytes(
-                defaultAbiCoder.encode(
-                  ["uint64", "uint64", "uint64", "address[]"],
-                  [1, 1, 1, []],
-                ),
-              ),
-            },
-          ],
-        };
-
-        const gasFeesEstimation = await client.estimation.create(
-          daoCreationParams,
-        );
-
-        expect(typeof gasFeesEstimation).toEqual("object");
-        expect(typeof gasFeesEstimation.average).toEqual("bigint");
-        expect(typeof gasFeesEstimation.max).toEqual("bigint");
-        expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
-        expect(gasFeesEstimation.max).toBeGreaterThan(
-          gasFeesEstimation.average,
-        );
-      });
-
       it("Should create a DAO locally", async () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
@@ -116,7 +81,7 @@ describe("Client", () => {
           avatar: "https://...",
           links: [],
         });
-
+        const fiftyPercent = BigInt(500000000000000000);
         const daoCreationParams: ICreateParams = {
           metadataUri: ipfsUri,
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
@@ -126,7 +91,10 @@ describe("Client", () => {
               data: toUtf8Bytes(
                 defaultAbiCoder.encode(
                   ["uint64", "uint64", "uint64", "address[]"],
-                  [1, 1, 1, []],
+                  [fiftyPercent, fiftyPercent, 3600, [
+                    "0x1234567890123456789012345678901234567890",
+                    "0x0987654321098765432109876543210987654321",
+                  ]],
                 ),
               ),
             },

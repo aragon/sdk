@@ -1,10 +1,14 @@
-import { DAO__factory } from "@aragon/core-contracts-ethers";
+import {
+  DAO__factory,
+  DAOFactory,
+  DAOFactory__factory,
+  PluginRepo__factory,
+} from "@aragon/core-contracts-ethers";
 import {
   InvalidAddressOrEnsError,
   NoProviderError,
   NoSignerError,
   NoTokenAddress,
-  Random,
 } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -18,6 +22,7 @@ import {
 } from "../../interfaces";
 import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";
+import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 
 /**
  * Estimation module the SDK Generic Client
@@ -35,17 +40,41 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
-  public create(_params: ICreateParams): Promise<GasFeeEstimation> {
+  public async create(params: ICreateParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed for estimating the gas cost");
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
     }
 
-    // TODO: Unimplemented
-    // TODO: The new contract code is needed
-    return Promise.resolve(
-      this.web3.getApproximateGasFee(Random.getBigInt(BigInt(1500))),
+    const daoInstance = DAOFactory__factory.connect(
+      this.web3.getDaoFactoryAddress(),
+      signer,
     );
+    const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
+    for (const plugin of params.plugins) {
+      const latestVersion = await PluginRepo__factory.connect(
+        plugin.id,
+        signer,
+      ).getLatestVersion();
+      pluginInstallationData.push({
+        pluginSetup: latestVersion[1],
+        pluginSetupRepo: plugin.id,
+        data: toUtf8String(plugin.data),
+      });
+    }
+
+    const gasEstimation = await daoInstance.estimateGas.createDao(
+      {
+        name: params.ensSubdomain,
+        metadata: toUtf8Bytes(params.metadataUri),
+        trustedForwarder: params.trustedForwarder || AddressZero,
+      },
+      pluginInstallationData,
+    );
+
+    return this.web3.getApproximateGasFee(gasEstimation.toBigInt());
   }
   /**
    * Estimates the gas fee of depositing ether or an ERC20 token into the DAO
