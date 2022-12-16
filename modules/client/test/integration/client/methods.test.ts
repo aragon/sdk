@@ -81,7 +81,7 @@ describe("Client", () => {
           avatar: "https://...",
           links: [],
         });
-
+        const fiftyPercent = BigInt(500000000000000000);
         const daoCreationParams: ICreateParams = {
           metadataUri: ipfsUri,
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
@@ -91,7 +91,10 @@ describe("Client", () => {
               data: toUtf8Bytes(
                 defaultAbiCoder.encode(
                   ["uint64", "uint64", "uint64", "address[]"],
-                  [1, 1, 1, []],
+                  [fiftyPercent, fiftyPercent, 3600, [
+                    "0x1234567890123456789012345678901234567890",
+                    "0x0987654321098765432109876543210987654321",
+                  ]],
                 ),
               ),
             },
