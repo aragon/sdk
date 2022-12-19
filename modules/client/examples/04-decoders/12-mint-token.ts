@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Decode Mint Token Action (ERC-20)
+### Decode Mint Token Action (Token)
 */
 import {
   ClientToken,

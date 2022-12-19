@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Set Plugin Config (ERC-20)
+### Set Plugin Config (Token)
 */
 import {
   ClientToken,

@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Decode Update Plugin Settings Action (ERC-20)
+### Decode Update Plugin Settings Action (Token)
 */
 import {
   ClientToken,

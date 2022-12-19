@@ -1858,7 +1858,7 @@ const configAction = client.encoding.updatePluginSettingsAction(
 console.log(configAction);
 ```
 
-### Set Plugin Config (ERC-20)
+### Set Plugin Config (Token)
 
 ```ts
 import {
@@ -1889,7 +1889,7 @@ const configAction = client.encoding.updatePluginSettingsAction(
 console.log(configAction);
 ```
 
-### Mint Token (ERC-20)
+### Mint Token (Token)
 
 ```ts
 import {
@@ -2169,7 +2169,7 @@ console.log(params);
 */
 ```
 
-### Decode Update Plugin Settings Action (ERC-20)
+### Decode Update Plugin Settings Action (Token)
 
 ```ts
 import {
@@ -2252,7 +2252,7 @@ console.log(functionParams);
 */
 ```
 
-### Get Function Parameters from an encoded action (ERC-20)
+### Get Function Parameters from an encoded action (Token)
 
 ```ts
 import { ClientToken, Context, ContextPlugin } from "@aragon/sdk-client";
@@ -2278,7 +2278,7 @@ console.log(functionParams);
 */
 ```
 
-### Decode Mint Token Action (ERC-20)
+### Decode Mint Token Action (Token)
 
 ```ts
 import {

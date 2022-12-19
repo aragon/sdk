@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Mint Token (ERC-20)
+### Mint Token (Token)
 */
 import {
   ClientToken,

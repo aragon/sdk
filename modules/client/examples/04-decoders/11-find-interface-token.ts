@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Get Function Parameters from an encoded action (ERC-20)
+### Get Function Parameters from an encoded action (Token)
 */
 import { ClientToken, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
