@@ -72,7 +72,7 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const daoName = "ERC20VotingDAO_" +
+        const daoName = "TokenVotingDAO_" +
           Math.floor(Random.getFloat() * 9999) + 1;
         // pin metadata
         const ipfsUri = await client.methods.pinMetadata({
@@ -138,7 +138,7 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const daoName = "ERC20VotingDAO_" +
+        const daoName = "TokenVotingDAO_" +
           Math.floor(Random.getFloat() * 9999) + 1;
 
         const daoCreationParams: ICreateParams = {

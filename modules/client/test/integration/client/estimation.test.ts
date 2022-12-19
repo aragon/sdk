@@ -34,7 +34,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) +
+      const daoName = "TokenVotingDAO_" + Math.floor(Random.getFloat() * 9999) +
         1;
 
       const daoCreationParams: ICreateParams = {

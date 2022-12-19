@@ -2,7 +2,7 @@
 ### Set Plugin Config (ERC-20)
 */
 import {
-  ClientErc20,
+  ClientToken,
   Context,
   ContextPlugin,
   IPluginSettings,
@@ -11,7 +11,7 @@ import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientErc20(contextPlugin);
+const client = new ClientToken(contextPlugin);
 
 // create config action
 const configActionPrarms: IPluginSettings = {

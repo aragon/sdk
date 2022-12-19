@@ -1,4 +1,4 @@
-// This file contains the definitions of the ERC20 client
+// This file contains the definitions of the Token client
 import { BigNumber } from "@ethersproject/bignumber";
 import {
   DaoAction,
@@ -24,9 +24,9 @@ import {
   VoteValues,
 } from "../client-common";
 
-// ERC20
+// Token
 
-export interface IClientErc20Methods extends IClientCore {
+export interface IClientTokenMethods extends IClientCore {
   createProposal: (
     params: ICreateProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
@@ -39,15 +39,15 @@ export interface IClientErc20Methods extends IClientCore {
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canVote: (params: ICanVoteParams) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
-  getProposal: (propoosalId: string) => Promise<Erc20Proposal | null>;
+  getProposal: (propoosalId: string) => Promise<TokenProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
-  ) => Promise<Erc20ProposalListItem[]>;
+  ) => Promise<TokenProposalListItem[]>;
   getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
   getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
 }
 
-export interface IClientErc20Encoding extends IClientCore {
+export interface IClientTokenEncoding extends IClientCore {
   updatePluginSettingsAction: (
     pluginAddress: string,
     params: IPluginSettings,
@@ -57,12 +57,12 @@ export interface IClientErc20Encoding extends IClientCore {
     params: IMintTokenParams,
   ) => DaoAction;
 }
-export interface IClientErc20Decoding extends IClientCore {
+export interface IClientTokenDecoding extends IClientCore {
   updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings;
   mintTokenAction: (data: Uint8Array) => IMintTokenParams;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
-export interface IClientErc20Estimation extends IClientCore {
+export interface IClientTokenEstimation extends IClientCore {
   createProposal: (
     params: ICreateProposalParams,
   ) => Promise<GasFeeEstimation>;
@@ -72,16 +72,16 @@ export interface IClientErc20Estimation extends IClientCore {
   ) => Promise<GasFeeEstimation>;
 }
 
-/** Defines the shape of the ERC20 client class */
-export interface IClientErc20 {
-  methods: IClientErc20Methods;
-  encoding: IClientErc20Encoding;
-  decoding: IClientErc20Decoding;
-  estimation: IClientErc20Estimation;
+/** Defines the shape of the Token client class */
+export interface IClientToken {
+  methods: IClientTokenMethods;
+  encoding: IClientTokenEncoding;
+  decoding: IClientTokenDecoding;
+  estimation: IClientTokenEstimation;
 }
 // Factory init params
 
-export type IErc20PluginInstall = {
+export type ITokenPluginInstall = {
   settings: IPluginSettings;
   newToken?: NewTokenParams;
   useToken?: ExistingTokenParams;
@@ -100,8 +100,8 @@ type NewTokenParams = {
 };
 
 // PROPOSAL RETRIEVAL
-export type Erc20Proposal = ProposalBase & {
-  result: Erc20ProposalResult;
+export type TokenProposal = ProposalBase & {
+  result: TokenProposalResult;
   settings: IProposalSettings;
   token: Erc20TokenDetails;
   usedVotingWeight: bigint;
@@ -109,12 +109,12 @@ export type Erc20Proposal = ProposalBase & {
   totalVotingWeight: bigint;
 };
 
-export type Erc20ProposalListItem = ProposalListItemBase & {
+export type TokenProposalListItem = ProposalListItemBase & {
   token: Erc20TokenDetails;
-  result: Erc20ProposalResult;
+  result: TokenProposalResult;
 };
 
-export type Erc20ProposalResult = {
+export type TokenProposalResult = {
   yes: bigint;
   no: bigint;
   abstain: bigint;
@@ -127,11 +127,11 @@ export type Erc20TokenDetails = {
   decimals: number;
 };
 
-export type SubgraphErc20VoterListItem = SubgraphVoterListItemBase & {
+export type SubgraphTokenVoterListItem = SubgraphVoterListItemBase & {
   weight: string;
 };
 
-export type SubgraphErc20ProposalListItem = SubgraphProposalBase & {
+export type SubgraphTokenProposalListItem = SubgraphProposalBase & {
   plugin: {
     token: {
       symbol: string;
@@ -142,12 +142,12 @@ export type SubgraphErc20ProposalListItem = SubgraphProposalBase & {
   };
 };
 
-export type SubgraphErc20Proposal = SubgraphErc20ProposalListItem & {
+export type SubgraphTokenProposal = SubgraphTokenProposalListItem & {
   createdAt: string;
   actions: SubgraphAction[];
   totalSupportThresholdPct: string;
   relativeSupportThresholdPct: string;
-  voters: SubgraphErc20VoterListItem[];
+  voters: SubgraphTokenVoterListItem[];
   census: string;
 };
 
@@ -157,7 +157,7 @@ export interface IMintTokenParams {
 }
 
 export type ContractMintTokenParams = [string, BigNumber];
-export type ContractErc20InitParams = [
+export type ContractTokenInitParams = [
   string, // dao address
   BigNumber, // participation
   BigNumber, // support

@@ -1,22 +1,22 @@
 /* MARKDOWN
-## ERC20 governance plugin client
+## Token governance plugin client
 
 This is a `Client`-like class, tailored to suit the specific use cases of the
-built-in ERC20 voting DAO Plugin.
+built-in Token voting DAO Plugin.
 
 Similarly to the above class, it provides high level methods that abstract the
 underlying network requests.
 
-### Creating a DAO with an ERC20 plugin
+### Creating a DAO with an Token plugin
 */
 import {
   Client,
-  ClientErc20,
+  ClientToken,
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
   ICreateParams,
-  IErc20PluginInstall,
+  ITokenPluginInstall,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -26,7 +26,7 @@ const client: Client = new Client(context);
 // Define the plugins to install and their params
 
 // Use an already existing ERC20 token
-const pluginInitParams1: IErc20PluginInstall = {
+const pluginInitParams1: ITokenPluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minTurnout: 0.25, // 25%
@@ -37,7 +37,7 @@ const pluginInitParams1: IErc20PluginInstall = {
   },
 };
 // Mint a new token
-const pluginInitParams2: IErc20PluginInstall = {
+const pluginInitParams2: ITokenPluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24, // seconds
     minTurnout: 0.4, // 40%
@@ -64,25 +64,17 @@ const pluginInitParams2: IErc20PluginInstall = {
     ],
   },
 };
-const erc20InstallPluginItem1 = ClientErc20.encoding.getPluginInstallItem(
+const tokenInstallPluginItem1 = ClientToken.encoding.getPluginInstallItem(
   pluginInitParams1,
 );
-const erc20InstallPluginItem2 = ClientErc20.encoding.getPluginInstallItem(
+const tokenInstallPluginItem2 = ClientToken.encoding.getPluginInstallItem(
   pluginInitParams2,
 );
 
 const createParams: ICreateParams = {
-  metadata: {
-    name: "My DAO",
-    description: "This is a description",
-    avatar: "https://...",
-    links: [{
-      name: "Web site",
-      url: "https://...",
-    }],
-  },
+  metadataUri: "ipfs://123456789",
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [erc20InstallPluginItem1, erc20InstallPluginItem2],
+  plugins: [tokenInstallPluginItem1, tokenInstallPluginItem2],
 };
 
 // gas estimation

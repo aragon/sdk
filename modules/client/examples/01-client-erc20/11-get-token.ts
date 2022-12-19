@@ -2,10 +2,10 @@
 ### Loading a plugin's token details
 */
 import {
-  ClientErc20,
+  ClientToken,
   Context,
   ContextPlugin,
-  Erc20TokenDetails,
+  TokenTokenDetails,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -13,12 +13,12 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create an Token client
+const client = new ClientToken(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const token: Erc20TokenDetails | null = await client.methods.getToken(
+const token: TokenTokenDetails | null = await client.methods.getToken(
   pluginAddress,
 );
 console.log(token);

@@ -1,13 +1,13 @@
 /* MARKDOWN
-### Retrieve a proposal by proposalID (ERC20)
+### Retrieve a proposal by proposalID (Token)
 
-Retrieving the proposals of an ERC20 DAO.
+Retrieving the proposals of an Token DAO.
 */
 import {
-  ClientErc20,
+  ClientToken,
   Context,
   ContextPlugin,
-  Erc20Proposal,
+  TokenProposal,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -15,12 +15,12 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create an Token client
+const client = new ClientToken(contextPlugin);
 
 const proposalId = "0x12345...";
 
-const proposal: Erc20Proposal | null = await client.methods.getProposal(
+const proposal: TokenProposal | null = await client.methods.getProposal(
   proposalId,
 );
 console.log(proposal);

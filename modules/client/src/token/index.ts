@@ -1,9 +1,9 @@
-export { ClientErc20 } from "./client";
+export { ClientToken } from "./client";
 export {
-  Erc20Proposal,
-  Erc20ProposalListItem,
-  Erc20ProposalResult,
+  TokenProposal,
+  TokenProposalListItem,
+  TokenProposalResult,
   Erc20TokenDetails,
-  IErc20PluginInstall,
+  ITokenPluginInstall,
   IMintTokenParams,
 } from "./interfaces";

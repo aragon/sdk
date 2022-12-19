@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
-export const QueryErc20PluginSettings = gql`
-query erc20PluginSettings($address: ID!) {
-  erc20VotingPlugin(id: $address){
+export const QueryTokenPluginSettings = gql`
+query tokenPluginSettings($address: ID!) {
+  tokenVotingPlugin(id: $address){
     totalSupportThresholdPct
     relativeSupportThresholdPct
     minDuration

@@ -1,4 +1,4 @@
-import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
+import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
 import {
   ClientCore,
   ContextPlugin,
@@ -7,16 +7,16 @@ import {
   IExecuteProposalParams,
   IVoteProposalParams,
 } from "../../../client-common";
-import { IClientErc20Estimation } from "../../interfaces";
+import { IClientTokenEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 /**
- * Estimation module the SDK ERC20 Client
+ * Estimation module the SDK Token Client
  */
-export class ClientErc20Estimation extends ClientCore
-  implements IClientErc20Estimation {
+export class ClientTokenEstimation extends ClientCore
+  implements IClientTokenEstimation {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientErc20Estimation.prototype);
+    Object.freeze(ClientTokenEstimation.prototype);
     Object.freeze(this);
   }
   /**
@@ -24,7 +24,7 @@ export class ClientErc20Estimation extends ClientCore
    *
    * @param {ICreateProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientErc20Estimation
+   * @memberof ClientTokenEstimation
    */
   public async createProposal(
     params: ICreateProposalParams,
@@ -36,7 +36,7 @@ export class ClientErc20Estimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const erc20Contract = ERC20Voting__factory.connect(
+    const tokenContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -44,7 +44,7 @@ export class ClientErc20Estimation extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const estimatedGasFee = await erc20Contract.estimateGas.createVote(
+    const estimatedGasFee = await tokenContract.estimateGas.createVote(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
@@ -59,7 +59,7 @@ export class ClientErc20Estimation extends ClientCore
    *
    * @param {IVoteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientErc20Estimation
+   * @memberof ClientTokenEstimation
    */
   public async voteProposal(
     params: IVoteProposalParams,
@@ -70,12 +70,12 @@ export class ClientErc20Estimation extends ClientCore
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    const erc20VotingContract = ERC20Voting__factory.connect(
+    const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
 
-    const estimation = await erc20VotingContract.estimateGas.vote(
+    const estimation = await tokenVotingContract.estimateGas.vote(
       params.proposalId,
       params.vote,
       false,
@@ -84,11 +84,11 @@ export class ClientErc20Estimation extends ClientCore
   }
 
   /**
-   * Estimates the gas fee of executing an ERC20 proposal
+   * Estimates the gas fee of executing an Token proposal
    *
    * @param {IExecuteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientErc20Estimation
+   * @memberof ClientTokenEstimation
    */
   public async executeProposal(
     params: IExecuteProposalParams,
@@ -100,11 +100,11 @@ export class ClientErc20Estimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const erc20VotingContract = ERC20Voting__factory.connect(
+    const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
-    const estimation = await erc20VotingContract.estimateGas.execute(
+    const estimation = await tokenVotingContract.estimateGas.execute(
       params.proposalId,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());

@@ -1,15 +1,15 @@
 import {
-  IClientErc20,
-  IClientErc20Decoding,
-  IClientErc20Encoding,
-  IClientErc20Estimation,
-  IClientErc20Methods,
-  IErc20PluginInstall,
+  IClientToken,
+  IClientTokenDecoding,
+  IClientTokenEncoding,
+  IClientTokenEstimation,
+  IClientTokenMethods,
+  ITokenPluginInstall,
 } from "./interfaces";
-import { ClientErc20Methods } from "./internal/client/methods";
-import { ClientErc20Encoding } from "./internal/client/encoding";
-import { ClientErc20Decoding } from "./internal/client/decoding";
-import { ClientErc20Estimation } from "./internal/client/estimation";
+import { ClientTokenMethods } from "./internal/client/methods";
+import { ClientTokenEncoding } from "./internal/client/encoding";
+import { ClientTokenDecoding } from "./internal/client/decoding";
+import { ClientTokenEstimation } from "./internal/client/estimation";
 import {
   ClientCore,
   ContextPlugin,
@@ -17,33 +17,33 @@ import {
 } from "../client-common";
 
 /**
- * Provider a generic client with high level methods to manage and interact an ERC20 Voting plugin installed in a DAO
+ * Provider a generic client with high level methods to manage and interact an Token Voting plugin installed in a DAO
  */
-export class ClientErc20 extends ClientCore implements IClientErc20 {
-  private privateMethods: IClientErc20Methods;
-  private privateEncoding: IClientErc20Encoding;
-  private privateDecoding: IClientErc20Decoding;
-  private privateEstimation: IClientErc20Estimation;
+export class ClientToken extends ClientCore implements IClientToken {
+  private privateMethods: IClientTokenMethods;
+  private privateEncoding: IClientTokenEncoding;
+  private privateDecoding: IClientTokenDecoding;
+  private privateEstimation: IClientTokenEstimation;
 
   constructor(context: ContextPlugin) {
     super(context);
-    this.privateMethods = new ClientErc20Methods(context);
-    this.privateEncoding = new ClientErc20Encoding(context);
-    this.privateDecoding = new ClientErc20Decoding(context);
-    this.privateEstimation = new ClientErc20Estimation(context);
-    Object.freeze(ClientErc20.prototype);
+    this.privateMethods = new ClientTokenMethods(context);
+    this.privateEncoding = new ClientTokenEncoding(context);
+    this.privateDecoding = new ClientTokenDecoding(context);
+    this.privateEstimation = new ClientTokenEstimation(context);
+    Object.freeze(ClientToken.prototype);
     Object.freeze(this);
   }
-  get methods(): IClientErc20Methods {
+  get methods(): IClientTokenMethods {
     return this.privateMethods;
   }
-  get encoding(): IClientErc20Encoding {
+  get encoding(): IClientTokenEncoding {
     return this.privateEncoding;
   }
-  get decoding(): IClientErc20Decoding {
+  get decoding(): IClientTokenDecoding {
     return this.privateDecoding;
   }
-  get estimation(): IClientErc20Estimation {
+  get estimation(): IClientTokenEstimation {
     return this.privateEstimation;
   }
 
@@ -52,11 +52,11 @@ export class ClientErc20 extends ClientCore implements IClientErc20 {
      * Computes the parameters to be given when creating the DAO,
      * so that the plugin is configured
      *
-     * @param {IErc20PluginInstall} params
+     * @param {ITokenPluginInstall} params
      * @return {*}  {IPluginInstallItem}
-     * @memberof ClientErc20
+     * @memberof ClientToken
      */
-    getPluginInstallItem: (params: IErc20PluginInstall): IPluginInstallItem =>
-      ClientErc20Encoding.getPluginInstallItem(params),
+    getPluginInstallItem: (params: ITokenPluginInstall): IPluginInstallItem =>
+      ClientTokenEncoding.getPluginInstallItem(params),
   };
 }

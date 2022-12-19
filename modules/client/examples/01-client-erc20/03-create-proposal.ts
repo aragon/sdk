@@ -1,8 +1,8 @@
 /* MARKDOWN
-### Creating an ERC20 proposal
+### Creating an Token proposal
 */
 import {
-  ClientErc20,
+  ClientToken,
   Context,
   ContextPlugin,
   ICreateProposalParams,
@@ -16,8 +16,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create an Token client
+const client = new ClientToken(contextPlugin);
 
 const metadata:ProposalMetadata= {
   title: "Test Proposal",

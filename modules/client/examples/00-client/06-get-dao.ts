@@ -35,7 +35,7 @@ console.log(dao);
   creationDate: <Date>,
   plugins: [
     {
-      id: erc20-voting.plugin.dao.eth,
+      id: token-voting.plugin.dao.eth,
       instanceAddress: "0x12345..."
     }
   ]

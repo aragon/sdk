@@ -8,18 +8,18 @@ import {
   IPluginSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { IClientErc20Decoding, IMintTokenParams } from "../../interfaces";
-import { IERC20MintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
+import { IClientTokenDecoding, IMintTokenParams } from "../../interfaces";
+import { ITokenMintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
 import { mintTokenParamsFromContract } from "../utils";
 
 /**
- * Decoding module the SDK ERC20 Client
+ * Decoding module the SDK Token Client
  */
-export class ClientErc20Decoding extends ClientCore
-  implements IClientErc20Decoding {
+export class ClientTokenDecoding extends ClientCore
+  implements IClientTokenDecoding {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientErc20Decoding.prototype);
+    Object.freeze(ClientTokenDecoding.prototype);
     Object.freeze(this);
   }
   /**
@@ -27,7 +27,7 @@ export class ClientErc20Decoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IPluginSettings}
-   * @memberof ClientErc20Decoding
+   * @memberof ClientTokenDecoding
    */
   public updatePluginSettingsAction(data: Uint8Array): IPluginSettings {
     return decodeUpdatePluginSettingsAction(data);
@@ -37,10 +37,10 @@ export class ClientErc20Decoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IMintTokenParams}
-   * @memberof ClientErc20Decoding
+   * @memberof ClientTokenDecoding
    */
   public mintTokenAction(data: Uint8Array): IMintTokenParams {
-    const votingInterface = IERC20MintableUpgradeable__factory
+    const votingInterface = ITokenMintableUpgradeable__factory
       .createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
@@ -58,7 +58,7 @@ export class ClientErc20Decoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {(IInterfaceParams | null)}
-   * @memberof ClientErc20Decoding
+   * @memberof ClientTokenDecoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
     try {

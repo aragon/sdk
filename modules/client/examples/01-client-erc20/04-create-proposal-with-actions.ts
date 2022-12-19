@@ -1,8 +1,8 @@
 /* MARKDOWN
-### Creating an ERC20 proposal with an action
+### Creating an Token proposal with an action
 */
 import {
-  ClientErc20,
+  ClientToken,
   Context,
   ContextPlugin,
   ICreateProposalParams,
@@ -16,8 +16,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create an Token client
+const client = new ClientToken(contextPlugin);
 
 // create config action
 const configActionPrarms: IPluginSettings = {
@@ -35,25 +35,7 @@ const configAction = client.encoding.updatePluginSettingsAction(
 
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadata: {
-    title: "Test Proposal",
-    summary: "This is a short description",
-    description: "This is a long descrioption",
-    resources: [
-      {
-        name: "Discord",
-        url: "https://discord.com/...",
-      },
-      {
-        name: "Website",
-        url: "https://website...",
-      },
-    ],
-    media: {
-      logo: "https://...",
-      header: "https://...",
-    },
-  },
+  metadataUri: "ipfs://123456",
   actions: [configAction],
   startDate: new Date(),
   endDate: new Date(),

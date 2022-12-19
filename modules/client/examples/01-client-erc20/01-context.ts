@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Create an ERC20 context
+### Create an Token context
 */
 import { Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";

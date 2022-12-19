@@ -1,17 +1,17 @@
 /* MARKDOWN
-### Loading the list of members (ERC20)
+### Loading the list of members (Token)
 
-Retrieving all the members of an ERC20 DAO.
+Retrieving all the members of an Token DAO.
 */
-import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
+import { ClientToken, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create an Token client
+const client = new ClientToken(contextPlugin);
 
 const daoAddressorEns = "0x12345...";
 

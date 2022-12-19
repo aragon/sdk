@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
-export const QueryErc20Proposal = gql`
-query erc20Proposal($proposalId: ID!) {
-  erc20VotingProposal(id: $proposalId){
+export const QueryTokenProposal = gql`
+query tokenProposal($proposalId: ID!) {
+  tokenVotingProposal(id: $proposalId){
     id
     dao {
       id
@@ -44,9 +44,9 @@ query erc20Proposal($proposalId: ID!) {
   }
 }
 `;
-export const QueryErc20Proposals = gql`
-query erc20Proposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: ERC20VotingProposal_orderBy!) {
-  erc20VotingProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
+export const QueryTokenProposals = gql`
+query tokenProposals($where: TokenVotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: TokenVotingProposal_orderBy!) {
+  tokenVotingProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     dao {
       id

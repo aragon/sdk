@@ -2,10 +2,10 @@
 declare const describe, it, expect;
 
 import {
-  ClientErc20,
+  ClientToken,
   Context,
   ContextPlugin,
-  IErc20PluginInstall,
+  ITokenPluginInstall,
   IMintTokenParams,
   IPluginSettings,
 } from "../../../src";
@@ -14,10 +14,10 @@ import { AddressZero } from "@ethersproject/constants";
 import { InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 
-describe("Client ERC20", () => {
+describe("Client Token", () => {
   describe("Encoding module", () => {
-    it("Should create a Erc20 client and generate a install entry", async () => {
-      const initParams: IErc20PluginInstall = {
+    it("Should create a Token client and generate a install entry", async () => {
+      const initParams: ITokenPluginInstall = {
         settings: {
           minDuration: 7200,
           minTurnout: 0.5,
@@ -27,17 +27,17 @@ describe("Client ERC20", () => {
           address: AddressZero,
         },
       };
-      const erc20InstallPluginItem = ClientErc20.encoding.getPluginInstallItem(
+      const tokenInstallPluginItem = ClientToken.encoding.getPluginInstallItem(
         initParams,
       );
 
-      expect(typeof erc20InstallPluginItem).toBe("object");
-      expect(erc20InstallPluginItem.data).toBeInstanceOf(Uint8Array);
+      expect(typeof tokenInstallPluginItem).toBe("object");
+      expect(tokenInstallPluginItem.data).toBeInstanceOf(Uint8Array);
     });
     it("Should encode an update plugin settings action and fail with an invalid address", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientErc20(ctxPlugin);
+      const client = new ClientToken(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
         minTurnout: 0.5,
@@ -52,7 +52,7 @@ describe("Client ERC20", () => {
     it("Should encode an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientErc20(ctxPlugin);
+      const client = new ClientToken(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
         minTurnout: 0.5,
@@ -74,7 +74,7 @@ describe("Client ERC20", () => {
     it("Should encode a mint action with an invalid recipient address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientErc20(ctxPlugin);
+      const client = new ClientToken(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0xinvalid_address",
         amount: BigInt(10),
@@ -87,7 +87,7 @@ describe("Client ERC20", () => {
     it("Should encode a mint action with an invalid token address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientErc20(ctxPlugin);
+      const client = new ClientToken(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
@@ -97,10 +97,10 @@ describe("Client ERC20", () => {
       expect(() => client.encoding.mintTokenAction(minterAddress, params))
         .toThrow(new InvalidAddressError());
     });
-    it("Should encode an ERC20 token mint action", async () => {
+    it("Should encode an Token token mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientErc20(ctxPlugin);
+      const client = new ClientToken(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),

@@ -9,46 +9,46 @@ import {
 } from "../../../client-common";
 import { isAddress } from "@ethersproject/address";
 import {
-  IClientErc20Encoding,
-  IErc20PluginInstall,
+  IClientTokenEncoding,
+  ITokenPluginInstall,
   IMintTokenParams,
 } from "../../interfaces";
-import { ERC20_PLUGIN_ID } from "../constants";
+import { TOKEN_PLUGIN_ID } from "../constants";
 import {
-  ERC20Voting__factory,
-  IERC20MintableUpgradeable__factory,
+  TokenVoting__factory,
+  ITokenMintableUpgradeable__factory,
 } from "@aragon/core-contracts-ethers";
-import { erc20InitParamsToContract, mintTokenParamsToContract } from "../utils";
+import { tokenInitParamsToContract, mintTokenParamsToContract } from "../utils";
 /**
- * Encoding module the SDK ERC20 Client
+ * Encoding module the SDK Token Client
  */
-export class ClientErc20Encoding extends ClientCore
-  implements IClientErc20Encoding {
+export class ClientTokenEncoding extends ClientCore
+  implements IClientTokenEncoding {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientErc20Encoding.prototype);
+    Object.freeze(ClientTokenEncoding.prototype);
     Object.freeze(this);
   }
   /**
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured
    *
-   * @param {IErc20PluginInstall} params
+   * @param {ITokenPluginInstall} params
    * @return {*}  {IPluginInstallItem}
-   * @memberof ClientErc20Encoding
+   * @memberof ClientTokenEncoding
    */
-  static getPluginInstallItem(params: IErc20PluginInstall): IPluginInstallItem {
-    const erc20votingInterface = ERC20Voting__factory.createInterface();
-    const args = erc20InitParamsToContract(params);
+  static getPluginInstallItem(params: ITokenPluginInstall): IPluginInstallItem {
+    const tokenVotingInterface = TokenVoting__factory.createInterface();
+    const args = tokenInitParamsToContract(params);
     // get hex bytes
-    const hexBytes = erc20votingInterface.encodeFunctionData(
+    const hexBytes = tokenVotingInterface.encodeFunctionData(
       "initialize",
       args,
     );
     // Strip 0x => encode in Uint8Array
     const data = hexToBytes(strip0x(hexBytes));
     return {
-      id: ERC20_PLUGIN_ID,
+      id: TOKEN_PLUGIN_ID,
       data,
     };
   }
@@ -58,7 +58,7 @@ export class ClientErc20Encoding extends ClientCore
    * @param {string} pluginAddress
    * @param {IPluginSettings} params
    * @return {*}  {DaoAction}
-   * @memberof ClientErc20Encoding
+   * @memberof ClientTokenEncoding
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
@@ -81,7 +81,7 @@ export class ClientErc20Encoding extends ClientCore
    * @param {string} minterAddress
    * @param {IMintTokenParams} params
    * @return {*}  {DaoAction}
-   * @memberof ClientErc20Encoding
+   * @memberof ClientTokenEncoding
    */
   public mintTokenAction(
     minterAddress: string,
@@ -90,7 +90,7 @@ export class ClientErc20Encoding extends ClientCore
     if (!isAddress(minterAddress) || !isAddress(params.address)) {
       throw new InvalidAddressError();
     }
-    const votingInterface = IERC20MintableUpgradeable__factory
+    const votingInterface = ITokenMintableUpgradeable__factory
       .createInterface();
     const args = mintTokenParamsToContract(params);
     // get hex bytes

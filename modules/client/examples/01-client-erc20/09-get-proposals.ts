@@ -1,13 +1,13 @@
 /* MARKDOWN
-### Loading the list of proposals (ERC20)
+### Loading the list of proposals (Token)
 
-Retrieving the proposals of an ERC20 DAO.
+Retrieving the proposals of an Token DAO.
 */
 import {
-  ClientErc20,
+  ClientToken,
   Context,
   ContextPlugin,
-  Erc20ProposalListItem,
+  TokenProposalListItem,
   IProposalQueryParams,
   ProposalSortBy,
   SortDirection,
@@ -19,8 +19,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create an Token client
+const client = new ClientToken(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
@@ -30,7 +30,7 @@ const queryParams: IProposalQueryParams = {
   status: ProposalStatus.ACTIVE, // optional
 };
 
-const proposals: Erc20ProposalListItem[] = await client.methods.getProposals(
+const proposals: TokenProposalListItem[] = await client.methods.getProposals(
   queryParams,
 );
 console.log(proposals);

@@ -17,8 +17,8 @@ export interface Deployment {
   managingDaoAddress: string;
   daoFactory: aragonContracts.DAOFactory;
   daoRegistry: aragonContracts.DAORegistry;
-  erc20Repo: aragonContracts.PluginRepo;
-  erc20PluginSetup: aragonContracts.ERC20VotingSetup;
+  tokenRepo: aragonContracts.PluginRepo;
+  tokenPluginSetup: aragonContracts.TokenVotingSetup;
   addressListRepo: aragonContracts.PluginRepo;
   addressListPluginSetup: aragonContracts.AllowlistVotingSetup;
 }
@@ -135,20 +135,20 @@ export async function deploy(): Promise<Deployment> {
 
     const pluginRepo_Factory = new aragonContracts.PluginRepo__factory();
 
-    const erc20SetupFactory = new aragonContracts.ERC20VotingSetup__factory();
-    const erc20PluginSetup = await erc20SetupFactory
+    const tokenSetupFactory = new aragonContracts.TokenVotingSetup__factory();
+    const tokenPluginSetup = await tokenSetupFactory
       .connect(deployOwnerWallet)
       .deploy();
-    const erc20RepoAddr = await deployPlugin(
+    const tokenRepoAddr = await deployPlugin(
       pluginRepoFactory,
-      erc20PluginSetup.address,
-      "ERC20Voting",
+      tokenPluginSetup.address,
+      "TokenVoting",
       [1, 0, 0],
       deployOwnerWallet,
     );
-    const erc20Repo = pluginRepo_Factory
+    const tokenRepo = pluginRepo_Factory
       .connect(deployOwnerWallet)
-      .attach(erc20RepoAddr);
+      .attach(tokenRepoAddr);
 
     const addressListFactory = new aragonContracts
       .AllowlistVotingSetup__factory();
@@ -176,8 +176,8 @@ export async function deploy(): Promise<Deployment> {
       managingDaoAddress: managingDao.address,
       daoFactory,
       daoRegistry,
-      erc20Repo,
-      erc20PluginSetup,
+      tokenRepo,
+      tokenPluginSetup,
       addressListRepo,
       addressListPluginSetup,
     };
@@ -328,7 +328,7 @@ export async function createAddresslistDAO(
   );
 }
 
-export async function createERC20DAO(
+export async function createTokenDAO(
   deployment: Deployment,
   name: string,
   addresses: string[] = [],
@@ -342,8 +342,8 @@ export async function createERC20DAO(
     },
     [
       {
-        pluginSetup: deployment.erc20PluginSetup.address,
-        pluginSetupRepo: deployment.erc20Repo.address,
+        pluginSetup: deployment.tokenPluginSetup.address,
+        pluginSetupRepo: deployment.tokenRepo.address,
         data: defaultAbiCoder.encode(
           [
             "uint64",

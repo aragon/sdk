@@ -8,25 +8,25 @@ import {
   VoteValues,
 } from "../../client-common";
 import {
-  ContractErc20InitParams,
+  ContractTokenInitParams,
   ContractMintTokenParams,
-  Erc20Proposal,
-  Erc20ProposalListItem,
-  IErc20PluginInstall,
+  TokenProposal,
+  TokenProposalListItem,
+  ITokenPluginInstall,
   IMintTokenParams,
-  SubgraphErc20Proposal,
-  SubgraphErc20ProposalListItem,
-  SubgraphErc20VoterListItem,
+  SubgraphTokenProposal,
+  SubgraphTokenProposalListItem,
+  SubgraphTokenVoterListItem,
 } from "../interfaces";
 import { formatEther } from "@ethersproject/units";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
 
-export function toErc20Proposal(
-  proposal: SubgraphErc20Proposal,
+export function toTokenProposal(
+  proposal: SubgraphTokenProposal,
   metadata: ProposalMetadata,
-): Erc20Proposal {
+): TokenProposal {
   const startDate = new Date(
     parseInt(proposal.startDate) * 1000,
   );
@@ -104,7 +104,7 @@ export function toErc20Proposal(
     usedVotingWeight,
     totalVotingWeight: BigInt(proposal.census),
     votes: proposal.voters.map(
-      (voter: SubgraphErc20VoterListItem) => {
+      (voter: SubgraphTokenVoterListItem) => {
         return {
           address: voter.voter.id,
           vote: SubgraphVoteValuesMap.get(voter.vote) as VoteValues,
@@ -115,10 +115,10 @@ export function toErc20Proposal(
   };
 }
 
-export function toErc20ProposalListItem(
-  proposal: SubgraphErc20ProposalListItem,
+export function toTokenProposalListItem(
+  proposal: SubgraphTokenProposalListItem,
   metadata: ProposalMetadata,
-): Erc20ProposalListItem {
+): TokenProposalListItem {
   const startDate = new Date(
     parseInt(proposal.startDate) * 1000,
   );
@@ -166,9 +166,9 @@ export function mintTokenParamsFromContract(result: Result): IMintTokenParams {
 }
 
 
-export function erc20InitParamsToContract(
-  params: IErc20PluginInstall,
-): ContractErc20InitParams {
+export function tokenInitParamsToContract(
+  params: ITokenPluginInstall,
+): ContractTokenInitParams {
   // TODO
   // the SC specifies a token field but there is not format on thhis field
   // or how data should be passed to this in case it is using an existing

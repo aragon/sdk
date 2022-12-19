@@ -2,7 +2,7 @@ import { gql } from "graphql-request";
 
 export const QueryToken = gql`
 query token($address: ID!) {
-  erc20VotingPlugin(id: $address){
+  tokenVotingPlugin(id: $address){
     token {
       id
       name

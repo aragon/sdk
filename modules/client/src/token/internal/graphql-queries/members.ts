@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
-export const QueryErc20Members = gql`
-query Erc20PluginMembers($address: ID!) {
-    erc20VotingPlugin(id: $address){
+export const QueryTokenMembers = gql`
+query TokenPluginMembers($address: ID!) {
+    tokenVotingPlugin(id: $address){
         members {
             address
         }
