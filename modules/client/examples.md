@@ -382,7 +382,7 @@ console.log(transfers);
     reference: "withdrawing from dao to:0xc8541aAE19C5069482239735AD64FAC3dCc52Ca2",
     transactionId: "0xdb0f9422b5c3199021481c98a655741ca16119ff8a59571854a94a6f31dad7ba",
     to: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
-    proposalId: 0n
+    proposalId: "0x1234567890123456789012345678901234567890000000000000000000000000"
   },
   {
     type: "deposit",
@@ -839,7 +839,7 @@ const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(0),
+  proposalId: "0x1234567890123456789012345678901234567890000000000000000000000000",
   vote: VoteValues.YES,
 };
 
@@ -879,7 +879,7 @@ const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   addressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(1),
+  proposalId: "0x1234567890123456789012345678901234567890000000000000000000000001",
   pluginAddress: "0x1234567890123456789012345678901234567890",
 };
 
@@ -1530,7 +1530,7 @@ const client = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(0),
+  proposalId: "0x1234567890123456789012345678901234567890000000000000000000000000",
   vote: VoteValues.YES,
 };
 
@@ -1570,7 +1570,7 @@ const client = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   addressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(1),
+  proposalId: "0x1234567890123456789012345678901234567890000000000000000000000001",
   pluginAddress: "0x1234567890123456789012345678901234567890",
 };
 

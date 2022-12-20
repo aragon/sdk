@@ -77,17 +77,17 @@ export type CreateProposalBaseParams = {
 export interface IVoteProposalParams {
   pluginAddress: string;
   vote: VoteValues;
-  proposalId: bigint;
+  proposalId: string;
 }
 
 export interface IExecuteProposalParams {
   pluginAddress: string;
-  proposalId: bigint;
+  proposalId: string;
 }
 
 export interface ICanVoteParams {
   pluginAddress: string;
-  proposalId: bigint;
+  proposalId: string;
   addressOrEns: string;
 }
 

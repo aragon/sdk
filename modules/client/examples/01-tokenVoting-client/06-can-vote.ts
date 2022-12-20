@@ -18,7 +18,7 @@ const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   addressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(1),
+  proposalId: "0x1234567890123456789012345678901234567890000000000000000000000001",
   pluginAddress: "0x1234567890123456789012345678901234567890",
 };
 
