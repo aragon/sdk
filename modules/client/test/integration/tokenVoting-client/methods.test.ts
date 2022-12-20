@@ -193,7 +193,7 @@ describe("Token Voting Client", () => {
 
         const executeParams: IExecuteProposalParams = {
           pluginAddress: "0x1234567890123456789012345678901234567890",
-          proposalId: "0x1234567890123456789012345678901234567890000000000000000000000000",
+          proposalId: BigInt(0),
         };
 
         for await (
@@ -226,7 +226,7 @@ describe("Token Voting Client", () => {
 
         const params: ICanVoteParams = {
           addressOrEns: "0x1234567890123456789012345678901234567890",
-          proposalId: "0x1234567890123456789012345678901234567890000000000000000000000000",
+          proposalId: BigInt(0),
           pluginAddress,
         };
         const canVote = await client.methods.canVote(params);

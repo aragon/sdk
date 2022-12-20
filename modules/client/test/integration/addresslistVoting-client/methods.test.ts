@@ -190,7 +190,7 @@ describe("Client Address List", () => {
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
-        proposalId: "0x1234567890123456789012345678901234567890000000000000000000000000",
+        proposalId: BigInt(0),
       };
       for await (const step of client.methods.executeProposal(executeParams)) {
         switch (step.key) {
@@ -218,7 +218,7 @@ describe("Client Address List", () => {
 
       const params: ICanVoteParams = {
         addressOrEns: "0x1234567890123456789012345678901234567890",
-        proposalId: "0x1234567890123456789012345678901234567890000000000000000000000000",
+        proposalId: BigInt(0),
         pluginAddress,
       };
       const canVote = await client.methods.canVote(params);

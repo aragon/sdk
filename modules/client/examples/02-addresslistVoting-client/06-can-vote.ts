@@ -18,7 +18,7 @@ const client = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   addressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890000000000000000000000001",
+  proposalId: BigInt(1),
   pluginAddress: "0x1234567890123456789012345678901234567890",
 };
 
