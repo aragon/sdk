@@ -6,7 +6,6 @@ import {
   getFunctionFragment,
   IInterfaceParams,
   VotingSettings,
-  IPluginSettings,
   uint8ArraySchema,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";

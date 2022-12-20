@@ -2409,11 +2409,7 @@ const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-<<<<<<< HEAD
 const params: DaoMetadata = await client.decoding.updateDaoMetadataAction(data);
-=======
-const params: DaoMetadata = await client.decoding.updateMetadataAction(data);
->>>>>>> b4fa3c6 (update dao metadata naming)
 
 console.log(params);
 /*

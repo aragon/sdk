@@ -2,7 +2,7 @@ import { array, number, object, string } from "yup";
 import {
   addressOrEnsSchema,
   bigintSchema,
-  pluginSettingsSchema,
+  votingSettingsSchema,
 } from "../client-common";
 
 export const newTokenParamsSchema = object({
@@ -20,7 +20,7 @@ export const existingTokenParamsSchema = object({
 });
 
 export const erc20PluginInstallSchema = object({
-  settings: pluginSettingsSchema.required(),
+  settings: votingSettingsSchema.required(),
   newToken: newTokenParamsSchema.default(undefined),
   useToken: existingTokenParamsSchema.default(undefined),
 });

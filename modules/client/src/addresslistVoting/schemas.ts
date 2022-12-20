@@ -1,9 +1,9 @@
 import { array, object } from "yup";
-import { addressOrEnsSchema, pluginSettingsSchema } from "../client-common";
+import { addressOrEnsSchema, votingSettingsSchema } from "../client-common";
 
 export const membersSchema = array(addressOrEnsSchema);
 
 export const addressListPluginInstallSchema = object({
-  settings: pluginSettingsSchema.required(),
+  settings: votingSettingsSchema.required(),
   addresses: membersSchema.required(),
 });

@@ -6,8 +6,8 @@ import {
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
-  pluginSettingsSchema,
   VotingSettings,
+  votingSettingsSchema,
 } from "../../../client-common";
 import {
   IMintTokenParams,
@@ -75,7 +75,7 @@ export class TokenVotingClientEncoding extends ClientCore
     params: VotingSettings,
   ): DaoAction {
     addressOrEnsSchema.validateSync(pluginAddress);
-    pluginSettingsSchema.validateSync(params);
+    votingSettingsSchema.validateSync(params);
     // TODO: check if to and value are correct
     return {
       to: pluginAddress,

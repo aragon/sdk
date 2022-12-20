@@ -3,7 +3,6 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
-  InvalidProposalIdError,
   IpfsPinError,
   NoProviderError,
   NoSignerError,
@@ -36,6 +35,7 @@ import {
   parseEtherRatio,
   ProposalCreationSteps,
   ProposalCreationStepValue,
+  proposalIdSchema,
   ProposalMetadata,
   proposalMetadataSchema,
   ProposalSortBy,
@@ -293,9 +293,7 @@ export class AddresslistVotingClientMethods extends ClientCore
   public async getProposal(
     proposalId: string,
   ): Promise<AddresslistVotingProposal | null> {
-    if (!proposalId) {
-      throw new InvalidProposalIdError();
-    }
+    proposalIdSchema.validateSync(proposalId)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();

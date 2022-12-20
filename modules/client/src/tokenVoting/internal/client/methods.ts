@@ -4,7 +4,6 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
-  InvalidProposalIdError,
   IpfsPinError,
   NoProviderError,
   NoSignerError,
@@ -24,12 +23,16 @@ import {
   ICanVoteParams,
   ICreateProposalParams,
   IExecuteProposalParams,
+  //678723d (rename IpluginSettings to IVotingSettings):modules/client/src/erc20/internal/client/methods.ts
   IProposalQueryParams,
-  isProposalId,
   IVoteProposalParams,
+  // HEAD:modules/client/src/tokenVoting/internal/client/methods.ts
+  //
+  IVotingSettings,
   parseEtherRatio,
   ProposalCreationSteps,
   ProposalCreationStepValue,
+  proposalIdSchema,
   ProposalMetadata,
   proposalMetadataSchema,
   ProposalSortBy,
@@ -55,9 +58,9 @@ import {
 import {
   QueryTokenVotingMembers,
   QueryTokenVotingPlugin,
-  QueryTokenVotingSettings,
   QueryTokenVotingProposal,
   QueryTokenVotingProposals,
+  QueryTokenVotingSettings,
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
@@ -295,9 +298,7 @@ export class TokenVotingClientMethods extends ClientCore
   public async getProposal(
     proposalId: string,
   ): Promise<TokenVotingProposal | null> {
-    if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
+    proposalIdSchema.validateSync(proposalId);
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();

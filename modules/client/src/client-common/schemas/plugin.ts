@@ -70,7 +70,7 @@ export const canVoteParamsSchema = object({
   addressOrEns: addressOrEnsSchema.required(),
 });
 
-export const pluginSettingsSchema = object({
+export const votingSettingsSchema = object({
   minSupport: number().lessThan(1).positive().required(),
   minTurnout: number().lessThan(1).positive().required(),
   minDuration: number().positive().required(),

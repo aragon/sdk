@@ -9,7 +9,7 @@ import {
   IPluginInstallItem,
   VotingSettings,
   votingSettingsToContract,
-  pluginSettingsSchema,
+  votingSettingsSchema,
 } from "../../../client-common";
 import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
@@ -76,7 +76,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     params: VotingSettings,
   ): DaoAction {
     addressOrEnsSchema.validateSync(pluginAddress);
-    pluginSettingsSchema.validateSync(params);
+    votingSettingsSchema.validateSync(params);
     return {
       to: pluginAddress,
       value: BigInt(0),

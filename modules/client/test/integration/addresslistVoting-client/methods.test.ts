@@ -329,7 +329,7 @@ describe("Client Address List", () => {
         for (let i = 0; i < proposal.votes.length; i++) {
           const vote = proposal.votes[i];
           expect(typeof vote.address).toBe("string");
-          expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+          expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
           expect(typeof vote.vote).toBe("number");
         }
       }
