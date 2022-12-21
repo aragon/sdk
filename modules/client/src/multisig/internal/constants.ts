@@ -13,4 +13,7 @@ export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
   MultisigVoting__factory.createInterface().getFunction(
     "removeAllowedUsers",
   ).format("minimal"),
+  MultisigVoting__factory.createInterface().getFunction(
+    "updateMinApprovals",
+  ).format("minimal"),
 ];

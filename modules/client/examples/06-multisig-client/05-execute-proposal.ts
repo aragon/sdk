@@ -2,10 +2,9 @@
 ### Approve a multisig proposal
 */
 import {
-  ApproveMultisigProposalParams,
-  ApproveProposalStep,
   Context,
   ContextPlugin,
+  ExecuteProposalStep,
   MultisigClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -17,20 +16,14 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 
-const approveParams: ApproveMultisigProposalParams = {
-  proposalId:
-    "0x1234567890123456789012345678901234567890000000000000000000000001",
-  tryExecution: true,
-};
-
-const steps = client.methods.approveProposal(approveParams);
+const steps = client.methods.executeProposal("0x1234567890123456789012345678901234567890000000000000000000000001");
 for await (const step of steps) {
   try {
     switch (step.key) {
-      case ApproveProposalStep.APPROVING:
+      case ExecuteProposalStep.EXECUTING:
         console.log(step.txHash);
         break;
-      case ApproveProposalStep.DONE:
+      case ExecuteProposalStep.DONE:
         break;
     }
   } catch (err) {

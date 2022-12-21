@@ -9,13 +9,14 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   ApproveMultisigProposalParams,
+  ApproveProposalStep,
+  CanApproveParams,
   Client,
   Context,
   ContextPlugin,
   CreateMultisigProposalParams,
   IProposalQueryParams,
   MultisigClient,
-  ApproveProposalSteps,
   ProposalCreationSteps,
   ProposalMetadata,
   ProposalSortBy,
@@ -33,6 +34,7 @@ import {
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { EthereumProvider, Server } from "ganache";
+import { CanExecuteParams, ExecuteProposalStep } from "../../../dist";
 
 describe("Client Multisig", () => {
   let pluginAddress: string;
@@ -125,17 +127,17 @@ describe("Client Multisig", () => {
       const client = new MultisigClient(ctxPlugin);
 
       const approveParams: ApproveMultisigProposalParams = {
-        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId:
           "0x1234567890123456789012345678901234567890000000000000000000000001",
+        tryExecution: true,
       };
       for await (const step of client.methods.approveProposal(approveParams)) {
         switch (step.key) {
-          case ApproveProposalSteps.APPROVING:
+          case ApproveProposalStep.APPROVING:
             expect(typeof step.txHash).toBe("string");
             expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             break;
-          case ApproveProposalSteps.DONE:
+          case ApproveProposalStep.DONE:
             break;
           default:
             throw new Error(
@@ -152,27 +154,76 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
-      const canVote = await client.methods.canApprove(
-        "0x1234567890123456789012345678901234567890",
+      const canApproveParams: CanApproveParams = {
+        proposalId:
+          "0x1234567890123456789012345678901234567890000000000000000000000001",
+        addressOrEns: "0x1234567890123456789012345678901234567890",
+      };
+      const canApprove = await client.methods.canApprove(
+        canApproveParams,
       );
-      expect(typeof canVote).toBe("boolean");
+      expect(typeof canApprove).toBe("boolean");
+    });
+  });
+  describe("Execute proposal", () => {
+    it("Should execute a local proposal", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new MultisigClient(ctxPlugin);
+
+      for await (
+        const step of client.methods.executeProposal(
+          "0x1234567890123456789012345678901234567890000000000000000000000001",
+        )
+      ) {
+        switch (step.key) {
+          case ExecuteProposalStep.EXECUTING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case ExecuteProposalStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected execute proposal step: " +
+                Object.keys(step).join(", "),
+            );
+        }
+      }
+    });
+  });
+  describe("Can execute", () => {
+    it("Should check if an user can approve in a multisig instance", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new MultisigClient(ctxPlugin);
+      const canExecuteParams: CanExecuteParams = {
+        proposalId:
+          "0x1234567890123456789012345678901234567890000000000000000000000001",
+        addressOrEns: "0x1234567890123456789012345678901234567890",
+      };
+      const canExecute = await client.methods.canExecute(
+        canExecuteParams,
+      );
+      expect(typeof canExecute).toBe("boolean");
     });
   });
 
   describe("Data retrieval", () => {
-    it("Should get the list of members that can vote in a proposal", async () => {
+    it("Should get the settings of the plugin", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const wallets = await client.methods.getMembers(
+      const settings = await client.methods.getPluginSettings(
         TEST_MULTISIG_PLUGIN_ADDRESS,
       );
-
-      expect(Array.isArray(wallets)).toBe(true);
-      expect(wallets.length).toBeGreaterThan(0);
-      expect(typeof wallets[0]).toBe("string");
-      expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(typeof settings).toBe("object");
+      expect(typeof settings.minApprovals).toBe("bigint");
+      expect(Array.isArray(settings.members)).toBe(true);
+      expect(settings.members.length).toBeGreaterThan(0);
+      expect(typeof settings.members[0]).toBe("string");
+      expect(settings.members[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     });
     it("Should fetch the given proposal", async () => {
       const ctx = new Context(contextParams);

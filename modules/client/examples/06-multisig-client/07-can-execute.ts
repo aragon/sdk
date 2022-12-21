@@ -6,6 +6,7 @@ import {
   Context,
   ContextPlugin,
   ICanVoteParams,
+  CanExecuteParams,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -15,9 +16,12 @@ const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
-
-const canVote = await client.methods.canApprove("0x1234567890123456789012345678901234567890");
-console.log(canVote);
+const canExecuteParams :CanExecuteParams = {
+  proposalId: "0x1234567890123456789012345678901234567890000000000000000000000001",
+  addressOrEns: "0x1234567890123456789012345678901234567890"
+}
+const canExecute = await client.methods.canExecute(canExecuteParams);
+console.log(canExecute);
 /*
 true
 */

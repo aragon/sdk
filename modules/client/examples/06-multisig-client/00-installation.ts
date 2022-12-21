@@ -8,6 +8,7 @@ import {
   DaoCreationSteps,
   GasFeeEstimation,
   ICreateParams,
+  MultisigPluginInstallParams,
 } from "@aragon/sdk-client";
 import { MultisigClient } from "../../src";
 import { contextParams } from "../00-client/00-context";
@@ -17,15 +18,20 @@ const client: Client = new Client(context);
 
 // Define the plugins to install and their params
 
-const addresses: string[] = [
+const members: string[] = [
   "0x1234567890123456789012345678901234567890",
   "0x2345678901234567890123456789012345678901",
   "0x3456789012345678901234567890123456789012",
   "0x4567890123456789012345678901234567890123",
 ];
 
+const multisigIntallParams: MultisigPluginInstallParams = {
+  minApprovals: BigInt(3),
+  members,
+}
+
 const multisigInstallPluginItem = MultisigClient.encoding
-  .getPluginInstallItem(addresses);
+  .getPluginInstallItem(multisigIntallParams);
 
 const metadataUri = await client.methods.pinMetadata({
   name: "My DAO",

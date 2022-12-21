@@ -1,22 +1,34 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { Context, ContextPlugin, MultisigClient } from "../../../src";
+import {
+  AddAddressesParams,
+  Context,
+  ContextPlugin,
+  MultisigClient,
+  MultisigPluginInstallParams,
+  RemoveAddressesParams,
+} from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain, TEST_INVALID_ADDRESS } from "../constants";
-
 
 describe("Client Address List", () => {
   describe("Action generators", () => {
     it("Should create an a Multisig install entry", async () => {
+      const members: string[] = [
+        "0x1234567890123456789012345678901234567890",
+        "0x2345678901234567890123456789012345678901",
+        "0x3456789012345678901234567890123456789012",
+        "0x4567890123456789012345678901234567890123",
+      ];
+
+      const multisigIntallParams: MultisigPluginInstallParams = {
+        minApprovals: BigInt(3),
+        members,
+      };
       const installPluginItemItem = MultisigClient.encoding
         .getPluginInstallItem(
-          [
-            "0x1234567890123456789012345678901234567890",
-            "0x2345678901234567890123456789012345678901",
-            "0x3456789012345678901234567890123456789012",
-            "0x4567890123456789012345678901234567890134",
-          ],
+          multisigIntallParams,
         );
 
       expect(typeof installPluginItemItem).toBe("object");
@@ -32,16 +44,17 @@ describe("Client Address List", () => {
         "0x1234567890123456789012345678901234567890",
         "0x2345678901234567890123456789012345678901",
         "0x3456789012345678901234567890123456789012",
-        "0x4567890123456789012345678901234567890134",
+        "0x4567890123456789012345678901234567890123",
       ];
 
-      const pluginAddress = TEST_INVALID_ADDRESS;
-      expect(() =>
-        client.encoding.addMembersAction(
-          pluginAddress,
-          members,
-        )
-      ).toThrow(new InvalidAddressError());
+      const addAddressesParams: AddAddressesParams = {
+        minApprovals: BigInt(3),
+        members,
+        pluginAddress: TEST_INVALID_ADDRESS,
+      };
+
+      expect(() => client.encoding.addAddressesAction(addAddressesParams))
+        .toThrow(new InvalidAddressError());
     });
 
     it("Should create an Multisig client and fail to generate an add members action with an invalid member address", async () => {
@@ -57,10 +70,15 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
+
+      const addAddressesParams: AddAddressesParams = {
+        minApprovals: BigInt(3),
+        members,
+        pluginAddress,
+      };
       expect(() =>
-        client.encoding.addMembersAction(
-          pluginAddress,
-          members,
+        client.encoding.addAddressesAction(
+          addAddressesParams,
         )
       ).toThrow(new InvalidAddressError());
     });
@@ -76,15 +94,19 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      const action = client.encoding.addMembersAction(
-        pluginAddress,
+      const addAddressesParams: AddAddressesParams = {
+        minApprovals: BigInt(3),
         members,
+        pluginAddress,
+      };
+      const action = client.encoding.addAddressesAction(
+        addAddressesParams,
       );
       expect(typeof action).toBe("object");
       expect(action.data instanceof Uint8Array).toBe(true);
       expect(action.to).toBe(pluginAddress);
       expect(action.value.toString).toBe("0");
-      const decodedMembers = client.decoding.addMembersAction(action.data);
+      const decodedMembers = client.decoding.addAddressesAction(action.data);
       for (let i = 0; i < members.length; i++) {
         expect(members[i]).toBe(decodedMembers[i]);
       }
@@ -105,12 +127,13 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = TEST_INVALID_ADDRESS;
-      expect(() =>
-        client.encoding.removeMembersAction(
-          pluginAddress,
-          members,
-        )
-      ).toThrow(new InvalidAddressError());
+      const removeAddressesParams: RemoveAddressesParams = {
+        minApprovals: BigInt(3),
+        members,
+        pluginAddress,
+      };
+      expect(() => client.encoding.removeAddressesAction(removeAddressesParams))
+        .toThrow(new InvalidAddressError());
     });
 
     it("Should create an Multisig client and fail to generate a remove members action with an invalid member address", async () => {
@@ -126,12 +149,13 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      expect(() =>
-        client.encoding.removeMembersAction(
-          pluginAddress,
-          members,
-        )
-      ).toThrow(new InvalidAddressError());
+      const removeAddressesParams: RemoveAddressesParams = {
+        minApprovals: BigInt(3),
+        members,
+        pluginAddress,
+      };
+      expect(() => client.encoding.removeAddressesAction(removeAddressesParams))
+        .toThrow(new InvalidAddressError());
     });
     it("Should create an Multisig client and a remove members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -145,15 +169,20 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      const action = client.encoding.removeMembersAction(
-        pluginAddress,
+
+      const removeAddressesParams: RemoveAddressesParams = {
+        minApprovals: BigInt(3),
         members,
+        pluginAddress,
+      };
+      const action = client.encoding.removeAddressesAction(
+        removeAddressesParams,
       );
       expect(typeof action).toBe("object");
       expect(action.data instanceof Uint8Array).toBe(true);
       expect(action.to).toBe(pluginAddress);
       expect(action.value.toString).toBe("0");
-      const decodedMembers = client.decoding.addMembersAction(action.data);
+      const decodedMembers = client.decoding.removeAddressesAction(action.data);
       for (let i = 0; i < members.length; i++) {
         expect(members[i]).toBe(decodedMembers[i]);
       }

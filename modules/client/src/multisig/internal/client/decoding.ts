@@ -6,7 +6,7 @@ import {
   IInterfaceParams,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { IMultisigClientDecoding } from "../../interfaces";
+import { IMultisigClientDecoding, MultisigPluginSettings } from "../../interfaces";
 // @ts-ignore
 // todo fix new contracts-ethers
 import { MultisigVoting__factory } from "@aragon/core-contracts-ethers";
@@ -26,20 +26,18 @@ export class MultisigClientDecoding extends ClientCore
    * @return {*}  {string[]}
    * @memberof MultisigClientDecoding
    */
-  public addMembersAction(data: Uint8Array): string[] {
+  public addAddressesAction(data: Uint8Array): MultisigPluginSettings {
     const multisigInterface = MultisigVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = multisigInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
-    // TODO: Rename to `addAddresses` as soon as the plugin is updated
-    const expectedfunction = multisigInterface.getFunction("addAllowedUsers");
+    const expectedfunction = multisigInterface.getFunction("addAddresses");
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
     const result = multisigInterface.decodeFunctionData(
-      // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addAllowedUsers",
+      "addAddresses",
       data,
     );
     return result[0];
@@ -51,22 +49,45 @@ export class MultisigClientDecoding extends ClientCore
    * @return {*}  {string[]}
    * @memberof MultisigClientDecoding
    */
-  public removeMembersAction(data: Uint8Array): string[] {
+  public removeAddressesAction(data: Uint8Array): MultisigPluginSettings {
     const multisigInterface = MultisigVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = multisigInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
     const expectedfunction = multisigInterface.getFunction(
-      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
+      "removeAddresses",
     );
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
     const result = multisigInterface.decodeFunctionData(
-      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
+      "removeAddresses",
+      data,
+    );
+    return result[0];
+  }
+  /**
+   * Decodes a list of min approvals from an encoded update min approval action
+   *
+   * @param {Uint8Array} data
+   * @return {*}  {bigint}
+   * @memberof MultisigClientDecoding
+   */
+  public updateMinApprovalsAction(data: Uint8Array): bigint {
+    const multisigInterface = MultisigVoting__factory.createInterface();
+    const hexBytes = bytesToHex(data, true);
+    const receivedFunction = multisigInterface.getFunction(
+      hexBytes.substring(0, 10) as any,
+    );
+    const expectedfunction = multisigInterface.getFunction(
+      "updateMinApprovals",
+    );
+    if (receivedFunction.name !== expectedfunction.name) {
+      throw new UnexpectedActionError();
+    }
+    const result = multisigInterface.decodeFunctionData(
+      "updateMinApprovals",
       data,
     );
     return result[0];

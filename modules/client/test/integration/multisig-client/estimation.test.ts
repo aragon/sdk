@@ -7,15 +7,10 @@ import "../../mocks/aragon-sdk-ipfs";
 import {
   ApproveMultisigProposalParams,
   Client,
-  ClientAddressList,
   Context,
   ContextPlugin,
   CreateMultisigProposalParams,
-  ICreateProposalParams,
-  IExecuteProposalParams,
-  IVoteProposalParams,
   MultisigClient,
-  VoteValues,
 } from "../../../src";
 import { contextParamsLocalChain, TEST_WALLET_ADDRESS } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
@@ -78,12 +73,27 @@ describe("Client Address List", () => {
       const client = new MultisigClient(ctxPlugin);
 
       const approveParams: ApproveMultisigProposalParams = {
-        pluginAddress: "0x1234567890123456789012345678901234567890",
         proposalId:
           "0x1234567890123456789012345678901234567890000000000000000000000001",
+        tryExecution: true,
       };
 
       const estimation = await client.estimation.approveProposal(approveParams);
+
+      expect(typeof estimation).toEqual("object");
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+    });
+
+    it("Should estimate the gas fees for executing a proposal", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new MultisigClient(ctxPlugin);
+      const estimation = await client.estimation.executeProposal(
+        "0x1234567890123456789012345678901234567890000000000000000000000001",
+      );
 
       expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");

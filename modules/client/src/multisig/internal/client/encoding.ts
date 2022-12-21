@@ -1,7 +1,6 @@
 import {
   hexToBytes,
   InvalidAddressError,
-  InvalidAddressOrEnsError,
   strip0x,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
@@ -13,6 +12,9 @@ import {
 } from "../../../client-common";
 import {
   IMultisigClientEncoding,
+  MultisigPluginInstallParams,
+  UpdateAddressesParams,
+  UpdateMinApprovalsParams,
 } from "../../interfaces";
 // @ts-ignore
 // todo fix new contracts-ethers
@@ -37,13 +39,13 @@ export class MultisigClientEncoding extends ClientCore
    * @memberof MultisigClientEncoding
    */
   static getPluginInstallItem(
-    members: string[],
+    params: MultisigPluginInstallParams,
   ): IPluginInstallItem {
     const multisigInterface = MultisigVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
       "initialize",
-      [members],
+      [params.minApprovals, params.members],
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
@@ -55,53 +57,18 @@ export class MultisigClientEncoding extends ClientCore
   /**
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *
-   * @param {string} pluginAddress
-   * @param {string[]} members
+   * @param {UpdateAddressesParams} params
    * @return {*}  {DaoAction}
    * @memberof MultisigClientEncoding
    */
-  public addMembersAction(
-    pluginAddress: string,
-    members: string[],
+  public addAddressesAction(
+    params: UpdateAddressesParams,
   ): DaoAction {
-    if (!isAddress(pluginAddress)) {
-      throw new InvalidAddressOrEnsError();
-    }
-    for (const member of members) {
-      if (!isAddress(member)) {
-        throw new InvalidAddressError();
-      }
-    }
-    // TODO
-    // fix 
-    const multisigInterface = MultisigVoting__factory.createInterface();
-    const hexBytes = multisigInterface.encodeFunctionData(
-      "addAllowedUsers",
-      [members],
-    );
-    const data = hexToBytes(strip0x(hexBytes));
-    return {
-      to: pluginAddress,
-      value: BigInt(0),
-      data,
-    };
-  }
-  /**
-   * Computes the parameters to be given when creating a proposal that adds addresses to address list
-   *
-   * @param {string} pluginAddress
-   * @param {string[]} members
-   * @return {*}  {DaoAction}
-   * @memberof MultisigClientEncoding
-   */
-  public removeMembersAction(
-    pluginAddress: string,
-    members: string[],
-  ): DaoAction {
-    if (!isAddress(pluginAddress)) {
+    if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
-    for (const member of members) {
+    // TODO yup validation
+    for (const member of params.members) {
       if (!isAddress(member)) {
         throw new InvalidAddressError();
       }
@@ -109,13 +76,70 @@ export class MultisigClientEncoding extends ClientCore
     const multisigInterface = MultisigVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
-      // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
-      [members],
+      "addAddresses",
+      [params.members, params.minApprovals],
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
-      to: pluginAddress,
+      to: params.pluginAddress,
+      value: BigInt(0),
+      data,
+    };
+  }
+  /**
+   * Computes the parameters to be given when creating a proposal that adds addresses to address list
+   *
+   * @param {UpdateAddressesParams} params
+   * @return {*}  {DaoAction}
+   * @memberof MultisigClientEncoding
+   */
+  public removeAddressesAction(
+    params: UpdateAddressesParams,
+  ): DaoAction {
+    if (!isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    // TODO yup validation
+    for (const member of params.members) {
+      if (!isAddress(member)) {
+        throw new InvalidAddressError();
+      }
+    }
+    const multisigInterface = MultisigVoting__factory.createInterface();
+    // get hex bytes
+    const hexBytes = multisigInterface.encodeFunctionData(
+      "removeAddresses",
+      [params.members, params.minApprovals],
+    );
+    const data = hexToBytes(strip0x(hexBytes));
+    return {
+      to: params.pluginAddress,
+      value: BigInt(0),
+      data,
+    };
+  }
+  /**
+   * Computes the parameters to be given when creating a proposal updates the min approvals parameter
+   *
+   * @param {UpdateMinApprovalsParams} params
+   * @return {*}  {DaoAction}
+   * @memberof MultisigClientEncoding
+   */
+  public updateMinApprovalsAction(
+    params: UpdateMinApprovalsParams,
+  ): DaoAction {
+    if (!isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    const multisigInterface = MultisigVoting__factory.createInterface();
+    // get hex bytes
+    const hexBytes = multisigInterface.encodeFunctionData(
+      "updateMinApprovals",
+      [params.minApprovals],
+    );
+    const data = hexToBytes(strip0x(hexBytes));
+    return {
+      to: params.pluginAddress,
       value: BigInt(0),
       data,
     };

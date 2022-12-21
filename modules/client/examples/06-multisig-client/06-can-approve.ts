@@ -1,11 +1,11 @@
 /* MARKDOWN
-### Approve a multisig proposal
+### Checking if user can approve in a multisig plugin
 */
 import {
-  ApproveMultisigProposalParams,
-  ApproveProposalStep,
+  CanApproveParams,
   Context,
   ContextPlugin,
+  ICanVoteParams,
   MultisigClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -16,24 +16,14 @@ const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
-
-const approveParams: ApproveMultisigProposalParams = {
+const canApproveParams: CanApproveParams = {
   proposalId:
     "0x1234567890123456789012345678901234567890000000000000000000000001",
-  tryExecution: true,
+  addressOrEns: "0x1234567890123456789012345678901234567890",
 };
 
-const steps = client.methods.approveProposal(approveParams);
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case ApproveProposalStep.APPROVING:
-        console.log(step.txHash);
-        break;
-      case ApproveProposalStep.DONE:
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
+const canApprove = await client.methods.canApprove(canApproveParams);
+console.log(canApprove);
+/*
+true
+*/

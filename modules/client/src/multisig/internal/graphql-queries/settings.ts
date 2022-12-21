@@ -1,11 +1,12 @@
 import { gql } from "graphql-request";
 
-export const QueryMultisigMembers = gql`
-query MultisigPluginMembers($address: ID!) {
+export const QueryMultisigSettings = gql`
+query MultisigPluginSettings($address: ID!) {
     multisigPlugin(id: $address){
         members {
             address
         }
+        minApprovals
     }
 }
 `;

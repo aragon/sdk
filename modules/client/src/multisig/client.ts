@@ -4,6 +4,7 @@ import {
   IMultisigClientEncoding,
   IMultisigClientEstimation,
   IMultisigClientMethods,
+  MultisigPluginInstallParams,
 } from "./interfaces";
 import { MultisigClientMethods } from "./internal/client/methods";
 import { MultisigClientEncoding } from "./internal/client/encoding";
@@ -41,8 +42,8 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
      * @memberof MultisigClient
      */
     getPluginInstallItem: (
-      members: string[],
+      params: MultisigPluginInstallParams,
     ): IPluginInstallItem =>
-      MultisigClientEncoding.getPluginInstallItem(members),
+      MultisigClientEncoding.getPluginInstallItem(params),
   };
 }

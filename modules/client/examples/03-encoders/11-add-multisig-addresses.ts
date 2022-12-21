@@ -5,7 +5,9 @@ import {
   Context,
   ContextPlugin,
   MultisigClient,
+  UpdateAddressesParams,
 } from "@aragon/sdk-client";
+import { AddAddressesParams, RemoveAddressesParams } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -18,8 +20,13 @@ const members: string[] = [
   "0x0987654321098765432109876543210987654321",
 ];
 
-const pluginAddress = "0x0987654321098765432109876543210987654321";
-const action = client.encoding.removeMembersAction(pluginAddress, members);
+const addAddressesParams: AddAddressesParams = {
+  members,
+  minApprovals: BigInt(2),
+  pluginAddress: "0x0987654321098765432109876543210987654321",
+};
+
+const action = client.encoding.addAddressesAction(addAddressesParams);
 console.log(action);
 /*
 {

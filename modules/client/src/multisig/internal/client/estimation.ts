@@ -1,7 +1,13 @@
 import {
+  InvalidProposalIdError,
+  NoProviderError,
+  NoSignerError,
+} from "@aragon/sdk-common";
+import {
   ClientCore,
   ContextPlugin,
   GasFeeEstimation,
+  isProposalId,
 } from "../../../client-common";
 import {
   ApproveMultisigProposalParams,
@@ -21,18 +27,18 @@ export class MultisigClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *
-   * @param {CreateProposalParams} params
+   * @param {CreateMultisigProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientAddressListEstimation
+   * @memberof MultisigClientEstimation
    */
   public async createProposal(
     params: CreateMultisigProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
     // @ts-ignore
@@ -46,6 +52,8 @@ export class MultisigClientEstimation extends ClientCore
     const estimation = await multisigContract.estimateGas.createProposal(
       params.metadataUri,
       params.actions || [],
+      params.approve || false,
+      params.tryExecution || true,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
@@ -53,29 +61,68 @@ export class MultisigClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of approving a proposal
    *
-   * @param {IVoteProposalParams} params
+   * @param {ApproveMultisigProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientAddressListEstimation
+   * @memberof MultisigClientEstimation
    */
   public async approveProposal(
     params: ApproveMultisigProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
+    if (isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const pluginAddress = params.proposalId.substring(0, 42);
     // @ts-ignore
     // TODO
     // update factory
     const multisigContract = MultisigVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
     const estimation = await multisigContract.estimateGas.approveProposal(
       params.proposalId,
+      params.tryExecution,
+    );
+    return this.web3.getApproximateGasFee(estimation.toBigInt());
+  }
+  /**
+   * Estimates the gas fee of executing a proposal
+   *
+   * @param {string} proposalId
+   * @return {*}  {Promise<GasFeeEstimation>}
+   * @memberof MultisigClientEstimation
+   */
+  public async executeProposal(
+    proposalId: string,
+  ): Promise<GasFeeEstimation> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    if (isProposalId(proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+
+    const pluginAddress = proposalId.substring(0, 42);
+    // @ts-ignore
+    // TODO
+    // update factory
+    const multisigContract = MultisigVoting__factory.connect(
+      pluginAddress,
+      signer,
+    );
+
+    const estimation = await multisigContract.estimateGas.executeProposal(
+      proposalId,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

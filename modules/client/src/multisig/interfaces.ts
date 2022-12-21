@@ -1,7 +1,10 @@
 // This file contains the definitions of the AddressList DAO client
 
 import {
+  CanExecuteParams,
+  CreateProposalBaseParams,
   DaoAction,
+  ExecuteProposalStepValue,
   GasFeeEstimation,
   IClientCore,
   IInterfaceParams,
@@ -21,9 +24,15 @@ export interface IMultisigClientMethods extends IClientCore {
   pinMetadata: (params: ProposalMetadata) => Promise<string>;
   approveProposal: (
     params: ApproveMultisigProposalParams,
-  ) => AsyncGenerator<ProposalApprovalStepValue>;
-  canApprove: (addressOrEns: string) => Promise<boolean>;
-  getMembers: (addressOrEns: string) => Promise<string[]>;
+  ) => AsyncGenerator<ApproveProposalStepValue>;
+  executeProposal: (
+    proposalId: string,
+  ) => AsyncGenerator<ExecuteProposalStepValue>;
+  canApprove: (params: CanApproveParams) => Promise<boolean>;
+  canExecute: (params: CanExecuteParams) => Promise<boolean>;
+  getPluginSettings: (
+    addressOrEns: string,
+  ) => Promise<MultisigPluginSettings>;
   getProposal: (propoosalId: string) => Promise<MultisigProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
@@ -31,25 +40,26 @@ export interface IMultisigClientMethods extends IClientCore {
 }
 
 export interface IMultisigClientEncoding extends IClientCore {
-  addMembersAction: (
-    pluginAddress: string,
-    members: string[],
-  ) => DaoAction;
-  removeMembersAction: (
-    pluginAddress: string,
-    members: string[],
-  ) => DaoAction;
+  addAddressesAction: (params: AddAddressesParams) => DaoAction;
+  removeAddressesAction: (params: RemoveAddressesParams) => DaoAction;
+  updateMinApprovalsAction: (params: UpdateMinApprovalsParams) => DaoAction;
 }
 export interface IMultisigClientDecoding extends IClientCore {
-  addMembersAction: (data: Uint8Array) => string[];
-  removeMembersAction: (data: Uint8Array) => string[];
+  addAddressesAction: (data: Uint8Array) => MultisigPluginSettings;
+  removeAddressesAction: (data: Uint8Array) => MultisigPluginSettings;
+  updateMinApprovalsAction: (data: Uint8Array) => bigint;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
 export interface IMultisigClientEstimation extends IClientCore {
   createProposal: (
     params: CreateMultisigProposalParams,
   ) => Promise<GasFeeEstimation>;
-  approveProposal: (params: ApproveMultisigProposalParams) => Promise<GasFeeEstimation>;
+  approveProposal: (
+    params: ApproveMultisigProposalParams,
+  ) => Promise<GasFeeEstimation>;
+  executeProposal: (
+    proposalId: string,
+  ) => Promise<GasFeeEstimation>;
 }
 
 /** Defines the shape of the AddressList client class */
@@ -60,29 +70,44 @@ export interface IMultisigClient {
   estimation: IMultisigClientEstimation;
 }
 
-export type CreateMultisigProposalParams = {
+export type MultisigPluginInstallParams = MultisigPluginSettings;
+
+export type MultisigPluginSettings = {
+  minApprovals: bigint;
+  members: string[];
+};
+
+export type UpdateAddressesParams = MultisigPluginSettings & {
   pluginAddress: string;
-  metadataUri: string;
-  actions?: DaoAction[];
+};
+export type RemoveAddressesParams = UpdateAddressesParams;
+export type AddAddressesParams = UpdateAddressesParams;
+
+export type UpdateMinApprovalsParams = {
+  pluginAddress: string;
+  minApprovals: bigint;
+};
+
+export type CreateMultisigProposalParams = CreateProposalBaseParams & {
+  approve?: boolean;
+  tryExecution?: boolean;
 };
 
 export type ApproveMultisigProposalParams = {
-  pluginAddress: string;
   proposalId: string;
+  tryExecution: boolean;
 };
 
-export type MultisigPluginInstall = {
-  addresses: string[];
-};
+export type CanApproveParams = CanExecuteParams;
 
-export enum ApproveProposalSteps {
+export enum ApproveProposalStep {
   APPROVING = "approving",
   DONE = "done",
 }
 
-export type ProposalApprovalStepValue =
-  | { key: ApproveProposalSteps.APPROVING; txHash: string }
-  | { key: ApproveProposalSteps.DONE };
+export type ApproveProposalStepValue =
+  | { key: ApproveProposalStep.APPROVING; txHash: string }
+  | { key: ApproveProposalStep.DONE };
 
 type MultisigProposalBase = {
   id: string;
@@ -125,4 +150,11 @@ export type SubgraphMultisigProposal = SubgraphProposalBase & {
 
 export type SubgraphMultisigApprovalListItem = {
   id: string;
+};
+
+export type SubgraphMultisigPluginSettings = {
+  members: {
+    address: string;
+  }[];
+  minApprovals: string;
 };

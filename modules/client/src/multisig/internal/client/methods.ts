@@ -12,20 +12,28 @@ import {
 import { isAddress } from "@ethersproject/address";
 import {
   ApproveMultisigProposalParams,
+  ApproveProposalStep,
+  ApproveProposalStepValue,
+  CanApproveParams,
   CreateMultisigProposalParams,
   IMultisigClientMethods,
+  MultisigPluginSettings,
   MultisigProposal,
   MultisigProposalListItem,
-  ApproveProposalSteps,
-  ProposalApprovalStepValue,
+  SubgraphMultisigPluginSettings,
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
 } from "../../interfaces";
 import {
+  CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
+  ExecuteProposalStep,
+  ExecuteProposalStepValue,
+  findEventLog,
   IProposalQueryParams,
+  isProposalId,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
@@ -36,13 +44,14 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { id } from "@ethersproject/hash";
-import { hexZeroPad } from "@ethersproject/bytes";
 // @ts-ignore
 // todo fix new contracts-ethers
 import { MultisigVoting__factory } from "@aragon/core-contracts-ethers";
-import { QueryMultisigMembers } from "../graphql-queries/members";
-import { QueryMultisigProposal, QueryMultisigProposals } from "../graphql-queries/proposal";
+import { QueryMultisigSettings } from "../graphql-queries/settings";
+import {
+  QueryMultisigProposal,
+  QueryMultisigProposals,
+} from "../graphql-queries/proposal";
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 
 /**
@@ -81,6 +90,8 @@ export class MultisigClientMethods extends ClientCore
     const tx = await multisigContract.createProposal(
       params.metadataUri,
       params.actions || [],
+      params.approve || false,
+      params.tryExecution || true,
     );
 
     yield {
@@ -91,29 +102,24 @@ export class MultisigClientMethods extends ClientCore
     const receipt = await tx.wait();
     const multisigContractInterface = MultisigVoting__factory
       .createInterface();
-      // @ts-ignore
-      // TODO automatically fixed when new contracts lib
-    const log = receipt.logs.find((log) =>
-      log.topics[0] ===
-        id(
-          multisigContractInterface.getEvent("VoteCreated").format(
-            "sighash",
-          ),
-        )
+    const log = findEventLog(
+      "ProposalCreated",
+      receipt,
+      multisigContractInterface,
     );
-
     if (!log) {
       throw new ProposalCreationError();
     }
 
     const parsedLog = multisigContractInterface.parseLog(log);
-    if (!parsedLog.args["pro"]) {
+    const proposalId = parsedLog.args["proposalId"];
+    if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: hexZeroPad(parsedLog.args["voteId"].toHexString(), 32),
+      proposalId,
     };
   }
 
@@ -142,31 +148,76 @@ export class MultisigClientMethods extends ClientCore
    */
   public async *approveProposal(
     params: ApproveMultisigProposalParams,
-  ): AsyncGenerator<ProposalApprovalStepValue> {
+  ): AsyncGenerator<ApproveProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+    if (isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const pluginAddress = params.proposalId.substring(0, 42);
     const multisigContract = MultisigVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
     const tx = await multisigContract.approveProposal(
       params.proposalId,
+      params.tryExecution,
     );
 
     yield {
-      key: ApproveProposalSteps.APPROVING,
+      key: ApproveProposalStep.APPROVING,
       txHash: tx.hash,
     };
 
     await tx.wait();
 
     yield {
-      key: ApproveProposalSteps.DONE,
+      key: ApproveProposalStep.DONE,
+    };
+  }
+  /**
+   * Allow a wallet in the multisig give approval to a proposal
+   *
+   * @param {string} proposalId
+   * @return {*}  {AsyncGenerator<ExecuteMultisigProposalStepValue>}
+   * @memberof MultisigClientMethods
+   */
+  public async *executeProposal(
+    proposalId: string,
+  ): AsyncGenerator<ExecuteProposalStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    if (isProposalId(proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const pluginAddress = proposalId.substring(0, 42);
+    const multisigContract = MultisigVoting__factory.connect(
+      pluginAddress,
+      signer,
+    );
+
+    const tx = await multisigContract.execute(
+      proposalId,
+    );
+
+    yield {
+      key: ExecuteProposalStep.EXECUTING,
+      txHash: tx.hash,
+    };
+
+    await tx.wait();
+
+    yield {
+      key: ExecuteProposalStep.DONE,
     };
   }
 
@@ -178,7 +229,7 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async canApprove(
-    addressOrEns: string,
+    params: CanApproveParams,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -186,28 +237,66 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-
     // TODO
     // update this with yup validation
-    if (!isAddress(addressOrEns)) {
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    if (!isAddress(params.addressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
 
+    const pluginAddress = params.proposalId.substring(0, 42);
     const multisigContract = MultisigVoting__factory.connect(
-      addressOrEns,
+      pluginAddress,
       signer,
     );
 
-    return multisigContract.canApprove();
+    return multisigContract.canApprove(params.proposalId, params.addressOrEns);
   }
   /**
-   * Checks if an user can vote in a proposal
+   * Returns the list of wallet addresses with signing capabilities on the plugin
    *
    * @param {string} addressOrEns
-   * @return {*}  {Promise<string[]>}
+   * @return {*}  {Promise<boolean>}
    * @memberof MultisigClientMethods
    */
-  public async getMembers(addressOrEns: string): Promise<string[]> {
+  public async canExecute(
+    params: CanExecuteParams,
+  ): Promise<boolean> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    // TODO
+    // update this with yup validation
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    if (!isAddress(params.addressOrEns)) {
+      throw new InvalidAddressOrEnsError();
+    }
+
+    const pluginAddress = params.proposalId.substring(0, 42);
+    const multisigContract = MultisigVoting__factory.connect(
+      pluginAddress,
+      signer,
+    );
+
+    return multisigContract.canApprove(params.proposalId, params.addressOrEns);
+  }
+  /**
+   * returns the plugin settings
+   *
+   * @param {string} addressOrEns
+   * @return {*}  {Promise<MultisigPluginInstallParams>}
+   * @memberof MultisigClientMethods
+   */
+  public async getPluginSettings(
+    addressOrEns: string,
+  ): Promise<MultisigPluginSettings> {
     // TODO
     // update this with yup validation
     if (!isAddress(addressOrEns)) {
@@ -216,12 +305,17 @@ export class MultisigClientMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const response = await client.request(QueryMultisigMembers, {
+      const { multisigPlugin }: {
+        multisigPlugin: SubgraphMultisigPluginSettings;
+      } = await client.request(QueryMultisigSettings, {
         addressOrEns,
       });
-      return response.addresslistPlugin.members.map((
-        member: { address: string },
-      ) => member.address);
+      return {
+        minApprovals: BigInt(multisigPlugin.minApprovals),
+        members: multisigPlugin.members.map((
+          member: { address: string },
+        ) => member.address),
+      };
     } catch {
       throw new GraphQLError("Multisig members");
     }
