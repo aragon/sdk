@@ -2,14 +2,14 @@ import { bytesToHex, UnexpectedActionError } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
-  decodeUpdatePluginSettingsAction,
+  decodeUpdateVotingSettingsAction,
   getFunctionFragment,
   IInterfaceParams,
-  IPluginSettings,
+  VotingSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { IClientAddressListDecoding } from "../../interfaces";
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 
 /**
  * Decoding module for the SDK AddressList Client
@@ -26,11 +26,11 @@ export class ClientAddressListDecoding extends ClientCore
    * Decodes a dao metadata from an encoded update metadata action
    *
    * @param {Uint8Array} data
-   * @return {*}  {IPluginSettings}
+   * @return {*}  {VotingSettings}
    * @memberof ClientAddressListDecoding
    */
-  public updatePluginSettingsAction(data: Uint8Array): IPluginSettings {
-    return decodeUpdatePluginSettingsAction(data);
+  public updateVotingSettingsAction(data: Uint8Array): VotingSettings {
+    return decodeUpdateVotingSettingsAction(data);
   }
   /**
    * Decodes a list of addresses from an encoded add members action
@@ -40,19 +40,17 @@ export class ClientAddressListDecoding extends ClientCore
    * @memberof ClientAddressListDecoding
    */
   public addMembersAction(data: Uint8Array): string[] {
-    const votingInterface = AllowlistVoting__factory.createInterface();
+    const votingInterface = AddresslistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
-    // TODO: Rename to `addAddresses` as soon as the plugin is updated
-    const expectedfunction = votingInterface.getFunction("addAllowedUsers");
+    const expectedfunction = votingInterface.getFunction("addAddresses");
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
     const result = votingInterface.decodeFunctionData(
-      // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addAllowedUsers",
+      "addAddresses",
       data,
     );
     return result[0];
@@ -65,21 +63,19 @@ export class ClientAddressListDecoding extends ClientCore
    * @memberof ClientAddressListDecoding
    */
   public removeMembersAction(data: Uint8Array): string[] {
-    const votingInterface = AllowlistVoting__factory.createInterface();
+    const votingInterface = AddresslistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
     const expectedfunction = votingInterface.getFunction(
-      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
+      "removeAddresses",
     );
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
     const result = votingInterface.decodeFunctionData(
-      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
+      "removeAddresses",
       data,
     );
     return result[0];

@@ -284,17 +284,17 @@ describe("Client Address List", () => {
         expect(typeof proposal.result.abstain).toBe("number");
         // setttings
         expect(typeof proposal.settings.duration).toBe("number");
-        expect(typeof proposal.settings.minSupport).toBe("number");
-        expect(typeof proposal.settings.minTurnout).toBe("number");
+        expect(typeof proposal.settings.supportThreshold).toBe("number");
+        expect(typeof proposal.settings.minParticipation).toBe("number");
         // TODO
         // enable this tests when the subgrph have the correcto precision digits
         // expect(
-        //   proposal.settings.minSupport >= 0 &&
-        //     proposal.settings.minSupport <= 1,
+        //   proposal.settings.supportThreshold >= 0 &&
+        //     proposal.settings.supportThreshold <= 1,
         // ).toBe(true);
         // expect(
-        //   proposal.settings.minTurnout >= 0 &&
-        //     proposal.settings.minTurnout <= 1,
+        //   proposal.settings.minParticipation >= 0 &&
+        //     proposal.settings.minParticipation <= 1,
         // ).toBe(true);
         // token
         expect(typeof proposal.totalVotingWeight).toBe("number");
@@ -414,10 +414,10 @@ describe("Client Address List", () => {
       expect(settings === null).toBe(false);
       if (settings) {
         expect(typeof settings.minDuration).toBe("number");
-        expect(typeof settings.minSupport).toBe("number");
-        expect(typeof settings.minTurnout).toBe("number");
-        expect(settings.minSupport).toBeLessThanOrEqual(1);
-        expect(settings.minTurnout).toBeLessThanOrEqual(1);
+        expect(typeof settings.supportThreshold).toBe("number");
+        expect(typeof settings.minParticipation).toBe("number");
+        expect(settings.supportThreshold).toBeLessThanOrEqual(1);
+        expect(settings.minParticipation).toBeLessThanOrEqual(1);
       }
     });
   });

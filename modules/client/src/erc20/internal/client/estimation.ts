@@ -1,4 +1,4 @@
-import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
+import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
 import {
   ClientCore,
   ContextPlugin,
@@ -36,7 +36,7 @@ export class ClientErc20Estimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const erc20Contract = ERC20Voting__factory.connect(
+    const erc20Contract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -70,7 +70,7 @@ export class ClientErc20Estimation extends ClientCore
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    const erc20VotingContract = ERC20Voting__factory.connect(
+    const erc20VotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -100,7 +100,7 @@ export class ClientErc20Estimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const erc20VotingContract = ERC20Voting__factory.connect(
+    const erc20VotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );

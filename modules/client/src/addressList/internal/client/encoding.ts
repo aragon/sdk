@@ -4,17 +4,20 @@ import {
   ClientCore,
   ContextPlugin,
   DaoAction,
-  encodeUpdatePluginSettingsAction,
+  encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
-  IPluginSettings,
+  VotingSettings,
 } from "../../../client-common";
 import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
   IAddressListPluginInstall,
   IClientAddressListEncoding,
 } from "../../interfaces";
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import {
+  AddresslistVoting__factory,
+} from "@aragon/core-contracts-ethers";
 import { addressListInitParamsToContract } from "../utils";
+import { defaultAbiCoder } from "@ethersproject/abi";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -36,19 +39,16 @@ export class ClientAddressListEncoding extends ClientCore
    * @memberof ClientAddressListEncoding
    */
   static getPluginInstallItem(
-    params: IAddressListPluginInstall
+    params: IAddressListPluginInstall,
   ): IPluginInstallItem {
-    const addressListVotingInterface = AllowlistVoting__factory.createInterface();
     const args = addressListInitParamsToContract(params);
-    // get hex bytes
-    const hexBytes = addressListVotingInterface.encodeFunctionData(
-      "initialize",
-      args
+    const data = defaultAbiCoder.encode(
+      ["tuple(uint8,uint64,uint64,uint256)", "address[]"],
+      args,
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: ADDRESSLIST_PLUGIN_ID,
-      data,
+      data: hexToBytes(strip0x(data)),
     };
   }
 
@@ -56,13 +56,13 @@ export class ClientAddressListEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *
    * @param {string} pluginAddress
-   * @param {IPluginSettings} params
+   * @param {VotingSettings} params
    * @return {*}  {DaoAction}
    * @memberof ClientAddressListEncoding
    */
-  public updatePluginSettingsAction(
+  public updateVotingSettingsAction(
     pluginAddress: string,
-    params: IPluginSettings
+    params: VotingSettings,
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new Error("Invalid plugin address");
@@ -71,7 +71,7 @@ export class ClientAddressListEncoding extends ClientCore
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data: encodeUpdatePluginSettingsAction(params),
+      data: encodeUpdateVotingSettingsAction(params),
     };
   }
   /**
@@ -91,12 +91,11 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = AllowlistVoting__factory.createInterface();
+    const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
-      // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addAllowedUsers",
-      [members]
+      "addAddresses",
+      [members],
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
@@ -115,7 +114,7 @@ export class ClientAddressListEncoding extends ClientCore
    */
   public removeMembersAction(
     pluginAddress: string,
-    members: string[]
+    members: string[],
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -125,12 +124,11 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = AllowlistVoting__factory.createInterface();
+    const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
-      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
-      [members]
+      "removeAddresses",
+      [members],
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {

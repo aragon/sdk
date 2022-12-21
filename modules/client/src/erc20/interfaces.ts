@@ -9,7 +9,7 @@ import {
   ICreateProposalParams,
   IExecuteProposalParams,
   IInterfaceParams,
-  IPluginSettings,
+  VotingSettings,
   IProposalQueryParams,
   IProposalSettings,
   IVoteProposalParams,
@@ -22,6 +22,7 @@ import {
   SubgraphVoterListItemBase,
   VoteProposalStepValue,
   VoteValues,
+  ContractVotingSettings,
 } from "../client-common";
 
 // ERC20
@@ -43,14 +44,14 @@ export interface IClientErc20Methods extends IClientCore {
   getProposals: (
     params: IProposalQueryParams,
   ) => Promise<Erc20ProposalListItem[]>;
-  getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
+  getSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
   getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
 }
 
 export interface IClientErc20Encoding extends IClientCore {
-  updatePluginSettingsAction: (
+  updateVotingSettingsAction: (
     pluginAddress: string,
-    params: IPluginSettings,
+    params: VotingSettings,
   ) => DaoAction;
   mintTokenAction: (
     minterAddress: string,
@@ -58,7 +59,7 @@ export interface IClientErc20Encoding extends IClientCore {
   ) => DaoAction;
 }
 export interface IClientErc20Decoding extends IClientCore {
-  updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings;
+  updateVotingSettingsAction: (data: Uint8Array) => VotingSettings;
   mintTokenAction: (data: Uint8Array) => IMintTokenParams;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
@@ -82,7 +83,7 @@ export interface IClientErc20 {
 // Factory init params
 
 export type IErc20PluginInstall = {
-  settings: IPluginSettings;
+  settings: VotingSettings;
   newToken?: NewTokenParams;
   useToken?: ExistingTokenParams;
 };
@@ -158,6 +159,8 @@ export interface IMintTokenParams {
 
 export type ContractMintTokenParams = [string, BigNumber];
 export type ContractErc20InitParams = [
+  ContractVotingSettings,
+  
   string, // dao address
   BigNumber, // participation
   BigNumber, // support

@@ -6,7 +6,7 @@ import {
   Context,
   ContextPlugin,
   ICreateProposalParams,
-  IPluginSettings,
+  VotingSettings,
   ProposalCreationSteps,
   VoteValues,
 } from "@aragon/sdk-client";
@@ -20,15 +20,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientAddressList(contextPlugin);
 
 // create config action
-const configActionPrarms: IPluginSettings = {
+const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24,
-  minSupport: 0.3, // 30%
-  minTurnout: 0.5, // 50%
+  supportThreshold: 0.3, // 30%
+  minParticipation: 0.5, // 50%
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-const configAction = client.encoding.updatePluginSettingsAction(
+const configAction = client.encoding.updateVotingSettingsAction(
   pluginAddress,
   configActionPrarms,
 );

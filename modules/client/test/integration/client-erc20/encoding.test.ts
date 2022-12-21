@@ -7,7 +7,7 @@ import {
   ContextPlugin,
   IErc20PluginInstall,
   IMintTokenParams,
-  IPluginSettings,
+  VotingSettings,
 } from "../../../src";
 
 import { AddressZero } from "@ethersproject/constants";
@@ -20,8 +20,8 @@ describe("Client ERC20", () => {
       const initParams: IErc20PluginInstall = {
         settings: {
           minDuration: 7200,
-          minTurnout: 0.5,
-          minSupport: 0.5,
+          minParticipation: 0.5,
+          supportThreshold: 0.5,
         },
         useToken: {
           address: AddressZero,
@@ -38,38 +38,38 @@ describe("Client ERC20", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
-      const params: IPluginSettings = {
+      const params: VotingSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
       };
 
       const pluginAddress = "0xinvalid_address";
       expect(() =>
-        client.encoding.updatePluginSettingsAction(pluginAddress, params)
+        client.encoding.updateVotingSettingsAction(pluginAddress, params)
       ).toThrow("Invalid plugin address");
     });
     it("Should encode an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
-      const params: IPluginSettings = {
+      const params: VotingSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(
+      const updateVotingSettingsAction = client.encoding
+        .updateVotingSettingsAction(
           pluginAddress,
           params,
         );
 
-      expect(typeof updatePluginSettingsAction).toBe("object");
-      expect(updatePluginSettingsAction.data).toBeInstanceOf(Uint8Array);
-      expect(updatePluginSettingsAction.to).toBe(pluginAddress);
+      expect(typeof updateVotingSettingsAction).toBe("object");
+      expect(updateVotingSettingsAction.data).toBeInstanceOf(Uint8Array);
+      expect(updateVotingSettingsAction.to).toBe(pluginAddress);
     });
     it("Should encode a mint action with an invalid recipient address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);

@@ -5,7 +5,7 @@ import {
   ClientErc20,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -14,15 +14,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientErc20(contextPlugin);
 
 // create config action
-const configActionPrarms: IPluginSettings = {
+const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24,
-  minSupport: 0.3, // 30%
-  minTurnout: 0.5, // 50%
+  supportThreshold: 0.3, // 30%
+  minParticipation: 0.5, // 50%
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-const configAction = client.encoding.updatePluginSettingsAction(
+const configAction = client.encoding.updateVotingSettingsAction(
   pluginAddress,
   configActionPrarms,
 );

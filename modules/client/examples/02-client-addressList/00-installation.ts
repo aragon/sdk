@@ -21,8 +21,8 @@ const client: Client = new Client(context);
 const pluginInitParams: IAddressListPluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24, // seconds
-    minTurnout: 0.25, // 25%
-    minSupport: 0.5, // 50%
+    minParticipation: 0.25, // 25%
+    supportThreshold: 0.5, // 50%
   },
   addresses: [
     "0x1234567890123456789012345678901234567890",

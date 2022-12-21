@@ -19,8 +19,8 @@ TEMPLATE:
 
 ### Changed
 - Removes Changelog update from javascript publish workflow
-- Fix `minSupport` and `minTurnout` return values in `erc20.getSettings()`
-- Fix `minSupport` and `minTurnout` return values in `addresslist.getSettings()`
+- Fix `minSupport` and `minParticipation` return values in `erc20.getSettings()`
+- Fix `minSupport` and `minParticipation` return values in `addresslist.getSettings()`
 
 ## [0.16.1-alpha]
 ### Changed

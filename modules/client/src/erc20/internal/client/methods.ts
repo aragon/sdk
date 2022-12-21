@@ -17,10 +17,10 @@ import {
   ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
+  findEventLog,
   ICanVoteParams,
   ICreateProposalParams,
   IExecuteProposalParams,
-  IPluginSettings,
   IProposalQueryParams,
   isProposalId,
   IVoteProposalParams,
@@ -31,6 +31,7 @@ import {
   SortDirection,
   VoteProposalStep,
   VoteProposalStepValue,
+  VotingSettings,
 } from "../../../client-common";
 import {
   Erc20Proposal,
@@ -42,14 +43,13 @@ import {
 } from "../../interfaces";
 import {
   QueryErc20Members,
-  QueryErc20PluginSettings,
   QueryErc20Proposal,
   QueryErc20Proposals,
+  QueryErc20VotingSettings,
   QueryToken,
 } from "../graphql-queries";
 import { toErc20Proposal, toErc20ProposalListItem } from "../utils";
-import { ERC20Voting__factory } from "@aragon/core-contracts-ethers";
-import { id } from "@ethersproject/hash";
+import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
 import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
@@ -83,7 +83,7 @@ export class ClientErc20Methods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const erc20Contract = ERC20Voting__factory.connect(
+    const erc20Contract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -91,7 +91,7 @@ export class ClientErc20Methods extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const tx = await erc20Contract.createVote(
+    const tx = await erc20Contract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
@@ -106,28 +106,24 @@ export class ClientErc20Methods extends ClientCore
     };
 
     const receipt = await tx.wait();
-    const erc20VotingContractInterface = ERC20Voting__factory.createInterface();
-    const log = receipt.logs.find(
-      (log) =>
-        log.topics[0] ===
-          id(
-            erc20VotingContractInterface.getEvent("VoteCreated").format(
-              "sighash",
-            ),
-          ),
+    const erc20VotingContractInterface = TokenVoting__factory.createInterface();
+    const log = findEventLog(
+      "ProposalCreated",
+      receipt,
+      erc20VotingContractInterface,
     );
     if (!log) {
       throw new ProposalCreationError();
     }
 
     const parsedLog = erc20VotingContractInterface.parseLog(log);
-    if (!parsedLog.args["voteId"]) {
+    if (!parsedLog.args["proposalId"]) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: hexZeroPad(parsedLog.args["voteId"].toHexString(), 32),
+      proposalId: hexZeroPad(parsedLog.args["proposalId"].toHexString(), 32),
     };
   }
 
@@ -165,7 +161,7 @@ export class ClientErc20Methods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const erc20VotingContract = ERC20Voting__factory.connect(
+    const erc20VotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -205,7 +201,7 @@ export class ClientErc20Methods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const erc20VotingContract = ERC20Voting__factory.connect(
+    const erc20VotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -235,7 +231,7 @@ export class ClientErc20Methods extends ClientCore
       throw new InvalidAddressError();
     }
 
-    const erc20VotingContract = ERC20Voting__factory.connect(
+    const erc20VotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -404,12 +400,12 @@ export class ClientErc20Methods extends ClientCore
    * Returns the settings of a plugin given the address of the plugin instance
    *
    * @param {string} pluginAddress
-   * @return {*}  {Promise<IPluginSettings>}
+   * @return {*}  {Promise<VotingSettings>}
    * @memberof ClientErc20
    */
   public async getSettings(
     pluginAddress: string,
-  ): Promise<IPluginSettings | null> {
+  ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -417,7 +413,7 @@ export class ClientErc20Methods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { erc20VotingPlugin } = await client.request(
-        QueryErc20PluginSettings,
+        QueryErc20VotingSettings,
         {
           address: pluginAddress,
         },
@@ -427,13 +423,13 @@ export class ClientErc20Methods extends ClientCore
       }
       return {
         minDuration: parseInt(erc20VotingPlugin.minDuration),
-        minSupport: decodeRatio(
+        supportThreshold: decodeRatio(
           parseFloat(
             erc20VotingPlugin.totalSupportThresholdPct,
           ),
           2,
         ),
-        minTurnout: decodeRatio(
+        minParticipation: decodeRatio(
           parseFloat(
             erc20VotingPlugin.relativeSupportThresholdPct,
           ),

@@ -6,7 +6,7 @@ import {
   Context,
   ContextPlugin,
   IAddressListPluginInstall,
-  IPluginSettings,
+  VotingSettings,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
@@ -16,8 +16,8 @@ describe("Client Address List", () => {
       const withdrawParams: IAddressListPluginInstall = {
         settings: {
           minDuration: 7200, // seconds
-          minTurnout: 0.5,
-          minSupport: 0.5,
+          minParticipation: 0.5,
+          supportThreshold: 0.5,
         },
         addresses: [
           "0x1234567890123456789012345678901234567890",
@@ -42,15 +42,15 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientAddressList(ctxPlugin);
 
-      const pluginConfigParams: IPluginSettings = {
+      const pluginConfigParams: VotingSettings = {
         minDuration: 100000,
-        minTurnout: 0.25,
-        minSupport: 0.51,
+        minParticipation: 0.25,
+        supportThreshold: 0.51,
       };
 
       const pluginAddress = "0xinvalid_address";
       expect(() =>
-        client.encoding.updatePluginSettingsAction(
+        client.encoding.updateVotingSettingsAction(
           pluginAddress,
           pluginConfigParams,
         )
@@ -62,15 +62,15 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientAddressList(ctxPlugin);
 
-      const pluginConfigParams: IPluginSettings = {
+      const pluginConfigParams: VotingSettings = {
         minDuration: 100000,
-        minTurnout: 0.25,
-        minSupport: 0.51,
+        minParticipation: 0.25,
+        supportThreshold: 0.51,
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const installPluginItemItem = client.encoding.updatePluginSettingsAction(
+      const installPluginItemItem = client.encoding.updateVotingSettingsAction(
         pluginAddress,
         pluginConfigParams,
       );

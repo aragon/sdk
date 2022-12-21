@@ -2,10 +2,10 @@ import { bytesToHex, UnexpectedActionError } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
-  decodeUpdatePluginSettingsAction,
+  decodeUpdateVotingSettingsAction,
   getFunctionFragment,
   IInterfaceParams,
-  IPluginSettings,
+  VotingSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { IClientErc20Decoding, IMintTokenParams } from "../../interfaces";
@@ -26,11 +26,11 @@ export class ClientErc20Decoding extends ClientCore
    * Decodes a dao metadata from an encoded update metadata action
    *
    * @param {Uint8Array} data
-   * @return {*}  {IPluginSettings}
+   * @return {*}  {VotingSettings}
    * @memberof ClientErc20Decoding
    */
-  public updatePluginSettingsAction(data: Uint8Array): IPluginSettings {
-    return decodeUpdatePluginSettingsAction(data);
+  public updateVotingSettingsAction(data: Uint8Array): VotingSettings {
+    return decodeUpdateVotingSettingsAction(data);
   }
   /**
    * Decodes the mint token params from an encoded mint token action

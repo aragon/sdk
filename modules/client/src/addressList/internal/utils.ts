@@ -8,6 +8,7 @@ import {
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,
+  VotingMode,
 } from "../../client-common";
 import {
   AddressListProposal,
@@ -69,19 +70,19 @@ export function toAddressListProposal(
       // subgraph values are 18 digits precision. Uncomment below for 2 digits
       // precision
 
-      // minSupport: decodeRatio(
+      // supportThreshold: decodeRatio(
       //   BigInt(proposal.totalSupportThresholdPct),
       //   2,
       // ),
-      // minTurnout: decodeRatio(
+      // minParticipation: decodeRatio(
       //   BigInt(proposal.relativeSupportThresholdPct),
       //   2,
       // ),
       // TODO DELETE ME
-      minSupport: parseFloat(
+      supportThreshold: parseFloat(
         proposal.totalSupportThresholdPct,
       ),
-      minTurnout: parseFloat(
+      minParticipation: parseFloat(
         proposal.relativeSupportThresholdPct,
       ),
       duration: parseInt(proposal.endDate) -
@@ -135,10 +136,10 @@ export function addressListInitParamsToContract(
   // not sure if the IDao and gsn params will be needed after
   // this is converted into a plugin
   return [
-    AddressZero,
-    BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
-    BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
-    BigNumber.from(params.settings.minDuration),
+    [params.votingSettings.votingMode || VotingMode.STANDARD,
+    BigNumber.from(encodeRatio(params.votingSettings.minParticipation, 2)),
+    BigNumber.from(encodeRatio(params.votingSettings.supportThreshold, 2)),
+    BigNumber.from(params.votingSettings.minDuration)],
     params.addresses,
   ];
 }

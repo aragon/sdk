@@ -29,8 +29,8 @@ const client: Client = new Client(context);
 const pluginInitParams1: IErc20PluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
-    minTurnout: 0.25, // 25%
-    minSupport: 0.5, // 50%
+    minParticipation: 0.25, // 25%
+    supportThreshold: 0.5, // 50%
   },
   useToken: {
     address: "0x...",
@@ -40,8 +40,8 @@ const pluginInitParams1: IErc20PluginInstall = {
 const pluginInitParams2: IErc20PluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24, // seconds
-    minTurnout: 0.4, // 40%
-    minSupport: 0.55, // 55%
+    minParticipation: 0.4, // 40%
+    supportThreshold: 0.55, // 55%
   },
   newToken: {
     name: "Token",

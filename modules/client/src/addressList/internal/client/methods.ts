@@ -24,10 +24,10 @@ import {
   ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
+  findEventLog,
   ICanVoteParams,
   ICreateProposalParams,
   IExecuteProposalParams,
-  IPluginSettings,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -37,15 +37,15 @@ import {
   SortDirection,
   VoteProposalStep,
   VoteProposalStepValue,
+  VotingSettings,
 } from "../../../client-common";
 import {
   QueryAddressListProposal,
   QueryAddressListProposals,
 } from "../graphql-queries/proposal";
 import { toAddressListProposal, toAddressListProposalListItem } from "../utils";
-import { QueryAddressListPluginSettings } from "../graphql-queries/settings";
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
-import { id } from "@ethersproject/hash";
+import { QueryAddressListVotingSettings } from "../graphql-queries/settings";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
@@ -81,7 +81,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -89,7 +89,7 @@ export class ClientAddressListMethods extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const tx = await addresslistContract.createVote(
+    const tx = await addresslistContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
@@ -104,23 +104,19 @@ export class ClientAddressListMethods extends ClientCore
     };
 
     const receipt = await tx.wait();
-    const addresslistContractInterface = AllowlistVoting__factory
+    const addresslistContractInterface = AddresslistVoting__factory
       .createInterface();
-    const log = receipt.logs.find(
-      (log) =>
-        log.topics[0] ===
-          id(
-            addresslistContractInterface.getEvent("VoteCreated").format(
-              "sighash",
-            ),
-          ),
+    const log = findEventLog(
+      "ProposalCreated",
+      receipt,
+      addresslistContractInterface,
     );
     if (!log) {
       throw new ProposalCreationError();
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
-    if (!parsedLog.args["voteId"]) {
+    if (!parsedLog.args["proposalId"]) {
       throw new ProposalCreationError();
     }
 
@@ -163,7 +159,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -204,7 +200,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -234,7 +230,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new InvalidAddressError();
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -410,12 +406,12 @@ export class ClientAddressListMethods extends ClientCore
    * Returns the settings of a plugin given the address of the plugin instance
    *
    * @param {string} pluginAddress
-   * @return {*}  {(Promise<IPluginSettings | null>)}
+   * @return {*}  {(Promise<VotingSettings | null>)}
    * @memberof ClientAddressListMethods
    */
   public async getSettings(
     pluginAddress: string,
-  ): Promise<IPluginSettings | null> {
+  ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -423,7 +419,7 @@ export class ClientAddressListMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { addresslistPlugin } = await client.request(
-        QueryAddressListPluginSettings,
+        QueryAddressListVotingSettings,
         {
           address: pluginAddress,
         },
@@ -433,11 +429,11 @@ export class ClientAddressListMethods extends ClientCore
       }
       return {
         minDuration: parseInt(addresslistPlugin.minDuration),
-        minSupport: decodeRatio(
+        supportThreshold: decodeRatio(
           parseFloat(addresslistPlugin.totalSupportThresholdPct),
           2,
         ),
-        minTurnout: decodeRatio(
+        minParticipation: decodeRatio(
           parseFloat(addresslistPlugin.relativeSupportThresholdPct),
           2,
         ),

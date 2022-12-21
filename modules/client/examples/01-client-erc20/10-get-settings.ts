@@ -5,7 +5,7 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -18,14 +18,14 @@ const client = new ClientAddressList(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const settings: IPluginSettings | null = await client.methods.getSettings(
+const settings: VotingSettings | null = await client.methods.getSettings(
   pluginAddress,
 );
 console.log(settings);
 /*
   {
     minDuration: 7200,
-    minTurnout: 0.55,
-    minSupport: 0.25
+    minParticipation: 0.55,
+    supportThreshold: 0.25
   }
 */

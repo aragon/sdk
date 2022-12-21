@@ -3,9 +3,9 @@ import {
   ClientCore,
   ContextPlugin,
   DaoAction,
-  encodeUpdatePluginSettingsAction,
+  encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
-  IPluginSettings,
+  VotingSettings,
 } from "../../../client-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -15,10 +15,11 @@ import {
 } from "../../interfaces";
 import { ERC20_PLUGIN_ID } from "../constants";
 import {
-  ERC20Voting__factory,
   IERC20MintableUpgradeable__factory,
 } from "@aragon/core-contracts-ethers";
 import { erc20InitParamsToContract, mintTokenParamsToContract } from "../utils";
+import { defaultAbiCoder } from "@ethersproject/abi";
+
 /**
  * Encoding module the SDK ERC20 Client
  */
@@ -38,31 +39,27 @@ export class ClientErc20Encoding extends ClientCore
    * @memberof ClientErc20Encoding
    */
   static getPluginInstallItem(params: IErc20PluginInstall): IPluginInstallItem {
-    const erc20votingInterface = ERC20Voting__factory.createInterface();
     const args = erc20InitParamsToContract(params);
-    // get hex bytes
-    const hexBytes = erc20votingInterface.encodeFunctionData(
-      "initialize",
+    const data = defaultAbiCoder.encode(
+      ["tuple(uint8,uint64,uint64,uint256)", "address[]"],
       args,
     );
-    // Strip 0x => encode in Uint8Array
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: ERC20_PLUGIN_ID,
-      data,
+      data: hexToBytes(strip0x(data)),
     };
   }
   /**
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *
    * @param {string} pluginAddress
-   * @param {IPluginSettings} params
+   * @param {VotingSettings} params
    * @return {*}  {DaoAction}
    * @memberof ClientErc20Encoding
    */
-  public updatePluginSettingsAction(
+  public updateVotingSettingsAction(
     pluginAddress: string,
-    params: IPluginSettings,
+    params: VotingSettings,
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new Error("Invalid plugin address");
@@ -71,7 +68,7 @@ export class ClientErc20Encoding extends ClientCore
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data: encodeUpdatePluginSettingsAction(params),
+      data: encodeUpdateVotingSettingsAction(params),
     };
   }
 

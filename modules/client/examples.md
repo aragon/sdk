@@ -477,8 +477,8 @@ const client: Client = new Client(context);
 const pluginInitParams1: IErc20PluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
-    minTurnout: 0.25, // 25%
-    minSupport: 0.5, // 50%
+    minParticipation: 0.25, // 25%
+    supportThreshold: 0.5, // 50%
   },
   useToken: {
     address: "0x...",
@@ -488,8 +488,8 @@ const pluginInitParams1: IErc20PluginInstall = {
 const pluginInitParams2: IErc20PluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24, // seconds
-    minTurnout: 0.4, // 40%
-    minSupport: 0.55, // 55%
+    minParticipation: 0.4, // 40%
+    supportThreshold: 0.55, // 55%
   },
   newToken: {
     name: "Token",
@@ -667,7 +667,7 @@ import {
   Context,
   ContextPlugin,
   ICreateProposalParams,
-  IPluginSettings,
+  VotingSettings,
   ProposalCreationSteps,
   VoteValues,
 } from "@aragon/sdk-client";
@@ -681,15 +681,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientErc20(contextPlugin);
 
 // create config action
-const configActionPrarms: IPluginSettings = {
+const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24,
-  minSupport: 0.3, // 30%
-  minTurnout: 0.5, // 50%
+  supportThreshold: 0.3, // 30%
+  minParticipation: 0.5, // 50%
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-const configAction = client.encoding.updatePluginSettingsAction(
+const configAction = client.encoding.updateVotingSettingsAction(
   pluginAddress,
   configActionPrarms,
 );
@@ -912,8 +912,8 @@ console.log(proposal);
     abstain: 0n
   }
   settings:{
-    minTurnout: 0.5,
-    minSupport: 0.25,
+    minParticipation: 0.5,
+    supportThreshold: 0.25,
     minDuration: 7200
   },
   token: {
@@ -1041,7 +1041,7 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -1054,15 +1054,15 @@ const client = new ClientAddressList(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const settings: IPluginSettings | null = await client.methods.getSettings(
+const settings: VotingSettings | null = await client.methods.getSettings(
   pluginAddress,
 );
 console.log(settings);
 /*
   {
     minDuration: 7200,
-    minTurnout: 0.55,
-    minSupport: 0.25
+    minParticipation: 0.55,
+    supportThreshold: 0.25
   }
 */
 ```
@@ -1124,8 +1124,8 @@ const client: Client = new Client(context);
 const pluginInitParams: IAddressListPluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24, // seconds
-    minTurnout: 0.25, // 25%
-    minSupport: 0.5, // 50%
+    minParticipation: 0.25, // 25%
+    supportThreshold: 0.5, // 50%
   },
   addresses: [
     "0x1234567890123456789012345678901234567890",
@@ -1286,7 +1286,7 @@ import {
   Context,
   ContextPlugin,
   ICreateProposalParams,
-  IPluginSettings,
+  VotingSettings,
   ProposalCreationSteps,
   VoteValues,
 } from "@aragon/sdk-client";
@@ -1300,15 +1300,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientAddressList(contextPlugin);
 
 // create config action
-const configActionPrarms: IPluginSettings = {
+const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24,
-  minSupport: 0.3, // 30%
-  minTurnout: 0.5, // 50%
+  supportThreshold: 0.3, // 30%
+  minParticipation: 0.5, // 50%
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-const configAction = client.encoding.updatePluginSettingsAction(
+const configAction = client.encoding.updateVotingSettingsAction(
   pluginAddress,
   configActionPrarms,
 );
@@ -1528,8 +1528,8 @@ console.log(proposal);
     abstain: 0
   }
   settings: {
-    minTurnout: 0.5,
-    minSupport: 0.25,
+    minParticipation: 0.5,
+    supportThreshold: 0.25,
     minDuration: 7200
   },
   votes: [
@@ -1632,7 +1632,7 @@ import {
   ClientErc20,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -1645,15 +1645,15 @@ const client = new ClientErc20(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const settings: IPluginSettings | null = await client.methods.getSettings(
+const settings: VotingSettings | null = await client.methods.getSettings(
   pluginAddress,
 );
 console.log(settings);
 /*
   {
     minDuration: 7200,
-    minTurnout: 0.55,
-    minSupport: 0.25
+    minParticipation: 0.55,
+    supportThreshold: 0.25
   }
 */
 ```
@@ -1834,7 +1834,7 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -1843,15 +1843,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientAddressList(contextPlugin);
 
 // create config action
-const configActionPrarms: IPluginSettings = {
+const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24,
-  minSupport: 0.3, // 30%
-  minTurnout: 0.5, // 50%
+  supportThreshold: 0.3, // 30%
+  minParticipation: 0.5, // 50%
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-const configAction = client.encoding.updatePluginSettingsAction(
+const configAction = client.encoding.updateVotingSettingsAction(
   pluginAddress,
   configActionPrarms,
 );
@@ -1865,7 +1865,7 @@ import {
   ClientErc20,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -1874,15 +1874,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientErc20(contextPlugin);
 
 // create config action
-const configActionPrarms: IPluginSettings = {
+const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24,
-  minSupport: 0.3, // 30%
-  minTurnout: 0.5, // 50%
+  supportThreshold: 0.3, // 30%
+  minParticipation: 0.5, // 50%
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-const configAction = client.encoding.updatePluginSettingsAction(
+const configAction = client.encoding.updateVotingSettingsAction(
   pluginAddress,
   configActionPrarms,
 );
@@ -2147,7 +2147,7 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
@@ -2156,15 +2156,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const clientAddressList = new ClientAddressList(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IPluginSettings = clientAddressList.decoding
-  .updatePluginSettingsAction(data);
+const params: VotingSettings = clientAddressList.decoding
+  .updateVotingSettingsAction(data);
 
 console.log(params);
 /*
 {
   minDuration: 7200, // seconds
-  minTurnout: 0.25, // 25%
-  minSupport: 0.5 // 50%
+  minParticipation: 0.25, // 25%
+  supportThreshold: 0.5 // 50%
 }
 */
 ```
@@ -2176,7 +2176,7 @@ import {
   ClientErc20,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
@@ -2185,15 +2185,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const clientAddressList = new ClientErc20(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IPluginSettings = clientAddressList.decoding
-  .updatePluginSettingsAction(data);
+const params: VotingSettings = clientAddressList.decoding
+  .updateVotingSettingsAction(data);
 
 console.log(params);
 /*
 {
   minDuration: 7200, // seconds
-  minTurnout: 0.25, // 25%
-  minSupport: 0.5 // 50%
+  minParticipation: 0.25, // 25%
+  supportThreshold: 0.5 // 50%
 }
 */
 ```

@@ -77,19 +77,19 @@ export function toErc20Proposal(
       // subgraph values are 18 digits precision. Uncomment below for 2 digits
       // precision
 
-      // minSupport: decodeRatio(
+      // supportThreshold: decodeRatio(
       //   BigInt(proposal.totalSupportThresholdPct),
       //   2,
       // ),
-      // minTurnout: decodeRatio(
+      // minParticipation: decodeRatio(
       //   BigInt(proposal.relativeSupportThresholdPct),
       //   2,
       // ),
       // TODO DELETE ME
-      minSupport: parseFloat(
+      supportThreshold: parseFloat(
         formatEther(proposal.totalSupportThresholdPct),
       ),
-      minTurnout: parseFloat(
+      minParticipation: parseFloat(
         formatEther(proposal.relativeSupportThresholdPct),
       ),
       duration: parseInt(proposal.endDate) -
@@ -182,8 +182,8 @@ export function erc20InitParamsToContract(
   }
   return [
     AddressZero,
-    BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
-    BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
+    BigNumber.from(encodeRatio(params.settings.minParticipation, 2)),
+    BigNumber.from(encodeRatio(params.settings.supportThreshold, 2)),
     BigNumber.from(params.settings.minDuration),
     token,
   ];

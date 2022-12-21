@@ -5,7 +5,7 @@ import {
   ClientErc20,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
   IMintTokenParams,
 } from "../../../src";
 
@@ -18,27 +18,27 @@ describe("Client ERC20", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
-      const params: IPluginSettings = {
+      const params: VotingSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(
+      const updateVotingSettingsAction = client.encoding
+        .updateVotingSettingsAction(
           pluginAddress,
           params,
         );
-      const decodedParams: IPluginSettings = client.decoding
-        .updatePluginSettingsAction(
-          updatePluginSettingsAction.data,
+      const decodedParams: VotingSettings = client.decoding
+        .updateVotingSettingsAction(
+          updateVotingSettingsAction.data,
         );
 
       expect(decodedParams.minDuration).toBe(params.minDuration);
-      expect(decodedParams.minSupport).toBe(params.minSupport);
-      expect(decodedParams.minTurnout).toBe(params.minTurnout);
+      expect(decodedParams.supportThreshold).toBe(params.supportThreshold);
+      expect(decodedParams.minParticipation).toBe(params.minParticipation);
     });
     it("Should decode a mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -66,7 +66,7 @@ describe("Client ERC20", () => {
       const client = new ClientErc20(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
-      expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow(
+      expect(() => client.decoding.updateVotingSettingsAction(data)).toThrow(
         `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });
@@ -75,21 +75,21 @@ describe("Client ERC20", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientErc20(ctxPlugin);
-      const params: IPluginSettings = {
+      const params: VotingSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
-      const updatePluginSettingsAction = client.encoding
-        .updatePluginSettingsAction(
+      const updateVotingSettingsAction = client.encoding
+        .updateVotingSettingsAction(
           pluginAddress,
           params,
         );
       const iface = client.decoding.findInterface(
-        updatePluginSettingsAction.data,
+        updateVotingSettingsAction.data,
       );
       expect(iface?.id).toBe("function setConfiguration(uint64,uint64,uint64)");
       expect(iface?.functionName).toBe("setConfiguration");

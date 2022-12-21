@@ -289,15 +289,15 @@ describe("Client ERC20", () => {
           expect(typeof proposal.result.abstain).toBe("bigint");
           // setttings
           expect(typeof proposal.settings.duration).toBe("number");
-          expect(typeof proposal.settings.minSupport).toBe("number");
-          expect(typeof proposal.settings.minTurnout).toBe("number");
+          expect(typeof proposal.settings.supportThreshold).toBe("number");
+          expect(typeof proposal.settings.minParticipation).toBe("number");
           expect(
-            proposal.settings.minSupport >= 0 &&
-              proposal.settings.minSupport <= 1,
+            proposal.settings.supportThreshold >= 0 &&
+              proposal.settings.supportThreshold <= 1,
           ).toBe(true);
           expect(
-            proposal.settings.minTurnout >= 0 &&
-              proposal.settings.minTurnout <= 1,
+            proposal.settings.minParticipation >= 0 &&
+              proposal.settings.minParticipation <= 1,
           ).toBe(true);
           // token
           expect(typeof proposal.token.name).toBe("string");
@@ -444,10 +444,10 @@ describe("Client ERC20", () => {
         expect(settings === null).toBe(false);
         if (settings) {
           expect(typeof settings.minDuration).toBe("number");
-          expect(typeof settings.minSupport).toBe("number");
-          expect(typeof settings.minTurnout).toBe("number");
-          expect(settings.minSupport).toBeLessThanOrEqual(1);
-          expect(settings.minTurnout).toBeLessThanOrEqual(1);
+          expect(typeof settings.supportThreshold).toBe("number");
+          expect(typeof settings.minParticipation).toBe("number");
+          expect(settings.supportThreshold).toBeLessThanOrEqual(1);
+          expect(settings.minParticipation).toBeLessThanOrEqual(1);
         }
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {
