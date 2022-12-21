@@ -13,7 +13,7 @@ import {
   IAddressListPluginInstall,
   IClientAddressListEncoding,
 } from "../../interfaces";
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { addressListInitParamsToContract } from "../utils";
 
 /**
@@ -38,7 +38,7 @@ export class ClientAddressListEncoding extends ClientCore
   static getPluginInstallItem(
     params: IAddressListPluginInstall
   ): IPluginInstallItem {
-    const addressListVotingInterface = AllowlistVoting__factory.createInterface();
+    const addressListVotingInterface = AddresslistVoting__factory.createInterface();
     const args = addressListInitParamsToContract(params);
     // get hex bytes
     const hexBytes = addressListVotingInterface.encodeFunctionData(
@@ -78,25 +78,24 @@ export class ClientAddressListEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal that adds addresses to address list
    *
    * @param {string} pluginAddress
-   * @param {string[]} members
+   * @param {string[]} addresses
    * @return {*}  {DaoAction}
    * @memberof ClientAddressListEncoding
    */
-  public addMembersAction(pluginAddress: string, members: string[]): DaoAction {
+  public addAddressesAction(pluginAddress: string, addresses: string[]): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    for (const member of members) {
-      if (!isAddress(member)) {
+    for (const address of addresses) {
+      if (!isAddress(address)) {
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = AllowlistVoting__factory.createInterface();
+    const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
-      // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addAllowedUsers",
-      [members]
+      "addAddresses",
+      [addresses]
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
@@ -109,28 +108,27 @@ export class ClientAddressListEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal that removes addresses from the address list
    *
    * @param {string} pluginAddress
-   * @param {string[]} members
+   * @param {string[]} addresses
    * @return {*}  {DaoAction}
    * @memberof ClientAddressListEncoding
    */
-  public removeMembersAction(
+  public removeAddressesAction(
     pluginAddress: string,
-    members: string[]
+    addresses: string[]
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    for (const member of members) {
-      if (!isAddress(member)) {
+    for (const address of addresses) {
+      if (!isAddress(address)) {
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = AllowlistVoting__factory.createInterface();
+    const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
-      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
-      [members]
+      "removeAddresses",
+      [addresses]
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {

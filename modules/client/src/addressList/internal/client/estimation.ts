@@ -1,4 +1,4 @@
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import {
   ClientCore,
   ContextPlugin,
@@ -38,7 +38,7 @@ export class ClientAddressListEstimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -46,7 +46,7 @@ export class ClientAddressListEstimation extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const estimatedGasFee = await addresslistContract.estimateGas.createVote(
+    const estimatedGasFee = await addresslistContract.estimateGas.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
@@ -74,7 +74,7 @@ export class ClientAddressListEstimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -103,7 +103,7 @@ export class ClientAddressListEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );

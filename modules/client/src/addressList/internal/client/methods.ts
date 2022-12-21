@@ -44,7 +44,7 @@ import {
 } from "../graphql-queries/proposal";
 import { toAddressListProposal, toAddressListProposalListItem } from "../utils";
 import { QueryAddressListPluginSettings } from "../graphql-queries/settings";
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -81,7 +81,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -89,7 +89,7 @@ export class ClientAddressListMethods extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const tx = await addresslistContract.createVote(
+    const tx = await addresslistContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
@@ -104,13 +104,13 @@ export class ClientAddressListMethods extends ClientCore
     };
 
     const receipt = await tx.wait();
-    const addresslistContractInterface = AllowlistVoting__factory
+    const addresslistContractInterface = AddresslistVoting__factory
       .createInterface();
     const log = receipt.logs.find(
       (log) =>
         log.topics[0] ===
           id(
-            addresslistContractInterface.getEvent("VoteCreated").format(
+            addresslistContractInterface.getEvent("ProposalCreated").format(
               "sighash",
             ),
           ),
@@ -120,13 +120,13 @@ export class ClientAddressListMethods extends ClientCore
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
-    if (!parsedLog.args["voteId"]) {
+    if (!parsedLog.args["proposalId"]) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: hexZeroPad(parsedLog.args["voteId"].toHexString(), 32),
+      proposalId: hexZeroPad(parsedLog.args["proposalId"].toHexString(), 32),
     };
   }
 
@@ -163,7 +163,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -204,7 +204,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -234,7 +234,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new InvalidAddressError();
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -432,15 +432,17 @@ export class ClientAddressListMethods extends ClientCore
         return null;
       }
       return {
+        votingMode: parseInt(addresslistPlugin.votingMode),
         minDuration: parseInt(addresslistPlugin.minDuration),
-        minSupport: decodeRatio(
-          parseFloat(addresslistPlugin.totalSupportThresholdPct),
+        supportThreshold: decodeRatio(
+          parseFloat(addresslistPlugin.supportThreshold),
           2,
         ),
-        minTurnout: decodeRatio(
-          parseFloat(addresslistPlugin.relativeSupportThresholdPct),
+        minParticipation: decodeRatio(
+          parseFloat(addresslistPlugin.minParticipation),
           2,
         ),
+        minProposerVotingPower: BigInt(addresslistPlugin.minProposerVotingPower)
       };
     } catch {
       throw new Error("Cannot fetch the settings data from GraphQL");

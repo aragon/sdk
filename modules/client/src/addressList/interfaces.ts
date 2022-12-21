@@ -51,19 +51,19 @@ export interface IClientAddressListEncoding extends IClientCore {
     pluginAddress: string,
     params: IPluginSettings,
   ) => DaoAction;
-  addMembersAction: (
+  addAddressesAction: (
     pluginAddress: string,
-    members: string[],
+    addresses: string[],
   ) => DaoAction;
-  removeMembersAction: (
+  removeAddressesAction: (
     pluginAddress: string,
-    members: string[],
+    addresses: string[],
   ) => DaoAction;
 }
 export interface IClientAddressListDecoding extends IClientCore {
   updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings;
-  addMembersAction: (data: Uint8Array) => string[];
-  removeMembersAction: (data: Uint8Array) => string[];
+  addAddressesAction: (data: Uint8Array) => string[];
+  removeAddressesAction: (data: Uint8Array) => string[];
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
 export interface IClientAddressListEstimation extends IClientCore {
@@ -105,17 +105,23 @@ export type SubgraphAddressListProposalListItem = SubgraphProposalBase;
 export type SubgraphAddressListProposal = SubgraphProposalBase & {
   createdAt: string;
   actions: SubgraphAction[];
-  totalSupportThresholdPct: string;
-  relativeSupportThresholdPct: string;
   voters: SubgraphAddressListVoterListItem[];
   census: string;
+  votingMode: string
+  supportThreshold: string
+  minParticipation: string
+  totalVotingPower: string
 };
 
 export type ContractAddressListInitParams = [
   string, // dao Address
-  BigNumber, // min participation
-  BigNumber, // min support
-  BigNumber, // min duration
+  {
+    votingMode: BigNumber;
+    supportThreshold: BigNumber;
+    minParticipation: BigNumber;
+    minDuration: BigNumber;
+    minProposerVotingPower: BigNumber;
+  },
   string[], // addresses
 ];
 

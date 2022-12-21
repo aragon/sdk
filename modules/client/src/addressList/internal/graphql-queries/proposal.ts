@@ -19,12 +19,14 @@ query addressListProposal($proposalId: ID!) {
     yes,
     no,
     abstain
-    totalSupportThresholdPct,
-    relativeSupportThresholdPct,
     startDate
     endDate
     executed
     executable
+    votingMode
+    supportThreshold
+    minParticipation
+    totalVotingPower
     voters{
       voter{
         id

@@ -9,7 +9,7 @@ import {
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { IClientAddressListDecoding } from "../../interfaces";
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 
 /**
  * Decoding module for the SDK AddressList Client
@@ -39,14 +39,14 @@ export class ClientAddressListDecoding extends ClientCore
    * @return {*}  {string[]}
    * @memberof ClientAddressListDecoding
    */
-  public addMembersAction(data: Uint8Array): string[] {
-    const votingInterface = AllowlistVoting__factory.createInterface();
+  public addAddressesAction(data: Uint8Array): string[] {
+    const votingInterface = AddresslistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
     // TODO: Rename to `addAddresses` as soon as the plugin is updated
-    const expectedfunction = votingInterface.getFunction("addAllowedUsers");
+    const expectedfunction = votingInterface.getFunction("addAddresses");
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
@@ -64,22 +64,20 @@ export class ClientAddressListDecoding extends ClientCore
    * @return {*}  {string[]}
    * @memberof ClientAddressListDecoding
    */
-  public removeMembersAction(data: Uint8Array): string[] {
-    const votingInterface = AllowlistVoting__factory.createInterface();
+  public removeAddressesAction(data: Uint8Array): string[] {
+    const votingInterface = AddresslistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
     const expectedfunction = votingInterface.getFunction(
-      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
+      "removeAddresses",
     );
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
     const result = votingInterface.decodeFunctionData(
-      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
+      "removeAddresses",
       data,
     );
     return result[0];

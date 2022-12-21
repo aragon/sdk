@@ -63,29 +63,16 @@ export function toAddressListProposal(
       abstain: proposal.abstain ? parseInt(proposal.abstain) : 0,
     },
     settings: {
-      // TODO
-      // this should be decoded using the number of decimals that we want
-      // right now the encoders/recoders use 2 digit precission but the actual
-      // subgraph values are 18 digits precision. Uncomment below for 2 digits
-      // precision
-
-      // minSupport: decodeRatio(
-      //   BigInt(proposal.totalSupportThresholdPct),
-      //   2,
-      // ),
-      // minTurnout: decodeRatio(
-      //   BigInt(proposal.relativeSupportThresholdPct),
-      //   2,
-      // ),
-      // TODO DELETE ME
-      minSupport: parseFloat(
-        proposal.totalSupportThresholdPct,
+      supportThreshold: parseFloat(
+        proposal.supportThreshold,
       ),
-      minTurnout: parseFloat(
-        proposal.relativeSupportThresholdPct,
+      minParticipation: parseFloat(
+        proposal.minParticipation,
       ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
+      votingMode: parseInt(proposal.votingMode),
+      totalVotingPower: BigInt(proposal.totalVotingPower)
     },
     totalVotingWeight: parseInt(proposal.census),
     votes: proposal.voters.map(
@@ -136,9 +123,13 @@ export function addressListInitParamsToContract(
   // this is converted into a plugin
   return [
     AddressZero,
-    BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
-    BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
-    BigNumber.from(params.settings.minDuration),
+    {
+      votingMode: BigNumber.from(params.settings.votingMode),
+      supportThreshold: BigNumber.from(encodeRatio(params.settings.supportThreshold, 2)),
+      minParticipation: BigNumber.from(encodeRatio(params.settings.minParticipation, 2)),
+      minDuration: BigNumber.from(params.settings.minDuration),
+      minProposerVotingPower: BigNumber.from(params.settings.minProposerVotingPower),
+    },
     params.addresses,
   ];
 }

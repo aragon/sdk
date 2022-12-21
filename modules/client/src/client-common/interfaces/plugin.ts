@@ -1,7 +1,6 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { DaoAction, IPagination } from "./common";
 
-
 /**
  * Contains the states of a proposal. Note that on chain
  * proposals cannot be in draft state
@@ -21,23 +20,33 @@ export enum VoteValues {
   NO = 3,
 }
 
+export enum VotingModes {
+  STANDARD = 0,
+  EARLY_EXECUTION = 1,
+  VOTE_REPLACEMENT = 2,
+}
+
 // TYPES
 export interface IProposalSettings {
+  votingMode: VotingModes;
   /** Float: 0 to 1 */
-  minSupport: number;
+  supportThreshold: number;
   /** Float: 0 to 1 */
-  minTurnout: number;
+  minParticipation: number;
   /** In seconds */
   duration: number;
+  totalVotingPower: BigInt;
 }
 
 export interface IPluginSettings {
+  votingMode: VotingModes;
   /** Float: 0 to 1 */
-  minSupport: number;
+  supportThreshold: number;
   /** Float: 0 to 1 */
-  minTurnout: number;
+  minParticipation: number;
   /** In seconds */
   minDuration: number;
+  minProposerVotingPower: BigInt;
 }
 
 export interface ICreateProposalParams {
@@ -215,4 +224,10 @@ export type ExecuteProposalStepValue =
   | { key: ExecuteProposalStep.EXECUTING; txHash: string }
   | { key: ExecuteProposalStep.DONE };
 
-export type ContractPluginSettings = [BigNumber, BigNumber, BigNumber];
+export type ContractPluginSettings = [{
+  votingMode: BigNumber;
+  supportThreshold: BigNumber;
+  minParticipation: BigNumber;
+  minDuration: BigNumber;
+  minProposerVotingPower: BigNumber;
+}]

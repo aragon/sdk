@@ -19,7 +19,7 @@ export function decodeUpdatePluginSettingsAction(
   const receivedFunction = votingInterface.getFunction(
     hexBytes.substring(0, 10) as any,
   );
-  const expectedfunction = votingInterface.getFunction("setConfiguration");
+  const expectedfunction = votingInterface.getFunction("updateVotingSettings");
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
   }
@@ -33,27 +33,34 @@ export function encodeUpdatePluginSettingsAction(
   const votingInterface = MajorityVotingBase__factory.createInterface();
   const args = pluginSettingsToContract(params);
   // get hex bytes
-  const hexBytes = votingInterface.encodeFunctionData("setConfiguration", args);
+  const hexBytes = votingInterface.encodeFunctionData(
+    "updateVotingSettings",
+    args,
+  );
   // Strip 0x => encode in Uint8Array
   return hexToBytes(strip0x(hexBytes));
 }
 
 function pluginSettingsFromContract(result: Result): IPluginSettings {
   return {
-    minTurnout: decodeRatio(result[0], 2),
-    minSupport: decodeRatio(result[0], 2),
-    minDuration: result[2].toNumber(),
+    votingMode: result[0],
+    supportThreshold: decodeRatio(result[1], 2),
+    minParticipation: decodeRatio(result[2], 2),
+    minDuration: result[3].toNumber(),
+    minProposerVotingPower: result[4].toNumber(),
   };
 }
 
 function pluginSettingsToContract(
   params: IPluginSettings,
 ): ContractPluginSettings {
-  return [
-    BigNumber.from(encodeRatio(params.minTurnout, 2)),
-    BigNumber.from(encodeRatio(params.minSupport, 2)),
-    BigNumber.from(params.minDuration),
-  ];
+  return [{
+    votingMode: BigNumber.from(params.votingMode),
+    supportThreshold: BigNumber.from(encodeRatio(params.supportThreshold, 2)),
+    minParticipation: BigNumber.from(encodeRatio(params.minParticipation, 2)),
+    minDuration: BigNumber.from(params.minDuration),
+    minProposerVotingPower: BigNumber.from(params.minProposerVotingPower),
+  }]
 }
 
 export function getFunctionFragment(
