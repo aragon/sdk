@@ -1,6 +1,6 @@
 export { Client } from "./client";
 export * from "./addressList";
-export * from "./erc20";
+export * from "./token";
 export * from "./client-common";
 export {
   AssetBalance,

@@ -1,11 +1,11 @@
 /* MARKDOWN
-### Loading a plugin's settings
+### Checking if user can vote in an Token proposal
 */
 import {
   ClientToken,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  ICanVoteParams,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -13,19 +13,17 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an Token client
+// Create an address list client
 const client = new ClientToken(contextPlugin);
 
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+const voteParams: ICanVoteParams = {
+  address: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x1",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
+};
 
-const settings: IPluginSettings | null = await client.methods.getSettings(
-  pluginAddress,
-);
-console.log(settings);
+const canVote = await client.methods.canVote(voteParams);
+console.log(canVote);
 /*
-  {
-    minDuration: 7200,
-    minTurnout: 0.55,
-    minSupport: 0.25
-  }
+true
 */

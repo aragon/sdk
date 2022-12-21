@@ -15,6 +15,10 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
+## [UPCOMING
+### Changed
+- Renames all ERC20Voting occurences to TokenVoting
+
 ## [0.16.2-alpha]
 
 ### Changed
