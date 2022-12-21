@@ -6,6 +6,7 @@ import {
   IpfsPinError,
   NoProviderError,
   NoSignerError,
+  ProposalExecutionError,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import {
@@ -13,6 +14,7 @@ import {
   ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
+  findEventLog,
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
@@ -40,6 +42,7 @@ import {
   toAdminProposalListItem,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
+import { Admin__factory } from "@aragon/core-contracts-ethers";
 
 /**
  * Methods module for the SDK Admin Client
@@ -65,21 +68,32 @@ export class AdminClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use new ethers contracts
-    // @ts-ignore
     const adminContract = Admin__factory.connect(
       params.pluginAddress,
       signer,
     );
-    const tx = await adminContract.execute(params.metadataUri, params.actions);
+    const tx = await adminContract.executeProposal(
+      params.metadataUri,
+      params.actions,
+    );
     yield {
       key: ExecuteProposalStep.EXECUTING,
       txHash: tx.hash,
     };
-    await tx.wait();
+    const receipt = await tx.wait();
+    const admintInterface = Admin__factory.createInterface();
+    const log = findEventLog("ProposalCreation", receipt, admintInterface);
+    if (!log) {
+      throw new ProposalExecutionError();
+    }
+    const parsedLog = admintInterface.parseLog(log);
+    const proposalId = parsedLog.args["proposalId"];
+    if (!proposalId) {
+      throw new ProposalExecutionError();
+    }
     yield {
       key: ExecuteProposalStep.DONE,
+      proposalId,
     };
   }
 

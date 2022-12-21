@@ -6,6 +6,10 @@ import {
   ICreateProposalParams,
   ProposalStatus,
 } from "./interfaces/plugin";
+import { ContractReceipt } from "@ethersproject/contracts";
+import { Interface } from "@ethersproject/abi";
+import { id } from "@ethersproject/hash";
+import { Log } from "@ethersproject/providers";
 
 import { Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";

@@ -7,6 +7,8 @@ import {
   ContextPlugin,
   GasFeeEstimation,
 } from "../../../client-common";
+import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
+import { Admin__factory } from "@aragon/core-contracts-ethers";
 
 /**
  * Estimation module for the SDK Admin Client
@@ -28,18 +30,15 @@ export class AdminClientEstimation extends ClientCore
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
-    // TODO
-    // use new ethers contracts
-    // @ts-ignore
     const adminContract = Admin__factory.connect(
       params.pluginAddress,
       signer,
     );
-    const estimatedGasFee = await adminContract.estimateGas.execute(
+    const estimatedGasFee = await adminContract.estimateGas.executeProposal(
       params.metadataUri,
       params.actions,
     );

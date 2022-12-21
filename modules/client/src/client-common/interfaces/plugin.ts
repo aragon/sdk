@@ -240,7 +240,7 @@ export enum ExecuteProposalStep {
 
 export type ExecuteProposalStepValue =
   | { key: ExecuteProposalStep.EXECUTING; txHash: string }
-  | { key: ExecuteProposalStep.DONE };
+  | { key: ExecuteProposalStep.DONE; proposalId: string };
 
 export type ContractPluginSettings = [BigNumber, BigNumber, BigNumber];
 

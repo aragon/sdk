@@ -192,13 +192,14 @@ export async function deploy(): Promise<Deployment> {
     // use new ethers-contracts
     // @ts-ignore
     const adminSetupFactory = new aragonContracts.AdminVotingSetup__factory();
+    const adminSetupFactory = new aragonContracts.AdminSetup__factory();
     const adminPluginSetup = await adminSetupFactory
       .connect(deployOwnerWallet)
       .deploy();
     const adminRepoAddr = await deployPlugin(
       pluginRepoFactory,
       adminPluginSetup.address,
-      "ERC20Voting",
+      "Admin",
       [1, 0, 0],
       deployOwnerWallet,
     );

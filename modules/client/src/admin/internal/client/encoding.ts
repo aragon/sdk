@@ -11,6 +11,7 @@ import {
 import { IAdminClientEncoding } from "../../interfaces";
 import { ADMIN_PLUGIN_ID } from "../constants";
 import { isAddress } from "@ethersproject/address";
+import { Admin__factory } from "@aragon/core-contracts-ethers";
 
 /**
  * Encoding module for the SDK Admin Client
@@ -35,19 +36,14 @@ export class AdminClientEncoding extends ClientCore
     if (!isAddress(addressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
-    // TODO
-    // use new ethers contracts
-    // @ts-ignore
     const adminInterface = Admin__factory.createInterface();
-    // get hex bytes
     const hexBytes = adminInterface.encodeFunctionData(
       "initialize",
       [addressOrEns],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: ADMIN_PLUGIN_ID,
-      data,
+      data: hexToBytes(strip0x(hexBytes)),
     };
   }
 }
