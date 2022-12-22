@@ -35,7 +35,7 @@ import {
 import {
   TokenProposal,
   TokenProposalListItem,
-  Erc20TokenDetails,
+  TokenDetails,
   IClientTokenMethods,
   SubgraphTokenProposal,
   SubgraphTokenProposalListItem,
@@ -91,7 +91,7 @@ export class ClientTokenMethods extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const tx = await tokenContract.createVote(
+    const tx = await tokenContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
@@ -111,7 +111,7 @@ export class ClientTokenMethods extends ClientCore
       (log) =>
         log.topics[0] ===
           id(
-            tokenVotingContractInterface.getEvent("VoteCreated").format(
+            tokenVotingContractInterface.getEvent("ProposalCreated").format(
               "sighash",
             ),
           ),
@@ -121,13 +121,13 @@ export class ClientTokenMethods extends ClientCore
     }
 
     const parsedLog = tokenVotingContractInterface.parseLog(log);
-    if (!parsedLog.args["voteId"]) {
+    if (!parsedLog.args["proposalId"]) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: hexZeroPad(parsedLog.args["voteId"].toHexString(), 32),
+      proposalId: hexZeroPad(parsedLog.args["proposalId"].toHexString(), 32),
     };
   }
 
@@ -316,7 +316,7 @@ export class ClientTokenMethods extends ClientCore
         );
       }
     } catch (err) {
-      throw new GraphQLError("Token proposal");
+       throw new GraphQLError("Token proposal");
     }
   }
   /**
@@ -358,9 +358,9 @@ export class ClientTokenMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        tokenVotingProposal,
+        tokenVotingProposals,
       }: {
-        tokenVotingProposal: SubgraphTokenProposalListItem[];
+        tokenVotingProposals: SubgraphTokenProposalListItem[];
       } = await client.request(QueryTokenProposals, {
         where,
         limit,
@@ -370,7 +370,7 @@ export class ClientTokenMethods extends ClientCore
       });
       await this.ipfs.ensureOnline();
       return Promise.all(
-        tokenVotingProposal.map(
+        tokenVotingProposals.map(
           async (
             proposal: SubgraphTokenProposalListItem,
           ): Promise<TokenProposalListItem> => {
@@ -426,19 +426,17 @@ export class ClientTokenMethods extends ClientCore
         return null;
       }
       return {
+        votingMode: parseInt(tokenVotingPlugin.votingMode),
         minDuration: parseInt(tokenVotingPlugin.minDuration),
-        minSupport: decodeRatio(
-          parseFloat(
-            tokenVotingPlugin.totalSupportThresholdPct,
-          ),
-          2,
+        supportThreshold: decodeRatio(
+          parseFloat(tokenVotingPlugin.supportThreshold),
+          18,
         ),
-        minTurnout: decodeRatio(
-          parseFloat(
-            tokenVotingPlugin.relativeSupportThresholdPct,
-          ),
-          2,
+        minParticipation: decodeRatio(
+          parseFloat(tokenVotingPlugin.minParticipation),
+          18,
         ),
+        minProposerVotingPower: BigInt(tokenVotingPlugin.minProposerVotingPower)
       };
     } catch {
       throw new GraphQLError("plugin settings");
@@ -454,7 +452,7 @@ export class ClientTokenMethods extends ClientCore
    */
   public async getToken(
     pluginAddress: string,
-  ): Promise<Erc20TokenDetails | null> {
+  ): Promise<TokenDetails | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -469,7 +467,6 @@ export class ClientTokenMethods extends ClientCore
       }
       return {
         address: tokenVotingPlugin.token.id,
-        decimals: parseInt(tokenVotingPlugin.token.decimals),
         name: tokenVotingPlugin.token.name,
         symbol: tokenVotingPlugin.token.symbol,
       };

@@ -283,26 +283,25 @@ describe("Client Address List", () => {
         expect(typeof proposal.result.no).toBe("number");
         expect(typeof proposal.result.abstain).toBe("number");
         // setttings
+        expect(typeof proposal.settings.votingMode).toBe("number");
+        expect(typeof proposal.settings.totalVotingPower).toBe("bigint");
         expect(typeof proposal.settings.duration).toBe("number");
-        expect(typeof proposal.settings.minSupport).toBe("number");
-        expect(typeof proposal.settings.minTurnout).toBe("number");
-        // TODO
-        // enable this tests when the subgrph have the correcto precision digits
-        // expect(
-        //   proposal.settings.minSupport >= 0 &&
-        //     proposal.settings.minSupport <= 1,
-        // ).toBe(true);
-        // expect(
-        //   proposal.settings.minTurnout >= 0 &&
-        //     proposal.settings.minTurnout <= 1,
-        // ).toBe(true);
-        // token
-        expect(typeof proposal.totalVotingWeight).toBe("number");
+        expect(typeof proposal.settings.minParticipation).toBe("number");
+        expect(typeof proposal.settings.supportThreshold).toBe("number");
+        expect(
+          proposal.settings.minParticipation >= 0 &&
+            proposal.settings.minParticipation <= 1,
+        ).toBe(true);
+        expect(
+          proposal.settings.supportThreshold >= 0 &&
+            proposal.settings.supportThreshold <= 1,
+        ).toBe(true);
+        expect(typeof proposal.settings.totalVotingPower).toBe("bigint");
         expect(Array.isArray(proposal.votes)).toBe(true);
         for (let i = 0; i < proposal.votes.length; i++) {
           const vote = proposal.votes[i];
           expect(typeof vote.address).toBe("string");
-          expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+          expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
           expect(typeof vote.vote).toBe("number");
         }
       }
@@ -322,7 +321,7 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientAddressList(ctxPlugin);
       const limit = 5;
-      const status = ProposalStatus.EXECUTED;
+      const status = ProposalStatus.ACTIVE;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
@@ -414,10 +413,12 @@ describe("Client Address List", () => {
       expect(settings === null).toBe(false);
       if (settings) {
         expect(typeof settings.minDuration).toBe("number");
-        expect(typeof settings.minSupport).toBe("number");
-        expect(typeof settings.minTurnout).toBe("number");
-        expect(settings.minSupport).toBeLessThanOrEqual(1);
-        expect(settings.minTurnout).toBeLessThanOrEqual(1);
+        expect(typeof settings.minParticipation).toBe("number");
+        expect(typeof settings.minProposerVotingPower).toBe("bigint");
+        expect(typeof settings.supportThreshold).toBe("number");
+        expect(typeof settings.votingMode).toBe("number");
+        expect(settings.minParticipation).toBeLessThanOrEqual(1);
+        expect(settings.minProposerVotingPower).toBeLessThanOrEqual(1);
       }
     });
   });

@@ -3,7 +3,7 @@ export {
   TokenProposal,
   TokenProposalListItem,
   TokenProposalResult,
-  Erc20TokenDetails,
+  TokenDetails as Erc20TokenDetails,
   ITokenPluginInstall,
   IMintTokenParams,
 } from "./interfaces";

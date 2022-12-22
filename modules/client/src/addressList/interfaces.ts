@@ -87,7 +87,6 @@ export type AddressListProposal = ProposalBase & {
   result: AddressListProposalResult;
   settings: IProposalSettings;
   votes: Array<{ address: string; vote: VoteValues }>;
-  totalVotingWeight: number;
 };
 
 export type AddressListProposalListItem = ProposalListItemBase & {
@@ -106,7 +105,6 @@ export type SubgraphAddressListProposal = SubgraphProposalBase & {
   createdAt: string;
   actions: SubgraphAction[];
   voters: SubgraphAddressListVoterListItem[];
-  census: string;
   votingMode: string
   supportThreshold: string
   minParticipation: string

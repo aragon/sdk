@@ -23,8 +23,8 @@ export function decodeUpdatePluginSettingsAction(
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
   }
-  const result = votingInterface.decodeFunctionData("setConfiguration", data);
-  return pluginSettingsFromContract(result);
+  const result = votingInterface.decodeFunctionData("updateVotingSettings", data);
+  return pluginSettingsFromContract(result[0]);
 }
 
 export function encodeUpdatePluginSettingsAction(
@@ -47,7 +47,7 @@ function pluginSettingsFromContract(result: Result): IPluginSettings {
     supportThreshold: decodeRatio(result[1], 2),
     minParticipation: decodeRatio(result[2], 2),
     minDuration: result[3].toNumber(),
-    minProposerVotingPower: result[4].toNumber(),
+    minProposerVotingPower: BigInt(result[4]),
   };
 }
 

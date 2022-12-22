@@ -2,7 +2,7 @@ import { gql } from "graphql-request";
 
 export const QueryAddressListMembers = gql`
 query AddressListPluginMembers($address: ID!) {
-    addresslistPlugin(id: $address){
+    addresslistVotingPlugin(id: $address){
         members {
             address
         }

@@ -90,9 +90,9 @@ export function decodeRatio(
   onChainValue: bigint | number,
   digits: number,
 ): number {
-  if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
+  if (!Number.isInteger(digits) || digits < 1 || digits > 18) {
     throw new Error(
-      "The number of digits should be a positive integer between 1 and 15",
+      "The number of digits should be a positive integer between 1 and 18",
     );
   } else if (onChainValue > 10 ** digits) {
     throw new Error("The value is out of range");

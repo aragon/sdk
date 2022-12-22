@@ -6,6 +6,7 @@ import {
   Context,
   ContextPlugin,
   IPluginSettings,
+  VotingModes,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 
@@ -17,8 +18,10 @@ describe("Client Address List", () => {
       const client = new ClientAddressList(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
+        votingMode: VotingModes.EARLY_EXECUTION,
+        minProposerVotingPower: BigInt(2000)
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -34,8 +37,10 @@ describe("Client Address List", () => {
         );
 
       expect(decodedParams.minDuration).toBe(params.minDuration);
-      expect(decodedParams.minSupport).toBe(params.minSupport);
-      expect(decodedParams.minTurnout).toBe(params.minTurnout);
+      expect(decodedParams.minParticipation).toBe(params.minParticipation);
+      expect(decodedParams.minProposerVotingPower).toBe(params.minProposerVotingPower);
+      expect(decodedParams.supportThreshold).toBe(params.supportThreshold);
+      expect(decodedParams.votingMode).toBe(params.votingMode);
     });
 
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
@@ -60,8 +65,8 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      const action = client.encoding.addMembersAction(pluginAddress, members);
-      const decodedMembers = client.decoding.addMembersAction(action.data);
+      const action = client.encoding.addAddressesAction(pluginAddress, members);
+      const decodedMembers = client.decoding.addAddressesAction(action.data);
       expect(Array.isArray(decodedMembers)).toBe(true);
       for (let i = 0; i < decodedMembers.length; i++) {
         expect(typeof decodedMembers[i]).toBe("string");
@@ -80,11 +85,11 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      const action = client.encoding.removeMembersAction(
+      const action = client.encoding.removeAddressesAction(
         pluginAddress,
         members,
       );
-      const decodedMembers = client.decoding.removeMembersAction(action.data);
+      const decodedMembers = client.decoding.removeAddressesAction(action.data);
       expect(Array.isArray(decodedMembers)).toBe(true);
       for (let i = 0; i < decodedMembers.length; i++) {
         expect(typeof decodedMembers[i]).toBe("string");
@@ -98,8 +103,10 @@ describe("Client Address List", () => {
       const client = new ClientAddressList(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
+        votingMode: VotingModes.EARLY_EXECUTION,
+        minProposerVotingPower: BigInt(2000)
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -112,9 +119,9 @@ describe("Client Address List", () => {
       const iface = client.decoding.findInterface(
         updatePluginSettingsAction.data,
       );
-      expect(iface?.id).toBe("function setConfiguration(uint64,uint64,uint64)");
-      expect(iface?.functionName).toBe("setConfiguration");
-      expect(iface?.hash).toBe("0x9b979e2f");
+      expect(iface?.id).toBe("function updateVotingSettings(tuple(uint8,uint64,uint64,uint64,uint256))");
+      expect(iface?.functionName).toBe("updateVotingSettings");
+      expect(iface?.hash).toBe("0xe6848574");
     });
 
     it("Should try to get the function of an invalid data and return null", async () => {

@@ -44,7 +44,7 @@ export interface IClientTokenMethods extends IClientCore {
     params: IProposalQueryParams,
   ) => Promise<TokenProposalListItem[]>;
   getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
-  getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
+  getToken: (pluginAddress: string) => Promise<TokenDetails | null>;
 }
 
 export interface IClientTokenEncoding extends IClientCore {
@@ -103,14 +103,13 @@ type NewTokenParams = {
 export type TokenProposal = ProposalBase & {
   result: TokenProposalResult;
   settings: IProposalSettings;
-  token: Erc20TokenDetails;
-  usedVotingWeight: bigint;
-  votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
-  totalVotingWeight: bigint;
+  token: TokenDetails;
+  castedVotingPower: bigint;
+  votes: Array<{ address: string; vote: VoteValues; votingPower: bigint }>;
 };
 
 export type TokenProposalListItem = ProposalListItemBase & {
-  token: Erc20TokenDetails;
+  token: TokenDetails;
   result: TokenProposalResult;
 };
 
@@ -120,15 +119,14 @@ export type TokenProposalResult = {
   abstain: bigint;
 };
 
-export type Erc20TokenDetails = {
+export type TokenDetails = {
   address: string;
   name: string;
   symbol: string;
-  decimals: number;
 };
 
 export type SubgraphTokenVoterListItem = SubgraphVoterListItemBase & {
-  weight: string;
+  votingPower: string;
 };
 
 export type SubgraphTokenProposalListItem = SubgraphProposalBase & {
@@ -137,7 +135,6 @@ export type SubgraphTokenProposalListItem = SubgraphProposalBase & {
       symbol: string;
       name: string;
       id: string;
-      decimals: string;
     };
   };
 };
@@ -145,10 +142,11 @@ export type SubgraphTokenProposalListItem = SubgraphProposalBase & {
 export type SubgraphTokenProposal = SubgraphTokenProposalListItem & {
   createdAt: string;
   actions: SubgraphAction[];
-  totalSupportThresholdPct: string;
-  relativeSupportThresholdPct: string;
   voters: SubgraphTokenVoterListItem[];
-  census: string;
+  votingMode: string
+  supportThreshold: string
+  minParticipation: string
+  totalVotingPower: string
 };
 
 export interface IMintTokenParams {
@@ -159,8 +157,12 @@ export interface IMintTokenParams {
 export type ContractMintTokenParams = [string, BigNumber];
 export type ContractTokenInitParams = [
   string, // dao address
-  BigNumber, // participation
-  BigNumber, // support
-  BigNumber, // duration
+  {
+    votingMode: BigNumber;
+    supportThreshold: BigNumber;
+    minParticipation: BigNumber;
+    minDuration: BigNumber;
+    minProposerVotingPower: BigNumber;
+  },
   string, // token address
 ];

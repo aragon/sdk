@@ -8,6 +8,7 @@ import {
   ITokenPluginInstall,
   IMintTokenParams,
   IPluginSettings,
+  VotingModes,
 } from "../../../src";
 
 import { AddressZero } from "@ethersproject/constants";
@@ -20,8 +21,10 @@ describe("Client Token", () => {
       const initParams: ITokenPluginInstall = {
         settings: {
           minDuration: 7200,
-          minTurnout: 0.5,
-          minSupport: 0.5,
+          minParticipation: 0.5,
+          supportThreshold: 0.5,
+          votingMode: VotingModes.EARLY_EXECUTION,
+          minProposerVotingPower: BigInt(2000)
         },
         useToken: {
           address: AddressZero,
@@ -40,8 +43,10 @@ describe("Client Token", () => {
       const client = new ClientToken(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
+        votingMode: VotingModes.EARLY_EXECUTION,
+        minProposerVotingPower: BigInt(2000)
       };
 
       const pluginAddress = "0xinvalid_address";
@@ -55,8 +60,10 @@ describe("Client Token", () => {
       const client = new ClientToken(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
+        votingMode: VotingModes.EARLY_EXECUTION,
+        minProposerVotingPower: BigInt(2000)
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";

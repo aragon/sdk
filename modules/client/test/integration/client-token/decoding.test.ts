@@ -7,6 +7,7 @@ import {
   ContextPlugin,
   IPluginSettings,
   IMintTokenParams,
+  VotingModes,
 } from "../../../src";
 
 import { bytesToHex } from "@aragon/sdk-common";
@@ -20,8 +21,10 @@ describe("Client Token", () => {
       const client = new ClientToken(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
+        votingMode: VotingModes.EARLY_EXECUTION,
+        minProposerVotingPower: BigInt(2000)
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -36,9 +39,11 @@ describe("Client Token", () => {
           updatePluginSettingsAction.data,
         );
 
-      expect(decodedParams.minDuration).toBe(params.minDuration);
-      expect(decodedParams.minSupport).toBe(params.minSupport);
-      expect(decodedParams.minTurnout).toBe(params.minTurnout);
+        expect(decodedParams.minDuration).toBe(params.minDuration);
+        expect(decodedParams.minParticipation).toBe(params.minParticipation);
+        expect(decodedParams.minProposerVotingPower).toBe(params.minProposerVotingPower);
+        expect(decodedParams.supportThreshold).toBe(params.supportThreshold);
+        expect(decodedParams.votingMode).toBe(params.votingMode);
     });
     it("Should decode a mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -77,8 +82,10 @@ describe("Client Token", () => {
       const client = new ClientToken(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
+        votingMode: VotingModes.EARLY_EXECUTION,
+        minProposerVotingPower: BigInt(2000)
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -91,9 +98,9 @@ describe("Client Token", () => {
       const iface = client.decoding.findInterface(
         updatePluginSettingsAction.data,
       );
-      expect(iface?.id).toBe("function setConfiguration(uint64,uint64,uint64)");
-      expect(iface?.functionName).toBe("setConfiguration");
-      expect(iface?.hash).toBe("0x9b979e2f");
+      expect(iface?.id).toBe("function updateVotingSettings(tuple(uint8,uint64,uint64,uint64,uint256))");
+      expect(iface?.functionName).toBe("updateVotingSettings");
+      expect(iface?.hash).toBe("0xe6848574");
     });
 
     it("Should try to get the function of an invalid data and return null", async () => {

@@ -90,8 +90,8 @@ describe("Client", () => {
               id: deployment.addressListRepo.address,
               data: toUtf8Bytes(
                 defaultAbiCoder.encode(
-                  ["uint64", "uint64", "uint64", "address[]"],
-                  [fiftyPercent, fiftyPercent, 3600, [
+                  ["tuple(uint8, uint64, uint64, uint64, uint256)", "address[]"],
+                  [[0, fiftyPercent, fiftyPercent, 3600, 1], [
                     "0x1234567890123456789012345678901234567890",
                     "0x0987654321098765432109876543210987654321",
                   ]],

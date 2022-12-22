@@ -2,10 +2,12 @@ import { gql } from "graphql-request";
 
 export const QueryAddressListPluginSettings = gql`
 query AddressListPluginSettings($address: ID!) {
-  addresslistPlugin(id: $address){
-    totalSupportThresholdPct
-    relativeSupportThresholdPct
+  addresslistVotingPlugin(id: $address){
+    votingMode
+    supportThreshold
+    minParticipation
     minDuration
+    minProposerVotingPower
   }
 }
 `;

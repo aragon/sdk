@@ -45,14 +45,12 @@ export class ClientAddressListDecoding extends ClientCore
     const receivedFunction = votingInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
-    // TODO: Rename to `addAddresses` as soon as the plugin is updated
     const expectedfunction = votingInterface.getFunction("addAddresses");
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
     const result = votingInterface.decodeFunctionData(
-      // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addAllowedUsers",
+      "addAddresses",
       data,
     );
     return result[0];

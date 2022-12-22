@@ -16,7 +16,7 @@ import {
 import { TOKEN_PLUGIN_ID } from "../constants";
 import {
   TokenVoting__factory,
-  ITokenMintableUpgradeable__factory,
+  IERC20MintableUpgradeable__factory,
 } from "@aragon/core-contracts-ethers";
 import { tokenInitParamsToContract, mintTokenParamsToContract } from "../utils";
 /**
@@ -90,7 +90,7 @@ export class ClientTokenEncoding extends ClientCore
     if (!isAddress(minterAddress) || !isAddress(params.address)) {
       throw new InvalidAddressError();
     }
-    const votingInterface = ITokenMintableUpgradeable__factory
+    const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();
     const args = mintTokenParamsToContract(params);
     // get hex bytes

@@ -44,7 +44,7 @@ export class ClientTokenEstimation extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const estimatedGasFee = await tokenContract.estimateGas.createVote(
+    const estimatedGasFee = await tokenContract.estimateGas.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),

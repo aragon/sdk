@@ -146,7 +146,7 @@ export type SubgraphVoterListItemBase = {
   voter: {
     id: string;
   };
-  vote: SubgraphVoteValues;
+  voteOption: SubgraphVoteValues;
 };
 
 export type SubgraphAction = {

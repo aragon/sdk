@@ -7,6 +7,7 @@ import {
   ContextPlugin,
   IAddressListPluginInstall,
   IPluginSettings,
+  VotingModes,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
@@ -16,8 +17,10 @@ describe("Client Address List", () => {
       const withdrawParams: IAddressListPluginInstall = {
         settings: {
           minDuration: 7200, // seconds
-          minTurnout: 0.5,
-          minSupport: 0.5,
+          minParticipation: 0.5,
+          supportThreshold: 0.5,
+          votingMode: VotingModes.EARLY_EXECUTION,
+          minProposerVotingPower: BigInt(2000)
         },
         addresses: [
           "0x1234567890123456789012345678901234567890",
@@ -44,8 +47,10 @@ describe("Client Address List", () => {
 
       const pluginConfigParams: IPluginSettings = {
         minDuration: 100000,
-        minTurnout: 0.25,
-        minSupport: 0.51,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
+        votingMode: VotingModes.EARLY_EXECUTION,
+        minProposerVotingPower: BigInt(2000)
       };
 
       const pluginAddress = "0xinvalid_address";
@@ -64,8 +69,10 @@ describe("Client Address List", () => {
 
       const pluginConfigParams: IPluginSettings = {
         minDuration: 100000,
-        minTurnout: 0.25,
-        minSupport: 0.51,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
+        votingMode: VotingModes.EARLY_EXECUTION,
+        minProposerVotingPower: BigInt(2000)
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -93,7 +100,7 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0xinvalid_address";
-      expect(() => client.encoding.addMembersAction(pluginAddress, members))
+      expect(() => client.encoding.addAddressesAction(pluginAddress, members))
         .toThrow(new InvalidAddressError());
     });
     it("Should encode a add members action with an invalid member address and fail", async () => {
@@ -108,7 +115,7 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      expect(() => client.encoding.addMembersAction(pluginAddress, members))
+      expect(() => client.encoding.addAddressesAction(pluginAddress, members))
         .toThrow(new InvalidAddressError());
     });
     it("Should encode a add members action", async () => {
@@ -123,12 +130,12 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      const action = client.encoding.addMembersAction(pluginAddress, members);
+      const action = client.encoding.addAddressesAction(pluginAddress, members);
 
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
       expect(bytesToHex(action.data, true)).toBe(
-        "0x49e61d3700000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
+        "0x3628731c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
       expect(action.to).toBe(pluginAddress);
     });
@@ -144,7 +151,7 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0xinvalid_address";
-      expect(() => client.encoding.removeMembersAction(pluginAddress, members))
+      expect(() => client.encoding.removeAddressesAction(pluginAddress, members))
         .toThrow(new InvalidAddressError());
     });
     it("Should encode a remove members action with an invalid member address and fail", async () => {
@@ -159,7 +166,7 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      expect(() => client.encoding.removeMembersAction(pluginAddress, members))
+      expect(() => client.encoding.removeAddressesAction(pluginAddress, members))
         .toThrow(new InvalidAddressError());
     });
     it("Should encode a remove members action", async () => {
@@ -174,7 +181,7 @@ describe("Client Address List", () => {
       ];
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      const action = client.encoding.removeMembersAction(
+      const action = client.encoding.removeAddressesAction(
         pluginAddress,
         members,
       );
@@ -182,7 +189,7 @@ describe("Client Address List", () => {
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
       expect(bytesToHex(action.data, true)).toBe(
-        "0x28471eff00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
+        "0xa84eb99900000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
       expect(action.to).toBe(pluginAddress);
     });

@@ -1,4 +1,4 @@
-import { encodeRatio, hexToBytes, strip0x } from "@aragon/sdk-common";
+import { encodeRatio, decodeRatio, hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
   DaoAction,
@@ -18,7 +18,6 @@ import {
   SubgraphTokenProposalListItem,
   SubgraphTokenVoterListItem,
 } from "../interfaces";
-import { formatEther } from "@ethersproject/units";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
@@ -34,9 +33,9 @@ export function toTokenProposal(
   const creationDate = new Date(
     parseInt(proposal.createdAt) * 1000,
   );
-  let usedVotingWeight: bigint = BigInt(0);
+  let castedVotingPower: bigint = BigInt(0);
   for (const voter of proposal.voters) {
-    usedVotingWeight += BigInt(voter.weight);
+    castedVotingPower += BigInt(voter.votingPower);
   }
   return {
     id: proposal.id,
@@ -71,44 +70,29 @@ export function toTokenProposal(
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     settings: {
-      // TODO
-      // this should be decoded using the number of decimals that we want
-      // right now the encoders/recoders use 2 digit precission but the actual
-      // subgraph values are 18 digits precision. Uncomment below for 2 digits
-      // precision
-
-      // minSupport: decodeRatio(
-      //   BigInt(proposal.totalSupportThresholdPct),
-      //   2,
-      // ),
-      // minTurnout: decodeRatio(
-      //   BigInt(proposal.relativeSupportThresholdPct),
-      //   2,
-      // ),
-      // TODO DELETE ME
-      minSupport: parseFloat(
-        formatEther(proposal.totalSupportThresholdPct),
-      ),
-      minTurnout: parseFloat(
-        formatEther(proposal.relativeSupportThresholdPct),
-      ),
+      supportThreshold: decodeRatio(parseFloat(
+        proposal.supportThreshold,
+      ), 18),
+      minParticipation: decodeRatio(parseFloat(
+        proposal.minParticipation,
+      ), 18),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
+      votingMode: parseInt(proposal.votingMode),
+      totalVotingPower: BigInt(proposal.totalVotingPower)
     },
     token: {
       address: proposal.plugin.token.id,
       symbol: proposal.plugin.token.symbol,
       name: proposal.plugin.token.name,
-      decimals: parseInt(proposal.plugin.token.decimals),
     },
-    usedVotingWeight,
-    totalVotingWeight: BigInt(proposal.census),
+    castedVotingPower,
     votes: proposal.voters.map(
       (voter: SubgraphTokenVoterListItem) => {
         return {
           address: voter.voter.id,
-          vote: SubgraphVoteValuesMap.get(voter.vote) as VoteValues,
-          weight: BigInt(voter.weight),
+          vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
+          votingPower: BigInt(voter.votingPower),
         };
       },
     ),
@@ -146,7 +130,6 @@ export function toTokenProposalListItem(
       address: proposal.plugin.token.id,
       symbol: proposal.plugin.token.symbol,
       name: proposal.plugin.token.name,
-      decimals: parseInt(proposal.plugin.token.decimals),
     },
   };
 }
@@ -182,9 +165,13 @@ export function tokenInitParamsToContract(
   }
   return [
     AddressZero,
-    BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
-    BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
-    BigNumber.from(params.settings.minDuration),
+    {
+      votingMode: BigNumber.from(params.settings.votingMode),
+      supportThreshold: BigNumber.from(encodeRatio(params.settings.supportThreshold, 2)),
+      minParticipation: BigNumber.from(encodeRatio(params.settings.minParticipation, 2)),
+      minDuration: BigNumber.from(params.settings.minDuration),
+      minProposerVotingPower: BigNumber.from(params.settings.minProposerVotingPower),
+    },
     token,
   ];
 }

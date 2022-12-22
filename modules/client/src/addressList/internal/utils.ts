@@ -1,4 +1,4 @@
-import { encodeRatio, hexToBytes, strip0x } from "@aragon/sdk-common";
+import { encodeRatio, decodeRatio, hexToBytes, strip0x } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import {
@@ -63,23 +63,22 @@ export function toAddressListProposal(
       abstain: proposal.abstain ? parseInt(proposal.abstain) : 0,
     },
     settings: {
-      supportThreshold: parseFloat(
+      supportThreshold: decodeRatio(parseFloat(
         proposal.supportThreshold,
-      ),
-      minParticipation: parseFloat(
+      ), 18),
+      minParticipation: decodeRatio(parseFloat(
         proposal.minParticipation,
-      ),
+      ), 18),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
       votingMode: parseInt(proposal.votingMode),
       totalVotingPower: BigInt(proposal.totalVotingPower)
     },
-    totalVotingWeight: parseInt(proposal.census),
     votes: proposal.voters.map(
       (voter: SubgraphAddressListVoterListItem) => {
         return {
           address: voter.voter.id,
-          vote: SubgraphVoteValuesMap.get(voter.vote) as VoteValues,
+          vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
         };
       },
     ),

@@ -19,8 +19,9 @@ query tokenProposal($proposalId: ID!) {
     yes,
     no,
     abstain
-    totalSupportThresholdPct,
-    relativeSupportThresholdPct,
+    supportThreshold
+    totalVotingPower
+    minParticipation
     startDate
     endDate
     executed
@@ -29,18 +30,16 @@ query tokenProposal($proposalId: ID!) {
       voter{
         id
       }
-      vote
-      weight
+      voteOption
+      votingPower
     }
     plugin{
       token{
         symbol
         name
         id
-        decimals
       }
     }
-    census
   }
 }
 `;
@@ -66,7 +65,6 @@ query tokenProposals($where: TokenVotingProposal_filter!, $limit:Int!, $skip: In
         symbol
         name
         id
-        decimals
       }
     }
   }

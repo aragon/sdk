@@ -9,7 +9,7 @@ import {
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { IClientTokenDecoding, IMintTokenParams } from "../../interfaces";
-import { ITokenMintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
+import { IERC20MintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
 import { mintTokenParamsFromContract } from "../utils";
 
 /**
@@ -40,7 +40,7 @@ export class ClientTokenDecoding extends ClientCore
    * @memberof ClientTokenDecoding
    */
   public mintTokenAction(data: Uint8Array): IMintTokenParams {
-    const votingInterface = ITokenMintableUpgradeable__factory
+    const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(

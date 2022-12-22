@@ -287,35 +287,36 @@ describe("Client Token", () => {
           expect(typeof proposal.result.yes).toBe("bigint");
           expect(typeof proposal.result.no).toBe("bigint");
           expect(typeof proposal.result.abstain).toBe("bigint");
-          // setttings
+          // settings
+          expect(typeof proposal.settings.votingMode).toBe("number");
+          expect(typeof proposal.settings.totalVotingPower).toBe("bigint");
           expect(typeof proposal.settings.duration).toBe("number");
-          expect(typeof proposal.settings.minSupport).toBe("number");
-          expect(typeof proposal.settings.minTurnout).toBe("number");
+          expect(typeof proposal.settings.minParticipation).toBe("number");
+          expect(typeof proposal.settings.supportThreshold).toBe("number");
           expect(
-            proposal.settings.minSupport >= 0 &&
-              proposal.settings.minSupport <= 1,
+            proposal.settings.minParticipation >= 0 &&
+              proposal.settings.minParticipation <= 1,
           ).toBe(true);
           expect(
-            proposal.settings.minTurnout >= 0 &&
-              proposal.settings.minTurnout <= 1,
+            proposal.settings.supportThreshold >= 0 &&
+              proposal.settings.supportThreshold <= 1,
           ).toBe(true);
           // token
           expect(typeof proposal.token.name).toBe("string");
           expect(typeof proposal.token.symbol).toBe("string");
-          expect(typeof proposal.token.decimals).toBe("number");
           expect(typeof proposal.token.address).toBe("string");
           expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-          expect(typeof proposal.usedVotingWeight).toBe("bigint");
-          expect(typeof proposal.totalVotingWeight).toBe("bigint");
+          expect(typeof proposal.castedVotingPower).toBe("bigint");
+          expect(typeof proposal.settings.totalVotingPower).toBe("bigint");
           expect(Array.isArray(proposal.votes)).toBe(true);
           for (let i = 0; i < proposal.votes.length; i++) {
             const vote = proposal.votes[i];
             expect(typeof vote.address).toBe("string");
-            expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
             if (vote.vote) {
               expect(typeof vote.vote).toBe("number");
             }
-            expect(typeof vote.weight).toBe("bigint");
+            expect(typeof vote.votingPower).toBe("bigint");
           }
         }
       });
@@ -377,7 +378,6 @@ describe("Client Token", () => {
           // token
           expect(typeof proposal.token.name).toBe("string");
           expect(typeof proposal.token.symbol).toBe("string");
-          expect(typeof proposal.token.decimals).toBe("number");
           expect(typeof proposal.token.address).toBe("string");
           expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         }
@@ -444,10 +444,12 @@ describe("Client Token", () => {
         expect(settings === null).toBe(false);
         if (settings) {
           expect(typeof settings.minDuration).toBe("number");
-          expect(typeof settings.minSupport).toBe("number");
-          expect(typeof settings.minTurnout).toBe("number");
-          expect(settings.minSupport).toBeLessThanOrEqual(1);
-          expect(settings.minTurnout).toBeLessThanOrEqual(1);
+          expect(typeof settings.minParticipation).toBe("number");
+          expect(typeof settings.minProposerVotingPower).toBe("bigint");
+          expect(typeof settings.supportThreshold).toBe("number");
+          expect(typeof settings.votingMode).toBe("number");
+          expect(settings.minParticipation).toBeLessThanOrEqual(1);
+          expect(settings.minProposerVotingPower).toBeLessThanOrEqual(1);
         }
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {
@@ -458,7 +460,6 @@ describe("Client Token", () => {
         const pluginAddress: string = TEST_TOKEN_PLUGIN_ADDRESS;
         const token = await client.methods.getToken(pluginAddress);
         expect(typeof token?.address).toBe("string");
-        expect(typeof token?.decimals).toBe("number");
         expect(typeof token?.symbol).toBe("string");
         expect(typeof token?.name).toBe("string");
       });

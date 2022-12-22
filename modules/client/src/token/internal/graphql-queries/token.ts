@@ -7,7 +7,6 @@ query token($address: ID!) {
       id
       name
       symbol
-      decimals
     }
   }
 }
