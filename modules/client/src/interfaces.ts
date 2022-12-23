@@ -309,7 +309,7 @@ export enum DaoSortBy {
 }
 
 export enum SubgraphPluginTypeName {
-  TOKENVOTING = "TokenVotingPlugin",
+  TOKEN_VOTING = "TokenVotingPlugin",
   ADDRESS_LIST = "AddresslistPlugin",
 }
 
@@ -317,7 +317,7 @@ export const SubgraphPluginTypeMap: Map<
   SubgraphPluginTypeName,
   string
 > = new Map([
-  [SubgraphPluginTypeName.TOKENVOTING, "tokenvoting.dao.eth"],
+  [SubgraphPluginTypeName.TOKEN_VOTING, "tokenvoting.dao.eth"],
   [SubgraphPluginTypeName.ADDRESS_LIST, "addresslistvoting.dao.eth"],
 ]);
 

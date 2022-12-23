@@ -5,7 +5,7 @@ import {
   TokenVotingClient,
   Context,
   ContextPlugin,
-  TokenVotingTokenDetails,
+  Erc20TokenDetails,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -18,7 +18,7 @@ const client = new TokenVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const token: TokenVotingTokenDetails | null = await client.methods.getToken(
+const token: Erc20TokenDetails | null = await client.methods.getToken(
   pluginAddress,
 );
 console.log(token);
