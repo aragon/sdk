@@ -9,37 +9,37 @@ import {
 } from "../../../client-common";
 import { isAddress } from "@ethersproject/address";
 import {
-  IClientTokenEncoding,
-  ITokenPluginInstall,
+  ITokenVotingClientEncoding,
+  ITokenVotingPluginInstall,
   IMintTokenParams,
 } from "../../interfaces";
-import { TOKEN_PLUGIN_ID } from "../constants";
+import { TOKEN_VOTING_PLUGIN_ID } from "../constants";
 import {
   TokenVoting__factory,
   ITokenMintableUpgradeable__factory,
 } from "@aragon/core-contracts-ethers";
-import { tokenInitParamsToContract, mintTokenParamsToContract } from "../utils";
+import { tokenVotingInitParamsToContract, mintTokenParamsToContract } from "../utils";
 /**
- * Encoding module the SDK Token Client
+ * Encoding module the SDK TokenVoting Client
  */
-export class ClientTokenEncoding extends ClientCore
-  implements IClientTokenEncoding {
+export class TokenVotingClientEncoding extends ClientCore
+  implements ITokenVotingClientEncoding {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientTokenEncoding.prototype);
+    Object.freeze(TokenVotingClientEncoding.prototype);
     Object.freeze(this);
   }
   /**
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured
    *
-   * @param {ITokenPluginInstall} params
+   * @param {ITokenVotingPluginInstall} params
    * @return {*}  {IPluginInstallItem}
-   * @memberof ClientTokenEncoding
+   * @memberof TokenVotingClientEncoding
    */
-  static getPluginInstallItem(params: ITokenPluginInstall): IPluginInstallItem {
+  static getPluginInstallItem(params: ITokenVotingPluginInstall): IPluginInstallItem {
     const tokenVotingInterface = TokenVoting__factory.createInterface();
-    const args = tokenInitParamsToContract(params);
+    const args = tokenVotingInitParamsToContract(params);
     // get hex bytes
     const hexBytes = tokenVotingInterface.encodeFunctionData(
       "initialize",
@@ -48,7 +48,7 @@ export class ClientTokenEncoding extends ClientCore
     // Strip 0x => encode in Uint8Array
     const data = hexToBytes(strip0x(hexBytes));
     return {
-      id: TOKEN_PLUGIN_ID,
+      id: TOKEN_VOTING_PLUGIN_ID,
       data,
     };
   }
@@ -58,7 +58,7 @@ export class ClientTokenEncoding extends ClientCore
    * @param {string} pluginAddress
    * @param {IPluginSettings} params
    * @return {*}  {DaoAction}
-   * @memberof ClientTokenEncoding
+   * @memberof TokenVotingClientEncoding
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
@@ -81,7 +81,7 @@ export class ClientTokenEncoding extends ClientCore
    * @param {string} minterAddress
    * @param {IMintTokenParams} params
    * @return {*}  {DaoAction}
-   * @memberof ClientTokenEncoding
+   * @memberof TokenVotingClientEncoding
    */
   public mintTokenAction(
     minterAddress: string,

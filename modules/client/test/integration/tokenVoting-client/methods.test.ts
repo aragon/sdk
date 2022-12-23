@@ -6,7 +6,7 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import {
   Client,
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
@@ -30,16 +30,16 @@ import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParams,
   contextParamsLocalChain,
-  TEST_TOKEN_DAO_ADDRESS,
-  TEST_TOKEN_PLUGIN_ADDRESS,
-  TEST_TOKEN_PROPOSAL_ID,
+  TEST_TOKEN_VOTING_DAO_ADDRESS,
+  TEST_TOKEN_VOTING_PLUGIN_ADDRESS,
+  TEST_TOKEN_VOTING_PROPOSAL_ID,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { EthereumProvider, Server } from "ganache";
 
-describe("Client Token", () => {
+describe("Token Voting Client", () => {
   let pluginAddress: string;
   let server: Server;
 
@@ -47,7 +47,7 @@ describe("Client Token", () => {
     server = await ganacheSetup.start();
     const deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-    const daoCreation = await deployContracts.createTokenDAO(
+    const daoCreation = await deployContracts.createTokenVotingDAO(
       deployment,
       "testDAO",
       [TEST_WALLET_ADDRESS],
@@ -66,7 +66,7 @@ describe("Client Token", () => {
       it("Should create a new proposal locally", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const tokenClient = new ClientToken(ctxPlugin);
+        const tokenVotingClient = new TokenVotingClient(ctxPlugin);
         const client = new Client(ctx);
 
         // generate actions
@@ -92,7 +92,7 @@ describe("Client Token", () => {
           },
         };
 
-        const ipfsUri = await tokenClient.methods.pinMetadata(metadata);
+        const ipfsUri = await tokenVotingClient.methods.pinMetadata(metadata);
 
         const proposalParams: ICreateProposalParams = {
           pluginAddress,
@@ -103,7 +103,7 @@ describe("Client Token", () => {
         };
 
         for await (
-          const step of tokenClient.methods.createProposal(
+          const step of tokenVotingClient.methods.createProposal(
             proposalParams,
           )
         ) {
@@ -130,7 +130,7 @@ describe("Client Token", () => {
       it("Should vote on a proposal locally", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
 
         const voteParams: IVoteProposalParams = {
           pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -162,7 +162,7 @@ describe("Client Token", () => {
       it("Should execute a local proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
 
         const executeParams: IExecuteProposalParams = {
           pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -192,10 +192,10 @@ describe("Client Token", () => {
     });
 
     describe("Can vote", () => {
-      it("Should check if an user can vote in an Token proposal", async () => {
+      it("Should check if an user can vote in an TokenVoting proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
 
         const params: ICanVoteParams = {
           address: "0x1234567890123456789012345678901234567890",
@@ -211,9 +211,9 @@ describe("Client Token", () => {
       it("Should get the list of members that can vote in a proposal", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
 
-        const pluginAddress = TEST_TOKEN_PLUGIN_ADDRESS;
+        const pluginAddress = TEST_TOKEN_VOTING_PLUGIN_ADDRESS;
         const wallets = await client.methods.getMembers(pluginAddress);
 
         expect(Array.isArray(wallets)).toBe(true);
@@ -224,7 +224,7 @@ describe("Client Token", () => {
       it("Should fetch the given proposal", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
 
         mockedIPFSClient.cat.mockResolvedValueOnce(
           Buffer.from(
@@ -240,7 +240,7 @@ describe("Client Token", () => {
           ),
         );
 
-        const proposalId = TEST_TOKEN_PROPOSAL_ID;
+        const proposalId = TEST_TOKEN_VOTING_PROPOSAL_ID;
         const proposal = await client.methods.getProposal(proposalId);
 
         expect(typeof proposal).toBe("object");
@@ -322,7 +322,7 @@ describe("Client Token", () => {
       it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
 
         const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x0";
         const proposal = await client.methods.getProposal(proposalId);
@@ -332,7 +332,7 @@ describe("Client Token", () => {
       it("Should get a list of proposals filtered by the given criteria", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
         const status = ProposalStatus.EXECUTED;
         const params: IProposalQueryParams = {
@@ -387,9 +387,9 @@ describe("Client Token", () => {
       it("Should get a list of proposals from a specific dao", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
-        const address = TEST_TOKEN_DAO_ADDRESS;
+        const address = TEST_TOKEN_VOTING_DAO_ADDRESS;
         const params: IProposalQueryParams = {
           limit,
           sortBy: ProposalSortBy.CREATED_AT,
@@ -404,7 +404,7 @@ describe("Client Token", () => {
       it("Should get a list of proposals from a dao that has no proposals", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
         const address = TEST_NON_EXISTING_ADDRESS;
         const params: IProposalQueryParams = {
@@ -421,7 +421,7 @@ describe("Client Token", () => {
       it("Should get a list of proposals from an invalid address", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
         const address = TEST_INVALID_ADDRESS;
         const params: IProposalQueryParams = {
@@ -437,9 +437,9 @@ describe("Client Token", () => {
       it("Should get the settings of a plugin given a plugin instance address", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
 
-        const pluginAddress: string = TEST_TOKEN_PLUGIN_ADDRESS;
+        const pluginAddress: string = TEST_TOKEN_VOTING_PLUGIN_ADDRESS;
         const settings = await client.methods.getSettings(pluginAddress);
         expect(settings === null).toBe(false);
         if (settings) {
@@ -453,9 +453,9 @@ describe("Client Token", () => {
       it("Should get the token details of a plugin given a plugin instance address", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
 
-        const pluginAddress: string = TEST_TOKEN_PLUGIN_ADDRESS;
+        const pluginAddress: string = TEST_TOKEN_VOTING_PLUGIN_ADDRESS;
         const token = await client.methods.getToken(pluginAddress);
         expect(typeof token?.address).toBe("string");
         expect(typeof token?.decimals).toBe("number");
@@ -465,7 +465,7 @@ describe("Client Token", () => {
       it("Should return null token details for nonexistent plugin addresses", async () => {
         const ctx = new Context(contextParams);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new ClientToken(ctxPlugin);
+        const client = new TokenVotingClient(ctxPlugin);
 
         const pluginAddress: string = TEST_NON_EXISTING_ADDRESS;
         const token = await client.methods.getToken(pluginAddress);

@@ -7,16 +7,16 @@ import {
   IExecuteProposalParams,
   IVoteProposalParams,
 } from "../../../client-common";
-import { IClientTokenEstimation } from "../../interfaces";
+import { ITokenVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 /**
- * Estimation module the SDK Token Client
+ * Estimation module the SDK TokenVoting Client
  */
-export class ClientTokenEstimation extends ClientCore
-  implements IClientTokenEstimation {
+export class TokenVotingClientEstimation extends ClientCore
+  implements ITokenVotingClientEstimation {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientTokenEstimation.prototype);
+    Object.freeze(TokenVotingClientEstimation.prototype);
     Object.freeze(this);
   }
   /**
@@ -24,7 +24,7 @@ export class ClientTokenEstimation extends ClientCore
    *
    * @param {ICreateProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientTokenEstimation
+   * @memberof TokenVotingClientEstimation
    */
   public async createProposal(
     params: ICreateProposalParams,
@@ -59,7 +59,7 @@ export class ClientTokenEstimation extends ClientCore
    *
    * @param {IVoteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientTokenEstimation
+   * @memberof TokenVotingClientEstimation
    */
   public async voteProposal(
     params: IVoteProposalParams,
@@ -84,11 +84,11 @@ export class ClientTokenEstimation extends ClientCore
   }
 
   /**
-   * Estimates the gas fee of executing an Token proposal
+   * Estimates the gas fee of executing a TokenVoting proposal
    *
    * @param {IExecuteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientTokenEstimation
+   * @memberof TokenVotingClientEstimation
    */
   public async executeProposal(
     params: IExecuteProposalParams,

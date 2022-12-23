@@ -1,5 +1,5 @@
 /* MARKDOWN
-## Token governance plugin client
+## TokenVoting governance plugin client
 
 This is a `Client`-like class, tailored to suit the specific use cases of the
 built-in Token voting DAO Plugin.
@@ -7,16 +7,16 @@ built-in Token voting DAO Plugin.
 Similarly to the above class, it provides high level methods that abstract the
 underlying network requests.
 
-### Creating a DAO with an Token plugin
+### Creating a DAO with an TokenVoting plugin
 */
 import {
   Client,
-  ClientToken,
+  TokenVotingClient,
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
   ICreateParams,
-  ITokenPluginInstall,
+  ITokenVotingPluginInstall,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -26,7 +26,7 @@ const client: Client = new Client(context);
 // Define the plugins to install and their params
 
 // Use an already existing ERC20 token
-const pluginInitParams1: ITokenPluginInstall = {
+const pluginInitParams1: ITokenVotingPluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minTurnout: 0.25, // 25%
@@ -37,7 +37,7 @@ const pluginInitParams1: ITokenPluginInstall = {
   },
 };
 // Mint a new token
-const pluginInitParams2: ITokenPluginInstall = {
+const pluginInitParams2: ITokenVotingPluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24, // seconds
     minTurnout: 0.4, // 40%
@@ -64,17 +64,17 @@ const pluginInitParams2: ITokenPluginInstall = {
     ],
   },
 };
-const tokenInstallPluginItem1 = ClientToken.encoding.getPluginInstallItem(
+const tokenVotingInstallPluginItem1 = TokenVotingClient.encoding.getPluginInstallItem(
   pluginInitParams1,
 );
-const tokenInstallPluginItem2 = ClientToken.encoding.getPluginInstallItem(
+const tokenVotingInstallPluginItem2 = TokenVotingClient.encoding.getPluginInstallItem(
   pluginInitParams2,
 );
 
 const createParams: ICreateParams = {
   metadataUri: "ipfs://123456789",
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [tokenInstallPluginItem1, tokenInstallPluginItem2],
+  plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2],
 };
 
 // gas estimation

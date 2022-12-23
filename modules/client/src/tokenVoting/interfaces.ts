@@ -1,4 +1,4 @@
-// This file contains the definitions of the Token client
+// This file contains the definitions of the TokenVoting client
 import { BigNumber } from "@ethersproject/bignumber";
 import {
   DaoAction,
@@ -24,9 +24,9 @@ import {
   VoteValues,
 } from "../client-common";
 
-// Token
+// TokenVoting
 
-export interface IClientTokenMethods extends IClientCore {
+export interface ITokenVotingClientMethods extends IClientCore {
   createProposal: (
     params: ICreateProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
@@ -39,15 +39,15 @@ export interface IClientTokenMethods extends IClientCore {
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canVote: (params: ICanVoteParams) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
-  getProposal: (propoosalId: string) => Promise<TokenProposal | null>;
+  getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
-  ) => Promise<TokenProposalListItem[]>;
+  ) => Promise<TokenVotingProposalListItem[]>;
   getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
   getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
 }
 
-export interface IClientTokenEncoding extends IClientCore {
+export interface ITokenVotingClientEncoding extends IClientCore {
   updatePluginSettingsAction: (
     pluginAddress: string,
     params: IPluginSettings,
@@ -57,12 +57,12 @@ export interface IClientTokenEncoding extends IClientCore {
     params: IMintTokenParams,
   ) => DaoAction;
 }
-export interface IClientTokenDecoding extends IClientCore {
+export interface ITokenVotingClientDecoding extends IClientCore {
   updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings;
   mintTokenAction: (data: Uint8Array) => IMintTokenParams;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
-export interface IClientTokenEstimation extends IClientCore {
+export interface ITokenVotingClientEstimation extends IClientCore {
   createProposal: (
     params: ICreateProposalParams,
   ) => Promise<GasFeeEstimation>;
@@ -73,15 +73,15 @@ export interface IClientTokenEstimation extends IClientCore {
 }
 
 /** Defines the shape of the Token client class */
-export interface IClientToken {
-  methods: IClientTokenMethods;
-  encoding: IClientTokenEncoding;
-  decoding: IClientTokenDecoding;
-  estimation: IClientTokenEstimation;
+export interface ITokenVotingClient {
+  methods: ITokenVotingClientMethods;
+  encoding: ITokenVotingClientEncoding;
+  decoding: ITokenVotingClientDecoding;
+  estimation: ITokenVotingClientEstimation;
 }
 // Factory init params
 
-export type ITokenPluginInstall = {
+export type ITokenVotingPluginInstall = {
   settings: IPluginSettings;
   newToken?: NewTokenParams;
   useToken?: ExistingTokenParams;
@@ -100,8 +100,8 @@ type NewTokenParams = {
 };
 
 // PROPOSAL RETRIEVAL
-export type TokenProposal = ProposalBase & {
-  result: TokenProposalResult;
+export type TokenVotingProposal = ProposalBase & {
+  result: TokenVotingProposalResult;
   settings: IProposalSettings;
   token: Erc20TokenDetails;
   usedVotingWeight: bigint;
@@ -109,12 +109,12 @@ export type TokenProposal = ProposalBase & {
   totalVotingWeight: bigint;
 };
 
-export type TokenProposalListItem = ProposalListItemBase & {
+export type TokenVotingProposalListItem = ProposalListItemBase & {
   token: Erc20TokenDetails;
-  result: TokenProposalResult;
+  result: TokenVotingProposalResult;
 };
 
-export type TokenProposalResult = {
+export type TokenVotingProposalResult = {
   yes: bigint;
   no: bigint;
   abstain: bigint;
@@ -127,11 +127,11 @@ export type Erc20TokenDetails = {
   decimals: number;
 };
 
-export type SubgraphTokenVoterListItem = SubgraphVoterListItemBase & {
+export type SubgraphTokenVotingVoterListItem = SubgraphVoterListItemBase & {
   weight: string;
 };
 
-export type SubgraphTokenProposalListItem = SubgraphProposalBase & {
+export type SubgraphTokenVotingProposalListItem = SubgraphProposalBase & {
   plugin: {
     token: {
       symbol: string;
@@ -142,12 +142,12 @@ export type SubgraphTokenProposalListItem = SubgraphProposalBase & {
   };
 };
 
-export type SubgraphTokenProposal = SubgraphTokenProposalListItem & {
+export type SubgraphTokenVotingProposal = SubgraphTokenVotingProposalListItem & {
   createdAt: string;
   actions: SubgraphAction[];
   totalSupportThresholdPct: string;
   relativeSupportThresholdPct: string;
-  voters: SubgraphTokenVoterListItem[];
+  voters: SubgraphTokenVotingVoterListItem[];
   census: string;
 };
 
@@ -157,7 +157,7 @@ export interface IMintTokenParams {
 }
 
 export type ContractMintTokenParams = [string, BigNumber];
-export type ContractTokenInitParams = [
+export type ContractTokenVotingInitParams = [
   string, // dao address
   BigNumber, // participation
   BigNumber, // support

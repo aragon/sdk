@@ -1,8 +1,8 @@
 /* MARKDOWN
-### Set Plugin Config (Token)
+### Set Plugin Config (TokenVoting)
 */
 import {
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IPluginSettings,
@@ -11,7 +11,7 @@ import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientToken(contextPlugin);
+const client = new TokenVotingClient(contextPlugin);
 
 // create config action
 const configActionPrarms: IPluginSettings = {

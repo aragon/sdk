@@ -33,21 +33,21 @@ import {
   VoteProposalStepValue,
 } from "../../../client-common";
 import {
-  TokenProposal,
-  TokenProposalListItem,
+  TokenVotingProposal,
+  TokenVotingProposalListItem,
   Erc20TokenDetails,
-  IClientTokenMethods,
-  SubgraphTokenProposal,
-  SubgraphTokenProposalListItem,
+  ITokenVotingClientMethods,
+  SubgraphTokenVotingProposal,
+  SubgraphTokenVotingProposalListItem,
 } from "../../interfaces";
 import {
-  QueryTokenMembers,
-  QueryTokenPluginSettings,
-  QueryTokenProposal,
-  QueryTokenProposals,
-  QueryToken,
+  QueryTokenVotingMembers,
+  QueryTokenVotingPluginSettings,
+  QueryTokenVotingProposal,
+  QueryTokenVotingProposals,
+  QueryTokenVotingToken,
 } from "../graphql-queries";
-import { toTokenProposal, toTokenProposalListItem } from "../utils";
+import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
 import { id } from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
@@ -57,21 +57,21 @@ import {
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
 /**
- * Methods module the SDK Token Client
+ * Methods module the SDK TokenVoting Client
  */
-export class ClientTokenMethods extends ClientCore
-  implements IClientTokenMethods {
+export class TokenVotingClientMethods extends ClientCore
+  implements ITokenVotingClientMethods {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientTokenMethods.prototype);
+    Object.freeze(TokenVotingClientMethods.prototype);
     Object.freeze(this);
   }
   /**
-   * Creates a new proposal on the given Token plugin contract
+   * Creates a new proposal on the given TokenVoting plugin contract
    *
    * @param {ICreateProposalParams} params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
-   * @memberof ClientToken
+   * @memberof TokenVotingClient
    */
   public async *createProposal(
     params: ICreateProposalParams,
@@ -83,7 +83,7 @@ export class ClientTokenMethods extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const tokenContract = TokenVoting__factory.connect(
+    const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -91,7 +91,7 @@ export class ClientTokenMethods extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const tx = await tokenContract.createVote(
+    const tx = await tokenVotingContract.createVote(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
@@ -153,7 +153,7 @@ export class ClientTokenMethods extends ClientCore
    * @param {IVoteProposalParams} params
    * @param {VoteValues} vote
    * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
-   * @memberof ClientToken
+   * @memberof TokenVotingClient
    */
   public async *voteProposal(
     params: IVoteProposalParams,
@@ -193,7 +193,7 @@ export class ClientTokenMethods extends ClientCore
    *
    * @param {IExecuteProposalParams} params
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
-   * @memberof ClientToken
+   * @memberof TokenVotingClient
    */
   public async *executeProposal(
     params: IExecuteProposalParams,
@@ -251,7 +251,7 @@ export class ClientTokenMethods extends ClientCore
    * @async
    * @param {string} pluginAddress
    * @return {*}  {Promise<string[]>}
-   * @memberof ClientToken
+   * @memberof TokenVotingClient
    */
   public async getMembers(pluginAddress: string): Promise<string[]> {
     if (!isAddress(pluginAddress)) {
@@ -261,14 +261,14 @@ export class ClientTokenMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const response = await client.request(QueryTokenMembers, {
+      const response = await client.request(QueryTokenVotingMembers, {
         address: pluginAddress,
       });
       return response.tokenVotingPlugin.members.map((
         member: { address: string },
       ) => member.address);
     } catch {
-      throw new GraphQLError("Token members");
+      throw new GraphQLError("TokenVoting members");
     }
   }
 
@@ -276,10 +276,10 @@ export class ClientTokenMethods extends ClientCore
    * Returns the details of the given proposal
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<TokenProposal>}
-   * @memberof ClientToken
+   * @return {*}  {Promise<TokenVotingProposal>}
+   * @memberof TokenVotingClient
    */
-  public async getProposal(proposalId: string): Promise<TokenProposal | null> {
+  public async getProposal(proposalId: string): Promise<TokenVotingProposal | null> {
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
@@ -289,8 +289,8 @@ export class ClientTokenMethods extends ClientCore
       const {
         tokenVotingProposal,
       }: {
-        tokenVotingProposal: SubgraphTokenProposal;
-      } = await client.request(QueryTokenProposal, {
+        tokenVotingProposal: SubgraphTokenVotingProposal;
+      } = await client.request(QueryTokenVotingProposal, {
         proposalId,
       });
       if (!tokenVotingProposal) {
@@ -301,30 +301,30 @@ export class ClientTokenMethods extends ClientCore
         const metadataCid = resolveIpfsCid(tokenVotingProposal.metadata);
         const metadataString = await this.ipfs.fetchString(metadataCid);
         const metadata = JSON.parse(metadataString) as ProposalMetadata;
-        return toTokenProposal(tokenVotingProposal, metadata);
+        return toTokenVotingProposal(tokenVotingProposal, metadata);
         // TODO: Parse and validate schema
       } catch (err) {
         if (err instanceof InvalidCidError) {
-          return toTokenProposal(
+          return toTokenVotingProposal(
             tokenVotingProposal,
             UNSUPPORTED_PROPOSAL_METADATA_LINK,
           );
         }
-        return toTokenProposal(
+        return toTokenVotingProposal(
           tokenVotingProposal,
           UNAVAILABLE_PROPOSAL_METADATA,
         );
       }
     } catch (err) {
-      throw new GraphQLError("Token proposal");
+      throw new GraphQLError("TokenVoting proposal");
     }
   }
   /**
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
    * @param {IProposalQueryParams} params
-   * @return {*}  {Promise<TokenProposalListItem[]>}
-   * @memberof ClientToken
+   * @return {*}  {Promise<TokenVotingProposalListItem[]>}
+   * @memberof TokenVotingClient
    */
   public async getProposals({
     daoAddressOrEns,
@@ -333,7 +333,7 @@ export class ClientTokenMethods extends ClientCore
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = ProposalSortBy.CREATED_AT,
-  }: IProposalQueryParams): Promise<TokenProposalListItem[]> {
+  }: IProposalQueryParams): Promise<TokenVotingProposalListItem[]> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {
@@ -360,8 +360,8 @@ export class ClientTokenMethods extends ClientCore
       const {
         tokenVotingProposal,
       }: {
-        tokenVotingProposal: SubgraphTokenProposalListItem[];
-      } = await client.request(QueryTokenProposals, {
+        tokenVotingProposal: SubgraphTokenVotingProposalListItem[];
+      } = await client.request(QueryTokenVotingProposals, {
         where,
         limit,
         skip,
@@ -372,22 +372,22 @@ export class ClientTokenMethods extends ClientCore
       return Promise.all(
         tokenVotingProposal.map(
           async (
-            proposal: SubgraphTokenProposalListItem,
-          ): Promise<TokenProposalListItem> => {
+            proposal: SubgraphTokenVotingProposalListItem,
+          ): Promise<TokenVotingProposalListItem> => {
             // format in the metadata field
             try {
               const metadataCid = resolveIpfsCid(proposal.metadata);
               const stringMetadata = await this.ipfs.fetchString(metadataCid);
               const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
-              return toTokenProposalListItem(proposal, metadata);
+              return toTokenVotingProposalListItem(proposal, metadata);
             } catch (err) {
               if (err instanceof InvalidCidError) {
-                return toTokenProposalListItem(
+                return toTokenVotingProposalListItem(
                   proposal,
                   UNSUPPORTED_PROPOSAL_METADATA_LINK,
                 );
               }
-              return toTokenProposalListItem(
+              return toTokenVotingProposalListItem(
                 proposal,
                 UNAVAILABLE_PROPOSAL_METADATA,
               );
@@ -396,7 +396,7 @@ export class ClientTokenMethods extends ClientCore
         ),
       );
     } catch {
-      throw new GraphQLError("Token proposals");
+      throw new GraphQLError("TokenVoting proposals");
     }
   }
 
@@ -405,7 +405,7 @@ export class ClientTokenMethods extends ClientCore
    *
    * @param {string} pluginAddress
    * @return {*}  {Promise<IPluginSettings>}
-   * @memberof ClientToken
+   * @memberof TokenVotingClient
    */
   public async getSettings(
     pluginAddress: string,
@@ -417,7 +417,7 @@ export class ClientTokenMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { tokenVotingPlugin } = await client.request(
-        QueryTokenPluginSettings,
+        QueryTokenVotingPluginSettings,
         {
           address: pluginAddress,
         },
@@ -449,8 +449,8 @@ export class ClientTokenMethods extends ClientCore
    * Returns the details of the token used in a specific plugin instance
    *
    * @param {string} pluginAddress
-   * @return {*}  {Promise<TokenTokenDetails | null>}
-   * @memberof ClientToken
+   * @return {*}  {Promise<Erc20TokenDetails | null>}
+   * @memberof TokenVotingClient
    */
   public async getToken(
     pluginAddress: string,
@@ -461,7 +461,7 @@ export class ClientTokenMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { tokenVotingPlugin } = await client.request(QueryToken, {
+      const { tokenVotingPlugin } = await client.request(QueryTokenVotingToken, {
         address: pluginAddress,
       });
       if (!tokenVotingPlugin) {

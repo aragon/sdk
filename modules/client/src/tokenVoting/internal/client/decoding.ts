@@ -8,18 +8,18 @@ import {
   IPluginSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { IClientTokenDecoding, IMintTokenParams } from "../../interfaces";
+import { ITokenVotingClientDecoding, IMintTokenParams } from "../../interfaces";
 import { ITokenMintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
 import { mintTokenParamsFromContract } from "../utils";
 
 /**
- * Decoding module the SDK Token Client
+ * Decoding module the SDK TokenVoting Client
  */
-export class ClientTokenDecoding extends ClientCore
-  implements IClientTokenDecoding {
+export class TokenVotingClientDecoding extends ClientCore
+  implements ITokenVotingClientDecoding {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientTokenDecoding.prototype);
+    Object.freeze(TokenVotingClientDecoding.prototype);
     Object.freeze(this);
   }
   /**
@@ -27,7 +27,7 @@ export class ClientTokenDecoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IPluginSettings}
-   * @memberof ClientTokenDecoding
+   * @memberof TokenVotingClientDecoding
    */
   public updatePluginSettingsAction(data: Uint8Array): IPluginSettings {
     return decodeUpdatePluginSettingsAction(data);
@@ -37,7 +37,7 @@ export class ClientTokenDecoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {IMintTokenParams}
-   * @memberof ClientTokenDecoding
+   * @memberof TokenVotingClientDecoding
    */
   public mintTokenAction(data: Uint8Array): IMintTokenParams {
     const votingInterface = ITokenMintableUpgradeable__factory
@@ -58,7 +58,7 @@ export class ClientTokenDecoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {(IInterfaceParams | null)}
-   * @memberof ClientTokenDecoding
+   * @memberof TokenVotingClientDecoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
     try {

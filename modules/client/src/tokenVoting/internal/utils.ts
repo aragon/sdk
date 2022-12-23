@@ -8,25 +8,25 @@ import {
   VoteValues,
 } from "../../client-common";
 import {
-  ContractTokenInitParams,
+  ContractTokenVotingInitParams,
   ContractMintTokenParams,
-  TokenProposal,
-  TokenProposalListItem,
-  ITokenPluginInstall,
+  TokenVotingProposal,
+  TokenVotingProposalListItem,
+  ITokenVotingPluginInstall,
   IMintTokenParams,
-  SubgraphTokenProposal,
-  SubgraphTokenProposalListItem,
-  SubgraphTokenVoterListItem,
+  SubgraphTokenVotingProposal,
+  SubgraphTokenVotingProposalListItem,
+  SubgraphTokenVotingVoterListItem,
 } from "../interfaces";
 import { formatEther } from "@ethersproject/units";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
 
-export function toTokenProposal(
-  proposal: SubgraphTokenProposal,
+export function toTokenVotingProposal(
+  proposal: SubgraphTokenVotingProposal,
   metadata: ProposalMetadata,
-): TokenProposal {
+): TokenVotingProposal {
   const startDate = new Date(
     parseInt(proposal.startDate) * 1000,
   );
@@ -104,7 +104,7 @@ export function toTokenProposal(
     usedVotingWeight,
     totalVotingWeight: BigInt(proposal.census),
     votes: proposal.voters.map(
-      (voter: SubgraphTokenVoterListItem) => {
+      (voter: SubgraphTokenVotingVoterListItem) => {
         return {
           address: voter.voter.id,
           vote: SubgraphVoteValuesMap.get(voter.vote) as VoteValues,
@@ -115,10 +115,10 @@ export function toTokenProposal(
   };
 }
 
-export function toTokenProposalListItem(
-  proposal: SubgraphTokenProposalListItem,
+export function toTokenVotingProposalListItem(
+  proposal: SubgraphTokenVotingProposalListItem,
   metadata: ProposalMetadata,
-): TokenProposalListItem {
+): TokenVotingProposalListItem {
   const startDate = new Date(
     parseInt(proposal.startDate) * 1000,
   );
@@ -166,9 +166,9 @@ export function mintTokenParamsFromContract(result: Result): IMintTokenParams {
 }
 
 
-export function tokenInitParamsToContract(
-  params: ITokenPluginInstall,
-): ContractTokenInitParams {
+export function tokenVotingInitParamsToContract(
+  params: ITokenVotingPluginInstall,
+): ContractTokenVotingInitParams {
   // TODO
   // the SC specifies a token field but there is not format on thhis field
   // or how data should be passed to this in case it is using an existing

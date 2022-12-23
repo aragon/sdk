@@ -1,8 +1,8 @@
 /* MARKDOWN
-### Voting on an Token proposal
+### Voting on an TokenVoting proposal
 */
 import {
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IVoteProposalParams,
@@ -15,8 +15,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an Token client
-const client = new ClientToken(contextPlugin);
+// Create an TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",

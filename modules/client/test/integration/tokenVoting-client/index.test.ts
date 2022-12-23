@@ -9,16 +9,16 @@ import { Wallet } from "@ethersproject/wallet";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 import { contextParams, contextParamsFailing } from "../constants";
-import { ClientToken, Context, ContextPlugin } from "../../../src";
+import { TokenVotingClient, Context, ContextPlugin } from "../../../src";
 
-describe("Client Token", () => {
+describe("Token Voting Client", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
 
-      expect(client).toBeInstanceOf(ClientToken);
+      expect(client).toBeInstanceOf(TokenVotingClient);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
@@ -40,9 +40,9 @@ describe("Client Token", () => {
     it("Should create a failing client", async () => {
       const ctx = new Context(contextParamsFailing);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
 
-      expect(client).toBeInstanceOf(ClientToken);
+      expect(client).toBeInstanceOf(TokenVotingClient);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);

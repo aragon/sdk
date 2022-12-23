@@ -309,7 +309,7 @@ export enum DaoSortBy {
 }
 
 export enum SubgraphPluginTypeName {
-  TOKEN = "TokenVotingPlugin",
+  TOKENVOTING = "TokenVotingPlugin",
   ADDRESS_LIST = "AddresslistPlugin",
 }
 
@@ -317,7 +317,7 @@ export const SubgraphPluginTypeMap: Map<
   SubgraphPluginTypeName,
   string
 > = new Map([
-  [SubgraphPluginTypeName.TOKEN, "tokenvoting.dao.eth"],
+  [SubgraphPluginTypeName.TOKENVOTING, "tokenvoting.dao.eth"],
   [SubgraphPluginTypeName.ADDRESS_LIST, "addresslistvoting.dao.eth"],
 ]);
 
@@ -365,13 +365,13 @@ export type SubgraphTransferListItem = {
   type: SubgraphTransferType;
   to: string;
   sender: string;
-  token: SubgraphTokenToken;
+  token: SubgraphToken;
   proposal: {
     id: string | null;
   };
 };
 
-export type SubgraphTokenToken = {
+export type SubgraphToken = {
   id: string;
   name: string;
   symbol: string;

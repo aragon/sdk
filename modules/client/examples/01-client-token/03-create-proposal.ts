@@ -1,8 +1,8 @@
 /* MARKDOWN
-### Creating an Token proposal
+### Creating an TokenVoting proposal
 */
 import {
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
@@ -16,8 +16,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an Token client
-const client = new ClientToken(contextPlugin);
+// Create an TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const metadata:ProposalMetadata= {
   title: "Test Proposal",

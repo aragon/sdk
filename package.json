@@ -23,7 +23,7 @@
     "test": "yarn workspaces run test",
     "docs:client": "jsdoc2md --files ./modules/client/src/*.ts ./modules/client/src/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/client.md",
     "docs:addressList": "jsdoc2md --files ./modules/client/src/addressList/*.ts ./modules/client/src/addressList/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/addressList.md",
-    "docs:token": "jsdoc2md --files ./modules/client/src/token/*.ts ./modules/client/src/token/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/token.md"
+    "docs:tokenVoting": "jsdoc2md --files ./modules/client/src/tokenVoting/*.ts ./modules/client/src/tokenVoting/internal/client/*.ts --configure ./jsdoc2md.json > ./docs/tokenVoting.md"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.18.6",

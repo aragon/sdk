@@ -1,15 +1,15 @@
 import {
-  IClientToken,
-  IClientTokenDecoding,
-  IClientTokenEncoding,
-  IClientTokenEstimation,
-  IClientTokenMethods,
-  ITokenPluginInstall,
+  ITokenVotingClient,
+  ITokenVotingClientDecoding,
+  ITokenVotingClientEncoding,
+  ITokenVotingClientEstimation,
+  ITokenVotingClientMethods,
+  ITokenVotingPluginInstall,
 } from "./interfaces";
-import { ClientTokenMethods } from "./internal/client/methods";
-import { ClientTokenEncoding } from "./internal/client/encoding";
-import { ClientTokenDecoding } from "./internal/client/decoding";
-import { ClientTokenEstimation } from "./internal/client/estimation";
+import { TokenVotingClientMethods } from "./internal/client/methods";
+import { TokenVotingClientEncoding } from "./internal/client/encoding";
+import { TokenVotingClientDecoding } from "./internal/client/decoding";
+import { TokenVotingClientEstimation } from "./internal/client/estimation";
 import {
   ClientCore,
   ContextPlugin,
@@ -19,31 +19,31 @@ import {
 /**
  * Provider a generic client with high level methods to manage and interact an Token Voting plugin installed in a DAO
  */
-export class ClientToken extends ClientCore implements IClientToken {
-  private privateMethods: IClientTokenMethods;
-  private privateEncoding: IClientTokenEncoding;
-  private privateDecoding: IClientTokenDecoding;
-  private privateEstimation: IClientTokenEstimation;
+export class TokenVotingClient extends ClientCore implements ITokenVotingClient {
+  private privateMethods: ITokenVotingClientMethods;
+  private privateEncoding: ITokenVotingClientEncoding;
+  private privateDecoding: ITokenVotingClientDecoding;
+  private privateEstimation: ITokenVotingClientEstimation;
 
   constructor(context: ContextPlugin) {
     super(context);
-    this.privateMethods = new ClientTokenMethods(context);
-    this.privateEncoding = new ClientTokenEncoding(context);
-    this.privateDecoding = new ClientTokenDecoding(context);
-    this.privateEstimation = new ClientTokenEstimation(context);
-    Object.freeze(ClientToken.prototype);
+    this.privateMethods = new TokenVotingClientMethods(context);
+    this.privateEncoding = new TokenVotingClientEncoding(context);
+    this.privateDecoding = new TokenVotingClientDecoding(context);
+    this.privateEstimation = new TokenVotingClientEstimation(context);
+    Object.freeze(TokenVotingClient.prototype);
     Object.freeze(this);
   }
-  get methods(): IClientTokenMethods {
+  get methods(): ITokenVotingClientMethods {
     return this.privateMethods;
   }
-  get encoding(): IClientTokenEncoding {
+  get encoding(): ITokenVotingClientEncoding {
     return this.privateEncoding;
   }
-  get decoding(): IClientTokenDecoding {
+  get decoding(): ITokenVotingClientDecoding {
     return this.privateDecoding;
   }
-  get estimation(): IClientTokenEstimation {
+  get estimation(): ITokenVotingClientEstimation {
     return this.privateEstimation;
   }
 
@@ -52,11 +52,11 @@ export class ClientToken extends ClientCore implements IClientToken {
      * Computes the parameters to be given when creating the DAO,
      * so that the plugin is configured
      *
-     * @param {ITokenPluginInstall} params
+     * @param {ITokenVotingPluginInstall} params
      * @return {*}  {IPluginInstallItem}
-     * @memberof ClientToken
+     * @memberof TokenVotingClient
      */
-    getPluginInstallItem: (params: ITokenPluginInstall): IPluginInstallItem =>
-      ClientTokenEncoding.getPluginInstallItem(params),
+    getPluginInstallItem: (params: ITokenVotingPluginInstall): IPluginInstallItem =>
+      TokenVotingClientEncoding.getPluginInstallItem(params),
   };
 }

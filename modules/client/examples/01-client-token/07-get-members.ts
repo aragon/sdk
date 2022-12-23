@@ -1,17 +1,17 @@
 /* MARKDOWN
-### Loading the list of members (Token)
+### Loading the list of members (TokenVoting)
 
 Retrieving all the members of an Token DAO.
 */
-import { ClientToken, Context, ContextPlugin } from "@aragon/sdk-client";
+import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an Token client
-const client = new ClientToken(contextPlugin);
+// Create an TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const daoAddressorEns = "0x12345...";
 

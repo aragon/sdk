@@ -1,9 +1,9 @@
-export { ClientToken } from "./client";
+export { TokenVotingClient } from "./client";
 export {
-  TokenProposal,
-  TokenProposalListItem,
-  TokenProposalResult,
+  TokenVotingProposal,
+  TokenVotingProposalListItem,
+  TokenVotingProposalResult,
   Erc20TokenDetails,
-  ITokenPluginInstall,
+  ITokenVotingPluginInstall,
   IMintTokenParams,
 } from "./interfaces";

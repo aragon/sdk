@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
-export const QueryToken = gql`
+export const QueryTokenVotingToken = gql`
 query token($address: ID!) {
-  tokenVotingPlugin(id: $address){
+  tokenVotingVotingPlugin(id: $address){
     token {
       id
       name

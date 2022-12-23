@@ -1,13 +1,13 @@
 /* MARKDOWN
-### Retrieve a proposal by proposalID (Token)
+### Retrieve a proposal by proposalID (TokenVoting)
 
-Retrieving the proposals of an Token DAO.
+Retrieving the proposals of an TokenVoting DAO.
 */
 import {
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
-  TokenProposal,
+  TokenVotingProposal,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -15,12 +15,12 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an Token client
-const client = new ClientToken(contextPlugin);
+// Create an TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const proposalId = "0x12345...";
 
-const proposal: TokenProposal | null = await client.methods.getProposal(
+const proposal: TokenVotingProposal | null = await client.methods.getProposal(
   proposalId,
 );
 console.log(proposal);

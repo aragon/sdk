@@ -2,7 +2,7 @@
 declare const describe, it, expect;
 
 import {
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IPluginSettings,
@@ -12,12 +12,12 @@ import {
 import { bytesToHex } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 
-describe("Client Token", () => {
+describe("Token Voting Client", () => {
   describe("Action decoders", () => {
     it("Should decode the plugin settings from an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
         minTurnout: 0.5,
@@ -43,7 +43,7 @@ describe("Client Token", () => {
     it("Should decode a mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
@@ -63,7 +63,7 @@ describe("Client Token", () => {
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow(
@@ -74,7 +74,7 @@ describe("Client Token", () => {
     it("Should get the function for a given action data", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
         minTurnout: 0.5,
@@ -99,7 +99,7 @@ describe("Client Token", () => {
     it("Should try to get the function of an invalid data and return null", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
       const iface = client.decoding.findInterface(data);
       expect(iface).toBe(null);

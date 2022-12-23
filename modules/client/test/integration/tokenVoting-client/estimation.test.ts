@@ -5,7 +5,7 @@ declare const describe, it, expect, beforeAll, afterAll;
 import "../../mocks/aragon-sdk-ipfs";
 
 import {
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
@@ -19,7 +19,7 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 
-describe("Client Token", () => {
+describe("Token Voting Client", () => {
   describe("Estimation Module", () => {
     let server: Server;
 
@@ -36,7 +36,7 @@ describe("Client Token", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -54,7 +54,7 @@ describe("Client Token", () => {
     it("Should estimate the gas fees for casting a vote", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -72,7 +72,7 @@ describe("Client Token", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",

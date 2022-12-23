@@ -17,8 +17,8 @@ export interface Deployment {
   managingDaoAddress: string;
   daoFactory: aragonContracts.DAOFactory;
   daoRegistry: aragonContracts.DAORegistry;
-  tokenRepo: aragonContracts.PluginRepo;
-  tokenPluginSetup: aragonContracts.TokenVotingSetup;
+  tokenVotingRepo: aragonContracts.PluginRepo;
+  tokenVotingPluginSetup: aragonContracts.TokenVotingSetup;
   addressListRepo: aragonContracts.PluginRepo;
   addressListPluginSetup: aragonContracts.AllowlistVotingSetup;
 }
@@ -135,18 +135,18 @@ export async function deploy(): Promise<Deployment> {
 
     const pluginRepo_Factory = new aragonContracts.PluginRepo__factory();
 
-    const tokenSetupFactory = new aragonContracts.TokenVotingSetup__factory();
-    const tokenPluginSetup = await tokenSetupFactory
+    const tokenVotingSetupFactory = new aragonContracts.TokenVotingSetup__factory();
+    const tokenVotingPluginSetup = await tokenVotingSetupFactory
       .connect(deployOwnerWallet)
       .deploy();
     const tokenRepoAddr = await deployPlugin(
       pluginRepoFactory,
-      tokenPluginSetup.address,
+      tokenVotingPluginSetup.address,
       "TokenVoting",
       [1, 0, 0],
       deployOwnerWallet,
     );
-    const tokenRepo = pluginRepo_Factory
+    const tokenVotingRepo = pluginRepo_Factory
       .connect(deployOwnerWallet)
       .attach(tokenRepoAddr);
 
@@ -176,8 +176,8 @@ export async function deploy(): Promise<Deployment> {
       managingDaoAddress: managingDao.address,
       daoFactory,
       daoRegistry,
-      tokenRepo,
-      tokenPluginSetup,
+      tokenVotingRepo,
+      tokenVotingPluginSetup,
       addressListRepo,
       addressListPluginSetup,
     };
@@ -328,7 +328,7 @@ export async function createAddresslistDAO(
   );
 }
 
-export async function createTokenDAO(
+export async function createTokenVotingDAO(
   deployment: Deployment,
   name: string,
   addresses: string[] = [],
@@ -342,8 +342,8 @@ export async function createTokenDAO(
     },
     [
       {
-        pluginSetup: deployment.tokenPluginSetup.address,
-        pluginSetupRepo: deployment.tokenRepo.address,
+        pluginSetup: deployment.tokenVotingPluginSetup.address,
+        pluginSetupRepo: deployment.tokenVotingRepo.address,
         data: defaultAbiCoder.encode(
           [
             "uint64",

@@ -1,8 +1,8 @@
 /* MARKDOWN
-### Decode Mint Token Action (Token)
+### Decode Mint Token Action (TokenVoting)
 */
 import {
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IMintTokenParams,
@@ -11,10 +11,10 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientToken = new ClientToken(contextPlugin);
+const tokenVotingClient = new TokenVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IMintTokenParams = clientToken.decoding.mintTokenAction(data);
+const params: IMintTokenParams = tokenVotingClient.decoding.mintTokenAction(data);
 
 console.log(params);
 /*

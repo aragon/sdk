@@ -2,10 +2,10 @@
 declare const describe, it, expect;
 
 import {
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
-  ITokenPluginInstall,
+  ITokenVotingPluginInstall,
   IMintTokenParams,
   IPluginSettings,
 } from "../../../src";
@@ -14,10 +14,10 @@ import { AddressZero } from "@ethersproject/constants";
 import { InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 
-describe("Client Token", () => {
+describe("Token Voting Client", () => {
   describe("Encoding module", () => {
-    it("Should create a Token client and generate a install entry", async () => {
-      const initParams: ITokenPluginInstall = {
+    it("Should create a TokenVoting client and generate a install entry", async () => {
+      const initParams: ITokenVotingPluginInstall = {
         settings: {
           minDuration: 7200,
           minTurnout: 0.5,
@@ -27,17 +27,17 @@ describe("Client Token", () => {
           address: AddressZero,
         },
       };
-      const tokenInstallPluginItem = ClientToken.encoding.getPluginInstallItem(
+      const tokenVotingInstallPluginItem = TokenVotingClient.encoding.getPluginInstallItem(
         initParams,
       );
 
-      expect(typeof tokenInstallPluginItem).toBe("object");
-      expect(tokenInstallPluginItem.data).toBeInstanceOf(Uint8Array);
+      expect(typeof tokenVotingInstallPluginItem).toBe("object");
+      expect(tokenVotingInstallPluginItem.data).toBeInstanceOf(Uint8Array);
     });
     it("Should encode an update plugin settings action and fail with an invalid address", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
         minTurnout: 0.5,
@@ -52,7 +52,7 @@ describe("Client Token", () => {
     it("Should encode an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const params: IPluginSettings = {
         minDuration: 7200,
         minTurnout: 0.5,
@@ -74,7 +74,7 @@ describe("Client Token", () => {
     it("Should encode a mint action with an invalid recipient address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0xinvalid_address",
         amount: BigInt(10),
@@ -87,7 +87,7 @@ describe("Client Token", () => {
     it("Should encode a mint action with an invalid token address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
@@ -97,10 +97,10 @@ describe("Client Token", () => {
       expect(() => client.encoding.mintTokenAction(minterAddress, params))
         .toThrow(new InvalidAddressError());
     });
-    it("Should encode an Token token mint action", async () => {
+    it("Should encode an TokenVoting token mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientToken(ctxPlugin);
+      const client = new TokenVotingClient(ctxPlugin);
       const params: IMintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),

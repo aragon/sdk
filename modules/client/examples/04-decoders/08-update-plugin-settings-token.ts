@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Decode Update Plugin Settings Action (Token)
+### Decode Update Plugin Settings Action (TokenVoting)
 */
 import {
   ClientAddressList,
