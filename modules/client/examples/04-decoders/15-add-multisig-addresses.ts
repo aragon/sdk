@@ -23,6 +23,6 @@ console.log(settings);
     "0x56789...",
     "0x13579...",
   ],
-  minApprovals: 2n,
+  minApprovals: 2,
 }
 */

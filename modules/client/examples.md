@@ -2076,7 +2076,12 @@ console.log(action);
 ### Add Members (Multisig)
 
 ```ts
-import { Context, ContextPlugin, MultisigClient } from "@aragon/sdk-client";
+import {
+  Context,
+  ContextPlugin,
+  MultisigClient,
+  AddAddressesParams,
+} from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -2089,8 +2094,13 @@ const members: string[] = [
   "0x0987654321098765432109876543210987654321",
 ];
 
-const pluginAddress = "0x0987654321098765432109876543210987654321";
-const action = client.encoding.addMembersAction(pluginAddress, members);
+const addAddressesParams: AddAddressesParams = {
+  members,
+  minApprovals: 2,
+  pluginAddress: "0x0987654321098765432109876543210987654321",
+};
+
+const action = client.encoding.addAddressesAction(addAddressesParams);
 console.log(action);
 /*
 {
@@ -2108,7 +2118,9 @@ import {
   Context,
   ContextPlugin,
   MultisigClient,
+  UpdateAddressesParams,
 } from "@aragon/sdk-client";
+import { RemoveAddressesParams } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -2121,8 +2133,43 @@ const members: string[] = [
   "0x0987654321098765432109876543210987654321",
 ];
 
-const pluginAddress = "0x0987654321098765432109876543210987654321";
-const action = client.encoding.removeMembersAction(pluginAddress, members);
+const removeAddressesParams: RemoveAddressesParams = {
+  members,
+  minApprovals: 2,
+  pluginAddress: "0x0987654321098765432109876543210987654321",
+};
+
+const action = client.encoding.removeAddressesAction(removeAddressesParams);
+console.log(action);
+/*
+{
+  to: "0x1234567890...",
+  value: 0n,
+  data: Uint8Array[12,34,45...]
+}
+*/
+```
+
+### Remove Members (Multisig)
+
+```ts
+import {
+  Context,
+  ContextPlugin,
+  MultisigClient,
+  UpdateMinApprovalsParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new MultisigClient(contextPlugin);
+
+const updateMinApprovals: UpdateMinApprovalsParams = {
+  minApprovals: 2,
+  pluginAddress: "0x0987654321098765432109876543210987654321",
+};
+const action = client.encoding.updateMinApprovalsAction(updateMinApprovals);
 console.log(action);
 /*
 {
@@ -2508,7 +2555,8 @@ console.log(members);
 ### Decode Add Members Action (Multisig)
 
 ```ts
-import { MultisigClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import { Context, ContextPlugin, MultisigClient } from "@aragon/sdk-client";
+import { MultisigPluginSettings } from "../../src";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
@@ -2516,22 +2564,33 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const members: string[] = multisigClient.decoding.addMembersAction(data);
+const settings: MultisigPluginSettings = multisigClient.decoding
+  .addAddressesAction(
+    data,
+  );
 
-console.log(members);
+console.log(settings);
 /*
-[
-  "0x12345...",
-  "0x56789...",
-  "0x13579...",
-]
+{
+  members: [
+    "0x12345...",
+    "0x56789...",
+    "0x13579...",
+  ],
+  minApprovals: 2,
+}
 */
 ```
 
 ### Decode Remove Members Action (Multisig)
 
 ```ts
-import { MultisigClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import {
+  Context,
+  ContextPlugin,
+  MultisigClient,
+  MultisigPluginSettings,
+} from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
@@ -2539,15 +2598,39 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const members: string[] = multisigClient.decoding.removeMembersAction(data);
+const settings: MultisigPluginSettings = multisigClient.decoding
+  .removeAddressesAction(data);
 
-console.log(members);
+console.log(settings);
 /*
-[
-  "0x12345...",
-  "0x56789...",
-  "0x13579...",
-]
+{
+  members: [
+    "0x12345...",
+    "0x56789...",
+    "0x13579...",
+  ],
+  minApprovals: 2
+}
+*/
+```
+
+### Decode Remove Members Action (Multisig)
+
+```ts
+import { Context, ContextPlugin, MultisigClient } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const multisigClient = new MultisigClient(contextPlugin);
+const data: Uint8Array = new Uint8Array([12, 56]);
+
+const minApprovals: number = multisigClient.decoding
+  .updateMinApprovalsAction(data);
+
+console.log(minApprovals);
+/*
+2
 */
 ```
 
@@ -2561,6 +2644,7 @@ import {
   DaoCreationSteps,
   GasFeeEstimation,
   ICreateParams,
+  MultisigPluginInstallParams,
 } from "@aragon/sdk-client";
 import { MultisigClient } from "../../src";
 import { contextParams } from "../00-client/00-context";
@@ -2570,15 +2654,20 @@ const client: Client = new Client(context);
 
 // Define the plugins to install and their params
 
-const addresses: string[] = [
+const members: string[] = [
   "0x1234567890123456789012345678901234567890",
   "0x2345678901234567890123456789012345678901",
   "0x3456789012345678901234567890123456789012",
   "0x4567890123456789012345678901234567890123",
 ];
 
+const multisigIntallParams: MultisigPluginInstallParams = {
+  minApprovals: 3,
+  members,
+}
+
 const multisigInstallPluginItem = MultisigClient.encoding
-  .getPluginInstallItem(addresses);
+  .getPluginInstallItem(multisigIntallParams);
 
 const metadataUri = await client.methods.pinMetadata({
   name: "My DAO",
@@ -2736,12 +2825,12 @@ for await (const step of steps) {
 
 ```ts
 import {
+  ApproveMultisigProposalParams,
+  ApproveProposalStep,
   Context,
   ContextPlugin,
   MultisigClient,
-  ApproveProposalSteps,
 } from "@aragon/sdk-client";
-import { ApproveMultisigProposalParams } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -2751,19 +2840,54 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 
-const voteParams: ApproveMultisigProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890",
+const approveParams: ApproveMultisigProposalParams = {
+  proposalId:
+    "0x1234567890123456789012345678901234567890000000000000000000000001",
+  tryExecution: true,
 };
 
-const steps = client.methods.approveProposal(voteParams);
+const steps = client.methods.approveProposal(approveParams);
 for await (const step of steps) {
   try {
     switch (step.key) {
-      case ApproveProposalSteps.APPROVING:
+      case ApproveProposalStep.APPROVING:
         console.log(step.txHash);
         break;
-      case ApproveProposalSteps.DONE:
+      case ApproveProposalStep.DONE:
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+```
+
+### Approve a multisig proposal
+
+```ts
+import {
+  Context,
+  ContextPlugin,
+  ExecuteProposalStep,
+  MultisigClient,
+} from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+// Create a simple context
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an multisig client
+const client = new MultisigClient(contextPlugin);
+
+const steps = client.methods.executeProposal("0x1234567890123456789012345678901234567890000000000000000000000001");
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case ExecuteProposalStep.EXECUTING:
+        console.log(step.txHash);
+        break;
+      case ExecuteProposalStep.DONE:
         break;
     }
   } catch (err) {
@@ -2776,10 +2900,11 @@ for await (const step of steps) {
 
 ```ts
 import {
-  MultisigClient,
+  CanApproveParams,
   Context,
   ContextPlugin,
   ICanVoteParams,
+  MultisigClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -2789,9 +2914,43 @@ const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
+const canApproveParams: CanApproveParams = {
+  proposalId:
+    "0x1234567890123456789012345678901234567890000000000000000000000001",
+  addressOrEns: "0x1234567890123456789012345678901234567890",
+};
 
-const canVote = await client.methods.canApprove("0x1234567890123456789012345678901234567890");
-console.log(canVote);
+const canApprove = await client.methods.canApprove(canApproveParams);
+console.log(canApprove);
+/*
+true
+*/
+```
+
+### Checking if user can approve in a multisig plugin
+
+```ts
+import {
+  MultisigClient,
+  Context,
+  ContextPlugin,
+  ICanVoteParams,
+  CanExecuteParams,
+} from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+// Create a simple context
+const context: Context = new Context(contextParams);
+// Create a plugin context from the simple context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an multisig client
+const client = new MultisigClient(contextPlugin);
+const canExecuteParams :CanExecuteParams = {
+  proposalId: "0x1234567890123456789012345678901234567890000000000000000000000001",
+  addressOrEns: "0x1234567890123456789012345678901234567890"
+}
+const canExecute = await client.methods.canExecute(canExecuteParams);
+console.log(canExecute);
 /*
 true
 */
@@ -2800,7 +2959,12 @@ true
 ### Loading the list of members (multisig plugin)
 
 ```ts
-import { MultisigClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import {
+  Context,
+  ContextPlugin,
+  MultisigClient,
+  MultisigPluginSettings,
+} from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -2812,16 +2976,19 @@ const client = new MultisigClient(contextPlugin);
 
 const daoAddressorEns = "0x12345...";
 
-const memebers: string[] = await client.methods.getMembers(daoAddressorEns);
-console.log(memebers);
+const settings: MultisigPluginSettings = await client.methods
+  .getPluginSettings(daoAddressorEns);
+console.log(settings);
 /*
-[
-  "0x1234567890123456789012345678901234567890",
-  "0x2345678901234567890123456789012345678901",
-  "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123",
-  "0x5678901234567890123456789012345678901234",
-]
+{
+  members: [
+    "0x1234567890123456789012345678901234567890",
+    "0x2345678901234567890123456789012345678901",
+    "0x3456789012345678901234567890123456789012",
+    "0x4567890123456789012345678901234567890123",
+    "0x5678901234567890123456789012345678901234",
+  ],
+  minApprovals: 4
 */
 ```
 

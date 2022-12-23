@@ -9,10 +9,10 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const minApprovals: bigint = multisigClient.decoding
+const minApprovals: number = multisigClient.decoding
   .updateMinApprovalsAction(data);
 
 console.log(minApprovals);
 /*
-2n
+2
 */

@@ -23,7 +23,7 @@ describe("Client Address List", () => {
       ];
 
       const multisigIntallParams: MultisigPluginInstallParams = {
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
       };
       const installPluginItemItem = MultisigClient.encoding
@@ -48,7 +48,7 @@ describe("Client Address List", () => {
       ];
 
       const addAddressesParams: AddAddressesParams = {
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
         pluginAddress: TEST_INVALID_ADDRESS,
       };
@@ -72,7 +72,7 @@ describe("Client Address List", () => {
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
       const addAddressesParams: AddAddressesParams = {
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
         pluginAddress,
       };
@@ -95,7 +95,7 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const addAddressesParams: AddAddressesParams = {
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
         pluginAddress,
       };
@@ -128,7 +128,7 @@ describe("Client Address List", () => {
 
       const pluginAddress = TEST_INVALID_ADDRESS;
       const removeAddressesParams: RemoveAddressesParams = {
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
         pluginAddress,
       };
@@ -150,7 +150,7 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const removeAddressesParams: RemoveAddressesParams = {
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
         pluginAddress,
       };
@@ -171,7 +171,7 @@ describe("Client Address List", () => {
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
       const removeAddressesParams: RemoveAddressesParams = {
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
         pluginAddress,
       };

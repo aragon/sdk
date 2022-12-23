@@ -73,7 +73,7 @@ export interface IMultisigClient {
 export type MultisigPluginInstallParams = MultisigPluginSettings;
 
 export type MultisigPluginSettings = {
-  minApprovals: bigint;
+  minApprovals: number;
   members: string[];
 };
 
@@ -85,7 +85,7 @@ export type AddAddressesParams = UpdateAddressesParams;
 
 export type UpdateMinApprovalsParams = {
   pluginAddress: string;
-  minApprovals: bigint;
+  minApprovals: number;
 };
 
 export type CreateMultisigProposalParams = CreateProposalBaseParams & {

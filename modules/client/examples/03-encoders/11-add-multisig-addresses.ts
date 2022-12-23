@@ -1,13 +1,12 @@
 /* MARKDOWN
-### Remove Members (Multisig)
+### Add Members (Multisig)
 */
 import {
   Context,
   ContextPlugin,
   MultisigClient,
-  UpdateAddressesParams,
+  AddAddressesParams,
 } from "@aragon/sdk-client";
-import { AddAddressesParams, RemoveAddressesParams } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -22,7 +21,7 @@ const members: string[] = [
 
 const addAddressesParams: AddAddressesParams = {
   members,
-  minApprovals: BigInt(2),
+  minApprovals: 2,
   pluginAddress: "0x0987654321098765432109876543210987654321",
 };
 

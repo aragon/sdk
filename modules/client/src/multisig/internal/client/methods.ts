@@ -311,7 +311,7 @@ export class MultisigClientMethods extends ClientCore
         addressOrEns,
       });
       return {
-        minApprovals: BigInt(multisigPlugin.minApprovals),
+        minApprovals: parseInt(multisigPlugin.minApprovals),
         members: multisigPlugin.members.map((
           member: { address: string },
         ) => member.address),

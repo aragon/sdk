@@ -14,7 +14,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 
 const updateMinApprovals: UpdateMinApprovalsParams = {
-  minApprovals: BigInt(2),
+  minApprovals: 2,
   pluginAddress: "0x0987654321098765432109876543210987654321",
 };
 const action = client.encoding.updateMinApprovalsAction(updateMinApprovals);

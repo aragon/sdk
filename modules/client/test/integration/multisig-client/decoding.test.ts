@@ -27,7 +27,7 @@ describe("Client Address List", () => {
       ];
       const addAddressesParams: AddAddressesParams = {
         pluginAddress,
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
       };
 
@@ -57,7 +57,7 @@ describe("Client Address List", () => {
       ];
       const removeAddressesParams: RemoveAddressesParams = {
         pluginAddress,
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
       };
 
@@ -84,7 +84,7 @@ describe("Client Address List", () => {
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const updateMinApprovalsParams: UpdateMinApprovalsParams = {
         pluginAddress,
-        minApprovals: BigInt(3),
+        minApprovals: 3,
       };
 
       const action = client.encoding.updateMinApprovalsAction(
@@ -124,7 +124,7 @@ describe("Client Address List", () => {
       ];
       const addAddressesParams: AddAddressesParams = {
         pluginAddress,
-        minApprovals: BigInt(3),
+        minApprovals: 3,
         members,
       };
       const action = client.encoding.addAddressesAction(addAddressesParams);
