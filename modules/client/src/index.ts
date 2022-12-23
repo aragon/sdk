@@ -1,6 +1,6 @@
 export { Client } from "./client";
 export * from "./addressList";
-export * from "./token";
+export * from "./tokenVoting";
 export * from "./client-common";
 export {
   AssetBalance,
