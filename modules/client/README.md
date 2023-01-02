@@ -38,7 +38,7 @@ See `ClientCore` ([source](./src/internal/core.ts)):
   - Web3, contracts, signing
   - IPFS
   - GraphQL
-- Inherited by classes like `Client` and all plugin classes like `ClientErc20`.
+- Inherited by classes like `Client` and all plugin classes like `TokenVotingClient`.
 
 ## Common interfaces, types, enum's
 
@@ -60,7 +60,7 @@ When updating the `ClientCore` class:
 ## Developing a new Plugin client
 
 Create a new class that `extends` from `ClientCore`, receives a `Context` on the
-`constructor` and follows the structure of [ClientErc20](./src/client-erc20.ts).
+`constructor` and follows the structure of [TokenVotingClient](./src/token-client.ts).
 
 # Testing
 

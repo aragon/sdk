@@ -1,11 +1,13 @@
 /* MARKDOWN
-### Loading the a proposal by proposalId (address list plugin)
+### Retrieve a proposal by proposalID (TokenVoting)
+
+Retrieving the proposals of an TokenVoting DAO.
 */
 import {
-  AddressListProposal,
-  ClientAddressList,
+  TokenVotingClient,
   Context,
   ContextPlugin,
+  TokenVotingProposal,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -13,12 +15,12 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an AddressList client
-const client = new ClientAddressList(contextPlugin);
+// Create an TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const proposalId = "0x12345...";
 
-const proposal: AddressListProposal | null = await client.methods.getProposal(
+const proposal: TokenVotingProposal | null = await client.methods.getProposal(
   proposalId,
 );
 console.log(proposal);
@@ -41,7 +43,7 @@ console.log(proposal);
       },
       {
         url: "https://docs.com/...",
-        name: "Document"
+        "name: "Document"
       }
     ],
     media: {
@@ -59,26 +61,35 @@ console.log(proposal);
       data: [12,13,154...]
     }
   ],
-  status: "Executed",
   result {
-    yes: 1,
-    no: 1,
-    abstain: 0
+    yes: 700000n,
+    no: 300000n,
+    abstain: 0n
   }
-  settings: {
+  settings:{
     minTurnout: 0.5,
     minSupport: 0.25,
     minDuration: 7200
   },
+  token: {
+    address: "0x1234567890123456789012345678901234567890,
+    name: "The Token",
+    symbol: "TOK",
+    decimals: 18
+  },
+  usedVotingWeight: 1000000n,
   votes: [
     {
       address: "0x123456789123456789123456789123456789",
       vote: 2, // VoteValues.YES
+      voteWeight: 700000n,
     },
     {
       address: "0x234567891234567891234567891234567890",
       vote: 3, // VoteValues.NO
+      voteWeight: 300000n,
     }
   ]
+  status: "Executed",
 }
 */

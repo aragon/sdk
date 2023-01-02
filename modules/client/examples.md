@@ -255,7 +255,7 @@ console.log(daos);
     };
     plugins: [
       {
-        id: "erc20-voting.plugin.dao.eth",
+        id: "token-voting.plugin.dao.eth",
         instanceAddress: "0x12345..."
       }
     ]
@@ -283,7 +283,7 @@ console.log(daos);
     };
     plugins: [
       {
-        id: "erc20-voting.plugin.dao.eth",
+        id: "token-voting.plugin.dao.eth",
         instanceAddress: "0x12345..."
       }
     ]
@@ -328,7 +328,7 @@ console.log(dao);
   creationDate: <Date>,
   plugins: [
     {
-      id: erc20-voting.plugin.dao.eth,
+      id: token-voting.plugin.dao.eth,
       instanceAddress: "0x12345..."
     }
   ]
@@ -446,25 +446,25 @@ console.log(balances);
 */
 ```
 
-## ERC20 governance plugin client
+## TokenVoting governance plugin client
 
 This is a `Client`-like class, tailored to suit the specific use cases of the
-built-in ERC20 voting DAO Plugin.
+built-in Token voting DAO Plugin.
 
 Similarly to the above class, it provides high level methods that abstract the
 underlying network requests.
 
-### Creating a DAO with an ERC20 plugin
+### Creating a DAO with a TokenVoting plugin
 
 ```ts
 import {
   Client,
-  ClientErc20,
+  TokenVotingClient,
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
   ICreateParams,
-  IErc20PluginInstall,
+  ITokenVotingPluginInstall,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -474,7 +474,7 @@ const client: Client = new Client(context);
 // Define the plugins to install and their params
 
 // Use an already existing ERC20 token
-const pluginInitParams1: IErc20PluginInstall = {
+const pluginInitParams1: ITokenVotingPluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minTurnout: 0.25, // 25%
@@ -485,7 +485,7 @@ const pluginInitParams1: IErc20PluginInstall = {
   },
 };
 // Mint a new token
-const pluginInitParams2: IErc20PluginInstall = {
+const pluginInitParams2: ITokenVotingPluginInstall = {
   settings: {
     minDuration: 60 * 60 * 24, // seconds
     minTurnout: 0.4, // 40%
@@ -512,10 +512,10 @@ const pluginInitParams2: IErc20PluginInstall = {
     ],
   },
 };
-const erc20InstallPluginItem1 = ClientErc20.encoding.getPluginInstallItem(
+const tokenVotingInstallPluginItem1 = TokenVotingClient.encoding.getPluginInstallItem(
   pluginInitParams1,
 );
-const erc20InstallPluginItem2 = ClientErc20.encoding.getPluginInstallItem(
+const tokenVotingInstallPluginItem2 = TokenVotingClient.encoding.getPluginInstallItem(
   pluginInitParams2,
 );
 
@@ -530,7 +530,7 @@ const createParams: ICreateParams = {
     }],
   },
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [erc20InstallPluginItem1, erc20InstallPluginItem2],
+  plugins: [tokenInstallPluginItem1, tokenInstallPluginItem2],
 };
 
 // gas estimation
@@ -557,7 +557,7 @@ for await (const step of steps) {
 }
 ```
 
-### Create an ERC20 context
+### Create a TokenVoting context
 
 ```ts
 import { Context, ContextPlugin } from "@aragon/sdk-client";
@@ -575,25 +575,25 @@ contextPlugin.setFull(contextParams);
 console.log(contextPlugin)
 ```
 
-### Create an ERC20 client
+### Create a TokenVoting client
 
 ```ts
-import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
+import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
-const client = new ClientErc20(contextPlugin);
+const client = new TokenVotingClient(contextPlugin);
 
 console.log(client);
 ```
 
-### Creating an ERC20 proposal
+### Creating a TokenVoting proposal
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
@@ -607,8 +607,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create a TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const metadata:ProposalMetadata= {
   title: "Test Proposal",
@@ -659,11 +659,11 @@ for await (const step of steps) {
 }
 ```
 
-### Creating an ERC20 proposal with an action
+### Creating a TokenVoting proposal with an action
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
@@ -677,8 +677,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create a TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 // create config action
 const configActionPrarms: IPluginSettings = {
@@ -739,11 +739,11 @@ for await (const step of steps) {
 }
 ```
 
-### Voting on an ERC20 proposal
+### Voting on a TokenVoting proposal
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IVoteProposalParams,
@@ -756,8 +756,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create a TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -782,11 +782,11 @@ for await (const step of steps) {
 }
 ```
 
-### Checking if user can vote in an ERC20 proposal
+### Checking if user can vote in a TokenVoting proposal
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   ICanVoteParams,
@@ -798,7 +798,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientErc20(contextPlugin);
+const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   address: "0x1234567890123456789012345678901234567890",
@@ -813,20 +813,20 @@ true
 */
 ```
 
-### Loading the list of members (ERC20)
+### Loading the list of members (TokenVoting)
 
-Retrieving all the members of an ERC20 DAO.
+Retrieving all the members of a TokenVoting DAO.
 
 ```ts
-import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
+import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create a TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const daoAddressorEns = "0x12345...";
 
@@ -843,16 +843,16 @@ console.log(memebers);
 */
 ```
 
-### Retrieve a proposal by proposalID (ERC20)
+### Retrieve a proposal by proposalID (TokenVoting)
 
-Retrieving the proposals of an ERC20 DAO.
+Retrieving the proposals of a TokenVoting DAO.
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
-  Erc20Proposal,
+  TokenVotingProposal,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -860,12 +860,12 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create a TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const proposalId = "0x12345...";
 
-const proposal: Erc20Proposal | null = await client.methods.getProposal(
+const proposal: TokenVotingProposal | null = await client.methods.getProposal(
   proposalId,
 );
 console.log(proposal);
@@ -940,16 +940,16 @@ console.log(proposal);
 */
 ```
 
-### Loading the list of proposals (ERC20)
+### Loading the list of proposals (TokenVoting)
 
-Retrieving the proposals of an ERC20 DAO.
+Retrieving the proposals of a TokenVoting DAO.
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
-  Erc20ProposalListItem,
+  TokenVotingProposalListItem,
   IProposalQueryParams,
   ProposalSortBy,
   SortDirection,
@@ -961,8 +961,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create an Token client
+const client = new TokenVotingClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
@@ -972,7 +972,7 @@ const queryParams: IProposalQueryParams = {
   status: ProposalStatus.ACTIVE, // optional
 };
 
-const proposals: Erc20ProposalListItem[] = await client.methods.getProposals(
+const proposals: TokenVotingProposalListItem[] = await client.methods.getProposals(
   queryParams,
 );
 console.log(proposals);
@@ -1067,11 +1067,11 @@ console.log(settings);
 */
 ```
 
-### Loading a plugin's token details
+### Loading a plugin's TokenVoting details
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   Erc20TokenDetails,
@@ -1082,8 +1082,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create a TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
@@ -1442,7 +1442,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
+// Create an AddressList client
 const client = new ClientAddressList(contextPlugin);
 
 const daoAddressorEns = "0x12345...";
@@ -1475,7 +1475,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
+// Create an AddressList client
 const client = new ClientAddressList(contextPlugin);
 
 const proposalId = "0x12345...";
@@ -1629,7 +1629,7 @@ console.log(proposals);
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IPluginSettings,
@@ -1640,8 +1640,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an ERC20 client
-const client = new ClientErc20(contextPlugin);
+// Create a TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
@@ -1858,11 +1858,11 @@ const configAction = client.encoding.updatePluginSettingsAction(
 console.log(configAction);
 ```
 
-### Set Plugin Config (ERC-20)
+### Set Plugin Config (TokenVoting)
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IPluginSettings,
@@ -1871,7 +1871,7 @@ import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientErc20(contextPlugin);
+const client = new TokenVotingClient(contextPlugin);
 
 // create config action
 const configActionPrarms: IPluginSettings = {
@@ -1889,11 +1889,11 @@ const configAction = client.encoding.updatePluginSettingsAction(
 console.log(configAction);
 ```
 
-### Mint Token (ERC-20)
+### Mint Token (TokenVoting)
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IMintTokenParams,
@@ -1902,7 +1902,7 @@ import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientErc20(contextPlugin);
+const client = new TokenVotingClient(contextPlugin);
 
 const params: IMintTokenParams = {
   address: "0x1234567890123456789012345678901234567890",
@@ -2169,11 +2169,11 @@ console.log(params);
 */
 ```
 
-### Decode Update Plugin Settings Action (ERC-20)
+### Decode Update Plugin Settings Action (TokenVoting)
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IPluginSettings,
@@ -2182,7 +2182,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientAddressList = new ClientErc20(contextPlugin);
+const clientAddressList = new TokenVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
 const params: IPluginSettings = clientAddressList.decoding
@@ -2252,16 +2252,16 @@ console.log(functionParams);
 */
 ```
 
-### Get Function Parameters from an encoded action (ERC-20)
+### Get Function Parameters from an encoded action (TokenVoting)
 
 ```ts
-import { ClientErc20, Context, ContextPlugin } from "@aragon/sdk-client";
+import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientErc20(contextPlugin);
+const client = new TokenVotingClient(contextPlugin);
 
 const data: Uint8Array = new Uint8Array([12, 56]);
 
@@ -2278,11 +2278,11 @@ console.log(functionParams);
 */
 ```
 
-### Decode Mint Token Action (ERC-20)
+### Decode Mint Token Action (TokenVoting)
 
 ```ts
 import {
-  ClientErc20,
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IMintTokenParams,
@@ -2291,10 +2291,10 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientErc20 = new ClientErc20(contextPlugin);
+const tokenVotingClient = new TokenVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IMintTokenParams = clientErc20.decoding.mintTokenAction(data);
+const params: IMintTokenParams = tokenVotingClient.decoding.mintTokenAction(data);
 
 console.log(params);
 /*

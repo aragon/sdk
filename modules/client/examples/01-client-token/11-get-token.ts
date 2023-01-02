@@ -1,11 +1,11 @@
 /* MARKDOWN
-### Loading a plugin's settings
+### Loading a plugin's token details
 */
 import {
-  ClientAddressList,
+  TokenVotingClient,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  Erc20TokenDetails,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -13,19 +13,20 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an AddressList client
-const client = new ClientAddressList(contextPlugin);
+// Create an TokenVoting client
+const client = new TokenVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const settings: IPluginSettings | null = await client.methods.getSettings(
+const token: Erc20TokenDetails | null = await client.methods.getToken(
   pluginAddress,
 );
-console.log(settings);
+console.log(token);
 /*
   {
-    minDuration: 7200,
-    minTurnout: 0.55,
-    minSupport: 0.25
+    address: "0x123456789000987654323112345678900987654321",
+    name: "Token",
+    decimals: 18,
+    symbol: "TOK"
   }
 */
