@@ -36,7 +36,7 @@ export class TokenVotingClientEstimation extends ClientCore
       throw new Error("A web3 provider is needed");
     }
 
-    const tokenContract = TokenVoting__factory.connect(
+    const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -44,7 +44,7 @@ export class TokenVotingClientEstimation extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const estimatedGasFee = await tokenContract.estimateGas.createVote(
+    const estimatedGasFee = await tokenVotingContract.estimateGas.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),

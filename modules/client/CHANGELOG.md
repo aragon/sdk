@@ -48,7 +48,7 @@ TEMPLATE:
 - renames `QueryErc20Proposals` to `QueryTokenVotingProposals`
 - renames `QueryToken` to `QueryTokenVotingToken`
 - renames `toErc20Proposal` to `toTokenVotingProposal`
-- renames `toErc20ProposalListItem` to `toErc20ProposalListItem`
+- renames `toErc20ProposalListItem` to `toTokenVotingProposalListItem`
 
 
 ## [0.16.2-alpha]

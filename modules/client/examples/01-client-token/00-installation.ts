@@ -7,7 +7,7 @@ built-in Token voting DAO Plugin.
 Similarly to the above class, it provides high level methods that abstract the
 underlying network requests.
 
-### Creating a DAO with an TokenVoting plugin
+### Creating a DAO with a TokenVoting plugin
 */
 import {
   Client,

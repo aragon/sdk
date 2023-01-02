@@ -454,7 +454,7 @@ built-in Token voting DAO Plugin.
 Similarly to the above class, it provides high level methods that abstract the
 underlying network requests.
 
-### Creating a DAO with an TokenVoting plugin
+### Creating a DAO with a TokenVoting plugin
 
 ```ts
 import {
@@ -557,7 +557,7 @@ for await (const step of steps) {
 }
 ```
 
-### Create an TokenVoting context
+### Create a TokenVoting context
 
 ```ts
 import { Context, ContextPlugin } from "@aragon/sdk-client";
@@ -575,7 +575,7 @@ contextPlugin.setFull(contextParams);
 console.log(contextPlugin)
 ```
 
-### Create an TokenVoting client
+### Create a TokenVoting client
 
 ```ts
 import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
@@ -589,7 +589,7 @@ const client = new TokenVotingClient(contextPlugin);
 console.log(client);
 ```
 
-### Creating an TokenVoting proposal
+### Creating a TokenVoting proposal
 
 ```ts
 import {
@@ -607,7 +607,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const metadata:ProposalMetadata= {
@@ -659,7 +659,7 @@ for await (const step of steps) {
 }
 ```
 
-### Creating an TokenVoting proposal with an action
+### Creating a TokenVoting proposal with an action
 
 ```ts
 import {
@@ -677,7 +677,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 // create config action
@@ -739,7 +739,7 @@ for await (const step of steps) {
 }
 ```
 
-### Voting on an TokenVoting proposal
+### Voting on a TokenVoting proposal
 
 ```ts
 import {
@@ -756,7 +756,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
@@ -782,7 +782,7 @@ for await (const step of steps) {
 }
 ```
 
-### Checking if user can vote in an TokenVoting proposal
+### Checking if user can vote in a TokenVoting proposal
 
 ```ts
 import {
@@ -815,7 +815,7 @@ true
 
 ### Loading the list of members (TokenVoting)
 
-Retrieving all the members of an TokenVoting DAO.
+Retrieving all the members of a TokenVoting DAO.
 
 ```ts
 import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
@@ -825,7 +825,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const daoAddressorEns = "0x12345...";
@@ -845,7 +845,7 @@ console.log(memebers);
 
 ### Retrieve a proposal by proposalID (TokenVoting)
 
-Retrieving the proposals of an TokenVoting DAO.
+Retrieving the proposals of a TokenVoting DAO.
 
 ```ts
 import {
@@ -860,7 +860,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const proposalId = "0x12345...";
@@ -942,7 +942,7 @@ console.log(proposal);
 
 ### Loading the list of proposals (TokenVoting)
 
-Retrieving the proposals of an TokenVoting DAO.
+Retrieving the proposals of a TokenVoting DAO.
 
 ```ts
 import {
@@ -1082,7 +1082,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
@@ -1640,7 +1640,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";

@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Create an TokenVoting context
+### Create a TokenVoting context
 */
 import { Context, ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";
