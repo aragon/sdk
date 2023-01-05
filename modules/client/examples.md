@@ -465,6 +465,7 @@ import {
   ICreateParams,
   ITokenVotingPluginInstall,
   TokenVotingClient,
+  VotingMode,
 } from "@aragon/sdk-client";
 import { IMetadata } from "../../src";
 import { contextParams } from "../00-client/00-context";
@@ -481,8 +482,7 @@ const pluginInitParams1: ITokenVotingPluginInstall = {
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
-    earlyExecution: true, // default false
-    voteReplacement: false, // default false,
+    votingMode: VotingMode.STANDARD, // default standard
   },
   useToken: {
     address: "0x...",
@@ -495,8 +495,7 @@ const pluginInitParams2: ITokenVotingPluginInstall = {
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
-    earlyExecution: true, // default false
-    voteReplacement: false, // default false,
+    votingMode: VotingMode.EARLY_EXECUTION, // default standard
   },
   newToken: {
     name: "Token",
@@ -682,6 +681,7 @@ import {
   ProposalCreationSteps,
   TokenVotingClient,
   VoteValues,
+  VotingMode,
   VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -699,8 +699,7 @@ const configActionPrarms: VotingSettings = {
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
-  earlyExecution: true, // default false
-  voteReplacement: false, // default false
+  votingMode: VotingMode.EARLY_EXECUTION, // default standard
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -1052,15 +1051,17 @@ const client = new ClientAddressList(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const settings: VotingSettings | null = await client.methods.getSettings(
+const settings: VotingSettings | null = await client.methods.getVotingSettings(
   pluginAddress,
 );
 console.log(settings);
 /*
   {
-    minDuration: 7200,
-    minTurnout: 0.55,
-    minSupport: 0.25
+    minDuration: 60 * 60 * 24 * 2, // seconds
+    minParticipation: 0.25, // 25%
+    supportThreshold: 0.5, // 50%
+    minProposerVotingPower: BigInt("5000"), // default 0
+    votingMode: "Standard",
   }
 */
 ```
@@ -1304,6 +1305,7 @@ import {
   ProposalCreationSteps,
   ProposalMetadata,
   VoteValues,
+  VotingMode,
   VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -1321,8 +1323,7 @@ const configActionPrarms: VotingSettings = {
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
-  earlyExecution: true, // default false
-  voteReplacement: false, // default false,
+  votingMode: VotingMode.EARLY_EXECUTION,
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -1667,7 +1668,7 @@ const client = new ClientAddressList(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const settings: VotingSettings | null = await client.methods.getSettings(
+const settings: VotingSettings | null = await client.methods.getVotingSettings(
   pluginAddress,
 );
 console.log(settings);
@@ -1677,6 +1678,7 @@ console.log(settings);
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
+    votingMode: "Standard",
   }
 */
 ```
@@ -1857,8 +1859,10 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
+  VotingMode,
   VotingSettings,
 } from "@aragon/sdk-client";
+import {} from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -1871,8 +1875,7 @@ const configActionPrarms: VotingSettings = {
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
-  earlyExecution: true, // default false
-  voteReplacement: false, // default false,
+  votingMode: VotingMode.STANDARD,
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -1891,6 +1894,7 @@ import {
   Context,
   ContextPlugin,
   TokenVotingClient,
+  VotingMode,
   VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -1905,8 +1909,7 @@ const configActionPrarms: VotingSettings = {
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
-  earlyExecution: true, // default false
-  voteReplacement: false, // default false,
+  votingMode: VotingMode.STANDARD, // default standard
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -2192,8 +2195,9 @@ console.log(params);
 /*
 {
   minDuration: 7200, // seconds
-  minTurnout: 0.25, // 25%
-  minSupport: 0.5 // 50%
+  minParticipation: 0.25, // 25%
+  supportThreshold: 0.5, // 50%
+  minProposerVotingPower: BigInt("1")
 }
 */
 ```
@@ -2202,27 +2206,28 @@ console.log(params);
 
 ```ts
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
+  TokenVotingClient,
   VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientToken = new TokenVotingClient(contextPlugin);
+const tokenVotingClient = new TokenVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: VotingSettings = clientToken.decoding
+const params: VotingSettings = tokenVotingClient.decoding
   .updatePluginSettingsAction(data);
 
 console.log(params);
 /*
 {
   minDuration: 7200, // seconds
-  minTurnout: 0.25, // 25%
-  minSupport: 0.5 // 50%
+  minParticipation: 0.25, // 25%
+  supportThreshold: 0.5, // 50%
+  minProposerVotingPower: BigInt("5000")
 }
 */
 ```
