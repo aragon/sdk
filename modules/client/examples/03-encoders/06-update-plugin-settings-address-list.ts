@@ -5,8 +5,10 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
+  VotingMode,
   VotingSettings,
 } from "@aragon/sdk-client";
+import {} from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -19,8 +21,7 @@ const configActionPrarms: VotingSettings = {
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
-  earlyExecution: true, // default false
-  voteReplacement: false, // default false,
+  votingMode: VotingMode.STANDARD,
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";

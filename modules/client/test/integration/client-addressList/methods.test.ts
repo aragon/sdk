@@ -409,7 +409,7 @@ describe("Client Address List", () => {
       const client = new ClientAddressList(ctxPlugin);
 
       const pluginAddress: string = TEST_ADDRESSLIST_PLUGIN_ADDRESS;
-      const settings = await client.methods.getSettings(pluginAddress);
+      const settings = await client.methods.getVotingSettings(pluginAddress);
 
       expect(settings === null).toBe(false);
       if (settings) {

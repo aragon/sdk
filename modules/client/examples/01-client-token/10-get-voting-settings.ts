@@ -18,14 +18,16 @@ const client = new ClientAddressList(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const settings: VotingSettings | null = await client.methods.getSettings(
+const settings: VotingSettings | null = await client.methods.getVotingSettings(
   pluginAddress,
 );
 console.log(settings);
 /*
   {
-    minDuration: 7200,
-    minTurnout: 0.55,
-    minSupport: 0.25
+    minDuration: 60 * 60 * 24 * 2, // seconds
+    minParticipation: 0.25, // 25%
+    supportThreshold: 0.5, // 50%
+    minProposerVotingPower: BigInt("5000"), // default 0
+    votingMode: "Standard",
   }
 */

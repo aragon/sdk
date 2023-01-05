@@ -17,6 +17,7 @@ import {
   ICreateParams,
   ITokenVotingPluginInstall,
   TokenVotingClient,
+  VotingMode,
 } from "@aragon/sdk-client";
 import { IMetadata } from "../../src";
 import { contextParams } from "../00-client/00-context";
@@ -33,8 +34,7 @@ const pluginInitParams1: ITokenVotingPluginInstall = {
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
-    earlyExecution: true, // default false
-    voteReplacement: false, // default false,
+    votingMode: VotingMode.STANDARD, // default standard
   },
   useToken: {
     address: "0x...",
@@ -47,8 +47,7 @@ const pluginInitParams2: ITokenVotingPluginInstall = {
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
-    earlyExecution: true, // default false
-    voteReplacement: false, // default false,
+    votingMode: VotingMode.EARLY_EXECUTION, // default standard
   },
   newToken: {
     name: "Token",

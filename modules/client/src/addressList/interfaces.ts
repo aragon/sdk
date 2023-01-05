@@ -44,7 +44,7 @@ export interface IClientAddressListMethods extends IClientCore {
   getProposals: (
     params: IProposalQueryParams,
   ) => Promise<AddressListProposalListItem[]>;
-  getSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
+  getVotingSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
 }
 
 export interface IClientAddressListEncoding extends IClientCore {

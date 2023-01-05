@@ -451,7 +451,7 @@ describe("Token Voting Client", () => {
         const client = new TokenVotingClient(ctxPlugin);
 
         const pluginAddress: string = TEST_TOKEN_VOTING_PLUGIN_ADDRESS;
-        const settings = await client.methods.getSettings(pluginAddress);
+        const settings = await client.methods.getVotingSettings(pluginAddress);
         expect(settings === null).toBe(false);
         if (settings) {
           expect(typeof settings.minDuration).toBe("number");

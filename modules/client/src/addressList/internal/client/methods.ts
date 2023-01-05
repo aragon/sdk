@@ -413,7 +413,7 @@ export class ClientAddressListMethods extends ClientCore
    * @return {*}  {(Promise<VotingSettings | null>)}
    * @memberof ClientAddressListMethods
    */
-  public async getSettings(
+  public async getVotingSettings(
     pluginAddress: string,
   ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
@@ -444,6 +444,7 @@ export class ClientAddressListMethods extends ClientCore
         minProposerVotingPower: BigInt(
           addresslistVotingPlugin.minParticipation,
         ),
+        votingMode: addresslistVotingPlugin.votingMode,
       };
     } catch {
       throw new Error("Cannot fetch the settings data from GraphQL");

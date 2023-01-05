@@ -3,7 +3,7 @@ import {
   ClientCore,
   ContextPlugin,
   DaoAction,
-  encodeUpdatePluginSettingsAction,
+  encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
   VotingSettings,
 } from "../../../client-common";
@@ -79,7 +79,7 @@ export class TokenVotingClientEncoding extends ClientCore
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data: encodeUpdatePluginSettingsAction(params),
+      data: encodeUpdateVotingSettingsAction(params),
     };
   }
 

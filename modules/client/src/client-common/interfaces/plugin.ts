@@ -30,17 +30,23 @@ export interface IProposalSettings {
   duration: number;
 }
 
-
 export type VotingSettings = {
-  earlyExecution?: boolean;
-  voteReplacement?: boolean;
+  /* default is standard */
+  votingMode?: VotingMode;
   /** Float between 0 and 1 */
   supportThreshold: number;
   /** Float between 0 and 1 */
   minParticipation: number;
   minDuration: number;
+  /* default is 0 */
   minProposerVotingPower?: bigint;
 };
+
+export enum VotingMode {
+  STANDARD = "Standard",
+  EARLY_EXECUTION = "EarlyExecution",
+  VOTE_REPLACEMENT = "VoteReplacement",
+}
 
 export type ContractVotingSettings = [
   BigNumber, // votingMode
@@ -227,15 +233,10 @@ export type ExecuteProposalStepValue =
 
 export type ContractPluginSettings = [BigNumber, BigNumber, BigNumber];
 
-export enum SubgraphVotingMode {
-  STANDARD = "Standard",
-  EARLY_EXECUTION = "EarlyExecution",
-  VOTE_REPLACEMENT = "VoteReplacement",
-}
-
-export type SubgraphVotingSettings = {
-  minDuration: string
-  minProposerVotingPower: string
-  minParticipation: string
-  supportThreshold: string
-}
+export type SubgraphVotingSettings = {
+  minDuration: string;
+  minProposerVotingPower: string;
+  minParticipation: string;
+  supportThreshold: string;
+  votingMode: VotingMode;
+};

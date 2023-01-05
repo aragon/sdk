@@ -20,9 +20,9 @@ import {
   SubgraphAction,
   SubgraphProposalBase,
   SubgraphVoterListItemBase,
-  SubgraphVotingMode,
   VoteProposalStepValue,
   VoteValues,
+  VotingMode,
   VotingSettings,
 } from "../client-common";
 
@@ -45,7 +45,7 @@ export interface ITokenVotingClientMethods extends IClientCore {
   getProposals: (
     params: IProposalQueryParams,
   ) => Promise<TokenVotingProposalListItem[]>;
-  getSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
+  getVotingSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
   getToken: (
     pluginAddress: string,
   ) => Promise<Erc20TokenDetails | Erc721TokenDetails | null>;
@@ -174,7 +174,7 @@ export type SubgraphTokenVotingProposal =
     minParticipation: string;
     voters: SubgraphTokenVotingVoterListItem[];
     totalVotingPower: string;
-    votingMode: SubgraphVotingMode;
+    votingMode: VotingMode;
   };
 
 export interface IMintTokenParams {

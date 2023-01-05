@@ -5,7 +5,7 @@ import {
   ContextPlugin,
   ContractVotingSettings,
   DaoAction,
-  encodeUpdatePluginSettingsAction,
+  encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
   VotingSettings,
   votingSettingsToContract,
@@ -79,7 +79,7 @@ export class ClientAddressListEncoding extends ClientCore
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data: encodeUpdatePluginSettingsAction(params),
+      data: encodeUpdateVotingSettingsAction(params),
     };
   }
   /**

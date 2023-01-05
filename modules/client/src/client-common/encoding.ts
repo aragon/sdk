@@ -10,10 +10,10 @@ import {
   strip0x,
   UnexpectedActionError,
 } from "@aragon/sdk-common";
-import { VotingSettings } from "./interfaces/plugin";
+import { VotingMode, VotingSettings } from "./interfaces/plugin";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
-import { getVotingMode } from "./utils";
+import { votingModeToContracts } from "./utils";
 
 export function decodeUpdatePluginSettingsAction(
   data: Uint8Array,
@@ -34,7 +34,7 @@ export function decodeUpdatePluginSettingsAction(
   return pluginSettingsFromContract(result);
 }
 
-export function encodeUpdatePluginSettingsAction(
+export function encodeUpdateVotingSettingsAction(
   params: VotingSettings,
 ): Uint8Array {
   const votingInterface = MajorityVotingBase__factory.createInterface();
@@ -61,7 +61,9 @@ export function votingSettingsToContract(
   params: VotingSettings,
 ): IMajorityVoting.VotingSettingsStruct {
   return {
-    votingMode: BigNumber.from(getVotingMode(params)),
+    votingMode: BigNumber.from(
+      votingModeToContracts(params.votingMode || VotingMode.STANDARD),
+    ),
     supportThreshold: BigNumber.from(encodeRatio(params.supportThreshold, 2)),
     minParticipation: BigNumber.from(encodeRatio(params.minParticipation, 2)),
     minDuration: BigNumber.from(params.minDuration),

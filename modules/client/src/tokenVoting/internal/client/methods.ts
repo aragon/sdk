@@ -409,7 +409,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @return {*}  {Promise<VotingSettings>}
    * @memberof TokenVotingClient
    */
-  public async getSettings(
+  public async getVotingSettings(
     pluginAddress: string,
   ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
@@ -438,6 +438,7 @@ export class TokenVotingClientMethods extends ClientCore
         minProposerVotingPower: BigInt(
           tokenVotingPlugin.minParticipation,
         ),
+        votingMode: tokenVotingPlugin.votingMode,
       };
     } catch {
       throw new GraphQLError("plugin settings");
