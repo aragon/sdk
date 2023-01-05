@@ -192,7 +192,7 @@ describe("Token Voting Client", () => {
     });
 
     describe("Can vote", () => {
-      it("Should check if an user can vote in an TokenVoting proposal", async () => {
+      it("Should check if an user can vote in a TokenVoting proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
@@ -300,15 +300,15 @@ describe("Token Voting Client", () => {
               proposal.settings.minTurnout <= 1,
           ).toBe(true);
           // token
-          if(proposal.token){
+          if (proposal.token) {
             expect(typeof proposal.token.name).toBe("string");
             expect(typeof proposal.token.symbol).toBe("string");
             expect(typeof proposal.token.address).toBe("string");
             expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-            if ('decimals' in proposal.token) {
+            if ("decimals" in proposal.token) {
               expect(typeof proposal.token.decimals).toBe("number");
-            } else if('baseUri' in proposal.token) {
-            expect(typeof proposal.token.baseUri).toBe("string");
+            } else if ("baseUri" in proposal.token) {
+              expect(typeof proposal.token.baseUri).toBe("string");
             }
           }
           expect(typeof proposal.usedVotingWeight).toBe("bigint");
@@ -380,15 +380,15 @@ describe("Token Voting Client", () => {
           expect(typeof proposal.result.no).toBe("bigint");
           expect(typeof proposal.result.abstain).toBe("bigint");
           // token
-          if(proposal.token){
+          if (proposal.token) {
             expect(typeof proposal.token.name).toBe("string");
             expect(typeof proposal.token.symbol).toBe("string");
             expect(typeof proposal.token.address).toBe("string");
             expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-            if ('decimals' in proposal.token) {
+            if ("decimals" in proposal.token) {
               expect(typeof proposal.token.decimals).toBe("number");
-            } else if('baseUri' in proposal.token) {
-            expect(typeof proposal.token.baseUri).toBe("string");
+            } else if ("baseUri" in proposal.token) {
+              expect(typeof proposal.token.baseUri).toBe("string");
             }
           }
         }

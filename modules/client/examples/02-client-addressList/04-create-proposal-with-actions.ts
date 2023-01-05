@@ -25,9 +25,9 @@ const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
-  minProposerVotingPower: BigInt("5000"),
-  earlyExecution: true,
-  voteReplacement: false,
+  minProposerVotingPower: BigInt("5000"), // default 0
+  earlyExecution: true, // default false
+  voteReplacement: false, // default false,
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -37,8 +37,7 @@ const configAction = client.encoding.updatePluginSettingsAction(
   configActionPrarms,
 );
 
-
-const daoMetadata: ProposalMetadata =  {
+const daoMetadata: ProposalMetadata = {
   title: "Test Proposal",
   summary: "This is a short description",
   description: "This is a long descrioption",
@@ -56,7 +55,7 @@ const daoMetadata: ProposalMetadata =  {
     logo: "https://...",
     header: "https://...",
   },
-}
+};
 
 const metadataUri = await client.methods.pinMetadata(daoMetadata);
 

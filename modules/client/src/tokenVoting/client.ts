@@ -17,9 +17,10 @@ import {
 } from "../client-common";
 
 /**
- * Provider a generic client with high level methods to manage and interact an Token Voting plugin installed in a DAO
+ * Provider a generic client with high level methods to manage and interact a Token Voting plugin installed in a DAO
  */
-export class TokenVotingClient extends ClientCore implements ITokenVotingClient {
+export class TokenVotingClient extends ClientCore
+  implements ITokenVotingClient {
   private privateMethods: ITokenVotingClientMethods;
   private privateEncoding: ITokenVotingClientEncoding;
   private privateDecoding: ITokenVotingClientDecoding;
@@ -56,7 +57,9 @@ export class TokenVotingClient extends ClientCore implements ITokenVotingClient 
      * @return {*}  {IPluginInstallItem}
      * @memberof TokenVotingClient
      */
-    getPluginInstallItem: (params: ITokenVotingPluginInstall): IPluginInstallItem =>
+    getPluginInstallItem: (
+      params: ITokenVotingPluginInstall,
+    ): IPluginInstallItem =>
       TokenVotingClientEncoding.getPluginInstallItem(params),
   };
 }

@@ -27,6 +27,6 @@ console.log(settings);
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
-    minProposerVotingPower: BigInt("5000"),
+    minProposerVotingPower: BigInt("5000"), // default 0
   }
 */

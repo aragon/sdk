@@ -2,11 +2,11 @@
 declare const describe, it, expect;
 
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
-  ITokenVotingPluginInstall,
   IMintTokenParams,
+  ITokenVotingPluginInstall,
+  TokenVotingClient,
   VotingSettings,
 } from "../../../src";
 
@@ -27,9 +27,10 @@ describe("Token Voting Client", () => {
           address: AddressZero,
         },
       };
-      const tokenVotingInstallPluginItem = TokenVotingClient.encoding.getPluginInstallItem(
-        initParams,
-      );
+      const tokenVotingInstallPluginItem = TokenVotingClient.encoding
+        .getPluginInstallItem(
+          initParams,
+        );
 
       expect(typeof tokenVotingInstallPluginItem).toBe("object");
       expect(tokenVotingInstallPluginItem.data).toBeInstanceOf(Uint8Array);
@@ -97,7 +98,7 @@ describe("Token Voting Client", () => {
       expect(() => client.encoding.mintTokenAction(minterAddress, params))
         .toThrow(new InvalidAddressError());
     });
-    it("Should encode an TokenVoting token mint action", async () => {
+    it("Should encode a TokenVoting token mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);

@@ -2,7 +2,7 @@
 
 <dl>
 <dt><a href="#TokenVotingClient">TokenVotingClient</a></dt>
-<dd><p>Provider a generic client with high level methods to manage and interact an Token Voting plugin installed in a DAO</p></dd>
+<dd><p>Provider a generic client with high level methods to manage and interact a Token Voting plugin installed in a DAO</p></dd>
 <dt><a href="#TokenVotingClientDecoding">TokenVotingClientDecoding</a></dt>
 <dd><p>Decoding module the SDK TokenVoting Client</p></dd>
 <dt><a href="#TokenVotingClientEncoding">TokenVotingClientEncoding</a></dt>
@@ -23,7 +23,7 @@
 <a name="TokenVotingClient"></a>
 
 ## TokenVotingClient
-<p>Provider a generic client with high level methods to manage and interact an Token Voting plugin installed in a DAO</p>
+<p>Provider a generic client with high level methods to manage and interact a Token Voting plugin installed in a DAO</p>
 
 **Kind**: global class  
 

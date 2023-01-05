@@ -459,12 +459,12 @@ underlying network requests.
 ```ts
 import {
   Client,
-  TokenVotingClient,
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
   ICreateParams,
   ITokenVotingPluginInstall,
+  TokenVotingClient,
 } from "@aragon/sdk-client";
 import { IMetadata } from "../../src";
 import { contextParams } from "../00-client/00-context";
@@ -480,9 +480,9 @@ const pluginInitParams1: ITokenVotingPluginInstall = {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
-    minProposerVotingPower: BigInt("5000"),
-    earlyExecution: true,
-    voteReplacement: false
+    minProposerVotingPower: BigInt("5000"), // default 0
+    earlyExecution: true, // default false
+    voteReplacement: false, // default false,
   },
   useToken: {
     address: "0x...",
@@ -494,9 +494,9 @@ const pluginInitParams2: ITokenVotingPluginInstall = {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
-    minProposerVotingPower: BigInt("5000"),
-    earlyExecution: true,
-    voteReplacement: false
+    minProposerVotingPower: BigInt("5000"), // default 0
+    earlyExecution: true, // default false
+    voteReplacement: false, // default false,
   },
   newToken: {
     name: "Token",
@@ -519,12 +519,14 @@ const pluginInitParams2: ITokenVotingPluginInstall = {
     ],
   },
 };
-const tokenVotingInstallPluginItem1 = TokenVotingClient.encoding.getPluginInstallItem(
-  pluginInitParams1,
-);
-const tokenVotingInstallPluginItem2 = TokenVotingClient.encoding.getPluginInstallItem(
-  pluginInitParams2,
-);
+const tokenVotingInstallPluginItem1 = TokenVotingClient.encoding
+  .getPluginInstallItem(
+    pluginInitParams1,
+  );
+const tokenVotingInstallPluginItem2 = TokenVotingClient.encoding
+  .getPluginInstallItem(
+    pluginInitParams2,
+  );
 
 const daoMetadata: IMetadata = {
   name: "My DAO",
@@ -586,10 +588,10 @@ contextPlugin.setFull(contextParams);
 console.log(contextPlugin)
 ```
 
-### Create an TokenVoting client
+### Create a TokenVoting client
 
 ```ts
-import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import { Context, ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context = new Context(contextParams);
@@ -600,16 +602,16 @@ const client = new TokenVotingClient(contextPlugin);
 console.log(client);
 ```
 
-### Creating an TokenVoting proposal
+### Creating a TokenVoting proposal
 
 ```ts
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
+  TokenVotingClient,
   VoteValues,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -618,10 +620,10 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
-const metadata:ProposalMetadata= {
+const metadata: ProposalMetadata = {
   title: "Test Proposal",
   summary: "This is a short description",
   description: "This is a long description",
@@ -639,7 +641,7 @@ const metadata:ProposalMetadata= {
     logo: "https://...",
     header: "https://...",
   },
-}
+};
 
 const ipfsUri = await client.methods.pinMetadata(metadata);
 
@@ -670,15 +672,15 @@ for await (const step of steps) {
 }
 ```
 
-### Creating an TokenVoting proposal with an action
+### Creating a TokenVoting proposal with an action
 
 ```ts
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
   ProposalCreationSteps,
+  TokenVotingClient,
   VoteValues,
   VotingSettings,
 } from "@aragon/sdk-client";
@@ -688,7 +690,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 // create config action
@@ -696,9 +698,9 @@ const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
-  minProposerVotingPower: BigInt("5000"),
-  earlyExecution: true,
-  voteReplacement: false
+  minProposerVotingPower: BigInt("5000"), // default 0
+  earlyExecution: true, // default false
+  voteReplacement: false, // default false
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -735,14 +737,14 @@ for await (const step of steps) {
 }
 ```
 
-### Voting on an TokenVoting proposal
+### Voting on a TokenVoting proposal
 
 ```ts
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   IVoteProposalParams,
+  TokenVotingClient,
   VoteProposalStep,
   VoteValues,
 } from "@aragon/sdk-client";
@@ -752,7 +754,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
@@ -777,14 +779,14 @@ for await (const step of steps) {
 }
 ```
 
-### Checking if user can vote in an TokenVoting proposal
+### Checking if user can vote in a TokenVoting proposal
 
 ```ts
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   ICanVoteParams,
+  TokenVotingClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -810,23 +812,23 @@ true
 
 ### Loading the list of members (TokenVoting)
 
-Retrieving all the members of an Token DAO.
+Retrieving all the members of a TokenVoting DAO.
 
 ```ts
-import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import { Context, ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const daoAddressorEns = "0x12345...";
 
-const memebers: string[] = await client.methods.getMembers(daoAddressorEns);
-console.log(memebers);
+const members: string[] = await client.methods.getMembers(daoAddressorEns);
+console.log(members);
 /*
 [
   "0x1234567890123456789012345678901234567890",
@@ -840,13 +842,13 @@ console.log(memebers);
 
 ### Retrieve a proposal by proposalID (TokenVoting)
 
-Retrieving the proposals of an TokenVoting DAO.
+Retrieving the proposals of a TokenVoting DAO.
 
 ```ts
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
+  TokenVotingClient,
   TokenVotingProposal,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -855,7 +857,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const proposalId = "0x12345...";
@@ -915,6 +917,7 @@ console.log(proposal);
     address: "0x1234567890123456789012345678901234567890,
     name: "The Token",
     symbol: "TOK",
+    decimals: 18,
   },
   usedVotingWeight: 1000000n,
   votes: [
@@ -936,18 +939,18 @@ console.log(proposal);
 
 ### Loading the list of proposals (TokenVoting)
 
-Retrieving the proposals of an TokenVoting DAO.
+Retrieving the proposals of a TokenVoting DAO.
 
 ```ts
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
-  TokenVotingProposalListItem,
   IProposalQueryParams,
   ProposalSortBy,
-  SortDirection,
   ProposalStatus,
+  SortDirection,
+  TokenVotingClient,
+  TokenVotingProposalListItem,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -955,7 +958,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
@@ -966,9 +969,10 @@ const queryParams: IProposalQueryParams = {
   status: ProposalStatus.ACTIVE, // optional
 };
 
-const proposals: TokenVotingProposalListItem[] = await client.methods.getProposals(
-  queryParams,
-);
+const proposals: TokenVotingProposalListItem[] = await client.methods
+  .getProposals(
+    queryParams,
+  );
 console.log(proposals);
 /*
 [
@@ -1065,10 +1069,10 @@ console.log(settings);
 
 ```ts
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   Erc20TokenDetails,
+  TokenVotingClient,
 } from "@aragon/sdk-client";
 import { Erc721TokenDetails } from "../../src/tokenVoting/interfaces";
 import { contextParams } from "../00-client/00-context";
@@ -1077,14 +1081,15 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const token: Erc20TokenDetails | Erc721TokenDetails | null = await client.methods.getToken(
-  pluginAddress,
-);
+const token: Erc20TokenDetails | Erc721TokenDetails | null = await client
+  .methods.getToken(
+    pluginAddress,
+  );
 console.log(token);
 /*
   {
@@ -1093,7 +1098,7 @@ console.log(token);
     symbol: "TOK",
     decimals: 18
   }
-  or 
+  or
   {
     address: "0x123456789000987654323112345678900987654321",
     name: "Token",
@@ -1129,9 +1134,9 @@ const pluginInitParams: IAddressListPluginInstall = {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
-    minProposerVotingPower: BigInt("5000"),
-    earlyExecution: true,
-    voteReplacement: false,
+    minProposerVotingPower: BigInt("5000"), // default 0
+    earlyExecution: true, // default false
+    voteReplacement: false, // default false,
   },
   addresses: [
     "0x1234567890123456789012345678901234567890",
@@ -1315,9 +1320,9 @@ const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
-  minProposerVotingPower: BigInt("5000"),
-  earlyExecution: true,
-  voteReplacement: false,
+  minProposerVotingPower: BigInt("5000"), // default 0
+  earlyExecution: true, // default false
+  voteReplacement: false, // default false,
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -1327,8 +1332,7 @@ const configAction = client.encoding.updatePluginSettingsAction(
   configActionPrarms,
 );
 
-
-const daoMetadata: ProposalMetadata =  {
+const daoMetadata: ProposalMetadata = {
   title: "Test Proposal",
   summary: "This is a short description",
   description: "This is a long descrioption",
@@ -1346,7 +1350,7 @@ const daoMetadata: ProposalMetadata =  {
     logo: "https://...",
     header: "https://...",
   },
-}
+};
 
 const metadataUri = await client.methods.pinMetadata(daoMetadata);
 
@@ -1672,7 +1676,7 @@ console.log(settings);
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
-    minProposerVotingPower: BigInt("5000"),
+    minProposerVotingPower: BigInt("5000"), // default 0
   }
 */
 ```
@@ -1866,9 +1870,9 @@ const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
-  minProposerVotingPower: BigInt("5000"),
-  earlyExecution: true,
-  voteReplacement: false,
+  minProposerVotingPower: BigInt("5000"), // default 0
+  earlyExecution: true, // default false
+  voteReplacement: false, // default false,
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -1884,9 +1888,9 @@ console.log(configAction);
 
 ```ts
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
+  TokenVotingClient,
   VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -1900,9 +1904,9 @@ const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
-  minProposerVotingPower: BigInt("5000"),
-  earlyExecution: true,
-  voteReplacement: false,
+  minProposerVotingPower: BigInt("5000"), // default 0
+  earlyExecution: true, // default false
+  voteReplacement: false, // default false,
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";

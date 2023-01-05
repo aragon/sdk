@@ -1,11 +1,11 @@
 /* MARKDOWN
-### Checking if user can vote in an TokenVoting proposal
+### Checking if user can vote in a TokenVoting proposal
 */
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   ICanVoteParams,
+  TokenVotingClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
