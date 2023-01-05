@@ -84,13 +84,13 @@ export function isProposalId(propoosalId: string): boolean {
 export function findLog(
   receipt: ContractReceipt,
   iface: Interface,
-  event: string,
+  eventName: string,
 ): Log | undefined {
   return receipt.logs.find(
     (log) =>
       log.topics[0] ===
         id(
-          iface.getEvent(event).format(
+          iface.getEvent(eventName).format(
             "sighash",
           ),
         ),
