@@ -69,16 +69,6 @@ export function votingSettingsToContract(
   };
 }
 
-// export function votingSettingsToContract(params:VotingSettings):ContractVotingSettings {
-//   return   [
-//     BigNumber.from(getVotingMode(params)),
-//     BigNumber.from(encodeRatio(params.supportThreshold, 2)),
-//     BigNumber.from(encodeRatio(params.minParticipation, 2)),
-//     BigNumber.from(params.minDuration),
-//     BigNumber.from(params.minProposerVotingPower || 1)
-//   ]
-// }
-
 export function getFunctionFragment(
   data: Uint8Array,
   availableFunctions: string[],

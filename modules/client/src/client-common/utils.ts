@@ -98,9 +98,10 @@ export function findLog(
 }
 
 export function getVotingMode(votingSettings: VotingSettings): number {
-  return votingSettings.earlyExecution
-    ? 1
-    : votingSettings.voteReplacement
-    ? 2
-    : 0;
+  if (votingSettings.earlyExecution) {
+    return 1;
+  } else if (votingSettings.voteReplacement) {
+    return 2;
+  }
+  return 0;
 }
