@@ -32,7 +32,6 @@ for await (const step of steps) {
         console.log(step.txHash);
         break;
       case VoteProposalStep.DONE:
-        console.log(step.voteId);
         break;
     }
   } catch (err) {

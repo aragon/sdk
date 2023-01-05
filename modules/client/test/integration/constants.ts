@@ -40,7 +40,7 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli",
+        "https://subgraph.satsuma-prod.com/aragon/core-goerli/version/v0.5.0-alpha/api",
     },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],
@@ -49,24 +49,31 @@ const grapqhlEndpoints = {
 export const TEST_WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 export const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
-export const TEST_TOKEN_VOTING_PROPOSAL_ID =
-  "0x78f3cff73616cccb09ffc8b83521ed226615d88b_0x0";
+
+// Token
 export const TEST_TOKEN_VOTING_DAO_ADDRESS =
-  "0x600bbcbb47990a4e243041cc45b6c0057ff7eba1";
-export const TEST_DAO_ADDRESS = "0x77be007138e9dd83e0e73f0196c6b6498965d093";
+  "0x7dd41e356b9f9c6e71593cc654a78b445217b06d";
+export const TEST_TOKEN_VOTING_PLUGIN_ADDRESS =
+  "0x85eccd548378412bac8b08fe934bbb601e2d543e";
+export const TEST_TOKEN_VOTING_PROPOSAL_ID = TEST_TOKEN_VOTING_PLUGIN_ADDRESS +
+  "_0x0";
+
+// Address List
+export const TEST_ADDRESSLIST_DAO_ADDDRESS =
+  "0x3877319b1363a1b6451060aa27b6de31b97715fb";
+export const TEST_ADDRESSLIST_PLUGIN_ADDRESS =
+  "0xf533c1a458a04c57c3cac443e67b0e09bc6675c4";
+export const TEST_ADDRESSLIST_PROPOSAL_ID = TEST_ADDRESSLIST_PLUGIN_ADDRESS +
+  "_0x0";
+
+
+export const TEST_DAO_ADDRESS = TEST_TOKEN_VOTING_DAO_ADDRESS;
+// TODO FIX
 export const TEST_NO_BALANCES_DAO_ADDRESS =
   "0x600bbcbb47990a4e243041cc45b6c0057ff7eba1";
 export const TEST_INVALID_ADDRESS = "0x1nv4l1d_4ddr355";
 export const TEST_NON_EXISTING_ADDRESS =
   "0x1234567890123456789012345678901234567890";
-export const TEST_TOKEN_VOTING_PLUGIN_ADDRESS =
-  "0x1019a6536960b29c54eae1bb02bc4b1a4bcba449";
-export const TEST_ADDRESSLIST_PROPOSAL_ID =
-  "0xf91c316115605780d1a1d6cc7072556af197eaa9_0x0";
-export const TEST_ADDRESSLIST_DAO_ADDDRESS =
-  "0x77be007138e9dd83e0e73f0196c6b6498965d093";
-export const TEST_ADDRESSLIST_PLUGIN_ADDRESS =
-  "0xf91c316115605780d1a1d6cc7072556af197eaa9";
 
 export const contextParams: ContextParams = {
   network: "mainnet",

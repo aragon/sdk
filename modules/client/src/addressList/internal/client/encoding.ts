@@ -3,18 +3,21 @@ import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
   ContextPlugin,
+  ContractVotingSettings,
   DaoAction,
   encodeUpdatePluginSettingsAction,
   IPluginInstallItem,
-  IPluginSettings,
+  VotingSettings,
+  votingSettingsToContract,
 } from "../../../client-common";
 import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
   IAddressListPluginInstall,
   IClientAddressListEncoding,
 } from "../../interfaces";
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
-import { addressListInitParamsToContract } from "../utils";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
+import { defaultAbiCoder } from "@ethersproject/abi";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -36,19 +39,24 @@ export class ClientAddressListEncoding extends ClientCore
    * @memberof ClientAddressListEncoding
    */
   static getPluginInstallItem(
-    params: IAddressListPluginInstall
+    params: IAddressListPluginInstall,
   ): IPluginInstallItem {
-    const addressListVotingInterface = AllowlistVoting__factory.createInterface();
-    const args = addressListInitParamsToContract(params);
-    // get hex bytes
-    const hexBytes = addressListVotingInterface.encodeFunctionData(
-      "initialize",
-      args
+    const hexBytes = defaultAbiCoder.encode(
+      // ["votingMode","supportThreshold", "minParticipation", "minDuration"], "members"]
+      [
+        "tuple(uint8, uint64, uint64, uint64, uint256)",
+        "address[]",
+      ],
+      [
+        Object.values(
+          votingSettingsToContract(params.votingSettings),
+        ) as ContractVotingSettings,
+        params.addresses,
+      ],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: ADDRESSLIST_PLUGIN_ID,
-      data,
+      data: toUtf8Bytes(hexBytes),
     };
   }
 
@@ -56,16 +64,16 @@ export class ClientAddressListEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *
    * @param {string} pluginAddress
-   * @param {IPluginSettings} params
+   * @param {VotingSettings} params
    * @return {*}  {DaoAction}
    * @memberof ClientAddressListEncoding
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
-    params: IPluginSettings
+    params: VotingSettings,
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
-      throw new Error("Invalid plugin address");
+      throw new InvalidAddressError();
     }
     // TODO: check if to and value are correct
     return {
@@ -91,12 +99,11 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = AllowlistVoting__factory.createInterface();
+    const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
-      // TODO: Rename to `addAddresses` as soon as the plugin is updated
-      "addAllowedUsers",
-      [members]
+      "addAddresses",
+      [members],
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
@@ -115,7 +122,7 @@ export class ClientAddressListEncoding extends ClientCore
    */
   public removeMembersAction(
     pluginAddress: string,
-    members: string[]
+    members: string[],
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -125,12 +132,11 @@ export class ClientAddressListEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const votingInterface = AllowlistVoting__factory.createInterface();
+    const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
-      // TODO: Rename to `removeAddresses` as soon as the plugin is updated
-      "removeAllowedUsers",
-      [members]
+      "removeAddresses",
+      [members],
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {

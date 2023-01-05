@@ -6,7 +6,7 @@ import {
   Context,
   ContextPlugin,
   IAddressListPluginInstall,
-  IPluginSettings,
+  VotingSettings,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
@@ -14,10 +14,10 @@ describe("Client Address List", () => {
   describe("Action generators", () => {
     it("Should create an AddressList client and generate a install entry", async () => {
       const withdrawParams: IAddressListPluginInstall = {
-        settings: {
+        votingSettings: {
           minDuration: 7200, // seconds
-          minTurnout: 0.5,
-          minSupport: 0.5,
+          supportThreshold: 0.5,
+          minParticipation: 0.5,
         },
         addresses: [
           "0x1234567890123456789012345678901234567890",
@@ -42,10 +42,10 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientAddressList(ctxPlugin);
 
-      const pluginConfigParams: IPluginSettings = {
+      const pluginConfigParams: VotingSettings = {
         minDuration: 100000,
-        minTurnout: 0.25,
-        minSupport: 0.51,
+        minParticipation: 0.25,
+        supportThreshold: 0.51,
       };
 
       const pluginAddress = "0xinvalid_address";
@@ -54,7 +54,7 @@ describe("Client Address List", () => {
           pluginAddress,
           pluginConfigParams,
         )
-      ).toThrow("Invalid plugin address");
+      ).toThrow(new InvalidAddressError());
     });
 
     it("Should create an AddressList client and generate a plugin config action action", async () => {
@@ -62,10 +62,10 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientAddressList(ctxPlugin);
 
-      const pluginConfigParams: IPluginSettings = {
+      const pluginConfigParams: VotingSettings = {
         minDuration: 100000,
-        minTurnout: 0.25,
-        minSupport: 0.51,
+        minParticipation: 0.25,
+        supportThreshold: 0.51,
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -128,7 +128,7 @@ describe("Client Address List", () => {
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
       expect(bytesToHex(action.data, true)).toBe(
-        "0x49e61d3700000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
+        "0x3628731c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
       expect(action.to).toBe(pluginAddress);
     });
@@ -182,7 +182,7 @@ describe("Client Address List", () => {
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
       expect(bytesToHex(action.data, true)).toBe(
-        "0x28471eff00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
+        "0xa84eb99900000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
       expect(action.to).toBe(pluginAddress);
     });

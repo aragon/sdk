@@ -49,6 +49,11 @@ TEMPLATE:
 - renames `QueryToken` to `QueryTokenVotingToken`
 - renames `toErc20Proposal` to `toTokenVotingProposal`
 - renames `toErc20ProposalListItem` to `toTokenVotingProposalListItem`
+- renames `IPluginSettings` to `VotingSettings`
+- renames `minTurnout` to `minParticipation`
+- renames `minSupport` to `supportThreshold`
+- add `minProposerVotingPower`, `earlyExecution`and `voteReplacement` fields to `VotingSettings` and graphql responses
+- update `ethers-contracts` version to `0.5.0-alpha`
 
 
 ## [0.16.2-alpha]

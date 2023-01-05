@@ -1,22 +1,29 @@
-import { encodeRatio, hexToBytes, strip0x } from "@aragon/sdk-common";
+import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
+  ContractVotingSettings,
   DaoAction,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,
+  votingSettingsToContract,
 } from "../../client-common";
 import {
-  ContractTokenVotingInitParams,
   ContractMintTokenParams,
-  TokenVotingProposal,
-  TokenVotingProposalListItem,
-  ITokenVotingPluginInstall,
+  ContractTokenVotingInitParams,
+  Erc20TokenDetails,
+  Erc721TokenDetails,
   IMintTokenParams,
+  ITokenVotingPluginInstall,
+  SubgraphErc20Token,
+  SubgraphErc721Token,
+  SubgraphTokenType,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
   SubgraphTokenVotingVoterListItem,
+  TokenVotingProposal,
+  TokenVotingProposalListItem,
 } from "../interfaces";
 import { formatEther } from "@ethersproject/units";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -36,8 +43,9 @@ export function toTokenVotingProposal(
   );
   let usedVotingWeight: bigint = BigInt(0);
   for (const voter of proposal.voters) {
-    usedVotingWeight += BigInt(voter.weight);
+    usedVotingWeight += BigInt(voter.votingPower);
   }
+  const token = parseToken(proposal.plugin.token);
   return {
     id: proposal.id,
     dao: {
@@ -87,28 +95,23 @@ export function toTokenVotingProposal(
       // ),
       // TODO DELETE ME
       minSupport: parseFloat(
-        formatEther(proposal.totalSupportThresholdPct),
+        formatEther(proposal.supportThreshold),
       ),
       minTurnout: parseFloat(
-        formatEther(proposal.relativeSupportThresholdPct),
+        formatEther(proposal.minParticipation),
       ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
     },
-    token: {
-      address: proposal.plugin.token.id,
-      symbol: proposal.plugin.token.symbol,
-      name: proposal.plugin.token.name,
-      decimals: parseInt(proposal.plugin.token.decimals),
-    },
+    token,
     usedVotingWeight,
-    totalVotingWeight: BigInt(proposal.census),
+    totalVotingWeight: BigInt(proposal.totalVotingPower),
     votes: proposal.voters.map(
       (voter: SubgraphTokenVotingVoterListItem) => {
         return {
-          address: voter.voter.id,
-          vote: SubgraphVoteValuesMap.get(voter.vote) as VoteValues,
-          weight: BigInt(voter.weight),
+          address: voter.voter.address,
+          vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
+          weight: BigInt(voter.votingPower),
         };
       },
     ),
@@ -123,6 +126,7 @@ export function toTokenVotingProposalListItem(
     parseInt(proposal.startDate) * 1000,
   );
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
+  const token = parseToken(proposal.plugin.token)
   return {
     id: proposal.id,
     dao: {
@@ -142,15 +146,9 @@ export function toTokenVotingProposalListItem(
       no: proposal.no ? BigInt(proposal.no) : BigInt(0),
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
-    token: {
-      address: proposal.plugin.token.id,
-      symbol: proposal.plugin.token.symbol,
-      name: proposal.plugin.token.name,
-      decimals: parseInt(proposal.plugin.token.decimals),
-    },
+    token,
   };
 }
-
 
 export function mintTokenParamsToContract(
   params: IMintTokenParams,
@@ -165,26 +163,49 @@ export function mintTokenParamsFromContract(result: Result): IMintTokenParams {
   };
 }
 
-
 export function tokenVotingInitParamsToContract(
   params: ITokenVotingPluginInstall,
 ): ContractTokenVotingInitParams {
-  // TODO
-  // the SC specifies a token field but there is not format on thhis field
-  // or how data should be passed to this in case it is using an existing
-  // token or miniting a new one
-
-  let token = "";
+  let token: [string, string, string] = ["", "", ""];
+  let balances: [string[], BigNumber[]] = [[], []];
   if (params.newToken) {
-    token = params.newToken.name;
+    token = [AddressZero, params.newToken.name, params.newToken.symbol];
+    balances = [
+      params.newToken.balances.map((balance) => balance.address),
+      params.newToken.balances.map(({ balance }) => BigNumber.from(balance)),
+    ];
   } else if (params.useToken) {
-    token = params.useToken.address;
+    token = [params.useToken?.address, "", ""];
   }
   return [
-    AddressZero,
-    BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
-    BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
-    BigNumber.from(params.settings.minDuration),
+    Object.values(
+      votingSettingsToContract(params.votingSettings),
+    ) as ContractVotingSettings,
     token,
+    balances,
   ];
+}
+
+function parseToken(
+  subgraphToken: SubgraphErc20Token | SubgraphErc721Token,
+): Erc20TokenDetails | Erc721TokenDetails | null {
+  let token = null
+  if (subgraphToken.__typename === SubgraphTokenType.ERC20) {
+    subgraphToken = subgraphToken as SubgraphErc20Token;
+    token = {
+      address: subgraphToken.id,
+      symbol: subgraphToken.symbol,
+      name: subgraphToken.name,
+      decimals: parseInt(subgraphToken.decimals),
+    };
+  } else if (subgraphToken.__typename === SubgraphTokenType.ERC721) {
+    subgraphToken = subgraphToken as SubgraphErc721Token;
+    token = {
+      address: subgraphToken.id,
+      symbol: subgraphToken.symbol,
+      name: subgraphToken.name,
+      baseUri: subgraphToken.baseURI,
+    };
+  }
+  return token;
 }

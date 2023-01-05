@@ -17,10 +17,12 @@ import {
 } from "../constants";
 import {
   Client,
+  ClientAddressList,
   Context,
   DaoCreationSteps,
   DaoDepositSteps,
   DaoSortBy,
+  IAddressListPluginInstall,
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
@@ -81,23 +83,27 @@ describe("Client", () => {
           avatar: "https://...",
           links: [],
         });
-        const fiftyPercent = BigInt(500000000000000000);
+        const pluginParams: IAddressListPluginInstall = {
+          votingSettings: {
+            minDuration: 3600,
+            minParticipation: 0.5,
+            supportThreshold: 0.5,
+          },
+          addresses: [
+            "0x1234567890123456789012345678901234567890",
+            "0x0987654321098765432109876543210987654321",
+          ],
+        };
+
+        const addressListPlugin = ClientAddressList.encoding
+          .getPluginInstallItem(pluginParams);
+        addressListPlugin.id = deployment.addressListRepo.address;
+        
         const daoCreationParams: ICreateParams = {
           metadataUri: ipfsUri,
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
-            {
-              id: deployment.addressListRepo.address,
-              data: toUtf8Bytes(
-                defaultAbiCoder.encode(
-                  ["uint64", "uint64", "uint64", "address[]"],
-                  [fiftyPercent, fiftyPercent, 3600, [
-                    "0x1234567890123456789012345678901234567890",
-                    "0x0987654321098765432109876543210987654321",
-                  ]],
-                ),
-              ),
-            },
+            addressListPlugin,
           ],
         };
 
@@ -420,14 +426,12 @@ describe("Client", () => {
         const daos = await client.methods.getDaos(params);
         expect(Array.isArray(daos)).toBe(true);
         expect(daos.length <= limit).toBe(true);
-        for (let i = 0; i < daos.length; i++) {
-          const dao = daos[i];
+        for (const dao of daos) {
           expect(typeof dao.address).toBe("string");
           expect(dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
           expect(typeof dao.ensDomain).toBe("string");
           expect(Array.isArray(dao.plugins)).toBe(true);
-          for (let j = 0; j < dao.plugins.length; j++) {
-            const plugin = dao.plugins[j];
+          for (const plugin of dao.plugins) {
             expect(typeof plugin.id).toBe("string");
             expect(typeof plugin.instanceAddress).toBe("string");
             expect(plugin.instanceAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
@@ -502,9 +506,11 @@ describe("Client", () => {
               } else if (transfer.type === TransferType.WITHDRAW) {
                 // ETH withdraw
                 expect(isAddress(transfer.to)).toBe(true);
-                expect(transfer.proposalId).toMatch(
-                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
-                );
+                if (transfer.proposalId) {
+                  expect(transfer.proposalId).toMatch(
+                    /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
+                  );
+                }
               } else {
                 fail("invalid transfer type");
               }

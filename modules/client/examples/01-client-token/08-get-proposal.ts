@@ -75,7 +75,6 @@ console.log(proposal);
     address: "0x1234567890123456789012345678901234567890,
     name: "The Token",
     symbol: "TOK",
-    decimals: 18
   },
   usedVotingWeight: 1000000n,
   votes: [

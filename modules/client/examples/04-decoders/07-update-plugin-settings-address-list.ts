@@ -5,7 +5,7 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
@@ -14,7 +14,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const clientAddressList = new ClientAddressList(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IPluginSettings = clientAddressList.decoding
+const params: VotingSettings = clientAddressList.decoding
   .updatePluginSettingsAction(data);
 
 console.log(params);

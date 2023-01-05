@@ -18,6 +18,7 @@ import {
   ICreateParams,
   ITokenVotingPluginInstall,
 } from "@aragon/sdk-client";
+import { IMetadata } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -27,10 +28,13 @@ const client: Client = new Client(context);
 
 // Use an already existing ERC20 token
 const pluginInitParams1: ITokenVotingPluginInstall = {
-  settings: {
+  votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
-    minTurnout: 0.25, // 25%
-    minSupport: 0.5, // 50%
+    minParticipation: 0.25, // 25%
+    supportThreshold: 0.5, // 50%
+    minProposerVotingPower: BigInt("5000"),
+    earlyExecution: true,
+    voteReplacement: false
   },
   useToken: {
     address: "0x...",
@@ -38,10 +42,13 @@ const pluginInitParams1: ITokenVotingPluginInstall = {
 };
 // Mint a new token
 const pluginInitParams2: ITokenVotingPluginInstall = {
-  settings: {
-    minDuration: 60 * 60 * 24, // seconds
-    minTurnout: 0.4, // 40%
-    minSupport: 0.55, // 55%
+  votingSettings: {
+    minDuration: 60 * 60 * 24 * 2, // seconds
+    minParticipation: 0.25, // 25%
+    supportThreshold: 0.5, // 50%
+    minProposerVotingPower: BigInt("5000"),
+    earlyExecution: true,
+    voteReplacement: false
   },
   newToken: {
     name: "Token",
@@ -71,8 +78,20 @@ const tokenVotingInstallPluginItem2 = TokenVotingClient.encoding.getPluginInstal
   pluginInitParams2,
 );
 
+const daoMetadata: IMetadata = {
+  name: "My DAO",
+  description: "This is a description",
+  avatar: "",
+  links: [{
+    name: "Web site",
+    url: "https://...",
+  }],
+};
+
+const metadataUri = await client.methods.pinMetadata(daoMetadata);
+
 const createParams: ICreateParams = {
-  metadataUri: "ipfs://123456789",
+  metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2],
 };

@@ -1,10 +1,15 @@
 import { IDAO } from "@aragon/core-contracts-ethers";
-import { VoteValues } from "../client-common/interfaces/plugin";
+import { ContractReceipt } from "@ethersproject/contracts";
+import { VoteValues, VotingSettings } from "../client-common/interfaces/plugin";
 import {
   IComputeStatusProposal,
   ICreateProposalParams,
   ProposalStatus,
 } from "./interfaces/plugin";
+
+import { Interface } from "@ethersproject/abi";
+import { id } from "@ethersproject/hash";
+import { Log } from "@ethersproject/providers";
 
 export function unwrapProposalParams(
   params: ICreateProposalParams,
@@ -74,4 +79,28 @@ export function computeProposalStatusFilter(
 export function isProposalId(propoosalId: string): boolean {
   const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
   return regex.test(propoosalId);
+}
+
+export function findLog(
+  receipt: ContractReceipt,
+  iface: Interface,
+  event: string,
+): Log | undefined {
+  return receipt.logs.find(
+    (log) =>
+      log.topics[0] ===
+        id(
+          iface.getEvent(event).format(
+            "sighash",
+          ),
+        ),
+  );
+}
+
+export function getVotingMode(votingSettings: VotingSettings): number {
+  return votingSettings.earlyExecution
+    ? 1
+    : votingSettings.voteReplacement
+    ? 2
+    : 0;
 }

@@ -1,5 +1,4 @@
 import {
-  decodeRatio,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -7,6 +6,7 @@ import {
   InvalidProposalIdError,
   IpfsPinError,
   NoProviderError,
+  NoSignerError,
   ProposalCreationError,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
@@ -24,10 +24,10 @@ import {
   ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
+  findLog,
   ICanVoteParams,
   ICreateProposalParams,
   IExecuteProposalParams,
-  IPluginSettings,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -35,24 +35,25 @@ import {
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
+  SubgraphVotingSettings,
   VoteProposalStep,
   VoteProposalStepValue,
+  VotingSettings,
 } from "../../../client-common";
 import {
-  QueryAddressListProposal,
-  QueryAddressListProposals,
+  QueryAddressListVotingProposal,
+  QueryAddressListVotingProposals,
 } from "../graphql-queries/proposal";
 import { toAddressListProposal, toAddressListProposalListItem } from "../utils";
-import { QueryAddressListPluginSettings } from "../graphql-queries/settings";
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
-import { id } from "@ethersproject/hash";
-import { hexZeroPad } from "@ethersproject/bytes";
+import { QueryAddressListVotingPluginSettings } from "../graphql-queries/settings";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { QueryAddressListMembers } from "../graphql-queries/members";
+import { QueryAddressListVotingMembers } from "../graphql-queries/members";
+import { formatEther } from "@ethersproject/units";
 
 /**
  * Methods module the SDK Address List Client
@@ -76,12 +77,12 @@ export class ClientAddressListMethods extends ClientCore
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -89,7 +90,7 @@ export class ClientAddressListMethods extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const tx = await addresslistContract.createVote(
+    const tx = await addresslistContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
@@ -104,29 +105,29 @@ export class ClientAddressListMethods extends ClientCore
     };
 
     const receipt = await tx.wait();
-    const addresslistContractInterface = AllowlistVoting__factory
+    const addresslistContractInterface = AddresslistVoting__factory
       .createInterface();
-    const log = receipt.logs.find(
-      (log) =>
-        log.topics[0] ===
-          id(
-            addresslistContractInterface.getEvent("VoteCreated").format(
-              "sighash",
-            ),
-          ),
+
+    const log = findLog(
+      receipt,
+      addresslistContractInterface,
+      "ProposalCreated",
     );
+
     if (!log) {
       throw new ProposalCreationError();
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
-    if (!parsedLog.args["voteId"]) {
+    const proposalId = parsedLog.args["proposalId"];
+    if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: hexZeroPad(parsedLog.args["voteId"].toHexString(), 32),
+      // TODO remove this when new proposal format
+      proposalId: proposalId.toHexString(),
     };
   }
 
@@ -158,12 +159,12 @@ export class ClientAddressListMethods extends ClientCore
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -183,7 +184,6 @@ export class ClientAddressListMethods extends ClientCore
 
     yield {
       key: VoteProposalStep.DONE,
-      voteId: hexZeroPad(params.proposalId, 32),
     };
   }
 
@@ -199,12 +199,12 @@ export class ClientAddressListMethods extends ClientCore
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -234,7 +234,7 @@ export class ClientAddressListMethods extends ClientCore
       throw new InvalidAddressError();
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -259,10 +259,10 @@ export class ClientAddressListMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const response = await client.request(QueryAddressListMembers, {
+      const response = await client.request(QueryAddressListVotingMembers, {
         address: pluginAddress,
       });
-      return response.addresslistPlugin.members.map((
+      return response.addresslistVotingPlugin.members.map((
         member: { address: string },
       ) => member.address);
     } catch {
@@ -286,30 +286,30 @@ export class ClientAddressListMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        addresslistProposal: addressListProposal,
+        addresslistVotingProposal,
       }: {
-        addresslistProposal: SubgraphAddressListProposal;
-      } = await client.request(QueryAddressListProposal, {
+        addresslistVotingProposal: SubgraphAddressListProposal;
+      } = await client.request(QueryAddressListVotingProposal, {
         proposalId,
       });
-      if (!addressListProposal) {
+      if (!addresslistVotingProposal) {
         return null;
       }
       try {
-        const metadataCid = resolveIpfsCid(addressListProposal.metadata);
+        const metadataCid = resolveIpfsCid(addresslistVotingProposal.metadata);
         const metadataString = await this.ipfs.fetchString(metadataCid);
         const metadata = JSON.parse(metadataString) as ProposalMetadata;
-        return toAddressListProposal(addressListProposal, metadata);
+        return toAddressListProposal(addresslistVotingProposal, metadata);
         // TODO: Parse and validate schema
       } catch (err) {
         if (err instanceof InvalidCidError) {
           return toAddressListProposal(
-            addressListProposal,
+            addresslistVotingProposal,
             UNSUPPORTED_PROPOSAL_METADATA_LINK,
           );
         }
         return toAddressListProposal(
-          addressListProposal,
+          addresslistVotingProposal,
           UNAVAILABLE_PROPOSAL_METADATA,
         );
       }
@@ -364,10 +364,10 @@ export class ClientAddressListMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        addresslistProposals: addressListProposals,
+        addresslistVotingProposals,
       }: {
-        addresslistProposals: SubgraphAddressListProposalListItem[];
-      } = await client.request(QueryAddressListProposals, {
+        addresslistVotingProposals: SubgraphAddressListProposalListItem[];
+      } = await client.request(QueryAddressListVotingProposals, {
         where,
         limit,
         skip,
@@ -376,7 +376,7 @@ export class ClientAddressListMethods extends ClientCore
       });
       await this.ipfs.ensureOnline();
       return Promise.all(
-        addressListProposals.map(
+        addresslistVotingProposals.map(
           async (
             proposal: SubgraphAddressListProposalListItem,
           ): Promise<AddressListProposalListItem> => {
@@ -402,7 +402,7 @@ export class ClientAddressListMethods extends ClientCore
         ),
       );
     } catch {
-      throw new GraphQLError("AddressList proposals");
+      throw new GraphQLError("AddresslistVoting proposals");
     }
   }
 
@@ -410,36 +410,39 @@ export class ClientAddressListMethods extends ClientCore
    * Returns the settings of a plugin given the address of the plugin instance
    *
    * @param {string} pluginAddress
-   * @return {*}  {(Promise<IPluginSettings | null>)}
+   * @return {*}  {(Promise<VotingSettings | null>)}
    * @memberof ClientAddressListMethods
    */
   public async getSettings(
     pluginAddress: string,
-  ): Promise<IPluginSettings | null> {
+  ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { addresslistPlugin } = await client.request(
-        QueryAddressListPluginSettings,
+      const { addresslistVotingPlugin }: {
+        addresslistVotingPlugin: SubgraphVotingSettings;
+      } = await client.request(
+        QueryAddressListVotingPluginSettings,
         {
           address: pluginAddress,
         },
       );
-      if (!addresslistPlugin) {
+      if (!addresslistVotingPlugin) {
         return null;
       }
       return {
-        minDuration: parseInt(addresslistPlugin.minDuration),
-        minSupport: decodeRatio(
-          parseFloat(addresslistPlugin.totalSupportThresholdPct),
-          2,
+        minDuration: parseInt(addresslistVotingPlugin.minDuration),
+        supportThreshold: parseFloat(
+          formatEther(addresslistVotingPlugin.supportThreshold),
         ),
-        minTurnout: decodeRatio(
-          parseFloat(addresslistPlugin.relativeSupportThresholdPct),
-          2,
+        minParticipation: parseFloat(
+          formatEther(addresslistVotingPlugin.minParticipation),
+        ),
+        minProposerVotingPower: BigInt(
+          addresslistVotingPlugin.minParticipation,
         ),
       };
     } catch {

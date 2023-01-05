@@ -1,6 +1,5 @@
 import { isAddress } from "@ethersproject/address";
 import {
-  decodeRatio,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -8,6 +7,7 @@ import {
   InvalidProposalIdError,
   IpfsPinError,
   NoProviderError,
+  NoSignerError,
   ProposalCreationError,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
@@ -17,10 +17,10 @@ import {
   ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
+  findLog,
   ICanVoteParams,
   ICreateProposalParams,
   IExecuteProposalParams,
-  IPluginSettings,
   IProposalQueryParams,
   isProposalId,
   IVoteProposalParams,
@@ -31,14 +31,19 @@ import {
   SortDirection,
   VoteProposalStep,
   VoteProposalStepValue,
+  VotingSettings,
 } from "../../../client-common";
 import {
-  TokenVotingProposal,
-  TokenVotingProposalListItem,
   Erc20TokenDetails,
+  Erc721TokenDetails,
   ITokenVotingClientMethods,
+  SubgraphErc20Token,
+  SubgraphErc721Token,
+  SubgraphTokenType,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  TokenVotingProposal,
+  TokenVotingProposalListItem,
 } from "../../interfaces";
 import {
   QueryTokenVotingMembers,
@@ -49,13 +54,13 @@ import {
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
-import { id } from "@ethersproject/hash";
-import { hexZeroPad } from "@ethersproject/bytes";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
+import { formatEther } from "@ethersproject/units";
+
 /**
  * Methods module the SDK TokenVoting Client
  */
@@ -78,9 +83,9 @@ export class TokenVotingClientMethods extends ClientCore
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
     const tokenVotingContract = TokenVoting__factory.connect(
@@ -91,7 +96,7 @@ export class TokenVotingClientMethods extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const tx = await tokenVotingContract.createVote(
+    const tx = await tokenVotingContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       Math.round(startTimestamp / 1000),
@@ -107,27 +112,25 @@ export class TokenVotingClientMethods extends ClientCore
 
     const receipt = await tx.wait();
     const tokenVotingContractInterface = TokenVoting__factory.createInterface();
-    const log = receipt.logs.find(
-      (log) =>
-        log.topics[0] ===
-          id(
-            tokenVotingContractInterface.getEvent("VoteCreated").format(
-              "sighash",
-            ),
-          ),
+    const log = findLog(
+      receipt,
+      tokenVotingContractInterface,
+      "ProposalCreated",
     );
     if (!log) {
       throw new ProposalCreationError();
     }
 
     const parsedLog = tokenVotingContractInterface.parseLog(log);
-    if (!parsedLog.args["voteId"]) {
+    const proposalId = parsedLog.args["proposalId"];
+    if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: hexZeroPad(parsedLog.args["voteId"].toHexString(), 32),
+      // TODO remove this when new proposal format
+      proposalId: proposalId.toHexString(),
     };
   }
 
@@ -160,9 +163,9 @@ export class TokenVotingClientMethods extends ClientCore
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
     const tokenVotingContract = TokenVoting__factory.connect(
@@ -180,12 +183,9 @@ export class TokenVotingClientMethods extends ClientCore
       key: VoteProposalStep.VOTING,
       txHash: tx.hash,
     };
-
     await tx.wait();
-
     yield {
       key: VoteProposalStep.DONE,
-      voteId: hexZeroPad(params.proposalId, 32),
     };
   }
   /**
@@ -200,9 +200,9 @@ export class TokenVotingClientMethods extends ClientCore
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
     const tokenVotingContract = TokenVoting__factory.connect(
@@ -279,7 +279,9 @@ export class TokenVotingClientMethods extends ClientCore
    * @return {*}  {Promise<TokenVotingProposal>}
    * @memberof TokenVotingClient
    */
-  public async getProposal(proposalId: string): Promise<TokenVotingProposal | null> {
+  public async getProposal(
+    proposalId: string,
+  ): Promise<TokenVotingProposal | null> {
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
@@ -358,9 +360,9 @@ export class TokenVotingClientMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        tokenVotingProposal,
+        tokenVotingProposals,
       }: {
-        tokenVotingProposal: SubgraphTokenVotingProposalListItem[];
+        tokenVotingProposals: SubgraphTokenVotingProposalListItem[];
       } = await client.request(QueryTokenVotingProposals, {
         where,
         limit,
@@ -370,7 +372,7 @@ export class TokenVotingClientMethods extends ClientCore
       });
       await this.ipfs.ensureOnline();
       return Promise.all(
-        tokenVotingProposal.map(
+        tokenVotingProposals.map(
           async (
             proposal: SubgraphTokenVotingProposalListItem,
           ): Promise<TokenVotingProposalListItem> => {
@@ -404,12 +406,12 @@ export class TokenVotingClientMethods extends ClientCore
    * Returns the settings of a plugin given the address of the plugin instance
    *
    * @param {string} pluginAddress
-   * @return {*}  {Promise<IPluginSettings>}
+   * @return {*}  {Promise<VotingSettings>}
    * @memberof TokenVotingClient
    */
   public async getSettings(
     pluginAddress: string,
-  ): Promise<IPluginSettings | null> {
+  ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -427,17 +429,14 @@ export class TokenVotingClientMethods extends ClientCore
       }
       return {
         minDuration: parseInt(tokenVotingPlugin.minDuration),
-        minSupport: decodeRatio(
-          parseFloat(
-            tokenVotingPlugin.totalSupportThresholdPct,
-          ),
-          2,
+        supportThreshold: parseFloat(
+          formatEther(tokenVotingPlugin.supportThreshold),
         ),
-        minTurnout: decodeRatio(
-          parseFloat(
-            tokenVotingPlugin.relativeSupportThresholdPct,
-          ),
-          2,
+        minParticipation: parseFloat(
+          formatEther(tokenVotingPlugin.minParticipation),
+        ),
+        minProposerVotingPower: BigInt(
+          tokenVotingPlugin.minParticipation,
         ),
       };
     } catch {
@@ -454,25 +453,44 @@ export class TokenVotingClientMethods extends ClientCore
    */
   public async getToken(
     pluginAddress: string,
-  ): Promise<Erc20TokenDetails | null> {
+  ): Promise<Erc20TokenDetails | Erc721TokenDetails | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { tokenVotingPlugin } = await client.request(QueryTokenVotingTargetContract, {
-        address: pluginAddress,
-      });
+      const { tokenVotingPlugin } = await client.request(
+        QueryTokenVotingTargetContract,
+        {
+          address: pluginAddress,
+        },
+      );
       if (!tokenVotingPlugin) {
         return null;
       }
-      return {
-        address: tokenVotingPlugin.token.id,
-        decimals: parseInt(tokenVotingPlugin.token.decimals),
-        name: tokenVotingPlugin.token.name,
-        symbol: tokenVotingPlugin.token.symbol,
-      };
+      let token: SubgraphErc20Token | SubgraphErc721Token =
+        tokenVotingPlugin.token;
+      // type erc20
+      if (token.__typename === SubgraphTokenType.ERC20) {
+        token = token as SubgraphErc20Token;
+        return {
+          address: token.id,
+          name: token.name,
+          symbol: token.symbol,
+          decimals: parseInt(token.decimals),
+        };
+        // type erc721
+      } else if (token.__typename === SubgraphTokenType.ERC721) {
+        token = token as SubgraphErc721Token;
+        return {
+          address: token.id,
+          name: token.name,
+          symbol: token.symbol,
+          baseUri: token.baseURI,
+        };
+      }
+      return null;
     } catch (err) {
       throw new GraphQLError("token");
     }

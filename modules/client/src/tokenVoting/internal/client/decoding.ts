@@ -5,11 +5,11 @@ import {
   decodeUpdatePluginSettingsAction,
   getFunctionFragment,
   IInterfaceParams,
-  IPluginSettings,
+  VotingSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { ITokenVotingClientDecoding, IMintTokenParams } from "../../interfaces";
-import { ITokenMintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
+import { IERC20MintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
 import { mintTokenParamsFromContract } from "../utils";
 
 /**
@@ -26,10 +26,10 @@ export class TokenVotingClientDecoding extends ClientCore
    * Decodes a dao metadata from an encoded update metadata action
    *
    * @param {Uint8Array} data
-   * @return {*}  {IPluginSettings}
+   * @return {*}  {VotingSettings}
    * @memberof TokenVotingClientDecoding
    */
-  public updatePluginSettingsAction(data: Uint8Array): IPluginSettings {
+  public updatePluginSettingsAction(data: Uint8Array): VotingSettings {
     return decodeUpdatePluginSettingsAction(data);
   }
   /**
@@ -40,7 +40,7 @@ export class TokenVotingClientDecoding extends ClientCore
    * @memberof TokenVotingClientDecoding
    */
   public mintTokenAction(data: Uint8Array): IMintTokenParams {
-    const votingInterface = ITokenMintableUpgradeable__factory
+    const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(

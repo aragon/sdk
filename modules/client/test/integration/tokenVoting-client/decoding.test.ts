@@ -5,8 +5,8 @@ import {
   TokenVotingClient,
   Context,
   ContextPlugin,
-  IPluginSettings,
   IMintTokenParams,
+  VotingSettings,
 } from "../../../src";
 
 import { bytesToHex } from "@aragon/sdk-common";
@@ -18,10 +18,11 @@ describe("Token Voting Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
-      const params: IPluginSettings = {
-        minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+      const params: VotingSettings = {
+        minDuration: 100000,
+        minParticipation: 0.25,
+        supportThreshold: 0.51,
+        minProposerVotingPower: BigInt(0)
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -31,14 +32,15 @@ describe("Token Voting Client", () => {
           pluginAddress,
           params,
         );
-      const decodedParams: IPluginSettings = client.decoding
+      const decodedParams: VotingSettings = client.decoding
         .updatePluginSettingsAction(
           updatePluginSettingsAction.data,
         );
 
       expect(decodedParams.minDuration).toBe(params.minDuration);
-      expect(decodedParams.minSupport).toBe(params.minSupport);
-      expect(decodedParams.minTurnout).toBe(params.minTurnout);
+      expect(decodedParams.minParticipation).toBe(params.minParticipation);
+      expect(decodedParams.minProposerVotingPower).toBe(params.minProposerVotingPower);
+      expect(decodedParams.supportThreshold).toBe(params.supportThreshold);
     });
     it("Should decode a mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -75,10 +77,10 @@ describe("Token Voting Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
-      const params: IPluginSettings = {
-        minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+      const params: VotingSettings = {
+        minDuration: 100000,
+        minParticipation: 0.25,
+        supportThreshold: 0.51,
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -91,9 +93,9 @@ describe("Token Voting Client", () => {
       const iface = client.decoding.findInterface(
         updatePluginSettingsAction.data,
       );
-      expect(iface?.id).toBe("function setConfiguration(uint64,uint64,uint64)");
-      expect(iface?.functionName).toBe("setConfiguration");
-      expect(iface?.hash).toBe("0x9b979e2f");
+      expect(iface?.id).toBe("function updateVotingSettings(tuple(uint8,uint64,uint64,uint64,uint256))");
+      expect(iface?.functionName).toBe("updateVotingSettings");
+      expect(iface?.hash).toBe("0xe6848574");
     });
 
     it("Should try to get the function of an invalid data and return null", async () => {

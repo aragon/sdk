@@ -6,7 +6,6 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import {
   Client,
-  TokenVotingClient,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
@@ -20,6 +19,7 @@ import {
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
+  TokenVotingClient,
   VoteProposalStep,
   VoteValues,
 } from "../../../src";
@@ -30,11 +30,11 @@ import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParams,
   contextParamsLocalChain,
+  TEST_INVALID_ADDRESS,
+  TEST_NON_EXISTING_ADDRESS,
   TEST_TOKEN_VOTING_DAO_ADDRESS,
   TEST_TOKEN_VOTING_PLUGIN_ADDRESS,
   TEST_TOKEN_VOTING_PROPOSAL_ID,
-  TEST_INVALID_ADDRESS,
-  TEST_NON_EXISTING_ADDRESS,
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { EthereumProvider, Server } from "ganache";
@@ -114,7 +114,9 @@ describe("Token Voting Client", () => {
               break;
             case ProposalCreationSteps.DONE:
               expect(typeof step.proposalId).toBe("string");
-              expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9].*$/i);
+              // TODO uncomment with new proposal ID
+              // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
               break;
             default:
               throw new Error(
@@ -145,8 +147,6 @@ describe("Token Voting Client", () => {
               expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
               break;
             case VoteProposalStep.DONE:
-              expect(typeof step.voteId).toBe("string");
-              expect(step.voteId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
               break;
             default:
               throw new Error(
@@ -300,11 +300,17 @@ describe("Token Voting Client", () => {
               proposal.settings.minTurnout <= 1,
           ).toBe(true);
           // token
-          expect(typeof proposal.token.name).toBe("string");
-          expect(typeof proposal.token.symbol).toBe("string");
-          expect(typeof proposal.token.decimals).toBe("number");
-          expect(typeof proposal.token.address).toBe("string");
-          expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+          if(proposal.token){
+            expect(typeof proposal.token.name).toBe("string");
+            expect(typeof proposal.token.symbol).toBe("string");
+            expect(typeof proposal.token.address).toBe("string");
+            expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            if ('decimals' in proposal.token) {
+              expect(typeof proposal.token.decimals).toBe("number");
+            } else if('baseUri' in proposal.token) {
+            expect(typeof proposal.token.baseUri).toBe("string");
+            }
+          }
           expect(typeof proposal.usedVotingWeight).toBe("bigint");
           expect(typeof proposal.totalVotingWeight).toBe("bigint");
           expect(Array.isArray(proposal.votes)).toBe(true);
@@ -356,8 +362,7 @@ describe("Token Voting Client", () => {
 
         expect(Array.isArray(proposals)).toBe(true);
         expect(proposals.length <= limit).toBe(true);
-        for (let i = 0; i < proposals.length; i++) {
-          const proposal = proposals[i];
+        for (const proposal of proposals) {
           expect(typeof proposal.id).toBe("string");
           expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
           expect(typeof proposal.dao.address).toBe("string");
@@ -375,11 +380,17 @@ describe("Token Voting Client", () => {
           expect(typeof proposal.result.no).toBe("bigint");
           expect(typeof proposal.result.abstain).toBe("bigint");
           // token
-          expect(typeof proposal.token.name).toBe("string");
-          expect(typeof proposal.token.symbol).toBe("string");
-          expect(typeof proposal.token.decimals).toBe("number");
-          expect(typeof proposal.token.address).toBe("string");
-          expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+          if(proposal.token){
+            expect(typeof proposal.token.name).toBe("string");
+            expect(typeof proposal.token.symbol).toBe("string");
+            expect(typeof proposal.token.address).toBe("string");
+            expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            if ('decimals' in proposal.token) {
+              expect(typeof proposal.token.decimals).toBe("number");
+            } else if('baseUri' in proposal.token) {
+            expect(typeof proposal.token.baseUri).toBe("string");
+            }
+          }
         }
 
         mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
@@ -444,10 +455,11 @@ describe("Token Voting Client", () => {
         expect(settings === null).toBe(false);
         if (settings) {
           expect(typeof settings.minDuration).toBe("number");
-          expect(typeof settings.minSupport).toBe("number");
-          expect(typeof settings.minTurnout).toBe("number");
-          expect(settings.minSupport).toBeLessThanOrEqual(1);
-          expect(settings.minTurnout).toBeLessThanOrEqual(1);
+          expect(typeof settings.minParticipation).toBe("number");
+          expect(typeof settings.supportThreshold).toBe("number");
+          expect(typeof settings.minProposerVotingPower).toBe("bigint");
+          expect(settings.supportThreshold).toBeLessThanOrEqual(1);
+          expect(settings.minParticipation).toBeLessThanOrEqual(1);
         }
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {
@@ -458,7 +470,6 @@ describe("Token Voting Client", () => {
         const pluginAddress: string = TEST_TOKEN_VOTING_PLUGIN_ADDRESS;
         const token = await client.methods.getToken(pluginAddress);
         expect(typeof token?.address).toBe("string");
-        expect(typeof token?.decimals).toBe("number");
         expect(typeof token?.symbol).toBe("string");
         expect(typeof token?.name).toBe("string");
       });

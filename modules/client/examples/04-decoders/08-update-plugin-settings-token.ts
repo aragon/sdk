@@ -2,19 +2,19 @@
 ### Decode Update Plugin Settings Action (TokenVoting)
 */
 import {
-  ClientToken,
+  TokenVotingClient,
   Context,
   ContextPlugin,
-  IPluginSettings,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientToken = new ClientToken(contextPlugin);
+const clientToken = new TokenVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IPluginSettings = clientToken.decoding
+const params: VotingSettings = clientToken.decoding
   .updatePluginSettingsAction(data);
 
 console.log(params);

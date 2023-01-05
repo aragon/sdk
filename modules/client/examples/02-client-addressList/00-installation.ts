@@ -11,6 +11,7 @@ import {
   IAddressListPluginInstall,
   ICreateParams,
 } from "@aragon/sdk-client";
+import { IMetadata } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -19,10 +20,13 @@ const client: Client = new Client(context);
 // Define the plugins to install and their params
 
 const pluginInitParams: IAddressListPluginInstall = {
-  settings: {
-    minDuration: 60 * 60 * 24, // seconds
-    minTurnout: 0.25, // 25%
-    minSupport: 0.5, // 50%
+  votingSettings: {
+    minDuration: 60 * 60 * 24 * 2, // seconds
+    minParticipation: 0.25, // 25%
+    supportThreshold: 0.5, // 50%
+    minProposerVotingPower: BigInt("5000"),
+    earlyExecution: true,
+    voteReplacement: false,
   },
   addresses: [
     "0x1234567890123456789012345678901234567890",
@@ -35,16 +39,20 @@ const pluginInitParams: IAddressListPluginInstall = {
 const addressListInstallPluginItem = ClientAddressList.encoding
   .getPluginInstallItem(pluginInitParams);
 
+const daoMetadata: IMetadata = {
+  name: "My DAO",
+  description: "This is a description",
+  avatar: "",
+  links: [{
+    name: "Web site",
+    url: "https://...",
+  }],
+};
+
+const metadataUri = await client.methods.pinMetadata(daoMetadata);
+
 const createParams: ICreateParams = {
-  metadata: {
-    name: "My DAO",
-    description: "This is a description",
-    avatar: "",
-    links: [{
-      name: "Web site",
-      url: "https://...",
-    }],
-  },
+  metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: [addressListInstallPluginItem],
 };
