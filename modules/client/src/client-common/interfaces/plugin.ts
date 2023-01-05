@@ -34,9 +34,9 @@ export interface IProposalSettings {
 export type VotingSettings = {
   earlyExecution?: boolean;
   voteReplacement?: boolean;
-  // Float between 0 and 1
+  /** Float between 0 and 1 */
   supportThreshold: number;
-  // Float between 0 and 1
+  /** Float between 0 and 1 */
   minParticipation: number;
   minDuration: number;
   minProposerVotingPower?: bigint;

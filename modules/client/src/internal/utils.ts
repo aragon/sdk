@@ -152,9 +152,7 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
       creationDate,
       reference: transfer.reference,
       transactionId: transfer.transaction,
-      proposalId: transfer.proposal && transfer.proposal.id
-        ? transfer.proposal.id
-        : "",
+      proposalId: transfer.proposal?.id || "",
       to: transfer.to,
     };
   }
