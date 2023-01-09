@@ -1119,10 +1119,11 @@ import {
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
-  IAddressListPluginInstall,
   ICreateParams,
+  IMetadata,
+  VotingMode,
+  VotingSettings,
 } from "@aragon/sdk-client";
-import { IMetadata } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -1130,14 +1131,13 @@ const client: Client = new Client(context);
 
 // Define the plugins to install and their params
 
-const pluginInitParams: IAddressListPluginInstall = {
+const pluginInitParams: VotingSettings = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
-    earlyExecution: true, // default false
-    voteReplacement: false, // default false,
+    votingMode: VotingMode.VOTE_REPLACEMENT,
   },
   addresses: [
     "0x1234567890123456789012345678901234567890",
@@ -1862,7 +1862,6 @@ import {
   VotingMode,
   VotingSettings,
 } from "@aragon/sdk-client";
-import {} from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
