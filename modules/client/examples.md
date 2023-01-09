@@ -446,7 +446,7 @@ console.log(balances);
 */
 ```
 
-## TokenVoting governance plugin client
+## TokenVoting plugin client
 
 This is a `Client`-like class, tailored to suit the specific use cases of the
 built-in Token voting DAO Plugin.
@@ -709,9 +709,25 @@ const configAction = client.encoding.updatePluginSettingsAction(
   configActionPrarms,
 );
 
+const metadataUri = await client.methods.pinMetadata({
+  title: "Test proposal",
+    summary: "This is a test proposal",
+    description: "his is a test proposal, but longer",
+    resources: [
+      {
+        url: "https://thforumurl.com",
+        name: "Forum"
+      }
+    ],
+    media: {
+      header: "https://fileserver.com/header.png",
+      logo: "https://fileserver.com/logo.png"
+    }
+})
+
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri: "ipfs://123456",
+  metadataUri,
   actions: [configAction],
   startDate: new Date(),
   endDate: new Date(),
