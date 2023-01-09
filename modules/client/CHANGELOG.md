@@ -17,45 +17,17 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
-- renames `erc20.md` to `tokenVoting.md`
-- renames `ClientErc20` to `TokenVotingClient`
-- renames `IErc20PluginInstall` to `ITokenVotingPluginInstall`
-- renames `Erc20Proposal` to `TokenVotingProposal`
-- renames `Erc20ProposalListItem` to `TokenVotingProposalListItem`
-- renames `SubgraphPluginTypeName.ERC20` to `SubgraphPluginTypeName.TOKEN_VOTING`
-- changes the value of `SubgraphPluginTypeName.ERC20` from `ERC20VotingPlugin` to `TokenVotingPlugin`
-- changes the value of `ERC20VotingPlugin` in `SubgraphPluginTypeMap` from `erc20voting.dao.eth` to `tokenvoting.dao.eth`
-- renames `SubgraphErc20Token` to `SubgraphToken`
-- renames `IClientErc20Methods` to `ITokenVotingClientMethods`
-- renames `IClientErc20Encoding` to `ITokenVotingClientEncoding`
-- renames `IClientErc20Decoding` to `ITokenVotingClientDecoding`
-- renames `IClientErc20Estimation` to `ITokenVotingClientEstimation`
-- renames `IClientErc20` to `ITokenVotingClient`
-- renames `Erc20ProposalResult` to `TokenVotingProposalResult`
-- renames `SubgraphErc20VoterListItem` to `SubgraphTokenVotingVoterListItem`
-- renames `SubgraphErc20ProposalListItem` to `SubgraphTokenVotingProposalListItem`
-- renames `SubgraphErc20Proposal` to `SubgraphTokenVotingProposal`
-- renames `ContractErc20InitParams` to `ContractTokenVotingInitParams`
-- renames `ClientErc20Decoding` to `TokenVotingClientDecoding`
-- renames `ClientErc20Encoding` to `TokenVotingClientEncoding`
-- renames `ERC20_PLUGIN_ID` to `TOKEN_VOTING_PLUGIN_ID`
-- renames `erc20InitParamsToContract` to `tokenVotingInitParamsToContract`
-- renames `ClientErc20Estimation` to `TokenVotingClientEstimation`
-- renames `ClientErc20Methods` to `TokenVotingClientMethods`
-- renames `QueryErc20Members` to `QueryTokenVotingMembers`
-- renames `QueryErc20PluginSettings` to `QueryTokenVotingPluginSettings`
-- renames `QueryErc20Proposal` to `QueryTokenVotingProposal`
-- renames `QueryErc20Proposals` to `QueryTokenVotingProposals`
-- renames `QueryToken` to `QueryTokenVotingToken`
-- renames `toErc20Proposal` to `toTokenVotingProposal`
-- renames `toErc20ProposalListItem` to `toTokenVotingProposalListItem`
 - renames `IPluginSettings` to `VotingSettings`
 - renames `minTurnout` to `minParticipation`
 - renames `minSupport` to `supportThreshold`
 - add `minProposerVotingPower`, `earlyExecution`and `voteReplacement` fields to `VotingSettings` and graphql responses
-- update `ethers-contracts` version to `0.5.0-alpha`
+- renames `ClientErc20` to `TokenVotingClient`
+- renames `IErc20PluginInstall` to `ITokenVotingPluginInstall`
+- renames `Erc20Proposal` to `TokenVotingProposal`
+- renames `Erc20ProposalListItem` to `TokenVotingProposalListItem`
+- changes the value of `ERC20VotingPlugin` in `SubgraphPluginTypeMap` from `erc20voting.dao.eth` to `tokenvoting.dao.eth`
+- renames `Erc20ProposalResult` to `TokenVotingProposalResult`
 - rename `getSettings` to `getVotingSettings`
-- rename `encodeUpdatePluginSettingsAction` to `encodeUpdateVotingSettingsAction`
 
 
 ## [0.16.2-alpha]

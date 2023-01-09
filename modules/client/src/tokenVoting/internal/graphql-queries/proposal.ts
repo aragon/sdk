@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 
 export const QueryTokenVotingProposal = gql`
-query tokenVotingProposal($proposalId: ID!) {
+query TokenVotingProposal($proposalId: ID!) {
   tokenVotingProposal(id: $proposalId){
     id
     dao {
@@ -52,7 +52,7 @@ query tokenVotingProposal($proposalId: ID!) {
 }
 `;
 export const QueryTokenVotingProposals = gql`
-query tokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: TokenVotingProposal_orderBy!) {
+query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: TokenVotingProposal_orderBy!) {
   tokenVotingProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     dao {

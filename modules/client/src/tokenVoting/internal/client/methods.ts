@@ -50,7 +50,7 @@ import {
   QueryTokenVotingPluginSettings,
   QueryTokenVotingProposal,
   QueryTokenVotingProposals,
-  QueryTokenVotingTargetContract,
+  QueryTokenVotingPlugin,
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
@@ -462,7 +462,7 @@ export class TokenVotingClientMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { tokenVotingPlugin } = await client.request(
-        QueryTokenVotingTargetContract,
+        QueryTokenVotingPlugin,
         {
           address: pluginAddress,
         },

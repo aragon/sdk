@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 
 export const QueryDao = gql`
-  query dao($address: ID!) {
+  query Dao($address: ID!) {
     dao(id: $address){
       id
       name
@@ -17,7 +17,7 @@ export const QueryDao = gql`
   }
 `;
 export const QueryDaos = gql`
-  query daos ($limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: Dao_orderBy!) {
+  query Daos ($limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: Dao_orderBy!) {
     daos(first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
       id
       name
@@ -33,7 +33,7 @@ export const QueryDaos = gql`
 `;
 
 export const QueryDaoTransfersByAddress = gql`
-query daoTransfersByAddress($address: ID!) {
+query DaoTransfersByAddress($address: ID!) {
   dao(id: $address) {
     withdraws {
       id

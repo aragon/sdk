@@ -1,5 +1,5 @@
 /* MARKDOWN
-## TokenVoting governance plugin client
+## TokenVoting plugin client
 
 This is a `Client`-like class, tailored to suit the specific use cases of the
 built-in Token voting DAO Plugin.
