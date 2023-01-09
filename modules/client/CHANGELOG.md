@@ -54,6 +54,8 @@ TEMPLATE:
 - renames `minSupport` to `supportThreshold`
 - add `minProposerVotingPower`, `earlyExecution`and `voteReplacement` fields to `VotingSettings` and graphql responses
 - update `ethers-contracts` version to `0.5.0-alpha`
+- rename `getSettings` to `getVotingSettings`
+- rename `encodeUpdatePluginSettingsAction` to `encodeUpdateVotingSettingsAction`
 
 
 ## [0.16.2-alpha]

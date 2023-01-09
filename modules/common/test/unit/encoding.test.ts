@@ -325,7 +325,6 @@ describe("Value encoding", () => {
       { bigint: BigInt("367483947"), digits: 9, out: 0.367483947 },
       { bigint: 1, digits: 9, out: 0.000000001 },
       { bigint: 367483947, digits: 9, out: 0.367483947 },
-      { bigint: 367483947, digits: 9, out: 0.367483947 },
     ];
 
     for (let input of inputs) {

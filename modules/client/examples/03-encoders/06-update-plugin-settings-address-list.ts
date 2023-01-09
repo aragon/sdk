@@ -8,7 +8,6 @@ import {
   VotingMode,
   VotingSettings,
 } from "@aragon/sdk-client";
-import {} from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
