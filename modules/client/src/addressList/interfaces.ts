@@ -89,6 +89,9 @@ export type AddressListProposal = ProposalBase & {
   settings: IProposalSettings;
   votes: Array<{ address: string; vote: VoteValues }>;
   totalVotingWeight: number;
+  creationBlockNumber: bigint;
+  executionDate: Date;
+  executionBlockNumber: bigint;
 };
 
 export type AddressListProposalListItem = ProposalListItemBase & {
@@ -111,6 +114,9 @@ export type SubgraphAddressListProposal = SubgraphProposalBase & {
   voters: SubgraphAddressListVoterListItem[];
   totalVotingPower: string;
   votingMode: SubgraphVotingMode;
+  creationBlockNumber: string;
+  executionDate: string;
+  executionBlockNumber: string;
 };
 
 export type ContractAddressListInitParams = [

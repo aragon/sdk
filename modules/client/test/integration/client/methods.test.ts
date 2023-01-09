@@ -438,6 +438,7 @@ describe("Client", () => {
             expect(typeof plugin.version).toBe("string");
           }
           expect(typeof dao.metadata.name).toBe("string");
+          expect(typeof dao.metadata.description).toBe("string");
           if (dao.metadata.avatar) {
             expect(typeof dao.metadata.avatar).toBe("string");
           }

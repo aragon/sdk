@@ -11,6 +11,9 @@ query tokenVotingProposal($proposalId: ID!) {
     creator
     metadata
     createdAt
+    creationBlockNumber
+    executionDate
+    executionBlockNumber
     actions {
       to
       value
