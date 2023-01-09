@@ -2,12 +2,12 @@
 declare const describe, it, expect;
 
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
-  ITokenVotingPluginInstall,
   IMintTokenParams,
-  IPluginSettings,
+  ITokenVotingPluginInstall,
+  TokenVotingClient,
+  VotingSettings,
 } from "../../../src";
 
 import { AddressZero } from "@ethersproject/constants";
@@ -18,18 +18,19 @@ describe("Token Voting Client", () => {
   describe("Encoding module", () => {
     it("Should create a TokenVoting client and generate a install entry", async () => {
       const initParams: ITokenVotingPluginInstall = {
-        settings: {
+        votingSettings: {
           minDuration: 7200,
-          minTurnout: 0.5,
-          minSupport: 0.5,
+          minParticipation: 0.5,
+          supportThreshold: 0.5,
         },
         useToken: {
           address: AddressZero,
         },
       };
-      const tokenVotingInstallPluginItem = TokenVotingClient.encoding.getPluginInstallItem(
-        initParams,
-      );
+      const tokenVotingInstallPluginItem = TokenVotingClient.encoding
+        .getPluginInstallItem(
+          initParams,
+        );
 
       expect(typeof tokenVotingInstallPluginItem).toBe("object");
       expect(tokenVotingInstallPluginItem.data).toBeInstanceOf(Uint8Array);
@@ -38,10 +39,10 @@ describe("Token Voting Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
-      const params: IPluginSettings = {
+      const params: VotingSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        supportThreshold: 0.5,
+        minParticipation: 0.5,
       };
 
       const pluginAddress = "0xinvalid_address";
@@ -53,10 +54,10 @@ describe("Token Voting Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
-      const params: IPluginSettings = {
+      const params: VotingSettings = {
         minDuration: 7200,
-        minTurnout: 0.5,
-        minSupport: 0.5,
+        supportThreshold: 0.5,
+        minParticipation: 0.5,
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -97,7 +98,7 @@ describe("Token Voting Client", () => {
       expect(() => client.encoding.mintTokenAction(minterAddress, params))
         .toThrow(new InvalidAddressError());
     });
-    it("Should encode an TokenVoting token mint action", async () => {
+    it("Should encode a TokenVoting token mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);

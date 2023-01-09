@@ -1,4 +1,7 @@
-import { MajorityVotingBase__factory } from "@aragon/core-contracts-ethers";
+import {
+  IMajorityVoting,
+  MajorityVotingBase__factory,
+} from "@aragon/core-contracts-ethers";
 import {
   bytesToHex,
   decodeRatio,
@@ -7,53 +10,65 @@ import {
   strip0x,
   UnexpectedActionError,
 } from "@aragon/sdk-common";
-import { ContractPluginSettings, IPluginSettings } from "./interfaces/plugin";
+import { VotingMode, VotingSettings } from "./interfaces/plugin";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
+import { votingModeToContracts } from "./utils";
 
 export function decodeUpdatePluginSettingsAction(
   data: Uint8Array,
-): IPluginSettings {
+): VotingSettings {
   const votingInterface = MajorityVotingBase__factory.createInterface();
   const hexBytes = bytesToHex(data, true);
   const receivedFunction = votingInterface.getFunction(
     hexBytes.substring(0, 10) as any,
   );
-  const expectedfunction = votingInterface.getFunction("setConfiguration");
+  const expectedfunction = votingInterface.getFunction("updateVotingSettings");
   if (receivedFunction.name !== expectedfunction.name) {
     throw new UnexpectedActionError();
   }
-  const result = votingInterface.decodeFunctionData("setConfiguration", data);
+  const result = votingInterface.decodeFunctionData(
+    "updateVotingSettings",
+    data,
+  );
   return pluginSettingsFromContract(result);
 }
 
-export function encodeUpdatePluginSettingsAction(
-  params: IPluginSettings,
+export function encodeUpdateVotingSettingsAction(
+  params: VotingSettings,
 ): Uint8Array {
   const votingInterface = MajorityVotingBase__factory.createInterface();
-  const args = pluginSettingsToContract(params);
+  const args = votingSettingsToContract(params);
   // get hex bytes
-  const hexBytes = votingInterface.encodeFunctionData("setConfiguration", args);
+  const hexBytes = votingInterface.encodeFunctionData(
+    "updateVotingSettings",
+    [args],
+  );
   // Strip 0x => encode in Uint8Array
   return hexToBytes(strip0x(hexBytes));
 }
 
-function pluginSettingsFromContract(result: Result): IPluginSettings {
+function pluginSettingsFromContract(result: Result): VotingSettings {
   return {
-    minTurnout: decodeRatio(result[0], 2),
-    minSupport: decodeRatio(result[0], 2),
-    minDuration: result[2].toNumber(),
+    minProposerVotingPower: BigInt(result[0][0]),
+    supportThreshold: decodeRatio(result[0][1], 2),
+    minParticipation: decodeRatio(result[0][2], 2),
+    minDuration: result[0][3].toNumber(),
   };
 }
 
-function pluginSettingsToContract(
-  params: IPluginSettings,
-): ContractPluginSettings {
-  return [
-    BigNumber.from(encodeRatio(params.minTurnout, 2)),
-    BigNumber.from(encodeRatio(params.minSupport, 2)),
-    BigNumber.from(params.minDuration),
-  ];
+export function votingSettingsToContract(
+  params: VotingSettings,
+): IMajorityVoting.VotingSettingsStruct {
+  return {
+    votingMode: BigNumber.from(
+      votingModeToContracts(params.votingMode || VotingMode.STANDARD),
+    ),
+    supportThreshold: BigNumber.from(encodeRatio(params.supportThreshold, 2)),
+    minParticipation: BigNumber.from(encodeRatio(params.minParticipation, 2)),
+    minDuration: BigNumber.from(params.minDuration),
+    minProposerVotingPower: BigNumber.from(params.minProposerVotingPower || 0),
+  };
 }
 
 export function getFunctionFragment(

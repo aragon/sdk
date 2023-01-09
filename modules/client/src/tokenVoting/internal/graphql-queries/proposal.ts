@@ -19,28 +19,35 @@ query tokenVotingProposal($proposalId: ID!) {
     yes,
     no,
     abstain
-    totalSupportThresholdPct,
-    relativeSupportThresholdPct,
+    votingMode
+    supportThreshold
+    minParticipation
     startDate
     endDate
     executed
     executable
     voters{
       voter{
-        id
+        address
       }
-      vote
-      weight
+      voteOption
+      votingPower
     }
-    plugin{
-      token{
-        symbol
+    plugin {
+      token {
+        id
         name
-        id
-        decimals
+        symbol
+        __typename
+        ...on ERC20Token {
+          decimals
+        }
+        ...on ERC721Token {
+          baseURI
+        }
       }
     }
-    census
+    totalVotingPower
   }
 }
 `;
@@ -66,7 +73,6 @@ query tokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
         symbol
         name
         id
-        decimals
       }
     }
   }

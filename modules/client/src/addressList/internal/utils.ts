@@ -1,13 +1,13 @@
-import { encodeRatio, hexToBytes, strip0x } from "@aragon/sdk-common";
-import { BigNumber } from "@ethersproject/bignumber";
-import { AddressZero } from "@ethersproject/constants";
+import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
+  ContractVotingSettings,
   DaoAction,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,
+  votingSettingsToContract,
 } from "../../client-common";
 import {
   AddressListProposal,
@@ -79,20 +79,20 @@ export function toAddressListProposal(
       // ),
       // TODO DELETE ME
       minSupport: parseFloat(
-        proposal.totalSupportThresholdPct,
+        proposal.supportThreshold,
       ),
       minTurnout: parseFloat(
-        proposal.relativeSupportThresholdPct,
+        proposal.minParticipation,
       ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
     },
-    totalVotingWeight: parseInt(proposal.census),
+    totalVotingWeight: parseInt(proposal.totalVotingPower),
     votes: proposal.voters.map(
       (voter: SubgraphAddressListVoterListItem) => {
         return {
-          address: voter.voter.id,
-          vote: SubgraphVoteValuesMap.get(voter.vote) as VoteValues,
+          address: voter.voter.address,
+          vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
         };
       },
     ),
@@ -131,14 +131,8 @@ export function toAddressListProposalListItem(
 export function addressListInitParamsToContract(
   params: IAddressListPluginInstall,
 ): ContractAddressListInitParams {
-  // TODO
-  // not sure if the IDao and gsn params will be needed after
-  // this is converted into a plugin
   return [
-    AddressZero,
-    BigNumber.from(encodeRatio(params.settings.minTurnout, 2)),
-    BigNumber.from(encodeRatio(params.settings.minSupport, 2)),
-    BigNumber.from(params.settings.minDuration),
-    params.addresses,
+    Object.values(votingSettingsToContract(params.votingSettings)) as ContractVotingSettings,
+    params.addresses
   ];
 }

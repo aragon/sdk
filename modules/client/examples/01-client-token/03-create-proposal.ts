@@ -1,13 +1,13 @@
 /* MARKDOWN
-### Creating an TokenVoting proposal
+### Creating a TokenVoting proposal
 */
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
+  TokenVotingClient,
   VoteValues,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -16,10 +16,10 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
-const metadata:ProposalMetadata= {
+const metadata: ProposalMetadata = {
   title: "Test Proposal",
   summary: "This is a short description",
   description: "This is a long description",
@@ -37,7 +37,7 @@ const metadata:ProposalMetadata= {
     logo: "https://...",
     header: "https://...",
   },
-}
+};
 
 const ipfsUri = await client.methods.pinMetadata(metadata);
 

@@ -9,6 +9,7 @@ import {
 } from "../../../client-common";
 import { ITokenVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
 /**
  * Estimation module the SDK TokenVoting Client
  */
@@ -31,9 +32,9 @@ export class TokenVotingClientEstimation extends ClientCore
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
     const tokenVotingContract = TokenVoting__factory.connect(
@@ -44,14 +45,15 @@ export class TokenVotingClientEstimation extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const estimatedGasFee = await tokenVotingContract.estimateGas.createProposal(
-      toUtf8Bytes(params.metadataUri),
-      params.actions || [],
-      Math.round(startTimestamp / 1000),
-      Math.round(endTimestamp / 1000),
-      params.executeOnPass || false,
-      params.creatorVote || 0,
-    );
+    const estimatedGasFee = await tokenVotingContract.estimateGas
+      .createProposal(
+        toUtf8Bytes(params.metadataUri),
+        params.actions || [],
+        Math.round(startTimestamp / 1000),
+        Math.round(endTimestamp / 1000),
+        params.executeOnPass || false,
+        params.creatorVote || 0,
+      );
     return this.web3.getApproximateGasFee(estimatedGasFee.toBigInt());
   }
   /**
@@ -66,9 +68,9 @@ export class TokenVotingClientEstimation extends ClientCore
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
@@ -95,9 +97,9 @@ export class TokenVotingClientEstimation extends ClientCore
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
     const tokenVotingContract = TokenVoting__factory.connect(

@@ -6,9 +6,11 @@ import {
   Context,
   ContextPlugin,
   ICreateProposalParams,
-  IPluginSettings,
   ProposalCreationSteps,
+  ProposalMetadata,
   VoteValues,
+  VotingMode,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -20,10 +22,12 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new ClientAddressList(contextPlugin);
 
 // create config action
-const configActionPrarms: IPluginSettings = {
-  minDuration: 60 * 60 * 24,
-  minSupport: 0.3, // 30%
-  minTurnout: 0.5, // 50%
+const configActionPrarms: VotingSettings = {
+  minDuration: 60 * 60 * 24 * 2, // seconds
+  minParticipation: 0.25, // 25%
+  supportThreshold: 0.5, // 50%
+  minProposerVotingPower: BigInt("5000"), // default 0
+  votingMode: VotingMode.EARLY_EXECUTION,
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -33,27 +37,31 @@ const configAction = client.encoding.updatePluginSettingsAction(
   configActionPrarms,
 );
 
+const daoMetadata: ProposalMetadata = {
+  title: "Test Proposal",
+  summary: "This is a short description",
+  description: "This is a long descrioption",
+  resources: [
+    {
+      name: "Discord",
+      url: "https://discord.com/...",
+    },
+    {
+      name: "Website",
+      url: "https://website...",
+    },
+  ],
+  media: {
+    logo: "https://...",
+    header: "https://...",
+  },
+};
+
+const metadataUri = await client.methods.pinMetadata(daoMetadata);
+
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadata: {
-    title: "Test Proposal",
-    summary: "This is a short description",
-    description: "This is a long descrioption",
-    resources: [
-      {
-        name: "Discord",
-        url: "https://discord.com/...",
-      },
-      {
-        name: "Website",
-        url: "https://website...",
-      },
-    ],
-    media: {
-      logo: "https://...",
-      header: "https://...",
-    },
-  },
+  metadataUri,
   actions: [configAction],
   startDate: new Date(),
   endDate: new Date(),

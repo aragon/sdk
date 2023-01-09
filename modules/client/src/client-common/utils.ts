@@ -1,10 +1,16 @@
 import { IDAO } from "@aragon/core-contracts-ethers";
-import { VoteValues } from "../client-common/interfaces/plugin";
+import { ContractReceipt } from "@ethersproject/contracts";
+import { VoteValues, VotingMode } from "../client-common/interfaces/plugin";
 import {
   IComputeStatusProposal,
   ICreateProposalParams,
   ProposalStatus,
 } from "./interfaces/plugin";
+
+import { Interface } from "@ethersproject/abi";
+import { id } from "@ethersproject/hash";
+import { Log } from "@ethersproject/providers";
+import { InvalidVotingModeError } from "@aragon/sdk-common";
 
 export function unwrapProposalParams(
   params: ICreateProposalParams,
@@ -74,4 +80,33 @@ export function computeProposalStatusFilter(
 export function isProposalId(propoosalId: string): boolean {
   const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
   return regex.test(propoosalId);
+}
+
+export function findLog(
+  receipt: ContractReceipt,
+  iface: Interface,
+  eventName: string,
+): Log | undefined {
+  return receipt.logs.find(
+    (log) =>
+      log.topics[0] ===
+        id(
+          iface.getEvent(eventName).format(
+            "sighash",
+          ),
+        ),
+  );
+}
+
+export function votingModeToContracts(votingMode: VotingMode): number {
+  switch (votingMode) {
+    case VotingMode.STANDARD:
+      return 0;
+    case VotingMode.EARLY_EXECUTION:
+      return 1;
+    case VotingMode.VOTE_REPLACEMENT:
+      return 2;
+    default:
+      throw new InvalidVotingModeError();
+  }
 }

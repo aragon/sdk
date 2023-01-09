@@ -3,22 +3,25 @@ import {
   ClientCore,
   ContextPlugin,
   DaoAction,
-  encodeUpdatePluginSettingsAction,
+  encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
-  IPluginSettings,
+  VotingSettings,
 } from "../../../client-common";
 import { isAddress } from "@ethersproject/address";
 import {
+  IMintTokenParams,
   ITokenVotingClientEncoding,
   ITokenVotingPluginInstall,
-  IMintTokenParams,
 } from "../../interfaces";
 import { TOKEN_VOTING_PLUGIN_ID } from "../constants";
 import {
-  TokenVoting__factory,
-  ITokenMintableUpgradeable__factory,
+  IERC20MintableUpgradeable__factory,
 } from "@aragon/core-contracts-ethers";
-import { tokenVotingInitParamsToContract, mintTokenParamsToContract } from "../utils";
+import {
+  mintTokenParamsToContract,
+  tokenVotingInitParamsToContract,
+} from "../utils";
+import { defaultAbiCoder } from "@ethersproject/abi";
 /**
  * Encoding module the SDK TokenVoting Client
  */
@@ -37,12 +40,17 @@ export class TokenVotingClientEncoding extends ClientCore
    * @return {*}  {IPluginInstallItem}
    * @memberof TokenVotingClientEncoding
    */
-  static getPluginInstallItem(params: ITokenVotingPluginInstall): IPluginInstallItem {
-    const tokenVotingInterface = TokenVoting__factory.createInterface();
+  static getPluginInstallItem(
+    params: ITokenVotingPluginInstall,
+  ): IPluginInstallItem {
     const args = tokenVotingInitParamsToContract(params);
-    // get hex bytes
-    const hexBytes = tokenVotingInterface.encodeFunctionData(
-      "initialize",
+    const hexBytes = defaultAbiCoder.encode(
+      // ["votingMode","supportThreshold", "minParticipation", "minDuration"], ["address","name","symbol"][ "receivers","amount"]
+      [
+        "tuple(uint8, uint64, uint64, uint64, uint256)",
+        "tuple(address, string, string)",
+        "tuple(address[], uint256[])",
+      ],
       args,
     );
     // Strip 0x => encode in Uint8Array
@@ -56,13 +64,13 @@ export class TokenVotingClientEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *
    * @param {string} pluginAddress
-   * @param {IPluginSettings} params
+   * @param {VotingSettings} params
    * @return {*}  {DaoAction}
    * @memberof TokenVotingClientEncoding
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
-    params: IPluginSettings,
+    params: VotingSettings,
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new Error("Invalid plugin address");
@@ -71,7 +79,7 @@ export class TokenVotingClientEncoding extends ClientCore
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data: encodeUpdatePluginSettingsAction(params),
+      data: encodeUpdateVotingSettingsAction(params),
     };
   }
 
@@ -90,7 +98,7 @@ export class TokenVotingClientEncoding extends ClientCore
     if (!isAddress(minterAddress) || !isAddress(params.address)) {
       throw new InvalidAddressError();
     }
-    const votingInterface = ITokenMintableUpgradeable__factory
+    const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();
     const args = mintTokenParamsToContract(params);
     // get hex bytes

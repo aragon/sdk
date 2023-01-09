@@ -1,11 +1,11 @@
 /* MARKDOWN
-### Voting on an TokenVoting proposal
+### Voting on a TokenVoting proposal
 */
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   IVoteProposalParams,
+  TokenVotingClient,
   VoteProposalStep,
   VoteValues,
 } from "@aragon/sdk-client";
@@ -15,7 +15,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
@@ -32,7 +32,6 @@ for await (const step of steps) {
         console.log(step.txHash);
         break;
       case VoteProposalStep.DONE:
-        console.log(step.voteId);
         break;
     }
   } catch (err) {

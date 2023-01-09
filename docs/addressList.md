@@ -51,7 +51,7 @@ so that the plugin is configured</p>
 <p>Decodes a dao metadata from an encoded update metadata action</p>
 
 **Kind**: instance method of [<code>ClientAddressListDecoding</code>](#ClientAddressListDecoding)  
-**Returns**: <code>\*</code> - <p>{IPluginSettings}</p>  
+**Returns**: <code>\*</code> - <p>{VotingSettings}</p>  
 
 | Param | Type |
 | --- | --- |
@@ -119,7 +119,7 @@ so that the plugin is configured</p>
 | Param | Type |
 | --- | --- |
 | pluginAddress | <code>string</code> | 
-| params | <code>IPluginSettings</code> | 
+| params | <code>VotingSettings</code> | 
 
 <a name="ClientAddressListEncoding+addMembersAction"></a>
 
@@ -315,7 +315,7 @@ so that the plugin is configured</p>
 <p>Returns the settings of a plugin given the address of the plugin instance</p>
 
 **Kind**: instance method of [<code>ClientAddressListMethods</code>](#ClientAddressListMethods)  
-**Returns**: <code>\*</code> - <p>{(Promise&lt;IPluginSettings | null&gt;)}</p>  
+**Returns**: <code>\*</code> - <p>{(Promise&lt;VotingSettings | null&gt;)}</p>  
 
 | Param | Type |
 | --- | --- |

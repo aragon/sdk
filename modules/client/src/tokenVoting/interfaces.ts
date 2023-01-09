@@ -1,6 +1,7 @@
 // This file contains the definitions of the TokenVoting client
 import { BigNumber } from "@ethersproject/bignumber";
 import {
+  ContractVotingSettings,
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
@@ -9,7 +10,6 @@ import {
   ICreateProposalParams,
   IExecuteProposalParams,
   IInterfaceParams,
-  IPluginSettings,
   IProposalQueryParams,
   IProposalSettings,
   IVoteProposalParams,
@@ -22,6 +22,8 @@ import {
   SubgraphVoterListItemBase,
   VoteProposalStepValue,
   VoteValues,
+  VotingMode,
+  VotingSettings,
 } from "../client-common";
 
 // TokenVoting
@@ -43,14 +45,16 @@ export interface ITokenVotingClientMethods extends IClientCore {
   getProposals: (
     params: IProposalQueryParams,
   ) => Promise<TokenVotingProposalListItem[]>;
-  getSettings: (pluginAddress: string) => Promise<IPluginSettings | null>;
-  getToken: (pluginAddress: string) => Promise<Erc20TokenDetails | null>;
+  getVotingSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
+  getToken: (
+    pluginAddress: string,
+  ) => Promise<Erc20TokenDetails | Erc721TokenDetails | null>;
 }
 
 export interface ITokenVotingClientEncoding extends IClientCore {
   updatePluginSettingsAction: (
     pluginAddress: string,
-    params: IPluginSettings,
+    params: VotingSettings,
   ) => DaoAction;
   mintTokenAction: (
     minterAddress: string,
@@ -58,7 +62,7 @@ export interface ITokenVotingClientEncoding extends IClientCore {
   ) => DaoAction;
 }
 export interface ITokenVotingClientDecoding extends IClientCore {
-  updatePluginSettingsAction: (data: Uint8Array) => IPluginSettings;
+  updatePluginSettingsAction: (data: Uint8Array) => VotingSettings;
   mintTokenAction: (data: Uint8Array) => IMintTokenParams;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
@@ -82,7 +86,7 @@ export interface ITokenVotingClient {
 // Factory init params
 
 export type ITokenVotingPluginInstall = {
-  settings: IPluginSettings;
+  votingSettings: VotingSettings;
   newToken?: NewTokenParams;
   useToken?: ExistingTokenParams;
 };
@@ -103,14 +107,14 @@ type NewTokenParams = {
 export type TokenVotingProposal = ProposalBase & {
   result: TokenVotingProposalResult;
   settings: IProposalSettings;
-  token: Erc20TokenDetails;
+  token: Erc20TokenDetails | Erc721TokenDetails | null;
   usedVotingWeight: bigint;
   votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
   totalVotingWeight: bigint;
 };
 
 export type TokenVotingProposalListItem = ProposalListItemBase & {
-  token: Erc20TokenDetails;
+  token: Erc20TokenDetails | Erc721TokenDetails | null;
   result: TokenVotingProposalResult;
 };
 
@@ -120,36 +124,58 @@ export type TokenVotingProposalResult = {
   abstain: bigint;
 };
 
-export type Erc20TokenDetails = {
+export type Erc20TokenDetails = TokenBaseDetails & {
+  decimals: number;
+};
+export type Erc721TokenDetails = TokenBaseDetails & {
+  baseUri: string;
+};
+
+export type TokenBaseDetails = {
   address: string;
   name: string;
   symbol: string;
-  decimals: number;
 };
 
 export type SubgraphTokenVotingVoterListItem = SubgraphVoterListItemBase & {
-  weight: string;
+  votingPower: string;
 };
 
 export type SubgraphTokenVotingProposalListItem = SubgraphProposalBase & {
   plugin: {
-    token: {
-      symbol: string;
-      name: string;
-      id: string;
-      decimals: string;
-    };
+    token: SubgraphErc20Token | SubgraphErc721Token;
   };
 };
 
-export type SubgraphTokenVotingProposal = SubgraphTokenVotingProposalListItem & {
-  createdAt: string;
-  actions: SubgraphAction[];
-  totalSupportThresholdPct: string;
-  relativeSupportThresholdPct: string;
-  voters: SubgraphTokenVotingVoterListItem[];
-  census: string;
+type SubgraphBaseToken = {
+  symbol: string;
+  name: string;
+  id: string;
+  __typename: SubgraphTokenType;
 };
+export enum SubgraphTokenType {
+  ERC20 = "ERC20Token",
+  ERC721 = "ERC721Token",
+}
+
+export type SubgraphErc20Token = SubgraphBaseToken & {
+  decimals: string;
+};
+export type SubgraphErc721Token = SubgraphBaseToken & {
+  baseURI: string;
+};
+
+export type SubgraphTokenVotingProposal =
+  & SubgraphTokenVotingProposalListItem
+  & {
+    createdAt: string;
+    actions: SubgraphAction[];
+    supportThreshold: string;
+    minParticipation: string;
+    voters: SubgraphTokenVotingVoterListItem[];
+    totalVotingPower: string;
+    votingMode: VotingMode;
+  };
 
 export interface IMintTokenParams {
   address: string;
@@ -158,9 +184,14 @@ export interface IMintTokenParams {
 
 export type ContractMintTokenParams = [string, BigNumber];
 export type ContractTokenVotingInitParams = [
-  string, // dao address
-  BigNumber, // participation
-  BigNumber, // support
-  BigNumber, // duration
-  string, // token address
+  ContractVotingSettings,
+  [
+    string, // address
+    string, // name
+    string, // symbol
+  ],
+  [
+    string[], // receivers,
+    BigNumber[], // amounts
+  ],
 ];

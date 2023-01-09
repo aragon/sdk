@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
-export const QueryAddressListMembers = gql`
-query AddressListPluginMembers($address: ID!) {
-    addresslistPlugin(id: $address){
+export const QueryAddressListVotingMembers = gql`
+query AddressListVotingPluginMembers($address: ID!) {
+    addresslistVotingPlugin(id: $address){
         members {
             address
         }

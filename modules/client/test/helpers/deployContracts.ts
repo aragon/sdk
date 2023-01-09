@@ -20,7 +20,7 @@ export interface Deployment {
   tokenVotingRepo: aragonContracts.PluginRepo;
   tokenVotingPluginSetup: aragonContracts.TokenVotingSetup;
   addressListRepo: aragonContracts.PluginRepo;
-  addressListPluginSetup: aragonContracts.AllowlistVotingSetup;
+  addressListPluginSetup: aragonContracts.AddresslistVotingSetup;
 }
 
 export async function deploy(): Promise<Deployment> {
@@ -135,7 +135,8 @@ export async function deploy(): Promise<Deployment> {
 
     const pluginRepo_Factory = new aragonContracts.PluginRepo__factory();
 
-    const tokenVotingSetupFactory = new aragonContracts.TokenVotingSetup__factory();
+    const tokenVotingSetupFactory = new aragonContracts
+      .TokenVotingSetup__factory();
     const tokenVotingPluginSetup = await tokenVotingSetupFactory
       .connect(deployOwnerWallet)
       .deploy();
@@ -151,7 +152,7 @@ export async function deploy(): Promise<Deployment> {
       .attach(tokenRepoAddr);
 
     const addressListFactory = new aragonContracts
-      .AllowlistVotingSetup__factory();
+      .AddresslistVotingSetup__factory();
     const addressListPluginSetup = await addressListFactory
       .connect(deployOwnerWallet)
       .deploy();
@@ -320,8 +321,8 @@ export async function createAddresslistDAO(
         pluginSetup: deployment.addressListPluginSetup.address,
         pluginSetupRepo: deployment.addressListRepo.address,
         data: defaultAbiCoder.encode(
-          ["uint64", "uint64", "uint64", "address[]"],
-          [1, 1, 1, addresses],
+          ["tuple(uint8, uint64, uint64, uint64, uint256)", "address[]"],
+          [[0, 1, 1, 3600, 1], addresses],
         ),
       },
     ],
@@ -346,16 +347,12 @@ export async function createTokenVotingDAO(
         pluginSetupRepo: deployment.tokenVotingRepo.address,
         data: defaultAbiCoder.encode(
           [
-            "uint64",
-            "uint64",
-            "uint64",
+            "tuple(uint8, uint64, uint64, uint64, uint256)",
             "tuple(address, string, string)",
             "tuple(address[], uint256[])",
           ],
           [
-            1,
-            1,
-            1,
+            [0, 1, 1, 3600, 1],
             [AddressZero, "erc20", "e20"],
             [addresses, addresses.map(() => parseEther("1"))],
           ],

@@ -7,7 +7,13 @@ query token($address: ID!) {
       id
       name
       symbol
-      decimals
+      __typename
+      ...on ERC20Token {
+        decimals
+      }
+      ...on ERC721Token {
+        baseURI
+      }
     }
   }
 }

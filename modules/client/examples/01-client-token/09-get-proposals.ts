@@ -1,17 +1,17 @@
 /* MARKDOWN
 ### Loading the list of proposals (TokenVoting)
 
-Retrieving the proposals of an TokenVoting DAO.
+Retrieving the proposals of a TokenVoting DAO.
 */
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
-  TokenVotingProposalListItem,
   IProposalQueryParams,
   ProposalSortBy,
-  SortDirection,
   ProposalStatus,
+  SortDirection,
+  TokenVotingClient,
+  TokenVotingProposalListItem,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -19,7 +19,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
@@ -30,9 +30,10 @@ const queryParams: IProposalQueryParams = {
   status: ProposalStatus.ACTIVE, // optional
 };
 
-const proposals: TokenVotingProposalListItem[] = await client.methods.getProposals(
-  queryParams,
-);
+const proposals: TokenVotingProposalListItem[] = await client.methods
+  .getProposals(
+    queryParams,
+  );
 console.log(proposals);
 /*
 [

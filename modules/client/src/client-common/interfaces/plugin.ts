@@ -1,7 +1,6 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { DaoAction, IPagination } from "./common";
 
-
 /**
  * Contains the states of a proposal. Note that on chain
  * proposals cannot be in draft state
@@ -31,14 +30,31 @@ export interface IProposalSettings {
   duration: number;
 }
 
-export interface IPluginSettings {
-  /** Float: 0 to 1 */
-  minSupport: number;
-  /** Float: 0 to 1 */
-  minTurnout: number;
-  /** In seconds */
+export type VotingSettings = {
+  /* default is standard */
+  votingMode?: VotingMode;
+  /** Float between 0 and 1 */
+  supportThreshold: number;
+  /** Float between 0 and 1 */
+  minParticipation: number;
   minDuration: number;
+  /* default is 0 */
+  minProposerVotingPower?: bigint;
+};
+
+export enum VotingMode {
+  STANDARD = "Standard",
+  EARLY_EXECUTION = "EarlyExecution",
+  VOTE_REPLACEMENT = "VoteReplacement",
 }
+
+export type ContractVotingSettings = [
+  BigNumber, // votingMode
+  BigNumber, // supportThreshold
+  BigNumber, // minParticipation
+  BigNumber, // minDuration
+  BigNumber, // minProposerVotingPower
+];
 
 export interface ICreateProposalParams {
   pluginAddress: string;
@@ -135,9 +151,9 @@ export const SubgraphVoteValuesMap: Map<
 
 export type SubgraphVoterListItemBase = {
   voter: {
-    id: string;
+    address: string;
   };
-  vote: SubgraphVoteValues;
+  voteOption: SubgraphVoteValues;
 };
 
 export type SubgraphAction = {
@@ -203,7 +219,7 @@ export enum VoteProposalStep {
 
 export type VoteProposalStepValue =
   | { key: VoteProposalStep.VOTING; txHash: string }
-  | { key: VoteProposalStep.DONE; voteId: string };
+  | { key: VoteProposalStep.DONE };
 
 // PROPOSAL EXECUTION
 export enum ExecuteProposalStep {
@@ -216,3 +232,11 @@ export type ExecuteProposalStepValue =
   | { key: ExecuteProposalStep.DONE };
 
 export type ContractPluginSettings = [BigNumber, BigNumber, BigNumber];
+
+export type SubgraphVotingSettings = {
+  minDuration: string;
+  minProposerVotingPower: string;
+  minParticipation: string;
+  supportThreshold: string;
+  votingMode: VotingMode;
+};

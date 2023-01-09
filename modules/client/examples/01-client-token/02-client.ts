@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Create an TokenVoting client
+### Create a TokenVoting client
 */
-import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import { Context, ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context = new Context(contextParams);

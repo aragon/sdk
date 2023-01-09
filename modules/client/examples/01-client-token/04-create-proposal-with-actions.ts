@@ -1,14 +1,15 @@
 /* MARKDOWN
-### Creating an TokenVoting proposal with an action
+### Creating a TokenVoting proposal with an action
 */
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
-  IPluginSettings,
   ProposalCreationSteps,
+  TokenVotingClient,
   VoteValues,
+  VotingMode,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -16,14 +17,16 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client
+// Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
 // create config action
-const configActionPrarms: IPluginSettings = {
-  minDuration: 60 * 60 * 24,
-  minSupport: 0.3, // 30%
-  minTurnout: 0.5, // 50%
+const configActionPrarms: VotingSettings = {
+  minDuration: 60 * 60 * 24 * 2, // seconds
+  minParticipation: 0.25, // 25%
+  supportThreshold: 0.5, // 50%
+  minProposerVotingPower: BigInt("5000"), // default 0
+  votingMode: VotingMode.EARLY_EXECUTION, // default standard
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890";
