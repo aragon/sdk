@@ -111,9 +111,9 @@ export type TokenVotingProposal = ProposalBase & {
   usedVotingWeight: bigint;
   votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
   totalVotingWeight: bigint;
-  creationBlockNumber: bigint;
+  creationBlockNumber: number;
   executionDate: Date;
-  executionBlockNumber: bigint;
+  executionBlockNumber: number;
 };
 
 export type TokenVotingProposalListItem = ProposalListItemBase & {

@@ -54,9 +54,9 @@ console.log(proposal);
   startDate: <Date>,
   endDate: <Date>,
   creationDate: <Date>,
-  creationBlockNumber: 812345n,
+  creationBlockNumber: 812345,
   executionDate: <Date>,
-  executionBlockNumber: 812345n,
+  executionBlockNumber: 812345,
   actions: [
     {
       to: "0x12345..."

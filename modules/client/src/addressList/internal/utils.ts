@@ -50,9 +50,9 @@ export function toAddressListProposal(
     startDate,
     endDate,
     creationDate,
-    creationBlockNumber: BigInt(proposal.creationBlockNumber),
+    creationBlockNumber: parseInt(proposal.creationBlockNumber),
     executionDate,
-    executionBlockNumber: BigInt(proposal.executionBlockNumber || 0),
+    executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
@@ -138,7 +138,9 @@ export function addressListInitParamsToContract(
   params: IAddressListPluginInstall,
 ): ContractAddressListInitParams {
   return [
-    Object.values(votingSettingsToContract(params.votingSettings)) as ContractVotingSettings,
-    params.addresses
+    Object.values(
+      votingSettingsToContract(params.votingSettings),
+    ) as ContractVotingSettings,
+    params.addresses,
   ];
 }

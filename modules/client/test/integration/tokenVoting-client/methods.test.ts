@@ -275,9 +275,9 @@ describe("Token Voting Client", () => {
           expect(proposal.startDate instanceof Date).toBe(true);
           expect(proposal.endDate instanceof Date).toBe(true);
           expect(proposal.creationDate instanceof Date).toBe(true);
-          expect(typeof proposal.creationBlockNumber === "bigint").toBe(true);
+          expect(typeof proposal.creationBlockNumber === "number").toBe(true);
           expect(proposal.executionDate instanceof Date).toBe(true);
-          expect(typeof proposal.executionBlockNumber === "bigint").toBe(true);
+          expect(typeof proposal.executionBlockNumber === "number").toBe(true);
           expect(Array.isArray(proposal.actions)).toBe(true);
           // actions
           for (let i = 0; i < proposal.actions.length; i++) {

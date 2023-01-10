@@ -66,9 +66,9 @@ export function toTokenVotingProposal(
     startDate,
     endDate,
     creationDate,
-    creationBlockNumber: BigInt(proposal.creationBlockNumber),
+    creationBlockNumber: parseInt(proposal.creationBlockNumber),
     executionDate,
-    executionBlockNumber: BigInt(proposal.executionBlockNumber || 0),
+    executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
