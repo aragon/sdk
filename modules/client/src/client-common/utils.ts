@@ -11,6 +11,7 @@ import { Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import { Log } from "@ethersproject/providers";
 import { InvalidVotingModeError } from "@aragon/sdk-common";
+import { formatEther } from "@ethersproject/units";
 
 export function unwrapProposalParams(
   params: ICreateProposalParams,
@@ -109,4 +110,12 @@ export function votingModeToContracts(votingMode: VotingMode): number {
     default:
       throw new InvalidVotingModeError();
   }
+}
+
+export function etherToUnitInterval(ether: string): number {
+  return parseFloat(
+    parseFloat(
+      formatEther(ether),
+    ).toFixed(2),
+  );
 }

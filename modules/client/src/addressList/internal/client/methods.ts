@@ -22,6 +22,7 @@ import {
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
+  etherToUnitInterval,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -53,7 +54,6 @@ import {
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
 import { QueryAddressListVotingMembers } from "../graphql-queries/members";
-import { formatEther } from "@ethersproject/units";
 
 /**
  * Methods module the SDK Address List Client
@@ -435,15 +435,11 @@ export class ClientAddressListMethods extends ClientCore
       }
       return {
         minDuration: parseInt(addresslistVotingPlugin.minDuration),
-        supportThreshold: parseFloat(
-          parseFloat(
-            formatEther(addresslistVotingPlugin.supportThreshold),
-          ).toFixed(2),
+        supportThreshold: etherToUnitInterval(
+          addresslistVotingPlugin.supportThreshold,
         ),
-        minParticipation: parseFloat(
-          parseFloat(
-            formatEther(addresslistVotingPlugin.minParticipation),
-          ).toFixed(2),
+        minParticipation: etherToUnitInterval(
+          addresslistVotingPlugin.minParticipation,
         ),
         minProposerVotingPower: BigInt(
           addresslistVotingPlugin.minParticipation,

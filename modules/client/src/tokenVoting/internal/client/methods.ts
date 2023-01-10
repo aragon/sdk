@@ -15,6 +15,7 @@ import {
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
+  etherToUnitInterval,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -59,7 +60,6 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { formatEther } from "@ethersproject/units";
 
 /**
  * Methods module the SDK TokenVoting Client
@@ -429,15 +429,11 @@ export class TokenVotingClientMethods extends ClientCore
       }
       return {
         minDuration: parseInt(tokenVotingPlugin.minDuration),
-        supportThreshold: parseFloat(
-          parseFloat(
-            formatEther(tokenVotingPlugin.supportThreshold),
-          ).toFixed(2),
+        supportThreshold: etherToUnitInterval(
+          tokenVotingPlugin.supportThreshold,
         ),
-        minParticipation: parseFloat(
-          parseFloat(
-            formatEther(tokenVotingPlugin.minParticipation),
-          ).toFixed(2),
+        minParticipation: etherToUnitInterval(
+          tokenVotingPlugin.supportThreshold,
         ),
         minProposerVotingPower: BigInt(
           tokenVotingPlugin.minParticipation,

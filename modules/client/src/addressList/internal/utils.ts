@@ -3,6 +3,7 @@ import {
   computeProposalStatus,
   ContractVotingSettings,
   DaoAction,
+  etherToUnitInterval,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
@@ -18,7 +19,6 @@ import {
   SubgraphAddressListProposalListItem,
   SubgraphAddressListVoterListItem,
 } from "../interfaces";
-import { formatEther } from "@ethersproject/units";
 
 export function toAddressListProposal(
   proposal: SubgraphAddressListProposal,
@@ -70,16 +70,22 @@ export function toAddressListProposal(
       abstain: proposal.abstain ? parseInt(proposal.abstain) : 0,
     },
     settings: {
-      minSupport: parseFloat(
-        parseFloat(
-          formatEther(proposal.supportThreshold),
-        ).toFixed(2),
-      ),
-      minTurnout: parseFloat(
-        parseFloat(
-          formatEther(proposal.minParticipation),
-        ).toFixed(2),
-      ),
+      // TODO
+      // this should be decoded using the number of decimals that we want
+      // right now the encoders/recoders use 2 digit precission but the actual
+      // subgraph values are 18 digits precision. Uncomment below for 2 digits
+      // precision
+
+      // minSupport: decodeRatio(
+      //   BigInt(proposal.totalSupportThresholdPct),
+      //   2,
+      // ),
+      // minTurnout: decodeRatio(
+      //   BigInt(proposal.relativeSupportThresholdPct),
+      //   2,
+      // ),
+      minSupport: etherToUnitInterval(proposal.supportThreshold),
+      minTurnout: etherToUnitInterval(proposal.minParticipation),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
     },
