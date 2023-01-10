@@ -1,5 +1,5 @@
 import {
-  AllowlistVoting__factory,
+  AddresslistVoting__factory,
   MajorityVotingBase__factory
 } from "@aragon/core-contracts-ethers";
 
@@ -8,11 +8,11 @@ export const ADDRESSLIST_PLUGIN_ID =
   "0x1234567890123456789012345678901234567890";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
-  MajorityVotingBase__factory.createInterface().getFunction("setConfiguration")
+  MajorityVotingBase__factory.createInterface().getFunction("updateVotingSettings")
     .format("minimal"),
-  AllowlistVoting__factory.createInterface().getFunction("addAllowedUsers")
+  AddresslistVoting__factory.createInterface().getFunction("addAddresses")
     .format("minimal"),
-  AllowlistVoting__factory.createInterface().getFunction(
-    "removeAllowedUsers",
+  AddresslistVoting__factory.createInterface().getFunction(
+    "removeAddresses",
   ).format("minimal"),
 ];

@@ -1,4 +1,4 @@
-import { AllowlistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import {
   ClientCore,
   ContextPlugin,
@@ -9,6 +9,7 @@ import {
 } from "../../../client-common";
 import { IClientAddressListEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
 
 /**
  * Estimation module the SDK Address List Client
@@ -33,12 +34,12 @@ export class ClientAddressListEstimation extends ClientCore
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -46,14 +47,15 @@ export class ClientAddressListEstimation extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const estimatedGasFee = await addresslistContract.estimateGas.createVote(
-      toUtf8Bytes(params.metadataUri),
-      params.actions || [],
-      Math.round(startTimestamp / 1000),
-      Math.round(endTimestamp / 1000),
-      params.executeOnPass || false,
-      params.creatorVote || 0,
-    );
+    const estimatedGasFee = await addresslistContract.estimateGas
+      .createProposal(
+        toUtf8Bytes(params.metadataUri),
+        params.actions || [],
+        Math.round(startTimestamp / 1000),
+        Math.round(endTimestamp / 1000),
+        params.executeOnPass || false,
+        params.creatorVote || 0,
+      );
     return this.web3.getApproximateGasFee(estimatedGasFee.toBigInt());
   }
 
@@ -69,12 +71,12 @@ export class ClientAddressListEstimation extends ClientCore
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
 
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );
@@ -99,11 +101,11 @@ export class ClientAddressListEstimation extends ClientCore
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
-      throw new Error("A signer is needed");
+      throw new NoSignerError();
     } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
+      throw new NoProviderError();
     }
-    const addresslistContract = AllowlistVoting__factory.connect(
+    const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
       signer,
     );

@@ -5,14 +5,12 @@ declare const describe, it, expect, beforeAll, afterAll;
 import "../../mocks/aragon-sdk-ipfs";
 
 import { Random } from "@aragon/sdk-common";
-import { Client, Context, ICreateParams, IDepositParams } from "../../../src";
+import { Client, ClientAddressList, Context, IAddressListPluginInstall, ICreateParams, IDepositParams } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { deployErc20 } from "./methods.test";
 import { Server } from "ganache";
-import { toUtf8Bytes } from "@ethersproject/strings";
-import { defaultAbiCoder } from "@ethersproject/abi";
 
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
@@ -34,22 +32,30 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const daoName = "ERC20VotingDAO_" + Math.floor(Random.getFloat() * 9999) +
+      const daoName = "TokenVotingDAO_" + Math.floor(Random.getFloat() * 9999) +
         1;
+
+      const pluginParams: IAddressListPluginInstall = {
+        votingSettings: {
+          minDuration: 3600,
+          minParticipation: 0.5,
+          supportThreshold: 0.5,
+        },
+        addresses: [
+          "0x1234567890123456789012345678901234567890",
+          "0x0987654321098765432109876543210987654321",
+        ],
+      };
+
+      const addressListPlugin = ClientAddressList.encoding
+        .getPluginInstallItem(pluginParams);
+      addressListPlugin.id = deployment.addressListRepo.address;
 
       const daoCreationParams: ICreateParams = {
         metadataUri: `ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK`,
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [
-          {
-            id: deployment.addressListRepo.address,
-            data: toUtf8Bytes(
-              defaultAbiCoder.encode(
-                ["uint64", "uint64", "uint64", "address[]"],
-                [1, 1, 1, []],
-              ),
-            ),
-          },
+          addressListPlugin,
         ],
       };
 

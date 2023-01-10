@@ -15,6 +15,21 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
+## [UPCOMING]
+### Changed
+- renames `IPluginSettings` to `VotingSettings`
+- renames `minTurnout` to `minParticipation`
+- renames `minSupport` to `supportThreshold`
+- add `minProposerVotingPower`, `earlyExecution`and `voteReplacement` fields to `VotingSettings` and graphql responses
+- renames `ClientErc20` to `TokenVotingClient`
+- renames `IErc20PluginInstall` to `ITokenVotingPluginInstall`
+- renames `Erc20Proposal` to `TokenVotingProposal`
+- renames `Erc20ProposalListItem` to `TokenVotingProposalListItem`
+- changes the value of `ERC20VotingPlugin` in `SubgraphPluginTypeMap` from `erc20voting.dao.eth` to `token-voting.plugin.dao.ethh`
+- renames `Erc20ProposalResult` to `TokenVotingProposalResult`
+- rename `getSettings` to `getVotingSettings`
+
+
 ## [0.16.2-alpha]
 
 ### Changed

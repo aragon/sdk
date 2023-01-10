@@ -17,10 +17,10 @@ export interface Deployment {
   managingDaoAddress: string;
   daoFactory: aragonContracts.DAOFactory;
   daoRegistry: aragonContracts.DAORegistry;
-  erc20Repo: aragonContracts.PluginRepo;
-  erc20PluginSetup: aragonContracts.ERC20VotingSetup;
+  tokenVotingRepo: aragonContracts.PluginRepo;
+  tokenVotingPluginSetup: aragonContracts.TokenVotingSetup;
   addressListRepo: aragonContracts.PluginRepo;
-  addressListPluginSetup: aragonContracts.AllowlistVotingSetup;
+  addressListPluginSetup: aragonContracts.AddresslistVotingSetup;
 }
 
 export async function deploy(): Promise<Deployment> {
@@ -135,23 +135,24 @@ export async function deploy(): Promise<Deployment> {
 
     const pluginRepo_Factory = new aragonContracts.PluginRepo__factory();
 
-    const erc20SetupFactory = new aragonContracts.ERC20VotingSetup__factory();
-    const erc20PluginSetup = await erc20SetupFactory
+    const tokenVotingSetupFactory = new aragonContracts
+      .TokenVotingSetup__factory();
+    const tokenVotingPluginSetup = await tokenVotingSetupFactory
       .connect(deployOwnerWallet)
       .deploy();
-    const erc20RepoAddr = await deployPlugin(
+    const tokenRepoAddr = await deployPlugin(
       pluginRepoFactory,
-      erc20PluginSetup.address,
-      "ERC20Voting",
+      tokenVotingPluginSetup.address,
+      "TokenVoting",
       [1, 0, 0],
       deployOwnerWallet,
     );
-    const erc20Repo = pluginRepo_Factory
+    const tokenVotingRepo = pluginRepo_Factory
       .connect(deployOwnerWallet)
-      .attach(erc20RepoAddr);
+      .attach(tokenRepoAddr);
 
     const addressListFactory = new aragonContracts
-      .AllowlistVotingSetup__factory();
+      .AddresslistVotingSetup__factory();
     const addressListPluginSetup = await addressListFactory
       .connect(deployOwnerWallet)
       .deploy();
@@ -176,8 +177,8 @@ export async function deploy(): Promise<Deployment> {
       managingDaoAddress: managingDao.address,
       daoFactory,
       daoRegistry,
-      erc20Repo,
-      erc20PluginSetup,
+      tokenVotingRepo,
+      tokenVotingPluginSetup,
       addressListRepo,
       addressListPluginSetup,
     };
@@ -320,15 +321,15 @@ export async function createAddresslistDAO(
         pluginSetup: deployment.addressListPluginSetup.address,
         pluginSetupRepo: deployment.addressListRepo.address,
         data: defaultAbiCoder.encode(
-          ["uint64", "uint64", "uint64", "address[]"],
-          [1, 1, 1, addresses],
+          ["tuple(uint8, uint64, uint64, uint64, uint256)", "address[]"],
+          [[0, 1, 1, 3600, 1], addresses],
         ),
       },
     ],
   );
 }
 
-export async function createERC20DAO(
+export async function createTokenVotingDAO(
   deployment: Deployment,
   name: string,
   addresses: string[] = [],
@@ -342,20 +343,16 @@ export async function createERC20DAO(
     },
     [
       {
-        pluginSetup: deployment.erc20PluginSetup.address,
-        pluginSetupRepo: deployment.erc20Repo.address,
+        pluginSetup: deployment.tokenVotingPluginSetup.address,
+        pluginSetupRepo: deployment.tokenVotingRepo.address,
         data: defaultAbiCoder.encode(
           [
-            "uint64",
-            "uint64",
-            "uint64",
+            "tuple(uint8, uint64, uint64, uint64, uint256)",
             "tuple(address, string, string)",
             "tuple(address[], uint256[])",
           ],
           [
-            1,
-            1,
-            1,
+            [0, 1, 1, 3600, 1],
             [AddressZero, "erc20", "e20"],
             [addresses, addresses.map(() => parseEther("1"))],
           ],

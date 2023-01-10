@@ -95,3 +95,8 @@ export class IpfsFetchError extends Error {
     super("Failed to fetch data from IPFS");
   }
 }
+export class InvalidVotingModeError extends Error {
+  constructor() {
+    super("Invalid voting mode");
+  }
+}
