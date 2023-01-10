@@ -436,10 +436,14 @@ export class ClientAddressListMethods extends ClientCore
       return {
         minDuration: parseInt(addresslistVotingPlugin.minDuration),
         supportThreshold: parseFloat(
-          formatEther(addresslistVotingPlugin.supportThreshold),
+          parseFloat(
+            formatEther(addresslistVotingPlugin.supportThreshold),
+          ).toFixed(2),
         ),
         minParticipation: parseFloat(
-          formatEther(addresslistVotingPlugin.minParticipation),
+          parseFloat(
+            formatEther(addresslistVotingPlugin.minParticipation),
+          ).toFixed(2),
         ),
         minProposerVotingPower: BigInt(
           addresslistVotingPlugin.minParticipation,

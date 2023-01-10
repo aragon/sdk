@@ -47,10 +47,10 @@ import {
 } from "../../interfaces";
 import {
   QueryTokenVotingMembers,
+  QueryTokenVotingPlugin,
   QueryTokenVotingPluginSettings,
   QueryTokenVotingProposal,
   QueryTokenVotingProposals,
-  QueryTokenVotingPlugin,
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
@@ -430,10 +430,14 @@ export class TokenVotingClientMethods extends ClientCore
       return {
         minDuration: parseInt(tokenVotingPlugin.minDuration),
         supportThreshold: parseFloat(
-          formatEther(tokenVotingPlugin.supportThreshold),
+          parseFloat(
+            formatEther(tokenVotingPlugin.supportThreshold),
+          ).toFixed(2),
         ),
         minParticipation: parseFloat(
-          formatEther(tokenVotingPlugin.minParticipation),
+          parseFloat(
+            formatEther(tokenVotingPlugin.minParticipation),
+          ).toFixed(2),
         ),
         minProposerVotingPower: BigInt(
           tokenVotingPlugin.minParticipation,

@@ -86,10 +86,14 @@ export function toTokenVotingProposal(
     },
     settings: {
       minSupport: parseFloat(
-        formatEther(proposal.supportThreshold),
+        parseFloat(
+          formatEther(proposal.supportThreshold),
+        ).toFixed(2),
       ),
       minTurnout: parseFloat(
-        formatEther(proposal.minParticipation),
+        parseFloat(
+          formatEther(proposal.minParticipation),
+        ).toFixed(2),
       ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
@@ -117,7 +121,7 @@ export function toTokenVotingProposalListItem(
     parseInt(proposal.startDate) * 1000,
   );
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
-  const token = parseToken(proposal.plugin.token)
+  const token = parseToken(proposal.plugin.token);
   return {
     id: proposal.id,
     dao: {
@@ -180,7 +184,7 @@ export function tokenVotingInitParamsToContract(
 function parseToken(
   subgraphToken: SubgraphErc20Token | SubgraphErc721Token,
 ): Erc20TokenDetails | Erc721TokenDetails | null {
-  let token = null
+  let token = null;
   if (subgraphToken.__typename === SubgraphTokenType.ERC20) {
     subgraphToken = subgraphToken as SubgraphErc20Token;
     token = {

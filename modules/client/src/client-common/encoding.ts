@@ -50,8 +50,8 @@ export function encodeUpdateVotingSettingsAction(
 function pluginSettingsFromContract(result: Result): VotingSettings {
   return {
     minProposerVotingPower: BigInt(result[0][0]),
-    supportThreshold: parseFloat(formatEther(result[0][1])),
-    minParticipation: parseFloat(formatEther(result[0][2])),
+    supportThreshold: parseFloat(parseFloat(formatEther(result[0][1])).toFixed(2)),
+    minParticipation: parseFloat(parseFloat(formatEther(result[0][2])).toFixed(2)),
     minDuration: result[0][3].toNumber(),
   };
 }

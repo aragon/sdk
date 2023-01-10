@@ -71,10 +71,14 @@ export function toAddressListProposal(
     },
     settings: {
       minSupport: parseFloat(
-        formatEther(proposal.supportThreshold),
+        parseFloat(
+          formatEther(proposal.supportThreshold),
+        ).toFixed(2),
       ),
       minTurnout: parseFloat(
-        formatEther(proposal.minParticipation),
+        parseFloat(
+          formatEther(proposal.minParticipation),
+        ).toFixed(2),
       ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
