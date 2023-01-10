@@ -289,6 +289,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
   }
 
+  /**
+   * Checks if the allowance is enough and updates it
+   *
+   * @param {EnsureAllowanceParams} params
+   * @return {*}  {AsyncGenerator<EnsureAllowanceStepValue>}
+   * @memberof ClientMethods
+   */
   public async *ensureAllowance(
     params: EnsureAllowanceParams,
   ): AsyncGenerator<EnsureAllowanceStepValue> {
