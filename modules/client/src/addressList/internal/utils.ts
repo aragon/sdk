@@ -18,6 +18,7 @@ import {
   SubgraphAddressListProposalListItem,
   SubgraphAddressListVoterListItem,
 } from "../interfaces";
+import { formatEther } from "@ethersproject/units";
 
 export function toAddressListProposal(
   proposal: SubgraphAddressListProposal,
@@ -69,26 +70,11 @@ export function toAddressListProposal(
       abstain: proposal.abstain ? parseInt(proposal.abstain) : 0,
     },
     settings: {
-      // TODO
-      // this should be decoded using the number of decimals that we want
-      // right now the encoders/recoders use 2 digit precission but the actual
-      // subgraph values are 18 digits precision. Uncomment below for 2 digits
-      // precision
-
-      // minSupport: decodeRatio(
-      //   BigInt(proposal.totalSupportThresholdPct),
-      //   2,
-      // ),
-      // minTurnout: decodeRatio(
-      //   BigInt(proposal.relativeSupportThresholdPct),
-      //   2,
-      // ),
-      // TODO DELETE ME
       minSupport: parseFloat(
-        proposal.supportThreshold,
+        formatEther(proposal.supportThreshold),
       ),
       minTurnout: parseFloat(
-        proposal.minParticipation,
+        formatEther(proposal.minParticipation),
       ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),

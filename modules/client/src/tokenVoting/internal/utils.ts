@@ -85,21 +85,6 @@ export function toTokenVotingProposal(
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     settings: {
-      // TODO
-      // this should be decoded using the number of decimals that we want
-      // right now the encoders/recoders use 2 digit precission but the actual
-      // subgraph values are 18 digits precision. Uncomment below for 2 digits
-      // precision
-
-      // minSupport: decodeRatio(
-      //   BigInt(proposal.totalSupportThresholdPct),
-      //   2,
-      // ),
-      // minTurnout: decodeRatio(
-      //   BigInt(proposal.relativeSupportThresholdPct),
-      //   2,
-      // ),
-      // TODO DELETE ME
       minSupport: parseFloat(
         formatEther(proposal.supportThreshold),
       ),

@@ -289,16 +289,14 @@ describe("Client Address List", () => {
         expect(typeof proposal.settings.duration).toBe("number");
         expect(typeof proposal.settings.minSupport).toBe("number");
         expect(typeof proposal.settings.minTurnout).toBe("number");
-        // TODO
-        // enable this tests when the subgrph have the correcto precision digits
-        // expect(
-        //   proposal.settings.minSupport >= 0 &&
-        //     proposal.settings.minSupport <= 1,
-        // ).toBe(true);
-        // expect(
-        //   proposal.settings.minTurnout >= 0 &&
-        //     proposal.settings.minTurnout <= 1,
-        // ).toBe(true);
+        expect(
+          proposal.settings.minSupport >= 0 &&
+            proposal.settings.minSupport <= 1,
+        ).toBe(true);
+        expect(
+          proposal.settings.minTurnout >= 0 &&
+            proposal.settings.minTurnout <= 1,
+        ).toBe(true);
         // token
         expect(typeof proposal.totalVotingWeight).toBe("number");
         expect(Array.isArray(proposal.votes)).toBe(true);
