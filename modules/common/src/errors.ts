@@ -100,3 +100,8 @@ export class InvalidVotingModeError extends Error {
     super("Invalid voting mode");
   }
 }
+export class EnsureAllowanceError extends Error {
+  constructor() {
+    super("Failed to ensure allowance");
+  }
+}

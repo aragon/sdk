@@ -16,7 +16,7 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## [UPCOMING]
-
+- Adds new error `EnsureAllowanceError`
 ## 0.9.1-alpha
 On 2022-12-13 15:57:38
 ### Fixed
