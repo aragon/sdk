@@ -446,7 +446,7 @@ console.log(balances);
 */
 ```
 
-### Ensure an allowance is enouch
+### Ensure an a minimum token allowance
 Check if the allowance is enough and updates it if it is not
 
 ```ts
