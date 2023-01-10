@@ -46,6 +46,7 @@ import { Server } from "ganache";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { PluginSetupProcessor__factory } from "@aragon/core-contracts-ethers";
+import { EnsureAllowanceParams } from "../../../src/interfaces";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -225,6 +226,47 @@ describe("Client", () => {
           (
             await tokenContract.functions.balanceOf(
               depositParams.daoAddressOrEns,
+            )
+          ).toString(),
+        ).toBe(amount.toString());
+      });
+      it("Should ensure allowance for an ERC20 token", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const tokenContract = await deployErc20(client);
+        const amount = BigInt("1000000000000000000");
+        const ensureAllowanceParams: EnsureAllowanceParams = {
+          daoAddress,
+          amount,
+          tokenAddress: tokenContract.address,
+        };
+
+        for await (const step of client.methods.ensureAllowance(ensureAllowanceParams)) {
+          switch (step.key) {
+            case DaoDepositSteps.CHECKED_ALLOWANCE:
+              expect(typeof step.allowance).toBe("bigint");
+              expect(step.allowance).toBe(BigInt(0));
+              break;
+            case DaoDepositSteps.UPDATING_ALLOWANCE:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoDepositSteps.UPDATED_ALLOWANCE:
+              expect(typeof step.allowance).toBe("bigint");
+              expect(step.allowance).toBe(amount);
+              break;
+            default:
+              throw new Error(
+                "Unexpected DAO ensure allowance step: " + JSON.stringify(step, null, 2),
+              );
+          }
+        }
+
+        expect(
+          (
+            await tokenContract.functions.allowance(
+              client.web3.getSigner()?.getAddress(),
+              daoAddress,
             )
           ).toString(),
         ).toBe(amount.toString());

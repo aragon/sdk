@@ -17,6 +17,7 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
+- Exposes `ensureAllowance` method
 - renames `IPluginSettings` to `VotingSettings`
 - renames `minTurnout` to `minParticipation`
 - renames `minSupport` to `supportThreshold`
