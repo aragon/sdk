@@ -102,6 +102,6 @@ export class InvalidVotingModeError extends Error {
 }
 export class EnsureAllowanceError extends Error {
   constructor() {
-    super("Failed to ensure allowance");
+    super("Could not define a minimum allowance");
   }
 }
