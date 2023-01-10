@@ -318,9 +318,9 @@ export const SubgraphPluginTypeMap: Map<
   SubgraphPluginTypeName,
   string
 > = new Map([
-  [SubgraphPluginTypeName.TOKEN_VOTING, "tokenvoting.dao.eth"],
-  [SubgraphPluginTypeName.ADDRESS_LIST, "addresslistvoting.dao.eth"],
-  [SubgraphPluginTypeName.ADMIN, "admin.dao.eth"],
+  [SubgraphPluginTypeName.TOKEN_VOTING, "token-voting.plugin.dao.eth"],
+  [SubgraphPluginTypeName.ADDRESS_LIST, "addresslist-voting.plugin.dao.eth"],
+  [SubgraphPluginTypeName.ADMIN, "admin.plugin.dao.eth"],
 ]);
 
 export type SubgraphPluginListItem = {

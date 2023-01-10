@@ -25,7 +25,7 @@ TEMPLATE:
 - renames `IErc20PluginInstall` to `ITokenVotingPluginInstall`
 - renames `Erc20Proposal` to `TokenVotingProposal`
 - renames `Erc20ProposalListItem` to `TokenVotingProposalListItem`
-- changes the value of `ERC20VotingPlugin` in `SubgraphPluginTypeMap` from `erc20voting.dao.eth` to `tokenvoting.dao.eth`
+- changes the value of `ERC20VotingPlugin` in `SubgraphPluginTypeMap` from `erc20voting.dao.eth` to `token-voting.plugin.dao.ethh`
 - renames `Erc20ProposalResult` to `TokenVotingProposalResult`
 - rename `getSettings` to `getVotingSettings`
 
