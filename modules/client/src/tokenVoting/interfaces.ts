@@ -111,6 +111,9 @@ export type TokenVotingProposal = ProposalBase & {
   usedVotingWeight: bigint;
   votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
   totalVotingWeight: bigint;
+  creationBlockNumber: bigint;
+  executionDate: Date;
+  executionBlockNumber: bigint;
 };
 
 export type TokenVotingProposalListItem = ProposalListItemBase & {
@@ -175,6 +178,9 @@ export type SubgraphTokenVotingProposal =
     voters: SubgraphTokenVotingVoterListItem[];
     totalVotingPower: string;
     votingMode: VotingMode;
+    creationBlockNumber: string;
+    executionDate: string;
+    executionBlockNumber: string;
   };
 
 export interface IMintTokenParams {
