@@ -223,7 +223,7 @@ so that the plugin is configured</p>
     * [.getMembers(pluginAddress)](#ClientAddressListMethods+getMembers) ⇒ <code>\*</code>
     * [.getProposal(proposalId)](#ClientAddressListMethods+getProposal) ⇒ <code>\*</code>
     * [.getProposals({)](#ClientAddressListMethods+getProposals) ⇒ <code>\*</code>
-    * [.getSettings(pluginAddress)](#ClientAddressListMethods+getSettings) ⇒ <code>\*</code>
+    * [.getVotingSettings(pluginAddress)](#ClientAddressListMethods+getVotingSettings) ⇒ <code>\*</code>
 
 <a name="ClientAddressListMethods+createProposal"></a>
 
@@ -309,9 +309,9 @@ so that the plugin is configured</p>
 | --- | --- | --- |
 | { | <code>IProposalQueryParams</code> | <p>daoAddressOrEns, limit = 10, status, skip = 0, direction = SortDirection.ASC, sortBy = ProposalSortBy.CREATED_AT, }</p> |
 
-<a name="ClientAddressListMethods+getSettings"></a>
+<a name="ClientAddressListMethods+getVotingSettings"></a>
 
-### clientAddressListMethods.getSettings(pluginAddress) ⇒ <code>\*</code>
+### clientAddressListMethods.getVotingSettings(pluginAddress) ⇒ <code>\*</code>
 <p>Returns the settings of a plugin given the address of the plugin instance</p>
 
 **Kind**: instance method of [<code>ClientAddressListMethods</code>](#ClientAddressListMethods)  

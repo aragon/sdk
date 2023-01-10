@@ -35,7 +35,7 @@
     * [.TokenVotingClientMethods#getMembers(pluginAddress)](#TokenVotingClient.TokenVotingClientMethods+getMembers) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#getProposal(proposalId)](#TokenVotingClient.TokenVotingClientMethods+getProposal) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#getProposals(params)](#TokenVotingClient.TokenVotingClientMethods+getProposals) ⇒ <code>\*</code>
-    * [.TokenVotingClientMethods#getSettings(pluginAddress)](#TokenVotingClient.TokenVotingClientMethods+getSettings) ⇒ <code>\*</code>
+    * [.TokenVotingClientMethods#getVotingSettings(pluginAddress)](#TokenVotingClient.TokenVotingClientMethods+getVotingSettings) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#getToken(pluginAddress)](#TokenVotingClient.TokenVotingClientMethods+getToken) ⇒ <code>\*</code>
 
 <a name="TokenVotingClient.getPluginInstallItem"></a>
@@ -124,9 +124,9 @@ so that the plugin is configured</p>
 | --- | --- |
 | params | <code>IProposalQueryParams</code> | 
 
-<a name="TokenVotingClient.TokenVotingClientMethods+getSettings"></a>
+<a name="TokenVotingClient.TokenVotingClientMethods+getVotingSettings"></a>
 
-### TokenVotingClient.TokenVotingClientMethods#getSettings(pluginAddress) ⇒ <code>\*</code>
+### TokenVotingClient.TokenVotingClientMethods#getVotingSettings(pluginAddress) ⇒ <code>\*</code>
 <p>Returns the settings of a plugin given the address of the plugin instance</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
