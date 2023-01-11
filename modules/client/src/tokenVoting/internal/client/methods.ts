@@ -15,7 +15,7 @@ import {
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
-  etherToUnitInterval,
+  parseEtherRatio,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -429,10 +429,10 @@ export class TokenVotingClientMethods extends ClientCore
       }
       return {
         minDuration: parseInt(tokenVotingPlugin.minDuration),
-        supportThreshold: etherToUnitInterval(
+        supportThreshold: parseEtherRatio(
           tokenVotingPlugin.supportThreshold,
         ),
-        minParticipation: etherToUnitInterval(
+        minParticipation: parseEtherRatio(
           tokenVotingPlugin.supportThreshold,
         ),
         minProposerVotingPower: BigInt(

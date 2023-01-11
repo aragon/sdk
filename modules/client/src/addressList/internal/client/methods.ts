@@ -22,7 +22,7 @@ import {
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
-  etherToUnitInterval,
+  parseEtherRatio,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -435,10 +435,10 @@ export class ClientAddressListMethods extends ClientCore
       }
       return {
         minDuration: parseInt(addresslistVotingPlugin.minDuration),
-        supportThreshold: etherToUnitInterval(
+        supportThreshold: parseEtherRatio(
           addresslistVotingPlugin.supportThreshold,
         ),
-        minParticipation: etherToUnitInterval(
+        minParticipation: parseEtherRatio(
           addresslistVotingPlugin.minParticipation,
         ),
         minProposerVotingPower: BigInt(

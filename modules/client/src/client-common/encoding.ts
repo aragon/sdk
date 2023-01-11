@@ -11,7 +11,7 @@ import {
 import { VotingMode, VotingSettings } from "./interfaces/plugin";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
-import { etherToUnitInterval, votingModeToContracts } from "./utils";
+import { parseEtherRatio, votingModeToContracts } from "./utils";
 import { parseEther } from "@ethersproject/units";
 
 export function decodeUpdatePluginSettingsAction(
@@ -50,8 +50,8 @@ export function encodeUpdateVotingSettingsAction(
 function pluginSettingsFromContract(result: Result): VotingSettings {
   return {
     minProposerVotingPower: BigInt(result[0][0]),
-    supportThreshold: etherToUnitInterval(result[0][1]),
-    minParticipation: etherToUnitInterval(result[0][2]),
+    supportThreshold: parseEtherRatio(result[0][1]),
+    minParticipation: parseEtherRatio(result[0][2]),
     minDuration: result[0][3].toNumber(),
   };
 }
