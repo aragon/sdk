@@ -3,6 +3,7 @@ import {
   computeProposalStatus,
   ContractVotingSettings,
   DaoAction,
+  parseEtherRatio,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
@@ -83,13 +84,8 @@ export function toAddressListProposal(
       //   BigInt(proposal.relativeSupportThresholdPct),
       //   2,
       // ),
-      // TODO DELETE ME
-      minSupport: parseFloat(
-        proposal.supportThreshold,
-      ),
-      minTurnout: parseFloat(
-        proposal.minParticipation,
-      ),
+      minSupport: parseEtherRatio(proposal.supportThreshold),
+      minTurnout: parseEtherRatio(proposal.minParticipation),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
     },

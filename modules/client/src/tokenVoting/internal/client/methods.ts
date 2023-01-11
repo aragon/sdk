@@ -15,6 +15,7 @@ import {
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
+  parseEtherRatio,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -47,10 +48,10 @@ import {
 } from "../../interfaces";
 import {
   QueryTokenVotingMembers,
+  QueryTokenVotingPlugin,
   QueryTokenVotingPluginSettings,
   QueryTokenVotingProposal,
   QueryTokenVotingProposals,
-  QueryTokenVotingPlugin,
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
@@ -59,7 +60,6 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { formatEther } from "@ethersproject/units";
 
 /**
  * Methods module the SDK TokenVoting Client
@@ -429,11 +429,11 @@ export class TokenVotingClientMethods extends ClientCore
       }
       return {
         minDuration: parseInt(tokenVotingPlugin.minDuration),
-        supportThreshold: parseFloat(
-          formatEther(tokenVotingPlugin.supportThreshold),
+        supportThreshold: parseEtherRatio(
+          tokenVotingPlugin.supportThreshold,
         ),
-        minParticipation: parseFloat(
-          formatEther(tokenVotingPlugin.minParticipation),
+        minParticipation: parseEtherRatio(
+          tokenVotingPlugin.supportThreshold,
         ),
         minProposerVotingPower: BigInt(
           tokenVotingPlugin.minParticipation,

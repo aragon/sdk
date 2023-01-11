@@ -4,8 +4,6 @@ import {
 } from "@aragon/core-contracts-ethers";
 import {
   bytesToHex,
-  decodeRatio,
-  encodeRatio,
   hexToBytes,
   strip0x,
   UnexpectedActionError,
@@ -13,7 +11,8 @@ import {
 import { VotingMode, VotingSettings } from "./interfaces/plugin";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
-import { votingModeToContracts } from "./utils";
+import { parseEtherRatio, votingModeToContracts } from "./utils";
+import { parseEther } from "@ethersproject/units";
 
 export function decodeUpdatePluginSettingsAction(
   data: Uint8Array,
@@ -51,8 +50,8 @@ export function encodeUpdateVotingSettingsAction(
 function pluginSettingsFromContract(result: Result): VotingSettings {
   return {
     minProposerVotingPower: BigInt(result[0][0]),
-    supportThreshold: decodeRatio(result[0][1], 2),
-    minParticipation: decodeRatio(result[0][2], 2),
+    supportThreshold: parseEtherRatio(result[0][1]),
+    minParticipation: parseEtherRatio(result[0][2]),
     minDuration: result[0][3].toNumber(),
   };
 }
@@ -64,8 +63,8 @@ export function votingSettingsToContract(
     votingMode: BigNumber.from(
       votingModeToContracts(params.votingMode || VotingMode.STANDARD),
     ),
-    supportThreshold: BigNumber.from(encodeRatio(params.supportThreshold, 2)),
-    minParticipation: BigNumber.from(encodeRatio(params.minParticipation, 2)),
+    supportThreshold: parseEther(params.supportThreshold.toString()),
+    minParticipation: parseEther(params.minParticipation.toString()),
     minDuration: BigNumber.from(params.minDuration),
     minProposerVotingPower: BigNumber.from(params.minProposerVotingPower || 0),
   };

@@ -105,3 +105,8 @@ export class EnsureAllowanceError extends Error {
     super("Could not define a minimum allowance");
   }
 }
+export class InvalidPrecisionError extends Error {
+  constructor() {
+    super("Invalid precision, number must be an integer greater than 0");
+  }
+}

@@ -18,6 +18,7 @@ TEMPLATE:
 ## [UPCOMING]
 ### Changed
 - Exposes `ensureAllowance` method
+- Fix precission in `VotingSettings`
 - renames `IPluginSettings` to `VotingSettings`
 - renames `minTurnout` to `minParticipation`
 - renames `minSupport` to `supportThreshold`

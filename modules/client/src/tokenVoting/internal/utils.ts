@@ -3,6 +3,7 @@ import {
   computeProposalStatus,
   ContractVotingSettings,
   DaoAction,
+  parseEtherRatio,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
@@ -25,7 +26,6 @@ import {
   TokenVotingProposal,
   TokenVotingProposalListItem,
 } from "../interfaces";
-import { formatEther } from "@ethersproject/units";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
@@ -99,13 +99,8 @@ export function toTokenVotingProposal(
       //   BigInt(proposal.relativeSupportThresholdPct),
       //   2,
       // ),
-      // TODO DELETE ME
-      minSupport: parseFloat(
-        formatEther(proposal.supportThreshold),
-      ),
-      minTurnout: parseFloat(
-        formatEther(proposal.minParticipation),
-      ),
+      minSupport: parseEtherRatio(proposal.supportThreshold),
+      minTurnout: parseEtherRatio(proposal.minParticipation),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
     },
@@ -132,7 +127,7 @@ export function toTokenVotingProposalListItem(
     parseInt(proposal.startDate) * 1000,
   );
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
-  const token = parseToken(proposal.plugin.token)
+  const token = parseToken(proposal.plugin.token);
   return {
     id: proposal.id,
     dao: {
@@ -195,7 +190,7 @@ export function tokenVotingInitParamsToContract(
 function parseToken(
   subgraphToken: SubgraphErc20Token | SubgraphErc721Token,
 ): Erc20TokenDetails | Erc721TokenDetails | null {
-  let token = null
+  let token = null;
   if (subgraphToken.__typename === SubgraphTokenType.ERC20) {
     subgraphToken = subgraphToken as SubgraphErc20Token;
     token = {
