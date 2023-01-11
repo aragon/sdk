@@ -258,6 +258,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
     * [.create(params)](#ClientMethods+create) ⇒ <code>\*</code>
     * [.pinMetadata(params)](#ClientMethods+pinMetadata) ⇒ <code>\*</code>
     * [.deposit(params)](#ClientMethods+deposit) ⇒ <code>\*</code>
+    * [.ensureAllowance(params)](#ClientMethods+ensureAllowance) ⇒ <code>\*</code>
     * [.hasPermission(params)](#ClientMethods+hasPermission) ⇒ <code>\*</code>
     * [.getDao(daoAddressOrEns)](#ClientMethods+getDao) ⇒ <code>\*</code>
     * [.getDaos({)](#ClientMethods+getDaos) ⇒ <code>\*</code>
@@ -299,6 +300,18 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 | Param | Type |
 | --- | --- |
 | params | <code>IDepositParams</code> | 
+
+<a name="ClientMethods+ensureAllowance"></a>
+
+### clientMethods.ensureAllowance(params) ⇒ <code>\*</code>
+<p>Checks if the allowance is enough and updates it</p>
+
+**Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
+**Returns**: <code>\*</code> - <p>{AsyncGenerator<EnsureAllowanceStepValue>}</p>  
+
+| Param | Type |
+| --- | --- |
+| params | <code>EnsureAllowanceParams</code> | 
 
 <a name="ClientMethods+hasPermission"></a>
 

@@ -7,21 +7,20 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/core-contracts-ethers";
 import {
+  EnsureAllowanceError,
   GraphQLError,
   InvalidAddressOrEnsError,
-  MissingExecPermissionError,
   InvalidCidError,
   IpfsPinError,
+  MissingExecPermissionError,
   NoProviderError,
   NoSignerError,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
-import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import {
   Contract,
-  ContractReceipt,
   ContractTransaction,
 } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
@@ -40,6 +39,8 @@ import {
   DaoDetails,
   DaoListItem,
   DaoSortBy,
+  EnsureAllowanceParams,
+  EnsureAllowanceStepValue,
   IClientMethods,
   ICreateParams,
   IDaoQueryParams,
@@ -59,6 +60,7 @@ import {
 import {
   ClientCore,
   Context,
+  findLog,
   SortDirection,
 } from "../../client-common";
 import {
@@ -233,10 +235,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       // If the target is an ERC20 token, ensure that the amount can be transferred
       // Relay the yield steps to the caller as they are received
       yield* this.ensureAllowance(
-        daoAddress,
-        params.amount,
-        tokenAddress,
-        signer,
+        {
+          amount: params.amount,
+          daoAddress,
+          tokenAddress
+        }
       );
     }
 
@@ -286,17 +289,34 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
   }
 
-  private async *ensureAllowance(
-    daoAddress: string,
-    amount: bigint,
-    tokenAddress: string,
-    signer: Signer,
-  ): AsyncGenerator<DaoDepositStepValue> {
-    const tokenInstance = new Contract(tokenAddress, erc20ContractAbi, signer);
+  /**
+   * Checks if the allowance is enough and updates it
+   *
+   * @param {EnsureAllowanceParams} params
+   * @return {*}  {AsyncGenerator<EnsureAllowanceStepValue>}
+   * @memberof ClientMethods
+   */
+  public async *ensureAllowance(
+    params: EnsureAllowanceParams,
+  ): AsyncGenerator<EnsureAllowanceStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    // TODO
+    // add params check with yup
+
+    const tokenInstance = new Contract(
+      params.tokenAddress,
+      erc20ContractAbi,
+      signer,
+    );
 
     const currentAllowance = await tokenInstance.allowance(
       await signer.getAddress(),
-      daoAddress,
+      params.daoAddress,
     );
 
     yield {
@@ -304,11 +324,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       allowance: currentAllowance.toBigInt(),
     };
 
-    if (currentAllowance.gte(amount)) return;
+    if (currentAllowance.gte(params.amount)) return;
 
     const tx: ContractTransaction = await tokenInstance.approve(
-      daoAddress,
-      BigNumber.from(amount),
+      params.daoAddress,
+      BigNumber.from(params.amount),
     );
 
     yield {
@@ -316,22 +336,20 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       txHash: tx.hash,
     };
 
-    await tx.wait().then((cr: ContractReceipt) => {
-      const log = cr.logs?.find(
-        (e) => e?.topics[0] === id("Approval(address,address,uint256)"),
-      );
-      if (!log) {
-        throw new Error("Could not find the Approval event");
-      }
-      const value = log.data;
-      if (!value || BigNumber.from(amount).gt(BigNumber.from(value))) {
-        throw new Error("Could not update allowance");
-      }
-    });
+    const cr = await tx.wait();
+    const log = findLog(cr, tokenInstance.interface, "Approval");
+
+    if (!log) {
+      throw new EnsureAllowanceError();
+    }
+    const value = log.data;
+    if (!value || BigNumber.from(params.amount).gt(BigNumber.from(value))) {
+      throw new EnsureAllowanceError();
+    }
 
     yield {
       key: DaoDepositSteps.UPDATED_ALLOWANCE,
-      allowance: amount,
+      allowance: params.amount,
     };
   }
   /**
