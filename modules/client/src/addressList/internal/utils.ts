@@ -30,6 +30,9 @@ export function toAddressListProposal(
   const creationDate = new Date(
     parseInt(proposal.createdAt) * 1000,
   );
+  const executionDate = new Date(
+    parseInt(proposal.executionDate) * 1000,
+  );
   return {
     id: proposal.id,
     dao: {
@@ -47,6 +50,9 @@ export function toAddressListProposal(
     startDate,
     endDate,
     creationDate,
+    creationBlockNumber: parseInt(proposal.creationBlockNumber),
+    executionDate,
+    executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
@@ -132,7 +138,9 @@ export function addressListInitParamsToContract(
   params: IAddressListPluginInstall,
 ): ContractAddressListInitParams {
   return [
-    Object.values(votingSettingsToContract(params.votingSettings)) as ContractVotingSettings,
-    params.addresses
+    Object.values(
+      votingSettingsToContract(params.votingSettings),
+    ) as ContractVotingSettings,
+    params.addresses,
   ];
 }
