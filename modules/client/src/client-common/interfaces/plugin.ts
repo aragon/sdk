@@ -91,7 +91,6 @@ export interface ICanVoteParams {
 
 export type CanExecuteParams = {
   proposalId: bigint;
-  addressOrEns: string;
   pluginAddress: string
 };
 

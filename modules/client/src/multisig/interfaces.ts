@@ -106,7 +106,9 @@ export type ApproveMultisigProposalParams = {
   tryExecution: boolean;
 };
 
-export type CanApproveParams = CanExecuteParams;
+export type CanApproveParams = CanExecuteParams & {
+  addressOrEns: string;
+};
 
 export enum ApproveProposalStep {
   APPROVING = "approving",

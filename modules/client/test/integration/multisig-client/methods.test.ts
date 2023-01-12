@@ -203,10 +203,8 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
-      const address = await client.web3.getSigner()?.getAddress()
       const canExecuteParams: CanExecuteParams = {
         proposalId: BigInt(0),
-        addressOrEns: address!,
         pluginAddress,
       };
       const canExecute = await client.methods.canExecute(

@@ -278,9 +278,6 @@ export class MultisigClientMethods extends ClientCore
     //   throw new InvalidProposalIdError();
     // update when new proposalid
     // }
-    if (!isAddress(params.addressOrEns)) {
-      throw new InvalidAddressOrEnsError();
-    }
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressOrEnsError();
     }
@@ -292,7 +289,7 @@ export class MultisigClientMethods extends ClientCore
       signer,
     );
 
-    return multisigContract.canApprove(params.proposalId, params.addressOrEns);
+    return multisigContract.canExecute(params.proposalId);
   }
   /**
    * returns the plugin settings

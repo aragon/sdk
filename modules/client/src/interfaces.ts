@@ -325,6 +325,7 @@ export enum SubgraphPluginTypeName {
   TOKEN_VOTING = "TokenVotingPlugin",
   ADDRESS_LIST = "AddresslistVotingPlugin",
   ADMIN = "AdminPlugin",
+  MULTISIG = "MultisigPlugin",
 }
 
 export const SubgraphPluginTypeMap: Map<
@@ -334,6 +335,7 @@ export const SubgraphPluginTypeMap: Map<
   [SubgraphPluginTypeName.TOKEN_VOTING, "token-voting.plugin.dao.eth"],
   [SubgraphPluginTypeName.ADDRESS_LIST, "addresslist-voting.plugin.dao.eth"],
   [SubgraphPluginTypeName.ADMIN, "admin.plugin.dao.eth"],
+  [SubgraphPluginTypeName.MULTISIG, "multisig.plugin.dao.eth"],
 ]);
 
 export type SubgraphPluginListItem = {
