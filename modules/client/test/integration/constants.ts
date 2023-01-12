@@ -40,7 +40,7 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://subgraph.satsuma-prod.com/aragon/core-goerli/version/v0.5.0-alpha/api",
+        "https://subgraph.satsuma-prod.com/aragon/core-goerli/version/v0.6.1-alpha/api",
     },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],
@@ -68,8 +68,9 @@ export const TEST_ADDRESSLIST_PROPOSAL_ID = TEST_ADDRESSLIST_PLUGIN_ADDRESS +
 
 // Multisig
 export const TEST_MULTISIG_PLUGIN_ADDRESS =
-  "0x1234567890123456789012345678901234567890";
-
+  "0xfdb81a1be7feae875088d5d9ab7953824ba69adf";
+export const TEST_MULTISIG_DAO_ADDRESS = "0x84432686c0d14f362e0e7c08c780682116d6bc44"
+export const TEST_MULTISIG_PROPOSAL_ID = "0xfdb81a1be7feae875088d5d9ab7953824ba69adf_0x0"
 
 export const TEST_DAO_ADDRESS = TEST_TOKEN_VOTING_DAO_ADDRESS;
 // TODO FIX

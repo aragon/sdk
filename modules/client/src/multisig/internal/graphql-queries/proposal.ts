@@ -17,8 +17,8 @@ query multisigProposal($proposalId: ID!) {
       data
     }
     executed
-    appovals {
-      {
+    approvers{
+      approver{
         id
       }
     }
@@ -26,7 +26,7 @@ query multisigProposal($proposalId: ID!) {
 }
 `;
 export const QueryMultisigProposals = gql`
-query multisigProposals($where: ERC20VotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: ERC20VotingProposal_orderBy!) {
+query multisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: MultisigProposal_orderBy!) {
   multisigProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     dao {

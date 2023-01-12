@@ -69,7 +69,7 @@ export interface ICreateProposalParams {
 export type CreateProposalBaseParams = {
   pluginAddress: string;
   actions?: DaoAction[];
-  metadataUri?: string;
+  metadataUri: string;
 };
 
 export interface IVoteProposalParams {
@@ -90,8 +90,9 @@ export interface ICanVoteParams {
 }
 
 export type CanExecuteParams = {
-  proposalId: string;
+  proposalId: bigint;
   addressOrEns: string;
+  pluginAddress: string
 };
 
 /**
@@ -220,7 +221,7 @@ export enum ProposalCreationSteps {
 
 export type ProposalCreationStepValue =
   | { key: ProposalCreationSteps.CREATING; txHash: string }
-  | { key: ProposalCreationSteps.DONE; proposalId: string };
+  | { key: ProposalCreationSteps.DONE; proposalId: bigint };
 
 // PROPOSAL VOTING
 export enum VoteProposalStep {

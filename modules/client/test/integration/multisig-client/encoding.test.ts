@@ -23,7 +23,10 @@ describe("Client Address List", () => {
       ];
 
       const multisigIntallParams: MultisigPluginInstallParams = {
-        minApprovals: 3,
+        votingSettings: {
+          minApprovals: 3,
+          onlyListed: true
+        },
         members,
       };
       const installPluginItemItem = MultisigClient.encoding
@@ -48,7 +51,6 @@ describe("Client Address List", () => {
       ];
 
       const addAddressesParams: AddAddressesParams = {
-        minApprovals: 3,
         members,
         pluginAddress: TEST_INVALID_ADDRESS,
       };
@@ -72,7 +74,6 @@ describe("Client Address List", () => {
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
       const addAddressesParams: AddAddressesParams = {
-        minApprovals: 3,
         members,
         pluginAddress,
       };
@@ -95,7 +96,6 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const addAddressesParams: AddAddressesParams = {
-        minApprovals: 3,
         members,
         pluginAddress,
       };
@@ -105,13 +105,13 @@ describe("Client Address List", () => {
       expect(typeof action).toBe("object");
       expect(action.data instanceof Uint8Array).toBe(true);
       expect(action.to).toBe(pluginAddress);
-      expect(action.value.toString).toBe("0");
+      expect(action.value.toString()).toBe("0");
       const decodedMembers = client.decoding.addAddressesAction(action.data);
       for (let i = 0; i < members.length; i++) {
         expect(members[i]).toBe(decodedMembers[i]);
       }
       expect(bytesToHex(action.data, true)).toBe(
-        "0x28471eff00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
+        "0x3628731c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
     });
     it("Should create an Multisig client and fail to generate a remove members action with an invalid plugin address", async () => {
@@ -128,7 +128,6 @@ describe("Client Address List", () => {
 
       const pluginAddress = TEST_INVALID_ADDRESS;
       const removeAddressesParams: RemoveAddressesParams = {
-        minApprovals: 3,
         members,
         pluginAddress,
       };
@@ -150,7 +149,6 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const removeAddressesParams: RemoveAddressesParams = {
-        minApprovals: 3,
         members,
         pluginAddress,
       };
@@ -171,7 +169,6 @@ describe("Client Address List", () => {
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
       const removeAddressesParams: RemoveAddressesParams = {
-        minApprovals: 3,
         members,
         pluginAddress,
       };
@@ -181,13 +178,13 @@ describe("Client Address List", () => {
       expect(typeof action).toBe("object");
       expect(action.data instanceof Uint8Array).toBe(true);
       expect(action.to).toBe(pluginAddress);
-      expect(action.value.toString).toBe("0");
+      expect(action.value.toString()).toBe("0");
       const decodedMembers = client.decoding.removeAddressesAction(action.data);
       for (let i = 0; i < members.length; i++) {
         expect(members[i]).toBe(decodedMembers[i]);
       }
       expect(bytesToHex(action.data, true)).toBe(
-        "0x28471eff00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
+        "0x3628731c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
     });
   });

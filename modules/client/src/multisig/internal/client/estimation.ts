@@ -1,3 +1,4 @@
+import { Multisig__factory } from "@aragon/core-contracts-ethers";
 import {
   InvalidProposalIdError,
   NoProviderError,
@@ -14,6 +15,7 @@ import {
   CreateMultisigProposalParams,
   IMultisigClientEstimation,
 } from "../../interfaces";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Estimation module the SDK Address List Client
@@ -41,16 +43,13 @@ export class MultisigClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    // @ts-ignore
-    // TODO
-    // update factory
-    const multisigContract = MultisigVoting__factory.connect(
+    const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,
     );
 
     const estimation = await multisigContract.estimateGas.createProposal(
-      params.metadataUri,
+      toUtf8Bytes(params.metadataUri),
       params.actions || [],
       params.approve || false,
       params.tryExecution || true,
@@ -78,15 +77,12 @@ export class MultisigClientEstimation extends ClientCore
       throw new InvalidProposalIdError();
     }
     const pluginAddress = params.proposalId.substring(0, 42);
-    // @ts-ignore
-    // TODO
-    // update factory
-    const multisigContract = MultisigVoting__factory.connect(
+    const multisigContract = Multisig__factory.connect(
       pluginAddress,
       signer,
     );
 
-    const estimation = await multisigContract.estimateGas.approveProposal(
+    const estimation = await multisigContract.estimateGas.approve(
       params.proposalId,
       params.tryExecution,
     );
@@ -113,15 +109,12 @@ export class MultisigClientEstimation extends ClientCore
     }
 
     const pluginAddress = proposalId.substring(0, 42);
-    // @ts-ignore
-    // TODO
-    // update factory
-    const multisigContract = MultisigVoting__factory.connect(
+    const multisigContract = Multisig__factory.connect(
       pluginAddress,
       signer,
     );
 
-    const estimation = await multisigContract.estimateGas.executeProposal(
+    const estimation = await multisigContract.estimateGas.execute(
       proposalId,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());

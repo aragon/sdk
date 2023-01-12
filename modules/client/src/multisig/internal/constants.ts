@@ -1,19 +1,19 @@
 // @ts-ignore
 // todo fix new contracts-ethers
-import { MultisigVoting__factory } from "@aragon/core-contracts-ethers";
+import { Multisig__factory } from "@aragon/core-contracts-ethers";
 
 // TODO: This address needs to be set when the plugin has
 // been published and the ID is known
-export const MULTISIG_PLUGIN_ID = "0x1234567890123456789012345678901234567890";
+export const MULTISIG_PLUGIN_ID = "0xadeaf3671874df5e61fbf1349eeabf6a1e198b32";
 
 // TODO update with function names
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
-  MultisigVoting__factory.createInterface().getFunction("addAllowedUsers")
+  Multisig__factory.createInterface().getFunction("addAddresses")
     .format("minimal"),
-  MultisigVoting__factory.createInterface().getFunction(
-    "removeAllowedUsers",
+  Multisig__factory.createInterface().getFunction(
+    "removeAddresses",
   ).format("minimal"),
-  MultisigVoting__factory.createInterface().getFunction(
-    "updateMinApprovals",
+  Multisig__factory.createInterface().getFunction(
+    "updateMultisigSettings",
   ).format("minimal"),
 ];

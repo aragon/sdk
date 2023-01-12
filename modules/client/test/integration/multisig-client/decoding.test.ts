@@ -6,9 +6,9 @@ import {
   Context,
   ContextPlugin,
   MultisigClient,
-  MultisigPluginSettings,
+  MultisigVotingSettings,
   RemoveAddressesParams,
-  UpdateMinApprovalsParams,
+  UpdateMultisigVotingSettingsParams,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 
@@ -27,21 +27,19 @@ describe("Client Address List", () => {
       ];
       const addAddressesParams: AddAddressesParams = {
         pluginAddress,
-        minApprovals: 3,
         members,
       };
 
       const action = client.encoding.addAddressesAction(addAddressesParams);
 
-      const decodedParams: MultisigPluginSettings = client.decoding
+      const decodedMembers: string[] = client.decoding
         .addAddressesAction(
           action.data,
         );
 
-      expect(typeof decodedParams.minApprovals).toBe("bigint");
-      for (let i = 0; i < members.length; i++) {
-        expect(typeof decodedParams.members[i]).toBe("string");
-        expect(members[i]).toBe(decodedParams.members[i]);
+      for (const member of decodedMembers) {
+        expect(typeof member).toBe("string");
+        expect(member).toBe(member);
       }
     });
     it("Should decode the members from an remove members action", async () => {
@@ -57,7 +55,6 @@ describe("Client Address List", () => {
       ];
       const removeAddressesParams: RemoveAddressesParams = {
         pluginAddress,
-        minApprovals: 3,
         members,
       };
 
@@ -65,15 +62,14 @@ describe("Client Address List", () => {
         removeAddressesParams,
       );
 
-      const decodedParams: MultisigPluginSettings = client.decoding
+      const decodedMembers: string[] = client.decoding
         .removeAddressesAction(
           action.data,
         );
 
-        expect(typeof decodedParams.minApprovals).toBe("bigint");
-      for (let i = 0; i < members.length; i++) {
-        expect(typeof decodedParams.members[i]).toBe("string");
-        expect(members[i]).toBe(decodedParams.members[i]);
+      for (const member of decodedMembers) {
+        expect(typeof member).toBe("string");
+        expect(member).toBe(member);
       }
     });
     it("Should decode the min approvals from an update min approvals action", async () => {
@@ -82,20 +78,26 @@ describe("Client Address List", () => {
       const client = new MultisigClient(ctxPlugin);
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
-      const updateMinApprovalsParams: UpdateMinApprovalsParams = {
+      const updateMinApprovalsParams: UpdateMultisigVotingSettingsParams = {
         pluginAddress,
-        minApprovals: 3,
+        votingSettings: {
+          minApprovals: 3,
+          onlyListed: true,
+        },
       };
 
-      const action = client.encoding.updateMinApprovalsAction(
+      const action = client.encoding.updateMultisigVotingSettings(
         updateMinApprovalsParams,
       );
 
-      const decodedMinApprovals: bigint = client.decoding
-        .updateMinApprovalsAction(
+      const decodedSettings: MultisigVotingSettings = client.decoding
+        .updateMultisigVotingSettings(
           action.data,
         );
-      expect(typeof decodedMinApprovals).toBe("bigint");
+      expect(typeof decodedSettings.minApprovals).toBe("number");
+      expect(decodedSettings.minApprovals).toBe(3);
+      expect(typeof decodedSettings.onlyListed).toBe("boolean");
+      expect(decodedSettings.onlyListed).toBe(true);
     });
 
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
@@ -124,7 +126,6 @@ describe("Client Address List", () => {
       ];
       const addAddressesParams: AddAddressesParams = {
         pluginAddress,
-        minApprovals: 3,
         members,
       };
       const action = client.encoding.addAddressesAction(addAddressesParams);
@@ -133,7 +134,7 @@ describe("Client Address List", () => {
       );
       expect(iface?.id).toBe("function addAddresses(address[])");
       expect(iface?.functionName).toBe("addAddresses");
-      expect(iface?.hash).toBe("0x9b979e2f");
+      expect(iface?.hash).toBe("0x3628731c");
     });
 
     it("Should try to get the function of an invalid data and return null", async () => {

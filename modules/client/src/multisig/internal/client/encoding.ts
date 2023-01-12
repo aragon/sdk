@@ -14,12 +14,14 @@ import {
   IMultisigClientEncoding,
   MultisigPluginInstallParams,
   UpdateAddressesParams,
-  UpdateMinApprovalsParams,
+  UpdateMultisigVotingSettingsParams,
 } from "../../interfaces";
 // @ts-ignore
 // todo fix new contracts-ethers
-import { MultisigVoting__factory } from "@aragon/core-contracts-ethers";
+import { Multisig__factory } from "@aragon/core-contracts-ethers";
 import { MULTISIG_PLUGIN_ID } from "../constants";
+import { defaultAbiCoder } from "@ethersproject/abi";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -41,16 +43,23 @@ export class MultisigClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
   ): IPluginInstallItem {
-    const multisigInterface = MultisigVoting__factory.createInterface();
-    // get hex bytes
-    const hexBytes = multisigInterface.encodeFunctionData(
-      "initialize",
-      [params.minApprovals, params.members],
+    const hexBytes = defaultAbiCoder.encode(
+      // members, [onlyListed, minApprovals]
+      [
+        "address[]",
+        "tuple(bool, uint16)",
+      ],
+      [
+       params.members,
+       [
+        params.votingSettings.onlyListed,
+        params.votingSettings.minApprovals
+       ]
+      ],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: MULTISIG_PLUGIN_ID,
-      data,
+      data: toUtf8Bytes(hexBytes)
     };
   }
 
@@ -73,11 +82,11 @@ export class MultisigClientEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const multisigInterface = MultisigVoting__factory.createInterface();
+    const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
       "addAddresses",
-      [params.members, params.minApprovals],
+      [params.members],
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
@@ -105,11 +114,11 @@ export class MultisigClientEncoding extends ClientCore
         throw new InvalidAddressError();
       }
     }
-    const multisigInterface = MultisigVoting__factory.createInterface();
+    const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
       "removeAddresses",
-      [params.members, params.minApprovals],
+      [params.members],
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {
@@ -119,23 +128,23 @@ export class MultisigClientEncoding extends ClientCore
     };
   }
   /**
-   * Computes the parameters to be given when creating a proposal updates the min approvals parameter
+   * Computes the parameters to be given when creating a proposal updates multisig settings
    *
-   * @param {UpdateMinApprovalsParams} params
+   * @param {UpdateMultisigVotingSettingsParams} params
    * @return {*}  {DaoAction}
    * @memberof MultisigClientEncoding
    */
-  public updateMinApprovalsAction(
-    params: UpdateMinApprovalsParams,
+  public updateMultisigVotingSettings(
+    params: UpdateMultisigVotingSettingsParams,
   ): DaoAction {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
-    const multisigInterface = MultisigVoting__factory.createInterface();
+    const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
-      "updateMinApprovals",
-      [params.minApprovals],
+      "updateMultisigSettings",
+      [params.votingSettings],
     );
     const data = hexToBytes(strip0x(hexBytes));
     return {

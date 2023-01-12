@@ -27,9 +27,10 @@ import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParams,
   contextParamsLocalChain,
-  TEST_ADDRESSLIST_DAO_ADDDRESS,
   TEST_INVALID_ADDRESS,
+  TEST_MULTISIG_DAO_ADDRESS,
   TEST_MULTISIG_PLUGIN_ADDRESS,
+  TEST_MULTISIG_PROPOSAL_ID,
   TEST_NON_EXISTING_ADDRESS,
   TEST_WALLET_ADDRESS,
 } from "../constants";
@@ -107,8 +108,11 @@ describe("Client Multisig", () => {
             expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             break;
           case ProposalCreationSteps.DONE:
-            expect(typeof step.proposalId).toBe("string");
-            expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            expect(typeof step.proposalId).toBe("bigint");
+            // TODO
+            // update with new proposal id when contracts are ready
+            // expect(typeof step.proposalId).toBe("string");
+            // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             break;
           default:
             throw new Error(
@@ -154,15 +158,17 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
+      const address = await client.web3.getSigner()?.getAddress()
       const canApproveParams: CanApproveParams = {
-        proposalId:
-          "0x1234567890123456789012345678901234567890000000000000000000000001",
-        addressOrEns: "0x1234567890123456789012345678901234567890",
+        proposalId: BigInt(0),
+        addressOrEns: address!,
+        pluginAddress
       };
       const canApprove = await client.methods.canApprove(
         canApproveParams,
       );
       expect(typeof canApprove).toBe("boolean");
+      expect(canApprove).toBe(true);
     });
   });
   describe("Execute proposal", () => {
@@ -197,10 +203,11 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
+      const address = await client.web3.getSigner()?.getAddress()
       const canExecuteParams: CanExecuteParams = {
-        proposalId:
-          "0x1234567890123456789012345678901234567890000000000000000000000001",
-        addressOrEns: "0x1234567890123456789012345678901234567890",
+        proposalId: BigInt(0),
+        addressOrEns: address!,
+        pluginAddress,
       };
       const canExecute = await client.methods.canExecute(
         canExecuteParams,
@@ -219,18 +226,15 @@ describe("Client Multisig", () => {
         TEST_MULTISIG_PLUGIN_ADDRESS,
       );
       expect(typeof settings).toBe("object");
-      expect(typeof settings.minApprovals).toBe("bigint");
-      expect(Array.isArray(settings.members)).toBe(true);
-      expect(settings.members.length).toBeGreaterThan(0);
-      expect(typeof settings.members[0]).toBe("string");
-      expect(settings.members[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(typeof settings.votingSettings.minApprovals).toBe("number");
+      expect(typeof settings.votingSettings.onlyListed).toBe("boolean")
     });
     it("Should fetch the given proposal", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const proposalId = TEST_MULTISIG_PLUGIN_ADDRESS;
+      const proposalId = TEST_MULTISIG_PROPOSAL_ID;
 
       mockedIPFSClient.cat.mockResolvedValue(
         Buffer.from(
@@ -288,7 +292,7 @@ describe("Client Multisig", () => {
       }
       for (const approval of proposal.approvals) {
         expect(typeof approval).toBe("string");
-        expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
       }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
@@ -296,7 +300,7 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const proposalId = TEST_NON_EXISTING_ADDRESS + "000000000000000000000001";
+      const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x1";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(proposal === null).toBe(true);
@@ -335,7 +339,7 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
-      const address = TEST_ADDRESSLIST_DAO_ADDDRESS;
+      const address = TEST_MULTISIG_DAO_ADDRESS;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,

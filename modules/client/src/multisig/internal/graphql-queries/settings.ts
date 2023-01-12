@@ -7,6 +7,7 @@ query MultisigPluginSettings($address: ID!) {
             address
         }
         minApprovals
+        onlyListed
     }
 }
 `;

@@ -400,8 +400,17 @@ export async function createMultisigDAO(
         pluginSetup: deployment.multisigPluginSetup.address,
         pluginSetupRepo: deployment.multisigRepo.address,
         data: defaultAbiCoder.encode(
-          ["address[]"],
-          [addresses],
+          [
+            "address[]",
+            "tuple(bool, uint16)",
+          ],
+          [
+           addresses,
+           [
+            true,
+            1
+           ]
+          ],
         ),
       },
     ],

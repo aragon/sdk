@@ -101,8 +101,8 @@ export class TokenVotingClientMethods extends ClientCore
       params.actions || [],
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
-      params.executeOnPass || false,
       params.creatorVote || 0,
+      params.executeOnPass || false,
     );
 
     yield {

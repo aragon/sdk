@@ -1,5 +1,5 @@
 import {
-  IMajorityVoting,
+  MajorityVotingBase,
   MajorityVotingBase__factory,
 } from "@aragon/core-contracts-ethers";
 import {
@@ -58,7 +58,7 @@ function pluginSettingsFromContract(result: Result): VotingSettings {
 
 export function votingSettingsToContract(
   params: VotingSettings,
-): IMajorityVoting.VotingSettingsStruct {
+): MajorityVotingBase.VotingSettingsStruct {
   return {
     votingMode: BigNumber.from(
       votingModeToContracts(params.votingMode || VotingMode.STANDARD),

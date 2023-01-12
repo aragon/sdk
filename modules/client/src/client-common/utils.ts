@@ -1,13 +1,6 @@
 import { IDAO } from "@aragon/core-contracts-ethers";
 import { ContractReceipt } from "@ethersproject/contracts";
-<<<<<<< HEAD
 import { VoteValues, VotingMode } from "../client-common/interfaces/plugin";
-=======
-import { id } from "@ethersproject/hash";
-import { Log } from "@ethersproject/providers";
-import { Interface } from "@ethersproject/abi";
-import { VoteValues } from "../client-common/interfaces/plugin";
->>>>>>> afe6128 (fix integraction with contracts)
 import {
   IComputeStatusProposal,
   ICreateProposalParams,

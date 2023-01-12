@@ -8,7 +8,7 @@ import {
 import {
   MultisigProposal,
   MultisigProposalListItem,
-  SubgraphMultisigApprovalListItem,
+  SubgraphMultisigApproversListItem,
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
 } from "../interfaces";
@@ -45,8 +45,8 @@ export function toMultisigProposal(
       },
     ),
     status: proposal.executed ? ProposalStatus.EXECUTED : ProposalStatus.ACTIVE,
-    approvals: proposal.approvals.map(
-      (approval: SubgraphMultisigApprovalListItem) => approval.id,
+    approvals: proposal.approvers.map(
+      (approver: SubgraphMultisigApproversListItem) => approver.approver.id,
     ),
   };
 }

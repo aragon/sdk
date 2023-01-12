@@ -6,10 +6,13 @@ import {
   IInterfaceParams,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { IMultisigClientDecoding, MultisigPluginSettings } from "../../interfaces";
+import {
+  IMultisigClientDecoding,
+  MultisigVotingSettings,
+} from "../../interfaces";
 // @ts-ignore
 // todo fix new contracts-ethers
-import { MultisigVoting__factory } from "@aragon/core-contracts-ethers";
+import { Multisig__factory } from "@aragon/core-contracts-ethers";
 
 /**
  * Decoding module for the SDK AddressList Client
@@ -26,8 +29,8 @@ export class MultisigClientDecoding extends ClientCore
    * @return {*}  {string[]}
    * @memberof MultisigClientDecoding
    */
-  public addAddressesAction(data: Uint8Array): MultisigPluginSettings {
-    const multisigInterface = MultisigVoting__factory.createInterface();
+  public addAddressesAction(data: Uint8Array): string[] {
+    const multisigInterface = Multisig__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = multisigInterface.getFunction(
       hexBytes.substring(0, 10) as any,
@@ -49,8 +52,8 @@ export class MultisigClientDecoding extends ClientCore
    * @return {*}  {string[]}
    * @memberof MultisigClientDecoding
    */
-  public removeAddressesAction(data: Uint8Array): MultisigPluginSettings {
-    const multisigInterface = MultisigVoting__factory.createInterface();
+  public removeAddressesAction(data: Uint8Array): string[] {
+    const multisigInterface = Multisig__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = multisigInterface.getFunction(
       hexBytes.substring(0, 10) as any,
@@ -74,23 +77,26 @@ export class MultisigClientDecoding extends ClientCore
    * @return {*}  {bigint}
    * @memberof MultisigClientDecoding
    */
-  public updateMinApprovalsAction(data: Uint8Array): bigint {
-    const multisigInterface = MultisigVoting__factory.createInterface();
+  public updateMultisigVotingSettings(data: Uint8Array): MultisigVotingSettings {
+    const multisigInterface = Multisig__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = multisigInterface.getFunction(
       hexBytes.substring(0, 10) as any,
     );
     const expectedfunction = multisigInterface.getFunction(
-      "updateMinApprovals",
+      "updateMultisigSettings",
     );
     if (receivedFunction.name !== expectedfunction.name) {
       throw new UnexpectedActionError();
     }
     const result = multisigInterface.decodeFunctionData(
-      "updateMinApprovals",
+      "updateMultisigSettings",
       data,
     );
-    return result[0];
+    return {
+      minApprovals: result[0].minApprovals,
+      onlyListed: result[0].onlyListed,
+    };
   }
   /**
    * Returns the decoded function info given the encoded data of an action

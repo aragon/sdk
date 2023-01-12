@@ -42,12 +42,14 @@ export interface IMultisigClientMethods extends IClientCore {
 export interface IMultisigClientEncoding extends IClientCore {
   addAddressesAction: (params: AddAddressesParams) => DaoAction;
   removeAddressesAction: (params: RemoveAddressesParams) => DaoAction;
-  updateMinApprovalsAction: (params: UpdateMinApprovalsParams) => DaoAction;
+  updateMultisigVotingSettings: (
+    params: UpdateMultisigVotingSettingsParams,
+  ) => DaoAction;
 }
 export interface IMultisigClientDecoding extends IClientCore {
-  addAddressesAction: (data: Uint8Array) => MultisigPluginSettings;
-  removeAddressesAction: (data: Uint8Array) => MultisigPluginSettings;
-  updateMinApprovalsAction: (data: Uint8Array) => bigint;
+  addAddressesAction: (data: Uint8Array) => string[];
+  removeAddressesAction: (data: Uint8Array) => string[];
+  updateMultisigVotingSettings: (data: Uint8Array) => MultisigVotingSettings;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
 export interface IMultisigClientEstimation extends IClientCore {
@@ -72,20 +74,26 @@ export interface IMultisigClient {
 
 export type MultisigPluginInstallParams = MultisigPluginSettings;
 
-export type MultisigPluginSettings = {
+export type MultisigVotingSettings = {
   minApprovals: number;
-  members: string[];
+  onlyListed: boolean;
 };
 
-export type UpdateAddressesParams = MultisigPluginSettings & {
+export type MultisigPluginSettings = {
+  members: string[];
+  votingSettings: MultisigVotingSettings;
+};
+
+export type UpdateAddressesParams = {
   pluginAddress: string;
+  members: string[];
 };
 export type RemoveAddressesParams = UpdateAddressesParams;
 export type AddAddressesParams = UpdateAddressesParams;
 
-export type UpdateMinApprovalsParams = {
+export type UpdateMultisigVotingSettingsParams = {
   pluginAddress: string;
-  minApprovals: number;
+  votingSettings: MultisigVotingSettings;
 };
 
 export type CreateMultisigProposalParams = CreateProposalBaseParams & {
@@ -145,11 +153,11 @@ export type SubgraphMultisigProposalListItem = SubgraphProposalBase;
 export type SubgraphMultisigProposal = SubgraphProposalBase & {
   createdAt: string;
   actions: SubgraphAction[];
-  approvals: SubgraphMultisigApprovalListItem[];
+  approvers: SubgraphMultisigApproversListItem[];
 };
 
-export type SubgraphMultisigApprovalListItem = {
-  id: string;
+export type SubgraphMultisigApproversListItem = {
+  approver: { id: string };
 };
 
 export type SubgraphMultisigPluginSettings = {
@@ -157,4 +165,5 @@ export type SubgraphMultisigPluginSettings = {
     address: string;
   }[];
   minApprovals: string;
+  onlyListed: boolean;
 };

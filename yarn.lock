@@ -10,10 +10,10 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aragon/core-contracts-ethers@^0.5.0-alpha":
-  version "0.5.0-alpha"
-  resolved "https://registry.yarnpkg.com/@aragon/core-contracts-ethers/-/core-contracts-ethers-0.5.0-alpha.tgz#a8d08fc207dcdc462eb56fdc0b7ba00eec84c74d"
-  integrity sha512-oBJfUMgq2ShtjdZyLjsTb2ZzKPh9i/+VEDQWLwILlb2aUt024xKo2lRSktVjN9TAlxrl7Yajdc5o4Ws22uopkw==
+"@aragon/core-contracts-ethers@^0.6.0-alpha":
+  version "0.6.0-alpha"
+  resolved "https://registry.yarnpkg.com/@aragon/core-contracts-ethers/-/core-contracts-ethers-0.6.0-alpha.tgz#d21f392605af7479517760d3e5d2544ccb409bf4"
+  integrity sha512-FXv2THDpfsxjFqxNjhSMqv6ayx31PLTeWLhGyHx4IqshOz8h12rERq53kGOOeuKZ3MqxpJGt6/1eCZwm67wPbQ==
   dependencies:
     ethers "^5.6.2"
 

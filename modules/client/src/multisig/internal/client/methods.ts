@@ -31,7 +31,7 @@ import {
   ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  findEventLog,
+  findLog,
   IProposalQueryParams,
   isProposalId,
   ProposalCreationSteps,
@@ -44,15 +44,14 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-// @ts-ignore
-// todo fix new contracts-ethers
-import { MultisigVoting__factory } from "@aragon/core-contracts-ethers";
+import { Multisig__factory } from "@aragon/core-contracts-ethers";
 import { QueryMultisigSettings } from "../graphql-queries/settings";
 import {
   QueryMultisigProposal,
   QueryMultisigProposals,
 } from "../graphql-queries/proposal";
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Methods module the SDK Address List Client
@@ -79,16 +78,13 @@ export class MultisigClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    // @ts-ignore
-    // TODO
-    // update factory
-    const multisigContract = MultisigVoting__factory.connect(
+    const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,
     );
 
     const tx = await multisigContract.createProposal(
-      params.metadataUri,
+      toUtf8Bytes(params.metadataUri),
       params.actions || [],
       params.approve || false,
       params.tryExecution || true,
@@ -100,12 +96,12 @@ export class MultisigClientMethods extends ClientCore
     };
 
     const receipt = await tx.wait();
-    const multisigContractInterface = MultisigVoting__factory
+    const multisigContractInterface = Multisig__factory
       .createInterface();
-    const log = findEventLog(
-      "ProposalCreated",
+    const log = findLog(
       receipt,
       multisigContractInterface,
+      "ProposalCreated",
     );
     if (!log) {
       throw new ProposalCreationError();
@@ -119,7 +115,7 @@ export class MultisigClientMethods extends ClientCore
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId,
+      proposalId: BigInt(proposalId),
     };
   }
 
@@ -159,12 +155,12 @@ export class MultisigClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     const pluginAddress = params.proposalId.substring(0, 42);
-    const multisigContract = MultisigVoting__factory.connect(
+    const multisigContract = Multisig__factory.connect(
       pluginAddress,
       signer,
     );
 
-    const tx = await multisigContract.approveProposal(
+    const tx = await multisigContract.approve(
       params.proposalId,
       params.tryExecution,
     );
@@ -200,7 +196,7 @@ export class MultisigClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     const pluginAddress = proposalId.substring(0, 42);
-    const multisigContract = MultisigVoting__factory.connect(
+    const multisigContract = Multisig__factory.connect(
       pluginAddress,
       signer,
     );
@@ -239,16 +235,22 @@ export class MultisigClientMethods extends ClientCore
     }
     // TODO
     // update this with yup validation
-    if (!isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
-    }
+    // update when new proposalid
+    // if (!isProposalId(params.proposalId)) {
+    //   throw new InvalidProposalIdError();
+    // }
     if (!isAddress(params.addressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
+    if (!isAddress(params.pluginAddress)) {
+      throw new InvalidAddressOrEnsError();
+    }
 
-    const pluginAddress = params.proposalId.substring(0, 42);
-    const multisigContract = MultisigVoting__factory.connect(
-      pluginAddress,
+    // update with new proposal Id
+    // const pluginAddress = params.proposalId.substring(0, 42);
+    // const pluginAddress = params.proposalId.substring(0, 42);
+    const multisigContract = Multisig__factory.connect(
+      params.pluginAddress,
       signer,
     );
 
@@ -272,16 +274,21 @@ export class MultisigClientMethods extends ClientCore
     }
     // TODO
     // update this with yup validation
-    if (!isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
-    }
+    // if (!isProposalId(params.proposalId)) {
+    //   throw new InvalidProposalIdError();
+    // update when new proposalid
+    // }
     if (!isAddress(params.addressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
-
-    const pluginAddress = params.proposalId.substring(0, 42);
-    const multisigContract = MultisigVoting__factory.connect(
-      pluginAddress,
+    if (!isAddress(params.pluginAddress)) {
+      throw new InvalidAddressOrEnsError();
+    }
+    // TODO
+    // update with new proposal Id
+    // const pluginAddress = params.proposalId.substring(0, 42);
+    const multisigContract = Multisig__factory.connect(
+      params.pluginAddress,
       signer,
     );
 
@@ -295,11 +302,11 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async getPluginSettings(
-    addressOrEns: string,
+    address: string,
   ): Promise<MultisigPluginSettings> {
     // TODO
     // update this with yup validation
-    if (!isAddress(addressOrEns)) {
+    if (!isAddress(address)) {
       throw new InvalidAddressOrEnsError();
     }
     try {
@@ -308,16 +315,17 @@ export class MultisigClientMethods extends ClientCore
       const { multisigPlugin }: {
         multisigPlugin: SubgraphMultisigPluginSettings;
       } = await client.request(QueryMultisigSettings, {
-        addressOrEns,
+        address,
       });
       return {
-        minApprovals: parseInt(multisigPlugin.minApprovals),
-        members: multisigPlugin.members.map((
-          member: { address: string },
-        ) => member.address),
+        votingSettings: {
+          onlyListed: multisigPlugin.onlyListed,
+          minApprovals: parseInt(multisigPlugin.minApprovals),
+        },
+        members: [],
       };
     } catch {
-      throw new GraphQLError("Multisig members");
+      throw new GraphQLError("Multisig settings");
     }
   }
   /**
@@ -415,9 +423,9 @@ export class MultisigClientMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        MultisigProposals: MultisigProposals,
+        multisigProposals,
       }: {
-        MultisigProposals: SubgraphMultisigProposalListItem[];
+        multisigProposals: SubgraphMultisigProposalListItem[];
       } = await client.request(QueryMultisigProposals, {
         where,
         limit,
@@ -427,7 +435,7 @@ export class MultisigClientMethods extends ClientCore
       });
       await this.ipfs.ensureOnline();
       return Promise.all(
-        MultisigProposals.map(
+        multisigProposals.map(
           async (
             proposal: SubgraphMultisigProposalListItem,
           ): Promise<MultisigProposalListItem> => {
