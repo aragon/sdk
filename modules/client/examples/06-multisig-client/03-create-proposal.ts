@@ -2,12 +2,12 @@
 ### Creating a multisig proposal
 */
 import {
-  MultisigClient,
+  Client,
   Context,
   ContextPlugin,
+  MultisigClient,
   ProposalCreationSteps,
   ProposalMetadata,
-  Client
 } from "@aragon/sdk-client";
 import { CreateMultisigProposalParams, IWithdrawParams } from "../../src";
 import { contextParams } from "../00-client/00-context";
@@ -17,9 +17,9 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create a multisig client
-const client:Client = new Client(context);
+const client: Client = new Client(context);
 // Create a multisig client
-const multisigClient:MultisigClient = new MultisigClient(contextPlugin);
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
