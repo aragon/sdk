@@ -12,7 +12,7 @@ import {
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 
-describe("Client Address List", () => {
+describe("Client Multisig", () => {
   describe("Action decoders", () => {
     it("Should decode the members from an add members action", async () => {
       const ctx = new Context(contextParamsLocalChain);

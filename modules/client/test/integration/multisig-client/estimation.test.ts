@@ -17,7 +17,7 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 
-describe("Client Address List", () => {
+describe("Client Multisig", () => {
   describe("Estimation module", () => {
     let pluginAddress: string;
     let server: Server;
