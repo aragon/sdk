@@ -16,7 +16,12 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 
-const steps = client.methods.executeProposal("0x1234567890123456789012345678901234567890000000000000000000000001");
+const steps = client.methods.executeProposal(
+  {
+    pluginAddress: "0x1234567890123456789012345678901234567890",
+    proposalId: BigInt(0)
+  }
+);
 for await (const step of steps) {
   try {
     switch (step.key) {

@@ -92,7 +92,10 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const estimation = await client.estimation.executeProposal(
-        "0x1234567890123456789012345678901234567890000000000000000000000001",
+        {
+          pluginAddress: "0x1234567890123456789012345678901234567890",
+          proposalId: BigInt(0)
+        }
       );
 
       expect(typeof estimation).toEqual("object");

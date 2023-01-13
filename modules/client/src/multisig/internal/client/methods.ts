@@ -16,6 +16,7 @@ import {
   ApproveProposalStepValue,
   CanApproveParams,
   CreateMultisigProposalParams,
+  ExecuteProposalParams,
   IMultisigClientMethods,
   MultisigPluginSettings,
   MultisigProposal,
@@ -179,12 +180,12 @@ export class MultisigClientMethods extends ClientCore
   /**
    * Allow a wallet in the multisig give approval to a proposal
    *
-   * @param {string} proposalId
+   * @param {params} ExecuteProposalParams
    * @return {*}  {AsyncGenerator<ExecuteMultisigProposalStepValue>}
    * @memberof MultisigClientMethods
    */
   public async *executeProposal(
-    proposalId: string,
+    params: ExecuteProposalParams,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -192,17 +193,20 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    if (isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
-    const pluginAddress = proposalId.substring(0, 42);
+    // TODO
+    // check new Proposal Id when ready
+    // update params to be only the proposal ID
+    // if (isProposalId(proposalId)) {
+    //   throw new InvalidProposalIdError();
+    // }
+    // const pluginAddress = proposalId.substring(0, 42);
     const multisigContract = Multisig__factory.connect(
-      pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
     const tx = await multisigContract.execute(
-      proposalId,
+      params.proposalId,
     );
 
     yield {
@@ -295,7 +299,7 @@ export class MultisigClientMethods extends ClientCore
    * returns the plugin settings
    *
    * @param {string} addressOrEns
-   * @return {*}  {Promise<MultisigPluginInstallParams>}
+   * @return {*}  {Promise<MultisigPluginSettings>}
    * @memberof MultisigClientMethods
    */
   public async getPluginSettings(
@@ -329,7 +333,7 @@ export class MultisigClientMethods extends ClientCore
    * Returns the details of the given proposal
    *
    * @param {string} proposalId
-   * @return {*}  {(Promise<AddressListProposal | null>)}
+   * @return {*}  {(Promise<MultisigProposal | null>)}
    * @memberof MultisigClientMethods
    */
   public async getProposal(
@@ -385,7 +389,7 @@ export class MultisigClientMethods extends ClientCore
    *       direction = SortDirection.ASC,
    *       sortBy = ProposalSortBy.CREATED_AT,
    *     }
-   * @return {*}  {Promise<AddressListProposalListItem[]>}
+   * @return {*}  {Promise<MultisigProposalListItem[]>}
    * @memberof MultisigClientMethods
    */
   public async getProposals({

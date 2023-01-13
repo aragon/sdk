@@ -26,7 +26,10 @@ const members: string[] = [
 ];
 
 const multisigIntallParams: MultisigPluginInstallParams = {
-  minApprovals: 3,
+  votingSettings: {
+    minApprovals: 1,
+    onlyListed: true
+  },
   members,
 }
 

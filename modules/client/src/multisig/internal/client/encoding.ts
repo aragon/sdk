@@ -36,7 +36,7 @@ export class MultisigClientEncoding extends ClientCore
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured
    *
-   * @param {string[]} members
+   * @param {MultisigPluginInstallParams} params
    * @return {*}  {IPluginInstallItem}
    * @memberof MultisigClientEncoding
    */

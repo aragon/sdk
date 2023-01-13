@@ -2662,7 +2662,10 @@ const members: string[] = [
 ];
 
 const multisigIntallParams: MultisigPluginInstallParams = {
-  minApprovals: 3,
+  votingSettings: {
+    minApprovals: 1,
+    onlyListed: true
+  },
   members,
 }
 
@@ -2841,8 +2844,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
-  proposalId:
-    "0x1234567890123456789012345678901234567890000000000000000000000001",
+  proposalId: BigInt(0),
+  pluginAddress: "0x1234567890123456789012345678901234567890",
   tryExecution: true,
 };
 
@@ -2880,7 +2883,12 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 
-const steps = client.methods.executeProposal("0x1234567890123456789012345678901234567890000000000000000000000001");
+const steps = client.methods.executeProposal(
+  {
+    pluginAddress: "0x1234567890123456789012345678901234567890",
+    proposalId: BigInt(0)
+  }
+);
 for await (const step of steps) {
   try {
     switch (step.key) {
@@ -2915,9 +2923,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 const canApproveParams: CanApproveParams = {
-  proposalId:
-    "0x1234567890123456789012345678901234567890000000000000000000000001",
-  addressOrEns: "0x1234567890123456789012345678901234567890",
+  pluginAddress: "0x1234567890123456789012345678901234567890",
+  proposalId: BigInt(0),
 };
 
 const canApprove = await client.methods.canApprove(canApproveParams);
@@ -2946,9 +2953,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 const canExecuteParams :CanExecuteParams = {
-  proposalId: "0x1234567890123456789012345678901234567890000000000000000000000001",
-  addressOrEns: "0x1234567890123456789012345678901234567890"
-}
+  pluginAddress: "0x1234567890123456789012345678901234567890",
+  proposalId: BigInt(0),
+};
 const canExecute = await client.methods.canExecute(canExecuteParams);
 console.log(canExecute);
 /*
@@ -2988,7 +2995,11 @@ console.log(settings);
     "0x4567890123456789012345678901234567890123",
     "0x5678901234567890123456789012345678901234",
   ],
-  minApprovals: 4
+  votingSettings: {
+    minApprovals: 4,
+    onlyListed: true
+  }
+}
 */
 ```
 
@@ -3052,7 +3063,7 @@ console.log(proposal);
     }
   ],
   status: "Executed",
-  apporvals: [
+  approvals: [
     "0x123456789123456789123456789123456789",
     "0x234567891234567891234567891234567890",
   ]

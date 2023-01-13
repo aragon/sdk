@@ -35,7 +35,7 @@ import {
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { EthereumProvider, Server } from "ganache";
-import { CanExecuteParams, ExecuteProposalStep } from "../../../dist";
+import { CanExecuteParams, ExecuteProposalStep } from "../../../src";
 
 describe("Client Multisig", () => {
   let pluginAddress: string;
@@ -158,11 +158,11 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
-      const address = await client.web3.getSigner()?.getAddress()
+      const address = await client.web3.getSigner()?.getAddress();
       const canApproveParams: CanApproveParams = {
         proposalId: BigInt(0),
         addressOrEns: address!,
-        pluginAddress
+        pluginAddress,
       };
       const canApprove = await client.methods.canApprove(
         canApproveParams,
@@ -179,7 +179,10 @@ describe("Client Multisig", () => {
 
       for await (
         const step of client.methods.executeProposal(
-          "0x1234567890123456789012345678901234567890000000000000000000000001",
+          {
+            pluginAddress: "0x1234567890123456789012345678901234567890",
+            proposalId: BigInt(0),
+          },
         )
       ) {
         switch (step.key) {
@@ -225,7 +228,7 @@ describe("Client Multisig", () => {
       );
       expect(typeof settings).toBe("object");
       expect(typeof settings.votingSettings.minApprovals).toBe("number");
-      expect(typeof settings.votingSettings.onlyListed).toBe("boolean")
+      expect(typeof settings.votingSettings.onlyListed).toBe("boolean");
     });
     it("Should fetch the given proposal", async () => {
       const ctx = new Context(contextParams);

@@ -30,5 +30,9 @@ console.log(settings);
     "0x4567890123456789012345678901234567890123",
     "0x5678901234567890123456789012345678901234",
   ],
-  minApprovals: 4
+  votingSettings: {
+    minApprovals: 4,
+    onlyListed: true
+  }
+}
 */

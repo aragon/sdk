@@ -58,7 +58,7 @@ console.log(proposal);
     }
   ],
   status: "Executed",
-  apporvals: [
+  approvals: [
     "0x123456789123456789123456789123456789",
     "0x234567891234567891234567891234567890",
   ]

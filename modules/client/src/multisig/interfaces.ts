@@ -26,7 +26,7 @@ export interface IMultisigClientMethods extends IClientCore {
     params: ApproveMultisigProposalParams,
   ) => AsyncGenerator<ApproveProposalStepValue>;
   executeProposal: (
-    proposalId: string,
+    params: ExecuteProposalParams,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canApprove: (params: CanApproveParams) => Promise<boolean>;
   canExecute: (params: CanExecuteParams) => Promise<boolean>;
@@ -60,7 +60,7 @@ export interface IMultisigClientEstimation extends IClientCore {
     params: ApproveMultisigProposalParams,
   ) => Promise<GasFeeEstimation>;
   executeProposal: (
-    proposalId: string,
+    params: ExecuteProposalParams,
   ) => Promise<GasFeeEstimation>;
 }
 
@@ -109,6 +109,7 @@ export type ApproveMultisigProposalParams = {
 export type CanApproveParams = CanExecuteParams & {
   addressOrEns: string;
 };
+export type ExecuteProposalParams = CanExecuteParams
 
 export enum ApproveProposalStep {
   APPROVING = "approving",

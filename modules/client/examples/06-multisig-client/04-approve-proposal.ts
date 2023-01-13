@@ -18,8 +18,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
-  proposalId:
-    "0x1234567890123456789012345678901234567890000000000000000000000001",
+  proposalId: BigInt(0),
+  pluginAddress: "0x1234567890123456789012345678901234567890",
   tryExecution: true,
 };
 

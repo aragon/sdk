@@ -74,7 +74,7 @@ export class MultisigClientDecoding extends ClientCore
    * Decodes a list of min approvals from an encoded update min approval action
    *
    * @param {Uint8Array} data
-   * @return {*}  {bigint}
+   * @return {*}  {MultisigVotingSettings}
    * @memberof MultisigClientDecoding
    */
   public updateMultisigVotingSettings(data: Uint8Array): MultisigVotingSettings {
