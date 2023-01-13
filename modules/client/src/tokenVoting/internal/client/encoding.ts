@@ -22,6 +22,7 @@ import {
   tokenVotingInitParamsToContract,
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { toUtf8Bytes } from "@ethersproject/strings";
 /**
  * Encoding module the SDK TokenVoting Client
  */
@@ -53,11 +54,9 @@ export class TokenVotingClientEncoding extends ClientCore
       ],
       args,
     );
-    // Strip 0x => encode in Uint8Array
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       id: TOKEN_VOTING_PLUGIN_ID,
-      data,
+      data: toUtf8Bytes(hexBytes),
     };
   }
   /**

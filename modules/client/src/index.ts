@@ -2,6 +2,7 @@ export { Client } from "./client";
 export * from "./addressList";
 export * from "./tokenVoting";
 export * from "./client-common";
+export * from "./multisig";
 export {
   AssetBalance,
   DaoCreationSteps,

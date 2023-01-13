@@ -5,7 +5,6 @@ const IPFS_API_KEY = process.env.IPFS_API_KEY || "";
 
 export const web3endpoints = {
   working: [
-    "https://mainnet.infura.io/v3/94d2e8caf1bc4c4884af830d96f927ca",
     "https://cloudflare-eth.com/",
   ],
   failing: ["https://bad-url-gateway.io/"],
@@ -40,7 +39,7 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://subgraph.satsuma-prod.com/aragon/core-goerli/version/v0.5.0-alpha/api",
+        "https://subgraph.satsuma-prod.com/aragon/core-goerli/version/v0.6.3-alpha/api",
     },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],
@@ -51,26 +50,30 @@ export const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
 // Token
-export const TEST_TOKEN_VOTING_DAO_ADDRESS =
-  "0x7dd41e356b9f9c6e71593cc654a78b445217b06d";
+export const TEST_TOKEN_VOTING_DAO_ADDRESS = "0xa893a2b4c4372dea2877ecfc0d079676e637985f";
 export const TEST_TOKEN_VOTING_PLUGIN_ADDRESS =
-  "0x85eccd548378412bac8b08fe934bbb601e2d543e";
+  "0x6bafbdb8d8b68ba08cc8c2f6f014b22ce54abfcd";
 export const TEST_TOKEN_VOTING_PROPOSAL_ID = TEST_TOKEN_VOTING_PLUGIN_ADDRESS +
   "_0x0";
 
 // Address List
 export const TEST_ADDRESSLIST_DAO_ADDDRESS =
-  "0x3877319b1363a1b6451060aa27b6de31b97715fb";
+  "0x23c020edea8e851157eb997220a534ccac880b57";
 export const TEST_ADDRESSLIST_PLUGIN_ADDRESS =
-  "0xf533c1a458a04c57c3cac443e67b0e09bc6675c4";
+  "0xbefc344eb15e6e6bd18645e2333e0e5ce136b818";
 export const TEST_ADDRESSLIST_PROPOSAL_ID = TEST_ADDRESSLIST_PLUGIN_ADDRESS +
   "_0x0";
 
+// Multisig
+export const TEST_MULTISIG_DAO_ADDRESS = "0x84432686c0d14f362e0e7c08c780682116d6bc44"
+export const TEST_MULTISIG_PLUGIN_ADDRESS =
+  "0xfdb81a1be7feae875088d5d9ab7953824ba69adf";
+export const TEST_MULTISIG_PROPOSAL_ID = TEST_MULTISIG_PLUGIN_ADDRESS + "_0x0"
 
 export const TEST_DAO_ADDRESS = TEST_TOKEN_VOTING_DAO_ADDRESS;
 // TODO FIX
 export const TEST_NO_BALANCES_DAO_ADDRESS =
-  "0x600bbcbb47990a4e243041cc45b6c0057ff7eba1";
+  "0x95acd075a4519edb30d4138d0fafea2d1a1f74e6";
 export const TEST_INVALID_ADDRESS = "0x1nv4l1d_4ddr355";
 export const TEST_NON_EXISTING_ADDRESS =
   "0x1234567890123456789012345678901234567890";

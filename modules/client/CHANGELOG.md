@@ -17,6 +17,7 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
+- Add `MultisigClient`
 - Exposes `ensureAllowance` method
 - Fix precission in `VotingSettings`
 - renames `IPluginSettings` to `VotingSettings`

@@ -21,6 +21,8 @@ export interface Deployment {
   tokenVotingPluginSetup: aragonContracts.TokenVotingSetup;
   addressListRepo: aragonContracts.PluginRepo;
   addressListPluginSetup: aragonContracts.AddresslistVotingSetup;
+  multisigRepo: aragonContracts.PluginRepo;
+  multisigPluginSetup: aragonContracts.AddresslistVotingSetup;
 }
 
 export async function deploy(): Promise<Deployment> {
@@ -167,6 +169,24 @@ export async function deploy(): Promise<Deployment> {
       .connect(deployOwnerWallet)
       .attach(addressListRepoAddr);
 
+    const multisigFactory = new aragonContracts
+      // @ts-ignore
+      // TODO update contracts-ethers
+      .MultisigSetup__factory();
+    const multisigPluginSetup = await multisigFactory
+      .connect(deployOwnerWallet)
+      .deploy();
+    const multisigRepoAddr = await deployPlugin(
+      pluginRepoFactory,
+      multisigPluginSetup.address,
+      "Multisig",
+      [1, 0, 0],
+      deployOwnerWallet,
+    );
+    const multisigRepo = pluginRepo_Factory
+      .connect(deployOwnerWallet)
+      .attach(multisigRepoAddr);
+
     // send ETH to hardcoded wallet in tests
     await deployOwnerWallet.sendTransaction({
       to: WALLET_ADDRESS,
@@ -181,6 +201,8 @@ export async function deploy(): Promise<Deployment> {
       tokenVotingPluginSetup,
       addressListRepo,
       addressListPluginSetup,
+      multisigRepo,
+      multisigPluginSetup,
     };
   } catch (e) {
     throw e;
@@ -355,6 +377,39 @@ export async function createTokenVotingDAO(
             [0, 1, 1, 3600, 1],
             [AddressZero, "erc20", "e20"],
             [addresses, addresses.map(() => parseEther("1"))],
+          ],
+        ),
+      },
+    ],
+  );
+}
+export async function createMultisigDAO(
+  deployment: Deployment,
+  name: string,
+  addresses: string[] = [],
+) {
+  return createDAO(
+    deployment.daoFactory,
+    {
+      metadata: "0x0000",
+      name: name,
+      trustedForwarder: AddressZero,
+    },
+    [
+      {
+        pluginSetup: deployment.multisigPluginSetup.address,
+        pluginSetupRepo: deployment.multisigRepo.address,
+        data: defaultAbiCoder.encode(
+          [
+            "address[]",
+            "tuple(bool, uint16)",
+          ],
+          [
+           addresses,
+           [
+            true,
+            1
+           ]
           ],
         ),
       },
