@@ -101,15 +101,14 @@ export type CreateMultisigProposalParams = CreateProposalBaseParams & {
   tryExecution?: boolean;
 };
 
-export type ApproveMultisigProposalParams = {
-  proposalId: string;
+export type ApproveMultisigProposalParams = CanExecuteParams & {
   tryExecution: boolean;
 };
 
 export type CanApproveParams = CanExecuteParams & {
   addressOrEns: string;
 };
-export type ExecuteProposalParams = CanExecuteParams
+export type ExecuteProposalParams = CanExecuteParams;
 
 export enum ApproveProposalStep {
   APPROVING = "approving",

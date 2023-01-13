@@ -1,5 +1,6 @@
 import {
   GraphQLError,
+  InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidProposalIdError,
@@ -34,7 +35,6 @@ import {
   ExecuteProposalStepValue,
   findLog,
   IProposalQueryParams,
-  isProposalId,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
@@ -152,12 +152,13 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    if (isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
+    // TODO
+    // use yup
+    if (isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
     }
-    const pluginAddress = params.proposalId.substring(0, 42);
     const multisigContract = Multisig__factory.connect(
-      pluginAddress,
+      params.pluginAddress,
       signer,
     );
 
@@ -194,12 +195,10 @@ export class MultisigClientMethods extends ClientCore
       throw new NoProviderError();
     }
     // TODO
-    // check new Proposal Id when ready
-    // update params to be only the proposal ID
-    // if (isProposalId(proposalId)) {
-    //   throw new InvalidProposalIdError();
-    // }
-    // const pluginAddress = proposalId.substring(0, 42);
+    // use yup
+    if (isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,
@@ -238,21 +237,13 @@ export class MultisigClientMethods extends ClientCore
       throw new NoProviderError();
     }
     // TODO
-    // update this with yup validation
-    // update when new proposalid
-    // if (!isProposalId(params.proposalId)) {
-    //   throw new InvalidProposalIdError();
-    // }
+    // use yup
     if (!isAddress(params.addressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressOrEnsError();
     }
-
-    // update with new proposal Id
-    // const pluginAddress = params.proposalId.substring(0, 42);
-    // const pluginAddress = params.proposalId.substring(0, 42);
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,
@@ -277,17 +268,10 @@ export class MultisigClientMethods extends ClientCore
       throw new NoProviderError();
     }
     // TODO
-    // update this with yup validation
-    // if (!isProposalId(params.proposalId)) {
-    //   throw new InvalidProposalIdError();
-    // update when new proposalid
-    // }
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressOrEnsError();
+    // use yup
+    if (isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
     }
-    // TODO
-    // update with new proposal Id
-    // const pluginAddress = params.proposalId.substring(0, 42);
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,

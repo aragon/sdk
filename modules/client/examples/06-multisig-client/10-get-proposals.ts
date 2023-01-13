@@ -2,11 +2,11 @@
 ### Loading the list of proposals (multisig plugin)
 */
 import {
-  MultisigProposalListItem,
-  MultisigClient,
   Context,
   ContextPlugin,
   IProposalQueryParams,
+  MultisigClient,
+  MultisigProposalListItem,
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
@@ -26,6 +26,7 @@ const queryParams: IProposalQueryParams = {
   direction: SortDirection.ASC, // optional
   sortBy: ProposalSortBy.POPULARITY, //optional
   status: ProposalStatus.ACTIVE, // optional
+  daoAddressOrEns: "0x1234...",
 };
 
 const proposals: MultisigProposalListItem[] = await client.methods

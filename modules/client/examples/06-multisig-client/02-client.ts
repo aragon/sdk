@@ -1,7 +1,7 @@
 /* MARKDOWN
 ### Create an Multisig client
 */
-import { MultisigClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import { Context, ContextPlugin, MultisigClient } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context = new Context(contextParams);

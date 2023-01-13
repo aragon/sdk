@@ -2728,13 +2728,13 @@ contextPlugin.set({ network: 1 });
 contextPlugin.set({ signer: new Wallet("other private key") });
 contextPlugin.setFull(contextParams);
 
-console.log(contextPlugin)
+console.log(contextPlugin);
 ```
 
 ### Create an Multisig client
 
 ```ts
-import { MultisigClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import { Context, ContextPlugin, MultisigClient } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context = new Context(contextParams);
@@ -2887,8 +2887,8 @@ const client = new MultisigClient(contextPlugin);
 const steps = client.methods.executeProposal(
   {
     pluginAddress: "0x1234567890123456789012345678901234567890",
-    proposalId: BigInt(0)
-  }
+    proposalId: BigInt(0),
+  },
 );
 for await (const step of steps) {
   try {
@@ -2912,7 +2912,6 @@ import {
   CanApproveParams,
   Context,
   ContextPlugin,
-  ICanVoteParams,
   MultisigClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -2925,6 +2924,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 const canApproveParams: CanApproveParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
+  addressOrEns: "0x1234567890123456789012345678901234567890",
   proposalId: BigInt(0),
 };
 
@@ -2939,11 +2939,10 @@ true
 
 ```ts
 import {
-  MultisigClient,
+  CanExecuteParams,
   Context,
   ContextPlugin,
-  ICanVoteParams,
-  CanExecuteParams,
+  MultisigClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -2953,7 +2952,7 @@ const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
-const canExecuteParams :CanExecuteParams = {
+const canExecuteParams: CanExecuteParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   proposalId: BigInt(0),
 };
@@ -3076,11 +3075,11 @@ console.log(proposal);
 
 ```ts
 import {
-  MultisigProposalListItem,
-  MultisigClient,
   Context,
   ContextPlugin,
   IProposalQueryParams,
+  MultisigClient,
+  MultisigProposalListItem,
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
@@ -3100,6 +3099,7 @@ const queryParams: IProposalQueryParams = {
   direction: SortDirection.ASC, // optional
   sortBy: ProposalSortBy.POPULARITY, //optional
   status: ProposalStatus.ACTIVE, // optional
+  daoAddressOrEns: "0x1234...",
 };
 
 const proposals: MultisigProposalListItem[] = await client.methods

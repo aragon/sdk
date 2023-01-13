@@ -2,11 +2,10 @@
 ### Checking if user can approve in a multisig plugin
 */
 import {
-  MultisigClient,
+  CanExecuteParams,
   Context,
   ContextPlugin,
-  ICanVoteParams,
-  CanExecuteParams,
+  MultisigClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -16,7 +15,7 @@ const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
-const canExecuteParams :CanExecuteParams = {
+const canExecuteParams: CanExecuteParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   proposalId: BigInt(0),
 };

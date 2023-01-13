@@ -73,6 +73,6 @@
   },
   "jest": {
     "testEnvironment": "../../test-environment.js",
-    "testTimeout": 180000
+    "testTimeout": 20000
   }
 }

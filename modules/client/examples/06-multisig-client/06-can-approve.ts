@@ -5,7 +5,6 @@ import {
   CanApproveParams,
   Context,
   ContextPlugin,
-  ICanVoteParams,
   MultisigClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -18,6 +17,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 const canApproveParams: CanApproveParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
+  addressOrEns: "0x1234567890123456789012345678901234567890",
   proposalId: BigInt(0),
 };
 
