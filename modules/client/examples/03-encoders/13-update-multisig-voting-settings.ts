@@ -5,7 +5,7 @@ import {
   Context,
   ContextPlugin,
   MultisigClient,
-  UpdateMinApprovalsParams,
+  UpdateMultisigVotingSettingsParams,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -13,11 +13,14 @@ const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 
-const updateMinApprovals: UpdateMinApprovalsParams = {
-  minApprovals: 2,
+const updateMinApprovals: UpdateMultisigVotingSettingsParams = {
+  votingSettings: {
+    minApprovals: 2,
+    onlyListed: false,
+  },
   pluginAddress: "0x0987654321098765432109876543210987654321",
 };
-const action = client.encoding.updateMinApprovalsAction(updateMinApprovals);
+const action = client.encoding.updateMultisigVotingSettings(updateMinApprovals);
 console.log(action);
 /*
 {

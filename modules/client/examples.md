@@ -2096,7 +2096,6 @@ const members: string[] = [
 
 const addAddressesParams: AddAddressesParams = {
   members,
-  minApprovals: 2,
   pluginAddress: "0x0987654321098765432109876543210987654321",
 };
 
@@ -2135,7 +2134,6 @@ const members: string[] = [
 
 const removeAddressesParams: RemoveAddressesParams = {
   members,
-  minApprovals: 2,
   pluginAddress: "0x0987654321098765432109876543210987654321",
 };
 
@@ -2157,7 +2155,7 @@ import {
   Context,
   ContextPlugin,
   MultisigClient,
-  UpdateMinApprovalsParams,
+  UpdateMultisigVotingSettingsParams,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -2165,11 +2163,14 @@ const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 
-const updateMinApprovals: UpdateMinApprovalsParams = {
-  minApprovals: 2,
+const updateMinApprovals: UpdateMultisigVotingSettingsParams = {
+  votingSettings: {
+    minApprovals: 2,
+    onlyListed: false,
+  },
   pluginAddress: "0x0987654321098765432109876543210987654321",
 };
-const action = client.encoding.updateMinApprovalsAction(updateMinApprovals);
+const action = client.encoding.updateMultisigVotingSettings(updateMinApprovals);
 console.log(action);
 /*
 {
@@ -2564,21 +2565,18 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const settings: MultisigPluginSettings = multisigClient.decoding
+const settings: string[] = multisigClient.decoding
   .addAddressesAction(
     data,
   );
 
 console.log(settings);
 /*
-{
-  members: [
+  [
     "0x12345...",
     "0x56789...",
     "0x13579...",
-  ],
-  minApprovals: 2,
-}
+  ]
 */
 ```
 
@@ -2617,7 +2615,7 @@ console.log(settings);
 ### Decode Remove Members Action (Multisig)
 
 ```ts
-import { Context, ContextPlugin, MultisigClient } from "@aragon/sdk-client";
+import { Context, ContextPlugin, MultisigClient, MultisigVotingSettings } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
@@ -2625,12 +2623,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const minApprovals: number = multisigClient.decoding
-  .updateMinApprovalsAction(data);
+const minApprovals: MultisigVotingSettings = multisigClient.decoding
+  .updateMultisigVotingSettings(data);
 
 console.log(minApprovals);
 /*
-2
+{
+  minApprovals: 2,
+  onlyListed: false
+}
 */
 ```
 

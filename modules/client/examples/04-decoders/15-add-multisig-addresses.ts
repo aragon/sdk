@@ -10,19 +10,16 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const settings: MultisigPluginSettings = multisigClient.decoding
+const settings: string[] = multisigClient.decoding
   .addAddressesAction(
     data,
   );
 
 console.log(settings);
 /*
-{
-  members: [
+  [
     "0x12345...",
     "0x56789...",
     "0x13579...",
-  ],
-  minApprovals: 2,
-}
+  ]
 */

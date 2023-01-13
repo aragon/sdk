@@ -22,7 +22,6 @@ const members: string[] = [
 
 const removeAddressesParams: RemoveAddressesParams = {
   members,
-  minApprovals: 2,
   pluginAddress: "0x0987654321098765432109876543210987654321",
 };
 
