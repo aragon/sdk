@@ -5,7 +5,7 @@ declare const describe, it, expect, beforeAll, afterAll;
 import "../../mocks/aragon-sdk-ipfs";
 
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
@@ -34,7 +34,7 @@ describe("Client Address List", () => {
     it("Should estimate the gas fees for creating a new proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -58,7 +58,7 @@ describe("Client Address List", () => {
     it("Should estimate the gas fees for casting a vote", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -78,7 +78,7 @@ describe("Client Address List", () => {
     it("Should estimate the gas fees for executing a proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",

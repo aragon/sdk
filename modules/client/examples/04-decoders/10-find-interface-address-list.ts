@@ -2,7 +2,7 @@
 ### Get Function Parameters from an encoded action (Address List)
 */
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
 } from "@aragon/sdk-client";
@@ -11,7 +11,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const data: Uint8Array = new Uint8Array([12, 56]);
 

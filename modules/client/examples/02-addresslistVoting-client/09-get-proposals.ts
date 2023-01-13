@@ -2,8 +2,8 @@
 ### Loading the list of proposals (address list plugin)
 */
 import {
-  AddressListProposalListItem,
-  ClientAddressList,
+  AddresslistVotingProposalListItem,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   IProposalQueryParams,
@@ -18,7 +18,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
@@ -28,7 +28,7 @@ const queryParams: IProposalQueryParams = {
   status: ProposalStatus.ACTIVE, // optional
 };
 
-const proposals: AddressListProposalListItem[] = await client.methods
+const proposals: AddresslistVotingProposalListItem[] = await client.methods
   .getProposals(queryParams);
 console.log(proposals);
 /*

@@ -2,7 +2,7 @@
 ### Loading a plugin's settings
 */
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   VotingSettings,
@@ -13,8 +13,8 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an addres list client
-const client = new ClientAddressList(contextPlugin);
+// Create an AddressList client
+const client = new AddresslistVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 

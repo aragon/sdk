@@ -1093,7 +1093,7 @@ console.log(proposals);
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   VotingSettings,
@@ -1105,7 +1105,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an addres list client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
@@ -1168,12 +1168,12 @@ console.log(token);
 ```
 
 ## Address List governance plugin client
-### Creating a DAO with a addressList plugin
+### Creating a DAO with a addresslistVoting plugin
 
 ```ts
 import {
   Client,
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
@@ -1205,7 +1205,7 @@ const pluginInitParams: VotingSettings = {
   ],
 };
 
-const addressListInstallPluginItem = ClientAddressList.encoding
+const addresslistVotingInstallPluginItem = AddresslistVotingClient.encoding
   .getPluginInstallItem(pluginInitParams);
 
 const daoMetadata: IMetadata = {
@@ -1223,7 +1223,7 @@ const metadataUri = await client.methods.pinMetadata(daoMetadata);
 const createParams: ICreateParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [addressListInstallPluginItem],
+  plugins: [addresslistVotingInstallPluginItem],
 };
 
 // gas estimation
@@ -1271,13 +1271,13 @@ console.log(contextPlugin)
 ### Create an Address List client
 
 ```ts
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 console.log(client);
 ```
@@ -1286,7 +1286,7 @@ console.log(client);
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
@@ -1301,7 +1301,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
@@ -1356,7 +1356,7 @@ for await (const step of steps) {
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
@@ -1373,7 +1373,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 // create config action
 const configActionPrarms: VotingSettings = {
@@ -1444,7 +1444,7 @@ for await (const step of steps) {
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   IVoteProposalParams,
@@ -1458,7 +1458,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -1486,7 +1486,7 @@ for await (const step of steps) {
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   ICanVoteParams,
@@ -1498,7 +1498,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   address: "0x1234567890123456789012345678901234567890",
@@ -1516,7 +1516,7 @@ true
 ### Loading the list of members (address list plugin)
 
 ```ts
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -1524,7 +1524,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an AddressList client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const daoAddressorEns = "0x12345...";
 
@@ -1545,8 +1545,8 @@ console.log(memebers);
 
 ```ts
 import {
-  AddressListProposal,
-  ClientAddressList,
+  AddresslistVotingProposal,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
 } from "@aragon/sdk-client";
@@ -1557,11 +1557,11 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an AddressList client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const proposalId = "0x12345...";
 
-const proposal: AddressListProposal | null = await client.methods.getProposal(
+const proposal: AddresslistVotingProposal | null = await client.methods.getProposal(
   proposalId,
 );
 console.log(proposal);
@@ -1634,8 +1634,8 @@ console.log(proposal);
 
 ```ts
 import {
-  AddressListProposalListItem,
-  ClientAddressList,
+  AddresslistVotingProposalListItem,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   IProposalQueryParams,
@@ -1650,7 +1650,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
@@ -1660,7 +1660,7 @@ const queryParams: IProposalQueryParams = {
   status: ProposalStatus.ACTIVE, // optional
 };
 
-const proposals: AddressListProposalListItem[] = await client.methods
+const proposals: AddresslistVotingProposalListItem[] = await client.methods
   .getProposals(queryParams);
 console.log(proposals);
 /*
@@ -1713,7 +1713,7 @@ console.log(proposals);
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   VotingSettings,
@@ -1725,7 +1725,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an AddressList client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
@@ -1917,7 +1917,7 @@ console.log(updateMetadataAction);
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   VotingMode,
@@ -1927,7 +1927,7 @@ import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 // create config action
 const configActionPrarms: VotingSettings = {
@@ -2016,12 +2016,12 @@ console.log(action);
 ### Add Members (AddressList)
 
 ```ts
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const members: string[] = [
   "0x1357924680135792468013579246801357924680",
@@ -2045,7 +2045,7 @@ console.log(action);
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
 } from "@aragon/sdk-client";
@@ -2053,7 +2053,7 @@ import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const members: string[] = [
   "0x1357924680135792468013579246801357924680",
@@ -2344,7 +2344,7 @@ ipfs://Qm...
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   VotingSettings,
@@ -2353,7 +2353,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientAddressList = new ClientAddressList(contextPlugin);
+const clientAddressList = new AddresslistVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
 const params: VotingSettings = clientAddressList.decoding
@@ -2428,7 +2428,7 @@ console.log(functionParams);
 
 ```ts
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
 } from "@aragon/sdk-client";
@@ -2437,7 +2437,7 @@ import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const data: Uint8Array = new Uint8Array([12, 56]);
 
@@ -2510,12 +2510,12 @@ console.log(params);
 ### Decode Add Members Action (Address List)
 
 ```ts
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientAddressList = new ClientAddressList(contextPlugin);
+const clientAddressList = new AddresslistVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
 const members: string[] = clientAddressList.decoding.addMembersAction(data);
@@ -2533,12 +2533,12 @@ console.log(members);
 ### Decode Remove Members Action (Address List)
 
 ```ts
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientAddressList = new ClientAddressList(contextPlugin);
+const clientAddressList = new AddresslistVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
 const members: string[] = clientAddressList.decoding.removeMembersAction(data);

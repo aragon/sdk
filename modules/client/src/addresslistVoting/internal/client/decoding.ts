@@ -8,17 +8,17 @@ import {
   VotingSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { IClientAddressListDecoding } from "../../interfaces";
+import { IAddresslistVotingClientDecoding } from "../../interfaces";
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 
 /**
  * Decoding module for the SDK AddressList Client
  */
-export class ClientAddressListDecoding extends ClientCore
-  implements IClientAddressListDecoding {
+export class AddresslistVotingClientDecoding extends ClientCore
+  implements IAddresslistVotingClientDecoding {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientAddressListDecoding.prototype);
+    Object.freeze(AddresslistVotingClientDecoding.prototype);
     Object.freeze(this);
   }
 
@@ -27,7 +27,7 @@ export class ClientAddressListDecoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {VotingSettings}
-   * @memberof ClientAddressListDecoding
+   * @memberof AddresslistVotingClientDecoding
    */
   public updatePluginSettingsAction(data: Uint8Array): VotingSettings {
     return decodeUpdatePluginSettingsAction(data);
@@ -37,7 +37,7 @@ export class ClientAddressListDecoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {string[]}
-   * @memberof ClientAddressListDecoding
+   * @memberof AddresslistVotingClientDecoding
    */
   public addMembersAction(data: Uint8Array): string[] {
     const votingInterface = AddresslistVoting__factory.createInterface();
@@ -60,7 +60,7 @@ export class ClientAddressListDecoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {string[]}
-   * @memberof ClientAddressListDecoding
+   * @memberof AddresslistVotingClientDecoding
    */
   public removeMembersAction(data: Uint8Array): string[] {
     const votingInterface = AddresslistVoting__factory.createInterface();
@@ -85,7 +85,7 @@ export class ClientAddressListDecoding extends ClientCore
    *
    * @param {Uint8Array} data
    * @return {*}  {(IInterfaceParams | null)}
-   * @memberof ClientAddressListDecoding
+   * @memberof AddresslistVotingClientDecoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
     try {

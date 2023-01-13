@@ -6,7 +6,7 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { ClientAddressList, Context, ContextPlugin } from "../../../src";
+import { AddresslistVotingClient, Context, ContextPlugin } from "../../../src";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 
@@ -17,9 +17,9 @@ describe("Client Address List", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
-      expect(client).toBeInstanceOf(ClientAddressList);
+      expect(client).toBeInstanceOf(AddresslistVotingClient);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);
@@ -41,9 +41,9 @@ describe("Client Address List", () => {
     it("Should create a failing client", async () => {
       const ctx = new Context(contextParamsFailing);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
-      expect(client).toBeInstanceOf(ClientAddressList);
+      expect(client).toBeInstanceOf(AddresslistVotingClient);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
       expect(client.web3.getConnectedSigner()).toBeInstanceOf(Wallet);
       expect(client.ipfs.getClient()).toBeInstanceOf(IpfsClient);

@@ -12,8 +12,8 @@ import {
 } from "../../../client-common";
 import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
-  IAddressListPluginInstall,
-  IClientAddressListEncoding,
+  IAddresslistVotingPluginInstall,
+  IAddresslistVotingClientEncoding,
 } from "../../interfaces";
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
@@ -22,11 +22,11 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 /**
  * Encoding module for the SDK AddressList Client
  */
-export class ClientAddressListEncoding extends ClientCore
-  implements IClientAddressListEncoding {
+export class AddresslistVotingClientEncoding extends ClientCore
+  implements IAddresslistVotingClientEncoding {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientAddressListEncoding.prototype);
+    Object.freeze(AddresslistVotingClientEncoding.prototype);
     Object.freeze(this);
   }
 
@@ -34,12 +34,12 @@ export class ClientAddressListEncoding extends ClientCore
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured
    *
-   * @param {IAddressListPluginInstall} params
+   * @param {IAddresslistVotingPluginInstall} params
    * @return {*}  {IPluginInstallItem}
-   * @memberof ClientAddressListEncoding
+   * @memberof AddresslistVotingClientEncoding
    */
   static getPluginInstallItem(
-    params: IAddressListPluginInstall,
+    params: IAddresslistVotingPluginInstall,
   ): IPluginInstallItem {
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], "members"]
@@ -66,7 +66,7 @@ export class ClientAddressListEncoding extends ClientCore
    * @param {string} pluginAddress
    * @param {VotingSettings} params
    * @return {*}  {DaoAction}
-   * @memberof ClientAddressListEncoding
+   * @memberof AddresslistVotingClientEncoding
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
@@ -88,7 +88,7 @@ export class ClientAddressListEncoding extends ClientCore
    * @param {string} pluginAddress
    * @param {string[]} members
    * @return {*}  {DaoAction}
-   * @memberof ClientAddressListEncoding
+   * @memberof AddresslistVotingClientEncoding
    */
   public addMembersAction(pluginAddress: string, members: string[]): DaoAction {
     if (!isAddress(pluginAddress)) {
@@ -118,7 +118,7 @@ export class ClientAddressListEncoding extends ClientCore
    * @param {string} pluginAddress
    * @param {string[]} members
    * @return {*}  {DaoAction}
-   * @memberof ClientAddressListEncoding
+   * @memberof AddresslistVotingClientEncoding
    */
   public removeMembersAction(
     pluginAddress: string,

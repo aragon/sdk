@@ -1,10 +1,10 @@
 /* MARKDOWN
 ## Address List governance plugin client
-### Creating a DAO with a addressList plugin
+### Creating a DAO with a addresslistVoting plugin
 */
 import {
   Client,
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
@@ -36,7 +36,7 @@ const pluginInitParams: VotingSettings = {
   ],
 };
 
-const addressListInstallPluginItem = ClientAddressList.encoding
+const addresslistVotingInstallPluginItem = AddresslistVotingClient.encoding
   .getPluginInstallItem(pluginInitParams);
 
 const daoMetadata: IMetadata = {
@@ -54,7 +54,7 @@ const metadataUri = await client.methods.pinMetadata(daoMetadata);
 const createParams: ICreateParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [addressListInstallPluginItem],
+  plugins: [addresslistVotingInstallPluginItem],
 };
 
 // gas estimation

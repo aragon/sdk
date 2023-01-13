@@ -1,12 +1,12 @@
 /* MARKDOWN
 ### Decode Add Members Action (Address List)
 */
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const clientAddressList = new ClientAddressList(contextPlugin);
+const clientAddressList = new AddresslistVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
 const members: string[] = clientAddressList.decoding.addMembersAction(data);

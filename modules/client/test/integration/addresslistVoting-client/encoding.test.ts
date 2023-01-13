@@ -2,10 +2,10 @@
 declare const describe, it, expect;
 
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
-  IAddressListPluginInstall,
+  IAddresslistVotingPluginInstall,
   VotingSettings,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
@@ -13,7 +13,7 @@ import { contextParamsLocalChain } from "../constants";
 describe("Client Address List", () => {
   describe("Action generators", () => {
     it("Should create an AddressList client and generate a install entry", async () => {
-      const withdrawParams: IAddressListPluginInstall = {
+      const withdrawParams: IAddresslistVotingPluginInstall = {
         votingSettings: {
           minDuration: 7200, // seconds
           supportThreshold: 0.5,
@@ -27,7 +27,7 @@ describe("Client Address List", () => {
         ],
       };
 
-      const installPluginItemItem = ClientAddressList.encoding
+      const installPluginItemItem = AddresslistVotingClient.encoding
         .getPluginInstallItem(
           withdrawParams,
         );
@@ -40,7 +40,7 @@ describe("Client Address List", () => {
     it("Should create an AddressList client and fail to generate a plugin config action with an invalid address", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const pluginConfigParams: VotingSettings = {
         minDuration: 100000,
@@ -60,7 +60,7 @@ describe("Client Address List", () => {
     it("Should create an AddressList client and generate a plugin config action action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const pluginConfigParams: VotingSettings = {
         minDuration: 100000,
@@ -84,7 +84,7 @@ describe("Client Address List", () => {
     it("Should encode a add members action with an invalid plugin address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -99,7 +99,7 @@ describe("Client Address List", () => {
     it("Should encode a add members action with an invalid member address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const members: string[] = [
         "0xinvalid_address",
@@ -114,7 +114,7 @@ describe("Client Address List", () => {
     it("Should encode a add members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -135,7 +135,7 @@ describe("Client Address List", () => {
     it("Should encode a remove members action with an invalid plugin address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -150,7 +150,7 @@ describe("Client Address List", () => {
     it("Should encode a remove members action with an invalid member address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const members: string[] = [
         "0xinvalid_address",
@@ -165,7 +165,7 @@ describe("Client Address List", () => {
     it("Should encode a remove members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",

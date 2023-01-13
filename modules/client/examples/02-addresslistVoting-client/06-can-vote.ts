@@ -2,7 +2,7 @@
 ### Checking if user can vote in a address list proposal
 */
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   ICanVoteParams,
@@ -14,7 +14,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   address: "0x1234567890123456789012345678901234567890",

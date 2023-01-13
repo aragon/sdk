@@ -1,5 +1,5 @@
 export { Client } from "./client";
-export * from "./addressList";
+export * from "./addresslistVoting";
 export * from "./tokenVoting";
 export * from "./client-common";
 export * from "./multisig";

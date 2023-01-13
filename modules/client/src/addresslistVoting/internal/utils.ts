@@ -11,19 +11,19 @@ import {
   votingSettingsToContract,
 } from "../../client-common";
 import {
-  AddressListProposal,
-  AddressListProposalListItem,
-  ContractAddressListInitParams,
-  IAddressListPluginInstall,
-  SubgraphAddressListProposal,
-  SubgraphAddressListProposalListItem,
-  SubgraphAddressListVoterListItem,
+  AddresslistVotingProposal,
+  AddresslistVotingProposalListItem,
+  ContractAddresslistVotingInitParams,
+  IAddresslistVotingPluginInstall,
+  SubgraphAddresslistVotingProposal,
+  SubgraphAddresslistVotingProposalListItem,
+  SubgraphAddresslistVotingVoterListItem,
 } from "../interfaces";
 
-export function toAddressListProposal(
-  proposal: SubgraphAddressListProposal,
+export function toAddresslistVotingProposal(
+  proposal: SubgraphAddresslistVotingProposal,
   metadata: ProposalMetadata,
-): AddressListProposal {
+): AddresslistVotingProposal {
   const startDate = new Date(
     parseInt(proposal.startDate) * 1000,
   );
@@ -91,7 +91,7 @@ export function toAddressListProposal(
     },
     totalVotingWeight: parseInt(proposal.totalVotingPower),
     votes: proposal.voters.map(
-      (voter: SubgraphAddressListVoterListItem) => {
+      (voter: SubgraphAddresslistVotingVoterListItem) => {
         return {
           address: voter.voter.address,
           vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
@@ -100,10 +100,10 @@ export function toAddressListProposal(
     ),
   };
 }
-export function toAddressListProposalListItem(
-  proposal: SubgraphAddressListProposalListItem,
+export function toAddresslistVotingProposalListItem(
+  proposal: SubgraphAddresslistVotingProposalListItem,
   metadata: ProposalMetadata,
-): AddressListProposalListItem {
+): AddresslistVotingProposalListItem {
   const startDate = new Date(
     parseInt(proposal.startDate) * 1000,
   );
@@ -130,9 +130,9 @@ export function toAddressListProposalListItem(
   };
 }
 
-export function addressListInitParamsToContract(
-  params: IAddressListPluginInstall,
-): ContractAddressListInitParams {
+export function addresslistVotingInitParamsToContract(
+  params: IAddresslistVotingPluginInstall,
+): ContractAddresslistVotingInitParams {
   return [
     Object.values(
       votingSettingsToContract(params.votingSettings),

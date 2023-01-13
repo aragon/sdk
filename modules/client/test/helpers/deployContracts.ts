@@ -19,8 +19,8 @@ export interface Deployment {
   daoRegistry: aragonContracts.DAORegistry;
   tokenVotingRepo: aragonContracts.PluginRepo;
   tokenVotingPluginSetup: aragonContracts.TokenVotingSetup;
-  addressListRepo: aragonContracts.PluginRepo;
-  addressListPluginSetup: aragonContracts.AddresslistVotingSetup;
+  addresslistVotingRepo: aragonContracts.PluginRepo;
+  addresslistVotingPluginSetup: aragonContracts.AddresslistVotingSetup;
   multisigRepo: aragonContracts.PluginRepo;
   multisigPluginSetup: aragonContracts.AddresslistVotingSetup;
 }
@@ -153,21 +153,21 @@ export async function deploy(): Promise<Deployment> {
       .connect(deployOwnerWallet)
       .attach(tokenRepoAddr);
 
-    const addressListFactory = new aragonContracts
+    const addresslistVotingFactory = new aragonContracts
       .AddresslistVotingSetup__factory();
-    const addressListPluginSetup = await addressListFactory
+    const addresslistVotingPluginSetup = await addresslistVotingFactory
       .connect(deployOwnerWallet)
       .deploy();
-    const addressListRepoAddr = await deployPlugin(
+    const addresslistVotingRepoAddr = await deployPlugin(
       pluginRepoFactory,
-      addressListPluginSetup.address,
+      addresslistVotingPluginSetup.address,
       "Addresslist",
       [1, 0, 0],
       deployOwnerWallet,
     );
-    const addressListRepo = pluginRepo_Factory
+    const addresslistVotingRepo = pluginRepo_Factory
       .connect(deployOwnerWallet)
-      .attach(addressListRepoAddr);
+      .attach(addresslistVotingRepoAddr);
 
     const multisigFactory = new aragonContracts
       // @ts-ignore
@@ -199,8 +199,8 @@ export async function deploy(): Promise<Deployment> {
       daoRegistry,
       tokenVotingRepo,
       tokenVotingPluginSetup,
-      addressListRepo,
-      addressListPluginSetup,
+      addresslistVotingRepo,
+      addresslistVotingPluginSetup,
       multisigRepo,
       multisigPluginSetup,
     };
@@ -340,8 +340,8 @@ export async function createAddresslistDAO(
     },
     [
       {
-        pluginSetup: deployment.addressListPluginSetup.address,
-        pluginSetupRepo: deployment.addressListRepo.address,
+        pluginSetup: deployment.addresslistVotingPluginSetup.address,
+        pluginSetupRepo: deployment.addresslistVotingRepo.address,
         data: defaultAbiCoder.encode(
           ["tuple(uint8, uint64, uint64, uint64, uint256)", "address[]"],
           [[0, 1, 1, 3600, 1], addresses],

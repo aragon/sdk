@@ -1,14 +1,16 @@
 /* MARKDOWN
-### Creating a address list proposal
+### Creating a address list proposal with an action
 */
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
   VoteValues,
+  VotingMode,
+  VotingSettings,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -17,12 +19,28 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
-const metadata: ProposalMetadata = {
+// create config action
+const configActionPrarms: VotingSettings = {
+  minDuration: 60 * 60 * 24 * 2, // seconds
+  minParticipation: 0.25, // 25%
+  supportThreshold: 0.5, // 50%
+  minProposerVotingPower: BigInt("5000"), // default 0
+  votingMode: VotingMode.EARLY_EXECUTION,
+};
+
+const pluginAddress = "0x1234567890123456789012345678901234567890";
+
+const configAction = client.encoding.updatePluginSettingsAction(
+  pluginAddress,
+  configActionPrarms,
+);
+
+const daoMetadata: ProposalMetadata = {
   title: "Test Proposal",
   summary: "This is a short description",
-  description: "This is a long description",
+  description: "This is a long descrioption",
   resources: [
     {
       name: "Discord",
@@ -39,12 +57,12 @@ const metadata: ProposalMetadata = {
   },
 };
 
-const ipfsUri = await client.methods.pinMetadata(metadata);
+const metadataUri = await client.methods.pinMetadata(daoMetadata);
 
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri: ipfsUri,
-  actions: [],
+  metadataUri,
+  actions: [configAction],
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,

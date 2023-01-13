@@ -20,6 +20,8 @@ TEMPLATE:
 - Fix `VotingMode` not decoding
 ### Changed
 - Add `MultisigClient`
+- Changes `ClientAddressList` to `AddresslistVotingClient`
+- Changes all `addressList` to `AddresslistVoting`
 - Exposes `ensureAllowance` method
 - Fix precission in `VotingSettings`
 - renames `IPluginSettings` to `VotingSettings`

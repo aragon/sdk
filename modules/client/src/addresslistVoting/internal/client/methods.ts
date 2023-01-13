@@ -12,11 +12,11 @@ import {
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
-  AddressListProposal,
-  AddressListProposalListItem,
-  IClientAddressListMethods,
-  SubgraphAddressListProposal,
-  SubgraphAddressListProposalListItem,
+  AddresslistVotingProposal,
+  AddresslistVotingProposalListItem,
+  IAddresslistVotingClientMethods,
+  SubgraphAddresslistVotingProposal,
+  SubgraphAddresslistVotingProposalListItem,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -45,7 +45,7 @@ import {
   QueryAddressListVotingProposal,
   QueryAddressListVotingProposals,
 } from "../graphql-queries/proposal";
-import { toAddressListProposal, toAddressListProposalListItem } from "../utils";
+import { toAddresslistVotingProposal, toAddresslistVotingProposalListItem } from "../utils";
 import { QueryAddressListVotingPluginSettings } from "../graphql-queries/settings";
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -58,11 +58,11 @@ import { QueryAddressListVotingMembers } from "../graphql-queries/members";
 /**
  * Methods module the SDK Address List Client
  */
-export class ClientAddressListMethods extends ClientCore
-  implements IClientAddressListMethods {
+export class AddresslistVotingClientMethods extends ClientCore
+  implements IAddresslistVotingClientMethods {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientAddressListMethods.prototype);
+    Object.freeze(AddresslistVotingClientMethods.prototype);
     Object.freeze(this);
   }
   /**
@@ -70,7 +70,7 @@ export class ClientAddressListMethods extends ClientCore
    *
    * @param {ICreateProposalParams} params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
-   * @memberof ClientAddressListMethods
+   * @memberof AddresslistVotingClientMethods
    */
   public async *createProposal(
     params: ICreateProposalParams,
@@ -152,7 +152,7 @@ export class ClientAddressListMethods extends ClientCore
    *
    * @param {IVoteProposalParams} params
    * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
-   * @memberof ClientAddressListMethods
+   * @memberof AddresslistVotingClientMethods
    */
   public async *voteProposal(
     params: IVoteProposalParams,
@@ -192,7 +192,7 @@ export class ClientAddressListMethods extends ClientCore
    *
    * @param {IExecuteProposalParams} params
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
-   * @memberof ClientAddressListMethods
+   * @memberof AddresslistVotingClientMethods
    */
   public async *executeProposal(
     params: IExecuteProposalParams,
@@ -224,7 +224,7 @@ export class ClientAddressListMethods extends ClientCore
    *
    * @param {ICanVoteParams} params
    * @return {*}  {Promise<boolean>}
-   * @memberof ClientAddressListMethods
+   * @memberof AddresslistVotingClientMethods
    */
   public async canVote(params: ICanVoteParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
@@ -249,7 +249,7 @@ export class ClientAddressListMethods extends ClientCore
    * @async
    * @param {string} pluginAddress
    * @return {*}  {Promise<string[]>}
-   * @memberof ClientAddressListMethods
+   * @memberof AddresslistVotingClientMethods
    */
   public async getMembers(pluginAddress: string): Promise<string[]> {
     if (!isAddress(pluginAddress)) {
@@ -273,12 +273,12 @@ export class ClientAddressListMethods extends ClientCore
    * Returns the details of the given proposal
    *
    * @param {string} proposalId
-   * @return {*}  {(Promise<AddressListProposal | null>)}
-   * @memberof ClientAddressListMethods
+   * @return {*}  {(Promise<AddresslistVotingProposal | null>)}
+   * @memberof AddresslistVotingClientMethods
    */
   public async getProposal(
     proposalId: string,
-  ): Promise<AddressListProposal | null> {
+  ): Promise<AddresslistVotingProposal | null> {
     if (!proposalId) {
       throw new InvalidProposalIdError();
     }
@@ -288,7 +288,7 @@ export class ClientAddressListMethods extends ClientCore
       const {
         addresslistVotingProposal,
       }: {
-        addresslistVotingProposal: SubgraphAddressListProposal;
+        addresslistVotingProposal: SubgraphAddresslistVotingProposal;
       } = await client.request(QueryAddressListVotingProposal, {
         proposalId,
       });
@@ -299,16 +299,16 @@ export class ClientAddressListMethods extends ClientCore
         const metadataCid = resolveIpfsCid(addresslistVotingProposal.metadata);
         const metadataString = await this.ipfs.fetchString(metadataCid);
         const metadata = JSON.parse(metadataString) as ProposalMetadata;
-        return toAddressListProposal(addresslistVotingProposal, metadata);
+        return toAddresslistVotingProposal(addresslistVotingProposal, metadata);
         // TODO: Parse and validate schema
       } catch (err) {
         if (err instanceof InvalidCidError) {
-          return toAddressListProposal(
+          return toAddresslistVotingProposal(
             addresslistVotingProposal,
             UNSUPPORTED_PROPOSAL_METADATA_LINK,
           );
         }
-        return toAddressListProposal(
+        return toAddresslistVotingProposal(
           addresslistVotingProposal,
           UNAVAILABLE_PROPOSAL_METADATA,
         );
@@ -329,8 +329,8 @@ export class ClientAddressListMethods extends ClientCore
    *       direction = SortDirection.ASC,
    *       sortBy = ProposalSortBy.CREATED_AT,
    *     }
-   * @return {*}  {Promise<AddressListProposalListItem[]>}
-   * @memberof ClientAddressListMethods
+   * @return {*}  {Promise<AddresslistVotingProposalListItem[]>}
+   * @memberof AddresslistVotingClientMethods
    */
   public async getProposals({
     daoAddressOrEns,
@@ -339,7 +339,7 @@ export class ClientAddressListMethods extends ClientCore
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = ProposalSortBy.CREATED_AT,
-  }: IProposalQueryParams): Promise<AddressListProposalListItem[]> {
+  }: IProposalQueryParams): Promise<AddresslistVotingProposalListItem[]> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {
@@ -366,7 +366,7 @@ export class ClientAddressListMethods extends ClientCore
       const {
         addresslistVotingProposals,
       }: {
-        addresslistVotingProposals: SubgraphAddressListProposalListItem[];
+        addresslistVotingProposals: SubgraphAddresslistVotingProposalListItem[];
       } = await client.request(QueryAddressListVotingProposals, {
         where,
         limit,
@@ -378,22 +378,22 @@ export class ClientAddressListMethods extends ClientCore
       return Promise.all(
         addresslistVotingProposals.map(
           async (
-            proposal: SubgraphAddressListProposalListItem,
-          ): Promise<AddressListProposalListItem> => {
+            proposal: SubgraphAddresslistVotingProposalListItem,
+          ): Promise<AddresslistVotingProposalListItem> => {
             // format in the metadata field
             try {
               const metadataCid = resolveIpfsCid(proposal.metadata);
               const stringMetadata = await this.ipfs.fetchString(metadataCid);
               const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
-              return toAddressListProposalListItem(proposal, metadata);
+              return toAddresslistVotingProposalListItem(proposal, metadata);
             } catch (err) {
               if (err instanceof InvalidCidError) {
-                return toAddressListProposalListItem(
+                return toAddresslistVotingProposalListItem(
                   proposal,
                   UNSUPPORTED_PROPOSAL_METADATA_LINK,
                 );
               }
-              return toAddressListProposalListItem(
+              return toAddresslistVotingProposalListItem(
                 proposal,
                 UNAVAILABLE_PROPOSAL_METADATA,
               );
@@ -411,7 +411,7 @@ export class ClientAddressListMethods extends ClientCore
    *
    * @param {string} pluginAddress
    * @return {*}  {(Promise<VotingSettings | null>)}
-   * @memberof ClientAddressListMethods
+   * @memberof AddresslistVotingClientMethods
    */
   public async getVotingSettings(
     pluginAddress: string,
