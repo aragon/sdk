@@ -73,7 +73,7 @@ export class MultisigClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    if (isAddress(params.pluginAddress)) {
+    if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
     const multisigContract = Multisig__factory.connect(

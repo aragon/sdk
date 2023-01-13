@@ -154,7 +154,7 @@ export class MultisigClientMethods extends ClientCore
     }
     // TODO
     // use yup
-    if (isAddress(params.pluginAddress)) {
+    if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
     const multisigContract = Multisig__factory.connect(
@@ -196,7 +196,7 @@ export class MultisigClientMethods extends ClientCore
     }
     // TODO
     // use yup
-    if (isAddress(params.pluginAddress)) {
+    if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
     const multisigContract = Multisig__factory.connect(
@@ -269,7 +269,7 @@ export class MultisigClientMethods extends ClientCore
     }
     // TODO
     // use yup
-    if (isAddress(params.pluginAddress)) {
+    if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
     const multisigContract = Multisig__factory.connect(
