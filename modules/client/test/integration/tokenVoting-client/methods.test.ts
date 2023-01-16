@@ -135,9 +135,36 @@ describe("Token Voting Client", () => {
         const client = new TokenVotingClient(ctxPlugin);
 
         const voteParams: IVoteProposalParams = {
-          pluginAddress: "0x1234567890123456789012345678901234567890",
-          proposalId: "0x1234567890123456789012345678901234567890",
+          pluginAddress,
+          proposalId: "0x0",
           vote: VoteValues.YES,
+        };
+
+        for await (const step of client.methods.voteProposal(voteParams)) {
+          switch (step.key) {
+            case VoteProposalStep.VOTING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case VoteProposalStep.DONE:
+              break;
+            default:
+              throw new Error(
+                "Unexpected vote proposal step: " +
+                  Object.keys(step).join(", "),
+              );
+          }
+        }
+      });
+      it("Should replace a vote on a proposal locally", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
+
+        const voteParams: IVoteProposalParams = {
+          pluginAddress,
+          proposalId: "0x0",
+          vote: VoteValues.NO,
         };
 
         for await (const step of client.methods.voteProposal(voteParams)) {
