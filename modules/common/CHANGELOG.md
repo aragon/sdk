@@ -15,6 +15,7 @@ TEMPLATE:
 ### Fixed
 - Fix 1, 2, 3
 -->
+
 ## [UPCOMING]
 - Adds new error `EnsureAllowanceError`
 - Adds new error `InvalidPrecisionError`
