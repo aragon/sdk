@@ -73,9 +73,16 @@ query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
     executable
     plugin{
       token{
-        symbol
-        name
         id
+        name
+        symbol
+        __typename
+        ...on ERC20Token {
+          decimals
+        }
+        ...on ERC721Token {
+          baseURI
+        }
       }
     }
   }

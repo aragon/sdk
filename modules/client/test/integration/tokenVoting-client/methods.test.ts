@@ -353,7 +353,6 @@ describe("Token Voting Client", () => {
           limit,
           sortBy: ProposalSortBy.CREATED_AT,
           direction: SortDirection.ASC,
-          status,
         };
 
         const defaultCatImplementation = mockedIPFSClient.cat
