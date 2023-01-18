@@ -144,7 +144,7 @@ export type MultisigProposal = MultisigProposalBase & {
   endDate: Date;
 };
 
-type SubgraphProposalBase = {
+type SubgraphMultisigProposalBase = {
   id: string;
   dao: {
     id: string;
@@ -153,15 +153,16 @@ type SubgraphProposalBase = {
   creator: string;
   metadata: string;
   executed: boolean;
+  startDate: string;
+  endDate: string;
+  executable: boolean;
 };
 
-export type SubgraphMultisigProposalListItem = SubgraphProposalBase
-export type SubgraphMultisigProposal = SubgraphProposalBase & {
+export type SubgraphMultisigProposalListItem = SubgraphMultisigProposalBase;
+export type SubgraphMultisigProposal = SubgraphMultisigProposalBase & {
   createdAt: string;
   actions: SubgraphAction[];
   approvers: SubgraphMultisigApproversListItem[];
-  startDate: string;
-  endDate: string;
 };
 
 export type SubgraphMultisigApproversListItem = {

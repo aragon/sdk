@@ -1,5 +1,6 @@
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
+  computeProposalStatus,
   DaoAction,
   ProposalMetadata,
   ProposalStatus,
@@ -48,7 +49,7 @@ export function toMultisigProposal(
         };
       },
     ),
-    status: proposal.executed ? ProposalStatus.EXECUTED : ProposalStatus.ACTIVE,
+    status: computeProposalStatus(proposal),
     approvals: proposal.approvers.map(
       (approver: SubgraphMultisigApproversListItem) => approver.approver.id,
     ),
@@ -71,6 +72,6 @@ export function toMultisigProposalListItem(
       title: metadata.title,
       summary: metadata.summary,
     },
-    status: proposal.executed ? ProposalStatus.EXECUTED : ProposalStatus.ACTIVE,
+    status: computeProposalStatus(proposal),
   };
 }

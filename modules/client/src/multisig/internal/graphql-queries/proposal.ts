@@ -19,6 +19,7 @@ query multisigProposal($proposalId: ID!) {
       data
     }
     executed
+    executable
     approvers{
       approver{
         id
@@ -40,6 +41,7 @@ query multisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: In
     creator
     metadata
     executed
+    executable
   }
 }
 `;
