@@ -112,10 +112,22 @@ export function votingModeToContracts(votingMode: VotingMode): number {
       throw new InvalidVotingModeError();
   }
 }
+export function votingModeFromContracts(votingMode: number): VotingMode {
+  switch (votingMode) {
+    case 0:
+      return VotingMode.STANDARD;
+    case 1:
+      return VotingMode.EARLY_EXECUTION;
+    case 2:
+      return VotingMode.VOTE_REPLACEMENT;
+    default:
+      throw new InvalidVotingModeError();
+  }
+}
 
 export function parseEtherRatio(ether: string, precision: number = 2): number {
   if (precision <= 0 || !Number.isInteger(precision)) {
-    throw new InvalidPrecisionError()
+    throw new InvalidPrecisionError();
   }
   return parseFloat(
     parseFloat(
