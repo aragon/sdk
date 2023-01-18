@@ -50,10 +50,17 @@ describe("Client Multisig", () => {
         amount: BigInt(1),
         reference: "test",
       });
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() + 3);
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 10);
+      
       const proposalParams: CreateMultisigProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
         metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
         actions: [action],
+        startDate,
+        endDate,
       };
 
       const estimation = await multisigClient.estimation.createProposal(

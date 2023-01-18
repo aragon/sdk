@@ -84,11 +84,16 @@ export class MultisigClientMethods extends ClientCore
       signer,
     );
 
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
+
     const tx = await multisigContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       params.approve || false,
       params.tryExecution || true,
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
     );
 
     yield {

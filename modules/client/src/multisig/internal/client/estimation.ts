@@ -48,11 +48,16 @@ export class MultisigClientEstimation extends ClientCore
       signer,
     );
 
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
+
     const estimation = await multisigContract.estimateGas.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
       params.approve || false,
       params.tryExecution || true,
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

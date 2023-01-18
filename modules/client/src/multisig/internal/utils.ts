@@ -20,6 +20,10 @@ export function toMultisigProposal(
   const creationDate = new Date(
     parseInt(proposal.createdAt) * 1000,
   );
+  const startDate = new Date(
+    parseInt(proposal.startDate) * 1000,
+  );
+  const endDate = new Date(parseInt(proposal.endDate) * 1000);
   return {
     id: proposal.id,
     dao: {
@@ -48,6 +52,8 @@ export function toMultisigProposal(
     approvals: proposal.approvers.map(
       (approver: SubgraphMultisigApproversListItem) => approver.approver.id,
     ),
+    startDate,
+    endDate,
   };
 }
 export function toMultisigProposalListItem(

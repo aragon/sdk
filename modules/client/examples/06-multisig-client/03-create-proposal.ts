@@ -59,6 +59,8 @@ const proposalParams: CreateMultisigProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
   actions: [withdrawAction],
+  startDate: new Date(), // set an arbitrary date
+  endDate: new Date(), // set a date that is postetior to startDate
 };
 
 const steps = multisigClient.methods.createProposal(proposalParams);

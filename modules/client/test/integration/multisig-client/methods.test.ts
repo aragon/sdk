@@ -91,10 +91,18 @@ describe("Client Multisig", () => {
 
       const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
 
+
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() + 3);
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 10);
+
       const proposalParams: CreateMultisigProposalParams = {
         pluginAddress,
         metadataUri: ipfsUri,
         actions: [action],
+        startDate,
+        endDate,
       };
 
       for await (
@@ -284,6 +292,8 @@ describe("Client Multisig", () => {
         }
       }
       expect(proposal.creationDate instanceof Date).toBe(true);
+      expect(proposal.startDate instanceof Date).toBe(true);
+      expect(proposal.endDate instanceof Date).toBe(true);
       expect(Array.isArray(proposal.actions)).toBe(true);
       // actions
       for (const action of proposal.actions) {

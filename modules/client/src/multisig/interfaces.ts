@@ -99,6 +99,8 @@ export type UpdateMultisigVotingSettingsParams = {
 export type CreateMultisigProposalParams = CreateProposalBaseParams & {
   approve?: boolean;
   tryExecution?: boolean;
+  startDate?: Date;
+  endDate?: Date;
 };
 
 export type ApproveMultisigProposalParams = CanExecuteParams & {
@@ -138,6 +140,8 @@ export type MultisigProposal = MultisigProposalBase & {
   metadata: ProposalMetadata;
   actions: DaoAction[];
   approvals: string[];
+  startDate: Date;
+  endDate: Date;
 };
 
 type SubgraphProposalBase = {
@@ -151,11 +155,13 @@ type SubgraphProposalBase = {
   executed: boolean;
 };
 
-export type SubgraphMultisigProposalListItem = SubgraphProposalBase;
+export type SubgraphMultisigProposalListItem = SubgraphProposalBase
 export type SubgraphMultisigProposal = SubgraphProposalBase & {
   createdAt: string;
   actions: SubgraphAction[];
   approvers: SubgraphMultisigApproversListItem[];
+  startDate: string;
+  endDate: string;
 };
 
 export type SubgraphMultisigApproversListItem = {

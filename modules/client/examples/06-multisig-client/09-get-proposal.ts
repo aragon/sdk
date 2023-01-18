@@ -50,6 +50,8 @@ console.log(proposal);
     }
   };
   creationDate: <Date>,
+  startDate: <Date>,
+  endDate: <Date>,
   actions: [
     {
       to: "0x12345..."

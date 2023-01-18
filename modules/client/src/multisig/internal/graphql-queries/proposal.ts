@@ -11,6 +11,8 @@ query multisigProposal($proposalId: ID!) {
     creator
     metadata
     createdAt
+    startDate
+    endDate
     actions {
       to
       value
@@ -33,6 +35,8 @@ query multisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: In
       id
       name
     }
+    startDate
+    endDate
     creator
     metadata
     executed
