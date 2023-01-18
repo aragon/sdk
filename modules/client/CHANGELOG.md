@@ -16,6 +16,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+- Fix `updateMetadata` decoders
 ### Changed
 - Add `MultisigClient`
 - Exposes `ensureAllowance` method
