@@ -139,6 +139,7 @@ export async function deploy(): Promise<Deployment> {
 
     const pluginRepo_Factory = new aragonContracts.PluginRepo__factory();
 
+    // token
     const tokenVotingSetupFactory = new aragonContracts
       .TokenVotingSetup__factory();
     const tokenVotingPluginSetup = await tokenVotingSetupFactory
@@ -171,9 +172,8 @@ export async function deploy(): Promise<Deployment> {
       .connect(deployOwnerWallet)
       .attach(addresslistVotingRepoAddr);
 
+    // multisig
     const multisigFactory = new aragonContracts
-      // @ts-ignore
-      // TODO update contracts-ethers
       .MultisigSetup__factory();
     const multisigPluginSetup = await multisigFactory
       .connect(deployOwnerWallet)
@@ -188,10 +188,8 @@ export async function deploy(): Promise<Deployment> {
     const multisigRepo = pluginRepo_Factory
       .connect(deployOwnerWallet)
       .attach(multisigRepoAddr);
-    // TODO
-    // use new ethers-contracts
-    // @ts-ignore
-    const adminSetupFactory = new aragonContracts.AdminVotingSetup__factory();
+    
+    // ADMIN
     const adminSetupFactory = new aragonContracts.AdminSetup__factory();
     const adminPluginSetup = await adminSetupFactory
       .connect(deployOwnerWallet)

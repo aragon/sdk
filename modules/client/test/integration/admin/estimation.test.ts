@@ -8,9 +8,7 @@ import {
   AdminClient,
   Context,
   ContextPlugin,
-  ExecuteProposalParams,
-  ICreateProposalParams,
-  VoteValues,
+  ExecuteAdminProposalParams,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
@@ -36,7 +34,7 @@ describe("Client Admin", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AdminClient(ctxPlugin);
 
-      const proposalParams: ExecuteProposalParams = {
+      const proposalParams: ExecuteAdminProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
         metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
         actions: [],

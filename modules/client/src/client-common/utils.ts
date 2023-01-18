@@ -1,5 +1,4 @@
 import { IDAO } from "@aragon/core-contracts-ethers";
-import { ContractReceipt } from "@ethersproject/contracts";
 import { VoteValues, VotingMode } from "../client-common/interfaces/plugin";
 import {
   IComputeStatusProposal,
@@ -7,10 +6,6 @@ import {
   ProposalStatus,
 } from "./interfaces/plugin";
 import { ContractReceipt } from "@ethersproject/contracts";
-import { Interface } from "@ethersproject/abi";
-import { id } from "@ethersproject/hash";
-import { Log } from "@ethersproject/providers";
-
 import { Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import { Log } from "@ethersproject/providers";

@@ -1,17 +1,14 @@
 import {
-  hexToBytes,
-  InvalidAddressOrEnsError,
-  strip0x,
-} from "@aragon/sdk-common";
-import {
   ClientCore,
   ContextPlugin,
   IPluginInstallItem,
 } from "../../../client-common";
 import { IAdminClientEncoding } from "../../interfaces";
 import { ADMIN_PLUGIN_ID } from "../constants";
+import { defaultAbiCoder } from "@ethersproject/abi";
+import { toUtf8Bytes } from "@ethersproject/strings";
 import { isAddress } from "@ethersproject/address";
-import { Admin__factory } from "@aragon/core-contracts-ethers";
+import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 
 /**
  * Encoding module for the SDK Admin Client
@@ -26,9 +23,9 @@ export class AdminClientEncoding extends ClientCore
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured
    *
-   * @param {IAdminPluginInstall} params
+   * @param {string} addressOrEns
    * @return {*}  {IPluginInstallItem}
-   * @memberof ClientAddressListEncoding
+   * @memberof AdminClientEncoding
    */
   static getPluginInstallItem(
     addressOrEns: string,
@@ -36,14 +33,17 @@ export class AdminClientEncoding extends ClientCore
     if (!isAddress(addressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
-    const adminInterface = Admin__factory.createInterface();
-    const hexBytes = adminInterface.encodeFunctionData(
-      "initialize",
-      [addressOrEns],
+    const hexBytes = defaultAbiCoder.encode(
+      [
+        "address",
+      ],
+      [
+        addressOrEns,
+      ],
     );
     return {
       id: ADMIN_PLUGIN_ID,
-      data: hexToBytes(strip0x(hexBytes)),
+      data: toUtf8Bytes(hexBytes),
     };
   }
 }

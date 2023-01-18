@@ -91,7 +91,7 @@ export interface ICanVoteParams {
 
 export type CanExecuteParams = {
   proposalId: bigint;
-  pluginAddress: string
+  pluginAddress: string;
 };
 
 /**
@@ -240,7 +240,7 @@ export enum ExecuteProposalStep {
 
 export type ExecuteProposalStepValue =
   | { key: ExecuteProposalStep.EXECUTING; txHash: string }
-  | { key: ExecuteProposalStep.DONE; proposalId: string };
+  | { key: ExecuteProposalStep.DONE };
 
 export type ContractPluginSettings = [BigNumber, BigNumber, BigNumber];
 

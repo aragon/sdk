@@ -28,7 +28,7 @@ export function toAdminProposal(
     creatorAddress: proposal.creator,
     metadata,
     creationDate,
-    adminAddress: proposal.administrator.address,
+    adminAddress: proposal.adminstrator.address,
     status: proposal.executed
       ? ProposalStatus.EXECUTED
       : ProposalStatus.SUCCEEDED,
@@ -41,7 +41,7 @@ export function toAdminProposal(
         };
       },
     ),
-    pluginAddress: proposal.plugin.address,
+    pluginAddress: proposal.plugin.id,
     proposalId: BigInt(proposal.proposalId),
   };
 }
@@ -61,7 +61,7 @@ export function toAdminProposalListItem(
     creatorAddress: proposal.creator,
     metadata,
     creationDate,
-    adminAddress: proposal.administrator.address,
+    adminAddress: proposal.adminstrator.address,
     status: proposal.executed
       ? ProposalStatus.EXECUTED
       : ProposalStatus.SUCCEEDED,

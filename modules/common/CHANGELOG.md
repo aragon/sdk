@@ -17,6 +17,7 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+- Adds new error `ProposalExecutionError`
 - Adds new error `EnsureAllowanceError`
 - Adds new error `InvalidPrecisionError`
 

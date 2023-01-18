@@ -12,7 +12,7 @@ import {
 
 export interface IAdminClientMethods extends IClientCore {
   executeProposal: (
-    params: ExecuteProposalParams,
+    params: ExecuteAdminProposalParams,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   pinMetadata: (
     params: ProposalMetadata,
@@ -26,7 +26,7 @@ export interface IAdminClientMethods extends IClientCore {
 export interface IAdminClientEncoding extends IClientCore {}
 
 export interface IAdminClientEstimation extends IClientCore {
-  executeProposal: (parms: ExecuteProposalParams) => Promise<GasFeeEstimation>;
+  executeProposal: (parms: ExecuteAdminProposalParams) => Promise<GasFeeEstimation>;
 }
 
 export interface IAdminClient {
@@ -35,7 +35,7 @@ export interface IAdminClient {
   estimation: IAdminClientEstimation;
 }
 
-export type ExecuteProposalParams = {
+export type ExecuteAdminProposalParams = {
   pluginAddress: string;
   metadataUri: string;
   actions: DaoAction[];
@@ -76,7 +76,9 @@ type SubgraphAdminProposalBase = {
   metadata: string;
   createdAt: string;
   executed: boolean;
-  administrator: {
+  // TODO
+  // fix typo
+  adminstrator: {
     address: string;
   };
 };
@@ -86,7 +88,7 @@ export type SubgraphAdminProposalListItem = SubgraphAdminProposalBase;
 export type SubgraphAdminProposal = SubgraphAdminProposalBase & {
   actions: SubgraphAction[];
   plugin: {
-    address: string;
+    id: string;
   };
   proposalId: string;
 };

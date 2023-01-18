@@ -8,12 +8,12 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 
 import {
-  Client,
   AdminClient,
+  Client,
   Context,
   ContextPlugin,
-  ExecuteProposalParams,
   ExecuteProposalStep,
+  Permissions,
   ProposalMetadata,
   ProposalSortBy,
   ProposalStatus,
@@ -23,18 +23,22 @@ import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParams,
   contextParamsLocalChain,
-  TEST_ADMIN_ADDRESS,
+  TEST_ADMIN_DAO_ADDRESS,
   TEST_ADMIN_PROPOSAL_ID,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { Server } from "ganache";
-import { IAdminProposalQueryParams } from "../../../src/admin";
+import {
+  ExecuteAdminProposalParams,
+  IAdminProposalQueryParams,
+} from "../../../src/admin";
 
 describe("Client Admin", () => {
   let pluginAddress: string;
   let server: Server;
+  let daoAddr: string
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
@@ -46,25 +50,31 @@ describe("Client Admin", () => {
       TEST_WALLET_ADDRESS,
     );
     pluginAddress = daoCreation.pluginAddrs[0];
+    daoAddr = daoCreation.daoAddr
   });
 
   afterAll(async () => {
     await server.close();
   });
 
-  describe("Proposal Creation", () => {
-    it("Should create a new proposal locally", async () => {
+  describe("Proposal Execution", () => {
+    it("Should execute a new proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const adminClient = new AdminClient(ctxPlugin);
       const client = new Client(ctx);
 
+      // const metadataUri = await client.methods.pinMetadata({
+      //   name: "New DAO Name",
+      //   description: "new description",
+      //   links: [],
+      // });
+
       // generate actions
-      const action = await client.encoding.withdrawAction(pluginAddress, {
-        recipientAddress: "0x1234567890123456789012345678901234567890",
-        amount: BigInt(1),
-        reference: "test",
-      });
+      // const action = await client.encoding.updateMetadataAction(
+      //   pluginAddress,
+      //   metadataUri,
+      // );
 
       const metadata: ProposalMetadata = {
         title: "Best Proposal",
@@ -82,9 +92,14 @@ describe("Client Admin", () => {
         },
       };
 
+      const action = client.encoding.grantAction(pluginAddress, {
+        who: "0x1234567890123456789012345678901234567890",
+        where: daoAddr,
+        permission: Permissions.EXECUTE_PERMISSION
+      });
       const ipfsUri = await adminClient.methods.pinMetadata(metadata);
 
-      const proposalParams: ExecuteProposalParams = {
+      const proposalParams: ExecuteAdminProposalParams = {
         pluginAddress,
         metadataUri: ipfsUri,
         actions: [action],
@@ -227,7 +242,7 @@ describe("Client Admin", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AdminClient(ctxPlugin);
       const limit = 5;
-      const address = TEST_ADMIN_ADDRESS;
+      const address = TEST_ADMIN_DAO_ADDRESS;
       const params: IAdminProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,

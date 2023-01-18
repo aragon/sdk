@@ -1,8 +1,11 @@
 import { gql } from "graphql-request";
 
+// TODO
+// fix adminstrator typo once is fixed in subgraph
+
 export const QueryAdminProposal = gql`
 query adminProposal($proposalId: ID!) {
-  adminProposal(id: $proposalId){
+  adminProposal(id: $proposalId) {
     id
     dao {
       id
@@ -18,9 +21,9 @@ query adminProposal($proposalId: ID!) {
     }
     executed
     plugin {
-      address
+      id
     }
-    administrator {
+    adminstrator {
       address
     }
     proposalId
@@ -28,7 +31,7 @@ query adminProposal($proposalId: ID!) {
 }
 `;
 export const QueryAdminProposals = gql`
-query adminProposals($where: Admin!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: AdminProposal_orderBy!) {
+query adminProposals($where: AdminProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: AdminProposal_orderBy!) {
   adminProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     dao {
@@ -39,7 +42,7 @@ query adminProposals($where: Admin!, $limit:Int!, $skip: Int!, $direction: Order
     metadata
     createdAt
     executed
-    administrator {
+    adminstrator {
       address
     }
   }

@@ -25,7 +25,7 @@ describe("Client Admin", () => {
           .getPluginInstallItem(
             TEST_INVALID_ADDRESS,
           )
-      ).rejects.toThrow(new InvalidAddressOrEnsError());
+      ).toThrow(new InvalidAddressOrEnsError());
     });
   });
 });

@@ -6,7 +6,6 @@ import {
   IpfsPinError,
   NoProviderError,
   NoSignerError,
-  ProposalExecutionError,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import {
@@ -14,7 +13,6 @@ import {
   ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  findEventLog,
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
@@ -26,7 +24,7 @@ import {
 import {
   AdminProposal,
   AdminProposalListItem,
-  ExecuteProposalParams,
+  ExecuteAdminProposalParams,
   IAdminClientMethods,
   IAdminProposalQueryParams,
   SubgraphAdminProposal,
@@ -43,6 +41,7 @@ import {
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { Admin__factory } from "@aragon/core-contracts-ethers";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Methods module for the SDK Admin Client
@@ -55,12 +54,12 @@ export class AdminClientMethods extends ClientCore
   /**
    * Executes the given proposal if the user has
    *
-   * @param {ExecuteProposalParams} params
+   * @param {ExecuteAdminProposalParams} params
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
    * @memberof AdminClientMethods
    */
   public async *executeProposal(
-    params: ExecuteProposalParams,
+    params: ExecuteAdminProposalParams,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -72,28 +71,26 @@ export class AdminClientMethods extends ClientCore
       params.pluginAddress,
       signer,
     );
+
+    // const actions = params.actions.map((action) => {
+    //   return {
+    //     to: action.to,
+    //     value: action.value,
+    //     data: "0x" + bytesToHex(action.data),
+    //   };
+    // });
+
     const tx = await adminContract.executeProposal(
-      params.metadataUri,
+      toUtf8Bytes(params.metadataUri),
       params.actions,
     );
     yield {
       key: ExecuteProposalStep.EXECUTING,
       txHash: tx.hash,
     };
-    const receipt = await tx.wait();
-    const admintInterface = Admin__factory.createInterface();
-    const log = findEventLog("ProposalCreation", receipt, admintInterface);
-    if (!log) {
-      throw new ProposalExecutionError();
-    }
-    const parsedLog = admintInterface.parseLog(log);
-    const proposalId = parsedLog.args["proposalId"];
-    if (!proposalId) {
-      throw new ProposalExecutionError();
-    }
+    await tx.wait();
     yield {
       key: ExecuteProposalStep.DONE,
-      proposalId,
     };
   }
 
@@ -129,7 +126,7 @@ export class AdminClientMethods extends ClientCore
         adminProposal,
       }: { adminProposal: SubgraphAdminProposal } = await client.request(
         QueryAdminProposal,
-        proposalId,
+        { proposalId },
       );
 
       if (!adminProposal) {
@@ -237,7 +234,7 @@ export class AdminClientMethods extends ClientCore
         ),
       );
     } catch {
-      throw new GraphQLError("ERC20 proposals");
+      throw new GraphQLError("Admin proposals");
     }
   }
 }

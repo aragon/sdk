@@ -1,5 +1,5 @@
 import {
-  ExecuteProposalParams,
+  ExecuteAdminProposalParams,
   IAdminClientEstimation,
 } from "../../interfaces";
 import {
@@ -9,6 +9,7 @@ import {
 } from "../../../client-common";
 import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
 import { Admin__factory } from "@aragon/core-contracts-ethers";
+import { toUtf8Bytes } from "@ethersproject/strings"
 
 /**
  * Estimation module for the SDK Admin Client
@@ -21,12 +22,12 @@ export class AdminClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of executing a proposal
    *
-   * @param {ExecuteProposalParams} params
+   * @param {ExecuteAdminProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof AdminClientEstimation
    */
   public async executeProposal(
-    params: ExecuteProposalParams,
+    params: ExecuteAdminProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -39,7 +40,7 @@ export class AdminClientEstimation extends ClientCore
       signer,
     );
     const estimatedGasFee = await adminContract.estimateGas.executeProposal(
-      params.metadataUri,
+      toUtf8Bytes(params.metadataUri),
       params.actions,
     );
     return this.web3.getApproximateGasFee(estimatedGasFee.toBigInt());
