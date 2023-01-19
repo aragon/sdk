@@ -23,7 +23,7 @@ import {
   DaoDepositSteps,
   DaoSortBy,
   IAddresslistVotingPluginInstall,
-  ICreateParams,
+  CreateDaoParams,
   IDaoQueryParams,
   IDepositParams,
   IHasPermissionParams,
@@ -100,7 +100,7 @@ describe("Client", () => {
           .getPluginInstallItem(pluginParams);
         addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
         
-        const daoCreationParams: ICreateParams = {
+        const daoCreationParams: CreateDaoParams = {
           metadataUri: ipfsUri,
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
@@ -108,7 +108,7 @@ describe("Client", () => {
           ],
         };
 
-        for await (const step of client.methods.create(daoCreationParams)) {
+        for await (const step of client.methods.createDao(daoCreationParams)) {
           switch (step.key) {
             case DaoCreationSteps.CREATING:
               expect(typeof step.txHash).toBe("string");
@@ -148,7 +148,7 @@ describe("Client", () => {
         const daoName = "TokenVotingDAO_" +
           Math.floor(Random.getFloat() * 9999) + 1;
 
-        const daoCreationParams: ICreateParams = {
+        const daoCreationParams: CreateDaoParams = {
           metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
@@ -164,7 +164,7 @@ describe("Client", () => {
           ],
         };
 
-        await expect(client.methods.create(daoCreationParams).next()).rejects
+        await expect(client.methods.createDao(daoCreationParams).next()).rejects
           .toMatchObject(new MissingExecPermissionError());
 
         pluginSetupProcessorConnectSpy.mockReset();
@@ -493,7 +493,7 @@ describe("Client", () => {
         const ctx = new Context(contextParams);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
-        const balances = await client.methods.getBalances(daoAddress);
+        const balances = await client.methods.getDaoBalances(daoAddress);
         expect(Array.isArray(balances)).toBe(true);
         expect(balances === null).toBe(false);
         if (balances) {
@@ -517,7 +517,7 @@ describe("Client", () => {
         const ctx = new Context(contextParams);
         const client = new Client(ctx);
         const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
-        const balances = await client.methods.getBalances(daoAddress);
+        const balances = await client.methods.getDaoBalances(daoAddress);
         expect(Array.isArray(balances)).toBe(true);
         expect(balances?.length).toBe(0);
       });
@@ -532,7 +532,7 @@ describe("Client", () => {
           skip: 0,
           direction: SortDirection.ASC,
         };
-        const transfers = await client.methods.getTransfers(params);
+        const transfers = await client.methods.getDaoTransfers(params);
         expect(Array.isArray(transfers)).toBe(true);
         if (transfers) {
           expect(transfers.length > 0).toBe(true);
@@ -593,7 +593,7 @@ describe("Client", () => {
           direction: SortDirection.ASC,
           type: transferType,
         };
-        const transfers = await client.methods.getTransfers(params);
+        const transfers = await client.methods.getDaoTransfers(params);
         expect(Array.isArray(transfers)).toBe(true);
         if (transfers) {
           expect(transfers.length > 0).toBe(true);

@@ -14,12 +14,12 @@ import {
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
-  ICreateParams,
+  CreateDaoParams,
   ITokenVotingPluginInstall,
   TokenVotingClient,
   VotingMode,
+  DaoMetadata,
 } from "@aragon/sdk-client";
-import { IMetadata } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -79,7 +79,7 @@ const tokenVotingInstallPluginItem2 = TokenVotingClient.encoding
     pluginInitParams2,
   );
 
-const daoMetadata: IMetadata = {
+const daoMetadata: DaoMetadata = {
   name: "My DAO",
   description: "This is a description",
   avatar: "",
@@ -91,7 +91,7 @@ const daoMetadata: IMetadata = {
 
 const metadataUri = await client.methods.pinMetadata(daoMetadata);
 
-const createParams: ICreateParams = {
+const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2],

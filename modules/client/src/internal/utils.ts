@@ -12,7 +12,7 @@ import {
   IFreezePermissionParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
-  IMetadata,
+  DaoMetadata,
   InstalledPluginListItem,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
@@ -46,7 +46,7 @@ export function unwrapDepositParams(
 
 export function toDaoDetails(
   dao: SubgraphDao,
-  metadata: IMetadata,
+  metadata: DaoMetadata,
 ): DaoDetails {
   return {
     address: dao.id,
@@ -81,7 +81,7 @@ export function toDaoDetails(
 
 export function toDaoListItem(
   dao: SubgraphDaoListItem,
-  metadata: IMetadata,
+  metadata: DaoMetadata,
 ): DaoListItem {
   return {
     address: dao.id,

@@ -63,15 +63,15 @@ import {
   Client,
   Context,
   DaoCreationSteps,
+  DaoMetadata,
   GasFeeEstimation,
-  ICreateParams,
 } from "@aragon/sdk-client";
-import { IMetadata } from "../../src";
+import { CreateDaoParams } from "../../src/interfaces";
 import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
-const metadata: IMetadata = {
+const metadata: DaoMetadata = {
   name: "My DAO",
   description: "This is a description",
   avatar: "",
@@ -81,20 +81,20 @@ const metadata: IMetadata = {
   }],
 };
 const ipfsUri = await client.methods.pinMetadata(metadata);
-const createParams: ICreateParams = {
+const createParams: CreateDaoParams = {
   metadataUri: ipfsUri,
   ensSubdomain: "my-org", // my-org.dao.eth,
   plugins: [],
 };
 
 // gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.create(
+const estimatedGas: GasFeeEstimation = await client.estimation.createDao(
   createParams,
 );
 console.log(estimatedGas.average);
 console.log(estimatedGas.max);
 
-const steps = client.methods.create(createParams);
+const steps = client.methods.createDao(createParams);
 for await (const step of steps) {
   try {
     switch (step.key) {
@@ -363,7 +363,7 @@ const params: ITransferQueryParams = {
   direction: SortDirection.ASC, // optional
   type: TransferType.DEPOSIT, // optional
 };
-const transfers: Transfer[] | null = await client.methods.getTransfers(params);
+const transfers: Transfer[] | null = await client.methods.getDaoTransfers(params);
 console.log(transfers);
 
 /*
@@ -423,7 +423,7 @@ import { contextParams } from "./00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const daoAddressOrEns = "0x12345...";
-const balances: AssetBalance[] | null = await client.methods.getBalances(daoAddressOrEns);
+const balances: AssetBalance[] | null = await client.methods.getDaoBalances(daoAddressOrEns);
 console.log(balances);
 /*
   [
@@ -501,12 +501,12 @@ import {
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
-  ICreateParams,
+  CreateDaoParams,
   ITokenVotingPluginInstall,
   TokenVotingClient,
   VotingMode,
+  DaoMetadata,
 } from "@aragon/sdk-client";
-import { IMetadata } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -566,7 +566,7 @@ const tokenVotingInstallPluginItem2 = TokenVotingClient.encoding
     pluginInitParams2,
   );
 
-const daoMetadata: IMetadata = {
+const daoMetadata: DaoMetadata = {
   name: "My DAO",
   description: "This is a description",
   avatar: "",
@@ -578,7 +578,7 @@ const daoMetadata: IMetadata = {
 
 const metadataUri = await client.methods.pinMetadata(daoMetadata);
 
-const createParams: ICreateParams = {
+const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2],
@@ -1177,10 +1177,10 @@ import {
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
-  ICreateParams,
-  IMetadata,
+  CreateDaoParams,
+  DaoMetadata,
   VotingMode,
-  VotingSettings,
+  IAddressListPluginInstall,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -1189,7 +1189,7 @@ const client: Client = new Client(context);
 
 // Define the plugins to install and their params
 
-const pluginInitParams: VotingSettings = {
+const pluginInitParams: IAddressListPluginInstall = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
@@ -1208,7 +1208,7 @@ const pluginInitParams: VotingSettings = {
 const addresslistVotingInstallPluginItem = AddresslistVotingClient.encoding
   .getPluginInstallItem(pluginInitParams);
 
-const daoMetadata: IMetadata = {
+const daoMetadata: DaoMetadata = {
   name: "My DAO",
   description: "This is a description",
   avatar: "",
@@ -1220,20 +1220,20 @@ const daoMetadata: IMetadata = {
 
 const metadataUri = await client.methods.pinMetadata(daoMetadata);
 
-const createParams: ICreateParams = {
+const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: [addresslistVotingInstallPluginItem],
 };
 
 // gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.create(
+const estimatedGas: GasFeeEstimation = await client.estimation.createDao(
   createParams,
 );
 console.log(estimatedGas.average);
 console.log(estimatedGas.max);
 
-const steps = client.methods.create(createParams);
+const steps = client.methods.createDao(createParams);
 for await (const step of steps) {
   try {
     switch (step.key) {
@@ -1881,13 +1881,13 @@ console.log(withdrawAction);
 ### Update Metadata
 
 ```ts
-import { Client, Context, IMetadata } from "@aragon/sdk-client";
+import { Client, Context, DaoMetadata } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 
-const metadataParams: IMetadata = {
+const metadataParams: DaoMetadata = {
   name: "New Name",
   description: "New description",
   avatar: "https://theavatar.com/image.jpg",
@@ -1906,11 +1906,11 @@ const daoAddressOrEns = "0x12345";
 
 const ipfsUri = await client.methods.pinMetadata(metadataParams);
 
-const updateMetadataAction = await client.encoding.updateMetadataAction(
+const updateDaoMetadataAction = await client.encoding.updateDaoMetadataAction(
   daoAddressOrEns,
   ipfsUri,
 );
-console.log(updateMetadataAction);
+console.log(updateDaoMetadataAction);
 ```
 
 ### Set Plugin Config (Address List)
@@ -2293,13 +2293,13 @@ console.log(params);
 Decode an update metadata action and expect the metadata
 
 ```ts
-import { Client, Context, IMetadata } from "@aragon/sdk-client";
+import { Client, Context, DaoMetadata } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IMetadata = await client.decoding.updateMetadataAction(data);
+const params: DaoMetadata = await client.decoding.updateDaoMetadataAction(data);
 
 console.log(params);
 /*
@@ -2326,13 +2326,13 @@ console.log(params);
 Decode an update metadata action and expect an IPFS uri containing the cid
 
 ```ts
-import { Client, Context, IMetadata } from "@aragon/sdk-client";
+import { Client, Context } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: string = client.decoding.updateMetadataRawAction(data);
+const params: string = client.decoding.updateDaoMetadataRawAction(data);
 
 console.log(params);
 /*
@@ -2644,7 +2644,7 @@ import {
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
-  ICreateParams,
+  CreateDaoParams,
   MultisigPluginInstallParams,
 } from "@aragon/sdk-client";
 import { MultisigClient } from "../../src";
@@ -2683,7 +2683,7 @@ const metadataUri = await client.methods.pinMetadata({
   }],
 });
 
-const createParams: ICreateParams = {
+const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: [multisigInstallPluginItem],

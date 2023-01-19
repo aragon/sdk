@@ -6,7 +6,7 @@ import {
   IClientDecoding,
   IFreezePermissionDecodedParams,
   IGrantPermissionDecodedParams,
-  IMetadata,
+  DaoMetadata,
   IRevokePermissionDecodedParams,
   IWithdrawParams,
 } from "../../interfaces";
@@ -121,7 +121,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @return {*}  {string}
    * @memberof ClientDecoding
    */
-  public updateMetadataRawAction(data: Uint8Array): string {
+  public updateDaoMetadataRawAction(data: Uint8Array): string {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(
@@ -141,10 +141,10 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes a dao metadata from an encoded update metadata raw action
    *
    * @param {Uint8Array} data
-   * @return {*}  {Promise<IMetadata>}
+   * @return {*}  {Promise<DaoMetadata>}
    * @memberof ClientDecoding
    */
-  public async updateMetadataAction(data: Uint8Array): Promise<IMetadata> {
+  public async updateDaoMetadataAction(data: Uint8Array): Promise<DaoMetadata> {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(

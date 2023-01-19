@@ -11,7 +11,7 @@ import {
   Context,
   IFreezePermissionParams,
   IGrantPermissionParams,
-  IMetadata,
+  DaoMetadata,
   IRevokePermissionParams,
   IWithdrawParams,
   Permissions,
@@ -147,7 +147,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const params: IMetadata = {
+      const params: DaoMetadata = {
         name: "New Name",
         description: "New description",
         avatar: "https://theavatar.com/image.jpg",
@@ -164,7 +164,7 @@ describe("Client", () => {
       };
       const ipfsUri = await client.methods.pinMetadata(params)
 
-      const installEntry = await client.encoding.updateMetadataAction(
+      const installEntry = await client.encoding.updateDaoMetadataAction(
         "0x1234567890123456789012345678901234567890",
         ipfsUri,
       );

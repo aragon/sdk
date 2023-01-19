@@ -9,7 +9,7 @@ import { contextParams } from "./00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const daoAddressOrEns = "0x12345...";
-const balances: AssetBalance[] | null = await client.methods.getBalances(daoAddressOrEns);
+const balances: AssetBalance[] | null = await client.methods.getDaoBalances(daoAddressOrEns);
 console.log(balances);
 /*
   [

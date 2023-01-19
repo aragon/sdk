@@ -42,11 +42,11 @@ import {
   EnsureAllowanceParams,
   EnsureAllowanceStepValue,
   IClientMethods,
-  ICreateParams,
+  CreateDaoParams,
   IDaoQueryParams,
   IDepositParams,
   IHasPermissionParams,
-  IMetadata,
+  DaoMetadata,
   ITransferQueryParams,
   PermissionIds,
   SubgraphBalance,
@@ -90,12 +90,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Creates a DAO with the given settings and plugins
    *
-   * @param {ICreateParams} params
+   * @param {CreateDaoParams} params
    * @return {*}  {AsyncGenerator<DaoCreationStepValue>}
    * @memberof ClientMethods
    */
-  public async *create(
-    params: ICreateParams,
+  public async *createDao(
+    params: CreateDaoParams,
   ): AsyncGenerator<DaoCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -198,11 +198,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Pins a metadata object into IPFS and retruns the generated hash
    *
-   * @param {IMetadata} params
+   * @param {DaoMetadata} params
    * @return {*}  {Promise<string>}
    * @memberof ClientMethods
    */
-  public async pinMetadata(params: IMetadata): Promise<string> {
+  public async pinMetadata(params: DaoMetadata): Promise<string> {
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);
@@ -408,7 +408,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       try {
         const metadataCid = resolveIpfsCid(dao.metadata);
         const metadataString = await this.ipfs.fetchString(metadataCid);
-        const metadata = JSON.parse(metadataString) as IMetadata;
+        const metadata = JSON.parse(metadataString) as DaoMetadata;
         return toDaoDetails(dao, metadata);
         // TODO: Parse and validate schema
       } catch (err) {
@@ -480,7 +480,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {(Promise<AssetBalance[] | null>)}
    * @memberof ClientMethods
    */
-  public async getBalances(
+  public async getDaoBalances(
     daoAddressorEns: string,
   ): Promise<AssetBalance[] | null> {
     let address = daoAddressorEns;
@@ -532,7 +532,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {(Promise<Transfer[] | null>)}
    * @memberof ClientMethods
    */
-  public async getTransfers({
+  public async getDaoTransfers({
     daoAddressOrEns,
     type,
     limit = 10,
