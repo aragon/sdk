@@ -11,8 +11,6 @@ import { Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import { Log } from "@ethersproject/providers";
 import { InvalidVotingModeError } from "@aragon/sdk-common";
-import { formatEther } from "@ethersproject/units";
-import { InvalidPrecisionError } from "@aragon/sdk-common";
 
 export function unwrapProposalParams(
   params: ICreateProposalParams,
@@ -111,15 +109,4 @@ export function votingModeToContracts(votingMode: VotingMode): number {
     default:
       throw new InvalidVotingModeError();
   }
-}
-
-export function parseEtherRatio(ether: string, precision: number = 2): number {
-  if (precision <= 0 || !Number.isInteger(precision)) {
-    throw new InvalidPrecisionError()
-  }
-  return parseFloat(
-    parseFloat(
-      formatEther(ether),
-    ).toFixed(precision),
-  );
 }

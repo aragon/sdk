@@ -1,9 +1,8 @@
-import { hexToBytes, strip0x } from "@aragon/sdk-common";
+import { decodeRatio, hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
   ContractVotingSettings,
   DaoAction,
-  parseEtherRatio,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
@@ -84,8 +83,8 @@ export function toAddressListProposal(
       //   BigInt(proposal.relativeSupportThresholdPct),
       //   2,
       // ),
-      minSupport: parseEtherRatio(proposal.supportThreshold),
-      minTurnout: parseEtherRatio(proposal.minParticipation),
+      minSupport: decodeRatio(BigInt(proposal.supportThreshold), 6),
+      minTurnout: decodeRatio(BigInt(proposal.minParticipation), 6),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
     },

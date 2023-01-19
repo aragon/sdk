@@ -19,6 +19,7 @@ TEMPLATE:
 ### Fixed
 - Fix `updateMetadata` decoders
 ### Changed
+- Encode ratios with 6 digits precision
 - Add `MultisigClient`
 - Exposes `ensureAllowance` method
 - Fix precission in `VotingSettings`

@@ -1,5 +1,6 @@
 import { isAddress } from "@ethersproject/address";
 import {
+  decodeRatio,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -15,7 +16,6 @@ import {
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
-  parseEtherRatio,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -429,11 +429,13 @@ export class TokenVotingClientMethods extends ClientCore
       }
       return {
         minDuration: parseInt(tokenVotingPlugin.minDuration),
-        supportThreshold: parseEtherRatio(
-          tokenVotingPlugin.supportThreshold,
+        supportThreshold: decodeRatio(
+          BigInt(tokenVotingPlugin.supportThreshold),
+          6,
         ),
-        minParticipation: parseEtherRatio(
-          tokenVotingPlugin.supportThreshold,
+        minParticipation: decodeRatio(
+          BigInt(tokenVotingPlugin.supportThreshold),
+          6,
         ),
         minProposerVotingPower: BigInt(
           tokenVotingPlugin.minParticipation,

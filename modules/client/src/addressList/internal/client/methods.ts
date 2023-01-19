@@ -1,4 +1,5 @@
 import {
+  decodeRatio,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -22,7 +23,6 @@ import {
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
-  parseEtherRatio,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -435,11 +435,13 @@ export class ClientAddressListMethods extends ClientCore
       }
       return {
         minDuration: parseInt(addresslistVotingPlugin.minDuration),
-        supportThreshold: parseEtherRatio(
-          addresslistVotingPlugin.supportThreshold,
+        supportThreshold: decodeRatio(
+          BigInt(addresslistVotingPlugin.supportThreshold),
+          6,
         ),
-        minParticipation: parseEtherRatio(
-          addresslistVotingPlugin.minParticipation,
+        minParticipation: decodeRatio(
+          BigInt(addresslistVotingPlugin.minParticipation),
+          6,
         ),
         minProposerVotingPower: BigInt(
           addresslistVotingPlugin.minParticipation,
