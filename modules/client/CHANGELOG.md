@@ -11,13 +11,13 @@ TEMPLATE:
 
 - Change 1, 2, 3
 
-### Fixed
-- Fix 1, 2, 3
 -->
 
 ## [UPCOMING]
 ### Fixed
 - Fix `updateMetadata` decoders
+- Fix `getProposals` ERC721 support on `tokenVotingClient`
+- Fix `VotingMode` not decoding
 ### Changed
 - Add `MultisigClient`
 - Exposes `ensureAllowance` method

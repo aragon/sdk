@@ -7,6 +7,7 @@ import {
   ContextPlugin,
   IMintTokenParams,
   VotingSettings,
+  VotingMode,
 } from "../../../src";
 
 import { bytesToHex } from "@aragon/sdk-common";
@@ -22,7 +23,8 @@ describe("Token Voting Client", () => {
         minDuration: 100000,
         minParticipation: 0.25,
         supportThreshold: 0.51,
-        minProposerVotingPower: BigInt(0)
+        minProposerVotingPower: BigInt(0),
+        votingMode: VotingMode.EARLY_EXECUTION
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -41,6 +43,7 @@ describe("Token Voting Client", () => {
       expect(decodedParams.minParticipation).toBe(params.minParticipation);
       expect(decodedParams.minProposerVotingPower).toBe(params.minProposerVotingPower);
       expect(decodedParams.supportThreshold).toBe(params.supportThreshold);
+      expect(decodedParams.votingMode).toBe(params.votingMode);
     });
     it("Should decode a mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);

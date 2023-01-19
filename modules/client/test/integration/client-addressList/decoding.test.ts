@@ -5,6 +5,7 @@ import {
   ClientAddressList,
   Context,
   ContextPlugin,
+  VotingMode,
   VotingSettings,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
@@ -19,7 +20,8 @@ describe("Client Address List", () => {
         minDuration: 100000,
         minParticipation: 0.25,
         supportThreshold: 0.51,
-        minProposerVotingPower: BigInt(0)
+        minProposerVotingPower: BigInt(0),
+        votingMode: VotingMode.EARLY_EXECUTION
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -38,6 +40,7 @@ describe("Client Address List", () => {
       expect(decodedParams.minParticipation).toBe(params.minParticipation);
       expect(decodedParams.minProposerVotingPower).toBe(params.minProposerVotingPower);
       expect(decodedParams.supportThreshold).toBe(params.supportThreshold);
+      expect(decodedParams.votingMode).toBe(params.votingMode);
     });
 
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {

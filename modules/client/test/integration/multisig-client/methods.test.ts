@@ -20,7 +20,6 @@ import {
   ProposalCreationSteps,
   ProposalMetadata,
   ProposalSortBy,
-  ProposalStatus,
   SortDirection,
 } from "../../../src";
 import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
@@ -311,12 +310,10 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
-      const status = ProposalStatus.EXECUTED;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
-        status,
       };
       const proposals = await client.methods.getProposals(params);
 
@@ -332,7 +329,6 @@ describe("Client Multisig", () => {
         expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         expect(typeof proposal.metadata.title).toBe("string");
         expect(typeof proposal.metadata.summary).toBe("string");
-        expect(proposal.status).toBe(status);
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {

@@ -323,7 +323,7 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new ClientAddressList(ctxPlugin);
       const limit = 5;
-      const status = ProposalStatus.EXECUTED;
+      const status = ProposalStatus.DEFEATED;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
