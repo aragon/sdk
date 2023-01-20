@@ -2,7 +2,7 @@
 ### Set Plugin Config (Address List)
 */
 import {
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   VotingMode,
@@ -12,7 +12,7 @@ import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 // create config action
 const configActionPrarms: VotingSettings = {

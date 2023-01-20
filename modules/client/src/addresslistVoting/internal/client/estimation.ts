@@ -7,18 +7,18 @@ import {
   IExecuteProposalParams,
   IVoteProposalParams,
 } from "../../../client-common";
-import { IClientAddressListEstimation } from "../../interfaces";
+import { IAddresslistVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
 
 /**
  * Estimation module the SDK Address List Client
  */
-export class ClientAddressListEstimation extends ClientCore
-  implements IClientAddressListEstimation {
+export class AddresslistVotingClientEstimation extends ClientCore
+  implements IAddresslistVotingClientEstimation {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(ClientAddressListEstimation.prototype);
+    Object.freeze(AddresslistVotingClientEstimation.prototype);
     Object.freeze(this);
   }
 
@@ -27,7 +27,7 @@ export class ClientAddressListEstimation extends ClientCore
    *
    * @param {ICreateProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientAddressListEstimation
+   * @memberof AddresslistVotingClientEstimation
    */
   public async createProposal(
     params: ICreateProposalParams,
@@ -64,7 +64,7 @@ export class ClientAddressListEstimation extends ClientCore
    *
    * @param {IVoteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientAddressListEstimation
+   * @memberof AddresslistVotingClientEstimation
    */
   public async voteProposal(
     params: IVoteProposalParams,
@@ -94,7 +94,7 @@ export class ClientAddressListEstimation extends ClientCore
    *
    * @param {IExecuteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
-   * @memberof ClientAddressListEstimation
+   * @memberof AddresslistVotingClientEstimation
    */
   public async executeProposal(
     params: IExecuteProposalParams,

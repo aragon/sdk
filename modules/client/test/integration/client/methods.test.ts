@@ -17,12 +17,12 @@ import {
 } from "../constants";
 import {
   Client,
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   DaoCreationSteps,
   DaoDepositSteps,
   DaoSortBy,
-  IAddressListPluginInstall,
+  IAddresslistVotingPluginInstall,
   ICreateParams,
   IDaoQueryParams,
   IDepositParams,
@@ -84,7 +84,7 @@ describe("Client", () => {
           avatar: "https://...",
           links: [],
         });
-        const pluginParams: IAddressListPluginInstall = {
+        const pluginParams: IAddresslistVotingPluginInstall = {
           votingSettings: {
             minDuration: 3600,
             minParticipation: 0.5,
@@ -96,15 +96,15 @@ describe("Client", () => {
           ],
         };
 
-        const addressListPlugin = ClientAddressList.encoding
+        const addresslistVotingPlugin = AddresslistVotingClient.encoding
           .getPluginInstallItem(pluginParams);
-        addressListPlugin.id = deployment.addressListRepo.address;
+        addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
         
         const daoCreationParams: ICreateParams = {
           metadataUri: ipfsUri,
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
-            addressListPlugin,
+            addresslistVotingPlugin,
           ],
         };
 
@@ -153,7 +153,7 @@ describe("Client", () => {
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
           plugins: [
             {
-              id: deployment.addressListRepo.address,
+              id: deployment.addresslistVotingRepo.address,
               data: toUtf8Bytes(
                 defaultAbiCoder.encode(
                   ["uint64", "uint64", "uint64", "address[]"],

@@ -5,7 +5,7 @@ declare const describe, it, expect, beforeAll, afterAll;
 import "../../mocks/aragon-sdk-ipfs";
 
 import { Random } from "@aragon/sdk-common";
-import { Client, ClientAddressList, Context, IAddressListPluginInstall, ICreateParams, IDepositParams } from "../../../src";
+import { Client, AddresslistVotingClient, Context, IAddresslistVotingPluginInstall, ICreateParams, IDepositParams } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
@@ -35,7 +35,7 @@ describe("Client", () => {
       const daoName = "TokenVotingDAO_" + Math.floor(Random.getFloat() * 9999) +
         1;
 
-      const pluginParams: IAddressListPluginInstall = {
+      const pluginParams: IAddresslistVotingPluginInstall = {
         votingSettings: {
           minDuration: 3600,
           minParticipation: 0.5,
@@ -47,15 +47,15 @@ describe("Client", () => {
         ],
       };
 
-      const addressListPlugin = ClientAddressList.encoding
+      const addresslistVotingPlugin = AddresslistVotingClient.encoding
         .getPluginInstallItem(pluginParams);
-      addressListPlugin.id = deployment.addressListRepo.address;
+      addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
 
       const daoCreationParams: ICreateParams = {
         metadataUri: `ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK`,
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [
-          addressListPlugin,
+          addresslistVotingPlugin,
         ],
       };
 

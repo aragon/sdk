@@ -2,8 +2,8 @@
 ### Loading the a proposal by proposalId (address list plugin)
 */
 import {
-  AddressListProposal,
-  ClientAddressList,
+  AddresslistVotingProposal,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
 } from "@aragon/sdk-client";
@@ -14,11 +14,11 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an AddressList client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const proposalId = "0x12345...";
 
-const proposal: AddressListProposal | null = await client.methods.getProposal(
+const proposal: AddresslistVotingProposal | null = await client.methods.getProposal(
   proposalId,
 );
 console.log(proposal);

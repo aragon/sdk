@@ -9,7 +9,7 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   Client,
-  ClientAddressList,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
@@ -65,7 +65,7 @@ describe("Client Address List", () => {
     it("Should create a new proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const addressListClient = new ClientAddressList(ctxPlugin);
+      const addresslistVotingClient = new AddresslistVotingClient(ctxPlugin);
       const client = new Client(ctx);
 
       // generate actions
@@ -91,7 +91,7 @@ describe("Client Address List", () => {
         },
       };
 
-      const ipfsUri = await addressListClient.methods.pinMetadata(metadata);
+      const ipfsUri = await addresslistVotingClient.methods.pinMetadata(metadata);
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress,
@@ -102,7 +102,7 @@ describe("Client Address List", () => {
       };
 
       for await (
-        const step of addressListClient.methods.createProposal(
+        const step of addresslistVotingClient.methods.createProposal(
           proposalParams,
         )
       ) {
@@ -131,7 +131,7 @@ describe("Client Address List", () => {
     it("Should vote on a proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -160,7 +160,7 @@ describe("Client Address List", () => {
     it("Should execute a local proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -188,7 +188,7 @@ describe("Client Address List", () => {
     it("Should check if an user can vote in an Address List proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const params: ICanVoteParams = {
         address: "0x1234567890123456789012345678901234567890",
@@ -204,7 +204,7 @@ describe("Client Address List", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const wallets = await client.methods.getMembers(
         TEST_ADDRESSLIST_PLUGIN_ADDRESS,
@@ -218,7 +218,7 @@ describe("Client Address List", () => {
     it("Should fetch the given proposal", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const proposalId = TEST_ADDRESSLIST_PROPOSAL_ID;
 
@@ -311,7 +311,7 @@ describe("Client Address List", () => {
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x0";
       const proposal = await client.methods.getProposal(proposalId);
@@ -321,7 +321,7 @@ describe("Client Address List", () => {
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
       const status = ProposalStatus.DEFEATED;
       const params: IProposalQueryParams = {
@@ -357,7 +357,7 @@ describe("Client Address List", () => {
     it("Should get a list of proposals from a specific dao", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
       const address = TEST_ADDRESSLIST_DAO_ADDDRESS;
       const params: IProposalQueryParams = {
@@ -374,7 +374,7 @@ describe("Client Address List", () => {
     it("Should get a list of proposals from a dao that has no proposals", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
       const address = TEST_NON_EXISTING_ADDRESS;
       const params: IProposalQueryParams = {
@@ -391,7 +391,7 @@ describe("Client Address List", () => {
     it("Should get a list of proposals from an invalid address", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
       const address = TEST_INVALID_ADDRESS;
       const params: IProposalQueryParams = {
@@ -407,7 +407,7 @@ describe("Client Address List", () => {
     it("Should get the settings of a plugin given a plugin instance address", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const pluginAddress: string = TEST_ADDRESSLIST_PLUGIN_ADDRESS;
       const settings = await client.methods.getVotingSettings(pluginAddress);

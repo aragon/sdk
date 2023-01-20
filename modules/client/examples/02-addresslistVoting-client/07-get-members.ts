@@ -1,7 +1,7 @@
 /* MARKDOWN
 ### Loading the list of members (address list plugin)
 */
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -9,7 +9,7 @@ const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an AddressList client
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const daoAddressorEns = "0x12345...";
 

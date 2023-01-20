@@ -1,12 +1,12 @@
 /* MARKDOWN
 ### Add Members (AddressList)
 */
-import { ClientAddressList, Context, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new ClientAddressList(contextPlugin);
+const client = new AddresslistVotingClient(contextPlugin);
 
 const members: string[] = [
   "0x1357924680135792468013579246801357924680",
