@@ -51,7 +51,6 @@ import {
   toAddresslistVotingProposal,
   toAddresslistVotingProposalListItem,
 } from "../utils";
-import {} from "../graphql-queries/settings";
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
