@@ -442,7 +442,7 @@ export class AddresslistVotingClientMethods extends ClientCore
           addresslistVotingPlugin.minParticipation,
         ),
         minProposerVotingPower: BigInt(
-          addresslistVotingPlugin.minParticipation,
+          addresslistVotingPlugin.minProposerVotingPower,
         ),
         votingMode: addresslistVotingPlugin.votingMode,
       };

@@ -15,7 +15,6 @@ import {
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
-  parseEtherRatio,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -25,11 +24,13 @@ import {
   IProposalQueryParams,
   isProposalId,
   IVoteProposalParams,
+  parseEtherRatio,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
+  SubgraphVotingSettings,
   VoteProposalStep,
   VoteProposalStepValue,
   VotingSettings,
@@ -418,7 +419,9 @@ export class TokenVotingClientMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const { tokenVotingPlugin } = await client.request(
+      const { tokenVotingPlugin }: {
+        tokenVotingPlugin: SubgraphVotingSettings;
+      } = await client.request(
         QueryTokenVotingPluginSettings,
         {
           address: pluginAddress,
@@ -430,13 +433,13 @@ export class TokenVotingClientMethods extends ClientCore
       return {
         minDuration: parseInt(tokenVotingPlugin.minDuration),
         supportThreshold: parseEtherRatio(
-          tokenVotingPlugin.supportThreshold,
+          tokenVotingPlugin.minParticipation,
         ),
         minParticipation: parseEtherRatio(
           tokenVotingPlugin.supportThreshold,
         ),
         minProposerVotingPower: BigInt(
-          tokenVotingPlugin.minParticipation,
+          tokenVotingPlugin.minProposerVotingPower,
         ),
         votingMode: tokenVotingPlugin.votingMode,
       };
