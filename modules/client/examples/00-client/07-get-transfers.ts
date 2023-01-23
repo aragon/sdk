@@ -25,7 +25,7 @@ const params: ITransferQueryParams = {
   direction: SortDirection.ASC, // optional
   type: TransferType.DEPOSIT, // optional
 };
-const transfers: Transfer[] | null = await client.methods.getTransfers(params);
+const transfers: Transfer[] | null = await client.methods.getDaoTransfers(params);
 console.log(transfers);
 
 /*

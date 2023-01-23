@@ -11,7 +11,7 @@ import {
   IFreezePermissionParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
-  IMetadata,
+  DaoMetadata,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
   IWithdrawParams,
@@ -187,7 +187,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const params: IMetadata = {
+      const params: DaoMetadata = {
         name: "New Name",
         description: "New description",
         avatar: "https://theavatar.com/image.jpg",
@@ -214,13 +214,13 @@ describe("Client", () => {
 
       const ipfsUri = await client.methods.pinMetadata(params);
 
-      const updateMetadataAction = await client.encoding.updateMetadataAction(
+      const updateDaoMetadataAction = await client.encoding.updateDaoMetadataAction(
         "0x1234567890123456789012345678901234567890",
         ipfsUri,
       );
       const recoveredIpfsUri: string = await client.decoding
-        .updateMetadataRawAction(
-          updateMetadataAction.data,
+        .updateDaoMetadataRawAction(
+          updateDaoMetadataAction.data,
         );
       const ipfsRegex =
         /^ipfs:\/\/(Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}))$/;
@@ -234,7 +234,7 @@ describe("Client", () => {
     it("Should try to decode an encoded update metadata action with the withdraws decoder and return an error", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const params: IMetadata = {
+      const params: DaoMetadata = {
         name: "New Name",
         description: "New description",
         avatar: "https://theavatar.com/image.jpg",
@@ -250,12 +250,12 @@ describe("Client", () => {
         ],
       };
       const ipfsUri = await client.methods.pinMetadata(params);
-      const updateMetadataAction = await client.encoding.updateMetadataAction(
+      const updateDaoMetadataAction = await client.encoding.updateDaoMetadataAction(
         "0x1234567890123456789012345678901234567890",
         ipfsUri,
       );
 
-      expect(() => client.decoding.withdrawAction(updateMetadataAction.data))
+      expect(() => client.decoding.withdrawAction(updateDaoMetadataAction.data))
         .toThrow("The received action is different from the expected one");
     });
 
@@ -272,7 +272,7 @@ describe("Client", () => {
     it("Should get the function for a given action data", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const params: IMetadata = {
+      const params: DaoMetadata = {
         name: "New Name",
         description: "New description",
         avatar: "https://theavatar.com/image.jpg",
@@ -289,11 +289,11 @@ describe("Client", () => {
       };
 
       const ipfsUri = await client.methods.pinMetadata(params);
-      const updateMetadataAction = await client.encoding.updateMetadataAction(
+      const updateDaoMetadataAction = await client.encoding.updateDaoMetadataAction(
         "0x1234567890123456789012345678901234567890",
         ipfsUri,
       );
-      const iface = client.decoding.findInterface(updateMetadataAction.data);
+      const iface = client.decoding.findInterface(updateDaoMetadataAction.data);
       expect(iface?.id).toBe("function setMetadata(bytes)");
       expect(iface?.functionName).toBe("setMetadata");
       expect(iface?.hash).toBe("0xee57e36f");
@@ -311,7 +311,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const params: IMetadata = {
+      const params: DaoMetadata = {
         name: "New Name",
         description: "New description",
         avatar: "https://theavatar.com/image.jpg",
@@ -336,7 +336,7 @@ describe("Client", () => {
       });
 
       const ipfsUri = await client.methods.pinMetadata(params);
-      const updateMetadataAction = await client.encoding.updateMetadataAction(
+      const updateDaoMetadataAction = await client.encoding.updateDaoMetadataAction(
         "0x1234567890123456789012345678901234567890",
         ipfsUri,
       );
@@ -346,7 +346,7 @@ describe("Client", () => {
       );
 
       const decodedParams = await client.decoding
-        .updateMetadataAction(updateMetadataAction.data);
+        .updateDaoMetadataAction(updateDaoMetadataAction.data);
 
       expect(decodedParams.name).toBe(params.name);
       expect(decodedParams.description).toBe(params.description);

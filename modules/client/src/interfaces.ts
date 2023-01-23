@@ -13,14 +13,14 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { IClientCore } from "./client-common/interfaces/core";
 /** Defines the shape of the general purpose Client class */
 export interface IClientMethods extends IClientCore {
-  create: (params: ICreateParams) => AsyncGenerator<DaoCreationStepValue>;
-  pinMetadata: (params: IMetadata) => Promise<string>;
+  createDao: (params: CreateDaoParams) => AsyncGenerator<DaoCreationStepValue>;
+  pinMetadata: (params: DaoMetadata) => Promise<string>;
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
-  getBalances: (
+  getDaoBalances: (
     daoAddressOrEns: string,
   ) => Promise<AssetBalance[] | null>;
   /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
-  getTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
+  getDaoTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
   /** Checks whether a role is granted by the current DAO's ACL settings */
   hasPermission: (params: IHasPermissionParams) => Promise<boolean>;
   /** Deposits ether or an ERC20 token */
@@ -52,7 +52,7 @@ export interface IClientEncoding extends IClientCore {
     daoAddresOrEns: string,
     params: IWithdrawParams,
   ) => Promise<DaoAction>;
-  updateMetadataAction: (
+  updateDaoMetadataAction: (
     daoAddressOrEns: string,
     metadataUri: string,
   ) => Promise<DaoAction>;
@@ -63,13 +63,13 @@ export interface IClientDecoding {
   revokeAction: (data: Uint8Array) => IRevokePermissionDecodedParams;
   freezeAction: (data: Uint8Array) => IFreezePermissionDecodedParams;
   withdrawAction: (data: Uint8Array) => IWithdrawParams;
-  updateMetadataRawAction: (data: Uint8Array) => string;
-  updateMetadataAction: (data: Uint8Array) => Promise<IMetadata>;
+  updateDaoMetadataRawAction: (data: Uint8Array) => string;
+  updateDaoMetadataAction: (data: Uint8Array) => Promise<DaoMetadata>;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
 
 export interface IClientEstimation {
-  create: (params: ICreateParams) => Promise<GasFeeEstimation>;
+  createDao: (params: CreateDaoParams) => Promise<GasFeeEstimation>;
   deposit: (params: IDepositParams) => Promise<GasFeeEstimation>;
   updateAllowance: (params: IDepositParams) => Promise<GasFeeEstimation>;
 }
@@ -84,14 +84,14 @@ export interface IClient {
 // DAO CREATION
 
 /** Holds the parameters that the DAO will be created with */
-export interface ICreateParams {
+export type CreateDaoParams = {
   metadataUri: string;
   ensSubdomain: string;
   trustedForwarder?: string;
   plugins: IPluginInstallItem[];
 }
 
-export interface IMetadata {
+export type DaoMetadata = {
   name: string;
   description: string;
   avatar?: string;
@@ -286,7 +286,7 @@ export type InstalledPluginListItem = {
 export type DaoDetails = {
   address: string;
   ensDomain: string;
-  metadata: IMetadata;
+  metadata: DaoMetadata;
   creationDate: Date;
   plugins: InstalledPluginListItem[];
 };

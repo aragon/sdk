@@ -22,6 +22,12 @@ TEMPLATE:
 - Fix `getProposals` ERC721 support on `tokenVotingClient`
 - Fix `VotingMode` not decoding
 ### Changed
+- renames `updateMetadataRawAction` to `updateDaoMetadataRawAction`
+- renames `updateMetadataAction` to `updateDaoMetadataAction`
+- Renames `getBalances` to `getDaoBalances`
+- Renames `getTransfers` to `getDaoTransfers`
+- Renames `ICreateParams` to `CreateDaoParams`
+- Renames `IMetadata` to `DaoMetadata`
 - Add `MultisigClient`
 - Changes `ClientAddressList` to `AddresslistVotingClient`
 - Changes all `addressList` to `AddresslistVoting`

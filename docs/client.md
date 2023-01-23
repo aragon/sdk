@@ -31,8 +31,8 @@
     * [.revokeAction(data)](#ClientDecoding+revokeAction) ⇒ <code>\*</code>
     * [.freezeAction(data)](#ClientDecoding+freezeAction) ⇒ <code>\*</code>
     * [.withdrawAction(data)](#ClientDecoding+withdrawAction) ⇒ <code>\*</code>
-    * [.updateMetadataRawAction(data)](#ClientDecoding+updateMetadataRawAction) ⇒ <code>\*</code>
-    * [.updateMetadataAction(data)](#ClientDecoding+updateMetadataAction) ⇒ <code>\*</code>
+    * [.updateDaoMetadataRawAction(data)](#ClientDecoding+updateDaoMetadataRawAction) ⇒ <code>\*</code>
+    * [.updateDaoMetadataAction(data)](#ClientDecoding+updateDaoMetadataAction) ⇒ <code>\*</code>
     * [.findInterface(data)](#ClientDecoding+findInterface) ⇒ <code>\*</code>
 
 <a name="ClientDecoding+grantAction"></a>
@@ -83,9 +83,9 @@
 | --- | --- |
 | data | <code>Uint8Array</code> | 
 
-<a name="ClientDecoding+updateMetadataRawAction"></a>
+<a name="ClientDecoding+updateDaoMetadataRawAction"></a>
 
-### clientDecoding.updateMetadataRawAction(data) ⇒ <code>\*</code>
+### clientDecoding.updateDaoMetadataRawAction(data) ⇒ <code>\*</code>
 <p>Decodes a dao metadata ipfs uri from an encoded update metadata action</p>
 
 **Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
@@ -95,13 +95,13 @@
 | --- | --- |
 | data | <code>Uint8Array</code> | 
 
-<a name="ClientDecoding+updateMetadataAction"></a>
+<a name="ClientDecoding+updateDaoMetadataAction"></a>
 
-### clientDecoding.updateMetadataAction(data) ⇒ <code>\*</code>
+### clientDecoding.updateDaoMetadataAction(data) ⇒ <code>\*</code>
 <p>Decodes a dao metadata from an encoded update metadata raw action</p>
 
 **Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
-**Returns**: <code>\*</code> - <p>{Promise<IMetadata>}</p>  
+**Returns**: <code>\*</code> - <p>{Promise<DaoMetadata>}</p>  
 
 | Param | Type |
 | --- | --- |
@@ -131,7 +131,7 @@
     * [.revokeAction(daoAddress, params)](#ClientEncoding+revokeAction) ⇒ <code>\*</code>
     * [.freezeAction(daoAddress, params)](#ClientEncoding+freezeAction) ⇒ <code>\*</code>
     * [.withdrawAction(daoAddressOrEns, params)](#ClientEncoding+withdrawAction) ⇒ <code>\*</code>
-    * [.updateMetadataAction(daoAddressOrEns, params)](#ClientEncoding+updateMetadataAction) ⇒ <code>\*</code>
+    * [.updateDaoMetadataAction(daoAddressOrEns, params)](#ClientEncoding+updateDaoMetadataAction) ⇒ <code>\*</code>
 
 <a name="ClientEncoding+grantAction"></a>
 
@@ -185,9 +185,9 @@
 | daoAddressOrEns | <code>string</code> | 
 | params | <code>IWithdrawParams</code> | 
 
-<a name="ClientEncoding+updateMetadataAction"></a>
+<a name="ClientEncoding+updateDaoMetadataAction"></a>
 
-### clientEncoding.updateMetadataAction(daoAddressOrEns, params) ⇒ <code>\*</code>
+### clientEncoding.updateDaoMetadataAction(daoAddressOrEns, params) ⇒ <code>\*</code>
 <p>Computes the payload to be given when creating a proposal that updates the metadata the DAO</p>
 
 **Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
@@ -196,7 +196,7 @@
 | Param | Type |
 | --- | --- |
 | daoAddressOrEns | <code>string</code> | 
-| params | <code>IMetadata</code> | 
+| params | <code>DaoMetadata</code> | 
 
 <a name="ClientEstimation"></a>
 
@@ -206,13 +206,13 @@
 **Kind**: global class  
 
 * [ClientEstimation](#ClientEstimation)
-    * [.create(_params)](#ClientEstimation+create) ⇒ <code>\*</code>
+    * [.createDao(_params)](#ClientEstimation+createDao) ⇒ <code>\*</code>
     * [.deposit(params)](#ClientEstimation+deposit) ⇒ <code>\*</code>
     * [.updateAllowance(_params)](#ClientEstimation+updateAllowance) ⇒ <code>\*</code>
 
-<a name="ClientEstimation+create"></a>
+<a name="ClientEstimation+createDao"></a>
 
-### clientEstimation.create(_params) ⇒ <code>\*</code>
+### clientEstimation.createDao(_params) ⇒ <code>\*</code>
 <p>Estimates the gas fee of creating a DAO</p>
 
 **Kind**: instance method of [<code>ClientEstimation</code>](#ClientEstimation)  
@@ -220,7 +220,7 @@
 
 | Param | Type |
 | --- | --- |
-| _params | <code>ICreateParams</code> | 
+| _params | <code>CreateDaoParams</code> | 
 
 <a name="ClientEstimation+deposit"></a>
 
@@ -255,19 +255,19 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 **Kind**: global class  
 
 * [ClientMethods](#ClientMethods)
-    * [.create(params)](#ClientMethods+create) ⇒ <code>\*</code>
+    * [.createDao(params)](#ClientMethods+createDao) ⇒ <code>\*</code>
     * [.pinMetadata(params)](#ClientMethods+pinMetadata) ⇒ <code>\*</code>
     * [.deposit(params)](#ClientMethods+deposit) ⇒ <code>\*</code>
     * [.ensureAllowance(params)](#ClientMethods+ensureAllowance) ⇒ <code>\*</code>
     * [.hasPermission(params)](#ClientMethods+hasPermission) ⇒ <code>\*</code>
     * [.getDao(daoAddressOrEns)](#ClientMethods+getDao) ⇒ <code>\*</code>
     * [.getDaos({)](#ClientMethods+getDaos) ⇒ <code>\*</code>
-    * [.getBalances(daoAddressorEns)](#ClientMethods+getBalances) ⇒ <code>\*</code>
-    * [.getTransfers({)](#ClientMethods+getTransfers) ⇒ <code>\*</code>
+    * [.getDaoBalances(daoAddressorEns)](#ClientMethods+getDaoBalances) ⇒ <code>\*</code>
+    * [.getDaoTransfers({)](#ClientMethods+getDaoTransfers) ⇒ <code>\*</code>
 
-<a name="ClientMethods+create"></a>
+<a name="ClientMethods+createDao"></a>
 
-### clientMethods.create(params) ⇒ <code>\*</code>
+### clientMethods.createDao(params) ⇒ <code>\*</code>
 <p>Creates a DAO with the given settings and plugins</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
@@ -275,7 +275,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 | Param | Type |
 | --- | --- |
-| params | <code>ICreateParams</code> | 
+| params | <code>CreateDaoParams</code> | 
 
 <a name="ClientMethods+pinMetadata"></a>
 
@@ -287,7 +287,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 | Param | Type |
 | --- | --- |
-| params | <code>IMetadata</code> | 
+| params | <code>DaoMetadata</code> | 
 
 <a name="ClientMethods+deposit"></a>
 
@@ -349,9 +349,9 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 | --- | --- | --- |
 | { | <code>IDaoQueryParams</code> | <p>limit = 10, skip = 0, direction = SortDirection.ASC, sortBy = DaoSortBy.CREATED_AT, }</p> |
 
-<a name="ClientMethods+getBalances"></a>
+<a name="ClientMethods+getDaoBalances"></a>
 
-### clientMethods.getBalances(daoAddressorEns) ⇒ <code>\*</code>
+### clientMethods.getDaoBalances(daoAddressorEns) ⇒ <code>\*</code>
 <p>Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
@@ -361,9 +361,9 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 | --- | --- |
 | daoAddressorEns | <code>string</code> | 
 
-<a name="ClientMethods+getTransfers"></a>
+<a name="ClientMethods+getDaoTransfers"></a>
 
-### clientMethods.getTransfers({) ⇒ <code>\*</code>
+### clientMethods.getDaoTransfers({) ⇒ <code>\*</code>
 <p>Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  

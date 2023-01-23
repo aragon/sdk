@@ -1,5 +1,5 @@
 import { DAO__factory } from "@aragon/core-contracts-ethers";
-import { IMetadata } from "../interfaces";
+import { DaoMetadata } from "../interfaces";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
   DAO__factory.createInterface().getFunction("withdraw").format("minimal"),
@@ -9,13 +9,13 @@ export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
   DAO__factory.createInterface().getFunction("freeze").format("minimal"),
 ];
 
-export const UNSUPPORTED_DAO_METADATA_LINK: IMetadata = {
+export const UNSUPPORTED_DAO_METADATA_LINK: DaoMetadata = {
   name: "(unsupported metadata link)",
   description: "(the metadata link is not supported)",
   links: [],
 };
 
-export const UNAVAILABLE_DAO_METADATA: IMetadata = {
+export const UNAVAILABLE_DAO_METADATA: DaoMetadata = {
   name: "(unavailable metadata)",
   description: "(the DAO metadata is not available)",
   links: [],

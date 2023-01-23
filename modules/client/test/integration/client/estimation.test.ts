@@ -5,7 +5,14 @@ declare const describe, it, expect, beforeAll, afterAll;
 import "../../mocks/aragon-sdk-ipfs";
 
 import { Random } from "@aragon/sdk-common";
-import { Client, AddresslistVotingClient, Context, IAddresslistVotingPluginInstall, ICreateParams, IDepositParams } from "../../../src";
+import {
+  Client,
+  AddresslistVotingClient,
+  Context,
+  CreateDaoParams,
+  IAddresslistVotingPluginInstall,
+  IDepositParams,
+} from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
@@ -51,7 +58,7 @@ describe("Client", () => {
         .getPluginInstallItem(pluginParams);
       addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
 
-      const daoCreationParams: ICreateParams = {
+      const daoCreationParams: CreateDaoParams = {
         metadataUri: `ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK`,
         ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
         plugins: [
@@ -59,7 +66,7 @@ describe("Client", () => {
         ],
       };
 
-      const gasFeesEstimation = await client.estimation.create(
+      const gasFeesEstimation = await client.estimation.createDao(
         daoCreationParams,
       );
 

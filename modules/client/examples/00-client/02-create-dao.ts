@@ -6,15 +6,15 @@ import {
   Client,
   Context,
   DaoCreationSteps,
+  DaoMetadata,
   GasFeeEstimation,
-  ICreateParams,
+  CreateDaoParams
 } from "@aragon/sdk-client";
-import { IMetadata } from "../../src";
 import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
-const metadata: IMetadata = {
+const metadata: DaoMetadata = {
   name: "My DAO",
   description: "This is a description",
   avatar: "",
@@ -24,20 +24,20 @@ const metadata: IMetadata = {
   }],
 };
 const ipfsUri = await client.methods.pinMetadata(metadata);
-const createParams: ICreateParams = {
+const createParams: CreateDaoParams = {
   metadataUri: ipfsUri,
   ensSubdomain: "my-org", // my-org.dao.eth,
   plugins: [],
 };
 
 // gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.create(
+const estimatedGas: GasFeeEstimation = await client.estimation.createDao(
   createParams,
 );
 console.log(estimatedGas.average);
 console.log(estimatedGas.max);
 
-const steps = client.methods.create(createParams);
+const steps = client.methods.createDao(createParams);
 for await (const step of steps) {
   try {
     switch (step.key) {

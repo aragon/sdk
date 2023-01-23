@@ -17,7 +17,7 @@ import { erc20ContractAbi } from "../abi/erc20";
 import { ClientCore, Context, GasFeeEstimation } from "../../client-common";
 import {
   IClientEstimation,
-  ICreateParams,
+  CreateDaoParams,
   IDepositParams,
 } from "../../interfaces";
 import { unwrapDepositParams } from "../utils";
@@ -36,11 +36,11 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
   /**
    * Estimates the gas fee of creating a DAO
    *
-   * @param {ICreateParams} _params
+   * @param {CreateDaoParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
-  public async create(params: ICreateParams): Promise<GasFeeEstimation> {
+  public async createDao(params: CreateDaoParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new NoSignerError();

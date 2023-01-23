@@ -8,10 +8,10 @@ import {
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
-  ICreateParams,
-  IMetadata,
+  CreateDaoParams,
+  DaoMetadata,
   VotingMode,
-  VotingSettings,
+  IAddressListPluginInstall,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -20,7 +20,7 @@ const client: Client = new Client(context);
 
 // Define the plugins to install and their params
 
-const pluginInitParams: VotingSettings = {
+const pluginInitParams: IAddressListPluginInstall = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
@@ -39,7 +39,7 @@ const pluginInitParams: VotingSettings = {
 const addresslistVotingInstallPluginItem = AddresslistVotingClient.encoding
   .getPluginInstallItem(pluginInitParams);
 
-const daoMetadata: IMetadata = {
+const daoMetadata: DaoMetadata = {
   name: "My DAO",
   description: "This is a description",
   avatar: "",
@@ -51,20 +51,20 @@ const daoMetadata: IMetadata = {
 
 const metadataUri = await client.methods.pinMetadata(daoMetadata);
 
-const createParams: ICreateParams = {
+const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: [addresslistVotingInstallPluginItem],
 };
 
 // gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.create(
+const estimatedGas: GasFeeEstimation = await client.estimation.createDao(
   createParams,
 );
 console.log(estimatedGas.average);
 console.log(estimatedGas.max);
 
-const steps = client.methods.create(createParams);
+const steps = client.methods.createDao(createParams);
 for await (const step of steps) {
   try {
     switch (step.key) {

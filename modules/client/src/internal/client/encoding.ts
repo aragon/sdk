@@ -172,11 +172,11 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * Computes the payload to be given when creating a proposal that updates the metadata the DAO
    *
    * @param {string} daoAddressOrEns
-   * @param {IMetadata} params
+   * @param {DaoMetadata} params
    * @return {*}  {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
-  public async updateMetadataAction(
+  public async updateDaoMetadataAction(
     daoAddressOrEns: string,
     metadataUri: string,
   ): Promise<DaoAction> {

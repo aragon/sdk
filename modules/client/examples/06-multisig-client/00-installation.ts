@@ -7,7 +7,7 @@ import {
   Context,
   DaoCreationSteps,
   GasFeeEstimation,
-  ICreateParams,
+  CreateDaoParams,
   MultisigPluginInstallParams,
 } from "@aragon/sdk-client";
 import { MultisigClient } from "../../src";
@@ -46,7 +46,7 @@ const metadataUri = await client.methods.pinMetadata({
   }],
 });
 
-const createParams: ICreateParams = {
+const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: [multisigInstallPluginItem],
