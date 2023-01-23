@@ -157,7 +157,7 @@ describe("Client Address List", () => {
     it("Should replace a vote on a proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new ClientAddressList(ctxPlugin);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
         pluginAddress,
