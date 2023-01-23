@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 
-export const QueryAddressListVotingPluginSettings = gql`
-query AddressListVotingPluginSettings($address: ID!) {
+export const QueryAddresslistVotingSettings = gql`
+query AddresslistVotingSettings($address: ID!) {
   addresslistVotingPlugin(id: $address){
     minDuration
     minProposerVotingPower

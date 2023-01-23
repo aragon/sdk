@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 
-export const QueryAddressListVotingProposal = gql`
-query AddressListVotingProposal($proposalId: ID!) {
+export const QueryAddresslistVotingProposal = gql`
+query AddresslistVotingProposal($proposalId: ID!) {
   addresslistVotingProposal(id: $proposalId){
     id
     dao {
@@ -39,8 +39,8 @@ query AddressListVotingProposal($proposalId: ID!) {
   }
 }
 `;
-export const QueryAddressListVotingProposals = gql`
-query AddressListVotingProposals($where: AddresslistVotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: AddresslistVotingProposal_orderBy!) {
+export const QueryAddresslistVotingProposals = gql`
+query AddresslistVotingProposals($where: AddresslistVotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: AddresslistVotingProposal_orderBy!) {
   addresslistVotingProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     dao {

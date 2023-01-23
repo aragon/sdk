@@ -46,11 +46,11 @@ import {
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
 import { Multisig__factory } from "@aragon/core-contracts-ethers";
-import { QueryMultisigSettings } from "../graphql-queries/settings";
 import {
   QueryMultisigProposal,
   QueryMultisigProposals,
-} from "../graphql-queries/proposal";
+  QueryMultisigVotingSettings,
+} from "../graphql-queries";
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 
@@ -299,7 +299,7 @@ export class MultisigClientMethods extends ClientCore
       const client = this.graphql.getClient();
       const { multisigPlugin }: {
         multisigPlugin: SubgraphMultisigPluginSettings;
-      } = await client.request(QueryMultisigSettings, {
+      } = await client.request(QueryMultisigVotingSettings, {
         address,
       });
       return {

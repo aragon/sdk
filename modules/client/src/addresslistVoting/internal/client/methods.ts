@@ -22,7 +22,6 @@ import {
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
-  parseEtherRatio,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -31,6 +30,7 @@ import {
   IExecuteProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
+  parseEtherRatio,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
@@ -42,18 +42,21 @@ import {
   VotingSettings,
 } from "../../../client-common";
 import {
-  QueryAddressListVotingProposal,
-  QueryAddressListVotingProposals,
-} from "../graphql-queries/proposal";
-import { toAddresslistVotingProposal, toAddresslistVotingProposalListItem } from "../utils";
-import { QueryAddressListVotingPluginSettings } from "../graphql-queries/settings";
+  QueryAddresslistVotingMembers,
+  QueryAddresslistVotingProposal,
+  QueryAddresslistVotingProposals,
+  QueryAddresslistVotingSettings,
+} from "../graphql-queries";
+import {
+  toAddresslistVotingProposal,
+  toAddresslistVotingProposalListItem,
+} from "../utils";
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { QueryAddressListVotingMembers } from "../graphql-queries/members";
 
 /**
  * Methods module the SDK Address List Client
@@ -259,7 +262,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
-      const response = await client.request(QueryAddressListVotingMembers, {
+      const response = await client.request(QueryAddresslistVotingMembers, {
         address: pluginAddress,
       });
       return response.addresslistVotingPlugin.members.map((
@@ -289,7 +292,7 @@ export class AddresslistVotingClientMethods extends ClientCore
         addresslistVotingProposal,
       }: {
         addresslistVotingProposal: SubgraphAddresslistVotingProposal;
-      } = await client.request(QueryAddressListVotingProposal, {
+      } = await client.request(QueryAddresslistVotingProposal, {
         proposalId,
       });
       if (!addresslistVotingProposal) {
@@ -367,7 +370,7 @@ export class AddresslistVotingClientMethods extends ClientCore
         addresslistVotingProposals,
       }: {
         addresslistVotingProposals: SubgraphAddresslistVotingProposalListItem[];
-      } = await client.request(QueryAddressListVotingProposals, {
+      } = await client.request(QueryAddresslistVotingProposals, {
         where,
         limit,
         skip,
@@ -425,7 +428,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       const { addresslistVotingPlugin }: {
         addresslistVotingPlugin: SubgraphVotingSettings;
       } = await client.request(
-        QueryAddressListVotingPluginSettings,
+        QueryAddresslistVotingSettings,
         {
           address: pluginAddress,
         },

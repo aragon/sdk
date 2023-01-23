@@ -50,7 +50,7 @@ import {
 import {
   QueryTokenVotingMembers,
   QueryTokenVotingPlugin,
-  QueryTokenVotingPluginSettings,
+  QueryTokenVotingSettings,
   QueryTokenVotingProposal,
   QueryTokenVotingProposals,
 } from "../graphql-queries";
@@ -422,7 +422,7 @@ export class TokenVotingClientMethods extends ClientCore
       const { tokenVotingPlugin }: {
         tokenVotingPlugin: SubgraphVotingSettings;
       } = await client.request(
-        QueryTokenVotingPluginSettings,
+        QueryTokenVotingSettings,
         {
           address: pluginAddress,
         },
