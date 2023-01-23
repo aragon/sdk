@@ -14,6 +14,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+- Add `pinMetadata` examples
 ### Fixed
 - Fix `getVotingSettings` respoinse in tokenVoting and addresslistVoting clients
 - Fix `updateMetadata` decoders
