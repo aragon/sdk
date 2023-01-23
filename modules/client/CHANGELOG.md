@@ -14,6 +14,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+- `pinMetadata` examples
 ### Fixed
 - Fix `updateMetadata` decoders
 - Fix `getProposals` ERC721 support on `tokenVotingClient`
