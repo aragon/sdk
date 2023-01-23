@@ -15,6 +15,7 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Fixed
+- Fix `getVotingSettings` respoinse in tokenVoting and addresslistVoting clients
 - Fix `updateMetadata` decoders
 - Fix `getProposals` ERC721 support on `tokenVotingClient`
 - Fix `VotingMode` not decoding
