@@ -8,8 +8,8 @@ import {
   DaoCreationSteps,
   DaoMetadata,
   GasFeeEstimation,
+  CreateDaoParams
 } from "@aragon/sdk-client";
-import { CreateDaoParams } from "../../src/interfaces";
 import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
