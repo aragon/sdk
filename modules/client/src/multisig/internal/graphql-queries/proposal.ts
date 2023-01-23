@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 
 export const QueryMultisigProposal = gql`
-query multisigProposal($proposalId: ID!) {
+query MultisigProposal($proposalId: ID!) {
   multisigProposal(id: $proposalId){
     id
     dao {
@@ -26,7 +26,7 @@ query multisigProposal($proposalId: ID!) {
 }
 `;
 export const QueryMultisigProposals = gql`
-query multisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: MultisigProposal_orderBy!) {
+query MultisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: MultisigProposal_orderBy!) {
   multisigProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     dao {

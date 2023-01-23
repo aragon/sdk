@@ -25,10 +25,10 @@ import {
 } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
-  QueryBalances,
+  QueryDaoBalances,
   QueryDao,
   QueryDaos,
-  QueryTransfers,
+  QueryDaoTransfers,
 } from "../graphql-queries";
 import {
   AssetBalance,
@@ -501,7 +501,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       const client = this.graphql.getClient();
       const {
         balances,
-      }: { balances: SubgraphBalance[] } = await client.request(QueryBalances, {
+      }: { balances: SubgraphBalance[] } = await client.request(QueryDaoBalances, {
         address,
       });
       if (balances.length === 0) {
@@ -566,7 +566,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       const {
         vaultTransfers,
       }: { vaultTransfers: SubgraphTransferListItem[] } = await client.request(
-        QueryTransfers,
+        QueryDaoTransfers,
         {
           where,
           limit,
