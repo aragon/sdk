@@ -344,7 +344,8 @@ export async function createAddresslistDAO(
         pluginSetupRepo: deployment.addresslistVotingRepo.address,
         data: defaultAbiCoder.encode(
           ["tuple(uint8, uint64, uint64, uint64, uint256)", "address[]"],
-          [[0, 1, 1, 3600, 1], addresses],
+          // Allow vote replacement
+          [[2, 1, 1, 3600, 1], addresses],
         ),
       },
     ],
@@ -374,7 +375,8 @@ export async function createTokenVotingDAO(
             "tuple(address[], uint256[])",
           ],
           [
-            [0, 1, 1, 3600, 1],
+            // allow vote replacement
+            [2, 1, 1, 3600, 1],
             [AddressZero, "erc20", "e20"],
             [addresses, addresses.map(() => parseEther("1"))],
           ],
