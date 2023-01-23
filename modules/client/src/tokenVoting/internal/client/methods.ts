@@ -433,10 +433,10 @@ export class TokenVotingClientMethods extends ClientCore
       return {
         minDuration: parseInt(tokenVotingPlugin.minDuration),
         supportThreshold: parseEtherRatio(
-          tokenVotingPlugin.minParticipation,
+          tokenVotingPlugin.supportThreshold,
         ),
         minParticipation: parseEtherRatio(
-          tokenVotingPlugin.supportThreshold,
+          tokenVotingPlugin.minParticipation,
         ),
         minProposerVotingPower: BigInt(
           tokenVotingPlugin.minProposerVotingPower,
