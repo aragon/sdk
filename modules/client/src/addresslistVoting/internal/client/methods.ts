@@ -57,7 +57,6 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import {} from "../graphql-queries/members";
 
 /**
  * Methods module the SDK Address List Client
