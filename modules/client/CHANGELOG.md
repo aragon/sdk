@@ -14,6 +14,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## [0.18.0-alpha]
 ### Added
 - Add `pinMetadata` examples
 ### Fixed
