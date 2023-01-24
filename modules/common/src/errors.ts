@@ -84,6 +84,11 @@ export class ProposalCreationError extends Error {
     super("Failed to create proposal");
   }
 }
+export class ProposalExecutionError extends Error {
+  constructor() {
+    super("Failed to execute proposal");
+  }
+}
 
 export class MissingExecPermissionError extends Error {
   constructor() {
@@ -93,6 +98,11 @@ export class MissingExecPermissionError extends Error {
 export class IpfsFetchError extends Error {
   constructor() {
     super("Failed to fetch data from IPFS");
+  }
+}
+export class InvalidProposalStatus extends Error {
+  constructor() {
+    super("Invalid proposal status");
   }
 }
 export class InvalidVotingModeError extends Error {

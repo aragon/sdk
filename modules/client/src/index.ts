@@ -3,6 +3,7 @@ export * from "./addresslistVoting";
 export * from "./tokenVoting";
 export * from "./client-common";
 export * from "./multisig";
+export * from "./admin";
 export {
   AssetBalance,
   DaoCreationSteps,

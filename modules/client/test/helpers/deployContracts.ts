@@ -23,6 +23,8 @@ export interface Deployment {
   addresslistVotingPluginSetup: aragonContracts.AddresslistVotingSetup;
   multisigRepo: aragonContracts.PluginRepo;
   multisigPluginSetup: aragonContracts.AddresslistVotingSetup;
+  adminRepo: aragonContracts.PluginRepo;
+  adminPluginSetup: aragonContracts.AdminSetup;
 }
 
 export async function deploy(): Promise<Deployment> {
@@ -137,6 +139,7 @@ export async function deploy(): Promise<Deployment> {
 
     const pluginRepo_Factory = new aragonContracts.PluginRepo__factory();
 
+    // token
     const tokenVotingSetupFactory = new aragonContracts
       .TokenVotingSetup__factory();
     const tokenVotingPluginSetup = await tokenVotingSetupFactory
@@ -169,9 +172,8 @@ export async function deploy(): Promise<Deployment> {
       .connect(deployOwnerWallet)
       .attach(addresslistVotingRepoAddr);
 
+    // multisig
     const multisigFactory = new aragonContracts
-      // @ts-ignore
-      // TODO update contracts-ethers
       .MultisigSetup__factory();
     const multisigPluginSetup = await multisigFactory
       .connect(deployOwnerWallet)
@@ -186,6 +188,22 @@ export async function deploy(): Promise<Deployment> {
     const multisigRepo = pluginRepo_Factory
       .connect(deployOwnerWallet)
       .attach(multisigRepoAddr);
+    
+    // ADMIN
+    const adminSetupFactory = new aragonContracts.AdminSetup__factory();
+    const adminPluginSetup = await adminSetupFactory
+      .connect(deployOwnerWallet)
+      .deploy();
+    const adminRepoAddr = await deployPlugin(
+      pluginRepoFactory,
+      adminPluginSetup.address,
+      "Admin",
+      [1, 0, 0],
+      deployOwnerWallet,
+    );
+    const adminRepo = pluginRepo_Factory
+      .connect(deployOwnerWallet)
+      .attach(adminRepoAddr);
 
     // send ETH to hardcoded wallet in tests
     await deployOwnerWallet.sendTransaction({
@@ -203,6 +221,8 @@ export async function deploy(): Promise<Deployment> {
       addresslistVotingPluginSetup,
       multisigRepo,
       multisigPluginSetup,
+      adminRepo,
+      adminPluginSetup,
     };
   } catch (e) {
     throw e;
@@ -418,3 +438,34 @@ export async function createMultisigDAO(
     ],
   );
 }
+
+export async function createAdminDAO(
+  deployment: Deployment,
+  name: string,
+  admin: string,
+) {
+  return createDAO(
+    deployment.daoFactory,
+    {
+      metadata: "0x0000",
+      name,
+      trustedForwarder: AddressZero,
+    },
+    [
+      {
+        pluginSetup: deployment.adminPluginSetup.address,
+        pluginSetupRepo: deployment.adminRepo.address,
+        data: defaultAbiCoder.encode(
+          [
+            "address",
+          ],
+          [
+            admin,
+          ],
+        ),
+      },
+    ],
+  );
+}
+
+
