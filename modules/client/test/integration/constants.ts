@@ -39,7 +39,7 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://subgraph.satsuma-prod.com/aragon/core-goerli/version/v0.6.3-alpha/api",
+        "https://subgraph.satsuma-prod.com/aragon/core-goerli/api",
     },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],
