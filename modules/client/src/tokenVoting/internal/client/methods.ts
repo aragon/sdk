@@ -23,12 +23,8 @@ import {
   ICanVoteParams,
   ICreateProposalParams,
   IExecuteProposalParams,
-  //678723d (rename IpluginSettings to IVotingSettings):modules/client/src/erc20/internal/client/methods.ts
   IProposalQueryParams,
   IVoteProposalParams,
-  // HEAD:modules/client/src/tokenVoting/internal/client/methods.ts
-  //
-  IVotingSettings,
   parseEtherRatio,
   ProposalCreationSteps,
   ProposalCreationStepValue,

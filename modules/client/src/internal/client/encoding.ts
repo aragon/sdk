@@ -5,8 +5,7 @@ import {
   IRevokePermissionParams,
   IWithdrawParams,
 } from "../../interfaces";
-import { ClientCore, Context, DaoAction } from "../../client-common";
-import { isAddress } from "@ethersproject/address";
+import { ClientCore, Context, DaoAction, ipfsUriSchema } from "../../client-common";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
@@ -20,6 +19,7 @@ import {
   withdrawParamsSchema,
 } from "../../schemas";
 import { addressOrEnsSchema } from "../../client-common";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Encoding module the SDK Generic Client
@@ -163,27 +163,19 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * @return {*}  {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
-  public async updateDaoMetadataAction(
+  public updateDaoMetadataAction(
     daoAddressOrEns: string,
     metadataUri: string,
-  ): Promise<DaoAction> {
-    let address = daoAddressOrEns;
-    if (!isAddress(daoAddressOrEns)) {
-      const resolvedAddress = await this.web3.getSigner()?.resolveName(
-        daoAddressOrEns,
-      );
-      if (!resolvedAddress) {
-        throw new Error("invalid ens");
-      }
-      address = resolvedAddress;
-    }
+  ): DaoAction {
+    addressOrEnsSchema.strict().validateSync(daoAddressOrEns);
+    ipfsUriSchema.strict().validateSync(metadataUri)
     // upload metadata to IPFS
     const daoInterface = DAO__factory.createInterface();
-    const args = new TextEncoder().encode(metadataUri);
+    const args = toUtf8Bytes(metadataUri)
     const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
     const data = hexToBytes(strip0x(hexBytes));
     return {
-      to: address,
+      to: daoAddressOrEns,
       value: BigInt(0),
       data,
     };

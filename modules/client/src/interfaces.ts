@@ -51,11 +51,11 @@ export interface IClientEncoding extends IClientCore {
   withdrawAction: (
     daoAddresOrEns: string,
     params: IWithdrawParams,
-  ) => Promise<DaoAction>;
+  ) => DaoAction;
   updateDaoMetadataAction: (
     daoAddressOrEns: string,
     metadataUri: string,
-  ) => Promise<DaoAction>;
+  ) => DaoAction;
 }
 
 export interface IClientDecoding {
