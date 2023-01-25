@@ -1,9 +1,7 @@
 import {
   hexToBytes,
-  InvalidAddressError,
   strip0x,
 } from "@aragon/sdk-common";
-import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
   ContextPlugin,

@@ -10,6 +10,7 @@ import {
   VotingSettings,
   votingSettingsToContract,
   votingSettingsSchema,
+  membersSchema,
 } from "../../../client-common";
 import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
@@ -19,7 +20,7 @@ import {
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { addresslistVotingPluginInstallSchema, membersSchema } from "../../schemas";
+import { addresslistVotingPluginInstallSchema } from "../../schemas";
 
 /**
  * Encoding module for the SDK AddressList Client

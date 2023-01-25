@@ -13,7 +13,6 @@ import {
 import { ITokenVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
-import { ApproveMultisigProposalSchema } from "../../../multisig/internal/schemas";
 /**
  * Estimation module the SDK TokenVoting Client
  */

@@ -1,6 +1,5 @@
 import { Multisig__factory } from "@aragon/core-contracts-ethers";
 import {
-  InvalidAddressError,
   NoProviderError,
   NoSignerError,
 } from "@aragon/sdk-common";
@@ -17,7 +16,6 @@ import {
   IMultisigClientEstimation,
 } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { isAddress } from "@ethersproject/address";
 import { approveMultisigProposalSchema, createMultisigProposalSchema } from "../schemas";
 /**
  * Estimation module the SDK Address List Client

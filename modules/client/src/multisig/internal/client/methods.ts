@@ -3,7 +3,6 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
-  InvalidProposalIdError,
   IpfsPinError,
   NoProviderError,
   NoSignerError,

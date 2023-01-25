@@ -1,4 +1,4 @@
-import { array, boolean, number, object, string } from "yup";
+import { array, boolean, number, object } from "yup";
 import {
   addressOrEnsSchema,
   bigintSchema,
