@@ -255,7 +255,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     );
     return addresslistContract.callStatic.canVote(
       params.proposalId,
-      params.addressOrEns,
+      params.address,
     );
   }
   /**

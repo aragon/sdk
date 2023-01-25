@@ -154,12 +154,12 @@ export function toTokenVotingProposalListItem(
 export function mintTokenParamsToContract(
   params: IMintTokenParams,
 ): ContractMintTokenParams {
-  return [params.address, BigNumber.from(params.amount)];
+  return [params.addressOrEns, BigNumber.from(params.amount)];
 }
 
 export function mintTokenParamsFromContract(result: Result): IMintTokenParams {
   return {
-    address: result[0],
+    addressOrEns: result[0],
     amount: BigInt(result[1]),
   };
 }

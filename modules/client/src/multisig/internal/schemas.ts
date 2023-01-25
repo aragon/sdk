@@ -1,7 +1,7 @@
-import { array, boolean, number, object } from "yup";
+import { array, boolean, number, object, mixed } from "yup";
 import {
   addressOrEnsSchema,
-  bigintSchema,
+  addressSchema,
   daoActionSchema,
   ipfsUriSchema,
   membersSchema,
@@ -12,28 +12,28 @@ export const multisigVotingSettings = object({
   onlyListed: boolean().required(),
 });
 
-export const tokenVotingInstallSchema = object({
-  minApprovals: membersSchema.required(),
+export const multisigInstallSchema = object({
+  members: membersSchema.required(),
   votingSettings: multisigVotingSettings.required(),
 });
 
 export const updateAddressesSchema = object({
-  pluginAddress: addressOrEnsSchema.required(),
+  pluginAddress: addressSchema.required(),
   members: membersSchema.required(),
 });
 
 export const updateMultisigVotingSettingsSchema = object({
-  pluginAddress: addressOrEnsSchema.required(),
+  pluginAddress: addressSchema.required(),
   votingSettings: multisigVotingSettings.required(),
 });
 
 export const approveMultisigProposalSchema = object({
   tryExecution: boolean().required(),
-  proposalId: bigintSchema.required(),
-  pluginAddress: addressOrEnsSchema.required(),
+  proposalId: mixed().required(),
+  pluginAddress: addressSchema.required(),
 });
 export const createMultisigProposalSchema = object({
-  pluginAddress: addressOrEnsSchema.required(),
+  pluginAddress: addressSchema.required(),
   metadataUri: ipfsUriSchema.required(),
   actions: array(daoActionSchema).default([]),
   tryExecution: boolean(),
@@ -41,11 +41,11 @@ export const createMultisigProposalSchema = object({
 });
 
 export const canApproveSchema = object({
-    pluginAddress: addressOrEnsSchema.required(),
-    proposalId: bigintSchema.required(),
+    pluginAddress: addressSchema.required(),
+    proposalId: mixed().required(),
     addressOrEns: addressOrEnsSchema.required(),
   });
   export const canExecuteSchema = object({
-    pluginAddress: addressOrEnsSchema.required(),
-    proposalId: bigintSchema.required(),
+    pluginAddress: addressSchema.required(),
+    proposalId: mixed().required(),
   });

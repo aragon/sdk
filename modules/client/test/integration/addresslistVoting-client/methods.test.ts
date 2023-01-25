@@ -190,7 +190,7 @@ describe("Client Address List", () => {
 
       const executeParams: IExecuteProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
-        proposalId: BigInt(0),
+        proposalId: "0x1234567890123456789012345678901234567890",
       };
       for await (const step of client.methods.executeProposal(executeParams)) {
         switch (step.key) {
@@ -217,8 +217,8 @@ describe("Client Address List", () => {
       const client = new AddresslistVotingClient(ctxPlugin);
 
       const params: ICanVoteParams = {
-        addressOrEns: "0x1234567890123456789012345678901234567890",
-        proposalId: BigInt(0),
+        address: "0x1234567890123456789012345678901234567890",
+        proposalId: "0x1234567890123456789012345678901234567890",
         pluginAddress,
       };
       const canVote = await client.methods.canVote(params);
@@ -329,7 +329,7 @@ describe("Client Address List", () => {
         for (let i = 0; i < proposal.votes.length; i++) {
           const vote = proposal.votes[i];
           expect(typeof vote.address).toBe("string");
-          expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
+          expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
           expect(typeof vote.vote).toBe("number");
         }
       }

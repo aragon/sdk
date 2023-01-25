@@ -1,6 +1,5 @@
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
-  addressOrEnsSchema,
   ClientCore,
   ContextPlugin,
   ContractVotingSettings,
@@ -11,6 +10,7 @@ import {
   votingSettingsToContract,
   votingSettingsSchema,
   membersSchema,
+  addressSchema,
 } from "../../../client-common";
 import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
@@ -20,7 +20,7 @@ import {
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { addresslistVotingPluginInstallSchema } from "../../schemas";
+import { addresslistVotingInstallSchema } from "../../schemas";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -44,7 +44,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
   ): IPluginInstallItem {
-    addresslistVotingPluginInstallSchema.validateSync(params);
+    addresslistVotingInstallSchema.validateSync(params);
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], "members"]
       [
@@ -76,7 +76,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     pluginAddress: string,
     params: VotingSettings,
   ): DaoAction {
-    addressOrEnsSchema.validateSync(pluginAddress);
+    addressSchema.validateSync(pluginAddress);
     votingSettingsSchema.validateSync(params);
     return {
       to: pluginAddress,
@@ -93,7 +93,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    * @memberof AddresslistVotingClientEncoding
    */
   public addMembersAction(pluginAddress: string, members: string[]): DaoAction {
-    addressOrEnsSchema.validateSync(pluginAddress);
+    addressSchema.validateSync(pluginAddress);
     membersSchema.validateSync(members);
     const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
@@ -120,7 +120,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     pluginAddress: string,
     members: string[],
   ): DaoAction {
-    addressOrEnsSchema.validateSync(pluginAddress);
+    addressSchema.validateSync(pluginAddress);
     membersSchema.validateSync(members);
     const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes

@@ -2,10 +2,11 @@ import {
   InvalidProposalIdError,
   InvalidVoteValueError,
 } from "@aragon/sdk-common";
-import { array, boolean, number, object, string } from "yup";
+import { array, boolean, number, object, string, mixed } from "yup";
 import { isProposalId } from "../utils";
 import {
   addressOrEnsSchema,
+  addressSchema,
   bigintSchema,
   daoActionSchema,
   dateSchema,
@@ -47,7 +48,7 @@ export const proposalMetadataSchema = object({
 });
 
 export const createProposalParamsSchema = object({
-  pluginAddress: addressOrEnsSchema.required(),
+  pluginAddress: addressSchema.required(),
   metadataUri: ipfsUriSchema.required(),
   actions: array(daoActionSchema).default([]),
   startDate: dateSchema,
@@ -57,20 +58,20 @@ export const createProposalParamsSchema = object({
 });
 
 export const voteProposalParamsSchema = object({
-  pluginAddress: addressOrEnsSchema.required(),
+  pluginAddress: addressSchema.required(),
   vote: voteValuesSchema.required(),
-  proposalId: bigintSchema.required(),
+  proposalId: mixed().required(),
 });
 
 export const executeProposalParamsSchema = object({
-  pluginAddress: addressOrEnsSchema.required(),
-  proposalId: bigintSchema.required(),
+  pluginAddress: addressSchema.required(),
+  proposalId: mixed().required(),
 });
 
 export const canVoteParamsSchema = object({
-  pluginAddress: addressOrEnsSchema.required(),
-  proposalId: bigintSchema.required(),
-  addressOrEns: addressOrEnsSchema.required(),
+  pluginAddress: addressSchema.required(),
+  proposalId:   mixed().required(),
+  address: addressOrEnsSchema.required(),
 });
 
 export const votingSettingsSchema = object({

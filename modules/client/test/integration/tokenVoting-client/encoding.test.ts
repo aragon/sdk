@@ -11,7 +11,7 @@ import {
 } from "../../../src";
 
 import { AddressZero } from "@ethersproject/constants";
-import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
+import { InvalidAddressError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 
 describe("Token Voting Client", () => {
@@ -48,7 +48,7 @@ describe("Token Voting Client", () => {
       const pluginAddress = "0xinvalid_address";
       expect(() =>
         client.encoding.updatePluginSettingsAction(pluginAddress, params)
-      ).toThrow(new InvalidAddressOrEnsError().message);
+      ).toThrow(new InvalidAddressError());
     });
     it("Should encode an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -96,7 +96,7 @@ describe("Token Voting Client", () => {
 
       const minterAddress = "0xinvalid_address";
       expect(() => client.encoding.mintTokenAction(minterAddress, params))
-        .toThrow(new InvalidAddressOrEnsError());
+        .toThrow(new InvalidAddressError());
     });
     it("Should encode a TokenVoting token mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);

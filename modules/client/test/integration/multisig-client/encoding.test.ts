@@ -9,7 +9,7 @@ import {
   MultisigPluginInstallParams,
   RemoveAddressesParams,
 } from "../../../src";
-import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
+import { bytesToHex, InvalidAddressError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import { contextParamsLocalChain, TEST_INVALID_ADDRESS } from "../constants";
 
 describe("Client Multisig", () => {
@@ -81,7 +81,7 @@ describe("Client Multisig", () => {
         client.encoding.addAddressesAction(
           addAddressesParams,
         )
-      ).toThrow(new InvalidAddressError());
+      ).toThrow(new InvalidAddressOrEnsError());
     });
     it("Should create a Multisig client and an add members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -153,7 +153,7 @@ describe("Client Multisig", () => {
         pluginAddress,
       };
       expect(() => client.encoding.removeAddressesAction(removeAddressesParams))
-        .toThrow(new InvalidAddressError());
+        .toThrow(new InvalidAddressOrEnsError());
     });
     it("Should create a Multisig client and a remove members action", async () => {
       const ctx = new Context(contextParamsLocalChain);

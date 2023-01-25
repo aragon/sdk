@@ -14,7 +14,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new TokenVotingClient(contextPlugin);
 
 const params: IMintTokenParams = {
-  addressOrEns : "0x1234567890123456789012345678901234567890",
+  address: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10),
 };
 

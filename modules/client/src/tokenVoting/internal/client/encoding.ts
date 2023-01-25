@@ -1,6 +1,6 @@
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
-  addressOrEnsSchema,
+  addressSchema,
   ClientCore,
   ContextPlugin,
   DaoAction,
@@ -74,7 +74,7 @@ export class TokenVotingClientEncoding extends ClientCore
     pluginAddress: string,
     params: VotingSettings,
   ): DaoAction {
-    addressOrEnsSchema.validateSync(pluginAddress);
+    addressSchema.validateSync(pluginAddress);
     votingSettingsSchema.validateSync(params);
     // TODO: check if to and value are correct
     return {
@@ -96,7 +96,7 @@ export class TokenVotingClientEncoding extends ClientCore
     minterAddress: string,
     params: IMintTokenParams,
   ): DaoAction {
-    addressOrEnsSchema.validateSync(minterAddress);
+    addressSchema.validateSync(minterAddress);
     mintTokenSchema.validateSync(params);
     const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();

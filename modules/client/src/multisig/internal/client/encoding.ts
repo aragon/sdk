@@ -20,7 +20,7 @@ import { Multisig__factory } from "@aragon/core-contracts-ethers";
 import { MULTISIG_PLUGIN_ID } from "../constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { tokenVotingInstallSchema, updateAddressesSchema, updateMultisigVotingSettingsSchema } from "../schemas";
+import { multisigInstallSchema, updateAddressesSchema, updateMultisigVotingSettingsSchema } from "../schemas";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -42,7 +42,7 @@ export class MultisigClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
   ): IPluginInstallItem {
-    tokenVotingInstallSchema.validateSync(params)
+    multisigInstallSchema.validateSync(params)
     const hexBytes = defaultAbiCoder.encode(
       // members, [onlyListed, minApprovals]
       [

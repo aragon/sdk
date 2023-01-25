@@ -27,7 +27,6 @@ import {
   SubgraphMultisigVotingSettings,
 } from "../../interfaces";
 import {
-  addressOrEnsSchema,
   addressSchema,
   CanExecuteParams,
   ClientCore,
@@ -311,16 +310,16 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async getMembers(
-    addressOrEns: string,
+    address: string,
   ): Promise<string[]> {
-    addressOrEnsSchema.validateSync(addressOrEns)
+    addressSchema.validateSync(address)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { multisigPlugin }: {
         multisigPlugin: SubgraphMultisigMembers;
       } = await client.request(QueryMultisigMembers, {
-        addressOrEns,
+        address,
       });
       return multisigPlugin.members.map((member) => member.address);
     } catch {

@@ -184,7 +184,7 @@ export type SubgraphTokenVotingProposal =
   };
 
 export interface IMintTokenParams {
-  address: string;
+  addressOrEns: string;
   amount: bigint;
 }
 

@@ -20,7 +20,7 @@ export const existingTokenParamsSchema = object({
 });
 
 export const tokenVotingInstallSchema = object({
-  settings: votingSettingsSchema.required(),
+  votingSettings: votingSettingsSchema.required(),
   newToken: newTokenParamsSchema.default(undefined),
   useToken: existingTokenParamsSchema.default(undefined),
 });

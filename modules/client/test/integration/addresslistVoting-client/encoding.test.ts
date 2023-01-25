@@ -8,7 +8,7 @@ import {
   IAddresslistVotingPluginInstall,
   VotingSettings,
 } from "../../../src";
-import { bytesToHex, InvalidAddressOrEnsError } from "@aragon/sdk-common";
+import { bytesToHex, InvalidAddressError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 describe("Client Address List", () => {
   describe("Action generators", () => {
@@ -54,7 +54,7 @@ describe("Client Address List", () => {
           pluginAddress,
           pluginConfigParams,
         )
-      ).toThrow(new InvalidAddressOrEnsError());
+      ).toThrow(new InvalidAddressError());
     });
 
     it("Should create an AddressList client and generate a plugin config action action", async () => {
@@ -94,7 +94,7 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0xinvalid_address";
       expect(() => client.encoding.addMembersAction(pluginAddress, members))
-        .toThrow(new InvalidAddressOrEnsError());
+        .toThrow(new InvalidAddressError());
     });
     it("Should encode a add members action with an invalid member address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -145,7 +145,7 @@ describe("Client Address List", () => {
 
       const pluginAddress = "0xinvalid_address";
       expect(() => client.encoding.removeMembersAction(pluginAddress, members))
-        .toThrow(new InvalidAddressOrEnsError());
+        .toThrow(new InvalidAddressError());
     });
     it("Should encode a remove members action with an invalid member address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
