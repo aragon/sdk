@@ -226,7 +226,8 @@ so that the plugin is configured</p>
     * [.executeProposal(ExecuteProposalParams)](#MultisigClientMethods+executeProposal) ⇒ <code>\*</code>
     * [.canApprove(addressOrEns)](#MultisigClientMethods+canApprove) ⇒ <code>\*</code>
     * [.canExecute(addressOrEns)](#MultisigClientMethods+canExecute) ⇒ <code>\*</code>
-    * [.getPluginSettings(addressOrEns)](#MultisigClientMethods+getPluginSettings) ⇒ <code>\*</code>
+    * [.getVotingSettings(addressOrEns)](#MultisigClientMethods+getVotingSettings) ⇒ <code>\*</code>
+    * [.getMembers(addressOrEns)](#MultisigClientMethods+getMembers) ⇒ <code>\*</code>
     * [.getProposal(proposalId)](#MultisigClientMethods+getProposal) ⇒ <code>\*</code>
     * [.getProposals({)](#MultisigClientMethods+getProposals) ⇒ <code>\*</code>
 
@@ -302,13 +303,25 @@ so that the plugin is configured</p>
 | --- | --- |
 | addressOrEns | <code>string</code> | 
 
-<a name="MultisigClientMethods+getPluginSettings"></a>
+<a name="MultisigClientMethods+getVotingSettings"></a>
 
-### multisigClientMethods.getPluginSettings(addressOrEns) ⇒ <code>\*</code>
-<p>returns the plugin settings</p>
+### multisigClientMethods.getVotingSettings(addressOrEns) ⇒ <code>\*</code>
+<p>returns the voting settings</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<MultisigPluginSettings>}</p>  
+**Returns**: <code>\*</code> - <p>{Promise<MultisigVotingSettings>}</p>  
+
+| Param | Type |
+| --- | --- |
+| addressOrEns | <code>string</code> | 
+
+<a name="MultisigClientMethods+getMembers"></a>
+
+### multisigClientMethods.getMembers(addressOrEns) ⇒ <code>\*</code>
+<p>returns the members of the multisig</p>
+
+**Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
+**Returns**: <code>\*</code> - <p>{Promise&lt;string[]&gt;}</p>  
 
 | Param | Type |
 | --- | --- |

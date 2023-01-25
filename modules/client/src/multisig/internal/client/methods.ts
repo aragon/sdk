@@ -19,12 +19,13 @@ import {
   CreateMultisigProposalParams,
   ExecuteProposalParams,
   IMultisigClientMethods,
-  MultisigPluginSettings,
   MultisigProposal,
   MultisigProposalListItem,
-  SubgraphMultisigPluginSettings,
+  MultisigVotingSettings,
+  SubgraphMultisigMembers,
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
+  SubgraphMultisigVotingSettings,
 } from "../../interfaces";
 import {
   CanExecuteParams,
@@ -53,6 +54,7 @@ import {
 } from "../graphql-queries";
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { QueryMultisigMembers } from "../graphql-queries/members";
 
 /**
  * Methods module the SDK Address List Client
@@ -280,15 +282,15 @@ export class MultisigClientMethods extends ClientCore
     return multisigContract.canExecute(params.proposalId);
   }
   /**
-   * returns the plugin settings
+   * returns the voting settings
    *
    * @param {string} addressOrEns
-   * @return {*}  {Promise<MultisigPluginSettings>}
+   * @return {*}  {Promise<MultisigVotingSettings>}
    * @memberof MultisigClientMethods
    */
-  public async getPluginSettings(
+  public async getVotingSettings(
     address: string,
-  ): Promise<MultisigPluginSettings> {
+  ): Promise<MultisigVotingSettings> {
     // TODO
     // update this with yup validation
     if (!isAddress(address)) {
@@ -298,19 +300,44 @@ export class MultisigClientMethods extends ClientCore
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { multisigPlugin }: {
-        multisigPlugin: SubgraphMultisigPluginSettings;
+        multisigPlugin: SubgraphMultisigVotingSettings;
       } = await client.request(QueryMultisigVotingSettings, {
         address,
       });
       return {
-        votingSettings: {
-          onlyListed: multisigPlugin.onlyListed,
-          minApprovals: parseInt(multisigPlugin.minApprovals),
-        },
-        members: [],
+        onlyListed: multisigPlugin.onlyListed,
+        minApprovals: parseInt(multisigPlugin.minApprovals),
       };
     } catch {
       throw new GraphQLError("Multisig settings");
+    }
+  }
+  /**
+   * returns the members of the multisig
+   *
+   * @param {string} addressOrEns
+   * @return {*}  {Promise<string[]>}
+   * @memberof MultisigClientMethods
+   */
+  public async getMembers(
+    address: string,
+  ): Promise<string[]> {
+    // TODO
+    // update this with yup validation
+    if (!isAddress(address)) {
+      throw new InvalidAddressOrEnsError();
+    }
+    try {
+      await this.graphql.ensureOnline();
+      const client = this.graphql.getClient();
+      const { multisigPlugin }: {
+        multisigPlugin: SubgraphMultisigMembers;
+      } = await client.request(QueryMultisigMembers, {
+        address,
+      });
+      return multisigPlugin.members.map((member) => member.address);
+    } catch {
+      throw new GraphQLError("Multisig members");
     }
   }
   /**
