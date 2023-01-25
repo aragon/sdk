@@ -14,7 +14,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-
+### Changed
+- Splits `getPluginSettings` in `getVotingSettings` and `getMembers`
 ## [0.18.0-alpha]
 ### Added
 - Add `pinMetadata` examples

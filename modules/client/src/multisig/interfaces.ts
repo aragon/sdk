@@ -30,9 +30,12 @@ export interface IMultisigClientMethods extends IClientCore {
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canApprove: (params: CanApproveParams) => Promise<boolean>;
   canExecute: (params: CanExecuteParams) => Promise<boolean>;
-  getPluginSettings: (
+  getVotingSettings: (
     addressOrEns: string,
-  ) => Promise<MultisigPluginSettings>;
+  ) => Promise<MultisigVotingSettings>;
+  getMembers: (
+    addressOrEns: string,
+  ) => Promise<string[]>;
   getProposal: (propoosalId: string) => Promise<MultisigProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
@@ -162,10 +165,13 @@ export type SubgraphMultisigApproversListItem = {
   approver: { id: string };
 };
 
-export type SubgraphMultisigPluginSettings = {
+export type SubgraphMultisigVotingSettings = {
+  minApprovals: string;
+  onlyListed: boolean;
+};
+
+export type SubgraphMultisigMembers = {
   members: {
     address: string;
   }[];
-  minApprovals: string;
-  onlyListed: boolean;
 };

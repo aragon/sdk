@@ -217,18 +217,33 @@ describe("Client Multisig", () => {
   });
 
   describe("Data retrieval", () => {
-    it("Should get the settings of the plugin", async () => {
+    it("Should get the voting settings of the plugin", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const settings = await client.methods.getPluginSettings(
+      const settings = await client.methods.getVotingSettings(
         TEST_MULTISIG_PLUGIN_ADDRESS,
       );
       expect(typeof settings).toBe("object");
-      expect(typeof settings.votingSettings.minApprovals).toBe("number");
-      expect(typeof settings.votingSettings.onlyListed).toBe("boolean");
+      expect(typeof settings.minApprovals).toBe("number");
+      expect(typeof settings.onlyListed).toBe("boolean");
     });
+
+    it("Should get members of the multisig", async () => {
+      const ctx = new Context(contextParams);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new MultisigClient(ctxPlugin);
+
+      const wallets = await client.methods.getMembers(
+        TEST_MULTISIG_PLUGIN_ADDRESS,
+      );
+      expect(Array.isArray(wallets)).toBe(true);
+      expect(wallets.length).toBeGreaterThan(0);
+      expect(typeof wallets[0]).toBe("string");
+      expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+    });
+
     it("Should fetch the given proposal", async () => {
       const ctx = new Context(contextParams);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
