@@ -22,6 +22,7 @@ import { Multisig__factory } from "@aragon/core-contracts-ethers";
 import { MULTISIG_PLUGIN_ID } from "../constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { tokenVotingInstallSchema, updateAddressesSchema, updateMultisigVotingSettingsSchema } from "../schemas";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -43,6 +44,7 @@ export class MultisigClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
   ): IPluginInstallItem {
+    tokenVotingInstallSchema.validateSync(params)
     const hexBytes = defaultAbiCoder.encode(
       // members, [onlyListed, minApprovals]
       [
@@ -73,15 +75,7 @@ export class MultisigClientEncoding extends ClientCore
   public addAddressesAction(
     params: UpdateAddressesParams,
   ): DaoAction {
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
-    // TODO yup validation
-    for (const member of params.members) {
-      if (!isAddress(member)) {
-        throw new InvalidAddressError();
-      }
-    }
+    updateAddressesSchema.validateSync(params)
     const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
@@ -105,15 +99,7 @@ export class MultisigClientEncoding extends ClientCore
   public removeAddressesAction(
     params: UpdateAddressesParams,
   ): DaoAction {
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
-    // TODO yup validation
-    for (const member of params.members) {
-      if (!isAddress(member)) {
-        throw new InvalidAddressError();
-      }
-    }
+    updateAddressesSchema.validateSync(params)
     const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
@@ -137,9 +123,8 @@ export class MultisigClientEncoding extends ClientCore
   public updateMultisigVotingSettings(
     params: UpdateMultisigVotingSettingsParams,
   ): DaoAction {
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
+    updateMultisigVotingSettingsSchema.validateSync(params)
+
     const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(

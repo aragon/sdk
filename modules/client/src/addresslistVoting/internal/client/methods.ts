@@ -18,6 +18,7 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../interfaces";
 import {
+  addressSchema,
   canVoteParamsSchema,
   ClientCore,
   computeProposalStatusFilter,
@@ -266,10 +267,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof AddresslistVotingClientMethods
    */
   public async getMembers(pluginAddress: string): Promise<string[]> {
-    if (!isAddress(pluginAddress)) {
-      throw new InvalidAddressError();
-    }
-
+    addressSchema.validateSync(pluginAddress)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();

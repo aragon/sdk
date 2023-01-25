@@ -7,6 +7,7 @@ import {
 import {
   ClientCore,
   ContextPlugin,
+  executeProposalParamsSchema,
   GasFeeEstimation,
 } from "../../../client-common";
 import {
@@ -17,6 +18,7 @@ import {
 } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { isAddress } from "@ethersproject/address";
+import { approveMultisigProposalSchema, createMultisigProposalSchema } from "../schemas";
 /**
  * Estimation module the SDK Address List Client
  */
@@ -42,6 +44,8 @@ export class MultisigClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    createMultisigProposalSchema.validateSync(params)
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
@@ -73,9 +77,9 @@ export class MultisigClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
+
+    approveMultisigProposalSchema.validateSync(params)
+
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,
@@ -103,6 +107,7 @@ export class MultisigClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+    executeProposalParamsSchema.validateSync(params)
     // TODO
     // update with yup and new propsal ID
     // if (isProposalId(proposalId)) {

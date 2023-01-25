@@ -19,7 +19,7 @@ export const existingTokenParamsSchema = object({
   address: addressOrEnsSchema.required(),
 });
 
-export const erc20PluginInstallSchema = object({
+export const tokenVotingInstallSchema = object({
   settings: votingSettingsSchema.required(),
   newToken: newTokenParamsSchema.default(undefined),
   useToken: existingTokenParamsSchema.default(undefined),

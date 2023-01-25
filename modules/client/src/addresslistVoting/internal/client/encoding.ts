@@ -19,7 +19,7 @@ import {
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { addressListPluginInstallSchema, membersSchema } from "../../schemas";
+import { addresslistVotingPluginInstallSchema, membersSchema } from "../../schemas";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -43,7 +43,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
   ): IPluginInstallItem {
-    addressListPluginInstallSchema.validateSync(params);
+    addresslistVotingPluginInstallSchema.validateSync(params);
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], "members"]
       [

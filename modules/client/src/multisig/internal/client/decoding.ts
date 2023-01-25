@@ -4,6 +4,7 @@ import {
   ContextPlugin,
   getFunctionFragment,
   IInterfaceParams,
+  uint8ArraySchema,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import {
@@ -30,6 +31,7 @@ export class MultisigClientDecoding extends ClientCore
    * @memberof MultisigClientDecoding
    */
   public addAddressesAction(data: Uint8Array): string[] {
+    uint8ArraySchema.validateSync(data)
     const multisigInterface = Multisig__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = multisigInterface.getFunction(
@@ -53,6 +55,7 @@ export class MultisigClientDecoding extends ClientCore
    * @memberof MultisigClientDecoding
    */
   public removeAddressesAction(data: Uint8Array): string[] {
+    uint8ArraySchema.validateSync(data)
     const multisigInterface = Multisig__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = multisigInterface.getFunction(
@@ -78,6 +81,7 @@ export class MultisigClientDecoding extends ClientCore
    * @memberof MultisigClientDecoding
    */
   public updateMultisigVotingSettings(data: Uint8Array): MultisigVotingSettings {
+    uint8ArraySchema.validateSync(data)
     const multisigInterface = Multisig__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = multisigInterface.getFunction(
@@ -106,6 +110,7 @@ export class MultisigClientDecoding extends ClientCore
    * @memberof MultisigClientDecoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
+    uint8ArraySchema.validateSync(data)
     try {
       const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
       return {

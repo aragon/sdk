@@ -11,12 +11,17 @@ import {
   dateSchema,
   ipfsUriSchema,
 } from "./common";
-import { VoteValues } from "../interfaces/plugin";
+import { VoteValues, VotingMode } from "../interfaces/plugin";
 
 export const voteValuesSchema = number().test(
   "isVoteValue",
   new InvalidVoteValueError().message,
   (value) => value ? Object.values(VoteValues).includes(value) : true,
+);
+export const votingModeSchema = string().test(
+  "isVotingMode",
+  new InvalidVoteValueError().message,
+  (value) => value ? Object.values(VotingMode).includes(value as VotingMode) : true,
 );
 
 export const proposalIdSchema = string().notRequired().test(
@@ -49,8 +54,6 @@ export const createProposalParamsSchema = object({
   endDate: dateSchema,
   executeOnPass: boolean(),
   creatorVote: voteValuesSchema,
-  earlyExecution: boolean(),
-  voteReplacement: boolean(),
 });
 
 export const voteProposalParamsSchema = object({
@@ -71,7 +74,11 @@ export const canVoteParamsSchema = object({
 });
 
 export const votingSettingsSchema = object({
-  minSupport: number().lessThan(1).positive().required(),
-  minTurnout: number().lessThan(1).positive().required(),
+  votingMode: votingModeSchema,
+  minProposeerVotingPower: bigintSchema,
+  supportThreshold: number().lessThan(1).positive().required(),
+  minParticipation: number().lessThan(1).positive().required(),
   minDuration: number().positive().required(),
 });
+
+export const membersSchema = array(addressOrEnsSchema);

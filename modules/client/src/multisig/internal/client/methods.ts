@@ -28,17 +28,22 @@ import {
   SubgraphMultisigVotingSettings,
 } from "../../interfaces";
 import {
+  addressOrEnsSchema,
+  addressSchema,
   CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
+  executeProposalParamsSchema,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
   IProposalQueryParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
+  proposalIdSchema,
   ProposalMetadata,
+  proposalMetadataSchema,
   ProposalSortBy,
   SortDirection,
 } from "../../../client-common";
@@ -55,6 +60,7 @@ import {
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { QueryMultisigMembers } from "../graphql-queries/members";
+import { approveMultisigProposalSchema, canApproveSchema, canExecuteSchema, createMultisigProposalSchema } from "../schemas";
 
 /**
  * Methods module the SDK Address List Client
@@ -80,6 +86,8 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    createMultisigProposalSchema.validateSync(params)
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
@@ -130,6 +138,7 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async pinMetadata(params: ProposalMetadata): Promise<string> {
+    proposalMetadataSchema.validateSync(params)
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);
@@ -154,8 +163,7 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
+    approveMultisigProposalSchema.validateSync(params)
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -196,11 +204,7 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
+    executeProposalParamsSchema.validateSync(params)
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,
@@ -238,14 +242,7 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.addressOrEns)) {
-      throw new InvalidAddressOrEnsError();
-    }
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressOrEnsError();
-    }
+    canApproveSchema.validateSync(params)
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,
@@ -269,8 +266,7 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
+    canExecuteSchema.validateSync(params)
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -291,11 +287,7 @@ export class MultisigClientMethods extends ClientCore
   public async getVotingSettings(
     address: string,
   ): Promise<MultisigVotingSettings> {
-    // TODO
-    // update this with yup validation
-    if (!isAddress(address)) {
-      throw new InvalidAddressOrEnsError();
-    }
+    addressSchema.validateSync(address)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -320,20 +312,16 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async getMembers(
-    address: string,
+    addressOrEns: string,
   ): Promise<string[]> {
-    // TODO
-    // update this with yup validation
-    if (!isAddress(address)) {
-      throw new InvalidAddressOrEnsError();
-    }
+    addressOrEnsSchema.validateSync(addressOrEns)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const { multisigPlugin }: {
         multisigPlugin: SubgraphMultisigMembers;
       } = await client.request(QueryMultisigMembers, {
-        address,
+        addressOrEns,
       });
       return multisigPlugin.members.map((member) => member.address);
     } catch {
@@ -350,9 +338,7 @@ export class MultisigClientMethods extends ClientCore
   public async getProposal(
     proposalId: string,
   ): Promise<MultisigProposal | null> {
-    if (!proposalId) {
-      throw new InvalidProposalIdError();
-    }
+    proposalIdSchema.validateSync(proposalId)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();

@@ -24,7 +24,7 @@ import {
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { erc20PluginInstallSchema, mintTokenSchema } from "../../schemas";
+import { tokenVotingInstallSchema, mintTokenSchema } from "../../schemas";
 /**
  * Encoding module the SDK TokenVoting Client
  */
@@ -46,7 +46,7 @@ export class TokenVotingClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: ITokenVotingPluginInstall,
   ): IPluginInstallItem {
-    erc20PluginInstallSchema.validateSync(params);
+    tokenVotingInstallSchema.validateSync(params);
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], ["address","name","symbol"][ "receivers","amount"]
