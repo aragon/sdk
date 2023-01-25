@@ -85,7 +85,7 @@ export class MultisigClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    createMultisigProposalSchema.validateSync(params)
+    createMultisigProposalSchema.strict().validateSync(params)
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
@@ -136,7 +136,7 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async pinMetadata(params: ProposalMetadata): Promise<string> {
-    proposalMetadataSchema.validateSync(params)
+    proposalMetadataSchema.strict().validateSync(params)
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);
@@ -161,7 +161,7 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    approveMultisigProposalSchema.validateSync(params)
+    approveMultisigProposalSchema.strict().validateSync(params)
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -202,7 +202,7 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    executeProposalParamsSchema.validateSync(params)
+    executeProposalParamsSchema.strict().validateSync(params)
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,
@@ -240,7 +240,7 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    canApproveSchema.validateSync(params)
+    canApproveSchema.strict().validateSync(params)
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
       signer,
@@ -264,7 +264,7 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    canExecuteSchema.validateSync(params)
+    canExecuteSchema.strict().validateSync(params)
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -285,7 +285,7 @@ export class MultisigClientMethods extends ClientCore
   public async getVotingSettings(
     address: string,
   ): Promise<MultisigVotingSettings> {
-    addressSchema.validateSync(address)
+    addressSchema.strict().validateSync(address)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -312,7 +312,7 @@ export class MultisigClientMethods extends ClientCore
   public async getMembers(
     address: string,
   ): Promise<string[]> {
-    addressSchema.validateSync(address)
+    addressSchema.strict().validateSync(address)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -336,7 +336,7 @@ export class MultisigClientMethods extends ClientCore
   public async getProposal(
     proposalId: string,
   ): Promise<MultisigProposal | null> {
-    proposalIdSchema.validateSync(proposalId)
+    proposalIdSchema.strict().validateSync(proposalId)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();

@@ -39,7 +39,7 @@ export class TokenVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    createProposalParamsSchema.validateSync(params);
+    createProposalParamsSchema.strict().validateSync(params);
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
@@ -75,7 +75,7 @@ export class TokenVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    voteProposalParamsSchema.validateSync(params);
+    voteProposalParamsSchema.strict().validateSync(params);
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,
@@ -105,7 +105,7 @@ export class TokenVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    executeProposalParamsSchema.validateSync(params);
+    executeProposalParamsSchema.strict().validateSync(params);
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
       signer,

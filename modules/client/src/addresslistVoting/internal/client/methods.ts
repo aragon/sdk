@@ -91,7 +91,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    createProposalParamsSchema.validateSync(params);
+    createProposalParamsSchema.strict().validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -150,7 +150,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof ClientMethods
    */
   public async pinMetadata(params: ProposalMetadata): Promise<string> {
-    proposalMetadataSchema.validateSync(params);
+    proposalMetadataSchema.strict().validateSync(params);
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);
@@ -176,7 +176,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    voteProposalParamsSchema.validateSync(params);
+    voteProposalParamsSchema.strict().validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -218,7 +218,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    executeProposalParamsSchema.validateSync(params);
+    executeProposalParamsSchema.strict().validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -247,7 +247,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!signer.provider) {
       throw new NoProviderError();
     }
-    canVoteParamsSchema.validateSync(params);
+    canVoteParamsSchema.strict().validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -267,7 +267,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof AddresslistVotingClientMethods
    */
   public async getMembers(pluginAddress: string): Promise<string[]> {
-    addressSchema.validateSync(pluginAddress)
+    addressSchema.strict().validateSync(pluginAddress)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -291,7 +291,7 @@ export class AddresslistVotingClientMethods extends ClientCore
   public async getProposal(
     proposalId: string,
   ): Promise<AddresslistVotingProposal | null> {
-    proposalIdSchema.validateSync(proposalId)
+    proposalIdSchema.strict().validateSync(proposalId)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();

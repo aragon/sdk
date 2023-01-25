@@ -31,7 +31,7 @@ export class TokenVotingClientDecoding extends ClientCore
    * @memberof TokenVotingClientDecoding
    */
   public updatePluginSettingsAction(data: Uint8Array): VotingSettings {
-    uint8ArraySchema.validateSync(data)
+    uint8ArraySchema.strict().validateSync(data)
     return decodeUpdatePluginSettingsAction(data);
   }
   /**
@@ -42,7 +42,7 @@ export class TokenVotingClientDecoding extends ClientCore
    * @memberof TokenVotingClientDecoding
    */
   public mintTokenAction(data: Uint8Array): IMintTokenParams {
-    uint8ArraySchema.validateSync(data)
+    uint8ArraySchema.strict().validateSync(data)
     const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();
     const hexBytes = bytesToHex(data, true);
@@ -64,7 +64,7 @@ export class TokenVotingClientDecoding extends ClientCore
    * @memberof TokenVotingClientDecoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
-    uint8ArraySchema.validateSync(data)
+    uint8ArraySchema.strict().validateSync(data)
     try {
       const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
       return {

@@ -42,7 +42,7 @@ export class MultisigClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
   ): IPluginInstallItem {
-    multisigInstallSchema.validateSync(params)
+    multisigInstallSchema.strict().validateSync(params)
     const hexBytes = defaultAbiCoder.encode(
       // members, [onlyListed, minApprovals]
       [
@@ -73,7 +73,7 @@ export class MultisigClientEncoding extends ClientCore
   public addAddressesAction(
     params: UpdateAddressesParams,
   ): DaoAction {
-    updateAddressesSchema.validateSync(params)
+    updateAddressesSchema.strict().validateSync(params)
     const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
@@ -97,7 +97,7 @@ export class MultisigClientEncoding extends ClientCore
   public removeAddressesAction(
     params: UpdateAddressesParams,
   ): DaoAction {
-    updateAddressesSchema.validateSync(params)
+    updateAddressesSchema.strict().validateSync(params)
     const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
@@ -121,7 +121,7 @@ export class MultisigClientEncoding extends ClientCore
   public updateMultisigVotingSettings(
     params: UpdateMultisigVotingSettingsParams,
   ): DaoAction {
-    updateMultisigVotingSettingsSchema.validateSync(params)
+    updateMultisigVotingSettingsSchema.strict().validateSync(params)
 
     const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes

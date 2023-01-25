@@ -43,7 +43,7 @@ export class MultisigClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    createMultisigProposalSchema.validateSync(params)
+    createMultisigProposalSchema.strict().validateSync(params)
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
@@ -76,7 +76,7 @@ export class MultisigClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    approveMultisigProposalSchema.validateSync(params)
+    approveMultisigProposalSchema.strict().validateSync(params)
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
@@ -105,7 +105,7 @@ export class MultisigClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    executeProposalParamsSchema.validateSync(params)
+    executeProposalParamsSchema.strict().validateSync(params)
     // TODO
     // update with yup and new propsal ID
     // if (isProposalId(proposalId)) {

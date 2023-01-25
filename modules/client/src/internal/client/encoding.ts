@@ -46,8 +46,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     if (!signer) {
       throw new Error("A signer is needed");
     }
-    addressOrEnsSchema.validateSync(daoAddress);
-    const validParams = permissionParamsSchema.validateSync(params);
+    addressOrEnsSchema.strict().validateSync(daoAddress);
+    const validParams = permissionParamsSchema.strict().validateSync(params);
 
     const daoInterface = DAO__factory.createInterface();
     const args = permissionParamsToContract(validParams);

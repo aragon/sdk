@@ -212,7 +212,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async pinMetadata(params: DaoMetadata): Promise<string> {
-    daoMetadataSchema.validateSync(params);
+    daoMetadataSchema.strict().validateSync(params);
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);

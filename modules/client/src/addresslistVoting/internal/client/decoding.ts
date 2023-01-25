@@ -31,7 +31,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * @memberof AddresslistVotingClientDecoding
    */
   public updatePluginSettingsAction(data: Uint8Array): VotingSettings {
-    uint8ArraySchema.validateSync(data);
+    uint8ArraySchema.strict().validateSync(data);
     return decodeUpdatePluginSettingsAction(data);
   }
   /**
@@ -42,7 +42,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * @memberof AddresslistVotingClientDecoding
    */
   public addMembersAction(data: Uint8Array): string[] {
-    uint8ArraySchema.validateSync(data);
+    uint8ArraySchema.strict().validateSync(data);
     const votingInterface = AddresslistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
@@ -66,7 +66,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * @memberof AddresslistVotingClientDecoding
    */
   public removeMembersAction(data: Uint8Array): string[] {
-    uint8ArraySchema.validateSync(data);
+    uint8ArraySchema.strict().validateSync(data);
     const votingInterface = AddresslistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = votingInterface.getFunction(
@@ -92,7 +92,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * @memberof AddresslistVotingClientDecoding
    */
   public findInterface(data: Uint8Array): IInterfaceParams | null {
-    uint8ArraySchema.validateSync(data);
+    uint8ArraySchema.strict().validateSync(data);
     try {
       const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
       return {

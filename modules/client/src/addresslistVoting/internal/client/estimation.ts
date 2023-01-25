@@ -42,7 +42,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    createProposalParamsSchema.validateSync(params);
+    createProposalParamsSchema.strict().validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -81,7 +81,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    voteProposalParamsSchema.validateSync(params);
+    voteProposalParamsSchema.strict().validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -113,7 +113,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    executeProposalParamsSchema.validateSync(params);
+    executeProposalParamsSchema.strict().validateSync(params);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,

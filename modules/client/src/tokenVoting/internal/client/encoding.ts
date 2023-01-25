@@ -46,7 +46,7 @@ export class TokenVotingClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: ITokenVotingPluginInstall,
   ): IPluginInstallItem {
-    tokenVotingInstallSchema.validateSync(params);
+    tokenVotingInstallSchema.strict().validateSync(params);
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], ["address","name","symbol"][ "receivers","amount"]
@@ -74,8 +74,8 @@ export class TokenVotingClientEncoding extends ClientCore
     pluginAddress: string,
     params: VotingSettings,
   ): DaoAction {
-    addressSchema.validateSync(pluginAddress);
-    votingSettingsSchema.validateSync(params);
+    addressSchema.strict().validateSync(pluginAddress);
+    votingSettingsSchema.strict().validateSync(params);
     // TODO: check if to and value are correct
     return {
       to: pluginAddress,
@@ -96,8 +96,8 @@ export class TokenVotingClientEncoding extends ClientCore
     minterAddress: string,
     params: IMintTokenParams,
   ): DaoAction {
-    addressSchema.validateSync(minterAddress);
-    mintTokenSchema.validateSync(params);
+    addressSchema.strict().validateSync(minterAddress);
+    mintTokenSchema.strict().validateSync(params);
     const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();
     const args = mintTokenParamsToContract(params);

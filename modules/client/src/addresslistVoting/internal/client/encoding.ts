@@ -44,7 +44,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
   ): IPluginInstallItem {
-    addresslistVotingInstallSchema.validateSync(params);
+    addresslistVotingInstallSchema.strict().validateSync(params);
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], "members"]
       [
@@ -76,8 +76,8 @@ export class AddresslistVotingClientEncoding extends ClientCore
     pluginAddress: string,
     params: VotingSettings,
   ): DaoAction {
-    addressSchema.validateSync(pluginAddress);
-    votingSettingsSchema.validateSync(params);
+    addressSchema.strict().validateSync(pluginAddress);
+    votingSettingsSchema.strict().validateSync(params);
     return {
       to: pluginAddress,
       value: BigInt(0),
@@ -93,8 +93,8 @@ export class AddresslistVotingClientEncoding extends ClientCore
    * @memberof AddresslistVotingClientEncoding
    */
   public addMembersAction(pluginAddress: string, members: string[]): DaoAction {
-    addressSchema.validateSync(pluginAddress);
-    membersSchema.validateSync(members);
+    addressSchema.strict().validateSync(pluginAddress);
+    membersSchema.strict().validateSync(members);
     const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
@@ -120,8 +120,8 @@ export class AddresslistVotingClientEncoding extends ClientCore
     pluginAddress: string,
     members: string[],
   ): DaoAction {
-    addressSchema.validateSync(pluginAddress);
-    membersSchema.validateSync(members);
+    addressSchema.strict().validateSync(pluginAddress);
+    membersSchema.strict().validateSync(members);
     const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData(
