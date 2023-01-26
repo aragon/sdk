@@ -219,8 +219,6 @@ export function withdrawParamsFromContract(result: Result): WithdrawParams {
     reference: result[3],
   };
 }
-<<<<<<< HEAD
-=======
 
 export function withdrawParamsToContract(
   params: WithdrawParams,
@@ -233,4 +231,3 @@ export function withdrawParamsToContract(
     params.reference ?? "",
   ];
 }
->>>>>>> c0cd84b (add nft deposit and withdraw types)
