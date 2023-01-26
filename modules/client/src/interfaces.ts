@@ -24,7 +24,9 @@ export interface IClientMethods extends IClientCore {
   /** Checks whether a role is granted by the current DAO's ACL settings */
   hasPermission: (params: IHasPermissionParams) => Promise<boolean>;
   /** Deposits ether or an ERC20 token */
-  deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
+  deposit: (
+    params: DepositParams,
+  ) => AsyncGenerator<DaoDepositStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
   ensureAllowance: (
     params: EnsureAllowanceParams,
@@ -50,7 +52,7 @@ export interface IClientEncoding extends IClientCore {
   ) => DaoAction;
   withdrawAction: (
     daoAddresOrEns: string,
-    params: IWithdrawParams,
+    params: WithdrawParams,
   ) => Promise<DaoAction>;
   updateDaoMetadataAction: (
     daoAddressOrEns: string,
@@ -62,7 +64,7 @@ export interface IClientDecoding {
   grantAction: (data: Uint8Array) => IGrantPermissionDecodedParams;
   revokeAction: (data: Uint8Array) => IRevokePermissionDecodedParams;
   freezeAction: (data: Uint8Array) => IFreezePermissionDecodedParams;
-  withdrawAction: (data: Uint8Array) => IWithdrawParams;
+  withdrawAction: (data: Uint8Array) => WithdrawParams;
   updateDaoMetadataRawAction: (data: Uint8Array) => string;
   updateDaoMetadataAction: (data: Uint8Array) => Promise<DaoMetadata>;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
@@ -70,8 +72,10 @@ export interface IClientDecoding {
 
 export interface IClientEstimation {
   createDao: (params: CreateDaoParams) => Promise<GasFeeEstimation>;
-  deposit: (params: IDepositParams) => Promise<GasFeeEstimation>;
-  updateAllowance: (params: IDepositParams) => Promise<GasFeeEstimation>;
+  deposit: (
+    params: DepositParams,
+  ) => Promise<GasFeeEstimation>;
+  updateAllowance: (params: EnsureAllowanceParams) => Promise<GasFeeEstimation>;
 }
 
 export interface IClient {
@@ -89,21 +93,32 @@ export type CreateDaoParams = {
   ensSubdomain: string;
   trustedForwarder?: string;
   plugins: IPluginInstallItem[];
-}
+};
 
 export type DaoMetadata = {
   name: string;
   description: string;
   avatar?: string;
   links: DaoResourceLink[];
-}
+};
 
-export interface IWithdrawParams {
+export type WithdrawParamsBase = {
+  type: TransferTokenType.ERC20;
   recipientAddress: string;
+  reference?: string;
+};
+
+export type WithdrawErc20Params = WithdrawParamsBase & {
   amount: bigint;
   tokenAddress?: string;
-  reference?: string;
-}
+};
+export type WithdrawErc721Params = WithdrawParamsBase & {
+  type: TransferTokenType.ERC721;
+  tokenAddress: string;
+};
+
+export type WithdrawParams = WithdrawErc20Params | WithdrawErc721Params;
+
 interface IPermissionParamsBase {
   where: string;
   who: string;
@@ -173,15 +188,33 @@ export type DaoCreationStepValue =
 
 // DEPOSIT
 
-export interface IDepositParams {
+export type DepositBaseParams = {
   daoAddressOrEns: string;
-  amount: bigint;
-  tokenAddress?: string;
   reference?: string;
+};
+
+export type DepositErc20Params = DepositBaseParams & {
+  type: TransferTokenType.ERC20;
+  tokenAddress?: string;
+  amount: bigint;
+};
+export type DepositErc721Params = DepositBaseParams & {
+  type: TransferTokenType.ERC721;
+  tokenAddress: string;
+};
+
+export enum TransferTokenType {
+  ERC20 = "Erc20",
+  ERC721 = "Erc721",
 }
 
+export type DepositParams = DepositErc20Params | DepositErc721Params;
+
+export const DepositType = { ...TransferTokenType };
+export const WithdrawType = { ...TransferTokenType };
+
 export type EnsureAllowanceParams = {
-  daoAddress: string;
+  daoAddressOrEns: string;
   amount: bigint;
   tokenAddress: string;
 };

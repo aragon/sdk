@@ -9,7 +9,7 @@ import {
   ProposalCreationSteps,
   ProposalMetadata,
 } from "@aragon/sdk-client";
-import { CreateMultisigProposalParams, IWithdrawParams } from "../../src";
+import { CreateMultisigProposalParams, WithdrawParams } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -42,7 +42,7 @@ const metadata: ProposalMetadata = {
 };
 
 const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
-const withdrawParams: IWithdrawParams = {
+const withdrawParams: WithdrawParams = {
   recipientAddress: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10),
   tokenAddress: "0x1234567890123456789012345678901234567890",

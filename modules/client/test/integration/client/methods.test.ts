@@ -16,16 +16,16 @@ import {
   // TEST_WALLET,
 } from "../constants";
 import {
-  Client,
   AddresslistVotingClient,
+  Client,
   Context,
+  CreateDaoParams,
   DaoCreationSteps,
   DaoDepositSteps,
   DaoSortBy,
+  DepositParams,
   IAddresslistVotingPluginInstall,
-  CreateDaoParams,
   IDaoQueryParams,
-  IDepositParams,
   IHasPermissionParams,
   ITransferQueryParams,
   Permissions,
@@ -33,6 +33,8 @@ import {
   TokenType,
   TransferSortBy,
   TransferType,
+  DepositType,
+  EnsureAllowanceParams,
 } from "../../../src";
 import {
   InvalidAddressOrEnsError,
@@ -46,7 +48,6 @@ import { Server } from "ganache";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { PluginSetupProcessor__factory } from "@aragon/core-contracts-ethers";
-import { EnsureAllowanceParams } from "../../../src/interfaces";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -99,7 +100,7 @@ describe("Client", () => {
         const addresslistVotingPlugin = AddresslistVotingClient.encoding
           .getPluginInstallItem(pluginParams);
         addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
-        
+
         const daoCreationParams: CreateDaoParams = {
           metadataUri: ipfsUri,
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
@@ -178,7 +179,8 @@ describe("Client", () => {
 
         const tokenContract = await deployErc20(client);
         const amount = BigInt("1000000000000000000");
-        const depositParams: IDepositParams = {
+        const depositParams: DepositParams = {
+          type: DepositType.ERC20,
           daoAddressOrEns: daoAddress,
           amount,
           tokenAddress: tokenContract.address,
@@ -236,12 +238,14 @@ describe("Client", () => {
         const tokenContract = await deployErc20(client);
         const amount = BigInt("1000000000000000000");
         const ensureAllowanceParams: EnsureAllowanceParams = {
-          daoAddress,
+          daoAddressOrEns: daoAddress,
           amount,
           tokenAddress: tokenContract.address,
         };
 
-        for await (const step of client.methods.ensureAllowance(ensureAllowanceParams)) {
+        for await (
+          const step of client.methods.ensureAllowance(ensureAllowanceParams)
+        ) {
           switch (step.key) {
             case DaoDepositSteps.CHECKED_ALLOWANCE:
               expect(typeof step.allowance).toBe("bigint");
@@ -257,7 +261,8 @@ describe("Client", () => {
               break;
             default:
               throw new Error(
-                "Unexpected DAO ensure allowance step: " + JSON.stringify(step, null, 2),
+                "Unexpected DAO ensure allowance step: " +
+                  JSON.stringify(step, null, 2),
               );
           }
         }
@@ -278,7 +283,8 @@ describe("Client", () => {
 
         const tokenContract = await deployErc20(client);
 
-        const depositParams: IDepositParams = {
+        const depositParams: DepositParams = {
+          type: DepositType.ERC20,
           daoAddressOrEns: daoAddress,
           amount: BigInt(7),
           tokenAddress: tokenContract.address,

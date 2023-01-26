@@ -6,12 +6,14 @@ import "../../mocks/aragon-sdk-ipfs";
 
 import { Random } from "@aragon/sdk-common";
 import {
-  Client,
   AddresslistVotingClient,
+  Client,
   Context,
   CreateDaoParams,
+  DepositParams,
+  DepositType,
+  EnsureAllowanceParams,
   IAddresslistVotingPluginInstall,
-  IDepositParams,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
@@ -80,7 +82,8 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const depositParams: IDepositParams = {
+      const depositParams: DepositParams = {
+        type: DepositType.ERC20,
         daoAddressOrEns: daoAddress,
         amount: BigInt(1234),
       };
@@ -100,7 +103,7 @@ describe("Client", () => {
 
       const tokenContract = await deployErc20(client);
 
-      const depositParams: IDepositParams = {
+      const depositParams: EnsureAllowanceParams = {
         daoAddressOrEns: daoAddress,
         amount: BigInt(1234),
         tokenAddress: tokenContract.address,

@@ -3,7 +3,7 @@ import {
   IFreezePermissionParams,
   IGrantPermissionParams,
   IRevokePermissionParams,
-  IWithdrawParams,
+  WithdrawParams,
 } from "../../interfaces";
 import { ClientCore, Context, DaoAction } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
@@ -139,13 +139,13 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
    *
    * @param {string} daoAddressOrEns
-   * @param {IWithdrawParams} params
+   * @param {WithdrawParams} params
    * @return {*}  {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
   public async withdrawAction(
     daoAddressOrEns: string,
-    params: IWithdrawParams,
+    params: WithdrawParams,
   ): Promise<DaoAction> {
     let address = daoAddressOrEns;
     if (!isAddress(daoAddressOrEns)) {

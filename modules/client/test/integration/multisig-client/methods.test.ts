@@ -21,6 +21,7 @@ import {
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
+  WithdrawType,
 } from "../../../src";
 import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
@@ -67,6 +68,7 @@ describe("Client Multisig", () => {
 
       // generate actions
       const action = await client.encoding.withdrawAction(pluginAddress, {
+        type: WithdrawType.ERC20,
         recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(1),
         reference: "test",

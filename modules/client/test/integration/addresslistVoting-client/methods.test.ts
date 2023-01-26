@@ -8,8 +8,8 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 
 import {
-  Client,
   AddresslistVotingClient,
+  Client,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
@@ -25,6 +25,7 @@ import {
   SortDirection,
   VoteProposalStep,
   VoteValues,
+  WithdrawType,
 } from "../../../src";
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
@@ -70,6 +71,7 @@ describe("Client Address List", () => {
 
       // generate actions
       const action = await client.encoding.withdrawAction(pluginAddress, {
+        type: WithdrawType.ERC20,
         recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(1),
         reference: "test",
@@ -91,7 +93,9 @@ describe("Client Address List", () => {
         },
       };
 
-      const ipfsUri = await addresslistVotingClient.methods.pinMetadata(metadata);
+      const ipfsUri = await addresslistVotingClient.methods.pinMetadata(
+        metadata,
+      );
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress,

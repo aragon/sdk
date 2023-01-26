@@ -13,18 +13,20 @@ import {
   IGrantPermissionParams,
   DaoMetadata,
   IRevokePermissionParams,
-  IWithdrawParams,
+  WithdrawParams,
   Permissions,
 } from "../../../src";
 import { DaoAction } from "../../../src/client-common/interfaces/common";
 import { contextParamsLocalChain } from "../constants";
+import { WithdrawType } from "../../../src/interfaces";
 describe("Client", () => {
   describe("Action generators", () => {
     it("Should create a client and generate a withdraw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const withdrawParams: IWithdrawParams = {
+      const withdrawParams: WithdrawParams = {
+        type: WithdrawType.ERC20,
         recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
         reference: "test",
