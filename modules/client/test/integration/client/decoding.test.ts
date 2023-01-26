@@ -12,13 +12,14 @@ import {
   DaoMetadata,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
-  IWithdrawParams,
+  WithdrawParams,
   Permissions,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { AddressZero } from "@ethersproject/constants";
+import { TransferTokenType, WithdrawType } from "../../../src/interfaces";
 describe("Client", () => {
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {
@@ -95,7 +96,8 @@ describe("Client", () => {
     it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const withdrawParams: IWithdrawParams = {
+      const withdrawParams: WithdrawParams = {
+        type: TransferTokenType.ERC20,
         recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
         reference: "test",
@@ -106,7 +108,7 @@ describe("Client", () => {
         "0x1234567890123456789012345678901234567890",
         withdrawParams,
       );
-      const decodedWithdrawParams: IWithdrawParams = client.decoding
+      const decodedWithdrawParams: WithdrawParams = client.decoding
         .withdrawAction(
           withdrawAction.data,
         );
@@ -125,7 +127,8 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const withdrawParams: IWithdrawParams = {
+      const withdrawParams: WithdrawParams = {
+        type: WithdrawType.ERC20,
         recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
         reference: "test",
@@ -135,7 +138,7 @@ describe("Client", () => {
         "0x1234567890123456789012345678901234567890",
         withdrawParams,
       );
-      const decodedWithdrawParams: IWithdrawParams = client.decoding
+      const decodedWithdrawParams: WithdrawParams = client.decoding
         .withdrawAction(
           withdrawAction.data,
         );

@@ -17,10 +17,12 @@ import { erc20ContractAbi } from "../abi/erc20";
 import { ClientCore, Context, GasFeeEstimation } from "../../client-common";
 import {
   CreateDaoParams,
+  DepositParams,
+  TransferTokenType,
   IClientEstimation,
-  IDepositParams,
+  EnsureAllowanceParams,
 } from "../../interfaces";
-import { unwrapDepositParams } from "../utils";
+import { unwrapDepositErc20Params } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 
@@ -89,44 +91,51 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * Estimates the gas fee of depositing ether or an ERC20 token into the DAO
    * This does not estimate the gas cost of updating the allowance of an ERC20 token
    *
-   * @param {IDepositParams} params
+   * @param {DepositParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
-  public deposit(params: IDepositParams): Promise<GasFeeEstimation> {
+  public deposit(
+    params: DepositParams,
+  ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+    if (params.type === TransferTokenType.ERC20) {
+      const [daoAddress, amount, tokenAddress, reference] =
+        unwrapDepositErc20Params(
+          params,
+        );
 
-    const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params,
-    );
+      const daoInstance = DAO__factory.connect(daoAddress, signer);
 
-    const daoInstance = DAO__factory.connect(daoAddress, signer);
+      const override: { value?: BigNumber } = {};
+      if (tokenAddress === AddressZero) {
+        override.value = amount;
+      }
 
-    const override: { value?: BigNumber } = {};
-    if (tokenAddress === AddressZero) {
-      override.value = amount;
+      return daoInstance.estimateGas
+        .deposit(tokenAddress, amount, reference, override)
+        .then((gasLimit) => {
+          return this.web3.getApproximateGasFee(gasLimit.toBigInt());
+        });
+    } else if (params.type === TransferTokenType.ERC721) {
+      // TODO
     }
-
-    return daoInstance.estimateGas
-      .deposit(tokenAddress, amount, reference, override)
-      .then((gasLimit) => {
-        return this.web3.getApproximateGasFee(gasLimit.toBigInt());
-      });
+    return this.web3.getApproximateGasFee(BigInt(0));
   }
   /**
    * Estimates the gas fee of updating the allowance of an ERC20 token
    *
-   * @param {IDepositParams} _params
+   * @param {EnsureAllowanceParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
   public async updateAllowance(
-    params: IDepositParams,
+    params: EnsureAllowanceParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {

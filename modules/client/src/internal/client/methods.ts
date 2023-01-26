@@ -38,11 +38,11 @@ import {
   DaoListItem,
   DaoMetadata,
   DaoSortBy,
+  DepositParams,
   EnsureAllowanceParams,
   EnsureAllowanceStepValue,
   IClientMethods,
   IDaoQueryParams,
-  IDepositParams,
   IHasPermissionParams,
   ITransferQueryParams,
   PermissionIds,
@@ -53,6 +53,7 @@ import {
   SubgraphTransferTypeMap,
   Transfer,
   TransferSortBy,
+  TransferTokenType,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -65,7 +66,7 @@ import {
   toDaoDetails,
   toDaoListItem,
   toTransfer,
-  unwrapDepositParams,
+  unwrapDepositErc20Params,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
@@ -215,12 +216,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Deposits ether or an ERC20 token into the DAO
    *
-   * @param {IDepositParams} params
+   * @param { DepositParams} params
    * @return {*}  {AsyncGenerator<DaoDepositStepValue>}
    * @memberof ClientMethods
    */
   public async *deposit(
-    params: IDepositParams,
+    params: DepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -228,66 +229,71 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params,
-    );
+    if (params.type === TransferTokenType.ERC20) {
+      const [daoAddress, amount, tokenAddress, reference] =
+        unwrapDepositErc20Params(
+          params,
+        );
 
-    if (tokenAddress && tokenAddress !== AddressZero) {
-      // If the target is an ERC20 token, ensure that the amount can be transferred
-      // Relay the yield steps to the caller as they are received
-      yield* this.ensureAllowance(
-        {
-          amount: params.amount,
-          daoAddress,
-          tokenAddress,
-        },
-      );
-    }
-
-    // Doing the transfer
-    const daoInstance = DAO__factory.connect(daoAddress, signer);
-    const override: { value?: BigNumber } = {};
-
-    if (tokenAddress === AddressZero) {
-      // Ether
-      override.value = amount;
-    }
-
-    const depositTx = await daoInstance.deposit(
-      tokenAddress,
-      amount,
-      reference,
-      override,
-    );
-    yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
-
-    await depositTx.wait().then((cr) => {
-      if (!cr.logs?.length) {
-        throw new Error("The deposit was not properly registered");
-      }
-
-      const daoInterface = DAO__factory.createInterface();
-      const log = cr.logs?.find(
-        (e) =>
-          e?.topics[0] ===
-            id(daoInterface.getEvent("Deposited").format("sighash")),
-      );
-      if (!log) {
-        throw new Error("Failed to deposit");
-      }
-
-      const logParsed = daoInterface.parseLog(log);
-      if (!amount.eq(logParsed.args["amount"])) {
-        throw new Error(
-          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${
-            logParsed.args[
-              "amount"
-            ].toBigInt()
-          }`,
+      if (tokenAddress && tokenAddress !== AddressZero) {
+        // If the target is an ERC20 token, ensure that the amount can be transferred
+        // Relay the yield steps to the caller as they are received
+        yield* this.ensureAllowance(
+          {
+            amount: params.amount,
+            daoAddressOrEns: daoAddress,
+            tokenAddress,
+          },
         );
       }
-    });
-    yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
+
+      // Doing the transfer
+      const daoInstance = DAO__factory.connect(daoAddress, signer);
+      const override: { value?: BigNumber } = {};
+
+      if (tokenAddress === AddressZero) {
+        // Ether
+        override.value = amount;
+      }
+
+      const depositTx = await daoInstance.deposit(
+        tokenAddress,
+        amount,
+        reference,
+        override,
+      );
+      yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
+
+      await depositTx.wait().then((cr) => {
+        if (!cr.logs?.length) {
+          throw new Error("The deposit was not properly registered");
+        }
+
+        const daoInterface = DAO__factory.createInterface();
+        const log = cr.logs?.find(
+          (e) =>
+            e?.topics[0] ===
+              id(daoInterface.getEvent("Deposited").format("sighash")),
+        );
+        if (!log) {
+          throw new Error("Failed to deposit");
+        }
+
+        const logParsed = daoInterface.parseLog(log);
+        if (!amount.eq(logParsed.args["amount"])) {
+          throw new Error(
+            `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${
+              logParsed.args[
+                "amount"
+              ].toBigInt()
+            }`,
+          );
+        }
+      });
+      yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
+    } else if (params.type === TransferTokenType.ERC721) {
+      // TODO
+    }
   }
 
   /**
@@ -317,7 +323,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     const currentAllowance = await tokenInstance.allowance(
       await signer.getAddress(),
-      params.daoAddress,
+      params.daoAddressOrEns,
     );
 
     yield {
@@ -328,7 +334,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (currentAllowance.gte(params.amount)) return;
 
     const tx: ContractTransaction = await tokenInstance.approve(
-      params.daoAddress,
+      params.daoAddressOrEns,
       BigNumber.from(params.amount),
     );
 

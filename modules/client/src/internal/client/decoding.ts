@@ -7,7 +7,7 @@ import {
   IGrantPermissionDecodedParams,
   DaoMetadata,
   IRevokePermissionDecodedParams,
-  IWithdrawParams,
+  WithdrawParams,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -76,10 +76,10 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the withdraw parameters from an encoded withdraw action
    *
    * @param {Uint8Array} data
-   * @return {*}  {IWithdrawParams}
+   * @return {*}  {WithdrawParams}
    * @memberof ClientDecoding
    */
-  public withdrawAction(data: Uint8Array): IWithdrawParams {
+  public withdrawAction(data: Uint8Array): WithdrawParams {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data, true);
     const receivedFunction = daoInterface.getFunction(

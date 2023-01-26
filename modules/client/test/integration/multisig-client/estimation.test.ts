@@ -11,6 +11,7 @@ import {
   ContextPlugin,
   CreateMultisigProposalParams,
   MultisigClient,
+  WithdrawType,
 } from "../../../src";
 import { contextParamsLocalChain, TEST_WALLET_ADDRESS } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
@@ -46,6 +47,7 @@ describe("Client Multisig", () => {
 
       // generate actions
       const action = await client.encoding.withdrawAction(pluginAddress, {
+        type: WithdrawType.ERC20,
         recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(1),
         reference: "test",

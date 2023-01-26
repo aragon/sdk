@@ -14,13 +14,15 @@ import {
   Context,
   DaoDepositSteps,
   GasFeeEstimation,
-  IDepositParams,
+  DepositParams,
+  DepositType,
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
 const context = new Context(contextParams);
 const client = new Client(context);
-const depositParams: IDepositParams = {
+const depositParams: DepositParams = {
+  type: DepositType.ERC20,
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress

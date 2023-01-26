@@ -6,14 +6,13 @@ import {
   ContractWithdrawParams,
   DaoDetails,
   DaoListItem,
-  IDepositParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
   DaoMetadata,
   InstalledPluginListItem,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
-  IWithdrawParams,
+  WithdrawParams,
   PermissionIds,
   SubgraphBalance,
   SubgraphDao,
@@ -25,13 +24,15 @@ import {
   TokenType,
   Transfer,
   TransferType,
+  DepositErc20Params,
+  TransferTokenType,
 } from "../interfaces";
 import { Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 
-export function unwrapDepositParams(
-  params: IDepositParams,
+export function unwrapDepositErc20Params(
+  params: DepositErc20Params,
 ): [string, BigNumber, string, string] {
   return [
     params.daoAddressOrEns,
@@ -208,11 +209,28 @@ export function permissionParamsFromContract(
   };
 }
 
-export function withdrawParamsFromContract(result: Result): IWithdrawParams {
+export function withdrawParamsFromContract(result: Result): WithdrawParams {
+  // TODO ERC721
   return {
+    type: TransferTokenType.ERC20,
     tokenAddress: result[0],
     recipientAddress: result[1],
     amount: BigInt(result[2]),
     reference: result[3],
   };
 }
+<<<<<<< HEAD
+=======
+
+export function withdrawParamsToContract(
+  params: WithdrawParams,
+): ContractWithdrawParams {
+  // TODO ERC721
+  return [
+    params.tokenAddress ?? AddressZero,
+    params.recipientAddress,
+    BigNumber.from(params.amount),
+    params.reference ?? "",
+  ];
+}
+>>>>>>> c0cd84b (add nft deposit and withdraw types)

@@ -22,6 +22,7 @@ import {
   TokenVotingClient,
   VoteProposalStep,
   VoteValues,
+  WithdrawType,
 } from "../../../src";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
@@ -71,6 +72,7 @@ describe("Token Voting Client", () => {
 
         // generate actions
         const action = await client.encoding.withdrawAction(pluginAddress, {
+          type: WithdrawType.ERC20,
           recipientAddress: "0x1234567890123456789012345678901234567890",
           amount: BigInt(1),
           reference: "test",
