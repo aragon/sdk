@@ -69,6 +69,9 @@ export interface ICreateProposalParams {
 export type CreateProposalBaseParams = {
   pluginAddress: string;
   actions?: DaoAction[];
+  /** For every action item, denotes whether its execution could fail
+   * without aborting the whole proposal execution */
+  failSafeActions?: Array<boolean>;
   metadataUri: string;
 };
 
@@ -91,7 +94,7 @@ export interface ICanVoteParams {
 
 export type CanExecuteParams = {
   proposalId: bigint;
-  pluginAddress: string
+  pluginAddress: string;
 };
 
 /**

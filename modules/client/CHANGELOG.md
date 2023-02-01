@@ -15,7 +15,13 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
+- Updates to contracts-ethers v0.7.1
 - Splits `getPluginSettings` in `getVotingSettings` and `getMembers`
+### Added
+- Add `boolArrayToBitmap` and `bitmapToBoolArray`
+- Proposals accept a `failSafeActions` variable
+- Multisig plugin settings now include `startDate` and `endDate`
+
 ## [0.18.0-alpha]
 ### Added
 - Add `pinMetadata` examples

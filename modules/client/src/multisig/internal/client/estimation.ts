@@ -5,6 +5,7 @@ import {
   NoSignerError,
 } from "@aragon/sdk-common";
 import {
+  boolArrayToBitmap,
   ClientCore,
   ContextPlugin,
   GasFeeEstimation,
@@ -48,11 +49,16 @@ export class MultisigClientEstimation extends ClientCore
       signer,
     );
 
+    const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
+
     const estimation = await multisigContract.estimateGas.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
+      allowFailureMap,
       params.approve || false,
       params.tryExecution || true,
+      Math.floor(params.startDate.getTime() / 1000),
+      Math.floor(params.endDate.getTime() / 1000),
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

@@ -102,6 +102,9 @@ export type UpdateMultisigVotingSettingsParams = {
 export type CreateMultisigProposalParams = CreateProposalBaseParams & {
   approve?: boolean;
   tryExecution?: boolean;
+  startDate: Date;
+  /** Date at which the proposal will expire if not approved */
+  endDate: Date;
 };
 
 export type ApproveMultisigProposalParams = CanExecuteParams & {
