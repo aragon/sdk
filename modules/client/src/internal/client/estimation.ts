@@ -16,8 +16,8 @@ import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import { ClientCore, Context, GasFeeEstimation } from "../../client-common";
 import {
-  IClientEstimation,
   CreateDaoParams,
+  IClientEstimation,
   IDepositParams,
 } from "../../interfaces";
 import { unwrapDepositParams } from "../utils";
@@ -46,6 +46,10 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
+    } else if (
+      params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
+    ) {
+      throw new Error("Invalid subdomain format: use a-z, 0-9 and -");
     }
 
     const daoInstance = DAOFactory__factory.connect(

@@ -19,34 +19,31 @@ import {
 } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import {
-  Contract,
-  ContractTransaction,
-} from "@ethersproject/contracts";
+import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
-  QueryDaoBalances,
   QueryDao,
+  QueryDaoBalances,
   QueryDaos,
   QueryDaoTransfers,
 } from "../graphql-queries";
 import {
   AssetBalance,
+  CreateDaoParams,
   DaoCreationSteps,
   DaoCreationStepValue,
   DaoDepositSteps,
   DaoDepositStepValue,
   DaoDetails,
   DaoListItem,
+  DaoMetadata,
   DaoSortBy,
   EnsureAllowanceParams,
   EnsureAllowanceStepValue,
   IClientMethods,
-  CreateDaoParams,
   IDaoQueryParams,
   IDepositParams,
   IHasPermissionParams,
-  DaoMetadata,
   ITransferQueryParams,
   PermissionIds,
   SubgraphBalance,
@@ -102,6 +99,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
+    } else if (
+      params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
+    ) {
+      throw new Error("Invalid subdomain format: use a-z, 0-9 and -");
     }
 
     const daoFactoryInstance = DAOFactory__factory.connect(
@@ -238,8 +239,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         {
           amount: params.amount,
           daoAddress,
-          tokenAddress
-        }
+          tokenAddress,
+        },
       );
     }
 
@@ -501,9 +502,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       const client = this.graphql.getClient();
       const {
         balances,
-      }: { balances: SubgraphBalance[] } = await client.request(QueryDaoBalances, {
-        address,
-      });
+      }: { balances: SubgraphBalance[] } = await client.request(
+        QueryDaoBalances,
+        {
+          address,
+        },
+      );
       if (balances.length === 0) {
         return [];
       }
