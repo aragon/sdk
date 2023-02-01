@@ -2258,7 +2258,7 @@ console.log(action);
 */
 ```
 
-### Remove Members (Multisig)
+### Update plugin settings (Multisig)
 
 ```ts
 import {
