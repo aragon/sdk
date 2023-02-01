@@ -28,6 +28,7 @@ import {
   SubgraphMultisigVotingSettings,
 } from "../../interfaces";
 import {
+  boolArrayToBitmap,
   CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
@@ -86,11 +87,27 @@ export class MultisigClientMethods extends ClientCore
       signer,
     );
 
+    if (
+      params.failSafeActions?.length &&
+      params.failSafeActions.length !== params.actions?.length
+    ) {
+      throw new Error(
+        "Size mismatch: actions and failSafeActions should match",
+      );
+    }
+    const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
+
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
+
     const tx = await multisigContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
+      allowFailureMap,
       params.approve || false,
       params.tryExecution || true,
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
     );
 
     yield {

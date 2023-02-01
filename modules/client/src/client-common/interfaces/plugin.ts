@@ -56,10 +56,14 @@ export type ContractVotingSettings = [
   BigNumber, // minProposerVotingPower
 ];
 
+// TODO: turn into a type, and potentially refactor these fields
 export interface ICreateProposalParams {
   pluginAddress: string;
   metadataUri: string;
   actions?: DaoAction[];
+  /** For every action item, denotes whether its execution could fail
+   * without aborting the whole proposal execution */
+  failSafeActions?: Array<boolean>;
   startDate?: Date;
   endDate?: Date;
   executeOnPass?: boolean;

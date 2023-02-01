@@ -8,8 +8,9 @@ import {
   MultisigClient,
   ProposalCreationSteps,
   ProposalMetadata,
+  CreateMultisigProposalParams,
+  IWithdrawParams,
 } from "@aragon/sdk-client";
-import { CreateMultisigProposalParams, IWithdrawParams } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -59,6 +60,9 @@ const proposalParams: CreateMultisigProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
   actions: [withdrawAction],
+  failSafeActions: [false], // the action cannot fail gracefully
+  startDate: new Date(),
+  endDate: new Date(),
 };
 
 const steps = multisigClient.methods.createProposal(proposalParams);

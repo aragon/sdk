@@ -19,6 +19,7 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../interfaces";
 import {
+  boolArrayToBitmap,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
@@ -90,12 +91,23 @@ export class AddresslistVotingClientMethods extends ClientCore
       signer,
     );
 
+    if (
+      params.failSafeActions?.length &&
+      params.failSafeActions.length !== params.actions?.length
+    ) {
+      throw new Error(
+        "Size mismatch: actions and failSafeActions should match",
+      );
+    }
+    const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
+
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await addresslistContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
+      allowFailureMap,
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
       params.creatorVote || 0,

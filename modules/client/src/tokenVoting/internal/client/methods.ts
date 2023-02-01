@@ -12,6 +12,7 @@ import {
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import {
+  boolArrayToBitmap,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
@@ -50,9 +51,9 @@ import {
 import {
   QueryTokenVotingMembers,
   QueryTokenVotingPlugin,
-  QueryTokenVotingSettings,
   QueryTokenVotingProposal,
   QueryTokenVotingProposals,
+  QueryTokenVotingSettings,
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
@@ -94,12 +95,23 @@ export class TokenVotingClientMethods extends ClientCore
       signer,
     );
 
+    if (
+      params.failSafeActions?.length &&
+      params.failSafeActions.length !== params.actions?.length
+    ) {
+      throw new Error(
+        "Size mismatch: actions and failSafeActions should match",
+      );
+    }
+    const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
+
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await tokenVotingContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
+      allowFailureMap,
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
       params.creatorVote || 0,
@@ -240,8 +252,7 @@ export class TokenVotingClientMethods extends ClientCore
       params.pluginAddress,
       signer,
     );
-    return tokenVotingContract.callStatic.canVote(
-      params.proposalId,
+    return tokenVotingContract.callStatic.isMember(
       params.address,
     );
   }
