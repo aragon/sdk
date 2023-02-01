@@ -17,10 +17,13 @@ TEMPLATE:
 ### Changed
 - Updates to contracts-ethers v0.7.1
 - Splits `getPluginSettings` in `getVotingSettings` and `getMembers`
+- Replace `withdrawAction`'s internal implementation
 ### Added
 - Add `boolArrayToBitmap` and `bitmapToBoolArray`
 - Proposals accept a `failSafeActions` variable
 - Multisig plugin settings now include `startDate` and `endDate`
+### Removed
+- Freeze action encoders
 
 ## [0.18.0-alpha]
 ### Added

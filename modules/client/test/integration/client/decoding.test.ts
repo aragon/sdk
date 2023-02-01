@@ -7,8 +7,6 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import {
   Client,
   Context,
-  IFreezePermissionDecodedParams,
-  IFreezePermissionParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
   DaoMetadata,
@@ -92,39 +90,6 @@ describe("Client", () => {
           keccak256(toUtf8Bytes(params.permission)),
         );
         expect(decodedParams.who).toBe(params.who);
-      }
-    });
-    it("Should decode an encoded freeze action", () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
-
-      const daoAddresses = [
-        "0x2468013579246801357924680135792468013579",
-        "0x1357924680135792468013579246801357924680",
-      ];
-      const paramsArray: IFreezePermissionParams[] = [
-        {
-          where: "0x1234567890123456789012345678901234567890",
-          permission: Permissions.UPGRADE_PERMISSION,
-        },
-        {
-          where: "0x0987654321098765432109876543210987654321",
-          permission: Permissions.EXECUTE_PERMISSION,
-        },
-      ];
-      for (let i = 0; i < paramsArray.length; i++) {
-        const params = paramsArray[i];
-        const action = client.encoding.freezeAction(daoAddresses[i], params);
-        const decodedParams: IFreezePermissionDecodedParams = client.decoding
-          .freezeAction(
-            action.data,
-          );
-
-        expect(decodedParams.permission).toBe(params.permission);
-        expect(decodedParams.permissionId).toBe(
-          keccak256(toUtf8Bytes(params.permission)),
-        );
-        expect(decodedParams.where).toBe(params.where);
       }
     });
     it("Should decode an encoded raw withdraw action of an erc20 token", async () => {

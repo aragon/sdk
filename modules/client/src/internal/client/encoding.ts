@@ -1,6 +1,5 @@
 import {
   IClientEncoding,
-  IFreezePermissionParams,
   IGrantPermissionParams,
   IRevokePermissionParams,
   IWithdrawParams,
@@ -10,7 +9,6 @@ import { isAddress } from "@ethersproject/address";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
-  freezeParamsToContract,
   permissionParamsToContract,
   withdrawParamsToContract,
 } from "../utils";
@@ -101,41 +99,6 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     };
   }
   /**
-   * Computes the payload to be given when creating a proposal that freezes a permission within a DAO
-   *
-   * @param {string} daoAddress
-   * @param {IFreezePermissionParams} params
-   * @return {*}  {DaoAction}
-   * @memberof ClientEncoding
-   */
-  public freezeAction(
-    daoAddress: string,
-    params: IFreezePermissionParams,
-  ): DaoAction {
-    const signer = this.web3.getSigner();
-    const { where } = params;
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (!isAddress(where) || !isAddress(daoAddress)) {
-      throw new Error("Invalid address");
-    }
-    const daoInterface = DAO__factory.createInterface();
-    const args = freezeParamsToContract(
-      {
-        where,
-        permission: params.permission,
-      },
-    );
-    // get hex bytes
-    const hexBytes = daoInterface.encodeFunctionData("freeze", args);
-    const data = hexToBytes(strip0x(hexBytes));
-    return {
-      to: daoAddress,
-      value: BigInt(0),
-      data,
-    };
-  }
-  /**
    * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
    *
    * @param {string} daoAddressOrEns
@@ -186,7 +149,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
         daoAddressOrEns,
       );
       if (!resolvedAddress) {
-        throw new Error("invalid ens");
+        throw new Error("Invalid ENS");
       }
       address = resolvedAddress;
     }

@@ -269,7 +269,7 @@ console.log(daos);
     };
     plugins: [
       {
-        id: "addressList-voting.plugin.dao.eth",
+        id: "address-list-voting.plugin.dao.eth",
         instanceAddress: "0x12345..."
       }
     ]

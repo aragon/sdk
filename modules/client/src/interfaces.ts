@@ -44,10 +44,6 @@ export interface IClientEncoding extends IClientCore {
     daoAddress: string,
     params: IRevokePermissionParams,
   ) => DaoAction;
-  freezeAction: (
-    daoAddress: string,
-    params: IFreezePermissionParams,
-  ) => DaoAction;
   withdrawAction: (
     daoAddresOrEns: string,
     params: IWithdrawParams,
@@ -61,7 +57,6 @@ export interface IClientEncoding extends IClientCore {
 export interface IClientDecoding {
   grantAction: (data: Uint8Array) => IGrantPermissionDecodedParams;
   revokeAction: (data: Uint8Array) => IRevokePermissionDecodedParams;
-  freezeAction: (data: Uint8Array) => IFreezePermissionDecodedParams;
   withdrawAction: (data: Uint8Array) => IWithdrawParams;
   updateDaoMetadataRawAction: (data: Uint8Array) => string;
   updateDaoMetadataAction: (data: Uint8Array) => Promise<DaoMetadata>;
@@ -118,14 +113,6 @@ export interface IGrantPermissionDecodedParams
   extends IPermissionDecodedParamsBase {}
 export interface IRevokePermissionDecodedParams
   extends IPermissionDecodedParamsBase {}
-export interface IFreezePermissionParams {
-  where: string;
-  permission: string;
-}
-export interface IFreezePermissionDecodedParams
-  extends IFreezePermissionParams {
-  permissionId: string;
-}
 
 export interface IHasPermissionParams {
   daoAddressOrEns: string;
@@ -333,7 +320,7 @@ export const SubgraphPluginTypeMap: Map<
   string
 > = new Map([
   [SubgraphPluginTypeName.TOKEN_VOTING, "token-voting.plugin.dao.eth"],
-  [SubgraphPluginTypeName.ADDRESS_LIST, "addresslist-voting.plugin.dao.eth"],
+  [SubgraphPluginTypeName.ADDRESS_LIST, "address-list-voting.plugin.dao.eth"],
   [SubgraphPluginTypeName.ADMIN, "admin.plugin.dao.eth"],
   [SubgraphPluginTypeName.MULTISIG, "multisig.plugin.dao.eth"],
 ]);
@@ -402,6 +389,5 @@ export const SubgraphTransferTypeMap: Map<
   [TransferType.WITHDRAW, SubgraphTransferType.WITHDRAW],
 ]);
 
-export type ContractFreezeParams = [string, string];
 export type ContractPermissionParams = [string, string, string];
 export type ContractWithdrawParams = [string, string, BigNumber, string];

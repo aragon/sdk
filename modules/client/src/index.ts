@@ -14,8 +14,6 @@ export {
   CreateDaoParams,
   IDaoQueryParams,
   IDepositParams,
-  IFreezePermissionDecodedParams,
-  IFreezePermissionParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
   IHasPermissionParams,

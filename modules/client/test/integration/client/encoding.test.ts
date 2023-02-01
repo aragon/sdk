@@ -9,7 +9,6 @@ import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import {
   Client,
   Context,
-  IFreezePermissionParams,
   IGrantPermissionParams,
   DaoMetadata,
   IRevokePermissionParams,
@@ -96,41 +95,6 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         actions.push(client.encoding.revokeAction(daoAddresses[i], params));
-      }
-      const decoder = new TextDecoder();
-      for (let i = 0; i < actions.length; i++) {
-        const action = actions[i];
-        expect(typeof action).toBe("object");
-        expect(action.to).toBe(daoAddresses[i]);
-        expect(action.data).toBeInstanceOf(Uint8Array);
-      }
-      expect(
-        decoder.decode(actions[0].data) === decoder.decode(actions[1].data),
-      ).toBe(false);
-    });
-    it("Should create a client and generate a freeze action", () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
-
-      const daoAddresses = [
-        "0x2468013579246801357924680135792468013579",
-        "0x1357924680135792468013579246801357924680",
-      ];
-
-      const paramsArray: IFreezePermissionParams[] = [
-        {
-          where: "0x1234567890123456789012345678901234567890",
-          permission: Permissions.UPGRADE_PERMISSION,
-        },
-        {
-          where: "0x0987654321098765432109876543210987654321",
-          permission: Permissions.EXECUTE_PERMISSION,
-        },
-      ];
-      let actions: DaoAction[] = [];
-      for (let i = 0; i < paramsArray.length; i++) {
-        const params = paramsArray[i];
-        actions.push(client.encoding.freezeAction(daoAddresses[i], params));
       }
       const decoder = new TextDecoder();
       for (let i = 0; i < actions.length; i++) {

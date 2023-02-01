@@ -2,14 +2,11 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import {
   AssetBalance,
-  ContractFreezeParams,
   ContractPermissionParams,
   ContractWithdrawParams,
   DaoDetails,
   DaoListItem,
   IDepositParams,
-  IFreezePermissionDecodedParams,
-  IFreezePermissionParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
   DaoMetadata,
@@ -189,23 +186,6 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
     transactionId: transfer.transaction,
     to: transfer.to,
     proposalId: transfer.proposal.id || "",
-  };
-}
-
-export function freezeParamsToContract(
-  params: IFreezePermissionParams,
-): ContractFreezeParams {
-  return [params.where, keccak256(toUtf8Bytes(params.permission))];
-}
-export function freezeParamsFromContract(
-  result: Result,
-): IFreezePermissionDecodedParams {
-  return {
-    where: result[0],
-    permissionId: result[1],
-    permission: Object.keys(PermissionIds)
-      .find((k) => PermissionIds[k] === result[1])
-      ?.replace(/_ID$/, "") || "",
   };
 }
 

@@ -4,7 +4,6 @@ import {
 } from "@aragon/sdk-common";
 import {
   IClientDecoding,
-  IFreezePermissionDecodedParams,
   IGrantPermissionDecodedParams,
   DaoMetadata,
   IRevokePermissionDecodedParams,
@@ -19,7 +18,6 @@ import {
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import {
-  freezeParamsFromContract,
   permissionParamsFromContract,
   withdrawParamsFromContract,
 } from "../utils";
@@ -73,26 +71,6 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     }
     const result = daoInterface.decodeFunctionData("revoke", data);
     return permissionParamsFromContract(result);
-  }
-  /**
-   * Decodes the freeze parameters from an encoded freeze action
-   *
-   * @param {Uint8Array} data
-   * @return {*}  {IFreezePermissionDecodedParams}
-   * @memberof ClientDecoding
-   */
-  public freezeAction(data: Uint8Array): IFreezePermissionDecodedParams {
-    const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
-    const receivedFunction = daoInterface.getFunction(
-      hexBytes.substring(0, 10) as any,
-    );
-    const expectedFunction = daoInterface.getFunction("freeze");
-    if (receivedFunction.name !== expectedFunction.name) {
-      throw new Error("The received action is different from the expected one");
-    }
-    const result = daoInterface.decodeFunctionData("freeze", data);
-    return freezeParamsFromContract(result);
   }
   /**
    * Decodes the withdraw parameters from an encoded withdraw action
