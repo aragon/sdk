@@ -10,8 +10,9 @@ import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
   permissionParamsToContract,
-  withdrawParamsToContract,
 } from "../utils";
+import { Contract } from "@ethersproject/contracts";
+import { erc20ContractAbi } from "../abi/erc20";
 
 /**
  * Encoding module the SDK Generic Client
@@ -120,16 +121,25 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       }
       address = resolvedAddress;
     }
-    const daoInterface = DAO__factory.createInterface();
-    const args = withdrawParamsToContract(params);
-    // get hex bytes
-    const hexBytes = daoInterface.encodeFunctionData("withdraw", args);
-    const data = hexToBytes(strip0x(hexBytes));
+
+    if (params.tokenAddress) {
+      const contract = new Contract(
+        params.tokenAddress,
+        erc20ContractAbi,
+      );
+      const tx = await contract.populateTransaction.transfer(address, params.amount)
+      return {
+        to: tx.to!,
+        value: BigInt(0),
+        data: hexToBytes(strip0x(tx.data!))
+      }
+    }
+
     return {
       to: address,
-      value: BigInt(0),
-      data,
-    };
+      value: params.amount,
+      data: hexToBytes('')
+    }
   }
   /**
    * Computes the payload to be given when creating a proposal that updates the metadata the DAO

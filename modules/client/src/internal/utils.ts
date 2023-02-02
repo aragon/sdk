@@ -216,14 +216,3 @@ export function withdrawParamsFromContract(result: Result): IWithdrawParams {
     reference: result[3],
   };
 }
-
-export function withdrawParamsToContract(
-  params: IWithdrawParams,
-): ContractWithdrawParams {
-  return [
-    params.tokenAddress ?? AddressZero,
-    params.recipientAddress,
-    BigNumber.from(params.amount),
-    params.reference ?? "",
-  ];
-}
