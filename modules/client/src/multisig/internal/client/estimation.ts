@@ -3,9 +3,9 @@ import {
   InvalidAddressError,
   NoProviderError,
   NoSignerError,
+  boolArrayToBitmap,
 } from "@aragon/sdk-common";
 import {
-  boolArrayToBitmap,
   ClientCore,
   ContextPlugin,
   GasFeeEstimation,

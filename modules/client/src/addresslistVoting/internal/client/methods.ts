@@ -9,6 +9,7 @@ import {
   NoSignerError,
   ProposalCreationError,
   resolveIpfsCid,
+  boolArrayToBitmap,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -19,7 +20,6 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../interfaces";
 import {
-  boolArrayToBitmap,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,

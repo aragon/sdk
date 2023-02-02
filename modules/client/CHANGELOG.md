@@ -19,7 +19,6 @@ TEMPLATE:
 - Splits `getPluginSettings` in `getVotingSettings` and `getMembers`
 - Replace `withdrawAction`'s internal implementation
 ### Added
-- Add `boolArrayToBitmap` and `bitmapToBoolArray`
 - Proposals accept a `failSafeActions` variable
 - Multisig plugin settings now include `startDate` and `endDate`
 ### Removed

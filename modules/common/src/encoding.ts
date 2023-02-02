@@ -100,3 +100,33 @@ export function decodeRatio(
 
   return Number(onChainValue) / (10 ** digits);
 }
+
+
+/** Transforms an array of booleans into a bitmap big integer */
+export function boolArrayToBitmap(bools?: Array<boolean>) {
+  if (!bools || !bools.length) return BigInt(0);
+  else if (bools.length > 256) throw new Error("The array is too big");
+
+  let result = BigInt(0);
+  for (let i = 0; i < 256; i++) {
+    if (!bools[i]) continue;
+    result |= BigInt(1) << BigInt(i);
+  }
+
+  return result;
+}
+
+/** Transforms an array of booleans into a bitmap big integer */
+export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
+  if (bitmap >= (BigInt(1) << BigInt(256))) {
+    throw new Error("The bitmap value is too big");
+  }
+
+  const result: Array<boolean> = [];
+  for (let i = 0; i < 256; i++) {
+    const mask = BigInt(1) << BigInt(i);
+    result.push((bitmap & mask) != BigInt(0));
+  }
+
+  return result;
+}

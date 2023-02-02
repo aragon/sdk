@@ -1,6 +1,5 @@
 import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
 import {
-  boolArrayToBitmap,
   ClientCore,
   ContextPlugin,
   GasFeeEstimation,
@@ -10,7 +9,7 @@ import {
 } from "../../../client-common";
 import { ITokenVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
+import { NoProviderError, NoSignerError, boolArrayToBitmap } from "@aragon/sdk-common";
 /**
  * Estimation module the SDK TokenVoting Client
  */

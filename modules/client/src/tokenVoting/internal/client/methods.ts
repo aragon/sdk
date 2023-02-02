@@ -10,9 +10,9 @@ import {
   NoSignerError,
   ProposalCreationError,
   resolveIpfsCid,
+  boolArrayToBitmap,
 } from "@aragon/sdk-common";
 import {
-  boolArrayToBitmap,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,

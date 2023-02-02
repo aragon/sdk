@@ -14,8 +14,6 @@ import { InvalidVotingModeError } from "@aragon/sdk-common";
 import { formatEther } from "@ethersproject/units";
 import { InvalidPrecisionError } from "@aragon/sdk-common";
 
-const BIGINT_ZERO = BigInt(0);
-
 export function unwrapProposalParams(
   params: ICreateProposalParams,
 ): [string, IDAO.ActionStruct[], number, number, boolean, number] {
@@ -79,35 +77,6 @@ export function computeProposalStatusFilter(
       throw new Error("invalid proposal status");
   }
   return where;
-}
-
-/** Transforms an array of booleans into a bitmap big integer */
-export function boolArrayToBitmap(bools?: Array<boolean>) {
-  if (!bools || !bools.length) return BigInt(0);
-  else if (bools.length > 256) throw new Error("The array is too big");
-
-  let result = BigInt(0);
-  for (let i = 0; i < 256; i++) {
-    if (!bools[i]) continue;
-    result |= BigInt(1) << BigInt(i);
-  }
-
-  return result;
-}
-
-/** Transforms an array of booleans into a bitmap big integer */
-export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
-  if (bitmap >= (BigInt(1) << BigInt(256))) {
-    throw new Error("The bitmap value is too big");
-  }
-
-  const result: Array<boolean> = [];
-  for (let i = 0; i < 256; i++) {
-    const mask = BigInt(1) << BigInt(i);
-    result.push((bitmap & mask) != BIGINT_ZERO);
-  }
-
-  return result;
 }
 
 export function isProposalId(propoosalId: string): boolean {
