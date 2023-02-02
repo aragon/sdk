@@ -58,13 +58,17 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     );
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
     for (const plugin of params.plugins) {
-      const latestVersion = await PluginRepo__factory.connect(
-        plugin.id,
-        signer,
-      ).getLatestVersion();
+      const repo = PluginRepo__factory.connect(plugin.id, signer);
+
+      const currentRelease = await repo.latestRelease();
+      const latestVersion = await repo["getLatestVersion(uint8)"](
+        currentRelease,
+      );
       pluginInstallationData.push({
-        pluginSetup: latestVersion[1],
-        pluginSetupRepo: plugin.id,
+        pluginSetupRef: {
+          pluginSetupRepo: repo.address,
+          versionTag: latestVersion.tag,
+        },
         data: toUtf8String(plugin.data),
       });
     }
@@ -73,6 +77,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
       {
         name: params.ensSubdomain,
         metadata: toUtf8Bytes(params.metadataUri),
+        daoURI: params.daoUri || "",
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
       pluginInstallationData,

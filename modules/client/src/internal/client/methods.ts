@@ -112,13 +112,17 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
     for (const plugin of params.plugins) {
-      const latestVersion = await PluginRepo__factory.connect(
-        plugin.id,
-        signer,
-      ).getLatestVersion();
+      const repo = PluginRepo__factory.connect(plugin.id, signer);
+
+      const currentRelease = await repo.latestRelease();
+      const latestVersion = await repo["getLatestVersion(uint8)"](
+        currentRelease,
+      );
       pluginInstallationData.push({
-        pluginSetup: latestVersion[1],
-        pluginSetupRepo: plugin.id,
+        pluginSetupRef: {
+          pluginSetupRepo: repo.address,
+          versionTag: latestVersion.tag,
+        },
         data: toUtf8String(plugin.data),
       });
     }
@@ -137,15 +141,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // using the DAO base because it reflects a newly created DAO the best
     const daoBaseAddr = await daoFactoryInstance.daoBase();
     // simulates each plugin installation seperately to get the requested permissions
-    for (const plugin of pluginInstallationData) {
+    for (const installData of pluginInstallationData) {
       const pluginSetupProcessorResponse = await pluginSetupProcessor.callStatic
-        .prepareInstallation(
-          daoBaseAddr,
-          plugin.pluginSetup,
-          plugin.pluginSetupRepo,
-          plugin.data,
-        );
-      const found = pluginSetupProcessorResponse.permissions.find(
+        .prepareInstallation(daoBaseAddr, installData);
+      const found = pluginSetupProcessorResponse[1].permissions.find(
         (permission) =>
           permission.permissionId === PermissionIds.EXECUTE_PERMISSION_ID,
       );
@@ -163,6 +162,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       {
         name: params.ensSubdomain,
         metadata: toUtf8Bytes(params.metadataUri),
+        daoURI: params.daoUri || "",
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
       pluginInstallationData,

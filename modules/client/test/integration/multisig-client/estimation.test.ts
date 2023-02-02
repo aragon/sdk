@@ -54,6 +54,9 @@ describe("Client Multisig", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
         metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
         actions: [action],
+        failSafeActions: [false],
+        startDate: new Date(),
+        endDate: new Date(),
       };
 
       const estimation = await multisigClient.estimation.createProposal(

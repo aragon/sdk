@@ -81,17 +81,18 @@ export interface IClient {
 /** Holds the parameters that the DAO will be created with */
 export type CreateDaoParams = {
   metadataUri: string;
+  daoUri?: string;
   ensSubdomain: string;
   trustedForwarder?: string;
   plugins: IPluginInstallItem[];
-}
+};
 
 export type DaoMetadata = {
   name: string;
   description: string;
   avatar?: string;
   links: DaoResourceLink[];
-}
+};
 
 export interface IWithdrawParams {
   recipientAddress: string;

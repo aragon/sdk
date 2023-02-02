@@ -2,10 +2,10 @@ import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { DaoMetadata } from "../interfaces";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
-  DAO__factory.createInterface().getFunction("setMetadata").format("minimal"),
   DAO__factory.createInterface().getFunction("grant").format("minimal"),
   DAO__factory.createInterface().getFunction("grantWithCondition").format("minimal"),
   DAO__factory.createInterface().getFunction("revoke").format("minimal"),
+  DAO__factory.createInterface().getFunction("setMetadata").format("minimal"),
   DAO__factory.createInterface().getFunction("setDaoURI").format("minimal"),
   DAO__factory.createInterface().getFunction("registerStandardCallback").format("minimal"),
   DAO__factory.createInterface().getFunction("setSignatureValidator").format("minimal"),

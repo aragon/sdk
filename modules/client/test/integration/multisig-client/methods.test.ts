@@ -94,6 +94,9 @@ describe("Client Multisig", () => {
         pluginAddress,
         metadataUri: ipfsUri,
         actions: [action],
+        failSafeActions: [false],
+        startDate: new Date(),
+        endDate: new Date(),
       };
 
       for await (
