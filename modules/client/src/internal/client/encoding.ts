@@ -2,15 +2,14 @@ import {
   IClientEncoding,
   IGrantPermissionParams,
   IRevokePermissionParams,
+  TokenStandards,
   WithdrawParams,
 } from "../../interfaces";
 import { ClientCore, Context, DaoAction } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
-import {
-  permissionParamsToContract,
-} from "../utils";
+import { permissionParamsToContract } from "../utils";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 
@@ -122,23 +121,30 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       address = resolvedAddress;
     }
 
-    if (params.tokenAddress) {
-      const contract = new Contract(
-        params.tokenAddress,
-        erc20ContractAbi,
-      );
-      const tx = await contract.populateTransaction.transfer(address, params.amount)
-      return {
-        to: tx.to!,
-        value: BigInt(0),
-        data: hexToBytes(strip0x(tx.data!))
+    if (params.type === TokenStandards.ERC20) {
+      if (params.tokenAddress) {
+        const contract = new Contract(
+          params.tokenAddress,
+          erc20ContractAbi,
+        );
+        const tx = await contract.populateTransaction.transfer(
+          address,
+          params.amount,
+        );
+        return {
+          to: tx.to!,
+          value: BigInt(0),
+          data: hexToBytes(strip0x(tx.data!)),
+        };
       }
-    }
-
-    return {
-      to: address,
-      value: params.amount,
-      data: hexToBytes('')
+      return {
+        to: address,
+        value: params.amount,
+        data: hexToBytes(""),
+      };
+    } else {
+      // TODO ERC/"! and ERC1155"
+      throw new Error("not implemented");
     }
   }
   /**

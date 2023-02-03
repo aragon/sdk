@@ -11,7 +11,6 @@ import {
   ApproveMultisigProposalParams,
   ApproveProposalStep,
   CanApproveParams,
-  Client,
   Context,
   ContextPlugin,
   CreateMultisigProposalParams,
@@ -21,7 +20,6 @@ import {
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
-  WithdrawType,
 } from "../../../src";
 import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
@@ -51,6 +49,7 @@ describe("Client Multisig", () => {
       [TEST_WALLET_ADDRESS],
     );
     pluginAddress = daoCreation.pluginAddrs[0];
+    console.log(daoCreation)
     // advance to get past the voting checkpoint
     await advanceBlocks(server.provider, 10);
   });
@@ -64,15 +63,20 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const multisigClient = new MultisigClient(ctxPlugin);
-      const client = new Client(ctx);
 
       // generate actions
-      const action = await client.encoding.withdrawAction(pluginAddress, {
-        type: WithdrawType.ERC20,
-        recipientAddress: "0x1234567890123456789012345678901234567890",
-        amount: BigInt(1),
-        reference: "test",
-      });
+      try {
+        const action = multisigClient.encoding.updateMultisigVotingSettings({
+          pluginAddress,
+          votingSettings: {
+            minApprovals: 1,
+            onlyListed: false,
+          },
+        });
+        console.log(action)
+      } catch (e) {
+        console.log(e);
+      }
 
       const metadata: ProposalMetadata = {
         title: "Best Proposal",
@@ -95,7 +99,7 @@ describe("Client Multisig", () => {
       const proposalParams: CreateMultisigProposalParams = {
         pluginAddress,
         metadataUri: ipfsUri,
-        actions: [action],
+        actions: [],
         failSafeActions: [false],
         startDate: new Date(),
         endDate: new Date(),

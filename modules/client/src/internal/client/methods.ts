@@ -53,7 +53,7 @@ import {
   SubgraphTransferTypeMap,
   Transfer,
   TransferSortBy,
-  TransferTokenType,
+  TokenStandards,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -229,7 +229,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    if (params.type === TransferTokenType.ERC20) {
+    if (params.type === TokenStandards.ERC20) {
       const [daoAddress, amount, tokenAddress, reference] =
         unwrapDepositErc20Params(
           params,
@@ -249,50 +249,47 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
       // Doing the transfer
       const daoInstance = DAO__factory.connect(daoAddress, signer);
-      const override: { value?: BigNumber } = {};
+      const override: { value?: bigint } = {};
 
       if (tokenAddress === AddressZero) {
         // Ether
         override.value = amount;
       }
 
-      const depositTx = await daoInstance.deposit(
+      const tx = await daoInstance.deposit(
         tokenAddress,
         amount,
         reference,
         override,
       );
-      yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
+      yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
 
-      await depositTx.wait().then((cr) => {
-        if (!cr.logs?.length) {
-          throw new Error("The deposit was not properly registered");
-        }
+      const cr = await tx.wait();
+      const log = findLog(cr, daoInstance.interface, "Deposited");
+      if (!log) {
+        // TODO
+        // cmmon errors
+        throw new Error("Failed to deposit");
+      }
 
-        const daoInterface = DAO__factory.createInterface();
-        const log = cr.logs?.find(
-          (e) =>
-            e?.topics[0] ===
-              id(daoInterface.getEvent("Deposited").format("sighash")),
+      const daoInterface = DAO__factory.createInterface();
+      const parsedLog = daoInterface.parseLog(log);
+
+      if (!amount.toString() === parsedLog.args["amount"]) {
+        throw new Error(
+          `Deposited amount mismatch. Expected: ${amount}, received: ${
+            parsedLog.args[
+              "amount"
+            ].toBigInt()
+          }`,
         );
-        if (!log) {
-          throw new Error("Failed to deposit");
-        }
-
-        const logParsed = daoInterface.parseLog(log);
-        if (!amount.eq(logParsed.args["amount"])) {
-          throw new Error(
-            `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${
-              logParsed.args[
-                "amount"
-              ].toBigInt()
-            }`,
-          );
-        }
-      });
-      yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
-    } else if (params.type === TransferTokenType.ERC721) {
-      // TODO
+        // TODO
+        // cmmon errors
+        // throw new AmountMisMatchError(amount, parsedLog.args["amount"])
+      }
+      yield { key: DaoDepositSteps.DONE, amount: amount };
+    } else {
+      // TODO ERC721 and ERC1155
     }
   }
 

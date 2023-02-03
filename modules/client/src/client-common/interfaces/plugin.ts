@@ -94,6 +94,7 @@ export interface ICanVoteParams {
   pluginAddress: string;
   proposalId: string;
   address: string;
+  vote: VoteValues
 }
 
 export type CanExecuteParams = {

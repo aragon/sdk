@@ -6,7 +6,6 @@ import { AddressZero, HashZero } from "@ethersproject/constants";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { id, namehash } from "@ethersproject/hash";
 import { parseEther } from "@ethersproject/units";
-import { BigNumberish } from "@ethersproject/bignumber";
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract, ContractFactory } from "@ethersproject/contracts";
 import { defaultAbiCoder } from "@ethersproject/abi";
@@ -34,13 +33,17 @@ export async function deploy(): Promise<Deployment> {
 
   try {
     const managingDaoFactory = new aragonContracts.DAO__factory();
+
     const managingDao = await managingDaoFactory
       .connect(deployOwnerWallet)
       .deploy();
+    const owner = await deployOwnerWallet.getAddress();
+    console.log(owner);
     await managingDao.initialize(
       "0x",
       await deployOwnerWallet.getAddress(),
       AddressZero,
+      "0x", // daoUri
     );
 
     const ensSubdomainRegistrarFactory = new aragonContracts
@@ -146,7 +149,6 @@ export async function deploy(): Promise<Deployment> {
       pluginRepoFactory,
       tokenVotingPluginSetup.address,
       "TokenVoting",
-      [1, 0, 0],
       deployOwnerWallet,
     );
     const tokenVotingRepo = pluginRepo_Factory
@@ -162,7 +164,6 @@ export async function deploy(): Promise<Deployment> {
       pluginRepoFactory,
       addresslistVotingPluginSetup.address,
       "Addresslist",
-      [1, 0, 0],
       deployOwnerWallet,
     );
     const addresslistVotingRepo = pluginRepo_Factory
@@ -180,7 +181,6 @@ export async function deploy(): Promise<Deployment> {
       pluginRepoFactory,
       multisigPluginSetup.address,
       "Multisig",
-      [1, 0, 0],
       deployOwnerWallet,
     );
     const multisigRepo = pluginRepo_Factory
@@ -213,23 +213,22 @@ async function deployPlugin(
   pluginRepoFactory: aragonContracts.PluginRepoFactory,
   setupAddr: string,
   name: string,
-  version: [BigNumberish, BigNumberish, BigNumberish],
   deployOwnerWallet: Signer,
 ) {
   const repoaddr = await pluginRepoFactory.callStatic
-    .createPluginRepoWithVersion(
+    .createPluginRepoWithFirstVersion(
       name,
-      version,
       setupAddr,
-      "0x",
       await deployOwnerWallet.getAddress(),
+      "0x",
+      "0x",
     );
-  const tx = await pluginRepoFactory.createPluginRepoWithVersion(
+  const tx = await pluginRepoFactory.createPluginRepoWithFirstVersion(
     name,
-    version,
     setupAddr,
-    "0x",
     await deployOwnerWallet.getAddress(),
+    "0x",
+    "0x",
   );
   await tx.wait();
   return repoaddr;
@@ -331,19 +330,29 @@ export async function createAddresslistDAO(
   name: string,
   addresses: string[] = [],
 ) {
+  const versionTagStruct = await deployment.addresslistVotingRepo
+    ["getLatestVersion(address)"](
+      deployment.addresslistVotingPluginSetup.address,
+    );
   return createDAO(
     deployment.daoFactory,
     {
       metadata: "0x0000",
       name: name,
       trustedForwarder: AddressZero,
+      daoURI: "",
     },
     [
       {
-        pluginSetup: deployment.addresslistVotingPluginSetup.address,
-        pluginSetupRepo: deployment.addresslistVotingRepo.address,
+        pluginSetupRef: {
+          pluginSetupRepo: deployment.addresslistVotingPluginSetup.address,
+          versionTag: versionTagStruct[0],
+        },
         data: defaultAbiCoder.encode(
-          ["tuple(uint8, uint64, uint64, uint64, uint256)", "address[]"],
+          [
+            "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
+            "address[] members",
+          ],
           // Allow vote replacement
           [[2, 1, 1, 3600, 1], addresses],
         ),
@@ -357,22 +366,29 @@ export async function createTokenVotingDAO(
   name: string,
   addresses: string[] = [],
 ) {
+  const versionTagStruct = await deployment.tokenVotingRepo
+    ["getLatestVersion(address)"](
+      deployment.tokenVotingPluginSetup.address,
+    );
   return createDAO(
     deployment.daoFactory,
     {
       metadata: "0x0000",
       name,
       trustedForwarder: AddressZero,
+      daoURI: "",
     },
     [
       {
-        pluginSetup: deployment.tokenVotingPluginSetup.address,
-        pluginSetupRepo: deployment.tokenVotingRepo.address,
+        pluginSetupRef: {
+          pluginSetupRepo: deployment.tokenVotingPluginSetup.address,
+          versionTag: versionTagStruct[0],
+        },
         data: defaultAbiCoder.encode(
           [
-            "tuple(uint8, uint64, uint64, uint64, uint256)",
-            "tuple(address, string, string)",
-            "tuple(address[], uint256[])",
+            "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
+            "tuple(address addr, string name, string symbol) tokenSettings",
+            "tuple(address[] receivers, uint256[] amounts) mintSettings",
           ],
           [
             // allow vote replacement
@@ -390,28 +406,36 @@ export async function createMultisigDAO(
   name: string,
   addresses: string[] = [],
 ) {
+  const versionTagStruct = await deployment.multisigRepo
+    ["getLatestVersion(address)"](
+      deployment.multisigPluginSetup.address,
+    );
+
   return createDAO(
     deployment.daoFactory,
     {
       metadata: "0x0000",
       name: name,
       trustedForwarder: AddressZero,
+      daoURI: "",
     },
     [
       {
-        pluginSetup: deployment.multisigPluginSetup.address,
-        pluginSetupRepo: deployment.multisigRepo.address,
+        pluginSetupRef: {
+          pluginSetupRepo: deployment.multisigPluginSetup.address,
+          versionTag: versionTagStruct[0],
+        },
         data: defaultAbiCoder.encode(
           [
             "address[]",
             "tuple(bool, uint16)",
           ],
           [
-           addresses,
-           [
-            true,
-            1
-           ]
+            addresses,
+            [
+              true,
+              1,
+            ],
           ],
         ),
       },

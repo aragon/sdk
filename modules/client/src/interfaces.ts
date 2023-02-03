@@ -99,17 +99,18 @@ export type DaoMetadata = {
 };
 
 export type WithdrawParamsBase = {
-  type: TransferTokenType.ERC20;
+  type: TokenStandards.ERC20;
   recipientAddress: string;
   reference?: string;
 };
 
 export type WithdrawErc20Params = WithdrawParamsBase & {
+  type: TokenStandards.ERC20;
   amount: bigint;
   tokenAddress?: string;
 };
 export type WithdrawErc721Params = WithdrawParamsBase & {
-  type: TransferTokenType.ERC721;
+  type: TokenStandards.ERC721;
   tokenAddress: string;
 };
 
@@ -182,24 +183,25 @@ export type DepositBaseParams = {
 };
 
 export type DepositErc20Params = DepositBaseParams & {
-  type: TransferTokenType.ERC20;
+  type: TokenStandards.ERC20;
   tokenAddress?: string;
   amount: bigint;
 };
 export type DepositErc721Params = DepositBaseParams & {
-  type: TransferTokenType.ERC721;
+  type: TokenStandards.ERC721;
   tokenAddress: string;
 };
 
-export enum TransferTokenType {
+export enum TokenStandards {
   ERC20 = "Erc20",
   ERC721 = "Erc721",
+  ERC1155 = "Erc1155",
 }
 
 export type DepositParams = DepositErc20Params | DepositErc721Params;
 
-export const DepositType = { ...TransferTokenType };
-export const WithdrawType = { ...TransferTokenType };
+export const DepositType = { ...TokenStandards };
+export const WithdrawType = { ...TokenStandards };
 
 export type EnsureAllowanceParams = {
   daoAddressOrEns: string;

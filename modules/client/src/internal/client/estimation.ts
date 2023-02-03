@@ -10,7 +10,6 @@ import {
   NoSignerError,
   NoTokenAddress,
 } from "@aragon/sdk-common";
-import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
@@ -18,7 +17,7 @@ import { ClientCore, Context, GasFeeEstimation } from "../../client-common";
 import {
   CreateDaoParams,
   DepositParams,
-  TransferTokenType,
+  TokenStandards,
   IClientEstimation,
   EnsureAllowanceParams,
 } from "../../interfaces";
@@ -104,7 +103,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    if (params.type === TransferTokenType.ERC20) {
+    if (params.type === TokenStandards.ERC20) {
       const [daoAddress, amount, tokenAddress, reference] =
         unwrapDepositErc20Params(
           params,
@@ -112,7 +111,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
 
       const daoInstance = DAO__factory.connect(daoAddress, signer);
 
-      const override: { value?: BigNumber } = {};
+      const override: { value?: bigint } = {};
       if (tokenAddress === AddressZero) {
         override.value = amount;
       }
@@ -122,7 +121,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
         .then((gasLimit) => {
           return this.web3.getApproximateGasFee(gasLimit.toBigInt());
         });
-    } else if (params.type === TransferTokenType.ERC721) {
+    } else if (params.type === TokenStandards.ERC721) {
       // TODO
     }
     return this.web3.getApproximateGasFee(BigInt(0));

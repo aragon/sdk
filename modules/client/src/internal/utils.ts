@@ -6,13 +6,13 @@ import {
   ContractWithdrawParams,
   DaoDetails,
   DaoListItem,
+  DaoMetadata,
+  DepositErc20Params,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
-  DaoMetadata,
   InstalledPluginListItem,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
-  WithdrawParams,
   PermissionIds,
   SubgraphBalance,
   SubgraphDao,
@@ -21,11 +21,11 @@ import {
   SubgraphPluginTypeMap,
   SubgraphTransferListItem,
   SubgraphTransferType,
+  TokenStandards,
   TokenType,
   Transfer,
   TransferType,
-  DepositErc20Params,
-  TransferTokenType,
+  WithdrawParams,
 } from "../interfaces";
 import { Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
@@ -33,10 +33,10 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 
 export function unwrapDepositErc20Params(
   params: DepositErc20Params,
-): [string, BigNumber, string, string] {
+): [string, bigint, string, string] {
   return [
     params.daoAddressOrEns,
-    BigNumber.from(params.amount),
+    params.amount,
     params.tokenAddress ?? AddressZero,
     params.reference ?? "",
   ];
@@ -209,15 +209,21 @@ export function permissionParamsFromContract(
   };
 }
 
-export function withdrawParamsFromContract(result: Result): WithdrawParams {
-  // TODO ERC721
-  return {
-    type: TransferTokenType.ERC20,
-    tokenAddress: result[0],
-    recipientAddress: result[1],
-    amount: BigInt(result[2]),
-    reference: result[3],
-  };
+export function withdrawParamsFromContract(
+  result: Result,
+  tokenStandart: TokenStandards,
+): WithdrawParams {
+  if (tokenStandart === TokenStandards.ERC20) {
+    return {
+      type: TokenStandards.ERC20,
+      tokenAddress: result[0],
+      recipientAddress: result[1],
+      amount: BigInt(result[2]),
+      reference: result[3],
+    };
+  }
+  // TODO Add ERC721 and ERC1155
+  throw new Error("not implemented");
 }
 
 export function withdrawParamsToContract(
