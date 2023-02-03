@@ -1,6 +1,7 @@
 /* MARKDOWN
-### Decode Update Plugin Settings Action (Address List)
+### Decode update plugin settings action (Address List)
 */
+
 import {
   AddresslistVotingClient,
   Context,

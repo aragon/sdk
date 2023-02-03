@@ -9,6 +9,7 @@ underlying network requests.
 
 ### Creating a DAO with a TokenVoting plugin
 */
+
 import {
   Client,
   Context,
@@ -27,7 +28,7 @@ const client: Client = new Client(context);
 
 // Define the plugins to install and their params
 
-// Use an already existing ERC20 token
+// Plugin params if you want to use an already existing ERC20 token
 const pluginInitParams1: ITokenVotingPluginInstall = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
@@ -37,10 +38,11 @@ const pluginInitParams1: ITokenVotingPluginInstall = {
     votingMode: VotingMode.STANDARD, // default standard
   },
   useToken: {
-    address: "0x...",
+    address: "0x...", // contract address of the token to use
   },
 };
-// Mint a new token
+
+// Plugin params if you need to mint a new token when using this plugin for the DAO
 const pluginInitParams2: ITokenVotingPluginInstall = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
@@ -50,14 +52,14 @@ const pluginInitParams2: ITokenVotingPluginInstall = {
     votingMode: VotingMode.EARLY_EXECUTION, // default standard
   },
   newToken: {
-    name: "Token",
-    symbol: "TOK",
-    decimals: 18,
-    minter: "0x...", // optionally, define a minter
+    name: "Token", // the name of your token
+    symbol: "TOK", // the symbol for your token. shouldn't be more than 5 letters
+    decimals: 18, // the number of decimals your token uses
+    minter: "0x...", // optionally, define a minter contract address
     balances: [
       { // Initial balances of the new token
-        address: "0x...",
-        balance: BigInt(10),
+        address: "0x...", // address of the account to receive the newly minted tokens
+        balance: BigInt(10), // amount of tokens that address should receive
       },
       {
         address: "0x...",
@@ -70,14 +72,13 @@ const pluginInitParams2: ITokenVotingPluginInstall = {
     ],
   },
 };
+
+// Creates a TokenVoting plugin client with the parameteres defined above (with an existing token).
 const tokenVotingInstallPluginItem1 = TokenVotingClient.encoding
-  .getPluginInstallItem(
-    pluginInitParams1,
-  );
+  .getPluginInstallItem(pluginInitParams1);
+// Creates a TokenVoting plugin client with the parameteres defined above (with newly minted tokens).
 const tokenVotingInstallPluginItem2 = TokenVotingClient.encoding
-  .getPluginInstallItem(
-    pluginInitParams2,
-  );
+  .getPluginInstallItem(pluginInitParams2);
 
 const daoMetadata: DaoMetadata = {
   name: "My DAO",
@@ -89,21 +90,21 @@ const daoMetadata: DaoMetadata = {
   }],
 };
 
-const metadataUri = await client.methods.pinMetadata(daoMetadata);
+// Pins the DAO's metadata in IPFS to get back the URI.
+const daoMetadataUri = await client.methods.pinMetadata(daoMetadata);
 
 const createParams: CreateDaoParams = {
-  metadataUri,
+  daoMetadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2],
+  plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2]
 };
 
-// gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.create(
-  createParams,
-);
-console.log(estimatedGas.average);
-console.log(estimatedGas.max);
+// Estimate how much gas the transaction will cost.
+const estimatedGas: GasFeeEstimation = await client.estimation.create(createParams);
+console.log({ avg: estimatedGas.average, max: estimatedGas.max });
 
+// Create the DAO with the two token voting plugins installed. This means that the DAO will be able to use either of the two tokens to vote.
+// You can also create a DAO with only one of the plugins.
 const steps = client.methods.create(createParams);
 for await (const step of steps) {
   try {

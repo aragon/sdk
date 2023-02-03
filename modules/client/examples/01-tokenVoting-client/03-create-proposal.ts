@@ -1,5 +1,8 @@
 /* MARKDOWN
 ### Creating a TokenVoting proposal
+
+In order to use the Token Voting governance mechanism within your DAO, you'll want to ensure your DAO has the TokenVoting plugin installed.
+Then, you can create proposals using the `createProposal` method in your `TokenVotingClient`.
 */
 import {
   Context,
@@ -12,12 +15,13 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create the SDK context.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the SDK.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create a TokenVoting client
-const client = new TokenVotingClient(contextPlugin);
+
+// Create a TokenVoting client.
+const tokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
@@ -39,19 +43,21 @@ const metadata: ProposalMetadata = {
   },
 };
 
-const ipfsUri = await client.methods.pinMetadata(metadata);
+// Pin the metadata in IPFS to get back the URI.
+const metadataUri = await tokenVotingClient.methods.pinMetadata(metadata);
 
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri: ipfsUri,
+  metadataUri,
   actions: [],
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
-  creatorVote: VoteValues.YES,
+  creatorVote: VoteValues.YES
 };
 
-const steps = client.methods.createProposal(proposalParams);
+// Create a proposal where members participate through token voting.
+const steps = tokenVotingClient.methods.createProposal(proposalParams);
 for await (const step of steps) {
   try {
     switch (step.key) {

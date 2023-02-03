@@ -1,6 +1,9 @@
 /* MARKDOWN
 ### Creating a TokenVoting proposal with an action
+
+Add the actions you want fulfilled when a TokenVoting proposal passes within the proposal parameters.
 */
+
 import {
   Context,
   ContextPlugin,
@@ -13,15 +16,15 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create a simple context.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create a TokenVoting client
-const client = new TokenVotingClient(contextPlugin);
+// Create a TokenVoting client.
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
-// create config action
-const configActionPrarms: VotingSettings = {
+// Create a config action
+const configActionParams: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
@@ -29,14 +32,16 @@ const configActionPrarms: VotingSettings = {
   votingMode: VotingMode.EARLY_EXECUTION, // default standard
 };
 
-const pluginAddress = "0x1234567890123456789012345678901234567890";
+// The contract address of the token voting plugin you have installed in your DAO
+const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const configAction = client.encoding.updatePluginSettingsAction(
+// The action you want the plugin to have when creating the proposal.
+const configAction = tokenVotingClient.encoding.updatePluginSettingsAction(
   pluginAddress,
-  configActionPrarms,
+  configActionParams,
 );
 
-const metadataUri = await client.methods.pinMetadata({
+const metadataUri = await tokenVotingClient.methods.pinMetadata({
   title: "Test proposal",
     summary: "This is a test proposal",
     description: "his is a test proposal, but longer",
@@ -62,7 +67,8 @@ const proposalParams: ICreateProposalParams = {
   creatorVote: VoteValues.YES,
 };
 
-const steps = client.methods.createProposal(proposalParams);
+// Creates a proposal using the token voting governance mechanism, which executes the actions set in the configAction object.
+const steps = tokenVotingClient.methods.createProposal(proposalParams);
 for await (const step of steps) {
   try {
     switch (step.key) {

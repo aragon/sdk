@@ -1,6 +1,7 @@
 /* MARKDOWN
-### Loading a plugin's token details
+### Get a TokenVoting Plugin's token details
 */
+
 import {
   Context,
   ContextPlugin,
@@ -10,32 +11,36 @@ import {
 import { Erc721TokenDetails } from "../../src/tokenVoting/interfaces";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create a context from the Aragon SDK.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create a TokenVoting client
-const client = new TokenVotingClient(contextPlugin);
+// Create a TokenVoting client.
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
-const token: Erc20TokenDetails | Erc721TokenDetails | null = await client
-  .methods.getToken(
-    pluginAddress,
-  );
-console.log(token);
+// Get the token details used in the TokenVoting plugin for a given DAO.
+const tokenDetails: Erc20TokenDetails | Erc721TokenDetails | null = await tokenVotingClient.methods.getToken(pluginAddress);
+console.log({ tokenDetails });
+
 /*
+Returns:
+```json
   {
     address: "0x123456789000987654323112345678900987654321",
     name: "Token",
     symbol: "TOK",
     decimals: 18
   }
-  or
+```
+Or:
+```json
   {
     address: "0x123456789000987654323112345678900987654321",
     name: "Token",
     symbol: "TOK",
     baseUri: "base.uri"
   }
+```
 */

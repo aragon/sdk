@@ -17,10 +17,14 @@ const members: string[] = [
 const pluginAddress = "0x0987654321098765432109876543210987654321";
 const action = client.encoding.addMembersAction(pluginAddress, members);
 console.log(action);
+
 /*
+Returns:
+```json
 {
   to: "0x1234567890...",
   value: 0n,
   data: Uint8Array[12,34,45...]
 }
+```
 */

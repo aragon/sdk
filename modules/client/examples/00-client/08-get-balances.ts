@@ -1,17 +1,25 @@
 /* MARKDOWN
-### Loading DAO financial data
+### Get a DAO's financial data
 
-Handles retrieving DAO asset balances using the DAO address or its ENS domain.
+Handles retrieving a DAO's asset balances using the DAO address or its ENS domain.
 */
+
 import { AssetBalance, Client, Context } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
+
+// Address of the DAO whose asset balances you want to retrieve.
 const daoAddressOrEns = "0x12345...";
-const balances: AssetBalance[] | null = await client.methods.getDaoBalances(daoAddressOrEns);
-console.log(balances);
+
+// Get a DAO's asset balances.
+const daoBalances: AssetBalance[] | null = await client.methods.getDaoBalances(daoAddressOrEns);
+console.log({ daoBalances });
+
 /*
+Returns:
+```json
   [
     {
       type: "native",
@@ -29,4 +37,5 @@ console.log(balances);
     },
     ...
   ]
+```
 */

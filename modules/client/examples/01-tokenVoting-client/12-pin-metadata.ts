@@ -1,6 +1,7 @@
 /* MARKDOWN
 ### Add and pin metadata
-Adds an pin data with a the format used by aragon app into one of the specified IPFS nodes and return a ipfs cid preceded by ipfs://
+
+Adds and pins data with the format needed by the Aragon App into one of the specified IPFS nodes and return an IPFS CID preceded by "ipfs://"
 
 */
 import {
@@ -11,9 +12,13 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-const context = new Context(contextParams);
-const contextPlugin = ContextPlugin.fromContext(context);
-const client = new TokenVotingClient(contextPlugin);
+// Create an Aragon SDK context.
+const context: Context = new Context(contextParams);
+// Create a plugin context from the Aragon SDK context.
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an TokenVoting client.
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
+
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
   summary: "This is a short description",
@@ -33,9 +38,13 @@ const metadata: ProposalMetadata = {
     header: "https://...",
   },
 };
-const metadataUri = await client.methods.pinMetadata(metadata);
-console.log(metadataUri);
+
+// Pin the metadata in IPFS to get back the URI.
+const metadataUri = await tokenVotingClient.methods.pinMetadata(metadata);
+console.log({ metadataUri });
 
 /*
-  ipfs://Qm...
+```javascript
+  "ipfs://Qm..."
+```
 */

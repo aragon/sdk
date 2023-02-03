@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Loading DAO details
+### Get DAO details
 
 Handles retrieving DAO metadata using its address or ENS domain.
 
@@ -9,11 +9,17 @@ import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
+
+// Address of the DAO whose metadata you want to retrieve.
 const daoAddressOrEns = "0x1234567890123456789012345678901234567890"; // test.dao.eth
+
+// Get a DAO's details.
 const dao: DaoDetails | null = await client.methods.getDao(daoAddressOrEns);
-console.log(dao);
+console.log({ dao });
 
 /*
+Returns:
+```json
 {
   address: "0x1234567890123456789012345678901234567890",
   ensDomain: "test.dao.eth",
@@ -40,4 +46,5 @@ console.log(dao);
     }
   ]
 }
+```
 */

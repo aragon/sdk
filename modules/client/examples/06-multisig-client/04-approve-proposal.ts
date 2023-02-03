@@ -1,6 +1,9 @@
 /* MARKDOWN
 ### Approve a multisig proposal
+
+A member of a multisig plugin is able to approve a proposal and give their approval for the transaction to go through
 */
+
 import {
   ApproveMultisigProposalParams,
   ApproveProposalStep,
@@ -10,20 +13,20 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create an Aragon SDK context.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
-const client = new MultisigClient(contextPlugin);
+const multisigClient = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
   proposalId: BigInt(0),
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  tryExecution: true,
+  tryExecution: true
 };
 
-const steps = client.methods.approveProposal(approveParams);
+const steps = multisigClient.methods.approveProposal(approveParams);
 for await (const step of steps) {
   try {
     switch (step.key) {

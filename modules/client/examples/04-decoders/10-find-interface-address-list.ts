@@ -1,6 +1,8 @@
 /* MARKDOWN
 ### Get Function Parameters from an encoded action (Address List)
+
 */
+
 import {
   AddresslistVotingClient,
   Context,

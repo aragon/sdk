@@ -1,8 +1,9 @@
 /* MARKDOWN
-### Loading the list of proposals (TokenVoting)
+### Get the list of proposals of a DAO, when using the TokenVoting plugin
 
-Retrieving the proposals of a TokenVoting DAO.
+Retrieves the proposals of a DAO created with the TokenVoting plugin.
 */
+
 import {
   Context,
   ContextPlugin,
@@ -15,12 +16,12 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create a context from the Aragon SDK.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the Aragon SDK.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create a TokenVoting client
-const client = new TokenVotingClient(contextPlugin);
+// Create a TokenVoting client.
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
@@ -30,12 +31,13 @@ const queryParams: IProposalQueryParams = {
   status: ProposalStatus.ACTIVE, // optional
 };
 
-const proposals: TokenVotingProposalListItem[] = await client.methods
-  .getProposals(
-    queryParams,
-  );
-console.log(proposals);
+const proposals: TokenVotingProposalListItem[] = await tokenVotingClient.methods
+  .getProposals(queryParams);
+console.log({ proposals });
+
 /*
+Returns:
+```json
 [
   {
     id: "0x12345...",
@@ -46,7 +48,7 @@ console.log(proposals);
     creatorAddress: "0x1234567890123456789012345678901234567890",
     metadata: {
       title: "Test Proposal",
-      summary: "test proposal summary"
+      summary: "Test Proposal Summary"
     };
     startDate: <Date>,
     endDate: <Date>,
@@ -72,7 +74,7 @@ console.log(proposals);
     creatorAddress: "0x1234567890123456789012345678901234567890",
     metadata: {
       title: "Test Proposal 2",
-      summary: "test proposal summary 2"
+      summary: "Test Proposal Summary 2"
     };
     startDate: <Date>,
     endDate: <Date>,
@@ -90,4 +92,5 @@ console.log(proposals);
     }
   }
 ]
+```
 */

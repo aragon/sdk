@@ -1,6 +1,7 @@
 /* MARKDOWN
 ### Ensure an a minimum token allowance
-Check if the allowance is enough and updates it if it is not
+
+Check if the allowance is enough and updates it if it is not.
 
 */
 import {
@@ -11,14 +12,16 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
-const context = new Context(contextParams);
-const client = new Client(context);
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+
 const ensureAllowanceParams: EnsureAllowanceParams = {
   daoAddress: "0x1234567890123456789012345678901234567890",
-  amount: BigInt(10), // amount
-  tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
+  amount: BigInt(10), // amount in wei
+  tokenAddress: "0x1234567890123456789012345678901234567890" // token contract adddress
 };
 
+// Ensure the allowance is enough.
 const steps = client.methods.ensureAllowance(ensureAllowanceParams);
 for await (const step of steps) {
   try {

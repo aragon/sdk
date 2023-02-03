@@ -1,5 +1,7 @@
 /* MARKDOWN
-### Checking if user can vote in a TokenVoting proposal
+### Check if an address can vote in a TokenVoting proposal
+
+This function returns a boolean indicating whether an address can vote in a specific TokenVoting proposal.
 */
 import {
   Context,
@@ -9,21 +11,25 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create an Aragon SDK context.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the Aragon SDK.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an address list client
-const client = new TokenVotingClient(contextPlugin);
+// Create an TokenVoting client
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
-const voteParams: ICanVoteParams = {
+const canVoteParams: ICanVoteParams = {
   address: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x1",
-  pluginAddress: "0x1234567890123456789012345678901234567890",
+  pluginAddress: "0x1234567890123456789012345678901234567890"
 };
 
-const canVote = await client.methods.canVote(voteParams);
-console.log(canVote);
+const canVote = await tokenVotingClient.methods.canVote(canVoteParams);
+console.log({ canVote });
+
 /*
-true
+Returns:
+```javascript
+  true
+```
 */

@@ -1,6 +1,9 @@
 /* MARKDOWN
-### Remove Members (Multisig)
+### Update Multisig voting confuguration
+
+Allows you to update the voting configuration of a Multisig plugin installed in a DAO.
 */
+
 import {
   Context,
   ContextPlugin,
@@ -9,23 +12,32 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
+// Create an Aragon SDK context.
 const context: Context = new Context(contextParams);
+// Create a plugin context from the Aragon SDK.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new MultisigClient(contextPlugin);
+// Create a Multisig client.
+const multisigClient = new MultisigClient(contextPlugin);
 
 const updateMinApprovals: UpdateMultisigVotingSettingsParams = {
   votingSettings: {
     minApprovals: 2,
     onlyListed: false,
   },
-  pluginAddress: "0x0987654321098765432109876543210987654321",
+  pluginAddress: "0x0987654321098765432109876543210987654321"
 };
-const action = client.encoding.updateMultisigVotingSettings(updateMinApprovals);
-console.log(action);
+
+// Updates the voting configuration of a Multisig plugin installed in a DAO.
+const updateMultisigConfig = multisigClient.encoding.updateMultisigVotingSettings(updateMinApprovals);
+console.log(updateMultisigConfig);
+
 /*
+Returns:
+```json
 {
   to: "0x1234567890...",
   value: 0n,
   data: Uint8Array[12,34,45...]
 }
+```
 */

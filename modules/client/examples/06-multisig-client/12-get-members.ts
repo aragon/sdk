@@ -1,6 +1,9 @@
 /* MARKDOWN
-### Loading the list of members (multisig plugin)
+### Get the list of members participating in a DAO's Multisig plugin.
+
+Retrieves the list of addresses able to participate in a Multisig proposal for a given DAO.
 */
+
 import {
   Context,
   ContextPlugin,
@@ -9,22 +12,24 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create an Aragon SDK context.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an multisig client
-const client = new MultisigClient(contextPlugin);
+// Create a Multisig client
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const daoAddressorEns = "0x12345...";
+const daoAddressorEns: string = "0x12345...";
 
-const settings: string[] = await client.methods
-  .getMembers(daoAddressorEns);
-console.log(settings);
+const multisigMembers: string[] = await multisigClient.methods.getMembers(daoAddressorEns);
+console.log({ multisigMembers });
+
 /*
+```json
 [
   "0x1234567890...",
   "0x2345678901...",
-  "0x3456789012...",
+  "0x3456789012..."
 ]
+```
 */

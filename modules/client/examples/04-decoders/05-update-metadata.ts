@@ -1,18 +1,26 @@
 /* MARKDOWN
 ### Decode Update Metadata Action
 
-Decode an update metadata action and expect the metadata
+Decodes an update metadata action and expect the metadata.
 */
+
 import { Client, Context, DaoMetadata } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
+
+// Creates an Aragon SDK context.
 const context: Context = new Context(contextParams);
+// Creates an Aragon SDK client.
 const client: Client = new Client(context);
+
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: DaoMetadata = await client.decoding.updateDaoMetadataAction(data);
+// Decodes the update metadata action.
+const updateDaoMetadataParams: DaoMetadata = await client.decoding.updateDaoMetadataAction(data);
+console.log({ updateDaoMetadataParams });
 
-console.log(params);
 /*
+Returns:
+```json
 {
   "name":"New Name",
   "description":"New description",
@@ -28,4 +36,5 @@ console.log(params);
     }
   ]
 }
+```
 */

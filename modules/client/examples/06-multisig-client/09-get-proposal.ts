@@ -1,6 +1,9 @@
 /* MARKDOWN
-### Loading the a proposal by proposalId (multisig plugin)
+### Get a given proposal made by a Multisig plugin
+
+Retrieves the proposal details of a given proposal made using the Multisig plugin.
 */
+
 import {
   Context,
   ContextPlugin,
@@ -9,20 +12,21 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create an Aragon SDK context.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the Aragon SDK.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an multisig client
-const client = new MultisigClient(contextPlugin);
+// Create a Multisig client
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const proposalId = "0x12345...";
+const proposalId: string = "0x12345...";
 
-const proposal: MultisigProposal | null = await client.methods.getProposal(
-  proposalId,
-);
-console.log(proposal);
+const proposalDetails: MultisigProposal | null = await multisigClient.methods.getProposal(proposalId);
+console.log({ proposalDetails });
+
 /*
+Returns:
+```json
 {
   id: "0x12345...",
   dao: {
@@ -32,8 +36,8 @@ console.log(proposal);
   creatorAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
-    summary: "test proposal summary",
-    description: "this is a long description",
+    summary: "Test Proposal Summary",
+    description: "This is a long description",
     resources: [
       {
         url: "https://dicord.com/...",
@@ -60,7 +64,8 @@ console.log(proposal);
   status: "Executed",
   approvals: [
     "0x123456789123456789123456789123456789",
-    "0x234567891234567891234567891234567890",
+    "0x234567891234567891234567891234567890"
   ]
 }
+```
 */

@@ -1,8 +1,10 @@
 /* MARKDOWN
-### Loading DAO activity
+### Get DAO activity
 
-Retrieves the list of asset transfers to and from the given DAO (by default,
-from ETH, DAI, USDC and USDT, on Mainnet)
+Retrieves the list of asset transfers to and from DAOs.
+If passed a `daoAddressOrEns`, will only retrieve transfers for that DAO. Otherwise, it returns for all DAOs.
+
+By default, retrieves ETH, DAI, USDC and USDT, on Mainnet).
 */
 import {
   Client,
@@ -17,6 +19,7 @@ import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
+
 const params: ITransferQueryParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // optional
   sortBy: TransferSortBy.CREATED_AT, // optional
@@ -25,10 +28,14 @@ const params: ITransferQueryParams = {
   direction: SortDirection.ASC, // optional
   type: TransferType.DEPOSIT, // optional
 };
-const transfers: Transfer[] | null = await client.methods.getDaoTransfers(params);
-console.log(transfers);
+
+// Get a list of DAO transfers.
+const daoTransfers: Transfer[] | null = await client.methods.getDaoTransfers(params);
+console.log({ daoTransfers });
 
 /*
+Returns:
+```json
 [
   {
     type: "withdraw",
@@ -71,4 +78,5 @@ console.log(transfers);
     from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
   }
 ]
+```
 */

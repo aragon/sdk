@@ -1,8 +1,9 @@
 /* MARKDOWN
-### Retrieve a proposal by proposalID (TokenVoting)
+### Get a proposal by proposalID (TokenVoting)
 
-Retrieving the proposals of a TokenVoting DAO.
+Retrieves a given proposal of DAO with the TokenVoting plugin installed.
 */
+
 import {
   Context,
   ContextPlugin,
@@ -11,20 +12,23 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create an Aragon SDK context.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from an Aragon SDK.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create a TokenVoting client
-const client = new TokenVotingClient(contextPlugin);
+const tokenVotingClient = new TokenVotingClient(contextPlugin);
 
-const proposalId = "0x12345...";
+// The address of the proposal you want to retrieve.
+const proposalId: string = "0x12345...";
 
-const proposal: TokenVotingProposal | null = await client.methods.getProposal(
-  proposalId,
-);
-console.log(proposal);
+// Get a specific proposal created using the TokenVoting plugin.
+const proposal: TokenVotingProposal | null = await tokenVotingClient.methods.getProposal(proposalId);
+console.log({ proposal });
+
 /*
+Returns:
+```json
 {
   id: "0x12345...",
   dao: {
@@ -78,21 +82,22 @@ console.log(proposal);
     address: "0x1234567890123456789012345678901234567890,
     name: "The Token",
     symbol: "TOK",
-    decimals: 18,
+    decimals: 18
   },
   usedVotingWeight: 1000000n,
   votes: [
     {
       address: "0x123456789123456789123456789123456789",
       vote: 2, // VoteValues.YES
-      voteWeight: 700000n,
+      voteWeight: 700000n
     },
     {
       address: "0x234567891234567891234567891234567890",
       vote: 3, // VoteValues.NO
-      voteWeight: 300000n,
+      voteWeight: 300000n
     }
   ]
-  status: "Executed",
+  status: "Executed"
 }
+```
 */

@@ -1,5 +1,7 @@
 /* MARKDOWN
-### Checking if user can approve in a multisig plugin
+### Check if user can execute an action in a multisig plugin
+
+Checks whether the signer of the transaction is able to execute actions created by proposals from the Multisig plugin.
 */
 import {
   CanExecuteParams,
@@ -9,18 +11,24 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create an Aragon SDK context.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
-const client = new MultisigClient(contextPlugin);
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 const canExecuteParams: CanExecuteParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(0),
+  proposalId: BigInt(0)
 };
-const canExecute = await client.methods.canExecute(canExecuteParams);
-console.log(canExecute);
+
+// Checks whether the signer of the transaction can execute a given proposal.
+const canExecute = await multisigClient.methods.canExecute(canExecuteParams);
+console.log({ canExecute });
+
 /*
+Returns:
+```javascript
 true
+```
 */

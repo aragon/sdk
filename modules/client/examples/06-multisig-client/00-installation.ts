@@ -1,7 +1,13 @@
 /* MARKDOWN
-## Multisig governance plugin client
+## Multisig governance plugin
+
+The Mutisig plugin is a governance mechanism which establishes that x amount of signers must approve a proposal in order for it to pass.
+It establishes a minimum approval threshold and a list of addresses which are allowed to vote.
+
 ### Creating a DAO with a multisig plugin
+In order to create a DAO with a Multisig plugin, you will need to first instantiate the Multisig plugin client, then use it when creating your DAO.
 */
+
 import {
   Client,
   Context,
@@ -13,11 +19,12 @@ import {
 import { MultisigClient } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
+// Create an Aragon SDK context.
 const context: Context = new Context(contextParams);
+// Create a client from the Aragon SDK context.
 const client: Client = new Client(context);
 
-// Define the plugins to install and their params
-
+// Addresses which will be allowed to vote in the Multisig plugin.
 const members: string[] = [
   "0x1234567890123456789012345678901234567890",
   "0x2345678901234567890123456789012345678901",
@@ -30,13 +37,13 @@ const multisigIntallParams: MultisigPluginInstallParams = {
     minApprovals: 1,
     onlyListed: true
   },
-  members,
+  members
 }
 
-const multisigInstallPluginItem = MultisigClient.encoding
-  .getPluginInstallItem(multisigIntallParams);
+const multisigInstallPluginItem = MultisigClient.encoding.getPluginInstallItem(multisigIntallParams);
 
-const metadataUri = await client.methods.pinMetadata({
+// Pin metadata to IPFS, returns IPFS CID string.
+const metadataUri: string = await client.methods.pinMetadata({
   name: "My DAO",
   description: "This is a description",
   avatar: "",
@@ -49,16 +56,16 @@ const metadataUri = await client.methods.pinMetadata({
 const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [multisigInstallPluginItem],
+  plugins: [multisigInstallPluginItem]
 };
 
-// gas estimation
+// Estimate gas for the transaction.
 const estimatedGas: GasFeeEstimation = await client.estimation.create(
   createParams,
 );
-console.log(estimatedGas.average);
-console.log(estimatedGas.max);
+console.log({ avg: estimatedGas.average, max: estimatedGas.max });
 
+// Creates a DAO with a Multisig plugin installed.
 const steps = client.methods.create(createParams);
 for await (const step of steps) {
   try {

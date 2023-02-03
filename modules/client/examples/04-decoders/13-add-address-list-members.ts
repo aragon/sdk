@@ -12,10 +12,14 @@ const data: Uint8Array = new Uint8Array([12, 56]);
 const members: string[] = clientAddressList.decoding.addMembersAction(data);
 
 console.log(members);
+
 /*
+Returns:
+```json
 [
   "0x12345...",
   "0x56789...",
-  "0x13579...",
+  "0x13579..."
 ]
+```
 */

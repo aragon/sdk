@@ -1,6 +1,8 @@
 /* MARKDOWN
 ### Creating a DAO
 
+The `createADao` function allows you to create a DAO with the given parameters.
+
 */
 import {
   Client,
@@ -14,6 +16,7 @@ import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
+
 const metadata: DaoMetadata = {
   name: "My DAO",
   description: "This is a description",
@@ -23,20 +26,20 @@ const metadata: DaoMetadata = {
     url: "https://...",
   }],
 };
+
+// Through pinning the metadata in IPFS, we can get the IPFS URI. You can read more about it here: https://docs.ipfs.tech/how-to/pin-files/
 const ipfsUri = await client.methods.pinMetadata(metadata);
 const createParams: CreateDaoParams = {
   metadataUri: ipfsUri,
-  ensSubdomain: "my-org", // my-org.dao.eth,
+  ensSubdomain: "my-org", // my-org.dao.eth
   plugins: [],
 };
 
-// gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.createDao(
-  createParams,
-);
-console.log(estimatedGas.average);
-console.log(estimatedGas.max);
+// Estimate how much gas the transaction will cost.
+const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createParams);
+console.log({ avg: estimatedGas.average, maximum: estimatedGas.max });
 
+// Create the DAO.
 const steps = client.methods.createDao(createParams);
 for await (const step of steps) {
   try {

@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Loading Multiple DAOs
+### Get Multiple DAOs
 
-Handles retrieving list of DAO metadata.
+Handles retrieving list of DAOs' metadata.
 
 */
 import {
@@ -16,16 +16,21 @@ import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
+
 const queryParams: IDaoQueryParams = {
   skip: 0, // optional
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
   sortBy: DaoSortBy.POPULARITY, //optional
 };
+
+// Get a list of DAOs.
 const daos: DaoListItem[] = await client.methods.getDaos(queryParams);
-console.log(daos);
+console.log({ daos });
 
 /*
+Returns:
+```json
 [
   {
     address: "0x12345...",
@@ -43,7 +48,7 @@ console.log(daos);
   },
   {
     address: "0x12345...",
-    ensDomain: "test-1.dao.eth", // on mainnet
+    ensDomain: "test-1.dao.eth", // ENS only works on mainnet
     metadata: {
         name: "Test 1",
         description: "This is a description 1"
@@ -70,4 +75,5 @@ console.log(daos);
     ]
   }
 ]
+```
 */

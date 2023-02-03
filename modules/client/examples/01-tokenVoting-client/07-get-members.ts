@@ -1,23 +1,26 @@
 /* MARKDOWN
-### Loading the list of members (TokenVoting)
+### Get list of members in a DAO (token-holders)
 
-Retrieving all the members of a TokenVoting DAO.
+Returns an array with the addresses of all the members of a DAO using the TokenVoting plugin.
 */
+
 import { Context, ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
-// Create a simple context
+// Create an Aragon SDK context.
 const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the Aragon SDK.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create a TokenVoting client
-const client = new TokenVotingClient(contextPlugin);
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
-const daoAddressorEns = "0x12345...";
+const daoAddressorEns: string = "0x12345...";
 
-const members: string[] = await client.methods.getMembers(daoAddressorEns);
-console.log(members);
+const members: string[] = await tokenVotingClient.methods.getMembers(daoAddressorEns);
+console.log({ members });
 /*
+Returns:
+```json
 [
   "0x1234567890123456789012345678901234567890",
   "0x2345678901234567890123456789012345678901",
@@ -25,4 +28,5 @@ console.log(members);
   "0x4567890123456789012345678901234567890123",
   "0x5678901234567890123456789012345678901234",
 ]
+```
 */

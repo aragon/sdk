@@ -3,10 +3,10 @@
 
 Handles the flow of depositing ERC20 tokens to a DAO.
 
-- Similar to the example above
-- The `tokenAddress` field is required
-- Will attempt to increase the ERC20 allowance if not sufficient
-- More intermediate steps are yielded
+- Similar to the ETH deposit flow
+- The `tokenAddress` field is required. This is the contract address of the ERC-20 token.
+- Will attempt to increase the ERC20 allowance if not sufficient.
+- More intermediate steps are yielded.
 
 */
 import {
@@ -18,22 +18,21 @@ import {
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
-const context = new Context(contextParams);
-const client = new Client(context);
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
 const depositParams: IDepositParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
-  amount: BigInt(10), // amount
+  amount: BigInt(10), // amount in wei
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
   reference: "test deposit", // optional
 };
 
-// gas estimation
-const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
-  depositParams,
-);
+// Estimate how much gas the transaction will cost.
+const estimatedGas: GasFeeEstimation = await client.estimation.deposit(depositParams);
 console.log(estimatedGas.average);
 console.log(estimatedGas.max);
 
+// Deposit the ERC20 tokens.
 const steps = client.methods.deposit(depositParams);
 for await (const step of steps) {
   try {
