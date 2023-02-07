@@ -163,7 +163,7 @@ export async function deploy(): Promise<Deployment> {
       .PluginRepoFactory__factory();
     const pluginRepoFactory = await pluginRepoFactoryFactory
       .connect(deployOwnerWallet)
-      .deploy(pluginRepoRegistry.address);
+      .deploy(pluginRepoRegistryInstance.address);
 
     // Plugin Setup Prcessor
     const pluginSetupProcessorFacotry = new aragonContracts
@@ -181,23 +181,29 @@ export async function deploy(): Promise<Deployment> {
       );
 
     // Permissions
-    // ENS
+    // ENS DAO
     await managingDaoInstance.grant(
       daoRegistrarInstance.address,
       daoRegistryInstance.address,
-      await daoRegistrarInstance.REGISTER_ENS_SUBDOMAIN_PERMISSION_ID(),
+      id("REGISTER_ENS_SUBDOMAIN_PERMISSION"),
+    );
+    // ENS Plugin
+    await managingDaoInstance.grant(
+      pluginRegistrarInstance.address,
+      pluginRepoRegistryInstance.address,
+      id("REGISTER_ENS_SUBDOMAIN_PERMISSION"),
     );
     // DAO Registry
     await managingDaoInstance.grant(
       daoRegistryInstance.address,
       daoFactory.address,
-      await daoRegistryInstance.REGISTER_DAO_PERMISSION_ID(),
+      id("REGISTER_DAO_PERMISSION"),
     );
     // Plugin Registry
     await managingDaoInstance.grant(
       pluginRepoRegistryInstance.address,
       pluginRepoFactory.address,
-      await pluginRepoRegistryInstance.REGISTER_PLUGIN_REPO_PERMISSION_ID(),
+      id("REGISTER_PLUGIN_REPO_PERMISSION"),
     );
 
     // Token Voting Plugin
@@ -213,7 +219,6 @@ export async function deploy(): Promise<Deployment> {
       await deployOwnerWallet.getAddress(),
       pluginRepoFactory,
     );
-
     const tokenVotingRepo = aragonContracts.PluginRepo__factory
       .connect(tokenRepoAddress, deployOwnerWallet);
 
@@ -226,7 +231,7 @@ export async function deploy(): Promise<Deployment> {
     const addresslistVotingRepoAddress = await deployPlugin(
       "address-list-voting",
       addresslistVotingPluginSetup.address,
-      managingDaoInstance.address,
+      await deployOwnerWallet.getAddress(),
       pluginRepoFactory,
     );
     const addresslistVotingRepo = aragonContracts.PluginRepo__factory
@@ -241,7 +246,7 @@ export async function deploy(): Promise<Deployment> {
     const multisigRepoAddress = await deployPlugin(
       "multisig",
       multisigPluginSetup.address,
-      managingDaoInstance.address,
+      await deployOwnerWallet.getAddress(),
       pluginRepoFactory,
     );
     const multisigRepo = aragonContracts.PluginRepo__factory
@@ -254,9 +259,9 @@ export async function deploy(): Promise<Deployment> {
     });
 
     return {
-      managingDaoAddress: managingDao.address,
+      managingDaoAddress: managingDaoInstance.address,
       daoFactory,
-      daoRegistry,
+      daoRegistry: daoRegistryInstance,
       tokenVotingRepo,
       tokenVotingPluginSetup,
       addresslistVotingRepo,
@@ -279,6 +284,14 @@ async function deployPlugin(
   buildMetadata: string =
     "ipfs://QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR",
 ) {
+  const address = await pluginRepoFactory.callStatic
+    .createPluginRepoWithFirstVersion(
+      name,
+      setupAddress,
+      maintainer,
+      hexlify(toUtf8Bytes(releaseMetadata)),
+      hexlify(toUtf8Bytes(buildMetadata)),
+    );
   const tx = await pluginRepoFactory.createPluginRepoWithFirstVersion(
     name,
     setupAddress,
@@ -286,8 +299,8 @@ async function deployPlugin(
     hexlify(toUtf8Bytes(releaseMetadata)),
     hexlify(toUtf8Bytes(buildMetadata)),
   );
-  await tx.wait()
-  return "todo";
+  await tx.wait();
+  return address;
 }
 
 async function deployEnsContracts(deployOwnerWallet: Signer) {
@@ -347,7 +360,9 @@ export async function createDAO(
   daoSettings: aragonContracts.DAOFactory.DAOSettingsStruct,
   pluginSettings: aragonContracts.DAOFactory.PluginSettingsStruct[],
 ): Promise<{ daoAddr: string; pluginAddrs: string[] }> {
-  const tx = await daoFactory.createDao(daoSettings, pluginSettings);
+  const tx = await daoFactory.createDao(daoSettings, pluginSettings, {
+    gasLimit: 100000,
+  });
   const receipt = await tx.wait();
   const registryInterface = aragonContracts.DAORegistry__factory
     .createInterface();
@@ -393,16 +408,16 @@ export async function createAddresslistDAO(
   return createDAO(
     deployment.daoFactory,
     {
-      metadata: "0x0000",
+      metadata: "0x",
       name: name,
       trustedForwarder: AddressZero,
-      daoURI: "",
+      daoURI: "0x",
     },
     [
       {
         pluginSetupRef: {
           pluginSetupRepo: deployment.addresslistVotingPluginSetup.address,
-          versionTag: versionTagStruct[0],
+          versionTag: versionTagStruct.tag,
         },
         data: defaultAbiCoder.encode(
           [
@@ -429,16 +444,16 @@ export async function createTokenVotingDAO(
   return createDAO(
     deployment.daoFactory,
     {
-      metadata: "0x0000",
+      metadata: "0x",
       name,
       trustedForwarder: AddressZero,
-      daoURI: "",
+      daoURI: "0x",
     },
     [
       {
         pluginSetupRef: {
           pluginSetupRepo: deployment.tokenVotingPluginSetup.address,
-          versionTag: versionTagStruct[0],
+          versionTag: versionTagStruct.tag,
         },
         data: defaultAbiCoder.encode(
           [
@@ -462,39 +477,57 @@ export async function createMultisigDAO(
   name: string,
   addresses: string[] = [],
 ) {
-  const versionTagStruct = await deployment.multisigRepo
-    ["getLatestVersion(address)"](
-      deployment.multisigPluginSetup.address,
-    );
-
-  return createDAO(
-    deployment.daoFactory,
-    {
-      metadata: "0x0000",
-      name: name,
-      trustedForwarder: AddressZero,
-      daoURI: "",
-    },
-    [
+  try {
+    const latestVersion = await deployment.multisigRepo
+      ["getLatestVersion(address)"](deployment.multisigPluginSetup.address);
+    const addr = await createDAO(
+      deployment.daoFactory,
       {
-        pluginSetupRef: {
-          pluginSetupRepo: deployment.multisigPluginSetup.address,
-          versionTag: versionTagStruct[0],
-        },
-        data: defaultAbiCoder.encode(
-          [
-            "address[]",
-            "tuple(bool, uint16)",
-          ],
-          [
-            addresses,
-            [
-              true,
-              1,
-            ],
-          ],
-        ),
+        metadata: toUtf8Bytes("ipfs://...."),
+        name: name,
+        trustedForwarder: AddressZero,
+        daoURI: "0x",
       },
-    ],
-  );
+      [
+        // {
+        //   pluginSetupRef: {
+        //     pluginSetupRepo: deployment.multisigPluginSetup.address,
+        //     versionTag: latestVersion.tag,
+        //   },
+        //   data: defaultAbiCoder.encode(
+        //     [
+        //       "address[] members",
+        //       "tuple(bool onlyListed, uint16 minApprovals)",
+        //     ],
+        //     [
+        //       addresses,
+        //       [false, 1],
+        //     ],
+        //   ),
+        // },
+        {
+          pluginSetupRef: {
+            pluginSetupRepo: deployment.tokenVotingPluginSetup.address,
+            versionTag: latestVersion.tag,
+          },
+          data: defaultAbiCoder.encode(
+            [
+              "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
+              "tuple(address addr, string name, string symbol) tokenSettings",
+              "tuple(address[] receivers, uint256[] amounts) mintSettings",
+            ],
+            [
+              // allow vote replacement
+              [2, 1, 1, 3600, 1],
+              [AddressZero, "erc20", "e20"],
+              [addresses, addresses.map(() => parseEther("1"))],
+            ],
+          ),
+        },
+      ],
+    );
+    return addr;
+  } catch (e) {
+    throw e;
+  }
 }
