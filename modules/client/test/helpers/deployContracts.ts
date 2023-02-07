@@ -489,38 +489,19 @@ export async function createMultisigDAO(
         daoURI: "0x",
       },
       [
-        // {
-        //   pluginSetupRef: {
-        //     pluginSetupRepo: deployment.multisigPluginSetup.address,
-        //     versionTag: latestVersion.tag,
-        //   },
-        //   data: defaultAbiCoder.encode(
-        //     [
-        //       "address[] members",
-        //       "tuple(bool onlyListed, uint16 minApprovals)",
-        //     ],
-        //     [
-        //       addresses,
-        //       [false, 1],
-        //     ],
-        //   ),
-        // },
         {
           pluginSetupRef: {
-            pluginSetupRepo: deployment.tokenVotingPluginSetup.address,
+            pluginSetupRepo: deployment.multisigPluginSetup.address,
             versionTag: latestVersion.tag,
           },
           data: defaultAbiCoder.encode(
             [
-              "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
-              "tuple(address addr, string name, string symbol) tokenSettings",
-              "tuple(address[] receivers, uint256[] amounts) mintSettings",
+              "address[] members",
+              "tuple(bool onlyListed, uint16 minApprovals)",
             ],
             [
-              // allow vote replacement
-              [2, 1, 1, 3600, 1],
-              [AddressZero, "erc20", "e20"],
-              [addresses, addresses.map(() => parseEther("1"))],
+              addresses,
+              [false, 1],
             ],
           ),
         },
