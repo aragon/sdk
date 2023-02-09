@@ -40,20 +40,36 @@ import {
 import { EthereumProvider, Server } from "ganache";
 
 describe("Token Voting Client", () => {
-  let pluginAddress: string;
+  let pluginAddressMap: Map<VotingMode, string> = new Map<VotingMode, string>();
   let server: Server;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
     const deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-    const daoCreation = await deployContracts.createTokenVotingDAO(
-      deployment,
-      "test-token-dao",
-      [TEST_WALLET_ADDRESS],
-    );
-    pluginAddress = daoCreation.pluginAddrs[0];
-    // advance to get past the voting checkpoint
+    const daos = [
+      {
+        type: "standard",
+        votingMode: VotingMode.STANDARD,
+      },
+      {
+        type: "early-execution",
+        votingMode: VotingMode.EARLY_EXECUTION,
+      },
+      {
+        type: "vote-replacement",
+        votingMode: VotingMode.VOTE_REPLACEMENT,
+      },
+    ];
+    for (const dao of daos) {
+      const daoCreation = await deployContracts.createTokenVotingDAO(
+        deployment,
+        "test-token-dao-" + dao.type,
+        dao.votingMode,
+        [TEST_WALLET_ADDRESS],
+      );
+      pluginAddressMap.set(dao.votingMode, daoCreation.pluginAddrs[0]);
+    }
     await advanceBlocks(server.provider, 10);
   });
 
@@ -67,65 +83,70 @@ describe("Token Voting Client", () => {
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const tokenVotingClient = new TokenVotingClient(ctxPlugin);
+        for (const key of pluginAddressMap.keys()) {
+          const pluginAddress = pluginAddressMap.get(key);
+          if (!pluginAddress) {
+            throw new Error("invalid voting mode");
+          }
+          // generate actions
+          const action = await tokenVotingClient.encoding
+            .updatePluginSettingsAction(pluginAddress, {
+              votingMode: VotingMode.VOTE_REPLACEMENT,
+              supportThreshold: 0.5,
+              minParticipation: 0.5,
+              minDuration: 7200,
+            });
 
-        // generate actions
-        const action = await tokenVotingClient.encoding
-          .updatePluginSettingsAction(pluginAddress, {
-            votingMode: VotingMode.VOTE_REPLACEMENT,
-            supportThreshold: 0.5,
-            minParticipation: 0.5,
-            minDuration: 7200,
-          });
-
-        const metadata: ProposalMetadata = {
-          title: "Best Proposal",
-          summary: "this is the sumnary",
-          description: "This is a very long description",
-          resources: [
-            {
-              name: "Website",
-              url: "https://the.website",
+          const metadata: ProposalMetadata = {
+            title: "Best Proposal",
+            summary: "this is the sumnary",
+            description: "This is a very long description",
+            resources: [
+              {
+                name: "Website",
+                url: "https://the.website",
+              },
+            ],
+            media: {
+              header: "https://no.media/media.jpeg",
+              logo: "https://no.media/media.jpeg",
             },
-          ],
-          media: {
-            header: "https://no.media/media.jpeg",
-            logo: "https://no.media/media.jpeg",
-          },
-        };
+          };
 
-        const ipfsUri = await tokenVotingClient.methods.pinMetadata(metadata);
-        const endDate = new Date();
-        endDate.setHours(endDate.getHours() + 2);
+          const ipfsUri = await tokenVotingClient.methods.pinMetadata(metadata);
+          const endDate = new Date();
+          endDate.setHours(endDate.getHours() + 2);
 
-        const proposalParams: ICreateProposalParams = {
-          pluginAddress,
-          metadataUri: ipfsUri,
-          actions: [action],
-          executeOnPass: false,
-          endDate,
-        };
+          const proposalParams: ICreateProposalParams = {
+            pluginAddress,
+            metadataUri: ipfsUri,
+            actions: [action],
+            executeOnPass: false,
+            endDate,
+          };
 
-        for await (
-          const step of tokenVotingClient.methods.createProposal(
-            proposalParams,
-          )
-        ) {
-          switch (step.key) {
-            case ProposalCreationSteps.CREATING:
-              expect(typeof step.txHash).toBe("string");
-              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            case ProposalCreationSteps.DONE:
-              expect(typeof step.proposalId).toBe("string");
-              expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9].*$/i);
-              // TODO uncomment with new proposal ID
-              // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            default:
-              throw new Error(
-                "Unexpected proposal creation step: " +
-                  Object.keys(step).join(", "),
-              );
+          for await (
+            const step of tokenVotingClient.methods.createProposal(
+              proposalParams,
+            )
+          ) {
+            switch (step.key) {
+              case ProposalCreationSteps.CREATING:
+                expect(typeof step.txHash).toBe("string");
+                expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+                break;
+              case ProposalCreationSteps.DONE:
+                expect(typeof step.proposalId).toBe("string");
+                expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9].*$/i);
+                // TODO uncomment with new proposal ID
+                // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+                break;
+              default:
+                throw new Error(
+                  "Unexpected proposal creation step: " +
+                    Object.keys(step).join(", "),
+                );
+            }
           }
         }
       });
@@ -137,15 +158,21 @@ describe("Token Voting Client", () => {
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
-        const params: ICanVoteParams = {
-          address: TEST_WALLET_ADDRESS,
-          proposalId: "0x00",
-          pluginAddress,
-          vote: VoteValues.YES,
-        };
-        const canVote = await client.methods.canVote(params);
-        expect(typeof canVote).toBe("boolean");
-        expect(canVote).toBe(true);
+        for (const key of pluginAddressMap.keys()) {
+          const pluginAddress = pluginAddressMap.get(key);
+          if (!pluginAddress) {
+            throw new Error("invalid voting mode");
+          }
+          const params: ICanVoteParams = {
+            address: TEST_WALLET_ADDRESS,
+            proposalId: "0x00",
+            pluginAddress,
+            vote: VoteValues.YES,
+          };
+          const canVote = await client.methods.canVote(params);
+          expect(typeof canVote).toBe("boolean");
+          expect(canVote).toBe(true);
+        }
       });
     });
 
@@ -155,57 +182,72 @@ describe("Token Voting Client", () => {
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
-        const voteParams: IVoteProposalParams = {
-          pluginAddress,
-          proposalId: "0x00",
-          vote: VoteValues.YES,
-        };
+        for (const key of pluginAddressMap.keys()) {
+          const pluginAddress = pluginAddressMap.get(key);
+          if (!pluginAddress) {
+            throw new Error("invalid voting mode");
+          }
 
-        for await (const step of client.methods.voteProposal(voteParams)) {
-          switch (step.key) {
-            case VoteProposalStep.VOTING:
-              expect(typeof step.txHash).toBe("string");
-              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            case VoteProposalStep.DONE:
-              break;
-            default:
-              throw new Error(
-                "Unexpected vote proposal step: " +
-                  Object.keys(step).join(", "),
-              );
+          const voteParams: IVoteProposalParams = {
+            pluginAddress,
+            proposalId: "0x00",
+            vote: VoteValues.YES,
+          };
+
+          for await (const step of client.methods.voteProposal(voteParams)) {
+            switch (step.key) {
+              case VoteProposalStep.VOTING:
+                expect(typeof step.txHash).toBe("string");
+                expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+                break;
+              case VoteProposalStep.DONE:
+                break;
+              default:
+                throw new Error(
+                  "Unexpected vote proposal step: " +
+                    Object.keys(step).join(", "),
+                );
+            }
           }
         }
       });
-      // TODO
-      // the dao hasnt voteReplacement enabled
-      //   it("Should replace a vote on a proposal locally", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const ctxPlugin = ContextPlugin.fromContext(ctx);
-      //     const client = new TokenVotingClient(ctxPlugin);
 
-      //     const voteParams: IVoteProposalParams = {
-      //       pluginAddress,
-      //       proposalId: "0x00",
-      //       vote: VoteValues.YES,
-      //     };
+      it("Should replace a vote on a proposal locally", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
 
-      //     for await (const step of client.methods.voteProposal(voteParams)) {
-      //       switch (step.key) {
-      //         case VoteProposalStep.VOTING:
-      //           expect(typeof step.txHash).toBe("string");
-      //           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-      //           break;
-      //         case VoteProposalStep.DONE:
-      //           break;
-      //         default:
-      //           throw new Error(
-      //             "Unexpected vote proposal step: " +
-      //               Object.keys(step).join(", "),
-      //           );
-      //       }
-      //     }
-      //   });
+        for (const key of pluginAddressMap.keys()) {
+          if (key !== VotingMode.VOTE_REPLACEMENT) {
+            continue;
+          }
+          const pluginAddress = pluginAddressMap.get(key);
+          if (!pluginAddress) {
+            throw new Error("invalid voting mode");
+          }
+          const voteParams: IVoteProposalParams = {
+            pluginAddress,
+            proposalId: "0x00",
+            vote: VoteValues.YES,
+          };
+
+          for await (const step of client.methods.voteProposal(voteParams)) {
+            switch (step.key) {
+              case VoteProposalStep.VOTING:
+                expect(typeof step.txHash).toBe("string");
+                expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+                break;
+              case VoteProposalStep.DONE:
+                break;
+              default:
+                throw new Error(
+                  "Unexpected vote proposal step: " +
+                    Object.keys(step).join(", "),
+                );
+            }
+          }
+        }
+      });
     });
 
     describe("Execute proposal", () => {
@@ -214,34 +256,43 @@ describe("Token Voting Client", () => {
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
-        const executeParams: IExecuteProposalParams = {
-          pluginAddress,
-          proposalId: "0x00",
-        };
-
-        try {
-          for await (
-            const step of client.methods.executeProposal(
-              executeParams,
-            )
-          ) {
-            switch (step.key) {
-              case ExecuteProposalStep.EXECUTING:
-                expect(typeof step.txHash).toBe("string");
-                expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-                break;
-              case ExecuteProposalStep.DONE:
-                break;
-              default:
-                throw new Error(
-                  "Unexpected execute proposal step: " +
-                    Object.keys(step).join(", "),
-                );
-            }
+        for (const key of pluginAddressMap.keys()) {
+          if (key !== VotingMode.EARLY_EXECUTION) {
+            continue;
           }
-        } catch (e) {
-          console.log(e);
-          throw e;
+          const pluginAddress = pluginAddressMap.get(key);
+          if (!pluginAddress) {
+            throw new Error("invalid voting mode");
+          }
+          const executeParams: IExecuteProposalParams = {
+            pluginAddress,
+            proposalId: "0x00",
+          };
+
+          try {
+            for await (
+              const step of client.methods.executeProposal(
+                executeParams,
+              )
+            ) {
+              switch (step.key) {
+                case ExecuteProposalStep.EXECUTING:
+                  expect(typeof step.txHash).toBe("string");
+                  expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+                  break;
+                case ExecuteProposalStep.DONE:
+                  break;
+                default:
+                  throw new Error(
+                    "Unexpected execute proposal step: " +
+                      Object.keys(step).join(", "),
+                  );
+              }
+            }
+          } catch (e) {
+            console.log(e);
+            throw e;
+          }
         }
       });
     });
@@ -371,7 +422,7 @@ describe("Token Voting Client", () => {
             expect(typeof vote.weight).toBe("bigint");
           }
           if (proposal.executionTxHash) {
-            expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{52}$/i);
+            expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
           }
         }
       });

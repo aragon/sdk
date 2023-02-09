@@ -321,7 +321,7 @@ describe("Client Multisig", () => {
         expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
       }
       if (proposal.executionTxHash) {
-        expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{52}$/i);
+        expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
       }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {

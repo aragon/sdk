@@ -340,7 +340,7 @@ export enum TransferSortBy {
 
 export enum DaoSortBy {
   CREATED_AT = "createdAt",
-  NAME = "name",
+  SUBDOMAIN = "subdomain",
   POPULARITY = "totalProposals", // currently defined as number of proposals
 }
 
@@ -362,15 +362,13 @@ export const SubgraphPluginTypeMap: Map<
 ]);
 
 export type SubgraphPluginListItem = {
-  plugin: {
-    id: string;
-    __typename: SubgraphPluginTypeName;
-  };
+  id: string;
+  __typename: SubgraphPluginTypeName;
 };
 
 type SubgraphDaoBase = {
   id: string;
-  name: string;
+  subdomain: string;
   metadata: string;
   plugins: SubgraphPluginListItem[];
 };

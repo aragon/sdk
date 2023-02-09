@@ -12,6 +12,7 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 import { ERC1967ABI, ERC1967Bytecode } from "../abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
+import { VotingMode, votingModeToContracts } from "../../src";
 
 const WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 
@@ -396,6 +397,7 @@ export async function createDAO(
 export async function createAddresslistDAO(
   deployment: Deployment,
   name: string,
+  votingMode: VotingMode,
   addresses: string[] = [],
 ) {
   const latestVersion = await deployment.addresslistVotingRepo
@@ -423,7 +425,7 @@ export async function createAddresslistDAO(
               "address[] members",
             ],
             // Allow vote replacement
-            [[1, 500000, 500000, 3600, 1], addresses],
+            [[votingModeToContracts(votingMode), 500000, 500000, 3600, 1], addresses],
           ),
         },
       ],
@@ -438,6 +440,7 @@ export async function createAddresslistDAO(
 export async function createTokenVotingDAO(
   deployment: Deployment,
   name: string,
+  votingMode: VotingMode,
   addresses: string[] = [],
 ) {
   const latestVersion = await deployment.tokenVotingRepo
@@ -464,7 +467,7 @@ export async function createTokenVotingDAO(
           ],
           [
             // allow vote replacement
-            [1, 500000, 500000, 3600, 1],
+            [votingModeToContracts(votingMode), 500000, 500000, 3600, 1],
             [AddressZero, "erc20", "e20"],
             [addresses, addresses.map(() => parseEther("1"))],
           ],

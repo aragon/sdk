@@ -48,7 +48,7 @@ export function toDaoDetails(
 ): DaoDetails {
   return {
     address: dao.id,
-    ensDomain: dao.name,
+    ensDomain: dao.subdomain,
     metadata: {
       name: metadata.name,
       description: metadata.description,
@@ -62,11 +62,11 @@ export function toDaoDetails(
         plugin: SubgraphPluginListItem,
       ): InstalledPluginListItem => {
         return {
-          instanceAddress: plugin.plugin.id,
+          instanceAddress: plugin.id,
           // TODO
           // temporary ens addreses for the plugins
           id: SubgraphPluginTypeMap.get(
-            plugin.plugin.__typename,
+            plugin.__typename,
           ) as string,
           // TODO
           // update when subgraph returns version
@@ -83,7 +83,7 @@ export function toDaoListItem(
 ): DaoListItem {
   return {
     address: dao.id,
-    ensDomain: dao.name,
+    ensDomain: dao.subdomain,
     metadata: {
       name: metadata.name,
       description: metadata.description,
@@ -95,11 +95,11 @@ export function toDaoListItem(
         plugin: SubgraphPluginListItem,
       ): InstalledPluginListItem => {
         return {
-          instanceAddress: plugin.plugin.id,
+          instanceAddress: plugin.id,
           // TODO
           // temporary ens addreses for the plugins
           id: SubgraphPluginTypeMap.get(
-            plugin.plugin.__typename,
+            plugin.__typename,
           ) as string,
           // TODO
           // update when subgraph returns version

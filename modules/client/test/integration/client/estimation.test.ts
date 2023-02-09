@@ -41,7 +41,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const daoName = "TokenVotingDAO_" + Math.floor(Random.getFloat() * 9999) +
+      const daoName = "TokenVotingDAO-" + Math.floor(Random.getFloat() * 9999) +
         1;
 
       const pluginParams: IAddresslistVotingPluginInstall = {

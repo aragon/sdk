@@ -84,12 +84,9 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     const abiObjects = [{ tokenStandard: TokenStandards.ERC20, abi: erc20ContractAbi }];
     for (const abiObject of abiObjects) {
       const hexBytes = bytesToHex(data, true);
-      const iface  = new Contract(AddressZero, abiObject.abi); 
-      const receivedSigHash = iface.getFunction(
-        hexBytes.substring(0, 10) as any,
-      );
-      const expectedSigHash = iface.getSigHash("transfer");
-      if (receivedSigHash !== expectedSigHash) {
+      const iface  = new Contract(AddressZero, abiObject.abi).interface;
+      const expectedSigHash = iface.getSighash("transfer");
+      if (hexBytes.substring(0, 10) !== expectedSigHash) {
         continue
       }
       const result = iface.decodeFunctionData("transfer", data);
