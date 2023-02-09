@@ -1,16 +1,15 @@
 /* MARKDOWN
 ### Remove members (Multisig plugin)
 
-Removes a list of addresses from the Multisig plugin of a given DAO
+Removes a list of addresses from the Multisig plugin of a given DAO so they are no longer able to vote on Multisig proposals for that DAO.
 */
 
 import {
-  Context,
   ContextPlugin,
   DaoAction,
-  MultisigClient
+  MultisigClient,
+  RemoveAddressesParams
 } from "@aragon/sdk-client";
-import { RemoveAddressesParams } from "../../src";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate a plugin context from the aragonOSx SDK context.
@@ -27,7 +26,7 @@ const members: string[] = [
 
 const removeAddressesParams: RemoveAddressesParams = {
   members,
-  pluginAddress: "0x0987654321098765432109876543210987654321",
+  pluginAddress: "0x0987654321098765432109876543210987654321", // The address of the Multisig plugin contract itself.
 };
 
 // Removes the addresses from the Multisig plugin of a DAO.
@@ -36,6 +35,7 @@ console.log(removeAddressesFromMultisig);
 
 /* MARKDOWN
 Returns:
+
 ```json
 {
   to: "0x1234567890...",

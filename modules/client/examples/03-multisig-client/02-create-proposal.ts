@@ -6,13 +6,13 @@ Creates a proposal whose governance mechanism is the Multisig plugin and its con
 
 import {
   Client,
-  Context,
   ContextPlugin,
+  CreateMultisigProposalParams,
+  IWithdrawParams,
   MultisigClient,
   ProposalCreationSteps,
-  ProposalMetadata,
+  ProposalMetadata
 } from "@aragon/sdk-client";
-import { CreateMultisigProposalParams, IWithdrawParams } from "../../src";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate an aragonOSx SDK client.
@@ -49,7 +49,7 @@ const withdrawParams: IWithdrawParams = {
   recipientAddress: "0x1234567890123456789012345678901234567890", // address of the receiver of the transaction
   amount: BigInt(10),
   tokenAddress: "0x1234567890123456789012345678901234567890", // token's contract address
-  reference: "test",
+  reference: "test"
 };
 
 // Address of the DAO where the proposal will be created.
@@ -77,6 +77,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error(err);
+    console.error({ err });
   }
 }

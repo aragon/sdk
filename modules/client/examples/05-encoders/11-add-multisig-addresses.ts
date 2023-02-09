@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Add Members to a Multisig Plugin
+### Add Members (Multisig)
 
-Adds a new address as a member of the Multisig plugin installed in a DAO.
+Adds new address as members of the Multisig plugin installed in a DAO, so they are now able to vote on proposals.
 */
 
 import {
@@ -26,7 +26,7 @@ const members: string[] = [
 
 const addAddressesParams: AddAddressesParams = {
   members,
-  pluginAddress: "0x0987654321098765432109876543210987654321" // The address of the Multisig plugin.
+  pluginAddress: "0x0987654321098765432109876543210987654321" // The address of the Multisig plugin contract itself.
 };
 
 // Adds the addresses as members of the Multisig plugin for a DAO.

@@ -7,14 +7,14 @@ However, whenever you want to interact with any plugin within our SDK, you will 
 */
 
 import { ContextPlugin } from "@aragon/sdk-client";
-import { Wallet } from "@ethersproject/wallet";
-import { context, contextParams } from "./00-getting-started";
+import { context } from "./00-getting-started";
 
-// In order to interact with the plugins, you need to create a `ContextPlugin` which will allow you to then generate the clients for any plugin you want to interact with.
+// Instantiate the Context Plugin from the aragonOSx SDK context.
 export const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 /* MARKDOWN
 Update the context with new parameters if you wish to throughout your app.
+
 ```tsx
 contextPlugin.set({ network: 1 });
 contextPlugin.set({ signer: new Wallet("other private key") });

@@ -1,16 +1,16 @@
 /* MARKDOWN
 ### Create an Address List context
 */
-import { Context, ContextPlugin } from "@aragon/sdk-client";
+import { ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";
-import { contextParams } from "../00-client/00-context";
+import { context, contextParams } from "../00-setup/00-getting-started";
 
-const context = new Context(contextParams);
+// Create a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
-// update
+// Update the context plugin.
 contextPlugin.set({ network: 1 });
 contextPlugin.set({ signer: new Wallet("other private key") });
 contextPlugin.setFull(contextParams);
 
-console.log(contextPlugin)
+console.log({ contextPlugin });

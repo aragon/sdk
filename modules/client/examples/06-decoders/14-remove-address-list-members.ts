@@ -1,6 +1,9 @@
 /* MARKDOWN
-### Decode Remove Members Action (Address List)
+### Decode Remove Members Action (AddresslistVoting)
+
+Decodes the action of removing addresses from the AddresslistVoting plugin so they can no longer vote in AddresslistVoting proposals.
 */
+
 import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -11,8 +14,8 @@ const clientAddressList = new AddresslistVotingClient(contextPlugin);
 
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const members: string[] = clientAddressList.decoding.removeMembersAction(data);
-console.log(members);
+const removedMembers: string[] = clientAddressList.decoding.removeMembersAction(data);
+console.log({ removedMembers });
 
 /* MARKDOWN
 Returns:

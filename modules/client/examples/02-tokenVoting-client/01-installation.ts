@@ -1,18 +1,18 @@
 /* MARKDOWN
-### Create a DAO with a TokenVoting governance plugin
+### Create a DAO with TokenVoting plugin
 
-Creates a DAO which uses the TokenVoting plugin.
+Creates a DAO with the TokenVoting plugin installed off the bat.
 */
 
 import {
   Client,
-  DaoCreationSteps,
-  GasFeeEstimation,
   CreateDaoParams,
+  DaoCreationSteps,
+  DaoMetadata,
+  GasFeeEstimation,
   ITokenVotingPluginInstall,
   TokenVotingClient,
-  VotingMode,
-  DaoMetadata
+  VotingMode
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -27,7 +27,7 @@ const pluginInitParams1: ITokenVotingPluginInstall = {
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
-    votingMode: VotingMode.STANDARD, // default standard
+    votingMode: VotingMode.STANDARD // default standard, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   },
   useToken: {
     address: "0x...", // contract address of the token to use
@@ -41,25 +41,25 @@ const pluginInitParams2: ITokenVotingPluginInstall = {
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
-    votingMode: VotingMode.EARLY_EXECUTION, // default standard
+    votingMode: VotingMode.EARLY_EXECUTION // default is STANDARD. other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   },
   newToken: {
     name: "Token", // the name of your token
     symbol: "TOK", // the symbol for your token. shouldn't be more than 5 letters
     decimals: 18, // the number of decimals your token uses
-    minter: "0x...", // optionally, define a minter contract address
+    minter: "0x...", // optional. if you don't define any, we'll use the standard OZ ERC20 contract. Otherwise, you can define your own token minter contract address.
     balances: [
-      { // Initial balances of the new token
+      { // Defines the initial balances of the new token
         address: "0x...", // address of the account to receive the newly minted tokens
-        balance: BigInt(10), // amount of tokens that address should receive
+        balance: BigInt(10) // amount of tokens that address should receive
       },
       {
         address: "0x...",
-        balance: BigInt(10),
+        balance: BigInt(10)
       },
       {
         address: "0x...",
-        balance: BigInt(10),
+        balance: BigInt(10)
       },
     ],
   },
@@ -77,7 +77,7 @@ const daoMetadata: DaoMetadata = {
   links: [{
     name: "Web site",
     url: "https://..."
-  }],
+  }]
 };
 
 // Pins the DAO's metadata in IPFS to get back the URI.
@@ -107,6 +107,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error(err);
+    console.error({ err });
   }
 }

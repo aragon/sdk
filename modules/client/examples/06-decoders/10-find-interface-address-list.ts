@@ -18,11 +18,11 @@ const client: AddresslistVotingClient = new AddresslistVotingClient(contextPlugi
 const data: Uint8Array = new Uint8Array([12, 56]);
 
 const functionParams = client.decoding.findInterface(data);
-
-console.log(functionParams);
+console.log({ functionParams });
 
 /* MARKDOWN
 Returns:
+
 ```json
 {
   id: "function functionName(param1, param2)"

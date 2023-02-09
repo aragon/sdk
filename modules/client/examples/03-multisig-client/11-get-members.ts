@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Get the list of members participating in a DAO's Multisig plugin.
+### Get the list of members (Multisig)
 
-Retrieves the list of addresses able to participate in a Multisig proposal for a given DAO.
+Retrieves the list of addresses able to participate in a Multisig proposal for a given DAO that has the Multisig plugin installed.
 */
 
 import {
@@ -15,7 +15,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig plugin client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const daoAddressorEns: string = "0x1234548357023847502348";
+const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
 
 const multisigMembers: string[] = await multisigClient.methods.getMembers(daoAddressorEns);
 console.log({ multisigMembers });

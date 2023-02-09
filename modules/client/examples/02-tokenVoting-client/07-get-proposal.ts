@@ -14,7 +14,7 @@ import { context } from "../00-setup/00-getting-started";
 // Instantiate a plugin context from an aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
-// Create a TokenVoting client
+// Create a TokenVoting client.
 const tokenVotingClient = new TokenVotingClient(contextPlugin);
 
 // The address of the proposal you want to retrieve.

@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Get a TokenVoting Plugin's token details
+### Get token details (TokenVoting)
 
 Returns the token details used in the TokenVoting plugin for a given DAO. These are the details of the tokens used to vote in that specific DAO.
 */

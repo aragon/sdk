@@ -1,41 +1,45 @@
 /* MARKDOWN
 ### Add and pin metadata
-Adds an pin data with a the format used by aragon app into one of the specified IPFS nodes and return a ipfs cid preceded by ipfs://
 
+Adds an pin data with a the format used by aragon app into one of the specified IPFS nodes and return a IPFS CID preceded by "ipfs://".
 */
+
 import {
   AddresslistVotingClient,
-  Context,
   ContextPlugin,
-  ProposalMetadata,
+  ProposalMetadata
 } from "@aragon/sdk-client";
-import { contextParams } from "../00-client/00-context";
+import { context } from "../00-setup/00-getting-started";
 
-const context = new Context(contextParams);
+// Instantiate a plugin context from the aragonOSx SDK context.
 const contextPlugin = ContextPlugin.fromContext(context);
+// Instantiate an AddresslistVoting plugin client.
 const client = new AddresslistVotingClient(contextPlugin);
-const metadata: ProposalMetadata = {
+
+const proposalMetadata: ProposalMetadata = {
   title: "Test Proposal",
   summary: "This is a short description",
   description: "This is a long description",
   resources: [
     {
       name: "Discord",
-      url: "https://discord.com/...",
+      url: "https://discord.com/..."
     },
     {
       name: "Website",
-      url: "https://website...",
+      url: "https://website..."
     },
   ],
   media: {
     logo: "https://...",
-    header: "https://...",
+    header: "https://..."
   },
 };
-const metadataUri = await client.methods.pinMetadata(metadata);
-console.log(metadataUri);
+const proposalMetadataUri = await client.methods.pinMetadata(proposalMetadata);
+console.log({ proposalMetadataUri });
 
-/*
+/* MARKDOWN
+```javascript
   ipfs://Qm...
+```
 */

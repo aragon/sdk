@@ -21,6 +21,7 @@ console.log({ revokeParams });
 
 /* MARKDOWN
 Returns:
+
 ```json
 {
   who: "0x1234567890...",

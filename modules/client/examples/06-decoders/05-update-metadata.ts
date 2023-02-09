@@ -7,7 +7,7 @@ Decodes an update metadata action and expect the metadata.
 import { Client, DaoMetadata } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Creates an Aragon SDK client.
+// Instantiates an aragonOSx SDK client.
 const client: Client = new Client(context);
 
 const data: Uint8Array = new Uint8Array([12, 56]);

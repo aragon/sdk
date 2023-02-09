@@ -1,12 +1,16 @@
 /* MARKDOWN
-### Create an Address List client
-*/
-import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
-import { contextParams } from "../00-client/00-context";
+### Create an AddresslistVoting client
 
-const context = new Context(contextParams);
+Creating an AddresslistVoting client allows you to access the AddresslistVoting plugin functionality.
+*/
+
+import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
+import { context } from "../00-setup/00-getting-started";
+
+// Instantiate a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
-const client = new AddresslistVotingClient(contextPlugin);
+// Instantiate an AddresslistVoting client from the aragonOSx SDK context.
+const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-console.log(client);
+console.log({ addresslistVotingClient });

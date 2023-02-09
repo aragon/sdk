@@ -23,10 +23,10 @@ const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
   limit: 10, // optional
-  direction: SortDirection.ASC, // optional
-  sortBy: ProposalSortBy.POPULARITY, //optional
-  status: ProposalStatus.ACTIVE, // optional
-  daoAddressOrEns: "0x1234348529348570294650287698237520938574284357"
+  direction: SortDirection.ASC, // optional. otherwise, DESC
+  sortBy: ProposalSortBy.POPULARITY, //optional. otherwise, CREATED_AT, NAME, VOTES
+  status: ProposalStatus.ACTIVE, // optional. otherwise, PENDING, SUCCEEDED, EXECUTED, DEFEATED
+  daoAddressOrEns: "0x1234348529348570294650287698237520938574284357" // or my-dao.dao.eth
 };
 
 const multisigProposals: MultisigProposalListItem[] = await multisigClient.methods.getProposals(queryParams);

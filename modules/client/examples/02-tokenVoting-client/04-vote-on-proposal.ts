@@ -1,16 +1,15 @@
 /* MARKDOWN
 ### Vote on a TokenVoting proposal
 
-Adds a vote to a token voting proposal. The amount of votes generated depends on the amount of tokens a given address has.
+Adds a vote to a proposal using the TokenVoting governance mechanism. The amount of votes generated depends on the amount of tokens a given address has.
 */
 
 import {
-  Context,
   ContextPlugin,
   IVoteProposalParams,
   TokenVotingClient,
   VoteProposalStep,
-  VoteValues,
+  VoteValues
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -23,7 +22,7 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin
 const voteParams: IVoteProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890",
-  vote: VoteValues.YES
+  vote: VoteValues.YES // other options: NO, ABSTAIN
 };
 
 // Creates a vote on a given proposal created by the token voting governance mechanism.
@@ -38,6 +37,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error(err);
+    console.error({ err });
   }
 }

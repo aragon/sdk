@@ -6,10 +6,10 @@ The `createADao` function allows you to create a DAO with the given parameters.
 
 import {
   Client,
+  CreateDaoParams,
   DaoCreationSteps,
   DaoMetadata,
-  GasFeeEstimation,
-  CreateDaoParams
+  GasFeeEstimation
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -19,11 +19,11 @@ const client: Client = new Client(context);
 const metadata: DaoMetadata = {
   name: "My DAO",
   description: "This is a description",
-  avatar: "",
+  avatar: "image-url",
   links: [{
     name: "Web site",
     url: "https://..."
-  }],
+  }]
 };
 
 // Through pinning the metadata in IPFS, we can get the IPFS URI. You can read more about it here: https://docs.ipfs.tech/how-to/pin-files/
@@ -51,6 +51,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error(err);
+    console.error({ err });
   }
 }

@@ -20,7 +20,7 @@ const queryParams: IDaoQueryParams = {
   skip: 0, // optional
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
-  sortBy: DaoSortBy.POPULARITY, //optional
+  sortBy: DaoSortBy.POPULARITY //optional
 };
 
 // Get a list of DAOs.
@@ -48,7 +48,7 @@ Returns:
   },
   {
     address: "0x12345...",
-    ensDomain: "test-1.dao.eth", // ENS only works on mainnet
+    ensDomain: "test-1.dao.eth",
     metadata: {
         name: "Test 1",
         description: "This is a description 1"

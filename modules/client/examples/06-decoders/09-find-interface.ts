@@ -4,7 +4,7 @@
 Decodes the parameters of a function call.
 */
 
-import { Client, Context } from "@aragon/sdk-client";
+import { Client } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiates an aragonOSx SDK client.

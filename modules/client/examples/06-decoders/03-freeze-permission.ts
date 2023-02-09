@@ -15,8 +15,9 @@ const data: Uint8Array = new Uint8Array([12, 56]);
 const freezeParams: IFreezePermissionDecodedParams = client.decoding.freezeAction(data);
 console.log({ freezeParams });
 
-/*
+/* MARKDOWN
 Returns:
+
 ```json
 {
   where: "0x1234567890...",

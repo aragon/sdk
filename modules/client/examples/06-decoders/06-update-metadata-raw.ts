@@ -14,7 +14,7 @@ const data: Uint8Array = new Uint8Array([12, 56]);
 
 // Decodes the parameters of an update metadata raw action.
 const decodedUpdateMetadata: string = client.decoding.updateDaoMetadataRawAction(data);
-console.log(decodedUpdateMetadata);
+console.log({ decodedUpdateMetadata });
 
 /* MARKDOWN
 Returns:

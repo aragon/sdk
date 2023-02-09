@@ -23,6 +23,7 @@ const canVoteParams: ICanVoteParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890"
 };
 
+// Returns true or false depending on whether the address can vote in the specific proposal.
 const canVote: boolean = await tokenVotingClient.methods.canVote(canVoteParams);
 console.log({ canVote });
 

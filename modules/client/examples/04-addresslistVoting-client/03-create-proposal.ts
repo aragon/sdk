@@ -1,23 +1,23 @@
 /* MARKDOWN
-### Creating a address list proposal
+### Create a AddresslistVoting proposal
+
+Creates a proposal for a DAO with the AddresslistVoting plugin installed. Within this proposal, only addresses in the approved list of the AddresslistVoting plugin can vote.
 */
+
 import {
   AddresslistVotingClient,
-  Context,
   ContextPlugin,
   ICreateProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
-  VoteValues,
+  VoteValues
 } from "@aragon/sdk-client";
-import { contextParams } from "../00-client/00-context";
+import { context } from "../00-setup/00-getting-started";
 
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Create a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an address list client
-const client = new AddresslistVotingClient(contextPlugin);
+// Create an AddresslistVoting client.
+const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
@@ -26,32 +26,32 @@ const metadata: ProposalMetadata = {
   resources: [
     {
       name: "Discord",
-      url: "https://discord.com/...",
+      url: "https://discord.com/..."
     },
     {
       name: "Website",
-      url: "https://website...",
+      url: "https://website..."
     },
   ],
   media: {
     logo: "https://...",
-    header: "https://...",
+    header: "https://..."
   },
 };
 
-const ipfsUri = await client.methods.pinMetadata(metadata);
+const ipfsUri = await addresslistVotingClient.methods.pinMetadata(metadata);
 
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
-  actions: [],
+  actions: [], // actions to happen after a proposal is approved
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
-  creatorVote: VoteValues.YES,
+  creatorVote: VoteValues.YES // otherwise NO or ABSTAIN
 };
 
-const steps = client.methods.createProposal(proposalParams);
+const steps = addresslistVotingClient.methods.createProposal(proposalParams);
 for await (const step of steps) {
   try {
     switch (step.key) {
@@ -63,6 +63,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error(err);
+    console.error({ err });
   }
 }

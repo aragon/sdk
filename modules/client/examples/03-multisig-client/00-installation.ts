@@ -13,9 +13,9 @@ import {
   CreateDaoParams,
   DaoCreationSteps,
   GasFeeEstimation,
+  MultisigClient,
   MultisigPluginInstallParams
 } from "@aragon/sdk-client";
-import { MultisigClient } from "../../src";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate a client from the aragonOSx SDK context.
@@ -43,7 +43,7 @@ const multisigInstallPluginItem = MultisigClient.encoding.getPluginInstallItem(m
 const metadataUri: string = await client.methods.pinMetadata({
   name: "My DAO",
   description: "This is a description",
-  avatar: "",
+  avatar: "", // image url
   links: [{
     name: "Web site",
     url: "https://..."
@@ -73,6 +73,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error(err);
+    console.error({ err });
   }
 }

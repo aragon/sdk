@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Check if user can approve a transaction in a Multisig proposal
+### Check if user can approve a transaction (Multisig)
 
 Checks whether a user is able to participate in a proposal created using the Multisig plugin.
 */
@@ -7,7 +7,7 @@ Checks whether a user is able to participate in a proposal created using the Mul
 import {
   CanApproveParams,
   ContextPlugin,
-  MultisigClient,
+  MultisigClient
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 

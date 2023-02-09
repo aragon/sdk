@@ -4,7 +4,7 @@
 Retrieves a DAO's asset balances using the DAO address or its ENS domain.
 */
 
-import { AssetBalance, Client, Context } from "@aragon/sdk-client";
+import { AssetBalance, Client } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate the general purpose client from the aragonOSx SDK context.

@@ -1,29 +1,36 @@
 /* MARKDOWN
 ### Remove Members (AddressList)
+
+Removes an address from the AddressList plugin so that this address is no longer able to vote in AddresslistVoting proposals.
 */
 
 import {
   AddresslistVotingClient,
   ContextPlugin,
-  DaoAction,
+  DaoAction
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
+// Instantiate a plugin context from the aragonOSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new AddresslistVotingClient(contextPlugin);
+// Instantiate an AddresslistVoting client.
+const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
+// Addresses to remove from the AddressList plugin.
 const members: string[] = [
   "0x1357924680135792468013579246801357924680",
   "0x2468013579246801357924680135792468013579",
   "0x0987654321098765432109876543210987654321"
 ];
 
-const pluginAddress: string = "0x0987654321098765432109876543210987654321";
-const action: DaoAction = client.encoding.removeMembersAction(pluginAddress, members);
-console.log(action);
+const pluginAddress: string = "0x0987654321098765432109876543210987654321"; // the address of the plugin contract itself.
+
+const removeMembersAction: DaoAction = addresslistVotingClient.encoding.removeMembersAction(pluginAddress, members);
+console.log({ removeMembersAction });
 
 /* MARKDOWN
 Returns:
+
 ```json
 {
   to: "0x1234567890...",

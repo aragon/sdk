@@ -1,33 +1,36 @@
 /* MARKDOWN
-### Loading a plugin's settings
+### Get plugin settings (AddresslistVoting)
+
+Get the settings established for a given AddresslistVoting plugin.
 */
+
 import {
   AddresslistVotingClient,
-  Context,
   ContextPlugin,
   VotingSettings,
 } from "@aragon/sdk-client";
-import { contextParams } from "../00-client/00-context";
+import { context } from "../00-setup/00-getting-started";
 
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Instantiate a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an AddressList client
-const client = new AddresslistVotingClient(contextPlugin);
+// Instantiate an AddresslistVoting client.
+const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+const pluginAddress: string = "0x1234567890123456789012345678901234567890"; // the address of the plugin contract itself.
 
-const settings: VotingSettings | null = await client.methods.getVotingSettings(
-  pluginAddress,
-);
-console.log(settings);
-/*
+const addresslistVotingSettings: VotingSettings | null = await addresslistVotingClient.methods.getVotingSettings(pluginAddress);
+console.log({ addresslistVotingSettings });
+
+/* MARKDOWN
+Returns:
+
+```json
   {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
-    votingMode: "Standard",
+    votingMode: "Standard" // default STANDARD, otherwise EARLY_EXECUTION or VOTE_REPLACEMENT
   }
+  ```
 */

@@ -19,7 +19,7 @@ const multisigClient = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
   proposalId: BigInt(0),
-  pluginAddress: "0x1234567890123456789012345678901234567890",
+  pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the plugin contract itself.
   tryExecution: true
 };
 
@@ -34,6 +34,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error(err);
+    console.error({ err });
   }
 }

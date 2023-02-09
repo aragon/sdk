@@ -1,6 +1,9 @@
 /* MARKDOWN
-### Loading the list of proposals (address list plugin)
+### Get proposal list (AddresslistVoting)
+
+Gets the list of proposals created using the AddresslistVoting plugin.
 */
+
 import {
   AddresslistVotingProposalListItem,
   AddresslistVotingClient,
@@ -9,16 +12,14 @@ import {
   IProposalQueryParams,
   ProposalSortBy,
   ProposalStatus,
-  SortDirection,
+  SortDirection
 } from "@aragon/sdk-client";
-import { contextParams } from "../00-client/00-context";
+import { context } from "../00-setup/00-getting-started";
 
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Instantiate a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an address list client
-const client = new AddresslistVotingClient(contextPlugin);
+// Instantiate an AddresslistVoting client.
+const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
@@ -28,10 +29,13 @@ const queryParams: IProposalQueryParams = {
   status: ProposalStatus.ACTIVE, // optional
 };
 
-const proposals: AddresslistVotingProposalListItem[] = await client.methods
-  .getProposals(queryParams);
-console.log(proposals);
-/*
+const addresslistVotingProposals: AddresslistVotingProposalListItem[] = await addresslistVotingClient.methods.getProposals(queryParams);
+console.log({ addresslistVotingProposals });
+
+/* MARKDOWN
+Returns:
+
+```json
 [
   {
     id: "0x12345...",
@@ -74,4 +78,5 @@ console.log(proposals);
     }
   }
 ]
+```
 */

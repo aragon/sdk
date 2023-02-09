@@ -7,9 +7,9 @@ Retrieves the proposals of a DAO created with the `TokenVoting` plugin.
 import {
   ContextPlugin,
   IProposalQueryParams,
+  SortDirection,
   ProposalSortBy,
   ProposalStatus,
-  SortDirection,
   TokenVotingClient,
   TokenVotingProposalListItem
 } from "@aragon/sdk-client";
@@ -23,9 +23,9 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
   limit: 10, // optional
-  direction: SortDirection.ASC, // optional
-  sortBy: ProposalSortBy.POPULARITY, // optional
-  status: ProposalStatus.ACTIVE, // optional
+  direction: SortDirection.ASC, // optional, otherwise DESC ("descending")
+  sortBy: ProposalSortBy.POPULARITY, // optional, otherwise CREATED_AT, NAME, VOTES
+  status: ProposalStatus.ACTIVE // optional, otherwise PENDING, SUCCEEDED, EXECUTED, DEFEATED
 };
 
 const proposals: TokenVotingProposalListItem[] = await tokenVotingClient.methods.getProposals(queryParams);

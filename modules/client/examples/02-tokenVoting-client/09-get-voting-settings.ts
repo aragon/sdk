@@ -5,9 +5,9 @@ Retrieves the settings used when installing the `TokenVoting` plugin.
 */
 
 import {
-  TokenVotingClient,
   ContextPlugin,
-  VotingSettings,
+  TokenVotingClient,
+  VotingSettings
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 

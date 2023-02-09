@@ -1,32 +1,32 @@
 /* MARKDOWN
-### Set Plugin Config (Address List)
+### Set Plugin Config Action (Address List)
+
+Updates the settings of a given AddresslistVoting plugin.
 */
+
 import {
   AddresslistVotingClient,
-  Context,
   ContextPlugin,
   VotingMode,
-  VotingSettings,
+  VotingSettings
 } from "@aragon/sdk-client";
-import { contextParams } from "../00-client/00-context";
+import { context } from "../00-setup/00-getting-started";
 
-const context: Context = new Context(contextParams);
+// Instantiate a plugin context from the aragonOSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-const client = new AddresslistVotingClient(contextPlugin);
+// Instantiates an AddresslistVoting client.
+const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-// create config action
+// The action object for updating the plugin settings.
 const configActionPrarms: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
-  votingMode: VotingMode.STANDARD,
+  votingMode: VotingMode.STANDARD // default STANDARD, otherwise EARLY_EXECUTION or VOTE_REPLACEMENT
 };
 
-const pluginAddress = "0x1234567890123456789012345678901234567890";
+const pluginAddress = "0x1234567890123456789012345678901234567890"; // the address of the plugin contract itself
 
-const configAction = client.encoding.updatePluginSettingsAction(
-  pluginAddress,
-  configActionPrarms,
-);
-console.log(configAction);
+const configAction = addresslistVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionPrarms);
+console.log({ configAction });

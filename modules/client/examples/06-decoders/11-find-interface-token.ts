@@ -4,7 +4,7 @@
 Decodes the parameters of a function call from the TokenVoting plugin contract.
 */
 
-import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate a plugin context from the aragonOSx SDK context.

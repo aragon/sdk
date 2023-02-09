@@ -5,11 +5,10 @@ Allows you to update the voting configuration of a Multisig plugin installed in 
 */
 
 import {
-  Context,
   ContextPlugin,
   DaoAction,
   MultisigClient,
-  UpdateMultisigVotingSettingsParams,
+  UpdateMultisigVotingSettingsParams
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -23,12 +22,12 @@ const updateMinApprovals: UpdateMultisigVotingSettingsParams = {
     minApprovals: 2,
     onlyListed: false
   },
-  pluginAddress: "0x0987654321098765432109876543210987654321"
+  pluginAddress: "0x0987654321098765432109876543210987654321" // The address of the Multisig plugin contract itself.
 };
 
 // Updates the voting configuration of a Multisig plugin installed in a DAO.
 const updateMultisigConfig: DaoAction = multisigClient.encoding.updateMultisigVotingSettings(updateMinApprovals);
-console.log(updateMultisigConfig);
+console.log({ updateMultisigConfig });
 
 /* MARKDOWN
 Returns:

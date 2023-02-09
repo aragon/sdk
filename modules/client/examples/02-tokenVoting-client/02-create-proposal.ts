@@ -51,7 +51,7 @@ const proposalParams: ICreateProposalParams = {
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
-  creatorVote: VoteValues.YES
+  creatorVote: VoteValues.YES // default NO, other options: ABSTAIN, YES
 };
 
 // Create a proposal where members participate through token voting.
@@ -67,6 +67,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error(err);
+    console.error({ err });
   }
 }

@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Get the voting settings of a Multisig plugin
+### Get voting settings (Multisig)
 
-Retrieves the settings of a Multisig plugin from a DAO.
+Retrieves the settings of a Multisig plugin from a specific DAO.
 */
 
 import {

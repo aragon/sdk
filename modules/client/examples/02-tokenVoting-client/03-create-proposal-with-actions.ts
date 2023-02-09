@@ -5,14 +5,13 @@ Create a proposal using the TokenVoting plugin. This proposal will be created us
 */
 
 import {
-  Context,
   ContextPlugin,
   ICreateProposalParams,
   ProposalCreationSteps,
   TokenVotingClient,
-  VoteValues,
   VotingMode,
   VotingSettings,
+  VoteValues
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -28,7 +27,7 @@ const configActionParams: VotingSettings = {
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
-  votingMode: VotingMode.EARLY_EXECUTION, // default standard
+  votingMode: VotingMode.EARLY_EXECUTION // default standard, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
 };
 
 // The contract address of the token voting plugin you have installed in your DAO
@@ -63,7 +62,7 @@ const proposalParams: ICreateProposalParams = {
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
-  creatorVote: VoteValues.YES
+  creatorVote: VoteValues.YES // default NO, other options: ABSTAIN, YES
 };
 
 // Creates a proposal using the token voting governance mechanism, which executes with the parameters set in the configAction object.
@@ -79,6 +78,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error(err);
+    console.error({ err });
   }
 }

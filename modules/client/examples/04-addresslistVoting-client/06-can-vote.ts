@@ -1,29 +1,33 @@
 /* MARKDOWN
-### Checking if user can vote in a address list proposal
+### Check if an address can vote in a proposal (Addresslist)
+
+Checks whether an address is able to participate in a DAO proposal created using the Addresslist Voting plugin.
 */
+
 import {
   AddresslistVotingClient,
-  Context,
   ContextPlugin,
-  ICanVoteParams,
+  ICanVoteParams
 } from "@aragon/sdk-client";
-import { contextParams } from "../00-client/00-context";
+import { context } from "../00-setup/00-getting-started";
 
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Instantiate a plugin context from the aragonOSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an address list client
-const client = new AddresslistVotingClient(contextPlugin);
+// Create an AddresslistVoting client.
+const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   address: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x1",
-  pluginAddress: "0x1234567890123456789012345678901234567890",
+  pluginAddress: "0x1234567890123456789012345678901234567890" // the address of the plugin contract itself.
 };
 
-const canVote = await client.methods.canVote(voteParams);
+const canVote = await addresslistVotingClient.methods.canVote(voteParams);
 console.log(canVote);
-/*
-true
+
+/* MARKDOWN
+Returns:
+```javascript
+  true
+```
 */

@@ -11,7 +11,7 @@ import { context } from "../00-setup/00-getting-started";
 const client: Client = new Client(context);
 console.log({ client });
 
-// Instantiate the ContextPlugin from the aragonOSx SDK context. This will allow you to instancit
+// Instantiate the ContextPlugin from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 // Create a TokenVoting client.

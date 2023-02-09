@@ -14,8 +14,9 @@ import { context } from "../00-setup/00-getting-started";
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+
 const canExecuteParams: CanExecuteParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
+  pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the plugin contract itself.
   proposalId: BigInt(0)
 };
 

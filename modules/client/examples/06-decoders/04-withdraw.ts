@@ -14,7 +14,7 @@ const data: Uint8Array = new Uint8Array([12, 56]);
 
 // Decodes the withdraw action.
 const withdrawParams: IWithdrawParams = client.decoding.withdrawAction(data);
-console.log(withdrawParams);
+console.log({ withdrawParams });
 
 /* MARKDOWN
 Returns:

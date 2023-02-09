@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Mint tokens for a DAO with the TokenVoting plugin installed
+### Mint tokens for a DAO (TokenVoting)
 
-Mints tokens for a DAO using the TokenVoting plugin.
+Mints tokens for a DAO that has the TokenVoting plugin installed.
 */
 
 import {
@@ -18,14 +18,14 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const params: IMintTokenParams = {
-  address: "0x1234567890123456789012345678901234567890",
-  amount: BigInt(10)
+  address: "0x1234567890123456789012345678901234567890", // address which will receive the minted tokens
+  amount: BigInt(10) // amount of tokens they will receive
 };
 
-const minterAddress: string = "0x0987654321098765432109876543210987654321";
+const minterAddress: string = "0x0987654321098765432109876543210987654321"; // if not provided, the default minter (Open Zeppellin's ERC20 contract) will be used.
 
 const mintTokenAction: DaoAction = tokenVotingClient.encoding.mintTokenAction(minterAddress, params);
-console.log(mintTokenAction);
+console.log({ mintTokenAction });
 
 /* MARKDOWN
 Returns:

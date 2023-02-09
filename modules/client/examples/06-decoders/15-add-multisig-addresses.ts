@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Decode Add Members Action in a Multisig plugin
+### Decode Add Members Action (Multisig plugin)
 
 Decodes the parameters of the add members action from the Multisig plugin.
 */

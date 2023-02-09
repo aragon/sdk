@@ -10,11 +10,11 @@ By default, retrieves ETH, DAI, USDC and USDT, on Mainnet).
 import {
   Client,
   ITransferQueryParams,
+  SortDirection,
   Transfer,
   TransferSortBy,
   TransferType
 } from "@aragon/sdk-client";
-import { SortDirection } from "../../src";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate the general purpose client from the aragonOSx SDK context.
@@ -25,8 +25,8 @@ const params: ITransferQueryParams = {
   sortBy: TransferSortBy.CREATED_AT, // optional
   limit: 10, // optional
   skip: 0, // optional
-  direction: SortDirection.ASC, // optional
-  type: TransferType.DEPOSIT, // optional
+  direction: SortDirection.ASC, // optional, options: DESC or ASC
+  type: TransferType.DEPOSIT // optional, options: DEPOSIT or WITHDRAW
 };
 
 // Get a list of DAO transfers.

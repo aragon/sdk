@@ -5,9 +5,9 @@ Decodes the parameters of a mint token action from the TokenVoting plugin.
 */
 
 import {
-  TokenVotingClient,
   ContextPlugin,
-  IMintTokenParams
+  IMintTokenParams,
+  TokenVotingClient
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 

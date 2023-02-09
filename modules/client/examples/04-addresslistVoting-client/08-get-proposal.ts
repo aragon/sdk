@@ -1,28 +1,30 @@
 /* MARKDOWN
-### Loading the a proposal by proposalId (address list plugin)
+### Get the proposal by proposalId (Addresslist)
+
+Retrieves a proposal created using the AddresslistVoting plugin.
 */
+
 import {
   AddresslistVotingProposal,
   AddresslistVotingClient,
-  Context,
-  ContextPlugin,
+  ContextPlugin
 } from "@aragon/sdk-client";
-import { contextParams } from "../00-client/00-context";
+import { context } from "../00-setup/00-getting-started";
 
-// Create a simple context
-const context: Context = new Context(contextParams);
-// Create a plugin context from the simple context
+// Instantiates a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an AddressList client
-const client = new AddresslistVotingClient(contextPlugin);
+// Instantiates an AddresslistVoting client.
+const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const proposalId = "0x12345...";
 
-const proposal: AddresslistVotingProposal | null = await client.methods.getProposal(
-  proposalId,
-);
-console.log(proposal);
-/*
+const addresslistVotingProposal: AddresslistVotingProposal | null = await addresslistVotingClient.methods.getProposal(proposalId);
+console.log({ addresslistVotingProposal });
+
+/* MARKDOWN
+Returns:
+
+```json
 {
   id: "0x12345...",
   dao: {
@@ -84,4 +86,5 @@ console.log(proposal);
     }
   ]
 }
+```
 */
