@@ -125,6 +125,8 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
   }
 }
 
+// TODO 
+// delete me
 export function parseEtherRatio(ether: string, precision: number = 2): number {
   if (precision <= 0 || !Number.isInteger(precision)) {
     throw new InvalidPrecisionError();

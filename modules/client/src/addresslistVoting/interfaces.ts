@@ -40,7 +40,9 @@ export interface IAddresslistVotingClientMethods extends IClientCore {
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canVote: (params: ICanVoteParams) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
-  getProposal: (propoosalId: string) => Promise<AddresslistVotingProposal | null>;
+  getProposal: (
+    propoosalId: string,
+  ) => Promise<AddresslistVotingProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
   ) => Promise<AddresslistVotingProposalListItem[]>;
@@ -92,6 +94,7 @@ export type AddresslistVotingProposal = ProposalBase & {
   creationBlockNumber: number;
   executionDate: Date;
   executionBlockNumber: number;
+  executionTxHash: string;
 };
 
 export type AddresslistVotingProposalListItem = ProposalListItemBase & {
@@ -110,13 +113,14 @@ export type SubgraphAddresslistVotingProposal = SubgraphProposalBase & {
   createdAt: string;
   actions: SubgraphAction[];
   supportThreshold: string;
-  minParticipation: string;
+  minVotingPower: string;
   voters: SubgraphAddresslistVotingVoterListItem[];
   totalVotingPower: string;
   votingMode: SubgraphVotingMode;
   creationBlockNumber: string;
   executionDate: string;
   executionBlockNumber: string;
+  executionTxHash: string;
 };
 
 export type ContractAddresslistVotingInitParams = [

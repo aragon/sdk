@@ -257,7 +257,6 @@ export async function deploy(): Promise<Deployment> {
       to: WALLET_ADDRESS,
       value: parseEther("50.0"),
     });
-
     return {
       managingDaoAddress: managingDaoInstance.address,
       daoFactory,
@@ -360,9 +359,7 @@ export async function createDAO(
   daoSettings: aragonContracts.DAOFactory.DAOSettingsStruct,
   pluginSettings: aragonContracts.DAOFactory.PluginSettingsStruct[],
 ): Promise<{ daoAddr: string; pluginAddrs: string[] }> {
-  const tx = await daoFactory.createDao(daoSettings, pluginSettings, {
-    gasLimit: 100000,
-  });
+  const tx = await daoFactory.createDao(daoSettings, pluginSettings);
   const receipt = await tx.wait();
   const registryInterface = aragonContracts.DAORegistry__factory
     .createInterface();
@@ -401,35 +398,41 @@ export async function createAddresslistDAO(
   name: string,
   addresses: string[] = [],
 ) {
-  const versionTagStruct = await deployment.addresslistVotingRepo
+  const latestVersion = await deployment.addresslistVotingRepo
     ["getLatestVersion(address)"](
       deployment.addresslistVotingPluginSetup.address,
     );
-  return createDAO(
-    deployment.daoFactory,
-    {
-      metadata: "0x",
-      name: name,
-      trustedForwarder: AddressZero,
-      daoURI: "0x",
-    },
-    [
+  try {
+    const addr = await createDAO(
+      deployment.daoFactory,
       {
-        pluginSetupRef: {
-          pluginSetupRepo: deployment.addresslistVotingPluginSetup.address,
-          versionTag: versionTagStruct.tag,
-        },
-        data: defaultAbiCoder.encode(
-          [
-            "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
-            "address[] members",
-          ],
-          // Allow vote replacement
-          [[2, 1, 1, 3600, 1], addresses],
-        ),
+        metadata: "0x",
+        name: name,
+        trustedForwarder: AddressZero,
+        daoURI: "0x",
       },
-    ],
-  );
+      [
+        {
+          pluginSetupRef: {
+            pluginSetupRepo: deployment.addresslistVotingRepo.address,
+            versionTag: latestVersion.tag,
+          },
+          data: defaultAbiCoder.encode(
+            [
+              "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
+              "address[] members",
+            ],
+            // Allow vote replacement
+            [[1, 500000, 500000, 3600, 1], addresses],
+          ),
+        },
+      ],
+    );
+    return addr
+  } catch (e) {
+    console.log(e);
+    throw e
+  }
 }
 
 export async function createTokenVotingDAO(
@@ -437,10 +440,8 @@ export async function createTokenVotingDAO(
   name: string,
   addresses: string[] = [],
 ) {
-  const versionTagStruct = await deployment.tokenVotingRepo
-    ["getLatestVersion(address)"](
-      deployment.tokenVotingPluginSetup.address,
-    );
+  const latestVersion = await deployment.tokenVotingRepo
+    ["getLatestVersion(address)"](deployment.tokenVotingPluginSetup.address);
   return createDAO(
     deployment.daoFactory,
     {
@@ -452,8 +453,8 @@ export async function createTokenVotingDAO(
     [
       {
         pluginSetupRef: {
-          pluginSetupRepo: deployment.tokenVotingPluginSetup.address,
-          versionTag: versionTagStruct.tag,
+          pluginSetupRepo: deployment.tokenVotingRepo.address,
+          versionTag: latestVersion.tag,
         },
         data: defaultAbiCoder.encode(
           [
@@ -463,7 +464,7 @@ export async function createTokenVotingDAO(
           ],
           [
             // allow vote replacement
-            [2, 1, 1, 3600, 1],
+            [1, 500000, 500000, 3600, 1],
             [AddressZero, "erc20", "e20"],
             [addresses, addresses.map(() => parseEther("1"))],
           ],
@@ -480,18 +481,18 @@ export async function createMultisigDAO(
   try {
     const latestVersion = await deployment.multisigRepo
       ["getLatestVersion(address)"](deployment.multisigPluginSetup.address);
-    const addr = await createDAO(
+    return await createDAO(
       deployment.daoFactory,
       {
-        metadata: toUtf8Bytes("ipfs://...."),
+        metadata: "0x",
         name: name,
         trustedForwarder: AddressZero,
-        daoURI: "0x",
+        daoURI: "ipfs://...",
       },
       [
         {
           pluginSetupRef: {
-            pluginSetupRepo: deployment.multisigPluginSetup.address,
+            pluginSetupRepo: deployment.multisigRepo.address,
             versionTag: latestVersion.tag,
           },
           data: defaultAbiCoder.encode(
@@ -507,7 +508,6 @@ export async function createMultisigDAO(
         },
       ],
     );
-    return addr;
   } catch (e) {
     throw e;
   }

@@ -1,9 +1,9 @@
+import { decodeRatio } from "@aragon/sdk-common";
 import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
   ContractVotingSettings,
   DaoAction,
-  parseEtherRatio,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
@@ -38,7 +38,7 @@ export function toAddresslistVotingProposal(
     id: proposal.id,
     dao: {
       address: proposal.dao.id,
-      name: proposal.dao.name,
+      name: proposal.dao.subdomain,
     },
     creatorAddress: proposal.creator,
     metadata: {
@@ -51,6 +51,7 @@ export function toAddresslistVotingProposal(
     startDate,
     endDate,
     creationDate,
+    executionTxHash: proposal.executionTxHash || "",
     creationBlockNumber: parseInt(proposal.creationBlockNumber),
     executionDate,
     executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
@@ -70,22 +71,12 @@ export function toAddresslistVotingProposal(
       abstain: proposal.abstain ? parseInt(proposal.abstain) : 0,
     },
     settings: {
-      // TODO
-      // this should be decoded using the number of decimals that we want
-      // right now the encoders/recoders use 2 digit precission but the actual
-      // subgraph values are 18 digits precision. Uncomment below for 2 digits
-      // precision
-
-      // minSupport: decodeRatio(
-      //   BigInt(proposal.totalSupportThresholdPct),
-      //   2,
-      // ),
-      // minTurnout: decodeRatio(
-      //   BigInt(proposal.relativeSupportThresholdPct),
-      //   2,
-      // ),
-      minSupport: parseEtherRatio(proposal.supportThreshold),
-      minTurnout: parseEtherRatio(proposal.minParticipation),
+      minSupport: decodeRatio(BigInt(proposal.supportThreshold), 6),
+      minTurnout: decodeRatio(
+        (BigInt(proposal.minVotingPower) * BigInt(1000000)) /
+          BigInt(proposal.totalVotingPower),
+        6,
+      ),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
     },
@@ -112,7 +103,7 @@ export function toAddresslistVotingProposalListItem(
     id: proposal.id,
     dao: {
       address: proposal.dao.id,
-      name: proposal.dao.name,
+      name: proposal.dao.subdomain,
     },
     creatorAddress: proposal.creator,
     metadata: {

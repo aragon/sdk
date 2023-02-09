@@ -1,9 +1,7 @@
-import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
   ContractVotingSettings,
   DaoAction,
-  parseEtherRatio,
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
@@ -29,6 +27,8 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
+import { decodeRatio } from "@aragon/sdk-common";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 export function toTokenVotingProposal(
   proposal: SubgraphTokenVotingProposal,
@@ -53,7 +53,7 @@ export function toTokenVotingProposal(
     id: proposal.id,
     dao: {
       address: proposal.dao.id,
-      name: proposal.dao.name,
+      name: proposal.dao.subdomain,
     },
     creatorAddress: proposal.creator,
     metadata: {
@@ -69,10 +69,11 @@ export function toTokenVotingProposal(
     creationBlockNumber: parseInt(proposal.creationBlockNumber),
     executionDate,
     executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
+    executionTxHash: proposal.executionTxHash || "",
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
-          data: hexToBytes(strip0x(action.data)),
+          data: toUtf8Bytes(action.data),
           to: action.to,
           value: BigInt(action.value),
         };
@@ -85,24 +86,14 @@ export function toTokenVotingProposal(
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     settings: {
-      // TODO
-      // this should be decoded using the number of decimals that we want
-      // right now the encoders/recoders use 2 digit precission but the actual
-      // subgraph values are 18 digits precision. Uncomment below for 2 digits
-      // precision
-
-      // minSupport: decodeRatio(
-      //   BigInt(proposal.totalSupportThresholdPct),
-      //   2,
-      // ),
-      // minTurnout: decodeRatio(
-      //   BigInt(proposal.relativeSupportThresholdPct),
-      //   2,
-      // ),
-      minSupport: parseEtherRatio(proposal.supportThreshold),
-      minTurnout: parseEtherRatio(proposal.minParticipation),
+      minSupport: decodeRatio(BigInt(proposal.supportThreshold), 6),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
+      minTurnout: decodeRatio(
+        (BigInt(proposal.minVotingPower) * BigInt(1000000)) /
+          BigInt(proposal.totalVotingPower),
+        6,
+      ),
     },
     token,
     usedVotingWeight,
@@ -132,7 +123,7 @@ export function toTokenVotingProposalListItem(
     id: proposal.id,
     dao: {
       address: proposal.dao.id,
-      name: proposal.dao.name,
+      name: proposal.dao.subdomain,
     },
     creatorAddress: proposal.creator,
     metadata: {

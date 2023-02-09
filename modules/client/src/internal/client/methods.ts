@@ -12,7 +12,6 @@ import {
   InvalidAddressOrEnsError,
   InvalidCidError,
   IpfsPinError,
-  MissingExecPermissionError,
   NoProviderError,
   NoSignerError,
   resolveIpfsCid,
@@ -51,9 +50,9 @@ import {
   SubgraphDaoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
+  TokenStandards,
   Transfer,
   TransferSortBy,
-  TokenStandards,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -75,6 +74,7 @@ import {
   UNAVAILABLE_DAO_METADATA,
   UNSUPPORTED_DAO_METADATA_LINK,
 } from "../constants";
+import { MissingExecPermissionError } from "@aragon/sdk-common";
 
 /**
  * Methods module the SDK Generic Client
@@ -154,7 +154,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         break;
       }
     }
-
+    
     if (!execPermissionFound) {
       throw new MissingExecPermissionError();
     }
@@ -182,16 +182,27 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         e.topics[0] ===
           id(daoFactoryInterface.getEvent("DAORegistered").format("sighash")),
     );
+
     if (!log) {
       throw new Error("Failed to create DAO");
     }
 
+    const pspInterface = PluginSetupProcessor__factory.createInterface();
+    const pluginLog = receipt.logs?.find(
+      (e) =>
+        e.topics[0] ===
+          id(pspInterface.getEvent("InstallationApplied").format("sighash")),
+    );
+
+    if (pluginLog) {
+      const parsedPluginLog = pspInterface.parseLog(pluginLog);
+      console.log(parsedPluginLog);
+    }
     const parsedLog = daoFactoryInterface.parseLog(log);
 
     if (!parsedLog.args["dao"]) {
       throw new Error("Failed to create DAO");
     }
-
     yield {
       key: DaoCreationSteps.DONE,
       address: parsedLog.args["dao"],

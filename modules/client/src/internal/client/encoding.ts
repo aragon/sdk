@@ -12,6 +12,7 @@ import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import { permissionParamsToContract } from "../utils";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Encoding module the SDK Generic Client
@@ -134,16 +135,16 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
         return {
           to: tx.to!,
           value: BigInt(0),
-          data: hexToBytes(strip0x(tx.data!)),
+          data: toUtf8Bytes(tx.data!),
         };
       }
       return {
         to: address,
         value: params.amount,
-        data: hexToBytes(""),
+        data: toUtf8Bytes("0x"),
       };
     } else {
-      // TODO ERC/"! and ERC1155"
+      // TODO ERC721 and ERC1155"
       throw new Error("not implemented");
     }
   }

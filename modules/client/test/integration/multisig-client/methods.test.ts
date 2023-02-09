@@ -45,11 +45,10 @@ describe("Client Multisig", () => {
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
     const daoCreation = await deployContracts.createMultisigDAO(
       deployment,
-      "testDAO",
+      "test-multisig-dao",
       [TEST_WALLET_ADDRESS],
     );
     pluginAddress = daoCreation.pluginAddrs[0];
-    console.log(daoCreation)
     // advance to get past the voting checkpoint
     await advanceBlocks(server.provider, 10);
   });
@@ -65,18 +64,15 @@ describe("Client Multisig", () => {
       const multisigClient = new MultisigClient(ctxPlugin);
 
       // generate actions
-      try {
-        const action = multisigClient.encoding.updateMultisigVotingSettings({
+      const action = await multisigClient.encoding.updateMultisigVotingSettings(
+        {
           pluginAddress,
           votingSettings: {
             minApprovals: 1,
-            onlyListed: false,
+            onlyListed: true,
           },
-        });
-        console.log(action)
-      } catch (e) {
-        console.log(e);
-      }
+        },
+      );
 
       const metadata: ProposalMetadata = {
         title: "Best Proposal",
@@ -93,16 +89,16 @@ describe("Client Multisig", () => {
           logo: "https://no.media/media.jpeg",
         },
       };
-
       const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
-
+      const endDate = new Date();
+      endDate.setHours(endDate.getHours() + 1);
       const proposalParams: CreateMultisigProposalParams = {
         pluginAddress,
         metadataUri: ipfsUri,
-        actions: [],
+        actions: [action],
         failSafeActions: [false],
         startDate: new Date(),
-        endDate: new Date(),
+        endDate,
       };
 
       for await (
@@ -132,6 +128,25 @@ describe("Client Multisig", () => {
     });
   });
 
+  describe("Can approve", () => {
+    it("Should check if an user can approve in a multisig instance", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new MultisigClient(ctxPlugin);
+      // const address = await client.web3.getSigner()?.getAddress();
+      const canApproveParams: CanApproveParams = {
+        proposalId: BigInt(0),
+        addressOrEns: TEST_WALLET_ADDRESS,
+        pluginAddress,
+      };
+      const canApprove = await client.methods.canApprove(
+        canApproveParams,
+      );
+      expect(typeof canApprove).toBe("boolean");
+      expect(canApprove).toBe(true);
+    });
+  });
+
   describe("Approve proposal", () => {
     it("Should approve a local proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -140,8 +155,8 @@ describe("Client Multisig", () => {
 
       const approveParams: ApproveMultisigProposalParams = {
         proposalId: BigInt(0),
-        pluginAddress: "0x1234567890123456789012345678901234567890",
-        tryExecution: true,
+        pluginAddress,
+        tryExecution: false,
       };
       for await (const step of client.methods.approveProposal(approveParams)) {
         switch (step.key) {
@@ -161,24 +176,23 @@ describe("Client Multisig", () => {
     });
   });
 
-  describe("Can approve", () => {
-    it("Should check if an user can approve in a multisig instance", async () => {
+  describe("Can execute", () => {
+    it("Should check if an user can execute in a multisig instance", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
-      const address = await client.web3.getSigner()?.getAddress();
-      const canApproveParams: CanApproveParams = {
+      const canExecuteParams: CanExecuteParams = {
         proposalId: BigInt(0),
-        addressOrEns: address!,
         pluginAddress,
       };
-      const canApprove = await client.methods.canApprove(
-        canApproveParams,
+      const canExecute = await client.methods.canExecute(
+        canExecuteParams,
       );
-      expect(typeof canApprove).toBe("boolean");
-      expect(canApprove).toBe(true);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(true);
     });
   });
+
   describe("Execute proposal", () => {
     it("Should execute a local proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -188,7 +202,7 @@ describe("Client Multisig", () => {
       for await (
         const step of client.methods.executeProposal(
           {
-            pluginAddress: "0x1234567890123456789012345678901234567890",
+            pluginAddress,
             proposalId: BigInt(0),
           },
         )
@@ -201,27 +215,13 @@ describe("Client Multisig", () => {
           case ExecuteProposalStep.DONE:
             break;
           default:
+            console.log(step);
             throw new Error(
               "Unexpected execute proposal step: " +
                 Object.keys(step).join(", "),
             );
         }
       }
-    });
-  });
-  describe("Can execute", () => {
-    it("Should check if an user can approve in a multisig instance", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
-      const canExecuteParams: CanExecuteParams = {
-        proposalId: BigInt(0),
-        pluginAddress,
-      };
-      const canExecute = await client.methods.canExecute(
-        canExecuteParams,
-      );
-      expect(typeof canExecute).toBe("boolean");
     });
   });
 
@@ -307,6 +307,8 @@ describe("Client Multisig", () => {
         }
       }
       expect(proposal.creationDate instanceof Date).toBe(true);
+      expect(proposal.startDate instanceof Date).toBe(true);
+      expect(proposal.endDate instanceof Date).toBe(true);
       expect(Array.isArray(proposal.actions)).toBe(true);
       // actions
       for (const action of proposal.actions) {
@@ -317,6 +319,9 @@ describe("Client Multisig", () => {
       for (const approval of proposal.approvals) {
         expect(typeof approval).toBe("string");
         expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
+      }
+      if (proposal.executionTxHash) {
+        expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{52}$/i);
       }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {

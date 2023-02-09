@@ -48,9 +48,9 @@ export class TokenVotingClientEncoding extends ClientCore
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], ["address","name","symbol"][ "receivers","amount"]
       [
-        "tuple(uint8, uint64, uint64, uint64, uint256)",
-        "tuple(address, string, string)",
-        "tuple(address[], uint256[])",
+        "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
+        "tuple(address addr, string name, string symbol) tokenSettings",
+        "tuple(address[] receivers, uint256[] amounts) mintSettings"
       ],
       args,
     );

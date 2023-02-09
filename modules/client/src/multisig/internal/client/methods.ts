@@ -105,7 +105,7 @@ export class MultisigClientMethods extends ClientCore
       params.actions || [],
       allowFailureMap,
       params.approve || false,
-      params.tryExecution || true,
+      params.tryExecution || false,
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
     );

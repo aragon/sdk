@@ -9,7 +9,6 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   AddresslistVotingClient,
-  Client,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
@@ -25,7 +24,7 @@ import {
   SortDirection,
   VoteProposalStep,
   VoteValues,
-  WithdrawType,
+  VotingMode,
 } from "../../../src";
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
@@ -50,7 +49,7 @@ describe("Client Address List", () => {
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
     const daoCreation = await deployContracts.createAddresslistDAO(
       deployment,
-      "testDAO",
+      "test-addresslist-dao",
       [TEST_WALLET_ADDRESS],
     );
     pluginAddress = daoCreation.pluginAddrs[0];
@@ -67,15 +66,15 @@ describe("Client Address List", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const addresslistVotingClient = new AddresslistVotingClient(ctxPlugin);
-      const client = new Client(ctx);
 
       // generate actions
-      const action = await client.encoding.withdrawAction(pluginAddress, {
-        type: WithdrawType.ERC20,
-        recipientAddress: "0x1234567890123456789012345678901234567890",
-        amount: BigInt(1),
-        reference: "test",
-      });
+      const action = await addresslistVotingClient.encoding
+        .updatePluginSettingsAction(pluginAddress, {
+          votingMode: VotingMode.VOTE_REPLACEMENT,
+          supportThreshold: 0.5,
+          minParticipation: 0.5,
+          minDuration: 7200,
+        });
 
       const metadata: ProposalMetadata = {
         title: "Best Proposal",
@@ -96,13 +95,15 @@ describe("Client Address List", () => {
       const ipfsUri = await addresslistVotingClient.methods.pinMetadata(
         metadata,
       );
+      const endDate = new Date();
+      endDate.setHours(endDate.getHours() + 2);
 
       const proposalParams: ICreateProposalParams = {
         pluginAddress,
         metadataUri: ipfsUri,
         actions: [action],
-        creatorVote: VoteValues.YES,
         executeOnPass: false,
+        endDate,
       };
 
       for await (
@@ -130,6 +131,23 @@ describe("Client Address List", () => {
       }
     });
   });
+  describe("Can vote", () => {
+    it("Should check if an user can vote in an Address List proposal", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new AddresslistVotingClient(ctxPlugin);
+
+      const params: ICanVoteParams = {
+        address: TEST_WALLET_ADDRESS,
+        proposalId: "0x00",
+        pluginAddress,
+        vote: VoteValues.YES,
+      };
+      const canVote = await client.methods.canVote(params);
+      expect(typeof canVote).toBe("boolean");
+      expect(canVote).toBe(true);
+    });
+  });
 
   describe("Vote on a proposal", () => {
     it("Should vote on a proposal locally", async () => {
@@ -139,33 +157,7 @@ describe("Client Address List", () => {
 
       const voteParams: IVoteProposalParams = {
         pluginAddress,
-        proposalId: "0x0",
-        vote: VoteValues.YES,
-      };
-
-      for await (const step of client.methods.voteProposal(voteParams)) {
-        switch (step.key) {
-          case VoteProposalStep.VOTING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case VoteProposalStep.DONE:
-            break;
-          default:
-            throw new Error(
-              "Unexpected vote proposal step: " + Object.keys(step).join(", "),
-            );
-        }
-      }
-    });
-    it("Should replace a vote on a proposal locally", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
-
-      const voteParams: IVoteProposalParams = {
-        pluginAddress,
-        proposalId: "0x0",
+        proposalId: "0x00",
         vote: VoteValues.NO,
       };
 
@@ -184,6 +176,34 @@ describe("Client Address List", () => {
         }
       }
     });
+    // TODO
+    // the dao hasnt voteReplacement enabled
+    // it("Should replace a vote on a proposal locally", async () => {
+    //   const ctx = new Context(contextParamsLocalChain);
+    //   const ctxPlugin = ContextPlugin.fromContext(ctx);
+    //   const client = new AddresslistVotingClient(ctxPlugin);
+
+    //   const voteParams: IVoteProposalParams = {
+    //     pluginAddress,
+    //     proposalId: "0x00",
+    //     vote: VoteValues.YES,
+    //   };
+
+    //   for await (const step of client.methods.voteProposal(voteParams)) {
+    //     switch (step.key) {
+    //       case VoteProposalStep.VOTING:
+    //         expect(typeof step.txHash).toBe("string");
+    //         expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+    //         break;
+    //       case VoteProposalStep.DONE:
+    //         break;
+    //       default:
+    //         throw new Error(
+    //           "Unexpected vote proposal step: " + Object.keys(step).join(", "),
+    //         );
+    //     }
+    //   }
+    // });
   });
 
   describe("Execute proposal", () => {
@@ -193,8 +213,8 @@ describe("Client Address List", () => {
       const client = new AddresslistVotingClient(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
-        pluginAddress: "0x1234567890123456789012345678901234567890",
-        proposalId: "0x1234567890123456789012345678901234567890",
+        pluginAddress,
+        proposalId: "0x00",
       };
       for await (const step of client.methods.executeProposal(executeParams)) {
         switch (step.key) {
@@ -211,22 +231,6 @@ describe("Client Address List", () => {
             );
         }
       }
-    });
-  });
-
-  describe("Can vote", () => {
-    it("Should check if an user can vote in an Address List proposal", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
-
-      const params: ICanVoteParams = {
-        address: "0x1234567890123456789012345678901234567890",
-        proposalId: "0x1234567890123456789012345678901234567890",
-        pluginAddress,
-      };
-      const canVote = await client.methods.canVote(params);
-      expect(typeof canVote).toBe("boolean");
     });
   });
 
@@ -335,6 +339,9 @@ describe("Client Address List", () => {
           expect(typeof vote.address).toBe("string");
           expect(vote.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
           expect(typeof vote.vote).toBe("number");
+        }
+        if (proposal.executionTxHash) {
+          expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{52}$/i);
         }
       }
     });

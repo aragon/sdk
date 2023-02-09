@@ -114,6 +114,7 @@ export type TokenVotingProposal = ProposalBase & {
   creationBlockNumber: number;
   executionDate: Date;
   executionBlockNumber: number;
+  executionTxHash: string;
 };
 
 export type TokenVotingProposalListItem = ProposalListItemBase & {
@@ -174,12 +175,13 @@ export type SubgraphTokenVotingProposal =
     createdAt: string;
     actions: SubgraphAction[];
     supportThreshold: string;
-    minParticipation: string;
     voters: SubgraphTokenVotingVoterListItem[];
+    minVotingPower: bigint;
     totalVotingPower: string;
     votingMode: VotingMode;
     creationBlockNumber: string;
     executionDate: string;
+    executionTxHash: string;
     executionBlockNumber: string;
   };
 

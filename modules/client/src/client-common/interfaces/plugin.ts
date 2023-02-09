@@ -28,6 +28,7 @@ export interface IProposalSettings {
   minTurnout: number;
   /** In seconds */
   duration: number;
+  
 }
 
 export type VotingSettings = {
@@ -185,7 +186,7 @@ export type SubgraphProposalBase = {
   id: string;
   dao: {
     id: string;
-    name: string;
+    subdomain: string;
   };
   creator: string;
   metadata: string;

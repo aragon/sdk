@@ -96,9 +96,9 @@ describe("Token Voting Client", () => {
       const iface = client.decoding.findInterface(
         updatePluginSettingsAction.data,
       );
-      expect(iface?.id).toBe("function updateVotingSettings(tuple(uint8,uint64,uint64,uint64,uint256))");
+      expect(iface?.id).toBe("function updateVotingSettings(tuple(uint8,uint32,uint32,uint64,uint256))");
       expect(iface?.functionName).toBe("updateVotingSettings");
-      expect(iface?.hash).toBe("0xe6848574");
+      expect(iface?.hash).toBe("0x0dfb278e");
     });
 
     it("Should try to get the function of an invalid data and return null", async () => {

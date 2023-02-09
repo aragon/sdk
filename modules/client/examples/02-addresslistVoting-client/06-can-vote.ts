@@ -6,6 +6,7 @@ import {
   Context,
   ContextPlugin,
   ICanVoteParams,
+  VoteValues,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -20,6 +21,7 @@ const voteParams: ICanVoteParams = {
   address: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x1",
   pluginAddress: "0x1234567890123456789012345678901234567890",
+  vote: VoteValues.YES
 };
 
 const canVote = await client.methods.canVote(voteParams);

@@ -5,7 +5,7 @@ import {
 
 // NOTE: This address needs to be set when the plugin has been published and the ID is known
 export const ADDRESSLIST_PLUGIN_ID =
-  "0x8aa3acd377008d72ad79f27ec19d54f9291f68c0";
+  "0x583E48C1d7dBd9a65b7866A5fF6956339458d001";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
   MajorityVotingBase__factory.createInterface().getFunction("updateVotingSettings")
