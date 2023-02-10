@@ -36,7 +36,7 @@ export interface IMultisigClientMethods extends IClientCore {
   getMembers: (
     addressOrEns: string,
   ) => Promise<string[]>;
-  getProposal: (propoosalId: string) => Promise<MultisigProposal | null>;
+  getProposal: (proposalId: string) => Promise<MultisigProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
   ) => Promise<MultisigProposalListItem[]>;

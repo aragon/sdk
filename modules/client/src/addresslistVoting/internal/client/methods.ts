@@ -58,6 +58,7 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
+import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK Address List Client
@@ -134,7 +135,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
-    const proposalId = parsedLog.args["proposalId"];
+    const proposalId: BigNumber = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
@@ -142,7 +143,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     yield {
       key: ProposalCreationSteps.DONE,
       // TODO remove this when new proposal format
-      proposalId: proposalId.toHexString(),
+      proposalId: proposalId.toNumber(),
     };
   }
 

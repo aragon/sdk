@@ -15,8 +15,6 @@ export {
   IDaoQueryParams,
   DepositParams,
   EnsureAllowanceParams,
-  DepositType,
-  WithdrawType,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
   IHasPermissionParams,

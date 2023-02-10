@@ -13,11 +13,20 @@ TEMPLATE:
 
 -->
 
+TODO:
+- PLUGIN_ID constants
+- Init plugin tests from the own SDK
+- Addresslist tests crash
+- proposalId's as a number by now
+
+
 ## [UPCOMING]
 ### Changed
 - Updates to contracts-ethers v0.7.1
 - Splits `getPluginSettings` in `getVotingSettings` and `getMembers`
-- Replace `withdrawAction`'s internal implementation
+- Replace `withdrawAction`'s internal implementation and types
+- `DepositParams`
+- `createDao` now returns `pluginAddresses`
 ### Added
 - Proposals accept a `failSafeActions` variable
 - Multisig plugin settings now include `startDate` and `endDate`

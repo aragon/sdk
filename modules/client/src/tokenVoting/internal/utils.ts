@@ -27,8 +27,7 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
-import { decodeRatio } from "@aragon/sdk-common";
-import { toUtf8Bytes } from "@ethersproject/strings";
+import { decodeRatio, hexToBytes } from "@aragon/sdk-common";
 
 export function toTokenVotingProposal(
   proposal: SubgraphTokenVotingProposal,
@@ -73,7 +72,7 @@ export function toTokenVotingProposal(
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
-          data: toUtf8Bytes(action.data),
+          data: hexToBytes(action.data),
           to: action.to,
           value: BigInt(action.value),
         };

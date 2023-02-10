@@ -12,7 +12,11 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 import { ERC1967ABI, ERC1967Bytecode } from "../abi";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
-import { VotingMode, votingModeToContracts } from "../../src";
+import {
+  AddresslistVotingClient,
+  VotingMode,
+  votingModeToContracts,
+} from "../../src";
 
 const WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 
@@ -404,37 +408,74 @@ export async function createAddresslistDAO(
     ["getLatestVersion(address)"](
       deployment.addresslistVotingPluginSetup.address,
     );
-  try {
-    const addr = await createDAO(
-      deployment.daoFactory,
-      {
-        metadata: "0x",
-        name: name,
-        trustedForwarder: AddressZero,
-        daoURI: "0x",
+
+  const dummyMetadata = {
+    metadata: "0x",
+    name,
+    trustedForwarder: AddressZero,
+    daoURI: "0x",
+  };
+
+  const pluginItem = AddresslistVotingClient.encoding.getPluginInstallItem({
+    addresses,
+    votingSettings: {
+      minDuration: 60 * 60, // 1h
+      minParticipation: 0.5,
+      supportThreshold: 0.5,
+      votingMode,
+      minProposerVotingPower: BigInt(0),
+    },
+  });
+
+  const pluginInstallItems = [
+    {
+      pluginSetupRef: {
+        pluginSetupRepo: latestVersion.pluginSetup,
+        versionTag: latestVersion.tag,
       },
-      [
-        {
-          pluginSetupRef: {
-            pluginSetupRepo: deployment.addresslistVotingRepo.address,
-            versionTag: latestVersion.tag,
-          },
-          data: defaultAbiCoder.encode(
-            [
-              "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
-              "address[] members",
-            ],
-            // Allow vote replacement
-            [[votingModeToContracts(votingMode), 500000, 500000, 3600, 1], addresses],
-          ),
-        },
-      ],
-    );
-    return addr
-  } catch (e) {
-    console.log(e);
-    throw e
-  }
+      data: pluginItem.data,
+    },
+  ];
+  return createDAO(
+    deployment.daoFactory,
+    dummyMetadata,
+    pluginInstallItems,
+  );
+
+  // try {
+  //   const addr = await createDAO(
+  //     deployment.daoFactory,
+  //     {
+  //       metadata: "0x",
+  //       name: name,
+  //       trustedForwarder: AddressZero,
+  //       daoURI: "0x",
+  //     },
+  //     [
+  //       {
+  //         pluginSetupRef: {
+  //           pluginSetupRepo: latestVersion.pluginSetup,
+  //           versionTag: latestVersion.tag,
+  //         },
+  //         data: defaultAbiCoder.encode(
+  //           [
+  //             // VotingSettings
+  //             "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
+  //             "address[] members",
+  //           ],
+  //           [
+  //             [votingModeToContracts(votingMode), 500000, 500000, 3600, 1],
+  //             addresses,
+  //           ],
+  //         ),
+  //       },
+  //     ],
+  //   );
+  //   return addr;
+  // } catch (e) {
+  //   console.log("CANNOT CREATE ADDRESS LIST DAO", e);
+  //   throw e;
+  // }
 }
 
 export async function createTokenVotingDAO(
@@ -445,6 +486,7 @@ export async function createTokenVotingDAO(
 ) {
   const latestVersion = await deployment.tokenVotingRepo
     ["getLatestVersion(address)"](deployment.tokenVotingPluginSetup.address);
+
   return createDAO(
     deployment.daoFactory,
     {

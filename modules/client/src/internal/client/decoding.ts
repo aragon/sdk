@@ -3,7 +3,7 @@ import {
   IClientDecoding,
   IGrantPermissionDecodedParams,
   IRevokePermissionDecodedParams,
-  TokenStandards,
+  TokenType,
   WithdrawParams,
 } from "../../interfaces";
 import {
@@ -18,7 +18,7 @@ import {
   permissionParamsFromContract,
   withdrawParamsFromContract,
 } from "../utils";
-import { resolveIpfsCid } from "@aragon/sdk-common";
+import { bytesToHex, resolveIpfsCid } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "../abi/erc20";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
@@ -42,15 +42,9 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public grantAction(data: Uint8Array): IGrantPermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = toUtf8String(data);
-    const receivedFunction = daoInterface.getFunction(
-      hexBytes.substring(0, 10) as any,
-    );
+    const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("grant");
-    if (receivedFunction.name !== expectedFunction.name) {
-      throw new Error("The received action is different from the expected one");
-    }
-    const result = daoInterface.decodeFunctionData("grant", hexBytes);
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     return permissionParamsFromContract(result);
   }
   /**
@@ -62,15 +56,9 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public revokeAction(data: Uint8Array): IRevokePermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = toUtf8String(data);
-    const receivedFunction = daoInterface.getFunction(
-      hexBytes.substring(0, 10) as any,
-    );
+    const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("revoke");
-    if (receivedFunction.name !== expectedFunction.name) {
-      throw new Error("The received action is different from the expected one");
-    }
-    const result = daoInterface.decodeFunctionData("revoke", hexBytes);
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     return permissionParamsFromContract(result);
   }
   /**
@@ -80,27 +68,38 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @return {*}  {WithdrawParams}
    * @memberof ClientDecoding
    */
-  public withdrawAction(data: Uint8Array): WithdrawParams {
+  public withdrawAction(
+    to: string,
+    value: bigint,
+    data: Uint8Array,
+  ): WithdrawParams {
+    // Native
+    if (!data?.length) {
+      return {
+        type: TokenType.NATIVE,
+        recipientAddressOrEns: to,
+        amount: value,
+      };
+    }
+
+    // ERC20 and other
     const abiObjects = [{
-      tokenStandard: TokenStandards.ERC20,
+      tokenStandard: TokenType.ERC20,
       abi: erc20ContractAbi,
     }];
     for (const abiObject of abiObjects) {
-      const hexBytes = toUtf8String(data);
+      const hexBytes = bytesToHex(data);
       const iface = new Contract(AddressZero, abiObject.abi).interface;
-      const receivedFunction = iface.getFunction(
-        hexBytes.substring(0, 10) as any,
-      );
       const expectedFunction = iface.getFunction("transfer");
-      if (expectedFunction.name !== receivedFunction.name) {
-        throw new Error(
-          "The received action is different from the expected one",
-        );
-      }
-      const result = iface.decodeFunctionData("transfer", hexBytes);
-      return withdrawParamsFromContract(result, abiObject.tokenStandard);
+      const result = iface.decodeFunctionData(expectedFunction, hexBytes);
+      return withdrawParamsFromContract(
+        to,
+        value,
+        result,
+        abiObject.tokenStandard,
+      );
     }
-    throw new Error("The received action is different from the expected one");
+    throw new Error("The received action is not recognized");
   }
   /**
    * Decodes a dao metadata ipfs uri from an encoded update metadata action
@@ -111,15 +110,9 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public updateDaoMetadataRawAction(data: Uint8Array): string {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = toUtf8String(data);
-    const receivedFunction = daoInterface.getFunction(
-      hexBytes.substring(0, 10) as any,
-    );
+    const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("setMetadata");
-    if (receivedFunction.name !== expectedFunction.name) {
-      throw new Error("The received action is different from the expected one");
-    }
-    const result = daoInterface.decodeFunctionData("setMetadata", hexBytes);
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     const metadataUri = toUtf8String(result[0]);
     resolveIpfsCid(metadataUri);
     return metadataUri;
@@ -133,15 +126,9 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    */
   public async updateDaoMetadataAction(data: Uint8Array): Promise<DaoMetadata> {
     const daoInterface = DAO__factory.createInterface();
-    const hexBytes = toUtf8String(data);
-    const receivedFunction = daoInterface.getFunction(
-      hexBytes.substring(0, 10) as any,
-    );
+    const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("setMetadata");
-    if (receivedFunction.name !== expectedFunction.name) {
-      throw new Error("The received action is different from the expected one");
-    }
-    const result = daoInterface.decodeFunctionData("setMetadata", hexBytes);
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     const metadataUri = toUtf8String(result[0]);
     const ipfsCid = resolveIpfsCid(metadataUri);
     try {
@@ -164,7 +151,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       return {
         id: func.format("minimal"),
         functionName: func.name,
-        hash: toUtf8String(data).substring(0, 10),
+        hash: bytesToHex(data).substring(0, 10),
       };
     } catch {
       return null;

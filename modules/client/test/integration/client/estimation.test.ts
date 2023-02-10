@@ -11,7 +11,7 @@ import {
   Context,
   CreateDaoParams,
   DepositParams,
-  DepositType,
+  TokenType,
   EnsureAllowanceParams,
   IAddresslistVotingPluginInstall,
 } from "../../../src";
@@ -83,8 +83,9 @@ describe("Client", () => {
       const client = new Client(context);
 
       const depositParams: DepositParams = {
-        type: DepositType.ERC20,
+        type: TokenType.ERC20,
         daoAddressOrEns: daoAddress,
+        tokenAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(1234),
       };
 

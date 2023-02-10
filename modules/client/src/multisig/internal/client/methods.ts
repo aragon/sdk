@@ -1,4 +1,5 @@
 import {
+  boolArrayToBitmap,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -9,7 +10,6 @@ import {
   NoSignerError,
   ProposalCreationError,
   resolveIpfsCid,
-  boolArrayToBitmap,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -56,6 +56,7 @@ import {
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { QueryMultisigMembers } from "../graphql-queries/members";
+import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK Address List Client
@@ -128,14 +129,14 @@ export class MultisigClientMethods extends ClientCore
     }
 
     const parsedLog = multisigContractInterface.parseLog(log);
-    const proposalId = parsedLog.args["proposalId"];
+    const proposalId: BigNumber = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: BigInt(proposalId),
+      proposalId: proposalId.toBigInt(),
     };
   }
 
@@ -357,6 +358,7 @@ export class MultisigClientMethods extends ClientCore
       throw new GraphQLError("Multisig members");
     }
   }
+
   /**
    * Returns the details of the given proposal
    *

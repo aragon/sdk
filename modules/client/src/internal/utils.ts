@@ -1,13 +1,11 @@
-import { BigNumber } from "@ethersproject/bignumber";
-import { AddressZero } from "@ethersproject/constants";
 import {
   AssetBalance,
   ContractPermissionParams,
-  ContractWithdrawParams,
   DaoDetails,
   DaoListItem,
   DaoMetadata,
   DepositErc20Params,
+  DepositEthParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
   InstalledPluginListItem,
@@ -21,7 +19,6 @@ import {
   SubgraphPluginTypeMap,
   SubgraphTransferListItem,
   SubgraphTransferType,
-  TokenStandards,
   TokenType,
   Transfer,
   TransferType,
@@ -30,15 +27,16 @@ import {
 import { Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { AddressZero } from "@ethersproject/constants";
 
-export function unwrapDepositErc20Params(
-  params: DepositErc20Params,
+export function unwrapDepositParams(
+  params: DepositEthParams | DepositErc20Params,
 ): [string, bigint, string, string] {
   return [
     params.daoAddressOrEns,
     params.amount,
-    params.tokenAddress ?? AddressZero,
-    params.reference ?? "",
+    (params as any)?.tokenAddress ?? AddressZero,
+    "",
   ];
 }
 
@@ -139,7 +137,6 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
         tokenType: TokenType.NATIVE,
         amount: BigInt(transfer.amount),
         creationDate,
-        reference: transfer.reference,
         transactionId: transfer.transaction,
         from: transfer.sender,
       };
@@ -149,7 +146,6 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
       tokenType: TokenType.NATIVE,
       amount: BigInt(transfer.amount),
       creationDate,
-      reference: transfer.reference,
       transactionId: transfer.transaction,
       proposalId: transfer.proposal?.id || "",
       to: transfer.to,
@@ -167,7 +163,6 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
       },
       amount: BigInt(transfer.amount),
       creationDate,
-      reference: transfer.reference,
       transactionId: transfer.transaction,
       from: transfer.sender,
     };
@@ -183,7 +178,6 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
     },
     amount: BigInt(transfer.amount),
     creationDate,
-    reference: transfer.reference,
     transactionId: transfer.transaction,
     to: transfer.to,
     proposalId: transfer.proposal.id || "",
@@ -210,28 +204,19 @@ export function permissionParamsFromContract(
 }
 
 export function withdrawParamsFromContract(
+  to: string,
+  _value: bigint,
   result: Result,
-  tokenStandart: TokenStandards,
+  tokenStandard: TokenType,
 ): WithdrawParams {
-  if (tokenStandart === TokenStandards.ERC20) {
+  if (tokenStandard === TokenType.ERC20) {
     return {
-      type: TokenStandards.ERC20,
-      recipientAddress: result[0],
+      type: TokenType.ERC20,
+      tokenAddress: to,
+      recipientAddressOrEns: result[0],
       amount: BigInt(result[1]),
     };
   }
   // TODO Add ERC721 and ERC1155
   throw new Error("not implemented");
-}
-
-export function withdrawParamsToContract(
-  params: WithdrawParams,
-): ContractWithdrawParams {
-  // TODO ERC721
-  return [
-    params.tokenAddress ?? AddressZero,
-    params.recipientAddress,
-    BigNumber.from(params.amount),
-    params.reference ?? "",
-  ];
 }

@@ -1,4 +1,4 @@
-import { InvalidAddressError } from "@aragon/sdk-common";
+import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
@@ -17,7 +17,6 @@ import {
 } from "../../interfaces";
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -67,7 +66,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     );
     return {
       id: ADDRESSLIST_PLUGIN_ID,
-      data: toUtf8Bytes(hexBytes),
+      data: hexToBytes(hexBytes),
     };
   }
 
@@ -119,7 +118,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data: toUtf8Bytes(hexBytes),
+      data: hexToBytes(hexBytes),
     };
   }
   /**
@@ -151,7 +150,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data: toUtf8Bytes(hexBytes),
+      data: hexToBytes(hexBytes),
     };
   }
 }

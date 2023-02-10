@@ -31,11 +31,11 @@ import { hexToBytes, bytesToHex } from "@aragon/sdk-common";
 const buff = hexToBytes("0xffffffff");
 // [255, 255, 255, 255]
 
-const str = bytesToHex(new Uint8Array([100, 100, 100, 100, 100, 100]));
-// "646464646464"
-
-const str0x = bytesToHex(new Uint8Array([100, 100, 100, 100, 100, 100]), true);
+const str0x = bytesToHex(new Uint8Array([100, 100, 100, 100, 100, 100]));
 // "0x646464646464"
+
+const str = bytesToHex(new Uint8Array([100, 100, 100, 100, 100, 100]), true);
+// "646464646464"
 ```
 
 ### Converting between buffers and big integers

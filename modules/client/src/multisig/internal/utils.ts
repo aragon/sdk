@@ -1,4 +1,4 @@
-import { toUtf8Bytes } from "@ethersproject/strings";
+import { hexToBytes } from "@aragon/sdk-common";
 import {
   DaoAction,
   ProposalMetadata,
@@ -47,7 +47,7 @@ export function toMultisigProposal(
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
-          data: toUtf8Bytes(action.data),
+          data: hexToBytes(action.data),
           to: action.to,
           value: BigInt(action.value),
         };

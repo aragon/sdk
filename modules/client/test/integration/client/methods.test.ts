@@ -24,6 +24,7 @@ import {
   DaoDepositSteps,
   DaoSortBy,
   DepositParams,
+  EnsureAllowanceParams,
   IAddresslistVotingPluginInstall,
   IDaoQueryParams,
   IHasPermissionParams,
@@ -33,8 +34,6 @@ import {
   TokenType,
   TransferSortBy,
   TransferType,
-  DepositType,
-  EnsureAllowanceParams,
   VotingMode,
 } from "../../../src";
 import {
@@ -58,10 +57,10 @@ describe("Client", () => {
       server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      const daoCreation = await deployContracts.createAddresslistDAO(
+      const daoCreation = await deployContracts.createTokenVotingDAO(
         deployment,
-        "test-addresslist-dao",
-        VotingMode.STANDARD
+        "test-tokenvoting-dao",
+        VotingMode.STANDARD,
       );
       daoAddress = daoCreation.daoAddr;
     });
@@ -128,7 +127,6 @@ describe("Client", () => {
       });
 
       it("should fail if no execute_permission is requested", async () => {
-
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
@@ -138,13 +136,11 @@ describe("Client", () => {
         const daoCreationParams: CreateDaoParams = {
           metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-          plugins: [
-          ],
+          plugins: [],
         };
 
         await expect(client.methods.createDao(daoCreationParams).next()).rejects
           .toMatchObject(new MissingExecPermissionError());
-
       });
     });
 
@@ -156,11 +152,10 @@ describe("Client", () => {
         const tokenContract = await deployErc20(client);
         const amount = BigInt("1000000000000000000");
         const depositParams: DepositParams = {
-          type: DepositType.ERC20,
+          type: TokenType.ERC20,
           daoAddressOrEns: daoAddress,
           amount,
           tokenAddress: tokenContract.address,
-          reference: "My reference",
         };
 
         expect(
@@ -260,11 +255,10 @@ describe("Client", () => {
         const tokenContract = await deployErc20(client);
 
         const depositParams: DepositParams = {
-          type: DepositType.ERC20,
+          type: TokenType.ERC20,
           daoAddressOrEns: daoAddress,
           amount: BigInt(7),
           tokenAddress: tokenContract.address,
-          reference: "My reference",
         };
 
         expect(
@@ -522,7 +516,6 @@ describe("Client", () => {
             expect(transfer.amount).toBeGreaterThan(BigInt(0));
             expect(typeof transfer.amount).toBe("bigint");
             expect(transfer.creationDate).toBeInstanceOf(Date);
-            expect(typeof transfer.reference).toBe("string");
             expect(transfer.transactionId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             if (transfer.tokenType === TokenType.NATIVE) {
               if (transfer.type === TransferType.DEPOSIT) {

@@ -57,73 +57,100 @@ describe("Client Multisig", () => {
     await server.close();
   });
 
+  async function buildProposal(multisigClient: MultisigClient): Promise<number> {
+    // generate actions
+    const action = multisigClient.encoding.updateMultisigVotingSettings(
+      {
+        pluginAddress,
+        votingSettings: {
+          minApprovals: 1,
+          onlyListed: true,
+        },
+      },
+    );
+
+    const metadata: ProposalMetadata = {
+      title: "Best Proposal",
+      summary: "this is the sumnary",
+      description: "This is a very long description",
+      resources: [
+        {
+          name: "Website",
+          url: "https://the.website",
+        },
+      ],
+      media: {
+        header: "https://no.media/media.jpeg",
+        logo: "https://no.media/media.jpeg",
+      },
+    };
+    const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
+    const endDate = new Date(Date.now() + 1000 * 60);
+    const proposalParams: CreateMultisigProposalParams = {
+      pluginAddress,
+      metadataUri: ipfsUri,
+      actions: [action],
+      failSafeActions: [false],
+      endDate,
+    };
+
+    for await (
+      const step of multisigClient.methods.createProposal(
+        proposalParams,
+      )
+    ) {
+      switch (step.key) {
+        case ProposalCreationSteps.CREATING:
+          expect(typeof step.txHash).toBe("string");
+          expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          break;
+        case ProposalCreationSteps.DONE:
+          expect(typeof step.proposalId).toBe("bigint");
+          return step.proposalId;
+          // TODO
+          // update with new proposal id when contracts are ready
+          // expect(typeof step.proposalId).toBe("string");
+          // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          break;
+        default:
+          throw new Error(
+            "Unexpected proposal creation step: " +
+              Object.keys(step).join(", "),
+          );
+      }
+    }
+    throw new Error();
+  }
+  async function approveProposal(proposalId: number, client: MultisigClient) {
+    const approveParams: ApproveMultisigProposalParams = {
+      proposalId,
+      pluginAddress,
+      tryExecution: false,
+    };
+    for await (const step of client.methods.approveProposal(approveParams)) {
+      switch (step.key) {
+        case ApproveProposalStep.APPROVING:
+          expect(typeof step.txHash).toBe("string");
+          expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          break;
+        case ApproveProposalStep.DONE:
+          break;
+        default:
+          throw new Error(
+            "Unexpected approve proposal step: " +
+              Object.keys(step).join(", "),
+          );
+      }
+    }
+  }
+
   describe("Proposal Creation", () => {
     it("Should create a new proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const multisigClient = new MultisigClient(ctxPlugin);
 
-      // generate actions
-      const action = await multisigClient.encoding.updateMultisigVotingSettings(
-        {
-          pluginAddress,
-          votingSettings: {
-            minApprovals: 1,
-            onlyListed: true,
-          },
-        },
-      );
-
-      const metadata: ProposalMetadata = {
-        title: "Best Proposal",
-        summary: "this is the sumnary",
-        description: "This is a very long description",
-        resources: [
-          {
-            name: "Website",
-            url: "https://the.website",
-          },
-        ],
-        media: {
-          header: "https://no.media/media.jpeg",
-          logo: "https://no.media/media.jpeg",
-        },
-      };
-      const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
-      const endDate = new Date();
-      endDate.setHours(endDate.getHours() + 10);
-      const proposalParams: CreateMultisigProposalParams = {
-        pluginAddress,
-        metadataUri: ipfsUri,
-        actions: [action],
-        failSafeActions: [false],
-        endDate,
-      };
-
-      for await (
-        const step of multisigClient.methods.createProposal(
-          proposalParams,
-        )
-      ) {
-        switch (step.key) {
-          case ProposalCreationSteps.CREATING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case ProposalCreationSteps.DONE:
-            expect(typeof step.proposalId).toBe("bigint");
-            // TODO
-            // update with new proposal id when contracts are ready
-            // expect(typeof step.proposalId).toBe("string");
-            // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          default:
-            throw new Error(
-              "Unexpected proposal creation step: " +
-                Object.keys(step).join(", "),
-            );
-        }
-      }
+      await buildProposal(multisigClient);
     });
   });
 
@@ -133,16 +160,24 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       // const address = await client.web3.getSigner()?.getAddress();
+
+      const proposalId = await buildProposal(client);
       const canApproveParams: CanApproveParams = {
-        proposalId: BigInt(0),
+        proposalId,
         addressOrEns: TEST_WALLET_ADDRESS,
         pluginAddress,
       };
-      const canApprove = await client.methods.canApprove(
-        canApproveParams,
-      );
+      // positive
+      let canApprove = await client.methods.canApprove(canApproveParams);
       expect(typeof canApprove).toBe("boolean");
       expect(canApprove).toBe(true);
+
+      // negative
+      canApproveParams.addressOrEns =
+        "0x0000000000000000000000000000000000000000";
+      canApprove = await client.methods.canApprove(canApproveParams);
+      expect(typeof canApprove).toBe("boolean");
+      expect(canApprove).toBe(false);
     });
   });
 
@@ -152,26 +187,8 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const approveParams: ApproveMultisigProposalParams = {
-        proposalId: BigInt(0),
-        pluginAddress,
-        tryExecution: false,
-      };
-      for await (const step of client.methods.approveProposal(approveParams)) {
-        switch (step.key) {
-          case ApproveProposalStep.APPROVING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case ApproveProposalStep.DONE:
-            break;
-          default:
-            throw new Error(
-              "Unexpected approve proposal step: " +
-                Object.keys(step).join(", "),
-            );
-        }
-      }
+      const proposalId = await buildProposal(client);
+      await approveProposal(proposalId, client);
     });
   });
 
@@ -180,13 +197,20 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
+
+      const proposalId = await buildProposal(client);
       const canExecuteParams: CanExecuteParams = {
-        proposalId: BigInt(0),
+        proposalId,
         pluginAddress,
       };
-      const canExecute = await client.methods.canExecute(
-        canExecuteParams,
-      );
+      let canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(false);
+
+      // now approve
+      await approveProposal(proposalId, client);
+
+      canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(true);
     });
@@ -198,11 +222,14 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
+      const proposalId = await buildProposal(client);
+      await approveProposal(proposalId, client);
+
       for await (
         const step of client.methods.executeProposal(
           {
             pluginAddress,
-            proposalId: BigInt(0),
+            proposalId,
           },
         )
       ) {
@@ -214,7 +241,6 @@ describe("Client Multisig", () => {
           case ExecuteProposalStep.DONE:
             break;
           default:
-            console.log(step);
             throw new Error(
               "Unexpected execute proposal step: " +
                 Object.keys(step).join(", "),

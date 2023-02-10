@@ -1,4 +1,4 @@
-import { InvalidAddressError } from "@aragon/sdk-common";
+import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
@@ -17,7 +17,6 @@ import {
 import { Multisig__factory } from "@aragon/core-contracts-ethers";
 import { MULTISIG_PLUGIN_ID } from "../constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -55,7 +54,7 @@ export class MultisigClientEncoding extends ClientCore
     );
     return {
       id: MULTISIG_PLUGIN_ID,
-      data: toUtf8Bytes(hexBytes),
+      data: hexToBytes(hexBytes),
     };
   }
 
@@ -87,7 +86,7 @@ export class MultisigClientEncoding extends ClientCore
     return {
       to: params.pluginAddress,
       value: BigInt(0),
-      data: toUtf8Bytes(hexBytes),
+      data: hexToBytes(hexBytes),
     };
   }
   /**
@@ -118,7 +117,7 @@ export class MultisigClientEncoding extends ClientCore
     return {
       to: params.pluginAddress,
       value: BigInt(0),
-      data: toUtf8Bytes(hexBytes),
+      data: hexToBytes(hexBytes),
     };
   }
   /**
@@ -143,7 +142,7 @@ export class MultisigClientEncoding extends ClientCore
     return {
       to: params.pluginAddress,
       value: BigInt(0),
-      data: toUtf8Bytes(hexBytes),
+      data: hexToBytes(hexBytes),
     };
   }
 }

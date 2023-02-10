@@ -165,7 +165,7 @@ describe("Token Voting Client", () => {
           }
           const params: ICanVoteParams = {
             address: TEST_WALLET_ADDRESS,
-            proposalId: "0x00",
+            proposalId: 0,
             pluginAddress,
             vote: VoteValues.YES,
           };
@@ -190,7 +190,7 @@ describe("Token Voting Client", () => {
 
           const voteParams: IVoteProposalParams = {
             pluginAddress,
-            proposalId: "0x00",
+            proposalId: 0,
             vote: VoteValues.YES,
           };
 
@@ -227,7 +227,7 @@ describe("Token Voting Client", () => {
           }
           const voteParams: IVoteProposalParams = {
             pluginAddress,
-            proposalId: "0x00",
+            proposalId: 0,
             vote: VoteValues.YES,
           };
 
@@ -266,7 +266,7 @@ describe("Token Voting Client", () => {
           }
           const executeParams: IExecuteProposalParams = {
             pluginAddress,
-            proposalId: "0x00",
+            proposalId: 0,
           };
 
           try {
@@ -290,7 +290,6 @@ describe("Token Voting Client", () => {
               }
             }
           } catch (e) {
-            console.log(e);
             throw e;
           }
         }

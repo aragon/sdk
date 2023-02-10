@@ -8,36 +8,59 @@ import { DAO__factory } from "@aragon/core-contracts-ethers";
 import {
   Client,
   Context,
-  IGrantPermissionParams,
   DaoMetadata,
+  IGrantPermissionParams,
   IRevokePermissionParams,
-  WithdrawParams,
   Permissions,
+  WithdrawParams,
 } from "../../../src";
 import { DaoAction } from "../../../src/client-common/interfaces/common";
 import { contextParamsLocalChain } from "../constants";
-import { WithdrawType } from "../../../src/interfaces";
+import { TokenType } from "../../../src/interfaces";
 import { toUtf8String } from "@ethersproject/strings";
+import { bytesToHex } from "@aragon/sdk-common";
+
 describe("Client", () => {
   describe("Action generators", () => {
-    it("Should create a client and generate a withdraw action", async () => {
+    it("Should create a client and generate a native withdraw action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
       const withdrawParams: WithdrawParams = {
-        type: WithdrawType.ERC20,
-        recipientAddress: "0x1234567890123456789012345678901234567890",
+        type: TokenType.NATIVE,
+        recipientAddressOrEns: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
-        reference: "test",
       };
 
       const withdrawAction = await client.encoding.withdrawAction(
-        "0x1234567890123456789012345678901234567890",
+        withdrawParams,
+      );
+
+      expect(withdrawAction.value).toBe(withdrawParams.amount);
+      expect(withdrawAction.to).toBe(
+        withdrawParams.recipientAddressOrEns,
+      );
+      expect(withdrawAction.data.length).toBe(0);
+    });
+
+    it("Should create a client and generate an ERC20 withdraw action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const withdrawParams: WithdrawParams = {
+        type: TokenType.ERC20,
+        tokenAddress: "0x0123456789012345678901234567890123456789",
+        recipientAddressOrEns: "0x1234567890123456789012345678901234567890",
+        amount: BigInt(10),
+      };
+
+      const withdrawAction = await client.encoding.withdrawAction(
         withdrawParams,
       );
 
       expect(typeof withdrawAction).toBe("object");
       expect(withdrawAction.data).toBeInstanceOf(Uint8Array);
+      expect(bytesToHex(withdrawAction.data)).toBe("0xa9059cbb0000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a");
     });
     it("Should create a client and generate a grant action", () => {
       const context = new Context(contextParamsLocalChain);
@@ -128,7 +151,7 @@ describe("Client", () => {
           },
         ],
       };
-      const ipfsUri = await client.methods.pinMetadata(params)
+      const ipfsUri = await client.methods.pinMetadata(params);
 
       const installEntry = await client.encoding.updateDaoMetadataAction(
         "0x1234567890123456789012345678901234567890",
@@ -139,7 +162,7 @@ describe("Client", () => {
       expect(installEntry.data).toBeInstanceOf(Uint8Array);
 
       const daoInterface = DAO__factory.createInterface();
-      const hexString = toUtf8String(installEntry.data);
+      const hexString = bytesToHex(installEntry.data);
       const argsDecoded = daoInterface.decodeFunctionData(
         "setMetadata",
         hexString,

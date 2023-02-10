@@ -9,7 +9,7 @@ import {
   MultisigClient,
   ProposalCreationSteps,
   ProposalMetadata,
-  TokenStandards,
+  TokenType,
   WithdrawParams,
 } from "@aragon/sdk-client";
 import {} from "../../src/interfaces";
@@ -46,7 +46,7 @@ const metadata: ProposalMetadata = {
 
 const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
 const withdrawParams: WithdrawParams = {
-  type: TokenStandards.ERC20,
+  type: TokenType.ERC20,
   recipientAddress: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10),
   tokenAddress: "0x1234567890123456789012345678901234567890",

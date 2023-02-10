@@ -1,5 +1,4 @@
-import { decodeRatio } from "@aragon/sdk-common";
-import { toUtf8Bytes } from "@ethersproject/strings";
+import { decodeRatio, hexToBytes } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
   ContractVotingSettings,
@@ -58,7 +57,7 @@ export function toAddresslistVotingProposal(
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
-          data: toUtf8Bytes(action.data),
+          data: hexToBytes(action.data),
           to: action.to,
           value: BigInt(action.value),
         };

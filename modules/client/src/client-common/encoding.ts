@@ -2,29 +2,21 @@ import {
   MajorityVotingBase,
   MajorityVotingBase__factory,
 } from "@aragon/core-contracts-ethers";
-import { UnexpectedActionError } from "@aragon/sdk-common";
+import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { VotingMode, VotingSettings } from "./interfaces/plugin";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { votingModeFromContracts, votingModeToContracts } from "./utils";
-import { encodeRatio } from "@aragon/sdk-common";
-import { decodeRatio } from "@aragon/sdk-common";
-import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
+import { encodeRatio, decodeRatio } from "@aragon/sdk-common";
 
 export function decodeUpdatePluginSettingsAction(
   data: Uint8Array,
 ): VotingSettings {
   const votingInterface = MajorityVotingBase__factory.createInterface();
-  const hexBytes = toUtf8String(data);
-  const receivedFunction = votingInterface.getFunction(
-    hexBytes.substring(0, 10) as any,
-  );
+  const hexBytes = bytesToHex(data);
   const expectedfunction = votingInterface.getFunction("updateVotingSettings");
-  if (receivedFunction.name !== expectedfunction.name) {
-    throw new UnexpectedActionError();
-  }
   const result = votingInterface.decodeFunctionData(
-    "updateVotingSettings",
+    expectedfunction,
     hexBytes,
   );
   return pluginSettingsFromContract(result);
@@ -41,7 +33,7 @@ export function encodeUpdateVotingSettingsAction(
     [args],
   );
   // Strip 0x => encode in Uint8Array
-  return toUtf8Bytes(hexBytes);
+  return hexToBytes(hexBytes);
 }
 
 function pluginSettingsFromContract(result: Result): VotingSettings {
@@ -72,7 +64,7 @@ export function getFunctionFragment(
   data: Uint8Array,
   availableFunctions: string[],
 ): FunctionFragment {
-  const hexBytes = toUtf8String(data);
-  const inter = new Interface(availableFunctions);
-  return inter.getFunction(hexBytes.substring(0, 10));
+  const hexBytes = bytesToHex(data);
+  const iface = new Interface(availableFunctions);
+  return iface.getFunction(hexBytes.substring(0, 10));
 }

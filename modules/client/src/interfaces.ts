@@ -11,6 +11,7 @@ import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { BigNumber } from "@ethersproject/bignumber";
 import { IClientCore } from "./client-common/interfaces/core";
+
 /** Defines the shape of the general purpose Client class */
 export interface IClientMethods extends IClientCore {
   createDao: (params: CreateDaoParams) => AsyncGenerator<DaoCreationStepValue>;
@@ -47,8 +48,7 @@ export interface IClientEncoding extends IClientCore {
     params: IRevokePermissionParams,
   ) => DaoAction;
   withdrawAction: (
-    daoAddresOrEns: string,
-    params: WithdrawParams,
+    parameters: WithdrawParams,
   ) => Promise<DaoAction>;
   updateDaoMetadataAction: (
     daoAddressOrEns: string,
@@ -59,7 +59,11 @@ export interface IClientEncoding extends IClientCore {
 export interface IClientDecoding {
   grantAction: (data: Uint8Array) => IGrantPermissionDecodedParams;
   revokeAction: (data: Uint8Array) => IRevokePermissionDecodedParams;
-  withdrawAction: (data: Uint8Array) => WithdrawParams;
+  withdrawAction: (
+    to: string,
+    value: bigint,
+    data: Uint8Array,
+  ) => WithdrawParams;
   updateDaoMetadataRawAction: (data: Uint8Array) => string;
   updateDaoMetadataAction: (data: Uint8Array) => Promise<DaoMetadata>;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
@@ -98,23 +102,23 @@ export type DaoMetadata = {
   links: DaoResourceLink[];
 };
 
-export type WithdrawParamsBase = {
-  type: TokenStandards.ERC20;
-  recipientAddress: string;
-  reference?: string;
+// Withdrawals
+type WithdrawParamsBase = {
+  type: TokenType;
+  recipientAddressOrEns: string;
 };
 
-export type WithdrawErc20Params = WithdrawParamsBase & {
-  type: TokenStandards.ERC20;
+type WithdrawEthParams = WithdrawParamsBase & {
+  type: TokenType.NATIVE;
   amount: bigint;
-  tokenAddress?: string;
 };
-export type WithdrawErc721Params = WithdrawParamsBase & {
-  type: TokenStandards.ERC721;
+type WithdrawErc20Params = WithdrawParamsBase & {
+  type: TokenType.ERC20;
+  amount: bigint;
   tokenAddress: string;
 };
 
-export type WithdrawParams = WithdrawErc20Params | WithdrawErc721Params;
+export type WithdrawParams = WithdrawEthParams | WithdrawErc20Params;
 
 interface IPermissionParamsBase {
   where: string;
@@ -173,35 +177,29 @@ export enum DaoCreationSteps {
 
 export type DaoCreationStepValue =
   | { key: DaoCreationSteps.CREATING; txHash: string }
-  | { key: DaoCreationSteps.DONE; address: string };
+  | { key: DaoCreationSteps.DONE; address: string, pluginAddresses: string[] };
 
 // DEPOSIT
 
 export type DepositBaseParams = {
   daoAddressOrEns: string;
-  reference?: string;
 };
 
-export type DepositErc20Params = DepositBaseParams & {
-  type: TokenStandards.ERC20;
-  tokenAddress?: string;
+export type DepositEthParams = DepositBaseParams & {
+  type: TokenType.NATIVE;
   amount: bigint;
 };
-export type DepositErc721Params = DepositBaseParams & {
-  type: TokenStandards.ERC721;
+export type DepositErc20Params = DepositBaseParams & {
+  type: TokenType.ERC20;
   tokenAddress: string;
+  amount: bigint;
 };
+// export type DepositErc721Params = DepositBaseParams & {
+//   type: TokenType.ERC721;
+//   tokenAddress: string;
+// };
 
-export enum TokenStandards {
-  ERC20 = "Erc20",
-  ERC721 = "Erc721",
-  ERC1155 = "Erc1155",
-}
-
-export type DepositParams = DepositErc20Params | DepositErc721Params;
-
-export const DepositType = { ...TokenStandards };
-export const WithdrawType = { ...TokenStandards };
+export type DepositParams = DepositEthParams | DepositErc20Params; // | DepositErc721Params;
 
 export type EnsureAllowanceParams = {
   daoAddressOrEns: string;
@@ -266,7 +264,6 @@ export enum TokenType {
 type BaseTokenTransfer = {
   amount: bigint;
   creationDate: Date;
-  reference: string;
   transactionId: string;
 };
 
@@ -398,7 +395,6 @@ export enum SubgraphTransferType {
 export type SubgraphTransferListItem = {
   amount: string;
   createdAt: string;
-  reference: string;
   transaction: string;
   type: SubgraphTransferType;
   to: string;

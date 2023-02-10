@@ -122,14 +122,14 @@ import {
   DaoDepositSteps,
   GasFeeEstimation,
   DepositParams,
-  DepositType
+  TokenType
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const depositParams: DepositParams = {
-  type: DepositType.ERC20,
+  type: TokenType.ERC20,
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount in wei
   reference: "test deposit", // optional
@@ -175,14 +175,14 @@ import {
   DaoDepositSteps,
   GasFeeEstimation,
   DepositParams,
-  DepositType,
+  TokenType,
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
 const context = new Context(contextParams);
 const client = new Client(context);
 const depositParams: DepositParams = {
-  type: DepositType.ERC20,
+  type: TokenType.ERC20,
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
@@ -526,14 +526,14 @@ import {
     DaoDepositSteps,
     GasFeeEstimation,
     DepositParams,
-    DepositType,
+    TokenType,
   } from "@aragon/sdk-client";
   import { contextParams } from "./00-context";
   
   const context = new Context(contextParams);
   const client = new Client(context);
   const depositParams: DepositParams = {
-    type: DepositType.ERC721,
+    type: TokenType.ERC721,
     daoAddressOrEns: "0x1234567890123456789012345678901234567890",
     tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
     reference: "test deposit nft", // optional
@@ -3066,7 +3066,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
-  proposalId: BigInt(0),
+  proposalId: 0,
   pluginAddress: "0x1234567890123456789012345678901234567890",
   tryExecution: true,
 };
@@ -3108,7 +3108,7 @@ const client = new MultisigClient(contextPlugin);
 const steps = client.methods.executeProposal(
   {
     pluginAddress: "0x1234567890123456789012345678901234567890",
-    proposalId: BigInt(0),
+    proposalId: 0,
   },
 );
 for await (const step of steps) {
@@ -3146,7 +3146,7 @@ const client = new MultisigClient(contextPlugin);
 const canApproveParams: CanApproveParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   addressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(0),
+  proposalId: 0,
 };
 
 const canApprove = await client.methods.canApprove(canApproveParams);
@@ -3175,7 +3175,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 const canExecuteParams: CanExecuteParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(0),
+  proposalId: 0,
 };
 const canExecute = await client.methods.canExecute(canExecuteParams);
 console.log(canExecute);

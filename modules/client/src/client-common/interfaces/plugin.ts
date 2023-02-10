@@ -83,23 +83,23 @@ export type CreateProposalBaseParams = {
 export interface IVoteProposalParams {
   pluginAddress: string;
   vote: VoteValues;
-  proposalId: string;
+  proposalId: number;
 }
 
 export interface IExecuteProposalParams {
   pluginAddress: string;
-  proposalId: string;
+  proposalId: number;
 }
 
 export interface ICanVoteParams {
   pluginAddress: string;
-  proposalId: string;
+  proposalId: number;
   address: string;
   vote: VoteValues
 }
 
 export type CanExecuteParams = {
-  proposalId: bigint;
+  proposalId: number;
   pluginAddress: string;
 };
 
@@ -229,7 +229,7 @@ export enum ProposalCreationSteps {
 
 export type ProposalCreationStepValue =
   | { key: ProposalCreationSteps.CREATING; txHash: string }
-  | { key: ProposalCreationSteps.DONE; proposalId: bigint };
+  | { key: ProposalCreationSteps.DONE; proposalId: number };
 
 // PROPOSAL VOTING
 export enum VoteProposalStep {

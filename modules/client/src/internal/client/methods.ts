@@ -50,7 +50,7 @@ import {
   SubgraphDaoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
-  TokenStandards,
+  TokenType,
   Transfer,
   TransferSortBy,
 } from "../../interfaces";
@@ -65,10 +65,10 @@ import {
   toDaoDetails,
   toDaoListItem,
   toTransfer,
-  unwrapDepositErc20Params,
+  unwrapDepositParams,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
-import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
+import { toUtf8Bytes } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
 import {
   UNAVAILABLE_DAO_METADATA,
@@ -124,7 +124,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           pluginSetupRepo: repo.address,
           versionTag: latestVersion.tag,
         },
-        data: toUtf8String(plugin.data),
+        data: plugin.data,
       });
     }
 
@@ -154,7 +154,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         break;
       }
     }
-    
+
     if (!execPermissionFound) {
       throw new MissingExecPermissionError();
     }
@@ -187,25 +187,26 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       throw new Error("Failed to create DAO");
     }
 
+    // Plugin logs
     const pspInterface = PluginSetupProcessor__factory.createInterface();
-    const pluginLog = receipt.logs?.find(
+    const installedLogs = receipt.logs?.filter(
       (e) =>
         e.topics[0] ===
           id(pspInterface.getEvent("InstallationApplied").format("sighash")),
     );
 
-    if (pluginLog) {
-      const parsedPluginLog = pspInterface.parseLog(pluginLog);
-      console.log(parsedPluginLog);
-    }
+    // DAO logs
     const parsedLog = daoFactoryInterface.parseLog(log);
-
     if (!parsedLog.args["dao"]) {
       throw new Error("Failed to create DAO");
     }
+
     yield {
       key: DaoCreationSteps.DONE,
       address: parsedLog.args["dao"],
+      pluginAddresses: installedLogs.map(
+        (log) => pspInterface.parseLog(log).args[1],
+      ),
     };
   }
   /**
@@ -240,68 +241,68 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
-    if (params.type === TokenStandards.ERC20) {
-      const [daoAddress, amount, tokenAddress, reference] =
-        unwrapDepositErc20Params(
-          params,
-        );
 
-      if (tokenAddress && tokenAddress !== AddressZero) {
-        // If the target is an ERC20 token, ensure that the amount can be transferred
-        // Relay the yield steps to the caller as they are received
-        yield* this.ensureAllowance(
-          {
-            amount: params.amount,
-            daoAddressOrEns: daoAddress,
-            tokenAddress,
-          },
-        );
-      }
-
-      // Doing the transfer
-      const daoInstance = DAO__factory.connect(daoAddress, signer);
-      const override: { value?: bigint } = {};
-
-      if (tokenAddress === AddressZero) {
-        // Ether
-        override.value = amount;
-      }
-
-      const tx = await daoInstance.deposit(
-        tokenAddress,
-        amount,
-        reference,
-        override,
-      );
-      yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
-
-      const cr = await tx.wait();
-      const log = findLog(cr, daoInstance.interface, "Deposited");
-      if (!log) {
-        // TODO
-        // cmmon errors
-        throw new Error("Failed to deposit");
-      }
-
-      const daoInterface = DAO__factory.createInterface();
-      const parsedLog = daoInterface.parseLog(log);
-
-      if (!amount.toString() === parsedLog.args["amount"]) {
-        throw new Error(
-          `Deposited amount mismatch. Expected: ${amount}, received: ${
-            parsedLog.args[
-              "amount"
-            ].toBigInt()
-          }`,
-        );
-        // TODO
-        // cmmon errors
-        // throw new AmountMisMatchError(amount, parsedLog.args["amount"])
-      }
-      yield { key: DaoDepositSteps.DONE, amount: amount };
-    } else {
-      // TODO ERC721 and ERC1155
+    if (params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20) {
+      throw new Error("Please, use the token's transfer function directly");
     }
+
+    const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
+      params,
+    );
+
+    if (tokenAddress && tokenAddress !== AddressZero) {
+      // If the target is an ERC20 token, ensure that the amount can be transferred
+      // Relay the yield steps to the caller as they are received
+      yield* this.ensureAllowance(
+        {
+          amount: params.amount,
+          daoAddressOrEns: daoAddress,
+          tokenAddress,
+        },
+      );
+    }
+
+    // Doing the transfer
+    const daoInstance = DAO__factory.connect(daoAddress, signer);
+    const override: { value?: bigint } = {};
+
+    if (tokenAddress === AddressZero) {
+      // Ether
+      override.value = amount;
+    }
+
+    const tx = await daoInstance.deposit(
+      tokenAddress,
+      amount,
+      reference,
+      override,
+    );
+    yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
+
+    const cr = await tx.wait();
+    const log = findLog(cr, daoInstance.interface, "Deposited");
+    if (!log) {
+      // TODO
+      // cmmon errors
+      throw new Error("Failed to deposit");
+    }
+
+    const daoInterface = DAO__factory.createInterface();
+    const parsedLog = daoInterface.parseLog(log);
+
+    if (!amount.toString() === parsedLog.args["amount"]) {
+      throw new Error(
+        `Deposited amount mismatch. Expected: ${amount}, received: ${
+          parsedLog.args[
+            "amount"
+          ].toBigInt()
+        }`,
+      );
+      // TODO
+      // cmmon errors
+      // throw new AmountMisMatchError(amount, parsedLog.args["amount"])
+    }
+    yield { key: DaoDepositSteps.DONE, amount: amount };
   }
 
   /**

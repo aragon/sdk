@@ -2,7 +2,7 @@ import {
   IClientEncoding,
   IGrantPermissionParams,
   IRevokePermissionParams,
-  TokenStandards,
+  TokenType,
   WithdrawParams,
 } from "../../interfaces";
 import { ClientCore, Context, DaoAction } from "../../client-common";
@@ -11,6 +11,7 @@ import { DAO__factory } from "@aragon/core-contracts-ethers";
 import { permissionParamsToContract } from "../utils";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
+import { hexToBytes } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
@@ -56,7 +57,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     return {
       to: daoAddress,
       value: BigInt(0),
-      data: toUtf8Bytes(hexBytes)
+      data: hexToBytes(hexBytes),
     };
   }
   /**
@@ -93,57 +94,52 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     return {
       to: daoAddress,
       value: BigInt(0),
-      data: toUtf8Bytes(hexBytes)
+      data: hexToBytes(hexBytes),
     };
   }
   /**
-   * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
+   * Computes the payload to be given when creating a proposal that withdraws ether from the DAO
    *
-   * @param {string} daoAddressOrEns
-   * @param {WithdrawParams} params
+   * @param {string} recipientAddressOrEns
+   * @param {WithdrawParams} value
    * @return {*}  {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
-  public async withdrawAction(
-    daoAddressOrEns: string,
-    params: WithdrawParams,
-  ): Promise<DaoAction> {
-    let address = daoAddressOrEns;
-    if (!isAddress(daoAddressOrEns)) {
+  public async withdrawAction(params: WithdrawParams): Promise<DaoAction> {
+    let to = params.recipientAddressOrEns;
+    if (!isAddress(params.recipientAddressOrEns)) {
       const resolvedAddress = await this.web3.getSigner()?.resolveName(
-        daoAddressOrEns,
+        params.recipientAddressOrEns,
       );
       if (!resolvedAddress) {
         throw new Error("invalid ens");
       }
-      address = resolvedAddress;
+      to = resolvedAddress;
     }
 
-    if (params.type === TokenStandards.ERC20) {
-      if (params.tokenAddress) {
+    switch (params.type) {
+      case TokenType.NATIVE:
+        return { to, value: params.amount, data: new Uint8Array() };
+      case TokenType.ERC20:
+        if (!params.tokenAddress) {
+          throw new Error("Empty token contract address");
+        }
+
         const iface = new Contract(
           params.tokenAddress,
           erc20ContractAbi,
         ).interface;
         const data = iface.encodeFunctionData("transfer", [
-          params.recipientAddress,
+          params.recipientAddressOrEns,
           params.amount,
         ]);
         return {
           to: params.tokenAddress,
           value: BigInt(0),
-          data: toUtf8Bytes(data),
+          data: hexToBytes(data),
         };
-      }
-      return {
-        to: address,
-        value: params.amount,
-        data: toUtf8Bytes("0x"),
-      };
-    } else {
-      // TODO ERC721 and ERC1155"
-      throw new Error("not implemented");
     }
+    throw new Error("Unsupported token type");
   }
   /**
    * Computes the payload to be given when creating a proposal that updates the metadata the DAO
@@ -174,7 +170,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     return {
       to: address,
       value: BigInt(0),
-      data: toUtf8Bytes(hexBytes)
+      data: hexToBytes(hexBytes),
     };
   }
 }
