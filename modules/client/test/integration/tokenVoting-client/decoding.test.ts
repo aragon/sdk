@@ -10,8 +10,8 @@ import {
   VotingMode,
 } from "../../../src";
 
-import { bytesToHex } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
+import { toUtf8String } from "@ethersproject/strings";
 
 describe("Token Voting Client", () => {
   describe("Action decoders", () => {
@@ -59,7 +59,7 @@ describe("Token Voting Client", () => {
       const decodedParams = client.decoding.mintTokenAction(action.data);
 
       expect(decodedParams.address).toBe(params.address);
-      expect(bytesToHex(action.data, true)).toBe(
+      expect(toUtf8String(action.data)).toBe(
         "0x40c10f190000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a",
       );
       expect(decodedParams.amount).toBe(params.amount);
@@ -72,7 +72,7 @@ describe("Token Voting Client", () => {
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow(
-        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
+        `no matching function (argument=\"name\", value=\"\\u0016\\u0016!!!\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });
 

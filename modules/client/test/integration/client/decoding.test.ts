@@ -17,8 +17,7 @@ import {
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
-import { toUtf8Bytes } from "@ethersproject/strings";
-import { AddressZero } from "@ethersproject/constants";
+import { toUtf8String, toUtf8Bytes } from "@ethersproject/strings";
 import { TokenStandards, WithdrawType } from "../../../src/interfaces";
 describe("Client", () => {
   describe("Action decoders", () => {
@@ -100,7 +99,6 @@ describe("Client", () => {
         type: TokenStandards.ERC20,
         recipientAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
-        reference: "test",
         tokenAddress: "0x1234567890098765432112345678900987654321",
       };
 
@@ -117,10 +115,7 @@ describe("Client", () => {
       expect(decodedWithdrawParams.recipientAddress).toBe(
         withdrawParams.recipientAddress,
       );
-      expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference);
-      expect(decodedWithdrawParams.tokenAddress).toBe(
-        withdrawParams.tokenAddress,
-      );
+      expect(withdrawAction.to).toBe(withdrawParams.tokenAddress);
     });
 
     it("Should decode an encoded raw withdraw action of a native token", async () => {
@@ -138,17 +133,12 @@ describe("Client", () => {
         "0x1234567890123456789012345678901234567890",
         withdrawParams,
       );
-      const decodedWithdrawParams: WithdrawParams = client.decoding
-        .withdrawAction(
-          withdrawAction.data,
-        );
 
-      expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
-      expect(decodedWithdrawParams.recipientAddress).toBe(
+      expect(withdrawAction.value).toBe(withdrawParams.amount);
+      expect(withdrawAction.to).toBe(
         withdrawParams.recipientAddress,
       );
-      expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference);
-      expect(decodedWithdrawParams.tokenAddress).toBe(AddressZero);
+      expect(toUtf8String(withdrawAction.data)).toBe("0x");
     });
 
     it("Should decode an encoded update metadata action", async () => {
@@ -223,7 +213,7 @@ describe("Client", () => {
         ipfsUri,
       );
 
-      expect(() => client.decoding.withdrawAction(updateDaoMetadataAction.data))
+      expect(() => client.decoding.grantAction(updateDaoMetadataAction.data))
         .toThrow("The received action is different from the expected one");
     });
 
@@ -233,7 +223,7 @@ describe("Client", () => {
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.withdrawAction(data)).toThrow(
-        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
+        `no matching function (argument=\"name\", value=\"\\u0016\\u0016!!!\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });
 

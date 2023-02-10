@@ -9,8 +9,9 @@ import {
   MultisigPluginInstallParams,
   RemoveAddressesParams,
 } from "../../../src";
-import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
+import { InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain, TEST_INVALID_ADDRESS } from "../constants";
+import { toUtf8String } from "@ethersproject/strings";
 
 describe("Client Multisig", () => {
   describe("Action generators", () => {
@@ -25,7 +26,7 @@ describe("Client Multisig", () => {
       const multisigIntallParams: MultisigPluginInstallParams = {
         votingSettings: {
           minApprovals: 3,
-          onlyListed: true
+          onlyListed: true,
         },
         members,
       };
@@ -110,7 +111,7 @@ describe("Client Multisig", () => {
       for (let i = 0; i < members.length; i++) {
         expect(members[i]).toBe(decodedMembers[i]);
       }
-      expect(bytesToHex(action.data, true)).toBe(
+      expect(toUtf8String(action.data)).toBe(
         "0x3628731c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
     });
@@ -183,7 +184,7 @@ describe("Client Multisig", () => {
       for (let i = 0; i < members.length; i++) {
         expect(members[i]).toBe(decodedMembers[i]);
       }
-      expect(bytesToHex(action.data, true)).toBe(
+      expect(toUtf8String(action.data)).toBe(
         "0xa84eb99900000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
     });

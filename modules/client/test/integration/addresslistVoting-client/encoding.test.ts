@@ -8,8 +8,9 @@ import {
   IAddresslistVotingPluginInstall,
   VotingSettings,
 } from "../../../src";
-import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
+import { InvalidAddressError } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
+import { toUtf8String } from "@ethersproject/strings";
 describe("Client Address List", () => {
   describe("Action generators", () => {
     it("Should create an AddressList client and generate a install entry", async () => {
@@ -127,7 +128,7 @@ describe("Client Address List", () => {
 
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
-      expect(bytesToHex(action.data, true)).toBe(
+      expect(toUtf8String(action.data)).toBe(
         "0x3628731c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
       expect(action.to).toBe(pluginAddress);
@@ -181,7 +182,7 @@ describe("Client Address List", () => {
 
       expect(typeof action).toBe("object");
       expect(action.data).toBeInstanceOf(Uint8Array);
-      expect(bytesToHex(action.data, true)).toBe(
+      expect(toUtf8String(action.data)).toBe(
         "0xa84eb99900000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
       expect(action.to).toBe(pluginAddress);

@@ -1,4 +1,4 @@
-import { hexToBytes, InvalidAddressError, strip0x } from "@aragon/sdk-common";
+import { InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
@@ -116,11 +116,10 @@ export class AddresslistVotingClientEncoding extends ClientCore
       "addAddresses",
       [members],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data,
+      data: toUtf8Bytes(hexBytes),
     };
   }
   /**
@@ -149,11 +148,10 @@ export class AddresslistVotingClientEncoding extends ClientCore
       "removeAddresses",
       [members],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data,
+      data: toUtf8Bytes(hexBytes),
     };
   }
 }

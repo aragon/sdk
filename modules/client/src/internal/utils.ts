@@ -216,10 +216,8 @@ export function withdrawParamsFromContract(
   if (tokenStandart === TokenStandards.ERC20) {
     return {
       type: TokenStandards.ERC20,
-      tokenAddress: result[0],
-      recipientAddress: result[1],
-      amount: BigInt(result[2]),
-      reference: result[3],
+      recipientAddress: result[0],
+      amount: BigInt(result[1]),
     };
   }
   // TODO Add ERC721 and ERC1155

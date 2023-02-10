@@ -2,27 +2,20 @@ import {
   MajorityVotingBase,
   MajorityVotingBase__factory,
 } from "@aragon/core-contracts-ethers";
-import {
-  bytesToHex,
-  hexToBytes,
-  strip0x,
-  UnexpectedActionError,
-} from "@aragon/sdk-common";
+import { UnexpectedActionError } from "@aragon/sdk-common";
 import { VotingMode, VotingSettings } from "./interfaces/plugin";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
-import {
-  votingModeFromContracts,
-  votingModeToContracts,
-} from "./utils";
+import { votingModeFromContracts, votingModeToContracts } from "./utils";
 import { encodeRatio } from "@aragon/sdk-common";
 import { decodeRatio } from "@aragon/sdk-common";
+import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 
 export function decodeUpdatePluginSettingsAction(
   data: Uint8Array,
 ): VotingSettings {
   const votingInterface = MajorityVotingBase__factory.createInterface();
-  const hexBytes = bytesToHex(data, true);
+  const hexBytes = toUtf8String(data);
   const receivedFunction = votingInterface.getFunction(
     hexBytes.substring(0, 10) as any,
   );
@@ -32,7 +25,7 @@ export function decodeUpdatePluginSettingsAction(
   }
   const result = votingInterface.decodeFunctionData(
     "updateVotingSettings",
-    data,
+    hexBytes,
   );
   return pluginSettingsFromContract(result);
 }
@@ -48,7 +41,7 @@ export function encodeUpdateVotingSettingsAction(
     [args],
   );
   // Strip 0x => encode in Uint8Array
-  return hexToBytes(strip0x(hexBytes));
+  return toUtf8Bytes(hexBytes);
 }
 
 function pluginSettingsFromContract(result: Result): VotingSettings {
@@ -79,7 +72,7 @@ export function getFunctionFragment(
   data: Uint8Array,
   availableFunctions: string[],
 ): FunctionFragment {
-  const hexBytes = bytesToHex(data, true);
+  const hexBytes = toUtf8String(data);
   const inter = new Interface(availableFunctions);
   return inter.getFunction(hexBytes.substring(0, 10));
 }

@@ -108,7 +108,7 @@ describe("Client Multisig", () => {
 
       expect(() => client.decoding.addAddressesAction(data)).toThrow(
         // TODO update error
-        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
+        `no matching function (argument=\"name\", value=\"\\u0016\\u0016!!!\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });
 

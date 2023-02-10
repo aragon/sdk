@@ -1,4 +1,4 @@
-import { hexToBytes, strip0x } from "@aragon/sdk-common";
+import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   DaoAction,
   ProposalMetadata,
@@ -47,12 +47,15 @@ export function toMultisigProposal(
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
-          data: hexToBytes(strip0x(action.data)),
+          data: toUtf8Bytes(action.data),
           to: action.to,
           value: BigInt(action.value),
         };
       },
     ),
+    // TODO
+    // change to computeProposalStatus
+    // Missing executable property from subgraph
     status: proposal.executed ? ProposalStatus.EXECUTED : ProposalStatus.ACTIVE,
     approvals: proposal.approvers.map(
       (approver: SubgraphMultisigApproversListItem) => approver.approver.id,
@@ -74,6 +77,10 @@ export function toMultisigProposalListItem(
       title: metadata.title,
       summary: metadata.summary,
     },
+    approvals: parseInt(proposal.approvals),
+    // TODO
+    // change to computeProposalStatus
+    // Missing executable property from subgraph
     status: proposal.executed ? ProposalStatus.EXECUTED : ProposalStatus.ACTIVE,
   };
 }

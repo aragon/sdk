@@ -50,7 +50,7 @@ describe("Client Address List", () => {
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow(
-        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
+        `no matching function (argument=\"name\", value=\"\\u0016\\u0016!!!\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });
     it("Should decode a add members action", async () => {

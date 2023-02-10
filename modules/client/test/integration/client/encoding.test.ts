@@ -4,7 +4,6 @@ declare const describe, it, expect;
 // mocks need to be at the top of the imports
 import "../../mocks/aragon-sdk-ipfs";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
-import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 
 import {
   Client,
@@ -18,6 +17,7 @@ import {
 import { DaoAction } from "../../../src/client-common/interfaces/common";
 import { contextParamsLocalChain } from "../constants";
 import { WithdrawType } from "../../../src/interfaces";
+import { toUtf8String } from "@ethersproject/strings";
 describe("Client", () => {
   describe("Action generators", () => {
     it("Should create a client and generate a withdraw action", async () => {
@@ -139,13 +139,13 @@ describe("Client", () => {
       expect(installEntry.data).toBeInstanceOf(Uint8Array);
 
       const daoInterface = DAO__factory.createInterface();
-      const argsBytes = bytesToHex(installEntry.data);
+      const hexString = toUtf8String(installEntry.data);
       const argsDecoded = daoInterface.decodeFunctionData(
         "setMetadata",
-        `0x${argsBytes}`,
+        hexString,
       );
       expect(argsDecoded.length).toBe(1);
-      expect(new TextDecoder().decode(hexToBytes(argsDecoded[0]))).toBe(
+      expect(toUtf8String(argsDecoded[0])).toBe(
         "ipfs://QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo",
       );
     });

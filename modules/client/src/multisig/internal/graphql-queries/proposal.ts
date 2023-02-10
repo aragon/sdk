@@ -39,6 +39,7 @@ query MultisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: In
     creator
     metadata
     executed
+    approvals
   }
 }
 `;

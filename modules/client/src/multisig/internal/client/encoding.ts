@@ -1,8 +1,4 @@
-import {
-  hexToBytes,
-  InvalidAddressError,
-  strip0x,
-} from "@aragon/sdk-common";
+import { InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
@@ -50,16 +46,16 @@ export class MultisigClientEncoding extends ClientCore
         "tuple(bool, uint16)",
       ],
       [
-       params.members,
-       [
-        params.votingSettings.onlyListed,
-        params.votingSettings.minApprovals
-       ]
+        params.members,
+        [
+          params.votingSettings.onlyListed,
+          params.votingSettings.minApprovals,
+        ],
       ],
     );
     return {
       id: MULTISIG_PLUGIN_ID,
-      data: toUtf8Bytes(hexBytes)
+      data: toUtf8Bytes(hexBytes),
     };
   }
 
@@ -88,11 +84,10 @@ export class MultisigClientEncoding extends ClientCore
       "addAddresses",
       [params.members],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: params.pluginAddress,
       value: BigInt(0),
-      data,
+      data: toUtf8Bytes(hexBytes),
     };
   }
   /**
@@ -120,11 +115,10 @@ export class MultisigClientEncoding extends ClientCore
       "removeAddresses",
       [params.members],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: params.pluginAddress,
       value: BigInt(0),
-      data,
+      data: toUtf8Bytes(hexBytes),
     };
   }
   /**
@@ -146,11 +140,10 @@ export class MultisigClientEncoding extends ClientCore
       "updateMultisigSettings",
       [params.votingSettings],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: params.pluginAddress,
       value: BigInt(0),
-      data,
+      data: toUtf8Bytes(hexBytes),
     };
   }
 }

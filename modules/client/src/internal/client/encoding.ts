@@ -8,7 +8,6 @@ import {
 import { ClientCore, Context, DaoAction } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
-import { hexToBytes, strip0x } from "@aragon/sdk-common";
 import { permissionParamsToContract } from "../utils";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
@@ -54,11 +53,10 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     );
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("grant", args);
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: daoAddress,
       value: BigInt(0),
-      data,
+      data: toUtf8Bytes(hexBytes)
     };
   }
   /**
@@ -92,11 +90,10 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     );
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("revoke", args);
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: daoAddress,
       value: BigInt(0),
-      data,
+      data: toUtf8Bytes(hexBytes)
     };
   }
   /**
@@ -124,18 +121,18 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
 
     if (params.type === TokenStandards.ERC20) {
       if (params.tokenAddress) {
-        const contract = new Contract(
+        const iface = new Contract(
           params.tokenAddress,
           erc20ContractAbi,
-        );
-        const tx = await contract.populateTransaction.transfer(
-          address,
+        ).interface;
+        const data = iface.encodeFunctionData("transfer", [
+          params.recipientAddress,
           params.amount,
-        );
+        ]);
         return {
-          to: tx.to!,
+          to: params.tokenAddress,
           value: BigInt(0),
-          data: toUtf8Bytes(tx.data!),
+          data: toUtf8Bytes(data),
         };
       }
       return {
@@ -172,13 +169,12 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     }
     // upload metadata to IPFS
     const daoInterface = DAO__factory.createInterface();
-    const args = new TextEncoder().encode(metadataUri);
+    const args = toUtf8Bytes(metadataUri);
     const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: address,
       value: BigInt(0),
-      data,
+      data: toUtf8Bytes(hexBytes)
     };
   }
 }

@@ -1,4 +1,4 @@
-import { hexToBytes, InvalidAddressError, strip0x } from "@aragon/sdk-common";
+import { InvalidAddressError } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -50,7 +50,7 @@ export class TokenVotingClientEncoding extends ClientCore
       [
         "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
         "tuple(address addr, string name, string symbol) tokenSettings",
-        "tuple(address[] receivers, uint256[] amounts) mintSettings"
+        "tuple(address[] receivers, uint256[] amounts) mintSettings",
       ],
       args,
     );
@@ -102,11 +102,10 @@ export class TokenVotingClientEncoding extends ClientCore
     const args = mintTokenParamsToContract(params);
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData("mint", args);
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: minterAddress,
       value: BigInt(0),
-      data,
+      data: toUtf8Bytes(hexBytes),
     };
   }
 }

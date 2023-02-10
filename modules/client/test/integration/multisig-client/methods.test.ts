@@ -91,13 +91,12 @@ describe("Client Multisig", () => {
       };
       const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
       const endDate = new Date();
-      endDate.setHours(endDate.getHours() + 1);
+      endDate.setHours(endDate.getHours() + 10);
       const proposalParams: CreateMultisigProposalParams = {
         pluginAddress,
         metadataUri: ipfsUri,
         actions: [action],
         failSafeActions: [false],
-        startDate: new Date(),
         endDate,
       };
 
@@ -358,6 +357,8 @@ describe("Client Multisig", () => {
         expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         expect(typeof proposal.metadata.title).toBe("string");
         expect(typeof proposal.metadata.summary).toBe("string");
+        expect(typeof proposal.approvals).toBe("number");
+        expect(proposal.approvals >= 0).toBe(true);
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {
