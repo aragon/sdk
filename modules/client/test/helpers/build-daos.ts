@@ -5,6 +5,7 @@ import {
   Context,
   CreateDaoParams,
   DaoCreationSteps,
+  MultisigClient,
   TokenVotingClient,
   VotingMode,
 } from "../../src";
@@ -13,21 +14,15 @@ import {
   TEST_WALLET_ADDRESS,
 } from "../integration/constants";
 
-export async function buildAddressListVotingDAO(
-  pluginRepoAddress: string,
-  votingMode: VotingMode = VotingMode.STANDARD,
-) {
+export async function buildMultisigDAO(pluginRepoAddress: string) {
   const client = new Client(new Context(contextParamsLocalChain));
 
-  const pluginInstallItem = AddresslistVotingClient.encoding
+  const pluginInstallItem = MultisigClient.encoding
     .getPluginInstallItem({
-      addresses: [TEST_WALLET_ADDRESS],
+      members: [TEST_WALLET_ADDRESS],
       votingSettings: {
-        minDuration: 60 * 60,
-        minParticipation: 0.5,
-        supportThreshold: 0.5,
-        minProposerVotingPower: BigInt(0),
-        votingMode,
+        minApprovals: 1,
+        onlyListed: true,
       },
     });
 
@@ -73,6 +68,52 @@ export async function buildTokenVotingDAO(
         symbol: "TTK",
         decimals: 18,
       },
+      votingSettings: {
+        minDuration: 60 * 60,
+        minParticipation: 0.5,
+        supportThreshold: 0.5,
+        minProposerVotingPower: BigInt(0),
+        votingMode,
+      },
+    });
+
+  const createDaoParams: CreateDaoParams = {
+    ensSubdomain: "teting-" + Math.random().toString().slice(2),
+    metadataUri: "ipfs://",
+    plugins: [
+      {
+        id: pluginRepoAddress, // TODO: Rename
+        data: pluginInstallItem.data,
+      },
+    ],
+    daoUri: "https://",
+    trustedForwarder: AddressZero,
+  };
+  for await (
+    const step of client.methods.createDao(createDaoParams)
+  ) {
+    switch (step.key) {
+      case DaoCreationSteps.CREATING:
+        break;
+      case DaoCreationSteps.DONE:
+        return {
+          dao: step.address,
+          plugin: step.pluginAddresses[0],
+        };
+    }
+  }
+  throw new Error("DAO not created");
+}
+
+export async function buildAddressListVotingDAO(
+  pluginRepoAddress: string,
+  votingMode: VotingMode = VotingMode.STANDARD,
+) {
+  const client = new Client(new Context(contextParamsLocalChain));
+
+  const pluginInstallItem = AddresslistVotingClient.encoding
+    .getPluginInstallItem({
+      addresses: [TEST_WALLET_ADDRESS],
       votingSettings: {
         minDuration: 60 * 60,
         minParticipation: 0.5,

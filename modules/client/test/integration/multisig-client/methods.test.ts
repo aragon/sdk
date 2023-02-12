@@ -33,32 +33,34 @@ import {
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { Server } from "ganache";
-import { advanceBlocks } from "../../helpers/advance-blocks";
+// import { advanceBlocks } from "../../helpers/advance-blocks";
 import { CanExecuteParams, ExecuteProposalStep } from "../../../src";
+import { buildMultisigDAO } from "../../helpers/build-daos";
+import { advanceBlocks } from "../../helpers/advance-blocks";
 
 describe("Client Multisig", () => {
-  let pluginAddress: string;
+  let deployment: deployContracts.Deployment;
   let server: Server;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
-    const deployment = await deployContracts.deploy();
+    deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-    const daoCreation = await deployContracts.createMultisigDAO(
-      deployment,
-      "test-multisig-dao",
-      [TEST_WALLET_ADDRESS],
-    );
-    pluginAddress = daoCreation.pluginAddrs[0];
-    // advance to get past the voting checkpoint
-    await advanceBlocks(server.provider, 10);
   });
 
   afterAll(async () => {
     await server.close();
   });
 
+  async function buildDao() {
+    const repoAddr = deployment.multisigRepo.address;
+    const result = await buildMultisigDAO(repoAddr);
+    await advanceBlocks(server.provider, 10);
+    return result;
+  }
+
   async function buildProposal(
+    pluginAddress: string,
     multisigClient: MultisigClient,
   ): Promise<number> {
     // generate actions
@@ -124,7 +126,11 @@ describe("Client Multisig", () => {
     }
     throw new Error();
   }
-  async function approveProposal(proposalId: number, client: MultisigClient) {
+  async function approveProposal(
+    proposalId: number,
+    pluginAddress: string,
+    client: MultisigClient,
+  ) {
     const approveParams: ApproveMultisigProposalParams = {
       proposalId,
       pluginAddress,
@@ -153,7 +159,9 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const multisigClient = new MultisigClient(ctxPlugin);
 
-      await buildProposal(multisigClient);
+      const { plugin: pluginAddress } = await buildDao();
+
+      await buildProposal(pluginAddress, multisigClient);
     });
   });
 
@@ -164,7 +172,9 @@ describe("Client Multisig", () => {
       const client = new MultisigClient(ctxPlugin);
       // const address = await client.web3.getSigner()?.getAddress();
 
-      const proposalId = await buildProposal(client);
+      const { plugin: pluginAddress } = await buildDao();
+
+      const proposalId = await buildProposal(pluginAddress, client);
       const canApproveParams: CanApproveParams = {
         proposalId,
         addressOrEns: TEST_WALLET_ADDRESS,
@@ -190,8 +200,10 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const proposalId = await buildProposal(client);
-      await approveProposal(proposalId, client);
+      const { plugin: pluginAddress } = await buildDao();
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      await approveProposal(proposalId, pluginAddress, client);
     });
   });
 
@@ -201,7 +213,9 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const proposalId = await buildProposal(client);
+      const { plugin: pluginAddress } = await buildDao();
+
+      const proposalId = await buildProposal(pluginAddress, client);
       const canExecuteParams: CanExecuteParams = {
         proposalId,
         pluginAddress,
@@ -211,7 +225,7 @@ describe("Client Multisig", () => {
       expect(canExecute).toBe(false);
 
       // now approve
-      await approveProposal(proposalId, client);
+      await approveProposal(proposalId, pluginAddress, client);
 
       canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
@@ -225,8 +239,10 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const proposalId = await buildProposal(client);
-      await approveProposal(proposalId, client);
+      const { plugin: pluginAddress } = await buildDao();
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      await approveProposal(proposalId, pluginAddress, client);
 
       for await (
         const step of client.methods.executeProposal(

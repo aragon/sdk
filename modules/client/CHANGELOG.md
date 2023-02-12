@@ -11,14 +11,12 @@ TEMPLATE:
 
 - Change 1, 2, 3
 
--->
-
-TODO:
+//////
+TODO: remove
 - PLUGIN_ID constants
-- Init plugin tests from the own SDK
-- Addresslist tests crash
 - proposalId's as a number by now
 
+-->
 
 ## [UPCOMING]
 ### Changed
