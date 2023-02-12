@@ -1,5 +1,6 @@
 import { isAddress } from "@ethersproject/address";
 import {
+  boolArrayToBitmap,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -10,7 +11,6 @@ import {
   NoSignerError,
   ProposalCreationError,
   resolveIpfsCid,
-  boolArrayToBitmap,
 } from "@aragon/sdk-common";
 import {
   ClientCore,
@@ -62,6 +62,7 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
+import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK TokenVoting Client
@@ -135,7 +136,7 @@ export class TokenVotingClientMethods extends ClientCore
     }
 
     const parsedLog = tokenVotingContractInterface.parseLog(log);
-    const proposalId = parsedLog.args["proposalId"];
+    const proposalId: BigNumber = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
@@ -143,7 +144,7 @@ export class TokenVotingClientMethods extends ClientCore
     yield {
       key: ProposalCreationSteps.DONE,
       // TODO remove this when new proposal format
-      proposalId: proposalId.toHexString(),
+      proposalId: proposalId.toNumber(),
     };
   }
 

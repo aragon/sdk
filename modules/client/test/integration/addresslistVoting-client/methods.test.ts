@@ -9,11 +9,8 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   AddresslistVotingClient,
-  Client,
   Context,
   ContextPlugin,
-  CreateDaoParams,
-  DaoCreationSteps,
   ExecuteProposalStep,
   ICanVoteParams,
   ICreateProposalParams,
@@ -42,7 +39,7 @@ import {
 } from "../constants";
 import { Server } from "ganache";
 import { advanceBlocks } from "../../helpers/advance-blocks";
-import { AddressZero } from "@ethersproject/constants";
+import { buildAddressListVotingDAO } from "../../helpers/build-daos";
 
 describe("Client Address List", () => {
   let server: Server;
@@ -59,47 +56,19 @@ describe("Client Address List", () => {
   });
 
   // Helpers
-  async function buildDAO(votingMode: VotingMode = VotingMode.STANDARD) {
-    const client = new Client(new Context(contextParamsLocalChain));
-
-    const pluginInstallItem = AddresslistVotingClient.encoding
-      .getPluginInstallItem({
-        addresses: [TEST_WALLET_ADDRESS],
-        votingSettings: {
-          minDuration: 60 * 60,
-          minParticipation: 0.5,
-          supportThreshold: 0.5,
-          minProposerVotingPower: BigInt(0),
-          votingMode,
-        },
-      });
-
-    const createDaoParams: CreateDaoParams = {
-      ensSubdomain: "teting-" + Math.random().toString().slice(2),
-      metadataUri: "ipfs://",
-      plugins: [
-        {
-          id: deployment.addresslistVotingRepo.address,
-          data: pluginInstallItem.data,
-        },
-      ],
-      daoUri: "https://",
-      trustedForwarder: AddressZero,
-    };
-    for await (
-      const step of client.methods.createDao(createDaoParams)
-    ) {
-      switch (step.key) {
-        case DaoCreationSteps.CREATING:
-          break;
-        case DaoCreationSteps.DONE:
-          return {
-            dao: step.address,
-            plugin: step.pluginAddresses[0],
-          };
-      }
-    }
-    throw new Error("DAO not created");
+  async function buildDaos() {
+    const repoAddr = deployment.addresslistVotingRepo.address;
+    const daoEntries: Array<{ dao: string; plugin: string }> = [];
+    daoEntries.push(
+      await buildAddressListVotingDAO(repoAddr, VotingMode.STANDARD),
+    );
+    daoEntries.push(
+      await buildAddressListVotingDAO(repoAddr, VotingMode.EARLY_EXECUTION),
+    );
+    daoEntries.push(
+      await buildAddressListVotingDAO(repoAddr, VotingMode.VOTE_REPLACEMENT),
+    );
+    return daoEntries;
   }
 
   async function buildProposal(
@@ -133,8 +102,7 @@ describe("Client Address List", () => {
     const ipfsUri = await client.methods.pinMetadata(
       metadata,
     );
-    const endDate = new Date();
-    endDate.setHours(endDate.getHours() + 2);
+    const endDate = new Date(Date.now() + 60 * 61 * 1000);
 
     const proposalParams: ICreateProposalParams = {
       pluginAddress,
@@ -158,8 +126,7 @@ describe("Client Address List", () => {
           expect(typeof step.proposalId).toBe("number");
           return step.proposalId;
           // TODO fix with new proposalId format
-          // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-          break;
+        // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
         default:
           throw new Error(
             "Unexpected proposal creation step: " +
@@ -170,17 +137,41 @@ describe("Client Address List", () => {
     throw new Error();
   }
 
+  async function voteProposal(
+    pluginAddress: string,
+    proposalId: number,
+    client: AddresslistVotingClient,
+    voteValue: VoteValues = VoteValues.YES,
+  ) {
+    const voteParams: IVoteProposalParams = {
+      pluginAddress,
+      proposalId,
+      vote: voteValue,
+    };
+    for await (const step of client.methods.voteProposal(voteParams)) {
+      switch (step.key) {
+        case VoteProposalStep.VOTING:
+          expect(typeof step.txHash).toBe("string");
+          expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          break;
+        case VoteProposalStep.DONE:
+          break;
+        default:
+          throw new Error(
+            "Unexpected vote proposal step: " +
+              Object.keys(step).join(", "),
+          );
+      }
+    }
+  }
+
   describe("Proposal Creation", () => {
     it("Should create a new proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const daoEntries: Array<{ dao: string; plugin: string }> = [];
-      daoEntries.push(await buildDAO(VotingMode.STANDARD));
-      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
-      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
-      // await advanceBlocks(server.provider, 10);
+      const daoEntries = await buildDaos();
 
       for (const daoEntry of daoEntries) {
         const { plugin: pluginAddress } = daoEntry;
@@ -199,11 +190,7 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const daoEntries: Array<{ dao: string; plugin: string }> = [];
-      daoEntries.push(await buildDAO(VotingMode.STANDARD));
-      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
-      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
-      // await advanceBlocks(server.provider, 10);
+      const daoEntries = await buildDaos();
 
       for (const daoEntry of daoEntries) {
         const { plugin: pluginAddress } = daoEntry;
@@ -233,99 +220,7 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const daoEntries: Array<{ dao: string; plugin: string }> = [];
-      daoEntries.push(await buildDAO(VotingMode.STANDARD));
-      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
-      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
-      // await advanceBlocks(server.provider, 10);
-
-      for (const daoEntry of daoEntries) {
-        const { plugin: pluginAddress } = daoEntry;
-        if (!pluginAddress) {
-          throw new Error("No plugin installed");
-        }
-
-        const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
-
-        const voteParams: IVoteProposalParams = {
-          pluginAddress,
-          proposalId,
-          vote: VoteValues.NO,
-        };
-
-        for await (const step of client.methods.voteProposal(voteParams)) {
-          switch (step.key) {
-            case VoteProposalStep.VOTING:
-              expect(typeof step.txHash).toBe("string");
-              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            case VoteProposalStep.DONE:
-              break;
-            default:
-              throw new Error(
-                "Unexpected vote proposal step: " +
-                  Object.keys(step).join(", "),
-              );
-          }
-        }
-      }
-    });
-    it("Should replace a vote on a proposal locally", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
-
-      const daoEntries: Array<{ dao: string; plugin: string }> = [];
-      daoEntries.push(await buildDAO(VotingMode.STANDARD));
-      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
-      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
-      // await advanceBlocks(server.provider, 10);
-
-      for (const daoEntry of daoEntries) {
-        const { plugin: pluginAddress } = daoEntry;
-        if (!pluginAddress) {
-          throw new Error("No plugin installed");
-        }
-
-        const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
-
-        const voteParams: IVoteProposalParams = {
-          pluginAddress,
-          proposalId,
-          vote: VoteValues.YES,
-        };
-
-        for await (const step of client.methods.voteProposal(voteParams)) {
-          switch (step.key) {
-            case VoteProposalStep.VOTING:
-              expect(typeof step.txHash).toBe("string");
-              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            case VoteProposalStep.DONE:
-              break;
-            default:
-              throw new Error(
-                "Unexpected vote proposal step: " +
-                  Object.keys(step).join(", "),
-              );
-          }
-        }
-      }
-    });
-  });
-
-  describe("Execute proposal", () => {
-    it("Should execute a local proposal", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
-
-      const daoEntries: Array<{ dao: string; plugin: string }> = [];
-      daoEntries.push(await buildDAO(VotingMode.STANDARD));
-      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
-      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
+      const daoEntries = await buildDaos();
 
       for (const daoEntry of daoEntries) {
         const { plugin: pluginAddress } = daoEntry;
@@ -337,49 +232,169 @@ describe("Client Address List", () => {
         expect(typeof proposalId).toBe("number");
 
         // Vote
-        const voteParams: IVoteProposalParams = {
-          pluginAddress,
-          proposalId,
-          vote: VoteValues.YES,
-        };
-        for await (const step of client.methods.voteProposal(voteParams)) {
-          switch (step.key) {
-            case VoteProposalStep.VOTING:
-              expect(typeof step.txHash).toBe("string");
-              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            case VoteProposalStep.DONE:
-              break;
-            default:
-              throw new Error(
-                "Unexpected vote proposal step: " +
-                  Object.keys(step).join(", "),
-              );
-          }
-        }
-        await advanceBlocks(server.provider, 10);
+        await voteProposal(pluginAddress, proposalId, client);
+      }
+    });
+    it("Should replace a vote on a proposal locally", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new AddresslistVotingClient(ctxPlugin);
 
-        // Execute
-        const executeParams: IExecuteProposalParams = {
-          pluginAddress,
-          proposalId,
-        };
-        for await (
-          const step of client.methods.executeProposal(executeParams)
-        ) {
-          switch (step.key) {
-            case ExecuteProposalStep.EXECUTING:
-              expect(typeof step.txHash).toBe("string");
-              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            case ExecuteProposalStep.DONE:
-              break;
-            default:
-              throw new Error(
-                "Unexpected execute proposal step: " +
-                  Object.keys(step).join(", "),
-              );
-          }
+      const repoAddr = deployment.addresslistVotingRepo.address;
+      const { plugin: pluginAddress } = await buildAddressListVotingDAO(
+        repoAddr,
+        VotingMode.VOTE_REPLACEMENT,
+      );
+      if (!pluginAddress) {
+        throw new Error("No plugin installed");
+      }
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      expect(typeof proposalId).toBe("number");
+
+      // Vote YES
+      await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+
+      await advanceBlocks(server.provider, 1);
+      await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+    });
+  });
+
+  describe("Execute proposal", () => {
+    it("Should execute a standard voting proposal", async () => {
+      const repoAddr = deployment.addresslistVotingRepo.address;
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new AddresslistVotingClient(ctxPlugin);
+
+      const { plugin: pluginAddress } = await buildAddressListVotingDAO(
+        repoAddr,
+        VotingMode.STANDARD,
+      );
+      if (!pluginAddress) {
+        throw new Error("No plugin installed");
+      }
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      expect(typeof proposalId).toBe("number");
+
+      // Vote
+      await voteProposal(pluginAddress, proposalId, client);
+      // Force date past end
+      await advanceBlocks(server.provider, 1000);
+
+      // Execute
+      const executeParams: IExecuteProposalParams = {
+        pluginAddress,
+        proposalId,
+      };
+      for await (
+        const step of client.methods.executeProposal(executeParams)
+      ) {
+        switch (step.key) {
+          case ExecuteProposalStep.EXECUTING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case ExecuteProposalStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected execute proposal step: " +
+                Object.keys(step).join(", "),
+            );
+        }
+      }
+    });
+
+    it("Should execute an early execution proposal", async () => {
+      const repoAddr = deployment.addresslistVotingRepo.address;
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new AddresslistVotingClient(ctxPlugin);
+
+      const { plugin: pluginAddress } = await buildAddressListVotingDAO(
+        repoAddr,
+        VotingMode.EARLY_EXECUTION,
+      );
+      if (!pluginAddress) {
+        throw new Error("No plugin installed");
+      }
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      expect(typeof proposalId).toBe("number");
+
+      // Vote
+      await voteProposal(pluginAddress, proposalId, client);
+      // No waiting here
+
+      // Execute
+      const executeParams: IExecuteProposalParams = {
+        pluginAddress,
+        proposalId,
+      };
+      for await (
+        const step of client.methods.executeProposal(executeParams)
+      ) {
+        switch (step.key) {
+          case ExecuteProposalStep.EXECUTING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case ExecuteProposalStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected execute proposal step: " +
+                Object.keys(step).join(", "),
+            );
+        }
+      }
+    });
+
+    it("Should execute a vote replacement proposal", async () => {
+      const repoAddr = deployment.addresslistVotingRepo.address;
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new AddresslistVotingClient(ctxPlugin);
+
+      const { plugin: pluginAddress } = await buildAddressListVotingDAO(
+        repoAddr,
+        VotingMode.EARLY_EXECUTION,
+      );
+      if (!pluginAddress) {
+        throw new Error("No plugin installed");
+      }
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      expect(typeof proposalId).toBe("number");
+
+      // Vote
+      await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+      await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+      // Force date past end
+      await advanceBlocks(server.provider, 1000);
+
+      // Execute
+      const executeParams: IExecuteProposalParams = {
+        pluginAddress,
+        proposalId,
+      };
+      for await (
+        const step of client.methods.executeProposal(executeParams)
+      ) {
+        switch (step.key) {
+          case ExecuteProposalStep.EXECUTING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case ExecuteProposalStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected execute proposal step: " +
+                Object.keys(step).join(", "),
+            );
         }
       }
     });
