@@ -18,7 +18,7 @@ const web3endpoints = {
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
-const contextParams: ContextParams = {
+const contextParamsMainnet: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
@@ -41,7 +41,7 @@ describe("GraphQL core module", () => {
   it("Should detect all invalid graphql endpoints", async () => {
     const ctx = new Context(
       {
-        ...contextParams,
+        ...contextParamsMainnet,
         graphqlNodes: [
           { url: "https://the.wrong/url" },
           { url: "https://the.wrong/url" },
@@ -59,7 +59,7 @@ describe("GraphQL core module", () => {
   it("Should create a valid graphql client", async () => {
     const ctx = new Context(
       {
-        ...contextParams,
+        ...contextParamsMainnet,
         graphqlNodes: [
           { url: "https://the.wrong/url" },
           { url: "https://the.wrong/url" },

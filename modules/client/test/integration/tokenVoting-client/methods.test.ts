@@ -28,7 +28,7 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
-  contextParams,
+  contextParamsMainnet,
   contextParamsLocalChain,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
@@ -37,7 +37,8 @@ import {
   TEST_TOKEN_VOTING_PROPOSAL_ID,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import { EthereumProvider, Server } from "ganache";
+import { Server } from "ganache";
+import { advanceBlocks } from "../../helpers/advance-blocks";
 
 describe("Token Voting Client", () => {
   let pluginAddressMap: Map<VotingMode, string> = new Map<VotingMode, string>();
@@ -298,7 +299,7 @@ describe("Token Voting Client", () => {
 
     describe("Data retrieval", () => {
       it("Should get the list of members that can vote in a proposal", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -316,7 +317,7 @@ describe("Token Voting Client", () => {
         }
       });
       it("Should fetch the given proposal", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -426,7 +427,7 @@ describe("Token Voting Client", () => {
         }
       });
       it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -436,7 +437,7 @@ describe("Token Voting Client", () => {
         expect(proposal === null).toBe(true);
       });
       it("Should get a list of proposals filtered by the given criteria", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -496,7 +497,7 @@ describe("Token Voting Client", () => {
         mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
       });
       it("Should get a list of proposals from a specific dao", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -513,7 +514,7 @@ describe("Token Voting Client", () => {
         expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
       });
       it("Should get a list of proposals from a dao that has no proposals", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -530,7 +531,7 @@ describe("Token Voting Client", () => {
         expect(proposals.length === 0).toBe(true);
       });
       it("Should get a list of proposals from an invalid address", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -546,7 +547,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should get the settings of a plugin given a plugin instance address", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -563,7 +564,7 @@ describe("Token Voting Client", () => {
         }
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -574,7 +575,7 @@ describe("Token Voting Client", () => {
         expect(typeof token?.name).toBe("string");
       });
       it("Should return null token details for nonexistent plugin addresses", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -585,12 +586,3 @@ describe("Token Voting Client", () => {
     });
   });
 });
-
-async function advanceBlocks(
-  provider: EthereumProvider,
-  amountOfBlocks: number,
-) {
-  for (let i = 0; i < amountOfBlocks; i++) {
-    await provider.send("evm_mine", []);
-  }
-}

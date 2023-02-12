@@ -4,12 +4,12 @@ declare const describe, it, expect;
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import { Client, Context } from "../../../src";
-import { contextParams, web3endpoints } from "../constants";
+import { contextParamsMainnet, web3endpoints } from "../constants";
 
 describe("Client", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const client = new Client(ctx);
 
       expect(client).toBeInstanceOf(Client);
@@ -20,8 +20,8 @@ describe("Client", () => {
       expect(web3Status).toEqual(true);
     });
     it("Should create a failing client", async () => {
-      contextParams.web3Providers = web3endpoints.failing;
-      const context = new Context(contextParams);
+      contextParamsMainnet.web3Providers = web3endpoints.failing;
+      const context = new Context(contextParamsMainnet);
       const client = new Client(context);
 
       expect(client).toBeInstanceOf(Client);
@@ -32,10 +32,10 @@ describe("Client", () => {
       expect(web3Status).toEqual(false);
     });
     it("Should create a client, fail and shift to a working endpoint", async () => {
-      contextParams.web3Providers = web3endpoints.failing.concat(
+      contextParamsMainnet.web3Providers = web3endpoints.failing.concat(
         web3endpoints.working,
       );
-      const context = new Context(contextParams);
+      const context = new Context(contextParamsMainnet);
       const client = new Client(context);
 
       await client

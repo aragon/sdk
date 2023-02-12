@@ -12,6 +12,7 @@ import {
   Client,
   Context,
   ContextPlugin,
+  CreateDaoParams,
   DaoCreationSteps,
   ExecuteProposalStep,
   ICanVoteParams,
@@ -30,8 +31,8 @@ import {
 } from "../../../src";
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
-  contextParams,
   contextParamsLocalChain,
+  contextParamsMainnet,
   TEST_ADDRESSLIST_DAO_ADDDRESS,
   TEST_ADDRESSLIST_PLUGIN_ADDRESS,
   TEST_ADDRESSLIST_PROPOSAL_ID,
@@ -39,7 +40,8 @@ import {
   TEST_NON_EXISTING_ADDRESS,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import { EthereumProvider, Server } from "ganache";
+import { Server } from "ganache";
+import { advanceBlocks } from "../../helpers/advance-blocks";
 import { AddressZero } from "@ethersproject/constants";
 
 describe("Client Address List", () => {
@@ -58,9 +60,7 @@ describe("Client Address List", () => {
 
   // Helpers
   async function buildDAO(votingMode: VotingMode = VotingMode.STANDARD) {
-    const client = new Client(
-      new Context(contextParams),
-    );
+    const client = new Client(new Context(contextParamsLocalChain));
 
     const pluginInstallItem = AddresslistVotingClient.encoding
       .getPluginInstallItem({
@@ -74,19 +74,20 @@ describe("Client Address List", () => {
         },
       });
 
+    const createDaoParams: CreateDaoParams = {
+      ensSubdomain: "teting-" + Math.random().toString().slice(2),
+      metadataUri: "ipfs://",
+      plugins: [
+        {
+          id: deployment.addresslistVotingRepo.address,
+          data: pluginInstallItem.data,
+        },
+      ],
+      daoUri: "https://",
+      trustedForwarder: AddressZero,
+    };
     for await (
-      const step of client.methods.createDao({
-        ensSubdomain: "teting-" + Math.random().toString().slice(2),
-        metadataUri: "ipfs://",
-        plugins: [
-          {
-            id: deployment.addresslistVotingRepo.address,
-            data: pluginInstallItem.data,
-          },
-        ],
-        daoUri: "https://",
-        trustedForwarder: AddressZero,
-      })
+      const step of client.methods.createDao(createDaoParams)
     ) {
       switch (step.key) {
         case DaoCreationSteps.CREATING:
@@ -99,19 +100,6 @@ describe("Client Address List", () => {
       }
     }
     throw new Error("DAO not created");
-
-    // TODO: Original
-
-    // const daoCreation = await deployContracts.createAddresslistDAO(
-    //   deployment,
-    //   "test-token-dao-" + Math.random(),
-    //   votingMode,
-    //   [TEST_WALLET_ADDRESS],
-    // );
-    // return {
-    //   dao: daoCreation.daoAddr,
-    //   plugin: daoCreation.pluginAddrs[0],
-    // };
   }
 
   async function buildProposal(
@@ -188,12 +176,11 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const daoEntries = await Promise.all([
-        buildDAO(VotingMode.STANDARD),
-        buildDAO(VotingMode.EARLY_EXECUTION),
-        buildDAO(VotingMode.VOTE_REPLACEMENT),
-      ]);
-      await advanceBlocks(server.provider, 10);
+      const daoEntries: Array<{ dao: string; plugin: string }> = [];
+      daoEntries.push(await buildDAO(VotingMode.STANDARD));
+      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
+      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
+      // await advanceBlocks(server.provider, 10);
 
       for (const daoEntry of daoEntries) {
         const { plugin: pluginAddress } = daoEntry;
@@ -212,12 +199,11 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const daoEntries = await Promise.all([
-        buildDAO(VotingMode.STANDARD),
-        buildDAO(VotingMode.EARLY_EXECUTION),
-        buildDAO(VotingMode.VOTE_REPLACEMENT),
-      ]);
-      await advanceBlocks(server.provider, 10);
+      const daoEntries: Array<{ dao: string; plugin: string }> = [];
+      daoEntries.push(await buildDAO(VotingMode.STANDARD));
+      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
+      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
+      // await advanceBlocks(server.provider, 10);
 
       for (const daoEntry of daoEntries) {
         const { plugin: pluginAddress } = daoEntry;
@@ -226,7 +212,7 @@ describe("Client Address List", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("bigint");
+        expect(typeof proposalId).toBe("number");
 
         const params: ICanVoteParams = {
           address: TEST_WALLET_ADDRESS,
@@ -247,12 +233,11 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const daoEntries = await Promise.all([
-        buildDAO(VotingMode.STANDARD),
-        buildDAO(VotingMode.EARLY_EXECUTION),
-        buildDAO(VotingMode.VOTE_REPLACEMENT),
-      ]);
-      await advanceBlocks(server.provider, 10);
+      const daoEntries: Array<{ dao: string; plugin: string }> = [];
+      daoEntries.push(await buildDAO(VotingMode.STANDARD));
+      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
+      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
+      // await advanceBlocks(server.provider, 10);
 
       for (const daoEntry of daoEntries) {
         const { plugin: pluginAddress } = daoEntry;
@@ -261,7 +246,7 @@ describe("Client Address List", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("bigint");
+        expect(typeof proposalId).toBe("number");
 
         const voteParams: IVoteProposalParams = {
           pluginAddress,
@@ -291,11 +276,11 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const daoEntries = await Promise.all([
-        buildDAO(VotingMode.STANDARD),
-        buildDAO(VotingMode.EARLY_EXECUTION),
-        buildDAO(VotingMode.VOTE_REPLACEMENT),
-      ]);
+      const daoEntries: Array<{ dao: string; plugin: string }> = [];
+      daoEntries.push(await buildDAO(VotingMode.STANDARD));
+      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
+      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
+      // await advanceBlocks(server.provider, 10);
 
       for (const daoEntry of daoEntries) {
         const { plugin: pluginAddress } = daoEntry;
@@ -304,7 +289,7 @@ describe("Client Address List", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("bigint");
+        expect(typeof proposalId).toBe("number");
 
         const voteParams: IVoteProposalParams = {
           pluginAddress,
@@ -337,12 +322,10 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const daoEntries = await Promise.all([
-        buildDAO(VotingMode.STANDARD),
-        buildDAO(VotingMode.EARLY_EXECUTION),
-        buildDAO(VotingMode.VOTE_REPLACEMENT),
-      ]);
-      await advanceBlocks(server.provider, 10);
+      const daoEntries: Array<{ dao: string; plugin: string }> = [];
+      daoEntries.push(await buildDAO(VotingMode.STANDARD));
+      daoEntries.push(await buildDAO(VotingMode.EARLY_EXECUTION));
+      daoEntries.push(await buildDAO(VotingMode.VOTE_REPLACEMENT));
 
       for (const daoEntry of daoEntries) {
         const { plugin: pluginAddress } = daoEntry;
@@ -351,7 +334,7 @@ describe("Client Address List", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("bigint");
+        expect(typeof proposalId).toBe("number");
 
         // Vote
         const voteParams: IVoteProposalParams = {
@@ -374,6 +357,7 @@ describe("Client Address List", () => {
               );
           }
         }
+        await advanceBlocks(server.provider, 10);
 
         // Execute
         const executeParams: IExecuteProposalParams = {
@@ -403,7 +387,7 @@ describe("Client Address List", () => {
 
   describe("Data retrieval", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
@@ -417,7 +401,7 @@ describe("Client Address List", () => {
       expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
     });
     it("Should fetch the given proposal", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
@@ -513,7 +497,7 @@ describe("Client Address List", () => {
       }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
@@ -523,7 +507,7 @@ describe("Client Address List", () => {
       expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
@@ -559,7 +543,7 @@ describe("Client Address List", () => {
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
@@ -576,7 +560,7 @@ describe("Client Address List", () => {
       expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
     });
     it("Should get a list of proposals from a dao that has no proposals", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
@@ -593,7 +577,7 @@ describe("Client Address List", () => {
       expect(proposals.length === 0).toBe(true);
     });
     it("Should get a list of proposals from an invalid address", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
@@ -609,7 +593,7 @@ describe("Client Address List", () => {
       );
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
@@ -628,12 +612,3 @@ describe("Client Address List", () => {
     });
   });
 });
-
-async function advanceBlocks(
-  provider: EthereumProvider,
-  amountOfBlocks: number,
-) {
-  for (let i = 0; i < amountOfBlocks; i++) {
-    await provider.send("evm_mine", []);
-  }
-}

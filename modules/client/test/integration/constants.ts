@@ -80,7 +80,7 @@ export const TEST_INVALID_ADDRESS = "0x1nv4l1d_4ddr355";
 export const TEST_NON_EXISTING_ADDRESS =
   "0x1234567890123456789012345678901234567890";
 
-export const contextParams: ContextParams = {
+export const contextParamsMainnet: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",

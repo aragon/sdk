@@ -23,8 +23,8 @@ import {
 } from "../../../src";
 import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
-  contextParams,
   contextParamsLocalChain,
+  contextParamsMainnet,
   TEST_INVALID_ADDRESS,
   TEST_MULTISIG_DAO_ADDRESS,
   TEST_MULTISIG_PLUGIN_ADDRESS,
@@ -32,7 +32,8 @@ import {
   TEST_NON_EXISTING_ADDRESS,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import { EthereumProvider, Server } from "ganache";
+import { Server } from "ganache";
+import { advanceBlocks } from "../../helpers/advance-blocks";
 import { CanExecuteParams, ExecuteProposalStep } from "../../../src";
 
 describe("Client Multisig", () => {
@@ -57,7 +58,9 @@ describe("Client Multisig", () => {
     await server.close();
   });
 
-  async function buildProposal(multisigClient: MultisigClient): Promise<number> {
+  async function buildProposal(
+    multisigClient: MultisigClient,
+  ): Promise<number> {
     // generate actions
     const action = multisigClient.encoding.updateMultisigVotingSettings(
       {
@@ -252,7 +255,7 @@ describe("Client Multisig", () => {
 
   describe("Data retrieval", () => {
     it("Should get the voting settings of the plugin", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -265,7 +268,7 @@ describe("Client Multisig", () => {
     });
 
     it("Should get members of the multisig", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -279,7 +282,7 @@ describe("Client Multisig", () => {
     });
 
     it("Should fetch the given proposal", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -350,7 +353,7 @@ describe("Client Multisig", () => {
       }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -360,7 +363,7 @@ describe("Client Multisig", () => {
       expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -388,7 +391,7 @@ describe("Client Multisig", () => {
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -405,7 +408,7 @@ describe("Client Multisig", () => {
       expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
     });
     it("Should get a list of proposals from a dao that has no proposals", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -422,7 +425,7 @@ describe("Client Multisig", () => {
       expect(proposals.length === 0).toBe(true);
     });
     it("Should get a list of proposals from an invalid address", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -439,12 +442,3 @@ describe("Client Multisig", () => {
     });
   });
 });
-
-async function advanceBlocks(
-  provider: EthereumProvider,
-  amountOfBlocks: number,
-) {
-  for (let i = 0; i < amountOfBlocks; i++) {
-    await provider.send("evm_mine", []);
-  }
-}

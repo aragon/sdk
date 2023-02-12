@@ -7,7 +7,7 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import {
-  contextParams,
+  contextParamsMainnet,
   contextParamsLocalChain,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
@@ -356,7 +356,7 @@ describe("Client", () => {
 
     describe("Data retrieval", () => {
       it("Should get a DAO's metadata with a specific address", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
 
@@ -402,7 +402,7 @@ describe("Client", () => {
         }
       });
       it("Should get a DAO's metadata of an non existent dao and receive null", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_NON_EXISTING_ADDRESS;
         const dao = await client.methods.getDao(daoAddress);
@@ -410,7 +410,7 @@ describe("Client", () => {
       });
 
       it("Should get a DAO's metadata of an invalid dao address and throw an error", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_INVALID_ADDRESS;
         await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
@@ -466,7 +466,7 @@ describe("Client", () => {
       });
 
       it("Should get DAOs balances", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
         const balances = await client.methods.getDaoBalances(daoAddress);
@@ -490,7 +490,7 @@ describe("Client", () => {
         }
       });
       it("Should get DAOs balances from a dao with no balances", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
         const balances = await client.methods.getDaoBalances(daoAddress);
