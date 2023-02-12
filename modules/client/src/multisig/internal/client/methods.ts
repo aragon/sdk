@@ -136,7 +136,7 @@ export class MultisigClientMethods extends ClientCore
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: proposalId.toBigInt(),
+      proposalId: proposalId.toNumber(),
     };
   }
 
@@ -241,7 +241,7 @@ export class MultisigClientMethods extends ClientCore
   }
 
   /**
-   * Returns the list of wallet addresses with signing capabilities on the plugin
+   * Checks whether the current proposal can be approved by the given address
    *
    * @param {string} addressOrEns
    * @return {*}  {Promise<boolean>}
@@ -272,7 +272,7 @@ export class MultisigClientMethods extends ClientCore
     return multisigContract.canApprove(params.proposalId, params.addressOrEns);
   }
   /**
-   * Returns the list of wallet addresses with signing capabilities on the plugin
+   * Checks whether the current proposal can be executed
    *
    * @param {string} addressOrEns
    * @return {*}  {Promise<boolean>}
@@ -300,7 +300,7 @@ export class MultisigClientMethods extends ClientCore
     return multisigContract.canExecute(params.proposalId);
   }
   /**
-   * returns the voting settings
+   * Returns the voting settings
    *
    * @param {string} addressOrEns
    * @return {*}  {Promise<MultisigVotingSettings>}

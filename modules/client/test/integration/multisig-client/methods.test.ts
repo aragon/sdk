@@ -110,13 +110,12 @@ describe("Client Multisig", () => {
           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
           break;
         case ProposalCreationSteps.DONE:
-          expect(typeof step.proposalId).toBe("bigint");
+          expect(typeof step.proposalId).toBe("number");
           return step.proposalId;
           // TODO
           // update with new proposal id when contracts are ready
           // expect(typeof step.proposalId).toBe("string");
           // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-          break;
         default:
           throw new Error(
             "Unexpected proposal creation step: " +

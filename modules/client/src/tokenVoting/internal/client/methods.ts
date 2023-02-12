@@ -13,6 +13,7 @@ import {
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import {
+  CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
@@ -258,6 +259,34 @@ export class TokenVotingClientMethods extends ClientCore
     );
   }
 
+  /**
+   * Checks whether the current proposal can be executed
+   *
+   * @param {string} addressOrEns
+   * @return {*}  {Promise<boolean>}
+   * @memberof MultisigClientMethods
+   */
+  public async canExecute(
+    params: CanExecuteParams,
+  ): Promise<boolean> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    // TODO
+    // use yup
+    if (!isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    const multisigContract = TokenVoting__factory.connect(
+      params.pluginAddress,
+      signer,
+    );
+
+    return multisigContract.canExecute(params.proposalId);
+  }
   /**
    * Returns the list of wallet addresses holding tokens from the underlying Token contract used by the plugin
    *

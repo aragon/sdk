@@ -9,6 +9,7 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   AddresslistVotingClient,
+  CanExecuteParams,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
@@ -260,7 +261,125 @@ describe("Client Address List", () => {
     });
   });
 
+  describe("Can execute", () => {
+    const BLOCK_ADVANCE_COUNT = 1000; // greater than 3600 seconds
+
+    it("Should check if an user can execute a standard voting proposal", async () => {
+      const repoAddr = deployment.addresslistVotingRepo.address;
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new AddresslistVotingClient(ctxPlugin);
+
+      const { plugin: pluginAddress } = await buildAddressListVotingDAO(
+        repoAddr,
+        VotingMode.STANDARD,
+      );
+      if (!pluginAddress) {
+        throw new Error("No plugin installed");
+      }
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      expect(typeof proposalId).toBe("number");
+
+      const canExecuteParams: CanExecuteParams = {
+        proposalId,
+        pluginAddress,
+      };
+      let canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(false);
+
+      // now approve
+      await voteProposal(pluginAddress, proposalId, client);
+      // Force date past end
+      await advanceBlocks(server.provider, BLOCK_ADVANCE_COUNT);
+
+      canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(true);
+    });
+
+    it("Should check if an user can execute an early execution proposal", async () => {
+      const repoAddr = deployment.addresslistVotingRepo.address;
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new AddresslistVotingClient(ctxPlugin);
+
+      const { plugin: pluginAddress } = await buildAddressListVotingDAO(
+        repoAddr,
+        VotingMode.EARLY_EXECUTION,
+      );
+      if (!pluginAddress) {
+        throw new Error("No plugin installed");
+      }
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      expect(typeof proposalId).toBe("number");
+
+      const canExecuteParams: CanExecuteParams = {
+        proposalId,
+        pluginAddress,
+      };
+      let canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(false);
+
+      // now approve
+      await voteProposal(pluginAddress, proposalId, client);
+      // No waiting
+
+      canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(true);
+    });
+
+    it("Should check if an user can execute a vote replacement proposal", async () => {
+      const repoAddr = deployment.addresslistVotingRepo.address;
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new AddresslistVotingClient(ctxPlugin);
+
+      const { plugin: pluginAddress } = await buildAddressListVotingDAO(
+        repoAddr,
+        VotingMode.VOTE_REPLACEMENT,
+      );
+      if (!pluginAddress) {
+        throw new Error("No plugin installed");
+      }
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      expect(typeof proposalId).toBe("number");
+
+      const canExecuteParams: CanExecuteParams = {
+        proposalId,
+        pluginAddress,
+      };
+      let canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(false);
+
+      // vote no
+      await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+
+      canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(false);
+
+      // now approve
+      await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+
+      // Force date past end
+      await advanceBlocks(server.provider, BLOCK_ADVANCE_COUNT);
+
+      canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(true);
+    });
+  });
+
   describe("Execute proposal", () => {
+    const BLOCK_ADVANCE_COUNT = 1000; // greater than 3600 seconds
+
     it("Should execute a standard voting proposal", async () => {
       const repoAddr = deployment.addresslistVotingRepo.address;
       const ctx = new Context(contextParamsLocalChain);
@@ -281,7 +400,7 @@ describe("Client Address List", () => {
       // Vote
       await voteProposal(pluginAddress, proposalId, client);
       // Force date past end
-      await advanceBlocks(server.provider, 1000);
+      await advanceBlocks(server.provider, BLOCK_ADVANCE_COUNT);
 
       // Execute
       const executeParams: IExecuteProposalParams = {
@@ -373,7 +492,7 @@ describe("Client Address List", () => {
       await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
       await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
       // Force date past end
-      await advanceBlocks(server.provider, 1000);
+      await advanceBlocks(server.provider, BLOCK_ADVANCE_COUNT);
 
       // Execute
       const executeParams: IExecuteProposalParams = {

@@ -1,4 +1,5 @@
 import {
+  boolArrayToBitmap,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -9,7 +10,6 @@ import {
   NoSignerError,
   ProposalCreationError,
   resolveIpfsCid,
-  boolArrayToBitmap,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -20,6 +20,7 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../interfaces";
 import {
+  CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
@@ -257,8 +258,36 @@ export class AddresslistVotingClientMethods extends ClientCore
     return addresslistContract.callStatic.canVote(
       params.proposalId,
       params.address,
-      params.vote
+      params.vote,
     );
+  }
+  /**
+   * Checks whether the current proposal can be executed
+   *
+   * @param {string} addressOrEns
+   * @return {*}  {Promise<boolean>}
+   * @memberof MultisigClientMethods
+   */
+  public async canExecute(
+    params: CanExecuteParams,
+  ): Promise<boolean> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    // TODO
+    // use yup
+    if (!isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    const multisigContract = AddresslistVoting__factory.connect(
+      params.pluginAddress,
+      signer,
+    );
+
+    return multisigContract.canExecute(params.proposalId);
   }
   /**
    * Returns the list of wallet addresses with signing capabilities on the plugin
