@@ -1,22 +1,16 @@
-import { BigNumber } from "@ethersproject/bignumber";
-import { AddressZero } from "@ethersproject/constants";
 import {
   AssetBalance,
-  ContractFreezeParams,
   ContractPermissionParams,
-  ContractWithdrawParams,
   DaoDetails,
   DaoListItem,
-  IDepositParams,
-  IFreezePermissionDecodedParams,
-  IFreezePermissionParams,
+  DaoMetadata,
+  DepositErc20Params,
+  DepositEthParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
-  DaoMetadata,
   InstalledPluginListItem,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
-  IWithdrawParams,
   PermissionIds,
   SubgraphBalance,
   SubgraphDao,
@@ -28,19 +22,21 @@ import {
   TokenType,
   Transfer,
   TransferType,
+  WithdrawParams,
 } from "../interfaces";
 import { Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { AddressZero } from "@ethersproject/constants";
 
 export function unwrapDepositParams(
-  params: IDepositParams,
-): [string, BigNumber, string, string] {
+  params: DepositEthParams | DepositErc20Params,
+): [string, bigint, string, string] {
   return [
     params.daoAddressOrEns,
-    BigNumber.from(params.amount),
-    params.tokenAddress ?? AddressZero,
-    params.reference ?? "",
+    params.amount,
+    (params as any)?.tokenAddress ?? AddressZero,
+    "",
   ];
 }
 
@@ -50,7 +46,7 @@ export function toDaoDetails(
 ): DaoDetails {
   return {
     address: dao.id,
-    ensDomain: dao.name,
+    ensDomain: dao.subdomain,
     metadata: {
       name: metadata.name,
       description: metadata.description,
@@ -64,11 +60,11 @@ export function toDaoDetails(
         plugin: SubgraphPluginListItem,
       ): InstalledPluginListItem => {
         return {
-          instanceAddress: plugin.plugin.id,
+          instanceAddress: plugin.id,
           // TODO
           // temporary ens addreses for the plugins
           id: SubgraphPluginTypeMap.get(
-            plugin.plugin.__typename,
+            plugin.__typename,
           ) as string,
           // TODO
           // update when subgraph returns version
@@ -85,7 +81,7 @@ export function toDaoListItem(
 ): DaoListItem {
   return {
     address: dao.id,
-    ensDomain: dao.name,
+    ensDomain: dao.subdomain,
     metadata: {
       name: metadata.name,
       description: metadata.description,
@@ -97,11 +93,11 @@ export function toDaoListItem(
         plugin: SubgraphPluginListItem,
       ): InstalledPluginListItem => {
         return {
-          instanceAddress: plugin.plugin.id,
+          instanceAddress: plugin.id,
           // TODO
           // temporary ens addreses for the plugins
           id: SubgraphPluginTypeMap.get(
-            plugin.plugin.__typename,
+            plugin.__typename,
           ) as string,
           // TODO
           // update when subgraph returns version
@@ -141,7 +137,6 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
         tokenType: TokenType.NATIVE,
         amount: BigInt(transfer.amount),
         creationDate,
-        reference: transfer.reference,
         transactionId: transfer.transaction,
         from: transfer.sender,
       };
@@ -151,7 +146,6 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
       tokenType: TokenType.NATIVE,
       amount: BigInt(transfer.amount),
       creationDate,
-      reference: transfer.reference,
       transactionId: transfer.transaction,
       proposalId: transfer.proposal?.id || "",
       to: transfer.to,
@@ -169,7 +163,6 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
       },
       amount: BigInt(transfer.amount),
       creationDate,
-      reference: transfer.reference,
       transactionId: transfer.transaction,
       from: transfer.sender,
     };
@@ -185,27 +178,9 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
     },
     amount: BigInt(transfer.amount),
     creationDate,
-    reference: transfer.reference,
     transactionId: transfer.transaction,
     to: transfer.to,
     proposalId: transfer.proposal.id || "",
-  };
-}
-
-export function freezeParamsToContract(
-  params: IFreezePermissionParams,
-): ContractFreezeParams {
-  return [params.where, keccak256(toUtf8Bytes(params.permission))];
-}
-export function freezeParamsFromContract(
-  result: Result,
-): IFreezePermissionDecodedParams {
-  return {
-    where: result[0],
-    permissionId: result[1],
-    permission: Object.keys(PermissionIds)
-      .find((k) => PermissionIds[k] === result[1])
-      ?.replace(/_ID$/, "") || "",
   };
 }
 
@@ -228,22 +203,20 @@ export function permissionParamsFromContract(
   };
 }
 
-export function withdrawParamsFromContract(result: Result): IWithdrawParams {
-  return {
-    tokenAddress: result[0],
-    recipientAddress: result[1],
-    amount: BigInt(result[2]),
-    reference: result[3],
-  };
-}
-
-export function withdrawParamsToContract(
-  params: IWithdrawParams,
-): ContractWithdrawParams {
-  return [
-    params.tokenAddress ?? AddressZero,
-    params.recipientAddress,
-    BigNumber.from(params.amount),
-    params.reference ?? "",
-  ];
+export function withdrawParamsFromContract(
+  to: string,
+  _value: bigint,
+  result: Result,
+  tokenStandard: TokenType,
+): WithdrawParams {
+  if (tokenStandard === TokenType.ERC20) {
+    return {
+      type: TokenType.ERC20,
+      tokenAddress: to,
+      recipientAddressOrEns: result[0],
+      amount: BigInt(result[1]),
+    };
+  }
+  // TODO Add ERC721 and ERC1155
+  throw new Error("not implemented");
 }

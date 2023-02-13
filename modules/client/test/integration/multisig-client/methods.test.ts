@@ -11,7 +11,6 @@ import {
   ApproveMultisigProposalParams,
   ApproveProposalStep,
   CanApproveParams,
-  Client,
   Context,
   ContextPlugin,
   CreateMultisigProposalParams,
@@ -24,8 +23,8 @@ import {
 } from "../../../src";
 import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
-  contextParams,
   contextParamsLocalChain,
+  contextParamsMainnet,
   TEST_INVALID_ADDRESS,
   TEST_MULTISIG_DAO_ADDRESS,
   TEST_MULTISIG_PLUGIN_ADDRESS,
@@ -33,93 +32,178 @@ import {
   TEST_NON_EXISTING_ADDRESS,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import { EthereumProvider, Server } from "ganache";
+import { Server } from "ganache";
+// import { advanceBlocks } from "../../helpers/advance-blocks";
 import { CanExecuteParams, ExecuteProposalStep } from "../../../src";
+import { buildMultisigDAO } from "../../helpers/build-daos";
+import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Client Multisig", () => {
-  let pluginAddress: string;
+  let deployment: deployContracts.Deployment;
   let server: Server;
+  let repoAddr: string;
+  let provider: JsonRpcProvider;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
-    const deployment = await deployContracts.deploy();
+    deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-    const daoCreation = await deployContracts.createMultisigDAO(
-      deployment,
-      "testDAO",
-      [TEST_WALLET_ADDRESS],
-    );
-    pluginAddress = daoCreation.pluginAddrs[0];
-    // advance to get past the voting checkpoint
-    await advanceBlocks(server.provider, 10);
+    repoAddr = deployment.multisigRepo.address;
+
+    if (Array.isArray(contextParamsLocalChain.web3Providers)) {
+      provider = new JsonRpcProvider(
+        contextParamsLocalChain.web3Providers[0] as string,
+      );
+    } else {
+      provider = new JsonRpcProvider(
+        contextParamsLocalChain.web3Providers as any,
+      );
+    }
+    await restoreBlockTime(provider);
   });
 
   afterAll(async () => {
     await server.close();
   });
 
+  async function buildDao() {
+    const result = await buildMultisigDAO(repoAddr);
+    await mineBlock(provider);
+    return result;
+  }
+
+  async function buildProposal(
+    pluginAddress: string,
+    multisigClient: MultisigClient,
+  ): Promise<number> {
+    // generate actions
+    const action = multisigClient.encoding.updateMultisigVotingSettings(
+      {
+        pluginAddress,
+        votingSettings: {
+          minApprovals: 1,
+          onlyListed: true,
+        },
+      },
+    );
+
+    const metadata: ProposalMetadata = {
+      title: "Best Proposal",
+      summary: "this is the sumnary",
+      description: "This is a very long description",
+      resources: [
+        {
+          name: "Website",
+          url: "https://the.website",
+        },
+      ],
+      media: {
+        header: "https://no.media/media.jpeg",
+        logo: "https://no.media/media.jpeg",
+      },
+    };
+    const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
+    const endDate = new Date(Date.now() + 1000 * 60);
+    const proposalParams: CreateMultisigProposalParams = {
+      pluginAddress,
+      metadataUri: ipfsUri,
+      actions: [action],
+      failSafeActions: [false],
+      endDate,
+    };
+
+    for await (
+      const step of multisigClient.methods.createProposal(
+        proposalParams,
+      )
+    ) {
+      switch (step.key) {
+        case ProposalCreationSteps.CREATING:
+          expect(typeof step.txHash).toBe("string");
+          expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          break;
+        case ProposalCreationSteps.DONE:
+          expect(typeof step.proposalId).toBe("number");
+          return step.proposalId;
+          // TODO
+        // update with new proposal id when contracts are ready
+        // expect(typeof step.proposalId).toBe("string");
+        // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+        default:
+          throw new Error(
+            "Unexpected proposal creation step: " +
+              Object.keys(step).join(", "),
+          );
+      }
+    }
+    throw new Error();
+  }
+  async function approveProposal(
+    proposalId: number,
+    pluginAddress: string,
+    client: MultisigClient,
+  ) {
+    const approveParams: ApproveMultisigProposalParams = {
+      proposalId,
+      pluginAddress,
+      tryExecution: false,
+    };
+    for await (const step of client.methods.approveProposal(approveParams)) {
+      switch (step.key) {
+        case ApproveProposalStep.APPROVING:
+          expect(typeof step.txHash).toBe("string");
+          expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          break;
+        case ApproveProposalStep.DONE:
+          break;
+        default:
+          throw new Error(
+            "Unexpected approve proposal step: " +
+              Object.keys(step).join(", "),
+          );
+      }
+    }
+  }
+
   describe("Proposal Creation", () => {
     it("Should create a new proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const multisigClient = new MultisigClient(ctxPlugin);
-      const client = new Client(ctx);
 
-      // generate actions
-      const action = await client.encoding.withdrawAction(pluginAddress, {
-        recipientAddress: "0x1234567890123456789012345678901234567890",
-        amount: BigInt(1),
-        reference: "test",
-      });
+      const { plugin: pluginAddress } = await buildDao();
 
-      const metadata: ProposalMetadata = {
-        title: "Best Proposal",
-        summary: "this is the sumnary",
-        description: "This is a very long description",
-        resources: [
-          {
-            name: "Website",
-            url: "https://the.website",
-          },
-        ],
-        media: {
-          header: "https://no.media/media.jpeg",
-          logo: "https://no.media/media.jpeg",
-        },
-      };
+      await buildProposal(pluginAddress, multisigClient);
+    });
+  });
 
-      const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
+  describe("Can approve", () => {
+    it("Should check if an user can approve in a multisig instance", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new MultisigClient(ctxPlugin);
+      // const address = await client.web3.getSigner()?.getAddress();
 
-      const proposalParams: CreateMultisigProposalParams = {
+      const { plugin: pluginAddress } = await buildDao();
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      const canApproveParams: CanApproveParams = {
+        proposalId,
+        addressOrEns: TEST_WALLET_ADDRESS,
         pluginAddress,
-        metadataUri: ipfsUri,
-        actions: [action],
       };
+      // positive
+      let canApprove = await client.methods.canApprove(canApproveParams);
+      expect(typeof canApprove).toBe("boolean");
+      expect(canApprove).toBe(true);
 
-      for await (
-        const step of multisigClient.methods.createProposal(
-          proposalParams,
-        )
-      ) {
-        switch (step.key) {
-          case ProposalCreationSteps.CREATING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case ProposalCreationSteps.DONE:
-            expect(typeof step.proposalId).toBe("bigint");
-            // TODO
-            // update with new proposal id when contracts are ready
-            // expect(typeof step.proposalId).toBe("string");
-            // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          default:
-            throw new Error(
-              "Unexpected proposal creation step: " +
-                Object.keys(step).join(", "),
-            );
-        }
-      }
+      // negative
+      canApproveParams.addressOrEns =
+        "0x0000000000000000000000000000000000000000";
+      canApprove = await client.methods.canApprove(canApproveParams);
+      expect(typeof canApprove).toBe("boolean");
+      expect(canApprove).toBe(false);
     });
   });
 
@@ -129,58 +213,55 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const approveParams: ApproveMultisigProposalParams = {
-        proposalId: BigInt(0),
-        pluginAddress: "0x1234567890123456789012345678901234567890",
-        tryExecution: true,
-      };
-      for await (const step of client.methods.approveProposal(approveParams)) {
-        switch (step.key) {
-          case ApproveProposalStep.APPROVING:
-            expect(typeof step.txHash).toBe("string");
-            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-            break;
-          case ApproveProposalStep.DONE:
-            break;
-          default:
-            throw new Error(
-              "Unexpected approve proposal step: " +
-                Object.keys(step).join(", "),
-            );
-        }
-      }
+      const { plugin: pluginAddress } = await buildDao();
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      await approveProposal(proposalId, pluginAddress, client);
     });
   });
 
-  describe("Can approve", () => {
-    it("Should check if an user can approve in a multisig instance", async () => {
+  describe("Can execute", () => {
+    it("Should check if an user can execute in a multisig instance", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
-      const address = await client.web3.getSigner()?.getAddress();
-      const canApproveParams: CanApproveParams = {
-        proposalId: BigInt(0),
-        addressOrEns: address!,
+
+      const { plugin: pluginAddress } = await buildDao();
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      const canExecuteParams: CanExecuteParams = {
+        proposalId,
         pluginAddress,
       };
-      const canApprove = await client.methods.canApprove(
-        canApproveParams,
-      );
-      expect(typeof canApprove).toBe("boolean");
-      expect(canApprove).toBe(true);
+      let canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(false);
+
+      // now approve
+      await approveProposal(proposalId, pluginAddress, client);
+
+      canExecute = await client.methods.canExecute(canExecuteParams);
+      expect(typeof canExecute).toBe("boolean");
+      expect(canExecute).toBe(true);
     });
   });
+
   describe("Execute proposal", () => {
     it("Should execute a local proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
+      const { plugin: pluginAddress } = await buildDao();
+
+      const proposalId = await buildProposal(pluginAddress, client);
+      await approveProposal(proposalId, pluginAddress, client);
+
       for await (
         const step of client.methods.executeProposal(
           {
-            pluginAddress: "0x1234567890123456789012345678901234567890",
-            proposalId: BigInt(0),
+            pluginAddress,
+            proposalId,
           },
         )
       ) {
@@ -200,25 +281,10 @@ describe("Client Multisig", () => {
       }
     });
   });
-  describe("Can execute", () => {
-    it("Should check if an user can approve in a multisig instance", async () => {
-      const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
-      const canExecuteParams: CanExecuteParams = {
-        proposalId: BigInt(0),
-        pluginAddress,
-      };
-      const canExecute = await client.methods.canExecute(
-        canExecuteParams,
-      );
-      expect(typeof canExecute).toBe("boolean");
-    });
-  });
 
   describe("Data retrieval", () => {
     it("Should get the voting settings of the plugin", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -231,7 +297,7 @@ describe("Client Multisig", () => {
     });
 
     it("Should get members of the multisig", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -245,7 +311,7 @@ describe("Client Multisig", () => {
     });
 
     it("Should fetch the given proposal", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -298,6 +364,8 @@ describe("Client Multisig", () => {
         }
       }
       expect(proposal.creationDate instanceof Date).toBe(true);
+      expect(proposal.startDate instanceof Date).toBe(true);
+      expect(proposal.endDate instanceof Date).toBe(true);
       expect(Array.isArray(proposal.actions)).toBe(true);
       // actions
       for (const action of proposal.actions) {
@@ -309,9 +377,12 @@ describe("Client Multisig", () => {
         expect(typeof approval).toBe("string");
         expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
       }
+      if (proposal.executionTxHash) {
+        expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+      }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -321,7 +392,7 @@ describe("Client Multisig", () => {
       expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -344,10 +415,12 @@ describe("Client Multisig", () => {
         expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         expect(typeof proposal.metadata.title).toBe("string");
         expect(typeof proposal.metadata.summary).toBe("string");
+        expect(typeof proposal.approvals).toBe("number");
+        expect(proposal.approvals >= 0).toBe(true);
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -364,7 +437,7 @@ describe("Client Multisig", () => {
       expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
     });
     it("Should get a list of proposals from a dao that has no proposals", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -381,7 +454,7 @@ describe("Client Multisig", () => {
       expect(proposals.length === 0).toBe(true);
     });
     it("Should get a list of proposals from an invalid address", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -398,12 +471,3 @@ describe("Client Multisig", () => {
     });
   });
 });
-
-async function advanceBlocks(
-  provider: EthereumProvider,
-  amountOfBlocks: number,
-) {
-  for (let i = 0; i < amountOfBlocks; i++) {
-    await provider.send("evm_mine", []);
-  }
-}

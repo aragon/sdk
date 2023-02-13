@@ -17,7 +17,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 const canExecuteParams: CanExecuteParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(0),
+  proposalId: 0,
 };
 const canExecute = await client.methods.canExecute(canExecuteParams);
 console.log(canExecute);

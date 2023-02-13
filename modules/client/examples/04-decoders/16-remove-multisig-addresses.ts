@@ -14,7 +14,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const settings: MultisigPluginSettings = multisigClient.decoding
+const settings: string[] = multisigClient.decoding
   .removeAddressesAction(data);
 
 console.log(settings);

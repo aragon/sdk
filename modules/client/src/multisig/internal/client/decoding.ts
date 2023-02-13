@@ -1,4 +1,4 @@
-import { bytesToHex, UnexpectedActionError } from "@aragon/sdk-common";
+import { bytesToHex } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -31,17 +31,12 @@ export class MultisigClientDecoding extends ClientCore
    */
   public addAddressesAction(data: Uint8Array): string[] {
     const multisigInterface = Multisig__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
-    const receivedFunction = multisigInterface.getFunction(
-      hexBytes.substring(0, 10) as any,
-    );
+    const hexBytes = bytesToHex(data);
+
     const expectedfunction = multisigInterface.getFunction("addAddresses");
-    if (receivedFunction.name !== expectedfunction.name) {
-      throw new UnexpectedActionError();
-    }
     const result = multisigInterface.decodeFunctionData(
-      "addAddresses",
-      data,
+      expectedfunction,
+      hexBytes,
     );
     return result[0];
   }
@@ -54,19 +49,13 @@ export class MultisigClientDecoding extends ClientCore
    */
   public removeAddressesAction(data: Uint8Array): string[] {
     const multisigInterface = Multisig__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
-    const receivedFunction = multisigInterface.getFunction(
-      hexBytes.substring(0, 10) as any,
-    );
+    const hexBytes = bytesToHex(data);
     const expectedfunction = multisigInterface.getFunction(
       "removeAddresses",
     );
-    if (receivedFunction.name !== expectedfunction.name) {
-      throw new UnexpectedActionError();
-    }
     const result = multisigInterface.decodeFunctionData(
-      "removeAddresses",
-      data,
+      expectedfunction,
+      hexBytes,
     );
     return result[0];
   }
@@ -77,21 +66,17 @@ export class MultisigClientDecoding extends ClientCore
    * @return {*}  {MultisigVotingSettings}
    * @memberof MultisigClientDecoding
    */
-  public updateMultisigVotingSettings(data: Uint8Array): MultisigVotingSettings {
+  public updateMultisigVotingSettings(
+    data: Uint8Array,
+  ): MultisigVotingSettings {
     const multisigInterface = Multisig__factory.createInterface();
-    const hexBytes = bytesToHex(data, true);
-    const receivedFunction = multisigInterface.getFunction(
-      hexBytes.substring(0, 10) as any,
-    );
+    const hexBytes = bytesToHex(data);
     const expectedfunction = multisigInterface.getFunction(
       "updateMultisigSettings",
     );
-    if (receivedFunction.name !== expectedfunction.name) {
-      throw new UnexpectedActionError();
-    }
     const result = multisigInterface.decodeFunctionData(
-      "updateMultisigSettings",
-      data,
+      expectedfunction,
+      hexBytes,
     );
     return {
       minApprovals: result[0].minApprovals,
@@ -111,7 +96,7 @@ export class MultisigClientDecoding extends ClientCore
       return {
         id: func.format("minimal"),
         functionName: func.name,
-        hash: bytesToHex(data, true).substring(0, 10),
+        hash: bytesToHex(data).substring(0, 10),
       };
     } catch {
       return null;

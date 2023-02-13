@@ -7,20 +7,19 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import {
   Client,
   Context,
-  IFreezePermissionDecodedParams,
-  IFreezePermissionParams,
+  DaoMetadata,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
-  DaoMetadata,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
-  IWithdrawParams,
   Permissions,
+  WithdrawParams,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { AddressZero } from "@ethersproject/constants";
+import { TokenType } from "../../../src/interfaces";
+
 describe("Client", () => {
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {
@@ -94,93 +93,57 @@ describe("Client", () => {
         expect(decodedParams.who).toBe(params.who);
       }
     });
-    it("Should decode an encoded freeze action", () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
-
-      const daoAddresses = [
-        "0x2468013579246801357924680135792468013579",
-        "0x1357924680135792468013579246801357924680",
-      ];
-      const paramsArray: IFreezePermissionParams[] = [
-        {
-          where: "0x1234567890123456789012345678901234567890",
-          permission: Permissions.UPGRADE_PERMISSION,
-        },
-        {
-          where: "0x0987654321098765432109876543210987654321",
-          permission: Permissions.EXECUTE_PERMISSION,
-        },
-      ];
-      for (let i = 0; i < paramsArray.length; i++) {
-        const params = paramsArray[i];
-        const action = client.encoding.freezeAction(daoAddresses[i], params);
-        const decodedParams: IFreezePermissionDecodedParams = client.decoding
-          .freezeAction(
-            action.data,
-          );
-
-        expect(decodedParams.permission).toBe(params.permission);
-        expect(decodedParams.permissionId).toBe(
-          keccak256(toUtf8Bytes(params.permission)),
-        );
-        expect(decodedParams.where).toBe(params.where);
-      }
-    });
-    it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
-      const context = new Context(contextParamsLocalChain);
-      const client = new Client(context);
-      const withdrawParams: IWithdrawParams = {
-        recipientAddress: "0x1234567890123456789012345678901234567890",
-        amount: BigInt(10),
-        reference: "test",
-        tokenAddress: "0x1234567890098765432112345678900987654321",
-      };
-
-      const withdrawAction = await client.encoding.withdrawAction(
-        "0x1234567890123456789012345678901234567890",
-        withdrawParams,
-      );
-      const decodedWithdrawParams: IWithdrawParams = client.decoding
-        .withdrawAction(
-          withdrawAction.data,
-        );
-
-      expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
-      expect(decodedWithdrawParams.recipientAddress).toBe(
-        withdrawParams.recipientAddress,
-      );
-      expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference);
-      expect(decodedWithdrawParams.tokenAddress).toBe(
-        withdrawParams.tokenAddress,
-      );
-    });
 
     it("Should decode an encoded raw withdraw action of a native token", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const withdrawParams: IWithdrawParams = {
-        recipientAddress: "0x1234567890123456789012345678901234567890",
+      const withdrawParams: WithdrawParams = {
+        type: TokenType.NATIVE,
+        recipientAddressOrEns: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
-        reference: "test",
+      };
+      const withdrawAction = await client.encoding.withdrawAction(
+        withdrawParams,
+      );
+
+      const decoded = client.decoding.withdrawAction(
+        withdrawAction.to,
+        withdrawAction.value,
+        withdrawAction.data,
+      );
+
+      expect(decoded.amount).toBe(withdrawParams.amount);
+      expect(decoded.recipientAddressOrEns).toBe(
+        withdrawParams.recipientAddressOrEns,
+      );
+    });
+
+    it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const withdrawParams: WithdrawParams = {
+        type: TokenType.ERC20,
+        recipientAddressOrEns: "0x1234567890123456789012345678901234567890",
+        amount: BigInt(10),
+        tokenAddress: "0x1234567890098765432112345678900987654321",
       };
 
       const withdrawAction = await client.encoding.withdrawAction(
-        "0x1234567890123456789012345678901234567890",
         withdrawParams,
       );
-      const decodedWithdrawParams: IWithdrawParams = client.decoding
+      const decodedWithdrawParams: WithdrawParams = client.decoding
         .withdrawAction(
+          withdrawAction.to,
+          withdrawAction.value,
           withdrawAction.data,
         );
 
       expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
-      expect(decodedWithdrawParams.recipientAddress).toBe(
-        withdrawParams.recipientAddress,
+      expect(decodedWithdrawParams.recipientAddressOrEns).toBe(
+        withdrawParams.recipientAddressOrEns,
       );
-      expect(decodedWithdrawParams.reference).toBe(withdrawParams.reference);
-      expect(decodedWithdrawParams.tokenAddress).toBe(AddressZero);
+      expect(withdrawAction.to).toBe(withdrawParams.tokenAddress);
     });
 
     it("Should decode an encoded update metadata action", async () => {
@@ -214,10 +177,11 @@ describe("Client", () => {
 
       const ipfsUri = await client.methods.pinMetadata(params);
 
-      const updateDaoMetadataAction = await client.encoding.updateDaoMetadataAction(
-        "0x1234567890123456789012345678901234567890",
-        ipfsUri,
-      );
+      const updateDaoMetadataAction = await client.encoding
+        .updateDaoMetadataAction(
+          "0x1234567890123456789012345678901234567890",
+          ipfsUri,
+        );
       const recoveredIpfsUri: string = await client.decoding
         .updateDaoMetadataRawAction(
           updateDaoMetadataAction.data,
@@ -250,13 +214,14 @@ describe("Client", () => {
         ],
       };
       const ipfsUri = await client.methods.pinMetadata(params);
-      const updateDaoMetadataAction = await client.encoding.updateDaoMetadataAction(
-        "0x1234567890123456789012345678901234567890",
-        ipfsUri,
-      );
+      const updateDaoMetadataAction = await client.encoding
+        .updateDaoMetadataAction(
+          "0x1234567890123456789012345678901234567890",
+          ipfsUri,
+        );
 
-      expect(() => client.decoding.withdrawAction(updateDaoMetadataAction.data))
-        .toThrow("The received action is different from the expected one");
+      expect(() => client.decoding.grantAction(updateDaoMetadataAction.data))
+        .toThrow();
     });
 
     it("Should try to decode a invalid action and return an error", async () => {
@@ -264,8 +229,14 @@ describe("Client", () => {
       const client = new Client(context);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
-      expect(() => client.decoding.withdrawAction(data)).toThrow(
-        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
+      expect(() =>
+        client.decoding.withdrawAction(
+          "0x1234567890123456789012345678901234567890",
+          BigInt(10),
+          data,
+        )
+      ).toThrow(
+        `data signature does not match function transfer. (argument=\"data\", value=\"0x0b1616212121\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });
 
@@ -289,10 +260,11 @@ describe("Client", () => {
       };
 
       const ipfsUri = await client.methods.pinMetadata(params);
-      const updateDaoMetadataAction = await client.encoding.updateDaoMetadataAction(
-        "0x1234567890123456789012345678901234567890",
-        ipfsUri,
-      );
+      const updateDaoMetadataAction = await client.encoding
+        .updateDaoMetadataAction(
+          "0x1234567890123456789012345678901234567890",
+          ipfsUri,
+        );
       const iface = client.decoding.findInterface(updateDaoMetadataAction.data);
       expect(iface?.id).toBe("function setMetadata(bytes)");
       expect(iface?.functionName).toBe("setMetadata");
@@ -336,10 +308,11 @@ describe("Client", () => {
       });
 
       const ipfsUri = await client.methods.pinMetadata(params);
-      const updateDaoMetadataAction = await client.encoding.updateDaoMetadataAction(
-        "0x1234567890123456789012345678901234567890",
-        ipfsUri,
-      );
+      const updateDaoMetadataAction = await client.encoding
+        .updateDaoMetadataAction(
+          "0x1234567890123456789012345678901234567890",
+          ipfsUri,
+        );
 
       mockedIPFSClient.cat.mockResolvedValueOnce(
         Buffer.from(JSON.stringify(params)),

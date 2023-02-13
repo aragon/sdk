@@ -11,8 +11,8 @@ describe("Random generation", () => {
     const hex = Random.getHex();
 
     expect(typeof hex).toEqual("string");
-    expect(hex.substring(0, 2)).not.toEqual("0x");
-    expect(hex.length).toEqual(64);
+    expect(hex.substring(0, 2)).toEqual("0x");
+    expect(hex.length).toEqual(66);
   });
   it("Should generate a random bigint", () => {
     const bigint = Random.getBigInt(BigInt(256));

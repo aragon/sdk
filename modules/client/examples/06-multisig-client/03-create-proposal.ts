@@ -5,11 +5,14 @@ import {
   Client,
   Context,
   ContextPlugin,
+  CreateMultisigProposalParams,
   MultisigClient,
   ProposalCreationSteps,
   ProposalMetadata,
+  TokenType,
+  WithdrawParams,
 } from "@aragon/sdk-client";
-import { CreateMultisigProposalParams, IWithdrawParams } from "../../src";
+import {} from "../../src/interfaces";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -42,7 +45,8 @@ const metadata: ProposalMetadata = {
 };
 
 const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
-const withdrawParams: IWithdrawParams = {
+const withdrawParams: WithdrawParams = {
+  type: TokenType.ERC20,
   recipientAddress: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10),
   tokenAddress: "0x1234567890123456789012345678901234567890",
@@ -59,6 +63,9 @@ const proposalParams: CreateMultisigProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
   actions: [withdrawAction],
+  failSafeActions: [false], // the action cannot fail gracefully
+  startDate: new Date(),
+  endDate: new Date(),
 };
 
 const steps = multisigClient.methods.createProposal(proposalParams);

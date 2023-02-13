@@ -6,7 +6,6 @@ import "../../mocks/aragon-sdk-ipfs";
 
 import {
   ApproveMultisigProposalParams,
-  Client,
   Context,
   ContextPlugin,
   CreateMultisigProposalParams,
@@ -28,7 +27,7 @@ describe("Client Multisig", () => {
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
       const daoCreation = await deployContracts.createMultisigDAO(
         deployment,
-        "testDAO",
+        "test-multisig-dao",
         [TEST_WALLET_ADDRESS],
       );
       pluginAddress = daoCreation.pluginAddrs[0];
@@ -42,18 +41,23 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const multisigClient = new MultisigClient(ctxPlugin);
-      const client = new Client(ctx);
-
       // generate actions
-      const action = await client.encoding.withdrawAction(pluginAddress, {
-        recipientAddress: "0x1234567890123456789012345678901234567890",
-        amount: BigInt(1),
-        reference: "test",
-      });
+      const action = await multisigClient.encoding.updateMultisigVotingSettings(
+        {
+          pluginAddress,
+          votingSettings: {
+            minApprovals: 1,
+            onlyListed: true,
+          },
+        },
+      );
       const proposalParams: CreateMultisigProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
         metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
         actions: [action],
+        failSafeActions: [false],
+        startDate: new Date(),
+        endDate: new Date(),
       };
 
       const estimation = await multisigClient.estimation.createProposal(
@@ -73,7 +77,7 @@ describe("Client Multisig", () => {
       const client = new MultisigClient(ctxPlugin);
 
       const approveParams: ApproveMultisigProposalParams = {
-        proposalId: BigInt(0),
+        proposalId: 0,
         pluginAddress: "0x1234567890123456789012345678901234567890",
         tryExecution: true,
       };
@@ -94,7 +98,7 @@ describe("Client Multisig", () => {
       const estimation = await client.estimation.executeProposal(
         {
           pluginAddress: "0x1234567890123456789012345678901234567890",
-          proposalId: BigInt(0),
+          proposalId: 0,
         },
       );
 

@@ -1,4 +1,5 @@
 import {
+  boolArrayToBitmap,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -55,6 +56,7 @@ import {
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { QueryMultisigMembers } from "../graphql-queries/members";
+import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK Address List Client
@@ -86,11 +88,27 @@ export class MultisigClientMethods extends ClientCore
       signer,
     );
 
+    if (
+      params.failSafeActions?.length &&
+      params.failSafeActions.length !== params.actions?.length
+    ) {
+      throw new Error(
+        "Size mismatch: actions and failSafeActions should match",
+      );
+    }
+    const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
+
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
+
     const tx = await multisigContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
+      allowFailureMap,
       params.approve || false,
-      params.tryExecution || true,
+      params.tryExecution || false,
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
     );
 
     yield {
@@ -111,14 +129,14 @@ export class MultisigClientMethods extends ClientCore
     }
 
     const parsedLog = multisigContractInterface.parseLog(log);
-    const proposalId = parsedLog.args["proposalId"];
+    const proposalId: BigNumber = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: BigInt(proposalId),
+      proposalId: proposalId.toNumber(),
     };
   }
 
@@ -223,7 +241,7 @@ export class MultisigClientMethods extends ClientCore
   }
 
   /**
-   * Returns the list of wallet addresses with signing capabilities on the plugin
+   * Checks whether the current proposal can be approved by the given address
    *
    * @param {string} addressOrEns
    * @return {*}  {Promise<boolean>}
@@ -254,7 +272,7 @@ export class MultisigClientMethods extends ClientCore
     return multisigContract.canApprove(params.proposalId, params.addressOrEns);
   }
   /**
-   * Returns the list of wallet addresses with signing capabilities on the plugin
+   * Checks whether the current proposal can be executed
    *
    * @param {string} addressOrEns
    * @return {*}  {Promise<boolean>}
@@ -282,7 +300,7 @@ export class MultisigClientMethods extends ClientCore
     return multisigContract.canExecute(params.proposalId);
   }
   /**
-   * returns the voting settings
+   * Returns the voting settings
    *
    * @param {string} addressOrEns
    * @return {*}  {Promise<MultisigVotingSettings>}
@@ -340,6 +358,7 @@ export class MultisigClientMethods extends ClientCore
       throw new GraphQLError("Multisig members");
     }
   }
+
   /**
    * Returns the details of the given proposal
    *

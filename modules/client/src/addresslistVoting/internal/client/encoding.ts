@@ -1,9 +1,9 @@
-import { hexToBytes, InvalidAddressError, strip0x } from "@aragon/sdk-common";
+import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
   ContextPlugin,
-  ContractVotingSettings,
+  // ContractVotingSettings,
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
@@ -12,12 +12,11 @@ import {
 } from "../../../client-common";
 import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
-  IAddresslistVotingPluginInstall,
   IAddresslistVotingClientEncoding,
+  IAddresslistVotingPluginInstall,
 } from "../../interfaces";
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -41,22 +40,33 @@ export class AddresslistVotingClientEncoding extends ClientCore
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
   ): IPluginInstallItem {
+    const {
+      votingMode,
+      supportThreshold,
+      minParticipation,
+      minDuration,
+      minProposerVotingPower,
+    } = votingSettingsToContract(params.votingSettings);
+
     const hexBytes = defaultAbiCoder.encode(
-      // ["votingMode","supportThreshold", "minParticipation", "minDuration"], "members"]
       [
-        "tuple(uint8, uint64, uint64, uint64, uint256)",
-        "address[]",
+        "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
+        "address[] members",
       ],
       [
-        Object.values(
-          votingSettingsToContract(params.votingSettings),
-        ) as ContractVotingSettings,
+        [
+          votingMode,
+          supportThreshold,
+          minParticipation,
+          minDuration,
+          minProposerVotingPower,
+        ],
         params.addresses,
       ],
     );
     return {
       id: ADDRESSLIST_PLUGIN_ID,
-      data: toUtf8Bytes(hexBytes),
+      data: hexToBytes(hexBytes),
     };
   }
 
@@ -105,11 +115,10 @@ export class AddresslistVotingClientEncoding extends ClientCore
       "addAddresses",
       [members],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data,
+      data: hexToBytes(hexBytes),
     };
   }
   /**
@@ -138,11 +147,10 @@ export class AddresslistVotingClientEncoding extends ClientCore
       "removeAddresses",
       [members],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: pluginAddress,
       value: BigInt(0),
-      data,
+      data: hexToBytes(hexBytes),
     };
   }
 }

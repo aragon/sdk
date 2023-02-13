@@ -45,6 +45,7 @@ const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
   actions: [],
+  failSafeActions: [],
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,

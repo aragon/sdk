@@ -9,7 +9,7 @@ import {
 } from "../../../client-common";
 import { IAddresslistVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
+import { boolArrayToBitmap, NoProviderError, NoSignerError } from "@aragon/sdk-common";
 
 /**
  * Estimation module the SDK Address List Client
@@ -44,6 +44,16 @@ export class AddresslistVotingClientEstimation extends ClientCore
       signer,
     );
 
+    if (
+      params.failSafeActions?.length &&
+      params.failSafeActions.length !== params.actions?.length
+    ) {
+      throw new Error(
+        "Size mismatch: actions and failSafeActions should match",
+      );
+    }
+    const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
+
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
@@ -51,6 +61,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
       .createProposal(
         toUtf8Bytes(params.metadataUri),
         params.actions || [],
+        allowFailureMap,
         Math.round(startTimestamp / 1000),
         Math.round(endTimestamp / 1000),
         params.creatorVote || 0,
