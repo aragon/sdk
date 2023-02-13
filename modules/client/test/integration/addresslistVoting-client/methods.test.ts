@@ -39,23 +39,43 @@ import {
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { Server } from "ganache";
-import { advanceBlocks } from "../../helpers/advance-blocks";
+import {
+  mineBlock,
+  mineBlockWithTimeOffset,
+  restoreBlockTime,
+} from "../../helpers/block-times";
 import { buildAddressListVotingDAO } from "../../helpers/build-daos";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Client Address List", () => {
   let server: Server;
   let deployment: deployContracts.Deployment;
   let repoAddr: string;
+  let provider: JsonRpcProvider;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
     repoAddr = deployment.addresslistVotingRepo.address;
+
+    if (Array.isArray(contextParamsLocalChain.web3Providers)) {
+      provider = new JsonRpcProvider(
+        contextParamsLocalChain.web3Providers[0] as string,
+      );
+    } else {
+      provider = new JsonRpcProvider(
+        contextParamsLocalChain.web3Providers as any,
+      );
+    }
   });
 
   afterAll(async () => {
     await server.close();
+  });
+
+  beforeEach(() => {
+    return restoreBlockTime(provider);
   });
 
   // Helpers
@@ -104,7 +124,7 @@ describe("Client Address List", () => {
     const ipfsUri = await client.methods.pinMetadata(
       metadata,
     );
-    const endDate = new Date(Date.now() + 60 * 61 * 1000);
+    const endDate = new Date(Date.now() + 60 * 60 * 1000 + 10 * 1000);
 
     const proposalParams: ICreateProposalParams = {
       pluginAddress,
@@ -256,14 +276,12 @@ describe("Client Address List", () => {
       // Vote YES
       await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
 
-      await advanceBlocks(server.provider, 1);
+      await mineBlock(provider);
       await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
     });
   });
 
   describe("Can execute", () => {
-    const BLOCK_ADVANCE_COUNT = 1000; // greater than 3600 seconds
-
     it("Should check if an user can execute a standard voting proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
@@ -291,7 +309,7 @@ describe("Client Address List", () => {
       // now approve
       await voteProposal(pluginAddress, proposalId, client);
       // Force date past end
-      await advanceBlocks(server.provider, BLOCK_ADVANCE_COUNT);
+      await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
       canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
@@ -366,7 +384,7 @@ describe("Client Address List", () => {
       await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
 
       // Force date past end
-      await advanceBlocks(server.provider, BLOCK_ADVANCE_COUNT);
+      await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
       canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
@@ -375,8 +393,6 @@ describe("Client Address List", () => {
   });
 
   describe("Execute proposal", () => {
-    const BLOCK_ADVANCE_COUNT = 1000; // greater than 3600 seconds
-
     it("Should execute a standard voting proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
@@ -396,7 +412,7 @@ describe("Client Address List", () => {
       // Vote
       await voteProposal(pluginAddress, proposalId, client);
       // Force date past end
-      await advanceBlocks(server.provider, BLOCK_ADVANCE_COUNT);
+      await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
       // Execute
       const executeParams: IExecuteProposalParams = {
@@ -473,7 +489,7 @@ describe("Client Address List", () => {
 
       const { plugin: pluginAddress } = await buildAddressListVotingDAO(
         repoAddr,
-        VotingMode.EARLY_EXECUTION,
+        VotingMode.VOTE_REPLACEMENT,
       );
       if (!pluginAddress) {
         throw new Error("No plugin installed");
@@ -486,7 +502,7 @@ describe("Client Address List", () => {
       await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
       await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
       // Force date past end
-      await advanceBlocks(server.provider, BLOCK_ADVANCE_COUNT);
+      await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
       // Execute
       const executeParams: IExecuteProposalParams = {

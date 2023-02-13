@@ -11,11 +11,6 @@ TEMPLATE:
 
 - Change 1, 2, 3
 
-//////
-TODO: remove
-- PLUGIN_ID constants
-- proposalId's as a number by now
-
 -->
 
 ## [UPCOMING]

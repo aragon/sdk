@@ -36,18 +36,31 @@ import { Server } from "ganache";
 // import { advanceBlocks } from "../../helpers/advance-blocks";
 import { CanExecuteParams, ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
-import { advanceBlocks } from "../../helpers/advance-blocks";
+import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
   let server: Server;
   let repoAddr: string;
+  let provider: JsonRpcProvider;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
     repoAddr = deployment.multisigRepo.address;
+
+    if (Array.isArray(contextParamsLocalChain.web3Providers)) {
+      provider = new JsonRpcProvider(
+        contextParamsLocalChain.web3Providers[0] as string,
+      );
+    } else {
+      provider = new JsonRpcProvider(
+        contextParamsLocalChain.web3Providers as any,
+      );
+    }
+    await restoreBlockTime(provider);
   });
 
   afterAll(async () => {
@@ -56,7 +69,7 @@ describe("Client Multisig", () => {
 
   async function buildDao() {
     const result = await buildMultisigDAO(repoAddr);
-    await advanceBlocks(server.provider, 10);
+    await mineBlock(provider);
     return result;
   }
 
@@ -114,9 +127,9 @@ describe("Client Multisig", () => {
           expect(typeof step.proposalId).toBe("number");
           return step.proposalId;
           // TODO
-          // update with new proposal id when contracts are ready
-          // expect(typeof step.proposalId).toBe("string");
-          // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+        // update with new proposal id when contracts are ready
+        // expect(typeof step.proposalId).toBe("string");
+        // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
         default:
           throw new Error(
             "Unexpected proposal creation step: " +
