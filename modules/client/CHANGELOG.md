@@ -13,18 +13,42 @@ TEMPLATE:
 
 -->
 
-## [UPCOMING]
+## [0.20.0-beta]
 ### Changed
 - Updates to contracts-ethers v0.7.1
 - Splits `getPluginSettings` in `getVotingSettings` and `getMembers`
-- Replace `withdrawAction`'s internal implementation and types
+- `encoding.withdrawAction` now accepts a single parameter of type `WithdrawParams`
+  - `IWithdrawParams` is now `WithdrawParams`
+- `decoding.withdrawAction` now receives the `to` and `value` parameters, in addition to `data`
 - `DepositParams`
-- `createDao` now returns `pluginAddresses`
+- `IDepositParams` is now `DepositParams`
+  - It always gets a `type: TokenType`
+- `proposalId` is now a `bigint` on every plugin
+  - WARNING: This may change to a string, due to Subgraph limitations
+- `IAddressListPluginInstall` is now `IAddresslistVotingPluginInstall`
+- `decoders.removeMembersAction()` now returns an array of addresses
+- `DaoSortBy.NAME` => `DaoSortBy.SUBDOMAIN`
+- `ensureAllowance`'s field `daoAddress` is now named `daoAddressOrEns`
+- `TokenType` replaces any other token/transfer type enum
+
 ### Added
 - Proposals accept a `failSafeActions` variable
 - Multisig plugin settings now include `startDate` and `endDate`
+- `ICreateProposalParams` now receives an optional `failSafeActions` array, to denote which could fail without disrupting the entire execution flow
+- `createDao` now returns `pluginAddresses` when `DONE`
+- Multisig proposals have a `startDate`, `endDate` (and `approvals` when reading back)
+- `canExecute()` added to `TokenVotingClient.methods` and `AddresslistVotingClient.methods`
+- `executionTxHash` added to `TokenVotingProposal` and `AddresslistVotingProposal`
+- `CreateDaoParams` now includes `daoUri`
+- `pluginAddresses` on `DaoCreationStepValue`
+  - WARNING: it may be updated into an array of objects like `{address, pluginRepoEns}` to identify what plugin it corresponds
+
 ### Removed
 - Freeze action encoders
+  - Removed `IFreezePermissionParams` and `IFreezePermissionDecodedParams`
+- The `reference` field on deposits and withdrawals
+
+## [0.19.0-alpha]
 
 ## [0.18.0-alpha]
 ### Added
