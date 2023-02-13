@@ -6,12 +6,14 @@ import "../../mocks/aragon-sdk-ipfs";
 
 import { Random } from "@aragon/sdk-common";
 import {
-  Client,
   AddresslistVotingClient,
+  Client,
   Context,
   CreateDaoParams,
+  DepositParams,
+  TokenType,
+  EnsureAllowanceParams,
   IAddresslistVotingPluginInstall,
-  IDepositParams,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
@@ -39,7 +41,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const daoName = "TokenVotingDAO_" + Math.floor(Random.getFloat() * 9999) +
+      const daoName = "TokenVotingDAO-" + Math.floor(Random.getFloat() * 9999) +
         1;
 
       const pluginParams: IAddresslistVotingPluginInstall = {
@@ -80,8 +82,10 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const depositParams: IDepositParams = {
+      const depositParams: DepositParams = {
+        type: TokenType.ERC20,
         daoAddressOrEns: daoAddress,
+        tokenAddress: "0x1234567890123456789012345678901234567890",
         amount: BigInt(1234),
       };
 
@@ -100,7 +104,7 @@ describe("Client", () => {
 
       const tokenContract = await deployErc20(client);
 
-      const depositParams: IDepositParams = {
+      const depositParams: EnsureAllowanceParams = {
         daoAddressOrEns: daoAddress,
         amount: BigInt(1234),
         tokenAddress: tokenContract.address,

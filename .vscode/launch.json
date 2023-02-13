@@ -12,7 +12,9 @@
         "--inspect-brk",
         "${workspaceRoot}/node_modules/tsdx/dist/index.js",
         "test",
-        "--runInBand"
+        "--runInBand",
+        "--no-caching"
+        // "tokenvoting"
       ],
       "cwd": "${workspaceFolder}/modules/client",
       "console": "integratedTerminal",

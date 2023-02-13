@@ -19,6 +19,7 @@ TEMPLATE:
 ## [UPCOMING]
 - Adds new error `EnsureAllowanceError`
 - Adds new error `InvalidPrecisionError`
+- Adds `boolArrayToBitmap` and `bitmapToBoolArray`
 
 ## 0.9.1-alpha
 On 2022-12-13 15:57:38

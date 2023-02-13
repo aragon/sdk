@@ -29,7 +29,7 @@ export namespace Random {
   }
 
   /**
-   * Generates a 32 byte random buffer and returns it as a hex string
+   * Generates a 32 byte random buffer and returns it as a hex string with the "0x" prefix
    */
   export function getHex(): string {
     const bytes = getBytes(32);

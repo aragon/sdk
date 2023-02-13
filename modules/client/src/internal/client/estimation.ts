@@ -10,19 +10,20 @@ import {
   NoSignerError,
   NoTokenAddress,
 } from "@aragon/sdk-common";
-import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import { ClientCore, Context, GasFeeEstimation } from "../../client-common";
 import {
-  IClientEstimation,
   CreateDaoParams,
-  IDepositParams,
+  DepositParams,
+  EnsureAllowanceParams,
+  IClientEstimation,
+  TokenType,
 } from "../../interfaces";
 import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";
-import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Estimation module the SDK Generic Client
@@ -46,6 +47,10 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
+    } else if (
+      params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
+    ) {
+      throw new Error("Invalid subdomain format: use a-z, 0-9 and -");
     }
 
     const daoInstance = DAOFactory__factory.connect(
@@ -54,14 +59,18 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     );
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
     for (const plugin of params.plugins) {
-      const latestVersion = await PluginRepo__factory.connect(
-        plugin.id,
-        signer,
-      ).getLatestVersion();
+      const repo = PluginRepo__factory.connect(plugin.id, signer);
+
+      const currentRelease = await repo.latestRelease();
+      const latestVersion = await repo["getLatestVersion(uint8)"](
+        currentRelease,
+      );
       pluginInstallationData.push({
-        pluginSetup: latestVersion[1],
-        pluginSetupRepo: plugin.id,
-        data: toUtf8String(plugin.data),
+        pluginSetupRef: {
+          pluginSetupRepo: repo.address,
+          versionTag: latestVersion.tag,
+        },
+        data: plugin.data,
       });
     }
 
@@ -69,6 +78,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
       {
         name: params.ensSubdomain,
         metadata: toUtf8Bytes(params.metadataUri),
+        daoURI: params.daoUri || "",
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
       pluginInstallationData,
@@ -80,16 +90,22 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * Estimates the gas fee of depositing ether or an ERC20 token into the DAO
    * This does not estimate the gas cost of updating the allowance of an ERC20 token
    *
-   * @param {IDepositParams} params
+   * @param {DepositParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
-  public deposit(params: IDepositParams): Promise<GasFeeEstimation> {
+  public deposit(
+    params: DepositParams,
+  ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
+    }
+
+    if (params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20) {
+      throw new Error("Please, use the token's transfer function directly");
     }
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
@@ -98,7 +114,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
 
     const daoInstance = DAO__factory.connect(daoAddress, signer);
 
-    const override: { value?: BigNumber } = {};
+    const override: { value?: bigint } = {};
     if (tokenAddress === AddressZero) {
       override.value = amount;
     }
@@ -112,12 +128,12 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
   /**
    * Estimates the gas fee of updating the allowance of an ERC20 token
    *
-   * @param {IDepositParams} _params
+   * @param {EnsureAllowanceParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
   public async updateAllowance(
-    params: IDepositParams,
+    params: EnsureAllowanceParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {

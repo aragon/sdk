@@ -6,16 +6,19 @@ query MultisigProposal($proposalId: ID!) {
     id
     dao {
       id
-      name
+      subdomain
     }
     creator
     metadata
     createdAt
+    startDate
+    endDate
     actions {
       to
       value
       data
     }
+    executionTxHash
     executed
     approvers{
       approver{
@@ -31,11 +34,12 @@ query MultisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: In
     id
     dao {
       id
-      name
+      subdomain
     }
     creator
     metadata
     executed
+    approvals
   }
 }
 `;

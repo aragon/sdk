@@ -1,6 +1,7 @@
 // This file contains the definitions of the AddressList DAO client
 
 import {
+  CanExecuteParams,
   ContractVotingSettings,
   DaoAction,
   ExecuteProposalStepValue,
@@ -20,9 +21,9 @@ import {
   SubgraphAction,
   SubgraphProposalBase,
   SubgraphVoterListItemBase,
-  SubgraphVotingMode,
   VoteProposalStepValue,
   VoteValues,
+  VotingMode,
   VotingSettings,
 } from "../client-common";
 
@@ -39,8 +40,11 @@ export interface IAddresslistVotingClientMethods extends IClientCore {
     params: IExecuteProposalParams,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canVote: (params: ICanVoteParams) => Promise<boolean>;
+  canExecute: (params: CanExecuteParams) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
-  getProposal: (propoosalId: string) => Promise<AddresslistVotingProposal | null>;
+  getProposal: (
+    propoosalId: string,
+  ) => Promise<AddresslistVotingProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
   ) => Promise<AddresslistVotingProposalListItem[]>;
@@ -92,6 +96,7 @@ export type AddresslistVotingProposal = ProposalBase & {
   creationBlockNumber: number;
   executionDate: Date;
   executionBlockNumber: number;
+  executionTxHash: string;
 };
 
 export type AddresslistVotingProposalListItem = ProposalListItemBase & {
@@ -110,13 +115,14 @@ export type SubgraphAddresslistVotingProposal = SubgraphProposalBase & {
   createdAt: string;
   actions: SubgraphAction[];
   supportThreshold: string;
-  minParticipation: string;
+  minVotingPower: string;
   voters: SubgraphAddresslistVotingVoterListItem[];
   totalVotingPower: string;
-  votingMode: SubgraphVotingMode;
+  votingMode: VotingMode;
   creationBlockNumber: string;
   executionDate: string;
   executionBlockNumber: string;
+  executionTxHash: string;
 };
 
 export type ContractAddresslistVotingInitParams = [

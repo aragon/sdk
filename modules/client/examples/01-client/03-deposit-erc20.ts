@@ -13,18 +13,19 @@ import {
   Client,
   DaoDepositSteps,
   GasFeeEstimation,
-  IDepositParams
+  DepositParams,
+  TokenType
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate the general purpose client from the aragonOSx SDK context.
 const client: Client = new Client(context);
 
-const depositParams: IDepositParams = {
+const depositParams: DepositParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
   amount: BigInt(10), // amount in wei
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
-  reference: "test deposit" // optional
+  type: TokenType.ERC20 // "native" meaning the native token to that EVM (ETH in mainnet), otherwise "erc20" for ERC20 token
 };
 
 // Estimate how much gas the transaction will cost.

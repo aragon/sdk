@@ -18,7 +18,7 @@ const web3endpoints = {
 const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
-const contextParams: ContextParams = {
+const contextParamsMainnet: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
@@ -42,7 +42,7 @@ describe("IPFS core module", () => {
     expect(IPFS_API_KEY.length).toBeGreaterThan(0);
   });
   it("Should connect to a IPFS node and upload a string and recover the same string", async () => {
-    const context = new Context(contextParams);
+    const context = new Context(contextParamsMainnet);
     const client = new Client(context);
     const originalStr = "I am a test";
     const cid = await client.ipfs.add(originalStr);
@@ -57,7 +57,7 @@ describe("IPFS core module", () => {
     expect(decodedString).toEqual(originalStr);
   });
   it("Should connect to a IPFS node, upload bytes and recover the same string", async () => {
-    const context = new Context(contextParams);
+    const context = new Context(contextParamsMainnet);
     const client = new Client(context);
     const originalBytes = new Uint8Array([
       72,
@@ -87,7 +87,7 @@ describe("IPFS core module", () => {
     expect(decodedString).toEqual("Hello There :)");
   });
   it("Should work when an IPFS node is functional", async () => {
-    const context = new Context(contextParams);
+    const context = new Context(contextParamsMainnet);
     const client = new Client(context);
     const isOnline = await client.ipfs.isUp();
 
@@ -96,7 +96,7 @@ describe("IPFS core module", () => {
   it("Should fail when shifting an empty node list", async () => {
     {
       const context = new Context(
-        Object.assign({}, contextParams, {
+        Object.assign({}, contextParamsMainnet, {
           ipfsNodes: [],
         }),
       );
@@ -109,7 +109,7 @@ describe("IPFS core module", () => {
   it("Should fail when an IPFS node is not working", async () => {
     {
       const context = new Context(
-        Object.assign({}, contextParams, {
+        Object.assign({}, contextParamsMainnet, {
           ipfsNodes: [],
         }),
       );
@@ -120,7 +120,7 @@ describe("IPFS core module", () => {
     }
     {
       const context = new Context(
-        Object.assign({}, contextParams, {
+        Object.assign({}, contextParamsMainnet, {
           ipfsNodes: [{ url: "https://does-not-exist-here.random.hb/1234" }],
         }),
       );

@@ -107,8 +107,7 @@ describe("Client Multisig", () => {
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.addAddressesAction(data)).toThrow(
-        // TODO update error
-        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
+        `data signature does not match function addAddresses. (argument=\"data\", value=\"0x0b1616212121\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });
 

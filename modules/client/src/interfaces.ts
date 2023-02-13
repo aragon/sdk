@@ -11,6 +11,7 @@ import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { BigNumber } from "@ethersproject/bignumber";
 import { IClientCore } from "./client-common/interfaces/core";
+
 /** Defines the shape of the general purpose Client class */
 export interface IClientMethods extends IClientCore {
   createDao: (params: CreateDaoParams) => AsyncGenerator<DaoCreationStepValue>;
@@ -24,7 +25,9 @@ export interface IClientMethods extends IClientCore {
   /** Checks whether a role is granted by the current DAO's ACL settings */
   hasPermission: (params: IHasPermissionParams) => Promise<boolean>;
   /** Deposits ether or an ERC20 token */
-  deposit: (params: IDepositParams) => AsyncGenerator<DaoDepositStepValue>;
+  deposit: (
+    params: DepositParams,
+  ) => AsyncGenerator<DaoDepositStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
   ensureAllowance: (
     params: EnsureAllowanceParams,
@@ -44,13 +47,8 @@ export interface IClientEncoding extends IClientCore {
     daoAddress: string,
     params: IRevokePermissionParams,
   ) => DaoAction;
-  freezeAction: (
-    daoAddress: string,
-    params: IFreezePermissionParams,
-  ) => DaoAction;
   withdrawAction: (
-    daoAddresOrEns: string,
-    params: IWithdrawParams,
+    parameters: WithdrawParams,
   ) => Promise<DaoAction>;
   updateDaoMetadataAction: (
     daoAddressOrEns: string,
@@ -61,8 +59,11 @@ export interface IClientEncoding extends IClientCore {
 export interface IClientDecoding {
   grantAction: (data: Uint8Array) => IGrantPermissionDecodedParams;
   revokeAction: (data: Uint8Array) => IRevokePermissionDecodedParams;
-  freezeAction: (data: Uint8Array) => IFreezePermissionDecodedParams;
-  withdrawAction: (data: Uint8Array) => IWithdrawParams;
+  withdrawAction: (
+    to: string,
+    value: bigint,
+    data: Uint8Array,
+  ) => WithdrawParams;
   updateDaoMetadataRawAction: (data: Uint8Array) => string;
   updateDaoMetadataAction: (data: Uint8Array) => Promise<DaoMetadata>;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
@@ -70,8 +71,10 @@ export interface IClientDecoding {
 
 export interface IClientEstimation {
   createDao: (params: CreateDaoParams) => Promise<GasFeeEstimation>;
-  deposit: (params: IDepositParams) => Promise<GasFeeEstimation>;
-  updateAllowance: (params: IDepositParams) => Promise<GasFeeEstimation>;
+  deposit: (
+    params: DepositParams,
+  ) => Promise<GasFeeEstimation>;
+  updateAllowance: (params: EnsureAllowanceParams) => Promise<GasFeeEstimation>;
 }
 
 export interface IClient {
@@ -86,24 +89,37 @@ export interface IClient {
 /** Holds the parameters that the DAO will be created with */
 export type CreateDaoParams = {
   metadataUri: string;
+  daoUri?: string;
   ensSubdomain: string;
   trustedForwarder?: string;
   plugins: IPluginInstallItem[];
-}
+};
 
 export type DaoMetadata = {
   name: string;
   description: string;
   avatar?: string;
   links: DaoResourceLink[];
-}
+};
 
-export interface IWithdrawParams {
-  recipientAddress: string;
+// Withdrawals
+type WithdrawParamsBase = {
+  type: TokenType;
+  recipientAddressOrEns: string;
+};
+
+type WithdrawEthParams = WithdrawParamsBase & {
+  type: TokenType.NATIVE;
   amount: bigint;
-  tokenAddress?: string;
-  reference?: string;
-}
+};
+type WithdrawErc20Params = WithdrawParamsBase & {
+  type: TokenType.ERC20;
+  amount: bigint;
+  tokenAddress: string;
+};
+
+export type WithdrawParams = WithdrawEthParams | WithdrawErc20Params;
+
 interface IPermissionParamsBase {
   where: string;
   who: string;
@@ -118,14 +134,6 @@ export interface IGrantPermissionDecodedParams
   extends IPermissionDecodedParamsBase {}
 export interface IRevokePermissionDecodedParams
   extends IPermissionDecodedParamsBase {}
-export interface IFreezePermissionParams {
-  where: string;
-  permission: string;
-}
-export interface IFreezePermissionDecodedParams
-  extends IFreezePermissionParams {
-  permissionId: string;
-}
 
 export interface IHasPermissionParams {
   daoAddressOrEns: string;
@@ -169,19 +177,32 @@ export enum DaoCreationSteps {
 
 export type DaoCreationStepValue =
   | { key: DaoCreationSteps.CREATING; txHash: string }
-  | { key: DaoCreationSteps.DONE; address: string };
+  | { key: DaoCreationSteps.DONE; address: string, pluginAddresses: string[] };
 
 // DEPOSIT
 
-export interface IDepositParams {
+export type DepositBaseParams = {
   daoAddressOrEns: string;
+};
+
+export type DepositEthParams = DepositBaseParams & {
+  type: TokenType.NATIVE;
   amount: bigint;
-  tokenAddress?: string;
-  reference?: string;
-}
+};
+export type DepositErc20Params = DepositBaseParams & {
+  type: TokenType.ERC20;
+  tokenAddress: string;
+  amount: bigint;
+};
+// export type DepositErc721Params = DepositBaseParams & {
+//   type: TokenType.ERC721;
+//   tokenAddress: string;
+// };
+
+export type DepositParams = DepositEthParams | DepositErc20Params; // | DepositErc721Params;
 
 export type EnsureAllowanceParams = {
-  daoAddress: string;
+  daoAddressOrEns: string;
   amount: bigint;
   tokenAddress: string;
 };
@@ -243,7 +264,6 @@ export enum TokenType {
 type BaseTokenTransfer = {
   amount: bigint;
   creationDate: Date;
-  reference: string;
   transactionId: string;
 };
 
@@ -317,7 +337,7 @@ export enum TransferSortBy {
 
 export enum DaoSortBy {
   CREATED_AT = "createdAt",
-  NAME = "name",
+  SUBDOMAIN = "subdomain",
   POPULARITY = "totalProposals", // currently defined as number of proposals
 }
 
@@ -333,21 +353,19 @@ export const SubgraphPluginTypeMap: Map<
   string
 > = new Map([
   [SubgraphPluginTypeName.TOKEN_VOTING, "token-voting.plugin.dao.eth"],
-  [SubgraphPluginTypeName.ADDRESS_LIST, "addresslist-voting.plugin.dao.eth"],
+  [SubgraphPluginTypeName.ADDRESS_LIST, "address-list-voting.plugin.dao.eth"],
   [SubgraphPluginTypeName.ADMIN, "admin.plugin.dao.eth"],
   [SubgraphPluginTypeName.MULTISIG, "multisig.plugin.dao.eth"],
 ]);
 
 export type SubgraphPluginListItem = {
-  plugin: {
-    id: string;
-    __typename: SubgraphPluginTypeName;
-  };
+  id: string;
+  __typename: SubgraphPluginTypeName;
 };
 
 type SubgraphDaoBase = {
   id: string;
-  name: string;
+  subdomain: string;
   metadata: string;
   plugins: SubgraphPluginListItem[];
 };
@@ -377,7 +395,6 @@ export enum SubgraphTransferType {
 export type SubgraphTransferListItem = {
   amount: string;
   createdAt: string;
-  reference: string;
   transaction: string;
   type: SubgraphTransferType;
   to: string;
@@ -402,6 +419,5 @@ export const SubgraphTransferTypeMap: Map<
   [TransferType.WITHDRAW, SubgraphTransferType.WITHDRAW],
 ]);
 
-export type ContractFreezeParams = [string, string];
 export type ContractPermissionParams = [string, string, string];
 export type ContractWithdrawParams = [string, string, BigNumber, string];

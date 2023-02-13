@@ -6,7 +6,7 @@ query TokenVotingProposal($proposalId: ID!) {
     id
     dao {
       id
-      name
+      subdomain
     }
     creator
     metadata
@@ -24,7 +24,6 @@ query TokenVotingProposal($proposalId: ID!) {
     abstain
     votingMode
     supportThreshold
-    minParticipation
     startDate
     endDate
     executed
@@ -51,6 +50,7 @@ query TokenVotingProposal($proposalId: ID!) {
       }
     }
     totalVotingPower
+    minVotingPower
   }
 }
 `;
@@ -60,7 +60,7 @@ query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
     id
     dao {
       id
-      name
+      subdomain
     }
     creator
     metadata

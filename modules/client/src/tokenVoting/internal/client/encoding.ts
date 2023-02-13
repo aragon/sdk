@@ -1,4 +1,4 @@
-import { hexToBytes, InvalidAddressError, strip0x } from "@aragon/sdk-common";
+import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -22,7 +22,7 @@ import {
   tokenVotingInitParamsToContract,
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { toUtf8Bytes } from "@ethersproject/strings";
+
 /**
  * Encoding module the SDK TokenVoting Client
  */
@@ -48,15 +48,15 @@ export class TokenVotingClientEncoding extends ClientCore
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], ["address","name","symbol"][ "receivers","amount"]
       [
-        "tuple(uint8, uint64, uint64, uint64, uint256)",
-        "tuple(address, string, string)",
-        "tuple(address[], uint256[])",
+        "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
+        "tuple(address addr, string name, string symbol) tokenSettings",
+        "tuple(address[] receivers, uint256[] amounts) mintSettings",
       ],
       args,
     );
     return {
       id: TOKEN_VOTING_PLUGIN_ID,
-      data: toUtf8Bytes(hexBytes),
+      data: hexToBytes(hexBytes),
     };
   }
   /**
@@ -102,11 +102,10 @@ export class TokenVotingClientEncoding extends ClientCore
     const args = mintTokenParamsToContract(params);
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData("mint", args);
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: minterAddress,
       value: BigInt(0),
-      data,
+      data: hexToBytes(hexBytes),
     };
   }
 }

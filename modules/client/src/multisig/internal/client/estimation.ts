@@ -3,6 +3,7 @@ import {
   InvalidAddressError,
   NoProviderError,
   NoSignerError,
+  boolArrayToBitmap,
 } from "@aragon/sdk-common";
 import {
   ClientCore,
@@ -48,11 +49,27 @@ export class MultisigClientEstimation extends ClientCore
       signer,
     );
 
+    if (
+      params.failSafeActions?.length &&
+      params.failSafeActions.length !== params.actions?.length
+    ) {
+      throw new Error(
+        "Size mismatch: actions and failSafeActions should match",
+      );
+    }
+    const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
+
+    const startTimestamp = params.startDate?.getTime() || 0;
+    const endTimestamp = params.endDate?.getTime() || 0;
+
     const estimation = await multisigContract.estimateGas.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
+      allowFailureMap,
       params.approve || false,
       params.tryExecution || true,
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

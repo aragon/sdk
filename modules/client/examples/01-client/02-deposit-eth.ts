@@ -1,5 +1,7 @@
 /* MARKDOWN
-### Deposit ETH to a DAO
+### Depositing ETH to a DAO
+
+Handles the flow of depositing the native token to an Aragon DAO.
 
 Handles the flow of depositing the native EVM token (when in mainnet, it's ETH) to an aragonOSx DAO.
 */
@@ -8,17 +10,18 @@ import {
   Client,
   DaoDepositSteps,
   GasFeeEstimation,
-  IDepositParams
+  DepositParams,
+  TokenType
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate the general purpose client from the aragonOSx SDK context.
 const client: Client = new Client(context);
 
-const depositParams: IDepositParams = {
-  daoAddressOrEns: "0x1234567890123456789012345678901234567890",
+const depositParams: DepositParams = {
+  daoAddressOrEns: 'my-dao.dao.eth',
   amount: BigInt(10), // amount in wei
-  reference: "test deposit" // optional
+  type: TokenType.NATIVE // "native" meaning the native token to that EVM (ETH in mainnet), otherwise "erc20" for ERC20 tokens
 };
 
 // Estimate how much gas the transaction will cost.

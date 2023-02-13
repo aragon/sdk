@@ -7,7 +7,7 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import {
-  contextParams,
+  contextParamsMainnet,
   contextParamsLocalChain,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
@@ -16,16 +16,17 @@ import {
   // TEST_WALLET,
 } from "../constants";
 import {
-  Client,
   AddresslistVotingClient,
+  Client,
   Context,
+  CreateDaoParams,
   DaoCreationSteps,
   DaoDepositSteps,
   DaoSortBy,
+  DepositParams,
+  EnsureAllowanceParams,
   IAddresslistVotingPluginInstall,
-  CreateDaoParams,
   IDaoQueryParams,
-  IDepositParams,
   IHasPermissionParams,
   ITransferQueryParams,
   Permissions,
@@ -33,6 +34,7 @@ import {
   TokenType,
   TransferSortBy,
   TransferType,
+  VotingMode,
 } from "../../../src";
 import {
   InvalidAddressOrEnsError,
@@ -43,10 +45,6 @@ import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
 import { isAddress } from "@ethersproject/address";
 import { Server } from "ganache";
-import { toUtf8Bytes } from "@ethersproject/strings";
-import { defaultAbiCoder } from "@ethersproject/abi";
-import { PluginSetupProcessor__factory } from "@aragon/core-contracts-ethers";
-import { EnsureAllowanceParams } from "../../../src/interfaces";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -59,9 +57,10 @@ describe("Client", () => {
       server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      const daoCreation = await deployContracts.createAddresslistDAO(
+      const daoCreation = await deployContracts.createTokenVotingDAO(
         deployment,
-        "testDAO",
+        "test-tokenvoting-dao",
+        VotingMode.STANDARD,
       );
       daoAddress = daoCreation.daoAddr;
     });
@@ -75,7 +74,7 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const daoName = "TokenVotingDAO_" +
+        const daoName = "AddresslistVoting DAO-" +
           Math.floor(Random.getFloat() * 9999) + 1;
         // pin metadata
         const ipfsUri = await client.methods.pinMetadata({
@@ -99,7 +98,7 @@ describe("Client", () => {
         const addresslistVotingPlugin = AddresslistVotingClient.encoding
           .getPluginInstallItem(pluginParams);
         addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
-        
+
         const daoCreationParams: CreateDaoParams = {
           metadataUri: ipfsUri,
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
@@ -128,46 +127,20 @@ describe("Client", () => {
       });
 
       it("should fail if no execute_permission is requested", async () => {
-        const pluginSetupProcessorConnectSpy = jest.spyOn(
-          PluginSetupProcessor__factory,
-          "connect",
-        );
-        const prepareInstallationMock = jest.fn().mockResolvedValue({
-          permissions: [],
-        });
-        // @ts-ignore Ignoring type to not mock the whole class
-        pluginSetupProcessorConnectSpy.mockImplementation(() => ({
-          callStatic: {
-            prepareInstallation: prepareInstallationMock,
-          },
-        }));
-
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const daoName = "TokenVotingDAO_" +
+        const daoName = "AddresslistVoting DAO-" +
           Math.floor(Random.getFloat() * 9999) + 1;
 
         const daoCreationParams: CreateDaoParams = {
           metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
           ensSubdomain: daoName.toLowerCase().replace(" ", "-"),
-          plugins: [
-            {
-              id: deployment.addresslistVotingRepo.address,
-              data: toUtf8Bytes(
-                defaultAbiCoder.encode(
-                  ["uint64", "uint64", "uint64", "address[]"],
-                  [1, 1, 1, []],
-                ),
-              ),
-            },
-          ],
+          plugins: [],
         };
 
         await expect(client.methods.createDao(daoCreationParams).next()).rejects
           .toMatchObject(new MissingExecPermissionError());
-
-        pluginSetupProcessorConnectSpy.mockReset();
       });
     });
 
@@ -178,11 +151,11 @@ describe("Client", () => {
 
         const tokenContract = await deployErc20(client);
         const amount = BigInt("1000000000000000000");
-        const depositParams: IDepositParams = {
+        const depositParams: DepositParams = {
+          type: TokenType.ERC20,
           daoAddressOrEns: daoAddress,
           amount,
           tokenAddress: tokenContract.address,
-          reference: "My reference",
         };
 
         expect(
@@ -236,12 +209,14 @@ describe("Client", () => {
         const tokenContract = await deployErc20(client);
         const amount = BigInt("1000000000000000000");
         const ensureAllowanceParams: EnsureAllowanceParams = {
-          daoAddress,
+          daoAddressOrEns: daoAddress,
           amount,
           tokenAddress: tokenContract.address,
         };
 
-        for await (const step of client.methods.ensureAllowance(ensureAllowanceParams)) {
+        for await (
+          const step of client.methods.ensureAllowance(ensureAllowanceParams)
+        ) {
           switch (step.key) {
             case DaoDepositSteps.CHECKED_ALLOWANCE:
               expect(typeof step.allowance).toBe("bigint");
@@ -257,7 +232,8 @@ describe("Client", () => {
               break;
             default:
               throw new Error(
-                "Unexpected DAO ensure allowance step: " + JSON.stringify(step, null, 2),
+                "Unexpected DAO ensure allowance step: " +
+                  JSON.stringify(step, null, 2),
               );
           }
         }
@@ -278,11 +254,11 @@ describe("Client", () => {
 
         const tokenContract = await deployErc20(client);
 
-        const depositParams: IDepositParams = {
+        const depositParams: DepositParams = {
+          type: TokenType.ERC20,
           daoAddressOrEns: daoAddress,
           amount: BigInt(7),
           tokenAddress: tokenContract.address,
-          reference: "My reference",
         };
 
         expect(
@@ -380,7 +356,7 @@ describe("Client", () => {
 
     describe("Data retrieval", () => {
       it("Should get a DAO's metadata with a specific address", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
 
@@ -426,7 +402,7 @@ describe("Client", () => {
         }
       });
       it("Should get a DAO's metadata of an non existent dao and receive null", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_NON_EXISTING_ADDRESS;
         const dao = await client.methods.getDao(daoAddress);
@@ -434,7 +410,7 @@ describe("Client", () => {
       });
 
       it("Should get a DAO's metadata of an invalid dao address and throw an error", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_INVALID_ADDRESS;
         await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
@@ -450,7 +426,7 @@ describe("Client", () => {
           limit,
           skip: 0,
           direction: SortDirection.ASC,
-          sortBy: DaoSortBy.NAME,
+          sortBy: DaoSortBy.SUBDOMAIN,
         };
 
         const defaultImplementation = mockedIPFSClient.cat
@@ -490,7 +466,7 @@ describe("Client", () => {
       });
 
       it("Should get DAOs balances", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
         const balances = await client.methods.getDaoBalances(daoAddress);
@@ -514,7 +490,7 @@ describe("Client", () => {
         }
       });
       it("Should get DAOs balances from a dao with no balances", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
         const balances = await client.methods.getDaoBalances(daoAddress);
@@ -540,7 +516,6 @@ describe("Client", () => {
             expect(transfer.amount).toBeGreaterThan(BigInt(0));
             expect(typeof transfer.amount).toBe("bigint");
             expect(transfer.creationDate).toBeInstanceOf(Date);
-            expect(typeof transfer.reference).toBe("string");
             expect(transfer.transactionId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             if (transfer.tokenType === TokenType.NATIVE) {
               if (transfer.type === TransferType.DEPOSIT) {

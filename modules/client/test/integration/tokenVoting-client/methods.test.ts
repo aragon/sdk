@@ -5,7 +5,7 @@ declare const describe, it, beforeAll, afterAll, expect, test;
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import {
-  Client,
+  CanExecuteParams,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
@@ -22,14 +22,15 @@ import {
   TokenVotingClient,
   VoteProposalStep,
   VoteValues,
+  VotingMode,
 } from "../../../src";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
-  contextParams,
   contextParamsLocalChain,
+  contextParamsMainnet,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
   TEST_TOKEN_VOTING_DAO_ADDRESS,
@@ -37,93 +38,202 @@ import {
   TEST_TOKEN_VOTING_PROPOSAL_ID,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import { EthereumProvider, Server } from "ganache";
+import { Server } from "ganache";
+import { buildTokenVotingDAO } from "../../helpers/build-daos";
+import {
+  mineBlock,
+  mineBlockWithTimeOffset,
+  restoreBlockTime,
+} from "../../helpers/block-times";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Token Voting Client", () => {
-  let pluginAddress: string;
   let server: Server;
+  let deployment: deployContracts.Deployment;
+  let repoAddr: string;
+  let provider: JsonRpcProvider;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
-    const deployment = await deployContracts.deploy();
+    deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-    const daoCreation = await deployContracts.createTokenVotingDAO(
-      deployment,
-      "testDAO",
-      [TEST_WALLET_ADDRESS],
-    );
-    pluginAddress = daoCreation.pluginAddrs[0];
-    // advance to get past the voting checkpoint
-    await advanceBlocks(server.provider, 10);
+    repoAddr = deployment.tokenVotingRepo.address;
+
+    if (Array.isArray(contextParamsLocalChain.web3Providers)) {
+      provider = new JsonRpcProvider(
+        contextParamsLocalChain.web3Providers[0] as string,
+      );
+    } else {
+      provider = new JsonRpcProvider(
+        contextParamsLocalChain.web3Providers as any,
+      );
+    }
   });
 
   afterAll(async () => {
     await server.close();
   });
 
+  beforeEach(() => {
+    return restoreBlockTime(provider);
+  });
+
+  // Helpers
+  async function buildDaos() {
+    const daoEntries: Array<{ dao: string; plugin: string }> = [];
+    daoEntries.push(
+      await buildTokenVotingDAO(repoAddr, VotingMode.STANDARD),
+    );
+    daoEntries.push(
+      await buildTokenVotingDAO(repoAddr, VotingMode.EARLY_EXECUTION),
+    );
+    daoEntries.push(
+      await buildTokenVotingDAO(repoAddr, VotingMode.VOTE_REPLACEMENT),
+    );
+    return daoEntries;
+  }
+
+  async function buildProposal(
+    pluginAddress: string,
+    client: TokenVotingClient,
+  ) {
+    // generate actions
+    const action = client.encoding.updatePluginSettingsAction(pluginAddress, {
+      votingMode: VotingMode.VOTE_REPLACEMENT,
+      supportThreshold: 0.5,
+      minParticipation: 0.5,
+      minDuration: 7200,
+    });
+
+    const metadata: ProposalMetadata = {
+      title: "Best Proposal",
+      summary: "this is the sumnary",
+      description: "This is a very long description",
+      resources: [
+        {
+          name: "Website",
+          url: "https://the.website",
+        },
+      ],
+      media: {
+        header: "https://no.media/media.jpeg",
+        logo: "https://no.media/media.jpeg",
+      },
+    };
+
+    const ipfsUri = await client.methods.pinMetadata(
+      metadata,
+    );
+    const endDate = new Date(Date.now() + 60 * 60 * 1000 + 10 * 1000);
+
+    const proposalParams: ICreateProposalParams = {
+      pluginAddress,
+      metadataUri: ipfsUri,
+      actions: [action],
+      executeOnPass: false,
+      endDate,
+    };
+
+    for await (
+      const step of client.methods.createProposal(
+        proposalParams,
+      )
+    ) {
+      switch (step.key) {
+        case ProposalCreationSteps.CREATING:
+          expect(typeof step.txHash).toBe("string");
+          expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          break;
+        case ProposalCreationSteps.DONE:
+          expect(typeof step.proposalId).toBe("number");
+          return step.proposalId;
+          // TODO fix with new proposalId format
+        // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+        default:
+          throw new Error(
+            "Unexpected proposal creation step: " +
+              Object.keys(step).join(", "),
+          );
+      }
+    }
+    throw new Error();
+  }
+
+  async function voteProposal(
+    pluginAddress: string,
+    proposalId: number,
+    client: TokenVotingClient,
+    voteValue: VoteValues = VoteValues.YES,
+  ) {
+    const voteParams: IVoteProposalParams = {
+      pluginAddress,
+      proposalId,
+      vote: voteValue,
+    };
+    for await (const step of client.methods.voteProposal(voteParams)) {
+      switch (step.key) {
+        case VoteProposalStep.VOTING:
+          expect(typeof step.txHash).toBe("string");
+          expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          break;
+        case VoteProposalStep.DONE:
+          break;
+        default:
+          throw new Error(
+            "Unexpected vote proposal step: " +
+              Object.keys(step).join(", "),
+          );
+      }
+    }
+  }
+
   describe("Client instances", () => {
     describe("Proposal Creation", () => {
       it("Should create a new proposal locally", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const tokenVotingClient = new TokenVotingClient(ctxPlugin);
-        const client = new Client(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
 
-        // generate actions
-        const action = await client.encoding.withdrawAction(pluginAddress, {
-          recipientAddress: "0x1234567890123456789012345678901234567890",
-          amount: BigInt(1),
-          reference: "test",
-        });
+        const daoEntries = await buildDaos();
 
-        const metadata: ProposalMetadata = {
-          title: "Best Proposal",
-          summary: "this is the sumnary",
-          description: "This is a very long description",
-          resources: [
-            {
-              name: "Website",
-              url: "https://the.website",
-            },
-          ],
-          media: {
-            header: "https://no.media/media.jpeg",
-            logo: "https://no.media/media.jpeg",
-          },
-        };
-
-        const ipfsUri = await tokenVotingClient.methods.pinMetadata(metadata);
-
-        const proposalParams: ICreateProposalParams = {
-          pluginAddress,
-          metadataUri: ipfsUri,
-          actions: [action],
-          creatorVote: VoteValues.YES,
-          executeOnPass: false,
-        };
-
-        for await (
-          const step of tokenVotingClient.methods.createProposal(
-            proposalParams,
-          )
-        ) {
-          switch (step.key) {
-            case ProposalCreationSteps.CREATING:
-              expect(typeof step.txHash).toBe("string");
-              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            case ProposalCreationSteps.DONE:
-              expect(typeof step.proposalId).toBe("string");
-              expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9].*$/i);
-              // TODO uncomment with new proposal ID
-              // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            default:
-              throw new Error(
-                "Unexpected proposal creation step: " +
-                  Object.keys(step).join(", "),
-              );
+        for (const daoEntry of daoEntries) {
+          const { plugin: pluginAddress } = daoEntry;
+          if (!pluginAddress) {
+            throw new Error("No plugin installed");
           }
+
+          const proposalId = await buildProposal(pluginAddress, client);
+          expect(typeof proposalId).toBe("number");
+        }
+      });
+    });
+
+    describe("Can vote", () => {
+      it("Should check if an user can vote in a TokenVoting proposal", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
+
+        const daoEntries = await buildDaos();
+
+        for (const daoEntry of daoEntries) {
+          const { plugin: pluginAddress } = daoEntry;
+          if (!pluginAddress) {
+            throw new Error("No plugin installed");
+          }
+
+          const proposalId = await buildProposal(pluginAddress, client);
+          expect(typeof proposalId).toBe("number");
+
+          const params: ICanVoteParams = {
+            address: TEST_WALLET_ADDRESS,
+            proposalId,
+            pluginAddress,
+            vote: VoteValues.YES,
+          };
+          const canVote = await client.methods.canVote(params);
+          expect(typeof canVote).toBe("boolean");
+          expect(canVote).toBe(true);
         }
       });
     });
@@ -134,72 +244,276 @@ describe("Token Voting Client", () => {
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
-        const voteParams: IVoteProposalParams = {
-          pluginAddress,
-          proposalId: "0x0",
-          vote: VoteValues.YES,
-        };
+        const daoEntries = await buildDaos();
 
-        for await (const step of client.methods.voteProposal(voteParams)) {
-          switch (step.key) {
-            case VoteProposalStep.VOTING:
-              expect(typeof step.txHash).toBe("string");
-              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-              break;
-            case VoteProposalStep.DONE:
-              break;
-            default:
-              throw new Error(
-                "Unexpected vote proposal step: " +
-                  Object.keys(step).join(", "),
-              );
+        for (const daoEntry of daoEntries) {
+          const { plugin: pluginAddress } = daoEntry;
+          if (!pluginAddress) {
+            throw new Error("No plugin installed");
           }
+
+          const proposalId = await buildProposal(pluginAddress, client);
+          expect(typeof proposalId).toBe("number");
+
+          // Vote
+          await voteProposal(pluginAddress, proposalId, client);
         }
       });
+
       it("Should replace a vote on a proposal locally", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
-        const voteParams: IVoteProposalParams = {
-          pluginAddress,
-          proposalId: "0x0",
-          vote: VoteValues.NO,
-        };
+        const { plugin: pluginAddress } = await buildTokenVotingDAO(
+          repoAddr,
+          VotingMode.VOTE_REPLACEMENT,
+        );
+        if (!pluginAddress) {
+          throw new Error("No plugin installed");
+        }
 
-        for await (const step of client.methods.voteProposal(voteParams)) {
+        const proposalId = await buildProposal(pluginAddress, client);
+        expect(typeof proposalId).toBe("number");
+
+        // Vote
+        await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+        await mineBlock(provider);
+        await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+      });
+    });
+
+    describe("Can execute", () => {
+      it("Should check if an user can execute a standard voting proposal", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
+
+        const { plugin: pluginAddress } = await buildTokenVotingDAO(
+          repoAddr,
+          VotingMode.STANDARD,
+        );
+        if (!pluginAddress) {
+          throw new Error("No plugin installed");
+        }
+
+        const proposalId = await buildProposal(pluginAddress, client);
+        expect(typeof proposalId).toBe("number");
+
+        const canExecuteParams: CanExecuteParams = {
+          proposalId,
+          pluginAddress,
+        };
+        let canExecute = await client.methods.canExecute(canExecuteParams);
+        expect(typeof canExecute).toBe("boolean");
+        expect(canExecute).toBe(false);
+
+        // now approve
+        await voteProposal(pluginAddress, proposalId, client);
+        // Force date past end
+        await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
+
+        canExecute = await client.methods.canExecute(canExecuteParams);
+        expect(typeof canExecute).toBe("boolean");
+        expect(canExecute).toBe(true);
+      });
+
+      it("Should check if an user can execute an early execution proposal", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
+
+        const { plugin: pluginAddress } = await buildTokenVotingDAO(
+          repoAddr,
+          VotingMode.EARLY_EXECUTION,
+        );
+        if (!pluginAddress) {
+          throw new Error("No plugin installed");
+        }
+
+        const proposalId = await buildProposal(pluginAddress, client);
+        expect(typeof proposalId).toBe("number");
+
+        const canExecuteParams: CanExecuteParams = {
+          proposalId,
+          pluginAddress,
+        };
+        let canExecute = await client.methods.canExecute(canExecuteParams);
+        expect(typeof canExecute).toBe("boolean");
+        expect(canExecute).toBe(false);
+
+        // now approve
+        await voteProposal(pluginAddress, proposalId, client);
+        // No waiting
+
+        canExecute = await client.methods.canExecute(canExecuteParams);
+        expect(typeof canExecute).toBe("boolean");
+        expect(canExecute).toBe(true);
+      });
+
+      it("Should check if an user can execute a vote replacement proposal", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
+
+        const { plugin: pluginAddress } = await buildTokenVotingDAO(
+          repoAddr,
+          VotingMode.VOTE_REPLACEMENT,
+        );
+        if (!pluginAddress) {
+          throw new Error("No plugin installed");
+        }
+
+        const proposalId = await buildProposal(pluginAddress, client);
+        expect(typeof proposalId).toBe("number");
+
+        const canExecuteParams: CanExecuteParams = {
+          proposalId,
+          pluginAddress,
+        };
+        let canExecute = await client.methods.canExecute(canExecuteParams);
+        expect(typeof canExecute).toBe("boolean");
+        expect(canExecute).toBe(false);
+
+        // vote no
+        await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+
+        canExecute = await client.methods.canExecute(canExecuteParams);
+        expect(typeof canExecute).toBe("boolean");
+        expect(canExecute).toBe(false);
+
+        // now approve
+        await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+
+        // Force date past end
+        await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
+
+        canExecute = await client.methods.canExecute(canExecuteParams);
+        expect(typeof canExecute).toBe("boolean");
+        expect(canExecute).toBe(true);
+      });
+    });
+
+    describe("Execute proposal", () => {
+      it("Should execute a standard voting proposal", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
+
+        const { plugin: pluginAddress } = await buildTokenVotingDAO(
+          repoAddr,
+          VotingMode.STANDARD,
+        );
+        if (!pluginAddress) {
+          throw new Error("No plugin installed");
+        }
+
+        const proposalId = await buildProposal(pluginAddress, client);
+        expect(typeof proposalId).toBe("number");
+
+        // Vote
+        await voteProposal(pluginAddress, proposalId, client);
+        // Force date past end
+        await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
+
+        // Execute
+        const executeParams: IExecuteProposalParams = {
+          pluginAddress,
+          proposalId,
+        };
+        for await (
+          const step of client.methods.executeProposal(executeParams)
+        ) {
           switch (step.key) {
-            case VoteProposalStep.VOTING:
+            case ExecuteProposalStep.EXECUTING:
               expect(typeof step.txHash).toBe("string");
               expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
               break;
-            case VoteProposalStep.DONE:
+            case ExecuteProposalStep.DONE:
               break;
             default:
               throw new Error(
-                "Unexpected vote proposal step: " +
+                "Unexpected execute proposal step: " +
                   Object.keys(step).join(", "),
               );
           }
         }
       });
-    });
 
-    describe("Execute proposal", () => {
-      it("Should execute a local proposal", async () => {
+      it("Should execute an early execution proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
-        const executeParams: IExecuteProposalParams = {
-          pluginAddress: "0x1234567890123456789012345678901234567890",
-          proposalId: "0x1234567890123456789012345678901234567890",
-        };
+        const { plugin: pluginAddress } = await buildTokenVotingDAO(
+          repoAddr,
+          VotingMode.EARLY_EXECUTION,
+        );
+        if (!pluginAddress) {
+          throw new Error("No plugin installed");
+        }
 
+        const proposalId = await buildProposal(pluginAddress, client);
+        expect(typeof proposalId).toBe("number");
+
+        // Vote
+        await voteProposal(pluginAddress, proposalId, client);
+        // No waiting here
+
+        // Execute
+        const executeParams: IExecuteProposalParams = {
+          pluginAddress,
+          proposalId,
+        };
         for await (
-          const step of client.methods.executeProposal(
-            executeParams,
-          )
+          const step of client.methods.executeProposal(executeParams)
+        ) {
+          switch (step.key) {
+            case ExecuteProposalStep.EXECUTING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case ExecuteProposalStep.DONE:
+              break;
+            default:
+              throw new Error(
+                "Unexpected execute proposal step: " +
+                  Object.keys(step).join(", "),
+              );
+          }
+        }
+      });
+
+      it("Should execute a vote replacement proposal", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
+
+        const { plugin: pluginAddress } = await buildTokenVotingDAO(
+          repoAddr,
+          VotingMode.VOTE_REPLACEMENT,
+        );
+        if (!pluginAddress) {
+          throw new Error("No plugin installed");
+        }
+
+        const proposalId = await buildProposal(pluginAddress, client);
+        expect(typeof proposalId).toBe("number");
+
+        // Vote
+        await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+        await mineBlock(provider);
+        await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+        // Force date past end
+        await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
+
+        // Execute
+        const executeParams: IExecuteProposalParams = {
+          pluginAddress,
+          proposalId,
+        };
+        for await (
+          const step of client.methods.executeProposal(executeParams)
         ) {
           switch (step.key) {
             case ExecuteProposalStep.EXECUTING:
@@ -218,25 +532,9 @@ describe("Token Voting Client", () => {
       });
     });
 
-    describe("Can vote", () => {
-      it("Should check if an user can vote in a TokenVoting proposal", async () => {
-        const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
-
-        const params: ICanVoteParams = {
-          address: "0x1234567890123456789012345678901234567890",
-          proposalId: "0x1234567890123456789012345678901234567890",
-          pluginAddress,
-        };
-        const canVote = await client.methods.canVote(params);
-        expect(typeof canVote).toBe("boolean");
-      });
-    });
-
     describe("Data retrieval", () => {
       it("Should get the list of members that can vote in a proposal", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -254,7 +552,7 @@ describe("Token Voting Client", () => {
         }
       });
       it("Should fetch the given proposal", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -358,10 +656,13 @@ describe("Token Voting Client", () => {
             }
             expect(typeof vote.weight).toBe("bigint");
           }
+          if (proposal.executionTxHash) {
+            expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          }
         }
       });
       it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -371,7 +672,7 @@ describe("Token Voting Client", () => {
         expect(proposal === null).toBe(true);
       });
       it("Should get a list of proposals filtered by the given criteria", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -431,7 +732,7 @@ describe("Token Voting Client", () => {
         mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
       });
       it("Should get a list of proposals from a specific dao", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -448,7 +749,7 @@ describe("Token Voting Client", () => {
         expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
       });
       it("Should get a list of proposals from a dao that has no proposals", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -465,7 +766,7 @@ describe("Token Voting Client", () => {
         expect(proposals.length === 0).toBe(true);
       });
       it("Should get a list of proposals from an invalid address", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -481,7 +782,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should get the settings of a plugin given a plugin instance address", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -498,7 +799,7 @@ describe("Token Voting Client", () => {
         }
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -509,7 +810,7 @@ describe("Token Voting Client", () => {
         expect(typeof token?.name).toBe("string");
       });
       it("Should return null token details for nonexistent plugin addresses", async () => {
-        const ctx = new Context(contextParams);
+        const ctx = new Context(contextParamsMainnet);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -520,12 +821,3 @@ describe("Token Voting Client", () => {
     });
   });
 });
-
-async function advanceBlocks(
-  provider: EthereumProvider,
-  amountOfBlocks: number,
-) {
-  for (let i = 0; i < amountOfBlocks; i++) {
-    await provider.send("evm_mine", []);
-  }
-}

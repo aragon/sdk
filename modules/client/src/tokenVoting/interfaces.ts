@@ -1,6 +1,7 @@
 // This file contains the definitions of the TokenVoting client
 import { BigNumber } from "@ethersproject/bignumber";
 import {
+  CanExecuteParams,
   ContractVotingSettings,
   DaoAction,
   ExecuteProposalStepValue,
@@ -40,6 +41,7 @@ export interface ITokenVotingClientMethods extends IClientCore {
     params: IExecuteProposalParams,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canVote: (params: ICanVoteParams) => Promise<boolean>;
+  canExecute: (params: CanExecuteParams) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
   getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;
   getProposals: (
@@ -114,6 +116,7 @@ export type TokenVotingProposal = ProposalBase & {
   creationBlockNumber: number;
   executionDate: Date;
   executionBlockNumber: number;
+  executionTxHash: string;
 };
 
 export type TokenVotingProposalListItem = ProposalListItemBase & {
@@ -174,12 +177,13 @@ export type SubgraphTokenVotingProposal =
     createdAt: string;
     actions: SubgraphAction[];
     supportThreshold: string;
-    minParticipation: string;
     voters: SubgraphTokenVotingVoterListItem[];
+    minVotingPower: bigint;
     totalVotingPower: string;
     votingMode: VotingMode;
     creationBlockNumber: string;
     executionDate: string;
+    executionTxHash: string;
     executionBlockNumber: string;
   };
 

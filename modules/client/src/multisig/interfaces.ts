@@ -36,7 +36,7 @@ export interface IMultisigClientMethods extends IClientCore {
   getMembers: (
     addressOrEns: string,
   ) => Promise<string[]>;
-  getProposal: (propoosalId: string) => Promise<MultisigProposal | null>;
+  getProposal: (proposalId: string) => Promise<MultisigProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
   ) => Promise<MultisigProposalListItem[]>;
@@ -102,6 +102,9 @@ export type UpdateMultisigVotingSettingsParams = {
 export type CreateMultisigProposalParams = CreateProposalBaseParams & {
   approve?: boolean;
   tryExecution?: boolean;
+  startDate?: Date;
+  /** Date at which the proposal will expire if not approved */
+  endDate?: Date;
 };
 
 export type ApproveMultisigProposalParams = CanExecuteParams & {
@@ -134,6 +137,7 @@ type MultisigProposalBase = {
 
 export type MultisigProposalListItem = MultisigProposalBase & {
   metadata: ProposalMetadataSummary;
+  approvals: number;
 };
 
 export type MultisigProposal = MultisigProposalBase & {
@@ -141,24 +145,34 @@ export type MultisigProposal = MultisigProposalBase & {
   metadata: ProposalMetadata;
   actions: DaoAction[];
   approvals: string[];
+  startDate: Date;
+  endDate: Date;
+  executionTxHash: string;
 };
 
 type SubgraphProposalBase = {
   id: string;
   dao: {
     id: string;
-    name: string;
+    subdomain: string;
   };
   creator: string;
   metadata: string;
   executed: boolean;
+  createdAt: string;
+  startDate: string;
 };
 
-export type SubgraphMultisigProposalListItem = SubgraphProposalBase;
+export type SubgraphMultisigProposalListItem = SubgraphProposalBase & {
+  approvals: string;
+};
 export type SubgraphMultisigProposal = SubgraphProposalBase & {
   createdAt: string;
+  startDate: string;
+  endDate: string;
   actions: SubgraphAction[];
   approvers: SubgraphMultisigApproversListItem[];
+  executionTxHash: string;
 };
 
 export type SubgraphMultisigApproversListItem = {
@@ -166,7 +180,7 @@ export type SubgraphMultisigApproversListItem = {
 };
 
 export type SubgraphMultisigVotingSettings = {
-  minApprovals: string;
+  minApprovals: string; // TODO: Should be now a number?
   onlyListed: boolean;
 };
 

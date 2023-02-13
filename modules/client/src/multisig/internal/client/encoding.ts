@@ -1,8 +1,4 @@
-import {
-  hexToBytes,
-  InvalidAddressError,
-  strip0x,
-} from "@aragon/sdk-common";
+import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
@@ -21,7 +17,6 @@ import {
 import { Multisig__factory } from "@aragon/core-contracts-ethers";
 import { MULTISIG_PLUGIN_ID } from "../constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -50,16 +45,16 @@ export class MultisigClientEncoding extends ClientCore
         "tuple(bool, uint16)",
       ],
       [
-       params.members,
-       [
-        params.votingSettings.onlyListed,
-        params.votingSettings.minApprovals
-       ]
+        params.members,
+        [
+          params.votingSettings.onlyListed,
+          params.votingSettings.minApprovals,
+        ],
       ],
     );
     return {
       id: MULTISIG_PLUGIN_ID,
-      data: toUtf8Bytes(hexBytes)
+      data: hexToBytes(hexBytes),
     };
   }
 
@@ -88,11 +83,10 @@ export class MultisigClientEncoding extends ClientCore
       "addAddresses",
       [params.members],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: params.pluginAddress,
       value: BigInt(0),
-      data,
+      data: hexToBytes(hexBytes),
     };
   }
   /**
@@ -120,11 +114,10 @@ export class MultisigClientEncoding extends ClientCore
       "removeAddresses",
       [params.members],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: params.pluginAddress,
       value: BigInt(0),
-      data,
+      data: hexToBytes(hexBytes),
     };
   }
   /**
@@ -146,11 +139,10 @@ export class MultisigClientEncoding extends ClientCore
       "updateMultisigSettings",
       [params.votingSettings],
     );
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: params.pluginAddress,
       value: BigInt(0),
-      data,
+      data: hexToBytes(hexBytes),
     };
   }
 }

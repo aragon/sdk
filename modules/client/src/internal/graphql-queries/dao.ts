@@ -4,14 +4,12 @@ export const QueryDao = gql`
   query Dao($address: ID!) {
     dao(id: $address){
       id
-      name
+      subdomain
       metadata
       createdAt
       plugins{
-        plugin{
         id
-          __typename
-        }
+        __typename
       }
     }
   }
@@ -20,13 +18,11 @@ export const QueryDaos = gql`
   query Daos ($limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: Dao_orderBy!) {
     daos(first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
       id
-      name
+      subdomain
       metadata
       plugins{
-        plugin{
         id
-          __typename
-        }
+        __typename
       }
     }
   }
@@ -45,7 +41,7 @@ query DaoTransfersByAddress($address: ID!) {
       to
       dao {
         id
-        name
+        subdomain
       }
       amount
       reference
@@ -62,7 +58,7 @@ query DaoTransfersByAddress($address: ID!) {
       sender
       dao {
         id
-        name
+        subdomain
       }
       amount
       reference

@@ -121,13 +121,15 @@ import {
   Context,
   DaoDepositSteps,
   GasFeeEstimation,
-  IDepositParams,
+  DepositParams,
+  TokenType
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
-const depositParams: IDepositParams = {
+const depositParams: DepositParams = {
+  type: TokenType.ERC20,
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount in wei
   reference: "test deposit", // optional
@@ -172,13 +174,15 @@ import {
   Context,
   DaoDepositSteps,
   GasFeeEstimation,
-  IDepositParams,
+  DepositParams,
+  TokenType,
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
 const context = new Context(contextParams);
 const client = new Client(context);
-const depositParams: IDepositParams = {
+const depositParams: DepositParams = {
+  type: TokenType.ERC20,
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
@@ -269,7 +273,7 @@ console.log(daos);
     };
     plugins: [
       {
-        id: "addressList-voting.plugin.dao.eth",
+        id: "address-list-voting.plugin.dao.eth",
         instanceAddress: "0x12345..."
       }
     ]
@@ -509,6 +513,54 @@ console.log(metadataUri);
 /*
   ipfs://Qm...
 */
+```
+
+### Depositing ERC721 tokens to a DAO
+
+Handles the flow of depositing a ERC721 token to a DAO.
+
+```ts
+import {
+    Client,
+    Context,
+    DaoDepositSteps,
+    GasFeeEstimation,
+    DepositParams,
+    TokenType,
+  } from "@aragon/sdk-client";
+  import { contextParams } from "./00-context";
+  
+  const context = new Context(contextParams);
+  const client = new Client(context);
+  const depositParams: DepositParams = {
+    type: TokenType.ERC721,
+    daoAddressOrEns: "0x1234567890123456789012345678901234567890",
+    tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
+    reference: "test deposit nft", // optional
+  };
+  
+  // gas estimation
+  const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
+    depositParams,
+  );
+  console.log(estimatedGas.average);
+  console.log(estimatedGas.max);
+  
+  const steps = client.methods.deposit(depositParams);
+  for await (const step of steps) {
+    try {
+      switch (step.key) {
+        case DaoDepositSteps.DEPOSITING:
+          console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+          break;
+        case DaoDepositSteps.DONE:
+          console.log(step.amount); // 10n
+          break;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 ```
 
 ## TokenVoting plugin client
@@ -1967,13 +2019,19 @@ console.log(freezeAction);
 ### Withdrawals
 
 ```ts
-import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
+import {
+  Client,
+  Context,
+  WithdrawParams,
+  WithdrawType,
+} from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 
-const withdrawParams: IWithdrawParams = {
+const withdrawParams: WithdrawParams = {
+  type: WithdrawType.ERC20,
   recipientAddress: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10),
   tokenAddress: "0x1234567890123456789012345678901234567890",
@@ -2291,6 +2349,35 @@ console.log(action);
 */
 ```
 
+### Withdrawals
+
+```ts
+import {
+  Client,
+  Context,
+  WithdrawParams,
+  WithdrawType,
+} from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+
+const withdrawParams: WithdrawParams = {
+  type: WithdrawType.ERC721,
+  recipientAddress: "0x1234567890123456789012345678901234567890",
+  tokenAddress: "0x1234567890123456789012345678901234567890",
+  reference: "test withdraw of NFT",
+};
+const daoAddress = "0x1234567890123456789012345678901234567890";
+
+const withdrawAction = await client.encoding.withdrawAction(
+  daoAddress,
+  withdrawParams,
+);
+console.log(withdrawAction);
+```
+
 ## Action decoders
 ### Decode action grant permission
 
@@ -2379,17 +2466,18 @@ console.log(freezeParams);
 ### Decode Withdraw Action
 
 ```ts
-import { Client, Context, IWithdrawParams } from "@aragon/sdk-client";
+import { Client, Context, WithdrawParams } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 const client: Client = new Client(context);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IWithdrawParams = client.decoding.withdrawAction(data);
+const params: WithdrawParams = client.decoding.withdrawAction(data);
 
 console.log(params);
 /*
 {
+  type: "Erc20",
   recipientAddress: "0x1234567890123456789012345678901234567890",
   amount: 10n,
   tokenAddress: "0x1234567890123456789012345678901234567890",
@@ -2745,6 +2833,29 @@ console.log(minApprovals);
 */
 ```
 
+### Decode Withdraw Action
+
+```ts
+import { Client, Context, WithdrawParams } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+const context: Context = new Context(contextParams);
+const client: Client = new Client(context);
+const data: Uint8Array = new Uint8Array([12, 56]);
+
+const params: WithdrawParams = client.decoding.withdrawAction(data);
+
+console.log(params);
+/*
+{
+  type: "Erc721",
+  recipientAddress: "0x1234567890123456789012345678901234567890",
+  amount: 10n,
+  tokenAddress: "0x1234567890123456789012345678901234567890",
+  reference: "test",
+}
+*/
+```
+
 ## Multisig governance plugin client
 ### Creating a DAO with a multisig plugin
 
@@ -2866,7 +2977,7 @@ import {
   ProposalCreationSteps,
   ProposalMetadata,
 } from "@aragon/sdk-client";
-import { CreateMultisigProposalParams, IWithdrawParams } from "../../src";
+import { CreateMultisigProposalParams, WithdrawParams } from "../../src";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -2899,7 +3010,7 @@ const metadata: ProposalMetadata = {
 };
 
 const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
-const withdrawParams: IWithdrawParams = {
+const withdrawParams: WithdrawParams = {
   recipientAddress: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10),
   tokenAddress: "0x1234567890123456789012345678901234567890",
@@ -2955,7 +3066,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
-  proposalId: BigInt(0),
+  proposalId: 0,
   pluginAddress: "0x1234567890123456789012345678901234567890",
   tryExecution: true,
 };
@@ -2997,7 +3108,7 @@ const client = new MultisigClient(contextPlugin);
 const steps = client.methods.executeProposal(
   {
     pluginAddress: "0x1234567890123456789012345678901234567890",
-    proposalId: BigInt(0),
+    proposalId: 0,
   },
 );
 for await (const step of steps) {
@@ -3035,7 +3146,7 @@ const client = new MultisigClient(contextPlugin);
 const canApproveParams: CanApproveParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   addressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(0),
+  proposalId: 0,
 };
 
 const canApprove = await client.methods.canApprove(canApproveParams);
@@ -3064,7 +3175,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 const canExecuteParams: CanExecuteParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(0),
+  proposalId: 0,
 };
 const canExecute = await client.methods.canExecute(canExecuteParams);
 console.log(canExecute);

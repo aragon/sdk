@@ -10,12 +10,12 @@ import { AddresslistVotingClient, Context, ContextPlugin } from "../../../src";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 
-import { contextParams, contextParamsFailing } from "../constants";
+import { contextParamsMainnet, contextParamsFailing } from "../constants";
 
 describe("Client Address List", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
-      const ctx = new Context(contextParams);
+      const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 

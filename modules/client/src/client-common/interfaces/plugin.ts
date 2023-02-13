@@ -28,6 +28,7 @@ export interface IProposalSettings {
   minTurnout: number;
   /** In seconds */
   duration: number;
+  
 }
 
 export type VotingSettings = {
@@ -56,10 +57,14 @@ export type ContractVotingSettings = [
   BigNumber, // minProposerVotingPower
 ];
 
+// TODO: turn into a type, and potentially refactor these fields
 export interface ICreateProposalParams {
   pluginAddress: string;
   metadataUri: string;
   actions?: DaoAction[];
+  /** For every action item, denotes whether its execution could fail
+   * without aborting the whole proposal execution */
+  failSafeActions?: Array<boolean>;
   startDate?: Date;
   endDate?: Date;
   executeOnPass?: boolean;
@@ -69,29 +74,33 @@ export interface ICreateProposalParams {
 export type CreateProposalBaseParams = {
   pluginAddress: string;
   actions?: DaoAction[];
+  /** For every action item, denotes whether its execution could fail
+   * without aborting the whole proposal execution */
+  failSafeActions?: Array<boolean>;
   metadataUri: string;
 };
 
 export interface IVoteProposalParams {
   pluginAddress: string;
   vote: VoteValues;
-  proposalId: string;
+  proposalId: number;
 }
 
 export interface IExecuteProposalParams {
   pluginAddress: string;
-  proposalId: string;
+  proposalId: number;
 }
 
 export interface ICanVoteParams {
   pluginAddress: string;
-  proposalId: string;
+  proposalId: number;
   address: string;
+  vote: VoteValues
 }
 
 export type CanExecuteParams = {
-  proposalId: bigint;
-  pluginAddress: string
+  proposalId: number;
+  pluginAddress: string;
 };
 
 /**
@@ -177,7 +186,7 @@ export type SubgraphProposalBase = {
   id: string;
   dao: {
     id: string;
-    name: string;
+    subdomain: string;
   };
   creator: string;
   metadata: string;
@@ -220,7 +229,7 @@ export enum ProposalCreationSteps {
 
 export type ProposalCreationStepValue =
   | { key: ProposalCreationSteps.CREATING; txHash: string }
-  | { key: ProposalCreationSteps.DONE; proposalId: bigint };
+  | { key: ProposalCreationSteps.DONE; proposalId: number };
 
 // PROPOSAL VOTING
 export enum VoteProposalStep {

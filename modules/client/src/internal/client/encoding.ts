@@ -1,19 +1,18 @@
 import {
   IClientEncoding,
-  IFreezePermissionParams,
   IGrantPermissionParams,
   IRevokePermissionParams,
-  IWithdrawParams,
+  TokenType,
+  WithdrawParams,
 } from "../../interfaces";
 import { ClientCore, Context, DaoAction } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
-import { hexToBytes, strip0x } from "@aragon/sdk-common";
-import {
-  freezeParamsToContract,
-  permissionParamsToContract,
-  withdrawParamsToContract,
-} from "../utils";
+import { permissionParamsToContract } from "../utils";
+import { Contract } from "@ethersproject/contracts";
+import { erc20ContractAbi } from "../abi/erc20";
+import { hexToBytes } from "@aragon/sdk-common";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
  * Encoding module the SDK Generic Client
@@ -55,11 +54,10 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     );
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("grant", args);
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: daoAddress,
       value: BigInt(0),
-      data,
+      data: hexToBytes(hexBytes),
     };
   }
   /**
@@ -93,80 +91,55 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     );
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("revoke", args);
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: daoAddress,
       value: BigInt(0),
-      data,
+      data: hexToBytes(hexBytes),
     };
   }
   /**
-   * Computes the payload to be given when creating a proposal that freezes a permission within a DAO
+   * Computes the payload to be given when creating a proposal that withdraws ether from the DAO
    *
-   * @param {string} daoAddress
-   * @param {IFreezePermissionParams} params
-   * @return {*}  {DaoAction}
-   * @memberof ClientEncoding
-   */
-  public freezeAction(
-    daoAddress: string,
-    params: IFreezePermissionParams,
-  ): DaoAction {
-    const signer = this.web3.getSigner();
-    const { where } = params;
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (!isAddress(where) || !isAddress(daoAddress)) {
-      throw new Error("Invalid address");
-    }
-    const daoInterface = DAO__factory.createInterface();
-    const args = freezeParamsToContract(
-      {
-        where,
-        permission: params.permission,
-      },
-    );
-    // get hex bytes
-    const hexBytes = daoInterface.encodeFunctionData("freeze", args);
-    const data = hexToBytes(strip0x(hexBytes));
-    return {
-      to: daoAddress,
-      value: BigInt(0),
-      data,
-    };
-  }
-  /**
-   * Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO
-   *
-   * @param {string} daoAddressOrEns
-   * @param {IWithdrawParams} params
+   * @param {string} recipientAddressOrEns
+   * @param {WithdrawParams} value
    * @return {*}  {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
-  public async withdrawAction(
-    daoAddressOrEns: string,
-    params: IWithdrawParams,
-  ): Promise<DaoAction> {
-    let address = daoAddressOrEns;
-    if (!isAddress(daoAddressOrEns)) {
+  public async withdrawAction(params: WithdrawParams): Promise<DaoAction> {
+    let to = params.recipientAddressOrEns;
+    if (!isAddress(params.recipientAddressOrEns)) {
       const resolvedAddress = await this.web3.getSigner()?.resolveName(
-        daoAddressOrEns,
+        params.recipientAddressOrEns,
       );
       if (!resolvedAddress) {
         throw new Error("invalid ens");
       }
-      address = resolvedAddress;
+      to = resolvedAddress;
     }
-    const daoInterface = DAO__factory.createInterface();
-    const args = withdrawParamsToContract(params);
-    // get hex bytes
-    const hexBytes = daoInterface.encodeFunctionData("withdraw", args);
-    const data = hexToBytes(strip0x(hexBytes));
-    return {
-      to: address,
-      value: BigInt(0),
-      data,
-    };
+
+    switch (params.type) {
+      case TokenType.NATIVE:
+        return { to, value: params.amount, data: new Uint8Array() };
+      case TokenType.ERC20:
+        if (!params.tokenAddress) {
+          throw new Error("Empty token contract address");
+        }
+
+        const iface = new Contract(
+          params.tokenAddress,
+          erc20ContractAbi,
+        ).interface;
+        const data = iface.encodeFunctionData("transfer", [
+          params.recipientAddressOrEns,
+          params.amount,
+        ]);
+        return {
+          to: params.tokenAddress,
+          value: BigInt(0),
+          data: hexToBytes(data),
+        };
+    }
+    throw new Error("Unsupported token type");
   }
   /**
    * Computes the payload to be given when creating a proposal that updates the metadata the DAO
@@ -186,19 +159,18 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
         daoAddressOrEns,
       );
       if (!resolvedAddress) {
-        throw new Error("invalid ens");
+        throw new Error("Invalid ENS");
       }
       address = resolvedAddress;
     }
     // upload metadata to IPFS
     const daoInterface = DAO__factory.createInterface();
-    const args = new TextEncoder().encode(metadataUri);
+    const args = toUtf8Bytes(metadataUri);
     const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
-    const data = hexToBytes(strip0x(hexBytes));
     return {
       to: address,
       value: BigInt(0),
-      data,
+      data: hexToBytes(hexBytes),
     };
   }
 }

@@ -44,7 +44,8 @@ const ipfsUri = await addresslistVotingClient.methods.pinMetadata(metadata);
 const proposalParams: ICreateProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
-  actions: [], // actions to happen after a proposal is approved
+  actions: [],
+  failSafeActions: [],
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,

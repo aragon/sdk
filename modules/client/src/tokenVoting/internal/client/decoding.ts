@@ -1,4 +1,4 @@
-import { bytesToHex, UnexpectedActionError } from "@aragon/sdk-common";
+import { bytesToHex } from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
@@ -8,7 +8,7 @@ import {
   VotingSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { ITokenVotingClientDecoding, IMintTokenParams } from "../../interfaces";
+import { IMintTokenParams, ITokenVotingClientDecoding } from "../../interfaces";
 import { IERC20MintableUpgradeable__factory } from "@aragon/core-contracts-ethers";
 import { mintTokenParamsFromContract } from "../utils";
 
@@ -42,15 +42,12 @@ export class TokenVotingClientDecoding extends ClientCore
   public mintTokenAction(data: Uint8Array): IMintTokenParams {
     const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();
-    const hexBytes = bytesToHex(data, true);
-    const receivedFunction = votingInterface.getFunction(
-      hexBytes.substring(0, 10) as any,
-    );
+    const hexBytes = bytesToHex(data);
     const expectedfunction = votingInterface.getFunction("mint");
-    if (receivedFunction.name !== expectedfunction.name) {
-      throw new UnexpectedActionError();
-    }
-    const result = votingInterface.decodeFunctionData("mint", data);
+    const result = votingInterface.decodeFunctionData(
+      expectedfunction,
+      hexBytes,
+    );
     return mintTokenParamsFromContract(result);
   }
   /**
@@ -66,7 +63,7 @@ export class TokenVotingClientDecoding extends ClientCore
       return {
         id: func.format("minimal"),
         functionName: func.name,
-        hash: bytesToHex(data, true).substring(0, 10),
+        hash: bytesToHex(data).substring(0, 10),
       };
     } catch {
       return null;

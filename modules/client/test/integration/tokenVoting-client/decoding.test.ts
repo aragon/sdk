@@ -1,16 +1,16 @@
 // @ts-ignore
 declare const describe, it, expect;
 
+import { bytesToHex } from "@aragon/sdk-common";
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   IMintTokenParams,
-  VotingSettings,
+  TokenVotingClient,
   VotingMode,
+  VotingSettings,
 } from "../../../src";
 
-import { bytesToHex } from "@aragon/sdk-common";
 import { contextParamsLocalChain } from "../constants";
 
 describe("Token Voting Client", () => {
@@ -24,7 +24,7 @@ describe("Token Voting Client", () => {
         minParticipation: 0.25,
         supportThreshold: 0.51,
         minProposerVotingPower: BigInt(0),
-        votingMode: VotingMode.EARLY_EXECUTION
+        votingMode: VotingMode.EARLY_EXECUTION,
       };
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
@@ -41,7 +41,9 @@ describe("Token Voting Client", () => {
 
       expect(decodedParams.minDuration).toBe(params.minDuration);
       expect(decodedParams.minParticipation).toBe(params.minParticipation);
-      expect(decodedParams.minProposerVotingPower).toBe(params.minProposerVotingPower);
+      expect(decodedParams.minProposerVotingPower).toBe(
+        params.minProposerVotingPower,
+      );
       expect(decodedParams.supportThreshold).toBe(params.supportThreshold);
       expect(decodedParams.votingMode).toBe(params.votingMode);
     });
@@ -59,7 +61,7 @@ describe("Token Voting Client", () => {
       const decodedParams = client.decoding.mintTokenAction(action.data);
 
       expect(decodedParams.address).toBe(params.address);
-      expect(bytesToHex(action.data, true)).toBe(
+      expect(bytesToHex(action.data)).toBe(
         "0x40c10f190000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a",
       );
       expect(decodedParams.amount).toBe(params.amount);
@@ -71,9 +73,7 @@ describe("Token Voting Client", () => {
       const client = new TokenVotingClient(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
-      expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow(
-        `no matching function (argument="sighash", value="0x0b161621", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
-      );
+      expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow();
     });
 
     it("Should get the function for a given action data", async () => {
@@ -96,9 +96,11 @@ describe("Token Voting Client", () => {
       const iface = client.decoding.findInterface(
         updatePluginSettingsAction.data,
       );
-      expect(iface?.id).toBe("function updateVotingSettings(tuple(uint8,uint64,uint64,uint64,uint256))");
+      expect(iface?.id).toBe(
+        "function updateVotingSettings(tuple(uint8,uint32,uint32,uint64,uint256))",
+      );
       expect(iface?.functionName).toBe("updateVotingSettings");
-      expect(iface?.hash).toBe("0xe6848574");
+      expect(iface?.hash).toBe("0x0dfb278e");
     });
 
     it("Should try to get the function of an invalid data and return null", async () => {

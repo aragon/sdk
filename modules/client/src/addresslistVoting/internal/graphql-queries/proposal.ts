@@ -6,7 +6,7 @@ query AddresslistVotingProposal($proposalId: ID!) {
     id
     dao {
       id
-      name
+      subdomain
     }
     creator
     metadata
@@ -24,7 +24,6 @@ query AddresslistVotingProposal($proposalId: ID!) {
     abstain
     votingMode
     supportThreshold
-    minParticipation
     startDate
     endDate
     executed
@@ -36,6 +35,7 @@ query AddresslistVotingProposal($proposalId: ID!) {
       voteOption
     }
     totalVotingPower
+    minVotingPower
   }
 }
 `;
@@ -45,7 +45,7 @@ query AddresslistVotingProposals($where: AddresslistVotingProposal_filter!, $lim
     id
     dao {
       id
-      name
+      subdomain
     }
     creator
     metadata

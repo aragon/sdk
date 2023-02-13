@@ -29,7 +29,6 @@
 * [ClientDecoding](#ClientDecoding)
     * [.grantAction(data)](#ClientDecoding+grantAction) ⇒ <code>\*</code>
     * [.revokeAction(data)](#ClientDecoding+revokeAction) ⇒ <code>\*</code>
-    * [.freezeAction(data)](#ClientDecoding+freezeAction) ⇒ <code>\*</code>
     * [.withdrawAction(data)](#ClientDecoding+withdrawAction) ⇒ <code>\*</code>
     * [.updateDaoMetadataRawAction(data)](#ClientDecoding+updateDaoMetadataRawAction) ⇒ <code>\*</code>
     * [.updateDaoMetadataAction(data)](#ClientDecoding+updateDaoMetadataAction) ⇒ <code>\*</code>
@@ -59,25 +58,13 @@
 | --- | --- |
 | data | <code>Uint8Array</code> | 
 
-<a name="ClientDecoding+freezeAction"></a>
-
-### clientDecoding.freezeAction(data) ⇒ <code>\*</code>
-<p>Decodes the freeze parameters from an encoded freeze action</p>
-
-**Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
-**Returns**: <code>\*</code> - <p>{IFreezePermissionDecodedParams}</p>  
-
-| Param | Type |
-| --- | --- |
-| data | <code>Uint8Array</code> | 
-
 <a name="ClientDecoding+withdrawAction"></a>
 
 ### clientDecoding.withdrawAction(data) ⇒ <code>\*</code>
 <p>Decodes the withdraw parameters from an encoded withdraw action</p>
 
 **Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
-**Returns**: <code>\*</code> - <p>{IWithdrawParams}</p>  
+**Returns**: <code>\*</code> - <p>{WithdrawParams}</p>  
 
 | Param | Type |
 | --- | --- |
@@ -129,8 +116,7 @@
 * [ClientEncoding](#ClientEncoding)
     * [.grantAction(daoAddress, params)](#ClientEncoding+grantAction) ⇒ <code>\*</code>
     * [.revokeAction(daoAddress, params)](#ClientEncoding+revokeAction) ⇒ <code>\*</code>
-    * [.freezeAction(daoAddress, params)](#ClientEncoding+freezeAction) ⇒ <code>\*</code>
-    * [.withdrawAction(daoAddressOrEns, params)](#ClientEncoding+withdrawAction) ⇒ <code>\*</code>
+    * [.withdrawAction(recipientAddressOrEns, value)](#ClientEncoding+withdrawAction) ⇒ <code>\*</code>
     * [.updateDaoMetadataAction(daoAddressOrEns, params)](#ClientEncoding+updateDaoMetadataAction) ⇒ <code>\*</code>
 
 <a name="ClientEncoding+grantAction"></a>
@@ -159,31 +145,18 @@
 | daoAddress | <code>string</code> | 
 | params | <code>IRevokePermissionParams</code> | 
 
-<a name="ClientEncoding+freezeAction"></a>
-
-### clientEncoding.freezeAction(daoAddress, params) ⇒ <code>\*</code>
-<p>Computes the payload to be given when creating a proposal that freezes a permission within a DAO</p>
-
-**Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
-**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
-
-| Param | Type |
-| --- | --- |
-| daoAddress | <code>string</code> | 
-| params | <code>IFreezePermissionParams</code> | 
-
 <a name="ClientEncoding+withdrawAction"></a>
 
-### clientEncoding.withdrawAction(daoAddressOrEns, params) ⇒ <code>\*</code>
-<p>Computes the payload to be given when creating a proposal that withdraws ether or an ERC20 token from the DAO</p>
+### clientEncoding.withdrawAction(recipientAddressOrEns, value) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that withdraws ether from the DAO</p>
 
 **Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
 **Returns**: <code>\*</code> - <p>{Promise<DaoAction>}</p>  
 
 | Param | Type |
 | --- | --- |
-| daoAddressOrEns | <code>string</code> | 
-| params | <code>IWithdrawParams</code> | 
+| recipientAddressOrEns | <code>string</code> | 
+| value | <code>WithdrawParams</code> | 
 
 <a name="ClientEncoding+updateDaoMetadataAction"></a>
 
@@ -233,7 +206,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 | Param | Type |
 | --- | --- |
-| params | <code>IDepositParams</code> | 
+| params | <code>DepositParams</code> | 
 
 <a name="ClientEstimation+updateAllowance"></a>
 
@@ -245,7 +218,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 | Param | Type |
 | --- | --- |
-| _params | <code>IDepositParams</code> | 
+| _params | <code>EnsureAllowanceParams</code> | 
 
 <a name="ClientMethods"></a>
 
@@ -299,7 +272,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 | Param | Type |
 | --- | --- |
-| params | <code>IDepositParams</code> | 
+| params | <code>DepositParams</code> | 
 
 <a name="ClientMethods+ensureAllowance"></a>
 

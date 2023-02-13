@@ -1,5 +1,6 @@
 import { isAddress } from "@ethersproject/address";
 import {
+  boolArrayToBitmap,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -12,6 +13,7 @@ import {
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import {
+  CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
@@ -50,9 +52,9 @@ import {
 import {
   QueryTokenVotingMembers,
   QueryTokenVotingPlugin,
-  QueryTokenVotingSettings,
   QueryTokenVotingProposal,
   QueryTokenVotingProposals,
+  QueryTokenVotingSettings,
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
@@ -61,6 +63,7 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
+import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK TokenVoting Client
@@ -94,12 +97,23 @@ export class TokenVotingClientMethods extends ClientCore
       signer,
     );
 
+    if (
+      params.failSafeActions?.length &&
+      params.failSafeActions.length !== params.actions?.length
+    ) {
+      throw new Error(
+        "Size mismatch: actions and failSafeActions should match",
+      );
+    }
+    const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
+
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await tokenVotingContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
+      allowFailureMap,
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
       params.creatorVote || 0,
@@ -123,7 +137,7 @@ export class TokenVotingClientMethods extends ClientCore
     }
 
     const parsedLog = tokenVotingContractInterface.parseLog(log);
-    const proposalId = parsedLog.args["proposalId"];
+    const proposalId: BigNumber = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
@@ -131,7 +145,7 @@ export class TokenVotingClientMethods extends ClientCore
     yield {
       key: ProposalCreationSteps.DONE,
       // TODO remove this when new proposal format
-      proposalId: proposalId.toHexString(),
+      proposalId: proposalId.toNumber(),
     };
   }
 
@@ -240,12 +254,39 @@ export class TokenVotingClientMethods extends ClientCore
       params.pluginAddress,
       signer,
     );
-    return tokenVotingContract.callStatic.canVote(
-      params.proposalId,
+    return tokenVotingContract.callStatic.isMember(
       params.address,
     );
   }
 
+  /**
+   * Checks whether the current proposal can be executed
+   *
+   * @param {string} addressOrEns
+   * @return {*}  {Promise<boolean>}
+   * @memberof MultisigClientMethods
+   */
+  public async canExecute(
+    params: CanExecuteParams,
+  ): Promise<boolean> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    // TODO
+    // use yup
+    if (!isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    const multisigContract = TokenVoting__factory.connect(
+      params.pluginAddress,
+      signer,
+    );
+
+    return multisigContract.canExecute(params.proposalId);
+  }
   /**
    * Returns the list of wallet addresses holding tokens from the underlying Token contract used by the plugin
    *

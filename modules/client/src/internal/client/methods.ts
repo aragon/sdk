@@ -12,41 +12,37 @@ import {
   InvalidAddressOrEnsError,
   InvalidCidError,
   IpfsPinError,
-  MissingExecPermissionError,
   NoProviderError,
   NoSignerError,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import {
-  Contract,
-  ContractTransaction,
-} from "@ethersproject/contracts";
+import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
-  QueryDaoBalances,
   QueryDao,
+  QueryDaoBalances,
   QueryDaos,
   QueryDaoTransfers,
 } from "../graphql-queries";
 import {
   AssetBalance,
+  CreateDaoParams,
   DaoCreationSteps,
   DaoCreationStepValue,
   DaoDepositSteps,
   DaoDepositStepValue,
   DaoDetails,
   DaoListItem,
+  DaoMetadata,
   DaoSortBy,
+  DepositParams,
   EnsureAllowanceParams,
   EnsureAllowanceStepValue,
   IClientMethods,
-  CreateDaoParams,
   IDaoQueryParams,
-  IDepositParams,
   IHasPermissionParams,
-  DaoMetadata,
   ITransferQueryParams,
   PermissionIds,
   SubgraphBalance,
@@ -54,6 +50,7 @@ import {
   SubgraphDaoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
+  TokenType,
   Transfer,
   TransferSortBy,
 } from "../../interfaces";
@@ -71,12 +68,13 @@ import {
   unwrapDepositParams,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
-import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
+import { toUtf8Bytes } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
 import {
   UNAVAILABLE_DAO_METADATA,
   UNSUPPORTED_DAO_METADATA_LINK,
 } from "../constants";
+import { MissingExecPermissionError } from "@aragon/sdk-common";
 
 /**
  * Methods module the SDK Generic Client
@@ -102,6 +100,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
+    } else if (
+      params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
+    ) {
+      throw new Error("Invalid subdomain format: use a-z, 0-9 and -");
     }
 
     const daoFactoryInstance = DAOFactory__factory.connect(
@@ -111,14 +113,18 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
     for (const plugin of params.plugins) {
-      const latestVersion = await PluginRepo__factory.connect(
-        plugin.id,
-        signer,
-      ).getLatestVersion();
+      const repo = PluginRepo__factory.connect(plugin.id, signer);
+
+      const currentRelease = await repo.latestRelease();
+      const latestVersion = await repo["getLatestVersion(uint8)"](
+        currentRelease,
+      );
       pluginInstallationData.push({
-        pluginSetup: latestVersion[1],
-        pluginSetupRepo: plugin.id,
-        data: toUtf8String(plugin.data),
+        pluginSetupRef: {
+          pluginSetupRepo: repo.address,
+          versionTag: latestVersion.tag,
+        },
+        data: plugin.data,
       });
     }
 
@@ -136,15 +142,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // using the DAO base because it reflects a newly created DAO the best
     const daoBaseAddr = await daoFactoryInstance.daoBase();
     // simulates each plugin installation seperately to get the requested permissions
-    for (const plugin of pluginInstallationData) {
+    for (const installData of pluginInstallationData) {
       const pluginSetupProcessorResponse = await pluginSetupProcessor.callStatic
-        .prepareInstallation(
-          daoBaseAddr,
-          plugin.pluginSetup,
-          plugin.pluginSetupRepo,
-          plugin.data,
-        );
-      const found = pluginSetupProcessorResponse.permissions.find(
+        .prepareInstallation(daoBaseAddr, installData);
+      const found = pluginSetupProcessorResponse[1].permissions.find(
         (permission) =>
           permission.permissionId === PermissionIds.EXECUTE_PERMISSION_ID,
       );
@@ -162,6 +163,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       {
         name: params.ensSubdomain,
         metadata: toUtf8Bytes(params.metadataUri),
+        daoURI: params.daoUri || "",
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
       pluginInstallationData,
@@ -180,12 +182,21 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         e.topics[0] ===
           id(daoFactoryInterface.getEvent("DAORegistered").format("sighash")),
     );
+
     if (!log) {
       throw new Error("Failed to create DAO");
     }
 
-    const parsedLog = daoFactoryInterface.parseLog(log);
+    // Plugin logs
+    const pspInterface = PluginSetupProcessor__factory.createInterface();
+    const installedLogs = receipt.logs?.filter(
+      (e) =>
+        e.topics[0] ===
+          id(pspInterface.getEvent("InstallationApplied").format("sighash")),
+    );
 
+    // DAO logs
+    const parsedLog = daoFactoryInterface.parseLog(log);
     if (!parsedLog.args["dao"]) {
       throw new Error("Failed to create DAO");
     }
@@ -193,6 +204,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield {
       key: DaoCreationSteps.DONE,
       address: parsedLog.args["dao"],
+      pluginAddresses: installedLogs.map(
+        (log) => pspInterface.parseLog(log).args[1],
+      ),
     };
   }
   /**
@@ -214,12 +228,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Deposits ether or an ERC20 token into the DAO
    *
-   * @param {IDepositParams} params
+   * @param { DepositParams} params
    * @return {*}  {AsyncGenerator<DaoDepositStepValue>}
    * @memberof ClientMethods
    */
   public async *deposit(
-    params: IDepositParams,
+    params: DepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -227,6 +241,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else if (!signer.provider) {
       throw new Error("A web3 provider is needed");
     }
+
+    if (params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20) {
+      throw new Error("Please, use the token's transfer function directly");
+    }
+
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
       params,
     );
@@ -237,56 +256,53 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       yield* this.ensureAllowance(
         {
           amount: params.amount,
-          daoAddress,
-          tokenAddress
-        }
+          daoAddressOrEns: daoAddress,
+          tokenAddress,
+        },
       );
     }
 
     // Doing the transfer
     const daoInstance = DAO__factory.connect(daoAddress, signer);
-    const override: { value?: BigNumber } = {};
+    const override: { value?: bigint } = {};
 
     if (tokenAddress === AddressZero) {
       // Ether
       override.value = amount;
     }
 
-    const depositTx = await daoInstance.deposit(
+    const tx = await daoInstance.deposit(
       tokenAddress,
       amount,
       reference,
       override,
     );
-    yield { key: DaoDepositSteps.DEPOSITING, txHash: depositTx.hash };
+    yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
 
-    await depositTx.wait().then((cr) => {
-      if (!cr.logs?.length) {
-        throw new Error("The deposit was not properly registered");
-      }
+    const cr = await tx.wait();
+    const log = findLog(cr, daoInstance.interface, "Deposited");
+    if (!log) {
+      // TODO
+      // cmmon errors
+      throw new Error("Failed to deposit");
+    }
 
-      const daoInterface = DAO__factory.createInterface();
-      const log = cr.logs?.find(
-        (e) =>
-          e?.topics[0] ===
-            id(daoInterface.getEvent("Deposited").format("sighash")),
+    const daoInterface = DAO__factory.createInterface();
+    const parsedLog = daoInterface.parseLog(log);
+
+    if (!amount.toString() === parsedLog.args["amount"]) {
+      throw new Error(
+        `Deposited amount mismatch. Expected: ${amount}, received: ${
+          parsedLog.args[
+            "amount"
+          ].toBigInt()
+        }`,
       );
-      if (!log) {
-        throw new Error("Failed to deposit");
-      }
-
-      const logParsed = daoInterface.parseLog(log);
-      if (!amount.eq(logParsed.args["amount"])) {
-        throw new Error(
-          `Deposited amount mismatch. Expected: ${amount.toBigInt()}, received: ${
-            logParsed.args[
-              "amount"
-            ].toBigInt()
-          }`,
-        );
-      }
-    });
-    yield { key: DaoDepositSteps.DONE, amount: amount.toBigInt() };
+      // TODO
+      // cmmon errors
+      // throw new AmountMisMatchError(amount, parsedLog.args["amount"])
+    }
+    yield { key: DaoDepositSteps.DONE, amount: amount };
   }
 
   /**
@@ -316,7 +332,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     const currentAllowance = await tokenInstance.allowance(
       await signer.getAddress(),
-      params.daoAddress,
+      params.daoAddressOrEns,
     );
 
     yield {
@@ -327,7 +343,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (currentAllowance.gte(params.amount)) return;
 
     const tx: ContractTransaction = await tokenInstance.approve(
-      params.daoAddress,
+      params.daoAddressOrEns,
       BigNumber.from(params.amount),
     );
 
@@ -501,9 +517,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       const client = this.graphql.getClient();
       const {
         balances,
-      }: { balances: SubgraphBalance[] } = await client.request(QueryDaoBalances, {
-        address,
-      });
+      }: { balances: SubgraphBalance[] } = await client.request(
+        QueryDaoBalances,
+        {
+          address,
+        },
+      );
       if (balances.length === 0) {
         return [];
       }

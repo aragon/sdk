@@ -1,4 +1,5 @@
 import {
+  boolArrayToBitmap,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -19,6 +20,7 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../interfaces";
 import {
+  CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
@@ -57,6 +59,7 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
+import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK Address List Client
@@ -90,12 +93,23 @@ export class AddresslistVotingClientMethods extends ClientCore
       signer,
     );
 
+    if (
+      params.failSafeActions?.length &&
+      params.failSafeActions.length !== params.actions?.length
+    ) {
+      throw new Error(
+        "Size mismatch: actions and failSafeActions should match",
+      );
+    }
+    const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
+
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
     const tx = await addresslistContract.createProposal(
       toUtf8Bytes(params.metadataUri),
       params.actions || [],
+      allowFailureMap,
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
       params.creatorVote || 0,
@@ -122,7 +136,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
-    const proposalId = parsedLog.args["proposalId"];
+    const proposalId: BigNumber = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
@@ -130,7 +144,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     yield {
       key: ProposalCreationSteps.DONE,
       // TODO remove this when new proposal format
-      proposalId: proposalId.toHexString(),
+      proposalId: proposalId.toNumber(),
     };
   }
 
@@ -244,7 +258,36 @@ export class AddresslistVotingClientMethods extends ClientCore
     return addresslistContract.callStatic.canVote(
       params.proposalId,
       params.address,
+      params.vote,
     );
+  }
+  /**
+   * Checks whether the current proposal can be executed
+   *
+   * @param {string} addressOrEns
+   * @return {*}  {Promise<boolean>}
+   * @memberof MultisigClientMethods
+   */
+  public async canExecute(
+    params: CanExecuteParams,
+  ): Promise<boolean> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    // TODO
+    // use yup
+    if (!isAddress(params.pluginAddress)) {
+      throw new InvalidAddressError();
+    }
+    const multisigContract = AddresslistVoting__factory.connect(
+      params.pluginAddress,
+      signer,
+    );
+
+    return multisigContract.canExecute(params.proposalId);
   }
   /**
    * Returns the list of wallet addresses with signing capabilities on the plugin

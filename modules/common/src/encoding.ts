@@ -1,6 +1,7 @@
 /** Decodes a hex string and returns it as a buffer */
 export function hexToBytes(hexString: string): Uint8Array {
-  if (!/^(0x)?[0-9a-fA-F]+$/.test(hexString)) {
+  if (!hexString) return new Uint8Array();
+  else if (!/^(0x)?[0-9a-fA-F]+$/.test(hexString)) {
     throw new Error("Invalid hex string");
   } else if (hexString.length % 2 !== 0) {
     throw new Error("The hex string has an odd length");
@@ -16,15 +17,15 @@ export function hexToBytes(hexString: string): Uint8Array {
   return Uint8Array.from(bytes);
 }
 
-/** Encodes a buffer into a hex string */
-export function bytesToHex(buff: Uint8Array, prepend0x?: boolean): string {
+/** Encodes a buffer into a hex string with the "0x" prefix */
+export function bytesToHex(buff: Uint8Array, skip0x?: boolean): string {
   const bytes: string[] = [];
   for (let i = 0; i < buff.length; i++) {
     if (buff[i] >= 16) bytes.push(buff[i].toString(16));
     else bytes.push("0" + buff[i].toString(16));
   }
-  if (prepend0x) return "0x" + bytes.join("");
-  return bytes.join("");
+  if (skip0x) return bytes.join("");
+  return "0x" + bytes.join("");
 }
 
 /** Encodes the given big integer as a 32 byte big endian buffer */
@@ -99,4 +100,33 @@ export function decodeRatio(
   }
 
   return Number(onChainValue) / (10 ** digits);
+}
+
+/** Transforms an array of booleans into a bitmap big integer */
+export function boolArrayToBitmap(bools?: Array<boolean>) {
+  if (!bools || !bools.length) return BigInt(0);
+  else if (bools.length > 256) throw new Error("The array is too big");
+
+  let result = BigInt(0);
+  for (let i = 0; i < 256; i++) {
+    if (!bools[i]) continue;
+    result |= BigInt(1) << BigInt(i);
+  }
+
+  return result;
+}
+
+/** Transforms an array of booleans into a bitmap big integer */
+export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
+  if (bitmap >= (BigInt(1) << BigInt(256))) {
+    throw new Error("The bitmap value is too big");
+  }
+
+  const result: Array<boolean> = [];
+  for (let i = 0; i < 256; i++) {
+    const mask = BigInt(1) << BigInt(i);
+    result.push((bitmap & mask) != BigInt(0));
+  }
+
+  return result;
 }
