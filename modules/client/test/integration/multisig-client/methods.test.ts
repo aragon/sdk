@@ -41,11 +41,13 @@ import { advanceBlocks } from "../../helpers/advance-blocks";
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
   let server: Server;
+  let repoAddr: string;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    repoAddr = deployment.multisigRepo.address;
   });
 
   afterAll(async () => {
@@ -53,7 +55,6 @@ describe("Client Multisig", () => {
   });
 
   async function buildDao() {
-    const repoAddr = deployment.multisigRepo.address;
     const result = await buildMultisigDAO(repoAddr);
     await advanceBlocks(server.provider, 10);
     return result;

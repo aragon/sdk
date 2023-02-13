@@ -45,11 +45,13 @@ import { buildAddressListVotingDAO } from "../../helpers/build-daos";
 describe("Client Address List", () => {
   let server: Server;
   let deployment: deployContracts.Deployment;
+  let repoAddr: string;
 
   beforeAll(async () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    repoAddr = deployment.addresslistVotingRepo.address;
   });
 
   afterAll(async () => {
@@ -58,7 +60,6 @@ describe("Client Address List", () => {
 
   // Helpers
   async function buildDaos() {
-    const repoAddr = deployment.addresslistVotingRepo.address;
     const daoEntries: Array<{ dao: string; plugin: string }> = [];
     daoEntries.push(
       await buildAddressListVotingDAO(repoAddr, VotingMode.STANDARD),
@@ -241,7 +242,6 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const repoAddr = deployment.addresslistVotingRepo.address;
       const { plugin: pluginAddress } = await buildAddressListVotingDAO(
         repoAddr,
         VotingMode.VOTE_REPLACEMENT,
@@ -265,7 +265,6 @@ describe("Client Address List", () => {
     const BLOCK_ADVANCE_COUNT = 1000; // greater than 3600 seconds
 
     it("Should check if an user can execute a standard voting proposal", async () => {
-      const repoAddr = deployment.addresslistVotingRepo.address;
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
@@ -300,7 +299,6 @@ describe("Client Address List", () => {
     });
 
     it("Should check if an user can execute an early execution proposal", async () => {
-      const repoAddr = deployment.addresslistVotingRepo.address;
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
@@ -334,7 +332,6 @@ describe("Client Address List", () => {
     });
 
     it("Should check if an user can execute a vote replacement proposal", async () => {
-      const repoAddr = deployment.addresslistVotingRepo.address;
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
@@ -381,7 +378,6 @@ describe("Client Address List", () => {
     const BLOCK_ADVANCE_COUNT = 1000; // greater than 3600 seconds
 
     it("Should execute a standard voting proposal", async () => {
-      const repoAddr = deployment.addresslistVotingRepo.address;
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
@@ -427,7 +423,6 @@ describe("Client Address List", () => {
     });
 
     it("Should execute an early execution proposal", async () => {
-      const repoAddr = deployment.addresslistVotingRepo.address;
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
@@ -472,7 +467,6 @@ describe("Client Address List", () => {
     });
 
     it("Should execute a vote replacement proposal", async () => {
-      const repoAddr = deployment.addresslistVotingRepo.address;
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
