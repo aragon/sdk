@@ -27,19 +27,20 @@ const metadata: DaoMetadata = {
 };
 
 // Through pinning the metadata in IPFS, we can get the IPFS URI. You can read more about it here: https://docs.ipfs.tech/how-to/pin-files/
-const ipfsUri = await client.methods.pinMetadata(metadata);
-const createParams: CreateDaoParams = {
-  metadataUri: ipfsUri,
+const metadataUri = await client.methods.pinMetadata(metadata);
+
+const createDaoParams: CreateDaoParams = {
+  metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: []
 };
+const steps = client.methods.createDao(createDaoParams);
 
 // Estimate how much gas the transaction will cost.
-const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createParams);
+const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createDaoParams);
 console.log({ avg: estimatedGas.average, maximum: estimatedGas.max });
 
 // Create the DAO.
-const steps = client.methods.createDao(createParams);
 for await (const step of steps) {
   try {
     switch (step.key) {
