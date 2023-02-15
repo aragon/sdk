@@ -102,6 +102,39 @@ export function decodeRatio(
   return Number(onChainValue) / (10 ** digits);
 }
 
+/** Encodes the particles of a nonce-based proposalId into a globally unque value */
+export function encodeProposalId(pluginAddress: string, nonce: number): string {
+  const addrFragment = strip0x(pluginAddress.toLocaleLowerCase());
+  if (addrFragment.length != 40) throw new Error("Invalid address length");
+
+  let nonceFragment = nonce.toString(16);
+  if (nonceFragment.length < 24) {
+    nonceFragment = "0".repeat(24 - nonceFragment.length) + nonceFragment;
+  }
+
+  return "0x" + addrFragment + nonceFragment;
+}
+
+/** Decodes a proposalId and returns the original pluginAddress and the nonce */
+export function decodeProposalId(
+  proposalId: string,
+): { pluginAddress: string; nonce: number } {
+  if (!/^(0x)?[0-9a-fA-F]{64}$/.test(proposalId)) {
+    throw new Error("Invalid hex string");
+  } else if (proposalId.length % 2 !== 0) {
+    throw new Error("The hex string has an odd length");
+  }
+
+  proposalId = strip0x(proposalId);
+  const pluginAddress = "0x" + proposalId.substring(0, 40);
+  const nonce = parseInt(proposalId.substring(40, 64), 16);
+
+  return {
+    pluginAddress,
+    nonce,
+  };
+}
+
 /** Transforms an array of booleans into a bitmap big integer */
 export function boolArrayToBitmap(bools?: Array<boolean>) {
   if (!bools || !bools.length) return BigInt(0);

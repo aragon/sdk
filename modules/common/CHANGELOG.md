@@ -17,6 +17,11 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## 0.11.0-beta
+- Adds `encodeProposalId(addr, nonce)` and `decodeProposalId(pid)`
+
+## 0.10.0-beta
 - Adds new error `EnsureAllowanceError`
 - Adds new error `InvalidPrecisionError`
 - Adds `boolArrayToBitmap` and `bitmapToBoolArray`
