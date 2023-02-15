@@ -83,6 +83,7 @@ export function toAddresslistVotingProposal(
     votes: proposal.voters.map(
       (voter: SubgraphAddresslistVotingVoterListItem) => {
         return {
+          voteReplaced: voter.voteReplaced,
           address: voter.voter.address,
           vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
         };

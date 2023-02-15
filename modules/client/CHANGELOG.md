@@ -32,6 +32,7 @@ TEMPLATE:
 - `TokenType` replaces any other token/transfer type enum
 
 ### Added
+- Add Vote Replacement flag in MajorityVoting clients
 - Proposals accept a `failSafeActions` variable
 - Multisig plugin settings now include `startDate` and `endDate`
 - `ICreateProposalParams` now receives an optional `failSafeActions` array, to denote which could fail without disrupting the entire execution flow
