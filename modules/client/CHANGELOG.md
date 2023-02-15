@@ -21,6 +21,7 @@ TEMPLATE:
 - `DepositParams`
 - `createDao` now returns `pluginAddresses`
 ### Added
+- Add Vote Replacement flag in MajorityVoting clients
 - Proposals accept a `failSafeActions` variable
 - Multisig plugin settings now include `startDate` and `endDate`
 ### Removed

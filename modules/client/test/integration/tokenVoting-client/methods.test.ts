@@ -655,6 +655,7 @@ describe("Token Voting Client", () => {
               expect(typeof vote.vote).toBe("number");
             }
             expect(typeof vote.weight).toBe("bigint");
+            expect(typeof vote.voteReplaced).toBe("boolean");
           }
           if (proposal.executionTxHash) {
             expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);

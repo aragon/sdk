@@ -32,6 +32,7 @@ query TokenVotingProposal($proposalId: ID!) {
       voter{
         address
       }
+      voteReplaced
       voteOption
       votingPower
     }

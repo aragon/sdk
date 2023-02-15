@@ -111,7 +111,9 @@ export type TokenVotingProposal = ProposalBase & {
   settings: IProposalSettings;
   token: Erc20TokenDetails | Erc721TokenDetails | null;
   usedVotingWeight: bigint;
-  votes: Array<{ address: string; vote: VoteValues; weight: bigint }>;
+  votes: Array<
+    { address: string; vote: VoteValues; weight: bigint; voteReplaced: boolean }
+  >;
   totalVotingWeight: bigint;
   creationBlockNumber: number;
   executionDate: Date;
