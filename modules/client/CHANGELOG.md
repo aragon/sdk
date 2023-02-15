@@ -51,6 +51,9 @@ TEMPLATE:
 
 ## [0.19.0-alpha]
 
+### Fixed
+- Transfer and Balances queries
+
 ## [0.18.0-alpha]
 ### Added
 - Add `pinMetadata` examples
