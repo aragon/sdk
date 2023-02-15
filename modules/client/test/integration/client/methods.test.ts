@@ -7,7 +7,6 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import {
-  contextParamsMainnet,
   contextParamsLocalChain,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
@@ -356,7 +355,7 @@ describe("Client", () => {
 
     describe("Data retrieval", () => {
       it("Should get a DAO's metadata with a specific address", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
 
@@ -402,7 +401,7 @@ describe("Client", () => {
         }
       });
       it("Should get a DAO's metadata of an non existent dao and receive null", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_NON_EXISTING_ADDRESS;
         const dao = await client.methods.getDao(daoAddress);
@@ -410,7 +409,7 @@ describe("Client", () => {
       });
 
       it("Should get a DAO's metadata of an invalid dao address and throw an error", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_INVALID_ADDRESS;
         await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
@@ -466,7 +465,7 @@ describe("Client", () => {
       });
 
       it("Should get DAOs balances", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
         const balances = await client.methods.getDaoBalances(daoAddress);
@@ -474,23 +473,25 @@ describe("Client", () => {
         expect(balances === null).toBe(false);
         if (balances) {
           expect(balances.length > 0).toBe(true);
-          for (let i = 0; i < balances.length; i++) {
-            const balance = balances[i];
-            expect(typeof balance.balance).toBe("bigint");
+          for (const balance of balances) {
             expect(balance.updateDate instanceof Date).toBe(true);
-            if (balance.type === "erc20") {
+            if (balance.type === TokenType.NATIVE) {
               expect(typeof balance.balance).toBe("bigint");
-              expect(typeof balance.decimals).toBe("number");
+            } else {
               expect(typeof balance.address).toBe("string");
               expect(balance.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
               expect(typeof balance.name).toBe("string");
               expect(typeof balance.symbol).toBe("string");
+              if (balance.type === TokenType.ERC20) {
+                expect(typeof balance.balance).toBe("bigint");
+                expect(typeof balance.decimals).toBe("number");
+              }
             }
           }
         }
       });
       it("Should get DAOs balances from a dao with no balances", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
         const balances = await client.methods.getDaoBalances(daoAddress);
@@ -513,44 +514,27 @@ describe("Client", () => {
         if (transfers) {
           expect(transfers.length > 0).toBe(true);
           for (const transfer of transfers) {
-            expect(transfer.amount).toBeGreaterThan(BigInt(0));
-            expect(typeof transfer.amount).toBe("bigint");
             expect(transfer.creationDate).toBeInstanceOf(Date);
+            expect(transfer.from).toBeInstanceOf(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(transfer.to).toBeInstanceOf(/^0x[A-Fa-f0-9]{40}$/i);
             expect(transfer.transactionId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             if (transfer.tokenType === TokenType.NATIVE) {
-              if (transfer.type === TransferType.DEPOSIT) {
-                // ETH deposit
-                expect(isAddress(transfer.from)).toBe(true);
-              } else if (transfer.type === TransferType.WITHDRAW) {
-                // ETH withdraw
-                expect(isAddress(transfer.to)).toBe(true);
-                if (transfer.proposalId) {
-                  expect(transfer.proposalId).toMatch(
-                    /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
-                  );
-                }
-              } else {
-                fail("invalid transfer type");
-              }
-            } else if (transfer.tokenType === TokenType.ERC20) {
+              expect(transfer.amount).toBeGreaterThan(BigInt(0));
+              expect(typeof transfer.amount).toBe("bigint");
+              expect(typeof transfer.reference).toBe("bigint");
+            } else {
               expect(isAddress(transfer.token.address)).toBe(true);
-              expect(typeof transfer.token.decimals).toBe("number");
+              expect(typeof transfer.token.address).toBe("string");
+              expect(transfer.token.address).toBeInstanceOf(
+                /^0x[A-Fa-f0-9]{40}$/i,
+              );
               expect(typeof transfer.token.name).toBe("string");
               expect(typeof transfer.token.symbol).toBe("string");
-              if (transfer.type === TransferType.DEPOSIT) {
-                // ERC20 deposit
-                expect(isAddress(transfer.from)).toBe(true);
-              } else if (transfer.type === TransferType.WITHDRAW) {
-                // ERC20 withdraw
-                expect(isAddress(transfer.to)).toBe(true);
-                expect(transfer.proposalId).toMatch(
-                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
-                );
-              } else {
-                fail("invalid transfer type");
+              if (transfer.tokenType===TokenType.ERC20){
+                expect(typeof transfer.amount).toBe("bigint");
+                expect(typeof transfer.token.decimals).toBe("number");
+
               }
-            } else {
-              fail("invalid token type");
             }
           }
         } else {

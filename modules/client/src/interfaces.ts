@@ -19,7 +19,7 @@ export interface IClientMethods extends IClientCore {
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoBalances: (
     daoAddressOrEns: string,
-  ) => Promise<AssetBalance[] | null>;
+  ) => Promise<TokenBalance[] | null>;
   /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
   /** Checks whether a role is granted by the current DAO's ACL settings */
@@ -177,7 +177,7 @@ export enum DaoCreationSteps {
 
 export type DaoCreationStepValue =
   | { key: DaoCreationSteps.CREATING; txHash: string }
-  | { key: DaoCreationSteps.DONE; address: string, pluginAddresses: string[] };
+  | { key: DaoCreationSteps.DONE; address: string; pluginAddresses: string[] };
 
 // DEPOSIT
 
@@ -224,32 +224,35 @@ export type DaoDepositStepValue =
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 
-// Token types
 
-type NativeTokenBase = {
-  type: "native";
-};
-type Erc20TokenBase = {
-  type: "erc20";
-  /** The address of the token contract */
+
+// Token balances
+  
+type TokenBalanceBase = {
   address: string;
   name: string;
   symbol: string;
-  decimals: number;
-};
-
-// Token balances
-
-type NativeTokenBalance = NativeTokenBase & {
-  balance: bigint;
-};
-type Erc20TokenBalance = Erc20TokenBase & {
-  balance: bigint;
-};
-
-export type AssetBalance = (NativeTokenBalance | Erc20TokenBalance) & {
   updateDate: Date;
 };
+
+type NativeTokenBalance = {
+  type: TokenType.NATIVE;
+  balance: bigint;
+  updateDate: Date;
+};
+type Erc20TokenBalance = TokenBalanceBase & {
+  type: TokenType.ERC20;
+  balance: bigint;
+  decimals: number;
+};
+type Erc721TokenBalance = TokenBalanceBase & {
+  type: TokenType.ERC721;
+};
+
+export type TokenBalance =
+  | NativeTokenBalance
+  | Erc20TokenBalance
+  | Erc721TokenBalance;
 
 // Token transfers
 export enum TransferType {
@@ -259,20 +262,34 @@ export enum TransferType {
 export enum TokenType {
   NATIVE = "native",
   ERC20 = "erc20",
+  ERC721 = "erc721",
 }
 
 type BaseTokenTransfer = {
-  amount: bigint;
   creationDate: Date;
   transactionId: string;
+  to: string;
+  from: string;
 };
 
 type NativeTokenTransfer = BaseTokenTransfer & {
   tokenType: TokenType.NATIVE;
+  amount: bigint;
+  reference: string;
+};
+
+type Erc721TokenTransfer = BaseTokenTransfer & {
+  tokenType: TokenType.ERC721;
+  token: {
+    address: string;
+    name: string;
+    symbol: string;
+  };
 };
 
 type Erc20TokenTransfer = BaseTokenTransfer & {
   tokenType: TokenType.ERC20;
+  amount: bigint;
   token: {
     address: string;
     name: string;
@@ -281,16 +298,18 @@ type Erc20TokenTransfer = BaseTokenTransfer & {
   };
 };
 
-export type Deposit = (NativeTokenTransfer | Erc20TokenTransfer) & {
-  from: string;
-  type: TransferType.DEPOSIT;
-};
+export type Deposit =
+  & (NativeTokenTransfer | Erc20TokenTransfer | Erc721TokenTransfer)
+  & {
+    type: TransferType.DEPOSIT;
+  };
 
-export type Withdraw = (NativeTokenTransfer | Erc20TokenTransfer) & {
-  to: string;
-  type: TransferType.WITHDRAW;
-  proposalId: string;
-};
+export type Withdraw =
+  & (NativeTokenTransfer | Erc20TokenTransfer | Erc721TokenTransfer)
+  & {
+    type: TransferType.WITHDRAW;
+    proposalId: string;
+  };
 
 export type Transfer = Deposit | Withdraw;
 
@@ -377,11 +396,12 @@ export type SubgraphDao = SubgraphDaoBase & {
 export type SubgraphDaoListItem = SubgraphDaoBase;
 
 export type SubgraphBalance = {
+  __typename: string;
   token: {
     id: string;
     name: string;
     symbol: string;
-    decimals: string;
+    decimals: number;
   };
   balance: string;
   lastUpdated: string;
@@ -393,23 +413,26 @@ export enum SubgraphTransferType {
 }
 
 export type SubgraphTransferListItem = {
-  amount: string;
-  createdAt: string;
-  transaction: string;
-  type: SubgraphTransferType;
+  from: string;
   to: string;
-  sender: string;
-  token: SubgraphToken;
+  type: SubgraphTransferType;
+  createdAt: string;
+  txHash: string;
   proposal: {
     id: string | null;
   };
+  amount: string;
+  txhash: string;
+  token: SubgraphToken;
+  __typename: string;
+  reference: string;
 };
 
 export type SubgraphToken = {
   id: string;
   name: string;
   symbol: string;
-  decimals: string;
+  decimals: number;
 };
 export const SubgraphTransferTypeMap: Map<
   TransferType,

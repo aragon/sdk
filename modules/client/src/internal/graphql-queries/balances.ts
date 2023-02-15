@@ -1,16 +1,29 @@
 import { gql } from "graphql-request";
 
-export const QueryDaoBalances = gql`
-query DaoBalances($address: ID!, $limit: Int = 10, $skip: Int = 0) {
-    balances(where:{dao:$address}) {
+export const QueryTokenBalances = gql`
+query TokenBalances($address: ID!, $limit: Int = 10, $skip: Int = 0) {
+  tokenBalances {
+    lastUpdated
+    __typename
+    ... on ERC20Balance {
+      balance
       token {
+        name
+        decimals
+        symbol
         id
+      }
+    }
+    ... on ERC721Balance {
+      token {
         name
         symbol
-        decimals
+        id
       }
+    }
+    ... on NativeBalance {
       balance
-      lastUpdated
     }
   }
+}
 `;

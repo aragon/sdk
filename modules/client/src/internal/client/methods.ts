@@ -22,12 +22,11 @@ import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryDao,
-  QueryDaoBalances,
   QueryDaos,
-  QueryDaoTransfers,
+  QueryTokenBalances,
+  QueryTokenTransfers,
 } from "../graphql-queries";
 import {
-  AssetBalance,
   CreateDaoParams,
   DaoCreationSteps,
   DaoCreationStepValue,
@@ -50,6 +49,7 @@ import {
   SubgraphDaoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
+  TokenBalance,
   TokenType,
   Transfer,
   TransferSortBy,
@@ -61,10 +61,10 @@ import {
   SortDirection,
 } from "../../client-common";
 import {
-  toAssetBalance,
   toDaoDetails,
   toDaoListItem,
-  toTransfer,
+  toTokenBalance,
+  toTokenTransfer,
   unwrapDepositParams,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
@@ -493,12 +493,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
    * @param {string} daoAddressorEns
-   * @return {*}  {(Promise<AssetBalance[] | null>)}
+   * @return {*}  {(Promise<TokenBalance[] | null>)}
    * @memberof ClientMethods
    */
   public async getDaoBalances(
     daoAddressorEns: string,
-  ): Promise<AssetBalance[] | null> {
+  ): Promise<TokenBalance[] | null> {
     let address = daoAddressorEns;
     if (!isAddress(address)) {
       await this.web3.ensureOnline();
@@ -516,25 +516,23 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        balances,
-      }: { balances: SubgraphBalance[] } = await client.request(
-        QueryDaoBalances,
+        tokenBalances,
+      }: { tokenBalances: SubgraphBalance[] } = await client.request(
+        QueryTokenBalances,
         {
           address,
         },
       );
-      if (balances.length === 0) {
+      if (tokenBalances.length === 0) {
         return [];
       }
-      // TODO
-      // handle other tokens that are not ERC20 or eth
       return Promise.all(
-        balances.map(
-          (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
+        tokenBalances.map(
+          (balance: SubgraphBalance): TokenBalance => toTokenBalance(balance),
         ),
       );
     } catch (err) {
-      throw new GraphQLError("balance");
+       throw new GraphQLError("balance");
     }
   }
   /**
@@ -585,7 +583,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       const {
         vaultTransfers,
       }: { vaultTransfers: SubgraphTransferListItem[] } = await client.request(
-        QueryDaoTransfers,
+        QueryTokenTransfers,
         {
           where,
           limit,
@@ -600,11 +598,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return Promise.all(
         vaultTransfers.map(
           (transfer: SubgraphTransferListItem): Transfer =>
-            toTransfer(transfer),
+            toTokenTransfer(transfer),
         ),
       );
     } catch {
-      throw new GraphQLError("transfer");
+      throw new GraphQLError("token transfer");
     }
   }
 }
