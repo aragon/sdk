@@ -23,7 +23,7 @@ import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryDao,
   QueryDaos,
-  QueryTokenBalances,
+  QueryAssetBalances,
   QueryTokenTransfers,
 } from "../graphql-queries";
 import {
@@ -49,9 +49,9 @@ import {
   SubgraphDaoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
-  TokenBalance,
-  TokenBalanceQueryParams,
-  TokenBalanceSortBy,
+  AssetBalance,
+  AssetBalanceQueryParams,
+  AssetBalanceSortBy,
   TokenType,
   Transfer,
   TransferSortBy,
@@ -65,7 +65,7 @@ import {
 import {
   toDaoDetails,
   toDaoListItem,
-  toTokenBalance,
+  toAssetBalance,
   toTokenTransfer,
   unwrapDepositParams,
 } from "../utils";
@@ -495,7 +495,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
    * @param {string} daoAddressorEns
-   * @return {*}  {(Promise<TokenBalance[] | null>)}
+   * @return {*}  {(Promise<AssetBalance[] | null>)}
    * @memberof ClientMethods
    */
   public async getDaoBalances({
@@ -503,8 +503,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     limit = 10,
     skip = 0,
     direction = SortDirection.ASC,
-    sortBy = TokenBalanceSortBy.LAST_UPDATED,
-  }: TokenBalanceQueryParams): Promise<TokenBalance[] | null> {
+    sortBy = AssetBalanceSortBy.LAST_UPDATED,
+  }: AssetBalanceQueryParams): Promise<AssetBalance[] | null> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {
@@ -526,9 +526,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        tokenBalances,
-      }: { tokenBalances: SubgraphBalance[] } = await client.request(
-        QueryTokenBalances,
+        AssetBalances,
+      }: { AssetBalances: SubgraphBalance[] } = await client.request(
+        QueryAssetBalances,
         {
           where,
           limit,
@@ -537,12 +537,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           sortBy,
         },
       );
-      if (tokenBalances.length === 0) {
+      if (AssetBalances.length === 0) {
         return [];
       }
       return Promise.all(
-        tokenBalances.map(
-          (balance: SubgraphBalance): TokenBalance => toTokenBalance(balance),
+        AssetBalances.map(
+          (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
         ),
       );
     } catch (err) {

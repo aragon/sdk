@@ -19,8 +19,8 @@ export interface IClientMethods extends IClientCore {
   pinMetadata: (params: DaoMetadata) => Promise<string>;
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoBalances: (
-    params: TokenBalanceQueryParams,
-  ) => Promise<TokenBalance[] | null>;
+    params: AssetBalanceQueryParams,
+  ) => Promise<AssetBalance[] | null>;
   /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
   /** Checks whether a role is granted by the current DAO's ACL settings */
@@ -227,31 +227,31 @@ export type DaoDepositStepValue =
 
 // Token balances
 
-type TokenBalanceBase = {
+type AssetBalanceBase = {
   address: string;
   name: string;
   symbol: string;
   updateDate: Date;
 };
 
-type NativeTokenBalance = {
+type NativeAssetBalance = {
   type: TokenType.NATIVE;
   balance: bigint;
   updateDate: Date;
 };
-type Erc20TokenBalance = TokenBalanceBase & {
+type Erc20AssetBalance = AssetBalanceBase & {
   type: TokenType.ERC20;
   balance: bigint;
   decimals: number;
 };
-type Erc721TokenBalance = TokenBalanceBase & {
+type Erc721AssetBalance = AssetBalanceBase & {
   type: TokenType.ERC721;
 };
 
-export type TokenBalance =
-  | NativeTokenBalance
-  | Erc20TokenBalance
-  | Erc721TokenBalance;
+export type AssetBalance =
+  | NativeAssetBalance
+  | Erc20AssetBalance
+  | Erc721AssetBalance;
 
 // Token transfers
 export enum TransferType {
@@ -274,7 +274,6 @@ type BaseTokenTransfer = {
 type NativeTokenTransfer = BaseTokenTransfer & {
   tokenType: TokenType.NATIVE;
   amount: bigint;
-  reference: string;
 };
 
 type Erc721TokenTransfer = BaseTokenTransfer & {
@@ -352,11 +351,11 @@ export enum TransferSortBy {
   CREATED_AT = "createdAt",
 }
 
-export type TokenBalanceQueryParams = Pagination & {
-  sortBy?: TokenBalanceSortBy;
+export type AssetBalanceQueryParams = Pagination & {
+  sortBy?: AssetBalanceSortBy;
   daoAddressOrEns?: string;
 };
-export enum TokenBalanceSortBy {
+export enum AssetBalanceSortBy {
   LAST_UPDATED = "lastUpdated",
 }
 
@@ -431,7 +430,6 @@ export type SubgraphTransferListItem = {
   txhash: string;
   token: SubgraphToken;
   __typename: string;
-  reference: string;
 };
 
 export type SubgraphToken = {

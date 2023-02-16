@@ -525,7 +525,6 @@ describe("Client", () => {
             if (transfer.tokenType === TokenType.NATIVE) {
               expect(transfer.amount).toBeGreaterThan(BigInt(0));
               expect(typeof transfer.amount).toBe("bigint");
-              expect(typeof transfer.reference).toBe("bigint");
             } else {
               expect(isAddress(transfer.token.address)).toBe(true);
               expect(typeof transfer.token.address).toBe("string");

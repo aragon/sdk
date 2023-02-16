@@ -18,7 +18,7 @@ import {
   SubgraphPluginTypeMap,
   SubgraphTransferListItem,
   SubgraphTransferType,
-  TokenBalance,
+  AssetBalance,
   TokenType,
   Transfer,
   TransferType,
@@ -108,7 +108,7 @@ export function toDaoListItem(
   };
 }
 
-export function toTokenBalance(balance: SubgraphBalance): TokenBalance {
+export function toAssetBalance(balance: SubgraphBalance): AssetBalance {
   const updateDate = new Date(parseInt(balance.lastUpdated) * 1000);
   if (balance.__typename === "NativeBalance") {
     return {
@@ -149,7 +149,6 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
         transactionId: transfer.txhash,
         from: transfer.from,
         to: transfer.to,
-        reference: transfer.reference,
       };
     }
     return {
@@ -160,7 +159,6 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
       transactionId: transfer.txHash,
       proposalId: transfer.proposal?.id || "",
       to: transfer.to,
-      reference: transfer.reference,
       from: transfer.from,
     };
   } else if (transfer.__typename === "ERC721Transfer") {

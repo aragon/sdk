@@ -31,7 +31,6 @@ query TokenTransfers($where: TokenTransfer_filter!, $limit:Int!, $skip: Int!, $d
     }
     ... on NativeTransfer {
       amount
-      reference
     }
   }
 }

@@ -328,7 +328,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 <p>Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
-**Returns**: <code>\*</code> - <p>{(Promise&lt;TokenBalance[] | null&gt;)}</p>  
+**Returns**: <code>\*</code> - <p>{(Promise&lt;AssetBalance[] | null&gt;)}</p>  
 
 | Param | Type |
 | --- | --- |

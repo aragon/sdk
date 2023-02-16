@@ -4,7 +4,7 @@ export * from "./tokenVoting";
 export * from "./client-common";
 export * from "./multisig";
 export {
-  TokenBalance,
+  AssetBalance,
   DaoCreationSteps,
   DaoDepositSteps,
   DaoDetails,
