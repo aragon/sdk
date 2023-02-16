@@ -1,24 +1,37 @@
 import { gql } from "graphql-request";
 
-export const QueryDaoTransfers = gql`
-query DaoTransfers($where: VaultTransfer_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: VaultTransfer_orderBy!) {
-  vaultTransfers(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
-    token {
-      id
-      name
-      symbol
-      decimals
-    }
+export const QueryTokenTransfers = gql`
+query TokenTransfers($where: TokenTransfer_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: TokenTransfer_orderBy!) {
+  tokenTransfers (where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy) {
+    from
+    to
+    type
+    createdAt
+    txHash
     proposal{
       id
     }
-    type
-    amount
-    createdAt
-    transaction
-    sender
-    to
-    reference
+    __typename
+    ... on ERC20Transfer {
+      amount
+      token {
+        id
+        name
+        symbol
+        decimals
+      }
+    }
+    ... on ERC721Transfer {
+      token{
+      	id
+        name
+        symbol
+      }
+      
+    }
+    ... on NativeTransfer {
+      amount
+    }
   }
 }
 `;

@@ -12,7 +12,7 @@ import {
   TokenType,
   WithdrawParams,
 } from "@aragon/sdk-client";
-import {} from "../../src/interfaces";
+
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context

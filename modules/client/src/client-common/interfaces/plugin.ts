@@ -173,6 +173,7 @@ export type SubgraphVoterListItemBase = {
   voter: {
     address: string;
   };
+  voteReplaced: boolean
   voteOption: SubgraphVoteValues;
 };
 

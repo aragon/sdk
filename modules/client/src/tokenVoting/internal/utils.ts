@@ -15,9 +15,9 @@ import {
   Erc721TokenDetails,
   IMintTokenParams,
   ITokenVotingPluginInstall,
+  SubgraphContractType,
   SubgraphErc20Token,
   SubgraphErc721Token,
-  SubgraphTokenType,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
   SubgraphTokenVotingVoterListItem,
@@ -28,6 +28,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
 import { decodeRatio, hexToBytes } from "@aragon/sdk-common";
+import { TokenType } from "../../interfaces";
 
 export function toTokenVotingProposal(
   proposal: SubgraphTokenVotingProposal,
@@ -100,6 +101,7 @@ export function toTokenVotingProposal(
     votes: proposal.voters.map(
       (voter: SubgraphTokenVotingVoterListItem) => {
         return {
+          voteReplaced: voter.voteReplaced,
           address: voter.voter.address,
           vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
           weight: BigInt(voter.votingPower),
@@ -180,22 +182,21 @@ export function tokenVotingInitParamsToContract(
 function parseToken(
   subgraphToken: SubgraphErc20Token | SubgraphErc721Token,
 ): Erc20TokenDetails | Erc721TokenDetails | null {
-  let token = null;
-  if (subgraphToken.__typename === SubgraphTokenType.ERC20) {
-    subgraphToken = subgraphToken as SubgraphErc20Token;
+  let token: Erc721TokenDetails| Erc20TokenDetails | null = null;
+  if (subgraphToken.__typename === SubgraphContractType.ERC20) {
     token = {
       address: subgraphToken.id,
       symbol: subgraphToken.symbol,
       name: subgraphToken.name,
-      decimals: parseInt(subgraphToken.decimals),
+      decimals: subgraphToken.decimals,
+      type: TokenType.ERC20
     };
-  } else if (subgraphToken.__typename === SubgraphTokenType.ERC721) {
-    subgraphToken = subgraphToken as SubgraphErc721Token;
+  } else if (subgraphToken.__typename === SubgraphContractType.ERC721) {
     token = {
       address: subgraphToken.id,
       symbol: subgraphToken.symbol,
       name: subgraphToken.name,
-      baseUri: subgraphToken.baseURI,
+      type: TokenType.ERC721
     };
   }
   return token;
