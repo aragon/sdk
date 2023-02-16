@@ -5,12 +5,12 @@ declare const describe, it, expect, beforeAll, afterAll;
 import "../../mocks/aragon-sdk-ipfs";
 
 import {
-  TokenVotingClient,
   Context,
   ContextPlugin,
   ICreateProposalParams,
   IExecuteProposalParams,
   IVoteProposalParams,
+  TokenVotingClient,
   VoteValues,
 } from "../../../src";
 
@@ -57,8 +57,8 @@ describe("Token Voting Client", () => {
       const client = new TokenVotingClient(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
-        pluginAddress: "0x1234567890123456789012345678901234567890",
-        proposalId: 0,
+        proposalId:
+          "0x1234567890123456789012345678901234567890_0x0000000000000000000000000000000000000000000000000000000000000000",
         vote: VoteValues.YES,
       };
       const estimation = await client.estimation.voteProposal(voteParams);
@@ -75,8 +75,8 @@ describe("Token Voting Client", () => {
       const client = new TokenVotingClient(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
-        pluginAddress: "0x1234567890123456789012345678901234567890",
-        proposalId: 0,
+        proposalId:
+          "0x1234567890123456789012345678901234567890_0x0000000000000000000000000000000000000000000000000000000000000000",
       };
       const estimation = await client.estimation.executeProposal(executeParams);
 

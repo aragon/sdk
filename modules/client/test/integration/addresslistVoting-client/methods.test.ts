@@ -145,10 +145,11 @@ describe("Client Address List", () => {
           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
           break;
         case ProposalCreationSteps.DONE:
-          expect(typeof step.proposalId).toBe("number");
+          expect(typeof step.proposalId).toBe("string");
+          expect(step.proposalId).toMatch(
+            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/i,
+          );
           return step.proposalId;
-          // TODO fix with new proposalId format
-        // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
         default:
           throw new Error(
             "Unexpected proposal creation step: " +
@@ -160,13 +161,11 @@ describe("Client Address List", () => {
   }
 
   async function voteProposal(
-    pluginAddress: string,
-    proposalId: number,
+    proposalId: string,
     client: AddresslistVotingClient,
     voteValue: VoteValues = VoteValues.YES,
   ) {
     const voteParams: IVoteProposalParams = {
-      pluginAddress,
       proposalId,
       vote: voteValue,
     };
@@ -202,7 +201,8 @@ describe("Client Address List", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
       }
     });
   });
@@ -221,12 +221,12 @@ describe("Client Address List", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
 
         const params: ICanVoteParams = {
           address: TEST_WALLET_ADDRESS,
           proposalId,
-          pluginAddress,
           vote: VoteValues.YES,
         };
         const canVote = await client.methods.canVote(params);
@@ -251,10 +251,11 @@ describe("Client Address List", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
 
         // Vote
-        await voteProposal(pluginAddress, proposalId, client);
+        await voteProposal(proposalId, client);
       }
     });
     it("Should replace a vote on a proposal locally", async () => {
@@ -271,13 +272,14 @@ describe("Client Address List", () => {
       }
 
       const proposalId = await buildProposal(pluginAddress, client);
-      expect(typeof proposalId).toBe("number");
+      expect(typeof proposalId).toBe("string");
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
 
       // Vote YES
-      await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+      await voteProposal(proposalId, client, VoteValues.YES);
 
       await mineBlock(provider);
-      await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+      await voteProposal(proposalId, client, VoteValues.NO);
     });
   });
 
@@ -296,18 +298,18 @@ describe("Client Address List", () => {
       }
 
       const proposalId = await buildProposal(pluginAddress, client);
-      expect(typeof proposalId).toBe("number");
+      expect(typeof proposalId).toBe("string");
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
 
       const canExecuteParams: CanExecuteParams = {
         proposalId,
-        pluginAddress,
       };
       let canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
       // now approve
-      await voteProposal(pluginAddress, proposalId, client);
+      await voteProposal(proposalId, client);
       // Force date past end
       await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
@@ -330,18 +332,18 @@ describe("Client Address List", () => {
       }
 
       const proposalId = await buildProposal(pluginAddress, client);
-      expect(typeof proposalId).toBe("number");
+      expect(typeof proposalId).toBe("string");
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
 
       const canExecuteParams: CanExecuteParams = {
         proposalId,
-        pluginAddress,
       };
       let canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
       // now approve
-      await voteProposal(pluginAddress, proposalId, client);
+      await voteProposal(proposalId, client);
       // No waiting
 
       canExecute = await client.methods.canExecute(canExecuteParams);
@@ -363,25 +365,25 @@ describe("Client Address List", () => {
       }
 
       const proposalId = await buildProposal(pluginAddress, client);
-      expect(typeof proposalId).toBe("number");
+      expect(typeof proposalId).toBe("string");
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
 
       const canExecuteParams: CanExecuteParams = {
         proposalId,
-        pluginAddress,
       };
       let canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
       // vote no
-      await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+      await voteProposal(proposalId, client, VoteValues.NO);
 
       canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
       // now approve
-      await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+      await voteProposal(proposalId, client, VoteValues.YES);
 
       // Force date past end
       await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
@@ -407,16 +409,16 @@ describe("Client Address List", () => {
       }
 
       const proposalId = await buildProposal(pluginAddress, client);
-      expect(typeof proposalId).toBe("number");
+      expect(typeof proposalId).toBe("string");
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
 
       // Vote
-      await voteProposal(pluginAddress, proposalId, client);
+      await voteProposal(proposalId, client);
       // Force date past end
       await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
       // Execute
       const executeParams: IExecuteProposalParams = {
-        pluginAddress,
         proposalId,
       };
       for await (
@@ -452,15 +454,15 @@ describe("Client Address List", () => {
       }
 
       const proposalId = await buildProposal(pluginAddress, client);
-      expect(typeof proposalId).toBe("number");
+      expect(typeof proposalId).toBe("string");
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
 
       // Vote
-      await voteProposal(pluginAddress, proposalId, client);
+      await voteProposal(proposalId, client);
       // No waiting here
 
       // Execute
       const executeParams: IExecuteProposalParams = {
-        pluginAddress,
         proposalId,
       };
       for await (
@@ -496,17 +498,17 @@ describe("Client Address List", () => {
       }
 
       const proposalId = await buildProposal(pluginAddress, client);
-      expect(typeof proposalId).toBe("number");
+      expect(typeof proposalId).toBe("string");
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
 
       // Vote
-      await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
-      await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+      await voteProposal(proposalId, client, VoteValues.NO);
+      await voteProposal(proposalId, client, VoteValues.YES);
       // Force date past end
       await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
       // Execute
       const executeParams: IExecuteProposalParams = {
-        pluginAddress,
         proposalId,
       };
       for await (
@@ -572,7 +574,7 @@ describe("Client Address List", () => {
       if (proposal) {
         expect(proposal.id).toBe(proposalId);
         expect(typeof proposal.id).toBe("string");
-        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/i);
         expect(typeof proposal.dao.address).toBe("string");
         expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         expect(typeof proposal.dao.name).toBe("string");
@@ -645,7 +647,8 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x0";
+      const proposalId = TEST_NON_EXISTING_ADDRESS +
+        "_0x0000000000000000000000000000000000000000000000000000000000000000";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(proposal === null).toBe(true);

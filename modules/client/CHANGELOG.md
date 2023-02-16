@@ -13,6 +13,10 @@ TEMPLATE:
 
 -->
 
+## [UPCOMING]
+### Changed
+- `proposalId` is now a `string` everywhere and follows the new general format
+
 ## [0.20.0-beta]
 ### Changed
 - Updates to contracts-ethers v0.7.1

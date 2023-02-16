@@ -5,11 +5,18 @@ import {
   GasFeeEstimation,
   ICreateProposalParams,
   IExecuteProposalParams,
+  isProposalId,
   IVoteProposalParams,
 } from "../../../client-common";
 import { IAddresslistVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { boolArrayToBitmap, NoProviderError, NoSignerError } from "@aragon/sdk-common";
+import {
+  boolArrayToBitmap,
+  decodeProposalId,
+  InvalidProposalIdError,
+  NoProviderError,
+  NoSignerError,
+} from "@aragon/sdk-common";
 
 /**
  * Estimation module the SDK Address List Client
@@ -87,13 +94,20 @@ export class AddresslistVotingClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const { pluginAddress, id: proposalId } = decodeProposalId(
+      params.proposalId,
+    );
+
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
     const estimation = await addresslistContract.estimateGas.vote(
-      params.proposalId,
+      proposalId,
       params.vote,
       false,
     );
@@ -116,12 +130,20 @@ export class AddresslistVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const { pluginAddress, id: proposalId } = decodeProposalId(
+      params.proposalId,
+    );
+
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
     const estimation = await addresslistContract.estimateGas.execute(
-      params.proposalId,
+      proposalId,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

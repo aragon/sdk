@@ -1,6 +1,7 @@
 import { isAddress } from "@ethersproject/address";
 import {
   boolArrayToBitmap,
+  decodeProposalId,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -63,7 +64,6 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK TokenVoting Client
@@ -137,15 +137,14 @@ export class TokenVotingClientMethods extends ClientCore
     }
 
     const parsedLog = tokenVotingContractInterface.parseLog(log);
-    const proposalId: BigNumber = parsedLog.args["proposalId"];
+    const proposalId: string = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      // TODO remove this when new proposal format
-      proposalId: proposalId.toNumber(),
+      proposalId,
     };
   }
 
@@ -183,8 +182,13 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
     const tokenVotingContract = TokenVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
@@ -220,8 +224,13 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
     const tokenVotingContract = TokenVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
     const tx = await tokenVotingContract.execute(params.proposalId);
@@ -246,12 +255,17 @@ export class TokenVotingClientMethods extends ClientCore
     const signer = this.web3.getConnectedSigner();
     if (!signer.provider) {
       throw new NoProviderError();
-    } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+    } else if (!isAddress(params.address)) {
       throw new InvalidAddressError();
     }
 
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
     const tokenVotingContract = TokenVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
     return tokenVotingContract.callStatic.isMember(
@@ -264,7 +278,7 @@ export class TokenVotingClientMethods extends ClientCore
    *
    * @param {string} addressOrEns
    * @return {*}  {Promise<boolean>}
-   * @memberof MultisigClientMethods
+   * @memberof TokenVotingClientMethods
    */
   public async canExecute(
     params: CanExecuteParams,
@@ -275,17 +289,18 @@ export class TokenVotingClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
+
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
     }
-    const multisigContract = TokenVoting__factory.connect(
-      params.pluginAddress,
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
+    const tokenVotingContract = TokenVoting__factory.connect(
+      pluginAddress,
       signer,
     );
 
-    return multisigContract.canExecute(params.proposalId);
+    return tokenVotingContract.canExecute(params.proposalId);
   }
   /**
    * Returns the list of wallet addresses holding tokens from the underlying Token contract used by the plugin

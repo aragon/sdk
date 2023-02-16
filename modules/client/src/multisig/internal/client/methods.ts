@@ -1,7 +1,7 @@
 import {
   boolArrayToBitmap,
+  decodeProposalId,
   GraphQLError,
-  InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidProposalIdError,
@@ -37,6 +37,7 @@ import {
   ExecuteProposalStepValue,
   findLog,
   IProposalQueryParams,
+  isProposalId,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
@@ -56,7 +57,6 @@ import {
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { QueryMultisigMembers } from "../graphql-queries/members";
-import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK Address List Client
@@ -129,14 +129,14 @@ export class MultisigClientMethods extends ClientCore
     }
 
     const parsedLog = multisigContractInterface.parseLog(log);
-    const proposalId: BigNumber = parsedLog.args["proposalId"];
+    const proposalId: string = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: proposalId.toNumber(),
+      proposalId,
     };
   }
 
@@ -172,13 +172,14 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
+
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
     }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
     const multisigContract = Multisig__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
@@ -214,13 +215,14 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
+
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
     }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
     const multisigContract = Multisig__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
@@ -256,16 +258,17 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
     if (!isAddress(params.addressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressOrEnsError();
+
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
     }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
     const multisigContract = Multisig__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
@@ -287,13 +290,14 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
+
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
     }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
     const multisigContract = Multisig__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 

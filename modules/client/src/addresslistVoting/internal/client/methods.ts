@@ -1,5 +1,6 @@
 import {
   boolArrayToBitmap,
+  decodeProposalId,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -31,6 +32,7 @@ import {
   ICreateProposalParams,
   IExecuteProposalParams,
   IProposalQueryParams,
+  isProposalId,
   IVoteProposalParams,
   parseEtherRatio,
   ProposalCreationSteps,
@@ -59,7 +61,6 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK Address List Client
@@ -136,15 +137,14 @@ export class AddresslistVotingClientMethods extends ClientCore
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
-    const proposalId: BigNumber = parsedLog.args["proposalId"];
+    const proposalId: string = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      // TODO remove this when new proposal format
-      proposalId: proposalId.toNumber(),
+      proposalId,
     };
   }
 
@@ -180,9 +180,13 @@ export class AddresslistVotingClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
@@ -221,8 +225,13 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
     const tx = await addresslistContract.execute(params.proposalId);
@@ -247,12 +256,17 @@ export class AddresslistVotingClientMethods extends ClientCore
     const signer = this.web3.getConnectedSigner();
     if (!signer.provider) {
       throw new NoProviderError();
-    } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+    } else if (!isAddress(params.address)) {
       throw new InvalidAddressError();
     }
 
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
     return addresslistContract.callStatic.canVote(
@@ -266,7 +280,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    *
    * @param {string} addressOrEns
    * @return {*}  {Promise<boolean>}
-   * @memberof MultisigClientMethods
+   * @memberof AddresslistVotingClientMethods
    */
   public async canExecute(
     params: CanExecuteParams,
@@ -277,17 +291,17 @@ export class AddresslistVotingClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
     }
-    const multisigContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+    const { pluginAddress } = decodeProposalId(params.proposalId);
+
+    const addresslistContract = AddresslistVoting__factory.connect(
+      pluginAddress,
       signer,
     );
 
-    return multisigContract.canExecute(params.proposalId);
+    return addresslistContract.canExecute(params.proposalId);
   }
   /**
    * Returns the list of wallet addresses with signing capabilities on the plugin

@@ -7,8 +7,8 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import {
-  contextParamsMainnet,
   contextParamsLocalChain,
+  contextParamsMainnet,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
   TEST_NO_BALANCES_DAO_ADDRESS,
@@ -526,7 +526,7 @@ describe("Client", () => {
                 expect(isAddress(transfer.to)).toBe(true);
                 if (transfer.proposalId) {
                   expect(transfer.proposalId).toMatch(
-                    /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
+                    /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/i,
                   );
                 }
               } else {
@@ -544,7 +544,7 @@ describe("Client", () => {
                 // ERC20 withdraw
                 expect(isAddress(transfer.to)).toBe(true);
                 expect(transfer.proposalId).toMatch(
-                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i,
+                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/i,
                 );
               } else {
                 fail("invalid transfer type");

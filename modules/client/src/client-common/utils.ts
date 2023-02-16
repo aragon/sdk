@@ -80,7 +80,7 @@ export function computeProposalStatusFilter(
 }
 
 export function isProposalId(propoosalId: string): boolean {
-  const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+  const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/i);
   return regex.test(propoosalId);
 }
 
@@ -125,7 +125,7 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
   }
 }
 
-// TODO 
+// TODO
 // delete me
 export function parseEtherRatio(ether: string, precision: number = 2): number {
   if (precision <= 0 || !Number.isInteger(precision)) {

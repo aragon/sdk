@@ -76,7 +76,7 @@ describe("Client Multisig", () => {
   async function buildProposal(
     pluginAddress: string,
     multisigClient: MultisigClient,
-  ): Promise<number> {
+  ): Promise<string> {
     // generate actions
     const action = multisigClient.encoding.updateMultisigVotingSettings(
       {
@@ -124,12 +124,11 @@ describe("Client Multisig", () => {
           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
           break;
         case ProposalCreationSteps.DONE:
-          expect(typeof step.proposalId).toBe("number");
+          expect(typeof step.proposalId).toBe("string");
+          expect(step.proposalId).toMatch(
+            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/,
+          );
           return step.proposalId;
-          // TODO
-        // update with new proposal id when contracts are ready
-        // expect(typeof step.proposalId).toBe("string");
-        // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
         default:
           throw new Error(
             "Unexpected proposal creation step: " +
@@ -140,13 +139,11 @@ describe("Client Multisig", () => {
     throw new Error();
   }
   async function approveProposal(
-    proposalId: number,
-    pluginAddress: string,
+    proposalId: string,
     client: MultisigClient,
   ) {
     const approveParams: ApproveMultisigProposalParams = {
       proposalId,
-      pluginAddress,
       tryExecution: false,
     };
     for await (const step of client.methods.approveProposal(approveParams)) {
@@ -191,7 +188,6 @@ describe("Client Multisig", () => {
       const canApproveParams: CanApproveParams = {
         proposalId,
         addressOrEns: TEST_WALLET_ADDRESS,
-        pluginAddress,
       };
       // positive
       let canApprove = await client.methods.canApprove(canApproveParams);
@@ -216,7 +212,7 @@ describe("Client Multisig", () => {
       const { plugin: pluginAddress } = await buildDao();
 
       const proposalId = await buildProposal(pluginAddress, client);
-      await approveProposal(proposalId, pluginAddress, client);
+      await approveProposal(proposalId, client);
     });
   });
 
@@ -231,14 +227,13 @@ describe("Client Multisig", () => {
       const proposalId = await buildProposal(pluginAddress, client);
       const canExecuteParams: CanExecuteParams = {
         proposalId,
-        pluginAddress,
       };
       let canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
       // now approve
-      await approveProposal(proposalId, pluginAddress, client);
+      await approveProposal(proposalId, client);
 
       canExecute = await client.methods.canExecute(canExecuteParams);
       expect(typeof canExecute).toBe("boolean");
@@ -255,12 +250,11 @@ describe("Client Multisig", () => {
       const { plugin: pluginAddress } = await buildDao();
 
       const proposalId = await buildProposal(pluginAddress, client);
-      await approveProposal(proposalId, pluginAddress, client);
+      await approveProposal(proposalId, client);
 
       for await (
         const step of client.methods.executeProposal(
           {
-            pluginAddress,
             proposalId,
           },
         )
@@ -340,7 +334,7 @@ describe("Client Multisig", () => {
       }
       expect(proposal.id).toBe(proposalId);
       expect(typeof proposal.id).toBe("string");
-      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/i);
       expect(typeof proposal.dao.address).toBe("string");
       expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
       expect(typeof proposal.dao.name).toBe("string");
@@ -386,7 +380,8 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x1";
+      const proposalId = TEST_NON_EXISTING_ADDRESS +
+        "_0x0000000000000000000000000000000000000000000000000000000000000001";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(proposal === null).toBe(true);

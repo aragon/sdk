@@ -28,7 +28,6 @@ export interface IProposalSettings {
   minTurnout: number;
   /** In seconds */
   duration: number;
-  
 }
 
 export type VotingSettings = {
@@ -81,26 +80,22 @@ export type CreateProposalBaseParams = {
 };
 
 export interface IVoteProposalParams {
-  pluginAddress: string;
   vote: VoteValues;
-  proposalId: number;
+  proposalId: string;
 }
 
 export interface IExecuteProposalParams {
-  pluginAddress: string;
-  proposalId: number;
+  proposalId: string;
 }
 
 export interface ICanVoteParams {
-  pluginAddress: string;
-  proposalId: number;
+  proposalId: string;
   address: string;
-  vote: VoteValues
+  vote: VoteValues;
 }
 
 export type CanExecuteParams = {
-  proposalId: number;
-  pluginAddress: string;
+  proposalId: string;
 };
 
 /**
@@ -229,7 +224,7 @@ export enum ProposalCreationSteps {
 
 export type ProposalCreationStepValue =
   | { key: ProposalCreationSteps.CREATING; txHash: string }
-  | { key: ProposalCreationSteps.DONE; proposalId: number };
+  | { key: ProposalCreationSteps.DONE; proposalId: string };
 
 // PROPOSAL VOTING
 export enum VoteProposalStep {
