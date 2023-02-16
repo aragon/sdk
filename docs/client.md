@@ -332,7 +332,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 | Param | Type | Description |
 | --- | --- | --- |
-| { | <code>DaoBalancesQueryParams</code> | <p>daoAddressOrEns, limit = 10, skip = 0, direction = SortDirection.ASC, sortBy = TransferSortBy.LAST_UPDATED, }</p> |
+| { | <code>DaoBalancesQueryParams</code> | <p>daoAddressOrEns, limit = 10, skip = 0, direction = SortDirection.ASC, sortBy = AssetBalanceSortBy.LAST_UPDATED, }</p> |
 
 <a name="ClientMethods+getDaoTransfers"></a>
 

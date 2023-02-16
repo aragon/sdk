@@ -490,7 +490,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } catch (err) {
       throw new GraphQLError("DAO");
     }
-  }
+  }  
   /**
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
@@ -499,7 +499,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    *     limit = 10,
    *     skip = 0,
    *     direction = SortDirection.ASC,
-   *     sortBy = TransferSortBy.LAST_UPDATED,
+   *     sortBy = AssetBalanceSortBy.LAST_UPDATED,
    *   }
    * @return {*}  {(Promise<AssetBalance[] | null>)}
    * @memberof ClientMethods
