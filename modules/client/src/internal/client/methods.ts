@@ -50,6 +50,8 @@ import {
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
   TokenBalance,
+  TokenBalanceQueryParams,
+  TokenBalanceSortBy,
   TokenType,
   Transfer,
   TransferSortBy,
@@ -496,21 +498,29 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {(Promise<TokenBalance[] | null>)}
    * @memberof ClientMethods
    */
-  public async getDaoBalances(
-    daoAddressorEns: string,
-  ): Promise<TokenBalance[] | null> {
-    let address = daoAddressorEns;
-    if (!isAddress(address)) {
-      await this.web3.ensureOnline();
-      const provider = this.web3.getProvider();
-      if (!provider) {
-        throw new NoProviderError();
+  public async getDaoBalances({
+    daoAddressOrEns,
+    limit = 10,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = TokenBalanceSortBy.LAST_UPDATED,
+  }: TokenBalanceQueryParams): Promise<TokenBalance[] | null> {
+    let where = {};
+    let address = daoAddressOrEns;
+    if (address) {
+      if (!isAddress(address)) {
+        await this.web3.ensureOnline();
+        const provider = this.web3.getProvider();
+        if (!provider) {
+          throw new NoProviderError();
+        }
+        const resolvedAddress = await provider.resolveName(address);
+        if (!resolvedAddress) {
+          throw new InvalidAddressOrEnsError();
+        }
+        address = resolvedAddress;
       }
-      const resolvedAddress = await provider.resolveName(address);
-      if (!resolvedAddress) {
-        throw new InvalidAddressOrEnsError();
-      }
-      address = resolvedAddress;
+      where = { dao: address };
     }
     try {
       await this.graphql.ensureOnline();
@@ -520,7 +530,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       }: { tokenBalances: SubgraphBalance[] } = await client.request(
         QueryTokenBalances,
         {
-          address,
+          where,
+          limit,
+          skip,
+          direction,
+          sortBy,
         },
       );
       if (tokenBalances.length === 0) {
@@ -532,7 +546,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         ),
       );
     } catch (err) {
-       throw new GraphQLError("balance");
+      throw new GraphQLError("balance");
     }
   }
   /**

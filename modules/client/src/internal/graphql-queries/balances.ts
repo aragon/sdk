@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
 export const QueryTokenBalances = gql`
-query TokenBalances($address: ID!, $limit: Int = 10, $skip: Int = 0) {
-  tokenBalances {
+query TokenBalances($where: TokenBalance_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: TokenBalance_orderBy!) {
+  tokenBalances (where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy) {
     lastUpdated
     __typename
     ... on ERC20Balance {

@@ -6,6 +6,7 @@ import {
   IInterfaceParams,
   IPagination,
   IPluginInstallItem,
+  Pagination,
 } from "./client-common/interfaces/common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -18,7 +19,7 @@ export interface IClientMethods extends IClientCore {
   pinMetadata: (params: DaoMetadata) => Promise<string>;
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoBalances: (
-    daoAddressOrEns: string,
+    params: TokenBalanceQueryParams,
   ) => Promise<TokenBalance[] | null>;
   /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
@@ -224,10 +225,8 @@ export type DaoDepositStepValue =
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 
-
-
 // Token balances
-  
+
 type TokenBalanceBase = {
   address: string;
   name: string;
@@ -349,9 +348,16 @@ export interface ITransferQueryParams extends IPagination {
   type?: TransferType;
   daoAddressOrEns?: string;
 }
-
 export enum TransferSortBy {
-  CREATED_AT = "createdAt", // currently defined as number of proposals
+  CREATED_AT = "createdAt",
+}
+
+export type TokenBalanceQueryParams = Pagination & {
+  sortBy?: TokenBalanceSortBy;
+  daoAddressOrEns?: string;
+};
+export enum TokenBalanceSortBy {
+  LAST_UPDATED = "lastUpdated",
 }
 
 export enum DaoSortBy {

@@ -468,7 +468,9 @@ describe("Client", () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
-        const balances = await client.methods.getDaoBalances(daoAddress);
+        const balances = await client.methods.getDaoBalances({
+          daoAddressOrEns: daoAddress,
+        });
         expect(Array.isArray(balances)).toBe(true);
         expect(balances === null).toBe(false);
         if (balances) {
@@ -494,7 +496,9 @@ describe("Client", () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
-        const balances = await client.methods.getDaoBalances(daoAddress);
+        const balances = await client.methods.getDaoBalances({
+          daoAddressOrEns: daoAddress,
+        });
         expect(Array.isArray(balances)).toBe(true);
         expect(balances?.length).toBe(0);
       });
@@ -530,10 +534,9 @@ describe("Client", () => {
               );
               expect(typeof transfer.token.name).toBe("string");
               expect(typeof transfer.token.symbol).toBe("string");
-              if (transfer.tokenType===TokenType.ERC20){
+              if (transfer.tokenType === TokenType.ERC20) {
                 expect(typeof transfer.amount).toBe("bigint");
                 expect(typeof transfer.token.decimals).toBe("number");
-
               }
             }
           }
