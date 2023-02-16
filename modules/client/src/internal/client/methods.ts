@@ -21,16 +21,16 @@ import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
-  QueryTokenBalances,
   QueryDao,
   QueryDaos,
+  QueryTokenBalances,
   QueryTokenTransfers,
 } from "../graphql-queries";
 import {
   AssetBalance,
-  AssetBalanceQueryParams,
   AssetBalanceSortBy,
   CreateDaoParams,
+  DaoBalancesQueryParams,
   DaoCreationSteps,
   DaoCreationStepValue,
   DaoDepositSteps,
@@ -494,7 +494,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
-   * @param {string} daoAddressorEns
+   * @param {DaoBalancesQueryParams} {
+   *     daoAddressOrEns,
+   *     limit = 10,
+   *     skip = 0,
+   *     direction = SortDirection.ASC,
+   *     sortBy = TransferSortBy.LAST_UPDATED,
+   *   }
    * @return {*}  {(Promise<AssetBalance[] | null>)}
    * @memberof ClientMethods
    */
@@ -504,7 +510,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = AssetBalanceSortBy.LAST_UPDATED,
-  }: AssetBalanceQueryParams): Promise<AssetBalance[] | null> {
+  }: DaoBalancesQueryParams): Promise<AssetBalance[] | null> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {

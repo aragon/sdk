@@ -82,9 +82,7 @@ describe("Token Voting Client", () => {
   // Helpers
   async function buildDaos() {
     const daoEntries: Array<{ dao: string; plugin: string }> = [];
-    daoEntries.push(
-      await buildTokenVotingDAO(repoAddr, VotingMode.STANDARD),
-    );
+    daoEntries.push(await buildTokenVotingDAO(repoAddr, VotingMode.STANDARD));
     daoEntries.push(
       await buildTokenVotingDAO(repoAddr, VotingMode.EARLY_EXECUTION),
     );
@@ -122,9 +120,7 @@ describe("Token Voting Client", () => {
       },
     };
 
-    const ipfsUri = await client.methods.pinMetadata(
-      metadata,
-    );
+    const ipfsUri = await client.methods.pinMetadata(metadata);
     const endDate = new Date(Date.now() + 60 * 60 * 1000 + 10 * 1000);
 
     const proposalParams: ICreateProposalParams = {
@@ -135,11 +131,7 @@ describe("Token Voting Client", () => {
       endDate,
     };
 
-    for await (
-      const step of client.methods.createProposal(
-        proposalParams,
-      )
-    ) {
+    for await (const step of client.methods.createProposal(proposalParams)) {
       switch (step.key) {
         case ProposalCreationSteps.CREATING:
           expect(typeof step.txHash).toBe("string");
@@ -148,7 +140,7 @@ describe("Token Voting Client", () => {
         case ProposalCreationSteps.DONE:
           expect(typeof step.proposalId).toBe("number");
           return step.proposalId;
-          // TODO fix with new proposalId format
+        // TODO fix with new proposalId format
         // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
         default:
           throw new Error(
@@ -181,8 +173,7 @@ describe("Token Voting Client", () => {
           break;
         default:
           throw new Error(
-            "Unexpected vote proposal step: " +
-              Object.keys(step).join(", "),
+            "Unexpected vote proposal step: " + Object.keys(step).join(", "),
           );
       }
     }
@@ -423,7 +414,9 @@ describe("Token Voting Client", () => {
           proposalId,
         };
         for await (
-          const step of client.methods.executeProposal(executeParams)
+          const step of client.methods.executeProposal(
+            executeParams,
+          )
         ) {
           switch (step.key) {
             case ExecuteProposalStep.EXECUTING:
@@ -467,7 +460,9 @@ describe("Token Voting Client", () => {
           proposalId,
         };
         for await (
-          const step of client.methods.executeProposal(executeParams)
+          const step of client.methods.executeProposal(
+            executeParams,
+          )
         ) {
           switch (step.key) {
             case ExecuteProposalStep.EXECUTING:
@@ -514,7 +509,9 @@ describe("Token Voting Client", () => {
           proposalId,
         };
         for await (
-          const step of client.methods.executeProposal(executeParams)
+          const step of client.methods.executeProposal(
+            executeParams,
+          )
         ) {
           switch (step.key) {
             case ExecuteProposalStep.EXECUTING:
@@ -563,10 +560,12 @@ describe("Token Voting Client", () => {
               title: "Title",
               summary: "Summary",
               description: "Description",
-              resources: [{
-                name: "Name",
-                url: "url",
-              }],
+              resources: [
+                {
+                  name: "Name",
+                  url: "url",
+                },
+              ],
             }),
           ),
         );

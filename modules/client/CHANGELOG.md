@@ -15,6 +15,13 @@ TEMPLATE:
 
 ## [0.20.0-beta]
 ### Changed
+- Update `getDaoBalances` parameters from `daoAddressOrEns` to `DaoBalancesQueryParams`
+
+### Added
+- Add support for Subgraph version `0.7.2-alpha`
+- Add Vote Replacement flag in MajorityVoting clients
+## [0.20.0-beta]
+### Changed
 - Updates to contracts-ethers v0.7.1
 - Splits `getPluginSettings` in `getVotingSettings` and `getMembers`
 - `encoding.withdrawAction` now accepts a single parameter of type `WithdrawParams`
@@ -32,7 +39,6 @@ TEMPLATE:
 - `TokenType` replaces any other token/transfer type enum
 
 ### Added
-- Add Vote Replacement flag in MajorityVoting clients
 - Proposals accept a `failSafeActions` variable
 - Multisig plugin settings now include `startDate` and `endDate`
 - `ICreateProposalParams` now receives an optional `failSafeActions` array, to denote which could fail without disrupting the entire execution flow

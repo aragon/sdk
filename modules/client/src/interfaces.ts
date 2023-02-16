@@ -19,7 +19,7 @@ export interface IClientMethods extends IClientCore {
   pinMetadata: (params: DaoMetadata) => Promise<string>;
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoBalances: (
-    params: AssetBalanceQueryParams,
+    params: DaoBalancesQueryParams,
   ) => Promise<AssetBalance[] | null>;
   /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoTransfers: (params: ITransferQueryParams) => Promise<Transfer[] | null>;
@@ -351,7 +351,7 @@ export enum TransferSortBy {
   CREATED_AT = "createdAt",
 }
 
-export type AssetBalanceQueryParams = Pagination & {
+export type DaoBalancesQueryParams = Pagination & {
   sortBy?: AssetBalanceSortBy;
   daoAddressOrEns?: string;
 };
