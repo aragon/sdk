@@ -427,7 +427,6 @@ export type SubgraphTransferListItem = {
     id: string | null;
   };
   amount: string;
-  txhash: string;
   token: SubgraphToken;
   __typename: string;
 };

@@ -19,6 +19,7 @@ import {
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
+  TokenType,
   TokenVotingClient,
   VoteProposalStep,
   VoteValues,
@@ -638,10 +639,8 @@ describe("Token Voting Client", () => {
             expect(typeof proposal.token.symbol).toBe("string");
             expect(typeof proposal.token.address).toBe("string");
             expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-            if ("decimals" in proposal.token) {
+            if (proposal.token.type === TokenType.ERC20) {
               expect(typeof proposal.token.decimals).toBe("number");
-            } else if ("baseUri" in proposal.token) {
-              expect(typeof proposal.token.baseUri).toBe("string");
             }
           }
           expect(typeof proposal.usedVotingWeight).toBe("bigint");

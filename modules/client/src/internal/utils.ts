@@ -146,7 +146,7 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
         tokenType: TokenType.NATIVE,
         amount: BigInt(transfer.amount),
         creationDate,
-        transactionId: transfer.txhash,
+        transactionId: transfer.txHash,
         from: transfer.from,
         to: transfer.to,
       };

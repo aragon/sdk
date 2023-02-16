@@ -21,12 +21,15 @@ import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
+  QueryTokenBalances,
   QueryDao,
   QueryDaos,
-  QueryAssetBalances,
   QueryTokenTransfers,
 } from "../graphql-queries";
 import {
+  AssetBalance,
+  AssetBalanceQueryParams,
+  AssetBalanceSortBy,
   CreateDaoParams,
   DaoCreationSteps,
   DaoCreationStepValue,
@@ -49,9 +52,6 @@ import {
   SubgraphDaoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
-  AssetBalance,
-  AssetBalanceQueryParams,
-  AssetBalanceSortBy,
   TokenType,
   Transfer,
   TransferSortBy,
@@ -63,9 +63,9 @@ import {
   SortDirection,
 } from "../../client-common";
 import {
+  toAssetBalance,
   toDaoDetails,
   toDaoListItem,
-  toAssetBalance,
   toTokenTransfer,
   unwrapDepositParams,
 } from "../utils";
@@ -526,9 +526,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        AssetBalances,
-      }: { AssetBalances: SubgraphBalance[] } = await client.request(
-        QueryAssetBalances,
+        tokenBalances,
+      }: { tokenBalances: SubgraphBalance[] } = await client.request(
+        QueryTokenBalances,
         {
           where,
           limit,
@@ -537,11 +537,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           sortBy,
         },
       );
-      if (AssetBalances.length === 0) {
+      if (tokenBalances.length === 0) {
         return [];
       }
       return Promise.all(
-        AssetBalances.map(
+        tokenBalances.map(
           (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
         ),
       );
@@ -595,8 +595,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        vaultTransfers,
-      }: { vaultTransfers: SubgraphTransferListItem[] } = await client.request(
+        tokenTransfers,
+      }: { tokenTransfers: SubgraphTransferListItem[] } = await client.request(
         QueryTokenTransfers,
         {
           where,
@@ -606,11 +606,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           sortBy,
         },
       );
-      if (!vaultTransfers) {
+      if (!tokenTransfers) {
         return null;
       }
       return Promise.all(
-        vaultTransfers.map(
+        tokenTransfers.map(
           (transfer: SubgraphTransferListItem): Transfer =>
             toTokenTransfer(transfer),
         ),

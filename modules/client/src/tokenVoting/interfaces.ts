@@ -26,6 +26,7 @@ import {
   VotingMode,
   VotingSettings,
 } from "../client-common";
+import { TokenType } from "../interfaces";
 
 // TokenVoting
 
@@ -134,9 +135,10 @@ export type TokenVotingProposalResult = {
 
 export type Erc20TokenDetails = TokenBaseDetails & {
   decimals: number;
+  type: TokenType.ERC20;
 };
 export type Erc721TokenDetails = TokenBaseDetails & {
-  baseUri: string;
+  type: TokenType.ERC721;
 };
 
 export type TokenBaseDetails = {
@@ -159,19 +161,23 @@ type SubgraphBaseToken = {
   symbol: string;
   name: string;
   id: string;
-  __typename: SubgraphTokenType;
 };
 export enum SubgraphTokenType {
   ERC20 = "ERC20Token",
   ERC721 = "ERC721Token",
 }
+export enum SubgraphContractType {
+  ERC20 = "ERC20Contract",
+  ERC721 = "ERC721Contract",
+}
 
 export type SubgraphErc20Token = SubgraphBaseToken & {
-  decimals: string;
+  __typename: SubgraphContractType.ERC20;
+  decimals: number;
 };
 export type SubgraphErc721Token = SubgraphBaseToken & {
-  baseURI: string;
-};
+  __typename: SubgraphContractType.ERC721;
+}
 
 export type SubgraphTokenVotingProposal =
   & SubgraphTokenVotingProposalListItem
