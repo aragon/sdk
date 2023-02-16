@@ -102,36 +102,35 @@ export function decodeRatio(
   return Number(onChainValue) / (10 ** digits);
 }
 
-/** Encodes the particles of a nonce-based proposalId into a globally unque value */
-export function encodeProposalId(pluginAddress: string, nonce: number): string {
-  const addrFragment = strip0x(pluginAddress.toLocaleLowerCase());
-  if (addrFragment.length != 40) throw new Error("Invalid address length");
-
-  let nonceFragment = nonce.toString(16);
-  if (nonceFragment.length < 24) {
-    nonceFragment = "0".repeat(24 - nonceFragment.length) + nonceFragment;
+/** Encodes the particles of a proposalId into a globally unque value */
+export function encodeProposalId(pluginAddress: string, id: number): string {
+  if (!/^0x[A-Za-z0-9]{40}$/.test(pluginAddress)) {
+    throw new Error("Invalid address");
   }
 
-  return "0x" + addrFragment + nonceFragment;
+  let nonceFragment = id.toString(16).padStart(64, "0");
+
+  return `${pluginAddress}_0x${nonceFragment}`;
 }
 
 /** Decodes a proposalId and returns the original pluginAddress and the nonce */
 export function decodeProposalId(
   proposalId: string,
-): { pluginAddress: string; nonce: number } {
-  if (!/^(0x)?[0-9a-fA-F]{64}$/.test(proposalId)) {
-    throw new Error("Invalid hex string");
-  } else if (proposalId.length % 2 !== 0) {
-    throw new Error("The hex string has an odd length");
+): { pluginAddress: string; id: number } {
+  if (!/^0x[A-Za-z0-9]{40}_0x[A-Za-z0-9]{64}$/.test(proposalId)) {
+    throw new Error("Invalid proposalId");
   }
 
-  proposalId = strip0x(proposalId);
-  const pluginAddress = "0x" + proposalId.substring(0, 40);
-  const nonce = parseInt(proposalId.substring(40, 64), 16);
+  // matching array
+  const matchedRegexResult =
+    proposalId.match(/^(0x[A-Za-z0-9]{40})_(0x[A-Za-z0-9]{64})$/) || [];
+  if (matchedRegexResult.length !== 3) {
+    throw new Error("Failed to deconstruct proposalId");
+  }
 
   return {
-    pluginAddress,
-    nonce,
+    pluginAddress: matchedRegexResult[1],
+    id: parseInt(strip0x(matchedRegexResult[2]), 16),
   };
 }
 

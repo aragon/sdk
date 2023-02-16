@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Changed
+- Changes `encodeProposalId` and `decodeProposalId` function to support the new format
 
 ## 0.11.0-beta
 - Adds `encodeProposalId(addr, nonce)` and `decodeProposalId(pid)`
