@@ -22,13 +22,15 @@ import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryDao,
-  QueryDaoBalances,
   QueryDaos,
-  QueryDaoTransfers,
+  QueryTokenBalances,
+  QueryTokenTransfers,
 } from "../graphql-queries";
 import {
   AssetBalance,
+  AssetBalanceSortBy,
   CreateDaoParams,
+  DaoBalancesQueryParams,
   DaoCreationSteps,
   DaoCreationStepValue,
   DaoDepositSteps,
@@ -64,7 +66,7 @@ import {
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
-  toTransfer,
+  toTokenTransfer,
   unwrapDepositParams,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
@@ -488,48 +490,64 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } catch (err) {
       throw new GraphQLError("DAO");
     }
-  }
+  }  
   /**
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
-   * @param {string} daoAddressorEns
+   * @param {DaoBalancesQueryParams} {
+   *     daoAddressOrEns,
+   *     limit = 10,
+   *     skip = 0,
+   *     direction = SortDirection.ASC,
+   *     sortBy = AssetBalanceSortBy.LAST_UPDATED,
+   *   }
    * @return {*}  {(Promise<AssetBalance[] | null>)}
    * @memberof ClientMethods
    */
-  public async getDaoBalances(
-    daoAddressorEns: string,
-  ): Promise<AssetBalance[] | null> {
-    let address = daoAddressorEns;
-    if (!isAddress(address)) {
-      await this.web3.ensureOnline();
-      const provider = this.web3.getProvider();
-      if (!provider) {
-        throw new NoProviderError();
+  public async getDaoBalances({
+    daoAddressOrEns,
+    limit = 10,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = AssetBalanceSortBy.LAST_UPDATED,
+  }: DaoBalancesQueryParams): Promise<AssetBalance[] | null> {
+    let where = {};
+    let address = daoAddressOrEns;
+    if (address) {
+      if (!isAddress(address)) {
+        await this.web3.ensureOnline();
+        const provider = this.web3.getProvider();
+        if (!provider) {
+          throw new NoProviderError();
+        }
+        const resolvedAddress = await provider.resolveName(address);
+        if (!resolvedAddress) {
+          throw new InvalidAddressOrEnsError();
+        }
+        address = resolvedAddress;
       }
-      const resolvedAddress = await provider.resolveName(address);
-      if (!resolvedAddress) {
-        throw new InvalidAddressOrEnsError();
-      }
-      address = resolvedAddress;
+      where = { dao: address };
     }
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        balances,
-      }: { balances: SubgraphBalance[] } = await client.request(
-        QueryDaoBalances,
+        tokenBalances,
+      }: { tokenBalances: SubgraphBalance[] } = await client.request(
+        QueryTokenBalances,
         {
-          address,
+          where,
+          limit,
+          skip,
+          direction,
+          sortBy,
         },
       );
-      if (balances.length === 0) {
+      if (tokenBalances.length === 0) {
         return [];
       }
-      // TODO
-      // handle other tokens that are not ERC20 or eth
       return Promise.all(
-        balances.map(
+        tokenBalances.map(
           (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
         ),
       );
@@ -583,9 +601,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
       const {
-        vaultTransfers,
-      }: { vaultTransfers: SubgraphTransferListItem[] } = await client.request(
-        QueryDaoTransfers,
+        tokenTransfers,
+      }: { tokenTransfers: SubgraphTransferListItem[] } = await client.request(
+        QueryTokenTransfers,
         {
           where,
           limit,
@@ -594,17 +612,17 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           sortBy,
         },
       );
-      if (!vaultTransfers) {
+      if (!tokenTransfers) {
         return null;
       }
       return Promise.all(
-        vaultTransfers.map(
+        tokenTransfers.map(
           (transfer: SubgraphTransferListItem): Transfer =>
-            toTransfer(transfer),
+            toTokenTransfer(transfer),
         ),
       );
     } catch {
-      throw new GraphQLError("transfer");
+      throw new GraphQLError("token transfer");
     }
   }
 }

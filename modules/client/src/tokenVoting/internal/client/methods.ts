@@ -1,6 +1,7 @@
 import { isAddress } from "@ethersproject/address";
 import {
   boolArrayToBitmap,
+  decodeRatio,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -26,7 +27,6 @@ import {
   IProposalQueryParams,
   isProposalId,
   IVoteProposalParams,
-  parseEtherRatio,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
@@ -41,9 +41,9 @@ import {
   Erc20TokenDetails,
   Erc721TokenDetails,
   ITokenVotingClientMethods,
+  SubgraphContractType,
   SubgraphErc20Token,
   SubgraphErc721Token,
-  SubgraphTokenType,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
   TokenVotingProposal,
@@ -64,6 +64,7 @@ import {
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
 import { BigNumber } from "@ethersproject/bignumber";
+import { TokenType } from "../../../interfaces";
 
 /**
  * Methods module the SDK TokenVoting Client
@@ -473,11 +474,13 @@ export class TokenVotingClientMethods extends ClientCore
       }
       return {
         minDuration: parseInt(tokenVotingPlugin.minDuration),
-        supportThreshold: parseEtherRatio(
-          tokenVotingPlugin.supportThreshold,
+        supportThreshold: decodeRatio(
+          BigInt(tokenVotingPlugin.supportThreshold),
+          6,
         ),
-        minParticipation: parseEtherRatio(
-          tokenVotingPlugin.minParticipation,
+        minParticipation: decodeRatio(
+          BigInt(tokenVotingPlugin.minParticipation),
+          6,
         ),
         minProposerVotingPower: BigInt(
           tokenVotingPlugin.minProposerVotingPower,
@@ -517,22 +520,21 @@ export class TokenVotingClientMethods extends ClientCore
       let token: SubgraphErc20Token | SubgraphErc721Token =
         tokenVotingPlugin.token;
       // type erc20
-      if (token.__typename === SubgraphTokenType.ERC20) {
-        token = token as SubgraphErc20Token;
+      if (token.__typename === SubgraphContractType.ERC20) {
         return {
           address: token.id,
           name: token.name,
           symbol: token.symbol,
-          decimals: parseInt(token.decimals),
+          decimals: token.decimals,
+          type: TokenType.ERC20,
         };
         // type erc721
-      } else if (token.__typename === SubgraphTokenType.ERC721) {
-        token = token as SubgraphErc721Token;
+      } else if (token.__typename === SubgraphContractType.ERC721) {
         return {
           address: token.id,
           name: token.name,
           symbol: token.symbol,
-          baseUri: token.baseURI,
+          type: TokenType.ERC721,
         };
       }
       return null;

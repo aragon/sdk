@@ -1,5 +1,4 @@
 import {
-  AssetBalance,
   ContractPermissionParams,
   DaoDetails,
   DaoListItem,
@@ -19,6 +18,7 @@ import {
   SubgraphPluginTypeMap,
   SubgraphTransferListItem,
   SubgraphTransferType,
+  AssetBalance,
   TokenType,
   Transfer,
   TransferType,
@@ -110,35 +110,45 @@ export function toDaoListItem(
 
 export function toAssetBalance(balance: SubgraphBalance): AssetBalance {
   const updateDate = new Date(parseInt(balance.lastUpdated) * 1000);
-  if (balance.token.symbol === "ETH") {
+  if (balance.__typename === "NativeBalance") {
     return {
-      type: "native",
+      type: TokenType.NATIVE,
+      balance: BigInt(balance.balance),
+      updateDate,
+    };
+  } else if (balance.__typename === "ERC721Balance") {
+    return {
+      type: TokenType.ERC721,
+      name: balance.token.symbol,
+      symbol: balance.token.symbol,
+      updateDate,
+      address: balance.token.id,
+    };
+  } else {
+    return {
+      type: TokenType.ERC20,
+      address: balance.token.id,
+      name: balance.token.name,
+      symbol: balance.token.symbol,
+      decimals: balance.token.decimals,
       balance: BigInt(balance.balance),
       updateDate,
     };
   }
-  return {
-    type: "erc20",
-    address: balance.token.id,
-    name: balance.token.name,
-    symbol: balance.token.symbol,
-    decimals: parseInt(balance.token.decimals),
-    balance: BigInt(balance.balance),
-    updateDate,
-  };
 }
 
-export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
+export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
   const creationDate = new Date(parseInt(transfer.createdAt) * 1000);
-  if (transfer.token.symbol === "ETH") {
+  if (transfer.__typename === "NativeTransfer") {
     if (transfer.type === SubgraphTransferType.DEPOSIT) {
       return {
         type: TransferType.DEPOSIT,
         tokenType: TokenType.NATIVE,
         amount: BigInt(transfer.amount),
         creationDate,
-        transactionId: transfer.transaction,
-        from: transfer.sender,
+        transactionId: transfer.txHash,
+        from: transfer.from,
+        to: transfer.to,
       };
     }
     return {
@@ -146,42 +156,76 @@ export function toTransfer(transfer: SubgraphTransferListItem): Transfer {
       tokenType: TokenType.NATIVE,
       amount: BigInt(transfer.amount),
       creationDate,
-      transactionId: transfer.transaction,
+      transactionId: transfer.txHash,
       proposalId: transfer.proposal?.id || "",
       to: transfer.to,
+      from: transfer.from,
     };
-  }
-  if (transfer.type === SubgraphTransferType.DEPOSIT) {
+  } else if (transfer.__typename === "ERC721Transfer") {
+    if (transfer.type === SubgraphTransferType.DEPOSIT) {
+      return {
+        type: TransferType.DEPOSIT,
+        tokenType: TokenType.ERC721,
+        token: {
+          address: transfer.token.id,
+          name: transfer.token.name,
+          symbol: transfer.token.symbol,
+        },
+        creationDate,
+        transactionId: transfer.txHash,
+        from: transfer.from,
+        to: transfer.to,
+      };
+    }
     return {
-      type: TransferType.DEPOSIT,
+      type: TransferType.WITHDRAW,
+      tokenType: TokenType.ERC721,
+      token: {
+        address: transfer.token.id,
+        name: transfer.token.name,
+        symbol: transfer.token.symbol,
+      },
+      creationDate,
+      transactionId: transfer.txHash,
+      to: transfer.to,
+      from: transfer.from,
+      proposalId: transfer.proposal.id || "",
+    };
+  } else {
+    if (transfer.type === SubgraphTransferType.DEPOSIT) {
+      return {
+        type: TransferType.DEPOSIT,
+        tokenType: TokenType.ERC20,
+        token: {
+          address: transfer.token.id,
+          name: transfer.token.name,
+          symbol: transfer.token.symbol,
+          decimals: transfer.token.decimals,
+        },
+        amount: BigInt(transfer.amount),
+        creationDate,
+        transactionId: transfer.txHash,
+        from: transfer.from,
+        to: transfer.to,
+      };
+    }
+    return {
+      type: TransferType.WITHDRAW,
       tokenType: TokenType.ERC20,
       token: {
         address: transfer.token.id,
         name: transfer.token.name,
         symbol: transfer.token.symbol,
-        decimals: parseInt(transfer.token.decimals),
+        decimals: transfer.token.decimals,
       },
       amount: BigInt(transfer.amount),
       creationDate,
-      transactionId: transfer.transaction,
-      from: transfer.sender,
+      transactionId: transfer.txHash,
+      to: transfer.to,
+      from: transfer.from,
+      proposalId: transfer.proposal.id || "",
     };
   }
-  return {
-    type: TransferType.WITHDRAW,
-    tokenType: TokenType.ERC20,
-    token: {
-      address: transfer.token.id,
-      name: transfer.token.name,
-      symbol: transfer.token.symbol,
-      decimals: parseInt(transfer.token.decimals),
-    },
-    amount: BigInt(transfer.amount),
-    creationDate,
-    transactionId: transfer.transaction,
-    to: transfer.to,
-    proposalId: transfer.proposal.id || "",
-  };
 }
 
 export function permissionParamsToContract(

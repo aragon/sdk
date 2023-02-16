@@ -32,6 +32,7 @@ query TokenVotingProposal($proposalId: ID!) {
       voter{
         address
       }
+      voteReplaced
       voteOption
       votingPower
     }
@@ -41,11 +42,8 @@ query TokenVotingProposal($proposalId: ID!) {
         name
         symbol
         __typename
-        ...on ERC20Token {
+        ...on ERC20Contract {
           decimals
-        }
-        ...on ERC721Token {
-          baseURI
         }
       }
     }
@@ -77,11 +75,8 @@ query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
         name
         symbol
         __typename
-        ...on ERC20Token {
+        ...on ERC20Contract {
           decimals
-        }
-        ...on ERC721Token {
-          baseURI
         }
       }
     }

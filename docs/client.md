@@ -235,7 +235,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
     * [.hasPermission(params)](#ClientMethods+hasPermission) ⇒ <code>\*</code>
     * [.getDao(daoAddressOrEns)](#ClientMethods+getDao) ⇒ <code>\*</code>
     * [.getDaos({)](#ClientMethods+getDaos) ⇒ <code>\*</code>
-    * [.getDaoBalances(daoAddressorEns)](#ClientMethods+getDaoBalances) ⇒ <code>\*</code>
+    * [.getDaoBalances({)](#ClientMethods+getDaoBalances) ⇒ <code>\*</code>
     * [.getDaoTransfers({)](#ClientMethods+getDaoTransfers) ⇒ <code>\*</code>
 
 <a name="ClientMethods+createDao"></a>
@@ -324,15 +324,15 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 
 <a name="ClientMethods+getDaoBalances"></a>
 
-### clientMethods.getDaoBalances(daoAddressorEns) ⇒ <code>\*</code>
+### clientMethods.getDaoBalances({) ⇒ <code>\*</code>
 <p>Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
 **Returns**: <code>\*</code> - <p>{(Promise&lt;AssetBalance[] | null&gt;)}</p>  
 
-| Param | Type |
-| --- | --- |
-| daoAddressorEns | <code>string</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| { | <code>DaoBalancesQueryParams</code> | <p>daoAddressOrEns, limit = 10, skip = 0, direction = SortDirection.ASC, sortBy = AssetBalanceSortBy.LAST_UPDATED, }</p> |
 
 <a name="ClientMethods+getDaoTransfers"></a>
 

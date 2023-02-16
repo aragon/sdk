@@ -91,7 +91,7 @@ export interface IAddresslistVotingClient {
 export type AddresslistVotingProposal = ProposalBase & {
   result: AddresslistVotingProposalResult;
   settings: IProposalSettings;
-  votes: Array<{ address: string; vote: VoteValues }>;
+  votes: Array<{ address: string; vote: VoteValues, voteReplaced: boolean }>;
   totalVotingWeight: number;
   creationBlockNumber: number;
   executionDate: Date;

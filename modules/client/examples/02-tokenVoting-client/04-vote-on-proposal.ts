@@ -20,7 +20,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
+  pluginAddress: "0x1234567890123456789012345678901234567890", // contract address of the TokenVoting plugin installed into the DAO
   proposalId: "0x1234567890123456789012345678901234567890",
   vote: VoteValues.YES // other options: NO, ABSTAIN
 };

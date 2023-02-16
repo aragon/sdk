@@ -8,11 +8,8 @@ query TokenVotingPlugin($address: ID!) {
       name
       symbol
       __typename
-      ...on ERC20Token {
+      ...on ERC20Contract {
         decimals
-      }
-      ...on ERC721Token {
-        baseURI
       }
     }
   }
