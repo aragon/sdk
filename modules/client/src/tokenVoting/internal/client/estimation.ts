@@ -93,7 +93,7 @@ export class TokenVotingClientEstimation extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id: proposalId } = decodeProposalId(
+    const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
     );
 
@@ -103,7 +103,7 @@ export class TokenVotingClientEstimation extends ClientCore
     );
 
     const estimation = await tokenVotingContract.estimateGas.vote(
-      proposalId,
+      id,
       params.vote,
       false,
     );
@@ -130,7 +130,7 @@ export class TokenVotingClientEstimation extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id: proposalId } = decodeProposalId(
+    const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
     );
 
@@ -139,7 +139,7 @@ export class TokenVotingClientEstimation extends ClientCore
       signer,
     );
     const estimation = await tokenVotingContract.estimateGas.execute(
-      proposalId,
+      id,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

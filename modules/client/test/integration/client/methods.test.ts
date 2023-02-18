@@ -8,11 +8,11 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import {
   contextParamsLocalChain,
+  contextParamsMainnet,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
   TEST_NO_BALANCES_DAO_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
-  contextParamsMainnet,
   // TEST_WALLET,
 } from "../constants";
 import {
@@ -36,10 +36,7 @@ import {
   TransferType,
   VotingMode,
 } from "../../../src";
-import {
-  MissingExecPermissionError,
-  Random,
-} from "@aragon/sdk-common";
+import { MissingExecPermissionError, Random } from "@aragon/sdk-common";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
 import { isAddress } from "@ethersproject/address";

@@ -94,7 +94,7 @@ export class MultisigClientEstimation extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id: proposalId } = decodeProposalId(
+    const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
     );
 
@@ -104,7 +104,7 @@ export class MultisigClientEstimation extends ClientCore
     );
 
     const estimation = await multisigContract.estimateGas.approve(
-      proposalId,
+      id,
       params.tryExecution,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
@@ -129,7 +129,7 @@ export class MultisigClientEstimation extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id: proposalId } = decodeProposalId(
+    const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
     );
 
@@ -139,7 +139,7 @@ export class MultisigClientEstimation extends ClientCore
     );
 
     const estimation = await multisigContract.estimateGas.execute(
-      proposalId,
+      id,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

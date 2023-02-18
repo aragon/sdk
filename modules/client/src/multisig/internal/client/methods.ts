@@ -378,7 +378,7 @@ export class MultisigClientMethods extends ClientCore
     if (!proposalId) {
       throw new InvalidProposalIdError();
     }
-    const decodedProposalId = decodeProposalId(proposalId)
+    const decodedProposalId = decodeProposalId(proposalId);
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -387,7 +387,10 @@ export class MultisigClientMethods extends ClientCore
       }: {
         multisigProposal: SubgraphMultisigProposal;
       } = await client.request(QueryMultisigProposal, {
-        proposalId: encodeProposalIdSubgraph(decodedProposalId.pluginAddress, decodedProposalId.id),
+        proposalId: encodeProposalIdSubgraph(
+          decodedProposalId.pluginAddress,
+          decodedProposalId.id,
+        ),
       });
       if (!multisigProposal) {
         return null;

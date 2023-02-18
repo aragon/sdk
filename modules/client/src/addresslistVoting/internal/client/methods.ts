@@ -3,6 +3,7 @@ import {
   decodeProposalId,
   decodeRatio,
   encodeProposalId,
+  encodeProposalIdSubgraph,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -13,7 +14,6 @@ import {
   NoSignerError,
   ProposalCreationError,
   resolveIpfsCid,
-  encodeProposalIdSubgraph
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -344,7 +344,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!proposalId) {
       throw new InvalidProposalIdError();
     }
-    const decodedProposalId = decodeProposalId(proposalId)
+    const decodedProposalId = decodeProposalId(proposalId);
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -353,7 +353,10 @@ export class AddresslistVotingClientMethods extends ClientCore
       }: {
         addresslistVotingProposal: SubgraphAddresslistVotingProposal;
       } = await client.request(QueryAddresslistVotingProposal, {
-        proposalId: encodeProposalIdSubgraph(decodedProposalId.pluginAddress, decodedProposalId.id),
+        proposalId: encodeProposalIdSubgraph(
+          decodedProposalId.pluginAddress,
+          decodedProposalId.id,
+        ),
       });
       if (!addresslistVotingProposal) {
         return null;

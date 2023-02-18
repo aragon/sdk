@@ -140,7 +140,7 @@ export function encodeProposalIdSubgraph(pluginAddress: string, id: number) {
     throw new Error("Invalid address");
   }
 
-  return `${pluginAddress}_0x${id.toString(16)}`
+  return `${pluginAddress}_0x${id.toString(16)}`;
 }
 
 /** Decodes a proposalId from subgraph and returns the original pluginAddress and the nonce */
@@ -152,15 +152,15 @@ export function decodeProposalIdSubgraph(
   }
 
   const matchedRegexResult =
-  proposalId.match(/^(0x[A-Za-z0-9]{40})_(0x[A-Za-z0-9]{1,})$/) || [];
-if (matchedRegexResult.length !== 3) {
-  throw new Error("Failed to deconstruct proposalId");
-}
+    proposalId.match(/^(0x[A-Za-z0-9]{40})_(0x[A-Za-z0-9]{1,})$/) || [];
+  if (matchedRegexResult.length !== 3) {
+    throw new Error("Failed to deconstruct proposalId");
+  }
 
-return {
-  pluginAddress: matchedRegexResult[1],
-  id: parseInt(strip0x(matchedRegexResult[2]), 16),
-};
+  return {
+    pluginAddress: matchedRegexResult[1],
+    id: parseInt(strip0x(matchedRegexResult[2]), 16),
+  };
 }
 
 /** Transforms an array of booleans into a bitmap big integer */

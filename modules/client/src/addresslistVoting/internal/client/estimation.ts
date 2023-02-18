@@ -12,10 +12,10 @@ import { IAddresslistVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   boolArrayToBitmap,
+  decodeProposalId,
   InvalidProposalIdError,
   NoProviderError,
   NoSignerError,
-  decodeProposalId
 } from "@aragon/sdk-common";
 
 /**
@@ -97,7 +97,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id: proposalId } = decodeProposalId(
+    const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
     );
 
@@ -107,7 +107,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
     );
 
     const estimation = await addresslistContract.estimateGas.vote(
-      proposalId,
+      id,
       params.vote,
       false,
     );
@@ -134,7 +134,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id: proposalId } = decodeProposalId(
+    const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
     );
 
@@ -143,7 +143,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
       signer,
     );
     const estimation = await addresslistContract.estimateGas.execute(
-      proposalId,
+      id,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
