@@ -1,6 +1,7 @@
 import {
   boolArrayToBitmap,
   decodeProposalId,
+  decodeRatio,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -34,7 +35,6 @@ import {
   IProposalQueryParams,
   isProposalId,
   IVoteProposalParams,
-  parseEtherRatio,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
@@ -495,11 +495,13 @@ export class AddresslistVotingClientMethods extends ClientCore
       }
       return {
         minDuration: parseInt(addresslistVotingPlugin.minDuration),
-        supportThreshold: parseEtherRatio(
-          addresslistVotingPlugin.supportThreshold,
+        supportThreshold: decodeRatio(
+          BigInt(addresslistVotingPlugin.supportThreshold),
+          6,
         ),
-        minParticipation: parseEtherRatio(
-          addresslistVotingPlugin.minParticipation,
+        minParticipation: decodeRatio(
+          BigInt(addresslistVotingPlugin.minParticipation),
+          6,
         ),
         minProposerVotingPower: BigInt(
           addresslistVotingPlugin.minProposerVotingPower,

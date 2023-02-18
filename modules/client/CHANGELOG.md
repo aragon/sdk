@@ -12,10 +12,17 @@ TEMPLATE:
 - Change 1, 2, 3
 
 -->
-
-## [UPCOMING]
+## UPCOMING
 ### Changed
 - `proposalId` is now a `string` everywhere and follows the new general format
+
+## [0.20.0-beta]
+### Changed
+- Update `getDaoBalances` parameters from `daoAddressOrEns` to `DaoBalancesQueryParams`
+
+### Added
+- Add support for Subgraph version `0.7.2-alpha`
+- Add Vote Replacement flag in MajorityVoting clients
 
 ## [0.20.0-beta]
 ### Changed
@@ -53,6 +60,9 @@ TEMPLATE:
 - The `reference` field on deposits and withdrawals
 
 ## [0.19.0-alpha]
+
+### Fixed
+- Transfer and Balances queries
 
 ## [0.18.0-alpha]
 ### Added

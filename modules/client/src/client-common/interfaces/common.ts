@@ -45,6 +45,12 @@ export interface IPagination {
   direction?: SortDirection;
 }
 
+export type Pagination = {
+  skip?: number;
+  limit?: number;
+  direction?: SortDirection;
+};
+
 export enum SortDirection {
   ASC = "asc",
   DESC = "desc",

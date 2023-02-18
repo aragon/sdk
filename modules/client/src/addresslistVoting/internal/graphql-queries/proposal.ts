@@ -19,8 +19,8 @@ query AddresslistVotingProposal($proposalId: ID!) {
       value
       data
     }
-    yes,
-    no,
+    yes
+    no
     abstain
     votingMode
     supportThreshold
@@ -33,6 +33,7 @@ query AddresslistVotingProposal($proposalId: ID!) {
         address
       }
       voteOption
+      voteReplaced
     }
     totalVotingPower
     minVotingPower

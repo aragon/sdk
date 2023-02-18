@@ -1,6 +1,3 @@
-// @ts-ignore
-declare const describe, it, beforeAll, afterAll, expect, test;
-
 // mocks need to be at the top of the imports
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
@@ -19,6 +16,7 @@ import {
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
+  TokenType,
   TokenVotingClient,
   VoteProposalStep,
   VoteValues,
@@ -81,9 +79,7 @@ describe("Token Voting Client", () => {
   // Helpers
   async function buildDaos() {
     const daoEntries: Array<{ dao: string; plugin: string }> = [];
-    daoEntries.push(
-      await buildTokenVotingDAO(repoAddr, VotingMode.STANDARD),
-    );
+    daoEntries.push(await buildTokenVotingDAO(repoAddr, VotingMode.STANDARD));
     daoEntries.push(
       await buildTokenVotingDAO(repoAddr, VotingMode.EARLY_EXECUTION),
     );
@@ -121,9 +117,7 @@ describe("Token Voting Client", () => {
       },
     };
 
-    const ipfsUri = await client.methods.pinMetadata(
-      metadata,
-    );
+    const ipfsUri = await client.methods.pinMetadata(metadata);
     const endDate = new Date(Date.now() + 60 * 60 * 1000 + 10 * 1000);
 
     const proposalParams: ICreateProposalParams = {
@@ -134,11 +128,7 @@ describe("Token Voting Client", () => {
       endDate,
     };
 
-    for await (
-      const step of client.methods.createProposal(
-        proposalParams,
-      )
-    ) {
+    for await (const step of client.methods.createProposal(proposalParams)) {
       switch (step.key) {
         case ProposalCreationSteps.CREATING:
           expect(typeof step.txHash).toBe("string");
@@ -179,8 +169,7 @@ describe("Token Voting Client", () => {
           break;
         default:
           throw new Error(
-            "Unexpected vote proposal step: " +
-              Object.keys(step).join(", "),
+            "Unexpected vote proposal step: " + Object.keys(step).join(", "),
           );
       }
     }
@@ -424,7 +413,9 @@ describe("Token Voting Client", () => {
           proposalId,
         };
         for await (
-          const step of client.methods.executeProposal(executeParams)
+          const step of client.methods.executeProposal(
+            executeParams,
+          )
         ) {
           switch (step.key) {
             case ExecuteProposalStep.EXECUTING:
@@ -468,7 +459,9 @@ describe("Token Voting Client", () => {
           proposalId,
         };
         for await (
-          const step of client.methods.executeProposal(executeParams)
+          const step of client.methods.executeProposal(
+            executeParams,
+          )
         ) {
           switch (step.key) {
             case ExecuteProposalStep.EXECUTING:
@@ -515,7 +508,9 @@ describe("Token Voting Client", () => {
           proposalId,
         };
         for await (
-          const step of client.methods.executeProposal(executeParams)
+          const step of client.methods.executeProposal(
+            executeParams,
+          )
         ) {
           switch (step.key) {
             case ExecuteProposalStep.EXECUTING:
@@ -548,7 +543,7 @@ describe("Token Voting Client", () => {
         // for some reason subgraph does not have
         // addresses here
         if (wallets.length > 0) {
-          expect(wallets.length).TobeGr(0);
+          expect(wallets.length).toBeGreaterThan(0);
           expect(typeof wallets[0]).toBe("string");
           expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         }
@@ -564,10 +559,12 @@ describe("Token Voting Client", () => {
               title: "Title",
               summary: "Summary",
               description: "Description",
-              resources: [{
-                name: "Name",
-                url: "url",
-              }],
+              resources: [
+                {
+                  name: "Name",
+                  url: "url",
+                },
+              ],
             }),
           ),
         );
@@ -640,10 +637,8 @@ describe("Token Voting Client", () => {
             expect(typeof proposal.token.symbol).toBe("string");
             expect(typeof proposal.token.address).toBe("string");
             expect(proposal.token.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-            if ("decimals" in proposal.token) {
+            if (proposal.token.type === TokenType.ERC20) {
               expect(typeof proposal.token.decimals).toBe("number");
-            } else if ("baseUri" in proposal.token) {
-              expect(typeof proposal.token.baseUri).toBe("string");
             }
           }
           expect(typeof proposal.usedVotingWeight).toBe("bigint");
@@ -657,6 +652,7 @@ describe("Token Voting Client", () => {
               expect(typeof vote.vote).toBe("number");
             }
             expect(typeof vote.weight).toBe("bigint");
+            expect(typeof vote.voteReplaced).toBe("boolean");
           }
           if (proposal.executionTxHash) {
             expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);

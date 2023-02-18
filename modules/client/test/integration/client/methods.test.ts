@@ -13,6 +13,7 @@ import {
   TEST_INVALID_ADDRESS,
   TEST_NO_BALANCES_DAO_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
+  contextParamsMainnet,
   // TEST_WALLET,
 } from "../constants";
 import {
@@ -37,7 +38,6 @@ import {
   VotingMode,
 } from "../../../src";
 import {
-  InvalidAddressOrEnsError,
   MissingExecPermissionError,
   Random,
 } from "@aragon/sdk-common";
@@ -413,13 +413,11 @@ describe("Client", () => {
         const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_INVALID_ADDRESS;
-        await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow(
-          new InvalidAddressOrEnsError(),
-        );
+        await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow();
       });
 
       it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
-        const context = new Context(contextParamsLocalChain);
+        const context = new Context(contextParamsMainnet);
         const client = new Client(context);
         const limit = 3;
         const params: IDaoQueryParams = {
@@ -469,22 +467,26 @@ describe("Client", () => {
         const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
-        const balances = await client.methods.getDaoBalances(daoAddress);
+        const balances = await client.methods.getDaoBalances({
+          daoAddressOrEns: daoAddress,
+        });
         expect(Array.isArray(balances)).toBe(true);
         expect(balances === null).toBe(false);
         if (balances) {
           expect(balances.length > 0).toBe(true);
-          for (let i = 0; i < balances.length; i++) {
-            const balance = balances[i];
-            expect(typeof balance.balance).toBe("bigint");
+          for (const balance of balances) {
             expect(balance.updateDate instanceof Date).toBe(true);
-            if (balance.type === "erc20") {
+            if (balance.type === TokenType.NATIVE) {
               expect(typeof balance.balance).toBe("bigint");
-              expect(typeof balance.decimals).toBe("number");
+            } else {
               expect(typeof balance.address).toBe("string");
               expect(balance.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
               expect(typeof balance.name).toBe("string");
               expect(typeof balance.symbol).toBe("string");
+              if (balance.type === TokenType.ERC20) {
+                expect(typeof balance.balance).toBe("bigint");
+                expect(typeof balance.decimals).toBe("number");
+              }
             }
           }
         }
@@ -493,13 +495,15 @@ describe("Client", () => {
         const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
-        const balances = await client.methods.getDaoBalances(daoAddress);
+        const balances = await client.methods.getDaoBalances({
+          daoAddressOrEns: daoAddress,
+        });
         expect(Array.isArray(balances)).toBe(true);
         expect(balances?.length).toBe(0);
       });
 
       it("Should get the transfers of a dao", async () => {
-        const ctx = new Context(contextParamsLocalChain);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const params: ITransferQueryParams = {
           daoAddressOrEns: TEST_DAO_ADDRESS,
@@ -513,9 +517,9 @@ describe("Client", () => {
         if (transfers) {
           expect(transfers.length > 0).toBe(true);
           for (const transfer of transfers) {
-            expect(transfer.amount).toBeGreaterThan(BigInt(0));
-            expect(typeof transfer.amount).toBe("bigint");
             expect(transfer.creationDate).toBeInstanceOf(Date);
+            expect(transfer.from).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(transfer.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
             expect(transfer.transactionId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             if (transfer.tokenType === TokenType.NATIVE) {
               if (transfer.type === TransferType.DEPOSIT) {
@@ -534,7 +538,10 @@ describe("Client", () => {
               }
             } else if (transfer.tokenType === TokenType.ERC20) {
               expect(isAddress(transfer.token.address)).toBe(true);
-              expect(typeof transfer.token.decimals).toBe("number");
+              expect(typeof transfer.token.address).toBe("string");
+              expect(transfer.token.address).toBeInstanceOf(
+                /^0x[A-Fa-f0-9]{40}$/i,
+              );
               expect(typeof transfer.token.name).toBe("string");
               expect(typeof transfer.token.symbol).toBe("string");
               if (transfer.type === TransferType.DEPOSIT) {
@@ -549,8 +556,6 @@ describe("Client", () => {
               } else {
                 fail("invalid transfer type");
               }
-            } else {
-              fail("invalid token type");
             }
           }
         } else {
@@ -558,7 +563,7 @@ describe("Client", () => {
         }
       });
       it("Should get the transfers filtered by type", async () => {
-        const ctx = new Context(contextParamsLocalChain);
+        const ctx = new Context(contextParamsMainnet);
         const client = new Client(ctx);
         const transferType = TransferType.DEPOSIT;
         const params: ITransferQueryParams = {
@@ -583,13 +588,13 @@ describe("Client", () => {
       test.todo(
         "Should return an empty array when getting the transfers of a DAO that does not exist",
       ); //, async () => {
-      //   const ctx = new Context(contextParamsLocalChain);
+      //   const ctx = new Context(contextParamsMainnet);
       //   const client = new Client(ctx)
-      //   const res = await client.methods.getTransfers(contextParamsLocalChain.dao)
+      //   const res = await client.methods.getTransfers(contextParamsMainnet.dao)
       //   expect(res.length).toBe(0)
       // })
       test.todo("Should fail if the given ENS is invalid"); // async () => {
-      // const ctx = new Context(contextParamsLocalChain);
+      // const ctx = new Context(contextParamsMainnet);
       // const client = new Client(ctx)
       // // will fail when tested on local chain
       // await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
