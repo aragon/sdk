@@ -1,6 +1,8 @@
 import {
   boolArrayToBitmap,
   decodeProposalId,
+  encodeProposalId,
+  encodeProposalIdSubgraph,
   GraphQLError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -129,14 +131,14 @@ export class MultisigClientMethods extends ClientCore
     }
 
     const parsedLog = multisigContractInterface.parseLog(log);
-    const proposalId: string = parsedLog.args["proposalId"];
+    const proposalId = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId,
+      proposalId: encodeProposalId(params.pluginAddress, Number(proposalId)),
     };
   }
 
@@ -176,7 +178,7 @@ export class MultisigClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const multisigContract = Multisig__factory.connect(
       pluginAddress,
@@ -184,7 +186,7 @@ export class MultisigClientMethods extends ClientCore
     );
 
     const tx = await multisigContract.approve(
-      params.proposalId,
+      id,
       params.tryExecution,
     );
 
@@ -219,7 +221,7 @@ export class MultisigClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const multisigContract = Multisig__factory.connect(
       pluginAddress,
@@ -227,7 +229,7 @@ export class MultisigClientMethods extends ClientCore
     );
 
     const tx = await multisigContract.execute(
-      params.proposalId,
+      id,
     );
 
     yield {
@@ -265,14 +267,14 @@ export class MultisigClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const multisigContract = Multisig__factory.connect(
       pluginAddress,
       signer,
     );
 
-    return multisigContract.canApprove(params.proposalId, params.addressOrEns);
+    return multisigContract.canApprove(id, params.addressOrEns);
   }
   /**
    * Checks whether the current proposal can be executed
@@ -294,14 +296,14 @@ export class MultisigClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const multisigContract = Multisig__factory.connect(
       pluginAddress,
       signer,
     );
 
-    return multisigContract.canExecute(params.proposalId);
+    return multisigContract.canExecute(id);
   }
   /**
    * Returns the voting settings
@@ -376,6 +378,7 @@ export class MultisigClientMethods extends ClientCore
     if (!proposalId) {
       throw new InvalidProposalIdError();
     }
+    const decodedProposalId = decodeProposalId(proposalId)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -384,7 +387,7 @@ export class MultisigClientMethods extends ClientCore
       }: {
         multisigProposal: SubgraphMultisigProposal;
       } = await client.request(QueryMultisigProposal, {
-        proposalId,
+        proposalId: encodeProposalIdSubgraph(decodedProposalId.pluginAddress, decodedProposalId.id),
       });
       if (!multisigProposal) {
         return null;

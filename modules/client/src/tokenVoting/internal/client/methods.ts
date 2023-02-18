@@ -3,6 +3,8 @@ import {
   boolArrayToBitmap,
   decodeProposalId,
   decodeRatio,
+  encodeProposalId,
+  encodeProposalIdSubgraph,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -138,14 +140,14 @@ export class TokenVotingClientMethods extends ClientCore
     }
 
     const parsedLog = tokenVotingContractInterface.parseLog(log);
-    const proposalId: string = parsedLog.args["proposalId"];
+    const proposalId = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId,
+      proposalId: encodeProposalId(params.pluginAddress, Number(proposalId)),
     };
   }
 
@@ -186,7 +188,7 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
@@ -194,7 +196,7 @@ export class TokenVotingClientMethods extends ClientCore
     );
 
     const tx = await tokenVotingContract.vote(
-      params.proposalId,
+      id,
       params.vote,
       false,
     );
@@ -228,13 +230,13 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
       signer,
     );
-    const tx = await tokenVotingContract.execute(params.proposalId);
+    const tx = await tokenVotingContract.execute(id);
 
     yield {
       key: ExecuteProposalStep.EXECUTING,
@@ -263,14 +265,16 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
       signer,
     );
-    return tokenVotingContract.callStatic.isMember(
+    return tokenVotingContract.callStatic.canVote(
+      id,
       params.address,
+      params.vote
     );
   }
 
@@ -294,14 +298,14 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
       signer,
     );
 
-    return tokenVotingContract.canExecute(params.proposalId);
+    return tokenVotingContract.canExecute(id);
   }
   /**
    * Returns the list of wallet addresses holding tokens from the underlying Token contract used by the plugin
@@ -343,6 +347,7 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
+    const decodedProposalId = decodeProposalId(proposalId);
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -351,7 +356,10 @@ export class TokenVotingClientMethods extends ClientCore
       }: {
         tokenVotingProposal: SubgraphTokenVotingProposal;
       } = await client.request(QueryTokenVotingProposal, {
-        proposalId,
+        proposalId: encodeProposalIdSubgraph(
+          decodedProposalId.pluginAddress,
+          decodedProposalId.id,
+        ),
       });
       if (!tokenVotingProposal) {
         return null;

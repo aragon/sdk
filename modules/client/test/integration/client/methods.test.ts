@@ -8,7 +8,6 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import {
   contextParamsLocalChain,
-  contextParamsMainnet,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
   TEST_NO_BALANCES_DAO_ADDRESS,

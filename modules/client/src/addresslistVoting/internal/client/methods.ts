@@ -2,6 +2,7 @@ import {
   boolArrayToBitmap,
   decodeProposalId,
   decodeRatio,
+  encodeProposalId,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -12,6 +13,7 @@ import {
   NoSignerError,
   ProposalCreationError,
   resolveIpfsCid,
+  encodeProposalIdSubgraph
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -137,14 +139,14 @@ export class AddresslistVotingClientMethods extends ClientCore
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
-    const proposalId: string = parsedLog.args["proposalId"];
+    const proposalId = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId,
+      proposalId: encodeProposalId(params.pluginAddress, Number(proposalId)),
     };
   }
 
@@ -183,7 +185,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
@@ -191,7 +193,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     );
 
     const tx = await addresslistContract.vote(
-      params.proposalId,
+      id,
       params.vote,
       false,
     );
@@ -228,13 +230,13 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
       signer,
     );
-    const tx = await addresslistContract.execute(params.proposalId);
+    const tx = await addresslistContract.execute(id);
 
     yield {
       key: ExecuteProposalStep.EXECUTING,
@@ -263,14 +265,14 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
       signer,
     );
     return addresslistContract.callStatic.canVote(
-      params.proposalId,
+      id,
       params.address,
       params.vote,
     );
@@ -294,14 +296,14 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!isProposalId(params.proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
       signer,
     );
 
-    return addresslistContract.canExecute(params.proposalId);
+    return addresslistContract.canExecute(id);
   }
   /**
    * Returns the list of wallet addresses with signing capabilities on the plugin
@@ -342,6 +344,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!proposalId) {
       throw new InvalidProposalIdError();
     }
+    const decodedProposalId = decodeProposalId(proposalId)
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -350,7 +353,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       }: {
         addresslistVotingProposal: SubgraphAddresslistVotingProposal;
       } = await client.request(QueryAddresslistVotingProposal, {
-        proposalId,
+        proposalId: encodeProposalIdSubgraph(decodedProposalId.pluginAddress, decodedProposalId.id),
       });
       if (!addresslistVotingProposal) {
         return null;

@@ -134,6 +134,35 @@ export function decodeProposalId(
   };
 }
 
+/** Encodes the particles of a proposalId into a globally unque value for subgraph */
+export function encodeProposalIdSubgraph(pluginAddress: string, id: number) {
+  if (!/^0x[A-Za-z0-9]{40}$/.test(pluginAddress)) {
+    throw new Error("Invalid address");
+  }
+
+  return `${pluginAddress}_0x${id.toString(16)}`
+}
+
+/** Decodes a proposalId from subgraph and returns the original pluginAddress and the nonce */
+export function decodeProposalIdSubgraph(
+  proposalId: string,
+): { pluginAddress: string; id: number } {
+  if (!/^0x[A-Za-z0-9]{40}_0x[A-Za-z0-9]{1,}$/.test(proposalId)) {
+    throw new Error("Invalid proposalId");
+  }
+
+  const matchedRegexResult =
+  proposalId.match(/^(0x[A-Za-z0-9]{40})_(0x[A-Za-z0-9]{1,})$/) || [];
+if (matchedRegexResult.length !== 3) {
+  throw new Error("Failed to deconstruct proposalId");
+}
+
+return {
+  pluginAddress: matchedRegexResult[1],
+  id: parseInt(strip0x(matchedRegexResult[2]), 16),
+};
+}
+
 /** Transforms an array of booleans into a bitmap big integer */
 export function boolArrayToBitmap(bools?: Array<boolean>) {
   if (!bools || !bools.length) return BigInt(0);

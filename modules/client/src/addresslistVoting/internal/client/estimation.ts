@@ -12,10 +12,10 @@ import { IAddresslistVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   boolArrayToBitmap,
-  decodeProposalId,
   InvalidProposalIdError,
   NoProviderError,
   NoSignerError,
+  decodeProposalId
 } from "@aragon/sdk-common";
 
 /**

@@ -17,6 +17,11 @@
   dependencies:
     ethers "^5.6.2"
 
+"@aragon/sdk-common@^0.10.0-beta":
+  version "0.10.0-beta"
+  resolved "https://registry.yarnpkg.com/@aragon/sdk-common/-/sdk-common-0.10.0-beta.tgz#c33af6b8983db18b0fbf8d60fe3836c93ce1e666"
+  integrity sha512-A0c46wEF6ubh7tRsMtd80POgkLrE2gcfHM0A19SKzEIod8UVdj/kgfzGush9wBAdx7THnXQLg28mnAU303IBRw==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.18.6", "@babel/code-frame@^7.5.5":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.18.6.tgz#3b25d38c89600baa2dcc219edfa88a74eb2c427a"

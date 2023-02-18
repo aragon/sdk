@@ -27,7 +27,12 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
-import { decodeRatio, hexToBytes } from "@aragon/sdk-common";
+import {
+  decodeProposalIdSubgraph,
+  decodeRatio,
+  encodeProposalId,
+  hexToBytes,
+} from "@aragon/sdk-common";
 import { TokenType } from "../../interfaces";
 
 export function toTokenVotingProposal(
@@ -49,8 +54,9 @@ export function toTokenVotingProposal(
     usedVotingWeight += BigInt(voter.votingPower);
   }
   const token = parseToken(proposal.plugin.token);
+  const decodedProposalId = decodeProposalIdSubgraph(proposal.id);
   return {
-    id: proposal.id,
+    id: encodeProposalId(decodedProposalId.pluginAddress, decodedProposalId.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
@@ -120,8 +126,9 @@ export function toTokenVotingProposalListItem(
   );
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   const token = parseToken(proposal.plugin.token);
+  const decodedProposalId = decodeProposalIdSubgraph(proposal.id);
   return {
-    id: proposal.id,
+    id: encodeProposalId(decodedProposalId.pluginAddress, decodedProposalId.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
@@ -182,21 +189,21 @@ export function tokenVotingInitParamsToContract(
 function parseToken(
   subgraphToken: SubgraphErc20Token | SubgraphErc721Token,
 ): Erc20TokenDetails | Erc721TokenDetails | null {
-  let token: Erc721TokenDetails| Erc20TokenDetails | null = null;
+  let token: Erc721TokenDetails | Erc20TokenDetails | null = null;
   if (subgraphToken.__typename === SubgraphContractType.ERC20) {
     token = {
       address: subgraphToken.id,
       symbol: subgraphToken.symbol,
       name: subgraphToken.name,
       decimals: subgraphToken.decimals,
-      type: TokenType.ERC20
+      type: TokenType.ERC20,
     };
   } else if (subgraphToken.__typename === SubgraphContractType.ERC721) {
     token = {
       address: subgraphToken.id,
       symbol: subgraphToken.symbol,
       name: subgraphToken.name,
-      type: TokenType.ERC721
+      type: TokenType.ERC721,
     };
   }
   return token;
