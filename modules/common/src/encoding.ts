@@ -147,12 +147,12 @@ export function encodeProposalIdSubgraph(pluginAddress: string, id: number) {
 export function decodeProposalIdSubgraph(
   proposalId: string,
 ): { pluginAddress: string; id: number } {
-  if (!/^0x[A-Za-z0-9]{40}_0x[A-Za-z0-9]{1,}$/.test(proposalId)) {
+  if (!/^0x[A-Za-z0-9]{40}_0x[A-Za-z0-9]+$/.test(proposalId)) {
     throw new Error("Invalid proposalId");
   }
 
   const matchedRegexResult =
-    proposalId.match(/^(0x[A-Za-z0-9]{40})_(0x[A-Za-z0-9]{1,})$/) || [];
+    proposalId.match(/^(0x[A-Za-z0-9]{40})_(0x[A-Za-z0-9]+)$/) || [];
   if (matchedRegexResult.length !== 3) {
     throw new Error("Failed to deconstruct proposalId");
   }
