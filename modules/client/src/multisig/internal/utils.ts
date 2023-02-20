@@ -21,10 +21,10 @@ export function toMultisigProposal(
     parseInt(proposal.createdAt) * 1000,
   );
   const startDate = new Date(
-    parseInt(proposal.endDate) * 1000,
+    parseInt(proposal.startDate) * 1000,
   );
   const endDate = new Date(
-    parseInt(proposal.startDate) * 1000,
+    parseInt(proposal.endDate) * 1000,
   );
   return {
     id: proposal.id,

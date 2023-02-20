@@ -536,17 +536,15 @@ describe("Token Voting Client", () => {
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
-        const pluginAddress = TEST_TOKEN_VOTING_PLUGIN_ADDRESS;
-        const wallets = await client.methods.getMembers(pluginAddress);
+        const wallets = await client.methods.getMembers(
+          TEST_TOKEN_VOTING_PLUGIN_ADDRESS,
+        );
 
         expect(Array.isArray(wallets)).toBe(true);
-        // TODO
-        // for some reason subgraph does not have
-        // addresses here
-        if (wallets.length > 0) {
-          expect(wallets.length).TobeGr(0);
-          expect(typeof wallets[0]).toBe("string");
-          expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(wallets.length).toBeGreaterThan(0);
+        for (const wallet of wallets) {
+          expect(typeof wallet).toBe("string");
+          expect(wallet).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         }
       });
       it("Should fetch the given proposal", async () => {
