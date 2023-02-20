@@ -15,6 +15,11 @@ TEMPLATE:
 ## UPCOMING
 ### Changed
 - `proposalId` is now a `string` everywhere and follows the new general format
+- `canExecute()` and `execute()` expect the `proposalId` as parameter now.
+
+
+### Removed
+- removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces
 
 ## [0.21.1-beta]
 ### Fixed 
