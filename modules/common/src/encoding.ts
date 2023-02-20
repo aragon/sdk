@@ -104,7 +104,7 @@ export function decodeRatio(
 
 /** Encodes the particles of a proposalId into a globally unque value for subgraph */
 export function encodeProposalId(pluginAddress: string, id: number) {
-  if (!/^0x[A-Za-z0-9]{40}$/.test(pluginAddress)) {
+  if (!/^0x[A-Fa-f0-9]{40}$/.test(pluginAddress)) {
     throw new Error("Invalid address");
   }
 
@@ -115,12 +115,12 @@ export function encodeProposalId(pluginAddress: string, id: number) {
 export function decodeProposalId(
   proposalId: string,
 ): { pluginAddress: string; id: number } {
-  if (!/^0x[A-Za-z0-9]{40}_(0x[A-Fa-f0-9]{1,64})$/.test(proposalId)) {
+  if (!/^0x[A-Fa-f0-9]{40}_(0x[A-Fa-f0-9]{1,64})$/.test(proposalId)) {
     throw new Error("Invalid proposalId");
   }
 
   const matchedRegexResult =
-    proposalId.match(/^(0x[A-Za-z0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/) || [];
+    proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/) || [];
   if (matchedRegexResult.length !== 3) {
     throw new Error("Failed to deconstruct proposalId");
   }

@@ -375,7 +375,7 @@ export class MultisigClientMethods extends ClientCore
     if (!proposalId) {
       throw new InvalidProposalIdError();
     }
-    if (!/^0x[A-Za-z0-9]{40}_(0x[A-Fa-f0-9]{1,64})$/.test(proposalId)) {
+    if (!/^0x[A-Fa-f0-9]{40}_(0x[A-Fa-f0-9]{1,64})$/.test(proposalId)) {
       throw new InvalidProposalIdError();
     }
     try {
