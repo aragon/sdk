@@ -19,7 +19,6 @@ import {
   ApproveProposalStepValue,
   CanApproveParams,
   CreateMultisigProposalParams,
-  ExecuteProposalParams,
   IMultisigClientMethods,
   MultisigProposal,
   MultisigProposalListItem,
@@ -30,7 +29,6 @@ import {
   SubgraphMultisigVotingSettings,
 } from "../../interfaces";
 import {
-  CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
@@ -203,12 +201,12 @@ export class MultisigClientMethods extends ClientCore
   /**
    * Allow a wallet in the multisig give approval to a proposal
    *
-   * @param {params} ExecuteProposalParams
+   * @param {string} proposalId
    * @return {*}  {AsyncGenerator<ExecuteMultisigProposalStepValue>}
    * @memberof MultisigClientMethods
    */
   public async *executeProposal(
-    params: ExecuteProposalParams,
+    proposalId: string,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -217,10 +215,10 @@ export class MultisigClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(params.proposalId)) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const multisigContract = Multisig__factory.connect(
       pluginAddress,
@@ -278,12 +276,12 @@ export class MultisigClientMethods extends ClientCore
   /**
    * Checks whether the current proposal can be executed
    *
-   * @param {string} addressOrEns
+   * @param {string} proposalId
    * @return {*}  {Promise<boolean>}
    * @memberof MultisigClientMethods
    */
   public async canExecute(
-    params: CanExecuteParams,
+    proposalId: string
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -292,10 +290,10 @@ export class MultisigClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(params.proposalId)) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const multisigContract = Multisig__factory.connect(
       pluginAddress,

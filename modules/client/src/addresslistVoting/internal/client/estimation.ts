@@ -4,7 +4,6 @@ import {
   ContextPlugin,
   GasFeeEstimation,
   ICreateProposalParams,
-  IExecuteProposalParams,
   isProposalId,
   IVoteProposalParams,
 } from "../../../client-common";
@@ -117,12 +116,12 @@ export class AddresslistVotingClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of executing an AddressList proposal
    *
-   * @param {IExecuteProposalParams} params
+   * @param {string} proposalId
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
   public async executeProposal(
-    params: IExecuteProposalParams,
+    proposalId: string,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -131,11 +130,11 @@ export class AddresslistVotingClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(params.proposalId)) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
     const { pluginAddress, id } = decodeProposalId(
-      params.proposalId,
+      proposalId,
     );
 
     const addresslistContract = AddresslistVoting__factory.connect(

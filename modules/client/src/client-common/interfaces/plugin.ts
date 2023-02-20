@@ -84,19 +84,11 @@ export interface IVoteProposalParams {
   proposalId: string;
 }
 
-export interface IExecuteProposalParams {
-  proposalId: string;
-}
-
 export interface ICanVoteParams {
   proposalId: string;
   address: string;
   vote: VoteValues;
 }
-
-export type CanExecuteParams = {
-  proposalId: string;
-};
 
 /**
  * Contains the human-readable information about a proposal

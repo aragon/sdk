@@ -15,7 +15,6 @@ import {
 import {
   ApproveMultisigProposalParams,
   CreateMultisigProposalParams,
-  ExecuteProposalParams,
   IMultisigClientEstimation,
 } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -112,12 +111,12 @@ export class MultisigClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of executing a proposal
    *
-   * @param {ExecuteProposalParams} params
+   * @param {string} proposalId
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof MultisigClientEstimation
    */
   public async executeProposal(
-    params: ExecuteProposalParams,
+    proposalId: string,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -126,11 +125,11 @@ export class MultisigClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(params.proposalId)) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
     const { pluginAddress, id } = decodeProposalId(
-      params.proposalId,
+      proposalId,
     );
 
     const multisigContract = Multisig__factory.connect(

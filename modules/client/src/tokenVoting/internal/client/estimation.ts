@@ -4,7 +4,6 @@ import {
   ContextPlugin,
   GasFeeEstimation,
   ICreateProposalParams,
-  IExecuteProposalParams,
   isProposalId,
   IVoteProposalParams,
 } from "../../../client-common";
@@ -113,12 +112,12 @@ export class TokenVotingClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of executing a TokenVoting proposal
    *
-   * @param {IExecuteProposalParams} params
+   * @param {string} proposalId
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async executeProposal(
-    params: IExecuteProposalParams,
+    proposalId: string,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -127,11 +126,11 @@ export class TokenVotingClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(params.proposalId)) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
     const { pluginAddress, id } = decodeProposalId(
-      params.proposalId,
+      proposalId,
     );
 
     const tokenVotingContract = TokenVoting__factory.connect(

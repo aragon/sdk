@@ -34,7 +34,7 @@ import {
 } from "../constants";
 import { Server } from "ganache";
 // import { advanceBlocks } from "../../helpers/advance-blocks";
-import { CanExecuteParams, ExecuteProposalStep } from "../../../src";
+import { ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -225,17 +225,14 @@ describe("Client Multisig", () => {
       const { plugin: pluginAddress } = await buildDao();
 
       const proposalId = await buildProposal(pluginAddress, client);
-      const canExecuteParams: CanExecuteParams = {
-        proposalId,
-      };
-      let canExecute = await client.methods.canExecute(canExecuteParams);
+      let canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
       // now approve
       await approveProposal(proposalId, client);
 
-      canExecute = await client.methods.canExecute(canExecuteParams);
+      canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(true);
     });
@@ -254,9 +251,8 @@ describe("Client Multisig", () => {
 
       for await (
         const step of client.methods.executeProposal(
-          {
+          
             proposalId,
-          },
         )
       ) {
         switch (step.key) {

@@ -1,7 +1,6 @@
 // This file contains the definitions of the TokenVoting client
 import { BigNumber } from "@ethersproject/bignumber";
 import {
-  CanExecuteParams,
   ContractVotingSettings,
   DaoAction,
   ExecuteProposalStepValue,
@@ -9,7 +8,6 @@ import {
   ICanVoteParams,
   IClientCore,
   ICreateProposalParams,
-  IExecuteProposalParams,
   IInterfaceParams,
   IProposalQueryParams,
   IProposalSettings,
@@ -39,10 +37,10 @@ export interface ITokenVotingClientMethods extends IClientCore {
     params: IVoteProposalParams,
   ) => AsyncGenerator<VoteProposalStepValue>;
   executeProposal: (
-    params: IExecuteProposalParams,
+    proposalId: string
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canVote: (params: ICanVoteParams) => Promise<boolean>;
-  canExecute: (params: CanExecuteParams) => Promise<boolean>;
+  canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
   getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;
   getProposals: (
@@ -75,7 +73,7 @@ export interface ITokenVotingClientEstimation extends IClientCore {
   ) => Promise<GasFeeEstimation>;
   voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
   executeProposal: (
-    params: IExecuteProposalParams,
+    proposalId: string,
   ) => Promise<GasFeeEstimation>;
 }
 

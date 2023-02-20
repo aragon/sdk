@@ -9,13 +9,11 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   AddresslistVotingClient,
-  CanExecuteParams,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
   ICanVoteParams,
   ICreateProposalParams,
-  IExecuteProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -301,10 +299,7 @@ describe("Client Address List", () => {
       expect(typeof proposalId).toBe("string");
       expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-      const canExecuteParams: CanExecuteParams = {
-        proposalId,
-      };
-      let canExecute = await client.methods.canExecute(canExecuteParams);
+      let canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
@@ -313,7 +308,7 @@ describe("Client Address List", () => {
       // Force date past end
       await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
-      canExecute = await client.methods.canExecute(canExecuteParams);
+      canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(true);
     });
@@ -335,10 +330,7 @@ describe("Client Address List", () => {
       expect(typeof proposalId).toBe("string");
       expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-      const canExecuteParams: CanExecuteParams = {
-        proposalId,
-      };
-      let canExecute = await client.methods.canExecute(canExecuteParams);
+      let canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
@@ -346,7 +338,7 @@ describe("Client Address List", () => {
       await voteProposal(proposalId, client);
       // No waiting
 
-      canExecute = await client.methods.canExecute(canExecuteParams);
+      canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(true);
     });
@@ -368,17 +360,14 @@ describe("Client Address List", () => {
       expect(typeof proposalId).toBe("string");
       expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-      const canExecuteParams: CanExecuteParams = {
-        proposalId,
-      };
-      let canExecute = await client.methods.canExecute(canExecuteParams);
+      let canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
       // vote no
       await voteProposal(proposalId, client, VoteValues.NO);
 
-      canExecute = await client.methods.canExecute(canExecuteParams);
+      canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
@@ -388,7 +377,7 @@ describe("Client Address List", () => {
       // Force date past end
       await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
-      canExecute = await client.methods.canExecute(canExecuteParams);
+      canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(true);
     });
@@ -418,11 +407,8 @@ describe("Client Address List", () => {
       await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
       // Execute
-      const executeParams: IExecuteProposalParams = {
-        proposalId,
-      };
       for await (
-        const step of client.methods.executeProposal(executeParams)
+        const step of client.methods.executeProposal(proposalId)
       ) {
         switch (step.key) {
           case ExecuteProposalStep.EXECUTING:
@@ -462,11 +448,8 @@ describe("Client Address List", () => {
       // No waiting here
 
       // Execute
-      const executeParams: IExecuteProposalParams = {
-        proposalId,
-      };
       for await (
-        const step of client.methods.executeProposal(executeParams)
+        const step of client.methods.executeProposal(proposalId)
       ) {
         switch (step.key) {
           case ExecuteProposalStep.EXECUTING:
@@ -508,11 +491,8 @@ describe("Client Address List", () => {
       await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
       // Execute
-      const executeParams: IExecuteProposalParams = {
-        proposalId,
-      };
       for await (
-        const step of client.methods.executeProposal(executeParams)
+        const step of client.methods.executeProposal(proposalId)
       ) {
         switch (step.key) {
           case ExecuteProposalStep.EXECUTING:

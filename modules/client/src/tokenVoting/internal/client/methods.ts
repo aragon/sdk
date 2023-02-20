@@ -16,7 +16,6 @@ import {
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import {
-  CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
@@ -25,7 +24,6 @@ import {
   findLog,
   ICanVoteParams,
   ICreateProposalParams,
-  IExecuteProposalParams,
   IProposalQueryParams,
   isProposalId,
   IVoteProposalParams,
@@ -212,12 +210,12 @@ export class TokenVotingClientMethods extends ClientCore
   /**
    * Executes the given proposal, provided that it has already passed
    *
-   * @param {IExecuteProposalParams} params
+   * @param {string} proposalId
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
    * @memberof TokenVotingClient
    */
   public async *executeProposal(
-    params: IExecuteProposalParams,
+    proposalId: string,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -226,10 +224,10 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(params.proposalId)) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
@@ -280,12 +278,12 @@ export class TokenVotingClientMethods extends ClientCore
   /**
    * Checks whether the current proposal can be executed
    *
-   * @param {string} addressOrEns
+   * @param {string} proposalId
    * @return {*}  {Promise<boolean>}
    * @memberof TokenVotingClientMethods
    */
   public async canExecute(
-    params: CanExecuteParams,
+    proposalId: string,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -294,10 +292,10 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(params.proposalId)) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const { pluginAddress, id } = decodeProposalId(params.proposalId);
+    const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,

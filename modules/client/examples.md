@@ -3104,7 +3104,6 @@ true
 
 ```ts
 import {
-  CanExecuteParams,
   Context,
   ContextPlugin,
   MultisigClient,
@@ -3117,10 +3116,7 @@ const context: Context = new Context(contextParams);
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
-const canExecuteParams: CanExecuteParams = {
-  proposalId: "0x1234567890123456789012345678901234567890_0x0",
-};
-const canExecute = await client.methods.canExecute(canExecuteParams);
+const canExecute = await client.methods.canExecute("0x1234567890123456789012345678901234567890_0x0");
 console.log(canExecute);
 /*
 true

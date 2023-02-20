@@ -2,13 +2,11 @@
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import {
-  CanExecuteParams,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
   ICanVoteParams,
   ICreateProposalParams,
-  IExecuteProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -292,10 +290,7 @@ describe("Token Voting Client", () => {
         expect(typeof proposalId).toBe("string");
         expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-        const canExecuteParams: CanExecuteParams = {
-          proposalId,
-        };
-        let canExecute = await client.methods.canExecute(canExecuteParams);
+        let canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(false);
 
@@ -304,7 +299,7 @@ describe("Token Voting Client", () => {
         // Force date past end
         await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
-        canExecute = await client.methods.canExecute(canExecuteParams);
+        canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(true);
       });
@@ -326,10 +321,7 @@ describe("Token Voting Client", () => {
         expect(typeof proposalId).toBe("string");
         expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-        const canExecuteParams: CanExecuteParams = {
-          proposalId,
-        };
-        let canExecute = await client.methods.canExecute(canExecuteParams);
+        let canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(false);
 
@@ -337,7 +329,7 @@ describe("Token Voting Client", () => {
         await voteProposal(proposalId, client);
         // No waiting
 
-        canExecute = await client.methods.canExecute(canExecuteParams);
+        canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(true);
       });
@@ -359,17 +351,14 @@ describe("Token Voting Client", () => {
         expect(typeof proposalId).toBe("string");
         expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-        const canExecuteParams: CanExecuteParams = {
-          proposalId,
-        };
-        let canExecute = await client.methods.canExecute(canExecuteParams);
+        let canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(false);
 
         // vote no
         await voteProposal(proposalId, client, VoteValues.NO);
 
-        canExecute = await client.methods.canExecute(canExecuteParams);
+        canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(false);
 
@@ -379,7 +368,7 @@ describe("Token Voting Client", () => {
         // Force date past end
         await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
-        canExecute = await client.methods.canExecute(canExecuteParams);
+        canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(true);
       });
@@ -409,12 +398,9 @@ describe("Token Voting Client", () => {
         await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
         // Execute
-        const executeParams: IExecuteProposalParams = {
-          proposalId,
-        };
         for await (
           const step of client.methods.executeProposal(
-            executeParams,
+            proposalId,
           )
         ) {
           switch (step.key) {
@@ -455,12 +441,9 @@ describe("Token Voting Client", () => {
         // No waiting here
 
         // Execute
-        const executeParams: IExecuteProposalParams = {
-          proposalId,
-        };
         for await (
           const step of client.methods.executeProposal(
-            executeParams,
+            proposalId,
           )
         ) {
           switch (step.key) {
@@ -504,12 +487,9 @@ describe("Token Voting Client", () => {
         await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
         // Execute
-        const executeParams: IExecuteProposalParams = {
-          proposalId,
-        };
         for await (
           const step of client.methods.executeProposal(
-            executeParams,
+            proposalId,
           )
         ) {
           switch (step.key) {
