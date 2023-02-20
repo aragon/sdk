@@ -251,8 +251,7 @@ describe("Client Multisig", () => {
 
       for await (
         const step of client.methods.executeProposal(
-          
-            proposalId,
+          proposalId,
         )
       ) {
         switch (step.key) {

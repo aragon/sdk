@@ -281,7 +281,7 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async canExecute(
-    proposalId: string
+    proposalId: string,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {

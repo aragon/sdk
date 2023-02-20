@@ -37,7 +37,7 @@ export interface ITokenVotingClientMethods extends IClientCore {
     params: IVoteProposalParams,
   ) => AsyncGenerator<VoteProposalStepValue>;
   executeProposal: (
-    proposalId: string
+    proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canVote: (params: ICanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
@@ -175,7 +175,7 @@ export type SubgraphErc20Token = SubgraphBaseToken & {
 };
 export type SubgraphErc721Token = SubgraphBaseToken & {
   __typename: SubgraphContractType.ERC721;
-}
+};
 
 export type SubgraphTokenVotingProposal =
   & SubgraphTokenVotingProposalListItem

@@ -72,7 +72,9 @@ describe("Token Voting Client", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
 
-      const estimation = await client.estimation.executeProposal("0x1234567890123456789012345678901234567890_0x0");
+      const estimation = await client.estimation.executeProposal(
+        "0x1234567890123456789012345678901234567890_0x0",
+      );
 
       expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");

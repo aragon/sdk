@@ -112,7 +112,7 @@ export type ApproveMultisigProposalParams = {
 };
 
 export type CanApproveParams = {
-  proposalId: string
+  proposalId: string;
   addressOrEns: string;
 };
 
