@@ -630,8 +630,7 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const proposalId = TEST_NON_EXISTING_ADDRESS +
-        "0x0";
+      const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x0";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(proposal === null).toBe(true);

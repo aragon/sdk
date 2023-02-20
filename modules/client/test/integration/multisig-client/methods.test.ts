@@ -375,8 +375,7 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
-      const proposalId = TEST_NON_EXISTING_ADDRESS +
-        "_0x0000000000000000000000000000000000000000000000000000000000000001";
+      const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x1";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(proposal === null).toBe(true);
