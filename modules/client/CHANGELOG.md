@@ -13,7 +13,15 @@ TEMPLATE:
 
 -->
 
-## [0.20.0-beta]
+## [0.21.1-beta]
+### Fixed 
+- `startDate` and `endDate` swapped on `getProposal` funtion of the multisig client
+
+### Changed
+- Update common package to `0.10.1-beta` 
+### Added
+- Add `endDate` and `startDate` to `MultisigProposalListItem`  
+## [0.21.0-beta]
 ### Changed
 - Update `getDaoBalances` parameters from `daoAddressOrEns` to `DaoBalancesQueryParams`
 

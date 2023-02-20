@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+## 0.10.1-beta
+- Fix `hextoBytes` throwing an error when `0x` is the input
+## 0.10.0-beta
 - Adds new error `EnsureAllowanceError`
 - Adds new error `InvalidPrecisionError`
 - Adds `boolArrayToBitmap` and `bitmapToBoolArray`

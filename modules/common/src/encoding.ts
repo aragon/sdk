@@ -1,7 +1,7 @@
 /** Decodes a hex string and returns it as a buffer */
 export function hexToBytes(hexString: string): Uint8Array {
   if (!hexString) return new Uint8Array();
-  else if (!/^(0x)?[0-9a-fA-F]+$/.test(hexString)) {
+  else if (!/^(0x)?[0-9a-fA-F]*$/.test(hexString)) {
     throw new Error("Invalid hex string");
   } else if (hexString.length % 2 !== 0) {
     throw new Error("The hex string has an odd length");

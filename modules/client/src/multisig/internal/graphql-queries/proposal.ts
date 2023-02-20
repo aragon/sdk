@@ -40,6 +40,8 @@ query MultisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: In
     metadata
     executed
     approvals
+    startDate
+    endDate
   }
 }
 `;

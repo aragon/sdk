@@ -25,6 +25,7 @@ describe("Value encoding", () => {
         serializedBuffer: "170,170,170,170,170,170,170,170",
       },
       { hex: "00", serializedBuffer: "0" },
+      { hex: "0x", serializedBuffer: "" },
       { hex: "10", serializedBuffer: "16" },
       { hex: "ff", serializedBuffer: "255" },
       { hex: "ffffffff", serializedBuffer: "255,255,255,255" },
