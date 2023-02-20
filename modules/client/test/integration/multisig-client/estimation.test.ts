@@ -77,7 +77,7 @@ describe("Client Multisig", () => {
       const client = new MultisigClient(ctxPlugin);
 
       const approveParams: ApproveMultisigProposalParams = {
-        proposalId: "0x1234567890123456789012345678901234567890_0x00",
+        proposalId: "0x1234567890123456789012345678901234567890_0x0",
         tryExecution: true,
       };
 
@@ -96,7 +96,7 @@ describe("Client Multisig", () => {
       const client = new MultisigClient(ctxPlugin);
       const estimation = await client.estimation.executeProposal(
         {
-          proposalId: "0x1234567890123456789012345678901234567890_0x00",
+          proposalId: "0x1234567890123456789012345678901234567890_0x0",
         },
       );
 

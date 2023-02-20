@@ -385,7 +385,7 @@ console.log(transfers);
     reference: "withdrawing from dao to:0xc8541aAE19C5069482239735AD64FAC3dCc52Ca2",
     transactionId: "0xdb0f9422b5c3199021481c98a655741ca16119ff8a59571854a94a6f31dad7ba",
     to: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
-    proposalId: "0x1234567890123456789012345678901234567890_0x00"
+    proposalId: "0x1234567890123456789012345678901234567890_0x0"
   },
   {
     type: "deposit",
@@ -846,7 +846,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  proposalId: "0x1234567890123456789012345678901234567890_0x00",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES,
 };
 
@@ -887,7 +887,7 @@ const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   address: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890_0x00",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES,
 };
 
@@ -948,7 +948,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
-const proposalId = "0x1234567890123456789012345678901234567890_0x00";
+const proposalId = "0x1234567890123456789012345678901234567890_0x0";
 
 const proposal: TokenVotingProposal | null = await client.methods.getProposal(
   proposalId,
@@ -956,7 +956,7 @@ const proposal: TokenVotingProposal | null = await client.methods.getProposal(
 console.log(proposal);
 /*
 {
-  id: "0x1234567890123456789012345678901234567890_0x00",
+  id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"
@@ -1546,7 +1546,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  proposalId: "0x1234567890123456789012345678901234567890_0x00",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES,
 };
 
@@ -1587,7 +1587,7 @@ const client = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
   address: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890_0x00",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES,
 };
 
@@ -1648,7 +1648,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an AddressList client
 const client = new AddresslistVotingClient(contextPlugin);
 
-const proposalId = "0x1234567890123456789012345678901234567890_0x00";
+const proposalId = "0x1234567890123456789012345678901234567890_0x0";
 
 const proposal: AddresslistVotingProposal | null = await client.methods
   .getProposal(
@@ -1657,7 +1657,7 @@ const proposal: AddresslistVotingProposal | null = await client.methods
 console.log(proposal);
 /*
 {
-  id: "0x1234567890123456789012345678901234567890_0x00",
+  id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"
@@ -3013,7 +3013,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
-  proposalId: "0x1234567890123456789012345678901234567890_0x00",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   tryExecution: true,
 };
 
@@ -3053,7 +3053,7 @@ const client = new MultisigClient(contextPlugin);
 
 const steps = client.methods.executeProposal(
   {
-    proposalId: "0x1234567890123456789012345678901234567890_0x00",
+    proposalId: "0x1234567890123456789012345678901234567890_0x0",
   },
 );
 for await (const step of steps) {
@@ -3090,7 +3090,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new MultisigClient(contextPlugin);
 const canApproveParams: CanApproveParams = {
   addressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890_0x00",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
 };
 
 const canApprove = await client.methods.canApprove(canApproveParams);
@@ -3118,7 +3118,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 const canExecuteParams: CanExecuteParams = {
-  proposalId: "0x1234567890123456789012345678901234567890_0x00",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
 };
 const canExecute = await client.methods.canExecute(canExecuteParams);
 console.log(canExecute);
@@ -3178,7 +3178,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 
-const proposalId = "0x1234567890123456789012345678901234567890_0x00";
+const proposalId = "0x1234567890123456789012345678901234567890_0x0";
 
 const proposal: MultisigProposal | null = await client.methods.getProposal(
   proposalId,
@@ -3186,7 +3186,7 @@ const proposal: MultisigProposal | null = await client.methods.getProposal(
 console.log(proposal);
 /*
 {
-  id: "0x1234567890123456789012345678901234567890_0x00",
+  id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"

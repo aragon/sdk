@@ -16,7 +16,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an AddressList client
 const client = new AddresslistVotingClient(contextPlugin);
 
-const proposalId = "0x1234567890123456789012345678901234567890_0x00";
+const proposalId = "0x1234567890123456789012345678901234567890_0x0";
 
 const proposal: AddresslistVotingProposal | null = await client.methods
   .getProposal(
@@ -25,7 +25,7 @@ const proposal: AddresslistVotingProposal | null = await client.methods
 console.log(proposal);
 /*
 {
-  id: "0x1234567890123456789012345678901234567890_0x00",
+  id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"

@@ -16,7 +16,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 
-const proposalId = "0x1234567890123456789012345678901234567890_0x00";
+const proposalId = "0x1234567890123456789012345678901234567890_0x0";
 
 const proposal: MultisigProposal | null = await client.methods.getProposal(
   proposalId,
@@ -24,7 +24,7 @@ const proposal: MultisigProposal | null = await client.methods.getProposal(
 console.log(proposal);
 /*
 {
-  id: "0x1234567890123456789012345678901234567890_0x00",
+  id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"
