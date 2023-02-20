@@ -126,7 +126,7 @@ describe("Client Multisig", () => {
         case ProposalCreationSteps.DONE:
           expect(typeof step.proposalId).toBe("string");
           expect(step.proposalId).toMatch(
-            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/,
+            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/,
           );
           return step.proposalId;
         default:
@@ -334,7 +334,7 @@ describe("Client Multisig", () => {
       }
       expect(proposal.id).toBe(proposalId);
       expect(typeof proposal.id).toBe("string");
-      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/i);
+      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/i);
       expect(typeof proposal.dao.address).toBe("string");
       expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
       expect(typeof proposal.dao.name).toBe("string");

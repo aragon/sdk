@@ -147,7 +147,7 @@ describe("Client Address List", () => {
         case ProposalCreationSteps.DONE:
           expect(typeof step.proposalId).toBe("string");
           expect(step.proposalId).toMatch(
-            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/i,
+            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/i,
           );
           return step.proposalId;
         default:
@@ -202,7 +202,7 @@ describe("Client Address List", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
       }
     });
   });
@@ -222,7 +222,7 @@ describe("Client Address List", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         const params: ICanVoteParams = {
           address: TEST_WALLET_ADDRESS,
@@ -252,7 +252,7 @@ describe("Client Address List", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         // Vote
         await voteProposal(proposalId, client);
@@ -273,7 +273,7 @@ describe("Client Address List", () => {
 
       const proposalId = await buildProposal(pluginAddress, client);
       expect(typeof proposalId).toBe("string");
-      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
       // Vote YES
       await voteProposal(proposalId, client, VoteValues.YES);
@@ -299,7 +299,7 @@ describe("Client Address List", () => {
 
       const proposalId = await buildProposal(pluginAddress, client);
       expect(typeof proposalId).toBe("string");
-      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
       const canExecuteParams: CanExecuteParams = {
         proposalId,
@@ -333,7 +333,7 @@ describe("Client Address List", () => {
 
       const proposalId = await buildProposal(pluginAddress, client);
       expect(typeof proposalId).toBe("string");
-      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
       const canExecuteParams: CanExecuteParams = {
         proposalId,
@@ -366,7 +366,7 @@ describe("Client Address List", () => {
 
       const proposalId = await buildProposal(pluginAddress, client);
       expect(typeof proposalId).toBe("string");
-      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
       const canExecuteParams: CanExecuteParams = {
         proposalId,
@@ -410,7 +410,7 @@ describe("Client Address List", () => {
 
       const proposalId = await buildProposal(pluginAddress, client);
       expect(typeof proposalId).toBe("string");
-      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
       // Vote
       await voteProposal(proposalId, client);
@@ -455,7 +455,7 @@ describe("Client Address List", () => {
 
       const proposalId = await buildProposal(pluginAddress, client);
       expect(typeof proposalId).toBe("string");
-      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
       // Vote
       await voteProposal(proposalId, client);
@@ -499,7 +499,7 @@ describe("Client Address List", () => {
 
       const proposalId = await buildProposal(pluginAddress, client);
       expect(typeof proposalId).toBe("string");
-      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+      expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
       // Vote
       await voteProposal(proposalId, client, VoteValues.NO);
@@ -574,7 +574,7 @@ describe("Client Address List", () => {
       if (proposal) {
         expect(proposal.id).toBe(proposalId);
         expect(typeof proposal.id).toBe("string");
-        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/i);
+        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/i);
         expect(typeof proposal.dao.address).toBe("string");
         expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         expect(typeof proposal.dao.name).toBe("string");
@@ -649,7 +649,7 @@ describe("Client Address List", () => {
       const client = new AddresslistVotingClient(ctxPlugin);
 
       const proposalId = TEST_NON_EXISTING_ADDRESS +
-        "_0x0000000000000000000000000000000000000000000000000000000000000000";
+        "_0x00";
       const proposal = await client.methods.getProposal(proposalId);
 
       expect(proposal === null).toBe(true);

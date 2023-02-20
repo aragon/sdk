@@ -57,8 +57,7 @@ describe("Token Voting Client", () => {
       const client = new TokenVotingClient(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
-        proposalId:
-          "0x1234567890123456789012345678901234567890_0x0000000000000000000000000000000000000000000000000000000000000000",
+        proposalId: "0x1234567890123456789012345678901234567890_0x00",
         vote: VoteValues.YES,
       };
       const estimation = await client.estimation.voteProposal(voteParams);
@@ -75,8 +74,7 @@ describe("Token Voting Client", () => {
       const client = new TokenVotingClient(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
-        proposalId:
-          "0x1234567890123456789012345678901234567890_0x0000000000000000000000000000000000000000000000000000000000000000",
+        proposalId: "0x1234567890123456789012345678901234567890_0x00",
       };
       const estimation = await client.estimation.executeProposal(executeParams);
 

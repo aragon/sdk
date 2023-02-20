@@ -18,8 +18,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create a TokenVoting client
 const client = new TokenVotingClient(contextPlugin);
 
-const proposalId =
-  "0x1234567890123456789012345678901234567890_0x0000000000000000000000000000000000000000000000000000000000000000";
+const proposalId = "0x1234567890123456789012345678901234567890_0x00";
 
 const proposal: TokenVotingProposal | null = await client.methods.getProposal(
   proposalId,
@@ -27,7 +26,7 @@ const proposal: TokenVotingProposal | null = await client.methods.getProposal(
 console.log(proposal);
 /*
 {
-  id: "0x1234567890123456789012345678901234567890_0x0000000000000000000000000000000000000000000000000000000000000000",
+  id: "0x1234567890123456789012345678901234567890_0x00",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"

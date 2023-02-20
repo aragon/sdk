@@ -61,8 +61,7 @@ describe("Client Address List", () => {
       const client = new AddresslistVotingClient(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
-        proposalId:
-          "0x1234567890123456789012345678901234567890_0x0000000000000000000000000000000000000000000000000000000000000000",
+        proposalId: "0x1234567890123456789012345678901234567890_0x00",
         vote: VoteValues.YES,
       };
 
@@ -81,8 +80,7 @@ describe("Client Address List", () => {
       const client = new AddresslistVotingClient(ctxPlugin);
 
       const executeParams: IExecuteProposalParams = {
-        proposalId:
-          "0x1234567890123456789012345678901234567890_0x0000000000000000000000000000000000000000000000000000000000000000",
+        proposalId: "0x1234567890123456789012345678901234567890_0x00",
       };
       const estimation = await client.estimation.executeProposal(executeParams);
 

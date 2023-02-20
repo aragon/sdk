@@ -18,8 +18,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
-  proposalId:
-    "0x1234567890123456789012345678901234567890_0x0000000000000000000000000000000000000000000000000000000000000000",
+  proposalId: "0x1234567890123456789012345678901234567890_0x00",
   pluginAddress: "0x1234567890123456789012345678901234567890",
   vote: VoteValues.YES,
 };

@@ -137,7 +137,7 @@ describe("Token Voting Client", () => {
         case ProposalCreationSteps.DONE:
           expect(typeof step.proposalId).toBe("string");
           expect(step.proposalId).toMatch(
-            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/,
+            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/,
           );
           return step.proposalId;
         default:
@@ -192,7 +192,7 @@ describe("Token Voting Client", () => {
 
           const proposalId = await buildProposal(pluginAddress, client);
           expect(typeof proposalId).toBe("string");
-          expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+          expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
         }
       });
     });
@@ -213,7 +213,7 @@ describe("Token Voting Client", () => {
 
           const proposalId = await buildProposal(pluginAddress, client);
           expect(typeof proposalId).toBe("string");
-          expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+          expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
           const params: ICanVoteParams = {
             address: TEST_WALLET_ADDRESS,
@@ -243,7 +243,7 @@ describe("Token Voting Client", () => {
 
           const proposalId = await buildProposal(pluginAddress, client);
           expect(typeof proposalId).toBe("string");
-          expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+          expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
           // Vote
           await voteProposal(proposalId, client);
@@ -265,7 +265,7 @@ describe("Token Voting Client", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         // Vote
         await voteProposal(proposalId, client, VoteValues.NO);
@@ -290,7 +290,7 @@ describe("Token Voting Client", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         const canExecuteParams: CanExecuteParams = {
           proposalId,
@@ -324,7 +324,7 @@ describe("Token Voting Client", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         const canExecuteParams: CanExecuteParams = {
           proposalId,
@@ -357,7 +357,7 @@ describe("Token Voting Client", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         const canExecuteParams: CanExecuteParams = {
           proposalId,
@@ -401,7 +401,7 @@ describe("Token Voting Client", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         // Vote
         await voteProposal(proposalId, client);
@@ -448,7 +448,7 @@ describe("Token Voting Client", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         // Vote
         await voteProposal(proposalId, client);
@@ -494,7 +494,7 @@ describe("Token Voting Client", () => {
 
         const proposalId = await buildProposal(pluginAddress, client);
         expect(typeof proposalId).toBe("string");
-        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{64}$/);
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         // Vote
         await voteProposal(proposalId, client, VoteValues.NO);
@@ -665,7 +665,7 @@ describe("Token Voting Client", () => {
         const client = new TokenVotingClient(ctxPlugin);
 
         const proposalId = TEST_NON_EXISTING_ADDRESS +
-          "_0x0000000000000000000000000000000000000000000000000000000000000000";
+          "_0x00";
         const proposal = await client.methods.getProposal(proposalId);
 
         expect(proposal === null).toBe(true);

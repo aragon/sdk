@@ -1,8 +1,4 @@
-import {
-  decodeProposalIdSubgraph,
-  encodeProposalId,
-  hexToBytes,
-} from "@aragon/sdk-common";
+import { hexToBytes } from "@aragon/sdk-common";
 import {
   DaoAction,
   ProposalMetadata,
@@ -30,9 +26,8 @@ export function toMultisigProposal(
   const endDate = new Date(
     parseInt(proposal.startDate) * 1000,
   );
-  const decodedProposalId = decodeProposalIdSubgraph(proposal.id);
   return {
-    id: encodeProposalId(decodedProposalId.pluginAddress, decodedProposalId.id),
+    id: proposal.id,
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
@@ -71,9 +66,8 @@ export function toMultisigProposalListItem(
   proposal: SubgraphMultisigProposalListItem,
   metadata: ProposalMetadata,
 ): MultisigProposalListItem {
-  const decodedProposalId = decodeProposalIdSubgraph(proposal.id);
   return {
-    id: encodeProposalId(decodedProposalId.pluginAddress, decodedProposalId.id),
+    id: proposal.id,
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,

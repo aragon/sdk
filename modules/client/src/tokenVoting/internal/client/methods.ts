@@ -4,7 +4,6 @@ import {
   decodeProposalId,
   decodeRatio,
   encodeProposalId,
-  encodeProposalIdSubgraph,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -347,7 +346,9 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
-    const decodedProposalId = decodeProposalId(proposalId);
+    if (!/^0x[A-Za-z0-9]{40}_(0x[A-Fa-f0-9]{1,64})$/.test(proposalId)) {
+      throw new InvalidProposalIdError();
+    }
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -356,10 +357,7 @@ export class TokenVotingClientMethods extends ClientCore
       }: {
         tokenVotingProposal: SubgraphTokenVotingProposal;
       } = await client.request(QueryTokenVotingProposal, {
-        proposalId: encodeProposalIdSubgraph(
-          decodedProposalId.pluginAddress,
-          decodedProposalId.id,
-        ),
+        proposalId,
       });
       if (!tokenVotingProposal) {
         return null;

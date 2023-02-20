@@ -2,7 +2,6 @@ import {
   boolArrayToBitmap,
   decodeProposalId,
   encodeProposalId,
-  encodeProposalIdSubgraph,
   GraphQLError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -378,7 +377,9 @@ export class MultisigClientMethods extends ClientCore
     if (!proposalId) {
       throw new InvalidProposalIdError();
     }
-    const decodedProposalId = decodeProposalId(proposalId);
+    if (!/^0x[A-Za-z0-9]{40}_(0x[A-Fa-f0-9]{1,64})$/.test(proposalId)) {
+      throw new InvalidProposalIdError();
+    }
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
@@ -387,10 +388,7 @@ export class MultisigClientMethods extends ClientCore
       }: {
         multisigProposal: SubgraphMultisigProposal;
       } = await client.request(QueryMultisigProposal, {
-        proposalId: encodeProposalIdSubgraph(
-          decodedProposalId.pluginAddress,
-          decodedProposalId.id,
-        ),
+        proposalId,
       });
       if (!multisigProposal) {
         return null;
