@@ -416,6 +416,8 @@ describe("Client Multisig", () => {
         expect(typeof proposal.metadata.title).toBe("string");
         expect(typeof proposal.metadata.summary).toBe("string");
         expect(typeof proposal.approvals).toBe("number");
+        expect(proposal.startDate instanceof Date).toBe(true);
+        expect(proposal.endDate instanceof Date).toBe(true);
         expect(proposal.approvals >= 0).toBe(true);
       }
     });

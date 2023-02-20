@@ -66,6 +66,12 @@ export function toMultisigProposalListItem(
   proposal: SubgraphMultisigProposalListItem,
   metadata: ProposalMetadata,
 ): MultisigProposalListItem {
+  const startDate = new Date(
+    parseInt(proposal.startDate) * 1000,
+  );
+  const endDate = new Date(
+    parseInt(proposal.endDate) * 1000,
+  );
   return {
     id: proposal.id,
     dao: {
@@ -78,6 +84,8 @@ export function toMultisigProposalListItem(
       summary: metadata.summary,
     },
     approvals: parseInt(proposal.approvals),
+    startDate, 
+    endDate,
     // TODO
     // change to computeProposalStatus
     // Missing executable property from subgraph
