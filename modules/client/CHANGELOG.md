@@ -13,6 +13,7 @@ TEMPLATE:
 
 -->
 
+## [0.21.2-beta]
 ### Fixed
 - Add `transfer` to available functions
 
