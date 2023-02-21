@@ -12,7 +12,8 @@ TEMPLATE:
 - Change 1, 2, 3
 
 -->
-## UPCOMING
+## [0.22.0-beta]
+
 ### Changed
 - `proposalId` is now a `string` everywhere and follows the new general format
 - `canExecute()` and `execute()` expect the `proposalId` as parameter now.

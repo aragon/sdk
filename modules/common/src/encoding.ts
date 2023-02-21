@@ -1,3 +1,5 @@
+import { isProposalId } from "./utils";
+
 /** Decodes a hex string and returns it as a buffer */
 export function hexToBytes(hexString: string): Uint8Array {
   if (!hexString) return new Uint8Array();
@@ -115,7 +117,7 @@ export function encodeProposalId(pluginAddress: string, id: number) {
 export function decodeProposalId(
   proposalId: string,
 ): { pluginAddress: string; id: number } {
-  if (!/^0x[A-Fa-f0-9]{40}_(0x[A-Fa-f0-9]{1,64})$/.test(proposalId)) {
+  if (!isProposalId(proposalId)) {
     throw new Error("Invalid proposalId");
   }
 
