@@ -89,9 +89,7 @@ export class TokenVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    if (!isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
-    }
+
     const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
     );

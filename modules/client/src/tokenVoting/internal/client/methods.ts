@@ -182,9 +182,6 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
@@ -256,9 +253,6 @@ export class TokenVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
 
-    if (!isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
