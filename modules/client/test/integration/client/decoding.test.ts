@@ -271,6 +271,26 @@ describe("Client", () => {
       expect(iface?.hash).toBe("0xee57e36f");
     });
 
+    it("Should get the function for a withdraw action data", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params: WithdrawParams = {
+        type: TokenType.ERC20,
+        amount: BigInt(1),
+        tokenAddress: "0x1234567890123456789012345678901234567890",
+        recipientAddressOrEns: "0x2345678901234567890123456789012345678901"
+      };
+
+      const updateDaoMetadataAction = await client.encoding
+        .withdrawAction(
+          params,
+        );
+      const iface = client.decoding.findInterface(updateDaoMetadataAction.data);
+      expect(iface?.id).toBe("function transfer(address,uint256) returns (bool)");
+      expect(iface?.functionName).toBe("transfer");
+      expect(iface?.hash).toBe("0xa9059cbb");
+    });
+
     it("Should try to get the function of an invalid data and return null", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);

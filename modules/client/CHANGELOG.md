@@ -13,6 +13,9 @@ TEMPLATE:
 
 -->
 
+### Fixed
+- Add `transfer` to available functions
+
 ## [0.21.1-beta]
 ### Fixed 
 - `startDate` and `endDate` swapped on `getProposal` funtion of the multisig client
