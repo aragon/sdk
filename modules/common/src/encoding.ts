@@ -122,7 +122,7 @@ export function decodeProposalId(
   const matchedRegexResult =
     proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/) || [];
   if (matchedRegexResult.length !== 3) {
-    throw new Error("Failed to deconstruct proposalId");
+    throw new Error("Could not parse the proposal ID");
   }
 
   return {

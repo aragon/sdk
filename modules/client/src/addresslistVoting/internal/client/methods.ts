@@ -330,10 +330,7 @@ export class AddresslistVotingClientMethods extends ClientCore
   public async getProposal(
     proposalId: string,
   ): Promise<AddresslistVotingProposal | null> {
-    if (!proposalId) {
-      throw new InvalidProposalIdError();
-    }
-    if (!/^0x[A-Fa-f0-9]{40}_(0x[A-Fa-f0-9]{1,64})$/.test(proposalId)) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
     try {
