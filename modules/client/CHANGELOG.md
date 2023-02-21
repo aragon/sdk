@@ -20,6 +20,7 @@ TEMPLATE:
 
 ### Removed
 - removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces
+- removes `isProposalId()` and moves it to @aragon/sdk-common
 
 ## [0.21.2-beta]
 ### Fixed

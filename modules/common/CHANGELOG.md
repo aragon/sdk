@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Adds
+- Adds `isProposalId()` function to the package
+
 ### Changed
 - Changes `encodeProposalId` and `decodeProposalId` function to support the new format
 
