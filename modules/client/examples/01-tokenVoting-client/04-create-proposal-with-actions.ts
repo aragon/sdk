@@ -4,7 +4,7 @@
 import {
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   TokenVotingClient,
   VoteValues,
@@ -52,7 +52,7 @@ const metadataUri = await client.methods.pinMetadata({
     }
 })
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri,
   actions: [configAction],

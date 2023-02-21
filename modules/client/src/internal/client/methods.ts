@@ -7,7 +7,9 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/core-contracts-ethers";
 import {
+  AmountMismatchError,
   EnsureAllowanceError,
+  FailedDepositError,
   GraphQLError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -284,25 +286,17 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const cr = await tx.wait();
     const log = findLog(cr, daoInstance.interface, "Deposited");
     if (!log) {
-      // TODO
-      // cmmon errors
-      throw new Error("Failed to deposit");
+      throw new FailedDepositError();
     }
 
     const daoInterface = DAO__factory.createInterface();
     const parsedLog = daoInterface.parseLog(log);
 
     if (!amount.toString() === parsedLog.args["amount"]) {
-      throw new Error(
-        `Deposited amount mismatch. Expected: ${amount}, received: ${
-          parsedLog.args[
-            "amount"
-          ].toBigInt()
-        }`,
+      throw new AmountMismatchError(
+        amount,
+        parsedLog.args["amount"].toBigInt(),
       );
-      // TODO
-      // cmmon errors
-      // throw new AmountMisMatchError(amount, parsedLog.args["amount"])
     }
     yield { key: DaoDepositSteps.DONE, amount: amount };
   }

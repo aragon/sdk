@@ -680,7 +680,7 @@ console.log(client);
 import {
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
   TokenVotingClient,
@@ -717,7 +717,7 @@ const metadata: ProposalMetadata = {
 
 const ipfsUri = await client.methods.pinMetadata(metadata);
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
   actions: [],
@@ -750,7 +750,7 @@ for await (const step of steps) {
 import {
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   TokenVotingClient,
   VoteValues,
@@ -798,7 +798,7 @@ const metadataUri = await client.methods.pinMetadata({
   },
 });
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri,
   actions: [configAction],
@@ -1000,8 +1000,8 @@ console.log(proposal);
     abstain: 0n
   }
   settings:{
-    minTurnout: 0.5,
-    minSupport: 0.25,
+    minParticipation: 0.5,
+    supportThreshold: 0.25,
     minDuration: 7200
   },
   token: {
@@ -1372,7 +1372,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
   VoteValues,
@@ -1408,7 +1408,7 @@ const metadata: ProposalMetadata = {
 
 const ipfsUri = await client.methods.pinMetadata(metadata);
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
   actions: [],
@@ -1443,7 +1443,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
   VoteValues,
@@ -1497,7 +1497,7 @@ const daoMetadata: ProposalMetadata = {
 
 const metadataUri = await client.methods.pinMetadata(daoMetadata);
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri,
   actions: [configAction],
@@ -1702,8 +1702,8 @@ console.log(proposal);
     abstain: 0
   }
   settings: {
-    minTurnout: 0.5,
-    minSupport: 0.25,
+    minParticipation: 0.5,
+    supportThreshold: 0.25,
     minDuration: 7200
   },
   votes: [

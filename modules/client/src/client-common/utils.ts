@@ -3,7 +3,7 @@ import { ContractReceipt } from "@ethersproject/contracts";
 import { VoteValues, VotingMode } from "../client-common/interfaces/plugin";
 import {
   IComputeStatusProposal,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalStatus,
 } from "./interfaces/plugin";
 
@@ -13,7 +13,7 @@ import { Log } from "@ethersproject/providers";
 import { InvalidVotingModeError } from "@aragon/sdk-common";
 
 export function unwrapProposalParams(
-  params: ICreateProposalParams,
+  params: CreateMajorityVotingProposalParams,
 ): [string, IDAO.ActionStruct[], number, number, boolean, number] {
   return [
     params.metadataUri,

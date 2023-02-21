@@ -3,7 +3,7 @@ import {
   ClientCore,
   ContextPlugin,
   GasFeeEstimation,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   IVoteProposalParams,
 } from "../../../client-common";
 import { IAddresslistVotingClientEstimation } from "../../interfaces";
@@ -29,12 +29,12 @@ export class AddresslistVotingClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *
-   * @param {ICreateProposalParams} params
+   * @param {CreateMajorityVotingProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
   public async createProposal(
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {

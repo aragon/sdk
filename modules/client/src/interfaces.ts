@@ -44,6 +44,10 @@ export interface IClientEncoding extends IClientCore {
     daoAddress: string,
     params: IGrantPermissionParams,
   ) => DaoAction;
+  grantWithConditionAction: (
+    daoAddress: string,
+    params: GrantPermissionWithConditionParams,
+  ) => DaoAction;
   revokeAction: (
     daoAddress: string,
     params: IRevokePermissionParams,
@@ -55,10 +59,33 @@ export interface IClientEncoding extends IClientCore {
     daoAddressOrEns: string,
     metadataUri: string,
   ) => Promise<DaoAction>;
+  setDaoUriAction: (
+    daoAddressOrEns: string,
+    daoUri: string,
+  ) => DaoAction;
+  registerStandardCallbackAction: (
+    daoAddressOrEns: string,
+    params: RegisterStandardCallbackParams,
+  ) => DaoAction;
+  setSignatureValidatorAction: (
+    daoAddressOrEns: string,
+    signatureValidator: string,
+  ) => DaoAction;
+  upgradeToAction: (
+    daoAddressOrEns: string,
+    implementationAddress: string,
+  ) => DaoAction;
+  upgradeToAndCallAction: (
+    daoAddressOrEns: string,
+    params: UpgradeToAndCallParams,
+  ) => DaoAction;
 }
 
 export interface IClientDecoding {
   grantAction: (data: Uint8Array) => IGrantPermissionDecodedParams;
+  grantWithConditionAction: (
+    data: Uint8Array,
+  ) => GrantPermissionWithConditionParams;
   revokeAction: (data: Uint8Array) => IRevokePermissionDecodedParams;
   withdrawAction: (
     to: string,
@@ -67,6 +94,13 @@ export interface IClientDecoding {
   ) => WithdrawParams;
   updateDaoMetadataRawAction: (data: Uint8Array) => string;
   updateDaoMetadataAction: (data: Uint8Array) => Promise<DaoMetadata>;
+  setDaoUriAction: (data: Uint8Array) => string;
+  registerStandardCallbackAction: (
+    data: Uint8Array,
+  ) => RegisterStandardCallbackParams;
+  setSignatureValidatorAction: (data: Uint8Array) => string;
+  upgradeToAction: (data: Uint8Array) => string;
+  upgradeToAndCallAction: (data: Uint8Array) => UpgradeToAndCallParams;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
 
@@ -135,6 +169,20 @@ export interface IGrantPermissionDecodedParams
   extends IPermissionDecodedParamsBase {}
 export interface IRevokePermissionDecodedParams
   extends IPermissionDecodedParamsBase {}
+
+export type PermisionParamsBase = {
+  where: string;
+  who: string;
+  permission: string;
+};
+
+export type GrantPermissionWithConditionParams = PermisionParamsBase & {
+  condition: string;
+};
+export type GrantPermissionWithConditionDecodedParams = PermisionParamsBase & {
+  condition: string;
+  permissionId: string;
+};
 
 export interface IHasPermissionParams {
   daoAddressOrEns: string;
@@ -311,6 +359,17 @@ export type Withdraw =
 
 export type Transfer = Deposit | Withdraw;
 
+export type RegisterStandardCallbackParams = {
+  interfaceId: string;
+  callbackSelector: string;
+  magicNumber: string;
+};
+
+export type UpgradeToAndCallParams = {
+  implementationAddress: string;
+  data: Uint8Array;
+};
+
 // DAO details
 
 export type DaoResourceLink = { name: string; url: string };
@@ -446,4 +505,10 @@ export const SubgraphTransferTypeMap: Map<
 ]);
 
 export type ContractPermissionParams = [string, string, string];
+export type ContractPermissionWithConditionParams = [
+  string,
+  string,
+  string,
+  string,
+];
 export type ContractWithdrawParams = [string, string, BigNumber, string];

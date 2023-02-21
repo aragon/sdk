@@ -7,10 +7,10 @@ import {
   GasFeeEstimation,
   ICanVoteParams,
   IClientCore,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   IInterfaceParams,
   IProposalQueryParams,
-  IProposalSettings,
+  MajorityVotingProposalSettings,
   IVoteProposalParams,
   ProposalBase,
   ProposalCreationStepValue,
@@ -30,7 +30,7 @@ import { TokenType } from "../interfaces";
 
 export interface ITokenVotingClientMethods extends IClientCore {
   createProposal: (
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
   pinMetadata: (params: ProposalMetadata) => Promise<string>;
   voteProposal: (
@@ -69,7 +69,7 @@ export interface ITokenVotingClientDecoding extends IClientCore {
 }
 export interface ITokenVotingClientEstimation extends IClientCore {
   createProposal: (
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ) => Promise<GasFeeEstimation>;
   voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
   executeProposal: (
@@ -107,7 +107,7 @@ type NewTokenParams = {
 // PROPOSAL RETRIEVAL
 export type TokenVotingProposal = ProposalBase & {
   result: TokenVotingProposalResult;
-  settings: IProposalSettings;
+  settings: MajorityVotingProposalSettings;
   token: Erc20TokenDetails | Erc721TokenDetails | null;
   usedVotingWeight: bigint;
   votes: Array<

@@ -110,3 +110,15 @@ export class InvalidPrecisionError extends Error {
     super("Invalid precision, number must be an integer greater than 0");
   }
 }
+export class FailedDepositError extends Error {
+  constructor() {
+    super("Failed to deposit");
+  }
+}
+export class AmountMismatchError extends Error {
+  constructor(expected: bigint, received: bigint) {
+    super(
+      `Deposited amount mismatch. Expected: ${expected}, received: ${received}`,
+    );
+  }
+}

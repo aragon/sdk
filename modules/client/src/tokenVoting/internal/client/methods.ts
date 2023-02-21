@@ -24,7 +24,7 @@ import {
   ExecuteProposalStepValue,
   findLog,
   ICanVoteParams,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -78,12 +78,12 @@ export class TokenVotingClientMethods extends ClientCore
   /**
    * Creates a new proposal on the given TokenVoting plugin contract
    *
-   * @param {ICreateProposalParams} params
+   * @param {CreateMajorityVotingProposalParams} params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
    * @memberof TokenVotingClient
    */
   public async *createProposal(
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {

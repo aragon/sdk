@@ -30,4 +30,6 @@ export {
   TransferSortBy,
   TransferType,
   Withdraw,
+  GrantPermissionWithConditionParams,
+  GrantPermissionWithConditionDecodedParams
 } from "./interfaces";

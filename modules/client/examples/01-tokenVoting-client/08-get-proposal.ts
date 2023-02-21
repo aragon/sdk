@@ -70,8 +70,8 @@ console.log(proposal);
     abstain: 0n
   }
   settings:{
-    minTurnout: 0.5,
-    minSupport: 0.25,
+    minParticipation: 0.5,
+    supportThreshold: 0.25,
     minDuration: 7200
   },
   token: {

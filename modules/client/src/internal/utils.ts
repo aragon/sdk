@@ -1,10 +1,13 @@
 import {
   ContractPermissionParams,
+  ContractPermissionWithConditionParams,
   DaoDetails,
   DaoListItem,
   DaoMetadata,
   DepositErc20Params,
   DepositEthParams,
+  GrantPermissionWithConditionDecodedParams,
+  GrantPermissionWithConditionParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
   InstalledPluginListItem,
@@ -233,6 +236,18 @@ export function permissionParamsToContract(
 ): ContractPermissionParams {
   return [params.where, params.who, keccak256(toUtf8Bytes(params.permission))];
 }
+export function permissionWithConditionParamsToContract(
+  params: GrantPermissionWithConditionParams,
+): ContractPermissionWithConditionParams {
+  return [
+    ...permissionParamsToContract({
+      who: params.who,
+      where: params.where,
+      permission: params.permission,
+    }),
+    params.condition,
+  ];
+}
 
 export function permissionParamsFromContract(
   result: Result,
@@ -244,6 +259,14 @@ export function permissionParamsFromContract(
     permission: Object.keys(PermissionIds)
       .find((k) => PermissionIds[k] === result[2])
       ?.replace(/_ID$/, "") || "",
+  };
+}
+export function permissionParamsWitConditionFromContract(
+  result: Result,
+): GrantPermissionWithConditionDecodedParams {
+  return {
+    ...permissionParamsFromContract(result),
+    condition: result[3],
   };
 }
 

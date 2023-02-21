@@ -1,9 +1,12 @@
 import {
   DaoMetadata,
+  GrantPermissionWithConditionParams,
   IClientDecoding,
   IGrantPermissionDecodedParams,
   IRevokePermissionDecodedParams,
+  RegisterStandardCallbackParams,
   TokenType,
+  UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../interfaces";
 import {
@@ -16,9 +19,10 @@ import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
 import {
   permissionParamsFromContract,
+  permissionParamsWitConditionFromContract,
   withdrawParamsFromContract,
 } from "../utils";
-import { bytesToHex, resolveIpfsCid } from "@aragon/sdk-common";
+import { bytesToHex, hexToBytes, resolveIpfsCid } from "@aragon/sdk-common";
 import { erc20ContractAbi } from "../abi/erc20";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
@@ -46,6 +50,20 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     const expectedFunction = daoInterface.getFunction("grant");
     const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     return permissionParamsFromContract(result);
+  }
+  /**
+   * Decodes the grant permission with condition parameters from an encoded grant with condition action
+   *
+   * @param {Uint8Array} data
+   * @return {*}  {GrantPermissionWithConditionParams}
+   * @memberof ClientDecoding
+   */
+  public grantWithConditionAction(data: Uint8Array): GrantPermissionWithConditionParams {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = daoInterface.getFunction("grantWithCondition");
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return permissionParamsWitConditionFromContract(result);
   }
   /**
    * Decodes the permission parameters from an encoded revoke action
@@ -138,6 +156,91 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       throw new Error("Error reading data from IPFS");
     }
   }
+  /**
+   * Decodes the daoUri from a setDaoUriAction
+   *
+   * @param {Uint8Array} data
+   * @return {*}  {string}
+   * @memberof ClientDecoding
+   */
+  public setDaoUriAction(data: Uint8Array): string {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = daoInterface.getFunction("setDaoURI");
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return result[0];
+  }
+  /**
+   * Decodes the RegisterStandardCallbackParams from a registerStandardCallbackAction
+   *
+   * @param {Uint8Array} data
+   * @return {*}  {RegisterStandardCallbackParams}
+   * @memberof ClientDecoding
+   */
+  public registerStandardCallbackAction(
+    data: Uint8Array,
+  ): RegisterStandardCallbackParams {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = daoInterface.getFunction(
+      "registerStandardCallback",
+    );
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return {
+      interfaceId: result[0],
+      callbackSelector: result[1],
+      magicNumber: result[2],
+    };
+  }
+  /**
+   * Decodes the implementation address from an encoded upgradeToAction
+   *
+   * @param {Uint8Array} data
+   * @return {*}  {string}
+   * @memberof ClientDecoding
+   */
+  public setSignatureValidatorAction(
+    data: Uint8Array,
+  ): string {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = daoInterface.getFunction(
+      "setSignatureValidator",
+    );
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return result[0];
+  }
+  public upgradeToAction(data: Uint8Array): string {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = daoInterface.getFunction(
+      "upgradeTo",
+    );
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return result[0];
+  }
+  /**
+   * Decodes upgradeToAndCallback params from an upgradeToAndCallAction
+   *
+   * @param {Uint8Array} data
+   * @return {*}  {UpgradeToAndCallParams}
+   * @memberof ClientDecoding
+   */
+  public upgradeToAndCallAction(
+    data: Uint8Array,
+  ): UpgradeToAndCallParams {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = daoInterface.getFunction(
+      "upgradeToAndCall",
+    );
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return {
+      implementationAddress: result[0],
+      data: hexToBytes(result[1]),
+    };
+  }
+
   /**
    * Returns the decoded function info given the encoded data of an action
    *
