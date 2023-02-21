@@ -31,12 +31,13 @@ TEMPLATE:
 - Rename all mention of `ensureAllowance` to `updateAllowance`
 - ensDomain now includes `.dao.eth`
 - `getPluginInstallItem` now receives a `network` parameter to select the right Plugin Repo. Defaults to `mainnet`
+- Renamed `address`/`addressOrEns` to `voterAddressOrEns`/`approverAddressOrEns` in `canVote`/`canApprove` functions
+
 ## [0.22.0-beta]
 
 ### Changed
 - `proposalId` is now a `string` everywhere and follows the new general format
 - `canExecute()` and `execute()` expect the `proposalId` as parameter now.
-
 
 ### Removed
 - removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces

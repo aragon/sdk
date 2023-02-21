@@ -30,7 +30,7 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  ICanVoteParams,
+  CanVoteParams,
   CreateMajorityVotingProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
@@ -242,15 +242,15 @@ export class AddresslistVotingClientMethods extends ClientCore
   /**
    * Checks if an user can vote in a proposal
    *
-   * @param {ICanVoteParams} params
+   * @param {CanVoteParams} params
    * @return {*}  {Promise<boolean>}
    * @memberof AddresslistVotingClientMethods
    */
-  public async canVote(params: ICanVoteParams): Promise<boolean> {
+  public async canVote(params: CanVoteParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer.provider) {
       throw new NoProviderError();
-    } else if (!isAddress(params.address)) {
+    } else if (!isAddress(params.voterAddressOrEns)) {
       throw new InvalidAddressError();
     }
 
@@ -262,7 +262,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     );
     return addresslistContract.callStatic.canVote(
       id,
-      params.address,
+      params.voterAddressOrEns,
       params.vote,
     );
   }

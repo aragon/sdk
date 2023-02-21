@@ -870,7 +870,7 @@ for await (const step of steps) {
 import {
   Context,
   ContextPlugin,
-  ICanVoteParams,
+  CanVoteParams,
   TokenVotingClient,
   VoteValues,
 } from "@aragon/sdk-client";
@@ -1564,7 +1564,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  ICanVoteParams,
+  CanVoteParams,
   VoteValues,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";

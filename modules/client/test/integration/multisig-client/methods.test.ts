@@ -187,7 +187,7 @@ describe("Client Multisig", () => {
       const proposalId = await buildProposal(pluginAddress, client);
       const canApproveParams: CanApproveParams = {
         proposalId,
-        addressOrEns: TEST_WALLET_ADDRESS,
+        approverAddressOrEns: TEST_WALLET_ADDRESS,
       };
       // positive
       let canApprove = await client.methods.canApprove(canApproveParams);
@@ -195,7 +195,7 @@ describe("Client Multisig", () => {
       expect(canApprove).toBe(true);
 
       // negative
-      canApproveParams.addressOrEns =
+      canApproveParams.approverAddressOrEns =
         "0x0000000000000000000000000000000000000000";
       canApprove = await client.methods.canApprove(canApproveParams);
       expect(typeof canApprove).toBe("boolean");

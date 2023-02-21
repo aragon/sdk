@@ -6,7 +6,7 @@ import {
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
-  ICanVoteParams,
+  CanVoteParams,
   IClientCore,
   IInterfaceParams,
   IProposalQueryParams,
@@ -39,7 +39,7 @@ export interface ITokenVotingClientMethods extends IClientCore {
   executeProposal: (
     proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
-  canVote: (params: ICanVoteParams) => Promise<boolean>;
+  canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
   getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;

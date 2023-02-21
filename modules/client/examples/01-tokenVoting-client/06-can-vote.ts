@@ -4,7 +4,7 @@
 import {
   Context,
   ContextPlugin,
-  ICanVoteParams,
+  CanVoteParams,
   TokenVotingClient,
   VoteValues,
 } from "@aragon/sdk-client";
@@ -17,7 +17,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
 const client = new TokenVotingClient(contextPlugin);
 
-const voteParams: ICanVoteParams = {
+const voteParams: CanVoteParams = {
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
   address: "0x1234567890123456789012345678901234567890",
   vote: VoteValues.YES,

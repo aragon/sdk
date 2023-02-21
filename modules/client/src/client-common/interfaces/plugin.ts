@@ -79,9 +79,9 @@ export interface IVoteProposalParams {
   proposalId: string;
 }
 
-export interface ICanVoteParams {
+export interface CanVoteParams {
   proposalId: string;
-  address: string;
+  voterAddressOrEns: string;
   vote: VoteValues;
 }
 

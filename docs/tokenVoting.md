@@ -320,7 +320,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>ICanVoteParams</code> | 
+| params | <code>CanVoteParams</code> | 
 
 <a name="TokenVotingClientMethods+canExecute"></a>
 
