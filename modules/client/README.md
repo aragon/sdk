@@ -60,7 +60,7 @@ When updating the `ClientCore` class:
 ## Developing a new Plugin client
 
 Create a new class that `extends` from `ClientCore`, receives a `Context` on the
-`constructor` and follows the structure of [TokenVotingClient](./src/token-client.ts).
+`constructor` and follows the structure of [TokenVotingClient](./src/tokenVoting/client.ts).
 
 # Testing
 
