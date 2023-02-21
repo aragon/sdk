@@ -12,6 +12,16 @@ TEMPLATE:
 - Change 1, 2, 3
 
 -->
+## [0.22.0-beta]
+
+### Changed
+- `proposalId` is now a `string` everywhere and follows the new general format
+- `canExecute()` and `execute()` expect the `proposalId` as parameter now.
+
+
+### Removed
+- removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces
+- removes `isProposalId()` and moves it to @aragon/sdk-common
 
 ## [0.21.2-beta]
 ### Fixed
@@ -32,6 +42,7 @@ TEMPLATE:
 ### Added
 - Add support for Subgraph version `0.7.2-alpha`
 - Add Vote Replacement flag in MajorityVoting clients
+
 ## [0.20.0-beta]
 ### Changed
 - Updates to contracts-ethers v0.7.1

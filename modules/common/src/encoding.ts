@@ -1,3 +1,5 @@
+import { isProposalId } from "./utils";
+
 /** Decodes a hex string and returns it as a buffer */
 export function hexToBytes(hexString: string): Uint8Array {
   if (!hexString) return new Uint8Array();
@@ -100,6 +102,35 @@ export function decodeRatio(
   }
 
   return Number(onChainValue) / (10 ** digits);
+}
+
+/** Encodes the particles of a proposalId into a globally unque value for subgraph */
+export function encodeProposalId(pluginAddress: string, id: number) {
+  if (!/^0x[A-Fa-f0-9]{40}$/.test(pluginAddress)) {
+    throw new Error("Invalid address");
+  }
+
+  return `${pluginAddress}_0x${id.toString(16)}`;
+}
+
+/** Decodes a proposalId from subgraph and returns the original pluginAddress and the nonce */
+export function decodeProposalId(
+  proposalId: string,
+): { pluginAddress: string; id: number } {
+  if (!isProposalId(proposalId)) {
+    throw new Error("Invalid proposalId");
+  }
+
+  const matchedRegexResult =
+    proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/) || [];
+  if (matchedRegexResult.length !== 3) {
+    throw new Error("Could not parse the proposal ID");
+  }
+
+  return {
+    pluginAddress: matchedRegexResult[1],
+    id: parseInt(strip0x(matchedRegexResult[2]), 16),
+  };
 }
 
 /** Transforms an array of booleans into a bitmap big integer */

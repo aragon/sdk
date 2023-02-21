@@ -1,7 +1,6 @@
 // This file contains the definitions of the AddressList DAO client
 
 import {
-  CanExecuteParams,
   CreateProposalBaseParams,
   DaoAction,
   ExecuteProposalStepValue,
@@ -26,10 +25,10 @@ export interface IMultisigClientMethods extends IClientCore {
     params: ApproveMultisigProposalParams,
   ) => AsyncGenerator<ApproveProposalStepValue>;
   executeProposal: (
-    params: ExecuteProposalParams,
+    proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canApprove: (params: CanApproveParams) => Promise<boolean>;
-  canExecute: (params: CanExecuteParams) => Promise<boolean>;
+  canExecute: (proposalId: string) => Promise<boolean>;
   getVotingSettings: (
     addressOrEns: string,
   ) => Promise<MultisigVotingSettings>;
@@ -63,7 +62,7 @@ export interface IMultisigClientEstimation extends IClientCore {
     params: ApproveMultisigProposalParams,
   ) => Promise<GasFeeEstimation>;
   executeProposal: (
-    params: ExecuteProposalParams,
+    proposalId: string,
   ) => Promise<GasFeeEstimation>;
 }
 
@@ -107,14 +106,15 @@ export type CreateMultisigProposalParams = CreateProposalBaseParams & {
   endDate?: Date;
 };
 
-export type ApproveMultisigProposalParams = CanExecuteParams & {
+export type ApproveMultisigProposalParams = {
+  proposalId: string;
   tryExecution: boolean;
 };
 
-export type CanApproveParams = CanExecuteParams & {
+export type CanApproveParams = {
+  proposalId: string;
   addressOrEns: string;
 };
-export type ExecuteProposalParams = CanExecuteParams;
 
 export enum ApproveProposalStep {
   APPROVING = "approving",

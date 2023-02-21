@@ -18,8 +18,7 @@ const client = new MultisigClient(contextPlugin);
 
 const steps = client.methods.executeProposal(
   {
-    pluginAddress: "0x1234567890123456789012345678901234567890",
-    proposalId: 0,
+    proposalId: "0x1234567890123456789012345678901234567890_0x0",
   },
 );
 for await (const step of steps) {

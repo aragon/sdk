@@ -1,7 +1,6 @@
 // This file contains the definitions of the AddressList DAO client
 
 import {
-  CanExecuteParams,
   ContractVotingSettings,
   DaoAction,
   ExecuteProposalStepValue,
@@ -9,7 +8,6 @@ import {
   ICanVoteParams,
   IClientCore,
   ICreateProposalParams,
-  IExecuteProposalParams,
   IInterfaceParams,
   IProposalQueryParams,
   IProposalSettings,
@@ -37,10 +35,10 @@ export interface IAddresslistVotingClientMethods extends IClientCore {
     params: IVoteProposalParams,
   ) => AsyncGenerator<VoteProposalStepValue>;
   executeProposal: (
-    params: IExecuteProposalParams,
+    proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canVote: (params: ICanVoteParams) => Promise<boolean>;
-  canExecute: (params: CanExecuteParams) => Promise<boolean>;
+  canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
   getProposal: (
     propoosalId: string,
@@ -77,7 +75,7 @@ export interface IAddresslistVotingClientEstimation extends IClientCore {
   ) => Promise<GasFeeEstimation>;
   voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
   executeProposal: (
-    params: IExecuteProposalParams,
+    proposalId: string,
   ) => Promise<GasFeeEstimation>;
 }
 /** Defines the shape of the AddressList client class */

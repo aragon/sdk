@@ -86,7 +86,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>IExecuteProposalParams</code> | 
+| proposalId | <code>string</code> | 
 
 <a name="TokenVotingClient.TokenVotingClientMethods+getMembers"></a>
 
@@ -295,7 +295,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>IExecuteProposalParams</code> | 
+| proposalId | <code>string</code> | 
 
 <a name="TokenVotingClientMethods"></a>
 

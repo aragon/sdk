@@ -206,7 +206,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>IExecuteProposalParams</code> | 
+| proposalId | <code>string</code> | 
 
 <a name="AddresslistVotingClientMethods"></a>
 
@@ -259,7 +259,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>IExecuteProposalParams</code> | 
+| proposalId | <code>string</code> | 
 
 <a name="AddresslistVotingClientMethods+canVote"></a>
 

@@ -16,9 +16,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 const canApproveParams: CanApproveParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
   addressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: 0,
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
 };
 
 const canApprove = await client.methods.canApprove(canApproveParams);

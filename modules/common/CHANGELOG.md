@@ -16,9 +16,18 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 
-## [UPCOMING]
+## 0.11.0-beta
+
+### Adds
+- Adds `isProposalId()` function to the package
+- Adds `encodeProposalId(addr, nonce)` and `decodeProposalId(pid)`
+
+### Changed
+- Changes `encodeProposalId` and `decodeProposalId` function to support the new format
+
 ## 0.10.1-beta
 - Fix `hextoBytes` throwing an error when `0x` is the input
+
 ## 0.10.0-beta
 - Adds new error `EnsureAllowanceError`
 - Adds new error `InvalidPrecisionError`

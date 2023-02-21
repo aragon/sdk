@@ -210,7 +210,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>ExecuteProposalParams</code> | 
+| proposalId | <code>string</code> | 
 
 <a name="MultisigClientMethods"></a>
 
@@ -223,7 +223,7 @@ so that the plugin is configured</p>
     * [.createProposal(params)](#MultisigClientMethods+createProposal) ⇒ <code>\*</code>
     * [.pinMetadata(params)](#MultisigClientMethods+pinMetadata) ⇒ <code>\*</code>
     * [.approveProposal(params)](#MultisigClientMethods+approveProposal) ⇒ <code>\*</code>
-    * [.executeProposal(ExecuteProposalParams)](#MultisigClientMethods+executeProposal) ⇒ <code>\*</code>
+    * [.executeProposal(proposalId)](#MultisigClientMethods+executeProposal) ⇒ <code>\*</code>
     * [.canApprove(addressOrEns)](#MultisigClientMethods+canApprove) ⇒ <code>\*</code>
     * [.canExecute(addressOrEns)](#MultisigClientMethods+canExecute) ⇒ <code>\*</code>
     * [.getVotingSettings(addressOrEns)](#MultisigClientMethods+getVotingSettings) ⇒ <code>\*</code>
@@ -269,7 +269,7 @@ so that the plugin is configured</p>
 
 <a name="MultisigClientMethods+executeProposal"></a>
 
-### multisigClientMethods.executeProposal(ExecuteProposalParams) ⇒ <code>\*</code>
+### multisigClientMethods.executeProposal(proposalId) ⇒ <code>\*</code>
 <p>Allow a wallet in the multisig give approval to a proposal</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
@@ -277,7 +277,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| ExecuteProposalParams | <code>params</code> | 
+| proposalId | <code>string</code> | 
 
 <a name="MultisigClientMethods+canApprove"></a>
 

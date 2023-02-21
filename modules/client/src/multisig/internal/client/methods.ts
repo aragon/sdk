@@ -1,11 +1,13 @@
 import {
   boolArrayToBitmap,
+  decodeProposalId,
+  encodeProposalId,
   GraphQLError,
-  InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidProposalIdError,
   IpfsPinError,
+  isProposalId,
   NoProviderError,
   NoSignerError,
   ProposalCreationError,
@@ -18,7 +20,6 @@ import {
   ApproveProposalStepValue,
   CanApproveParams,
   CreateMultisigProposalParams,
-  ExecuteProposalParams,
   IMultisigClientMethods,
   MultisigProposal,
   MultisigProposalListItem,
@@ -29,7 +30,6 @@ import {
   SubgraphMultisigVotingSettings,
 } from "../../interfaces";
 import {
-  CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
@@ -56,7 +56,6 @@ import {
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { QueryMultisigMembers } from "../graphql-queries/members";
-import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK Address List Client
@@ -129,14 +128,14 @@ export class MultisigClientMethods extends ClientCore
     }
 
     const parsedLog = multisigContractInterface.parseLog(log);
-    const proposalId: BigNumber = parsedLog.args["proposalId"];
+    const proposalId = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      proposalId: proposalId.toNumber(),
+      proposalId: encodeProposalId(params.pluginAddress, Number(proposalId)),
     };
   }
 
@@ -172,18 +171,15 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
+
     const multisigContract = Multisig__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
     const tx = await multisigContract.approve(
-      params.proposalId,
+      id,
       params.tryExecution,
     );
 
@@ -201,12 +197,12 @@ export class MultisigClientMethods extends ClientCore
   /**
    * Allow a wallet in the multisig give approval to a proposal
    *
-   * @param {params} ExecuteProposalParams
+   * @param {string} proposalId
    * @return {*}  {AsyncGenerator<ExecuteMultisigProposalStepValue>}
    * @memberof MultisigClientMethods
    */
   public async *executeProposal(
-    params: ExecuteProposalParams,
+    proposalId: string,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -214,18 +210,16 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
+
+    const { pluginAddress, id } = decodeProposalId(proposalId);
+
     const multisigContract = Multisig__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
     const tx = await multisigContract.execute(
-      params.proposalId,
+      id,
     );
 
     yield {
@@ -256,30 +250,27 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
     if (!isAddress(params.addressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressOrEnsError();
-    }
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
+
     const multisigContract = Multisig__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
-    return multisigContract.canApprove(params.proposalId, params.addressOrEns);
+    return multisigContract.canApprove(id, params.addressOrEns);
   }
   /**
    * Checks whether the current proposal can be executed
    *
-   * @param {string} addressOrEns
+   * @param {string} proposalId
    * @return {*}  {Promise<boolean>}
    * @memberof MultisigClientMethods
    */
   public async canExecute(
-    params: CanExecuteParams,
+    proposalId: string,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -287,17 +278,15 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
+
+    const { pluginAddress, id } = decodeProposalId(proposalId);
+
     const multisigContract = Multisig__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
-    return multisigContract.canExecute(params.proposalId);
+    return multisigContract.canExecute(id);
   }
   /**
    * Returns the voting settings
@@ -369,7 +358,7 @@ export class MultisigClientMethods extends ClientCore
   public async getProposal(
     proposalId: string,
   ): Promise<MultisigProposal | null> {
-    if (!proposalId) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
     try {
