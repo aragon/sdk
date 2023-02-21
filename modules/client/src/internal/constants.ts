@@ -1,7 +1,11 @@
 import { DAO__factory } from "@aragon/core-contracts-ethers";
+import { AddressZero } from "@ethersproject/constants";
+import { Contract } from "@ethersproject/contracts";
 import { DaoMetadata } from "../interfaces";
+import { erc20ContractAbi } from "./abi/erc20";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
+  new Contract(AddressZero, erc20ContractAbi).interface.getFunction("transfer").format("minimal"),
   DAO__factory.createInterface().getFunction("grant").format("minimal"),
   DAO__factory.createInterface().getFunction("grantWithCondition").format("minimal"),
   DAO__factory.createInterface().getFunction("revoke").format("minimal"),
