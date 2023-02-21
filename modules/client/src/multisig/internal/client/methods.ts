@@ -215,9 +215,6 @@ export class MultisigClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const multisigContract = Multisig__factory.connect(
@@ -290,9 +287,6 @@ export class MultisigClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const multisigContract = Multisig__factory.connect(

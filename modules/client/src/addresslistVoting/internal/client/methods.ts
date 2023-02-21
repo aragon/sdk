@@ -224,9 +224,6 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
@@ -259,9 +256,6 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
 
-    if (!isProposalId(params.proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
@@ -290,9 +284,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
+
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(

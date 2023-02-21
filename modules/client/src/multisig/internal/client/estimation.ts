@@ -125,9 +125,6 @@ export class MultisigClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     const { pluginAddress, id } = decodeProposalId(
       proposalId,
     );

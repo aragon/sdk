@@ -224,9 +224,6 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
@@ -292,9 +289,6 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
-    if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
@@ -342,9 +336,6 @@ export class TokenVotingClientMethods extends ClientCore
     proposalId: string,
   ): Promise<TokenVotingProposal | null> {
     if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
-    if (!/^0x[A-Fa-f0-9]{40}_(0x[A-Fa-f0-9]{1,64})$/.test(proposalId)) {
       throw new InvalidProposalIdError();
     }
     try {
