@@ -2,7 +2,6 @@ import { Multisig__factory } from "@aragon/core-contracts-ethers";
 import {
   boolArrayToBitmap,
   decodeProposalId,
-  InvalidProposalIdError,
   NoProviderError,
   NoSignerError,
 } from "@aragon/sdk-common";
@@ -10,7 +9,6 @@ import {
   ClientCore,
   ContextPlugin,
   GasFeeEstimation,
-  isProposalId,
 } from "../../../client-common";
 import {
   ApproveMultisigProposalParams,

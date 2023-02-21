@@ -4,7 +4,6 @@ import {
   ContextPlugin,
   GasFeeEstimation,
   ICreateProposalParams,
-  isProposalId,
   IVoteProposalParams,
 } from "../../../client-common";
 import { IAddresslistVotingClientEstimation } from "../../interfaces";
@@ -12,7 +11,6 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   boolArrayToBitmap,
   decodeProposalId,
-  InvalidProposalIdError,
   NoProviderError,
   NoSignerError,
 } from "@aragon/sdk-common";
