@@ -170,7 +170,7 @@ so that the plugin is configured</p>
 * [AddresslistVotingClientEstimation](#AddresslistVotingClientEstimation)
     * [.createProposal(params)](#AddresslistVotingClientEstimation+createProposal) ⇒ <code>\*</code>
     * [.voteProposal(params)](#AddresslistVotingClientEstimation+voteProposal) ⇒ <code>\*</code>
-    * [.executeProposal(params)](#AddresslistVotingClientEstimation+executeProposal) ⇒ <code>\*</code>
+    * [.executeProposal(proposalId)](#AddresslistVotingClientEstimation+executeProposal) ⇒ <code>\*</code>
 
 <a name="AddresslistVotingClientEstimation+createProposal"></a>
 
@@ -198,7 +198,7 @@ so that the plugin is configured</p>
 
 <a name="AddresslistVotingClientEstimation+executeProposal"></a>
 
-### addresslistVotingClientEstimation.executeProposal(params) ⇒ <code>\*</code>
+### addresslistVotingClientEstimation.executeProposal(proposalId) ⇒ <code>\*</code>
 <p>Estimates the gas fee of executing an AddressList proposal</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientEstimation</code>](#AddresslistVotingClientEstimation)  
@@ -218,8 +218,9 @@ so that the plugin is configured</p>
 * [AddresslistVotingClientMethods](#AddresslistVotingClientMethods)
     * [.createProposal(params)](#AddresslistVotingClientMethods+createProposal) ⇒ <code>\*</code>
     * [.voteProposal(params)](#AddresslistVotingClientMethods+voteProposal) ⇒ <code>\*</code>
-    * [.executeProposal(params)](#AddresslistVotingClientMethods+executeProposal) ⇒ <code>\*</code>
+    * [.executeProposal(proposalId)](#AddresslistVotingClientMethods+executeProposal) ⇒ <code>\*</code>
     * [.canVote(params)](#AddresslistVotingClientMethods+canVote) ⇒ <code>\*</code>
+    * [.canExecute(proposalId)](#AddresslistVotingClientMethods+canExecute) ⇒ <code>\*</code>
     * [.getMembers(pluginAddress)](#AddresslistVotingClientMethods+getMembers) ⇒ <code>\*</code>
     * [.getProposal(proposalId)](#AddresslistVotingClientMethods+getProposal) ⇒ <code>\*</code>
     * [.getProposals({)](#AddresslistVotingClientMethods+getProposals) ⇒ <code>\*</code>
@@ -251,7 +252,7 @@ so that the plugin is configured</p>
 
 <a name="AddresslistVotingClientMethods+executeProposal"></a>
 
-### addresslistVotingClientMethods.executeProposal(params) ⇒ <code>\*</code>
+### addresslistVotingClientMethods.executeProposal(proposalId) ⇒ <code>\*</code>
 <p>Executes the given proposal, provided that it has already passed</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientMethods</code>](#AddresslistVotingClientMethods)  
@@ -272,6 +273,18 @@ so that the plugin is configured</p>
 | Param | Type |
 | --- | --- |
 | params | <code>ICanVoteParams</code> | 
+
+<a name="AddresslistVotingClientMethods+canExecute"></a>
+
+### addresslistVotingClientMethods.canExecute(proposalId) ⇒ <code>\*</code>
+<p>Checks whether the current proposal can be executed</p>
+
+**Kind**: instance method of [<code>AddresslistVotingClientMethods</code>](#AddresslistVotingClientMethods)  
+**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+
+| Param | Type |
+| --- | --- |
+| proposalId | <code>string</code> | 
 
 <a name="AddresslistVotingClientMethods+getMembers"></a>
 
