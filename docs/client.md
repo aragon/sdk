@@ -28,10 +28,15 @@
 
 * [ClientDecoding](#ClientDecoding)
     * [.grantAction(data)](#ClientDecoding+grantAction) ⇒ <code>\*</code>
+    * [.grantWithConditionAction(data)](#ClientDecoding+grantWithConditionAction) ⇒ <code>\*</code>
     * [.revokeAction(data)](#ClientDecoding+revokeAction) ⇒ <code>\*</code>
     * [.withdrawAction(data)](#ClientDecoding+withdrawAction) ⇒ <code>\*</code>
     * [.updateDaoMetadataRawAction(data)](#ClientDecoding+updateDaoMetadataRawAction) ⇒ <code>\*</code>
     * [.updateDaoMetadataAction(data)](#ClientDecoding+updateDaoMetadataAction) ⇒ <code>\*</code>
+    * [.setDaoUriAction(data)](#ClientDecoding+setDaoUriAction) ⇒ <code>\*</code>
+    * [.registerStandardCallbackAction(data)](#ClientDecoding+registerStandardCallbackAction) ⇒ <code>\*</code>
+    * [.setSignatureValidatorAction(data)](#ClientDecoding+setSignatureValidatorAction) ⇒ <code>\*</code>
+    * [.upgradeToAndCallAction(data)](#ClientDecoding+upgradeToAndCallAction) ⇒ <code>\*</code>
     * [.findInterface(data)](#ClientDecoding+findInterface) ⇒ <code>\*</code>
 
 <a name="ClientDecoding+grantAction"></a>
@@ -41,6 +46,18 @@
 
 **Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
 **Returns**: <code>\*</code> - <p>{IGrantPermissionDecodedParams}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="ClientDecoding+grantWithConditionAction"></a>
+
+### clientDecoding.grantWithConditionAction(data) ⇒ <code>\*</code>
+<p>Decodes the grant permission with condition parameters from an encoded grant with condition action</p>
+
+**Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
+**Returns**: <code>\*</code> - <p>{GrantPermissionWithConditionParams}</p>  
 
 | Param | Type |
 | --- | --- |
@@ -94,6 +111,54 @@
 | --- | --- |
 | data | <code>Uint8Array</code> | 
 
+<a name="ClientDecoding+setDaoUriAction"></a>
+
+### clientDecoding.setDaoUriAction(data) ⇒ <code>\*</code>
+<p>Decodes the daoUri from a setDaoUriAction</p>
+
+**Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
+**Returns**: <code>\*</code> - <p>{string}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="ClientDecoding+registerStandardCallbackAction"></a>
+
+### clientDecoding.registerStandardCallbackAction(data) ⇒ <code>\*</code>
+<p>Decodes the RegisterStandardCallbackParams from a registerStandardCallbackAction</p>
+
+**Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
+**Returns**: <code>\*</code> - <p>{RegisterStandardCallbackParams}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="ClientDecoding+setSignatureValidatorAction"></a>
+
+### clientDecoding.setSignatureValidatorAction(data) ⇒ <code>\*</code>
+<p>Decodes the implementation address from an encoded upgradeToAction</p>
+
+**Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
+**Returns**: <code>\*</code> - <p>{string}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
+<a name="ClientDecoding+upgradeToAndCallAction"></a>
+
+### clientDecoding.upgradeToAndCallAction(data) ⇒ <code>\*</code>
+<p>Decodes upgradeToAndCallback params from an upgradeToAndCallAction</p>
+
+**Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
+**Returns**: <code>\*</code> - <p>{UpgradeToAndCallParams}</p>  
+
+| Param | Type |
+| --- | --- |
+| data | <code>Uint8Array</code> | 
+
 <a name="ClientDecoding+findInterface"></a>
 
 ### clientDecoding.findInterface(data) ⇒ <code>\*</code>
@@ -115,9 +180,15 @@
 
 * [ClientEncoding](#ClientEncoding)
     * [.grantAction(daoAddress, params)](#ClientEncoding+grantAction) ⇒ <code>\*</code>
+    * [.grantWithConditionAction(daoAddress, params)](#ClientEncoding+grantWithConditionAction) ⇒ <code>\*</code>
     * [.revokeAction(daoAddress, params)](#ClientEncoding+revokeAction) ⇒ <code>\*</code>
     * [.withdrawAction(recipientAddressOrEns, value)](#ClientEncoding+withdrawAction) ⇒ <code>\*</code>
     * [.updateDaoMetadataAction(daoAddressOrEns, params)](#ClientEncoding+updateDaoMetadataAction) ⇒ <code>\*</code>
+    * [.setDaoUriAction(daoAddressOrEns, daoUri)](#ClientEncoding+setDaoUriAction) ⇒ <code>\*</code>
+    * [.registerStandardCallbackAction(daoAddressOrEns, daoUri)](#ClientEncoding+registerStandardCallbackAction) ⇒ <code>\*</code>
+    * [.setSignatureValidatorAction(daoAddressOrEns, signatureValidator)](#ClientEncoding+setSignatureValidatorAction) ⇒ <code>\*</code>
+    * [.upgradeToAction(daoAddressOrEns, implementationAddress)](#ClientEncoding+upgradeToAction) ⇒ <code>\*</code>
+    * [.upgradeToAndCallAction(daoAddressOrEns, params)](#ClientEncoding+upgradeToAndCallAction) ⇒ <code>\*</code>
 
 <a name="ClientEncoding+grantAction"></a>
 
@@ -131,6 +202,19 @@
 | --- | --- |
 | daoAddress | <code>string</code> | 
 | params | <code>IGrantPermissionParams</code> | 
+
+<a name="ClientEncoding+grantWithConditionAction"></a>
+
+### clientEncoding.grantWithConditionAction(daoAddress, params) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that grants a permission within a DAO given a certain condition</p>
+
+**Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddress | <code>string</code> | 
+| params | <code>GrantPermissionWithConditionParams</code> | 
 
 <a name="ClientEncoding+revokeAction"></a>
 
@@ -170,6 +254,71 @@
 | --- | --- |
 | daoAddressOrEns | <code>string</code> | 
 | params | <code>DaoMetadata</code> | 
+
+<a name="ClientEncoding+setDaoUriAction"></a>
+
+### clientEncoding.setDaoUriAction(daoAddressOrEns, daoUri) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that sets the dao uri</p>
+
+**Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddressOrEns | <code>string</code> | 
+| daoUri | <code>string</code> | 
+
+<a name="ClientEncoding+registerStandardCallbackAction"></a>
+
+### clientEncoding.registerStandardCallbackAction(daoAddressOrEns, daoUri) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that registers a new standard callback</p>
+
+**Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddressOrEns | <code>string</code> | 
+| daoUri | <code>string</code> | 
+
+<a name="ClientEncoding+setSignatureValidatorAction"></a>
+
+### clientEncoding.setSignatureValidatorAction(daoAddressOrEns, signatureValidator) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that sets the signature validator</p>
+
+**Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddressOrEns | <code>string</code> | 
+| signatureValidator | <code>string</code> | 
+
+<a name="ClientEncoding+upgradeToAction"></a>
+
+### clientEncoding.upgradeToAction(daoAddressOrEns, implementationAddress) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that sets a new implementation for the proxy</p>
+
+**Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddressOrEns | <code>string</code> | 
+| implementationAddress | <code>string</code> | 
+
+<a name="ClientEncoding+upgradeToAndCallAction"></a>
+
+### clientEncoding.upgradeToAndCallAction(daoAddressOrEns, params) ⇒ <code>\*</code>
+<p>Computes the payload to be given when creating a proposal that sets a new implementation for the proxy and calls the callback function with the specified data</p>
+
+**Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
+**Returns**: <code>\*</code> - <p>{DaoAction}</p>  
+
+| Param | Type |
+| --- | --- |
+| daoAddressOrEns | <code>string</code> | 
+| params | <code>UpgradeToAndCallParams</code> | 
 
 <a name="ClientEstimation"></a>
 
