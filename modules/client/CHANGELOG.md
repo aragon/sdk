@@ -21,6 +21,10 @@ TEMPLATE:
 ### Removed
 - removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces
 
+## [0.21.2-beta]
+### Fixed
+- Add `transfer` to available functions
+
 ## [0.21.1-beta]
 ### Fixed 
 - `startDate` and `endDate` swapped on `getProposal` funtion of the multisig client
