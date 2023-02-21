@@ -179,7 +179,7 @@ describe("Client", () => {
         "ipfs://QmXhJawTJ3PkoKMyF3a4D89zybAHjpcGivkb7F1NkHAjpo",
       );
     });
-    it("Should encode an grant with condition action", async () => {
+    it("Should encode a grant with condition action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 

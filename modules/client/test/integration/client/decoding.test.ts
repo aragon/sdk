@@ -355,7 +355,7 @@ describe("Client", () => {
         expect(decodedParams.links[index].url).toBe(params.links[index].url);
       }
     });
-    it("Should encode an grant with condition action", async () => {
+    it("Should decode a grant with condition action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
       const expectedParams: GrantPermissionWithConditionParams = {
@@ -386,7 +386,7 @@ describe("Client", () => {
         expectedParams.permission,
       );
     });
-    it("Should encode a set Dao URI action", async () => {
+    it("Should decode a set Dao URI action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -403,7 +403,7 @@ describe("Client", () => {
         daoUri,
       );
     });
-    it("Should encode a register standard callback action", async () => {
+    it("Should decode a register standard callback action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -430,7 +430,7 @@ describe("Client", () => {
         expectedRegisterStandardCallbackParams.magicNumber,
       );
     });
-    it("Should encode a set signature validator action", async () => {
+    it("Should decode a set signature validator action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -448,7 +448,7 @@ describe("Client", () => {
         decodedValidatorAddress,
       );
     });
-    it("Should encode an update proxy implementation action", async () => {
+    it("Should decode an update proxy implementation action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -467,7 +467,7 @@ describe("Client", () => {
         decodedImplementationAddress,
       );
     });
-    it("Should encode an update proxy implementation and call action", async () => {
+    it("Should decode an update proxy implementation and call action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 

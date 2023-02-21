@@ -23,6 +23,20 @@ TEMPLATE:
 - removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces
 - removes `isProposalId()` and moves it to @aragon/sdk-common
 
+## [UPCOMING]
+### Added
+- Encoders and decoders for `grantWithConditionAction`
+- Encoders and decoders for `setDaoUriAction`
+- Encoders and decoders for `registerStandardCallbackAction`
+- Encoders and decoders for `setSignatureValidatorAction`
+- Encoders and decoders for `upgradeToAction`
+- Encoders and decoders for `upgradeToAndCallAction`
+- Examples for new decoders and encoders
+- JsDoc for new encoders and decoders
+
+### Changed
+- `ICreateProposalParams` => `CreateMajorityVotingProposalParams`
+- `IProposalSettings` => `MajorityVotingProposalSettings`
 ## [0.21.2-beta]
 ### Fixed
 - Add `transfer` to available functions

@@ -2321,6 +2321,180 @@ const withdrawAction = await client.encoding.withdrawAction(
 console.log(withdrawAction);
 ```
 
+### Grant with Condition
+
+```ts
+import {
+  Client,
+  Context,
+  ContextPlugin,
+  GrantPermissionWithConditionParams,
+  Permissions,
+} from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const grantWithConditionParams: GrantPermissionWithConditionParams = {
+  who: "0x1234567890123456789012345678901234567890",
+  where: "0x2345678901234567890123456789012345678901",
+  permission: Permissions.EXECUTE_PERMISSION,
+  condition: "0x3456789012345678901234567890123456789012",
+};
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const action = client.encoding.grantWithConditionAction(
+  daoAddressOrEns,
+  grantWithConditionParams,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Set the dao uri
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const daoUri = "https://the.dao/uri";
+const action = client.encoding.setDaoUriAction(
+  daoAddressOrEns,
+  daoUri,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Register a new standard callback
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { RegisterStandardCallbackParams } from "../../dist/interfaces";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const registerStandardCallbackParaqms: RegisterStandardCallbackParams = {
+  interfaceId: "0xaaaaaaaa",
+  callbackSelector: "0xaaaaaaab",
+  magicNumber: "0xaaaaaaac",
+};
+
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const action = client.encoding.registerStandardCallbackAction(
+  daoAddressOrEns,
+  registerStandardCallbackParaqms,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Set the signature validator
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const signatureValidator = "0x1234567890123456789012345678901234567890";
+const action = client.encoding.setSignatureValidatorAction(
+  daoAddressOrEns,
+  signatureValidator,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Upgrade to action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const implementationAddress = "0x1234567890123456789012345678901234567890";
+const action = client.encoding.upgradeToAction(
+  daoAddressOrEns,
+  implementationAddress,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Upgrade to and call action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { UpgradeToAndCallParams } from "../../dist/interfaces";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const upgradeToAndCallParams: UpgradeToAndCallParams = {
+  implementationAddress: "0x1234567890123456789012345678901234567890",
+  data: new Uint8Array([10, 20, 130, 40]),
+};
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const action = client.encoding.upgradeToAndCallAction(
+  daoAddressOrEns,
+  upgradeToAndCallParams,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
 ## Action decoders
 
 ### Decode action grant permission
@@ -2793,6 +2967,129 @@ console.log(params);
   tokenAddress: "0x1234567890123456789012345678901234567890",
   reference: "test",
 }
+*/
+```
+
+### Decode Grant with Condition action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const action = client.decoding.grantWithConditionAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(action);
+/*
+  {
+  where: "0x1234567890...",
+  who: "0x2345678901...",
+  permission: "UPGRADE_PERMISSION"
+  condition: "0x3456789012..."
+  permissionId: "0x12345..."
+  }
+  */
+```
+
+### Decode set Dao Uri action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const decodedAction = client.decoding.setDaoUriAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(decodedAction);
+/*
+  "https://the.dao.uri"
+*/
+```
+
+### Decode an register callback action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const decodedAction = client.decoding.registerStandardCallbackAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(decodedAction);
+/*
+  {
+    interfaceId: "0x12345678",
+    callbackSelector: "0x23456789",
+    magicNumber: "0x34567890"
+  }
+  */
+```
+
+### Decode a set signature validator action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const decodedAction = client.decoding.setSignatureValidatorAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(decodedAction);
+/*
+  "0x1234567890123456789012345678901234567890"
+*/
+```
+
+### Decode an upgrade to action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const action = client.decoding.upgradeToAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(action);
+/*
+  "0x1234567890123456789012345678901234567890"
+*/
+```
+
+### Decaode an upgrade to and call action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const decodedAction = client.decoding.upgradeToAndCallAction(
+  new Uint8Array([10, 20, 30, 40]),
+);
+console.log(decodedAction);
+/*
+  {
+    implementationAddress: "0x1234567890...",
+    data: Uint8Array[12,34,45...]
+  }
 */
 ```
 
