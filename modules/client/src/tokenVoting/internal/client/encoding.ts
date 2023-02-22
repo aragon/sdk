@@ -1,5 +1,6 @@
 import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import {
+  AvailableNetworks,
   ClientCore,
   ContextPlugin,
   DaoAction,
@@ -14,7 +15,6 @@ import {
   ITokenVotingPluginInstall,
 } from "../../interfaces";
 import {
-  activeContractsList,
   IERC20MintableUpgradeable__factory,
 } from "@aragon/core-contracts-ethers";
 import {
@@ -22,7 +22,7 @@ import {
   tokenVotingInitParamsToContract,
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { Networkish } from "@ethersproject/providers";
+import { LIVE_CONTRACTS } from "../../../client-common/constants";
 
 /**
  * Encoding module the SDK TokenVoting Client
@@ -39,13 +39,13 @@ export class TokenVotingClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {ITokenVotingPluginInstall} params
-   * @param {Networkish} network
+   * @param {AvailableNetworks} network
    * @return {*}  {IPluginInstallItem}
    * @memberof TokenVotingClientEncoding
    */
   static getPluginInstallItem(
     params: ITokenVotingPluginInstall,
-    network: Networkish,
+    network: AvailableNetworks,
   ): IPluginInstallItem {
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
@@ -58,11 +58,7 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      // TODO remove tsiginore once all the networks have the same properties
-      // @ts-ignore
-      id: activeContractsList[
-        network.toString() as keyof typeof activeContractsList
-      ]["token-voting-repo"],
+      id: LIVE_CONTRACTS[network].tokenVotingRepo,
       data: hexToBytes(hexBytes),
     };
   }

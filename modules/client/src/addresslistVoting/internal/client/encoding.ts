@@ -1,9 +1,9 @@
 import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
+  AvailableNetworks,
   ClientCore,
   ContextPlugin,
-  // ContractVotingSettings,
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
@@ -15,11 +15,10 @@ import {
   IAddresslistVotingPluginInstall,
 } from "../../interfaces";
 import {
-  activeContractsList,
   AddresslistVoting__factory,
 } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { Networkish } from "@ethersproject/providers";
+import { LIVE_CONTRACTS } from "../../../client-common/constants";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -37,13 +36,13 @@ export class AddresslistVotingClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {IAddresslistVotingPluginInstall} params
-   * @param {Networkish} network
+   * @param {AvailableNetworks} network
    * @return {*}  {IPluginInstallItem}
    * @memberof AddresslistVotingClientEncoding
    */
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
-    network: Networkish,
+    network: AvailableNetworks,
   ): IPluginInstallItem {
     const {
       votingMode,
@@ -71,11 +70,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     );
 
     return {
-      // TODO remove tsiginore once all the networks have the same properties
-      // @ts-ignore
-      id: activeContractsList[
-        network.toString() as keyof typeof activeContractsList
-      ]["address-list-voting-repo"],
+      id: LIVE_CONTRACTS[network].addresslistVotingRepo,
       data: hexToBytes(hexBytes),
     };
   }

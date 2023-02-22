@@ -11,11 +11,11 @@ import { MultisigClientEncoding } from "./internal/client/encoding";
 import { MultisigClientDecoding } from "./internal/client/decoding";
 import { MultisigClientEstimation } from "./internal/client/estimation";
 import {
+  AvailableNetworks,
   ClientCore,
   ContextPlugin,
   IPluginInstallItem,
 } from "../client-common";
-import { Networkish } from "@ethersproject/providers";
 
 /**
  * Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO
@@ -39,14 +39,14 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
      * so that the plugin is configured
      *
      * @param {MultisigPluginInstallParams} params
-     * @param {Networkish} [network="mainnet"]
+     * @param {AvailableNetworks} [network="mainnet"]
      * @return {*}  {IPluginInstallItem}
      * @memberof MultisigClient
      */
     
     getPluginInstallItem: (
       params: MultisigPluginInstallParams,
-      network: Networkish = "mainnet",
+      network: AvailableNetworks = "mainnet",
     ): IPluginInstallItem =>
       MultisigClientEncoding.getPluginInstallItem(params, network),
   };

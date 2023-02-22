@@ -1,3 +1,12 @@
+export type AvailableNetworks = "mainnet" | "goerli";
+export type Deployment = {
+  daoFactory: string;
+  multisigRepo: string;
+  adminRepo: string;
+  addresslistVotingRepo: string;
+  tokenVotingRepo: string;
+};
+
 // This file contains common types, interfaces, and enumerations
 
 export enum DaoRole {

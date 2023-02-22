@@ -1,6 +1,7 @@
 import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
+  AvailableNetworks,
   ClientCore,
   ContextPlugin,
   DaoAction,
@@ -15,11 +16,10 @@ import {
 // @ts-ignore
 // todo fix new contracts-ethers
 import {
-  activeContractsList,
   Multisig__factory,
 } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { Networkish } from "@ethersproject/providers";
+import { LIVE_CONTRACTS } from "../../../client-common/constants";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -35,14 +35,14 @@ export class MultisigClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {MultisigPluginInstallParams} params
-   * @param {Networkish} network
+   * @param {AvailableNetworks} network
    * 
    * @return {*}  {IPluginInstallItem}
    * @memberof MultisigClientEncoding
    */
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
-    network: Networkish,
+    network: AvailableNetworks,
   ): IPluginInstallItem {
     const hexBytes = defaultAbiCoder.encode(
       // members, [onlyListed, minApprovals]
@@ -59,11 +59,7 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
-      // TODO remove tsiginore once all the networks have the same properties
-      // @ts-ignore
-      id: activeContractsList[
-        network.toString() as keyof typeof activeContractsList
-      ]["multisig-repo"],
+      id: LIVE_CONTRACTS[network].multisigRepo,
       data: hexToBytes(hexBytes),
     };
   }

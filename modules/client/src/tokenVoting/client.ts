@@ -11,11 +11,11 @@ import { TokenVotingClientEncoding } from "./internal/client/encoding";
 import { TokenVotingClientDecoding } from "./internal/client/decoding";
 import { TokenVotingClientEstimation } from "./internal/client/estimation";
 import {
+  AvailableNetworks,
   ClientCore,
   ContextPlugin,
   IPluginInstallItem,
 } from "../client-common";
-import { Networkish } from "@ethersproject/providers";
 
 /**
  * Provider a generic client with high level methods to manage and interact a Token Voting plugin installed in a DAO
@@ -55,13 +55,13 @@ export class TokenVotingClient extends ClientCore
      * so that the plugin is configured
      *
      * @param {ITokenVotingPluginInstall} params
-     * @param {Networkish} [network="mainnet"]
+     * @param {AvailableNetworks} [network="mainnet"]
      * @return {*}  {IPluginInstallItem}
      * @memberof TokenVotingClient
      */
     getPluginInstallItem: (
       params: ITokenVotingPluginInstall,
-      network: Networkish = "mainnet",
+      network: AvailableNetworks = "mainnet",
     ): IPluginInstallItem =>
       TokenVotingClientEncoding.getPluginInstallItem(params, network),
   };
