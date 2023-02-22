@@ -37,6 +37,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {IAddresslistVotingPluginInstall} params
+   * @param {Networkish} network
    * @return {*}  {IPluginInstallItem}
    * @memberof AddresslistVotingClientEncoding
    */

@@ -38,10 +38,12 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
      * Computes the parameters to be given when creating the DAO,
      * so that the plugin is configured
      *
-     * @param {string[]} members
+     * @param {MultisigPluginInstallParams} params
+     * @param {Networkish} [network="mainnet"]
      * @return {*}  {IPluginInstallItem}
      * @memberof MultisigClient
      */
+    
     getPluginInstallItem: (
       params: MultisigPluginInstallParams,
       network: Networkish = "mainnet",

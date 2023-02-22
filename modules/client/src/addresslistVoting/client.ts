@@ -55,6 +55,7 @@ export class AddresslistVotingClient extends ClientCore
      * so that the plugin is configured
      *
      * @param {IAddresslistVotingPluginInstall} params
+     * @param {Networkish} [network="mainnet"]
      * @return {*}  {IPluginInstallItem}
      * @memberof AddresslistVotingClient
      */

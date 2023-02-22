@@ -55,6 +55,7 @@ export class TokenVotingClient extends ClientCore
      * so that the plugin is configured
      *
      * @param {ITokenVotingPluginInstall} params
+     * @param {Networkish} [network="mainnet"]
      * @return {*}  {IPluginInstallItem}
      * @memberof TokenVotingClient
      */

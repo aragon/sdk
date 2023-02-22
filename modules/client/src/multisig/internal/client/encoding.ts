@@ -35,6 +35,8 @@ export class MultisigClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {MultisigPluginInstallParams} params
+   * @param {Networkish} network
+   * 
    * @return {*}  {IPluginInstallItem}
    * @memberof MultisigClientEncoding
    */
