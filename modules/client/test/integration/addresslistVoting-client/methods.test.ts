@@ -13,7 +13,7 @@ import {
   ContextPlugin,
   ExecuteProposalStep,
   ICanVoteParams,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -124,7 +124,7 @@ describe("Client Address List", () => {
     );
     const endDate = new Date(Date.now() + 60 * 60 * 1000 + 10 * 1000);
 
-    const proposalParams: ICreateProposalParams = {
+    const proposalParams: CreateMajorityVotingProposalParams = {
       pluginAddress,
       metadataUri: ipfsUri,
       actions: [action],
@@ -600,15 +600,15 @@ describe("Client Address List", () => {
         expect(typeof proposal.result.abstain).toBe("number");
         // setttings
         expect(typeof proposal.settings.duration).toBe("number");
-        expect(typeof proposal.settings.minSupport).toBe("number");
-        expect(typeof proposal.settings.minTurnout).toBe("number");
+        expect(typeof proposal.settings.supportThreshold).toBe("number");
+        expect(typeof proposal.settings.minParticipation).toBe("number");
         expect(
-          proposal.settings.minSupport >= 0 &&
-            proposal.settings.minSupport <= 1,
+          proposal.settings.supportThreshold >= 0 &&
+            proposal.settings.supportThreshold <= 1,
         ).toBe(true);
         expect(
-          proposal.settings.minTurnout >= 0 &&
-            proposal.settings.minTurnout <= 1,
+          proposal.settings.minParticipation >= 0 &&
+            proposal.settings.minParticipation <= 1,
         ).toBe(true);
         // token
         expect(typeof proposal.totalVotingWeight).toBe("number");

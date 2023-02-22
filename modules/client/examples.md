@@ -8,6 +8,7 @@ import { Context } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";
 import { ContextParams } from "@aragon/sdk-client";
 
+
 export const IPFS_API_KEY = "ipfs-api-key";
 
 export const contextParams: ContextParams = {
@@ -61,10 +62,10 @@ console.log(client);
 import {
   Client,
   Context,
-  CreateDaoParams,
   DaoCreationSteps,
   DaoMetadata,
   GasFeeEstimation,
+  CreateDaoParams
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
@@ -119,9 +120,9 @@ import {
   Client,
   Context,
   DaoDepositSteps,
-  DepositParams,
   GasFeeEstimation,
-  TokenType,
+  DepositParams,
+  TokenType
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
@@ -452,7 +453,6 @@ console.log(balances);
 ```
 
 ### Ensure an a minimum token allowance
-
 Check if the allowance is enough and updates it if it is not
 
 ```ts
@@ -460,19 +460,19 @@ import {
   Client,
   Context,
   DaoDepositSteps,
-  EnsureAllowanceParams,
+  UpdateAllowanceParams,
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
 const context = new Context(contextParams);
 const client = new Client(context);
-const ensureAllowanceParams: EnsureAllowanceParams = {
-  daoAddress: "0x1234567890123456789012345678901234567890",
+const updateAllowanceParams: UpdateAllowanceParams = {
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
 };
 
-const steps = client.methods.ensureAllowance(ensureAllowanceParams);
+const steps = client.methods.updateAllowance(updateAllowanceParams);
 for await (const step of steps) {
   try {
     switch (step.key) {
@@ -492,9 +492,7 @@ for await (const step of steps) {
 ```
 
 ### Add and pin metadata
-
-Adds an pin data with a the format used by aragon app into one of the specified
-IPFS nodes and return a ipfs cid preceded by ipfs://
+Adds an pin data with a the format used by aragon app into one of the specified IPFS nodes and return a ipfs cid preceded by ipfs://
 
 ```ts
 import { Client, Context, IMetadata } from "@aragon/sdk-client";
@@ -533,13 +531,13 @@ underlying network requests.
 import {
   Client,
   Context,
-  CreateDaoParams,
   DaoCreationSteps,
-  DaoMetadata,
   GasFeeEstimation,
+  CreateDaoParams,
   ITokenVotingPluginInstall,
   TokenVotingClient,
   VotingMode,
+  DaoMetadata,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -657,7 +655,7 @@ contextPlugin.set({ network: 1 });
 contextPlugin.set({ signer: new Wallet("other private key") });
 contextPlugin.setFull(contextParams);
 
-console.log(contextPlugin);
+console.log(contextPlugin)
 ```
 
 ### Create a TokenVoting client
@@ -680,7 +678,7 @@ console.log(client);
 import {
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
   TokenVotingClient,
@@ -717,7 +715,7 @@ const metadata: ProposalMetadata = {
 
 const ipfsUri = await client.methods.pinMetadata(metadata);
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
   actions: [],
@@ -750,7 +748,7 @@ for await (const step of steps) {
 import {
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   TokenVotingClient,
   VoteValues,
@@ -784,21 +782,21 @@ const configAction = client.encoding.updatePluginSettingsAction(
 
 const metadataUri = await client.methods.pinMetadata({
   title: "Test proposal",
-  summary: "This is a test proposal",
-  description: "his is a test proposal, but longer",
-  resources: [
-    {
-      url: "https://thforumurl.com",
-      name: "Forum",
-    },
-  ],
-  media: {
-    header: "https://fileserver.com/header.png",
-    logo: "https://fileserver.com/logo.png",
-  },
-});
+    summary: "This is a test proposal",
+    description: "his is a test proposal, but longer",
+    resources: [
+      {
+        url: "https://thforumurl.com",
+        name: "Forum"
+      }
+    ],
+    media: {
+      header: "https://fileserver.com/header.png",
+      logo: "https://fileserver.com/logo.png"
+    }
+})
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri,
   actions: [configAction],
@@ -886,8 +884,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new TokenVotingClient(contextPlugin);
 
 const voteParams: ICanVoteParams = {
-  address: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
+  address: "0x1234567890123456789012345678901234567890",
   vote: VoteValues.YES,
 };
 
@@ -1000,8 +998,8 @@ console.log(proposal);
     abstain: 0n
   }
   settings:{
-    minTurnout: 0.5,
-    minSupport: 0.25,
+    minParticipation: 0.5,
+    supportThreshold: 0.25,
     minDuration: 7200
   },
   token: {
@@ -1202,16 +1200,14 @@ console.log(token);
 ```
 
 ### Add and pin metadata
-
-Adds an pin data with a the format used by aragon app into one of the specified
-IPFS nodes and return a ipfs cid preceded by ipfs://
+Adds an pin data with a the format used by aragon app into one of the specified IPFS nodes and return a ipfs cid preceded by ipfs://
 
 ```ts
 import {
+  TokenVotingClient,
   Context,
   ContextPlugin,
   ProposalMetadata,
-  TokenVotingClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -1246,20 +1242,19 @@ console.log(metadataUri);
 ```
 
 ## Address List governance plugin client
-
 ### Creating a DAO with a addresslistVoting plugin
 
 ```ts
 import {
-  AddresslistVotingClient,
   Client,
+  AddresslistVotingClient,
   Context,
-  CreateDaoParams,
   DaoCreationSteps,
-  DaoMetadata,
   GasFeeEstimation,
-  IAddresslistVotingPluginInstall,
+  CreateDaoParams,
+  DaoMetadata,
   VotingMode,
+  IAddresslistVotingPluginInstall,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -1344,17 +1339,13 @@ contextPlugin.set({ network: 1 });
 contextPlugin.set({ signer: new Wallet("other private key") });
 contextPlugin.setFull(contextParams);
 
-console.log(contextPlugin);
+console.log(contextPlugin)
 ```
 
 ### Create an Address List client
 
 ```ts
-import {
-  AddresslistVotingClient,
-  Context,
-  ContextPlugin,
-} from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context = new Context(contextParams);
@@ -1372,7 +1363,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
   VoteValues,
@@ -1408,7 +1399,7 @@ const metadata: ProposalMetadata = {
 
 const ipfsUri = await client.methods.pinMetadata(metadata);
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri: ipfsUri,
   actions: [],
@@ -1443,7 +1434,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
   VoteValues,
@@ -1497,11 +1488,11 @@ const daoMetadata: ProposalMetadata = {
 
 const metadataUri = await client.methods.pinMetadata(daoMetadata);
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri,
   actions: [configAction],
-  failSafeActions: [false], // the action cannot fail gracefully
+  failSafeActions: [false],  // the action cannot fail gracefully
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
@@ -1601,11 +1592,7 @@ true
 ### Loading the list of members (address list plugin)
 
 ```ts
-import {
-  AddresslistVotingClient,
-  Context,
-  ContextPlugin,
-} from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -1702,8 +1689,8 @@ console.log(proposal);
     abstain: 0
   }
   settings: {
-    minTurnout: 0.5,
-    minSupport: 0.25,
+    minParticipation: 0.5,
+    supportThreshold: 0.25,
     minDuration: 7200
   },
   votes: [
@@ -1724,8 +1711,8 @@ console.log(proposal);
 
 ```ts
 import {
-  AddresslistVotingClient,
   AddresslistVotingProposalListItem,
+  AddresslistVotingClient,
   Context,
   ContextPlugin,
   IProposalQueryParams,
@@ -1835,9 +1822,7 @@ console.log(settings);
 ```
 
 ### Add and pin metadata
-
-Adds an pin data with a the format used by aragon app into one of the specified
-IPFS nodes and return a ipfs cid preceded by ipfs://
+Adds an pin data with a the format used by aragon app into one of the specified IPFS nodes and return a ipfs cid preceded by ipfs://
 
 ```ts
 import {
@@ -1884,7 +1869,6 @@ Proposals will eventually need to execute some action on behalf of the DAO,
 which needs to be encoded in a low level format.
 
 The helpers above help encoding the most typical DAO operations.
-
 ### Grant permission
 
 ```ts
@@ -2092,10 +2076,10 @@ console.log(configAction);
 
 ```ts
 import {
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IMintTokenParams,
-  TokenVotingClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -2123,11 +2107,7 @@ console.log(action);
 ### Add Members (AddressList)
 
 ```ts
-import {
-  AddresslistVotingClient,
-  Context,
-  ContextPlugin,
-} from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -2188,10 +2168,10 @@ console.log(action);
 
 ```ts
 import {
-  AddAddressesParams,
   Context,
   ContextPlugin,
   MultisigClient,
+  AddAddressesParams,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
@@ -2321,8 +2301,181 @@ const withdrawAction = await client.encoding.withdrawAction(
 console.log(withdrawAction);
 ```
 
-## Action decoders
+### Grant with Condition
 
+```ts
+import {
+  Client,
+  Context,
+  ContextPlugin,
+  GrantPermissionWithConditionParams,
+  Permissions,
+} from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const grantWithConditionParams: GrantPermissionWithConditionParams = {
+  who: "0x1234567890123456789012345678901234567890",
+  where: "0x2345678901234567890123456789012345678901",
+  permission: Permissions.EXECUTE_PERMISSION,
+  condition: "0x3456789012345678901234567890123456789012",
+};
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const action = client.encoding.grantWithConditionAction(
+  daoAddressOrEns,
+  grantWithConditionParams,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Set the dao uri
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const daoUri = "https://the.dao/uri";
+const action = client.encoding.setDaoUriAction(
+  daoAddressOrEns,
+  daoUri,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Register a new standard callback
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { RegisterStandardCallbackParams } from "../../dist/interfaces";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const registerStandardCallbackParaqms: RegisterStandardCallbackParams = {
+  interfaceId: "0xaaaaaaaa",
+  callbackSelector: "0xaaaaaaab",
+  magicNumber: "0xaaaaaaac",
+};
+
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const action = client.encoding.registerStandardCallbackAction(
+  daoAddressOrEns,
+  registerStandardCallbackParaqms,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Set the signature validator
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const signatureValidator = "0x1234567890123456789012345678901234567890";
+const action = client.encoding.setSignatureValidatorAction(
+  daoAddressOrEns,
+  signatureValidator,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Upgrade to action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const implementationAddress = "0x1234567890123456789012345678901234567890";
+const action = client.encoding.upgradeToAction(
+  daoAddressOrEns,
+  implementationAddress,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+### Upgrade to and call action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { UpgradeToAndCallParams } from "../../dist/interfaces";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const upgradeToAndCallParams: UpgradeToAndCallParams = {
+  implementationAddress: "0x1234567890123456789012345678901234567890",
+  data: new Uint8Array([10, 20, 130, 40]),
+};
+const daoAddressOrEns = "0x123123123123123123123123123123123123";
+const action = client.encoding.upgradeToAndCallAction(
+  daoAddressOrEns,
+  upgradeToAndCallParams,
+);
+console.log(action);
+/*
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+  */
+```
+
+## Action decoders
 ### Decode action grant permission
 
 ```ts
@@ -2580,7 +2733,7 @@ console.log(functionParams);
 ### Get Function Parameters from an encoded action (TokenVoting)
 
 ```ts
-import { Context, ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
+import { TokenVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 
 const context: Context = new Context(contextParams);
@@ -2607,10 +2760,10 @@ console.log(functionParams);
 
 ```ts
 import {
+  TokenVotingClient,
   Context,
   ContextPlugin,
   IMintTokenParams,
-  TokenVotingClient,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
@@ -2619,9 +2772,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient = new TokenVotingClient(contextPlugin);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const params: IMintTokenParams = tokenVotingClient.decoding.mintTokenAction(
-  data,
-);
+const params: IMintTokenParams = tokenVotingClient.decoding.mintTokenAction(data);
 
 console.log(params);
 /*
@@ -2635,11 +2786,7 @@ console.log(params);
 ### Decode Add Members Action (Address List)
 
 ```ts
-import {
-  AddresslistVotingClient,
-  Context,
-  ContextPlugin,
-} from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
@@ -2662,11 +2809,7 @@ console.log(members);
 ### Decode Remove Members Action (Address List)
 
 ```ts
-import {
-  AddresslistVotingClient,
-  Context,
-  ContextPlugin,
-} from "@aragon/sdk-client";
+import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
@@ -2748,12 +2891,7 @@ console.log(settings);
 ### Decode Remove Members Action (Multisig)
 
 ```ts
-import {
-  Context,
-  ContextPlugin,
-  MultisigClient,
-  MultisigVotingSettings,
-} from "@aragon/sdk-client";
+import { Context, ContextPlugin, MultisigClient, MultisigVotingSettings } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
 const context: Context = new Context(contextParams);
 // Create a plugin context from the simple context
@@ -2796,8 +2934,130 @@ console.log(params);
 */
 ```
 
-## Multisig governance plugin client
+### Decode Grant with Condition action
 
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const action = client.decoding.grantWithConditionAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(action);
+/*
+  {
+  where: "0x1234567890...",
+  who: "0x2345678901...",
+  permission: "UPGRADE_PERMISSION"
+  condition: "0x3456789012..."
+  permissionId: "0x12345..."
+  }
+  */
+```
+
+### Decode set Dao Uri action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const decodedAction = client.decoding.setDaoUriAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(decodedAction);
+/*
+  "https://the.dao.uri"
+*/
+```
+
+### Decode an register callback action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const decodedAction = client.decoding.registerStandardCallbackAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(decodedAction);
+/*
+  {
+    interfaceId: "0x12345678",
+    callbackSelector: "0x23456789",
+    magicNumber: "0x34567890"
+  }
+  */
+```
+
+### Decode a set signature validator action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const decodedAction = client.decoding.setSignatureValidatorAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(decodedAction);
+/*
+  "0x1234567890123456789012345678901234567890"
+*/
+```
+
+### Decode an upgrade to action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+const action = client.decoding.upgradeToAction(
+  new Uint8Array([0, 10, 20, 30]),
+);
+console.log(action);
+/*
+  "0x1234567890123456789012345678901234567890"
+*/
+```
+
+### Decaode an upgrade to and call action
+
+```ts
+import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
+import { contextParams } from "../00-client/00-context";
+
+const context: Context = new Context(contextParams);
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+const client = new Client(contextPlugin);
+
+const decodedAction = client.decoding.upgradeToAndCallAction(
+  new Uint8Array([10, 20, 30, 40]),
+);
+console.log(decodedAction);
+/*
+  {
+    implementationAddress: "0x1234567890...",
+    data: Uint8Array[12,34,45...]
+  }
+*/
+```
+
+## Multisig governance plugin client
 ### Creating a DAO with a multisig plugin
 
 ```ts
@@ -2921,6 +3181,7 @@ import {
   TokenType,
   WithdrawParams,
 } from "@aragon/sdk-client";
+
 import { contextParams } from "../00-client/00-context";
 
 // Create a simple context
@@ -3291,9 +3552,7 @@ console.log(proposals);
 ```
 
 ### Add and pin metadata
-
-Adds an pin data with a the format used by aragon app into one of the specified
-IPFS nodes and return a ipfs cid preceded by ipfs://
+Adds an pin data with a the format used by aragon app into one of the specified IPFS nodes and return a ipfs cid preceded by ipfs://
 
 ```ts
 import {

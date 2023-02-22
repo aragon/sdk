@@ -15,7 +15,9 @@ TEMPLATE:
 ### Fixed
 - Fix 1, 2, 3
 -->
-
+## UPCOMING
+### Changed
+- Rename `EnsureAllowanceError` to `UpdateAllowanceError`
 ## 0.11.0-beta
 
 ### Adds

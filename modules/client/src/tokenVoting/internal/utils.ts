@@ -86,10 +86,10 @@ export function toTokenVotingProposal(
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     settings: {
-      minSupport: decodeRatio(BigInt(proposal.supportThreshold), 6),
+      supportThreshold: decodeRatio(BigInt(proposal.supportThreshold), 6),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
-      minTurnout: decodeRatio(
+      minParticipation: decodeRatio(
         (BigInt(proposal.minVotingPower) * BigInt(1000000)) /
           BigInt(proposal.totalVotingPower),
         6,

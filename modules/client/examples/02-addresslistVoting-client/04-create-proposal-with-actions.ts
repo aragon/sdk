@@ -5,7 +5,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
   VoteValues,
@@ -59,7 +59,7 @@ const daoMetadata: ProposalMetadata = {
 
 const metadataUri = await client.methods.pinMetadata(daoMetadata);
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri,
   actions: [configAction],

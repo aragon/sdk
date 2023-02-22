@@ -7,7 +7,7 @@ import "../../mocks/aragon-sdk-ipfs";
 import {
   Context,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   IVoteProposalParams,
   TokenVotingClient,
   VoteValues,
@@ -37,7 +37,7 @@ describe("Token Voting Client", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
 
-      const proposalParams: ICreateProposalParams = {
+      const proposalParams: CreateMajorityVotingProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
         metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
       };

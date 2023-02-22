@@ -12,6 +12,23 @@ TEMPLATE:
 - Change 1, 2, 3
 
 -->
+## [UPCOMING]
+### Added
+- Encoders and decoders for `grantWithConditionAction`
+- Encoders and decoders for `setDaoUriAction`
+- Encoders and decoders for `registerStandardCallbackAction`
+- Encoders and decoders for `setSignatureValidatorAction`
+- Encoders and decoders for `upgradeToAction`
+- Encoders and decoders for `upgradeToAndCallAction`
+- Examples for new decoders and encoders
+- JsDoc for new encoders and decoders
+
+### Changed
+- `ICreateProposalParams` => `CreateMajorityVotingProposalParams`
+- `IProposalSettings` => `MajorityVotingProposalSettings`
+- Rename all mention of `ensureAllowance` to `updateAllowance`
+- ensDomain now includes `.dao.eth`
+
 ## [0.22.0-beta]
 
 ### Changed

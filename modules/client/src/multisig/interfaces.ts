@@ -179,7 +179,7 @@ export type SubgraphMultisigApproversListItem = {
 };
 
 export type SubgraphMultisigVotingSettings = {
-  minApprovals: string; // TODO: Should be now a number?
+  minApprovals: string;
   onlyListed: boolean;
 };
 

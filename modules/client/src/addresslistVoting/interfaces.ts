@@ -2,16 +2,16 @@
 
 import {
   ContractVotingSettings,
+  CreateMajorityVotingProposalParams,
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
   ICanVoteParams,
   IClientCore,
-  ICreateProposalParams,
   IInterfaceParams,
   IProposalQueryParams,
-  IProposalSettings,
   IVoteProposalParams,
+  MajorityVotingProposalSettings,
   ProposalBase,
   ProposalCreationStepValue,
   ProposalListItemBase,
@@ -28,7 +28,7 @@ import {
 // Address List
 export interface IAddresslistVotingClientMethods extends IClientCore {
   createProposal: (
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
   pinMetadata: (params: ProposalMetadata) => Promise<string>;
   voteProposal: (
@@ -71,7 +71,7 @@ export interface IAddresslistVotingClientDecoding extends IClientCore {
 }
 export interface IAddresslistVotingClientEstimation extends IClientCore {
   createProposal: (
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ) => Promise<GasFeeEstimation>;
   voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
   executeProposal: (
@@ -88,8 +88,8 @@ export interface IAddresslistVotingClient {
 
 export type AddresslistVotingProposal = ProposalBase & {
   result: AddresslistVotingProposalResult;
-  settings: IProposalSettings;
-  votes: Array<{ address: string; vote: VoteValues, voteReplaced: boolean }>;
+  settings: MajorityVotingProposalSettings;
+  votes: Array<{ address: string; vote: VoteValues; voteReplaced: boolean }>;
   totalVotingWeight: number;
   creationBlockNumber: number;
   executionDate: Date;

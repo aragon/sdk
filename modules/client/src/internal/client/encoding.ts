@@ -1,17 +1,27 @@
 import {
+  GrantPermissionWithConditionParams,
   IClientEncoding,
   IGrantPermissionParams,
   IRevokePermissionParams,
+  RegisterStandardCallbackParams,
   TokenType,
+  UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../interfaces";
 import { ClientCore, Context, DaoAction } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import { DAO__factory } from "@aragon/core-contracts-ethers";
-import { permissionParamsToContract } from "../utils";
+import {
+  permissionParamsToContract,
+  permissionWithConditionParamsToContract,
+} from "../utils";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
-import { hexToBytes } from "@aragon/sdk-common";
+import {
+  hexToBytes,
+  InvalidAddressError,
+  NoSignerError,
+} from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 
 /**
@@ -54,6 +64,47 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     );
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("grant", args);
+    return {
+      to: daoAddress,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
+  }
+  /**
+   * Computes the payload to be given when creating a proposal that grants a permission within a DAO given a certain condition
+   *
+   * @param {string} daoAddress
+   * @param {GrantPermissionWithConditionParams} params
+   * @return {*}  {DaoAction}
+   * @memberof ClientEncoding
+   */
+  public grantWithConditionAction(
+    daoAddress: string,
+    params: GrantPermissionWithConditionParams,
+  ): DaoAction {
+    const signer = this.web3.getSigner();
+    const { where, who } = params;
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (
+      !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
+    ) {
+      throw new InvalidAddressError();
+    }
+    const daoInterface = DAO__factory.createInterface();
+    const args = permissionWithConditionParamsToContract(
+      {
+        who,
+        where,
+        permission: params.permission,
+        condition: params.condition,
+      },
+    );
+    // get hex bytes
+    const hexBytes = daoInterface.encodeFunctionData(
+      "grantWithCondition",
+      args,
+    );
     return {
       to: daoAddress,
       value: BigInt(0),
@@ -169,6 +220,116 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     const hexBytes = daoInterface.encodeFunctionData("setMetadata", [args]);
     return {
       to: address,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
+  }
+  /**
+   * Computes the payload to be given when creating a proposal that sets the dao uri
+   *
+   * @param {string} daoAddressOrEns
+   * @param {string} daoUri
+   * @return {*}  {DaoAction}
+   * @memberof ClientEncoding
+   */
+  public setDaoUriAction(
+    daoAddressOrEns: string,
+    daoUri: string,
+  ): DaoAction {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = daoInterface.encodeFunctionData("setDaoURI", [daoUri]);
+    return {
+      to: daoAddressOrEns,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
+  }
+  /**
+   * Computes the payload to be given when creating a proposal that registers a new standard callback
+   *
+   * @param {string} daoAddressOrEns
+   * @param {string} daoUri
+   * @return {*}  {DaoAction}
+   * @memberof ClientEncoding
+   */
+  public registerStandardCallbackAction(
+    daoAddressOrEns: string,
+    params: RegisterStandardCallbackParams,
+  ): DaoAction {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = daoInterface.encodeFunctionData(
+      "registerStandardCallback",
+      [params.interfaceId, params.callbackSelector, params.magicNumber],
+    );
+    return {
+      to: daoAddressOrEns,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
+  }
+  /**
+   * Computes the payload to be given when creating a proposal that sets the signature validator
+   *
+   * @param {string} daoAddressOrEns
+   * @param {string} signatureValidator
+   * @return {*}  {DaoAction}
+   * @memberof ClientEncoding
+   */
+  public setSignatureValidatorAction(
+    daoAddressOrEns: string,
+    signatureValidator: string,
+  ): DaoAction {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = daoInterface.encodeFunctionData("setSignatureValidator", [
+      signatureValidator,
+    ]);
+    return {
+      to: daoAddressOrEns,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
+  }
+  /**
+   * Computes the payload to be given when creating a proposal that sets a new implementation for the proxy
+   *
+   * @param {string} daoAddressOrEns
+   * @param {string} implementationAddress
+   * @return {*}  {DaoAction}
+   * @memberof ClientEncoding
+   */
+  public upgradeToAction(
+    daoAddressOrEns: string,
+    implementationAddress: string,
+  ): DaoAction {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = daoInterface.encodeFunctionData("upgradeTo", [
+      implementationAddress,
+    ]);
+    return {
+      to: daoAddressOrEns,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
+  }
+  /**
+   * Computes the payload to be given when creating a proposal that sets a new implementation for the proxy and calls the callback function with the specified data
+   *
+   * @param {string} daoAddressOrEns
+   * @param {UpgradeToAndCallParams} params
+   * @return {*}  {DaoAction}
+   * @memberof ClientEncoding
+   */
+  public upgradeToAndCallAction(
+    daoAddressOrEns: string,
+    params: UpgradeToAndCallParams,
+  ): DaoAction {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = daoInterface.encodeFunctionData("upgradeToAndCall", [
+      params.implementationAddress,
+      params.data,
+    ]);
+    return {
+      to: daoAddressOrEns,
       value: BigInt(0),
       data: hexToBytes(hexBytes),
     };

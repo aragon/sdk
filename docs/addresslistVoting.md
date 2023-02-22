@@ -182,7 +182,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>ICreateProposalParams</code> | 
+| params | <code>CreateMajorityVotingProposalParams</code> | 
 
 <a name="AddresslistVotingClientEstimation+voteProposal"></a>
 
@@ -236,7 +236,7 @@ so that the plugin is configured</p>
 
 | Param | Type |
 | --- | --- |
-| params | <code>ICreateProposalParams</code> | 
+| params | <code>CreateMajorityVotingProposalParams</code> | 
 
 <a name="AddresslistVotingClientMethods+voteProposal"></a>
 

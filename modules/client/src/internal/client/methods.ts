@@ -7,7 +7,9 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/core-contracts-ethers";
 import {
-  EnsureAllowanceError,
+  AmountMismatchError,
+  UpdateAllowanceError,
+  FailedDepositError,
   GraphQLError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -40,8 +42,7 @@ import {
   DaoMetadata,
   DaoSortBy,
   DepositParams,
-  EnsureAllowanceParams,
-  EnsureAllowanceStepValue,
+  UpdateAllowanceStepValue,
   IClientMethods,
   IDaoQueryParams,
   IHasPermissionParams,
@@ -55,6 +56,7 @@ import {
   TokenType,
   Transfer,
   TransferSortBy,
+  UpdateAllowanceParams,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -230,7 +232,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Deposits ether or an ERC20 token into the DAO
    *
-   * @param { DepositParams} params
+   * @param {DepositParams} params
    * @return {*}  {AsyncGenerator<DaoDepositStepValue>}
    * @memberof ClientMethods
    */
@@ -255,7 +257,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (tokenAddress && tokenAddress !== AddressZero) {
       // If the target is an ERC20 token, ensure that the amount can be transferred
       // Relay the yield steps to the caller as they are received
-      yield* this.ensureAllowance(
+      yield* this.updateAllowance(
         {
           amount: params.amount,
           daoAddressOrEns: daoAddress,
@@ -284,25 +286,17 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const cr = await tx.wait();
     const log = findLog(cr, daoInstance.interface, "Deposited");
     if (!log) {
-      // TODO
-      // cmmon errors
-      throw new Error("Failed to deposit");
+      throw new FailedDepositError();
     }
 
     const daoInterface = DAO__factory.createInterface();
     const parsedLog = daoInterface.parseLog(log);
 
     if (!amount.toString() === parsedLog.args["amount"]) {
-      throw new Error(
-        `Deposited amount mismatch. Expected: ${amount}, received: ${
-          parsedLog.args[
-            "amount"
-          ].toBigInt()
-        }`,
+      throw new AmountMismatchError(
+        amount,
+        parsedLog.args["amount"].toBigInt(),
       );
-      // TODO
-      // cmmon errors
-      // throw new AmountMisMatchError(amount, parsedLog.args["amount"])
     }
     yield { key: DaoDepositSteps.DONE, amount: amount };
   }
@@ -310,13 +304,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Checks if the allowance is enough and updates it
    *
-   * @param {EnsureAllowanceParams} params
-   * @return {*}  {AsyncGenerator<EnsureAllowanceStepValue>}
+   * @param {UpdateAllowanceParams} params
+   * @return {*}  {AsyncGenerator<UpdateAllowanceStepValue>}
    * @memberof ClientMethods
    */
-  public async *ensureAllowance(
-    params: EnsureAllowanceParams,
-  ): AsyncGenerator<EnsureAllowanceStepValue> {
+  public async *updateAllowance(
+    params: UpdateAllowanceParams,
+  ): AsyncGenerator<UpdateAllowanceStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new NoSignerError();
@@ -358,11 +352,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const log = findLog(cr, tokenInstance.interface, "Approval");
 
     if (!log) {
-      throw new EnsureAllowanceError();
+      throw new UpdateAllowanceError();
     }
     const value = log.data;
     if (!value || BigNumber.from(params.amount).gt(BigNumber.from(value))) {
-      throw new EnsureAllowanceError();
+      throw new UpdateAllowanceError();
     }
 
     yield {
@@ -490,7 +484,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } catch (err) {
       throw new GraphQLError("DAO");
     }
-  }  
+  }
   /**
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
