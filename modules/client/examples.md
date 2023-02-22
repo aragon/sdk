@@ -883,9 +883,15 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
 const client = new TokenVotingClient(contextPlugin);
 
+<<<<<<< HEAD
 const voteParams: ICanVoteParams = {
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
   address: "0x1234567890123456789012345678901234567890",
+=======
+const voteParams: CanVoteParams = {
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
+  voterAddressOrEns: "0x1234567890123456789012345678901234567890",
+>>>>>>> 63999fa (update examples and docs)
   vote: VoteValues.YES,
 };
 
@@ -1576,8 +1582,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
 const client = new AddresslistVotingClient(contextPlugin);
 
-const voteParams: ICanVoteParams = {
-  address: "0x1234567890123456789012345678901234567890",
+const voteParams: CanVoteParams = {
+  voterAddressOrEns: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES,
 };
@@ -3064,9 +3070,9 @@ console.log(decodedAction);
 import {
   Client,
   Context,
-  CreateDaoParams,
   DaoCreationSteps,
   GasFeeEstimation,
+  CreateDaoParams,
   MultisigPluginInstallParams,
 } from "@aragon/sdk-client";
 import { MultisigClient } from "../../src";
@@ -3087,10 +3093,10 @@ const members: string[] = [
 const multisigIntallParams: MultisigPluginInstallParams = {
   votingSettings: {
     minApprovals: 1,
-    onlyListed: true,
+    onlyListed: true
   },
   members,
-};
+}
 
 const multisigInstallPluginItem = MultisigClient.encoding
   .getPluginInstallItem(multisigIntallParams);
@@ -3350,7 +3356,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 const canApproveParams: CanApproveParams = {
-  addressOrEns: "0x1234567890123456789012345678901234567890",
+  approverAddressOrEns: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
 };
 

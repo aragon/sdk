@@ -18,7 +18,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: CanVoteParams = {
-  address: "0x1234567890123456789012345678901234567890",
+  voterAddressOrEns: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES,
 };
