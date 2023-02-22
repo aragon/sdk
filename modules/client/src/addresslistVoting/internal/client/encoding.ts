@@ -10,13 +10,16 @@ import {
   VotingSettings,
   votingSettingsToContract,
 } from "../../../client-common";
-import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
   IAddresslistVotingClientEncoding,
   IAddresslistVotingPluginInstall,
 } from "../../interfaces";
-import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
+import {
+  activeContractsList,
+  AddresslistVoting__factory,
+} from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { Networkish } from "@ethersproject/providers";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -39,6 +42,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    */
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
+    network: Networkish,
   ): IPluginInstallItem {
     const {
       votingMode,
@@ -64,8 +68,13 @@ export class AddresslistVotingClientEncoding extends ClientCore
         params.addresses,
       ],
     );
+
     return {
-      id: ADDRESSLIST_PLUGIN_ID,
+      // TODO remove tsiginore once all the networks have the same properties
+      // @ts-ignore
+      id: activeContractsList[
+        network.toString() as keyof typeof activeContractsList
+      ]["address-list-voting-repo"],
       data: hexToBytes(hexBytes),
     };
   }

@@ -15,6 +15,7 @@ import {
   ContextPlugin,
   IPluginInstallItem,
 } from "../client-common";
+import { Networkish } from "@ethersproject/providers";
 
 /**
  * Provider a generic client with high level methods to manage and interact a Token Voting plugin installed in a DAO
@@ -59,7 +60,8 @@ export class TokenVotingClient extends ClientCore
      */
     getPluginInstallItem: (
       params: ITokenVotingPluginInstall,
+      network: Networkish = "mainnet",
     ): IPluginInstallItem =>
-      TokenVotingClientEncoding.getPluginInstallItem(params),
+      TokenVotingClientEncoding.getPluginInstallItem(params, network),
   };
 }

@@ -14,9 +14,12 @@ import {
 } from "../../interfaces";
 // @ts-ignore
 // todo fix new contracts-ethers
-import { Multisig__factory } from "@aragon/core-contracts-ethers";
-import { MULTISIG_PLUGIN_ID } from "../constants";
+import {
+  activeContractsList,
+  Multisig__factory,
+} from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { Networkish } from "@ethersproject/providers";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -37,6 +40,7 @@ export class MultisigClientEncoding extends ClientCore
    */
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
+    network: Networkish,
   ): IPluginInstallItem {
     const hexBytes = defaultAbiCoder.encode(
       // members, [onlyListed, minApprovals]
@@ -53,7 +57,11 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
-      id: MULTISIG_PLUGIN_ID,
+      // TODO remove tsiginore once all the networks have the same properties
+      // @ts-ignore
+      id: activeContractsList[
+        network.toString() as keyof typeof activeContractsList
+      ]["multisig-repo"],
       data: hexToBytes(hexBytes),
     };
   }

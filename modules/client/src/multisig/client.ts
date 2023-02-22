@@ -15,6 +15,7 @@ import {
   ContextPlugin,
   IPluginInstallItem,
 } from "../client-common";
+import { Networkish } from "@ethersproject/providers";
 
 /**
  * Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO
@@ -43,7 +44,8 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
      */
     getPluginInstallItem: (
       params: MultisigPluginInstallParams,
+      network: Networkish = "mainnet",
     ): IPluginInstallItem =>
-      MultisigClientEncoding.getPluginInstallItem(params),
+      MultisigClientEncoding.getPluginInstallItem(params, network),
   };
 }

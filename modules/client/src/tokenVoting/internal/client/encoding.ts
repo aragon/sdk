@@ -13,8 +13,8 @@ import {
   ITokenVotingClientEncoding,
   ITokenVotingPluginInstall,
 } from "../../interfaces";
-import { TOKEN_VOTING_PLUGIN_ID } from "../constants";
 import {
+  activeContractsList,
   IERC20MintableUpgradeable__factory,
 } from "@aragon/core-contracts-ethers";
 import {
@@ -22,6 +22,7 @@ import {
   tokenVotingInitParamsToContract,
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { Networkish } from "@ethersproject/providers";
 
 /**
  * Encoding module the SDK TokenVoting Client
@@ -43,6 +44,7 @@ export class TokenVotingClientEncoding extends ClientCore
    */
   static getPluginInstallItem(
     params: ITokenVotingPluginInstall,
+    network: Networkish,
   ): IPluginInstallItem {
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
@@ -55,7 +57,11 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      id: TOKEN_VOTING_PLUGIN_ID,
+      // TODO remove tsiginore once all the networks have the same properties
+      // @ts-ignore
+      id: activeContractsList[
+        network.toString() as keyof typeof activeContractsList
+      ]["token-voting-repo"],
       data: hexToBytes(hexBytes),
     };
   }
