@@ -5,9 +5,9 @@
 import {
   Client,
   Context,
+  CreateDaoParams,
   DaoCreationSteps,
   GasFeeEstimation,
-  CreateDaoParams,
   MultisigPluginInstallParams,
 } from "@aragon/sdk-client";
 import { MultisigClient } from "../../src";
@@ -28,10 +28,10 @@ const members: string[] = [
 const multisigIntallParams: MultisigPluginInstallParams = {
   votingSettings: {
     minApprovals: 1,
-    onlyListed: true
+    onlyListed: true,
   },
   members,
-}
+};
 
 const multisigInstallPluginItem = MultisigClient.encoding
   .getPluginInstallItem(multisigIntallParams);

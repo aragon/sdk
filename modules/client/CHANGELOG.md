@@ -27,6 +27,8 @@ TEMPLATE:
 - `ICreateProposalParams` => `CreateMajorityVotingProposalParams`
 - `IProposalSettings` => `MajorityVotingProposalSettings`
 - Rename all mention of `ensureAllowance` to `updateAllowance`
+- ensDomain now includes `.dao.eth`
+
 ## [0.22.0-beta]
 
 ### Changed
