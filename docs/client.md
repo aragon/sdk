@@ -105,7 +105,7 @@
 <p>Decodes a dao metadata from an encoded update metadata raw action</p>
 
 **Kind**: instance method of [<code>ClientDecoding</code>](#ClientDecoding)  
-**Returns**: <code>\*</code> - <p>{Promise<DaoMetadata>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<DaoMetadata>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -235,7 +235,7 @@
 <p>Computes the payload to be given when creating a proposal that withdraws ether from the DAO</p>
 
 **Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
-**Returns**: <code>\*</code> - <p>{Promise<DaoAction>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<DaoAction>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -248,7 +248,7 @@
 <p>Computes the payload to be given when creating a proposal that updates the metadata the DAO</p>
 
 **Kind**: instance method of [<code>ClientEncoding</code>](#ClientEncoding)  
-**Returns**: <code>\*</code> - <p>{Promise<DaoAction>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<DaoAction>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -338,7 +338,7 @@
 <p>Estimates the gas fee of creating a DAO</p>
 
 **Kind**: instance method of [<code>ClientEstimation</code>](#ClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -351,7 +351,7 @@
 This does not estimate the gas cost of updating the allowance of an ERC20 token</p>
 
 **Kind**: instance method of [<code>ClientEstimation</code>](#ClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -363,7 +363,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 <p>Estimates the gas fee of updating the allowance of an ERC20 token</p>
 
 **Kind**: instance method of [<code>ClientEstimation</code>](#ClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -393,7 +393,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 <p>Creates a DAO with the given settings and plugins</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<DaoCreationStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<DaoCreationStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -405,7 +405,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 <p>Pins a metadata object into IPFS and retruns the generated hash</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<string>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<string>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -417,7 +417,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 <p>Deposits ether or an ERC20 token into the DAO</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<DaoDepositStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<DaoDepositStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -429,7 +429,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 <p>Checks if the allowance is enough and updates it</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<UpdateAllowanceStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<UpdateAllowanceStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -441,7 +441,7 @@ This does not estimate the gas cost of updating the allowance of an ERC20 token<
 <p>Checks whether a role is granted by the current DAO's ACL settings</p>
 
 **Kind**: instance method of [<code>ClientMethods</code>](#ClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<boolean>}`</p>  
 
 | Param | Type |
 | --- | --- |

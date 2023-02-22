@@ -182,7 +182,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of creating a proposal on the plugin</p>
 
 **Kind**: instance method of [<code>MultisigClientEstimation</code>](#MultisigClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -194,7 +194,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of approving a proposal</p>
 
 **Kind**: instance method of [<code>MultisigClientEstimation</code>](#MultisigClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -206,7 +206,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of executing a proposal</p>
 
 **Kind**: instance method of [<code>MultisigClientEstimation</code>](#MultisigClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -237,7 +237,7 @@ so that the plugin is configured</p>
 <p>Creates a new proposal on the given multisig plugin contract</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<ProposalCreationStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<ProposalCreationStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -249,7 +249,7 @@ so that the plugin is configured</p>
 <p>Pins a metadata object into IPFS and retruns the generated hash</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<string>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<string>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -261,7 +261,7 @@ so that the plugin is configured</p>
 <p>Allow a wallet in the multisig give approval to a proposal</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<ApproveProposalStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<ApproveProposalStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -273,7 +273,7 @@ so that the plugin is configured</p>
 <p>Allow a wallet in the multisig give approval to a proposal</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<ExecuteMultisigProposalStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<ExecuteMultisigProposalStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -285,7 +285,7 @@ so that the plugin is configured</p>
 <p>Checks whether the current proposal can be approved by the given address</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<boolean>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -297,7 +297,7 @@ so that the plugin is configured</p>
 <p>Checks whether the current proposal can be executed</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<boolean>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -309,7 +309,7 @@ so that the plugin is configured</p>
 <p>Returns the voting settings</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<MultisigVotingSettings>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<MultisigVotingSettings>}`</p>  
 
 | Param | Type |
 | --- | --- |

@@ -57,7 +57,7 @@ so that the plugin is configured</p>
 <p>Creates a new proposal on the given TokenVoting plugin contract</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<ProposalCreationStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<ProposalCreationStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -69,7 +69,7 @@ so that the plugin is configured</p>
 <p>Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<VoteProposalStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<VoteProposalStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -82,7 +82,7 @@ so that the plugin is configured</p>
 <p>Executes the given proposal, provided that it has already passed</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<ExecuteProposalStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<ExecuteProposalStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -106,7 +106,7 @@ so that the plugin is configured</p>
 <p>Returns the details of the given proposal</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{Promise<TokenVotingProposal>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<TokenVotingProposal>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -130,7 +130,7 @@ so that the plugin is configured</p>
 <p>Returns the settings of a plugin given the address of the plugin instance</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{Promise<VotingSettings>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<VotingSettings>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -267,7 +267,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of creating a proposal on the plugin</p>
 
 **Kind**: instance method of [<code>TokenVotingClientEstimation</code>](#TokenVotingClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -279,7 +279,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of casting a vote on a proposal</p>
 
 **Kind**: instance method of [<code>TokenVotingClientEstimation</code>](#TokenVotingClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -291,7 +291,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of executing a TokenVoting proposal</p>
 
 **Kind**: instance method of [<code>TokenVotingClientEstimation</code>](#TokenVotingClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -314,7 +314,7 @@ so that the plugin is configured</p>
 <p>Checks if an user can vote in a proposal</p>
 
 **Kind**: instance method of [<code>TokenVotingClientMethods</code>](#TokenVotingClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<boolean>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -326,7 +326,7 @@ so that the plugin is configured</p>
 <p>Checks whether the current proposal can be executed</p>
 
 **Kind**: instance method of [<code>TokenVotingClientMethods</code>](#TokenVotingClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<boolean>}`</p>  
 
 | Param | Type |
 | --- | --- |

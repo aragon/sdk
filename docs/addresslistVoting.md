@@ -178,7 +178,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of creating a proposal on the plugin</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientEstimation</code>](#AddresslistVotingClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -190,7 +190,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of casting a vote on a proposal</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientEstimation</code>](#AddresslistVotingClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -202,7 +202,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of executing an AddressList proposal</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientEstimation</code>](#AddresslistVotingClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -232,7 +232,7 @@ so that the plugin is configured</p>
 <p>Creates a new proposal on the given AddressList plugin contract</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientMethods</code>](#AddresslistVotingClientMethods)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<ProposalCreationStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<ProposalCreationStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -244,7 +244,7 @@ so that the plugin is configured</p>
 <p>Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientMethods</code>](#AddresslistVotingClientMethods)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<VoteProposalStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<VoteProposalStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -256,7 +256,7 @@ so that the plugin is configured</p>
 <p>Executes the given proposal, provided that it has already passed</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientMethods</code>](#AddresslistVotingClientMethods)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<ExecuteProposalStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<ExecuteProposalStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -268,7 +268,7 @@ so that the plugin is configured</p>
 <p>Checks if an user can vote in a proposal</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientMethods</code>](#AddresslistVotingClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<boolean>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -280,7 +280,7 @@ so that the plugin is configured</p>
 <p>Checks whether the current proposal can be executed</p>
 
 **Kind**: instance method of [<code>AddresslistVotingClientMethods</code>](#AddresslistVotingClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<boolean>}`</p>  
 
 | Param | Type |
 | --- | --- |
