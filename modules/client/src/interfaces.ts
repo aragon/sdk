@@ -30,9 +30,9 @@ export interface IClientMethods extends IClientCore {
     params: DepositParams,
   ) => AsyncGenerator<DaoDepositStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-  ensureAllowance: (
-    params: EnsureAllowanceParams,
-  ) => AsyncGenerator<EnsureAllowanceStepValue>;
+  updateAllowance: (
+    params: UpdateAllowanceParams,
+  ) => AsyncGenerator<UpdateAllowanceStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
   getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
   /** Retrieves metadata for many daos */
@@ -109,7 +109,7 @@ export interface IClientEstimation {
   deposit: (
     params: DepositParams,
   ) => Promise<GasFeeEstimation>;
-  updateAllowance: (params: EnsureAllowanceParams) => Promise<GasFeeEstimation>;
+  updateAllowance: (params: UpdateAllowanceParams) => Promise<GasFeeEstimation>;
 }
 
 export interface IClient {
@@ -250,7 +250,7 @@ export type DepositErc20Params = DepositBaseParams & {
 
 export type DepositParams = DepositEthParams | DepositErc20Params; // | DepositErc721Params;
 
-export type EnsureAllowanceParams = {
+export type UpdateAllowanceParams = {
   daoAddressOrEns: string;
   amount: bigint;
   tokenAddress: string;
@@ -263,13 +263,13 @@ export enum DaoDepositSteps {
   DEPOSITING = "depositing",
   DONE = "done",
 }
-export type EnsureAllowanceStepValue =
+export type UpdateAllowanceStepValue =
   | { key: DaoDepositSteps.CHECKED_ALLOWANCE; allowance: bigint }
   | { key: DaoDepositSteps.UPDATING_ALLOWANCE; txHash: string }
   | { key: DaoDepositSteps.UPDATED_ALLOWANCE; allowance: bigint };
 
 export type DaoDepositStepValue =
-  | EnsureAllowanceStepValue
+  | UpdateAllowanceStepValue
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 

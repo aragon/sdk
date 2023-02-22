@@ -7,19 +7,19 @@ import {
   Client,
   Context,
   DaoDepositSteps,
-  EnsureAllowanceParams,
+  UpdateAllowanceParams,
 } from "@aragon/sdk-client";
 import { contextParams } from "./00-context";
 
 const context = new Context(contextParams);
 const client = new Client(context);
-const ensureAllowanceParams: EnsureAllowanceParams = {
-  daoAddress: "0x1234567890123456789012345678901234567890",
+const updateAllowanceParams: UpdateAllowanceParams = {
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
 };
 
-const steps = client.methods.ensureAllowance(ensureAllowanceParams);
+const steps = client.methods.updateAllowance(updateAllowanceParams);
 for await (const step of steps) {
   try {
     switch (step.key) {

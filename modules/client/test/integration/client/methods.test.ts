@@ -24,7 +24,7 @@ import {
   DaoDepositSteps,
   DaoSortBy,
   DepositParams,
-  EnsureAllowanceParams,
+  UpdateAllowanceParams,
   IAddresslistVotingPluginInstall,
   IDaoQueryParams,
   IHasPermissionParams,
@@ -204,14 +204,14 @@ describe("Client", () => {
         const client = new Client(context);
         const tokenContract = await deployErc20(client);
         const amount = BigInt("1000000000000000000");
-        const ensureAllowanceParams: EnsureAllowanceParams = {
+        const updateAllowanceParams: UpdateAllowanceParams = {
           daoAddressOrEns: daoAddress,
           amount,
           tokenAddress: tokenContract.address,
         };
 
         for await (
-          const step of client.methods.ensureAllowance(ensureAllowanceParams)
+          const step of client.methods.updateAllowance(updateAllowanceParams)
         ) {
           switch (step.key) {
             case DaoDepositSteps.CHECKED_ALLOWANCE:

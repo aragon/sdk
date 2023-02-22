@@ -174,7 +174,7 @@ so that the plugin is configured</p>
 * [MultisigClientEstimation](#MultisigClientEstimation)
     * [.createProposal(params)](#MultisigClientEstimation+createProposal) ⇒ <code>\*</code>
     * [.approveProposal(params)](#MultisigClientEstimation+approveProposal) ⇒ <code>\*</code>
-    * [.executeProposal(params)](#MultisigClientEstimation+executeProposal) ⇒ <code>\*</code>
+    * [.executeProposal(proposalId)](#MultisigClientEstimation+executeProposal) ⇒ <code>\*</code>
 
 <a name="MultisigClientEstimation+createProposal"></a>
 
@@ -202,7 +202,7 @@ so that the plugin is configured</p>
 
 <a name="MultisigClientEstimation+executeProposal"></a>
 
-### multisigClientEstimation.executeProposal(params) ⇒ <code>\*</code>
+### multisigClientEstimation.executeProposal(proposalId) ⇒ <code>\*</code>
 <p>Estimates the gas fee of executing a proposal</p>
 
 **Kind**: instance method of [<code>MultisigClientEstimation</code>](#MultisigClientEstimation)  
@@ -225,7 +225,7 @@ so that the plugin is configured</p>
     * [.approveProposal(params)](#MultisigClientMethods+approveProposal) ⇒ <code>\*</code>
     * [.executeProposal(proposalId)](#MultisigClientMethods+executeProposal) ⇒ <code>\*</code>
     * [.canApprove(addressOrEns)](#MultisigClientMethods+canApprove) ⇒ <code>\*</code>
-    * [.canExecute(addressOrEns)](#MultisigClientMethods+canExecute) ⇒ <code>\*</code>
+    * [.canExecute(proposalId)](#MultisigClientMethods+canExecute) ⇒ <code>\*</code>
     * [.getVotingSettings(addressOrEns)](#MultisigClientMethods+getVotingSettings) ⇒ <code>\*</code>
     * [.getMembers(addressOrEns)](#MultisigClientMethods+getMembers) ⇒ <code>\*</code>
     * [.getProposal(proposalId)](#MultisigClientMethods+getProposal) ⇒ <code>\*</code>
@@ -282,7 +282,7 @@ so that the plugin is configured</p>
 <a name="MultisigClientMethods+canApprove"></a>
 
 ### multisigClientMethods.canApprove(addressOrEns) ⇒ <code>\*</code>
-<p>Returns the list of wallet addresses with signing capabilities on the plugin</p>
+<p>Checks whether the current proposal can be approved by the given address</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
 **Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
@@ -293,20 +293,20 @@ so that the plugin is configured</p>
 
 <a name="MultisigClientMethods+canExecute"></a>
 
-### multisigClientMethods.canExecute(addressOrEns) ⇒ <code>\*</code>
-<p>Returns the list of wallet addresses with signing capabilities on the plugin</p>
+### multisigClientMethods.canExecute(proposalId) ⇒ <code>\*</code>
+<p>Checks whether the current proposal can be executed</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
 **Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
 
 | Param | Type |
 | --- | --- |
-| addressOrEns | <code>string</code> | 
+| proposalId | <code>string</code> | 
 
 <a name="MultisigClientMethods+getVotingSettings"></a>
 
 ### multisigClientMethods.getVotingSettings(addressOrEns) ⇒ <code>\*</code>
-<p>returns the voting settings</p>
+<p>Returns the voting settings</p>
 
 **Kind**: instance method of [<code>MultisigClientMethods</code>](#MultisigClientMethods)  
 **Returns**: <code>\*</code> - <p>{Promise<MultisigVotingSettings>}</p>  

@@ -1,4 +1,5 @@
 import {
+  AssetBalance,
   ContractPermissionParams,
   ContractPermissionWithConditionParams,
   DaoDetails,
@@ -21,7 +22,6 @@ import {
   SubgraphPluginTypeMap,
   SubgraphTransferListItem,
   SubgraphTransferType,
-  AssetBalance,
   TokenType,
   Transfer,
   TransferType,
@@ -49,7 +49,7 @@ export function toDaoDetails(
 ): DaoDetails {
   return {
     address: dao.id,
-    ensDomain: dao.subdomain,
+    ensDomain: dao.subdomain + ".dao.eth",
     metadata: {
       name: metadata.name,
       description: metadata.description,
@@ -84,7 +84,7 @@ export function toDaoListItem(
 ): DaoListItem {
   return {
     address: dao.id,
-    ensDomain: dao.subdomain,
+    ensDomain: dao.subdomain + ".dao.eth",
     metadata: {
       name: metadata.name,
       description: metadata.description,

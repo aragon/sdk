@@ -12,17 +12,6 @@ TEMPLATE:
 - Change 1, 2, 3
 
 -->
-## [0.22.0-beta]
-
-### Changed
-- `proposalId` is now a `string` everywhere and follows the new general format
-- `canExecute()` and `execute()` expect the `proposalId` as parameter now.
-
-
-### Removed
-- removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces
-- removes `isProposalId()` and moves it to @aragon/sdk-common
-
 ## [UPCOMING]
 ### Added
 - Encoders and decoders for `grantWithConditionAction`
@@ -37,6 +26,18 @@ TEMPLATE:
 ### Changed
 - `ICreateProposalParams` => `CreateMajorityVotingProposalParams`
 - `IProposalSettings` => `MajorityVotingProposalSettings`
+- Rename all mention of `ensureAllowance` to `updateAllowance`
+## [0.22.0-beta]
+
+### Changed
+- `proposalId` is now a `string` everywhere and follows the new general format
+- `canExecute()` and `execute()` expect the `proposalId` as parameter now.
+
+
+### Removed
+- removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces
+- removes `isProposalId()` and moves it to @aragon/sdk-common
+
 ## [0.21.2-beta]
 ### Fixed
 - Add `transfer` to available functions
