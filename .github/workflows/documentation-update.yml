@@ -28,6 +28,8 @@ jobs:
         run: yarn run docs:tokenVoting
       - name: Generate Address List Client Docs (Javascript)
         run: yarn run docs:addresslistVoting
+      - name: Generate Multisig Client Docs (Javascript)
+        run: yarn run docs:multisig
       - name: Get short commit hash
         id: hash
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
