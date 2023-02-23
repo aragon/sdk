@@ -18,6 +18,7 @@ TEMPLATE:
 ## UPCOMING
 ### Changed
 - Rename `EnsureAllowanceError` to `UpdateAllowanceError`
+- Add `UnsupportedNetworkError` error type
 ## 0.11.0-beta
 
 ### Adds

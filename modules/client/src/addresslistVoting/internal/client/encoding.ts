@@ -1,12 +1,17 @@
-import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
+import {
+  hexToBytes,
+  InvalidAddressError,
+  UnsupportedNetworkError,
+} from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
-  SupportedNetworks,
   ClientCore,
   ContextPlugin,
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
+  SupportedNetworks,
+  SupportedNetworksArray,
   VotingSettings,
   votingSettingsToContract,
 } from "../../../client-common";
@@ -14,9 +19,7 @@ import {
   IAddresslistVotingClientEncoding,
   IAddresslistVotingPluginInstall,
 } from "../../interfaces";
-import {
-  AddresslistVoting__factory,
-} from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { LIVE_CONTRACTS } from "../../../client-common/constants";
 
@@ -44,6 +47,9 @@ export class AddresslistVotingClientEncoding extends ClientCore
     params: IAddresslistVotingPluginInstall,
     network: SupportedNetworks,
   ): IPluginInstallItem {
+    if (!SupportedNetworksArray.includes(network)) {
+      throw new UnsupportedNetworkError(network);
+    }
     const {
       votingMode,
       supportThreshold,

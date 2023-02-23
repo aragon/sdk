@@ -1,11 +1,16 @@
-import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import {
-  SupportedNetworks,
+  hexToBytes,
+  InvalidAddressError,
+  UnsupportedNetworkError,
+} from "@aragon/sdk-common";
+import {
   ClientCore,
   ContextPlugin,
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
+  SupportedNetworks,
+  SupportedNetworksArray,
   VotingSettings,
 } from "../../../client-common";
 import { isAddress } from "@ethersproject/address";
@@ -47,6 +52,9 @@ export class TokenVotingClientEncoding extends ClientCore
     params: ITokenVotingPluginInstall,
     network: SupportedNetworks,
   ): IPluginInstallItem {
+    if (!SupportedNetworksArray.includes(network)) {
+      throw new UnsupportedNetworkError(network);
+    }
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], ["address","name","symbol"][ "receivers","amount"]
