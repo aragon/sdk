@@ -145,9 +145,9 @@ export type MultisigProposalListItem = MultisigProposalBase & {
 
 export type MultisigProposal = MultisigProposalBase & {
   creationDate: Date;
-  creationBlockNumber: number;
-  executionDate: Date;
-  executionBlockNumber: number;
+  creationBlockNumber: number | null;
+  executionDate: Date | null;
+  executionBlockNumber: number | null;
   metadata: ProposalMetadata;
   actions: DaoAction[];
   executionTxHash: string;

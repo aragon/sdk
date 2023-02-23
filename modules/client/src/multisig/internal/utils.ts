@@ -25,9 +25,11 @@ export function toMultisigProposal(
   const endDate = new Date(
     parseInt(proposal.endDate) * 1000,
   );
-  const executionDate = new Date(
-    (parseInt(proposal.executionDate) || 0) * 1000,
-  );
+  const executionDate = proposal.executionDate
+    ? new Date(
+      parseInt(proposal.executionDate) * 1000,
+    )
+    : null;
   return {
     id: proposal.id,
     dao: {
@@ -51,8 +53,8 @@ export function toMultisigProposal(
     startDate,
     endDate,
     executionDate,
-    executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
-    executionTxHash: proposal.executionTxHash || "",
+    executionBlockNumber: parseInt(proposal.executionBlockNumber) || null,
+    executionTxHash: proposal.executionTxHash || null,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {

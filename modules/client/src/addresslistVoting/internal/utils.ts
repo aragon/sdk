@@ -30,9 +30,11 @@ export function toAddresslistVotingProposal(
   const creationDate = new Date(
     parseInt(proposal.createdAt) * 1000,
   );
-  const executionDate = new Date(
-    parseInt(proposal.executionDate) * 1000,
-  );
+  const executionDate = proposal.executionDate
+    ? new Date(
+      parseInt(proposal.executionDate) * 1000,
+    )
+    : null;
   return {
     id: proposal.id,
     dao: {
@@ -50,10 +52,10 @@ export function toAddresslistVotingProposal(
     startDate,
     endDate,
     creationDate,
-    executionTxHash: proposal.executionTxHash || "",
+    executionTxHash: proposal.executionTxHash || null,
     creationBlockNumber: parseInt(proposal.creationBlockNumber),
     executionDate,
-    executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
+    executionBlockNumber: parseInt(proposal.executionBlockNumber) || null,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {

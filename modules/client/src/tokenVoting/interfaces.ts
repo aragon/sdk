@@ -2,16 +2,16 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import {
   ContractVotingSettings,
+  CreateMajorityVotingProposalParams,
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
   ICanVoteParams,
   IClientCore,
-  CreateMajorityVotingProposalParams,
   IInterfaceParams,
   IProposalQueryParams,
-  MajorityVotingProposalSettings,
   IVoteProposalParams,
+  MajorityVotingProposalSettings,
   ProposalBase,
   ProposalCreationStepValue,
   ProposalListItemBase,
@@ -115,9 +115,9 @@ export type TokenVotingProposal = ProposalBase & {
   >;
   totalVotingWeight: bigint;
   creationBlockNumber: number;
-  executionDate: Date;
-  executionBlockNumber: number;
-  executionTxHash: string;
+  executionDate: Date | null;
+  executionBlockNumber: number | null;
+  executionTxHash: string | null;
 };
 
 export type TokenVotingProposalListItem = ProposalListItemBase & {
