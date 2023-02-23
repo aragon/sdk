@@ -133,6 +133,7 @@ export function toTokenVotingProposalListItem(
       title: metadata.title,
       summary: metadata.summary,
     },
+    totalVotingWeight: BigInt(proposal.totalVotingPower),
     startDate,
     endDate,
     status: computeProposalStatus(proposal),

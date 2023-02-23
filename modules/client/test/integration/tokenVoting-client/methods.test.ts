@@ -692,6 +692,7 @@ describe("Token Voting Client", () => {
           expect(proposal.startDate instanceof Date).toBe(true);
           expect(proposal.endDate instanceof Date).toBe(true);
           expect(proposal.status).toBe(status);
+          expect(typeof proposal.totalVotingWeight).toBe("bigint");
           // result
           expect(typeof proposal.result.yes).toBe("bigint");
           expect(typeof proposal.result.no).toBe("bigint");
