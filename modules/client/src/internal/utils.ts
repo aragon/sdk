@@ -66,7 +66,7 @@ export function toDaoDetails(
           instanceAddress: plugin.id,
           // TODO
           // temporary ens addreses for the plugins
-          id: SubgraphPluginTypeMap.get(
+          pluginRepoAddress: SubgraphPluginTypeMap.get(
             plugin.__typename,
           ) as string,
           // TODO
@@ -99,7 +99,7 @@ export function toDaoListItem(
           instanceAddress: plugin.id,
           // TODO
           // temporary ens addreses for the plugins
-          id: SubgraphPluginTypeMap.get(
+          pluginRepoAddress: SubgraphPluginTypeMap.get(
             plugin.__typename,
           ) as string,
           // TODO

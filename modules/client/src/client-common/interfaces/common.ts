@@ -13,7 +13,7 @@ export enum DaoRole {
  * plugins can be initialized
  */
 export interface IPluginInstallItem {
-  id: string; // ENS domain or address of the plugin's Repo
+  pluginRepoAddress: string; // ENS domain or address of the plugin's Repo
   data: Uint8Array;
 }
 /**
