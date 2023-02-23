@@ -145,12 +145,12 @@ export type MultisigProposalListItem = MultisigProposalBase & {
 
 export type MultisigProposal = MultisigProposalBase & {
   creationDate: Date;
-  creationBlockNumber: number | null;
+  creationBlockNumber: number;
   executionDate: Date | null;
   executionBlockNumber: number | null;
+  executionTxHash: string | null;
   metadata: ProposalMetadata;
   actions: DaoAction[];
-  executionTxHash: string;
 };
 
 type SubgraphProposalBase = {
