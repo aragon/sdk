@@ -13,6 +13,7 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [0.23.0-beta]
 ### Added
 - Encoders and decoders for `grantWithConditionAction`
 - Encoders and decoders for `setDaoUriAction`
