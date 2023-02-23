@@ -41,9 +41,11 @@ export function toTokenVotingProposal(
   const creationDate = new Date(
     parseInt(proposal.createdAt) * 1000,
   );
-  const executionDate = new Date(
-    parseInt(proposal.executionDate) * 1000,
-  );
+  const executionDate = proposal.executionDate
+    ? new Date(
+      parseInt(proposal.executionDate) * 1000,
+    )
+    : null;
   let usedVotingWeight: bigint = BigInt(0);
   for (const voter of proposal.voters) {
     usedVotingWeight += BigInt(voter.votingPower);
@@ -68,8 +70,8 @@ export function toTokenVotingProposal(
     creationDate,
     creationBlockNumber: parseInt(proposal.creationBlockNumber),
     executionDate,
-    executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
-    executionTxHash: proposal.executionTxHash || "",
+    executionBlockNumber: parseInt(proposal.executionBlockNumber) || null,
+    executionTxHash: proposal.executionTxHash || null,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
@@ -131,6 +133,7 @@ export function toTokenVotingProposalListItem(
       title: metadata.title,
       summary: metadata.summary,
     },
+    totalVotingWeight: BigInt(proposal.totalVotingPower),
     startDate,
     endDate,
     status: computeProposalStatus(proposal),

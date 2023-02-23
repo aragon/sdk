@@ -92,9 +92,9 @@ export type AddresslistVotingProposal = ProposalBase & {
   votes: Array<{ address: string; vote: VoteValues; voteReplaced: boolean }>;
   totalVotingWeight: number;
   creationBlockNumber: number;
-  executionDate: Date;
-  executionBlockNumber: number;
-  executionTxHash: string;
+  executionDate: Date | null;
+  executionBlockNumber: number | null;
+  executionTxHash: string | null;
 };
 
 export type AddresslistVotingProposalListItem = ProposalListItemBase & {

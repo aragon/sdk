@@ -192,7 +192,7 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
       transactionId: transfer.txHash,
       to: transfer.to,
       from: transfer.from,
-      proposalId: transfer.proposal.id || "",
+      proposalId: transfer.proposal?.id || "",
     };
   } else {
     if (transfer.type === SubgraphTransferType.DEPOSIT) {
@@ -226,7 +226,7 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
       transactionId: transfer.txHash,
       to: transfer.to,
       from: transfer.from,
-      proposalId: transfer.proposal.id || "",
+      proposalId: transfer.proposal?.id || "",
     };
   }
 }

@@ -4,9 +4,9 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import {
   Context,
   ContextPlugin,
+  CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ICanVoteParams,
-  CreateMajorityVotingProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -583,8 +583,6 @@ describe("Token Voting Client", () => {
           expect(proposal.endDate instanceof Date).toBe(true);
           expect(proposal.creationDate instanceof Date).toBe(true);
           expect(typeof proposal.creationBlockNumber === "number").toBe(true);
-          expect(proposal.executionDate instanceof Date).toBe(true);
-          expect(typeof proposal.executionBlockNumber === "number").toBe(true);
           expect(Array.isArray(proposal.actions)).toBe(true);
           // actions
           for (let i = 0; i < proposal.actions.length; i++) {
@@ -632,8 +630,15 @@ describe("Token Voting Client", () => {
             expect(typeof vote.weight).toBe("bigint");
             expect(typeof vote.voteReplaced).toBe("boolean");
           }
-          if (proposal.executionTxHash) {
+          if (
+            proposal.executionDate && proposal.executionBlockNumber &&
+            proposal.executionTxHash
+          ) {
             expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            expect(proposal.executionDate instanceof Date).toBe(true);
+            expect(typeof proposal.executionBlockNumber === "number").toBe(
+              true,
+            );
           }
         }
       });
@@ -687,6 +692,7 @@ describe("Token Voting Client", () => {
           expect(proposal.startDate instanceof Date).toBe(true);
           expect(proposal.endDate instanceof Date).toBe(true);
           expect(proposal.status).toBe(status);
+          expect(typeof proposal.totalVotingWeight).toBe("bigint");
           // result
           expect(typeof proposal.result.yes).toBe("bigint");
           expect(typeof proposal.result.no).toBe("bigint");
