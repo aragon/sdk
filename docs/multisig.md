@@ -28,16 +28,17 @@
 **Kind**: global class  
 <a name="MultisigClient.getPluginInstallItem"></a>
 
-### MultisigClient.getPluginInstallItem(members) ⇒ <code>\*</code>
+### MultisigClient.getPluginInstallItem(params, [network]) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
 **Kind**: static method of [<code>MultisigClient</code>](#MultisigClient)  
 **Returns**: <code>\*</code> - <p>{IPluginInstallItem}</p>  
 
-| Param | Type |
-| --- | --- |
-| members | <code>Array.&lt;string&gt;</code> | 
+| Param | Type | Default |
+| --- | --- | --- |
+| params | <code>MultisigPluginInstallParams</code> |  | 
+| [network] | <code>SupportedNetworks</code> | <code>&quot;mainnet&quot;</code> | 
 
 <a name="MultisigClientDecoding"></a>
 
@@ -113,7 +114,7 @@ so that the plugin is configured</p>
         * [.removeAddressesAction(params)](#MultisigClientEncoding+removeAddressesAction) ⇒ <code>\*</code>
         * [.updateMultisigVotingSettings(params)](#MultisigClientEncoding+updateMultisigVotingSettings) ⇒ <code>\*</code>
     * _static_
-        * [.getPluginInstallItem(params)](#MultisigClientEncoding.getPluginInstallItem) ⇒ <code>\*</code>
+        * [.getPluginInstallItem(params, network)](#MultisigClientEncoding.getPluginInstallItem) ⇒ <code>\*</code>
 
 <a name="MultisigClientEncoding+addAddressesAction"></a>
 
@@ -153,7 +154,7 @@ so that the plugin is configured</p>
 
 <a name="MultisigClientEncoding.getPluginInstallItem"></a>
 
-### MultisigClientEncoding.getPluginInstallItem(params) ⇒ <code>\*</code>
+### MultisigClientEncoding.getPluginInstallItem(params, network) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
@@ -163,6 +164,7 @@ so that the plugin is configured</p>
 | Param | Type |
 | --- | --- |
 | params | <code>MultisigPluginInstallParams</code> | 
+| network | <code>SupportedNetworks</code> | 
 
 <a name="MultisigClientEstimation"></a>
 

@@ -28,7 +28,7 @@
 **Kind**: global class  
 
 * [TokenVotingClient](#TokenVotingClient)
-    * [.getPluginInstallItem(params)](#TokenVotingClient.getPluginInstallItem) ⇒ <code>\*</code>
+    * [.getPluginInstallItem(params, [network])](#TokenVotingClient.getPluginInstallItem) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#createProposal(params)](#TokenVotingClient.TokenVotingClientMethods+createProposal) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#voteProposal(params, vote)](#TokenVotingClient.TokenVotingClientMethods+voteProposal) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#executeProposal(proposalId)](#TokenVotingClient.TokenVotingClientMethods+executeProposal) ⇒ <code>\*</code>
@@ -40,16 +40,17 @@
 
 <a name="TokenVotingClient.getPluginInstallItem"></a>
 
-### TokenVotingClient.getPluginInstallItem(params) ⇒ <code>\*</code>
+### TokenVotingClient.getPluginInstallItem(params, [network]) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
 **Returns**: <code>\*</code> - <p>{IPluginInstallItem}</p>  
 
-| Param | Type |
-| --- | --- |
-| params | <code>ITokenVotingPluginInstall</code> | 
+| Param | Type | Default |
+| --- | --- | --- |
+| params | <code>ITokenVotingPluginInstall</code> |  | 
+| [network] | <code>SupportedNetworks</code> | <code>&quot;mainnet&quot;</code> | 
 
 <a name="TokenVotingClient.TokenVotingClientMethods+createProposal"></a>
 
@@ -208,7 +209,7 @@ so that the plugin is configured</p>
         * [.updatePluginSettingsAction(pluginAddress, params)](#TokenVotingClientEncoding+updatePluginSettingsAction) ⇒ <code>\*</code>
         * [.mintTokenAction(minterAddress, params)](#TokenVotingClientEncoding+mintTokenAction) ⇒ <code>\*</code>
     * _static_
-        * [.getPluginInstallItem(params)](#TokenVotingClientEncoding.getPluginInstallItem) ⇒ <code>\*</code>
+        * [.getPluginInstallItem(params, network)](#TokenVotingClientEncoding.getPluginInstallItem) ⇒ <code>\*</code>
 
 <a name="TokenVotingClientEncoding+updatePluginSettingsAction"></a>
 
@@ -238,7 +239,7 @@ so that the plugin is configured</p>
 
 <a name="TokenVotingClientEncoding.getPluginInstallItem"></a>
 
-### TokenVotingClientEncoding.getPluginInstallItem(params) ⇒ <code>\*</code>
+### TokenVotingClientEncoding.getPluginInstallItem(params, network) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
@@ -248,6 +249,7 @@ so that the plugin is configured</p>
 | Param | Type |
 | --- | --- |
 | params | <code>ITokenVotingPluginInstall</code> | 
+| network | <code>SupportedNetworks</code> | 
 
 <a name="TokenVotingClientEstimation"></a>
 

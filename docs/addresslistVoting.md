@@ -21,16 +21,17 @@
 **Kind**: global class  
 <a name="AddresslistVotingClient.getPluginInstallItem"></a>
 
-### AddresslistVotingClient.getPluginInstallItem(params) ⇒ <code>\*</code>
+### AddresslistVotingClient.getPluginInstallItem(params, [network]) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
 **Kind**: static method of [<code>AddresslistVotingClient</code>](#AddresslistVotingClient)  
 **Returns**: <code>\*</code> - <p>{IPluginInstallItem}</p>  
 
-| Param | Type |
-| --- | --- |
-| params | <code>IAddresslistVotingPluginInstall</code> | 
+| Param | Type | Default |
+| --- | --- | --- |
+| params | <code>IAddresslistVotingPluginInstall</code> |  | 
+| [network] | <code>SupportedNetworks</code> | <code>&quot;mainnet&quot;</code> | 
 
 <a name="AddresslistVotingClientDecoding"></a>
 
@@ -106,7 +107,7 @@ so that the plugin is configured</p>
         * [.addMembersAction(pluginAddress, members)](#AddresslistVotingClientEncoding+addMembersAction) ⇒ <code>\*</code>
         * [.removeMembersAction(pluginAddress, members)](#AddresslistVotingClientEncoding+removeMembersAction) ⇒ <code>\*</code>
     * _static_
-        * [.getPluginInstallItem(params)](#AddresslistVotingClientEncoding.getPluginInstallItem) ⇒ <code>\*</code>
+        * [.getPluginInstallItem(params, network)](#AddresslistVotingClientEncoding.getPluginInstallItem) ⇒ <code>\*</code>
 
 <a name="AddresslistVotingClientEncoding+updatePluginSettingsAction"></a>
 
@@ -149,7 +150,7 @@ so that the plugin is configured</p>
 
 <a name="AddresslistVotingClientEncoding.getPluginInstallItem"></a>
 
-### AddresslistVotingClientEncoding.getPluginInstallItem(params) ⇒ <code>\*</code>
+### AddresslistVotingClientEncoding.getPluginInstallItem(params, network) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
@@ -159,6 +160,7 @@ so that the plugin is configured</p>
 | Param | Type |
 | --- | --- |
 | params | <code>IAddresslistVotingPluginInstall</code> | 
+| network | <code>SupportedNetworks</code> | 
 
 <a name="AddresslistVotingClientEstimation"></a>
 
