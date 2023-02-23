@@ -127,6 +127,7 @@ export type ApproveProposalStepValue =
 
 type MultisigProposalBase = {
   id: string;
+  settings: MultisigVotingSettings;
   dao: {
     address: string;
     name: string;
@@ -135,18 +136,20 @@ type MultisigProposalBase = {
   status: ProposalStatus;
   startDate: Date;
   endDate: Date;
+  approvals: string[];
 };
 
 export type MultisigProposalListItem = MultisigProposalBase & {
   metadata: ProposalMetadataSummary;
-  approvals: number;
 };
 
 export type MultisigProposal = MultisigProposalBase & {
   creationDate: Date;
+  creationBlockNumber: number;
+  executionDate: Date;
+  executionBlockNumber: number;
   metadata: ProposalMetadata;
   actions: DaoAction[];
-  approvals: string[];
   executionTxHash: string;
 };
 
@@ -164,14 +167,21 @@ type SubgraphProposalBase = {
   endDate: string;
 };
 
-export type SubgraphMultisigProposalListItem = SubgraphProposalBase & {
-  approvals: string;
+
+export type SubgraphMultisigProposalBase = SubgraphProposalBase & {
+  plugin: SubgraphMultisigVotingSettings;
+  approvers: { id: string }[];
+  // TODO change on subgraph fix
+  // approvers: SubgraphMultisigApproversListItem[];
 };
-export type SubgraphMultisigProposal = SubgraphProposalBase & {
-  createdAt: string;
+
+export type SubgraphMultisigProposalListItem = SubgraphMultisigProposalBase 
+export type SubgraphMultisigProposal = SubgraphMultisigProposalBase & {
   actions: SubgraphAction[];
-  approvers: SubgraphMultisigApproversListItem[];
   executionTxHash: string;
+  executionDate: string;
+  executionBlockNumber: string;
+  creationBlockNumber: string;
 };
 
 export type SubgraphMultisigApproversListItem = {

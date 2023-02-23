@@ -8,7 +8,6 @@ import {
 import {
   MultisigProposal,
   MultisigProposalListItem,
-  SubgraphMultisigApproversListItem,
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
 } from "../interfaces";
@@ -26,6 +25,9 @@ export function toMultisigProposal(
   const endDate = new Date(
     parseInt(proposal.endDate) * 1000,
   );
+  const executionDate = new Date(
+    (parseInt(proposal.executionDate) || 0) * 1000,
+  );
   return {
     id: proposal.id,
     dao: {
@@ -40,9 +42,16 @@ export function toMultisigProposal(
       resources: metadata.resources,
       media: metadata.media,
     },
+    settings: {
+      onlyListed: proposal.plugin.onlyListed,
+      minApprovals: parseInt(proposal.plugin.minApprovals),
+    },
+    creationBlockNumber: parseInt(proposal.creationBlockNumber) || 0,
     creationDate,
     startDate,
     endDate,
+    executionDate,
+    executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
     executionTxHash: proposal.executionTxHash || "",
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
@@ -58,7 +67,7 @@ export function toMultisigProposal(
     // Missing executable property from subgraph
     status: proposal.executed ? ProposalStatus.EXECUTED : ProposalStatus.ACTIVE,
     approvals: proposal.approvers.map(
-      (approver: SubgraphMultisigApproversListItem) => approver.approver.id,
+      (approver) => approver.id.slice(0, 42),
     ),
   };
 }
@@ -83,8 +92,14 @@ export function toMultisigProposalListItem(
       title: metadata.title,
       summary: metadata.summary,
     },
-    approvals: parseInt(proposal.approvals),
-    startDate, 
+    approvals: proposal.approvers.map(
+      (approver) => approver.id.slice(0, 42),
+    ),
+    settings: {
+      onlyListed: proposal.plugin.onlyListed,
+      minApprovals: parseInt(proposal.plugin.minApprovals),
+    },
+    startDate,
     endDate,
     // TODO
     // change to computeProposalStatus

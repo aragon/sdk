@@ -366,9 +366,13 @@ describe("Client Multisig", () => {
         expect(typeof approval).toBe("string");
         expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
       }
-      if (proposal.executionTxHash) {
+      if (proposal.executionTxHash && proposal.executionDate && proposal.executionBlockNumber) {
         expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+        expect(proposal.executionDate instanceof Date).toBe(true);
+        expect(typeof proposal.executionBlockNumber).toBe("number");
       }
+      expect(typeof proposal.settings.minApprovals).toBe("number")
+      expect(typeof proposal.settings.onlyListed).toBe("boolean")
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
       const ctx = new Context(contextParamsMainnet);
@@ -407,7 +411,12 @@ describe("Client Multisig", () => {
         expect(typeof proposal.approvals).toBe("number");
         expect(proposal.startDate instanceof Date).toBe(true);
         expect(proposal.endDate instanceof Date).toBe(true);
-        expect(proposal.approvals >= 0).toBe(true);
+        for (const approval of proposal.approvals) {
+          expect(typeof approval).toBe("string");
+          expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
+        }
+        expect(typeof proposal.settings.minApprovals).toBe("number")
+        expect(typeof proposal.settings.onlyListed).toBe("boolean")
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {

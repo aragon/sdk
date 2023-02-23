@@ -22,7 +22,8 @@ TEMPLATE:
 - Encoders and decoders for `upgradeToAndCallAction`
 - Examples for new decoders and encoders
 - JsDoc for new encoders and decoders
-
+- Add `settings` and `appovals` fields to `MultisigProposalBase`
+- Add `creationBlockNumber` `executionDate` and `creationBlockNumber` to `MultisigProposal`
 ### Changed
 - `ICreateProposalParams` => `CreateMajorityVotingProposalParams`
 - `IProposalSettings` => `MajorityVotingProposalSettings`
