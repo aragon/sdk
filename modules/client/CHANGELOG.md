@@ -13,6 +13,11 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+
+## [0.22.0-beta]
+
+Release candidate 1
+
 ### Added
 - Encoders and decoders for `grantWithConditionAction`
 - Encoders and decoders for `setDaoUriAction`
@@ -25,18 +30,16 @@ TEMPLATE:
 - Add `settings` and `appovals` fields to `MultisigProposalBase`
 - Add `creationBlockNumber` `executionDate` and `creationBlockNumber` to `MultisigProposal`
 - Add `totalVotingWeight` to `tokenVotingListItem`
+
 ### Changed
 - `ICreateProposalParams` => `CreateMajorityVotingProposalParams`
 - `IProposalSettings` => `MajorityVotingProposalSettings`
 - Rename all mention of `ensureAllowance` to `updateAllowance`
 - ensDomain now includes `.dao.eth`
 - `getPluginInstallItem` now receives a `network` parameter to select the right Plugin Repo. Defaults to `mainnet`
-## [0.22.0-beta]
-
-### Changed
+- Renamed `address`/`addressOrEns` to `voterAddressOrEns`/`approverAddressOrEns` in `canVote`/`canApprove` functions
 - `proposalId` is now a `string` everywhere and follows the new general format
 - `canExecute()` and `execute()` expect the `proposalId` as parameter now.
-
 
 ### Removed
 - removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces

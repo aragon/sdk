@@ -16,17 +16,18 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## UPCOMING
+## 0.11.0-beta
+
+Release candidate 1
+
 ### Changed
 - Rename `EnsureAllowanceError` to `UpdateAllowanceError`
-- Add `UnsupportedNetworkError` error type
-## 0.11.0-beta
+- Changes `encodeProposalId` and `decodeProposalId` function to support the new format
 
 ### Adds
 - Adds `isProposalId()` function to the package
 - Adds `encodeProposalId(addr, nonce)` and `decodeProposalId(pid)`
-
-### Changed
-- Changes `encodeProposalId` and `decodeProposalId` function to support the new format
+- Adds `UnsupportedNetworkError` error type
 
 ## 0.10.1-beta
 - Fix `hextoBytes` throwing an error when `0x` is the input

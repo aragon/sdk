@@ -250,7 +250,7 @@ export class MultisigClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    if (!isAddress(params.addressOrEns)) {
+    if (!isAddress(params.approverAddressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
@@ -260,7 +260,7 @@ export class MultisigClientMethods extends ClientCore
       signer,
     );
 
-    return multisigContract.canApprove(id, params.addressOrEns);
+    return multisigContract.canApprove(id, params.approverAddressOrEns);
   }
   /**
    * Checks whether the current proposal can be executed

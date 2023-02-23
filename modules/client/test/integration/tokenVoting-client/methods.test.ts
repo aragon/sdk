@@ -4,9 +4,9 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import {
   Context,
   ContextPlugin,
-  CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
-  ICanVoteParams,
+  CanVoteParams,
+  CreateMajorityVotingProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -213,8 +213,8 @@ describe("Token Voting Client", () => {
           expect(typeof proposalId).toBe("string");
           expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-          const params: ICanVoteParams = {
-            address: TEST_WALLET_ADDRESS,
+          const params: CanVoteParams = {
+            voterAddressOrEns: TEST_WALLET_ADDRESS,
             proposalId,
             vote: VoteValues.YES,
           };

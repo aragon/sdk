@@ -113,7 +113,7 @@ export type ApproveMultisigProposalParams = {
 
 export type CanApproveParams = {
   proposalId: string;
-  addressOrEns: string;
+  approverAddressOrEns: string;
 };
 
 export enum ApproveProposalStep {

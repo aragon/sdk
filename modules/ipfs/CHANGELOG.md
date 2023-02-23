@@ -18,6 +18,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### 0.3.0-beta
+
+Release candidate 1
+
 ### Added
 
 - First version of the library

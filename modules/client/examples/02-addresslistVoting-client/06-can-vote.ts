@@ -5,7 +5,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  ICanVoteParams,
+  CanVoteParams,
   VoteValues,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -17,8 +17,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
 const client = new AddresslistVotingClient(contextPlugin);
 
-const voteParams: ICanVoteParams = {
-  address: "0x1234567890123456789012345678901234567890",
+const voteParams: CanVoteParams = {
+  voterAddressOrEns: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES,
 };

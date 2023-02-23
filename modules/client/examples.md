@@ -870,7 +870,7 @@ for await (const step of steps) {
 import {
   Context,
   ContextPlugin,
-  ICanVoteParams,
+  CanVoteParams,
   TokenVotingClient,
   VoteValues,
 } from "@aragon/sdk-client";
@@ -883,9 +883,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
 const client = new TokenVotingClient(contextPlugin);
 
-const voteParams: ICanVoteParams = {
+const voteParams: CanVoteParams = {
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
-  address: "0x1234567890123456789012345678901234567890",
+  voterAddressOrEns: "0x1234567890123456789012345678901234567890",
   vote: VoteValues.YES,
 };
 
@@ -1564,7 +1564,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  ICanVoteParams,
+  CanVoteParams,
   VoteValues,
 } from "@aragon/sdk-client";
 import { contextParams } from "../00-client/00-context";
@@ -1576,8 +1576,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an address list client
 const client = new AddresslistVotingClient(contextPlugin);
 
-const voteParams: ICanVoteParams = {
-  address: "0x1234567890123456789012345678901234567890",
+const voteParams: CanVoteParams = {
+  voterAddressOrEns: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES,
 };
@@ -3350,7 +3350,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an multisig client
 const client = new MultisigClient(contextPlugin);
 const canApproveParams: CanApproveParams = {
-  addressOrEns: "0x1234567890123456789012345678901234567890",
+  approverAddressOrEns: "0x1234567890123456789012345678901234567890",
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
 };
 
