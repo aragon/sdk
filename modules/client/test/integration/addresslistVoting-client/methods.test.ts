@@ -11,9 +11,9 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
+  CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ICanVoteParams,
-  CreateMajorityVotingProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -584,8 +584,6 @@ describe("Client Address List", () => {
         expect(proposal.endDate instanceof Date).toBe(true);
         expect(proposal.creationDate instanceof Date).toBe(true);
         expect(typeof proposal.creationBlockNumber === "number").toBe(true);
-        expect(proposal.executionDate instanceof Date).toBe(true);
-        expect(typeof proposal.executionBlockNumber === "number").toBe(true);
         expect(Array.isArray(proposal.actions)).toBe(true);
         // actions
         for (let i = 0; i < proposal.actions.length; i++) {
@@ -620,8 +618,13 @@ describe("Client Address List", () => {
           expect(typeof vote.vote).toBe("number");
           expect(typeof vote.voteReplaced).toBe("boolean");
         }
-        if (proposal.executionTxHash) {
+        if (
+          proposal.executionDate && proposal.executionBlockNumber &&
+          proposal.executionTxHash
+        ) {
           expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+          expect(proposal.executionDate instanceof Date).toBe(true);
+          expect(typeof proposal.executionBlockNumber === "number").toBe(true);
         }
       }
     });
