@@ -1,6 +1,6 @@
 import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import {
-  AvailableNetworks,
+  SupportedNetworks,
   ClientCore,
   ContextPlugin,
   DaoAction,
@@ -39,13 +39,13 @@ export class TokenVotingClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {ITokenVotingPluginInstall} params
-   * @param {AvailableNetworks} network
+   * @param {SupportedNetworks} network
    * @return {*}  {IPluginInstallItem}
    * @memberof TokenVotingClientEncoding
    */
   static getPluginInstallItem(
     params: ITokenVotingPluginInstall,
-    network: AvailableNetworks,
+    network: SupportedNetworks,
   ): IPluginInstallItem {
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(

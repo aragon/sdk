@@ -1,5 +1,5 @@
 import { activeContractsList } from "@aragon/core-contracts-ethers";
-import { AvailableNetworks, Deployment } from "./interfaces/common";
+import { SupportedNetworks, NetworkDeployment } from "./interfaces/common";
 import { ProposalMetadata } from "./interfaces/plugin";
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
@@ -15,7 +15,7 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
   resources: [],
 };
 
-export const LIVE_CONTRACTS: { [K in AvailableNetworks]: Deployment } = {
+export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
   mainnet: {
     // TODO change to mainnet
     daoFactory: activeContractsList.goerli.DAOFactory,

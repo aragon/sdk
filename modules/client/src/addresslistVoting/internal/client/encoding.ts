@@ -1,7 +1,7 @@
 import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
-  AvailableNetworks,
+  SupportedNetworks,
   ClientCore,
   ContextPlugin,
   DaoAction,
@@ -36,13 +36,13 @@ export class AddresslistVotingClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {IAddresslistVotingPluginInstall} params
-   * @param {AvailableNetworks} network
+   * @param {SupportedNetworks} network
    * @return {*}  {IPluginInstallItem}
    * @memberof AddresslistVotingClientEncoding
    */
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
-    network: AvailableNetworks,
+    network: SupportedNetworks,
   ): IPluginInstallItem {
     const {
       votingMode,

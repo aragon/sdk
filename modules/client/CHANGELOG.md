@@ -28,8 +28,7 @@ TEMPLATE:
 - `IProposalSettings` => `MajorityVotingProposalSettings`
 - Rename all mention of `ensureAllowance` to `updateAllowance`
 - ensDomain now includes `.dao.eth`
-- `getPluginInstallItem` must now receive a `network` param, by default is `mainnet`
-
+- `getPluginInstallItem` now receives a `network` parameter to select the right Plugin Repo. Defaults to `mainnet`
 ## [0.22.0-beta]
 
 ### Changed

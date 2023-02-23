@@ -1,5 +1,5 @@
-export type AvailableNetworks = "mainnet" | "goerli";
-export type Deployment = {
+export type SupportedNetworks = "mainnet" | "goerli";
+export type NetworkDeployment = {
   daoFactory: string;
   multisigRepo: string;
   adminRepo: string;

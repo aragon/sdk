@@ -11,7 +11,7 @@ import { MultisigClientEncoding } from "./internal/client/encoding";
 import { MultisigClientDecoding } from "./internal/client/decoding";
 import { MultisigClientEstimation } from "./internal/client/estimation";
 import {
-  AvailableNetworks,
+  SupportedNetworks,
   ClientCore,
   ContextPlugin,
   IPluginInstallItem,
@@ -39,14 +39,14 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
      * so that the plugin is configured
      *
      * @param {MultisigPluginInstallParams} params
-     * @param {AvailableNetworks} [network="mainnet"]
+     * @param {SupportedNetworks} [network="mainnet"]
      * @return {*}  {IPluginInstallItem}
      * @memberof MultisigClient
      */
     
     getPluginInstallItem: (
       params: MultisigPluginInstallParams,
-      network: AvailableNetworks = "mainnet",
+      network: SupportedNetworks = "mainnet",
     ): IPluginInstallItem =>
       MultisigClientEncoding.getPluginInstallItem(params, network),
   };

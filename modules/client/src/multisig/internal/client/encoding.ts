@@ -1,7 +1,7 @@
 import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
-  AvailableNetworks,
+  SupportedNetworks,
   ClientCore,
   ContextPlugin,
   DaoAction,
@@ -35,14 +35,14 @@ export class MultisigClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {MultisigPluginInstallParams} params
-   * @param {AvailableNetworks} network
+   * @param {SupportedNetworks} network
    * 
    * @return {*}  {IPluginInstallItem}
    * @memberof MultisigClientEncoding
    */
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
-    network: AvailableNetworks,
+    network: SupportedNetworks,
   ): IPluginInstallItem {
     const hexBytes = defaultAbiCoder.encode(
       // members, [onlyListed, minApprovals]
