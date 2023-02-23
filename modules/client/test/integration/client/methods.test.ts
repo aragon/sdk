@@ -93,7 +93,7 @@ describe("Client", () => {
 
         const addresslistVotingPlugin = AddresslistVotingClient.encoding
           .getPluginInstallItem(pluginParams);
-        addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
+        addresslistVotingPlugin.pluginRepoAddress = deployment.addresslistVotingRepo.address;
 
         const daoCreationParams: CreateDaoParams = {
           metadataUri: ipfsUri,
@@ -377,7 +377,7 @@ describe("Client", () => {
           expect(Array.isArray(dao.plugins)).toBe(true);
           if (dao.plugins.length > 0) {
             for (const plugin of dao.plugins) {
-              expect(typeof plugin.id).toBe("string");
+              expect(typeof plugin.pluginRepoAddress).toBe("string");
               expect(typeof plugin.instanceAddress).toBe("string");
               expect(plugin.instanceAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
               expect(typeof plugin.version).toBe("string");
@@ -444,7 +444,7 @@ describe("Client", () => {
           expect(typeof dao.ensDomain).toBe("string");
           expect(Array.isArray(dao.plugins)).toBe(true);
           for (const plugin of dao.plugins) {
-            expect(typeof plugin.id).toBe("string");
+            expect(typeof plugin.pluginRepoAddress).toBe("string");
             expect(typeof plugin.instanceAddress).toBe("string");
             expect(plugin.instanceAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
             expect(typeof plugin.version).toBe("string");

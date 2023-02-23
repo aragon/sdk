@@ -117,7 +117,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
     for (const plugin of params.plugins) {
-      const repo = PluginRepo__factory.connect(plugin.id, signer);
+      const repo = PluginRepo__factory.connect(plugin.pluginRepoAddress, signer);
 
       const currentRelease = await repo.latestRelease();
       const latestVersion = await repo["getLatestVersion(uint8)"](

@@ -50,7 +50,7 @@ console.log(daos);
     };
     plugins: [
       {
-        id: "address-list-voting.plugin.dao.eth",
+        pluginRepoAddress: "address-list-voting.plugin.dao.eth",
         instanceAddress: "0x12345..."
       }
     ]
@@ -64,7 +64,7 @@ console.log(daos);
     };
     plugins: [
       {
-        id: "token-voting.plugin.dao.eth",
+        pluginRepoAddress: "token-voting.plugin.dao.eth",
         instanceAddress: "0x12345..."
       }
     ]

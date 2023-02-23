@@ -55,7 +55,7 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      id: TOKEN_VOTING_PLUGIN_ID,
+      pluginRepoAddress: TOKEN_VOTING_PLUGIN_ID,
       data: hexToBytes(hexBytes),
     };
   }

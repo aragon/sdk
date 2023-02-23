@@ -53,7 +53,7 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
-      id: MULTISIG_PLUGIN_ID,
+      pluginRepoAddress: MULTISIG_PLUGIN_ID,
       data: hexToBytes(hexBytes),
     };
   }

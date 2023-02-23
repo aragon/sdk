@@ -65,7 +65,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
       ],
     );
     return {
-      id: ADDRESSLIST_PLUGIN_ID,
+      pluginRepoAddress: ADDRESSLIST_PLUGIN_ID,
       data: hexToBytes(hexBytes),
     };
   }

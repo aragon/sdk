@@ -374,7 +374,7 @@ export type UpgradeToAndCallParams = {
 
 export type DaoResourceLink = { name: string; url: string };
 export type InstalledPluginListItem = {
-  id: string;
+  pluginRepoAddress: string;
   instanceAddress: string;
   version: string;
 };

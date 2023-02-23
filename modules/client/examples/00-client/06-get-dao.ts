@@ -35,7 +35,7 @@ console.log(dao);
   creationDate: <Date>,
   plugins: [
     {
-      id: token-voting.plugin.dao.eth,
+      pluginRepoAddress: token-voting.plugin.dao.eth,
       instanceAddress: "0x12345..."
     }
   ]
