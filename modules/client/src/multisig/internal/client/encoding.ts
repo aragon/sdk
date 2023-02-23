@@ -1,10 +1,16 @@
-import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
+import {
+  hexToBytes,
+  InvalidAddressError,
+  UnsupportedNetworkError,
+} from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
   ContextPlugin,
   DaoAction,
   IPluginInstallItem,
+  SupportedNetworks,
+  SupportedNetworksArray,
 } from "../../../client-common";
 import {
   IMultisigClientEncoding,
@@ -15,8 +21,8 @@ import {
 // @ts-ignore
 // todo fix new contracts-ethers
 import { Multisig__factory } from "@aragon/core-contracts-ethers";
-import { MULTISIG_PLUGIN_ID } from "../constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { LIVE_CONTRACTS } from "../../../client-common/constants";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -32,12 +38,18 @@ export class MultisigClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {MultisigPluginInstallParams} params
+   * @param {SupportedNetworks} network
+   *
    * @return {*}  {IPluginInstallItem}
    * @memberof MultisigClientEncoding
    */
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
+    network: SupportedNetworks,
   ): IPluginInstallItem {
+    if (!SupportedNetworksArray.includes(network)) {
+      throw new UnsupportedNetworkError(network);
+    }
     const hexBytes = defaultAbiCoder.encode(
       // members, [onlyListed, minApprovals]
       [
@@ -53,7 +65,7 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
-      id: MULTISIG_PLUGIN_ID,
+      id: LIVE_CONTRACTS[network].multisigRepo,
       data: hexToBytes(hexBytes),
     };
   }

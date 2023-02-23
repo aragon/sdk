@@ -1,3 +1,13 @@
+export const SupportedNetworksArray = ["mainnet", "goerli"] as const;
+export type SupportedNetworks = typeof SupportedNetworksArray[number];
+export type NetworkDeployment = {
+  daoFactory: string;
+  multisigRepo: string;
+  adminRepo: string;
+  addresslistVotingRepo: string;
+  tokenVotingRepo: string;
+};
+
 // This file contains common types, interfaces, and enumerations
 
 export enum DaoRole {
