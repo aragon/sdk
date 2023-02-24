@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Voting on a Addresslist proposal
+### Vote on a Addresslist proposal
 
-This example shows how to vote on a proposal using the Addresslist Voting plugin.
+Enables voting on a proposal using the Addresslist Voting plugin installed within a DAO.
 */
 
 import {
@@ -16,16 +16,16 @@ import { context } from "../00-setup/00-getting-started";
 // Create a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an Addresslist client to use the Addresslist plugin.
-const client = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890",
-  vote: VoteValues.YES
+  proposalId: "0x12345678901234567890123456789012345678900x0",
+  vote: VoteValues.YES // alternatively NO, or ABSTAIN
 };
 
 // Vote on an Addresslist proposal.
-const steps = client.methods.voteProposal(voteParams);
+const steps = addresslistVotingClient.methods.voteProposal(voteParams);
+
 for await (const step of steps) {
   try {
     switch (step.key) {

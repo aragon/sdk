@@ -8,8 +8,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  ICreateProposalParams,
-  IExecuteProposalParams,
+  CreateMajorityVotingProposalParams,
   IVoteProposalParams,
   VoteValues,
 } from "../../../src";
@@ -36,7 +35,7 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const proposalParams: ICreateProposalParams = {
+      const proposalParams: CreateMajorityVotingProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
         metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",
         actions: [],
@@ -61,8 +60,7 @@ describe("Client Address List", () => {
       const client = new AddresslistVotingClient(ctxPlugin);
 
       const voteParams: IVoteProposalParams = {
-        pluginAddress: "0x1234567890123456789012345678901234567890",
-        proposalId: 0,
+        proposalId: "0x1234567890123456789012345678901234567890_0x0",
         vote: VoteValues.YES,
       };
 
@@ -80,11 +78,9 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const executeParams: IExecuteProposalParams = {
-        pluginAddress: "0x1234567890123456789012345678901234567890",
-        proposalId: 0,
-      };
-      const estimation = await client.estimation.executeProposal(executeParams);
+      const estimation = await client.estimation.executeProposal(
+        "0x1234567890123456789012345678901234567890_0x0",
+      );
 
       expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");

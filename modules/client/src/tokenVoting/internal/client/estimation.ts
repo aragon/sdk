@@ -3,13 +3,17 @@ import {
   ClientCore,
   ContextPlugin,
   GasFeeEstimation,
-  ICreateProposalParams,
-  IExecuteProposalParams,
+  CreateMajorityVotingProposalParams,
   IVoteProposalParams,
 } from "../../../client-common";
 import { ITokenVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { NoProviderError, NoSignerError, boolArrayToBitmap } from "@aragon/sdk-common";
+import {
+  boolArrayToBitmap,
+  decodeProposalId,
+  NoProviderError,
+  NoSignerError,
+} from "@aragon/sdk-common";
 /**
  * Estimation module the SDK TokenVoting Client
  */
@@ -23,12 +27,12 @@ export class TokenVotingClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *
-   * @param {ICreateProposalParams} params
+   * @param {CreateMajorityVotingProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async createProposal(
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -83,13 +87,18 @@ export class TokenVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    const { pluginAddress, id } = decodeProposalId(
+      params.proposalId,
+    );
+
     const tokenVotingContract = TokenVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
     const estimation = await tokenVotingContract.estimateGas.vote(
-      params.proposalId,
+      id,
       params.vote,
       false,
     );
@@ -99,12 +108,12 @@ export class TokenVotingClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of executing a TokenVoting proposal
    *
-   * @param {IExecuteProposalParams} params
+   * @param {string} proposalId
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async executeProposal(
-    params: IExecuteProposalParams,
+    proposalId: string,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -113,12 +122,16 @@ export class TokenVotingClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
+    const { pluginAddress, id } = decodeProposalId(
+      proposalId,
+    );
+
     const tokenVotingContract = TokenVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
     const estimation = await tokenVotingContract.estimateGas.execute(
-      params.proposalId,
+      id,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

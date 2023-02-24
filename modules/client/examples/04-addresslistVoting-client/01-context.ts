@@ -1,11 +1,14 @@
 /* MARKDOWN
 ### Create an Address List context
+
+Creates the context for an Addresslist plugin to be able to call on its functions.
 */
+
 import { ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";
 import { context, contextParams } from "../00-setup/00-getting-started";
 
-// Create a plugin context from the aragonOSx SDK context.
+// Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 // Update the context plugin.

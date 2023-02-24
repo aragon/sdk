@@ -107,6 +107,21 @@ ensure0x("0x1234")
 // "0x1234"
 ```
 
+### Proposal ID's
+
+For nonce based proposal ID's
+
+```ts
+import { encodeProposalId, decodeProposalId } from "@aragon/sdk-common";
+
+encodeProposalId(pluginAddr, nonce)
+// 0x1234567890123456789012345678901234567890_0x7
+
+decodeProposalId("0x1234567890123456789012345678901234567890_0x7")
+// { pluginAddress: "0x12345...", nonce: 7 }
+
+```
+
 ## Random
 
 ```ts

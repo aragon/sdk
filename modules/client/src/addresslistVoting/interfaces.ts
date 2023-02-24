@@ -1,19 +1,17 @@
 // This file contains the definitions of the AddressList DAO client
 
 import {
-  CanExecuteParams,
   ContractVotingSettings,
+  CreateMajorityVotingProposalParams,
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
-  ICanVoteParams,
+  CanVoteParams,
   IClientCore,
-  ICreateProposalParams,
-  IExecuteProposalParams,
   IInterfaceParams,
   IProposalQueryParams,
-  IProposalSettings,
   IVoteProposalParams,
+  MajorityVotingProposalSettings,
   ProposalBase,
   ProposalCreationStepValue,
   ProposalListItemBase,
@@ -30,17 +28,17 @@ import {
 // Address List
 export interface IAddresslistVotingClientMethods extends IClientCore {
   createProposal: (
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
   pinMetadata: (params: ProposalMetadata) => Promise<string>;
   voteProposal: (
     params: IVoteProposalParams,
   ) => AsyncGenerator<VoteProposalStepValue>;
   executeProposal: (
-    params: IExecuteProposalParams,
+    proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
-  canVote: (params: ICanVoteParams) => Promise<boolean>;
-  canExecute: (params: CanExecuteParams) => Promise<boolean>;
+  canVote: (params: CanVoteParams) => Promise<boolean>;
+  canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
   getProposal: (
     propoosalId: string,
@@ -73,11 +71,11 @@ export interface IAddresslistVotingClientDecoding extends IClientCore {
 }
 export interface IAddresslistVotingClientEstimation extends IClientCore {
   createProposal: (
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ) => Promise<GasFeeEstimation>;
   voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
   executeProposal: (
-    params: IExecuteProposalParams,
+    proposalId: string,
   ) => Promise<GasFeeEstimation>;
 }
 /** Defines the shape of the AddressList client class */
@@ -90,13 +88,13 @@ export interface IAddresslistVotingClient {
 
 export type AddresslistVotingProposal = ProposalBase & {
   result: AddresslistVotingProposalResult;
-  settings: IProposalSettings;
-  votes: Array<{ address: string; vote: VoteValues, voteReplaced: boolean }>;
+  settings: MajorityVotingProposalSettings;
+  votes: Array<{ address: string; vote: VoteValues; voteReplaced: boolean }>;
   totalVotingWeight: number;
   creationBlockNumber: number;
-  executionDate: Date;
-  executionBlockNumber: number;
-  executionTxHash: string;
+  executionDate: Date | null;
+  executionBlockNumber: number | null;
+  executionTxHash: string | null;
 };
 
 export type AddresslistVotingProposalListItem = ProposalListItemBase & {

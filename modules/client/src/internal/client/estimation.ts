@@ -17,9 +17,9 @@ import { ClientCore, Context, GasFeeEstimation } from "../../client-common";
 import {
   CreateDaoParams,
   DepositParams,
-  EnsureAllowanceParams,
   IClientEstimation,
   TokenType,
+  UpdateAllowanceParams,
 } from "../../interfaces";
 import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";
@@ -128,12 +128,12 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
   /**
    * Estimates the gas fee of updating the allowance of an ERC20 token
    *
-   * @param {EnsureAllowanceParams} _params
+   * @param {UpdateAllowanceParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
   public async updateAllowance(
-    params: EnsureAllowanceParams,
+    params: UpdateAllowanceParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {

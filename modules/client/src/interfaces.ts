@@ -30,9 +30,9 @@ export interface IClientMethods extends IClientCore {
     params: DepositParams,
   ) => AsyncGenerator<DaoDepositStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-  ensureAllowance: (
-    params: EnsureAllowanceParams,
-  ) => AsyncGenerator<EnsureAllowanceStepValue>;
+  updateAllowance: (
+    params: UpdateAllowanceParams,
+  ) => AsyncGenerator<UpdateAllowanceStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
   getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
   /** Retrieves metadata for many daos */
@@ -43,6 +43,10 @@ export interface IClientEncoding extends IClientCore {
   grantAction: (
     daoAddress: string,
     params: IGrantPermissionParams,
+  ) => DaoAction;
+  grantWithConditionAction: (
+    daoAddress: string,
+    params: GrantPermissionWithConditionParams,
   ) => DaoAction;
   revokeAction: (
     daoAddress: string,
@@ -55,10 +59,33 @@ export interface IClientEncoding extends IClientCore {
     daoAddressOrEns: string,
     metadataUri: string,
   ) => Promise<DaoAction>;
+  setDaoUriAction: (
+    daoAddressOrEns: string,
+    daoUri: string,
+  ) => DaoAction;
+  registerStandardCallbackAction: (
+    daoAddressOrEns: string,
+    params: RegisterStandardCallbackParams,
+  ) => DaoAction;
+  setSignatureValidatorAction: (
+    daoAddressOrEns: string,
+    signatureValidator: string,
+  ) => DaoAction;
+  upgradeToAction: (
+    daoAddressOrEns: string,
+    implementationAddress: string,
+  ) => DaoAction;
+  upgradeToAndCallAction: (
+    daoAddressOrEns: string,
+    params: UpgradeToAndCallParams,
+  ) => DaoAction;
 }
 
 export interface IClientDecoding {
   grantAction: (data: Uint8Array) => IGrantPermissionDecodedParams;
+  grantWithConditionAction: (
+    data: Uint8Array,
+  ) => GrantPermissionWithConditionParams;
   revokeAction: (data: Uint8Array) => IRevokePermissionDecodedParams;
   withdrawAction: (
     to: string,
@@ -67,6 +94,13 @@ export interface IClientDecoding {
   ) => WithdrawParams;
   updateDaoMetadataRawAction: (data: Uint8Array) => string;
   updateDaoMetadataAction: (data: Uint8Array) => Promise<DaoMetadata>;
+  setDaoUriAction: (data: Uint8Array) => string;
+  registerStandardCallbackAction: (
+    data: Uint8Array,
+  ) => RegisterStandardCallbackParams;
+  setSignatureValidatorAction: (data: Uint8Array) => string;
+  upgradeToAction: (data: Uint8Array) => string;
+  upgradeToAndCallAction: (data: Uint8Array) => UpgradeToAndCallParams;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }
 
@@ -75,7 +109,7 @@ export interface IClientEstimation {
   deposit: (
     params: DepositParams,
   ) => Promise<GasFeeEstimation>;
-  updateAllowance: (params: EnsureAllowanceParams) => Promise<GasFeeEstimation>;
+  updateAllowance: (params: UpdateAllowanceParams) => Promise<GasFeeEstimation>;
 }
 
 export interface IClient {
@@ -135,6 +169,20 @@ export interface IGrantPermissionDecodedParams
   extends IPermissionDecodedParamsBase {}
 export interface IRevokePermissionDecodedParams
   extends IPermissionDecodedParamsBase {}
+
+export type PermisionParamsBase = {
+  where: string;
+  who: string;
+  permission: string;
+};
+
+export type GrantPermissionWithConditionParams = PermisionParamsBase & {
+  condition: string;
+};
+export type GrantPermissionWithConditionDecodedParams = PermisionParamsBase & {
+  condition: string;
+  permissionId: string;
+};
 
 export interface IHasPermissionParams {
   daoAddressOrEns: string;
@@ -202,7 +250,7 @@ export type DepositErc20Params = DepositBaseParams & {
 
 export type DepositParams = DepositEthParams | DepositErc20Params; // | DepositErc721Params;
 
-export type EnsureAllowanceParams = {
+export type UpdateAllowanceParams = {
   daoAddressOrEns: string;
   amount: bigint;
   tokenAddress: string;
@@ -215,13 +263,13 @@ export enum DaoDepositSteps {
   DEPOSITING = "depositing",
   DONE = "done",
 }
-export type EnsureAllowanceStepValue =
+export type UpdateAllowanceStepValue =
   | { key: DaoDepositSteps.CHECKED_ALLOWANCE; allowance: bigint }
   | { key: DaoDepositSteps.UPDATING_ALLOWANCE; txHash: string }
   | { key: DaoDepositSteps.UPDATED_ALLOWANCE; allowance: bigint };
 
 export type DaoDepositStepValue =
-  | EnsureAllowanceStepValue
+  | UpdateAllowanceStepValue
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 
@@ -310,6 +358,17 @@ export type Withdraw =
   };
 
 export type Transfer = Deposit | Withdraw;
+
+export type RegisterStandardCallbackParams = {
+  interfaceId: string;
+  callbackSelector: string;
+  magicNumber: string;
+};
+
+export type UpgradeToAndCallParams = {
+  implementationAddress: string;
+  data: Uint8Array;
+};
 
 // DAO details
 
@@ -446,4 +505,10 @@ export const SubgraphTransferTypeMap: Map<
 ]);
 
 export type ContractPermissionParams = [string, string, string];
+export type ContractPermissionWithConditionParams = [
+  string,
+  string,
+  string,
+  string,
+];
 export type ContractWithdrawParams = [string, string, BigNumber, string];

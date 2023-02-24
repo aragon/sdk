@@ -3,13 +3,17 @@ import {
   ClientCore,
   ContextPlugin,
   GasFeeEstimation,
-  ICreateProposalParams,
-  IExecuteProposalParams,
+  CreateMajorityVotingProposalParams,
   IVoteProposalParams,
 } from "../../../client-common";
 import { IAddresslistVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { boolArrayToBitmap, NoProviderError, NoSignerError } from "@aragon/sdk-common";
+import {
+  boolArrayToBitmap,
+  decodeProposalId,
+  NoProviderError,
+  NoSignerError,
+} from "@aragon/sdk-common";
 
 /**
  * Estimation module the SDK Address List Client
@@ -25,12 +29,12 @@ export class AddresslistVotingClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *
-   * @param {ICreateProposalParams} params
+   * @param {CreateMajorityVotingProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
   public async createProposal(
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -87,13 +91,17 @@ export class AddresslistVotingClientEstimation extends ClientCore
       throw new NoProviderError();
     }
 
+    const { pluginAddress, id } = decodeProposalId(
+      params.proposalId,
+    );
+
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
     const estimation = await addresslistContract.estimateGas.vote(
-      params.proposalId,
+      id,
       params.vote,
       false,
     );
@@ -103,12 +111,12 @@ export class AddresslistVotingClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of executing an AddressList proposal
    *
-   * @param {IExecuteProposalParams} params
+   * @param {string} proposalId
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
   public async executeProposal(
-    params: IExecuteProposalParams,
+    proposalId: string,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -116,12 +124,17 @@ export class AddresslistVotingClientEstimation extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
+
+    const { pluginAddress, id } = decodeProposalId(
+      proposalId,
+    );
+
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
     const estimation = await addresslistContract.estimateGas.execute(
-      params.proposalId,
+      id,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }

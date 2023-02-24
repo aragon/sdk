@@ -6,8 +6,9 @@ This function returns a boolean indicating whether an address can vote in a spec
 
 import {
   ContextPlugin,
-  ICanVoteParams,
-  TokenVotingClient
+  CanVoteParams,
+  TokenVotingClient,
+  VoteValues
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -17,10 +18,10 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an TokenVoting client.
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
-const canVoteParams: ICanVoteParams = {
-  address: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890_0x1",
-  pluginAddress: "0x1234567890123456789012345678901234567890"
+const canVoteParams: CanVoteParams = {
+  proposalId: "0x12345678901234567890123456789012345678900x0",
+  voterAddressOrEns: "0x1234567890123456789012345678901234567890", // your-plugin.plugin.dao.eth
+  vote: VoteValues.YES // alternatively, could be  NO or ABSTAIN.
 };
 
 // Returns true or false depending on whether the address can vote in the specific proposal.

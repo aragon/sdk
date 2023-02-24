@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Get a DAO's financial data
+### Get a DAO's balance
 
-Retrieves a DAO's asset balances using the DAO address or its ENS domain.
+Gets a DAO's financial assets based on the DAO address or its ENS domain.
 */
 
 import { AssetBalance, Client } from "@aragon/sdk-client";

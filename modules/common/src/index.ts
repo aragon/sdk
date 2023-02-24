@@ -6,3 +6,4 @@ export * from "./uri";
 export * from "./random";
 export * from "./timeout";
 export * from "./types";
+export * from "./utils";

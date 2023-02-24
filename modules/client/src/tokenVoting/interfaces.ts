@@ -1,19 +1,17 @@
 // This file contains the definitions of the TokenVoting client
 import { BigNumber } from "@ethersproject/bignumber";
 import {
-  CanExecuteParams,
   ContractVotingSettings,
+  CreateMajorityVotingProposalParams,
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
-  ICanVoteParams,
+  CanVoteParams,
   IClientCore,
-  ICreateProposalParams,
-  IExecuteProposalParams,
   IInterfaceParams,
   IProposalQueryParams,
-  IProposalSettings,
   IVoteProposalParams,
+  MajorityVotingProposalSettings,
   ProposalBase,
   ProposalCreationStepValue,
   ProposalListItemBase,
@@ -32,17 +30,17 @@ import { TokenType } from "../interfaces";
 
 export interface ITokenVotingClientMethods extends IClientCore {
   createProposal: (
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
   pinMetadata: (params: ProposalMetadata) => Promise<string>;
   voteProposal: (
     params: IVoteProposalParams,
   ) => AsyncGenerator<VoteProposalStepValue>;
   executeProposal: (
-    params: IExecuteProposalParams,
+    proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
-  canVote: (params: ICanVoteParams) => Promise<boolean>;
-  canExecute: (params: CanExecuteParams) => Promise<boolean>;
+  canVote: (params: CanVoteParams) => Promise<boolean>;
+  canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
   getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;
   getProposals: (
@@ -71,11 +69,11 @@ export interface ITokenVotingClientDecoding extends IClientCore {
 }
 export interface ITokenVotingClientEstimation extends IClientCore {
   createProposal: (
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ) => Promise<GasFeeEstimation>;
   voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
   executeProposal: (
-    params: IExecuteProposalParams,
+    proposalId: string,
   ) => Promise<GasFeeEstimation>;
 }
 
@@ -109,7 +107,7 @@ type NewTokenParams = {
 // PROPOSAL RETRIEVAL
 export type TokenVotingProposal = ProposalBase & {
   result: TokenVotingProposalResult;
-  settings: IProposalSettings;
+  settings: MajorityVotingProposalSettings;
   token: Erc20TokenDetails | Erc721TokenDetails | null;
   usedVotingWeight: bigint;
   votes: Array<
@@ -117,14 +115,15 @@ export type TokenVotingProposal = ProposalBase & {
   >;
   totalVotingWeight: bigint;
   creationBlockNumber: number;
-  executionDate: Date;
-  executionBlockNumber: number;
-  executionTxHash: string;
+  executionDate: Date | null;
+  executionBlockNumber: number | null;
+  executionTxHash: string | null;
 };
 
 export type TokenVotingProposalListItem = ProposalListItemBase & {
   token: Erc20TokenDetails | Erc721TokenDetails | null;
   result: TokenVotingProposalResult;
+  totalVotingWeight: bigint;
 };
 
 export type TokenVotingProposalResult = {
@@ -155,6 +154,7 @@ export type SubgraphTokenVotingProposalListItem = SubgraphProposalBase & {
   plugin: {
     token: SubgraphErc20Token | SubgraphErc721Token;
   };
+  totalVotingPower: string;
 };
 
 type SubgraphBaseToken = {
@@ -177,7 +177,7 @@ export type SubgraphErc20Token = SubgraphBaseToken & {
 };
 export type SubgraphErc721Token = SubgraphBaseToken & {
   __typename: SubgraphContractType.ERC721;
-}
+};
 
 export type SubgraphTokenVotingProposal =
   & SubgraphTokenVotingProposalListItem

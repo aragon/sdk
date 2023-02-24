@@ -1,7 +1,7 @@
 /* MARKDOWN
 ### Add and pin metadata for the Multisig plugin
 
-Adds an pin data with a the format used by aragon app into one of the specified IPFS nodes and return a IPFS CID preceded by "ipfs://"
+Adds an pin data into one of the specified IPFS nodes and return a IPFS CID preceded by "ipfs://"
 */
 
 import {
@@ -11,8 +11,8 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate a plugin context from the aragonOSx SDK context.
-const contextPlugin = ContextPlugin.fromContext(context);
+// Instantiate a plugin context from the Aragon OSx SDK context.
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig plugin client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
@@ -35,6 +35,7 @@ const metadata: ProposalMetadata = {
     header: "https://..."
   },
 };
+
 const metadataUri: string = await multisigClient.methods.pinMetadata(metadata);
 console.log({ metadataUri });
 
@@ -42,6 +43,6 @@ console.log({ metadataUri });
 Returns:
 
 ```javascript
-  "ipfs://Qm..."
+  { metadataUri: "ipfs://Qm..." }
 ```
 */

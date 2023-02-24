@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Get the list of proposals of a DAO (TokenVoting)
+### Get proposals of a DAO (TokenVoting)
 
-Retrieves the proposals of a DAO created with the `TokenVoting` plugin.
+Gets all proposals from a DAO that are created using the TokenVoting plugin as its governance mechanism.
 */
 
 import {
@@ -24,7 +24,7 @@ const queryParams: IProposalQueryParams = {
   skip: 0, // optional
   limit: 10, // optional
   direction: SortDirection.ASC, // optional, otherwise DESC ("descending")
-  sortBy: ProposalSortBy.POPULARITY, // optional, otherwise CREATED_AT, NAME, VOTES
+  sortBy: ProposalSortBy.CREATED_AT, // optional, otherwise NAME, VOTES (POPULARITY coming soon)
   status: ProposalStatus.ACTIVE // optional, otherwise PENDING, SUCCEEDED, EXECUTED, DEFEATED
 };
 

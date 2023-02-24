@@ -1,22 +1,27 @@
-import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
+import {
+  hexToBytes,
+  InvalidAddressError,
+  UnsupportedNetworkError,
+} from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
   ContextPlugin,
-  // ContractVotingSettings,
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
+  SupportedNetworks,
+  SupportedNetworksArray,
   VotingSettings,
   votingSettingsToContract,
 } from "../../../client-common";
-import { ADDRESSLIST_PLUGIN_ID } from "../constants";
 import {
   IAddresslistVotingClientEncoding,
   IAddresslistVotingPluginInstall,
 } from "../../interfaces";
 import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { LIVE_CONTRACTS } from "../../../client-common/constants";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -34,12 +39,17 @@ export class AddresslistVotingClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {IAddresslistVotingPluginInstall} params
+   * @param {SupportedNetworks} network
    * @return {*}  {IPluginInstallItem}
    * @memberof AddresslistVotingClientEncoding
    */
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
+    network: SupportedNetworks,
   ): IPluginInstallItem {
+    if (!SupportedNetworksArray.includes(network)) {
+      throw new UnsupportedNetworkError(network);
+    }
     const {
       votingMode,
       supportThreshold,
@@ -64,8 +74,9 @@ export class AddresslistVotingClientEncoding extends ClientCore
         params.addresses,
       ],
     );
+
     return {
-      id: ADDRESSLIST_PLUGIN_ID,
+      id: LIVE_CONTRACTS[network].addresslistVotingRepo,
       data: hexToBytes(hexBytes),
     };
   }

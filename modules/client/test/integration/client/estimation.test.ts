@@ -12,7 +12,7 @@ import {
   CreateDaoParams,
   DepositParams,
   TokenType,
-  EnsureAllowanceParams,
+  UpdateAllowanceParams,
   IAddresslistVotingPluginInstall,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
@@ -104,7 +104,7 @@ describe("Client", () => {
 
       const tokenContract = await deployErc20(client);
 
-      const depositParams: EnsureAllowanceParams = {
+      const depositParams: UpdateAllowanceParams = {
         daoAddressOrEns: daoAddress,
         amount: BigInt(1234),
         tokenAddress: tokenContract.address,

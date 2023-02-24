@@ -1,7 +1,7 @@
 /* MARKDOWN
 ### Get a proposal by proposalID (TokenVoting)
 
-Retrieves a given proposal of DAO with the TokenVoting plugin installed.
+Gets a specific proposal using the TokenVoting plugin as its governance mechanism.
 */
 
 import {
@@ -13,9 +13,8 @@ import { context } from "../00-setup/00-getting-started";
 
 // Instantiate a plugin context from an aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
 // Create a TokenVoting client.
-const tokenVotingClient = new TokenVotingClient(contextPlugin);
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 // The address of the proposal you want to retrieve.
 const proposalId: string = "0x12345238513498562394651375914323423";
@@ -29,7 +28,7 @@ Returns:
 
 ```json
 {
-  id: "0x12345...",
+  id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"
@@ -73,8 +72,8 @@ Returns:
     abstain: 0n
   }
   settings:{
-    minTurnout: 0.5,
-    minSupport: 0.25,
+    minParticipation: 0.5,
+    supportThreshold: 0.25,
     minDuration: 7200
   },
   token: {

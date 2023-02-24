@@ -1,16 +1,17 @@
 import {
-  IAddresslistVotingPluginInstall,
   IAddresslistVotingClient,
   IAddresslistVotingClientDecoding,
   IAddresslistVotingClientEncoding,
   IAddresslistVotingClientEstimation,
   IAddresslistVotingClientMethods,
+  IAddresslistVotingPluginInstall,
 } from "./interfaces";
 import { AddresslistVotingClientMethods } from "./internal/client/methods";
 import { AddresslistVotingClientEncoding } from "./internal/client/encoding";
 import { AddresslistVotingClientDecoding } from "./internal/client/decoding";
 import { AddresslistVotingClientEstimation } from "./internal/client/estimation";
 import {
+  SupportedNetworks,
   ClientCore,
   ContextPlugin,
   IPluginInstallItem,
@@ -54,12 +55,14 @@ export class AddresslistVotingClient extends ClientCore
      * so that the plugin is configured
      *
      * @param {IAddresslistVotingPluginInstall} params
+     * @param {SupportedNetworks} [network="mainnet"]
      * @return {*}  {IPluginInstallItem}
      * @memberof AddresslistVotingClient
      */
     getPluginInstallItem: (
       params: IAddresslistVotingPluginInstall,
+      network: SupportedNetworks = "mainnet",
     ): IPluginInstallItem =>
-      AddresslistVotingClientEncoding.getPluginInstallItem(params),
+      AddresslistVotingClientEncoding.getPluginInstallItem(params, network),
   };
 }

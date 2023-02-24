@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Create a DAO with TokenVoting plugin
+### Create a DAO with a TokenVoting plugin installed
 
 Creates a DAO with the TokenVoting plugin installed off the bat.
 */
@@ -16,7 +16,7 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Insantiate the general purpose client from the aragonOSx SDK context.
+// Insantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 // You can do different types of installations, depending on your needs.
@@ -30,7 +30,7 @@ const pluginInitParams1: ITokenVotingPluginInstall = {
     votingMode: VotingMode.STANDARD // default standard, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   },
   useToken: {
-    address: "0x...", // contract address of the token to use
+    address: "0x23847102387419273491234", // contract address of the token to use as the voting token
   },
 };
 
@@ -50,19 +50,19 @@ const pluginInitParams2: ITokenVotingPluginInstall = {
     minter: "0x...", // optional. if you don't define any, we'll use the standard OZ ERC20 contract. Otherwise, you can define your own token minter contract address.
     balances: [
       { // Defines the initial balances of the new token
-        address: "0x...", // address of the account to receive the newly minted tokens
+        address: "0x2371238740123847102983471022", // address of the account to receive the newly minted tokens
         balance: BigInt(10) // amount of tokens that address should receive
       },
       {
-        address: "0x...",
+        address: "0x0237123874012384710298347102",
         balance: BigInt(10)
       },
       {
-        address: "0x...",
+        address: "0x2237123874012384710298347102",
         balance: BigInt(10)
-      },
-    ],
-  },
+      }
+    ]
+  }
 };
 
 // Creates a TokenVoting plugin client with the parameteres defined above (with an existing token).
@@ -81,12 +81,12 @@ const daoMetadata: DaoMetadata = {
 };
 
 // Pins the DAO's metadata in IPFS to get back the URI.
-const metadataUri = await client.methods.pinMetadata(daoMetadata);
+const metadataUri: string = await client.methods.pinMetadata(daoMetadata);
 
 const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2]
+  plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2] // optional, this will determine the plugins installed in your DAO upon creation.
 };
 
 // Estimate how much gas the transaction will cost.
@@ -94,8 +94,9 @@ const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createP
 console.log({ avg: estimatedGas.average, max: estimatedGas.max });
 
 // Create the DAO with the two token voting plugins installed. This means that the DAO will be able to use either of the two tokens to vote.
-// You can also create a DAO with only one of the plugins.
+// You can also create a DAO with only one of the plugins installed or none.
 const steps = client.methods.createDao(createParams);
+
 for await (const step of steps) {
   try {
     switch (step.key) {

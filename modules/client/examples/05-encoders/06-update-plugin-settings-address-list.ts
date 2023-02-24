@@ -7,12 +7,13 @@ Updates the settings of a given AddresslistVoting plugin.
 import {
   AddresslistVotingClient,
   ContextPlugin,
+  DaoAction,
   VotingMode,
   VotingSettings
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate a plugin context from the aragonOSx SDK context
+// Instantiate a plugin context from the Aragon OSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddresslistVoting client.
 const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
@@ -26,7 +27,7 @@ const configActionPrarms: VotingSettings = {
   votingMode: VotingMode.STANDARD // default STANDARD, otherwise EARLY_EXECUTION or VOTE_REPLACEMENT
 };
 
-const pluginAddress = "0x1234567890123456789012345678901234567890"; // the address of the plugin contract itself
+const pluginAddress: string = "0x1234567890123456789012345678901234567890"; // the address of the AddresslistVoting plugin contract installed in the DAO
 
-const configAction = addresslistVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionPrarms);
-console.log({ configAction });
+const updatePluginSettingsAction: DaoAction = addresslistVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionPrarms);
+console.log({ updatePluginSettingsAction });

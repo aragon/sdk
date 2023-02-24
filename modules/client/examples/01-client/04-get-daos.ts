@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Get multiple DAOs
+### Get DAOs
 
-Handles retrieving list of DAOs' metadata.
+Gets a list of DAOs from the Aragon OSx DAO registry.
 */
 
 import {
@@ -13,17 +13,17 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate the general purpose client from the aragonOSx SDK context.
+// Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 const queryParams: IDaoQueryParams = {
   skip: 0, // optional
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
-  sortBy: DaoSortBy.POPULARITY //optional
+  sortBy: DaoSortBy.CREATED_AT //optional, alternatively "SUBDOMAIN" (and "POPULARITY" coming soon)
 };
 
-// Get a list of DAOs.
+// Get a list of DAOs from the Aragon DAO registry.
 const daos: DaoListItem[] = await client.methods.getDaos(queryParams);
 console.log({ daos });
 

@@ -7,10 +7,12 @@ Then, you can create proposals using the `createProposal` method in your `TokenV
 
 import {
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
   TokenVotingClient,
+  VotingMode,
+  VotingSettings,
   VoteValues
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
@@ -19,7 +21,7 @@ import { context } from "../00-setup/00-getting-started";
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 // Create a TokenVoting client.
-const tokenVotingClient = new TokenVotingClient(contextPlugin);
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
@@ -42,20 +44,33 @@ const metadata: ProposalMetadata = {
 };
 
 // Pin the metadata in IPFS to get back the URI.
-const metadataUri = await tokenVotingClient.methods.pinMetadata(metadata);
+const metadataUri: string = await tokenVotingClient.methods.pinMetadata(metadata);
 
-const proposalParams: ICreateProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
+const pluginAddress: string = "0x1234567890123456789012345678901234567890"; // the address of the plugin contract containing all plugin logic.
+
+// [Optional] In case you wanted to pass an action to the proposal, you can configure it here and pass it immediately. An action is the encoded transaction which will get executed when a proposal passes.
+// In this example, we are creating an action to change the settings of a governance plugin to demonstrate how to set it up.
+const configActionPrarms: VotingSettings = {
+  minDuration: 60 * 60 * 24 * 2, // seconds
+  minParticipation: 0.25, // 25%
+  supportThreshold: 0.5, // 50%
+  minProposerVotingPower: BigInt("5000"), // default 0
+  votingMode: VotingMode.EARLY_EXECUTION, // default STANDARD, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
+};
+
+const proposalParams: CreateMajorityVotingProposalParams = {
+  pluginAddress,
   metadataUri,
-  actions: [],
+  actions: [configActionPrarms], // this is optional. if you don't want to pass any actions, simply pass an empty array `[]`.
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
-  creatorVote: VoteValues.YES // default NO, other options: ABSTAIN, YES
+  creatorVote: VoteValues.YES // default NO, other options: ABSTAIN, YES. This saves gas for the voting transaction.
 };
 
 // Create a proposal where members participate through token voting.
 const steps = tokenVotingClient.methods.createProposal(proposalParams);
+
 for await (const step of steps) {
   try {
     switch (step.key) {

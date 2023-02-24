@@ -26,7 +26,7 @@ const members: string[] = [
 
 const removeAddressesParams: RemoveAddressesParams = {
   members,
-  pluginAddress: "0x0987654321098765432109876543210987654321", // The address of the Multisig plugin contract itself.
+  pluginAddress: "0x0987654321098765432109876543210987654321" // the address of the Multisig plugin contract installed in the DAO
 };
 
 // Removes the addresses from the Multisig plugin of a DAO.

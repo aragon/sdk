@@ -1,9 +1,9 @@
 /* MARKDOWN
 ### Add and pin metadata
 
-Adds and pins data with the format needed by the Aragon App into one of the specified IPFS nodes and return an IPFS CID preceded by "ipfs://"
-
+Adds and pins data with into one of the specified IPFS nodes and return an IPFS CID preceded by "ipfs://".
 */
+
 import {
   ContextPlugin,
   TokenVotingClient,
@@ -37,7 +37,7 @@ const metadata: ProposalMetadata = {
 };
 
 // Pin the metadata in IPFS to get back the URI.
-const metadataUri = await tokenVotingClient.methods.pinMetadata(metadata);
+const metadataUri: string = await tokenVotingClient.methods.pinMetadata(metadata);
 console.log({ metadataUri });
 
 /* MARKDOWN

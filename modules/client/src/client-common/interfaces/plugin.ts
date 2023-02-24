@@ -21,27 +21,27 @@ export enum VoteValues {
 }
 
 // TYPES
-export interface IProposalSettings {
-  /** Float: 0 to 1 */
-  minSupport: number;
-  /** Float: 0 to 1 */
-  minTurnout: number;
-  /** In seconds */
-  duration: number;
-  
-}
 
-export type VotingSettings = {
-  /* default is standard */
-  votingMode?: VotingMode;
+export type MajorityVotingSettingsBase = {
   /** Float between 0 and 1 */
   supportThreshold: number;
   /** Float between 0 and 1 */
   minParticipation: number;
+};
+
+export type MajorityVotingProposalSettings = MajorityVotingSettingsBase & {
+  duration: number;
+};
+export type MajorityVotingSettings = MajorityVotingSettingsBase & {
+  /* default is standard */
+  votingMode?: VotingMode;
+  /* minimum is 3600 */
   minDuration: number;
   /* default is 0 */
   minProposerVotingPower?: bigint;
 };
+
+export type VotingSettings = MajorityVotingSettings
 
 export enum VotingMode {
   STANDARD = "Standard",
@@ -57,19 +57,6 @@ export type ContractVotingSettings = [
   BigNumber, // minProposerVotingPower
 ];
 
-// TODO: turn into a type, and potentially refactor these fields
-export interface ICreateProposalParams {
-  pluginAddress: string;
-  metadataUri: string;
-  actions?: DaoAction[];
-  /** For every action item, denotes whether its execution could fail
-   * without aborting the whole proposal execution */
-  failSafeActions?: Array<boolean>;
-  startDate?: Date;
-  endDate?: Date;
-  executeOnPass?: boolean;
-  creatorVote?: VoteValues;
-}
 
 export type CreateProposalBaseParams = {
   pluginAddress: string;
@@ -80,28 +67,23 @@ export type CreateProposalBaseParams = {
   metadataUri: string;
 };
 
+export type CreateMajorityVotingProposalParams = CreateProposalBaseParams & {
+  startDate?: Date;
+  endDate?: Date;
+  executeOnPass?: boolean;
+  creatorVote?: VoteValues;
+}
+
 export interface IVoteProposalParams {
-  pluginAddress: string;
   vote: VoteValues;
-  proposalId: number;
+  proposalId: string;
 }
 
-export interface IExecuteProposalParams {
-  pluginAddress: string;
-  proposalId: number;
+export interface CanVoteParams {
+  proposalId: string;
+  voterAddressOrEns: string;
+  vote: VoteValues;
 }
-
-export interface ICanVoteParams {
-  pluginAddress: string;
-  proposalId: number;
-  address: string;
-  vote: VoteValues
-}
-
-export type CanExecuteParams = {
-  proposalId: number;
-  pluginAddress: string;
-};
 
 /**
  * Contains the human-readable information about a proposal
@@ -173,7 +155,7 @@ export type SubgraphVoterListItemBase = {
   voter: {
     address: string;
   };
-  voteReplaced: boolean
+  voteReplaced: boolean;
   voteOption: SubgraphVoteValues;
 };
 
@@ -230,7 +212,7 @@ export enum ProposalCreationSteps {
 
 export type ProposalCreationStepValue =
   | { key: ProposalCreationSteps.CREATING; txHash: string }
-  | { key: ProposalCreationSteps.DONE; proposalId: number };
+  | { key: ProposalCreationSteps.DONE; proposalId: string };
 
 // PROPOSAL VOTING
 export enum VoteProposalStep {

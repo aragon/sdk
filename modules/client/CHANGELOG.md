@@ -12,14 +12,59 @@ TEMPLATE:
 - Change 1, 2, 3
 
 -->
+## [UPCOMING]
 
-## [0.20.0-beta]
+## [0.22.0-beta]
+
+Release candidate 1
+
+### Added
+- Encoders and decoders for `grantWithConditionAction`
+- Encoders and decoders for `setDaoUriAction`
+- Encoders and decoders for `registerStandardCallbackAction`
+- Encoders and decoders for `setSignatureValidatorAction`
+- Encoders and decoders for `upgradeToAction`
+- Encoders and decoders for `upgradeToAndCallAction`
+- Examples for new decoders and encoders
+- JsDoc for new encoders and decoders
+- Add `settings` and `appovals` fields to `MultisigProposalBase`
+- Add `creationBlockNumber` `executionDate` and `creationBlockNumber` to `MultisigProposal`
+- Add `totalVotingWeight` to `tokenVotingListItem`
+
+### Changed
+- `ICreateProposalParams` => `CreateMajorityVotingProposalParams`
+- `IProposalSettings` => `MajorityVotingProposalSettings`
+- Rename all mention of `ensureAllowance` to `updateAllowance`
+- ensDomain now includes `.dao.eth`
+- `getPluginInstallItem` now receives a `network` parameter to select the right Plugin Repo. Defaults to `mainnet`
+- Renamed `address`/`addressOrEns` to `voterAddressOrEns`/`approverAddressOrEns` in `canVote`/`canApprove` functions
+- `proposalId` is now a `string` everywhere and follows the new general format
+- `canExecute()` and `execute()` expect the `proposalId` as parameter now.
+
+### Removed
+- removes `IExecuteProposalParams`, `CanExecuteParams` and `ExecuteProposalParams` types/interfaces
+- removes `isProposalId()` and moves it to @aragon/sdk-common
+
+## [0.21.2-beta]
+### Fixed
+- Add `transfer` to available functions
+
+## [0.21.1-beta]
+### Fixed 
+- `startDate` and `endDate` swapped on `getProposal` funtion of the multisig client
+
+### Changed
+- Update common package to `0.10.1-beta` 
+### Added
+- Add `endDate` and `startDate` to `MultisigProposalListItem`  
+## [0.21.0-beta]
 ### Changed
 - Update `getDaoBalances` parameters from `daoAddressOrEns` to `DaoBalancesQueryParams`
 
 ### Added
 - Add support for Subgraph version `0.7.2-alpha`
 - Add Vote Replacement flag in MajorityVoting clients
+
 ## [0.20.0-beta]
 ### Changed
 - Updates to contracts-ethers v0.7.1

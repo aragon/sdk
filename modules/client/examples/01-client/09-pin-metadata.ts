@@ -1,17 +1,18 @@
 /* MARKDOWN
-### Add and pin metadata for a DAO within IPFS
+### Pins metadata for a DAO within IPFS
 
-Adds a pin data with the format used by Aragon App into one of the specified IPFS nodes and return an IPFS CID preceded by "ipfs://".
+Adds a pin data set into the specified IPFS nodes.
+Return an IPFS CID preceded by "ipfs://".
 */
 
-import { Client } from "@aragon/sdk-client";
+import { Client, DaoMetadata } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate the general purpose client from the aragonOSx SDK context.
-const client = new Client(context);
+const client: Client = new Client(context);
 
 // The Metadata object containing the details of the DAO.
-const metadata = {
+const metadata: DaoMetadata = {
   name: "My DAO",
   description: "This is a description",
   avatar: "",

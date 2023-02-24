@@ -41,9 +41,11 @@ export function toTokenVotingProposal(
   const creationDate = new Date(
     parseInt(proposal.createdAt) * 1000,
   );
-  const executionDate = new Date(
-    parseInt(proposal.executionDate) * 1000,
-  );
+  const executionDate = proposal.executionDate
+    ? new Date(
+      parseInt(proposal.executionDate) * 1000,
+    )
+    : null;
   let usedVotingWeight: bigint = BigInt(0);
   for (const voter of proposal.voters) {
     usedVotingWeight += BigInt(voter.votingPower);
@@ -68,8 +70,8 @@ export function toTokenVotingProposal(
     creationDate,
     creationBlockNumber: parseInt(proposal.creationBlockNumber),
     executionDate,
-    executionBlockNumber: parseInt(proposal.executionBlockNumber) || 0,
-    executionTxHash: proposal.executionTxHash || "",
+    executionBlockNumber: parseInt(proposal.executionBlockNumber) || null,
+    executionTxHash: proposal.executionTxHash || null,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
@@ -86,10 +88,10 @@ export function toTokenVotingProposal(
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     settings: {
-      minSupport: decodeRatio(BigInt(proposal.supportThreshold), 6),
+      supportThreshold: decodeRatio(BigInt(proposal.supportThreshold), 6),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
-      minTurnout: decodeRatio(
+      minParticipation: decodeRatio(
         (BigInt(proposal.minVotingPower) * BigInt(1000000)) /
           BigInt(proposal.totalVotingPower),
         6,
@@ -131,6 +133,7 @@ export function toTokenVotingProposalListItem(
       title: metadata.title,
       summary: metadata.summary,
     },
+    totalVotingWeight: BigInt(proposal.totalVotingPower),
     startDate,
     endDate,
     status: computeProposalStatus(proposal),
@@ -182,21 +185,21 @@ export function tokenVotingInitParamsToContract(
 function parseToken(
   subgraphToken: SubgraphErc20Token | SubgraphErc721Token,
 ): Erc20TokenDetails | Erc721TokenDetails | null {
-  let token: Erc721TokenDetails| Erc20TokenDetails | null = null;
+  let token: Erc721TokenDetails | Erc20TokenDetails | null = null;
   if (subgraphToken.__typename === SubgraphContractType.ERC20) {
     token = {
       address: subgraphToken.id,
       symbol: subgraphToken.symbol,
       name: subgraphToken.name,
       decimals: subgraphToken.decimals,
-      type: TokenType.ERC20
+      type: TokenType.ERC20,
     };
   } else if (subgraphToken.__typename === SubgraphContractType.ERC721) {
     token = {
       address: subgraphToken.id,
       symbol: subgraphToken.symbol,
       name: subgraphToken.name,
-      type: TokenType.ERC721
+      type: TokenType.ERC721,
     };
   }
   return token;

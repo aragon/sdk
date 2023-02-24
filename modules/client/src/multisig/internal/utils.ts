@@ -8,7 +8,6 @@ import {
 import {
   MultisigProposal,
   MultisigProposalListItem,
-  SubgraphMultisigApproversListItem,
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
 } from "../interfaces";
@@ -21,11 +20,16 @@ export function toMultisigProposal(
     parseInt(proposal.createdAt) * 1000,
   );
   const startDate = new Date(
-    parseInt(proposal.endDate) * 1000,
-  );
-  const endDate = new Date(
     parseInt(proposal.startDate) * 1000,
   );
+  const endDate = new Date(
+    parseInt(proposal.endDate) * 1000,
+  );
+  const executionDate = proposal.executionDate
+    ? new Date(
+      parseInt(proposal.executionDate) * 1000,
+    )
+    : null;
   return {
     id: proposal.id,
     dao: {
@@ -40,10 +44,17 @@ export function toMultisigProposal(
       resources: metadata.resources,
       media: metadata.media,
     },
+    settings: {
+      onlyListed: proposal.plugin.onlyListed,
+      minApprovals: parseInt(proposal.plugin.minApprovals),
+    },
+    creationBlockNumber: parseInt(proposal.creationBlockNumber) || 0,
     creationDate,
     startDate,
     endDate,
-    executionTxHash: proposal.executionTxHash || "",
+    executionDate,
+    executionBlockNumber: parseInt(proposal.executionBlockNumber) || null,
+    executionTxHash: proposal.executionTxHash || null,
     actions: proposal.actions.map(
       (action: SubgraphAction): DaoAction => {
         return {
@@ -58,7 +69,7 @@ export function toMultisigProposal(
     // Missing executable property from subgraph
     status: proposal.executed ? ProposalStatus.EXECUTED : ProposalStatus.ACTIVE,
     approvals: proposal.approvers.map(
-      (approver: SubgraphMultisigApproversListItem) => approver.approver.id,
+      (approver) => approver.id.slice(0, 42),
     ),
   };
 }
@@ -66,6 +77,12 @@ export function toMultisigProposalListItem(
   proposal: SubgraphMultisigProposalListItem,
   metadata: ProposalMetadata,
 ): MultisigProposalListItem {
+  const startDate = new Date(
+    parseInt(proposal.startDate) * 1000,
+  );
+  const endDate = new Date(
+    parseInt(proposal.endDate) * 1000,
+  );
   return {
     id: proposal.id,
     dao: {
@@ -77,7 +94,15 @@ export function toMultisigProposalListItem(
       title: metadata.title,
       summary: metadata.summary,
     },
-    approvals: parseInt(proposal.approvals),
+    approvals: proposal.approvers.map(
+      (approver) => approver.id.slice(0, 42),
+    ),
+    settings: {
+      onlyListed: proposal.plugin.onlyListed,
+      minApprovals: parseInt(proposal.plugin.minApprovals),
+    },
+    startDate,
+    endDate,
     // TODO
     // change to computeProposalStatus
     // Missing executable property from subgraph

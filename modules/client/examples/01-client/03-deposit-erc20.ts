@@ -25,7 +25,7 @@ const depositParams: DepositParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
   amount: BigInt(10), // amount in wei
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
-  type: TokenType.ERC20 // "native" meaning the native token to that EVM (ETH in mainnet), otherwise "erc20" for ERC20 token
+  type: TokenType.ERC20 // "erc20" for ERC20 token, otherwise "native" for EVM native token (ETH, MATIC, etc)
 };
 
 // Estimate how much gas the transaction will cost.

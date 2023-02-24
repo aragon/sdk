@@ -18,12 +18,17 @@ query MultisigProposal($proposalId: ID!) {
       value
       data
     }
+    executionDate
+    executionBlockNumber
+    creationBlockNumber
+    plugin {
+      minApprovals
+      onlyListed
+    }
     executionTxHash
     executed
     approvers{
-      approver{
-        id
-      }
+      id
     }
   }
 }
@@ -40,6 +45,18 @@ query MultisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: In
     metadata
     executed
     approvals
+    startDate
+    endDate
+    executionDate
+    executionBlockNumber
+    creationBlockNumber
+    approvers {
+      id
+    }
+    plugin{
+      minApprovals
+      onlyListed
+    }
   }
 }
 `;

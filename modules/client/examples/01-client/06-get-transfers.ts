@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Get DAO activity
+### Get transfers from DAO's activity
 
-Retrieves the list of asset transfers to and from DAOs.
+Gets the list of asset transfers to and from DAOs.
 If passed a `daoAddressOrEns`, will only retrieve transfers for that DAO. Otherwise, it returns for all DAOs.
 
 By default, retrieves ETH, DAI, USDC and USDT, on Mainnet).
@@ -29,7 +29,7 @@ const params: ITransferQueryParams = {
   type: TransferType.DEPOSIT // optional, options: DEPOSIT or WITHDRAW
 };
 
-// Get a list of DAO transfers.
+// Get a list of DAO transfers based on params set.
 const daoTransfers: Transfer[] | null = await client.methods.getDaoTransfers(params);
 console.log({ daoTransfers });
 

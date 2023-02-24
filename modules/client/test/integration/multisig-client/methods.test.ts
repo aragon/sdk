@@ -34,7 +34,7 @@ import {
 } from "../constants";
 import { Server } from "ganache";
 // import { advanceBlocks } from "../../helpers/advance-blocks";
-import { CanExecuteParams, ExecuteProposalStep } from "../../../src";
+import { ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -76,7 +76,7 @@ describe("Client Multisig", () => {
   async function buildProposal(
     pluginAddress: string,
     multisigClient: MultisigClient,
-  ): Promise<number> {
+  ): Promise<string> {
     // generate actions
     const action = multisigClient.encoding.updateMultisigVotingSettings(
       {
@@ -124,12 +124,11 @@ describe("Client Multisig", () => {
           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
           break;
         case ProposalCreationSteps.DONE:
-          expect(typeof step.proposalId).toBe("number");
+          expect(typeof step.proposalId).toBe("string");
+          expect(step.proposalId).toMatch(
+            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/,
+          );
           return step.proposalId;
-          // TODO
-        // update with new proposal id when contracts are ready
-        // expect(typeof step.proposalId).toBe("string");
-        // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
         default:
           throw new Error(
             "Unexpected proposal creation step: " +
@@ -140,13 +139,11 @@ describe("Client Multisig", () => {
     throw new Error();
   }
   async function approveProposal(
-    proposalId: number,
-    pluginAddress: string,
+    proposalId: string,
     client: MultisigClient,
   ) {
     const approveParams: ApproveMultisigProposalParams = {
       proposalId,
-      pluginAddress,
       tryExecution: false,
     };
     for await (const step of client.methods.approveProposal(approveParams)) {
@@ -190,8 +187,7 @@ describe("Client Multisig", () => {
       const proposalId = await buildProposal(pluginAddress, client);
       const canApproveParams: CanApproveParams = {
         proposalId,
-        addressOrEns: TEST_WALLET_ADDRESS,
-        pluginAddress,
+        approverAddressOrEns: TEST_WALLET_ADDRESS,
       };
       // positive
       let canApprove = await client.methods.canApprove(canApproveParams);
@@ -199,7 +195,7 @@ describe("Client Multisig", () => {
       expect(canApprove).toBe(true);
 
       // negative
-      canApproveParams.addressOrEns =
+      canApproveParams.approverAddressOrEns =
         "0x0000000000000000000000000000000000000000";
       canApprove = await client.methods.canApprove(canApproveParams);
       expect(typeof canApprove).toBe("boolean");
@@ -216,7 +212,7 @@ describe("Client Multisig", () => {
       const { plugin: pluginAddress } = await buildDao();
 
       const proposalId = await buildProposal(pluginAddress, client);
-      await approveProposal(proposalId, pluginAddress, client);
+      await approveProposal(proposalId, client);
     });
   });
 
@@ -229,18 +225,14 @@ describe("Client Multisig", () => {
       const { plugin: pluginAddress } = await buildDao();
 
       const proposalId = await buildProposal(pluginAddress, client);
-      const canExecuteParams: CanExecuteParams = {
-        proposalId,
-        pluginAddress,
-      };
-      let canExecute = await client.methods.canExecute(canExecuteParams);
+      let canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(false);
 
       // now approve
-      await approveProposal(proposalId, pluginAddress, client);
+      await approveProposal(proposalId, client);
 
-      canExecute = await client.methods.canExecute(canExecuteParams);
+      canExecute = await client.methods.canExecute(proposalId);
       expect(typeof canExecute).toBe("boolean");
       expect(canExecute).toBe(true);
     });
@@ -255,14 +247,11 @@ describe("Client Multisig", () => {
       const { plugin: pluginAddress } = await buildDao();
 
       const proposalId = await buildProposal(pluginAddress, client);
-      await approveProposal(proposalId, pluginAddress, client);
+      await approveProposal(proposalId, client);
 
       for await (
         const step of client.methods.executeProposal(
-          {
-            pluginAddress,
-            proposalId,
-          },
+          proposalId,
         )
       ) {
         switch (step.key) {
@@ -340,7 +329,7 @@ describe("Client Multisig", () => {
       }
       expect(proposal.id).toBe(proposalId);
       expect(typeof proposal.id).toBe("string");
-      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
+      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/i);
       expect(typeof proposal.dao.address).toBe("string");
       expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
       expect(typeof proposal.dao.name).toBe("string");
@@ -375,11 +364,18 @@ describe("Client Multisig", () => {
       }
       for (const approval of proposal.approvals) {
         expect(typeof approval).toBe("string");
-        expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{40}$/i);
+        expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
       }
-      if (proposal.executionTxHash) {
+      if (
+        proposal.executionTxHash && proposal.executionDate &&
+        proposal.executionBlockNumber
+      ) {
         expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+        expect(proposal.executionDate instanceof Date).toBe(true);
+        expect(typeof proposal.executionBlockNumber).toBe("number");
       }
+      expect(typeof proposal.settings.minApprovals).toBe("number");
+      expect(typeof proposal.settings.onlyListed).toBe("boolean");
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
       const ctx = new Context(contextParamsMainnet);
@@ -415,8 +411,14 @@ describe("Client Multisig", () => {
         expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         expect(typeof proposal.metadata.title).toBe("string");
         expect(typeof proposal.metadata.summary).toBe("string");
-        expect(typeof proposal.approvals).toBe("number");
-        expect(proposal.approvals >= 0).toBe(true);
+        expect(proposal.startDate instanceof Date).toBe(true);
+        expect(proposal.endDate instanceof Date).toBe(true);
+        for (const approval of proposal.approvals) {
+          expect(typeof approval).toBe("string");
+          expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        }
+        expect(typeof proposal.settings.minApprovals).toBe("number");
+        expect(typeof proposal.settings.onlyListed).toBe("boolean");
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {

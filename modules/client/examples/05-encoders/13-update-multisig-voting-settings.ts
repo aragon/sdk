@@ -22,7 +22,7 @@ const updateMinApprovals: UpdateMultisigVotingSettingsParams = {
     minApprovals: 2,
     onlyListed: false
   },
-  pluginAddress: "0x0987654321098765432109876543210987654321" // The address of the Multisig plugin contract itself.
+  pluginAddress: "0x0987654321098765432109876543210987654321" // the address of the Multisig plugin contract installed in the DAO
 };
 
 // Updates the voting configuration of a Multisig plugin installed in a DAO.

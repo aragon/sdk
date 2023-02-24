@@ -28,10 +28,10 @@
 **Kind**: global class  
 
 * [TokenVotingClient](#TokenVotingClient)
-    * [.getPluginInstallItem(params)](#TokenVotingClient.getPluginInstallItem) ⇒ <code>\*</code>
+    * [.getPluginInstallItem(params, [network])](#TokenVotingClient.getPluginInstallItem) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#createProposal(params)](#TokenVotingClient.TokenVotingClientMethods+createProposal) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#voteProposal(params, vote)](#TokenVotingClient.TokenVotingClientMethods+voteProposal) ⇒ <code>\*</code>
-    * [.TokenVotingClientMethods#executeProposal(params)](#TokenVotingClient.TokenVotingClientMethods+executeProposal) ⇒ <code>\*</code>
+    * [.TokenVotingClientMethods#executeProposal(proposalId)](#TokenVotingClient.TokenVotingClientMethods+executeProposal) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#getMembers(pluginAddress)](#TokenVotingClient.TokenVotingClientMethods+getMembers) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#getProposal(proposalId)](#TokenVotingClient.TokenVotingClientMethods+getProposal) ⇒ <code>\*</code>
     * [.TokenVotingClientMethods#getProposals(params)](#TokenVotingClient.TokenVotingClientMethods+getProposals) ⇒ <code>\*</code>
@@ -40,16 +40,17 @@
 
 <a name="TokenVotingClient.getPluginInstallItem"></a>
 
-### TokenVotingClient.getPluginInstallItem(params) ⇒ <code>\*</code>
+### TokenVotingClient.getPluginInstallItem(params, [network]) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
 **Returns**: <code>\*</code> - <p>{IPluginInstallItem}</p>  
 
-| Param | Type |
-| --- | --- |
-| params | <code>ITokenVotingPluginInstall</code> | 
+| Param | Type | Default |
+| --- | --- | --- |
+| params | <code>ITokenVotingPluginInstall</code> |  | 
+| [network] | <code>SupportedNetworks</code> | <code>&quot;mainnet&quot;</code> | 
 
 <a name="TokenVotingClient.TokenVotingClientMethods+createProposal"></a>
 
@@ -57,11 +58,11 @@ so that the plugin is configured</p>
 <p>Creates a new proposal on the given TokenVoting plugin contract</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<ProposalCreationStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<ProposalCreationStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
-| params | <code>ICreateProposalParams</code> | 
+| params | <code>CreateMajorityVotingProposalParams</code> | 
 
 <a name="TokenVotingClient.TokenVotingClientMethods+voteProposal"></a>
 
@@ -69,7 +70,7 @@ so that the plugin is configured</p>
 <p>Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<VoteProposalStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<VoteProposalStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -78,15 +79,15 @@ so that the plugin is configured</p>
 
 <a name="TokenVotingClient.TokenVotingClientMethods+executeProposal"></a>
 
-### TokenVotingClient.TokenVotingClientMethods#executeProposal(params) ⇒ <code>\*</code>
+### TokenVotingClient.TokenVotingClientMethods#executeProposal(proposalId) ⇒ <code>\*</code>
 <p>Executes the given proposal, provided that it has already passed</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{AsyncGenerator<ExecuteProposalStepValue>}</p>  
+**Returns**: <code>\*</code> - <p>`{AsyncGenerator<ExecuteProposalStepValue>}`</p>  
 
 | Param | Type |
 | --- | --- |
-| params | <code>IExecuteProposalParams</code> | 
+| proposalId | <code>string</code> | 
 
 <a name="TokenVotingClient.TokenVotingClientMethods+getMembers"></a>
 
@@ -106,7 +107,7 @@ so that the plugin is configured</p>
 <p>Returns the details of the given proposal</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{Promise<TokenVotingProposal>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<TokenVotingProposal>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -130,7 +131,7 @@ so that the plugin is configured</p>
 <p>Returns the settings of a plugin given the address of the plugin instance</p>
 
 **Kind**: static method of [<code>TokenVotingClient</code>](#TokenVotingClient)  
-**Returns**: <code>\*</code> - <p>{Promise<VotingSettings>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<VotingSettings>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -208,7 +209,7 @@ so that the plugin is configured</p>
         * [.updatePluginSettingsAction(pluginAddress, params)](#TokenVotingClientEncoding+updatePluginSettingsAction) ⇒ <code>\*</code>
         * [.mintTokenAction(minterAddress, params)](#TokenVotingClientEncoding+mintTokenAction) ⇒ <code>\*</code>
     * _static_
-        * [.getPluginInstallItem(params)](#TokenVotingClientEncoding.getPluginInstallItem) ⇒ <code>\*</code>
+        * [.getPluginInstallItem(params, network)](#TokenVotingClientEncoding.getPluginInstallItem) ⇒ <code>\*</code>
 
 <a name="TokenVotingClientEncoding+updatePluginSettingsAction"></a>
 
@@ -238,7 +239,7 @@ so that the plugin is configured</p>
 
 <a name="TokenVotingClientEncoding.getPluginInstallItem"></a>
 
-### TokenVotingClientEncoding.getPluginInstallItem(params) ⇒ <code>\*</code>
+### TokenVotingClientEncoding.getPluginInstallItem(params, network) ⇒ <code>\*</code>
 <p>Computes the parameters to be given when creating the DAO,
 so that the plugin is configured</p>
 
@@ -248,6 +249,7 @@ so that the plugin is configured</p>
 | Param | Type |
 | --- | --- |
 | params | <code>ITokenVotingPluginInstall</code> | 
+| network | <code>SupportedNetworks</code> | 
 
 <a name="TokenVotingClientEstimation"></a>
 
@@ -259,7 +261,7 @@ so that the plugin is configured</p>
 * [TokenVotingClientEstimation](#TokenVotingClientEstimation)
     * [.createProposal(params)](#TokenVotingClientEstimation+createProposal) ⇒ <code>\*</code>
     * [.voteProposal(params)](#TokenVotingClientEstimation+voteProposal) ⇒ <code>\*</code>
-    * [.executeProposal(params)](#TokenVotingClientEstimation+executeProposal) ⇒ <code>\*</code>
+    * [.executeProposal(proposalId)](#TokenVotingClientEstimation+executeProposal) ⇒ <code>\*</code>
 
 <a name="TokenVotingClientEstimation+createProposal"></a>
 
@@ -267,11 +269,11 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of creating a proposal on the plugin</p>
 
 **Kind**: instance method of [<code>TokenVotingClientEstimation</code>](#TokenVotingClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
-| params | <code>ICreateProposalParams</code> | 
+| params | <code>CreateMajorityVotingProposalParams</code> | 
 
 <a name="TokenVotingClientEstimation+voteProposal"></a>
 
@@ -279,7 +281,7 @@ so that the plugin is configured</p>
 <p>Estimates the gas fee of casting a vote on a proposal</p>
 
 **Kind**: instance method of [<code>TokenVotingClientEstimation</code>](#TokenVotingClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
@@ -287,15 +289,15 @@ so that the plugin is configured</p>
 
 <a name="TokenVotingClientEstimation+executeProposal"></a>
 
-### tokenVotingClientEstimation.executeProposal(params) ⇒ <code>\*</code>
+### tokenVotingClientEstimation.executeProposal(proposalId) ⇒ <code>\*</code>
 <p>Estimates the gas fee of executing a TokenVoting proposal</p>
 
 **Kind**: instance method of [<code>TokenVotingClientEstimation</code>](#TokenVotingClientEstimation)  
-**Returns**: <code>\*</code> - <p>{Promise<GasFeeEstimation>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<GasFeeEstimation>}`</p>  
 
 | Param | Type |
 | --- | --- |
-| params | <code>IExecuteProposalParams</code> | 
+| proposalId | <code>string</code> | 
 
 <a name="TokenVotingClientMethods"></a>
 
@@ -303,17 +305,34 @@ so that the plugin is configured</p>
 <p>Methods module the SDK TokenVoting Client</p>
 
 **Kind**: global class  
+
+* [TokenVotingClientMethods](#TokenVotingClientMethods)
+    * [.canVote(params)](#TokenVotingClientMethods+canVote) ⇒ <code>\*</code>
+    * [.canExecute(proposalId)](#TokenVotingClientMethods+canExecute) ⇒ <code>\*</code>
+
 <a name="TokenVotingClientMethods+canVote"></a>
 
 ### tokenVotingClientMethods.canVote(params) ⇒ <code>\*</code>
 <p>Checks if an user can vote in a proposal</p>
 
 **Kind**: instance method of [<code>TokenVotingClientMethods</code>](#TokenVotingClientMethods)  
-**Returns**: <code>\*</code> - <p>{Promise<boolean>}</p>  
+**Returns**: <code>\*</code> - <p>`{Promise<boolean>}`</p>  
 
 | Param | Type |
 | --- | --- |
-| params | <code>ICanVoteParams</code> | 
+| params | <code>CanVoteParams</code> | 
+
+<a name="TokenVotingClientMethods+canExecute"></a>
+
+### tokenVotingClientMethods.canExecute(proposalId) ⇒ <code>\*</code>
+<p>Checks whether the current proposal can be executed</p>
+
+**Kind**: instance method of [<code>TokenVotingClientMethods</code>](#TokenVotingClientMethods)  
+**Returns**: <code>\*</code> - <p>`{Promise<boolean>}`</p>  
+
+| Param | Type |
+| --- | --- |
+| proposalId | <code>string</code> | 
 
 <a name="SubgraphTokenType"></a>
 

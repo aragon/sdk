@@ -19,23 +19,24 @@ import { context } from "../00-setup/00-getting-started";
 // Create a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an AddresslistVoting client from the aragonOSx SDK context.
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-// Create a proposal with an action to be executed upon proposal approval.
-const configActionPrarms: VotingSettings = {
+// [Optional] You can add encoded actions to the proposal. These actions are the encoded transactions which will be executed when a transaction passes.
+// In this example, we are updating the plugin settings as an action that you may want upon a proposal approval.
+const configActionParams: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
-  votingMode: VotingMode.EARLY_EXECUTION // default STANDARD, otherwise EARLY_EXECUTION or VOTE_REPLACEMENT
+  votingMode: VotingMode.EARLY_EXECUTION // alternatively, STANDARD or VOTE_REPLACEMENT
 };
 
 const pluginAddress = "0x1234567890123456789012345678901234567890"; // the address of the plugin contract itself
 
 // Sets up the action instructions based on the above parameters.
 const configAction = addresslistVotingClient.encoding.updatePluginSettingsAction(
-  pluginAddress,
-  configActionPrarms
+  configActionParams,
+  pluginAddress
 );
 
 const daoMetadata: ProposalMetadata = {
@@ -58,12 +59,12 @@ const daoMetadata: ProposalMetadata = {
   },
 };
 
-const metadataUri = await addresslistVotingClient.methods.pinMetadata(daoMetadata);
+const metadataUri: string = await addresslistVotingClient.methods.pinMetadata(daoMetadata);
 
 const proposalParams: ICreateProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the plugin contract itself
+  pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the AddresslistVoting plugin contract installed in the DAO
   metadataUri,
-  actions: [configAction],
+  actions: [configAction], // the action you want to have executed upon a proposal approval
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
@@ -71,6 +72,7 @@ const proposalParams: ICreateProposalParams = {
 };
 
 const steps = addresslistVotingClient.methods.createProposal(proposalParams);
+
 for await (const step of steps) {
   try {
     switch (step.key) {

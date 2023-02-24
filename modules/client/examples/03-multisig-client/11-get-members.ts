@@ -1,7 +1,7 @@
 /* MARKDOWN
 ### Get the list of members (Multisig)
 
-Retrieves the list of addresses able to participate in a Multisig proposal for a given DAO that has the Multisig plugin installed.
+Gets the list of addresses able to participate in a Multisig proposal for a given DAO that has the Multisig plugin installed.
 */
 
 import {

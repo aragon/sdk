@@ -1,10 +1,14 @@
 import {
+  AssetBalance,
   ContractPermissionParams,
+  ContractPermissionWithConditionParams,
   DaoDetails,
   DaoListItem,
   DaoMetadata,
   DepositErc20Params,
   DepositEthParams,
+  GrantPermissionWithConditionDecodedParams,
+  GrantPermissionWithConditionParams,
   IGrantPermissionDecodedParams,
   IGrantPermissionParams,
   InstalledPluginListItem,
@@ -18,7 +22,6 @@ import {
   SubgraphPluginTypeMap,
   SubgraphTransferListItem,
   SubgraphTransferType,
-  AssetBalance,
   TokenType,
   Transfer,
   TransferType,
@@ -46,7 +49,7 @@ export function toDaoDetails(
 ): DaoDetails {
   return {
     address: dao.id,
-    ensDomain: dao.subdomain,
+    ensDomain: dao.subdomain + ".dao.eth",
     metadata: {
       name: metadata.name,
       description: metadata.description,
@@ -81,7 +84,7 @@ export function toDaoListItem(
 ): DaoListItem {
   return {
     address: dao.id,
-    ensDomain: dao.subdomain,
+    ensDomain: dao.subdomain + ".dao.eth",
     metadata: {
       name: metadata.name,
       description: metadata.description,
@@ -189,7 +192,7 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
       transactionId: transfer.txHash,
       to: transfer.to,
       from: transfer.from,
-      proposalId: transfer.proposal.id || "",
+      proposalId: transfer.proposal?.id || "",
     };
   } else {
     if (transfer.type === SubgraphTransferType.DEPOSIT) {
@@ -223,7 +226,7 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
       transactionId: transfer.txHash,
       to: transfer.to,
       from: transfer.from,
-      proposalId: transfer.proposal.id || "",
+      proposalId: transfer.proposal?.id || "",
     };
   }
 }
@@ -232,6 +235,18 @@ export function permissionParamsToContract(
   params: IGrantPermissionParams | IRevokePermissionParams,
 ): ContractPermissionParams {
   return [params.where, params.who, keccak256(toUtf8Bytes(params.permission))];
+}
+export function permissionWithConditionParamsToContract(
+  params: GrantPermissionWithConditionParams,
+): ContractPermissionWithConditionParams {
+  return [
+    ...permissionParamsToContract({
+      who: params.who,
+      where: params.where,
+      permission: params.permission,
+    }),
+    params.condition,
+  ];
 }
 
 export function permissionParamsFromContract(
@@ -244,6 +259,14 @@ export function permissionParamsFromContract(
     permission: Object.keys(PermissionIds)
       .find((k) => PermissionIds[k] === result[2])
       ?.replace(/_ID$/, "") || "",
+  };
+}
+export function permissionParamsWitConditionFromContract(
+  result: Result,
+): GrantPermissionWithConditionDecodedParams {
+  return {
+    ...permissionParamsFromContract(result),
+    condition: result[3],
   };
 }
 

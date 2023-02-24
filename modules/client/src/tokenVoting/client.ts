@@ -11,6 +11,7 @@ import { TokenVotingClientEncoding } from "./internal/client/encoding";
 import { TokenVotingClientDecoding } from "./internal/client/decoding";
 import { TokenVotingClientEstimation } from "./internal/client/estimation";
 import {
+  SupportedNetworks,
   ClientCore,
   ContextPlugin,
   IPluginInstallItem,
@@ -54,12 +55,14 @@ export class TokenVotingClient extends ClientCore
      * so that the plugin is configured
      *
      * @param {ITokenVotingPluginInstall} params
+     * @param {SupportedNetworks} [network="mainnet"]
      * @return {*}  {IPluginInstallItem}
      * @memberof TokenVotingClient
      */
     getPluginInstallItem: (
       params: ITokenVotingPluginInstall,
+      network: SupportedNetworks = "mainnet",
     ): IPluginInstallItem =>
-      TokenVotingClientEncoding.getPluginInstallItem(params),
+      TokenVotingClientEncoding.getPluginInstallItem(params, network),
   };
 }

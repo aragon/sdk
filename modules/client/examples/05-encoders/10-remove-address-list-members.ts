@@ -14,7 +14,7 @@ import { context } from "../00-setup/00-getting-started";
 // Instantiate a plugin context from the aragonOSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate an AddresslistVoting client.
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 // Addresses to remove from the AddressList plugin.
 const members: string[] = [
@@ -23,7 +23,7 @@ const members: string[] = [
   "0x0987654321098765432109876543210987654321"
 ];
 
-const pluginAddress: string = "0x0987654321098765432109876543210987654321"; // the address of the plugin contract itself.
+const pluginAddress: string = "0x0987654321098765432109876543210987654321"; // the address of the AddresslistVoting plugin contract installed in the DAO
 
 const removeMembersAction: DaoAction = addresslistVotingClient.encoding.removeMembersAction(pluginAddress, members);
 console.log({ removeMembersAction });

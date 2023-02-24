@@ -14,12 +14,11 @@ import { context } from "../00-setup/00-getting-started";
 // Instantiate a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client.
-const client = new MultisigClient(contextPlugin);
+const client: MultisigClient = new MultisigClient(contextPlugin);
 
 const canApproveParams: CanApproveParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
   addressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: BigInt(0)
+  pluginAddress: "0x1234567890123456789012345678901234567890"
 };
 
 // Checks whether the signer of the transaction can approve a given proposal.
@@ -30,6 +29,6 @@ console.log({ canApprove });
 Returns:
 
 ```javascript
-true
+  { canApprove: true }
 ```
 */

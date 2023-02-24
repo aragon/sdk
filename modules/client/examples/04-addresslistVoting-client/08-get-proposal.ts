@@ -1,22 +1,22 @@
 /* MARKDOWN
 ### Get the proposal by proposalId (Addresslist)
 
-Retrieves a proposal created using the AddresslistVoting plugin.
+Gets a proposal created using the AddresslistVoting plugin.
 */
 
 import {
-  AddresslistVotingProposal,
   AddresslistVotingClient,
+  AddresslistVotingProposal,
   ContextPlugin
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiates a plugin context from the aragonOSx SDK context.
+// Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddresslistVoting client.
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const proposalId = "0x12345...";
+const proposalId: string = "0x123456789012345678901234567890123456789090x0";
 
 const addresslistVotingProposal: AddresslistVotingProposal | null = await addresslistVotingClient.methods.getProposal(proposalId);
 console.log({ addresslistVotingProposal });
@@ -26,7 +26,7 @@ Returns:
 
 ```json
 {
-  id: "0x12345...",
+  id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"
@@ -71,8 +71,8 @@ Returns:
     abstain: 0
   }
   settings: {
-    minTurnout: 0.5,
-    minSupport: 0.25,
+    minParticipation: 0.5,
+    supportThreshold: 0.25,
     minDuration: 7200
   },
   votes: [

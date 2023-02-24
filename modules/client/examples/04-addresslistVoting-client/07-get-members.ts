@@ -1,24 +1,25 @@
 /* MARKDOWN
 ### Get list of members (AddresslistVoting)
 
-Retrieves an array of all addresses able to vote in a specific AddresslistVoting DAO proposal.
+Gets an array of all addresses able to vote in a specific AddresslistVoting DAO proposal.
 */
 
-import { AddresslistVotingClient, Context, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiates a plugin context from the aragonOSx SDK context.
+// Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddressList client.
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const daoAddressorEns = "0x12345..."; // or my-dao.dao.eth
+const daoAddressorEns = "0x12345382947301297439127433492834"; // or my-dao.dao.eth
 
 const members: string[] = await addresslistVotingClient.methods.getMembers(daoAddressorEns);
-console.log(members);
+console.log({ members });
 
 /* MARKDOWN
 Returns:
+
 ```json
 [
   "0x1234567890123456789012345678901234567890",

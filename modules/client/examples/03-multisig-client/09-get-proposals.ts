@@ -24,7 +24,7 @@ const queryParams: IProposalQueryParams = {
   skip: 0, // optional
   limit: 10, // optional
   direction: SortDirection.ASC, // optional. otherwise, DESC
-  sortBy: ProposalSortBy.POPULARITY, //optional. otherwise, CREATED_AT, NAME, VOTES
+  sortBy: ProposalSortBy.CREATED_AT, //optional. otherwise, NAME, VOTES (POPULARITY coming soon)
   status: ProposalStatus.ACTIVE, // optional. otherwise, PENDING, SUCCEEDED, EXECUTED, DEFEATED
   daoAddressOrEns: "0x1234348529348570294650287698237520938574284357" // or my-dao.dao.eth
 };

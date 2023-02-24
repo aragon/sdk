@@ -1,9 +1,7 @@
 /* MARKDOWN
-### Depositing ETH to a DAO
+### Deposit ETH to a DAO
 
-Handles the flow of depositing the native token to an Aragon DAO.
-
-Handles the flow of depositing the native EVM token (when in mainnet, it's ETH) to an aragonOSx DAO.
+Handles the flow of depositing the native EVM token (when in mainnet, it's ETH) to an Aragon OSx DAO.
 */
 
 import {
@@ -15,7 +13,7 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate the general purpose client from the aragonOSx SDK context.
+// Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 const depositParams: DepositParams = {

@@ -7,7 +7,6 @@ Gets the list of proposals created using the AddresslistVoting plugin.
 import {
   AddresslistVotingProposalListItem,
   AddresslistVotingClient,
-  Context,
   ContextPlugin,
   IProposalQueryParams,
   ProposalSortBy,
@@ -19,14 +18,14 @@ import { context } from "../00-setup/00-getting-started";
 // Instantiate a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate an AddresslistVoting client.
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
-  sortBy: ProposalSortBy.POPULARITY, //optional
-  status: ProposalStatus.ACTIVE, // optional
+  sortBy: ProposalSortBy.CREATED_AT, //optional, alternatively NAME, VOTES (POPULARITY coming soon)
+  status: ProposalStatus.ACTIVE, // optional, alternatively PENDING, SUCCEEDED, EXECUTED, DEFEATED
 };
 
 const addresslistVotingProposals: AddresslistVotingProposalListItem[] = await addresslistVotingClient.methods.getProposals(queryParams);

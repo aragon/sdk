@@ -1,7 +1,7 @@
 /* MARKDOWN
 ### Get a plugin's settings (TokenVoting)
 
-Retrieves the settings used when installing the `TokenVoting` plugin.
+Gets the settings defined for a specific TokenVoting plugin governance mechanism installed in a DAO.
 */
 
 import {
@@ -13,7 +13,6 @@ import { context } from "../00-setup/00-getting-started";
 
 // Instantiate a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
 // Create an Addresslist Client
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 

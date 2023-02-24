@@ -8,11 +8,11 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import {
   contextParamsLocalChain,
+  contextParamsMainnet,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
   TEST_NO_BALANCES_DAO_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
-  contextParamsMainnet,
   // TEST_WALLET,
 } from "../constants";
 import {
@@ -24,7 +24,7 @@ import {
   DaoDepositSteps,
   DaoSortBy,
   DepositParams,
-  EnsureAllowanceParams,
+  UpdateAllowanceParams,
   IAddresslistVotingPluginInstall,
   IDaoQueryParams,
   IHasPermissionParams,
@@ -36,10 +36,7 @@ import {
   TransferType,
   VotingMode,
 } from "../../../src";
-import {
-  MissingExecPermissionError,
-  Random,
-} from "@aragon/sdk-common";
+import { MissingExecPermissionError, Random } from "@aragon/sdk-common";
 import { ContractFactory } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../../../src/internal/abi/erc20";
 import { isAddress } from "@ethersproject/address";
@@ -207,14 +204,14 @@ describe("Client", () => {
         const client = new Client(context);
         const tokenContract = await deployErc20(client);
         const amount = BigInt("1000000000000000000");
-        const ensureAllowanceParams: EnsureAllowanceParams = {
+        const updateAllowanceParams: UpdateAllowanceParams = {
           daoAddressOrEns: daoAddress,
           amount,
           tokenAddress: tokenContract.address,
         };
 
         for await (
-          const step of client.methods.ensureAllowance(ensureAllowanceParams)
+          const step of client.methods.updateAllowance(updateAllowanceParams)
         ) {
           switch (step.key) {
             case DaoDepositSteps.CHECKED_ALLOWANCE:
@@ -521,9 +518,21 @@ describe("Client", () => {
             expect(transfer.to).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
             expect(transfer.transactionId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             if (transfer.tokenType === TokenType.NATIVE) {
-              expect(transfer.amount).toBeGreaterThan(BigInt(0));
-              expect(typeof transfer.amount).toBe("bigint");
-            } else {
+              if (transfer.type === TransferType.DEPOSIT) {
+                // ETH deposit
+                expect(isAddress(transfer.from)).toBe(true);
+              } else if (transfer.type === TransferType.WITHDRAW) {
+                // ETH withdraw
+                expect(isAddress(transfer.to)).toBe(true);
+                if (transfer.proposalId) {
+                  expect(transfer.proposalId).toMatch(
+                    /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/i,
+                  );
+                }
+              } else {
+                fail("invalid transfer type");
+              }
+            } else if (transfer.tokenType === TokenType.ERC20) {
               expect(isAddress(transfer.token.address)).toBe(true);
               expect(typeof transfer.token.address).toBe("string");
               expect(transfer.token.address).toBeInstanceOf(
@@ -531,9 +540,17 @@ describe("Client", () => {
               );
               expect(typeof transfer.token.name).toBe("string");
               expect(typeof transfer.token.symbol).toBe("string");
-              if (transfer.tokenType === TokenType.ERC20) {
-                expect(typeof transfer.amount).toBe("bigint");
-                expect(typeof transfer.token.decimals).toBe("number");
+              if (transfer.type === TransferType.DEPOSIT) {
+                // ERC20 deposit
+                expect(isAddress(transfer.from)).toBe(true);
+              } else if (transfer.type === TransferType.WITHDRAW) {
+                // ERC20 withdraw
+                expect(isAddress(transfer.to)).toBe(true);
+                expect(transfer.proposalId).toMatch(
+                  /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/i,
+                );
+              } else {
+                fail("invalid transfer type");
               }
             }
           }

@@ -1,10 +1,11 @@
 /* MARKDOWN
 ## Multisig governance plugin
 
-The Mutisig plugin is a governance mechanism which establishes that x amount of signers must approve a proposal in order for it to pass.
+The Mutisig plugin is a governance mechanism which enables x amount of signers to approve a proposal in order for it to pass.
 It establishes a minimum approval threshold and a list of addresses which are allowed to vote.
 
-### Creating a DAO with a Multisig plugin
+### Create a DAO with a Multisig plugin installed
+
 In order to create a DAO with a Multisig plugin, you will need to first instantiate the Multisig plugin client, then use it when creating your DAO.
 */
 
@@ -37,7 +38,8 @@ const multisigIntallParams: MultisigPluginInstallParams = {
   members
 }
 
-const multisigInstallPluginItem = MultisigClient.encoding.getPluginInstallItem(multisigIntallParams);
+// Encodes the parameters of the Multisig plugin. These will get used in the installation plugin for the DAO.
+const multisigInstallPluginEncodedParams = MultisigClient.encoding.getPluginInstallItem(multisigIntallParams);
 
 // Pin metadata to IPFS, returns IPFS CID string.
 const metadataUri: string = await client.methods.pinMetadata({
@@ -53,7 +55,7 @@ const metadataUri: string = await client.methods.pinMetadata({
 const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [multisigInstallPluginItem]
+  plugins: [multisigInstallPluginEncodedParams]
 };
 
 // Estimate gas for the transaction.

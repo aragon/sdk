@@ -1,12 +1,15 @@
 import {
   boolArrayToBitmap,
+  decodeProposalId,
   decodeRatio,
+  encodeProposalId,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidProposalIdError,
   IpfsPinError,
+  isProposalId,
   NoProviderError,
   NoSignerError,
   ProposalCreationError,
@@ -21,16 +24,14 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../interfaces";
 import {
-  CanExecuteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  ICanVoteParams,
-  ICreateProposalParams,
-  IExecuteProposalParams,
+  CanVoteParams,
+  CreateMajorityVotingProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -59,7 +60,6 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Methods module the SDK Address List Client
@@ -74,12 +74,12 @@ export class AddresslistVotingClientMethods extends ClientCore
   /**
    * Creates a new proposal on the given AddressList plugin contract
    *
-   * @param {ICreateProposalParams} params
+   * @param {CreateMajorityVotingProposalParams} params
    * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
    * @memberof AddresslistVotingClientMethods
    */
   public async *createProposal(
-    params: ICreateProposalParams,
+    params: CreateMajorityVotingProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -136,15 +136,14 @@ export class AddresslistVotingClientMethods extends ClientCore
     }
 
     const parsedLog = addresslistContractInterface.parseLog(log);
-    const proposalId: BigNumber = parsedLog.args["proposalId"];
+    const proposalId = parsedLog.args["proposalId"];
     if (!proposalId) {
       throw new ProposalCreationError();
     }
 
     yield {
       key: ProposalCreationSteps.DONE,
-      // TODO remove this when new proposal format
-      proposalId: proposalId.toNumber(),
+      proposalId: encodeProposalId(params.pluginAddress, Number(proposalId)),
     };
   }
 
@@ -181,13 +180,15 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
+
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
 
     const tx = await addresslistContract.vote(
-      params.proposalId,
+      id,
       params.vote,
       false,
     );
@@ -207,12 +208,12 @@ export class AddresslistVotingClientMethods extends ClientCore
   /**
    * Executes the given proposal, provided that it has already passed
    *
-   * @param {IExecuteProposalParams} params
+   * @param {string} proposalId
    * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
    * @memberof AddresslistVotingClientMethods
    */
   public async *executeProposal(
-    params: IExecuteProposalParams,
+    proposalId: string,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -221,11 +222,13 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
 
+    const { pluginAddress, id } = decodeProposalId(proposalId);
+
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
-    const tx = await addresslistContract.execute(params.proposalId);
+    const tx = await addresslistContract.execute(id);
 
     yield {
       key: ExecuteProposalStep.EXECUTING,
@@ -239,37 +242,39 @@ export class AddresslistVotingClientMethods extends ClientCore
   /**
    * Checks if an user can vote in a proposal
    *
-   * @param {ICanVoteParams} params
+   * @param {CanVoteParams} params
    * @return {*}  {Promise<boolean>}
    * @memberof AddresslistVotingClientMethods
    */
-  public async canVote(params: ICanVoteParams): Promise<boolean> {
+  public async canVote(params: CanVoteParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer.provider) {
       throw new NoProviderError();
-    } else if (!isAddress(params.address) || !isAddress(params.pluginAddress)) {
+    } else if (!isAddress(params.voterAddressOrEns)) {
       throw new InvalidAddressError();
     }
 
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
+
     const addresslistContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+      pluginAddress,
       signer,
     );
     return addresslistContract.callStatic.canVote(
-      params.proposalId,
-      params.address,
+      id,
+      params.voterAddressOrEns,
       params.vote,
     );
   }
   /**
    * Checks whether the current proposal can be executed
    *
-   * @param {string} addressOrEns
+   * @param {string} proposalId
    * @return {*}  {Promise<boolean>}
-   * @memberof MultisigClientMethods
+   * @memberof AddresslistVotingClientMethods
    */
   public async canExecute(
-    params: CanExecuteParams,
+    proposalId: string,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -277,17 +282,15 @@ export class AddresslistVotingClientMethods extends ClientCore
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // use yup
-    if (!isAddress(params.pluginAddress)) {
-      throw new InvalidAddressError();
-    }
-    const multisigContract = AddresslistVoting__factory.connect(
-      params.pluginAddress,
+
+    const { pluginAddress, id } = decodeProposalId(proposalId);
+
+    const addresslistContract = AddresslistVoting__factory.connect(
+      pluginAddress,
       signer,
     );
 
-    return multisigContract.canExecute(params.proposalId);
+    return addresslistContract.canExecute(id);
   }
   /**
    * Returns the list of wallet addresses with signing capabilities on the plugin
@@ -325,7 +328,7 @@ export class AddresslistVotingClientMethods extends ClientCore
   public async getProposal(
     proposalId: string,
   ): Promise<AddresslistVotingProposal | null> {
-    if (!proposalId) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
     try {

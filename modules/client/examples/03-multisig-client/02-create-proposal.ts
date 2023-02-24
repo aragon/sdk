@@ -1,7 +1,7 @@
 /* MARKDOWN
 ### Create a Multisig proposal
 
-Creates a proposal whose governance mechanism is the Multisig plugin and its configuration.
+Creates a proposal whose governance mechanism is the Multisig plugin and its defined configuration.
 */
 
 import {
@@ -15,14 +15,14 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate an aragonOSx SDK client.
+// Instantiate an Aragon OSx SDK client.
 const client: Client = new Client(context);
-// Instantiate a plugin context from the aragonOSx SDK context.
+// Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Insantiate a Multisig plugin client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const metadata: ProposalMetadata = {
+const proposalMetadata: ProposalMetadata = {
   title: "Test Proposal",
   summary: "This is a short description",
   description: "This is a long description",
@@ -43,7 +43,7 @@ const metadata: ProposalMetadata = {
 };
 
 // Pins the metadata to IPFS and gets back an IPFS URI.
-const ipfsUri: string = await multisigClient.methods.pinMetadata(metadata);
+const metadataUri: string = await multisigClient.methods.pinMetadata(proposalMetadata);
 
 const withdrawParams: IWithdrawParams = {
   recipientAddress: "0x1234567890123456789012345678901234567890", // address of the receiver of the transaction
@@ -55,17 +55,18 @@ const withdrawParams: IWithdrawParams = {
 // Address of the DAO where the proposal will be created.
 const daoAddress: string = "0x1234567890123456789012345678901234567890";
 
-// Encodes the acction of withdrawing assets from a given DAO's vault and transfers them over to the recipient address.
+// Encodes the action of withdrawing assets from a given DAO's vault and transfers them over to the recipient address.
 const withdrawAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
 
 const proposalParams: CreateMultisigProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri: ipfsUri,
-  actions: [withdrawAction]
+  metadataUri,
+  actions: [withdrawAction] // optional - if left as an empty array, no action will be set for the proposal. the action needs to be encoded and will be executed once a proposal passes.
 };
 
 // Generates a proposal with the withdraw action as passed in the proposalParams.
 const steps = multisigClient.methods.createProposal(proposalParams);
+
 for await (const step of steps) {
   try {
     switch (step.key) {

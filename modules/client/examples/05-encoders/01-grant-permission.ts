@@ -6,12 +6,13 @@ Grants permission to an address (`who`) to perform an action (`permission`) on a
 
 import {
   Client,
+  DaoAction,
   IGrantPermissionParams,
   Permissions
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiates a general purpose Client from the aragonOSx SDK context.
+// Instantiates a general purpose Client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 const grantParams: IGrantPermissionParams = {
@@ -22,7 +23,7 @@ const grantParams: IGrantPermissionParams = {
 
 const daoAddress: string = "0x1234567890123456789012345678901234567890";
 
-const grantPermission = await client.encoding.grantAction(daoAddress, grantParams);
+const grantPermission: DaoAction = await client.encoding.grantAction(daoAddress, grantParams);
 console.log({ grantPermission });
 
 /* MARKDOWN

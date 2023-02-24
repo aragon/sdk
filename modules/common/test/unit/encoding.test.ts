@@ -6,7 +6,9 @@ import {
   bufferLeToBigInt,
   bufferToBigInt,
   bytesToHex,
+  decodeProposalId,
   decodeRatio,
+  encodeProposalId,
   encodeRatio,
   ensure0x,
   hexToBytes,
@@ -25,6 +27,7 @@ describe("Value encoding", () => {
         serializedBuffer: "170,170,170,170,170,170,170,170",
       },
       { hex: "00", serializedBuffer: "0" },
+      { hex: "0x", serializedBuffer: "" },
       { hex: "10", serializedBuffer: "16" },
       { hex: "ff", serializedBuffer: "255" },
       { hex: "ffffffff", serializedBuffer: "255,255,255,255" },
@@ -342,6 +345,110 @@ describe("Value encoding", () => {
     );
     expect(() => decodeRatio(10 ** 2, 1)).toThrow("The value is out of range");
     expect(() => decodeRatio(10 ** 10, 9)).toThrow("The value is out of range");
+  });
+
+  it("Should encode a nonce-based proposalId", () => {
+    const entries = [
+      {
+        addr: "0x0000000000000000000000000000000000000000",
+        nonce: 0,
+        output:
+          "0x0000000000000000000000000000000000000000_0x0",
+      },
+      {
+        addr: "0x0000000000000000000000000000000000000000",
+        nonce: 1,
+        output:
+          "0x0000000000000000000000000000000000000000_0x1",
+      },
+      {
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 1,
+        output:
+          "0x1111111111111111111111111111111111111111_0x1",
+      },
+      {
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 10,
+        output:
+          "0x1111111111111111111111111111111111111111_0xa",
+      },
+      {
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 15,
+        output:
+          "0x1111111111111111111111111111111111111111_0xf",
+      },
+      {
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 16,
+        output:
+          "0x1111111111111111111111111111111111111111_0x10",
+      },
+      {
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 1 << 24,
+        output:
+          "0x1111111111111111111111111111111111111111_0x1000000",
+      },
+    ];
+
+    for (const entry of entries) {
+      expect(encodeProposalId(entry.addr, entry.nonce)).toBe(entry.output);
+    }
+  });
+
+  it("Should decode a nonce-based proposalId", () => {
+    const entries = [
+      {
+        input:
+          "0x0000000000000000000000000000000000000000_0x0",
+        addr: "0x0000000000000000000000000000000000000000",
+        nonce: 0,
+      },
+      {
+        input:
+          "0x0000000000000000000000000000000000000000_0x1",
+        addr: "0x0000000000000000000000000000000000000000",
+        nonce: 1,
+      },
+      {
+        input:
+          "0x1111111111111111111111111111111111111111_0x1",
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 1,
+      },
+      {
+        input:
+          "0x1111111111111111111111111111111111111111_0xa",
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 10,
+      },
+      {
+        input:
+          "0x1111111111111111111111111111111111111111_0xf",
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 15,
+      },
+      {
+        input:
+          "0x1111111111111111111111111111111111111111_0x10",
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 16,
+      },
+      {
+        input:
+          "0x1111111111111111111111111111111111111111_0x1000000",
+        addr: "0x1111111111111111111111111111111111111111",
+        nonce: 1 << 24,
+      },
+    ];
+
+    for (const entry of entries) {
+      const result = decodeProposalId(entry.input);
+      expect(result.pluginAddress).toBe(entry.addr);
+      expect(result.id).toBe(entry.nonce);
+    }
   });
 
   it("boolArrayToBitmap should transform a boolean array into a bigint bitmap", () => {

@@ -11,6 +11,7 @@ import { MultisigClientEncoding } from "./internal/client/encoding";
 import { MultisigClientDecoding } from "./internal/client/decoding";
 import { MultisigClientEstimation } from "./internal/client/estimation";
 import {
+  SupportedNetworks,
   ClientCore,
   ContextPlugin,
   IPluginInstallItem,
@@ -37,13 +38,16 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
      * Computes the parameters to be given when creating the DAO,
      * so that the plugin is configured
      *
-     * @param {string[]} members
+     * @param {MultisigPluginInstallParams} params
+     * @param {SupportedNetworks} [network="mainnet"]
      * @return {*}  {IPluginInstallItem}
      * @memberof MultisigClient
      */
+    
     getPluginInstallItem: (
       params: MultisigPluginInstallParams,
+      network: SupportedNetworks = "mainnet",
     ): IPluginInstallItem =>
-      MultisigClientEncoding.getPluginInstallItem(params),
+      MultisigClientEncoding.getPluginInstallItem(params, network),
   };
 }

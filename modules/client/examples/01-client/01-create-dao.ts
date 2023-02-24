@@ -1,7 +1,7 @@
 /* MARKDOWN
 ### Create a DAO
 
-The `createADao` function allows you to create a DAO with the given parameters.
+The `createDao` function allows you to create a DAO using the parameters you set for it.
 */
 
 import {
@@ -13,7 +13,7 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate the general purpose client from the aragonOSx SDK context.
+// Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 const metadata: DaoMetadata = {
@@ -32,7 +32,7 @@ const metadataUri = await client.methods.pinMetadata(metadata);
 const createDaoParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: []
+  plugins: [] // may be left as an empty array, but we recommend adding at least 1 governance plugin upon creation.
 };
 
 // Estimate how much gas the transaction will cost.
@@ -41,7 +41,6 @@ console.log({ avg: estimatedGas.average, maximum: estimatedGas.max });
 
 // Create the DAO.
 const steps = client.methods.createDao(createDaoParams);
-
 
 for await (const step of steps) {
   try {

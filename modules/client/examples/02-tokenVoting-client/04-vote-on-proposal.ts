@@ -1,7 +1,8 @@
 /* MARKDOWN
 ### Vote on a TokenVoting proposal
 
-Adds a vote to a proposal using the TokenVoting governance mechanism. The amount of votes generated depends on the amount of tokens a given address has.
+Adds a vote to a proposal using the TokenVoting governance mechanism.
+The amount of votes submitted depends on the amount of tokens the signer address has.
 */
 
 import {
@@ -27,6 +28,7 @@ const voteParams: IVoteProposalParams = {
 
 // Creates a vote on a given proposal created by the token voting governance mechanism.
 const steps = tokenVotingClient.methods.voteProposal(voteParams);
+
 for await (const step of steps) {
   try {
     switch (step.key) {

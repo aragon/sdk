@@ -18,7 +18,13 @@ import {
 import { contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { TokenType } from "../../../src/interfaces";
+import {
+  GrantPermissionWithConditionParams,
+  RegisterStandardCallbackParams,
+  TokenType,
+  UpgradeToAndCallParams,
+} from "../../../src/interfaces";
+import { bytesToHex } from "@aragon/sdk-common";
 
 describe("Client", () => {
   describe("Action decoders", () => {
@@ -271,6 +277,26 @@ describe("Client", () => {
       expect(iface?.hash).toBe("0xee57e36f");
     });
 
+    it("Should get the function for a withdraw action data", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params: WithdrawParams = {
+        type: TokenType.ERC20,
+        amount: BigInt(1),
+        tokenAddress: "0x1234567890123456789012345678901234567890",
+        recipientAddressOrEns: "0x2345678901234567890123456789012345678901"
+      };
+
+      const updateDaoMetadataAction = await client.encoding
+        .withdrawAction(
+          params,
+        );
+      const iface = client.decoding.findInterface(updateDaoMetadataAction.data);
+      expect(iface?.id).toBe("function transfer(address,uint256) returns (bool)");
+      expect(iface?.functionName).toBe("transfer");
+      expect(iface?.hash).toBe("0xa9059cbb");
+    });
+
     it("Should try to get the function of an invalid data and return null", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
@@ -328,6 +354,141 @@ describe("Client", () => {
         expect(decodedParams.links[index].name).toBe(params.links[index].name);
         expect(decodedParams.links[index].url).toBe(params.links[index].url);
       }
+    });
+    it("Should decode a grant with condition action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const expectedParams: GrantPermissionWithConditionParams = {
+        permission: Permissions.EXECUTE_PERMISSION,
+        condition: "0x3456789012345678901234567890123456789012",
+        where: "0x0987654321098765432109876543210987654321",
+        who: "0x0987654321098765432109876543210987654321",
+      };
+      const action = client.encoding.grantWithConditionAction(
+        "0x1234567890123456789012345678901234567890",
+        expectedParams,
+      );
+
+      const decodedParmas = client.decoding.grantWithConditionAction(
+        action.data,
+      );
+
+      expect(decodedParmas.condition).toBe(
+        expectedParams.condition,
+      );
+      expect(decodedParmas.where).toBe(
+        expectedParams.where,
+      );
+      expect(decodedParmas.who).toBe(
+        expectedParams.who,
+      );
+      expect(decodedParmas.permission).toBe(
+        expectedParams.permission,
+      );
+    });
+    it("Should decode a set Dao URI action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const daoUri = "https://dao.example.org";
+
+      const action = await client.encoding.setDaoUriAction(
+        "0x1234567890123456789012345678901234567890",
+        daoUri,
+      );
+      const decodedDaoUri = client.decoding.setDaoUriAction(
+        action.data,
+      );
+      expect(decodedDaoUri).toBe(
+        daoUri,
+      );
+    });
+    it("Should decode a register standard callback action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const expectedRegisterStandardCallbackParams:
+        RegisterStandardCallbackParams = {
+          interfaceId: "0x00000001",
+          callbackSelector: "0x00000001",
+          magicNumber: "0x00000001",
+        };
+
+      const action = await client.encoding.registerStandardCallbackAction(
+        "0x1234567890123456789012345678901234567890",
+        expectedRegisterStandardCallbackParams,
+      );
+      const decodedRegisterStandardCallbackParams = client.decoding
+        .registerStandardCallbackAction(action.data);
+      expect(decodedRegisterStandardCallbackParams.interfaceId).toBe(
+        expectedRegisterStandardCallbackParams.interfaceId,
+      );
+      expect(decodedRegisterStandardCallbackParams.callbackSelector).toBe(
+        expectedRegisterStandardCallbackParams.callbackSelector,
+      );
+      expect(decodedRegisterStandardCallbackParams.magicNumber).toBe(
+        expectedRegisterStandardCallbackParams.magicNumber,
+      );
+    });
+    it("Should decode a set signature validator action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const expectedValidatorAddress =
+        "0x1234567890123456789012345678901234567890";
+
+      const action = await client.encoding.setSignatureValidatorAction(
+        "0x1234567890123456789012345678901234567890",
+        expectedValidatorAddress,
+      );
+      const decodedValidatorAddress = client.decoding
+        .setSignatureValidatorAction(action.data);
+
+      expect(expectedValidatorAddress).toBe(
+        decodedValidatorAddress,
+      );
+    });
+    it("Should decode an update proxy implementation action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const expectedImplementationAddress =
+        "0x1234567890123456789012345678901234567890";
+
+      const action = await client.encoding.upgradeToAction(
+        "0x1234567890123456789012345678901234567890",
+        expectedImplementationAddress,
+      );
+
+      const decodedImplementationAddress = client.decoding
+        .upgradeToAction(action.data);
+
+      expect(expectedImplementationAddress).toBe(
+        decodedImplementationAddress,
+      );
+    });
+    it("Should decode an update proxy implementation and call action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const expectedUpgradeToAndCallParams: UpgradeToAndCallParams = {
+        implementationAddress: "0x1234567890123456789012345678901234567890",
+        data: new Uint8Array([0, 1, 2, 3]),
+      };
+
+      const action = await client.encoding.upgradeToAndCallAction(
+        "0x1234567890123456789012345678901234567890",
+        expectedUpgradeToAndCallParams,
+      );
+      const decodedUpgradeToAndCallParams = client.decoding
+        .upgradeToAndCallAction(action.data);
+
+      expect(expectedUpgradeToAndCallParams.implementationAddress).toBe(
+        decodedUpgradeToAndCallParams.implementationAddress,
+      );
+      expect(bytesToHex(expectedUpgradeToAndCallParams.data)).toBe(
+        bytesToHex(decodedUpgradeToAndCallParams.data),
+      );
     });
   });
 });

@@ -26,7 +26,7 @@ const members: string[] = [
 
 const addAddressesParams: AddAddressesParams = {
   members,
-  pluginAddress: "0x0987654321098765432109876543210987654321" // The address of the Multisig plugin contract itself.
+  pluginAddress: "0x0987654321098765432109876543210987654321" // the address of the Multisig plugin contract installed in the DAO
 };
 
 // Adds the addresses as members of the Multisig plugin for a DAO.

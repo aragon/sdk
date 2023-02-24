@@ -42,7 +42,7 @@ export const contextParams: ContextParams = {
   signer: new Wallet("private-key"),
   // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
   // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
-  daoFactoryAddress: "0x1234...",
+  daoFactoryAddress: "0x1234381072385710239847120734123847123",
   // Choose your Web3 provider: Cloudfare, Infura, Alchemy, etc.
   web3Providers: ["https://rpc.ankr.com/eth_goerli"],
   ipfsNodes: [

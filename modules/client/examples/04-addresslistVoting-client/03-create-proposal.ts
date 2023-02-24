@@ -1,20 +1,23 @@
 /* MARKDOWN
 ### Create a AddresslistVoting proposal
 
-Creates a proposal for a DAO with the AddresslistVoting plugin installed. Within this proposal, only addresses in the approved list of the AddresslistVoting plugin can vote.
+Creates a proposal for a DAO with the AddresslistVoting plugin installed.
+Within this proposal, only addresses in the approved list of the AddresslistVoting plugin can vote.
 */
 
 import {
   AddresslistVotingClient,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
+  VotingSettings,
+  VotingMode,
   VoteValues
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Create a plugin context from the aragonOSx SDK context.
+// Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an AddresslistVoting client.
 const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
@@ -39,11 +42,13 @@ const metadata: ProposalMetadata = {
   },
 };
 
-const ipfsUri = await addresslistVotingClient.methods.pinMetadata(metadata);
+const metadataUri: string = await addresslistVotingClient.methods.pinMetadata(metadata);
 
-const proposalParams: ICreateProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
-  metadataUri: ipfsUri,
+const pluginAddress = "0x1234567890123456789012345678901234567890"; // the address of the AddresslistVoting plugin installed into the DAO.
+
+const proposalParams: CreateMajorityVotingProposalParams = {
+  pluginAddress,
+  metadataUri,
   actions: [],
   failSafeActions: [],
   startDate: new Date(),
@@ -53,6 +58,7 @@ const proposalParams: ICreateProposalParams = {
 };
 
 const steps = addresslistVotingClient.methods.createProposal(proposalParams);
+
 for await (const step of steps) {
   try {
     switch (step.key) {

@@ -2,6 +2,7 @@
 ### Approve a multisig proposal
 
 A member of a Multisig plugin is an address that is able to give their approval for a transaction to go through.
+This function enables Multisig members to approve a proposal.
 */
 
 import {
@@ -18,12 +19,12 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
-  proposalId: BigInt(0),
-  pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the plugin contract itself.
+  proposalId: "0x123456789012345678901234567890123456789090x0",
   tryExecution: true
 };
 
 const steps = multisigClient.methods.approveProposal(approveParams);
+
 for await (const step of steps) {
   try {
     switch (step.key) {

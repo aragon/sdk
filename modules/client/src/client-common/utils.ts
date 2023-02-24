@@ -3,7 +3,7 @@ import { ContractReceipt } from "@ethersproject/contracts";
 import { VoteValues, VotingMode } from "../client-common/interfaces/plugin";
 import {
   IComputeStatusProposal,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalStatus,
 } from "./interfaces/plugin";
 
@@ -13,7 +13,7 @@ import { Log } from "@ethersproject/providers";
 import { InvalidVotingModeError } from "@aragon/sdk-common";
 
 export function unwrapProposalParams(
-  params: ICreateProposalParams,
+  params: CreateMajorityVotingProposalParams,
 ): [string, IDAO.ActionStruct[], number, number, boolean, number] {
   return [
     params.metadataUri,
@@ -77,11 +77,6 @@ export function computeProposalStatusFilter(
   return where;
 }
 
-export function isProposalId(propoosalId: string): boolean {
-  const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
-  return regex.test(propoosalId);
-}
-
 export function findLog(
   receipt: ContractReceipt,
   iface: Interface,
@@ -122,4 +117,3 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
       throw new InvalidVotingModeError();
   }
 }
-

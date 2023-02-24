@@ -6,13 +6,14 @@ Updates the configuration of a given TokenVoting plugin for a DAO.
 
 import {
   ContextPlugin,
+  DaoAction,
   TokenVotingClient,
   VotingMode,
   VotingSettings
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiates a plugin context from the aragonOSx SDK context.
+// Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates a TokenVoting client.
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
@@ -26,8 +27,8 @@ const configActionPrarms: VotingSettings = {
   votingMode: VotingMode.STANDARD, // default standard, otherwise EARLY_EXECUTION or VOTE_REPLACEMENT
 };
 
-const pluginAddress: string = "0x1234567890123456789012345678901234567890"; // the address of the plugin contract itself
+const pluginAddress: string = "0x1234567890123456789012345678901234567890"; // the address of the TokenVoting plugin contract installed in the DAO
 
 // Updates the configuration of a TokenVoting plugin for a DAO.
-const configAction = tokenVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionPrarms);
-console.log({ configAction });
+const updatePluginSettingsAction: DaoAction = tokenVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionPrarms);
+console.log({ updatePluginSettingsAction });

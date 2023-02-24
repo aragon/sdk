@@ -1,7 +1,8 @@
 /* MARKDOWN
 ### Create a TokenVoting proposal
 
-Create a proposal using the TokenVoting plugin. This proposal will be created using the governance mechanism of the TokenVoting plugin.
+Create a proposal using the TokenVoting plugin.
+This proposal will be created using the TokenVoting plugin as its governance mechanism.
 */
 
 import {
@@ -35,11 +36,11 @@ const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
 // Update the configuration of the plugin.
 const configAction = tokenVotingClient.encoding.updatePluginSettingsAction(
-  pluginAddress,
-  configActionParams
+  configActionParams,
+  pluginAddress
 );
 
-const metadataUri = await tokenVotingClient.methods.pinMetadata({
+const metadataUri: string = await tokenVotingClient.methods.pinMetadata({
   title: "Test proposal",
     summary: "This is a test proposal",
     description: "This is the description of a long test proposal",
@@ -56,9 +57,9 @@ const metadataUri = await tokenVotingClient.methods.pinMetadata({
 })
 
 const proposalParams: ICreateProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890",
+  pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the TokenVoting plugin contract containing all plugin logic.
   metadataUri,
-  actions: [configAction],
+  actions: [configAction], // optional, if none, leave an empty array `[]`
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
@@ -67,6 +68,7 @@ const proposalParams: ICreateProposalParams = {
 
 // Creates a proposal using the token voting governance mechanism, which executes with the parameters set in the configAction object.
 const steps = tokenVotingClient.methods.createProposal(proposalParams);
+
 for await (const step of steps) {
   try {
     switch (step.key) {

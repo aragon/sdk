@@ -1,7 +1,6 @@
 // This file contains the definitions of the AddressList DAO client
 
 import {
-  CanExecuteParams,
   CreateProposalBaseParams,
   DaoAction,
   ExecuteProposalStepValue,
@@ -26,10 +25,10 @@ export interface IMultisigClientMethods extends IClientCore {
     params: ApproveMultisigProposalParams,
   ) => AsyncGenerator<ApproveProposalStepValue>;
   executeProposal: (
-    params: ExecuteProposalParams,
+    proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   canApprove: (params: CanApproveParams) => Promise<boolean>;
-  canExecute: (params: CanExecuteParams) => Promise<boolean>;
+  canExecute: (proposalId: string) => Promise<boolean>;
   getVotingSettings: (
     addressOrEns: string,
   ) => Promise<MultisigVotingSettings>;
@@ -63,7 +62,7 @@ export interface IMultisigClientEstimation extends IClientCore {
     params: ApproveMultisigProposalParams,
   ) => Promise<GasFeeEstimation>;
   executeProposal: (
-    params: ExecuteProposalParams,
+    proposalId: string,
   ) => Promise<GasFeeEstimation>;
 }
 
@@ -107,14 +106,15 @@ export type CreateMultisigProposalParams = CreateProposalBaseParams & {
   endDate?: Date;
 };
 
-export type ApproveMultisigProposalParams = CanExecuteParams & {
+export type ApproveMultisigProposalParams = {
+  proposalId: string;
   tryExecution: boolean;
 };
 
-export type CanApproveParams = CanExecuteParams & {
-  addressOrEns: string;
+export type CanApproveParams = {
+  proposalId: string;
+  approverAddressOrEns: string;
 };
-export type ExecuteProposalParams = CanExecuteParams;
 
 export enum ApproveProposalStep {
   APPROVING = "approving",
@@ -127,27 +127,30 @@ export type ApproveProposalStepValue =
 
 type MultisigProposalBase = {
   id: string;
+  settings: MultisigVotingSettings;
   dao: {
     address: string;
     name: string;
   };
   creatorAddress: string;
   status: ProposalStatus;
+  startDate: Date;
+  endDate: Date;
+  approvals: string[];
 };
 
 export type MultisigProposalListItem = MultisigProposalBase & {
   metadata: ProposalMetadataSummary;
-  approvals: number;
 };
 
 export type MultisigProposal = MultisigProposalBase & {
   creationDate: Date;
+  creationBlockNumber: number;
+  executionDate: Date | null;
+  executionBlockNumber: number | null;
+  executionTxHash: string | null;
   metadata: ProposalMetadata;
   actions: DaoAction[];
-  approvals: string[];
-  startDate: Date;
-  endDate: Date;
-  executionTxHash: string;
 };
 
 type SubgraphProposalBase = {
@@ -161,18 +164,24 @@ type SubgraphProposalBase = {
   executed: boolean;
   createdAt: string;
   startDate: string;
+  endDate: string;
 };
 
-export type SubgraphMultisigProposalListItem = SubgraphProposalBase & {
-  approvals: string;
+
+export type SubgraphMultisigProposalBase = SubgraphProposalBase & {
+  plugin: SubgraphMultisigVotingSettings;
+  approvers: { id: string }[];
+  // TODO change on subgraph fix
+  // approvers: SubgraphMultisigApproversListItem[];
 };
-export type SubgraphMultisigProposal = SubgraphProposalBase & {
-  createdAt: string;
-  startDate: string;
-  endDate: string;
+
+export type SubgraphMultisigProposalListItem = SubgraphMultisigProposalBase 
+export type SubgraphMultisigProposal = SubgraphMultisigProposalBase & {
   actions: SubgraphAction[];
-  approvers: SubgraphMultisigApproversListItem[];
   executionTxHash: string;
+  executionDate: string;
+  executionBlockNumber: string;
+  creationBlockNumber: string;
 };
 
 export type SubgraphMultisigApproversListItem = {
@@ -180,7 +189,7 @@ export type SubgraphMultisigApproversListItem = {
 };
 
 export type SubgraphMultisigVotingSettings = {
-  minApprovals: string; // TODO: Should be now a number?
+  minApprovals: string;
   onlyListed: boolean;
 };
 

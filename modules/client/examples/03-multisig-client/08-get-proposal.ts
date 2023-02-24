@@ -1,7 +1,7 @@
 /* MARKDOWN
-### Get a given proposal made by a Multisig plugin
+### Get a proposal (Multisig plugin)
 
-Retrieves the proposal details of a given proposal made using the Multisig plugin.
+Get the proposal details of a given proposal made using the Multisig plugin.
 */
 
 import {
@@ -16,7 +16,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const proposalId: string = "0x12345...";
+const proposalId: string = "0x123456789012345678901234567890123456789080x0";
 
 const proposalDetails: MultisigProposal | null = await multisigClient.methods.getProposal(proposalId);
 console.log({ proposalDetails });
@@ -26,7 +26,7 @@ Returns:
 
 ```json
 {
-  id: "0x12345...",
+  id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"

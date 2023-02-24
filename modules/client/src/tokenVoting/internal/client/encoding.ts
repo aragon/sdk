@@ -1,10 +1,16 @@
-import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
+import {
+  hexToBytes,
+  InvalidAddressError,
+  UnsupportedNetworkError,
+} from "@aragon/sdk-common";
 import {
   ClientCore,
   ContextPlugin,
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
+  SupportedNetworks,
+  SupportedNetworksArray,
   VotingSettings,
 } from "../../../client-common";
 import { isAddress } from "@ethersproject/address";
@@ -13,7 +19,6 @@ import {
   ITokenVotingClientEncoding,
   ITokenVotingPluginInstall,
 } from "../../interfaces";
-import { TOKEN_VOTING_PLUGIN_ID } from "../constants";
 import {
   IERC20MintableUpgradeable__factory,
 } from "@aragon/core-contracts-ethers";
@@ -22,6 +27,7 @@ import {
   tokenVotingInitParamsToContract,
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { LIVE_CONTRACTS } from "../../../client-common/constants";
 
 /**
  * Encoding module the SDK TokenVoting Client
@@ -38,12 +44,17 @@ export class TokenVotingClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {ITokenVotingPluginInstall} params
+   * @param {SupportedNetworks} network
    * @return {*}  {IPluginInstallItem}
    * @memberof TokenVotingClientEncoding
    */
   static getPluginInstallItem(
     params: ITokenVotingPluginInstall,
+    network: SupportedNetworks,
   ): IPluginInstallItem {
+    if (!SupportedNetworksArray.includes(network)) {
+      throw new UnsupportedNetworkError(network);
+    }
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
       // ["votingMode","supportThreshold", "minParticipation", "minDuration"], ["address","name","symbol"][ "receivers","amount"]
@@ -55,7 +66,7 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      id: TOKEN_VOTING_PLUGIN_ID,
+      id: LIVE_CONTRACTS[network].tokenVotingRepo,
       data: hexToBytes(hexBytes),
     };
   }

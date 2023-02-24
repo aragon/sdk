@@ -1,17 +1,12 @@
-// @ts-ignore
-declare const describe, it, beforeAll, afterAll, expect, test;
-
 // mocks need to be at the top of the imports
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import {
-  CanExecuteParams,
   Context,
   ContextPlugin,
   ExecuteProposalStep,
-  ICanVoteParams,
-  ICreateProposalParams,
-  IExecuteProposalParams,
+  CanVoteParams,
+  CreateMajorityVotingProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -123,7 +118,7 @@ describe("Token Voting Client", () => {
     const ipfsUri = await client.methods.pinMetadata(metadata);
     const endDate = new Date(Date.now() + 60 * 60 * 1000 + 10 * 1000);
 
-    const proposalParams: ICreateProposalParams = {
+    const proposalParams: CreateMajorityVotingProposalParams = {
       pluginAddress,
       metadataUri: ipfsUri,
       actions: [action],
@@ -138,10 +133,11 @@ describe("Token Voting Client", () => {
           expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
           break;
         case ProposalCreationSteps.DONE:
-          expect(typeof step.proposalId).toBe("number");
+          expect(typeof step.proposalId).toBe("string");
+          expect(step.proposalId).toMatch(
+            /^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/,
+          );
           return step.proposalId;
-        // TODO fix with new proposalId format
-        // expect(step.proposalId).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
         default:
           throw new Error(
             "Unexpected proposal creation step: " +
@@ -153,13 +149,11 @@ describe("Token Voting Client", () => {
   }
 
   async function voteProposal(
-    pluginAddress: string,
-    proposalId: number,
+    proposalId: string,
     client: TokenVotingClient,
     voteValue: VoteValues = VoteValues.YES,
   ) {
     const voteParams: IVoteProposalParams = {
-      pluginAddress,
       proposalId,
       vote: voteValue,
     };
@@ -195,7 +189,8 @@ describe("Token Voting Client", () => {
           }
 
           const proposalId = await buildProposal(pluginAddress, client);
-          expect(typeof proposalId).toBe("number");
+          expect(typeof proposalId).toBe("string");
+          expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
         }
       });
     });
@@ -215,12 +210,12 @@ describe("Token Voting Client", () => {
           }
 
           const proposalId = await buildProposal(pluginAddress, client);
-          expect(typeof proposalId).toBe("number");
+          expect(typeof proposalId).toBe("string");
+          expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-          const params: ICanVoteParams = {
-            address: TEST_WALLET_ADDRESS,
+          const params: CanVoteParams = {
+            voterAddressOrEns: TEST_WALLET_ADDRESS,
             proposalId,
-            pluginAddress,
             vote: VoteValues.YES,
           };
           const canVote = await client.methods.canVote(params);
@@ -245,10 +240,11 @@ describe("Token Voting Client", () => {
           }
 
           const proposalId = await buildProposal(pluginAddress, client);
-          expect(typeof proposalId).toBe("number");
+          expect(typeof proposalId).toBe("string");
+          expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
           // Vote
-          await voteProposal(pluginAddress, proposalId, client);
+          await voteProposal(proposalId, client);
         }
       });
 
@@ -266,12 +262,13 @@ describe("Token Voting Client", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         // Vote
-        await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+        await voteProposal(proposalId, client, VoteValues.NO);
         await mineBlock(provider);
-        await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+        await voteProposal(proposalId, client, VoteValues.YES);
       });
     });
 
@@ -290,22 +287,19 @@ describe("Token Voting Client", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-        const canExecuteParams: CanExecuteParams = {
-          proposalId,
-          pluginAddress,
-        };
-        let canExecute = await client.methods.canExecute(canExecuteParams);
+        let canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(false);
 
         // now approve
-        await voteProposal(pluginAddress, proposalId, client);
+        await voteProposal(proposalId, client);
         // Force date past end
         await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
-        canExecute = await client.methods.canExecute(canExecuteParams);
+        canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(true);
       });
@@ -324,21 +318,18 @@ describe("Token Voting Client", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-        const canExecuteParams: CanExecuteParams = {
-          proposalId,
-          pluginAddress,
-        };
-        let canExecute = await client.methods.canExecute(canExecuteParams);
+        let canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(false);
 
         // now approve
-        await voteProposal(pluginAddress, proposalId, client);
+        await voteProposal(proposalId, client);
         // No waiting
 
-        canExecute = await client.methods.canExecute(canExecuteParams);
+        canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(true);
       });
@@ -357,30 +348,27 @@ describe("Token Voting Client", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
-        const canExecuteParams: CanExecuteParams = {
-          proposalId,
-          pluginAddress,
-        };
-        let canExecute = await client.methods.canExecute(canExecuteParams);
+        let canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(false);
 
         // vote no
-        await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+        await voteProposal(proposalId, client, VoteValues.NO);
 
-        canExecute = await client.methods.canExecute(canExecuteParams);
+        canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(false);
 
         // now approve
-        await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+        await voteProposal(proposalId, client, VoteValues.YES);
 
         // Force date past end
         await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
-        canExecute = await client.methods.canExecute(canExecuteParams);
+        canExecute = await client.methods.canExecute(proposalId);
         expect(typeof canExecute).toBe("boolean");
         expect(canExecute).toBe(true);
       });
@@ -401,21 +389,18 @@ describe("Token Voting Client", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         // Vote
-        await voteProposal(pluginAddress, proposalId, client);
+        await voteProposal(proposalId, client);
         // Force date past end
         await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
         // Execute
-        const executeParams: IExecuteProposalParams = {
-          pluginAddress,
-          proposalId,
-        };
         for await (
           const step of client.methods.executeProposal(
-            executeParams,
+            proposalId,
           )
         ) {
           switch (step.key) {
@@ -448,20 +433,17 @@ describe("Token Voting Client", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         // Vote
-        await voteProposal(pluginAddress, proposalId, client);
+        await voteProposal(proposalId, client);
         // No waiting here
 
         // Execute
-        const executeParams: IExecuteProposalParams = {
-          pluginAddress,
-          proposalId,
-        };
         for await (
           const step of client.methods.executeProposal(
-            executeParams,
+            proposalId,
           )
         ) {
           switch (step.key) {
@@ -494,23 +476,20 @@ describe("Token Voting Client", () => {
         }
 
         const proposalId = await buildProposal(pluginAddress, client);
-        expect(typeof proposalId).toBe("number");
+        expect(typeof proposalId).toBe("string");
+        expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
 
         // Vote
-        await voteProposal(pluginAddress, proposalId, client, VoteValues.NO);
+        await voteProposal(proposalId, client, VoteValues.NO);
         await mineBlock(provider);
-        await voteProposal(pluginAddress, proposalId, client, VoteValues.YES);
+        await voteProposal(proposalId, client, VoteValues.YES);
         // Force date past end
         await mineBlockWithTimeOffset(provider, 2 * 60 * 60);
 
         // Execute
-        const executeParams: IExecuteProposalParams = {
-          pluginAddress,
-          proposalId,
-        };
         for await (
           const step of client.methods.executeProposal(
-            executeParams,
+            proposalId,
           )
         ) {
           switch (step.key) {
@@ -536,17 +515,15 @@ describe("Token Voting Client", () => {
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
-        const pluginAddress = TEST_TOKEN_VOTING_PLUGIN_ADDRESS;
-        const wallets = await client.methods.getMembers(pluginAddress);
+        const wallets = await client.methods.getMembers(
+          TEST_TOKEN_VOTING_PLUGIN_ADDRESS,
+        );
 
         expect(Array.isArray(wallets)).toBe(true);
-        // TODO
-        // for some reason subgraph does not have
-        // addresses here
-        if (wallets.length > 0) {
-          expect(wallets.length).TobeGr(0);
-          expect(typeof wallets[0]).toBe("string");
-          expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+        expect(wallets.length).toBeGreaterThan(0);
+        for (const wallet of wallets) {
+          expect(typeof wallet).toBe("string");
+          expect(wallet).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
         }
       });
       it("Should fetch the given proposal", async () => {
@@ -606,8 +583,6 @@ describe("Token Voting Client", () => {
           expect(proposal.endDate instanceof Date).toBe(true);
           expect(proposal.creationDate instanceof Date).toBe(true);
           expect(typeof proposal.creationBlockNumber === "number").toBe(true);
-          expect(proposal.executionDate instanceof Date).toBe(true);
-          expect(typeof proposal.executionBlockNumber === "number").toBe(true);
           expect(Array.isArray(proposal.actions)).toBe(true);
           // actions
           for (let i = 0; i < proposal.actions.length; i++) {
@@ -622,15 +597,15 @@ describe("Token Voting Client", () => {
           expect(typeof proposal.result.abstain).toBe("bigint");
           // setttings
           expect(typeof proposal.settings.duration).toBe("number");
-          expect(typeof proposal.settings.minSupport).toBe("number");
-          expect(typeof proposal.settings.minTurnout).toBe("number");
+          expect(typeof proposal.settings.supportThreshold).toBe("number");
+          expect(typeof proposal.settings.minParticipation).toBe("number");
           expect(
-            proposal.settings.minSupport >= 0 &&
-              proposal.settings.minSupport <= 1,
+            proposal.settings.supportThreshold >= 0 &&
+              proposal.settings.supportThreshold <= 1,
           ).toBe(true);
           expect(
-            proposal.settings.minTurnout >= 0 &&
-              proposal.settings.minTurnout <= 1,
+            proposal.settings.minParticipation >= 0 &&
+              proposal.settings.minParticipation <= 1,
           ).toBe(true);
           // token
           if (proposal.token) {
@@ -655,8 +630,15 @@ describe("Token Voting Client", () => {
             expect(typeof vote.weight).toBe("bigint");
             expect(typeof vote.voteReplaced).toBe("boolean");
           }
-          if (proposal.executionTxHash) {
+          if (
+            proposal.executionDate && proposal.executionBlockNumber &&
+            proposal.executionTxHash
+          ) {
             expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            expect(proposal.executionDate instanceof Date).toBe(true);
+            expect(typeof proposal.executionBlockNumber === "number").toBe(
+              true,
+            );
           }
         }
       });
@@ -710,6 +692,7 @@ describe("Token Voting Client", () => {
           expect(proposal.startDate instanceof Date).toBe(true);
           expect(proposal.endDate instanceof Date).toBe(true);
           expect(proposal.status).toBe(status);
+          expect(typeof proposal.totalVotingWeight).toBe("bigint");
           // result
           expect(typeof proposal.result.yes).toBe("bigint");
           expect(typeof proposal.result.no).toBe("bigint");

@@ -6,6 +6,7 @@ Revokes a permission to a given address (`who`) to perform an action on a contra
 
 import {
   Client,
+  DaoAction,
   IRevokePermissionParams,
   Permissions
 } from "@aragon/sdk-client";
@@ -23,7 +24,7 @@ const revokeParams: IRevokePermissionParams = {
 const daoAddress: string = "0x1234567890123456789012345678901234567890";
 
 // Revokes a permission to a given address to perform an action on a contract.
-const revokePermission = await client.encoding.revokeAction(daoAddress, revokeParams);
+const revokePermission: DaoAction = await client.encoding.revokeAction(daoAddress, revokeParams);
 console.log({ revokePermission });
 
 /* MARKDOWN

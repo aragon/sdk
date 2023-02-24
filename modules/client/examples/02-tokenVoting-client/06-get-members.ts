@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Get members in a DAO (TokenVoting)
+### Get members in a DAO (with the TokenVoting plugin installed)
 
 Returns an array with the addresses of all the members of a specific DAO which has the TokenVoting plugin installed.
 */
@@ -9,7 +9,6 @@ import { context } from "../00-setup/00-getting-started";
 
 // Instantiate a plugin context from the aragonOSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
 // Create a TokenVoting client
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
