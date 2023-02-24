@@ -61,7 +61,6 @@
   },
   "dependencies": {
     "@aragon/core-contracts-ethers": "^0.7.1-alpha",
-    "@aragon/sdk-client": "^0.20.0-beta",
     "@aragon/sdk-common": "^0.10.0-beta",
     "@aragon/sdk-ipfs": "^0.2.0-alpha",
     "@ethersproject/abstract-signer": "^5.5.0",

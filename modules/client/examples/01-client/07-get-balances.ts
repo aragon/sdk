@@ -14,7 +14,7 @@ const client: Client = new Client(context);
 const daoAddressOrEns: string = "0x12345...";
 
 // Get a DAO's asset balances.
-const daoBalances: AssetBalance[] | null = await client.methods.getDaoBalances(daoAddressOrEns);
+const daoBalances: AssetBalance[] | null = await client.methods.getDaoBalances({ daoAddressOrEns });
 console.log({ daoBalances });
 
 /* MARKDOWN

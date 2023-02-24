@@ -22,7 +22,7 @@ const params: IMintTokenParams = {
   amount: BigInt(10) // amount of tokens they will receive
 };
 
-const minterAddress: string = "0x0987654321098765432109876543210987654321"; // if not provided, the default minter (Open Zeppellin's ERC20 contract) will be used.
+const minterAddress: string = "0x0987654321098765432109876543210987654321"; // the contract address of the token to mint
 
 const mintTokenAction: DaoAction = tokenVotingClient.encoding.mintTokenAction(minterAddress, params);
 console.log({ mintTokenAction });

@@ -34,13 +34,15 @@ const createDaoParams: CreateDaoParams = {
   ensSubdomain: "my-org", // my-org.dao.eth
   plugins: []
 };
-const steps = client.methods.createDao(createDaoParams);
 
 // Estimate how much gas the transaction will cost.
 const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createDaoParams);
 console.log({ avg: estimatedGas.average, maximum: estimatedGas.max });
 
 // Create the DAO.
+const steps = client.methods.createDao(createDaoParams);
+
+
 for await (const step of steps) {
   try {
     switch (step.key) {

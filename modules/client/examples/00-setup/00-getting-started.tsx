@@ -65,11 +65,10 @@ export const context: Context = new Context(contextParams);
 
 /* MARKDOWN
 Update the context with new parameters if you wish to throughout your app.
+*/
 
-```tsx
 context.set({ network: 1 });
 context.set({ signer: new Wallet("private key") }); // if you're using wagmi library, you can also get the signer through their [`useSigner` method](https://wagmi.sh/react/hooks/useSigner) inside a `useEffect` hook.
 context.setFull(contextParams);
-```
-*/
+
 
