@@ -167,15 +167,15 @@ type SubgraphProposalBase = {
   endDate: string;
 };
 
-
 export type SubgraphMultisigProposalBase = SubgraphProposalBase & {
   plugin: SubgraphMultisigVotingSettings;
+  executable: boolean;
   approvers: { id: string }[];
   // TODO change on subgraph fix
   // approvers: SubgraphMultisigApproversListItem[];
 };
 
-export type SubgraphMultisigProposalListItem = SubgraphMultisigProposalBase 
+export type SubgraphMultisigProposalListItem = SubgraphMultisigProposalBase;
 export type SubgraphMultisigProposal = SubgraphMultisigProposalBase & {
   actions: SubgraphAction[];
   executionTxHash: string;
