@@ -175,7 +175,7 @@ export async function deploy(): Promise<Deployment> {
       .PluginSetupProcessor__factory();
     const pluginSetupProcessor = await pluginSetupProcessorFacotry
       .connect(deployOwnerWallet)
-      .deploy(managingDaoInstance.address, pluginRepoRegistryInstance.address);
+      .deploy(pluginRepoRegistryInstance.address);
 
     // DAO Factory
     const daoFactoryfactory = new aragonContracts.DAOFactory__factory();
@@ -411,7 +411,7 @@ export async function createAddresslistDAO(
 
   const dummyMetadata = {
     metadata: "0x",
-    name,
+    subdomain: name,
     trustedForwarder: AddressZero,
     daoURI: "0x",
   };
@@ -491,7 +491,7 @@ export async function createTokenVotingDAO(
     deployment.daoFactory,
     {
       metadata: "0x",
-      name,
+      subdomain: name,
       trustedForwarder: AddressZero,
       daoURI: "0x",
     },
@@ -530,7 +530,7 @@ export async function createMultisigDAO(
       deployment.daoFactory,
       {
         metadata: "0x",
-        name: name,
+        subdomain: name,
         trustedForwarder: AddressZero,
         daoURI: "ipfs://...",
       },

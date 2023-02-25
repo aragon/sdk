@@ -76,7 +76,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
 
     const gasEstimation = await daoInstance.estimateGas.createDao(
       {
-        name: params.ensSubdomain,
+        subdomain: params.ensSubdomain,
         metadata: toUtf8Bytes(params.metadataUri),
         daoURI: params.daoUri || "",
         trustedForwarder: params.trustedForwarder || AddressZero,
