@@ -92,13 +92,13 @@ describe("Context instances", () => {
   });
   it("Should create a context with the correct DAOFactory address from the core-contracts-package", () => {
     contextParams.daoFactoryAddress = "";
-    contextParams.network = "rinkeby";
+    contextParams.network = "goerli";
     const context = new Context(contextParams);
 
     expect(context).toBeInstanceOf(Context);
-    expect(context.network).toEqual("rinkeby");
+    expect(context.network).toEqual("goerli");
     expect(context.daoFactoryAddress).toEqual(
-      activeContractsList.rinkeby.DAOFactory,
+      activeContractsList.goerli.DAOFactory,
     );
   });
 });

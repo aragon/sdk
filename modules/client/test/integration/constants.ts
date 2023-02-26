@@ -39,7 +39,7 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/core-goerli/version/v0.9.3-alpha-old-contr-sig-executable/api",
+        "https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-goerli/api",
     },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],
@@ -51,32 +51,31 @@ export const TEST_WALLET =
 
 // Token
 export const TEST_TOKEN_VOTING_DAO_ADDRESS =
-  "0xa1f85ddcf03ee9ac3eb3db66c0e056555a27b264";
+  "0x968ea45062ca6e5bd3799d8c4e11edc3c754efcc";
 export const TEST_TOKEN_VOTING_PLUGIN_ADDRESS =
-  "0x3b3ecc3007eb3cb29055d016259cb1e4399816e7";
+  "0x8a5188778239bc28adfabcc16187bdd48a60b191";
 export const TEST_TOKEN_VOTING_PROPOSAL_ID = TEST_TOKEN_VOTING_PLUGIN_ADDRESS +
   "_0x0";
 
 // Address List
 export const TEST_ADDRESSLIST_DAO_ADDDRESS =
-  "0xe263986b1c7984b4add5278bb331a40718d1d6ee";
+  "0x8317b5e06bb8eb2708878a507126af116b2bf74a";
 export const TEST_ADDRESSLIST_PLUGIN_ADDRESS =
-  "0x0e58ac69de79403a4ba8a378bda0e0225f89153a";
+  "0xeb56564b617b093b60b2d5734481cf400780e37b";
 export const TEST_ADDRESSLIST_PROPOSAL_ID = TEST_ADDRESSLIST_PLUGIN_ADDRESS +
   "_0x0";
 
 // Multisig
 export const TEST_MULTISIG_DAO_ADDRESS =
-  "0x1fc6bf066b5ce34a205db03dcd1abbfb509a5041";
+  "0x11ce7e748965fa6b0367a98174c8affeaaf5bd0a";
 export const TEST_MULTISIG_PLUGIN_ADDRESS =
-  "0x7c2a3fea43bc12f6b53e75e6d42ecc232becb031";
+  "0xbad39bda1f40b613ae9ec5fc2dcccf08c17cdee1";
 export const TEST_MULTISIG_PROPOSAL_ID = TEST_MULTISIG_PLUGIN_ADDRESS +
   "_0x0";
 
 export const TEST_DAO_ADDRESS = TEST_TOKEN_VOTING_DAO_ADDRESS;
 // TODO FIX
-export const TEST_NO_BALANCES_DAO_ADDRESS =
-  "0x95acd075a4519edb30d4138d0fafea2d1a1f74e6";
+export const TEST_NO_BALANCES_DAO_ADDRESS = TEST_MULTISIG_DAO_ADDRESS;
 export const TEST_INVALID_ADDRESS = "0x1nv4l1d_4ddr355";
 export const TEST_NON_EXISTING_ADDRESS =
   "0x1234567890123456789012345678901234567890";
