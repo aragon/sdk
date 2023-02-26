@@ -4,6 +4,7 @@ export {
   TokenVotingProposalListItem,
   TokenVotingProposalResult,
   Erc20TokenDetails,
+  Erc721TokenDetails,
   ITokenVotingPluginInstall,
   IMintTokenParams,
 } from "./interfaces";
