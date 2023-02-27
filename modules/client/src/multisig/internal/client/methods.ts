@@ -2,6 +2,7 @@ import {
   boolArrayToBitmap,
   decodeProposalId,
   encodeProposalId,
+  getExtendedProposalId,
   GraphQLError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -364,12 +365,13 @@ export class MultisigClientMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
+      const extendedProposalId = getExtendedProposalId(proposalId);
       const {
         multisigProposal,
       }: {
         multisigProposal: SubgraphMultisigProposal;
       } = await client.request(QueryMultisigProposal, {
-        proposalId,
+        proposalId: extendedProposalId,
       });
       if (!multisigProposal) {
         return null;

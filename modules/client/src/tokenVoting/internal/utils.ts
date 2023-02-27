@@ -27,7 +27,7 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
-import { decodeRatio, hexToBytes } from "@aragon/sdk-common";
+import { decodeRatio, getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
 import { TokenType } from "../../interfaces";
 
 export function toTokenVotingProposal(
@@ -52,7 +52,7 @@ export function toTokenVotingProposal(
   }
   const token = parseToken(proposal.plugin.token);
   return {
-    id: proposal.id,
+    id: getCompactProposalId(proposal.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
@@ -123,7 +123,7 @@ export function toTokenVotingProposalListItem(
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   const token = parseToken(proposal.plugin.token);
   return {
-    id: proposal.id,
+    id: getCompactProposalId(proposal.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,

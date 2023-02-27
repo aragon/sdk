@@ -1,4 +1,4 @@
-import { hexToBytes } from "@aragon/sdk-common";
+import { getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
   DaoAction,
@@ -31,7 +31,7 @@ export function toMultisigProposal(
     )
     : null;
   return {
-    id: proposal.id,
+    id: getCompactProposalId(proposal.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
@@ -81,7 +81,7 @@ export function toMultisigProposalListItem(
     parseInt(proposal.endDate) * 1000,
   );
   return {
-    id: proposal.id,
+    id: getCompactProposalId(proposal.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,

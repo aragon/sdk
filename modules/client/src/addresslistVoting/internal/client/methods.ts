@@ -3,6 +3,7 @@ import {
   decodeProposalId,
   decodeRatio,
   encodeProposalId,
+  getExtendedProposalId,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -334,12 +335,13 @@ export class AddresslistVotingClientMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
+      const extendedProposalId = getExtendedProposalId(proposalId)
       const {
         addresslistVotingProposal,
       }: {
         addresslistVotingProposal: SubgraphAddresslistVotingProposal;
       } = await client.request(QueryAddresslistVotingProposal, {
-        proposalId,
+        proposalId: extendedProposalId,
       });
       if (!addresslistVotingProposal) {
         return null;
