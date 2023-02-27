@@ -13,6 +13,9 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [0.23.1-beta]
+### Fixed
+- Adapt sdk to new subgraph proposalIds
 ## [0.23.0-beta]
 ### Changed
 - Upgrade contracts to version 0.8.0

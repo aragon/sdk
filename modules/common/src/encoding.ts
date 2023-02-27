@@ -1,4 +1,5 @@
 import { isProposalId } from "./utils";
+import { hexZeroPad } from "@ethersproject/bytes";
 
 /** Decodes a hex string and returns it as a buffer */
 export function hexToBytes(hexString: string): Uint8Array {
@@ -132,6 +133,23 @@ export function decodeProposalId(
     id: parseInt(strip0x(matchedRegexResult[2]), 16),
   };
 }
+
+/** Gets the extended version of a proposal id from the compact one */
+export const getExtendedProposalId = (proposalId: string): string => {
+  if (!proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/)) {
+    throw new Error("Invalid proposalId");
+  }
+  const splits = proposalId.split("_");
+  return splits[0].toLowerCase() + "_" + hexZeroPad(splits[1], 32);
+};
+/** Gets the compact version of a proposal id from the extended one */
+export const getCompactProposalId = (proposalId: string): string => {
+  if (!proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/)) {
+    throw new Error("Invalid proposalId");
+  }
+  const splits = proposalId.split("_");
+  return splits[0].toLowerCase() + "_0x" + parseInt(splits[1]).toString(16);
+};
 
 /** Transforms an array of booleans into a bitmap big integer */
 export function boolArrayToBitmap(bools?: Array<boolean>) {
