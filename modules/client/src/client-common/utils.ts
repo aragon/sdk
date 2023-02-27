@@ -37,10 +37,10 @@ export function computeProposalStatus(
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   if (startDate >= now) {
     return ProposalStatus.PENDING;
-  } else if (endDate >= now) {
-    return ProposalStatus.ACTIVE;
   } else if (proposal.executed) {
     return ProposalStatus.EXECUTED;
+  } else if (endDate >= now) {
+    return ProposalStatus.ACTIVE;
   } else if (
     proposal.executable
   ) {
@@ -60,7 +60,7 @@ export function computeProposalStatusFilter(
       where = { startDate_gte: now };
       break;
     case ProposalStatus.ACTIVE:
-      where = { startDate_lt: now, endDate_gte: now };
+      where = { startDate_lt: now, endDate_gte: now, executed: false };
       break;
     case ProposalStatus.EXECUTED:
       where = { executed: true };

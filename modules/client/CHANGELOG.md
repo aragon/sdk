@@ -13,6 +13,9 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [0.23.2-beta]
+### Fixed
+- Compute status functions
 ## [0.23.1-beta]
 ### Fixed
 - Adapt sdk to new subgraph proposalIds
