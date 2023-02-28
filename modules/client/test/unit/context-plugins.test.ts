@@ -4,7 +4,7 @@ declare const describe, it, beforeEach, expect, test;
 import { ContextPlugin, ContextPluginParams } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { activeContractsList } from "@aragon/core-contracts-ethers";
+import { activeContractsList } from "@aragon/osx-ethers";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
@@ -39,7 +39,6 @@ describe("ContextPlugin instances", () => {
 
     expect(context).toBeInstanceOf(ContextPlugin);
     expect(context.signer).toEqual(undefined);
-    expect(context.daoFactoryAddress).toEqual(undefined);
     expect(context.gasFeeEstimationFactor).toEqual(0.625);
   });
   it("Should create a context and have the correct values", () => {
@@ -70,13 +69,13 @@ describe("ContextPlugin instances", () => {
   });
   it("Should create a context with the correct DAOFactory address from the core-contracts-package", () => {
     contextParams.daoFactoryAddress = "";
-    contextParams.network = "rinkeby";
+    contextParams.network = "goerli";
     const context = new ContextPlugin(contextParams);
 
     expect(context).toBeInstanceOf(ContextPlugin);
-    expect(context.network).toEqual("rinkeby");
+    expect(context.network).toEqual("goerli");
     expect(context.daoFactoryAddress).toEqual(
-      activeContractsList.rinkeby.DAOFactory,
+      activeContractsList.goerli.DAOFactory,
     );
   });
 });

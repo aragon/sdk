@@ -10,7 +10,7 @@ import {
 } from "../../interfaces";
 import { ClientCore, Context, DaoAction } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
-import { DAO__factory } from "@aragon/core-contracts-ethers";
+import { DAO__factory } from "@aragon/osx-ethers";
 import {
   permissionParamsToContract,
   permissionWithConditionParamsToContract,

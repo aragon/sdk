@@ -1,4 +1,4 @@
-import { decodeRatio, hexToBytes } from "@aragon/sdk-common";
+import { decodeRatio, getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
   ContractVotingSettings,
@@ -36,7 +36,7 @@ export function toAddresslistVotingProposal(
     )
     : null;
   return {
-    id: proposal.id,
+    id: getCompactProposalId(proposal.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
@@ -102,7 +102,7 @@ export function toAddresslistVotingProposalListItem(
   );
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   return {
-    id: proposal.id,
+    id: getCompactProposalId(proposal.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,

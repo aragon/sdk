@@ -5,7 +5,7 @@ import {
   DAORegistry__factory,
   PluginRepo__factory,
   PluginSetupProcessor__factory,
-} from "@aragon/core-contracts-ethers";
+} from "@aragon/osx-ethers";
 import {
   AmountMismatchError,
   UpdateAllowanceError,
@@ -165,7 +165,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     const tx = await daoFactoryInstance.connect(signer).createDao(
       {
-        name: params.ensSubdomain,
+        subdomain: params.ensSubdomain,
         metadata: toUtf8Bytes(params.metadataUri),
         daoURI: params.daoUri || "",
         trustedForwarder: params.trustedForwarder || AddressZero,

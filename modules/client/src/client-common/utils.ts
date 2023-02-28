@@ -1,9 +1,9 @@
-import { IDAO } from "@aragon/core-contracts-ethers";
+import { IDAO } from "@aragon/osx-ethers";
 import { ContractReceipt } from "@ethersproject/contracts";
 import { VoteValues, VotingMode } from "../client-common/interfaces/plugin";
 import {
-  IComputeStatusProposal,
   CreateMajorityVotingProposalParams,
+  IComputeStatusProposal,
   ProposalStatus,
 } from "./interfaces/plugin";
 
@@ -37,10 +37,10 @@ export function computeProposalStatus(
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   if (startDate >= now) {
     return ProposalStatus.PENDING;
-  } else if (endDate >= now) {
-    return ProposalStatus.ACTIVE;
   } else if (proposal.executed) {
     return ProposalStatus.EXECUTED;
+  } else if (endDate >= now) {
+    return ProposalStatus.ACTIVE;
   } else if (
     proposal.executable
   ) {
@@ -60,7 +60,7 @@ export function computeProposalStatusFilter(
       where = { startDate_gte: now };
       break;
     case ProposalStatus.ACTIVE:
-      where = { startDate_lt: now, endDate_gte: now };
+      where = { startDate_lt: now, endDate_gte: now, executed: false };
       break;
     case ProposalStatus.EXECUTED:
       where = { executed: true };
@@ -69,7 +69,7 @@ export function computeProposalStatusFilter(
       where = { executable: true, endDate_lt: now };
       break;
     case ProposalStatus.DEFEATED:
-      where = { executable: false, endDate_lt: now };
+      where = { executable: false, endDate_lt: now, executed: false };
       break;
     default:
       throw new Error("invalid proposal status");

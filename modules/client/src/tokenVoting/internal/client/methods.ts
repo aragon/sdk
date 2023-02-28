@@ -4,6 +4,7 @@ import {
   decodeProposalId,
   decodeRatio,
   encodeProposalId,
+  getExtendedProposalId,
   GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -17,14 +18,14 @@ import {
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import {
+  CanVoteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
+  CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  CanVoteParams,
-  CreateMajorityVotingProposalParams,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -57,7 +58,7 @@ import {
   QueryTokenVotingSettings,
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
-import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
+import { TokenVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   UNAVAILABLE_PROPOSAL_METADATA,
@@ -335,12 +336,13 @@ export class TokenVotingClientMethods extends ClientCore
     try {
       await this.graphql.ensureOnline();
       const client = this.graphql.getClient();
+      const extendedProposalId = getExtendedProposalId(proposalId);
       const {
         tokenVotingProposal,
       }: {
         tokenVotingProposal: SubgraphTokenVotingProposal;
       } = await client.request(QueryTokenVotingProposal, {
-        proposalId,
+        proposalId: extendedProposalId,
       });
       if (!tokenVotingProposal) {
         return null;

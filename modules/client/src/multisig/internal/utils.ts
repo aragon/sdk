@@ -1,8 +1,8 @@
-import { hexToBytes } from "@aragon/sdk-common";
+import { getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
 import {
+  computeProposalStatus,
   DaoAction,
   ProposalMetadata,
-  ProposalStatus,
   SubgraphAction,
 } from "../../client-common";
 import {
@@ -31,7 +31,7 @@ export function toMultisigProposal(
     )
     : null;
   return {
-    id: proposal.id,
+    id: getCompactProposalId(proposal.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
@@ -64,10 +64,7 @@ export function toMultisigProposal(
         };
       },
     ),
-    // TODO
-    // change to computeProposalStatus
-    // Missing executable property from subgraph
-    status: proposal.executed ? ProposalStatus.EXECUTED : ProposalStatus.ACTIVE,
+    status: computeProposalStatus(proposal),
     approvals: proposal.approvers.map(
       (approver) => approver.id.slice(0, 42),
     ),
@@ -84,7 +81,7 @@ export function toMultisigProposalListItem(
     parseInt(proposal.endDate) * 1000,
   );
   return {
-    id: proposal.id,
+    id: getCompactProposalId(proposal.id),
     dao: {
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
@@ -103,9 +100,6 @@ export function toMultisigProposalListItem(
     },
     startDate,
     endDate,
-    // TODO
-    // change to computeProposalStatus
-    // Missing executable property from subgraph
-    status: proposal.executed ? ProposalStatus.EXECUTED : ProposalStatus.ACTIVE,
+    status: computeProposalStatus(proposal),
   };
 }

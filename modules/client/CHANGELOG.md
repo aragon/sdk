@@ -13,7 +13,17 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
-
+## [0.23.2-beta]
+### Fixed
+- Compute status functions
+## [0.23.1-beta]
+### Fixed
+- Adapt sdk to new subgraph proposalIds
+## [0.23.0-beta]
+### Changed
+- Upgrade contracts to version 0.8.0
+### Fixed
+- Status in multisig proposal
 ## [0.22.0-beta]
 
 Release candidate 1

@@ -16,6 +16,9 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## UPCOMING
+## 0.12.0-beta
+### Added
+- `getCompactProposalId` and `getExtendedProposalId` functions
 ## 0.11.0-beta
 
 Release candidate 1
