@@ -4,7 +4,7 @@ declare const describe, it, beforeEach, expect, test;
 import { ContextPlugin, ContextPluginParams } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { activeContractsList } from "@aragon/core-contracts-ethers";
+import { activeContractsList } from "@aragon/osx-ethers";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";

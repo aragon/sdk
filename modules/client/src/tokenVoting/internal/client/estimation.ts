@@ -1,4 +1,4 @@
-import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
+import { TokenVoting__factory } from "@aragon/osx-ethers";
 import {
   ClientCore,
   ContextPlugin,

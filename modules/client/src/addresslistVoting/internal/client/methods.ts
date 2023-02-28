@@ -55,7 +55,7 @@ import {
   toAddresslistVotingProposal,
   toAddresslistVotingProposalListItem,
 } from "../utils";
-import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   UNAVAILABLE_PROPOSAL_METADATA,

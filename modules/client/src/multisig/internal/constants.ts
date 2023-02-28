@@ -2,7 +2,7 @@
 // todo fix new contracts-ethers
 import {
   Multisig__factory,
-} from "@aragon/core-contracts-ethers";
+} from "@aragon/osx-ethers";
 
 // TODO update with function names
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [

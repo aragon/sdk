@@ -58,7 +58,7 @@ import {
   QueryTokenVotingSettings,
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
-import { TokenVoting__factory } from "@aragon/core-contracts-ethers";
+import { TokenVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   UNAVAILABLE_PROPOSAL_METADATA,

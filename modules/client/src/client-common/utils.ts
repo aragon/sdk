@@ -1,4 +1,4 @@
-import { IDAO } from "@aragon/core-contracts-ethers";
+import { IDAO } from "@aragon/osx-ethers";
 import { ContractReceipt } from "@ethersproject/contracts";
 import { VoteValues, VotingMode } from "../client-common/interfaces/plugin";
 import {

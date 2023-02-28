@@ -9,7 +9,7 @@ import {
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { IAddresslistVotingClientDecoding } from "../../interfaces";
-import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 
 /**
  * Decoding module for the SDK AddressList Client

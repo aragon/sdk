@@ -21,7 +21,7 @@ import {
 } from "../../interfaces";
 import {
   IERC20MintableUpgradeable__factory,
-} from "@aragon/core-contracts-ethers";
+} from "@aragon/osx-ethers";
 import {
   mintTokenParamsToContract,
   tokenVotingInitParamsToContract,

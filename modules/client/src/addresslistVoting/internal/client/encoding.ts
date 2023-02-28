@@ -19,7 +19,7 @@ import {
   IAddresslistVotingClientEncoding,
   IAddresslistVotingPluginInstall,
 } from "../../interfaces";
-import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { LIVE_CONTRACTS } from "../../../client-common/constants";
 
