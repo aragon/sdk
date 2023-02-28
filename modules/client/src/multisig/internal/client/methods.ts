@@ -48,7 +48,7 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { Multisig__factory } from "@aragon/core-contracts-ethers";
+import { Multisig__factory } from "@aragon/osx-ethers";
 import {
   QueryMultisigProposal,
   QueryMultisigProposals,

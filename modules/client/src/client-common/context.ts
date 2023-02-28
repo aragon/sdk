@@ -1,7 +1,7 @@
 import { ContextParams, ContextState } from "./interfaces/context";
 import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { UnsupportedProtocolError } from "@aragon/sdk-common";
-import { activeContractsList } from "@aragon/core-contracts-ethers";
+import { activeContractsList } from "@aragon/osx-ethers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 // import { GraphQLClient } from "graphql-request";

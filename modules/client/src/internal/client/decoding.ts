@@ -16,7 +16,7 @@ import {
   IInterfaceParams,
 } from "../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { DAO__factory } from "@aragon/core-contracts-ethers";
+import { DAO__factory } from "@aragon/osx-ethers";
 import {
   permissionParamsFromContract,
   permissionParamsWitConditionFromContract,

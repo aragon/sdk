@@ -1,4 +1,4 @@
-import { DAO__factory } from "@aragon/core-contracts-ethers";
+import { DAO__factory } from "@aragon/osx-ethers";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import { DaoMetadata } from "../interfaces";

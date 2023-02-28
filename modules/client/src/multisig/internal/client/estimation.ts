@@ -1,4 +1,4 @@
-import { Multisig__factory } from "@aragon/core-contracts-ethers";
+import { Multisig__factory } from "@aragon/osx-ethers";
 import {
   boolArrayToBitmap,
   decodeProposalId,

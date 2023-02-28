@@ -1,7 +1,7 @@
 {
   "name": "@aragon/sdk-ipfs",
   "author": "Aragon Association",
-  "version": "0.3.0-beta",
+  "version": "1.0.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/sdk-ipfs.esm.js",

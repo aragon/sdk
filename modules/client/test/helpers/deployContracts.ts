@@ -1,4 +1,4 @@
-import * as aragonContracts from "@aragon/core-contracts-ethers";
+import * as aragonContracts from "@aragon/osx-ethers";
 
 import ENSRegistry from "@ensdomains/ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json";
 import PublicResolver from "@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json";

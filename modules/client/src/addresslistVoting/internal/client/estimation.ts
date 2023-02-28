@@ -1,4 +1,4 @@
-import { AddresslistVoting__factory } from "@aragon/core-contracts-ethers";
+import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import {
   ClientCore,
   ContextPlugin,

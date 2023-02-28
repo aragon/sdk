@@ -5,7 +5,7 @@ import {
   DAORegistry__factory,
   PluginRepo__factory,
   PluginSetupProcessor__factory,
-} from "@aragon/core-contracts-ethers";
+} from "@aragon/osx-ethers";
 import {
   AmountMismatchError,
   UpdateAllowanceError,
