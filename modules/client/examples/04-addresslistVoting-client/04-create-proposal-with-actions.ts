@@ -16,9 +16,9 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Create a plugin context from the aragonOSx SDK context.
+// Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an AddresslistVoting client from the aragonOSx SDK context.
+// Create an AddresslistVoting client from the Aragon OSx SDK context.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 // [Optional] You can add encoded actions to the proposal. These actions are the encoded transactions which will be executed when a transaction passes.

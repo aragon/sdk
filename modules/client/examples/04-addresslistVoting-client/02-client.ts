@@ -10,6 +10,6 @@ import { context } from "../00-setup/00-getting-started";
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
-// Instantiate an AddresslistVoting client from the aragonOSx SDK context.
+// Instantiate an AddresslistVoting client from the Aragon OSx SDK context.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 console.log({ addresslistVotingClient });

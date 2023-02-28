@@ -19,7 +19,7 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate a client from the aragonOSx SDK context.
+// Instantiate a client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 // Addresses which will be allowed to vote in the Multisig plugin.
@@ -68,10 +68,10 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoCreationSteps.CREATING:
-        console.log(step.txHash);
+        console.log({ txHash: step.txHash });
         break;
       case DaoCreationSteps.DONE:
-        console.log(step.address);
+        console.log({ daoAddress: step.address, pluginAddresses: step.pluginAddresses });
         break;
     }
   } catch (err) {

@@ -13,7 +13,7 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Create a plugin context from the aragonOSx SDK context.
+// Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an Addresslist client to use the Addresslist plugin.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);

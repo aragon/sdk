@@ -11,4 +11,6 @@ Hence, the flow is the following:
 3. Vote until the proposal has a majority: if the voting mode is `EARLY_EXECUTION` or until the `endDate` is achieved if the `votingMode` is  `STANDARD` or `VOTE_REPLACEMENT`
 4. If the propoosal passes the required approvals and participation, execute the proposal
 5. Success
+
+### General purpose encoders
 */

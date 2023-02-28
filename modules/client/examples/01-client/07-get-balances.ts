@@ -7,7 +7,7 @@ Gets a DAO's financial assets based on the DAO address or its ENS domain.
 import { AssetBalance, Client } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate the general purpose client from the aragonOSx SDK context.
+// Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 // Address of the DAO whose asset balances you want to retrieve.

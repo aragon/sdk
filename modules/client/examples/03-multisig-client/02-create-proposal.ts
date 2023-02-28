@@ -8,10 +8,11 @@ import {
   Client,
   ContextPlugin,
   CreateMultisigProposalParams,
-  IWithdrawParams,
   MultisigClient,
   ProposalCreationSteps,
-  ProposalMetadata
+  ProposalMetadata,
+  TokenType,
+  WithdrawParams
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -45,11 +46,11 @@ const proposalMetadata: ProposalMetadata = {
 // Pins the metadata to IPFS and gets back an IPFS URI.
 const metadataUri: string = await multisigClient.methods.pinMetadata(proposalMetadata);
 
-const withdrawParams: IWithdrawParams = {
-  recipientAddress: "0x1234567890123456789012345678901234567890", // address of the receiver of the transaction
-  amount: BigInt(10),
-  tokenAddress: "0x1234567890123456789012345678901234567890", // token's contract address
-  reference: "test"
+// An action the proposal could take. This is only an example of an action. You can find all encoded actions within our encoders section.
+const withdrawParams: WithdrawParams = {
+  amount: BigInt(10), // amount in wei
+  tokenAddress: "0x1234567890123456789012345678901234567890", // ERC20 token's contract address to withdraw
+  type: TokenType.ERC20
 };
 
 // Address of the DAO where the proposal will be created.

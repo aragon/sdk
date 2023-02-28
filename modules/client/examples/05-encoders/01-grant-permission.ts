@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Grant permission
+#### Grant permission
 
 Grants permission to an address (`who`) to perform an action (`permission`) on a contract (`where`).
 */

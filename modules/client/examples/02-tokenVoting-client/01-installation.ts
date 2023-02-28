@@ -101,10 +101,10 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoCreationSteps.CREATING:
-        console.log(step.txHash);
+        console.log({ txHash: step.txHash });
         break;
       case DaoCreationSteps.DONE:
-        console.log(step.address);
+        console.log({ daoAddress: step.address, pluginAddresses: step.pluginAddresses });
         break;
     }
   } catch (err) {

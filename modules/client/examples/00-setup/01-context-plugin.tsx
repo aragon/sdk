@@ -9,7 +9,7 @@ import { Wallet } from "@ethersproject/wallet";
 import { ContextPlugin } from "@aragon/sdk-client";
 import { context, contextParams } from "./00-getting-started";
 
-// Instantiate the Context Plugin from the aragonOSx SDK context.
+// Instantiate the Context Plugin from the Aragon OSx SDK context.
 export const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 /* MARKDOWN

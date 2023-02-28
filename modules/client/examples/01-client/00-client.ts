@@ -13,7 +13,7 @@ Clients can be stored in a singleton and inherited from there. Can also be store
 import { Client } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate the general purpose client from the aragonOSx SDK context.
+// Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 console.log({ client });
 

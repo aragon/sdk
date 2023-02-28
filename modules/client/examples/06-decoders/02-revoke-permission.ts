@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Decode revoke permission action
+#### Decode revoke permission action
 
 Decodes the action of a revoke permission transaction.
 */
@@ -10,7 +10,7 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Insantiates an aragonOSx SDK client.
+// Insantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
 
 const data: Uint8Array = new Uint8Array([12, 56]);

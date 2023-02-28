@@ -7,7 +7,7 @@ Gets a specific DAO's metadata using its address or ENS domain.
 import { Client, DaoDetails } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate the general purpose client from the aragonOSx SDK context.
+// Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 // Address or ENS of the DAO whose metadata you want to retrieve.

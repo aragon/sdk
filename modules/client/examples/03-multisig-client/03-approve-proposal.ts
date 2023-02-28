@@ -13,7 +13,7 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Insantiate a plugin context from the aragonOSx SDK context.
+// Insantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client
 const multisigClient = new MultisigClient(contextPlugin);

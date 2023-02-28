@@ -8,7 +8,7 @@ Return an IPFS CID preceded by "ipfs://".
 import { Client, DaoMetadata } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Instantiate the general purpose client from the aragonOSx SDK context.
+// Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 // The Metadata object containing the details of the DAO.

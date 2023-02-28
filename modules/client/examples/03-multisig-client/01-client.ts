@@ -8,7 +8,7 @@ In order to interact with the Multisig plugin, you need to create a `MultisigCli
 import { ContextPlugin, MultisigClient } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Create a plugin context from the aragonOSx SDK context.
+// Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 // Creates a Multisig plugin client.

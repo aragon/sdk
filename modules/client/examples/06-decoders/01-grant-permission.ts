@@ -1,5 +1,5 @@
 /* MARKDOWN
-### Decode the grant permission action
+#### Decode the grant permission action
 
 Decodes the parameters of a grant permission action.
 */
@@ -10,7 +10,7 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
-// Creates an aragonOSx SDK client.
+// Creates an Aragon OSx SDK client.
 const client: Client = new Client(context);
 
 const data: Uint8Array = new Uint8Array([12, 56]);
