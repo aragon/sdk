@@ -1,7 +1,7 @@
 /* MARKDOWN
 ### Get DAO details
 
-Gets a specific DAO's metadata using its address or ENS domain.
+Gets a DAO's details using its address or ENS domain.
 */
 
 import { Client, DaoDetails } from "@aragon/sdk-client";

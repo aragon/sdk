@@ -12,9 +12,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create a TokenVoting client
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
-const daoAddressorEns: string = "0x12345384572394756239846529574932532985"; // or my-dao.dao.eth
+const pluginAddress: string = "0x12345384572394756239846529574932532985"; // the address of the plugin that DAO has installed. You can find this through getting the DAO details.
 
-const members: string[] = await tokenVotingClient.methods.getMembers(daoAddressorEns);
+const members: string[] = await tokenVotingClient.methods.getMembers(pluginAddress);
 console.log({ members });
 
 /* MARKDOWN

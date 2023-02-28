@@ -35,10 +35,7 @@ const configActionParams: VotingSettings = {
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
 // Update the configuration of the plugin.
-const configAction = tokenVotingClient.encoding.updatePluginSettingsAction(
-  configActionParams,
-  pluginAddress
-);
+const configAction = tokenVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionParams);
 
 const metadataUri: string = await tokenVotingClient.methods.pinMetadata({
   title: "Test proposal",
@@ -80,6 +77,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error({ err });
+    console.error(err);
   }
 }

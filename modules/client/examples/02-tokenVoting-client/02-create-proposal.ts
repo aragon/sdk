@@ -8,6 +8,7 @@ Then, you can create proposals using the `createProposal` method in your `TokenV
 import {
   ContextPlugin,
   CreateMajorityVotingProposalParams,
+  DaoAction,
   ProposalCreationSteps,
   ProposalMetadata,
   TokenVotingClient,
@@ -50,18 +51,20 @@ const pluginAddress: string = "0x1234567890123456789012345678901234567890"; // t
 
 // [Optional] In case you wanted to pass an action to the proposal, you can configure it here and pass it immediately. An action is the encoded transaction which will get executed when a proposal passes.
 // In this example, we are creating an action to change the settings of a governance plugin to demonstrate how to set it up.
-const configActionPrarms: VotingSettings = {
+const configActionParams: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
   votingMode: VotingMode.EARLY_EXECUTION, // default STANDARD, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
 };
+// We need to encode the action so it can executed once the proposal passes.
+const updatePluginSettingsAction: DaoAction = tokenVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionParams);
 
 const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress,
   metadataUri,
-  actions: [configActionPrarms], // this is optional. if you don't want to pass any actions, simply pass an empty array `[]`.
+  actions: [updatePluginSettingsAction], // this is optional. if you don't want to pass any actions, simply pass an empty array `[]`.
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
@@ -82,6 +85,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error({ err });
+    console.error(err);
   }
 }

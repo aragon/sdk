@@ -84,6 +84,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error({ err });
+    console.error(err);
   }
 }

@@ -23,7 +23,7 @@ const client: Client = new Client(context);
 // For ex, these would be the plugin params if you want to use an already-existing ERC20 token.
 const pluginInitParams1: ITokenVotingPluginInstall = {
   votingSettings: {
-    minDuration: 60 * 60 * 24 * 2, // seconds
+    minDuration: 60 * 60 * 24 * 2, // seconds (minimum amount is 3600)
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
@@ -31,13 +31,13 @@ const pluginInitParams1: ITokenVotingPluginInstall = {
   },
   useToken: {
     address: "0x23847102387419273491234", // contract address of the token to use as the voting token
-  },
+  }
 };
 
 // These would be the plugin params if you need to mint a new token for the DAO to enable TokenVoting.
 const pluginInitParams2: ITokenVotingPluginInstall = {
   votingSettings: {
-    minDuration: 60 * 60 * 24 * 2, // seconds
+    minDuration: 60 * 60 * 24 * 2, // seconds (minimum amount is 3600)
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
@@ -86,15 +86,14 @@ const metadataUri: string = await client.methods.pinMetadata(daoMetadata);
 const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2] // optional, this will determine the plugins installed in your DAO upon creation.
+  plugins: [tokenVotingInstallPluginItem1, tokenVotingInstallPluginItem2] // optional, this will determine the plugins installed in your DAO upon creation. 1 is mandatory, more than that is optional based on the DAO's needs.
 };
 
 // Estimate how much gas the transaction will cost.
 const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createParams);
 console.log({ avg: estimatedGas.average, max: estimatedGas.max });
 
-// Create the DAO with the two token voting plugins installed. This means that the DAO will be able to use either of the two tokens to vote.
-// You can also create a DAO with only one of the plugins installed or none.
+// Create the DAO with the two token voting plugins installed. This means that the DAO will be able to use either of the two tokens to vote depending on which TokenVoting plugin created the proposal.
 const steps = client.methods.createDao(createParams);
 
 for await (const step of steps) {
@@ -108,6 +107,6 @@ for await (const step of steps) {
         break;
     }
   } catch (err) {
-    console.error({ err });
+    console.error(err);
   }
 }

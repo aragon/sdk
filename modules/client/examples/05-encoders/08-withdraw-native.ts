@@ -17,7 +17,7 @@ import { context } from "../00-setup/00-getting-started";
 const client: Client = new Client(context);
 
 const withdrawParams: WithdrawParams = {
-  type: TokenType.NATIVE, // "native" meaning the native token to that EVM (ETH in mainnet), otherwise use "ERC20" for ERC20 tokens and pass it the contract address of the ERC20 token
+  type: TokenType.NATIVE, // "native" for ETH, otherwise use "ERC20" for ERC20 tokens and pass it the contract address of the ERC20 token
   amount: BigInt(10) // the amount in wei to withdraw
 };
 
