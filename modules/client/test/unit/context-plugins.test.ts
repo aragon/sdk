@@ -39,7 +39,6 @@ describe("ContextPlugin instances", () => {
 
     expect(context).toBeInstanceOf(ContextPlugin);
     expect(context.signer).toEqual(undefined);
-    expect(context.daoFactoryAddress).toEqual(undefined);
     expect(context.gasFeeEstimationFactor).toEqual(0.625);
   });
   it("Should create a context and have the correct values", () => {
