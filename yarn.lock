@@ -10,13 +10,6 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aragon/osx-ethers@^0.8.0-alpha":
-  version "0.8.0-alpha"
-  resolved "https://registry.yarnpkg.com/@aragon/osx-ethers/-/core-contracts-ethers-0.8.0-alpha.tgz#f6e14207f3973b87fdfc83ad3abb0ad2343bc27a"
-  integrity sha512-zvx5wK0li9ytXLDFn5VWy3d/QYh8BfkeignWNr5QslWcp5yLAjJXPzjSqH1fpz3litdlLydsDX0YxUXyilswDQ==
-  dependencies:
-    ethers "^5.6.2"
-
 "@aragon/osx-ethers@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@aragon/osx-ethers/-/osx-ethers-1.0.0.tgz#fa45346a8e3904a296afbd9b77e82e2789089e0e"
