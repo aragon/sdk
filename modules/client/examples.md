@@ -40,7 +40,7 @@ export const contextParams: ContextParams = {
   // Depending on how you're configuring your wallet, you may want to pass in a `signer` object here.
   signer: new Wallet("private-key"),
   // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
-  // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
+  // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.
   daoFactoryAddress: "0x1234381072385710239847120734123847123",
   // Choose your Web3 provider: Cloudfare, Infura, Alchemy, etc.
   web3Providers: ["https://rpc.ankr.com/eth_goerli"],
@@ -307,7 +307,7 @@ console.log({ dao });
 ```
 Returns:
 
-```json
+```
 {
   address: "0x1234567890123456789012345678901234567890",
   ensDomain: "test.dao.eth",
@@ -366,7 +366,7 @@ console.log({ daos });
 ```
 Returns:
 
-```json
+```
 { daos:
   [
     {
@@ -435,7 +435,7 @@ console.log({ daoBalances });
 ```
 Returns:
 
-```json
+```
 { daoBalances:
   [
     {
@@ -493,7 +493,7 @@ console.log({ daoTransfers });
 ```
 Returns:
 
-```json
+```
 { daoTransfers:
   [
     {
@@ -648,7 +648,7 @@ console.log({ metadataUri });
 ```
 Returns:
 
-```json
+```
   { metadataUri: "ipfs://Qm..." }
 ```
 
@@ -987,7 +987,7 @@ console.log({ canVote });
 ```
 Returns:
 
-```json
+```
   { canVote: true }
 ```
 
@@ -1061,7 +1061,7 @@ console.log({ proposal });
 ```
 Returns:
 
-```json
+```
 {
   id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
@@ -1168,7 +1168,7 @@ console.log({ proposals });
 ```
 Returns:
 
-```json
+```
 { proposals:
   [
     {
@@ -1251,7 +1251,7 @@ console.log({ pluginSettings });
 ```
 Returns:
 
-```json
+```
 { pluginSettings: {
     minDuration: 10000, // 10 seconds
     minParticipation: 0.25, // 25%
@@ -1282,7 +1282,7 @@ console.log({ members });
 ```
 Returns:
 
-```json
+```
 { members:
   [
     "0x1234567890123456789012345678901234567890",
@@ -1321,7 +1321,7 @@ console.log({ tokenDetails });
 ```
 Returns:
 
-```json
+```
   {
     address: "0x123456789000987654323112345678900987654321",
     name: "Token",
@@ -1330,7 +1330,7 @@ Returns:
   }
 ```
 Or:
-```json
+```
   {
     address: "0x123456789000987654323112345678900987654321",
     name: "Token",
@@ -1382,7 +1382,7 @@ console.log({ metadataUri });
 ```
 Returns:
 
-```json
+```
   { metadataUri: "ipfs://Qm..." }
 ```
 ## Multisig governance plugin
@@ -1636,7 +1636,7 @@ console.log({ canApprove });
 ```
 Returns:
 
-```json
+```
   { canApprove: true }
 ```
 
@@ -1664,7 +1664,7 @@ console.log({ canExecute });
 ```
 Returns:
 
-```json
+```
   { canExecute: true }
 ```
 
@@ -1729,7 +1729,7 @@ console.log({ proposalDetails });
 ```
 Returns:
 
-```json
+```
 {
   id: "0x1234567890123456789012345678901234567890_0x0",
   dao: {
@@ -1807,7 +1807,7 @@ console.log({ multisigProposals });
 ```
 Returns:
 
-```json
+```
 [
   {
     id: "0x12345...",
@@ -1861,7 +1861,7 @@ const multisigSettings: MultisigVotingSettings = await multisigClient.methods.ge
 console.log({ multisigSettings });
 ```
 Returns:
-```json
+```
 {
   votingSettings: {
     minApprovals: 4,
@@ -1893,7 +1893,7 @@ console.log({ multisigMembers });
 ```
 Returns:
 
-```json
+```
 { multisigMembers:
   [
     "0x1234567890...",
@@ -1945,7 +1945,7 @@ console.log({ metadataUri });
 ```
 Returns:
 
-```json
+```
   { metadataUri: "ipfs://Qm..." }
 ```
 
@@ -2267,7 +2267,7 @@ console.log({ canVote });
 ```
 Returns:
 
-```json
+```
   { canVote: true }
 ```
 
@@ -2337,7 +2337,7 @@ console.log({ addresslistVotingProposal });
 ```
 Returns:
 
-```json
+```
 { addresslistVotingProposal:
   {
     id: "0x1234567890123456789012345678901234567890_0x0",
@@ -2437,7 +2437,7 @@ console.log({ addresslistVotingProposals });
 ```
 Returns:
 
-```json
+```
 { addresslistVotingProposals:
   [
     {
@@ -2508,7 +2508,7 @@ console.log({ addresslistVotingSettings });
 ```
 Returns:
 
-```json
+```
 { addresslistVotingSettings:
   {
     minDuration: 60 * 60 * 24 * 2, // seconds
@@ -2541,7 +2541,7 @@ console.log({ members });
 ```
 Returns:
 
-```json
+```
 { members :
   [
     "0x1234567890123456789012345678901234567890",
@@ -2593,7 +2593,7 @@ const proposalMetadata: ProposalMetadata = {
 const proposalMetadataUri: string = await addresslistVotingClient.methods.pinMetadata(proposalMetadata);
 console.log({ proposalMetadataUri });
 ```
-```json
+```
   { proposalMetadataUri: ipfs://Qm... }
 ```
 
@@ -2640,7 +2640,7 @@ console.log({ grantPermission });
 ```
 Returns:
 
-```json
+```
 { grantPermission:
   {
     to: "0x1234567890...",
@@ -2686,7 +2686,7 @@ console.log({ grantWithConditionAction });
 ```
 Returns:
 
-```json
+```
   {
     to: "0x123123123...",
     value: 0n,
@@ -2724,7 +2724,7 @@ console.log({ revokePermission });
 ```
 Returns:
 
-```json
+```
 {
   to: "0x1234567890...",
   value: 0n;
@@ -2760,7 +2760,7 @@ const registerStandardCallbackAction: DaoAction = client.encoding.registerStanda
 console.log({ registerStandardCallbackAction });
 ```
 Returns:
-```json
+```
   {
     to: "0x123123123...",
     value: 0n,
@@ -2792,7 +2792,7 @@ console.log({ action });
 ```
 Returns:
 
-```json
+```
   {
     to: "0x123123123...",
     value: 0n,
@@ -2829,7 +2829,7 @@ console.log({ upgradeToAndCallAction });
 ```
 Returns:
 
-```json
+```
   {
     to: "0x123123123...",
     value: 0n,
@@ -2982,7 +2982,7 @@ const upgradeToAction: DaoAction = client.encoding.upgradeToAction(
 );
 console.log({ upgradeToAction });
 ```
-```json
+```
   {
     to: "0x123123123...",
     value: 0n,
@@ -3057,7 +3057,7 @@ console.log({ removeMembersAction });
 ```
 Returns:
 
-```json
+```
 {
   to: "0x1234567890...",
   value: 0n,
@@ -3096,7 +3096,7 @@ console.log({ removeMembersAction });
 
 Returns:
 
-```json
+```
 {
   to: "0x1234567890...",
   value: 0n,
@@ -3134,7 +3134,7 @@ console.log({ addMembersAction });
 ```
 Returns:
 
-```json
+```
 {
   to: "0x1234567890...",
   value: 0n,
@@ -3209,7 +3209,7 @@ console.log({ mintTokenAction });
 ```
 Returns:
 
-```json
+```
 {
   to: "0x0987654321098765432...",
   value: 0n,
@@ -3251,7 +3251,7 @@ console.log({ updateMultisigConfig });
 ```
 Returns:
 
-```json
+```
 {
   to: "0x1234567890...",
   value: 0n,
@@ -3295,7 +3295,7 @@ console.log({ addAddressesToMultisig });
 ```
 Returns:
 
-```json
+```
 {
   to: "0x1234567890...",
   value: 0n,
@@ -3339,7 +3339,7 @@ console.log(removeAddressesFromMultisig);
 ```
 Returns:
 
-```json
+```
 {
   to: "0x1234567890...",
   value: 0n,
@@ -3372,7 +3372,7 @@ console.log({ setDaoUriAction });
 ```
 Returns:
 
-```json
+```
   {
     to: "0x123123123...",
     value: 0n,
@@ -3410,7 +3410,7 @@ console.log({ grantParams });
 ```
 Returns:
 
-```json
+```
 {
   who: "0x1234567890...",
   where: "0x1234567890...",
@@ -3441,7 +3441,7 @@ console.log({ revokeParams });
 ```
 Returns:
 
-```json
+```
 {
   who: "0x1234567890...",
   where: "0x1234567890...",
@@ -3469,7 +3469,7 @@ console.log({ withdraw });
 ```
 Returns:
 
-```json
+```
 {
   recipientAddress: "0x1234567890123456789012345678901234567890",
   amount: 10n,
@@ -3497,7 +3497,7 @@ console.log({ decodedUpdateMetadata });
 ```
 Returns:
 
-```json
+```
   { decodedUpdateMetadata: "ipfs://Qm..." }
 ```
 
@@ -3525,7 +3525,7 @@ console.log({ pluginSettings });
 ```
 Returns:
 
-```json
+```
 {
   minDuration: 7200, // seconds
   minParticipation: 0.25, // 25%
@@ -3553,7 +3553,7 @@ console.log({ updateDaoMetadataParams });
 ```
 Returns:
 
-```json
+```
 {
   "name":"New Name",
   "description":"New description",
@@ -3589,7 +3589,7 @@ console.log({ registerStandardCallbackAction });
 ```
 Returns:
 
-```json
+```
 {
   interfaceId: "0x12345678",
   callbackSelector: "0x23456789",
@@ -3615,7 +3615,7 @@ console.log({ grantWithConditionAction });
 ```
 Returns:
 
-```json
+```
 {
   where: "0x1234567890...",
   who: "0x2345678901...",
@@ -3643,7 +3643,7 @@ console.log({ setDaoUriAction });
 ```
 Returns:
 
-```json
+```
   { setDaoUriAction: "https://the.dao.uri" }
 ```
 
@@ -3665,7 +3665,7 @@ console.log({ upgradeToAction });
 ```
 Returns:
 
-```json
+```
   { upgradeToAction: "0x1234567890123456789012345678901234567890" }
 ```
 
@@ -3687,7 +3687,7 @@ console.log({ setSignatureValidatorAction });
 ```
 Returns:
 
-```json
+```
   { setSignatureValidatorAction: "0x1234567890123456789012345678901234567890" }
 ```
 
@@ -3709,7 +3709,7 @@ console.log({ upgradeToAndCallAction });
 ```
 Returns:
 
-```json
+```
   {
     implementationAddress: "0x1234567890...",
     data: Uint8Array[12,34,45...]
@@ -3745,7 +3745,7 @@ console.log({ decodeUpdateTokenVotingSettings });
 ```
 Returns:
 
-```json
+```
 {
   minDuration: 7200, // seconds
   minParticipation: 0.25, // 25%
@@ -3775,7 +3775,7 @@ console.log({ functionParams });
 ```
 Returns:
 
-```json
+```
 {
   id: "function functionName(param1, param2)"
   functionName: "functionName"
@@ -3808,7 +3808,7 @@ console.log({ decodeMintTokenParams });
 ```
 Returns:
 
-```json
+```
 {
   address: "0x12345...",
   amount: 10n
@@ -3839,7 +3839,7 @@ console.log({ membersAdded });
 ```
 Returns:
 
-```json
+```
 { membersAdded:
   [
     "0x12345...",
@@ -3872,7 +3872,7 @@ console.log({ functionParams });
 ```
 Returns:
 
-```json
+```
 {
   id: "function functionName(param1, param2)"
   functionName: "functionName"
@@ -3900,7 +3900,7 @@ console.log({ removedMembers });
 ```
 Returns:
 
-```json
+```
 { removedMembers:
   [
     "0x12345...",
@@ -3934,7 +3934,7 @@ console.log({ decodeAddMembersMultisig });
 ```
 Returns:
 
-```json
+```
 { decodeAddMembersMultisig:
   [
     "0x12345...",
@@ -3968,7 +3968,7 @@ console.log({ decodeRemoveMemberMultisig });
 ```
 Returns:
 
-```json
+```
 { decodeRemoveMemberMultisig:
   [
     "0x12345...",
@@ -3999,7 +3999,7 @@ console.log({ decodeUpdateMultisigSettings });
 ```
 Returns:
 
-```json
+```
 {
   minApprovals: 2,
   onlyListed: false
@@ -4025,7 +4025,7 @@ console.log({ functionParams });
 ```
 Returns:
 
-```json
+```
 {
   id: "function functionName(param1, param2)"
   functionName: "functionName"
