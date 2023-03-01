@@ -70,7 +70,7 @@ However, keep in mind that because server-side rendering is not supported yet fo
 
 Also know that all documentation within this site is done with Typescript. You can read more about [Typescript here](https://www.typescriptlang.org/).
 
-## Setting up the clients
+## Setting up the client
 
 Next thing you'll want to do is set up the general purpose client so you can call on the SDK functions. This client is used to interact with any DAO on the network you're connected to.
 
@@ -88,6 +88,10 @@ import { context } from "./01-getting-started";
 const client: Client = new Client(context);
 console.log({ client });
 ```
+
+## General purpose functions
+
+These are the functions every DAO will have, no matter which plugin they have installed.
 
 ### Create a DAO
 
