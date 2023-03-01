@@ -12,9 +12,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddressList client.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const daoAddressorEns = "0x12345382947301297439127433492834"; // or my-dao.dao.eth
+const pluginAddress = "0x12345382947301297439127433492834";
 
-const members: string[] = await addresslistVotingClient.methods.getMembers(daoAddressorEns);
+const members: string[] = await addresslistVotingClient.methods.getMembers(pluginAddress);
 console.log({ members });
 
 /* MARKDOWN

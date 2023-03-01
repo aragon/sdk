@@ -15,9 +15,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig plugin client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
+const pluginAddress: string = "0x1234548357023847502348"; 
 
-const multisigMembers: string[] = await multisigClient.methods.getMembers(daoAddressorEns);
+const multisigMembers: string[] = await multisigClient.methods.getMembers(pluginAddress);
 console.log({ multisigMembers });
 
 /* MARKDOWN

@@ -16,9 +16,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Insantiate a Multisig client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const daoAddressorEns: string = "0x12345348523485623984752394854320";
+const pluginAddress: string = "0x12345348523485623984752394854320";
 
-const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(daoAddressorEns);
+const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(pluginAddress);
 console.log({ multisigSettings });
 
 /* MARKDOWN

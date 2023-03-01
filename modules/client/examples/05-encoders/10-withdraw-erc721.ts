@@ -14,6 +14,7 @@ import { context } from "../00-setup/00-getting-started";
 // Instantiate a general purpose client for Aragon OSx SDK context.
 const client: Client = new Client(context);
 
+// Coming Soon
 const withdrawParams: WithdrawParams = {
   type: TokenType.ERC721,
   tokenAddress: "0x1234567890123456789012345678901234567890", // ERFC721's token contract address to withdraw

@@ -32,4 +32,5 @@ export {
   UpdateAllowanceParams,
   Withdraw,
   WithdrawParams,
+  RegisterStandardCallbackParams,
 } from "./interfaces";
