@@ -7,7 +7,7 @@ This proposal will be created using the TokenVoting plugin as its governance mec
 
 import {
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   TokenVotingClient,
   VotingMode,
@@ -53,7 +53,7 @@ const metadataUri: string = await tokenVotingClient.methods.pinMetadata({
     }
 })
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the TokenVoting plugin contract containing all plugin logic.
   metadataUri,
   actions: [configAction], // optional, if none, leave an empty array `[]`

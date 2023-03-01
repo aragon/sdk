@@ -16,12 +16,10 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Insantiate a Multisig client.
 const multisigClient = new MultisigClient(contextPlugin);
 
-const executeProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890" // the address of the Multisig plugin contract installed into the DAO.
-}
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0"
 
 // Executes the actions of a Multisig proposal.
-const steps = multisigClient.methods.executeProposal(executeProposalParams);
+const steps = multisigClient.methods.executeProposal(proposalId);
 
 for await (const step of steps) {
   try {

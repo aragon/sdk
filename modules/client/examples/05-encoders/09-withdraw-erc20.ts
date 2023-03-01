@@ -18,10 +18,9 @@ const client: Client = new Client(context);
 const withdrawParams: WithdrawParams = {
   type: TokenType.ERC20,
   amount: BigInt(10), // amount  in wei
-  tokenAddress: "0x1234567890123456789012345678901234567890" // ERC20 token's address to withdraw
+  tokenAddress: "0x1234567890123456789012345678901234567890", // ERC20 token's address to withdraw
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890" // the address to transfer the funds to
 };
 
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
-const erc20WithdrawAction: DaoAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const erc20WithdrawAction: DaoAction = await client.encoding.withdrawAction(withdrawParams);
 console.log({ erc20WithdrawAction });

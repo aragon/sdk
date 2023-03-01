@@ -5,7 +5,6 @@ Checks whether the signer of the transaction is able to execute actions approved
 */
 
 import {
-  CanExecuteParams,
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
@@ -16,12 +15,10 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const canExecuteParams: CanExecuteParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890" // the address of the plugin contract itself.
-};
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0"
 
 // Checks whether the signer of the transaction can execute a given proposal.
-const canExecute = await multisigClient.methods.canExecute(canExecuteParams);
+const canExecute = await multisigClient.methods.canExecute(proposalId);
 console.log({ canExecute });
 
 /* MARKDOWN

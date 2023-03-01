@@ -19,11 +19,11 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 // The address of the TokenVoting plugin whose token you want to retrieve details about.
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+const proposalId: string = "0x1234567890123456789012345678901234567890";
 
 // Get the token details used in the TokenVoting plugin for a given DAO.
 // ERC721 Token coming soon!
-const tokenDetails: Erc20TokenDetails | Erc721TokenDetails | null = await tokenVotingClient.methods.getToken(pluginAddress);
+const tokenDetails: Erc20TokenDetails | Erc721TokenDetails | null = await tokenVotingClient.methods.getToken(proposalId);
 console.log({ tokenDetails });
 
 /* MARKDOWN

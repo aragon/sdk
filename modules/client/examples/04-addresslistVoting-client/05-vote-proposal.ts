@@ -19,7 +19,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  proposalId: "0x12345678901234567890123456789012345678900x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES // alternatively NO, or ABSTAIN
 };
 

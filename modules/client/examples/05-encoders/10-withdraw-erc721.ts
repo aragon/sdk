@@ -6,8 +6,8 @@ Withdraws ERC-721 tokens from the DAO when a proposal passes.
 import {
   Client,
   DaoAction,
-  WithdrawParams,
-  WithdrawType
+  TokenType,
+  WithdrawParams
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -15,12 +15,11 @@ import { context } from "../00-setup/00-getting-started";
 const client: Client = new Client(context);
 
 const withdrawParams: WithdrawParams = {
-  type: WithdrawType.ERC721,
+  type: TokenType.ERC721,
   tokenAddress: "0x1234567890123456789012345678901234567890", // ERFC721's token contract address to withdraw
-  amount: BigInt(10) // amount of tokens to withdraw
+  amount: BigInt(10), // amount of tokens to withdraw
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890" // the address to transfer the funds to
 };
 
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
-const nftWithdrawAction: DaoAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const nftWithdrawAction: DaoAction = await client.encoding.withdrawAction(withdrawParams);
 console.log({ nftWithdrawAction });

@@ -50,14 +50,12 @@ const metadataUri: string = await multisigClient.methods.pinMetadata(proposalMet
 const withdrawParams: WithdrawParams = {
   amount: BigInt(10), // amount in wei
   tokenAddress: "0x1234567890123456789012345678901234567890", // ERC20 token's contract address to withdraw
-  type: TokenType.ERC20
+  type: TokenType.ERC20,
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890", // address or ENS name to send the assets to
 };
 
-// Address of the DAO where the proposal will be created.
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
 // Encodes the action of withdrawing assets from a given DAO's vault and transfers them over to the recipient address.
-const withdrawAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const withdrawAction = await client.encoding.withdrawAction(withdrawParams);
 
 const proposalParams: CreateMultisigProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",

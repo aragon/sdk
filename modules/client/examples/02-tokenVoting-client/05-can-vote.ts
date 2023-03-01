@@ -19,7 +19,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const canVoteParams: CanVoteParams = {
-  proposalId: "0x12345678901234567890123456789012345678900x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   voterAddressOrEns: "0x1234567890123456789012345678901234567890", // your-plugin.plugin.dao.eth
   vote: VoteValues.YES // alternatively, could be  NO or ABSTAIN.
 };

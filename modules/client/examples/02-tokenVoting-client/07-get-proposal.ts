@@ -17,7 +17,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 // The address of the proposal you want to retrieve.
-const proposalId: string = "0x12345238513498562394651375914323423";
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 // Get a specific proposal created using the TokenVoting plugin.
 const proposal: TokenVotingProposal | null = await tokenVotingClient.methods.getProposal(proposalId);

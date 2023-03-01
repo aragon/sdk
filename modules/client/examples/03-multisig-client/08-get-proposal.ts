@@ -16,7 +16,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const proposalId: string = "0x123456789012345678901234567890123456789080x0";
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 const proposalDetails: MultisigProposal | null = await multisigClient.methods.getProposal(proposalId);
 console.log({ proposalDetails });

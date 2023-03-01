@@ -16,7 +16,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddresslistVoting client.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const proposalId: string = "0x123456789012345678901234567890123456789090x0";
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 const addresslistVotingProposal: AddresslistVotingProposal | null = await addresslistVotingClient.methods.getProposal(proposalId);
 console.log({ addresslistVotingProposal });
