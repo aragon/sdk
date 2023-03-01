@@ -1,4 +1,4 @@
-/*MARKDOWN
+/* MARKDOWN
 ### Create a DAO
 
 The `createDao` function allows you to create a DAO using the parameters you set for it.
