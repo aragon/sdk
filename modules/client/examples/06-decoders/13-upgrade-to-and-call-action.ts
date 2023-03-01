@@ -18,7 +18,7 @@ console.log({ upgradeToAndCallAction });
 /* MARKDOWN
 Returns:
 
-```json
+```
   {
     implementationAddress: "0x1234567890...",
     data: Uint8Array[12,34,45...]

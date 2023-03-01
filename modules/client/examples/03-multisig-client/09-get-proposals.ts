@@ -35,7 +35,7 @@ console.log({ multisigProposals });
 /* MARKDOWN
 Returns:
 
-```json
+```
 [
   {
     id: "0x12345...",

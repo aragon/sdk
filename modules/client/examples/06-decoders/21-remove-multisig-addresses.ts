@@ -24,7 +24,7 @@ console.log({ decodeRemoveMemberMultisig });
 /* MARKDOWN
 Returns:
 
-```json
+```
 { decodeRemoveMemberMultisig:
   [
     "0x12345...",

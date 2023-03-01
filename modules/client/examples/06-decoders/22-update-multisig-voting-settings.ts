@@ -21,7 +21,7 @@ console.log({ decodeUpdateMultisigSettings });
 /* MARKDOWN
 Returns:
 
-```json
+```
 {
   minApprovals: 2,
   onlyListed: false

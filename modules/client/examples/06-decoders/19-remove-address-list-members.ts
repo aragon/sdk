@@ -20,7 +20,7 @@ console.log({ removedMembers });
 /* MARKDOWN
 Returns:
 
-```json
+```
 { removedMembers:
   [
     "0x12345...",

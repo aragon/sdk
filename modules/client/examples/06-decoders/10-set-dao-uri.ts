@@ -18,7 +18,7 @@ console.log({ setDaoUriAction });
 /* MARKDOWN
 Returns:
 
-```json
+```
   { setDaoUriAction: "https://the.dao.uri" }
 ```
 */

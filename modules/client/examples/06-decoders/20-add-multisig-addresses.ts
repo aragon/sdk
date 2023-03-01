@@ -22,7 +22,7 @@ console.log({ decodeAddMembersMultisig });
 /* MARKDOWN
 Returns:
 
-```json
+```
 { decodeAddMembersMultisig:
   [
     "0x12345...",

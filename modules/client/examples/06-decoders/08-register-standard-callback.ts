@@ -18,7 +18,7 @@ console.log({ registerStandardCallbackAction });
 /* MARKDOWN
 Returns:
 
-```json
+```
 {
   interfaceId: "0x12345678",
   callbackSelector: "0x23456789",

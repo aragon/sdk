@@ -24,7 +24,7 @@ console.log({ addresslistVotingProposal });
 /* MARKDOWN
 Returns:
 
-```json
+```
 { addresslistVotingProposal:
   {
     id: "0x1234567890123456789012345678901234567890_0x0",

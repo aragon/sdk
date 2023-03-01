@@ -34,7 +34,7 @@ console.log({ proposals });
 /* MARKDOWN
 Returns:
 
-```json
+```
 { proposals:
   [
     {

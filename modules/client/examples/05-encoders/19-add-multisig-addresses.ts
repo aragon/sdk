@@ -36,7 +36,7 @@ console.log({ addAddressesToMultisig });
 /* MARKDOWN
 Returns:
 
-```json
+```
 {
   to: "0x1234567890...",
   value: 0n,

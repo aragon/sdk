@@ -31,7 +31,7 @@ console.log({ canVote });
 /* MARKDOWN
 Returns:
 
-```json
+```
   { canVote: true }
 ```
 */

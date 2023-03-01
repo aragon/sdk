@@ -36,7 +36,7 @@ console.log(removeAddressesFromMultisig);
 /* MARKDOWN
 Returns:
 
-```json
+```
 {
   to: "0x1234567890...",
   value: 0n,

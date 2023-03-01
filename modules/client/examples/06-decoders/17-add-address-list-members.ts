@@ -22,7 +22,7 @@ console.log({ membersAdded });
 /* MARKDOWN
 Returns:
 
-```json
+```
 { membersAdded:
   [
     "0x12345...",

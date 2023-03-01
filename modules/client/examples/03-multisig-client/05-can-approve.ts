@@ -28,7 +28,7 @@ console.log({ canApprove });
 /* MARKDOWN
 Returns:
 
-```json
+```
   { canApprove: true }
 ```
 */

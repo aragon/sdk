@@ -18,7 +18,7 @@ console.log({ grantWithConditionAction });
 /* MARKDOWN
 Returns:
 
-```json
+```
 {
   where: "0x1234567890...",
   who: "0x2345678901...",

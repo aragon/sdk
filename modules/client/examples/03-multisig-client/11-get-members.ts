@@ -23,7 +23,7 @@ console.log({ multisigMembers });
 /* MARKDOWN
 Returns:
 
-```json
+```
 { multisigMembers:
   [
     "0x1234567890...",

@@ -27,7 +27,7 @@ console.log({ decodeUpdateTokenVotingSettings });
 /* MARKDOWN
 Returns:
 
-```json
+```
 {
   minDuration: 7200, // seconds
   minParticipation: 0.25, // 25%

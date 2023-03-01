@@ -23,7 +23,7 @@ console.log({ functionParams });
 /* MARKDOWN
 Returns:
 
-```json
+```
 {
   id: "function functionName(param1, param2)"
   functionName: "functionName"

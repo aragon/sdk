@@ -19,7 +19,7 @@ console.log({ decodedUpdateMetadata });
 /* MARKDOWN
 Returns:
 
-```json
+```
   { decodedUpdateMetadata: "ipfs://Qm..." }
 ```
 */

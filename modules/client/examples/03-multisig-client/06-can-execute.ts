@@ -24,7 +24,7 @@ console.log({ canExecute });
 /* MARKDOWN
 Returns:
 
-```json
+```
   { canExecute: true }
 ```
 */
