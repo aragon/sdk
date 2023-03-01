@@ -11,11 +11,7 @@ import {
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
-<<<<<<<< HEAD:modules/client/examples/03-multisig-client/04-approve-proposal.ts
-import { context } from "../01-setup/01-getting-started";
-========
-import { context } from "../00-setup/00-getting-started";
->>>>>>>> ff7d28f52b53e70c70ca11662e9a2e8d2c35b827:modules/client/examples/03-multisig-client/03-approve-proposal.ts
+import { context } from "../01-client/01-getting-started";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

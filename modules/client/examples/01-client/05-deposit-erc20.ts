@@ -16,11 +16,7 @@ import {
   DepositParams,
   TokenType
 } from "@aragon/sdk-client";
-<<<<<<<< HEAD:modules/client/examples/01-client/05-deposit-erc20.ts
 import { context } from "./01-getting-started";
-========
-import { context } from "../00-setup/00-getting-started";
->>>>>>>> ff7d28f52b53e70c70ca11662e9a2e8d2c35b827:modules/client/examples/01-client/03-deposit-erc20.ts
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
