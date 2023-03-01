@@ -9,7 +9,7 @@ import {
   AddresslistVotingProposal,
   ContextPlugin
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -25,66 +25,68 @@ console.log({ addresslistVotingProposal });
 Returns:
 
 ```json
-{
-  id: "0x1234567890123456789012345678901234567890_0x0",
-  dao: {
-    address: "0x1234567890123456789012345678901234567890",
-    name: "Cool DAO"
-  };
-  creatorAddress: "0x1234567890123456789012345678901234567890",
-  metadata: {
-    title: "Test Proposal",
-    summary: "test proposal summary",
-    description: "this is a long description",
-    resources: [
+{ addresslistVotingProposal:
+  {
+    id: "0x1234567890123456789012345678901234567890_0x0",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
+    },
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal",
+      summary: "test proposal summary",
+      description: "this is a long description",
+      resources: [
+        {
+          url: "https://dicord.com/...",
+          name: "Discord"
+        },
+        {
+          url: "https://docs.com/...",
+          name: "Document"
+        }
+      ],
+      media: {
+        header: "https://.../image.jpeg",
+        logo: "https://.../image.jpeg"
+      }
+    },
+    startDate: <Date>,
+    endDate: <Date>,
+    creationDate: <Date>,
+    creationBlockNumber: 812345,
+    executionDate: <Date>,
+    executionBlockNumber: 812345,
+    actions: [
       {
-        url: "https://dicord.com/...",
-        name: "Discord"
-      },
-      {
-        url: "https://docs.com/...",
-        name: "Document"
+        to: "0x12345..."
+        value: 10n
+        data: [12,13,154...]
       }
     ],
-    media: {
-      header: "https://.../image.jpeg",
-      logo: "https://.../image.jpeg"
+    status: "Executed",
+    result {
+      yes: 1,
+      no: 1,
+      abstain: 0
     }
-  };
-  startDate: <Date>,
-  endDate: <Date>,
-  creationDate: <Date>,
-  creationBlockNumber: 812345,
-  executionDate: <Date>,
-  executionBlockNumber: 812345,
-  actions: [
-    {
-      to: "0x12345..."
-      value: 10n
-      data: [12,13,154...]
-    }
-  ],
-  status: "Executed",
-  result {
-    yes: 1,
-    no: 1,
-    abstain: 0
-  }
-  settings: {
-    minParticipation: 0.5,
-    supportThreshold: 0.25,
-    minDuration: 7200
-  },
-  votes: [
-    {
-      address: "0x123456789123456789123456789123456789",
-      vote: 2, // VoteValues.YES
+    settings: {
+      minParticipation: 0.5,
+      supportThreshold: 0.25,
+      minDuration: 7200
     },
-    {
-      address: "0x234567891234567891234567891234567890",
-      vote: 3, // VoteValues.NO
-    }
-  ]
+    votes: [
+      {
+        address: "0x123456789123456789123456789123456789",
+        vote: 2 // VoteValues.YES
+      },
+      {
+        address: "0x234567891234567891234567891234567890",
+        vote: 3 // VoteValues.NO
+      }
+    ]
+  }
 }
 ```
 */

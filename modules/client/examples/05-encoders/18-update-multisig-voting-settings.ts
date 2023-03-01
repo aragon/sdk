@@ -12,7 +12,7 @@ import {
   MultisigClient,
   UpdateMultisigVotingSettingsParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-setup/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

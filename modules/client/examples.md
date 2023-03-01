@@ -1,7 +1,138 @@
+# Getting Started with the Aragon OSx SDK
 
+## Before you begin
+
+The Aragon OSx SDK is Javascript agnostic, which means you can use it with any Javascript framework, including popular ones like React, Vite, or Vue.
+
+However, keep in mind that because server-side rendering is not supported yet for some crypto packages, you will not be able to use a framework like NextJS. Only frameworks that run entirely on client-side are supported.
+
+Also know that all documentation within this site is done with Typescript. You can read more about [Typescript here](https://www.typescriptlang.org/).
+
+## Installing the SDK
+
+First thing you want to do is install the Aragon OSx SDK package into your product. You can do this by using `npm` or `yarn`.
+
+```bash
+npm install @aragon/sdk-client
+```
+or
+```bash
+yarn add @aragon/sdk-client
+```
+
+## Setting up the context
+
+Then, you'll want to set up the Aragon OSx SDK context within your application to have access to the SDK functions. You can do this at any point within your app.
+
+However, so you're not setting it up multiple times, we recommend you set it up as a [context hook](https://www.freecodecamp.org/news/react-context-for-beginners/) within Javascript application if you're using a framework like React, Vue, or other, or within the entry file of your app.
 
 ```ts
-/* Markdown
+import { Wallet } from "@ethersproject/wallet";
+import { Context, ContextParams } from "@aragon/sdk-client";
+
+// Set up your IPFS API key. You can get one either by running a local node or by using a service like Infura or Alechmy.
+// Make sure to always keep these private in a file that is not committed to your public repository.
+export const IPFS_API_KEY: string = "ipfs-api-key";
+
+export const contextParams: ContextParams = {
+  // Choose the network you want to use. You can use "goerli" or "mumbai" for testing, "mainnet" for Ethereum.
+  network: "goerli",
+  // Depending on how you're configuring your wallet, you may want to pass in a `signer` object here.
+  signer: new Wallet("private-key"),
+  // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
+  // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
+  daoFactoryAddress: "0x1234381072385710239847120734123847123",
+  // Choose your Web3 provider: Cloudfare, Infura, Alchemy, etc.
+  web3Providers: ["https://rpc.ankr.com/eth_goerli"],
+  ipfsNodes: [
+    {
+      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: { "X-API-KEY": IPFS_API_KEY || "" }
+    },
+  ],
+  // Don't change this line. This is how we connect your app to the Aragon subgraph.
+  graphqlNodes: [
+    {
+      url:
+        "https://subgraph.satsuma-prod.com/aragon/core-goerli/api"
+    }
+  ]
+};
+
+// Instantiate the Aragon SDK context
+export const context: Context = new Context(contextParams);
+```
+Update the context with new parameters if you wish to throughout your app.
+
+Aragon OSx SDK is Javascript agnostic, which means you can use it with any Javascript framework, including popular ones like React, Vite, or Vue.
+
+However, keep in mind that because server-side rendering is not supported yet for some crypto packages, you will not be able to use a framework like NextJS. Only frameworks that run entirely on client-side are supported.
+
+Also know that all documentation within this site is done with Typescript. You can read more about [Typescript here](https://www.typescriptlang.org/).
+
+## Installing the SDK
+
+First thing you want to do is install the Aragon OSx SDK package into your product. You can do this by using `npm` or `yarn`.
+
+```bash
+npm install @aragon/sdk-client
+```
+or
+```bash
+yarn add @aragon/sdk-client
+```
+
+## Setting up the context
+
+Then, you'll want to set up the Aragon OSx SDK context within your application to have access to the SDK functions. You can do this at any point within your app.
+
+However, so you're not setting it up multiple times, we recommend you set it up as a [context hook](https://www.freecodecamp.org/news/react-context-for-beginners/) within Javascript application if you're using a framework like React, Vue, or other, or within the entry file of your app.
+*/
+
+```ts
+import { Wallet } from "@ethersproject/wallet";
+import { Context, ContextParams } from "@aragon/sdk-client";
+
+// Set up your IPFS API key. You can get one either by running a local node or by using a service like Infura or Alechmy.
+// Make sure to always keep these private in a file that is not committed to your public repository.
+export const IPFS_API_KEY: string = "ipfs-api-key";
+
+export const contextParams: ContextParams = {
+  // Choose the network you want to use. You can use "goerli" or "mumbai" for testing, "mainnet" for Ethereum.
+  network: "goerli",
+  // Depending on how you're configuring your wallet, you may want to pass in a `signer` object here.
+  signer: new Wallet("private-key"),
+  // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
+  // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
+  daoFactoryAddress: "0x1234381072385710239847120734123847123",
+  // Choose your Web3 provider: Cloudfare, Infura, Alchemy, etc.
+  web3Providers: ["https://rpc.ankr.com/eth_goerli"],
+  ipfsNodes: [
+    {
+      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: { "X-API-KEY": IPFS_API_KEY || "" }
+    },
+  ],
+  // Don't change this line. This is how we connect your app to the Aragon subgraph.
+  graphqlNodes: [
+    {
+      url:
+        "https://subgraph.satsuma-prod.com/aragon/core-goerli/api"
+    }
+  ]
+};
+
+// Instantiate the Aragon SDK context
+export const context: Context = new Context(contextParams);
+
+/* MARKDOWN
+Update the context with new parameters if you wish to throughout your app.
+*/
+
+context.set({ network: 1 });
+context.set({ signer: new Wallet("private key") }); // if you're using wagmi library, you can also get the signer through their [`useSigner` method](https://wagmi.sh/react/hooks/useSigner) inside a `useEffect` hook.
+context.setFull(contextParams);
+```
 ## Setting up the clients
 
 Next thing you'll want to do is set up the general purpose client so you can call on the SDK functions. This client is used to interact with any DAO on the network you're connected to.
@@ -11,10 +142,81 @@ The [Client](./src/client.ts) class allows you to perform operations that apply 
 We also have clients for each plugin, which allow us to use the plugin-specific functions.
 
 Clients can be stored in a singleton and inherited from there. Can also be stored in a [context hook](https://www.freecodecamp.org/news/react-context-for-beginners/) for easier use throughout your Javascript framework.
+
+```ts
+all the Aragon OSx SDK package into your product. You can do this by using `npm` or `yarn`.
+
+```bash
+npm install @aragon/sdk-client
+```
+or
+```bash
+yarn add @aragon/sdk-client
+```
+
+## Setting up the context
+
+Then, you'll want to set up the Aragon OSx SDK context within your application to have access to the SDK functions. You can do this at any point within your app.
+
+However, so you're not setting it up multiple times, we recommend you set it up as a [context hook](https://www.freecodecamp.org/news/react-context-for-beginners/) within Javascript application if you're using a framework like React, Vue, or other, or within the entry file of your app.
 */
 
+import { Wallet } from "@ethersproject/wallet";
+import { Context, ContextParams } from "@aragon/sdk-client";
+
+// Set up your IPFS API key. You can get one either by running a local node or by using a service like Infura or Alechmy.
+// Make sure to always keep these private in a file that is not committed to your public repository.
+export const IPFS_API_KEY: string = "ipfs-api-key";
+
+export const contextParams: ContextParams = {
+  // Choose the network you want to use. You can use "goerli" or "mumbai" for testing, "mainnet" for Ethereum.
+  network: "goerli",
+  // Depending on how you're configuring your wallet, you may want to pass in a `signer` object here.
+  signer: new Wallet("private-key"),
+  // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
+  // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
+  daoFactoryAddress: "0x1234381072385710239847120734123847123",
+  // Choose your Web3 provider: Cloudfare, Infura, Alchemy, etc.
+  web3Providers: ["https://rpc.ankr.com/eth_goerli"],
+  ipfsNodes: [
+    {
+      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: { "X-API-KEY": IPFS_API_KEY || "" }
+    },
+  ],
+  // Don't change this line. This is how we connect your app to the Aragon subgraph.
+  graphqlNodes: [
+    {
+      url:
+        "https://subgraph.satsuma-prod.com/aragon/core-goerli/api"
+    }
+  ]
+};
+
+// Instantiate the Aragon SDK context
+export const context: Context = new Context(contextParams);
+
+/* MARKDOWN
+Update the context with new parameters if you wish to throughout your app.
+*/
+
+context.set({ network: 1 });
+context.set({ signer: new Wallet("private key") }); // if you're using wagmi library, you can also get the signer through their [`useSigner` method](https://wagmi.sh/react/hooks/useSigner) inside a `useEffect` hook.
+context.setFull(contextParams);
+
+## Setting up the clients
+
+Next thing you'll want to do is set up the general purpose client so you can call on the SDK functions. This client is used to interact with any DAO on the network you're connected to.
+
+The [Client](./src/client.ts) class allows you to perform operations that apply to all DAOs, regardless of the plugins they use.
+
+We also have clients for each plugin, which allow us to use the plugin-specific functions.
+
+Clients can be stored in a singleton and inherited from there. Can also be stored in a [context hook](https://www.freecodecamp.org/news/react-context-for-beginners/) for easier use throughout your Javascript framework.
+
+
+```ts
 import { Client } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -36,7 +238,7 @@ import {
   TokenVotingClient,
   VotingMode
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "./01-getting-started";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -122,7 +324,7 @@ import {
   DepositParams,
   TokenType
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "./01-getting-started";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -172,7 +374,7 @@ import {
   DepositParams,
   TokenType
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "./01-getting-started";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -215,134 +417,13 @@ for await (const step of steps) {
 }
 ```
 
-### Get DAOs
-
-Gets a list of DAOs from the Aragon OSx DAO registry.
-
-```ts
-import {
-  Client,
-  DaoListItem,
-  DaoSortBy,
-  IDaoQueryParams,
-  SortDirection
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate the general purpose client from the Aragon OSx SDK context.
-const client: Client = new Client(context);
-
-const queryParams: IDaoQueryParams = {
-  skip: 0, // optional
-  limit: 10, // optional,
-  direction: SortDirection.ASC, // optional
-  sortBy: DaoSortBy.CREATED_AT //optional, alternatively "SUBDOMAIN" (and "POPULARITY" coming soon)
-};
-
-// Get a list of DAOs from the Aragon DAO registry.
-const daos: DaoListItem[] = await client.methods.getDaos(queryParams);
-console.log({ daos });
-```
-Returns:
-
-```json
-[
-  {
-    address: "0x12345...",
-    ensDomain: "test.dao.eth",
-    metadata: {
-        name: "Test",
-        description: "This is a description"
-    };
-    plugins: [
-      {
-        id: "token-voting.plugin.dao.eth",
-        instanceAddress: "0x12345..."
-      }
-    ]
-  },
-  {
-    address: "0x12345...",
-    ensDomain: "test-1.dao.eth",
-    metadata: {
-        name: "Test 1",
-        description: "This is a description 1"
-    };
-    plugins: [
-      {
-        id: "address-list-voting.plugin.dao.eth",
-        instanceAddress: "0x12345..."
-      }
-    ]
-  },
-  {
-    address: "0x12345...",
-    ensDomain: "test-2.dao.eth",
-    metadata: {
-        name: "Test 2",
-        description: "This is a description 2"
-    };
-    plugins: [
-      {
-        id: "token-voting.plugin.dao.eth",
-        instanceAddress: "0x12345..."
-      }
-    ]
-  }
-]
-```
-
-```ts
-st",
-        description: "This is a description"
-    };
-    plugins: [
-      {
-        id: "token-voting.plugin.dao.eth",
-        instanceAddress: "0x12345..."
-      }
-    ]
-  },
-  {
-    address: "0x12345...",
-    ensDomain: "test-1.dao.eth",
-    metadata: {
-        name: "Test 1",
-        description: "This is a description 1"
-    };
-    plugins: [
-      {
-        id: "address-list-voting.plugin.dao.eth",
-        instanceAddress: "0x12345..."
-      }
-    ]
-  },
-  {
-    address: "0x12345...",
-    ensDomain: "test-2.dao.eth",
-    metadata: {
-        name: "Test 2",
-        description: "This is a description 2"
-    };
-    plugins: [
-      {
-        id: "token-voting.plugin.dao.eth",
-        instanceAddress: "0x12345..."
-      }
-    ]
-  }
-]
-```
-*/
-```
-
 ### Get DAO details
 
 Gets a DAO's details using its address or ENS domain.
 
 ```ts
 import { Client, DaoDetails } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "./01-getting-started";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -361,20 +442,20 @@ Returns:
   address: "0x1234567890123456789012345678901234567890",
   ensDomain: "test.dao.eth",
   metadata: {
-      name: "test",
-      description: "this is a description",
-      avatar?: "https://wbsite.com/image.jpeg",
-      links: [
-        {
-          name: "Website",
-          url: "https://website..."
-        },
-        {
-          name: "Discord",
-          url: "https://discord.com/..."
-        }
-      ];
-  };
+    name: "test",
+    description: "this is a description",
+    avatar?: "https://wbsite.com/image.jpeg",
+    links: [
+      {
+        name: "Website",
+        url: "https://website..."
+      },
+      {
+        name: "Discord",
+        url: "https://discord.com/..."
+      }
+    ]
+  },
   creationDate: <Date>,
   plugins: [
     {
@@ -385,42 +466,125 @@ Returns:
 }
 ```
 
-```ts
-rEns);
-console.log({ dao });
+### Get DAOs
 
-/* MARKDOWN
+Gets a list of DAOs from the Aragon OSx DAO registry.
+
+```ts
+import {
+  Client,
+  DaoListItem,
+  DaoSortBy,
+  IDaoQueryParams,
+  SortDirection
+} from "@aragon/sdk-client";
+import { context } from "./01-getting-started";
+
+// Instantiate the general purpose client from the Aragon OSx SDK context.
+const client: Client = new Client(context);
+
+const queryParams: IDaoQueryParams = {
+  skip: 0, // optional
+  limit: 10, // optional,
+  direction: SortDirection.ASC, // optional
+  sortBy: DaoSortBy.CREATED_AT //optional, alternatively "SUBDOMAIN" (and "POPULARITY" coming soon)
+};
+
+// Get a list of DAOs from the Aragon DAO registry.
+const daos: DaoListItem[] = await client.methods.getDaos(queryParams);
+console.log({ daos });
+```
 Returns:
 
 ```json
-{
-  address: "0x1234567890123456789012345678901234567890",
-  ensDomain: "test.dao.eth",
-  metadata: {
-      name: "test",
-      description: "this is a description",
-      avatar?: "https://wbsite.com/image.jpeg",
-      links: [
-        {
-          name: "Website",
-          url: "https://website..."
-        },
-        {
-          name: "Discord",
-          url: "https://discord.com/..."
-        }
-      ];
-  };
-  creationDate: <Date>,
-  plugins: [
+{ daos:
+  [
     {
-      id: token-voting.plugin.dao.eth,
-      instanceAddress: "0x12345..."
+      address: "0x12345...",
+      ensDomain: "test.dao.eth",
+      metadata: {
+          name: "Test",
+          description: "This is a description"
+      };
+      plugins: [
+        {
+          id: "token-voting.plugin.dao.eth",
+          instanceAddress: "0x12345..."
+        }
+      ]
+    },
+    {
+      address: "0x12345...",
+      ensDomain: "test-1.dao.eth",
+      metadata: {
+          name: "Test 1",
+          description: "This is a description 1"
+      };
+      plugins: [
+        {
+          id: "address-list-voting.plugin.dao.eth",
+          instanceAddress: "0x12345..."
+        }
+      ]
+    },
+    {
+      address: "0x12345...",
+      ensDomain: "test-2.dao.eth",
+      metadata: {
+          name: "Test 2",
+          description: "This is a description 2"
+      };
+      plugins: [
+        {
+          id: "token-voting.plugin.dao.eth",
+          instanceAddress: "0x12345..."
+        }
+      ]
     }
   ]
 }
+  ```
+
+### Get a DAO's balance
+
+Gets a DAO's financial assets based on the DAO address or its ENS domain.
+
+```ts
+import { AssetBalance, Client } from "@aragon/sdk-client";
+import { context } from "./01-getting-started";
+
+// Instantiate the general purpose client from the Aragon OSx SDK context.
+const client: Client = new Client(context);
+
+// Address of the DAO whose asset balances you want to retrieve.
+const daoAddressOrEns: string = "0x12345...";
+
+// Get a DAO's asset balances.
+const daoBalances: AssetBalance[] | null = await client.methods.getDaoBalances({ daoAddressOrEns });
+console.log({ daoBalances });
 ```
-*/
+Returns:
+
+```json
+{ daoBalances:
+  [
+    {
+      type: "native",
+      balance: 100000n,
+      lastUpdate: <Date>
+    },
+    {
+      type: "erc20",
+      address: "0x1234567890123456789012345678901234567890"
+      name: "The Token",
+      symbol: "TOK",
+      decimals: 18,
+      balance: 200000n
+      lastUpdate: <Date>
+    },
+    ...
+  ]
+}
 ```
 
 ### Get transfers from DAO's activity
@@ -439,7 +603,7 @@ import {
   TransferSortBy,
   TransferType
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "./01-getting-started";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -460,202 +624,83 @@ console.log({ daoTransfers });
 Returns:
 
 ```json
-[
-  {
-    type: "withdraw",
-    tokenType: "erc20",
-    token: {
-      address: "0xc7ad46e0b8a400bb3c915120d284aafba8fc4735",
-      name: "Dai Stablecoin",
-      symbol: "DAI",
-      decimals: 18,
-    },
-    amount: 1000000000000000n,
-    creationDate: <Date>
-    reference: "withdrawing from dao to:0xc8541aAE19C5069482239735AD64FAC3dCc52Ca2",
-    transactionId: "0xdb0f9422b5c3199021481c98a655741ca16119ff8a59571854a94a6f31dad7ba",
-    to: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
-    proposalId: "0x1234567890123456789012345678901234567890_0x0"
-  },
-  {
-    type: "deposit",
-    tokenType: "native",
-    amount: 1000000000000000n,
-    creationDate: <Date>
-    reference: "dummy deposit of ETH, amount:0.001",
-    transactionId: "0xc18b310b2f8cf427d95fa905dc842df2cf999075f18579afbcbdce19f8db0a30",
-    from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
-  },
-  {
-    type: "deposit",
-    tokenType: "erc20",
-    token: {
-      address: "0xc7ad46e0b8a400bb3c915120d284aafba8fc4735",
-      name: "Dai Stablecoin",
-      symbol: "DAI",
-      decimals: 18,
-    },
-    amount: 1000000000000000n,
-    creationDate: <Date>
-    reference: "dummy deposit of Dai, amount:0.001",
-    transactionId: "0xdd8fff77c1f3e819d4224f8d02a00583c7e5d55475b8a9d70867aee0d6d16f07",
-    from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
-  }
-]
-```
-
-```ts
-00000000000n,
-    creationDate: <Date>
-    reference: "withdrawing from dao to:0xc8541aAE19C5069482239735AD64FAC3dCc52Ca2",
-    transactionId: "0xdb0f9422b5c3199021481c98a655741ca16119ff8a59571854a94a6f31dad7ba",
-    to: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
-    proposalId: "0x1234567890123456789012345678901234567890_0x0"
-  },
-  {
-    type: "deposit",
-    tokenType: "native",
-    amount: 1000000000000000n,
-    creationDate: <Date>
-    reference: "dummy deposit of ETH, amount:0.001",
-    transactionId: "0xc18b310b2f8cf427d95fa905dc842df2cf999075f18579afbcbdce19f8db0a30",
-    from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
-  },
-  {
-    type: "deposit",
-    tokenType: "erc20",
-    token: {
-      address: "0xc7ad46e0b8a400bb3c915120d284aafba8fc4735",
-      name: "Dai Stablecoin",
-      symbol: "DAI",
-      decimals: 18,
-    },
-    amount: 1000000000000000n,
-    creationDate: <Date>
-    reference: "dummy deposit of Dai, amount:0.001",
-    transactionId: "0xdd8fff77c1f3e819d4224f8d02a00583c7e5d55475b8a9d70867aee0d6d16f07",
-    from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
-  }
-]
-```
-*/
-```
-
-### Get a DAO's balance
-
-Gets a DAO's financial assets based on the DAO address or its ENS domain.
-
-```ts
-import { AssetBalance, Client } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate the general purpose client from the Aragon OSx SDK context.
-const client: Client = new Client(context);
-
-// Address of the DAO whose asset balances you want to retrieve.
-const daoAddressOrEns: string = "0x12345...";
-
-// Get a DAO's asset balances.
-const daoBalances: AssetBalance[] | null = await client.methods.getDaoBalances({ daoAddressOrEns });
-console.log({ daoBalances });
-```
-Returns:
-
-```json
+{ daoTransfers:
   [
     {
-      type: "native",
-      balance: 100000n,
-      lastUpdate: <Date>
+      type: "withdraw",
+      tokenType: "erc20",
+      token: {
+        address: "0xc7ad46e0b8a400bb3c915120d284aafba8fc4735",
+        name: "Dai Stablecoin",
+        symbol: "DAI",
+        decimals: 18,
+      },
+      amount: 1000000000000000n,
+      creationDate: <Date>
+      reference: "withdrawing from dao to:0xc8541aAE19C5069482239735AD64FAC3dCc52Ca2",
+      transactionId: "0xdb0f9422b5c3199021481c98a655741ca16119ff8a59571854a94a6f31dad7ba",
+      to: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
+      proposalId: "0x1234567890123456789012345678901234567890_0x0"
     },
     {
-      type: "erc20",
-      address: "0x1234567890123456789012345678901234567890"
-      name: "The Token",
-      symbol: "TOK",
-      decimals: 18,
-      balance: 200000n
-      lastUpdate: <Date>
-    },
-    ...
-  ]
-```
-
-```ts
-text);
-
-// Address of the DAO whose asset balances you want to retrieve.
-const daoAddressOrEns: string = "0x12345...";
-
-// Get a DAO's asset balances.
-const daoBalances: AssetBalance[] | null = await client.methods.getDaoBalances({ daoAddressOrEns });
-console.log({ daoBalances });
-
-/* MARKDOWN
-Returns:
-
-```json
-  [
-    {
-      type: "native",
-      balance: 100000n,
-      lastUpdate: <Date>
+      type: "deposit",
+      tokenType: "native",
+      amount: 1000000000000000n,
+      creationDate: <Date>
+      reference: "dummy deposit of ETH, amount:0.001",
+      transactionId: "0xc18b310b2f8cf427d95fa905dc842df2cf999075f18579afbcbdce19f8db0a30",
+      from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
     },
     {
-      type: "erc20",
-      address: "0x1234567890123456789012345678901234567890"
-      name: "The Token",
-      symbol: "TOK",
-      decimals: 18,
-      balance: 200000n
-      lastUpdate: <Date>
-    },
-    ...
-  ]
-```
-*/
-```
-
-### Ensure an a minimum ERC20 token allowance
-
-In order for an address to deposit an ERC20 token into the DAO, the allowance approval for that token needs to be set at the amount the person wants to deposit.
-This function ensures the allowance approval is set so that amount.
-Refer to OpenZeppelin docs here on ERC20's token allowance methods: https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-allowance-address-address-).
-
-```ts
-import {
-  Client,
-  DaoDepositSteps
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate the general purpose client from the Aragon OSx SDK context.
-const client: Client = new Client(context);
-
-const ensureAllowanceParams = {
-  amount: BigInt(10), // amount in wei
-  daoAddress: "0x1234567890123456789012345678901234567890",
-  tokenAddress: "0x1234567890123456789012345678901234567890" // token contract adddress
-};
-
-// Ensure the token's approval allowance is enough.
-const steps = client.methods.ensureAllowance(ensureAllowanceParams);
-
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case DaoDepositSteps.CHECKED_ALLOWANCE:
-        console.log(step.allowance); // 0n
-        break;
-      case DaoDepositSteps.UPDATING_ALLOWANCE:
-        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-        break;
-      case DaoDepositSteps.UPDATED_ALLOWANCE:
-        console.log(step.allowance); // 10n
+      type: "deposit",
+      tokenType: "erc20",
+      token: {
+        address: "0xc7ad46e0b8a400bb3c915120d284aafba8fc4735",
+        name: "Dai Stablecoin",
+        symbol: "DAI",
+        decimals: 18,
+      },
+      amount: 1000000000000000n,
+      creationDate: <Date>
+      reference: "dummy deposit of Dai, amount:0.001",
+      transactionId: "0xdd8fff77c1f3e819d4224f8d02a00583c7e5d55475b8a9d70867aee0d6d16f07",
+      from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
     }
-  } catch (err) {
-    console.error(err);
-  }
+  ]
+}
+```
+
+```ts
+m dao to:0xc8541aAE19C5069482239735AD64FAC3dCc52Ca2",
+      transactionId: "0xdb0f9422b5c3199021481c98a655741ca16119ff8a59571854a94a6f31dad7ba",
+      to: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
+      proposalId: "0x1234567890123456789012345678901234567890_0x0"
+    },
+    {
+      type: "deposit",
+      tokenType: "native",
+      amount: 1000000000000000n,
+      creationDate: <Date>
+      reference: "dummy deposit of ETH, amount:0.001",
+      transactionId: "0xc18b310b2f8cf427d95fa905dc842df2cf999075f18579afbcbdce19f8db0a30",
+      from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
+    },
+    {
+      type: "deposit",
+      tokenType: "erc20",
+      token: {
+        address: "0xc7ad46e0b8a400bb3c915120d284aafba8fc4735",
+        name: "Dai Stablecoin",
+        symbol: "DAI",
+        decimals: 18,
+      },
+      amount: 1000000000000000n,
+      creationDate: <Date>
+      reference: "dummy deposit of Dai, amount:0.001",
+      transactionId: "0xdd8fff77c1f3e819d4224f8d02a00583c7e5d55475b8a9d70867aee0d6d16f07",
+      from: "0xc8541aae19c5069482239735ad64fac3dcc52ca2",
+    }
+  ]
 }
 ```
 
@@ -673,7 +718,7 @@ import {
   DaoDepositSteps,
   UpdateAllowanceParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "./01-getting-started";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -711,7 +756,7 @@ Return an IPFS CID preceded by "ipfs://".
 
 ```ts
 import { Client, DaoMetadata } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "./01-getting-started";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -733,43 +778,8 @@ console.log({ metadataUri });
 ```
 Returns:
 
-```javascript
+```json
   { metadataUri: "ipfs://Qm..." }
-```
-
-```ts
-the specified IPFS nodes.
-Return an IPFS CID preceded by "ipfs://".
-*/
-
-import { Client, DaoMetadata } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate the general purpose client from the Aragon OSx SDK context.
-const client: Client = new Client(context);
-
-// The Metadata object containing the details of the DAO.
-const metadata: DaoMetadata = {
-  name: "My DAO",
-  description: "This is a description",
-  avatar: "",
-  links: [{
-    name: "Web site",
-    url: "https://..."
-  }]
-};
-
-// Pin the metadata in IPFS.
-const metadataUri = await client.methods.pinMetadata(metadata);
-console.log({ metadataUri });
-
-/* MARKDOWN
-Returns:
-
-```javascript
-  { metadataUri: "ipfs://Qm..." }
-```
-*/
 ```
 
 ## Create a TokenVoting client
@@ -779,7 +789,7 @@ This is created using the `ContextPlugin` which grants us access to plugins with
 
 ```ts
 import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate the ContextPlugin from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -804,7 +814,7 @@ import {
   TokenVotingClient,
   VotingMode
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Insantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -919,7 +929,7 @@ import {
   VotingSettings,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -1001,14 +1011,14 @@ This proposal will be created using the TokenVoting plugin as its governance mec
 ```ts
 import {
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   TokenVotingClient,
   VotingMode,
   VotingSettings,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -1047,7 +1057,7 @@ const metadataUri: string = await tokenVotingClient.methods.pinMetadata({
     }
 })
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the TokenVoting plugin contract containing all plugin logic.
   metadataUri,
   actions: [configAction], // optional, if none, leave an empty array `[]`
@@ -1076,6 +1086,41 @@ for await (const step of steps) {
 }
 ```
 
+### Check if an address can vote in a TokenVoting proposal
+
+This function returns a boolean indicating whether an address can vote in a specific TokenVoting proposal.
+
+```ts
+import {
+  ContextPlugin,
+  CanVoteParams,
+  TokenVotingClient,
+  VoteValues
+} from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
+
+// Instantiate a plugin context from the Aragon OSx SDK context.
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
+// Create an TokenVoting client.
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
+
+const canVoteParams: CanVoteParams = {
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
+  voterAddressOrEns: "0x1234567890123456789012345678901234567890", // your-plugin.plugin.dao.eth
+  vote: VoteValues.YES // alternatively, could be  NO or ABSTAIN.
+};
+
+// Returns true or false depending on whether the address can vote in the specific proposal.
+const canVote: boolean = await tokenVotingClient.methods.canVote(canVoteParams);
+console.log({ canVote });
+```
+Returns:
+
+```json
+  { canVote: true }
+```
+
 ### Vote on a TokenVoting proposal
 
 Adds a vote to a proposal using the TokenVoting governance mechanism.
@@ -1089,7 +1134,7 @@ import {
   VoteProposalStep,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -1098,7 +1143,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  proposalId: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES // other options: NO, ABSTAIN
 };
 
@@ -1120,138 +1165,6 @@ for await (const step of steps) {
 }
 ```
 
-### Check if an address can vote in a TokenVoting proposal
-
-This function returns a boolean indicating whether an address can vote in a specific TokenVoting proposal.
-
-```ts
-import {
-  ContextPlugin,
-  CanVoteParams,
-  TokenVotingClient,
-  VoteValues
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
-// Create an TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const canVoteParams: CanVoteParams = {
-  proposalId: "0x12345678901234567890123456789012345678900x0",
-  voterAddressOrEns: "0x1234567890123456789012345678901234567890", // your-plugin.plugin.dao.eth
-  vote: VoteValues.YES // alternatively, could be  NO or ABSTAIN.
-};
-
-// Returns true or false depending on whether the address can vote in the specific proposal.
-const canVote: boolean = await tokenVotingClient.methods.canVote(canVoteParams);
-console.log({ canVote });
-```
-Returns:
-
-```javascript
-  true
-```
-
-```ts
-TokenVoting proposal
-
-This function returns a boolean indicating whether an address can vote in a specific TokenVoting proposal.
-*/
-
-import {
-  ContextPlugin,
-  CanVoteParams,
-  TokenVotingClient,
-  VoteValues
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
-// Create an TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const canVoteParams: CanVoteParams = {
-  proposalId: "0x12345678901234567890123456789012345678900x0",
-  voterAddressOrEns: "0x1234567890123456789012345678901234567890", // your-plugin.plugin.dao.eth
-  vote: VoteValues.YES // alternatively, could be  NO or ABSTAIN.
-};
-
-// Returns true or false depending on whether the address can vote in the specific proposal.
-const canVote: boolean = await tokenVotingClient.methods.canVote(canVoteParams);
-console.log({ canVote });
-
-/* MARKDOWN
-Returns:
-
-```javascript
-  true
-```
-*/
-```
-
-### Get members in a DAO (with the TokenVoting plugin installed)
-
-Returns an array with the addresses of all the members of a specific DAO which has the TokenVoting plugin installed.
-
-```ts
-import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create a TokenVoting client
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const pluginAddress: string = "0x12345384572394756239846529574932532985"; // the address of the plugin that DAO has installed. You can find this through getting the DAO details.
-
-const members: string[] = await tokenVotingClient.methods.getMembers(pluginAddress);
-console.log({ members });
-```
-Returns:
-
-```json
-[
-  "0x1234567890123456789012345678901234567890",
-  "0x2345678901234567890123456789012345678901",
-  "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123",
-  "0x5678901234567890123456789012345678901234"
-]
-```
-
-```ts
-ontext } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create a TokenVoting client
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const pluginAddress: string = "0x12345384572394756239846529574932532985"; // the address of the plugin that DAO has installed. You can find this through getting the DAO details.
-
-const members: string[] = await tokenVotingClient.methods.getMembers(pluginAddress);
-console.log({ members });
-
-/* MARKDOWN
-Returns:
-
-```json
-[
-  "0x1234567890123456789012345678901234567890",
-  "0x2345678901234567890123456789012345678901",
-  "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123",
-  "0x5678901234567890123456789012345678901234"
-]
-```
-*/
-```
-
 ### Get a proposal by proposalID (TokenVoting)
 
 Gets a specific proposal using the TokenVoting plugin as its governance mechanism.
@@ -1262,7 +1175,7 @@ import {
   TokenVotingClient,
   TokenVotingProposal
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from an Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -1270,7 +1183,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 // The address of the proposal you want to retrieve.
-const proposalId: string = "0x12345238513498562394651375914323423";
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 // Get a specific proposal created using the TokenVoting plugin.
 const proposal: TokenVotingProposal | null = await tokenVotingClient.methods.getProposal(proposalId);
@@ -1284,7 +1197,7 @@ Returns:
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"
-  };
+  },
   creatorAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
@@ -1304,7 +1217,7 @@ Returns:
       header: "https://.../image.jpeg",
       logo: "https://.../image.jpeg"
     }
-  };
+  },
   startDate: <Date>,
   endDate: <Date>,
   creationDate: <Date>,
@@ -1329,7 +1242,7 @@ Returns:
     minDuration: 7200
   },
   token: {
-    address: "0x1234567890123456789012345678901234567890,
+    address: "0x1234567890123456789012345678901234567890",
     name: "The Token",
     symbol: "TOK",
     decimals: 18
@@ -1349,55 +1262,6 @@ Returns:
   ]
   status: "Executed"
 }
-```
-
-```ts
-startDate: <Date>,
-  endDate: <Date>,
-  creationDate: <Date>,
-  creationBlockNumber: 812345,
-  executionDate: <Date>,
-  executionBlockNumber: 812345,
-  actions: [
-    {
-      to: "0x12345..."
-      value: 10n
-      data: [12,13,154...]
-    }
-  ],
-  result {
-    yes: 700000n,
-    no: 300000n,
-    abstain: 0n
-  }
-  settings:{
-    minParticipation: 0.5,
-    supportThreshold: 0.25,
-    minDuration: 7200
-  },
-  token: {
-    address: "0x1234567890123456789012345678901234567890,
-    name: "The Token",
-    symbol: "TOK",
-    decimals: 18
-  },
-  usedVotingWeight: 1000000n,
-  votes: [
-    {
-      address: "0x123456789123456789123456789123456789",
-      vote: 2, // VoteValues.YES
-      voteWeight: 700000n
-    },
-    {
-      address: "0x234567891234567891234567891234567890",
-      vote: 3, // VoteValues.NO
-      voteWeight: 300000n
-    }
-  ]
-  status: "Executed"
-}
-```
-*/
 ```
 
 ### Get proposals of a DAO (TokenVoting)
@@ -1414,7 +1278,7 @@ import {
   TokenVotingClient,
   TokenVotingProposalListItem
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Create a plugin context from the Aragon SDK.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -1435,116 +1299,62 @@ console.log({ proposals });
 Returns:
 
 ```json
-[
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal",
-      summary: "Test Proposal Summary"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Executed",
-    token: {
-      address: "0x1234567890123456789012345678901234567890,
-      name: "The Token",
-      symbol: "TOK",
-      decimals: 18
+{ proposals:
+  [
+    {
+      id: "0x12345...",
+      dao: {
+        address: "0x1234567890123456789012345678901234567890",
+        name: "Cool DAO"
+      },
+      creatorAddress: "0x1234567890123456789012345678901234567890",
+      metadata: {
+        title: "Test Proposal",
+        summary: "Test Proposal Summary"
+      },
+      startDate: <Date>,
+      endDate: <Date>,
+      status: "Executed",
+      token: {
+        address: "0x1234567890123456789012345678901234567890,
+        name: "The Token",
+        symbol: "TOK",
+        decimals: 18
+      },
+      results {
+        yes: 100000n,
+        no: 77777n,
+        abstain: 0n
+      }
     },
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
+    {
+      id: "0x12345...",
+      dao: {
+        address: "0x1234567890123456789012345678901234567890",
+        name: "Cool DAO"
+      },
+      creatorAddress: "0x1234567890123456789012345678901234567890",
+      metadata: {
+        title: "Test Proposal 2",
+        summary: "Test Proposal Summary 2"
+      },
+      startDate: <Date>,
+      endDate: <Date>,
+      status: "Pending",
+      token: {
+        address: "0x1234567890123456789012345678901234567890,
+        name: "The Token",
+        symbol: "TOK",
+        decimals: 18
+      },
+      results {
+        yes: 100000n,
+        no: 77777n,
+        abstain: 0n
+      }
     }
-  },
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal 2",
-      summary: "Test Proposal Summary 2"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Pending",
-    token: {
-      address: "0x1234567890123456789012345678901234567890,
-      name: "The Token",
-      symbol: "TOK",
-      decimals: 18
-    },
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  }
-]
-```
-
-```ts
-dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal",
-      summary: "Test Proposal Summary"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Executed",
-    token: {
-      address: "0x1234567890123456789012345678901234567890,
-      name: "The Token",
-      symbol: "TOK",
-      decimals: 18
-    },
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  },
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal 2",
-      summary: "Test Proposal Summary 2"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Pending",
-    token: {
-      address: "0x1234567890123456789012345678901234567890,
-      name: "The Token",
-      symbol: "TOK",
-      decimals: 18
-    },
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  }
-]
-```
-*/
+  ]
+}
 ```
 
 ### Get a plugin's settings (TokenVoting)
@@ -1557,7 +1367,7 @@ import {
   TokenVotingClient,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-setup/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -1572,42 +1382,46 @@ console.log({ pluginSettings });
 Returns:
 
 ```json
-  {
+{ pluginSettings: {
     minDuration: 10000, // 10 seconds
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"),
     votingMode: "Standard"
   }
+}
 ```
+
+### Get members in a DAO (with the TokenVoting plugin installed)
+
+Returns an array with the addresses of all the members of a specific DAO which has the TokenVoting plugin installed.
 
 ```ts
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an Addresslist Client
+// Create a TokenVoting client
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+const pluginAddress: string = "0x12345384572394756239846529574932532985"; // the address of the plugin that DAO has installed. You can find this through getting the DAO details.
 
-const pluginSettings: VotingSettings | null = await tokenVotingClient.methods.getVotingSettings(pluginAddress);
-console.log({ pluginSettings });
-
-/* MARKDOWN
+const members: string[] = await tokenVotingClient.methods.getMembers(pluginAddress);
+console.log({ members });
+```
 Returns:
 
 ```json
-  {
-    minDuration: 10000, // 10 seconds
-    minParticipation: 0.25, // 25%
-    supportThreshold: 0.5, // 50%
-    minProposerVotingPower: BigInt("5000"),
-    votingMode: "Standard"
-  }
-```
-*/
+{ members:
+  [
+    "0x1234567890123456789012345678901234567890",
+    "0x2345678901234567890123456789012345678901",
+    "0x3456789012345678901234567890123456789012",
+    "0x4567890123456789012345678901234567890123",
+    "0x5678901234567890123456789012345678901234"
+  ]
+}
 ```
 
 ### Get token details (TokenVoting)
@@ -1618,11 +1432,9 @@ These are the details of the token used to vote in that specific DAO.
 ```ts
 import {
   ContextPlugin,
-  Erc20TokenDetails,
-  Erc721TokenDetails,
   TokenVotingClient
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -1630,11 +1442,11 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 // The address of the TokenVoting plugin whose token you want to retrieve details about.
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+const proposalId: string = "0x1234567890123456789012345678901234567890";
 
 // Get the token details used in the TokenVoting plugin for a given DAO.
 // ERC721 Token coming soon!
-const tokenDetails: Erc20TokenDetails | Erc721TokenDetails | null = await tokenVotingClient.methods.getToken(pluginAddress);
+const tokenDetails = await tokenVotingClient.methods.getToken(proposalId);
 console.log({ tokenDetails });
 ```
 Returns:
@@ -1655,46 +1467,6 @@ Or:
     symbol: "TOK",
     baseUri: "base.uri"
   }
-```
-
-```ts
-ient";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create a TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-// The address of the TokenVoting plugin whose token you want to retrieve details about.
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
-
-// Get the token details used in the TokenVoting plugin for a given DAO.
-// ERC721 Token coming soon!
-const tokenDetails: Erc20TokenDetails | Erc721TokenDetails | null = await tokenVotingClient.methods.getToken(pluginAddress);
-console.log({ tokenDetails });
-
-/* MARKDOWN
-Returns:
-
-```json
-  {
-    address: "0x123456789000987654323112345678900987654321",
-    name: "Token",
-    symbol: "TOK",
-    decimals: 18
-  }
-```
-Or:
-```json
-  {
-    address: "0x123456789000987654323112345678900987654321",
-    name: "Token",
-    symbol: "TOK",
-    baseUri: "base.uri"
-  }
-```
-*/
 ```
 
 ### Add and pin metadata
@@ -1707,7 +1479,7 @@ import {
   TokenVotingClient,
   ProposalMetadata
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -1740,63 +1512,31 @@ console.log({ metadataUri });
 ```
 Returns:
 
-```tsx
-  "ipfs://Qm..."
+```json
+  { metadataUri: "ipfs://Qm..." }
 ```
-
-```ts
-ata with into one of the specified IPFS nodes and return an IPFS CID preceded by "ipfs://".
-*/
-
-import {
-  ContextPlugin,
-  TokenVotingClient,
-  ProposalMetadata
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const metadata: ProposalMetadata = {
-  title: "Test Proposal",
-  summary: "This is a short description",
-  description: "This is a long description",
-  resources: [
-    {
-      name: "Discord",
-      url: "https://discord.com/..."
-    },
-    {
-      name: "Website",
-      url: "https://website..."
-    },
-  ],
-  media: {
-    logo: "https://...",
-    header: "https://..."
-  },
-};
-
-// Pin the metadata in IPFS to get back the URI.
-const metadataUri: string = await tokenVotingClient.methods.pinMetadata(metadata);
-console.log({ metadataUri });
-
-/* MARKDOWN
-Returns:
-
-```tsx
-  "ipfs://Qm..."
-```
-*/
-```
-
 ## Multisig governance plugin
 
 The Mutisig plugin is a governance mechanism which enables x amount of signers to approve a proposal in order for it to pass.
+
 It establishes a minimum approval threshold and a list of addresses which are allowed to vote.
+
+### Create an Multisig client
+
+Creating a Multisig plugin Client allows you to access the Multisig plugin from your DAO.
+In order to interact with the Multisig plugin, you need to create a `MultisigClient`. This is created using the `ContextPlugin`.
+
+```ts
+import { ContextPlugin, MultisigClient } from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
+
+// Create a plugin context from the Aragon OSx SDK context.
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
+// Creates a Multisig plugin client.
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+console.log({ multisigClient });
+```
 
 ### Create a DAO with a Multisig plugin installed
 
@@ -1811,7 +1551,7 @@ import {
   MultisigClient,
   MultisigPluginInstallParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -1874,23 +1614,6 @@ for await (const step of steps) {
 }
 ```
 
-### Create an Multisig client
-
-Creating a Multisig plugin Client allows you to access the Multisig plugin from your DAO.
-In order to interact with the Multisig plugin, you need to create a `MultisigClient`. This is created using the `ContextPlugin`.
-
-```ts
-import { ContextPlugin, MultisigClient } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Create a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
-// Creates a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-console.log({ multisigClient });
-```
-
 ### Create a Multisig proposal
 
 Creates a proposal whose governance mechanism is the Multisig plugin and its defined configuration.
@@ -1906,7 +1629,7 @@ import {
   TokenType,
   WithdrawParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate an Aragon OSx SDK client.
 const client: Client = new Client(context);
@@ -1942,14 +1665,12 @@ const metadataUri: string = await multisigClient.methods.pinMetadata(proposalMet
 const withdrawParams: WithdrawParams = {
   amount: BigInt(10), // amount in wei
   tokenAddress: "0x1234567890123456789012345678901234567890", // ERC20 token's contract address to withdraw
-  type: TokenType.ERC20
+  type: TokenType.ERC20,
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890", // address or ENS name to send the assets to
 };
 
-// Address of the DAO where the proposal will be created.
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
 // Encodes the action of withdrawing assets from a given DAO's vault and transfers them over to the recipient address.
-const withdrawAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const withdrawAction = await client.encoding.withdrawAction(withdrawParams);
 
 const proposalParams: CreateMultisigProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -1988,7 +1709,7 @@ import {
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-setup/01-getting-started";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -1996,7 +1717,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
-  proposalId: "0x123456789012345678901234567890123456789090x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   tryExecution: true
 };
 
@@ -2017,6 +1738,66 @@ for await (const step of steps) {
 }
 ```
 
+### Check if user can approve a transaction (Multisig)
+
+Checks whether a user is able to participate in a proposal created using the Multisig plugin.
+
+```ts
+import {
+  CanApproveParams,
+  ContextPlugin,
+  MultisigClient
+} from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
+
+// Instantiate a plugin context from the Aragon OSx SDK context.
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Instantiate a Multisig client.
+const client: MultisigClient = new MultisigClient(contextPlugin);
+
+const canApproveParams: CanApproveParams = {
+  approverAddressOrEns: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0"
+};
+
+// Checks whether the addressOrEns provided is able to approve a given proposal created with the pluginAddress.
+const canApprove = await client.methods.canApprove(canApproveParams);
+console.log({ canApprove });
+```
+Returns:
+
+```json
+  { canApprove: true }
+```
+
+### Check if user can execute an action (Multisig plugin)
+
+Checks whether the signer of the transaction is able to execute actions approved and created by proposals from the Multisig plugin.
+
+```ts
+import {
+  ContextPlugin,
+  MultisigClient
+} from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
+
+// Instantiate a plugin context from the Aragon OSx SDK context.
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Instantiate a Multisig client.
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0"
+
+// Checks whether the signer of the transaction can execute a given proposal.
+const canExecute = await multisigClient.methods.canExecute(proposalId);
+console.log({ canExecute });
+```
+Returns:
+
+```json
+  { canExecute: true }
+```
+
 ### Execute the actions of a Multisig proposal
 
 Executes the actions set within a proposal made using the Multisig plugin.
@@ -2027,19 +1808,17 @@ import {
   ExecuteProposalStep,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Insantiate a Multisig client.
 const multisigClient = new MultisigClient(contextPlugin);
 
-const executeProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890" // the address of the Multisig plugin contract installed into the DAO.
-}
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0"
 
 // Executes the actions of a Multisig proposal.
-const steps = multisigClient.methods.executeProposal(executeProposalParams);
+const steps = multisigClient.methods.executeProposal(proposalId);
 
 for await (const step of steps) {
   try {
@@ -2056,203 +1835,6 @@ for await (const step of steps) {
 }
 ```
 
-### Check if user can approve a transaction (Multisig)
-
-Checks whether a user is able to participate in a proposal created using the Multisig plugin.
-
-```ts
-import {
-  CanApproveParams,
-  ContextPlugin,
-  MultisigClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const client: MultisigClient = new MultisigClient(contextPlugin);
-
-const canApproveParams: CanApproveParams = {
-  addressOrEns: "0x1234567890123456789012345678901234567890",
-  pluginAddress: "0x1234567890123456789012345678901234567890"
-};
-
-// Checks whether the addressOrEns provided is able to approve a given proposal created with the pluginAddress.
-const canApprove = await client.methods.canApprove(canApproveParams);
-console.log({ canApprove });
-```
-Returns:
-
-```javascript
-  { canApprove: true }
-```
-
-```ts
-Checks whether a user is able to participate in a proposal created using the Multisig plugin.
-*/
-
-import {
-  CanApproveParams,
-  ContextPlugin,
-  MultisigClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const client: MultisigClient = new MultisigClient(contextPlugin);
-
-const canApproveParams: CanApproveParams = {
-  addressOrEns: "0x1234567890123456789012345678901234567890",
-  pluginAddress: "0x1234567890123456789012345678901234567890"
-};
-
-// Checks whether the addressOrEns provided is able to approve a given proposal created with the pluginAddress.
-const canApprove = await client.methods.canApprove(canApproveParams);
-console.log({ canApprove });
-
-/* MARKDOWN
-Returns:
-
-```javascript
-  { canApprove: true }
-```
-*/
-```
-
-### Check if user can execute an action (Multisig plugin)
-
-Checks whether the signer of the transaction is able to execute actions approved and created by proposals from the Multisig plugin.
-
-```ts
-import {
-  CanExecuteParams,
-  ContextPlugin,
-  MultisigClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const canExecuteParams: CanExecuteParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890" // the address of the plugin contract itself.
-};
-
-// Checks whether the signer of the transaction can execute a given proposal.
-const canExecute = await multisigClient.methods.canExecute(canExecuteParams);
-console.log({ canExecute });
-```
-Returns:
-
-```javascript
-  { canExecute: true }
-```
-
-```ts
-in)
-
-Checks whether the signer of the transaction is able to execute actions approved and created by proposals from the Multisig plugin.
-*/
-
-import {
-  CanExecuteParams,
-  ContextPlugin,
-  MultisigClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const canExecuteParams: CanExecuteParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890" // the address of the plugin contract itself.
-};
-
-// Checks whether the signer of the transaction can execute a given proposal.
-const canExecute = await multisigClient.methods.canExecute(canExecuteParams);
-console.log({ canExecute });
-
-/* MARKDOWN
-Returns:
-
-```javascript
-  { canExecute: true }
-```
-*/
-```
-
-### Get voting settings (Multisig)
-
-Get the settings of a Multisig plugin from a specific DAO.
-
-```ts
-import {
-  ContextPlugin,
-  MultisigClient,
-  MultisigVotingSettings
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Insantiate a Multisig client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const daoAddressorEns: string = "0x12345348523485623984752394854320";
-
-const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(daoAddressorEns);
-console.log({ multisigSettings });
-```
-Returns:
-```json
-{
-  votingSettings: {
-    minApprovals: 4,
-    onlyListed: true
-  }
-}
-```
-
-```ts
-*/
-
-import {
-  ContextPlugin,
-  MultisigClient,
-  MultisigVotingSettings
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Insantiate a Multisig client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const daoAddressorEns: string = "0x12345348523485623984752394854320";
-
-const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(daoAddressorEns);
-console.log({ multisigSettings });
-
-/* MARKDOWN
-Returns:
-```json
-{
-  votingSettings: {
-    minApprovals: 4,
-    onlyListed: true
-  }
-}
-```
-*/
-```
-
 ### Get a proposal (Multisig plugin)
 
 Get the proposal details of a given proposal made using the Multisig plugin.
@@ -2263,14 +1845,14 @@ import {
   MultisigClient,
   MultisigProposal
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const proposalId: string = "0x123456789012345678901234567890123456789080x0";
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 const proposalDetails: MultisigProposal | null = await multisigClient.methods.getProposal(proposalId);
 console.log({ proposalDetails });
@@ -2283,7 +1865,7 @@ Returns:
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"
-  };
+  },
   creatorAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
@@ -2303,7 +1885,7 @@ Returns:
       header: "https://.../image.jpeg",
       logo: "https://.../image.jpeg"
     }
-  };
+  },
   creationDate: <Date>,
   actions: [
     {
@@ -2318,47 +1900,6 @@ Returns:
     "0x234567891234567891234567891234567890"
   ]
 }
-```
-
-```ts
-O"
-  };
-  creatorAddress: "0x1234567890123456789012345678901234567890",
-  metadata: {
-    title: "Test Proposal",
-    summary: "Test Proposal Summary",
-    description: "This is a long description",
-    resources: [
-      {
-        url: "https://dicord.com/...",
-        name: "Discord"
-      },
-      {
-        url: "https://docs.com/...",
-        name: "Document"
-      }
-    ],
-    media: {
-      header: "https://.../image.jpeg",
-      logo: "https://.../image.jpeg"
-    }
-  };
-  creationDate: <Date>,
-  actions: [
-    {
-      to: "0x12345..."
-      value: 10n
-      data: [12,13,154...]
-    }
-  ],
-  status: "Executed",
-  approvals: [
-    "0x123456789123456789123456789123456789",
-    "0x234567891234567891234567891234567890"
-  ]
-}
-```
-*/
 ```
 
 ### Get the list of a given DAO's proposals made using the Multisig plugin.
@@ -2375,7 +1916,7 @@ import {
   ProposalSortBy,
   ProposalStatus
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -2427,53 +1968,69 @@ Returns:
 ]
 ```
 
+### Get voting settings (Multisig)
+
+Get the settings of a Multisig plugin from a specific DAO.
+
 ```ts
-ueryParams = {
-  skip: 0, // optional
-  limit: 10, // optional
-  direction: SortDirection.ASC, // optional. otherwise, DESC
-  sortBy: ProposalSortBy.CREATED_AT, //optional. otherwise, NAME, VOTES (POPULARITY coming soon)
-  status: ProposalStatus.ACTIVE, // optional. otherwise, PENDING, SUCCEEDED, EXECUTED, DEFEATED
-  daoAddressOrEns: "0x1234348529348570294650287698237520938574284357" // or my-dao.dao.eth
-};
+import {
+  ContextPlugin,
+  MultisigClient,
+  MultisigVotingSettings
+} from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
 
-const multisigProposals: MultisigProposalListItem[] = await multisigClient.methods.getProposals(queryParams);
-console.log({ multisigProposals });
+// Instantiate a plugin context from the Aragon OSx SDK context.
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Insantiate a Multisig client.
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-/* MARKDOWN
+const daoAddressorEns: string = "0x12345348523485623984752394854320";
+
+const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(daoAddressorEns);
+console.log({ multisigSettings });
+```
+Returns:
+```json
+{
+  votingSettings: {
+    minApprovals: 4,
+    onlyListed: true
+  }
+}
+```
+
+### Get the list of members (Multisig)
+
+Gets the list of addresses able to participate in a Multisig proposal for a given DAO that has the Multisig plugin installed.
+
+```ts
+import {
+  ContextPlugin,
+  MultisigClient
+} from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
+
+// Instantiate a plugin context from the Aragon OSx SDK context.
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Instantiate a Multisig plugin client.
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+
+const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
+
+const multisigMembers: string[] = await multisigClient.methods.getMembers(daoAddressorEns);
+console.log({ multisigMembers });
+```
 Returns:
 
 ```json
-[
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal",
-      summary: "Test Proposal Summary"
-    };
-    status: "Executed"
-  },
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal 2",
-      summary: "Test Proposal Summary 2"
-    };
-    status: "Pending"
-  }
-]
-```
-*/
+{ multisigMembers:
+  [
+    "0x1234567890...",
+    "0x2345678901...",
+    "0x3456789012..."
+  ]
+}
 ```
 
 ### Add and pin metadata for the Multisig plugin
@@ -2486,7 +2043,7 @@ import {
   MultisigClient,
   ProposalMetadata
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -2518,120 +2075,8 @@ console.log({ metadataUri });
 ```
 Returns:
 
-```javascript
-  { metadataUri: "ipfs://Qm..." }
-```
-
-```ts
-a into one of the specified IPFS nodes and return a IPFS CID preceded by "ipfs://"
-*/
-
-import {
-  ContextPlugin,
-  MultisigClient,
-  ProposalMetadata
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const metadata: ProposalMetadata = {
-  title: "Test Proposal",
-  summary: "This is a short description",
-  description: "This is a long description",
-  resources: [
-    {
-      name: "Discord",
-      url: "https://discord.com/..."
-    },
-    {
-      name: "Website",
-      url: "https://website..."
-    },
-  ],
-  media: {
-    logo: "https://...",
-    header: "https://..."
-  },
-};
-
-const metadataUri: string = await multisigClient.methods.pinMetadata(metadata);
-console.log({ metadataUri });
-
-/* MARKDOWN
-Returns:
-
-```javascript
-  { metadataUri: "ipfs://Qm..." }
-```
-*/
-```
-
-### Get the list of members (Multisig)
-
-Gets the list of addresses able to participate in a Multisig proposal for a given DAO that has the Multisig plugin installed.
-
-```ts
-import {
-  ContextPlugin,
-  MultisigClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
-
-const multisigMembers: string[] = await multisigClient.methods.getMembers(daoAddressorEns);
-console.log({ multisigMembers });
-```
-Returns:
-
 ```json
-[
-  "0x1234567890...",
-  "0x2345678901...",
-  "0x3456789012..."
-]
-```
-
-```ts
-Multisig proposal for a given DAO that has the Multisig plugin installed.
-*/
-
-import {
-  ContextPlugin,
-  MultisigClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
-
-const multisigMembers: string[] = await multisigClient.methods.getMembers(daoAddressorEns);
-console.log({ multisigMembers });
-
-/* MARKDOWN
-Returns:
-
-```json
-[
-  "0x1234567890...",
-  "0x2345678901...",
-  "0x3456789012..."
-]
-```
-*/
+  { metadataUri: "ipfs://Qm..." }
 ```
 
 ## Addresslist governance plugin
@@ -2654,7 +2099,7 @@ import {
   GasFeeEstimation,
   VotingMode
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -2728,7 +2173,7 @@ Creates the context for an Addresslist plugin to be able to call on its function
 ```ts
 import { ContextPlugin } from "@aragon/sdk-client";
 import { Wallet } from "@ethersproject/wallet";
-import { context, contextParams } from "../00-setup/00-getting-started";
+import { context, contextParams } from "../01-client/01-getting-started";
 
 // Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -2747,7 +2192,7 @@ Creates an AddresslistVoting client allowing you to access the AddresslistVoting
 
 ```ts
 import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -2773,7 +2218,7 @@ import {
   VotingMode,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -2841,14 +2286,14 @@ Creates a proposal with an action(s) to get executed upon the proposal passes. W
 import {
   AddresslistVotingClient,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
+  MajorityVotingSettings,
   ProposalCreationSteps,
   ProposalMetadata,
   VotingMode,
-  VotingSettings,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -2857,7 +2302,7 @@ const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingCl
 
 // [Optional] You can add encoded actions to the proposal. These actions are the encoded transactions which will be executed when a transaction passes.
 // In this example, we are updating the plugin settings as an action that you may want upon a proposal approval.
-const configActionParams: VotingSettings = {
+const configActionParams: MajorityVotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
@@ -2869,8 +2314,8 @@ const pluginAddress = "0x1234567890123456789012345678901234567890"; // the addre
 
 // Sets up the action instructions based on the above parameters.
 const configAction = addresslistVotingClient.encoding.updatePluginSettingsAction(
-  configActionParams,
-  pluginAddress
+  pluginAddress,
+  configActionParams
 );
 
 const daoMetadata: ProposalMetadata = {
@@ -2895,7 +2340,7 @@ const daoMetadata: ProposalMetadata = {
 
 const metadataUri: string = await addresslistVotingClient.methods.pinMetadata(daoMetadata);
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the AddresslistVoting plugin contract installed in the DAO
   metadataUri,
   actions: [configAction], // the action you want to have executed upon a proposal approval
@@ -2923,6 +2368,39 @@ for await (const step of steps) {
 }
 ```
 
+### Check if an address can vote in a proposal (Addresslist)
+
+Checks whether an address is able to participate in a DAO proposal created using the Addresslist Voting plugin.
+
+```ts
+import {
+  AddresslistVotingClient,
+  CanVoteParams,
+  ContextPlugin,
+  VoteValues
+} from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
+
+// Instantiate a plugin context from the Aragon OSx SDK context
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Create an AddresslistVoting client
+const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+
+const voteParams: CanVoteParams = {
+  voterAddressOrEns: "0x1234567890123456789012345678901234567890", // the address who's potential to vote you want to check
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
+  vote: VoteValues.YES // this doesn't execute the vote itself, simply checks whether that address can execute that vote. VoteValues can be NO, YES, or ABSTAIN
+};
+
+const canVote = await addresslistVotingClient.methods.canVote(voteParams);
+console.log({ canVote });
+```
+Returns:
+
+```json
+  { canVote: true }
+```
+
 ### Vote on a Addresslist proposal
 
 Enables voting on a proposal using the Addresslist Voting plugin installed within a DAO.
@@ -2935,7 +2413,7 @@ import {
   VoteProposalStep,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -2943,7 +2421,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  proposalId: "0x12345678901234567890123456789012345678900x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES // alternatively NO, or ABSTAIN
 };
 
@@ -2965,134 +2443,6 @@ for await (const step of steps) {
 }
 ```
 
-### Check if an address can vote in a proposal (Addresslist)
-
-Checks whether an address is able to participate in a DAO proposal created using the Addresslist Voting plugin.
-
-```ts
-import {
-  AddresslistVotingClient,
-  CanVoteParams,
-  ContextPlugin,
-  VoteValues
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an AddresslistVoting client
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
-
-const voteParams: CanVoteParams = {
-  voterAddressOrEns: "0x1234567890123456789012345678901234567890", // the address who's potential to vote you want to check
-  proposalId: "0x123456789012345678901234567890123456789080x0",
-  vote: VoteValues.YES // this doesn't execute the vote itself, simply checks whether that address can execute that vote. VoteValues can be NO, YES, or ABSTAIN
-};
-
-const canVote = await addresslistVotingClient.methods.canVote(voteParams);
-console.log({ canVote });
-```
-Returns:
-
-```json
-  { canVote: true }
-```
-
-```ts
-l (Addresslist)
-
-Checks whether an address is able to participate in a DAO proposal created using the Addresslist Voting plugin.
-*/
-
-import {
-  AddresslistVotingClient,
-  CanVoteParams,
-  ContextPlugin,
-  VoteValues
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an AddresslistVoting client
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
-
-const voteParams: CanVoteParams = {
-  voterAddressOrEns: "0x1234567890123456789012345678901234567890", // the address who's potential to vote you want to check
-  proposalId: "0x123456789012345678901234567890123456789080x0",
-  vote: VoteValues.YES // this doesn't execute the vote itself, simply checks whether that address can execute that vote. VoteValues can be NO, YES, or ABSTAIN
-};
-
-const canVote = await addresslistVotingClient.methods.canVote(voteParams);
-console.log({ canVote });
-
-/* MARKDOWN
-Returns:
-
-```json
-  { canVote: true }
-```
-*/
-```
-
-### Get list of members (AddresslistVoting)
-
-Gets an array of all addresses able to vote in a specific AddresslistVoting DAO proposal.
-
-```ts
-import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiates a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiates an AddressList client.
-const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
-
-const daoAddressorEns = "0x12345382947301297439127433492834"; // or my-dao.dao.eth
-
-const members: string[] = await addresslistVotingClient.methods.getMembers(daoAddressorEns);
-console.log({ members });
-```
-Returns:
-
-```json
-[
-  "0x1234567890123456789012345678901234567890",
-  "0x2345678901234567890123456789012345678901",
-  "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123",
-  "0x5678901234567890123456789012345678901234"
-]
-```
-
-```ts
-ted";
-
-// Instantiates a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiates an AddressList client.
-const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
-
-const daoAddressorEns = "0x12345382947301297439127433492834"; // or my-dao.dao.eth
-
-const members: string[] = await addresslistVotingClient.methods.getMembers(daoAddressorEns);
-console.log({ members });
-
-/* MARKDOWN
-Returns:
-
-```json
-[
-  "0x1234567890123456789012345678901234567890",
-  "0x2345678901234567890123456789012345678901",
-  "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123",
-  "0x5678901234567890123456789012345678901234"
-]
-```
-*/
-```
-
 ### Get the proposal by proposalId (Addresslist)
 
 Gets a proposal created using the AddresslistVoting plugin.
@@ -3103,14 +2453,14 @@ import {
   AddresslistVotingProposal,
   ContextPlugin
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddresslistVoting client.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const proposalId: string = "0x123456789012345678901234567890123456789090x0";
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 const addresslistVotingProposal: AddresslistVotingProposal | null = await addresslistVotingClient.methods.getProposal(proposalId);
 console.log({ addresslistVotingProposal });
@@ -3118,117 +2468,69 @@ console.log({ addresslistVotingProposal });
 Returns:
 
 ```json
-{
-  id: "0x1234567890123456789012345678901234567890_0x0",
-  dao: {
-    address: "0x1234567890123456789012345678901234567890",
-    name: "Cool DAO"
-  };
-  creatorAddress: "0x1234567890123456789012345678901234567890",
-  metadata: {
-    title: "Test Proposal",
-    summary: "test proposal summary",
-    description: "this is a long description",
-    resources: [
+{ addresslistVotingProposal:
+  {
+    id: "0x1234567890123456789012345678901234567890_0x0",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
+    },
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal",
+      summary: "test proposal summary",
+      description: "this is a long description",
+      resources: [
+        {
+          url: "https://dicord.com/...",
+          name: "Discord"
+        },
+        {
+          url: "https://docs.com/...",
+          name: "Document"
+        }
+      ],
+      media: {
+        header: "https://.../image.jpeg",
+        logo: "https://.../image.jpeg"
+      }
+    },
+    startDate: <Date>,
+    endDate: <Date>,
+    creationDate: <Date>,
+    creationBlockNumber: 812345,
+    executionDate: <Date>,
+    executionBlockNumber: 812345,
+    actions: [
       {
-        url: "https://dicord.com/...",
-        name: "Discord"
+        to: "0x12345..."
+        value: 10n
+        data: [12,13,154...]
+      }
+    ],
+    status: "Executed",
+    result {
+      yes: 1,
+      no: 1,
+      abstain: 0
+    }
+    settings: {
+      minParticipation: 0.5,
+      supportThreshold: 0.25,
+      minDuration: 7200
+    },
+    votes: [
+      {
+        address: "0x123456789123456789123456789123456789",
+        vote: 2 // VoteValues.YES
       },
       {
-        url: "https://docs.com/...",
-        name: "Document"
+        address: "0x234567891234567891234567891234567890",
+        vote: 3 // VoteValues.NO
       }
-    ],
-    media: {
-      header: "https://.../image.jpeg",
-      logo: "https://.../image.jpeg"
-    }
-  };
-  startDate: <Date>,
-  endDate: <Date>,
-  creationDate: <Date>,
-  creationBlockNumber: 812345,
-  executionDate: <Date>,
-  executionBlockNumber: 812345,
-  actions: [
-    {
-      to: "0x12345..."
-      value: 10n
-      data: [12,13,154...]
-    }
-  ],
-  status: "Executed",
-  result {
-    yes: 1,
-    no: 1,
-    abstain: 0
+    ]
   }
-  settings: {
-    minParticipation: 0.5,
-    supportThreshold: 0.25,
-    minDuration: 7200
-  },
-  votes: [
-    {
-      address: "0x123456789123456789123456789123456789",
-      vote: 2, // VoteValues.YES
-    },
-    {
-      address: "0x234567891234567891234567891234567890",
-      vote: 3, // VoteValues.NO
-    }
-  ]
 }
-```
-
-```ts
-{
-        url: "https://docs.com/...",
-        name: "Document"
-      }
-    ],
-    media: {
-      header: "https://.../image.jpeg",
-      logo: "https://.../image.jpeg"
-    }
-  };
-  startDate: <Date>,
-  endDate: <Date>,
-  creationDate: <Date>,
-  creationBlockNumber: 812345,
-  executionDate: <Date>,
-  executionBlockNumber: 812345,
-  actions: [
-    {
-      to: "0x12345..."
-      value: 10n
-      data: [12,13,154...]
-    }
-  ],
-  status: "Executed",
-  result {
-    yes: 1,
-    no: 1,
-    abstain: 0
-  }
-  settings: {
-    minParticipation: 0.5,
-    supportThreshold: 0.25,
-    minDuration: 7200
-  },
-  votes: [
-    {
-      address: "0x123456789123456789123456789123456789",
-      vote: 2, // VoteValues.YES
-    },
-    {
-      address: "0x234567891234567891234567891234567890",
-      vote: 3, // VoteValues.NO
-    }
-  ]
-}
-```
-*/
 ```
 
 ### Get proposal list (AddresslistVoting)
@@ -3245,7 +2547,7 @@ import {
   ProposalStatus,
   SortDirection
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -3266,105 +2568,50 @@ console.log({ addresslistVotingProposals });
 Returns:
 
 ```json
-[
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal",
-      summary: "test proposal summary"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Executed",
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
+{ addresslistVotingProposals:
+  [
+    {
+      id: "0x12345...",
+      dao: {
+        address: "0x1234567890123456789012345678901234567890",
+        name: "Cool DAO"
+      },
+      creatorAddress: "0x1234567890123456789012345678901234567890",
+      metadata: {
+        title: "Test Proposal",
+        summary: "test proposal summary"
+      },
+      startDate: <Date>,
+      endDate: <Date>,
+      status: "Executed",
+      results {
+        yes: 100000n,
+        no: 77777n,
+        abstain: 0n
+      }
+    },
+    {
+      id: "0x12345...",
+      dao: {
+        address: "0x1234567890123456789012345678901234567890",
+        name: "Cool DAO"
+      },
+      creatorAddress: "0x1234567890123456789012345678901234567890",
+      metadata: {
+        title: "Test Proposal 2",
+        summary: "test proposal summary 2"
+      },
+      startDate: <Date>,
+      endDate: <Date>,
+      status: "Pending",
+      results {
+        yes: 100000n,
+        no: 77777n,
+        abstain: 0n
+      }
     }
-  },
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal 2",
-      summary: "test proposal summary 2"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Pending",
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  }
-]
-```
-
-```ts
-: ProposalStatus.ACTIVE, // optional, alternatively PENDING, SUCCEEDED, EXECUTED, DEFEATED
-};
-
-const addresslistVotingProposals: AddresslistVotingProposalListItem[] = await addresslistVotingClient.methods.getProposals(queryParams);
-console.log({ addresslistVotingProposals });
-
-/* MARKDOWN
-Returns:
-
-```json
-[
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal",
-      summary: "test proposal summary"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Executed",
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  },
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal 2",
-      summary: "test proposal summary 2"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Pending",
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  }
-]
-```
-*/
+  ]
+}
 ```
 
 ### Get plugin settings (AddresslistVoting)
@@ -3377,7 +2624,7 @@ import {
   ContextPlugin,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -3392,6 +2639,7 @@ console.log({ addresslistVotingSettings });
 Returns:
 
 ```json
+{ addresslistVotingSettings:
   {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
@@ -3399,32 +2647,40 @@ Returns:
     minProposerVotingPower: BigInt("5000"), // default 0
     votingMode: "Standard" // default STANDARD, otherwise EARLY_EXECUTION or VOTE_REPLACEMENT
   }
-  ```
+}
+```
+
+
+### Get list of members (AddresslistVoting)
+
+Gets an array of all addresses able to vote in a specific AddresslistVoting DAO proposal.
 
 ```ts
-text from the Aragon OSx SDK context.
+import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
+
+// Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate an AddresslistVoting client.
+// Instantiates an AddressList client.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const pluginAddress: string = "0x1234567890123456789012345678901234567890"; // the address of the AddresslistVoting plugin contract installed in the DAO.
+const daoAddressorEns = "0x12345382947301297439127433492834"; // or my-dao.dao.eth
 
-const addresslistVotingSettings: VotingSettings | null = await addresslistVotingClient.methods.getVotingSettings(pluginAddress);
-console.log({ addresslistVotingSettings });
-
-/* MARKDOWN
+const members: string[] = await addresslistVotingClient.methods.getMembers(daoAddressorEns);
+console.log({ members });
+```
 Returns:
 
 ```json
-  {
-    minDuration: 60 * 60 * 24 * 2, // seconds
-    minParticipation: 0.25, // 25%
-    supportThreshold: 0.5, // 50%
-    minProposerVotingPower: BigInt("5000"), // default 0
-    votingMode: "Standard" // default STANDARD, otherwise EARLY_EXECUTION or VOTE_REPLACEMENT
-  }
-  ```
-*/
+{ members :
+  [
+    "0x1234567890123456789012345678901234567890",
+    "0x2345678901234567890123456789012345678901",
+    "0x3456789012345678901234567890123456789012",
+    "0x4567890123456789012345678901234567890123",
+    "0x5678901234567890123456789012345678901234"
+  ]
+}
 ```
 
 ### Add and pin metadata
@@ -3437,7 +2693,7 @@ import {
   ContextPlugin,
   ProposalMetadata
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -3467,54 +2723,8 @@ const proposalMetadata: ProposalMetadata = {
 const proposalMetadataUri: string = await addresslistVotingClient.methods.pinMetadata(proposalMetadata);
 console.log({ proposalMetadataUri });
 ```
-```javascript
+```json
   { proposalMetadataUri: ipfs://Qm... }
-```
-
-```ts
-pecified IPFS nodes and return a IPFS CID preceded by "ipfs://".
-*/
-
-import {
-  AddresslistVotingClient,
-  ContextPlugin,
-  ProposalMetadata
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate an AddresslistVoting plugin client.
-const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
-
-const proposalMetadata: ProposalMetadata = {
-  title: "Test Proposal",
-  summary: "This is a short description",
-  description: "This is a long description",
-  resources: [
-    {
-      name: "Discord",
-      url: "https://discord.com/..."
-    },
-    {
-      name: "Website",
-      url: "https://website..."
-    },
-  ],
-  media: {
-    logo: "https://...",
-    header: "https://..."
-  },
-};
-
-const proposalMetadataUri: string = await addresslistVotingClient.methods.pinMetadata(proposalMetadata);
-console.log({ proposalMetadataUri });
-
-/* MARKDOWN
-```javascript
-  { proposalMetadataUri: ipfs://Qm... }
-```
-*/
 ```
 
 ## Action encoders
@@ -3542,7 +2752,7 @@ import {
   IGrantPermissionParams,
   Permissions
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiates a general purpose Client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -3561,50 +2771,13 @@ console.log({ grantPermission });
 Returns:
 
 ```json
-{
-  to: "0x1234567890...",
-  value: 0n,
-  data: Uint8Array[12,34,45...]
+{ grantPermission:
+  {
+    to: "0x1234567890...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
 }
-```
-
-```ts
-on a contract (`where`).
-*/
-
-import {
-  Client,
-  DaoAction,
-  IGrantPermissionParams,
-  Permissions
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiates a general purpose Client from the Aragon OSx SDK context.
-const client: Client = new Client(context);
-
-const grantParams: IGrantPermissionParams = {
-  who: "0x1234567890123456789012345678901234567890",
-  where: "0x1234567890123456789012345678901234567890",
-  permission: Permissions.UPGRADE_PERMISSION
-};
-
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
-const grantPermission: DaoAction = await client.encoding.grantAction(daoAddress, grantParams);
-console.log({ grantPermission });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  to: "0x1234567890...",
-  value: 0n,
-  data: Uint8Array[12,34,45...]
-}
-```
-*/
 ```
 
 #### Grant permission based on a condition
@@ -3619,7 +2792,7 @@ import {
   GrantPermissionWithConditionParams,
   Permissions
 } from "@aragon/sdk-client";
-import { context } from '../00-setup/00-getting-started';
+import { context } from '../01-client/01-getting-started';
 
 // Initializes a plugin context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -3649,52 +2822,6 @@ Returns:
     value: 0n,
     data: Uint8Array[12,34,45...]
   }
-  ```
-
-```ts
-ndition is met.
-*/
-
-import {
-  Client,
-  ContextPlugin,
-  DaoAction,
-  GrantPermissionWithConditionParams,
-  Permissions
-} from "@aragon/sdk-client";
-import { context } from '../00-setup/00-getting-started';
-
-// Initializes a plugin context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initializes a general purpose client from the Aragon SDK context.
-const client: Client = new Client(contextPlugin);
-
-const grantWithConditionParams: GrantPermissionWithConditionParams = {
-  who: "0x1234567890123456789012345678901234567890", // address to which the permission will be granted
-  where: "0x2345678901234567890123456789012345678901", // where the permission is granted
-  permission: Permissions.EXECUTE_PERMISSION, // the permission to grant. alternatively: UPGRADE_PERMISSION, SET_METADATA_PERMISSION, WITHDRAW_PERMISSION, SET_SIGNATURE_VALIDATOR, SET_TRUSTED_FORWARDER_PERMISSION, ROOT_PERMISSION, CREATE_VERSION_PERMISSION, REGISTER_DAO_PERMISSION, REGISTER_PERMISSION, REGISTER_ENS_SUBDOMAIN_PERMISSION, MINT_PERMISSION, MERKLE_MINT_PERMISSION, MODIFY_ALLOWLIST_PERMISSION, SET_CONFIGURATION_PERMISSION
-  condition: "0x3456789012345678901234567890123456789012" // the contract address of the condition which needs to be met in order for the permission to be granted
-};
-
-const daoAddressOrEns: string = "0x123123123123123123123123123123123123"; // "my-dao" for my-dao.dao.eth address
-
-const grantWithConditionAction: DaoAction = client.encoding.grantWithConditionAction(
-  daoAddressOrEns,
-  grantWithConditionParams
-);
-console.log({ grantWithConditionAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-  {
-    to: "0x123123123...",
-    value: 0n,
-    data: Uint8Array[12,34,45...]
-  }
-  ```
-  */
 ```
 
 #### Revoke a permission
@@ -3708,7 +2835,7 @@ import {
   IRevokePermissionParams,
   Permissions
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
@@ -3733,46 +2860,6 @@ Returns:
   value: 0n;
   data: Uint8Array[12,34,45...]
 }
-```
-
-```ts
-contract (`where`).
-*/
-
-import {
-  Client,
-  DaoAction,
-  IRevokePermissionParams,
-  Permissions
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiates an Aragon OSx SDK client.
-const client: Client = new Client(context);
-
-const revokeParams: IRevokePermissionParams = {
-  who: "0x1234567890123456789012345678901234567890",
-  where: "0x1234567890123456789012345678901234567890",
-  permission: Permissions.UPGRADE_PERMISSION // other options: SET_METADATA_PERMISSION, EXECUTE_PERMISSION, WITHDRAW_PERMISSION, SET_SIGNATURE_VALIDATOR_PERMISSION, SET_TRUSTED_FORWARDER_PERMISSION, ROOT_PERMISSION, CREATE_VERSION_PERMISSION, REGISTER_PERMISSION, REGISTER_DAO_PERMISSION, REGISTER_ENS_SUBDOMAIN_PERMISSION, MINT_PERMISSION, MERKLE_MINT_PERMISSION, MODIFY_ALLOWLIST_PERMISSION, SET_CONFIGURATION_PERMISSION
-};
-
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
-// Revokes a permission to a given address to perform an action on a contract.
-const revokePermission: DaoAction = await client.encoding.revokeAction(daoAddress, revokeParams);
-console.log({ revokePermission });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  to: "0x1234567890...",
-  value: 0n;
-  data: Uint8Array[12,34,45...]
-}
-```
-*/
 ```
 
 #### Register a new standard callback
@@ -3780,137 +2867,35 @@ Returns:
 Encodes the action of registering a new standard callback for the DAO.
 
 ```ts
-import { Client, ContextPlugin, DaoAction, RegisterStandardCallbackParams } from "@aragon/sdk-client";
-import { context } from '../00-setup/00-getting-started';
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize the general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const registerStandardCallbackParams: RegisterStandardCallbackParams = {
-  interfaceId: "0x3134r1er213740123741207831238410972347",
-  callbackSelector: "0x382741239807410892375182734892",
-  magicNumber: "0x12192304781237401321329450123321"
-};
-
-const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
-
-const registerStandardCallbackAction: DaoAction = client.encoding.registerStandardCallbackAction(
-  daoAddressOrEns,
-  registerStandardCallbackParams
-);
-console.log({ registerStandardCallbackAction });
-```
-```json
-  {
-    to: "0x123123123...",
-    value: 0n,
-    data: Uint8Array[12,34,45...]
-  }
-  ```
-
-```ts
-e DAO.
-*/
-
-import { Client, ContextPlugin, DaoAction, RegisterStandardCallbackParams } from "@aragon/sdk-client";
-import { context } from '../00-setup/00-getting-started';
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize the general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const registerStandardCallbackParams: RegisterStandardCallbackParams = {
-  interfaceId: "0x3134r1er213740123741207831238410972347",
-  callbackSelector: "0x382741239807410892375182734892",
-  magicNumber: "0x12192304781237401321329450123321"
-};
-
-const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
-
-const registerStandardCallbackAction: DaoAction = client.encoding.registerStandardCallbackAction(
-  daoAddressOrEns,
-  registerStandardCallbackParams
-);
-console.log({ registerStandardCallbackAction });
-
-/* MARKDOWN
-
-```json
-  {
-    to: "0x123123123...",
-    value: 0n,
-    data: Uint8Array[12,34,45...]
-  }
-  ```
-  */
-```
-
-#### Set the DAO's URI
-
-Encodes the action of setting the DAO's URI.
-
-```ts
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from '../00-setup/00-getting-started';
+import { context } from '../01-client/01-getting-started';
 
-// Initializes the Context pluigin from the Aragon SDK context.
+// Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initializes the general purpose client using the plugin's context.
+// Initialize the general purpose client from the plugin's context.
 const client: Client = new Client(contextPlugin);
+
+const registerStandardCallbackParams = {
+  interfaceId: "0x3134r1er213740123741207831238410972347",
+  callbackSelector: "0x382741239807410892375182734892",
+  magicNumber: "0x12192304781237401321329450123321"
+};
 
 const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
 
-const daoUri: string = "https://the.dao/uri"; // the URI to be defined for the DAO.
-
-const setDaoUriAction: DaoAction = client.encoding.setDaoUriAction(
+const registerStandardCallbackAction: DaoAction = client.encoding.registerStandardCallbackAction(
   daoAddressOrEns,
-  daoUri
+  registerStandardCallbackParams
 );
-console.log({ setDaoUriAction });
+console.log({ registerStandardCallbackAction });
 ```
 Returns:
-
 ```json
   {
     to: "0x123123123...",
     value: 0n,
     data: Uint8Array[12,34,45...]
   }
-  ```
-
-```ts
-on } from "@aragon/sdk-client";
-import { context } from '../00-setup/00-getting-started';
-
-// Initializes the Context pluigin from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initializes the general purpose client using the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
-
-const daoUri: string = "https://the.dao/uri"; // the URI to be defined for the DAO.
-
-const setDaoUriAction: DaoAction = client.encoding.setDaoUriAction(
-  daoAddressOrEns,
-  daoUri
-);
-console.log({ setDaoUriAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-  {
-    to: "0x123123123...",
-    value: 0n,
-    data: Uint8Array[12,34,45...]
-  }
-  ```
-  */
 ```
 
 #### Set the signature validator
@@ -3919,7 +2904,7 @@ Encodes the action of setting the signatura validator of the DAO.
 
 ```ts
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from '../00-setup/00-getting-started';
+import { context } from '../01-client/01-getting-started';
 
 // Initialize the context plugin from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -3943,37 +2928,6 @@ Returns:
     value: 0n,
     data: Uint8Array[12,34,45...]
   }
-  ```
-
-```ts
-Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from '../00-setup/00-getting-started';
-
-// Initialize the context plugin from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize the general purpose client using the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
-const signatureValidator: string = "0x1234567890123456789012345678901234567890";
-
-const action: DaoAction = client.encoding.setSignatureValidatorAction(
-  daoAddressOrEns,
-  signatureValidator
-);
-console.log({ action });
-
-/* MARKDOWN
-Returns:
-
-```json
-  {
-    to: "0x123123123...",
-    value: 0n,
-    data: Uint8Array[12,34,45...]
-  }
-  ```
-  */
 ```
 
 #### Upgrade to and call action
@@ -3981,15 +2935,15 @@ Returns:
 Encodes the action of upgrading your DAO and enforcing the call.
 
 ```ts
-import { Client, ContextPlugin, DaoAction, UpgradeToAndCallParams } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate the general purpose client from the plugin's context.
 const client: Client = new Client(contextPlugin);
 
-const upgradeToAndCallParams: UpgradeToAndCallParams = {
+const upgradeToAndCallParams = {
   implementationAddress: "0x1234567890123456789012345678901234567890", // the implementation address to be upgraded to.
   data: new Uint8Array([10, 20, 130, 40])
 };
@@ -4011,42 +2965,6 @@ Returns:
     value: 0n,
     data: Uint8Array[12,34,45...]
   }
-  ```
-
-```ts
-lient, ContextPlugin, DaoAction, UpgradeToAndCallParams } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate the general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const upgradeToAndCallParams: UpgradeToAndCallParams = {
-  implementationAddress: "0x1234567890123456789012345678901234567890", // the implementation address to be upgraded to.
-  data: new Uint8Array([10, 20, 130, 40])
-};
-
-const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
-
-// Encodes the action of upgrading your DAO and enforcing the call.
-const upgradeToAndCallAction: DaoAction = client.encoding.upgradeToAndCallAction(
-  daoAddressOrEns,
-  upgradeToAndCallParams
-);
-console.log({ upgradeToAndCallAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-  {
-    to: "0x123123123...",
-    value: 0n,
-    data: Uint8Array[12,34,45...]
-  }
-  ```
-  */
 ```
 
 #### ETH Withdrawal
@@ -4061,20 +2979,19 @@ import {
   TokenType,
   WithdrawParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
 
 const withdrawParams: WithdrawParams = {
   type: TokenType.NATIVE, // "native" for ETH, otherwise use "ERC20" for ERC20 tokens and pass it the contract address of the ERC20 token
-  amount: BigInt(10) // the amount in wei to withdraw
+  amount: BigInt(10), // the amount in wei to withdraw
+  recipientAddressOrEns: '0x1234567890123456789012345678901234567890' // the address to transfer the funds to
 };
 
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
 // Withdraws ETH from a given DAO and transfers them to another address.
-const ethWithdraw: DaoAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const ethWithdraw: DaoAction = await client.encoding.withdrawAction(withdrawParams);
 console.log({ ethWithdraw });
 ```
 
@@ -4089,7 +3006,7 @@ import {
   TokenType,
   WithdrawParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a general purpose Client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
@@ -4097,12 +3014,11 @@ const client: Client = new Client(context);
 const withdrawParams: WithdrawParams = {
   type: TokenType.ERC20,
   amount: BigInt(10), // amount  in wei
-  tokenAddress: "0x1234567890123456789012345678901234567890" // ERC20 token's address to withdraw
+  tokenAddress: "0x1234567890123456789012345678901234567890", // ERC20 token's address to withdraw
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890" // the address to transfer the funds to
 };
 
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
-const erc20WithdrawAction: DaoAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const erc20WithdrawAction: DaoAction = await client.encoding.withdrawAction(withdrawParams);
 console.log({ erc20WithdrawAction });
 ```
 
@@ -4114,23 +3030,22 @@ Withdraws ERC-721 tokens from the DAO when a proposal passes.
 import {
   Client,
   DaoAction,
-  WithdrawParams,
-  WithdrawType
+  TokenType,
+  WithdrawParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a general purpose client for Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 const withdrawParams: WithdrawParams = {
-  type: WithdrawType.ERC721,
+  type: TokenType.ERC721,
   tokenAddress: "0x1234567890123456789012345678901234567890", // ERFC721's token contract address to withdraw
-  amount: BigInt(10) // amount of tokens to withdraw
+  amount: BigInt(10), // amount of tokens to withdraw
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890" // the address to transfer the funds to
 };
 
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
-const nftWithdrawAction: DaoAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const nftWithdrawAction: DaoAction = await client.encoding.withdrawAction(withdrawParams);
 console.log({ nftWithdrawAction });
 ```
 
@@ -4144,7 +3059,7 @@ import {
   DaoAction,
   DaoMetadata
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
@@ -4181,7 +3096,7 @@ Encodes the action of upgrading into a new implementation address.
 
 ```ts
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4203,36 +3118,6 @@ console.log({ upgradeToAction });
     value: 0n,
     data: Uint8Array[12,34,45...]
   }
-  ```
-
-```ts
-Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
-const implementationAddress: string = "0x1234567890123456789012345678901234567890";
-
-const upgradeToAction: DaoAction = client.encoding.upgradeToAction(
-  daoAddressOrEns,
-  implementationAddress
-);
-console.log({ upgradeToAction });
-
-/* MARKDOWN
-
-```json
-  {
-    to: "0x123123123...",
-    value: 0n,
-    data: Uint8Array[12,34,45...]
-  }
-  ```
-  */
 ```
 
 ### Addresslist Encoders
@@ -4249,7 +3134,7 @@ import {
   VotingMode,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4281,7 +3166,7 @@ import {
   ContextPlugin,
   DaoAction
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4319,7 +3204,7 @@ import {
   ContextPlugin,
   DaoAction
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4337,8 +3222,8 @@ const pluginAddress: string = "0x0987654321098765432109876543210987654321"; // t
 
 const removeMembersAction: DaoAction = addresslistVotingClient.encoding.removeMembersAction(pluginAddress, members);
 console.log({ removeMembersAction });
+```
 
-/* MARKDOWN
 Returns:
 
 ```json
@@ -4347,8 +3232,6 @@ Returns:
   value: 0n,
   data: Uint8Array[12,34,45...]
 }
-```
-*/
 ```
 
 #### Add Members (AddressList)
@@ -4359,9 +3242,9 @@ Adds a list of addresses to the AddressList plugin so that these new addresses a
 import {
   AddresslistVotingClient,
   DaoAction,
-  ContextPlugin }
-from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+  ContextPlugin
+} from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4387,46 +3270,6 @@ Returns:
   value: 0n,
   data: Uint8Array[12,34,45...]
 }
-```
-
-```ts
-w addresses are able to vote in AddresslistVoting proposals.
-*/
-
-import {
-  AddresslistVotingClient,
-  DaoAction,
-  ContextPlugin }
-from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an AddresslistVoting client.
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
-
-const members: string[] = [
-  "0x1357924680135792468013579246801357924680",
-  "0x2468013579246801357924680135792468013579",
-  "0x0987654321098765432109876543210987654321"
-];
-
-const pluginAddress = "0x0987654321098765432109876543210987654321"; // the address of the AddresslistVoting plugin contract installed in the DAO
-
-const addMembersAction: DaoAction = addresslistVotingClient.encoding.addMembersAction(pluginAddress, members);
-console.log({ addMembersAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  to: "0x1234567890...",
-  value: 0n,
-  data: Uint8Array[12,34,45...]
-}
-```
-*/
 ```
 
 ### Token Voting Encoders
@@ -4443,7 +3286,7 @@ import {
   VotingMode,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4477,7 +3320,7 @@ import {
   IMintTokenParams,
   TokenVotingClient
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4502,45 +3345,6 @@ Returns:
   value: 0n,
   data: Uint8Array[12,34,45...]
 }
-```
-
-```ts
-*/
-
-import {
-  ContextPlugin,
-  DaoAction,
-  IMintTokenParams,
-  TokenVotingClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const params: IMintTokenParams = {
-  address: "0x1234567890123456789012345678901234567890", // address which will receive the minted tokens
-  amount: BigInt(10) // amount of tokens they will receive
-};
-
-const minterAddress: string = "0x0987654321098765432109876543210987654321"; // the contract address of the token to mint
-
-const mintTokenAction: DaoAction = tokenVotingClient.encoding.mintTokenAction(minterAddress, params);
-console.log({ mintTokenAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  to: "0x0987654321098765432...",
-  value: 0n,
-  data: Uint8Array[12,34,45...]
-}
-```
-*/
 ```
 
 ### Multisig Encoders
@@ -4556,7 +3360,7 @@ import {
   MultisigClient,
   UpdateMultisigVotingSettingsParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-setup/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4583,48 +3387,6 @@ Returns:
   value: 0n,
   data: Uint8Array[12,34,45...]
 }
-```
-
-```ts
-onfiguration of a Multisig plugin installed in a DAO.
-*/
-
-import {
-  ContextPlugin,
-  DaoAction,
-  MultisigClient,
-  UpdateMultisigVotingSettingsParams
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const multisigClient = new MultisigClient(contextPlugin);
-
-const updateMinApprovals: UpdateMultisigVotingSettingsParams = {
-  votingSettings: {
-    minApprovals: 2,
-    onlyListed: false
-  },
-  pluginAddress: "0x0987654321098765432109876543210987654321" // the address of the Multisig plugin contract installed in the DAO
-};
-
-// Updates the voting configuration of a Multisig plugin installed in a DAO.
-const updateMultisigConfig: DaoAction = multisigClient.encoding.updateMultisigVotingSettings(updateMinApprovals);
-console.log({ updateMultisigConfig });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  to: "0x1234567890...",
-  value: 0n,
-  data: Uint8Array[12,34,45...]
-}
-```
-*/
 ```
 
 #### Add Members (Multisig)
@@ -4638,7 +3400,7 @@ import {
   DaoAction,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4669,52 +3431,6 @@ Returns:
   value: 0n,
   data: Uint8Array[12,34,45...]
 }
-```
-
-```ts
-so they are now able to vote on proposals.
-*/
-
-import {
-  AddAddressesParams,
-  ContextPlugin,
-  DaoAction,
-  MultisigClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const client: MultisigClient = new MultisigClient(contextPlugin);
-
-// The addresses to add as members.
-const members: string[] = [
-  "0x1357924680135792468013579246801357924680",
-  "0x2468013579246801357924680135792468013579",
-  "0x0987654321098765432109876543210987654321"
-];
-
-const addAddressesParams: AddAddressesParams = {
-  members,
-  pluginAddress: "0x0987654321098765432109876543210987654321" // the address of the Multisig plugin contract installed in the DAO
-};
-
-// Adds the addresses as members of the Multisig plugin for a DAO.
-const addAddressesToMultisig: DaoAction = client.encoding.addAddressesAction(addAddressesParams);
-console.log({ addAddressesToMultisig });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  to: "0x1234567890...",
-  value: 0n,
-  data: Uint8Array[12,34,45...]
-}
-```
-*/
 ```
 
 #### Remove members (Multisig plugin)
@@ -4728,7 +3444,7 @@ import {
   MultisigClient,
   RemoveAddressesParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -4760,58 +3476,48 @@ Returns:
   data: Uint8Array[12,34,45...]
 }
 ```
+
+#### Set the DAO's URI
+
+Encodes the action of setting the DAO's URI.
 
 ```ts
-ven DAO so they are no longer able to vote on Multisig proposals for that DAO.
-*/
+import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
 
-import {
-  ContextPlugin,
-  DaoAction,
-  MultisigClient,
-  RemoveAddressesParams
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
+// Initializes the Context pluigin from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+// Initializes the general purpose client using the plugin's context.
+const client: Client = new Client(contextPlugin);
 
-// List of members to remove from the multisig plugin.
-const members: string[] = [
-  "0x1357924680135792468013579246801357924680",
-  "0x2468013579246801357924680135792468013579",
-  "0x0987654321098765432109876543210987654321"
-];
+const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
 
-const removeAddressesParams: RemoveAddressesParams = {
-  members,
-  pluginAddress: "0x0987654321098765432109876543210987654321" // the address of the Multisig plugin contract installed in the DAO
-};
+const daoUri: string = "https://the.dao/uri"; // the URI to be defined for the DAO.
 
-// Removes the addresses from the Multisig plugin of a DAO.
-const removeAddressesFromMultisig: DaoAction = multisigClient.encoding.removeAddressesAction(removeAddressesParams);
-console.log(removeAddressesFromMultisig);
-
-/* MARKDOWN
+const setDaoUriAction: DaoAction = client.encoding.setDaoUriAction(
+  daoAddressOrEns,
+  daoUri
+);
+console.log({ setDaoUriAction });
+```
 Returns:
 
 ```json
-{
-  to: "0x1234567890...",
-  value: 0n,
-  data: Uint8Array[12,34,45...]
-}
-```
-*/
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
 ```
 
 ## Action decoders
 
 Decodes the actions of a transaction to understand them in a human-readable format.
 
-### General purpose Decoders
+### General Purpose Decoders
+
+These are the decoders that every DAO will have, no matter which plugins they have installed.
+
 #### Decode the grant permission action
 
 Decodes the parameters of a grant permission action.
@@ -4821,7 +3527,7 @@ import {
   Client,
   IGrantPermissionDecodedParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Creates an Aragon OSx SDK client.
 const client: Client = new Client(context);
@@ -4841,33 +3547,6 @@ Returns:
   permission: "UPGRADE_PERMISSION",
   permissionId: "0x12345..."
 }
-```
-
-```ts
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Creates an Aragon OSx SDK client.
-const client: Client = new Client(context);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the parameters of a grant permission action.
-const grantParams: IGrantPermissionDecodedParams = client.decoding.grantAction(data);
-console.log({ grantParams });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  who: "0x1234567890...",
-  where: "0x1234567890...",
-  permission: "UPGRADE_PERMISSION",
-  permissionId: "0x12345..."
-}
-```
-*/
 ```
 
 #### Decode revoke permission action
@@ -4879,7 +3558,7 @@ import {
   Client,
   IRevokePermissionDecodedParams
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Insantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
@@ -4899,33 +3578,6 @@ Returns:
   permission: "UPGRADE_PERMISSION",
   permissionId: "0x12345..."
 }
-```
-
-```ts
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Insantiates an Aragon OSx SDK client.
-const client: Client = new Client(context);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the action of a revoke permission transaction.
-const revokeParams: IRevokePermissionDecodedParams = client.decoding.revokeAction(data);
-console.log({ revokeParams });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  who: "0x1234567890...",
-  where: "0x1234567890...",
-  permission: "UPGRADE_PERMISSION",
-  permissionId: "0x12345..."
-}
-```
-*/
 ```
 
 #### Decode Withdraw Action
@@ -4934,7 +3586,7 @@ Decodes the parameters of a withdraw action of any token type.
 
 ```ts
 import { Client, WithdrawParams } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Insantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
@@ -4942,8 +3594,8 @@ const client: Client = new Client(context);
 const data: Uint8Array = new Uint8Array([12, 56]);
 
 // Decodes the withdraw action.
-const withdrawParams: WithdrawParams = client.decoding.withdrawAction(data);
-console.log({ withdrawParams });
+const withdraw: WithdrawParams = client.decoding.withdrawAction(data);
+console.log({ withdraw });
 ```
 Returns:
 
@@ -4954,101 +3606,6 @@ Returns:
   tokenAddress: "0x1234567890123456789012345678901234567890",
   reference: "test"
 }
-```
-
-```ts
-p/00-getting-started";
-
-// Insantiates an Aragon OSx SDK client.
-const client: Client = new Client(context);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the withdraw action.
-const withdrawParams: WithdrawParams = client.decoding.withdrawAction(data);
-console.log({ withdrawParams });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  recipientAddress: "0x1234567890123456789012345678901234567890",
-  amount: 10n,
-  tokenAddress: "0x1234567890123456789012345678901234567890",
-  reference: "test"
-}
-```
-*/
-```
-
-#### Decode Update Metadata Action
-
-Decodes an update metadata action and expect the metadata.
-
-```ts
-import { Client, DaoMetadata } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiates an Aragon OSx SDK client.
-const client: Client = new Client(context);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the update metadata action.
-const updateDaoMetadataParams: DaoMetadata = await client.decoding.updateDaoMetadataAction(data);
-console.log({ updateDaoMetadataParams });
-```
-Returns:
-
-```json
-{
-  "name":"New Name",
-  "description":"New description",
-  "avatar":"https://theavatar.com/image.jpg",
-  "links":[
-    {
-      "url":"https://discord.com/...",
-      "name":"Discord"
-    },
-    {
-      "url":"https://twitter.com/...",
-      "name":"Twitter"
-    }
-  ]
-}
-```
-
-```ts
-ext);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the update metadata action.
-const updateDaoMetadataParams: DaoMetadata = await client.decoding.updateDaoMetadataAction(data);
-console.log({ updateDaoMetadataParams });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  "name":"New Name",
-  "description":"New description",
-  "avatar":"https://theavatar.com/image.jpg",
-  "links":[
-    {
-      "url":"https://discord.com/...",
-      "name":"Discord"
-    },
-    {
-      "url":"https://twitter.com/...",
-      "name":"Twitter"
-    }
-  ]
-}
-```
-*/
 ```
 
 #### Decode an update metadata raw action
@@ -5057,7 +3614,7 @@ Decode an update metadata action and expect an IPFS URI containing the CID of th
 
 ```ts
 import { Client } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Insantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
@@ -5070,33 +3627,8 @@ console.log({ decodedUpdateMetadata });
 ```
 Returns:
 
-```javascript
-  "ipfs://Qm..."
-```
-
-```ts
-e an update metadata action and expect an IPFS URI containing the CID of the metadata.
-*/
-
-import { Client } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Insantiates an Aragon OSx SDK client.
-const client: Client = new Client(context);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the parameters of an update metadata raw action.
-const decodedUpdateMetadata: string = client.decoding.updateDaoMetadataRawAction(data);
-console.log({ decodedUpdateMetadata });
-
-/* MARKDOWN
-Returns:
-
-```javascript
-  "ipfs://Qm..."
-```
-*/
+```json
+  { decodedUpdateMetadata: "ipfs://Qm..." }
 ```
 
 #### Decode update plugin settings action (Address List)
@@ -5109,7 +3641,7 @@ import {
   ContextPlugin,
   VotingSettings,
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the simple context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5132,87 +3664,41 @@ Returns:
 }
 ```
 
-```ts
-extPlugin,
-  VotingSettings,
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+#### Decode Update Metadata Action
 
-// Instantiate a plugin context from the simple context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a AddresslistVoting plugin client.
-const clientAddressList = new AddresslistVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const pluginSettings: VotingSettings = clientAddressList.decoding.updatePluginSettingsAction(data);
-console.log({ pluginSettings });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  minDuration: 7200, // seconds
-  minParticipation: 0.25, // 25%
-  supportThreshold: 0.5, // 50%
-  minProposerVotingPower: BigInt("1")
-}
-```
-*/
-```
-
-#### Get function parameters from an encoded action
-
-Decodes the parameters of a function call.
+Decodes an update metadata action and expect the metadata.
 
 ```ts
-import { Client } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { Client, DaoMetadata } from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
 
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-// Decodes the parameters of a function call.
-const functionParams = client.decoding.findInterface(data);
-console.log({ functionParams });
+// Decodes the update metadata action.
+const updateDaoMetadataParams: DaoMetadata = await client.decoding.updateDaoMetadataAction(data);
+console.log({ updateDaoMetadataParams });
 ```
 Returns:
 
 ```json
 {
-  id: "function functionName(param1, param2)"
-  functionName: "functionName"
-  hash: "0x12345678"
+  "name":"New Name",
+  "description":"New description",
+  "avatar":"https://theavatar.com/image.jpg",
+  "links":[
+    {
+      "url":"https://discord.com/...",
+      "name":"Discord"
+    },
+    {
+      "url":"https://twitter.com/...",
+      "name":"Twitter"
+    }
+  ]
 }
-```
-
-```ts
-agon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiates an Aragon OSx SDK client.
-const client: Client = new Client(context);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the parameters of a function call.
-const functionParams = client.decoding.findInterface(data);
-console.log({ functionParams });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  id: "function functionName(param1, param2)"
-  functionName: "functionName"
-  hash: "0x12345678"
-}
-```
-*/
 ```
 
 #### Decode a "Register Callback" action
@@ -5221,7 +3707,7 @@ Decodes the action of registering a callback.
 
 ```ts
 import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5234,36 +3720,11 @@ console.log({ registerStandardCallbackAction });
 Returns:
 
 ```json
-  {
-    interfaceId: "0x12345678",
-    callbackSelector: "0x23456789",
-    magicNumber: "0x34567890"
-  }
-```
-
-```ts
-aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const registerStandardCallbackAction = client.decoding.registerStandardCallbackAction(new Uint8Array([0, 10, 20, 30]));
-console.log({ registerStandardCallbackAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-  {
-    interfaceId: "0x12345678",
-    callbackSelector: "0x23456789",
-    magicNumber: "0x34567890"
-  }
-```
-  */
+{
+  interfaceId: "0x12345678",
+  callbackSelector: "0x23456789",
+  magicNumber: "0x34567890"
+}
 ```
 
 #### Decode the "Grant with Condition" Action
@@ -5272,7 +3733,7 @@ Decodes the action of granting a permission based on a condition.
 
 ```ts
 import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5285,39 +3746,13 @@ console.log({ grantWithConditionAction });
 Returns:
 
 ```json
-  {
+{
   where: "0x1234567890...",
   who: "0x2345678901...",
   permission: "UPGRADE_PERMISSION"
   condition: "0x3456789012..."
   permissionId: "0x12345..."
-  }
-  ```
-
-```ts
-context } from "../00-setup/00-getting-started";
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const grantWithConditionAction = client.decoding.grantWithConditionAction(new Uint8Array([0, 10, 20, 30]));
-console.log({ grantWithConditionAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-  {
-  where: "0x1234567890...",
-  who: "0x2345678901...",
-  permission: "UPGRADE_PERMISSION"
-  condition: "0x3456789012..."
-  permissionId: "0x12345..."
-  }
-  ```
-  */
+}
 ```
 
 #### Decode the Set Dao URI action
@@ -5326,7 +3761,7 @@ Decodes the action of setting a DAO's URI
 
 ```ts
 import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5340,30 +3775,6 @@ Returns:
 
 ```json
   { setDaoUriAction: "https://the.dao.uri" }
-```
-
-```ts
-O's URI
-*/
-
-import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client = new Client(contextPlugin);
-
-const setDaoUriAction = client.decoding.setDaoUriAction(new Uint8Array([0, 10, 20, 30]));
-console.log({ setDaoUriAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-  { setDaoUriAction: "https://the.dao.uri" }
-```
-*/
 ```
 
 #### Decode an "Upgrade To" action
@@ -5372,7 +3783,7 @@ Decodes the action of upgrading the DAO to a new implementation.
 
 ```ts
 import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5386,30 +3797,6 @@ Returns:
 
 ```json
   { upgradeToAction: "0x1234567890123456789012345678901234567890" }
-```
-
-```ts
-tation.
-*/
-
-import { Client, Context, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const upgradeToAction = client.decoding.upgradeToAction(new Uint8Array([0, 10, 20, 30]));
-console.log({ upgradeToAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-  { upgradeToAction: "0x1234567890123456789012345678901234567890" }
-```
-*/
 ```
 
 #### Decode a "Set Signature Validator" action
@@ -5418,7 +3805,7 @@ Decodes the action of setting a signature validator for the DAO.
 
 ```ts
 import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5432,30 +3819,6 @@ Returns:
 
 ```json
   { setSignatureValidatorAction: "0x1234567890123456789012345678901234567890" }
-```
-
-```ts
-he DAO.
-*/
-
-import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const setSignatureValidatorAction = client.decoding.setSignatureValidatorAction(new Uint8Array([0, 10, 20, 30]));
-console.log({ setSignatureValidatorAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-  { setSignatureValidatorAction: "0x1234567890123456789012345678901234567890" }
-```
-*/
 ```
 
 #### Decode an "Upgrade To and Call" action
@@ -5464,7 +3827,7 @@ Decodes the action of upgrading the DAO to a new implementation and calling a fu
 
 ```ts
 import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5481,36 +3844,11 @@ Returns:
     implementationAddress: "0x1234567890...",
     data: Uint8Array[12,34,45...]
   }
-```
-
-```ts
-calling a function within it.
-*/
-
-import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const upgradeToAndCallAction = client.decoding.upgradeToAndCallAction(new Uint8Array([10, 20, 30, 40]));
-console.log({ upgradeToAndCallAction });
-
-/* MARKDOWN
-Returns:
-
-```json
-  {
-    implementationAddress: "0x1234567890...",
-    data: Uint8Array[12,34,45...]
-  }
-```
-*/
 ```
 
 ### Token Voting Decoders
+
+Decoders found in DAOs with the TokenVoting plugin installed.
 
 #### Decode the update plugin settings action for TokenVoting plugin
 
@@ -5522,7 +3860,7 @@ import {
   TokenVotingClient,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5544,42 +3882,6 @@ Returns:
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000")
 }
-```
-
-```ts
-nVoting plugin.
-*/
-
-import {
-  ContextPlugin,
-  TokenVotingClient,
-  VotingSettings
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a TokenVoting plugin client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the parameters of an update plugin settings action.
-const decodeUpdateTokenVotingSettings: VotingSettings = tokenVotingClient.decoding.updatePluginSettingsAction(data);
-console.log({ decodeUpdateTokenVotingSettings });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  minDuration: 7200, // seconds
-  minParticipation: 0.25, // 25%
-  supportThreshold: 0.5, // 50%
-  minProposerVotingPower: BigInt("5000")
-}
-```
-*/
 ```
 
 #### Get Function Parameters from an encoded action (TokenVoting)
@@ -5588,7 +3890,7 @@ Decodes the parameters of a function call from the TokenVoting plugin contract.
 
 ```ts
 import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5609,37 +3911,6 @@ Returns:
   functionName: "functionName"
   hash: "0x12345678"
 }
-```
-
-```ts
-ng plugin contract.
-*/
-
-import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a TokenVoting plugin client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the parameters of a function call from the TokenVoting plugin.
-const functionParams = tokenVotingClient.decoding.findInterface(data);
-console.log({ functionParams });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  id: "function functionName(param1, param2)"
-  functionName: "functionName"
-  hash: "0x12345678"
-}
-```
-*/
 ```
 
 #### Decode Mint Token Action (TokenVoting)
@@ -5652,7 +3923,7 @@ import {
   IMintTokenParams,
   TokenVotingClient
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5672,43 +3943,11 @@ Returns:
   address: "0x12345...",
   amount: 10n
 }
-```
-
-```ts
-of a mint token action from the TokenVoting plugin.
-*/
-
-import {
-  ContextPlugin,
-  IMintTokenParams,
-  TokenVotingClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a TokenVoting plugin client.
-const tokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the parameters of a mint token action.
-const decodeMintTokenParams: IMintTokenParams = tokenVotingClient.decoding.mintTokenAction(data);
-console.log({ decodeMintTokenParams });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  address: "0x12345...",
-  amount: 10n
-}
-```
-*/
 ```
 
 ### Addresslist Decoders
+
+For DAOs who have the Addresslist Voting plugin installed.
 
 #### Decode Add Members Action (Addresslist)
 
@@ -5716,7 +3955,7 @@ Decodes the action of adding new members to the Addresslist plugin.
 
 ```ts
 import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5731,41 +3970,13 @@ console.log({ membersAdded });
 Returns:
 
 ```json
-[
-  "0x12345...",
-  "0x56789...",
-  "0x13579..."
-]
-```
-
-```ts
-des the action of adding new members to the Addresslist plugin.
-*/
-
-import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate an Addresslist plugin client.
-const clientAddressList = new AddresslistVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const membersAdded: string[] = clientAddressList.decoding.addMembersAction(data);
-console.log({ membersAdded });
-
-/* MARKDOWN
-Returns:
-
-```json
-[
-  "0x12345...",
-  "0x56789...",
-  "0x13579..."
-]
-```
-*/
+{ membersAdded:
+  [
+    "0x12345...",
+    "0x56789...",
+    "0x13579..."
+  ]
+}
 ```
 
 #### Get function parameters from  encoded action (Addresslist)
@@ -5777,7 +3988,7 @@ import {
   AddresslistVotingClient,
   ContextPlugin
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5797,39 +4008,6 @@ Returns:
   functionName: "functionName"
   hash: "0x12345678"
 }
-```
-
-```ts
-plugin.
-*/
-
-import {
-  AddresslistVotingClient,
-  ContextPlugin
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate an Addresslist plugin client.
-const client: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const functionParams = client.decoding.findInterface(data);
-console.log({ functionParams });
-
-/* MARKDOWN
-Returns:
-
-```json
-{
-  id: "function functionName(param1, param2)"
-  functionName: "functionName"
-  hash: "0x12345678"
-}
-```
-*/
 ```
 
 #### Decode Remove Members Action (AddresslistVoting)
@@ -5838,7 +4016,7 @@ Decodes the action of removing addresses from the AddresslistVoting plugin so th
 
 ```ts
 import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5853,44 +4031,18 @@ console.log({ removedMembers });
 Returns:
 
 ```json
-[
-  "0x12345...",
-  "0x56789...",
-  "0x13579..."
-]
-```
-
-```ts
-removing addresses from the AddresslistVoting plugin so they can no longer vote in AddresslistVoting proposals.
-*/
-
-import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Insantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate an Addresslist plugin client.
-const clientAddressList = new AddresslistVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const removedMembers: string[] = clientAddressList.decoding.removeMembersAction(data);
-console.log({ removedMembers });
-
-/* MARKDOWN
-Returns:
-
-```json
-[
-  "0x12345...",
-  "0x56789...",
-  "0x13579..."
-]
-```
-*/
+{ removedMembers:
+  [
+    "0x12345...",
+    "0x56789...",
+    "0x13579..."
+  ]
+}
 ```
 
 ### Multisig Decoders
+
+For DAOs that have the Multisig plugin installed.
 
 #### Decode Add Members Action (Multisig)
 
@@ -5898,7 +4050,7 @@ Decodes the parameters of the add members action from the Multisig plugin.
 
 ```ts
 import { ContextPlugin, MultisigClient } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5913,41 +4065,13 @@ console.log({ decodeAddMembersMultisig });
 Returns:
 
 ```json
+{ decodeAddMembersMultisig:
   [
     "0x12345...",
     "0x56789...",
     "0x13579..."
   ]
-```
-
-```ts
-rs of the add members action from the Multisig plugin.
-*/
-
-import { ContextPlugin, MultisigClient } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const decodeAddMembersMultisig: string[] = multisigClient.decoding.addAddressesAction(data);
-console.log({ decodeAddMembersMultisig });
-
-/* MARKDOWN
-Returns:
-
-```json
-  [
-    "0x12345...",
-    "0x56789...",
-    "0x13579..."
-  ]
-```
-*/
+}
 ```
 
 #### Decode Remove Members Action (Multisig)
@@ -5959,7 +4083,7 @@ import {
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -5975,45 +4099,13 @@ console.log({ decodeRemoveMemberMultisig });
 Returns:
 
 ```json
+{ decodeRemoveMemberMultisig:
   [
     "0x12345...",
     "0x56789...",
     "0x13579..."
   ]
-```
-
-```ts
-bers action from the Multisig plugin.
-*/
-
-import {
-  ContextPlugin,
-  MultisigClient
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiates a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiates a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-// Decodes the parameters of the remove members action from the Multisig plugin.
-const decodeRemoveMemberMultisig: string[] = multisigClient.decoding.removeAddressesAction(data);
-console.log({ decodeRemoveMemberMultisig });
-
-/* MARKDOWN
-Returns:
-
-```json
-  [
-    "0x12345...",
-    "0x56789...",
-    "0x13579..."
-  ]
-```
-*/
+}
 ```
 
 #### Decodes the update settings action (Multisig).
@@ -6022,7 +4114,7 @@ Decodes the update settings action for a Multisig plugin.
 
 ```ts
 import { ContextPlugin, MultisigClient, MultisigVotingSettings } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from an Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -6043,33 +4135,30 @@ Returns:
   onlyListed: false
 }
 ```
+
+#### Get function parameters from an encoded action
+
+Decodes the parameters of a function call.
 
 ```ts
-ate settings action for a Multisig plugin.
-*/
+import { Client } from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
 
-import { ContextPlugin, MultisigClient, MultisigVotingSettings } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate a plugin context from an Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+// Instantiates an Aragon OSx SDK client.
+const client: Client = new Client(context);
 
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-// Decodes the update settings action for a Multisig plugin.
-const decodeUpdateMultisigSettings: MultisigVotingSettings = multisigClient.decoding.updateMultisigVotingSettings(data);
-console.log({ decodeUpdateMultisigSettings });
-
-/* MARKDOWN
+// Decodes the parameters of a function call.
+const functionParams = client.decoding.findInterface(data);
+console.log({ functionParams });
+```
 Returns:
 
 ```json
 {
-  minApprovals: 2,
-  onlyListed: false
+  id: "function functionName(param1, param2)"
+  functionName: "functionName"
+  hash: "0x12345678"
 }
-```
-*/
 ```

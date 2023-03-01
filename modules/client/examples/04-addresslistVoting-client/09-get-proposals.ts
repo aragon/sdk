@@ -13,7 +13,7 @@ import {
   ProposalStatus,
   SortDirection
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -35,47 +35,49 @@ console.log({ addresslistVotingProposals });
 Returns:
 
 ```json
-[
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal",
-      summary: "test proposal summary"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Executed",
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
+{ addresslistVotingProposals:
+  [
+    {
+      id: "0x12345...",
+      dao: {
+        address: "0x1234567890123456789012345678901234567890",
+        name: "Cool DAO"
+      },
+      creatorAddress: "0x1234567890123456789012345678901234567890",
+      metadata: {
+        title: "Test Proposal",
+        summary: "test proposal summary"
+      },
+      startDate: <Date>,
+      endDate: <Date>,
+      status: "Executed",
+      results {
+        yes: 100000n,
+        no: 77777n,
+        abstain: 0n
+      }
+    },
+    {
+      id: "0x12345...",
+      dao: {
+        address: "0x1234567890123456789012345678901234567890",
+        name: "Cool DAO"
+      },
+      creatorAddress: "0x1234567890123456789012345678901234567890",
+      metadata: {
+        title: "Test Proposal 2",
+        summary: "test proposal summary 2"
+      },
+      startDate: <Date>,
+      endDate: <Date>,
+      status: "Pending",
+      results {
+        yes: 100000n,
+        no: 77777n,
+        abstain: 0n
+      }
     }
-  },
-  {
-    id: "0x12345...",
-    dao: {
-      address: "0x1234567890123456789012345678901234567890",
-      name: "Cool DAO"
-    };
-    creatorAddress: "0x1234567890123456789012345678901234567890",
-    metadata: {
-      title: "Test Proposal 2",
-      summary: "test proposal summary 2"
-    };
-    startDate: <Date>,
-    endDate: <Date>,
-    status: "Pending",
-    results {
-      yes: 100000n,
-      no: 77777n,
-      abstain: 0n
-    }
-  }
-]
+  ]
+}
 ```
 */

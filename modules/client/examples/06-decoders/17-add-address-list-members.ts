@@ -7,7 +7,7 @@ Decodes the action of adding new members to the Addresslist plugin.
 */
 
 import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -23,10 +23,12 @@ console.log({ membersAdded });
 Returns:
 
 ```json
-[
-  "0x12345...",
-  "0x56789...",
-  "0x13579..."
-]
+{ membersAdded:
+  [
+    "0x12345...",
+    "0x56789...",
+    "0x13579..."
+  ]
+}
 ```
 */

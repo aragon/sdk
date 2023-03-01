@@ -5,7 +5,7 @@ Decodes the action of registering a callback.
 */
 
 import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -19,10 +19,10 @@ console.log({ registerStandardCallbackAction });
 Returns:
 
 ```json
-  {
-    interfaceId: "0x12345678",
-    callbackSelector: "0x23456789",
-    magicNumber: "0x34567890"
-  }
+{
+  interfaceId: "0x12345678",
+  callbackSelector: "0x23456789",
+  magicNumber: "0x34567890"
+}
 ```
-  */
+*/

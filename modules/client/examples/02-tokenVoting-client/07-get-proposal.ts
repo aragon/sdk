@@ -9,7 +9,7 @@ import {
   TokenVotingClient,
   TokenVotingProposal
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from an Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -32,7 +32,7 @@ Returns:
   dao: {
     address: "0x1234567890123456789012345678901234567890",
     name: "Cool DAO"
-  };
+  },
   creatorAddress: "0x1234567890123456789012345678901234567890",
   metadata: {
     title: "Test Proposal",
@@ -52,7 +52,7 @@ Returns:
       header: "https://.../image.jpeg",
       logo: "https://.../image.jpeg"
     }
-  };
+  },
   startDate: <Date>,
   endDate: <Date>,
   creationDate: <Date>,

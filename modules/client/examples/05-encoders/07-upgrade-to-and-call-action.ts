@@ -4,15 +4,15 @@
 Encodes the action of upgrading your DAO and enforcing the call.
 */
 
-import { Client, ContextPlugin, DaoAction, UpgradeToAndCallParams } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate the general purpose client from the plugin's context.
 const client: Client = new Client(contextPlugin);
 
-const upgradeToAndCallParams: UpgradeToAndCallParams = {
+const upgradeToAndCallParams = {
   implementationAddress: "0x1234567890123456789012345678901234567890", // the implementation address to be upgraded to.
   data: new Uint8Array([10, 20, 130, 40])
 };
@@ -35,5 +35,5 @@ Returns:
     value: 0n,
     data: Uint8Array[12,34,45...]
   }
-  ```
-  */
+```
+*/
