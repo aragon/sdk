@@ -26,7 +26,7 @@ Returns:
 
 ```json
   {
-    minDuration: 10000, // 10 seconds
+    minDuration: 3600, // 1 hour
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"),

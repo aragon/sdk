@@ -616,49 +616,6 @@ Returns:
 */
 ```
 
-### Ensure an a minimum ERC20 token allowance
-
-In order for an address to deposit an ERC20 token into the DAO, the allowance approval for that token needs to be set at the amount the person wants to deposit.
-This function ensures the allowance approval is set so that amount.
-Refer to OpenZeppelin docs here on ERC20's token allowance methods: https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-allowance-address-address-).
-
-```ts
-import {
-  Client,
-  DaoDepositSteps
-} from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
-
-// Instantiate the general purpose client from the Aragon OSx SDK context.
-const client: Client = new Client(context);
-
-const ensureAllowanceParams = {
-  amount: BigInt(10), // amount in wei
-  daoAddress: "0x1234567890123456789012345678901234567890",
-  tokenAddress: "0x1234567890123456789012345678901234567890" // token contract adddress
-};
-
-// Ensure the token's approval allowance is enough.
-const steps = client.methods.ensureAllowance(ensureAllowanceParams);
-
-for await (const step of steps) {
-  try {
-    switch (step.key) {
-      case DaoDepositSteps.CHECKED_ALLOWANCE:
-        console.log(step.allowance); // 0n
-        break;
-      case DaoDepositSteps.UPDATING_ALLOWANCE:
-        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
-        break;
-      case DaoDepositSteps.UPDATED_ALLOWANCE:
-        console.log(step.allowance); // 10n
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-```
-
 ### Updates ERC20 tokens' allowance approval
 
 In order for an address to deposit an ERC20 token into the DAO, the allowance approval for that token needs to be set at the amount the person wants to deposit.
@@ -1001,7 +958,7 @@ This proposal will be created using the TokenVoting plugin as its governance mec
 ```ts
 import {
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   TokenVotingClient,
   VotingMode,
@@ -1047,7 +1004,7 @@ const metadataUri: string = await tokenVotingClient.methods.pinMetadata({
     }
 })
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the TokenVoting plugin contract containing all plugin logic.
   metadataUri,
   actions: [configAction], // optional, if none, leave an empty array `[]`
@@ -1098,7 +1055,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  proposalId: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES // other options: NO, ABSTAIN
 };
 
@@ -1140,7 +1097,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const canVoteParams: CanVoteParams = {
-  proposalId: "0x12345678901234567890123456789012345678900x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   voterAddressOrEns: "0x1234567890123456789012345678901234567890", // your-plugin.plugin.dao.eth
   vote: VoteValues.YES // alternatively, could be  NO or ABSTAIN.
 };
@@ -1176,7 +1133,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 const canVoteParams: CanVoteParams = {
-  proposalId: "0x12345678901234567890123456789012345678900x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   voterAddressOrEns: "0x1234567890123456789012345678901234567890", // your-plugin.plugin.dao.eth
   vote: VoteValues.YES // alternatively, could be  NO or ABSTAIN.
 };
@@ -1270,7 +1227,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 // The address of the proposal you want to retrieve.
-const proposalId: string = "0x12345238513498562394651375914323423";
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 // Get a specific proposal created using the TokenVoting plugin.
 const proposal: TokenVotingProposal | null = await tokenVotingClient.methods.getProposal(proposalId);
@@ -1352,7 +1309,9 @@ Returns:
 ```
 
 ```ts
-startDate: <Date>,
+}
+  };
+  startDate: <Date>,
   endDate: <Date>,
   creationDate: <Date>,
   creationBlockNumber: 812345,
@@ -1573,7 +1532,7 @@ Returns:
 
 ```json
   {
-    minDuration: 10000, // 10 seconds
+    minDuration: 3600, // 1 hour
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"),
@@ -1582,6 +1541,7 @@ Returns:
 ```
 
 ```ts
+tings
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
@@ -1600,7 +1560,7 @@ Returns:
 
 ```json
   {
-    minDuration: 10000, // 10 seconds
+    minDuration: 3600, // 1 hour
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"),
@@ -1630,11 +1590,11 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 // The address of the TokenVoting plugin whose token you want to retrieve details about.
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+const proposalId: string = "0x1234567890123456789012345678901234567890";
 
 // Get the token details used in the TokenVoting plugin for a given DAO.
 // ERC721 Token coming soon!
-const tokenDetails: Erc20TokenDetails | Erc721TokenDetails | null = await tokenVotingClient.methods.getToken(pluginAddress);
+const tokenDetails: Erc20TokenDetails | Erc721TokenDetails | null = await tokenVotingClient.methods.getToken(proposalId);
 console.log({ tokenDetails });
 ```
 Returns:
@@ -1667,11 +1627,11 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
 
 // The address of the TokenVoting plugin whose token you want to retrieve details about.
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+const proposalId: string = "0x1234567890123456789012345678901234567890";
 
 // Get the token details used in the TokenVoting plugin for a given DAO.
 // ERC721 Token coming soon!
-const tokenDetails: Erc20TokenDetails | Erc721TokenDetails | null = await tokenVotingClient.methods.getToken(pluginAddress);
+const tokenDetails: Erc20TokenDetails | Erc721TokenDetails | null = await tokenVotingClient.methods.getToken(proposalId);
 console.log({ tokenDetails });
 
 /* MARKDOWN
@@ -1942,14 +1902,12 @@ const metadataUri: string = await multisigClient.methods.pinMetadata(proposalMet
 const withdrawParams: WithdrawParams = {
   amount: BigInt(10), // amount in wei
   tokenAddress: "0x1234567890123456789012345678901234567890", // ERC20 token's contract address to withdraw
-  type: TokenType.ERC20
+  type: TokenType.ERC20,
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890", // address or ENS name to send the assets to
 };
 
-// Address of the DAO where the proposal will be created.
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
 // Encodes the action of withdrawing assets from a given DAO's vault and transfers them over to the recipient address.
-const withdrawAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const withdrawAction = await client.encoding.withdrawAction(withdrawParams);
 
 const proposalParams: CreateMultisigProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -1996,7 +1954,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const multisigClient = new MultisigClient(contextPlugin);
 
 const approveParams: ApproveMultisigProposalParams = {
-  proposalId: "0x123456789012345678901234567890123456789090x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   tryExecution: true
 };
 
@@ -2034,12 +1992,10 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Insantiate a Multisig client.
 const multisigClient = new MultisigClient(contextPlugin);
 
-const executeProposalParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890" // the address of the Multisig plugin contract installed into the DAO.
-}
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0"
 
 // Executes the actions of a Multisig proposal.
-const steps = multisigClient.methods.executeProposal(executeProposalParams);
+const steps = multisigClient.methods.executeProposal(proposalId);
 
 for await (const step of steps) {
   try {
@@ -2074,8 +2030,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client: MultisigClient = new MultisigClient(contextPlugin);
 
 const canApproveParams: CanApproveParams = {
-  addressOrEns: "0x1234567890123456789012345678901234567890",
-  pluginAddress: "0x1234567890123456789012345678901234567890"
+  approverAddressOrEns: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0"
 };
 
 // Checks whether the addressOrEns provided is able to approve a given proposal created with the pluginAddress.
@@ -2105,8 +2061,8 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const client: MultisigClient = new MultisigClient(contextPlugin);
 
 const canApproveParams: CanApproveParams = {
-  addressOrEns: "0x1234567890123456789012345678901234567890",
-  pluginAddress: "0x1234567890123456789012345678901234567890"
+  approverAddressOrEns: "0x1234567890123456789012345678901234567890",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0"
 };
 
 // Checks whether the addressOrEns provided is able to approve a given proposal created with the pluginAddress.
@@ -2128,7 +2084,6 @@ Checks whether the signer of the transaction is able to execute actions approved
 
 ```ts
 import {
-  CanExecuteParams,
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
@@ -2139,12 +2094,10 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const canExecuteParams: CanExecuteParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890" // the address of the plugin contract itself.
-};
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0"
 
 // Checks whether the signer of the transaction can execute a given proposal.
-const canExecute = await multisigClient.methods.canExecute(canExecuteParams);
+const canExecute = await multisigClient.methods.canExecute(proposalId);
 console.log({ canExecute });
 ```
 Returns:
@@ -2160,7 +2113,6 @@ Checks whether the signer of the transaction is able to execute actions approved
 */
 
 import {
-  CanExecuteParams,
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
@@ -2171,12 +2123,10 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const canExecuteParams: CanExecuteParams = {
-  pluginAddress: "0x1234567890123456789012345678901234567890" // the address of the plugin contract itself.
-};
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0"
 
 // Checks whether the signer of the transaction can execute a given proposal.
-const canExecute = await multisigClient.methods.canExecute(canExecuteParams);
+const canExecute = await multisigClient.methods.canExecute(proposalId);
 console.log({ canExecute });
 
 /* MARKDOWN
@@ -2205,9 +2155,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Insantiate a Multisig client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const daoAddressorEns: string = "0x12345348523485623984752394854320";
+const pluginAddress: string = "0x12345348523485623984752394854320";
 
-const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(daoAddressorEns);
+const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(pluginAddress);
 console.log({ multisigSettings });
 ```
 Returns:
@@ -2235,9 +2185,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Insantiate a Multisig client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const daoAddressorEns: string = "0x12345348523485623984752394854320";
+const pluginAddress: string = "0x12345348523485623984752394854320";
 
-const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(daoAddressorEns);
+const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(pluginAddress);
 console.log({ multisigSettings });
 
 /* MARKDOWN
@@ -2270,7 +2220,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const proposalId: string = "0x123456789012345678901234567890123456789080x0";
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 const proposalDetails: MultisigProposal | null = await multisigClient.methods.getProposal(proposalId);
 console.log({ proposalDetails });
@@ -2586,9 +2536,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig plugin client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
+const pluginAddress: string = "0x1234548357023847502348"; 
 
-const multisigMembers: string[] = await multisigClient.methods.getMembers(daoAddressorEns);
+const multisigMembers: string[] = await multisigClient.methods.getMembers(pluginAddress);
 console.log({ multisigMembers });
 ```
 Returns:
@@ -2616,9 +2566,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig plugin client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
+const pluginAddress: string = "0x1234548357023847502348"; 
 
-const multisigMembers: string[] = await multisigClient.methods.getMembers(daoAddressorEns);
+const multisigMembers: string[] = await multisigClient.methods.getMembers(pluginAddress);
 console.log({ multisigMembers });
 
 /* MARKDOWN
@@ -2841,11 +2791,11 @@ Creates a proposal with an action(s) to get executed upon the proposal passes. W
 import {
   AddresslistVotingClient,
   ContextPlugin,
-  ICreateProposalParams,
+  CreateMajorityVotingProposalParams,
+  MajorityVotingSettings,
   ProposalCreationSteps,
   ProposalMetadata,
   VotingMode,
-  VotingSettings,
   VoteValues
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
@@ -2857,7 +2807,7 @@ const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingCl
 
 // [Optional] You can add encoded actions to the proposal. These actions are the encoded transactions which will be executed when a transaction passes.
 // In this example, we are updating the plugin settings as an action that you may want upon a proposal approval.
-const configActionParams: VotingSettings = {
+const configActionParams: MajorityVotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
@@ -2869,8 +2819,8 @@ const pluginAddress = "0x1234567890123456789012345678901234567890"; // the addre
 
 // Sets up the action instructions based on the above parameters.
 const configAction = addresslistVotingClient.encoding.updatePluginSettingsAction(
-  configActionParams,
-  pluginAddress
+  pluginAddress,
+  configActionParams
 );
 
 const daoMetadata: ProposalMetadata = {
@@ -2895,7 +2845,7 @@ const daoMetadata: ProposalMetadata = {
 
 const metadataUri: string = await addresslistVotingClient.methods.pinMetadata(daoMetadata);
 
-const proposalParams: ICreateProposalParams = {
+const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the AddresslistVoting plugin contract installed in the DAO
   metadataUri,
   actions: [configAction], // the action you want to have executed upon a proposal approval
@@ -2943,7 +2893,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: IVoteProposalParams = {
-  proposalId: "0x12345678901234567890123456789012345678900x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES // alternatively NO, or ABSTAIN
 };
 
@@ -2985,7 +2935,7 @@ const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: CanVoteParams = {
   voterAddressOrEns: "0x1234567890123456789012345678901234567890", // the address who's potential to vote you want to check
-  proposalId: "0x123456789012345678901234567890123456789080x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES // this doesn't execute the vote itself, simply checks whether that address can execute that vote. VoteValues can be NO, YES, or ABSTAIN
 };
 
@@ -3019,7 +2969,7 @@ const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
 const voteParams: CanVoteParams = {
   voterAddressOrEns: "0x1234567890123456789012345678901234567890", // the address who's potential to vote you want to check
-  proposalId: "0x123456789012345678901234567890123456789080x0",
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES // this doesn't execute the vote itself, simply checks whether that address can execute that vote. VoteValues can be NO, YES, or ABSTAIN
 };
 
@@ -3048,9 +2998,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddressList client.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const daoAddressorEns = "0x12345382947301297439127433492834"; // or my-dao.dao.eth
+const pluginAddress = "0x12345382947301297439127433492834";
 
-const members: string[] = await addresslistVotingClient.methods.getMembers(daoAddressorEns);
+const members: string[] = await addresslistVotingClient.methods.getMembers(pluginAddress);
 console.log({ members });
 ```
 Returns:
@@ -3073,9 +3023,9 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddressList client.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const daoAddressorEns = "0x12345382947301297439127433492834"; // or my-dao.dao.eth
+const pluginAddress = "0x12345382947301297439127433492834";
 
-const members: string[] = await addresslistVotingClient.methods.getMembers(daoAddressorEns);
+const members: string[] = await addresslistVotingClient.methods.getMembers(pluginAddress);
 console.log({ members });
 
 /* MARKDOWN
@@ -3110,7 +3060,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddresslistVoting client.
 const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
 
-const proposalId: string = "0x123456789012345678901234567890123456789090x0";
+const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 const addresslistVotingProposal: AddresslistVotingProposal | null = await addresslistVotingClient.methods.getProposal(proposalId);
 console.log({ addresslistVotingProposal });
@@ -4068,13 +4018,12 @@ const client: Client = new Client(context);
 
 const withdrawParams: WithdrawParams = {
   type: TokenType.NATIVE, // "native" for ETH, otherwise use "ERC20" for ERC20 tokens and pass it the contract address of the ERC20 token
-  amount: BigInt(10) // the amount in wei to withdraw
+  amount: BigInt(10), // the amount in wei to withdraw
+  recipientAddressOrEns: '0x1234567890123456789012345678901234567890' // the address to transfer the funds to
 };
 
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
 // Withdraws ETH from a given DAO and transfers them to another address.
-const ethWithdraw: DaoAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const ethWithdraw: DaoAction = await client.encoding.withdrawAction(withdrawParams);
 console.log({ ethWithdraw });
 ```
 
@@ -4097,12 +4046,11 @@ const client: Client = new Client(context);
 const withdrawParams: WithdrawParams = {
   type: TokenType.ERC20,
   amount: BigInt(10), // amount  in wei
-  tokenAddress: "0x1234567890123456789012345678901234567890" // ERC20 token's address to withdraw
+  tokenAddress: "0x1234567890123456789012345678901234567890", // ERC20 token's address to withdraw
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890" // the address to transfer the funds to
 };
 
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
-const erc20WithdrawAction: DaoAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const erc20WithdrawAction: DaoAction = await client.encoding.withdrawAction(withdrawParams);
 console.log({ erc20WithdrawAction });
 ```
 
@@ -4114,23 +4062,23 @@ Withdraws ERC-721 tokens from the DAO when a proposal passes.
 import {
   Client,
   DaoAction,
-  WithdrawParams,
-  WithdrawType
+  TokenType,
+  WithdrawParams
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate a general purpose client for Aragon OSx SDK context.
 const client: Client = new Client(context);
 
+// Coming Soon
 const withdrawParams: WithdrawParams = {
-  type: WithdrawType.ERC721,
+  type: TokenType.ERC721,
   tokenAddress: "0x1234567890123456789012345678901234567890", // ERFC721's token contract address to withdraw
-  amount: BigInt(10) // amount of tokens to withdraw
+  amount: BigInt(10), // amount of tokens to withdraw
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890" // the address to transfer the funds to
 };
 
-const daoAddress: string = "0x1234567890123456789012345678901234567890";
-
-const nftWithdrawAction: DaoAction = await client.encoding.withdrawAction(daoAddress, withdrawParams);
+const nftWithdrawAction: DaoAction = await client.encoding.withdrawAction(withdrawParams);
 console.log({ nftWithdrawAction });
 ```
 
@@ -4933,16 +4881,20 @@ Returns:
 Decodes the parameters of a withdraw action of any token type.
 
 ```ts
-import { Client, WithdrawParams } from "@aragon/sdk-client";
+import { Client, DaoAction, WithdrawParams } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
 // Insantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
 
-const data: Uint8Array = new Uint8Array([12, 56]);
+const action: DaoAction = {
+  to: "0x1234567890123456789012345678901234567890",
+  value: BigInt(10),
+  data: new Uint8Array([12, 56])
+}
 
 // Decodes the withdraw action.
-const withdrawParams: WithdrawParams = client.decoding.withdrawAction(data);
+const withdrawParams: WithdrawParams = client.decoding.withdrawAction(action.to, action.value, action.data);
 console.log({ withdrawParams });
 ```
 Returns:
@@ -4957,15 +4909,19 @@ Returns:
 ```
 
 ```ts
-p/00-getting-started";
+"../00-setup/00-getting-started";
 
 // Insantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
 
-const data: Uint8Array = new Uint8Array([12, 56]);
+const action: DaoAction = {
+  to: "0x1234567890123456789012345678901234567890",
+  value: BigInt(10),
+  data: new Uint8Array([12, 56])
+}
 
 // Decodes the withdraw action.
-const withdrawParams: WithdrawParams = client.decoding.withdrawAction(data);
+const withdrawParams: WithdrawParams = client.decoding.withdrawAction(action.to, action.value, action.data);
 console.log({ withdrawParams });
 
 /* MARKDOWN
