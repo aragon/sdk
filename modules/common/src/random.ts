@@ -5,7 +5,10 @@ export namespace Random {
    * Generates a random buffer of the given length
    */
   export function getBytes(count: number): Uint8Array {
-    if (typeof window?.crypto?.getRandomValues == "function") {
+    if (
+      typeof window !== "undefined" && typeof window.crypto !== "undefined" &&
+      typeof window.crypto.getRandomValues == "function"
+    ) {
       // Browser
       const buff = new Uint8Array(count);
       window.crypto.getRandomValues(buff);
