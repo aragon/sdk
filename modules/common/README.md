@@ -122,27 +122,6 @@ decodeProposalId("0x1234567890123456789012345678901234567890_0x7")
 
 ```
 
-## Random
-
-```ts
-import { Random } from "@aragon/sdk-common";
-
-// Bytes
-Random.getBytes(1); // Uint8Array(1) [34]
-Random.getBytes(2); // Uint8Array(1) [63, 215]
-Random.getBytes(8); // Uint8Array(1) [2, 194, 201, 142, 26, 5, 77, 152]
-
-// Hex (32 bytes)
-Random.getHex(); // "9a6dbc9176afdb69d6fb9a76fdb917613bd971a6bd9176adf3b791d1bda19d17"
-
-// Big integer up to the given number
-Random.getBigInt(256n); // 251n
-
-Random.getFloat(); // 0.24152366327234
-
-Random.shuffle([1, 2, 3, 4]);  // [3, 1, 4, 2]
-```
-
 ## Errors
 
 ## Promises
