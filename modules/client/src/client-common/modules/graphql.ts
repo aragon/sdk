@@ -1,4 +1,3 @@
-import { Random } from "@aragon/sdk-common";
 import { GraphQLClient } from "graphql-request";
 import { Context } from "../../client-common/context";
 import { QueryStatus } from "../graphql-queries";
@@ -15,7 +14,7 @@ export class GraphqlModule implements IClientGraphQLCore {
       clientsMap.set(this, context.graphql);
       clientsIdxMap.set(
         this,
-        Math.floor(Random.getFloat() * context.graphql.length),
+        Math.floor(Math.random() * context.graphql.length),
       );
     }
     Object.freeze(GraphqlModule.prototype);
