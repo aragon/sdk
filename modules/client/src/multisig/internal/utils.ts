@@ -46,7 +46,7 @@ export function toMultisigProposal(
     },
     settings: {
       onlyListed: proposal.plugin.onlyListed,
-      minApprovals: parseInt(proposal.plugin.minApprovals),
+      minApprovals: proposal.minApprovals,
     },
     creationBlockNumber: parseInt(proposal.creationBlockNumber) || 0,
     creationDate,
@@ -94,9 +94,9 @@ export function toMultisigProposalListItem(
     approvals: proposal.approvers.map(
       (approver) => approver.id.slice(0, 42),
     ),
-    settings: {
+    settings: {
       onlyListed: proposal.plugin.onlyListed,
-      minApprovals: parseInt(proposal.plugin.minApprovals),
+      minApprovals: proposal.minApprovals,
     },
     startDate,
     endDate,

@@ -22,9 +22,9 @@ query MultisigProposal($proposalId: ID!) {
     executionBlockNumber
     creationBlockNumber
     plugin {
-      minApprovals
       onlyListed
     }
+    minApprovals
     executionTxHash
     executed
     executable
@@ -55,8 +55,8 @@ query MultisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: In
     approvers {
       id
     }
+    minApprovals
     plugin{
-      minApprovals
       onlyListed
     }
   }
