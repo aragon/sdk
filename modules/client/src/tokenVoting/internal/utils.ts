@@ -128,6 +128,16 @@ export function toTokenVotingProposalListItem(
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
     },
+    settings:{
+      supportThreshold: decodeRatio(BigInt(proposal.supportThreshold), 6),
+      duration: parseInt(proposal.endDate) -
+        parseInt(proposal.startDate),
+      minParticipation: decodeRatio(
+        (BigInt(proposal.minVotingPower) * BigInt(1000000)) /
+          BigInt(proposal.totalVotingPower),
+        6,
+      ),
+    },
     creatorAddress: proposal.creator,
     metadata: {
       title: metadata.title,

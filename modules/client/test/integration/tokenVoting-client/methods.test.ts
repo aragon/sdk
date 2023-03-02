@@ -697,6 +697,18 @@ describe("Token Voting Client", () => {
           expect(typeof proposal.result.yes).toBe("bigint");
           expect(typeof proposal.result.no).toBe("bigint");
           expect(typeof proposal.result.abstain).toBe("bigint");
+          // setttings
+          expect(typeof proposal.settings.duration).toBe("number");
+          expect(typeof proposal.settings.supportThreshold).toBe("number");
+          expect(typeof proposal.settings.minParticipation).toBe("number");
+          expect(
+            proposal.settings.supportThreshold >= 0 &&
+              proposal.settings.supportThreshold <= 1,
+          ).toBe(true);
+          expect(
+            proposal.settings.minParticipation >= 0 &&
+              proposal.settings.minParticipation <= 1,
+          ).toBe(true);
           // token
           if (proposal.token) {
             expect(typeof proposal.token.name).toBe("string");

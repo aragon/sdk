@@ -69,6 +69,9 @@ query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
     endDate
     executed
     executable
+    votingMode
+    supportThreshold
+    minVotingPower
     totalVotingPower
     plugin{
       token{
