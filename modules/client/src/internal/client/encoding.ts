@@ -8,10 +8,19 @@ import {
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../interfaces";
-import { ClientCore, Context, DaoAction } from "../../client-common";
-import { isAddress } from "@ethersproject/address";
-import { DAO__factory } from "@aragon/osx-ethers";
 import {
+  ApplyInstallationParams,
+  ClientCore,
+  Context,
+  DaoAction,
+} from "../../client-common";
+import { isAddress } from "@ethersproject/address";
+import {
+  DAO__factory,
+  PluginSetupProcessor__factory,
+} from "@aragon/osx-ethers";
+import {
+  applyInstallatonParamsToContract,
   permissionParamsToContract,
   permissionWithConditionParamsToContract,
 } from "../utils";
@@ -32,6 +41,34 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     super(context);
     Object.freeze(ClientEncoding.prototype);
     Object.freeze(this);
+  }
+  /**
+   *
+   *
+   * @param {string} daoAddress
+   * @param {ApplyInstallationParams} params
+   * @return {*}  {DaoAction}
+   * @memberof ClientEncoding
+   */
+  public applyInstallation(
+    daoAddress: string,
+    params: ApplyInstallationParams,
+  ): DaoAction {
+    if (!isAddress(daoAddress)) {
+      throw new InvalidAddressError();
+    }
+    const pspInterface = PluginSetupProcessor__factory.createInterface();
+
+    const args = applyInstallatonParamsToContract(params);
+    const hexBytes = pspInterface.encodeFunctionData("applyInstallation", [
+      daoAddress,
+      args,
+    ]);
+    return {
+      to: daoAddress,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
   }
   /**
    * Computes the payload to be given when creating a proposal that grants a permission within a DAO

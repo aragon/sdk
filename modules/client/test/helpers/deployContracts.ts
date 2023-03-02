@@ -30,6 +30,7 @@ export interface Deployment {
   addresslistVotingPluginSetup: aragonContracts.AddresslistVotingSetup;
   multisigRepo: aragonContracts.PluginRepo;
   multisigPluginSetup: aragonContracts.AddresslistVotingSetup;
+  pluginSetupProcessor: aragonContracts.PluginSetupProcessor;
 }
 
 export async function deploy(): Promise<Deployment> {
@@ -272,6 +273,7 @@ export async function deploy(): Promise<Deployment> {
       addresslistVotingPluginSetup,
       multisigRepo,
       multisigPluginSetup,
+      pluginSetupProcessor,
     };
   } catch (e) {
     throw e;

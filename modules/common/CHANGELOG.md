@@ -16,6 +16,8 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## UPCOMING
+### Added
+- Adds `PluginInstallationPreparationError`
 ### Removes
 - removed `random.ts`
 ### Added

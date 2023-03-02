@@ -138,3 +138,9 @@ export class NoNodesAvailableError extends Error {
   }
 }
 
+
+export class PluginInstallationPreparationError extends Error {
+  constructor() {
+    super("Failed to install plugin");
+  }
+}
