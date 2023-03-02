@@ -13,6 +13,7 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.0.1]
 ### Added
 - `settings` to `tokenVotingProposalListItem`
 
