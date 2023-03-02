@@ -22,7 +22,6 @@ import {
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
-  VotingMode,
 } from "../../../src";
 import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
@@ -41,6 +40,7 @@ import { ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
@@ -63,6 +63,21 @@ describe("Client Multisig", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
+    LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
+    LIVE_CONTRACTS.goerli.pluginSetupProcessor =
+      deployment.pluginSetupProcessor.address;
+    LIVE_CONTRACTS.goerli.multisigRepo = deployment.multisigRepo.address;
+    LIVE_CONTRACTS.goerli.adminRepo = "";
+    LIVE_CONTRACTS.goerli.addresslistVotingRepo =
+      deployment.addresslistVotingRepo.address;
+    LIVE_CONTRACTS.goerli.tokenVotingRepo = deployment.tokenVotingRepo.address;
+    LIVE_CONTRACTS.goerli.multisigSetup =
+      deployment.multisigPluginSetup.address;
+    LIVE_CONTRACTS.goerli.adminSetup = "";
+    LIVE_CONTRACTS.goerli.addresslistVotingSetup =
+      deployment.addresslistVotingPluginSetup.address;
+    LIVE_CONTRACTS.goerli.tokenVotingSetup =
+      deployment.tokenVotingPluginSetup.address;
     await restoreBlockTime(provider);
   });
 

@@ -46,6 +46,7 @@ import {
 import { buildAddressListVotingDAO } from "../../helpers/build-daos";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddresslistVotingPluginPrepareInstallationParams } from "../../../src/addresslistVoting/interfaces";
+import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
 describe("Client Address List", () => {
   let server: Server;
@@ -68,6 +69,21 @@ describe("Client Address List", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
+    LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
+    LIVE_CONTRACTS.goerli.pluginSetupProcessor =
+      deployment.pluginSetupProcessor.address;
+    LIVE_CONTRACTS.goerli.multisigRepo = deployment.multisigRepo.address;
+    LIVE_CONTRACTS.goerli.adminRepo = "";
+    LIVE_CONTRACTS.goerli.addresslistVotingRepo =
+      deployment.addresslistVotingRepo.address;
+    LIVE_CONTRACTS.goerli.tokenVotingRepo = deployment.tokenVotingRepo.address;
+    LIVE_CONTRACTS.goerli.multisigSetup =
+      deployment.multisigPluginSetup.address;
+    LIVE_CONTRACTS.goerli.adminSetup = "";
+    LIVE_CONTRACTS.goerli.addresslistVotingSetup =
+      deployment.addresslistVotingPluginSetup.address;
+    LIVE_CONTRACTS.goerli.tokenVotingSetup =
+      deployment.tokenVotingPluginSetup.address;
   });
 
   afterAll(async () => {

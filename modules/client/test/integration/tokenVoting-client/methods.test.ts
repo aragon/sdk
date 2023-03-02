@@ -79,7 +79,7 @@ describe("Token Voting Client", () => {
       deployment.multisigPluginSetup.address;
     LIVE_CONTRACTS.goerli.adminSetup = "";
     LIVE_CONTRACTS.goerli.addresslistVotingSetup =
-      deployment.multisigPluginSetup.address;
+      deployment.addresslistVotingPluginSetup.address;
     LIVE_CONTRACTS.goerli.tokenVotingSetup =
       deployment.tokenVotingPluginSetup.address;
   });
