@@ -5,7 +5,7 @@ Decodes the action of removing addresses from the AddresslistVoting plugin so th
 */
 
 import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -20,11 +20,13 @@ console.log({ removedMembers });
 /* MARKDOWN
 Returns:
 
-```json
-[
-  "0x12345...",
-  "0x56789...",
-  "0x13579..."
-]
+```
+{ removedMembers:
+  [
+    "0x12345...",
+    "0x56789...",
+    "0x13579..."
+  ]
+}
 ```
 */

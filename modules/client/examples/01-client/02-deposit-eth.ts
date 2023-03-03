@@ -11,7 +11,8 @@ import {
   DepositParams,
   TokenType
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+
+import { context } from "./01-getting-started";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
