@@ -8,7 +8,6 @@ import {
 } from "@aragon/osx-ethers";
 import {
   AmountMismatchError,
-  UpdateAllowanceError,
   FailedDepositError,
   GraphQLError,
   InvalidAddressOrEnsError,
@@ -17,6 +16,7 @@ import {
   NoProviderError,
   NoSignerError,
   resolveIpfsCid,
+  UpdateAllowanceError,
 } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -42,7 +42,6 @@ import {
   DaoMetadata,
   DaoSortBy,
   DepositParams,
-  UpdateAllowanceStepValue,
   IClientMethods,
   IDaoQueryParams,
   IHasPermissionParams,
@@ -57,6 +56,7 @@ import {
   Transfer,
   TransferSortBy,
   UpdateAllowanceParams,
+  UpdateAllowanceStepValue,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -540,10 +540,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (tokenBalances.length === 0) {
         return [];
       }
-      return Promise.all(
-        tokenBalances.map(
-          (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
-        ),
+      return tokenBalances.map(
+        (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
       );
     } catch (err) {
       throw new GraphQLError("balance");
@@ -609,11 +607,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!tokenTransfers) {
         return null;
       }
-      return Promise.all(
-        tokenTransfers.map(
-          (transfer: SubgraphTransferListItem): Transfer =>
-            toTokenTransfer(transfer),
-        ),
+      return tokenTransfers.map(
+        (transfer: SubgraphTransferListItem): Transfer =>
+          toTokenTransfer(transfer),
       );
     } catch {
       throw new GraphQLError("token transfer");
