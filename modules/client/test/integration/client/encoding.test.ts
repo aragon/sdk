@@ -390,7 +390,7 @@ describe("Client", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
       const daoAddress = "0x1234567890123456789012345678901234567890";
-      const action = client.encoding.applyInstallation(
+      const action = client.encoding.applyInstallationAction(
         daoAddress,
         applyInstallationParams,
       );

@@ -12,7 +12,7 @@ import { PermissionIds } from "../../dist/interfaces";
   import { context } from '../00-setup/00-getting-started';
   // Initializes a general purpose client from the Aragon SDK context.
   const client: Client = new Client(context);
-  
+    // This variable contains the values received on the prepareInstallation() method
   const applyInstallationParams: ApplyInstallationParams = {
     helpers: [
         "0x1234567890123456789012345678901234567890",
@@ -36,9 +36,9 @@ import { PermissionIds } from "../../dist/interfaces";
       pluginAddress: "0x1234567890123456789012345678901234567890",
      };
   
-  const daoAddressOrEns: string = "0x123123123123123123123123123123123123"; // "my-dao" for my-dao.dao.eth address
+  const daoAddressOrEns: string = "0x123123123123123123123123123123123123"; // "my-dao.eth"
   
-  const applyInstallationAction: DaoAction = client.encoding.applyInstallation(
+  const applyInstallationAction: DaoAction = client.encoding.applyInstallationAction(
     daoAddressOrEns,
     applyInstallationParams
   );

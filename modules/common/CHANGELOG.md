@@ -18,11 +18,9 @@ TEMPLATE:
 ## UPCOMING
 ### Added
 - Adds `PluginInstallationPreparationError`
+- `runAndRetry` function
 ### Removes
 - removed `random.ts`
-### Added
-- `runAndRetry` function
-
 ## 0.12.0-beta
 ### Added
 - `getCompactProposalId` and `getExtendedProposalId` functions

@@ -69,7 +69,7 @@ Returns:
         condition: "0x12345...",
         who: "0x12345...",
         where: "0x12345...",
-        operation: 1,
+        operation: 1, // GRANT
         permissionId: Uint8Array([10, 20, 30])
       }
     ]

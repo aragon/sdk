@@ -50,7 +50,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * @return {*}  {DaoAction}
    * @memberof ClientEncoding
    */
-  public applyInstallation(
+  public applyInstallationAction(
     daoAddress: string,
     params: ApplyInstallationParams,
   ): DaoAction {

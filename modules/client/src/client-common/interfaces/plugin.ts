@@ -260,18 +260,17 @@ export type PrepareInstallationStepValue =
   } & ApplyInstallationParams;
 
 export type ApplyInstallationParamsBase = {
-  permissions: MultitargetPermission[];
+  permissions: MultiTargetPermission[];
   versionTag: VersionTag;
   pluginRepo: string;
   pluginAddress: string;
-}
-
+};
 
 export type ApplyInstallationParams = ApplyInstallationParamsBase & {
-  helpers: string[]
+  helpers: string[];
 };
 export type DecodedApplyInstallationParams = ApplyInstallationParamsBase & {
-  helpersHash: string
+  helpersHash: string;
 };
 
 export type VersionTag = {
@@ -279,8 +278,14 @@ export type VersionTag = {
   release: number;
 };
 
-export type MultitargetPermission = {
-  operation: number;
+export enum PermissionOperationType {
+  GRANT = 0,
+  REVOKE = 1,
+  GRANT_WITH_CONDITION = 2,
+}
+
+export type MultiTargetPermission = {
+  operation: PermissionOperationType;
   where: string;
   who: string;
   condition: string;

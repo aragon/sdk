@@ -43,12 +43,11 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     Object.freeze(this);
   }
   /**
-   * @param {string} daoAddress
-   * @param {ApplyInstallationParams} params
-   * @return {*}  {DaoAction}
-   * @memberof ClientEncoding
+   * @param {data} Uint8Array
+   * @return {*}  {DecodedApplyInstallationParams}
+   * @memberof ClientDecoding
    */
-  public applyInstallation(
+  public applyInstallationAction(
     data: Uint8Array,
   ): DecodedApplyInstallationParams {
     const pspInterface = PluginSetupProcessor__factory.createInterface();

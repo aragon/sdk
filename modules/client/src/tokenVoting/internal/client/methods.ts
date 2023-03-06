@@ -286,7 +286,7 @@ export class TokenVotingClientMethods extends ClientCore
       signer,
     );
     // use specified version or latest
-    let versionTag: VersionTag;
+    let versionTag: VersionTag | undefined = params.versionTag;
     if (!params.versionTag) {
       const latestVersion = await tokenVotingRepoContract
         ["getLatestVersion(address)"](
@@ -296,19 +296,17 @@ export class TokenVotingClientMethods extends ClientCore
         build: latestVersion.tag.build,
         release: latestVersion.tag.release,
       };
-    } else {
-      versionTag = params.versionTag;
     }
     // get install data
     const tokenVotingPluginInstallItem = TokenVotingClientEncoding
       .getPluginInstallItem(params.settings, networkName);
-    // execute proepareInstallationon
+    // execute prepareInstallationon
     const tx = await pspContract.prepareInstallation(
       params.daoAddressOrEns,
       {
         pluginSetupRef: {
           pluginSetupRepo: LIVE_CONTRACTS[networkName].tokenVotingRepo,
-          versionTag,
+          versionTag: versionTag!
         },
         data: tokenVotingPluginInstallItem.data,
       },
@@ -341,7 +339,7 @@ export class TokenVotingClientMethods extends ClientCore
       key: PrepareInstallationStep.DONE,
       pluginAddress,
       pluginRepo: LIVE_CONTRACTS[networkName].tokenVotingRepo,
-      versionTag,
+      versionTag: versionTag!,
       permissions: preparedSetupData.permissions,
       helpers: preparedSetupData.helpers,
     };

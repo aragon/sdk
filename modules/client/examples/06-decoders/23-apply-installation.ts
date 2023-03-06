@@ -13,7 +13,7 @@ const data: Uint8Array = new Uint8Array([12, 56]);
 
 // Decodes the update settings action for a Multisig plugin.
 const applyInstallationParams: DecodedApplyInstallationParams = client.decoding
-  .applyInstallation(data);
+  .applyInstallationAction(data);
 console.log({ applyInstallationParams });
 
 /* MARKDOWN

@@ -30,7 +30,6 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     addresslistVotingRepo:
       activeContractsList.mainnet["address-list-voting-repo"],
     tokenVotingRepo: activeContractsList.mainnet["token-voting-repo"],
-    // TODO change to mainnet
     multisigSetup: activeContractsList.mainnet.MultisigSetup,
     adminSetup: activeContractsList.mainnet.AdminSetup,
     addresslistVotingSetup: activeContractsList.mainnet.AddresslistVotingSetup,

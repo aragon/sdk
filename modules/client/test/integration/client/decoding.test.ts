@@ -495,7 +495,7 @@ describe("Client", () => {
         bytesToHex(decodedUpgradeToAndCallParams.data),
       );
     });
-    it("Should decode an update proxy implementation and call action", async () => {
+    it("Should decode an apply installation action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -522,11 +522,11 @@ describe("Client", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
 
-      const action = client.encoding.applyInstallation(
+      const action = client.encoding.applyInstallationAction(
         "0x1234567890123456789012345678901234567890",
         applyInstallationParams,
       );
-      const decodedApplyInstallationParams = client.decoding.applyInstallation(
+      const decodedApplyInstallationParams = client.decoding.applyInstallationAction(
         action.data,
       );
       expect(applyInstallationParams.versionTag.build).toBe(

@@ -80,7 +80,7 @@ export interface IClientEncoding extends IClientCore {
     daoAddressOrEns: string,
     params: UpgradeToAndCallParams,
   ) => DaoAction;
-  applyInstallation: (
+  applyInstallationAction: (
     daoAddressOrEns: string,
     params: ApplyInstallationParams,
   ) => DaoAction;
@@ -107,7 +107,7 @@ export interface IClientDecoding {
   upgradeToAction: (data: Uint8Array) => string;
   upgradeToAndCallAction: (data: Uint8Array) => UpgradeToAndCallParams;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
-  applyInstallation: (
+  applyInstallationAction: (
     data: Uint8Array,
   ) => DecodedApplyInstallationParams;
 }

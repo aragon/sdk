@@ -287,7 +287,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       signer,
     );
     // use specified version or latest
-    let versionTag: VersionTag;
+    let versionTag: VersionTag | undefined = params.versionTag;
     if (!params.versionTag) {
       const latestVersion = await addresslistVotingRepoContract
         ["getLatestVersion(address)"](
@@ -297,19 +297,17 @@ export class AddresslistVotingClientMethods extends ClientCore
         build: latestVersion.tag.build,
         release: latestVersion.tag.release,
       };
-    } else {
-      versionTag = params.versionTag;
     }
     // get install data
     const addresslistVotingPluginInstallItem = AddresslistVotingClientEncoding
       .getPluginInstallItem(params.settings, networkName);
-    // execute proepareInstallation
+    // execute prepareInstallation
     const tx = await pspContract.prepareInstallation(
       params.daoAddressOrEns,
       {
         pluginSetupRef: {
           pluginSetupRepo: LIVE_CONTRACTS[networkName].addresslistVotingRepo,
-          versionTag,
+          versionTag: versionTag!,
         },
         data: addresslistVotingPluginInstallItem.data,
       },
@@ -335,14 +333,14 @@ export class AddresslistVotingClientMethods extends ClientCore
     const parsedLog = pspContractInterface.parseLog(log);
     const pluginAddress = parsedLog.args["plugin"];
     const preparedSetupData = parsedLog.args["preparedSetupData"];
-    if (!pluginAddress || preparedSetupData) {
+    if (!(pluginAddress || preparedSetupData)) {
       throw new PluginInstallationPreparationError();
     }
     yield {
       key: PrepareInstallationStep.DONE,
       pluginAddress,
       pluginRepo: LIVE_CONTRACTS[networkName].addresslistVotingRepo,
-      versionTag,
+      versionTag: versionTag!,
       permissions: preparedSetupData.permissions,
       helpers: preparedSetupData.helpers,
     };
