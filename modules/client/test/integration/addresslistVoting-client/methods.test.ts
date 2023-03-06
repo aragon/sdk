@@ -535,7 +535,6 @@ describe("Client Address List", () => {
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),
       );
-      mockedGraphqlRequest.mockUpCheck(mockedClient);
       mockedClient.request.mockResolvedValueOnce({
         addresslistVotingPlugin: {
           members: [{
@@ -596,7 +595,6 @@ describe("Client Address List", () => {
         ...SUBGRAPH_PROPOSAL_BASE,
       };
 
-      mockedGraphqlRequest.mockUpCheck(mockedClient);
       mockedClient.request.mockResolvedValueOnce({
         addresslistVotingProposal: subgraphProposal,
       });
@@ -688,7 +686,6 @@ describe("Client Address List", () => {
         client.graphql.getClient(),
       );
 
-      mockedGraphqlRequest.mockUpCheck(mockedClient);
       mockedClient.request.mockResolvedValueOnce({
         addresslistVotingProposal: null,
       });
@@ -738,7 +735,6 @@ describe("Client Address List", () => {
         client.graphql.getClient(),
       );
 
-      mockedGraphqlRequest.mockUpCheck(mockedClient);
       mockedClient.request.mockResolvedValueOnce({
         addresslistVotingProposals: [SUBGRAPH_PROPOSAL_BASE],
       });
@@ -806,7 +802,6 @@ describe("Client Address List", () => {
         client.graphql.getClient(),
       );
 
-      mockedGraphqlRequest.mockUpCheck(mockedClient);
       mockedClient.request.mockResolvedValueOnce({
         addresslistVotingProposals: [],
       });
@@ -851,7 +846,6 @@ describe("Client Address List", () => {
         client.graphql.getClient(),
       );
 
-      mockedGraphqlRequest.mockUpCheck(mockedClient);
       mockedClient.request.mockResolvedValueOnce({
         addresslistVotingPlugin: {
           minDuration: "10",
