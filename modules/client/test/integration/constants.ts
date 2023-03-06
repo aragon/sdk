@@ -1,5 +1,11 @@
 import { Wallet } from "@ethersproject/wallet";
-import { ContextParams } from "../../src";
+import {
+  ContextParams,
+  SubgraphAction,
+  SubgraphProposalBase,
+  SubgraphVoterListItemBase,
+  SubgraphVoteValues,
+} from "../../src";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY || "";
 
@@ -45,9 +51,9 @@ const grapqhlEndpoints = {
   failing: [{ url: "https://bad-url-gateway.io/" }],
 };
 
-export const ADDRESS_ONE = '0x0000000000000000000000000000000000000001'
-export const ADDRESS_TWO = '0x0000000000000000000000000000000000000002'
-export const ADDRESS_THREE = '0x0000000000000000000000000000000000000003'
+export const ADDRESS_ONE = "0x0000000000000000000000000000000000000001";
+export const ADDRESS_TWO = "0x0000000000000000000000000000000000000002";
+export const ADDRESS_THREE = "0x0000000000000000000000000000000000000003";
 
 export const TEST_WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 export const TEST_WALLET =
@@ -111,5 +117,50 @@ export const contextParamsFailing: ContextParams = {
   graphqlNodes: grapqhlEndpoints.failing,
 };
 
-export const TEST_TX_HASH = '0x0000000000000000000000000000000000000000000000000000000000007E47'
-export const IPFS_CID = 'QmQPeNsJPyVWPFDVHb77w8G42Fvo15z4bG2X8D2GhfbSXc'
+export const TEST_TX_HASH =
+  "0x0000000000000000000000000000000000000000000000000000000000007E47";
+export const IPFS_CID = "QmQPeNsJPyVWPFDVHb77w8G42Fvo15z4bG2X8D2GhfbSXc";
+
+export const SUBGRAPH_ACTIONS: SubgraphAction[] = [{
+  to: ADDRESS_ONE,
+  value: "0",
+  data: "0x",
+}, {
+  to: ADDRESS_TWO,
+  value: "10",
+  data: "0x7E47",
+}];
+
+export const SUBGRAPH_VOTERS: SubgraphVoterListItemBase[] = [
+  {
+    voteOption: SubgraphVoteValues.YES,
+    voter: {
+      address: ADDRESS_ONE,
+    },
+    voteReplaced: false,
+  },
+  {
+    voteOption: SubgraphVoteValues.NO,
+    voter: {
+      address: ADDRESS_TWO,
+    },
+    voteReplaced: true,
+  },
+];
+
+export const SUBGRAPH_PROPOSAL_BASE: SubgraphProposalBase = {
+  id: TEST_ADDRESSLIST_PROPOSAL_ID,
+  dao: {
+    id: TEST_ADDRESSLIST_DAO_ADDDRESS,
+    subdomain: "test",
+  },
+  creator: TEST_WALLET_ADDRESS,
+  abstain: "0",
+  no: "1",
+  yes: "1",
+  executed: false,
+  startDate: Math.round(Date.now() / 1000).toString(),
+  endDate: Math.round(Date.now() / 1000).toString(),
+  executable: false,
+  metadata: `ipfs://${IPFS_CID}`,
+};
