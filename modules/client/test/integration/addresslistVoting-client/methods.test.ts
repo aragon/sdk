@@ -636,9 +636,6 @@ describe("Client Address List", () => {
       expect(proposal.result.no).toBe(parseInt(subgraphProposal.no));
       expect(proposal.result.abstain).toBe(parseInt(subgraphProposal.abstain));
       // setttings
-      expect(typeof proposal.settings.duration).toBe("number");
-      expect(typeof proposal.settings.supportThreshold).toBe("number");
-      expect(typeof proposal.settings.minParticipation).toBe("number");
       expect(proposal.settings.duration).toBe(
         parseInt(subgraphProposal.endDate) -
           parseInt(subgraphProposal.startDate),
@@ -669,7 +666,7 @@ describe("Client Address List", () => {
         parseInt(subgraphProposal.executionBlockNumber),
       );
 
-      // check function calls
+      // check function call
       expect(mockedClient.request).lastCalledWith(
         QueryAddresslistVotingProposal,
         {
