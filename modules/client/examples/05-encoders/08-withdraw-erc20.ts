@@ -10,7 +10,7 @@ import {
   TokenType,
   WithdrawParams
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a general purpose Client from the Aragon OSx SDK context.
 const client: Client = new Client(context);

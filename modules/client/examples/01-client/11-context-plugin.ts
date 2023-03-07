@@ -11,7 +11,7 @@ However, whenever you want to interact with any plugin within our SDK, you will 
 */
 import { Wallet } from "@ethersproject/wallet";
 import { ContextPlugin } from "@aragon/sdk-client";
-import { context, contextParams } from "./index";
+import { context, contextParams } from "../index";
 
 // Instantiate the Context Plugin from the Aragon OSx SDK context.
 export const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

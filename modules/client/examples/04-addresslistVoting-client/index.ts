@@ -5,7 +5,7 @@ Creates an AddresslistVoting client allowing you to access the AddresslistVoting
 */
 
 import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

@@ -6,7 +6,7 @@ This is created using the `ContextPlugin` which grants us access to plugins with
 */
 
 import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate the ContextPlugin from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
