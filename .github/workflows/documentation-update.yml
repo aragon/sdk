@@ -31,7 +31,7 @@ jobs:
       - name: Generate Multisig Docs
         run: yarn run docs:multisig
       - name: Generate examples Docs
-        run: yarn run docs:examples && rsync -r --prune-empty-dirs --include='*/' --include='*.md' --exclude='*' ./modules/client/examples/ ./docs/01-examples/;
+        run: yarn run docs:examples
       - name: Checkout builders-portal
         uses: actions/checkout@v3
         with:
