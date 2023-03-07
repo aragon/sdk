@@ -17,7 +17,7 @@ import {
   DaoDepositSteps,
   UpdateAllowanceParams
 } from "@aragon/sdk-client";
-import { context } from "./index";
+import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
