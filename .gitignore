@@ -13,5 +13,4 @@ coverage
 modules/client/examples/**/*.md
 docs/01-examples/*
 docs/02-reference-guide/*
-!docs/01-examples/index.md
 !docs/02-reference-guide/index.md
