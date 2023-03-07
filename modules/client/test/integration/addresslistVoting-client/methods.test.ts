@@ -722,6 +722,9 @@ describe("Client Address List", () => {
         }],
         media: [{ header: "Header", logo: "Logo" }],
       };
+
+      const defaultCatImplementation = mockedIPFSClient.cat
+        .getMockImplementation();
       mockedIPFSClient.cat.mockResolvedValue(
         Buffer.from(
           JSON.stringify(ipfsMetadata),
@@ -781,6 +784,8 @@ describe("Client Address List", () => {
           sortBy: params.sortBy,
         },
       );
+
+      mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
     });
     it("Should get a list of proposals from a specific dao", async () => {
       const ctx = new Context(contextParamsMainnet);
