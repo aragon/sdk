@@ -5,7 +5,7 @@ Encodes the action of setting the signatura validator of the DAO.
 */
 
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from '../00-setup/00-getting-started';
+import { context } from '../01-client/01-getting-started';
 
 // Initialize the context plugin from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -30,5 +30,5 @@ Returns:
     value: 0n,
     data: Uint8Array[12,34,45...]
   }
-  ```
-  */
+```
+*/

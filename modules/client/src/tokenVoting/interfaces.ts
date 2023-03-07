@@ -124,6 +124,7 @@ export type TokenVotingProposalListItem = ProposalListItemBase & {
   token: Erc20TokenDetails | Erc721TokenDetails | null;
   result: TokenVotingProposalResult;
   totalVotingWeight: bigint;
+  settings: MajorityVotingProposalSettings;
 };
 
 export type TokenVotingProposalResult = {
@@ -154,7 +155,10 @@ export type SubgraphTokenVotingProposalListItem = SubgraphProposalBase & {
   plugin: {
     token: SubgraphErc20Token | SubgraphErc721Token;
   };
+  supportThreshold: string;
+  minVotingPower: bigint;
   totalVotingPower: string;
+  votingMode: VotingMode;
 };
 
 type SubgraphBaseToken = {
@@ -184,11 +188,7 @@ export type SubgraphTokenVotingProposal =
   & {
     createdAt: string;
     actions: SubgraphAction[];
-    supportThreshold: string;
     voters: SubgraphTokenVotingVoterListItem[];
-    minVotingPower: bigint;
-    totalVotingPower: string;
-    votingMode: VotingMode;
     creationBlockNumber: string;
     executionDate: string;
     executionTxHash: string;

@@ -25,6 +25,18 @@ An exhaustive list of the SDK features and methods can be found on the **[exampl
 
 To generate the `examples.md` file run `yarn examples`
 
+## React Native
+In order for the SDK to be used in restricted environments like react native install the following polyfilesand  into your project:  
+-  [@ethersproject/shims](https://www.npmjs.com/package/@ethersproject/shims)
+-  [react-native-url-polyfill](https://www.npmjs.com/package/react-native-url-polyfill)
+
+Then import them like the following **before** you import the Aragon SDK package:  
+```javascript
+import "@ethersproject/shims";
+import "react-native-url-polyfill/auto";
+import { Client } from "@aragon/sdk-client";
+```
+
 # Development
 
 The building blocks are defined within the `src/internal` folder. The high level

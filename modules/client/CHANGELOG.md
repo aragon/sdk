@@ -13,7 +13,13 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
-## [0.23.2-beta]
+## [1.0.1]
+### Added
+- `settings` to `tokenVotingProposalListItem`
+
+### Fixed
+- Multisig proposals returning the wrong settings
+## [1.0.0]
 ### Fixed
 - Compute status functions
 ## [0.23.1-beta]

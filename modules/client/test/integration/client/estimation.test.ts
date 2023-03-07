@@ -1,7 +1,6 @@
 // mocks need to be at the top of the imports
 import "../../mocks/aragon-sdk-ipfs";
 
-import { Random } from "@aragon/sdk-common";
 import {
   AddresslistVotingClient,
   Client,
@@ -38,7 +37,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const daoName = "TokenVotingDAO-" + Math.floor(Random.getFloat() * 9999) +
+      const daoName = "TokenVotingDAO-" + Math.floor(Math.random() * 9999) +
         1;
 
       const pluginParams: IAddresslistVotingPluginInstall = {

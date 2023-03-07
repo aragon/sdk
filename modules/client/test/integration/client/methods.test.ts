@@ -89,7 +89,7 @@ describe("Client", () => {
         const client = new Client(context);
 
         const daoName = "AddresslistVoting DAO-" +
-          Math.floor(Random.getFloat() * 9999) + 1;
+          Math.floor(Math.random() * 9999) + 1;
         // pin metadata
         const ipfsUri = await client.methods.pinMetadata({
           name: daoName,
@@ -145,7 +145,7 @@ describe("Client", () => {
         const client = new Client(context);
 
         const daoName = "AddresslistVoting DAO-" +
-          Math.floor(Random.getFloat() * 9999) + 1;
+          Math.floor(Math.random() * 9999) + 1;
 
         const daoCreationParams: CreateDaoParams = {
           metadataUri: "ipfs://QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK",

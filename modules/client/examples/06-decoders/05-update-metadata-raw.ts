@@ -5,7 +5,7 @@ Decode an update metadata action and expect an IPFS URI containing the CID of th
 */
 
 import { Client } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Insantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
@@ -19,7 +19,7 @@ console.log({ decodedUpdateMetadata });
 /* MARKDOWN
 Returns:
 
-```javascript
-  "ipfs://Qm..."
+```
+  { decodedUpdateMetadata: "ipfs://Qm..." }
 ```
 */

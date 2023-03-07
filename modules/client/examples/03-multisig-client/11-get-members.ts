@@ -8,26 +8,28 @@ import {
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../01-client/01-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig plugin client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const pluginAddress: string = "0x1234548357023847502348"; 
+const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
 
-const multisigMembers: string[] = await multisigClient.methods.getMembers(pluginAddress);
+const multisigMembers: string[] = await multisigClient.methods.getMembers(daoAddressorEns);
 console.log({ multisigMembers });
 
 /* MARKDOWN
 Returns:
 
-```json
-[
-  "0x1234567890...",
-  "0x2345678901...",
-  "0x3456789012..."
-]
+```
+{ multisigMembers:
+  [
+    "0x1234567890...",
+    "0x2345678901...",
+    "0x3456789012..."
+  ]
+}
 ```
 */

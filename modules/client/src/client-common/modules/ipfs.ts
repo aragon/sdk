@@ -1,4 +1,3 @@
-import { Random } from "@aragon/sdk-common";
 import { Context } from "../../client-common/context";
 import { IClientIpfsCore } from "../interfaces/core";
 import { Client as IpfsClient, PinResponse } from "@aragon/sdk-ipfs";
@@ -13,7 +12,7 @@ export class IPFSModule implements IClientIpfsCore {
     if (context.ipfs?.length) {
       clientsIdxMap.set(
         this,
-        Math.floor(Random.getFloat() * context.ipfs.length),
+        Math.floor(Math.random() * context.ipfs.length),
       );
       clientsMap.set(this, context.ipfs);
     }
