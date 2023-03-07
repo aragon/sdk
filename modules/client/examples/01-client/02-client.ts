@@ -3,7 +3,7 @@
 
 Next thing you'll want to do is set up the general purpose client so you can call on the SDK functions. This client is used to interact with any DAO on the network you're connected to.
 
-The [Client](./src/client.ts) class allows you to perform operations that apply to all DAOs, regardless of the plugins they use.
+The `Client` class that can be imported via `@aragon/sdk-client` allows you to perform operations that apply to all DAOs, regardless of the plugins they use.
 
 We also have clients for each plugin, which allow us to use the plugin-specific functions.
 
