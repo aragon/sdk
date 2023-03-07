@@ -767,7 +767,9 @@ describe("Token Voting Client", () => {
                 __typename: SubgraphContractType.ERC20,
               },
             },
+            supportThreshold: "50000",
             totalVotingPower: "5000",
+            minVotingPower: "50",
             ...SUBGRAPH_PROPOSAL_BASE,
           }],
         });

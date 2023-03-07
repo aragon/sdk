@@ -373,9 +373,10 @@ describe("Client Multisig", () => {
         executionBlockNumber: "50",
         executionTxHash: TEST_TX_HASH,
         approvers: [{ id: ADDRESS_ONE }, { id: ADDRESS_TWO }],
+        minApprovals: 5,
         plugin: {
-          minApprovals: "5",
           onlyListed: true,
+          minApprovals: "5",
         },
         ...SUBGRAPH_PROPOSAL_BASE,
       };
@@ -491,8 +492,8 @@ describe("Client Multisig", () => {
           approvers: [{ id: ADDRESS_ONE }, { id: ADDRESS_TWO }],
           plugin: {
             onlyListed: true,
-            minApprovals: "5",
           },
+          minApprovals: 5,
         }],
       });
       const dateGetTimeSpy = jest.spyOn(Date.prototype, "getTime");
