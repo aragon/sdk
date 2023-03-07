@@ -307,7 +307,6 @@ export class AddresslistVotingClientMethods extends ClientCore
     }
 
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const response = await client.request(QueryAddresslistVotingMembers, {
         address: pluginAddress.toLowerCase(),
@@ -335,7 +334,6 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const extendedProposalId = getExtendedProposalId(proposalId);
       const {
@@ -416,7 +414,6 @@ export class AddresslistVotingClientMethods extends ClientCore
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         addresslistVotingProposals,
@@ -484,7 +481,6 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { addresslistVotingPlugin }: {
         addresslistVotingPlugin: SubgraphVotingSettings;

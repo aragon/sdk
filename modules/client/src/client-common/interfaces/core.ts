@@ -6,6 +6,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient, PinResponse } from "@aragon/sdk-ipfs";
 import { GasFeeEstimation } from "./common";
 import { GraphQLClient } from "graphql-request";
+import { GraphqlModule } from "../modules/graphql";
 
 export interface IClientWeb3Core {
   useSigner: (signer: Signer) => void;
@@ -39,11 +40,10 @@ export interface IClientGraphQLCore {
   shiftClient: () => void;
   isUp: () => Promise<boolean>;
   ensureOnline: () => Promise<void>;
-  assertClient: () => void;
 }
 
 export interface IClientCore {
   web3: IClientWeb3Core;
   ipfs: IClientIpfsCore;
-  graphql: IClientGraphQLCore;
+  graphql: GraphqlModule;
 }

@@ -1,41 +1,28 @@
-import { ClientNotInitializedError } from "@aragon/sdk-common";
+import {
+  ClientNotInitializedError,
+  NoNodesAvailableError,
+} from "@aragon/sdk-common";
 import { GraphQLClient } from "graphql-request";
 import { Context } from "../../client-common/context";
 import { QueryStatus } from "../graphql-queries";
 import { IClientGraphQLCore } from "../interfaces/core";
 
-const clientsMap = new Map<GraphqlModule, GraphQLClient[]>();
-const clientsIdxMap = new Map<GraphqlModule, number>();
-
 export class GraphqlModule implements IClientGraphQLCore {
+  private clientIdx: number = -1;
+  private clients: GraphQLClient[] = [];
   constructor(context: Context) {
-    clientsIdxMap.set(this, -1);
-    // Storing client data in the private module's scope to prevent external mutation
     if (context.graphql?.length) {
-      clientsMap.set(this, context.graphql);
-      clientsIdxMap.set(
-        this,
-        Math.floor(Math.random() * context.graphql.length),
-      );
+      this.clients = context.graphql;
+      this.clientIdx = Math.floor(Math.random() * context.graphql.length);
     }
-    Object.freeze(GraphqlModule.prototype);
-    Object.freeze(this);
-  }
-
-  private get clients(): GraphQLClient[] {
-    return clientsMap.get(this) || [];
-  }
-  private get clientIdx(): number {
-    return clientsIdxMap.get(this)!;
   }
   /**
    * Get the current graphql client
-   * without any additional checks
    * @returns {GraphQLClient}
    */
   public getClient(): GraphQLClient {
     if (!this.clients.length) {
-      throw new Error("No graphql endpoints available");
+      throw new ClientNotInitializedError("graphql");
     }
     return this.clients[this.clientIdx];
   }
@@ -46,11 +33,11 @@ export class GraphqlModule implements IClientGraphQLCore {
    */
   public shiftClient(): void {
     if (!this.clients.length) {
-      throw new Error("No graphql endpoints available");
+      throw new ClientNotInitializedError("graphql");
     } else if (this.clients.length < 2) {
-      throw new Error("No other endpoints");
+      throw new NoNodesAvailableError("graphql");
     }
-    clientsIdxMap.set(this, (this.clientIdx + 1) % this.clients.length);
+    this.clientIdx = (this.clientIdx + 1) % this.clients.length;
   }
 
   /**
@@ -77,20 +64,12 @@ export class GraphqlModule implements IClientGraphQLCore {
    */
   public async ensureOnline(): Promise<void> {
     if (!this.clients.length) {
-      return Promise.reject(new Error("graphql client is not initialized"));
-    }
-
-    for (let i = 0; i < this.clients.length; i++) {
-      if (await this.isUp()) return;
-
-      this.shiftClient();
-    }
-    throw new Error("No graphql nodes available");
-  }
-
-  public assertClient(): void {
-    if (!this.clients.length) {
       throw new ClientNotInitializedError("graphql");
     }
+    for (let i = 0; i < this.clients.length; i++) {
+      if (await this.isUp()) return;
+      this.shiftClient();
+    }
+    throw new NoNodesAvailableError("graphql");
   }
 }

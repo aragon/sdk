@@ -132,3 +132,9 @@ export class ClientNotInitializedError extends Error {
     super(client + " client is not initialized");
   }
 }
+export class NoNodesAvailableError extends Error {
+  constructor(name: string) {
+    super("No " + name + " nodes available");
+  }
+}
+

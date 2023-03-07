@@ -305,7 +305,6 @@ export class MultisigClientMethods extends ClientCore
       throw new InvalidAddressOrEnsError();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { multisigPlugin }: {
         multisigPlugin: SubgraphMultisigVotingSettings;
@@ -338,7 +337,6 @@ export class MultisigClientMethods extends ClientCore
       throw new InvalidAddressOrEnsError();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { multisigPlugin }: {
         multisigPlugin: SubgraphMultisigMembers;
@@ -367,7 +365,6 @@ export class MultisigClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const extendedProposalId = getExtendedProposalId(proposalId);
       const {
@@ -448,7 +445,6 @@ export class MultisigClientMethods extends ClientCore
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         multisigProposals,

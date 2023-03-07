@@ -409,7 +409,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       address = resolvedAddress.toLowerCase();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { dao }: { dao: SubgraphDao } = await client.request(QueryDao, {
         address,
@@ -454,7 +453,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     sortBy = DaoSortBy.CREATED_AT,
   }: IDaoQueryParams): Promise<DaoListItem[]> {
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { daos }: { daos: SubgraphDaoListItem[] } = await client.request(
         QueryDaos,
@@ -532,7 +530,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       where = { dao: address.toLowerCase() };
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         tokenBalances,
@@ -609,7 +606,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       where = { ...where, type: SubgraphTransferTypeMap.get(type) };
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         tokenTransfers,

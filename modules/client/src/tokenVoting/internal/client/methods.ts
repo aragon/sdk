@@ -306,7 +306,6 @@ export class TokenVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const response = await client.request(QueryTokenVotingMembers, {
         address: pluginAddress.toLowerCase(),
@@ -335,7 +334,6 @@ export class TokenVotingClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const extendedProposalId = getExtendedProposalId(proposalId);
       const {
@@ -409,7 +407,6 @@ export class TokenVotingClientMethods extends ClientCore
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         tokenVotingProposals,
@@ -477,7 +474,6 @@ export class TokenVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { tokenVotingPlugin }: {
         tokenVotingPlugin: SubgraphVotingSettings;
@@ -526,7 +522,6 @@ export class TokenVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
     try {
-      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { tokenVotingPlugin } = await client.request(
         QueryTokenVotingPlugin,
