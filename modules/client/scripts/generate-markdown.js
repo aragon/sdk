@@ -14,7 +14,7 @@ generateMarkdown().catch((err) => {
 async function generateMarkdown() {
   const workingDirectory = process.argv[2];
   if (!workingDirectory) {
-    console.error("Usage:  node generate-examples-md.js <working-directory>");
+    console.error("Usage:  node generate-markdown.js <working-directory>");
     process.exit(1);
   }
   const fileList = await getFileList(workingDirectory);
