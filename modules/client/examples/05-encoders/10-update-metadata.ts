@@ -9,7 +9,7 @@ import {
   DaoAction,
   DaoMetadata
 } from "@aragon/sdk-client";
-import { context } from "../01-client/01-getting-started";
+import { context } from "../01-client/index";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);

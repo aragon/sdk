@@ -5,7 +5,7 @@ Decode an update metadata action and expect an IPFS URI containing the CID of th
 */
 
 import { Client } from "@aragon/sdk-client";
-import { context } from "../01-client/01-getting-started";
+import { context } from "../01-client/index";
 
 // Insantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);

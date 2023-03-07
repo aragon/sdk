@@ -5,7 +5,7 @@ Decodes the action of registering a callback.
 */
 
 import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../01-client/01-getting-started";
+import { context } from "../01-client/index";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

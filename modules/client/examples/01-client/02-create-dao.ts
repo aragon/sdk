@@ -14,7 +14,7 @@ import {
   TokenVotingClient,
   VotingMode
 } from "@aragon/sdk-client";
-import { context } from "./01-getting-started";
+import { context } from "./index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);

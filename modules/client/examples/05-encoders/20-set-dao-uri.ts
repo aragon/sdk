@@ -5,7 +5,7 @@ Encodes the action of setting the DAO's URI.
 */
 
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from "../01-client/01-getting-started";
+import { context } from "../01-client/index";
 
 // Initializes the Context pluigin from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
