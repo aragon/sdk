@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get DAO details
+---
+title: DAO Details
+---
+
+## Get the DAO details
 
 Gets a DAO's details using its address or ENS domain.
 */

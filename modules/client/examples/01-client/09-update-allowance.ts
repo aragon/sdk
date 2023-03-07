@@ -1,8 +1,12 @@
 /* MARKDOWN
-### Updates ERC20 tokens' allowance approval
+---
+title: ERC-20 Allowance
+---
 
-In order for an address to deposit an ERC20 token into the DAO, the allowance approval for that token needs to be set at the amount the person wants to deposit.
-This function ensures the allowance approval is set so that amount.
+## Updates an ERC-20 Tokens' Allowance
+
+In order for an address to deposit an ERC20 token into the DAO, the allowance approval for that token needs to be set to the amount the person wants to deposit.
+This function ensures the allowance approval is set to that amount.
 Refer to OpenZeppelin docs here on ERC20's token allowance methods: https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-allowance-address-address-).
 
 This function updates the allowance approval to the amount specified.
@@ -13,7 +17,7 @@ import {
   DaoDepositSteps,
   UpdateAllowanceParams
 } from "@aragon/sdk-client";
-import { context } from "./01-getting-started";
+import { context } from "./index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);

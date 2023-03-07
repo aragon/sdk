@@ -1,7 +1,11 @@
 /* MARKDOWN
-# Getting Started with the Aragon OSx SDK
+---
+title: Getting Started
+---
 
-## Before you begin
+## Getting Started with the Aragon OSx SDK
+
+### Before you begin
 
 The Aragon OSx SDK is Javascript agnostic, which means you can use it with any Javascript framework, including popular ones like React, Vite, or Vue.
 
@@ -9,7 +13,7 @@ However, keep in mind that because server-side rendering is not supported yet fo
 
 Also know that all documentation within this site is done with Typescript. You can read more about [Typescript here](https://www.typescriptlang.org/).
 
-## Installing the SDK
+### Installing the SDK
 
 First thing you want to do is install the Aragon OSx SDK package into your product. You can do this by using `npm` or `yarn`.
 
@@ -21,7 +25,7 @@ or
 yarn add @aragon/sdk-client
 ```
 
-## Setting up the context
+### Setting up the context
 
 Then, you'll want to set up the Aragon OSx SDK context within your application to have access to the SDK functions. You can do this at any point within your app.
 

@@ -1,7 +1,11 @@
 /* MARKDOWN
-### Deposit ERC20 tokens to a DAO
+---
+title: ERC-20 Deposits
+---
 
-Deposits ERC20 tokens to a DAO.
+### Deposit ERC-20 Tokens to a DAO
+
+Deposits ERC-20 tokens to a DAO.
 
 - Similar to the ETH deposit flow
 - The `tokenAddress` field is required. This is the contract address of the ERC-20 token.

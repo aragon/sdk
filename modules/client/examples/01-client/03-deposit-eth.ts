@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Deposit ETH to a DAO
+---
+title: ETH Deposits
+---
+
+## Deposit ETH to a DAO
 
 Handles the flow of depositing the native EVM token (when in mainnet, it's ETH) to an Aragon OSx DAO.
 */

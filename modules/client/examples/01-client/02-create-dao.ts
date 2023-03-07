@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Create a DAO
+---
+title: DAO Creation
+---
+
+## Create a DAO
 
 The `createDao` function allows you to create a DAO using the parameters you set for it.
 */

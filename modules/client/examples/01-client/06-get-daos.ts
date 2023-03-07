@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get DAOs
+---
+title: Get DAOs
+---
+
+## Get Existing DAOs from the DAO Registry
 
 Gets a list of DAOs from the Aragon OSx DAO registry.
 */

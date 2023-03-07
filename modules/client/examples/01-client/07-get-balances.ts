@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get a DAO's balance
+---
+title: DAO Balance
+---
+
+## Get the Balance of a DAO
 
 Gets a DAO's financial assets based on the DAO address or its ENS domain.
 */

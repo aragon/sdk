@@ -1,5 +1,9 @@
 /* MARKDOWN
-## Setting up the clients
+---
+title: Client Setup
+---
+
+## Setting Up the SDK Client
 
 Next thing you'll want to do is set up the general purpose client so you can call on the SDK functions. This client is used to interact with any DAO on the network you're connected to.
 

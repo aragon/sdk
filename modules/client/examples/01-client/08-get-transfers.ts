@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get transfers from DAO's activity
+---
+title: DAO Transfers
+---
+
+## Get Transfers from DAO's Activity
 
 Gets the list of asset transfers to and from DAOs.
 If passed a `daoAddressOrEns`, will only retrieve transfers for that DAO. Otherwise, it returns for all DAOs.
@@ -15,7 +19,7 @@ import {
   TransferSortBy,
   TransferType
 } from "@aragon/sdk-client";
-import { context } from "./01-getting-started";
+import { context } from "./index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
