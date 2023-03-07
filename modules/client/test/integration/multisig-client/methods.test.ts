@@ -1,8 +1,6 @@
-// @ts-ignore
-declare const describe, it, beforeAll, afterAll, expect;
-
 // mocks need to be at the top of the imports
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
+import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
@@ -16,28 +14,38 @@ import {
   CreateMultisigProposalParams,
   IProposalQueryParams,
   MultisigClient,
+  MultisigProposal,
   ProposalCreationSteps,
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
+  SubgraphMultisigProposal,
 } from "../../../src";
-import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
+  getExtendedProposalId,
+  InvalidAddressOrEnsError,
+} from "@aragon/sdk-common";
+import {
+  ADDRESS_ONE,
+  ADDRESS_TWO,
   contextParamsLocalChain,
   contextParamsMainnet,
+  SUBGRAPH_ACTIONS,
+  SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
   TEST_MULTISIG_DAO_ADDRESS,
   TEST_MULTISIG_PLUGIN_ADDRESS,
   TEST_MULTISIG_PROPOSAL_ID,
   TEST_NON_EXISTING_ADDRESS,
+  TEST_TX_HASH,
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { Server } from "ganache";
-// import { advanceBlocks } from "../../helpers/advance-blocks";
 import { ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { QueryMultisigProposal } from "../../../src/multisig/internal/graphql-queries";
 
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
@@ -306,76 +314,100 @@ describe("Client Multisig", () => {
 
       const proposalId = TEST_MULTISIG_PROPOSAL_ID;
 
+      const ipfsMetadata = {
+        title: "Title",
+        summary: "Summary",
+        description: "Description",
+        resources: [{
+          name: "Name",
+          url: "URL",
+        }],
+        media: [{ header: "Header", logo: "Logo" }],
+      };
       mockedIPFSClient.cat.mockResolvedValue(
         Buffer.from(
-          JSON.stringify({
-            title: "Title",
-            summary: "Summary",
-            description: "Description",
-            resources: [{
-              name: "Name",
-              url: "URL",
-            }],
-          }),
+          JSON.stringify(ipfsMetadata),
         ),
       );
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
 
-      const proposal = await client.methods.getProposal(proposalId);
+      const subgraphProposal: SubgraphMultisigProposal = {
+        createdAt: Math.round(Date.now() / 1000).toString(),
+        actions: SUBGRAPH_ACTIONS,
+        creationBlockNumber: "40",
+        executionDate: Math.round(Date.now() / 1000).toString(),
+        executionBlockNumber: "50",
+        executionTxHash: TEST_TX_HASH,
+        approvers: [{ id: ADDRESS_ONE }, { id: ADDRESS_TWO }],
+        plugin: {
+          minApprovals: "5",
+          onlyListed: true,
+        },
+        ...SUBGRAPH_PROPOSAL_BASE,
+      };
 
-      expect(typeof proposal).toBe("object");
-      expect(proposal === null).toBe(false);
-      if (!proposal) {
-        throw new GraphQLError("multisig proposal");
-      }
-      expect(proposal.id).toBe(proposalId);
-      expect(typeof proposal.id).toBe("string");
-      expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/i);
-      expect(typeof proposal.dao.address).toBe("string");
-      expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-      expect(typeof proposal.dao.name).toBe("string");
-      expect(typeof proposal.creatorAddress).toBe("string");
-      expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      mockedClient.request.mockResolvedValueOnce({
+        multisigProposal: subgraphProposal,
+      });
+      const proposal = await client.methods.getProposal(
+        proposalId,
+      ) as MultisigProposal;
+      expect(proposal).not.toBe(null);
+
+      expect(proposal.id).toBe(subgraphProposal.id);
+      expect(proposal.dao.address).toBe(subgraphProposal.dao.id);
+      expect(proposal.dao.name).toBe(subgraphProposal.dao.subdomain);
+      expect(proposal.creatorAddress).toBe(subgraphProposal.creator);
       // check metadata
-      expect(typeof proposal.metadata.title).toBe("string");
-      expect(typeof proposal.metadata.summary).toBe("string");
-      expect(typeof proposal.metadata.description).toBe("string");
-      expect(Array.isArray(proposal.metadata.resources)).toBe(true);
-      for (const resource of proposal.metadata.resources) {
-        expect(typeof resource.name).toBe("string");
-        expect(typeof resource.url).toBe("string");
-      }
-      if (proposal.metadata.media) {
-        if (proposal.metadata.media.header) {
-          expect(typeof proposal.metadata.media.header).toBe("string");
-        }
-        if (proposal.metadata.media.logo) {
-          expect(typeof proposal.metadata.media.logo).toBe("string");
-        }
-      }
-      expect(proposal.creationDate instanceof Date).toBe(true);
+      expect(proposal.metadata.title).toBe(ipfsMetadata.title);
+      expect(proposal.metadata.summary).toBe(ipfsMetadata.summary);
+      expect(proposal.metadata.description).toBe(ipfsMetadata.description);
+      expect(proposal.metadata.resources).toMatchObject(ipfsMetadata.resources);
+      expect(proposal.metadata.media).toMatchObject(ipfsMetadata.media);
+
+      expect(proposal.status).toBe("Defeated");
       expect(proposal.startDate instanceof Date).toBe(true);
+      expect(proposal.startDate.getTime()).toBe(
+        parseInt(subgraphProposal.startDate) * 1000,
+      );
       expect(proposal.endDate instanceof Date).toBe(true);
-      expect(Array.isArray(proposal.actions)).toBe(true);
-      // actions
-      for (const action of proposal.actions) {
-        expect(action.data instanceof Uint8Array).toBe(true);
-        expect(typeof action.to).toBe("string");
-        expect(typeof action.value).toBe("bigint");
-      }
-      for (const approval of proposal.approvals) {
-        expect(typeof approval).toBe("string");
-        expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-      }
-      if (
-        proposal.executionTxHash && proposal.executionDate &&
-        proposal.executionBlockNumber
-      ) {
-        expect(proposal.executionTxHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
-        expect(proposal.executionDate instanceof Date).toBe(true);
-        expect(typeof proposal.executionBlockNumber).toBe("number");
-      }
-      expect(typeof proposal.settings.minApprovals).toBe("number");
-      expect(typeof proposal.settings.onlyListed).toBe("boolean");
+      expect(proposal.endDate.getTime()).toBe(
+        parseInt(subgraphProposal.endDate) * 1000,
+      );
+      expect(proposal.creationDate instanceof Date).toBe(true);
+      expect(proposal.creationDate.getTime()).toBe(
+        parseInt(subgraphProposal.createdAt) * 1000,
+      );
+      expect(proposal.actions).toMatchObject(proposal.actions);
+
+      expect(proposal.executionTxHash).toMatch(
+        subgraphProposal.executionTxHash,
+      );
+      expect(proposal.executionDate?.getTime()).toBe(
+        parseInt(subgraphProposal.executionDate) * 1000,
+      );
+      expect(proposal.executionBlockNumber).toBe(
+        parseInt(subgraphProposal.executionBlockNumber),
+      );
+      expect(proposal.approvals).toMatchObject(
+        subgraphProposal.approvers.map((approver) => approver.id),
+      );
+      expect(proposal.settings.minApprovals).toBe(
+        parseInt(subgraphProposal.plugin.minApprovals),
+      );
+      expect(proposal.settings.onlyListed).toBe(
+        subgraphProposal.plugin.onlyListed,
+      );
+
+      // check function call
+      expect(mockedClient.request).lastCalledWith(
+        QueryMultisigProposal,
+        {
+          proposalId: getExtendedProposalId(proposalId),
+        },
+      );
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
       const ctx = new Context(contextParamsMainnet);
