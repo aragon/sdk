@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### ETH Withdrawal
+---
+title: Withdraw ETH
+---
+
+## ETH Withdrawal
 
 Withdraws ETH from a DAO's vault and transfers them to another address.
 In order for a withdrawal to be successful, the address executing it must have `WITHDRAW` permissions.

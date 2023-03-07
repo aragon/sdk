@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Revoke a permission
+---
+title: Revoke Permissions
+---
+
+## Revoke a Permission
 
 Revokes a permission to a given address (`who`) to perform an action on a contract (`where`).
 */

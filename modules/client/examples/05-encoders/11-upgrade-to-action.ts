@@ -1,7 +1,11 @@
 /* MARKDOWN
-#### Upgrade to action
+---
+title: DAO Upgrade
+---
 
-Encodes the action of upgrading into a new implementation address.
+## Upgrade the DAO 
+
+Encodes the action of upgrading the DAO proxy contract to a new implementation address.
 */
 
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";

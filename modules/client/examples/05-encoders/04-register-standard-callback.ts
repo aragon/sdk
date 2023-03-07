@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Register a new standard callback
+---
+title: Register Callbacks
+---
+
+## Register a New Standard Callback
 
 Encodes the action of registering a new standard callback for the DAO.
 */

@@ -1,11 +1,15 @@
 /* MARKDOWN
-#### Set the signature validator
+---
+title: Set Signature Validator
+---
+
+## Set the Signature Validator
 
 Encodes the action of setting the signatura validator of the DAO.
 */
 
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from '../01-client/01-getting-started';
+import { context } from '../index';
 
 // Initialize the context plugin from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

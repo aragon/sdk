@@ -1,7 +1,11 @@
 /* MARKDOWN
-#### Upgrade to and call action
+---
+title: DAO Upgrade and Call
+---
 
-Encodes the action of upgrading your DAO and enforcing the call.
+## Upgrade the DAO and Call a Method
+
+Encodes the action of upgrading your DAO and doing a subsequent method call.
 */
 
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
@@ -19,7 +23,7 @@ const upgradeToAndCallParams = {
 
 const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
 
-// Encodes the action of upgrading your DAO and enforcing the call.
+// Encodes the action of upgrading your DAO and doing a subsequent method call.
 const upgradeToAndCallAction: DaoAction = client.encoding.upgradeToAndCallAction(
   daoAddressOrEns,
   upgradeToAndCallParams

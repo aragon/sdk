@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### ERC-721 Withdraws
+---
+title: Withdraw ERC-721
+---
+
+## Withdraws ERC-721 Tokens
 
 Withdraws ERC-721 tokens from the DAO when a proposal passes.
 */

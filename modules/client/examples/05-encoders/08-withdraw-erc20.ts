@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### ERC-20 Withdrawal
+---
+title: Withdraw ERC-20
+---
+
+## ERC-20 Withdrawal
 
 Encodes the action for withdrawing ERC-20 tokens from a DAO's vault upon a proposal approval.
 */

@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Grant permission based on a condition
+---
+title: Grant Conditional Permission
+---
+
+## Grant a Conditional Permission
 
 Grants a permission to an address depending on whether a specific condition is met.
 */
@@ -11,7 +15,7 @@ import {
   GrantPermissionWithConditionParams,
   Permissions
 } from "@aragon/sdk-client";
-import { context } from '../01-client/01-getting-started';
+import { context } from '../index';
 
 // Initializes a plugin context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

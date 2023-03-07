@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Update DAO's Metadata
+---
+title: Update DAO Metadata
+---
+
+## Update a DAO's Metadata
 
 Updates the metadata of a given DAO.
 */
