@@ -22,31 +22,16 @@ jobs:
           node-version: 16
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Generate Client Docs (Javascript)
+      - name: Generate Client Docs
         run: yarn run docs:client
-      - name: Generate tokenVoting Client Docs (Javascript)
+      - name: Generate TokenVoting Docs
         run: yarn run docs:tokenVoting
-      - name: Generate Address List Client Docs (Javascript)
+      - name: Generate AddresslistVoting Docs
         run: yarn run docs:addresslistVoting
-      - name: Generate Multisig Client Docs (Javascript)
+      - name: Generate Multisig Docs
         run: yarn run docs:multisig
-      - name: Get short commit hash
-        id: hash
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-      - name: Commit updated docs
-        id: commit
-        run: |
-          git fetch
-          git pull
-          git config --global user.name "Arabot-1"
-          git config --global user.email "arabot-1@users.noreply.github.com"
-          git add -A ./docs/
-          if [ $(git diff-index HEAD ./docs | wc -l) -gt 0 ]; then
-            git commit -am "Updates docs from commit $SHA_SHORT"
-            git push
-          fi
-        env:
-          SHA_SHORT: ${{ steps.hash.outputs.sha_short }}
+      - name: Generate examples Docs
+        run: yarn run docs:examples && rsync -r --prune-empty-dirs --include='*/' --include='*.md' --exclude='*' ./modules/client/examples/ ./docs/01-examples/;
       - name: Checkout builders-portal
         uses: actions/checkout@v3
         with:
@@ -54,21 +39,23 @@ jobs:
           ref: staging
           path: builders-portal
           token: ${{ secrets.ARABOT_PAT }}
-      - name: Copy docs (Javascript)
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
-          rm -rf $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/*
-          cp -R ./docs/* $GITHUB_WORKSPACE/builders-portal/docs/sdk/javascript/
+      - name: Remove the docs/sdk folder in the builders-portal
+        run: rm -rf $GITHUB_WORKSPACE/builders-portal/docs/sdk
+      - name: Copy the docs folder to the builders-portal
+        run: cp -R ./docs $GITHUB_WORKSPACE/builders-portal/docs/sdk
+      - name: Get short commit hash
+        id: hash
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.ARABOT_PAT }}
           path: builders-portal
-          commit-message: "Update the Aragon SDK docs by commit ${{ steps.hash.outputs.sha_short }}"
-          committer: "Arabot <arabot-1@users.noreply.github.com>"
-          branch: patch/sdk-docs
+          commit-message: 'Update the Aragon SDK docs by commit ${{ steps.hash.outputs.sha_short }}'
+          committer: 'Arabot <arabot-1@users.noreply.github.com>'
+          branch: patch/aragon-sdk-docs
           delete-branch: true
           title: Update the Aragon SDK docs
-          body: "Automated update by Github actions (Run: [${{ github.run_id }}](https://github.com/aragon/sdk/actions/runs/${{ github.run_id }}))"
+          body: 'Automated update by Github actions (Run: [${{ github.run_id }}](https://github.com/aragon/sdk/actions/runs/${{ github.run_id }}))'
           reviewers: ${{ github.actor }}
           team-reviewers: devrel
