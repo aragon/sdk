@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get a plugin's settings (TokenVoting)
+---
+title: Get Settings
+---
+
+## Get the Token Voting Plugin Settings
 
 Gets the settings defined for a specific TokenVoting plugin governance mechanism installed in a DAO.
 */
@@ -9,7 +13,7 @@ import {
   TokenVotingClient,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

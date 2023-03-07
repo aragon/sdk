@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Check if user can execute an action (Multisig plugin)
+---
+title: Check Execution
+---
+
+## Check if a User Can Execute an Proposal
 
 Checks whether the signer of the transaction is able to execute actions approved and created by proposals from the Multisig plugin.
 */
@@ -8,7 +12,7 @@ import {
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

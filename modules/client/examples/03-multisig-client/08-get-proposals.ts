@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get the list of a given DAO's proposals made using the Multisig plugin.
+---
+title: Get Proposals
+---
+
+## Get All Multisig Proposals That Have Been Created
 
 Gets the proposals made using the Multisig plugin for a given DAO.
 */
@@ -13,7 +17,7 @@ import {
   ProposalSortBy,
   ProposalStatus
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Check if user can approve a transaction (Multisig)
+---
+title: Check Approval Rights
+---
+
+## Check if an Signer Can Approve in a Multisig Proposal
 
 Checks whether a user is able to participate in a proposal created using the Multisig plugin.
 */
@@ -9,7 +13,7 @@ import {
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

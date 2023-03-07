@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get plugin settings (AddresslistVoting)
+---
+title: Get Settings
+---
+
+## Get the Addresslist Voting Plugin Settings
 
 Get the settings established for a given AddresslistVoting plugin.
 */
@@ -9,7 +13,7 @@ import {
   ContextPlugin,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

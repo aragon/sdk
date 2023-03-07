@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Create a proposal with an action (AddresslistVoting)
+---
+title: Proposal Actions
+---
+
+## Create a Token Voting Proposal with Actions
 
 Creates a proposal with an action(s) to get executed upon the proposal passes. Within this proposal, only addresses in the approved list of the AddresslistVoting plugin can vote.
 */
@@ -14,7 +18,7 @@ import {
   VotingMode,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

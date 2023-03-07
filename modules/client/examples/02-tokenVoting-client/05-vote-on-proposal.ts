@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Vote on a TokenVoting proposal
+---
+title: Vote
+---
+
+## Vote on a Token Voting Proposal
 
 Adds a vote to a proposal using the TokenVoting governance mechanism.
 The amount of votes submitted depends on the amount of tokens the signer address has.
@@ -12,7 +16,7 @@ import {
   VoteProposalStep,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

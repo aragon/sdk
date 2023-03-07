@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get a proposal (Multisig plugin)
+---
+title: Get Proposal
+---
+
+## Get a Multisig Proposal by Its ID
 
 Get the proposal details of a given proposal made using the Multisig plugin.
 */
@@ -9,7 +13,7 @@ import {
   MultisigClient,
   MultisigProposal
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

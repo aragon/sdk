@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Create a TokenVoting proposal
+---
+title: Proposal Creation
+---
+
+## Create a Token Voting Proposal
 
 In order to use the Token Voting governance mechanism within your DAO, you'll want to ensure your DAO has the TokenVoting plugin installed.
 Then, you can create proposals using the `createProposal` method in your `TokenVotingClient`.

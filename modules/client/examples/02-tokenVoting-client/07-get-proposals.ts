@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get proposals of a DAO (TokenVoting)
+---
+title: Get Proposals
+---
+
+## Get All Token Voting Proposals That Have Been Created
 
 Gets all proposals from a DAO that are created using the TokenVoting plugin as its governance mechanism.
 */
@@ -13,7 +17,7 @@ import {
   TokenVotingClient,
   TokenVotingProposalListItem
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Create a plugin context from the Aragon SDK.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

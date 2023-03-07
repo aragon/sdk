@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Create a Multisig proposal
+---
+title: Proposal Creation
+---
+
+## Create a Multisig Proposal
 
 Creates a proposal whose governance mechanism is the Multisig plugin and its defined configuration.
 */

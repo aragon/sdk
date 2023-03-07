@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Check if an address can vote in a proposal (Addresslist)
+---
+title: Check Voting Rights
+---
+
+## Check if an Address Can Vote in a Addresslist Voting proposal
 
 Checks whether an address is able to participate in a DAO proposal created using the Addresslist Voting plugin.
 */
@@ -10,7 +14,7 @@ import {
   ContextPlugin,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

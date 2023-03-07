@@ -1,7 +1,11 @@
 /* MARKDOWN
-### Get the proposal by proposalId (Addresslist)
+---
+title: Get Proposal
+---
 
-Gets a proposal created using the AddresslistVoting plugin.
+## Get a Addresslist Voting Proposal by Its ID
+
+Gets a proposal created using the Addresslist Voting plugin.
 */
 
 import {
@@ -9,7 +13,7 @@ import {
   AddresslistVotingProposal,
   ContextPlugin
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

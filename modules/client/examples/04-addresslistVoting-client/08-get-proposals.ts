@@ -1,7 +1,11 @@
 /* MARKDOWN
-### Get proposal list (AddresslistVoting)
+---
+title: Get Proposals
+---
 
-Gets the list of proposals created using the AddresslistVoting plugin.
+## Get All Addresslist Voting Proposals That Have Been Created
+
+Gets the list of proposals created using the Addresslist Voting plugin.
 */
 
 import {
@@ -13,7 +17,7 @@ import {
   ProposalStatus,
   SortDirection
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Execute the actions of a Multisig proposal
+---
+title: Execution
+---
+
+## Execute a Multisig Proposal
 
 Executes the actions set within a proposal made using the Multisig plugin.
 */
@@ -9,7 +13,7 @@ import {
   ExecuteProposalStep,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

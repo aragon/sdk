@@ -5,7 +5,7 @@ Decodes the update settings action for a Multisig plugin.
 */
 
 import { ContextPlugin, MultisigClient, MultisigVotingSettings } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from an Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

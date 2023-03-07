@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get the list of members (Multisig)
+---
+title: Get Members
+---
+
+## Get DAO Members Introduced by the Multisig Plugin
 
 Gets the list of addresses able to participate in a Multisig proposal for a given DAO that has the Multisig plugin installed.
 */
@@ -8,7 +12,7 @@ import {
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

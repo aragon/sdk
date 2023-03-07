@@ -1,8 +1,12 @@
 /* MARKDOWN
-### Create a AddresslistVoting proposal
+---
+title: Proposal Creation
+---
 
-Creates a proposal for a DAO with the AddresslistVoting plugin installed.
-Within this proposal, only addresses in the approved list of the AddresslistVoting plugin can vote.
+## Create an Addresslist Voting Proposal
+
+Creates a proposal for a DAO with the Addresslist Voting plugin installed.
+Within this proposal, only addresses in the approved list of the Addresslist Voting plugin can vote.
 */
 
 import {

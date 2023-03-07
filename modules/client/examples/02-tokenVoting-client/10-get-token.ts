@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get token details (TokenVoting)
+---
+title: Get Token Details
+---
+
+## Get Token Details
 
 Returns the token details used in the TokenVoting plugin for a given DAO.
 These are the details of the token used to vote in that specific DAO.
@@ -9,7 +13,7 @@ import {
   ContextPlugin,
   TokenVotingClient
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

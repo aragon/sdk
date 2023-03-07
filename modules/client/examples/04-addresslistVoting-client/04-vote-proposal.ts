@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Vote on a Addresslist proposal
+---
+title: Vote
+---
+
+## Vote on a Addresslist Voting Proposal
 
 Enables voting on a proposal using the Addresslist Voting plugin installed within a DAO.
 */
@@ -11,7 +15,7 @@ import {
   VoteProposalStep,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Create a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

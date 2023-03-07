@@ -1,7 +1,11 @@
 /* MARKDOWN
-### Create a TokenVoting proposal
+---
+title: Proposal Actions
+---
 
-Create a proposal using the TokenVoting plugin.
+## Create a Token Voting Proposal with Actions
+
+Create a proposal using the Token Voting plugin.
 This proposal will be created using the TokenVoting plugin as its governance mechanism.
 */
 
@@ -14,7 +18,7 @@ import {
   VotingSettings,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

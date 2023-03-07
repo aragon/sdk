@@ -9,7 +9,7 @@ import {
   ContextPlugin,
   VotingSettings,
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the simple context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

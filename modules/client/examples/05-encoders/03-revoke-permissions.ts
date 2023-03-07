@@ -10,7 +10,7 @@ import {
   IRevokePermissionParams,
   Permissions
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);

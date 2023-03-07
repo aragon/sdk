@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Add and pin metadata
+---
+title: Pin Metadata
+---
+
+## Add and Pin Metadata
 
 Adds and pins data with into one of the specified IPFS nodes and return an IPFS CID preceded by "ipfs://".
 */

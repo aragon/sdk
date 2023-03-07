@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Get a proposal by proposalID (TokenVoting)
+---
+title: Get Proposal
+---
+
+## Get a Token Voting Proposal by Its ID
 
 Gets a specific proposal using the TokenVoting plugin as its governance mechanism.
 */
@@ -9,7 +13,7 @@ import {
   TokenVotingClient,
   TokenVotingProposal
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from an Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

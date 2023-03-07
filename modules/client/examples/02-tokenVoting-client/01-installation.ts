@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Create a DAO with a TokenVoting plugin installed
+---
+title: Token Voting DAO
+---
+
+## Create a DAO with a Token Voting Plugin Installed
 
 Creates a DAO with the TokenVoting plugin installed off the bat.
 */

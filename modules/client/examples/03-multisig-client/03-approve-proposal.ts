@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Approve a multisig proposal
+---
+title: Approve
+---
+
+## Approve a Multisig Proposal
 
 A member of a Multisig plugin is an address that is able to give their approval for a transaction to go through.
 This function enables Multisig members to approve a proposal.
@@ -11,7 +15,7 @@ import {
   ContextPlugin,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

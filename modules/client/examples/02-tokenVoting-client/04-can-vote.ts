@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Check if an address can vote in a TokenVoting proposal
+---
+title: Check Voting Rights
+---
+
+## Check if an Address Can Vote in a Token Voting proposal
 
 This function returns a boolean indicating whether an address can vote in a specific TokenVoting proposal.
 */
@@ -10,7 +14,7 @@ import {
   TokenVotingClient,
   VoteValues
 } from "@aragon/sdk-client";
-import { context } from "../01-client/index";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
