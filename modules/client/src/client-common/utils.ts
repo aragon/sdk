@@ -10,7 +10,7 @@ import {
 import { Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import { Log } from "@ethersproject/providers";
-import { InvalidVotingModeError, ClientNotInitializedError } from "@aragon/sdk-common";
+import { InvalidVotingModeError } from "@aragon/sdk-common";
 import { ClientError as GraphQLClientError } from "graphql-request";
 import { GraphQLError } from "graphql";
 
@@ -120,14 +120,14 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
   }
 }
 
-
 export function handleGraphQLError(error: Error, message: string) {
-  if (error instanceof ClientNotInitializedError) {
-    throw error;
-  } else if (error instanceof GraphQLClientError) {
+  if (error instanceof GraphQLClientError) {
     const e = error as GraphQLClientError;
     if (e.response.status < 500) {
       throw new GraphQLError(message);
-    } 
+    }
+    return;
+  } else {
+    throw error;
   }
 }

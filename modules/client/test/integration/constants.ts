@@ -39,15 +39,15 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://httpstat.us/504?sleep=500",
+        "https://httpstat.us/504?sleep=100",
     },
     {
       url:
-        "https://httpstat.us/504?sleep=500",
+        "https://httpstat.us/504?sleep=200",
     },
     {
       url:
-        "https://httpstat.us/504?sleep=500",
+        "https://httpstat.us/504?sleep=300",
     },
     {
       url:
