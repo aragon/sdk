@@ -1,3 +1,4 @@
+import { ClientNotInitializedError } from "@aragon/sdk-common";
 import { GraphQLClient } from "graphql-request";
 import { Context } from "../../client-common/context";
 import { QueryStatus } from "../graphql-queries";
@@ -85,5 +86,11 @@ export class GraphqlModule implements IClientGraphQLCore {
       this.shiftClient();
     }
     throw new Error("No graphql nodes available");
+  }
+
+  public assertClient(): void {
+    if (!this.clients.length) {
+      throw new ClientNotInitializedError("graphql");
+    }
   }
 }

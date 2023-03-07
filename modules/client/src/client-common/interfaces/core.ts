@@ -39,6 +39,7 @@ export interface IClientGraphQLCore {
   shiftClient: () => void;
   isUp: () => Promise<boolean>;
   ensureOnline: () => Promise<void>;
+  assertClient: () => void;
 }
 
 export interface IClientCore {

@@ -3,7 +3,6 @@ import {
   decodeProposalId,
   encodeProposalId,
   getExtendedProposalId,
-  GraphQLError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidProposalIdError,
@@ -37,6 +36,7 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
+  handleGraphQLError,
   IProposalQueryParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
@@ -297,27 +297,29 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async getVotingSettings(
-    address: string,
+    pluginAddress: string,
   ): Promise<MultisigVotingSettings> {
     // TODO
     // update this with yup validation
-    if (!isAddress(address)) {
+    if (!isAddress(pluginAddress)) {
       throw new InvalidAddressOrEnsError();
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { multisigPlugin }: {
         multisigPlugin: SubgraphMultisigVotingSettings;
       } = await client.request(QueryMultisigVotingSettings, {
-        address,
+        address: pluginAddress.toLowerCase(),
       });
       return {
         onlyListed: multisigPlugin.onlyListed,
         minApprovals: parseInt(multisigPlugin.minApprovals),
       };
-    } catch {
-      throw new GraphQLError("Multisig settings");
+    } catch (e) {
+      handleGraphQLError(e as Error, "Multisig settings");
+      await this.graphql.ensureOnline();
+      return this.getVotingSettings(pluginAddress);
     }
   }
   /**
@@ -328,24 +330,26 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async getMembers(
-    address: string,
+    pluginAddress: string,
   ): Promise<string[]> {
     // TODO
     // update this with yup validation
-    if (!isAddress(address)) {
+    if (!isAddress(pluginAddress)) {
       throw new InvalidAddressOrEnsError();
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { multisigPlugin }: {
         multisigPlugin: SubgraphMultisigMembers;
       } = await client.request(QueryMultisigMembers, {
-        address,
+        address: pluginAddress.toLowerCase(),
       });
       return multisigPlugin.members.map((member) => member.address);
-    } catch {
-      throw new GraphQLError("Multisig members");
+    } catch (e) {
+      handleGraphQLError(e as Error, "Multisig members");
+      await this.graphql.ensureOnline();
+      return this.getMembers(pluginAddress);
     }
   }
 
@@ -363,7 +367,7 @@ export class MultisigClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const extendedProposalId = getExtendedProposalId(proposalId);
       const {
@@ -394,8 +398,10 @@ export class MultisigClientMethods extends ClientCore
           UNAVAILABLE_PROPOSAL_METADATA,
         );
       }
-    } catch (err) {
-      throw new GraphQLError("Multisig proposal");
+    } catch (e) {
+      handleGraphQLError(e as Error, "Multisig proposal");
+      await this.graphql.ensureOnline();
+      return this.getProposal(proposalId);
     }
   }
 
@@ -436,13 +442,13 @@ export class MultisigClientMethods extends ClientCore
         }
         address = resolvedAddress;
       }
-      where = { dao: address };
+      where = { dao: address.toLowerCase() };
     }
     if (status) {
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         multisigProposals,
@@ -482,8 +488,17 @@ export class MultisigClientMethods extends ClientCore
           },
         ),
       );
-    } catch {
-      throw new GraphQLError("Multisig proposals");
+    } catch (e) {
+      handleGraphQLError(e as Error, "Multisig proposals");
+      await this.graphql.ensureOnline();
+      return this.getProposals({
+        daoAddressOrEns: address,
+        limit,
+        status,
+        skip,
+        direction,
+        sortBy,
+      });
     }
   }
 }

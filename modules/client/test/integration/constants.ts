@@ -39,6 +39,18 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
+        "https://httpstat.us/504?sleep=500",
+    },
+    {
+      url:
+        "https://httpstat.us/504?sleep=500",
+    },
+    {
+      url:
+        "https://httpstat.us/504?sleep=500",
+    },
+    {
+      url:
         "https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-goerli/version/v1.0.0/api",
     },
   ],

@@ -8,15 +8,15 @@ import {
 } from "@aragon/osx-ethers";
 import {
   AmountMismatchError,
-  UpdateAllowanceError,
   FailedDepositError,
-  GraphQLError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   IpfsPinError,
+  MissingExecPermissionError,
   NoProviderError,
   NoSignerError,
   resolveIpfsCid,
+  UpdateAllowanceError,
 } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -42,7 +42,6 @@ import {
   DaoMetadata,
   DaoSortBy,
   DepositParams,
-  UpdateAllowanceStepValue,
   IClientMethods,
   IDaoQueryParams,
   IHasPermissionParams,
@@ -57,11 +56,13 @@ import {
   Transfer,
   TransferSortBy,
   UpdateAllowanceParams,
+  UpdateAllowanceStepValue,
 } from "../../interfaces";
 import {
   ClientCore,
   Context,
   findLog,
+  handleGraphQLError,
   SortDirection,
 } from "../../client-common";
 import {
@@ -78,7 +79,6 @@ import {
   UNAVAILABLE_DAO_METADATA,
   UNSUPPORTED_DAO_METADATA_LINK,
 } from "../constants";
-import { MissingExecPermissionError } from "@aragon/sdk-common";
 
 /**
  * Methods module the SDK Generic Client
@@ -406,10 +406,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!resolvedAddress) {
         throw new InvalidAddressOrEnsError();
       }
-      address = resolvedAddress;
+      address = resolvedAddress.toLowerCase();
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { dao }: { dao: SubgraphDao } = await client.request(QueryDao, {
         address,
@@ -429,8 +429,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         }
         return toDaoDetails(dao, UNAVAILABLE_DAO_METADATA);
       }
-    } catch (err) {
-      throw new GraphQLError("DAO");
+    } catch (e) {
+      handleGraphQLError(e as Error, "DAO");
+      await this.graphql.ensureOnline();
+      return this.getDao(address);
     }
   }
   /**
@@ -452,7 +454,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     sortBy = DaoSortBy.CREATED_AT,
   }: IDaoQueryParams): Promise<DaoListItem[]> {
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { daos }: { daos: SubgraphDaoListItem[] } = await client.request(
         QueryDaos,
@@ -481,8 +483,15 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           },
         ),
       );
-    } catch (err) {
-      throw new GraphQLError("DAO");
+    } catch (e) {
+      handleGraphQLError(e as Error, "DAOs");
+      await this.graphql.ensureOnline();
+      return this.getDaos({
+        limit,
+        skip,
+        direction,
+        sortBy,
+      });
     }
   }
   /**
@@ -520,10 +529,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         }
         address = resolvedAddress;
       }
-      where = { dao: address };
+      where = { dao: address.toLowerCase() };
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         tokenBalances,
@@ -545,8 +554,16 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
         ),
       );
-    } catch (err) {
-      throw new GraphQLError("balance");
+    } catch (e) {
+      handleGraphQLError(e as Error, "dao balances");
+      await this.graphql.ensureOnline();
+      return this.getDaoBalances({
+        daoAddressOrEns: address,
+        limit,
+        skip,
+        direction,
+        sortBy,
+      });
     }
   }
   /**
@@ -586,13 +603,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         }
         address = resolvedAddress;
       }
-      where = { dao: address };
+      where = { dao: address.toLowerCase() };
     }
     if (type) {
       where = { ...where, type: SubgraphTransferTypeMap.get(type) };
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         tokenTransfers,
@@ -615,8 +632,17 @@ export class ClientMethods extends ClientCore implements IClientMethods {
             toTokenTransfer(transfer),
         ),
       );
-    } catch {
-      throw new GraphQLError("token transfer");
+    } catch (e) {
+      handleGraphQLError(e as Error, "token transfer");
+      await this.graphql.ensureOnline();
+      return this.getDaoTransfers({
+        daoAddressOrEns: address,
+        type,
+        limit,
+        skip,
+        direction,
+        sortBy,
+      });
     }
   }
 }

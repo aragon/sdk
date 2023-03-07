@@ -5,7 +5,6 @@ import {
   decodeRatio,
   encodeProposalId,
   getExtendedProposalId,
-  GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -26,6 +25,7 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
+  handleGraphQLError,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -305,18 +305,19 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const response = await client.request(QueryTokenVotingMembers, {
-        address: pluginAddress,
+        address: pluginAddress.toLowerCase(),
       });
       return response.tokenVotingPlugin.members.map((
         member: { address: string },
       ) => member.address);
-    } catch {
-      throw new GraphQLError("TokenVoting members");
+    } catch (e) {
+      handleGraphQLError(e as Error, "TokenVoting proposal");
+      await this.graphql.ensureOnline();
+      return this.getMembers(pluginAddress);
     }
   }
 
@@ -334,7 +335,7 @@ export class TokenVotingClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const extendedProposalId = getExtendedProposalId(proposalId);
       const {
@@ -366,8 +367,10 @@ export class TokenVotingClientMethods extends ClientCore
           UNAVAILABLE_PROPOSAL_METADATA,
         );
       }
-    } catch (err) {
-      throw new GraphQLError("TokenVoting proposal");
+    } catch (e) {
+      handleGraphQLError(e as Error, "TokenVoting proposal");
+      await this.graphql.ensureOnline();
+      return this.getProposal(proposalId);
     }
   }
   /**
@@ -400,13 +403,13 @@ export class TokenVotingClientMethods extends ClientCore
         }
         address = resolvedAddress;
       }
-      where = { dao: address };
+      where = { dao: address.toLowerCase() };
     }
     if (status) {
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         tokenVotingProposals,
@@ -446,8 +449,17 @@ export class TokenVotingClientMethods extends ClientCore
           },
         ),
       );
-    } catch {
-      throw new GraphQLError("TokenVoting proposals");
+    } catch (e) {
+      handleGraphQLError(e as Error, "TokenVoting proposals");
+      await this.graphql.ensureOnline();
+      return this.getProposals({
+        daoAddressOrEns: address,
+        limit,
+        status,
+        skip,
+        direction,
+        sortBy,
+      });
     }
   }
 
@@ -465,14 +477,14 @@ export class TokenVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { tokenVotingPlugin }: {
         tokenVotingPlugin: SubgraphVotingSettings;
       } = await client.request(
         QueryTokenVotingSettings,
         {
-          address: pluginAddress,
+          address: pluginAddress.toLowerCase(),
         },
       );
       if (!tokenVotingPlugin) {
@@ -493,8 +505,10 @@ export class TokenVotingClientMethods extends ClientCore
         ),
         votingMode: tokenVotingPlugin.votingMode,
       };
-    } catch {
-      throw new GraphQLError("plugin settings");
+    } catch (e) {
+      handleGraphQLError(e as Error, "plugin settings");
+      await this.graphql.ensureOnline();
+      return this.getVotingSettings(pluginAddress);
     }
   }
 
@@ -512,12 +526,12 @@ export class TokenVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { tokenVotingPlugin } = await client.request(
         QueryTokenVotingPlugin,
         {
-          address: pluginAddress,
+          address: pluginAddress.toLowerCase(),
         },
       );
       if (!tokenVotingPlugin) {
@@ -544,8 +558,10 @@ export class TokenVotingClientMethods extends ClientCore
         };
       }
       return null;
-    } catch (err) {
-      throw new GraphQLError("token");
+    } catch (e) {
+      handleGraphQLError(e as Error, "token");
+      await this.graphql.ensureOnline();
+      return this.getToken(pluginAddress);
     }
   }
 }

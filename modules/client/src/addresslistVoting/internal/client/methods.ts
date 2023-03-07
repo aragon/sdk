@@ -4,7 +4,6 @@ import {
   decodeRatio,
   encodeProposalId,
   getExtendedProposalId,
-  GraphQLError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -25,14 +24,15 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../interfaces";
 import {
+  CanVoteParams,
   ClientCore,
   computeProposalStatusFilter,
   ContextPlugin,
+  CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  CanVoteParams,
-  CreateMajorityVotingProposalParams,
+  handleGraphQLError,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -307,16 +307,18 @@ export class AddresslistVotingClientMethods extends ClientCore
     }
 
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const response = await client.request(QueryAddresslistVotingMembers, {
-        address: pluginAddress,
+        address: pluginAddress.toLowerCase(),
       });
       return response.addresslistVotingPlugin.members.map((
         member: { address: string },
       ) => member.address);
-    } catch {
-      throw new GraphQLError("AddressList members");
+    } catch (e) {
+      handleGraphQLError(e as Error, "adddresslistVoting members");
+      await this.graphql.ensureOnline();
+      return this.getMembers(pluginAddress);
     }
   }
   /**
@@ -333,9 +335,9 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
-      const extendedProposalId = getExtendedProposalId(proposalId)
+      const extendedProposalId = getExtendedProposalId(proposalId);
       const {
         addresslistVotingProposal,
       }: {
@@ -364,8 +366,10 @@ export class AddresslistVotingClientMethods extends ClientCore
           UNAVAILABLE_PROPOSAL_METADATA,
         );
       }
-    } catch (err) {
-      throw new GraphQLError("AddressList proposal");
+    } catch (e) {
+      handleGraphQLError(e as Error, "adddresslistVoting proposal");
+      await this.graphql.ensureOnline();
+      return this.getProposal(proposalId);
     }
   }
 
@@ -406,13 +410,13 @@ export class AddresslistVotingClientMethods extends ClientCore
         }
         address = resolvedAddress;
       }
-      where = { dao: address };
+      where = { dao: address.toLowerCase() };
     }
     if (status) {
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const {
         addresslistVotingProposals,
@@ -452,8 +456,17 @@ export class AddresslistVotingClientMethods extends ClientCore
           },
         ),
       );
-    } catch {
-      throw new GraphQLError("AddresslistVoting proposals");
+    } catch (e) {
+      handleGraphQLError(e as Error, "addresslistVoting proposals");
+      await this.graphql.ensureOnline();
+      return this.getProposals({
+        daoAddressOrEns: address,
+        limit,
+        status,
+        skip,
+        direction,
+        sortBy,
+      });
     }
   }
 
@@ -471,14 +484,14 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
     try {
-      await this.graphql.ensureOnline();
+      this.graphql.assertClient();
       const client = this.graphql.getClient();
       const { addresslistVotingPlugin }: {
         addresslistVotingPlugin: SubgraphVotingSettings;
       } = await client.request(
         QueryAddresslistVotingSettings,
         {
-          address: pluginAddress,
+          address: pluginAddress.toLowerCase(),
         },
       );
       if (!addresslistVotingPlugin) {
@@ -499,8 +512,10 @@ export class AddresslistVotingClientMethods extends ClientCore
         ),
         votingMode: addresslistVotingPlugin.votingMode,
       };
-    } catch {
-      throw new Error("Cannot fetch the settings data from GraphQL");
+    } catch (e) {
+      handleGraphQLError(e as Error, "plugin settings");
+      await this.graphql.ensureOnline();
+      return this.getVotingSettings(pluginAddress);
     }
   }
 }
