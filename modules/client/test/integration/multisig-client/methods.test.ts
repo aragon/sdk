@@ -18,6 +18,7 @@ import {
   ProposalCreationSteps,
   ProposalMetadata,
   ProposalSortBy,
+  ProposalStatus,
   SortDirection,
   SubgraphMultisigProposal,
 } from "../../../src";
@@ -45,7 +46,11 @@ import { ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { QueryMultisigProposal } from "../../../src/multisig/internal/graphql-queries";
+import {
+  QueryMultisigProposal,
+  QueryMultisigVotingSettings,
+} from "../../../src/multisig/internal/graphql-queries";
+import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-queries/members";
 
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
@@ -284,27 +289,54 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
-
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      const subgraphSettings = {
+        minApprovals: "5",
+        onlyListed: false,
+      };
+      mockedClient.request.mockResolvedValueOnce({
+        multisigPlugin: subgraphSettings,
+      });
       const settings = await client.methods.getVotingSettings(
         TEST_MULTISIG_PLUGIN_ADDRESS,
       );
-      expect(typeof settings).toBe("object");
-      expect(typeof settings.minApprovals).toBe("number");
-      expect(typeof settings.onlyListed).toBe("boolean");
+      expect(settings.minApprovals).toBe(
+        parseInt(subgraphSettings.minApprovals),
+      );
+      expect(settings.onlyListed).toBe(subgraphSettings.onlyListed);
+      expect(mockedClient.request).toHaveBeenCalledWith(
+        QueryMultisigVotingSettings,
+        {
+          address: TEST_MULTISIG_PLUGIN_ADDRESS,
+        },
+      );
     });
 
     it("Should get members of the multisig", async () => {
       const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      const members = [ADDRESS_ONE, ADDRESS_TWO];
+
+      mockedClient.request.mockResolvedValueOnce({
+        multisigPlugin: {
+          members: members.map((member) => ({ address: member })),
+        },
+      });
 
       const wallets = await client.methods.getMembers(
         TEST_MULTISIG_PLUGIN_ADDRESS,
       );
-      expect(Array.isArray(wallets)).toBe(true);
-      expect(wallets.length).toBeGreaterThan(0);
-      expect(typeof wallets[0]).toBe("string");
-      expect(wallets[0]).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+      expect(wallets.length).toBe(2);
+      expect(wallets).toMatchObject(members);
+      expect(mockedClient.request).toHaveBeenCalledWith(QueryMultisigMembers, {
+        address: TEST_MULTISIG_PLUGIN_ADDRESS,
+      });
     });
 
     it("Should fetch the given proposal", async () => {
@@ -413,7 +445,10 @@ describe("Client Multisig", () => {
       const ctx = new Context(contextParamsMainnet);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
-
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      mockedClient.request.mockResolvedValueOnce({ multisigProposal: null });
       const proposalId = TEST_NON_EXISTING_ADDRESS + "_0x1";
       const proposal = await client.methods.getProposal(proposalId);
 
@@ -426,32 +461,81 @@ describe("Client Multisig", () => {
       const limit = 5;
       const params: IProposalQueryParams = {
         limit,
+        status: ProposalStatus.DEFEATED,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
       };
+      const ipfsMetadata = {
+        title: "Title",
+        summary: "Summary",
+        description: "Description",
+        resources: [{
+          name: "Name",
+          url: "URL",
+        }],
+        media: [{ header: "Header", logo: "Logo" }],
+      };
+      mockedIPFSClient.cat.mockResolvedValue(
+        Buffer.from(
+          JSON.stringify(ipfsMetadata),
+        ),
+      );
+
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+
+      mockedClient.request.mockResolvedValueOnce({
+        multisigProposals: [{
+          ...SUBGRAPH_PROPOSAL_BASE,
+          approvers: [{ id: ADDRESS_ONE }, { id: ADDRESS_TWO }],
+          plugin: {
+            onlyListed: true,
+            minApprovals: "5",
+          },
+        }],
+      });
+      const dateGetTimeSpy = jest.spyOn(Date.prototype, "getTime");
+      const now = Date.now();
+      const nowFilter = Math.round(now / 1000).toString();
+      dateGetTimeSpy.mockReturnValueOnce(now);
+
       const proposals = await client.methods.getProposals(params);
+      dateGetTimeSpy.mockRestore();
 
       expect(Array.isArray(proposals)).toBe(true);
-      expect(proposals.length <= limit).toBe(true);
-      for (const proposal of proposals) {
-        expect(typeof proposal.id).toBe("string");
-        expect(proposal.id).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,}$/i);
-        expect(typeof proposal.dao.address).toBe("string");
-        expect(proposal.dao.address).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-        expect(typeof proposal.dao.name).toBe("string");
-        expect(typeof proposal.creatorAddress).toBe("string");
-        expect(proposal.creatorAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-        expect(typeof proposal.metadata.title).toBe("string");
-        expect(typeof proposal.metadata.summary).toBe("string");
-        expect(proposal.startDate instanceof Date).toBe(true);
-        expect(proposal.endDate instanceof Date).toBe(true);
-        for (const approval of proposal.approvals) {
-          expect(typeof approval).toBe("string");
-          expect(approval).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
-        }
-        expect(typeof proposal.settings.minApprovals).toBe("number");
-        expect(typeof proposal.settings.onlyListed).toBe("boolean");
-      }
+      expect(proposals.length).toBe(1);
+      expect(proposals[0].id).toBe(SUBGRAPH_PROPOSAL_BASE.id);
+      expect(proposals[0].dao.address).toBe(SUBGRAPH_PROPOSAL_BASE.dao.id);
+      expect(proposals[0].dao.name).toBe(SUBGRAPH_PROPOSAL_BASE.dao.subdomain);
+      expect(proposals[0].creatorAddress).toBe(SUBGRAPH_PROPOSAL_BASE.creator);
+      expect(proposals[0].metadata.title).toBe(ipfsMetadata.title);
+      expect(proposals[0].metadata.summary).toBe(ipfsMetadata.summary);
+      expect(proposals[0].startDate.getTime()).toBe(
+        parseInt(SUBGRAPH_PROPOSAL_BASE.startDate) * 1000,
+      );
+      expect(proposals[0].endDate.getTime()).toBe(
+        parseInt(SUBGRAPH_PROPOSAL_BASE.endDate) * 1000,
+      );
+      expect(proposals[0].status).toBe("Defeated");
+      expect(proposals[0].approvals).toMatchObject([ADDRESS_ONE, ADDRESS_TWO]);
+      expect(proposals[0].settings.minApprovals).toBe(5);
+      expect(proposals[0].settings.onlyListed).toBe(true);
+
+      expect(mockedClient.request).toHaveBeenCalledWith(
+        QueryMultisigProposal,
+        {
+          where: {
+            executable: false,
+            endDate_lt: nowFilter,
+            executed: false,
+          },
+          skip: 0,
+          limit: params.limit,
+          direction: params.direction,
+          sortBy: params.sortBy,
+        },
+      );
     });
     it("Should get a list of proposals from a specific dao", async () => {
       const ctx = new Context(contextParamsMainnet);
@@ -465,27 +549,25 @@ describe("Client Multisig", () => {
         direction: SortDirection.ASC,
         daoAddressOrEns: address,
       };
-      const proposals = await client.methods.getProposals(params);
-
-      expect(Array.isArray(proposals)).toBe(true);
-      expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
-    });
-    it("Should get a list of proposals from a dao that has no proposals", async () => {
-      const ctx = new Context(contextParamsMainnet);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
-      const limit = 5;
-      const address = TEST_NON_EXISTING_ADDRESS;
-      const params: IProposalQueryParams = {
-        limit,
-        sortBy: ProposalSortBy.CREATED_AT,
-        direction: SortDirection.ASC,
-        daoAddressOrEns: address,
-      };
-      const proposals = await client.methods.getProposals(params);
-
-      expect(Array.isArray(proposals)).toBe(true);
-      expect(proposals.length === 0).toBe(true);
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      mockedClient.request.mockResolvedValueOnce({
+        multisigProposals: [],
+      });
+      await client.methods.getProposals(params);
+      expect(mockedClient.request).toHaveBeenCalledWith(
+        QueryMultisigProposal,
+        {
+          where: {
+            dao: address,
+          },
+          skip: 0,
+          limit: params.limit,
+          direction: params.direction,
+          sortBy: params.sortBy,
+        },
+      );
     });
     it("Should get a list of proposals from an invalid address", async () => {
       const ctx = new Context(contextParamsMainnet);
