@@ -1,3 +1,4 @@
+/* MARKDOWN
 ---
 title: Examples
 ---
@@ -6,3 +7,4 @@ title: Examples
 
 The following pages demonstrate the usage of the different SDK features.
 <!-- TODO add overview -->
+*/
