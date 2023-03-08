@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Add Members (AddressList)
+---
+title: Add Members
+---
+
+## Add Members from the Addresslist Voting Plugin
 
 Adds a list of addresses to the AddressList plugin so that these new addresses are able to vote in AddresslistVoting proposals.
 */

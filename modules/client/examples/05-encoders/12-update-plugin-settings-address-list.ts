@@ -1,7 +1,9 @@
 /* MARKDOWN
-### Addresslist Encoders
+---
+title: Addresslist Voting Settings
+---
 
-#### Set Plugin Config Action (Addresslist)
+## Update the Addresslist Voting Plugin Settings
 
 Updates the settings of a given AddresslistVoting plugin.
 */

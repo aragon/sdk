@@ -1,7 +1,9 @@
 /* MARKDOWN
-### Addresslist Decoders
+---
+title: Add Members
+---
 
-#### Decode Add Members Action (Addresslist)
+## Decode Add Members Action (Addresslist)
 
 Decodes the action of adding new members to the Addresslist plugin.
 */

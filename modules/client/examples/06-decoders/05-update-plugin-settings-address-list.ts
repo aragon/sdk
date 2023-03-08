@@ -1,7 +1,11 @@
 /* MARKDOWN
-#### Decode update plugin settings action (Address List)
+---
+title: Update Plugin Settings
+---
 
-Decodes the action of a update plugin settings transaction.
+## Decode the Update Plugin Settings Action for the Addresslist Voting Plugin
+
+Decodes the action of a update plugin settings action.
 */
 
 import {

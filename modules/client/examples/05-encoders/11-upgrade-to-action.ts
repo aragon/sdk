@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: DAO Upgrade
+title: Upgrade To
 ---
 
 ## Upgrade the DAO 

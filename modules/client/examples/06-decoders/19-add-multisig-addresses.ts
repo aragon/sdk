@@ -1,7 +1,9 @@
 /* MARKDOWN
-### Multisig Decoders
+---
+title: Add Members
+---
 
-#### Decode Add Members Action (Multisig)
+## Decode Add Members Action (Multisig)
 
 Decodes the parameters of the add members action from the Multisig plugin.
 */

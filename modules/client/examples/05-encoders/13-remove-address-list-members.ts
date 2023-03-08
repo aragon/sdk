@@ -1,7 +1,11 @@
 /* MARKDOWN
-#### Remove Members (AddressList)
+---
+title: Remove Members
+---
 
-Removes an address from the AddressList plugin so that this address is no longer able to vote in AddresslistVoting proposals.
+## Remove Members from the Addresslist Voting Plugin
+
+Removes an address from the Addresslist plugin so that this address is no longer able to vote in AddresslistVoting proposals.
 */
 
 import {

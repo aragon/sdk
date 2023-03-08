@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode a "Set Signature Validator" action
+---
+title: Set Signature Validator
+---
+
+## Decode a "Set Signature Validator" action
 
 Decodes the action of setting a signature validator for the DAO.
 */

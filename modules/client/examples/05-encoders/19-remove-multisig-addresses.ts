@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Remove members (Multisig plugin)
+---
+title: Remove Members
+---
+
+## Remove Members from the Multisig Plugin
 
 Removes a list of addresses from the Multisig plugin of a given DAO so they are no longer able to vote on Multisig proposals for that DAO.
 */

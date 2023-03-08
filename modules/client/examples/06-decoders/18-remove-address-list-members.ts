@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode Remove Members Action (AddresslistVoting)
+---
+title: Remove Members
+---
+
+## Decode Remove Members Action (Addresslist)
 
 Decodes the action of removing addresses from the AddresslistVoting plugin so they can no longer vote in AddresslistVoting proposals.
 */

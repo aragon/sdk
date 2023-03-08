@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode the Set Dao URI action
+---
+title: Set DAO URI
+---
+
+## Decode the Set Dao URI Action
 
 Decodes the action of setting a DAO's URI
 */

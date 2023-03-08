@@ -1,7 +1,11 @@
 /* MARKDOWN
-#### Mint tokens for a DAO (TokenVoting)
+---
+title: Mint Tokens
+---
 
-Mints tokens for a DAO that has the TokenVoting plugin installed.
+## Mint Vote Tokens for the TokenVoting Plugin
+
+Mints vote tokens for an installed TokenVoting plugin.
 */
 
 import {

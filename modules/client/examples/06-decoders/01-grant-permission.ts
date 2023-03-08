@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode the grant permission action
+---
+title: Grant Permission
+---
+
+## Decode the Grant Permission Action
 
 Decodes the parameters of a grant permission action.
 */

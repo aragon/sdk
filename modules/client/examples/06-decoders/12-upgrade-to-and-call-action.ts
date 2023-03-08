@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode an "Upgrade To and Call" action
+---
+title: Upgrade To and Call
+---
+
+## Decode an "Upgrade To and Call" action
 
 Decodes the action of upgrading the DAO to a new implementation and calling a function within it.
 */

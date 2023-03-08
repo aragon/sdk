@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Get function parameters from  encoded action (Addresslist)
+---
+title: Get Function Parameters 
+---
+
+## Get function parameters from  encoded action (Addresslist)
 
 Decodes the parameters of a function call from the Addresslist plugin.
 */

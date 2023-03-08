@@ -1,5 +1,10 @@
 /* MARKDOWN
-#### Decode a "Register Callback" action
+
+---
+title: Register Callback
+---
+
+## Decode a "Register Callback" action
 
 Decodes the action of registering a callback.
 */

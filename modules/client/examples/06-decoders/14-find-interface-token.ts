@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Get Function Parameters from an encoded action (TokenVoting)
+---
+title: Get Function Parameters
+---
+
+## Get Function Parameters from an Encoded Action
 
 Decodes the parameters of a function call from the TokenVoting plugin contract.
 */

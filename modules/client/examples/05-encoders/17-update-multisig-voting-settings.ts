@@ -1,9 +1,11 @@
 /* MARKDOWN
-### Multisig Encoders
+---
+title: Multisig Settings
+---
 
-#### Update Multisig voting confuguration
+## Update the Multisig Plugin Settings
 
-Allows you to update the voting configuration of a Multisig plugin installed in a DAO.
+Allows you to update the configuration of a Multisig plugin installed in a DAO.
 */
 
 import {

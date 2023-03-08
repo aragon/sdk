@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Add Members (Multisig)
+---
+title: Add Members
+---
+
+## Add Members from the Multisig Plugin
 
 Adds new address as members of the Multisig plugin installed in a DAO, so they are now able to vote on proposals.
 */

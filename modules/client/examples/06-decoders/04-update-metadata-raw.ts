@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode an update metadata raw action
+---
+title: Update Metadata
+---
+
+## Decode an Update Metadata Raw Action
 
 Decode an update metadata action and expect an IPFS URI containing the CID of the metadata.
 */

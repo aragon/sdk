@@ -1,5 +1,9 @@
 /* MARKDOWN
-## Action encoders
+---
+title: Action Encoders
+---
+
+## Encoding Actions
 
 Proposals will eventually need to execute some action on behalf of the DAO, which needs to be encoded in a low level format.
 
@@ -11,6 +15,4 @@ Hence, the flow is the following:
 3. Vote until the proposal has a majority: if the voting mode is `EARLY_EXECUTION` or until the `endDate` is achieved if the `votingMode` is  `STANDARD` or `VOTE_REPLACEMENT`
 4. If the propoosal passes the required approvals and participation, execute the proposal
 5. Success
-
-### General purpose encoders
 */

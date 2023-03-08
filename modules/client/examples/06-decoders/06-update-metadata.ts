@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode Update Metadata Action
+---
+title: Update Metadata
+---
+
+## Decode Update Metadata Action
 
 Decodes an update metadata action and expect the metadata.
 */

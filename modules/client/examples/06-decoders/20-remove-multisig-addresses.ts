@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode Remove Members Action (Multisig)
+---
+title: Remove Members
+---
+
+## Decode Remove Members Action (Multisig)
 
 Decodes the parameters of the remove members action from the Multisig plugin.
 */

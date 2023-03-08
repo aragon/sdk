@@ -1,7 +1,9 @@
 /* MARKDOWN
-### Token Voting Decoders
+---
+title: Update Plugin Settings
+---
 
-#### Decode the update plugin settings action for TokenVoting plugin
+## Decode the update plugin settings action for TokenVoting plugin
 
 Decode the parameters of an update plugin settings action for the TokenVoting plugin.
 */

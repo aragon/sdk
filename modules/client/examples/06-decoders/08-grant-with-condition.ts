@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode the "Grant with Condition" Action
+---
+title: Grant Conditional Permission
+---
+
+## Decode the "Grant with Condition" Action
 
 Decodes the action of granting a permission based on a condition.
 */

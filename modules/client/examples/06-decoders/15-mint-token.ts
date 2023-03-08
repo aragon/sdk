@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode Mint Token Action (TokenVoting)
+---
+title: Mint Token
+---
+
+## Decode Mint Token Action
 
 Decodes the parameters of a mint token action from the TokenVoting plugin.
 */

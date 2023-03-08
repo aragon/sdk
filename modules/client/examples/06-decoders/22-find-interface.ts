@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Get function parameters from an encoded action
+---
+title: Get Function Parameters
+---
+
+## Get Function Parameters from an Encoded Action
 
 Decodes the parameters of a function call.
 */

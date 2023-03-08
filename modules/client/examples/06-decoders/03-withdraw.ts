@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode Withdraw Action
+---
+title: Withdraw
+---
+
+## Decode Withdraw Action
 
 Decodes the parameters of a withdraw action of any token type.
 */

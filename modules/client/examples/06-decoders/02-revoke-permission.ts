@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decode revoke permission action
+---
+title: Revoke Permission
+---
+
+## Decode the Revoke Permission Action
 
 Decodes the action of a revoke permission transaction.
 */

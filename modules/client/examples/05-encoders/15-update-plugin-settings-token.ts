@@ -1,7 +1,9 @@
 /* MARKDOWN
-### Token Voting Encoders
+---
+title: Addresslist Voting Settings
+---
 
-#### Update plugin settings (TokenVoting)
+## Update the Token Voting Plugin Settings
 
 Updates the configuration of a given TokenVoting plugin for a DAO.
 */

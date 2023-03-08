@@ -1,5 +1,9 @@
 /* MARKDOWN
-#### Decodes the update settings action (Multisig).
+---
+title: Update Settings
+---
+
+## Decodes the Update Settings Action (Multisig)
 
 Decodes the update settings action for a Multisig plugin.
 */
