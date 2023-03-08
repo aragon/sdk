@@ -21,10 +21,10 @@
     "lint": "tsdx lint modules/*/src",
     "build": "yarn turbo run build",
     "test": "yarn workspaces run test",
-    "docs:client": "jsdoc2md --template ./docs/handlebars/main.hbs --files ./modules/client/src/*.ts ./modules/client/src/internal/client/*.ts --configure ./jsdoc2md.json | sed -r 's/(\\{[a-zA-Z]+<[a-zA-Z]+>\\})/`\\1`/mg' > ./docs/sdk/02-reference-guide/01-client.md",
-    "docs:multisig": "jsdoc2md --template ./docs/handlebars/main.hbs --files ./modules/client/src/multisig/*.ts ./modules/client/src/multisig/internal/client/*.ts --configure ./jsdoc2md.json | sed -r 's/(\\{[a-zA-Z]+<[a-zA-Z]+>\\})/`\\1`/mg' > ./docs/sdk/02-reference-guide/02-multisig.md",
-    "docs:tokenVoting": "jsdoc2md --template ./docs/handlebars/main.hbs  --files ./modules/client/src/tokenVoting/*.ts ./modules/client/src/tokenVoting/internal/client/*.ts --configure ./jsdoc2md.json | sed -r 's/(\\{[a-zA-Z]+<[a-zA-Z]+>\\})/`\\1`/mg' > ./docs/sdk/02-reference-guide/03-token-voting.md",
-    "docs:addresslistVoting": "jsdoc2md --template ./docs/handlebars/main.hbs --files ./modules/client/src/addresslistVoting/*.ts ./modules/client/src/addresslistVoting/internal/client/*.ts --configure ./jsdoc2md.json | sed -r 's/(\\{[a-zA-Z]+<[a-zA-Z]+>\\})/`\\1`/mg' > ./docs/sdk/02-reference-guide/04-addresslist-voting.md",
+    "docs:client": "jsdoc2md --template ./docs/template/main.hbs --files ./modules/client/src/*.ts ./modules/client/src/internal/client/*.ts --configure ./jsdoc2md.json | sed -r 's/(\\{[a-zA-Z]+<[a-zA-Z]+>\\})/`\\1`/mg' > ./docs/sdk/02-reference-guide/01-client.md",
+    "docs:multisig": "jsdoc2md --template ./docs/template/main.hbs --files ./modules/client/src/multisig/*.ts ./modules/client/src/multisig/internal/client/*.ts --configure ./jsdoc2md.json | sed -r 's/(\\{[a-zA-Z]+<[a-zA-Z]+>\\})/`\\1`/mg' > ./docs/sdk/02-reference-guide/02-multisig.md",
+    "docs:tokenVoting": "jsdoc2md --template ./docs/template/main.hbs  --files ./modules/client/src/tokenVoting/*.ts ./modules/client/src/tokenVoting/internal/client/*.ts --configure ./jsdoc2md.json | sed -r 's/(\\{[a-zA-Z]+<[a-zA-Z]+>\\})/`\\1`/mg' > ./docs/sdk/02-reference-guide/03-token-voting.md",
+    "docs:addresslistVoting": "jsdoc2md --template ./docs/template/main.hbs --files ./modules/client/src/addresslistVoting/*.ts ./modules/client/src/addresslistVoting/internal/client/*.ts --configure ./jsdoc2md.json | sed -r 's/(\\{[a-zA-Z]+<[a-zA-Z]+>\\})/`\\1`/mg' > ./docs/sdk/02-reference-guide/04-addresslist-voting.md",
     "docs:examples": "node ./modules/client/scripts/generate-markdown.js ./modules/client/examples && rsync -avr --prune-empty-dirs --remove-source-files --include='*/' --include='*.md' --exclude='*' ./modules/client/examples/ ./docs/sdk/01-examples/ --delete;"
   },
   "devDependencies": {
