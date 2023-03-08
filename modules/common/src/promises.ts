@@ -29,7 +29,6 @@ export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
       return result;
     } catch (err) {
       onFail(err as Error);
-      continue
     }
   } while (shouldRetry());
 }
