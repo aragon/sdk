@@ -17,10 +17,10 @@ function reflect<T>(prom: Promise<T>) {
     .catch((reason: T) => ({ reason, status: "rejected" }));
 }
 
-export async function tryUntil<T>({ func, onFail, shouldContinue }: {
+export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
   func: () => Promise<T>;
   onFail: (e: Error) => void;
-  shouldContinue: () => boolean;
+  shouldRetry: () => boolean;
 }) {
   do {
     try {
@@ -31,5 +31,5 @@ export async function tryUntil<T>({ func, onFail, shouldContinue }: {
       onFail(err as Error);
       continue
     }
-  } while (shouldContinue());
+  } while (shouldRetry());
 }

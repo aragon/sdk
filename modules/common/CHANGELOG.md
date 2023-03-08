@@ -19,7 +19,7 @@ TEMPLATE:
 ### Removes
 - removed `random.ts`
 ### Added
-- `tryUntil` function
+- `runAndRetry` function
 
 ## 0.12.0-beta
 ### Added
