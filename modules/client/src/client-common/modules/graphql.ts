@@ -1,8 +1,8 @@
-import { GraphQLError } from "@aragon/sdk-common";
-import { tryUntil } from "@aragon/sdk-common";
 import {
   ClientNotInitializedError,
+  GraphQLError,
   NoNodesAvailableError,
+  tryUntil,
 } from "@aragon/sdk-common";
 import { ClientError, GraphQLClient } from "graphql-request";
 import { Context } from "../../client-common/context";
