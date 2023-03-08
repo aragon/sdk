@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Create an Multisig client
+---
+title: Multisig Client
+---
+
+## Create a Multisig Client
 
 Creating a Multisig plugin Client allows you to access the Multisig plugin from your DAO.
 In order to interact with the Multisig plugin, you need to create a `MultisigClient`. This is created using the `ContextPlugin`.

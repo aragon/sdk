@@ -1,5 +1,9 @@
 /* MARKDOWN
-### Create an AddresslistVoting client
+---
+title: Addresslist Voting Client
+---
+
+## Create an Addresslist Voting Client
 
 Creates an AddresslistVoting client allowing you to access the AddresslistVoting plugin functionality.
 */

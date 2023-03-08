@@ -1,5 +1,9 @@
 /* MARKDOWN
-## Create a TokenVoting client
+---
+title: Token Voting Client
+---
+
+## Create a Token Voting Client
 
 In order to interact with the `TokenVoting` plugin, you need to create a `TokenVotingClient`.
 This is created using the `ContextPlugin` which grants us access to plugins within the SDK.
