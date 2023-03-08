@@ -3,7 +3,7 @@
 title: Check Approval Rights
 ---
 
-## Check if an Signer Can Approve in a Multisig Proposal
+## Check if a User Can Approve in a Multisig Proposal
 
 Checks whether a user is able to participate in a proposal created using the Multisig plugin.
 */
