@@ -5,7 +5,7 @@ title: Multisig DAO
 
 ## Create a DAO with a Multisig Installed
 
-The Mutisig plugin is a governance plugin which enables x amount of signers to approve a proposal in order for it to pass.
+The Mutisig plugin is a governance plugin which enables x out of y signers to approve a proposal in order for it to pass.
 It establishes a minimum approval threshold and a list of addresses which are allowed to vote.
 
 In order to create a DAO with a Multisig plugin, you will need to first instantiate the Multisig plugin client, then use it when creating your DAO.
