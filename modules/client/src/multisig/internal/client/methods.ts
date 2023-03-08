@@ -24,7 +24,6 @@ import {
   MultisigProposal,
   MultisigProposalListItem,
   MultisigVotingSettings,
-  SubgraphMultisigMembers,
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
   SubgraphMultisigVotingSettings,
@@ -36,13 +35,13 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  handleGraphQLError,
   IProposalQueryParams,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
+  SubgraphMembers,
 } from "../../../client-common";
 import {
   UNAVAILABLE_PROPOSAL_METADATA,
@@ -304,22 +303,19 @@ export class MultisigClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressOrEnsError();
     }
-    try {
-      const client = this.graphql.getClient();
-      const { multisigPlugin }: {
-        multisigPlugin: SubgraphMultisigVotingSettings;
-      } = await client.request(QueryMultisigVotingSettings, {
+    const { multisigPlugin }: {
+      multisigPlugin: SubgraphMultisigVotingSettings;
+    } = await this.graphql.request({
+      query: QueryMultisigVotingSettings,
+      params: {
         address: pluginAddress.toLowerCase(),
-      });
-      return {
-        onlyListed: multisigPlugin.onlyListed,
-        minApprovals: parseInt(multisigPlugin.minApprovals),
-      };
-    } catch (e) {
-      handleGraphQLError(e as Error, "Multisig settings");
-      await this.graphql.ensureOnline();
-      return this.getVotingSettings(pluginAddress);
-    }
+      },
+      name: "Multisig settings",
+    });
+    return {
+      onlyListed: multisigPlugin.onlyListed,
+      minApprovals: parseInt(multisigPlugin.minApprovals),
+    };
   }
   /**
    * returns the members of the multisig
@@ -336,19 +332,16 @@ export class MultisigClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressOrEnsError();
     }
-    try {
-      const client = this.graphql.getClient();
-      const { multisigPlugin }: {
-        multisigPlugin: SubgraphMultisigMembers;
-      } = await client.request(QueryMultisigMembers, {
+    const { multisigPlugin }: {
+      multisigPlugin: SubgraphMembers;
+    } = await this.graphql.request({
+      query: QueryMultisigMembers,
+      params: {
         address: pluginAddress.toLowerCase(),
-      });
-      return multisigPlugin.members.map((member) => member.address);
-    } catch (e) {
-      handleGraphQLError(e as Error, "Multisig members");
-      await this.graphql.ensureOnline();
-      return this.getMembers(pluginAddress);
-    }
+      },
+      name: "Multisig members",
+    });
+    return multisigPlugin.members.map((member) => member.address);
   }
 
   /**
@@ -364,41 +357,38 @@ export class MultisigClientMethods extends ClientCore
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
-    try {
-      const client = this.graphql.getClient();
-      const extendedProposalId = getExtendedProposalId(proposalId);
-      const {
-        multisigProposal,
-      }: {
-        multisigProposal: SubgraphMultisigProposal;
-      } = await client.request(QueryMultisigProposal, {
+    const extendedProposalId = getExtendedProposalId(proposalId);
+    const {
+      multisigProposal,
+    }: {
+      multisigProposal: SubgraphMultisigProposal;
+    } = await this.graphql.request({
+      query: QueryMultisigProposal,
+      params: {
         proposalId: extendedProposalId,
-      });
-      if (!multisigProposal) {
-        return null;
-      }
-      try {
-        const metadataCid = resolveIpfsCid(multisigProposal.metadata);
-        const metadataString = await this.ipfs.fetchString(metadataCid);
-        const metadata = JSON.parse(metadataString) as ProposalMetadata;
-        return toMultisigProposal(multisigProposal, metadata);
-        // TODO: Parse and validate schema
-      } catch (err) {
-        if (err instanceof InvalidCidError) {
-          return toMultisigProposal(
-            multisigProposal,
-            UNSUPPORTED_PROPOSAL_METADATA_LINK,
-          );
-        }
+      },
+      name: "Multisig proposal",
+    });
+    if (!multisigProposal) {
+      return null;
+    }
+    try {
+      const metadataCid = resolveIpfsCid(multisigProposal.metadata);
+      const metadataString = await this.ipfs.fetchString(metadataCid);
+      const metadata = JSON.parse(metadataString) as ProposalMetadata;
+      return toMultisigProposal(multisigProposal, metadata);
+      // TODO: Parse and validate schema
+    } catch (err) {
+      if (err instanceof InvalidCidError) {
         return toMultisigProposal(
           multisigProposal,
-          UNAVAILABLE_PROPOSAL_METADATA,
+          UNSUPPORTED_PROPOSAL_METADATA_LINK,
         );
       }
-    } catch (e) {
-      handleGraphQLError(e as Error, "Multisig proposal");
-      await this.graphql.ensureOnline();
-      return this.getProposal(proposalId);
+      return toMultisigProposal(
+        multisigProposal,
+        UNAVAILABLE_PROPOSAL_METADATA,
+      );
     }
   }
 
@@ -444,57 +434,47 @@ export class MultisigClientMethods extends ClientCore
     if (status) {
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
-    try {
-      const client = this.graphql.getClient();
-      const {
-        multisigProposals,
-      }: {
-        multisigProposals: SubgraphMultisigProposalListItem[];
-      } = await client.request(QueryMultisigProposals, {
+    const {
+      multisigProposals,
+    }: {
+      multisigProposals: SubgraphMultisigProposalListItem[];
+    } = await this.graphql.request({
+      query: QueryMultisigProposals,
+      params: {
         where,
         limit,
         skip,
         direction,
         sortBy,
-      });
-      await this.ipfs.ensureOnline();
-      return Promise.all(
-        multisigProposals.map(
-          async (
-            proposal: SubgraphMultisigProposalListItem,
-          ): Promise<MultisigProposalListItem> => {
-            // format in the metadata field
-            try {
-              const metadataCid = resolveIpfsCid(proposal.metadata);
-              const stringMetadata = await this.ipfs.fetchString(metadataCid);
-              const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
-              return toMultisigProposalListItem(proposal, metadata);
-            } catch (err) {
-              if (err instanceof InvalidCidError) {
-                return toMultisigProposalListItem(
-                  proposal,
-                  UNSUPPORTED_PROPOSAL_METADATA_LINK,
-                );
-              }
+      },
+      name: "Multisig proposals",
+    });
+    await this.ipfs.ensureOnline();
+    return Promise.all(
+      multisigProposals.map(
+        async (
+          proposal: SubgraphMultisigProposalListItem,
+        ): Promise<MultisigProposalListItem> => {
+          // format in the metadata field
+          try {
+            const metadataCid = resolveIpfsCid(proposal.metadata);
+            const stringMetadata = await this.ipfs.fetchString(metadataCid);
+            const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
+            return toMultisigProposalListItem(proposal, metadata);
+          } catch (err) {
+            if (err instanceof InvalidCidError) {
               return toMultisigProposalListItem(
                 proposal,
-                UNAVAILABLE_PROPOSAL_METADATA,
+                UNSUPPORTED_PROPOSAL_METADATA_LINK,
               );
             }
-          },
-        ),
-      );
-    } catch (e) {
-      handleGraphQLError(e as Error, "Multisig proposals");
-      await this.graphql.ensureOnline();
-      return this.getProposals({
-        daoAddressOrEns: address,
-        limit,
-        status,
-        skip,
-        direction,
-        sortBy,
-      });
-    }
+            return toMultisigProposalListItem(
+              proposal,
+              UNAVAILABLE_PROPOSAL_METADATA,
+            );
+          }
+        },
+      ),
+    );
   }
 }

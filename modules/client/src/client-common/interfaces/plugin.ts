@@ -243,3 +243,9 @@ export type SubgraphVotingSettings = {
   supportThreshold: string;
   votingMode: VotingMode;
 };
+
+export type SubgraphMembers = {
+  members: {
+    address: string;
+  }[];
+};

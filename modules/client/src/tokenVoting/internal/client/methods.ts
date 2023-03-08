@@ -25,7 +25,6 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  handleGraphQLError,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -33,6 +32,7 @@ import {
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
+  SubgraphMembers,
   SubgraphVotingSettings,
   VoteProposalStep,
   VoteProposalStepValue,
@@ -305,19 +305,18 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    try {
-      const client = this.graphql.getClient();
-      const response = await client.request(QueryTokenVotingMembers, {
+    const { tokenVotingPlugin }: {
+      tokenVotingPlugin: SubgraphMembers;
+    } = await this.graphql.request({
+      query: QueryTokenVotingMembers,
+      params: {
         address: pluginAddress.toLowerCase(),
-      });
-      return response.tokenVotingPlugin.members.map((
-        member: { address: string },
-      ) => member.address);
-    } catch (e) {
-      handleGraphQLError(e as Error, "TokenVoting proposal");
-      await this.graphql.ensureOnline();
-      return this.getMembers(pluginAddress);
-    }
+      },
+      name: "TokenVoting members",
+    });
+    return tokenVotingPlugin.members.map((
+      member: { address: string },
+    ) => member.address);
   }
 
   /**
@@ -333,42 +332,39 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
-    try {
-      const client = this.graphql.getClient();
-      const extendedProposalId = getExtendedProposalId(proposalId);
-      const {
-        tokenVotingProposal,
-      }: {
-        tokenVotingProposal: SubgraphTokenVotingProposal;
-      } = await client.request(QueryTokenVotingProposal, {
+    const extendedProposalId = getExtendedProposalId(proposalId);
+    const {
+      tokenVotingProposal,
+    }: {
+      tokenVotingProposal: SubgraphTokenVotingProposal;
+    } = await this.graphql.request({
+      query: QueryTokenVotingProposal,
+      params: {
         proposalId: extendedProposalId,
-      });
-      if (!tokenVotingProposal) {
-        return null;
-      }
-      // format in the metadata field
-      try {
-        const metadataCid = resolveIpfsCid(tokenVotingProposal.metadata);
-        const metadataString = await this.ipfs.fetchString(metadataCid);
-        const metadata = JSON.parse(metadataString) as ProposalMetadata;
-        return toTokenVotingProposal(tokenVotingProposal, metadata);
-        // TODO: Parse and validate schema
-      } catch (err) {
-        if (err instanceof InvalidCidError) {
-          return toTokenVotingProposal(
-            tokenVotingProposal,
-            UNSUPPORTED_PROPOSAL_METADATA_LINK,
-          );
-        }
+      },
+      name: "TokenVoting proposal",
+    });
+    if (!tokenVotingProposal) {
+      return null;
+    }
+    // format in the metadata field
+    try {
+      const metadataCid = resolveIpfsCid(tokenVotingProposal.metadata);
+      const metadataString = await this.ipfs.fetchString(metadataCid);
+      const metadata = JSON.parse(metadataString) as ProposalMetadata;
+      return toTokenVotingProposal(tokenVotingProposal, metadata);
+      // TODO: Parse and validate schema
+    } catch (err) {
+      if (err instanceof InvalidCidError) {
         return toTokenVotingProposal(
           tokenVotingProposal,
-          UNAVAILABLE_PROPOSAL_METADATA,
+          UNSUPPORTED_PROPOSAL_METADATA_LINK,
         );
       }
-    } catch (e) {
-      handleGraphQLError(e as Error, "TokenVoting proposal");
-      await this.graphql.ensureOnline();
-      return this.getProposal(proposalId);
+      return toTokenVotingProposal(
+        tokenVotingProposal,
+        UNAVAILABLE_PROPOSAL_METADATA,
+      );
     }
   }
   /**
@@ -406,58 +402,49 @@ export class TokenVotingClientMethods extends ClientCore
     if (status) {
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
-    try {
-      const client = this.graphql.getClient();
-      const {
-        tokenVotingProposals,
-      }: {
-        tokenVotingProposals: SubgraphTokenVotingProposalListItem[];
-      } = await client.request(QueryTokenVotingProposals, {
+
+    const {
+      tokenVotingProposals,
+    }: {
+      tokenVotingProposals: SubgraphTokenVotingProposalListItem[];
+    } = await this.graphql.request({
+      query: QueryTokenVotingProposals,
+      params: {
         where,
         limit,
         skip,
         direction,
         sortBy,
-      });
-      await this.ipfs.ensureOnline();
-      return Promise.all(
-        tokenVotingProposals.map(
-          async (
-            proposal: SubgraphTokenVotingProposalListItem,
-          ): Promise<TokenVotingProposalListItem> => {
-            // format in the metadata field
-            try {
-              const metadataCid = resolveIpfsCid(proposal.metadata);
-              const stringMetadata = await this.ipfs.fetchString(metadataCid);
-              const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
-              return toTokenVotingProposalListItem(proposal, metadata);
-            } catch (err) {
-              if (err instanceof InvalidCidError) {
-                return toTokenVotingProposalListItem(
-                  proposal,
-                  UNSUPPORTED_PROPOSAL_METADATA_LINK,
-                );
-              }
+      },
+      name: "TokenVoting proposals",
+    });
+    await this.ipfs.ensureOnline();
+    return Promise.all(
+      tokenVotingProposals.map(
+        async (
+          proposal: SubgraphTokenVotingProposalListItem,
+        ): Promise<TokenVotingProposalListItem> => {
+          // format in the metadata field
+          try {
+            const metadataCid = resolveIpfsCid(proposal.metadata);
+            const stringMetadata = await this.ipfs.fetchString(metadataCid);
+            const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
+            return toTokenVotingProposalListItem(proposal, metadata);
+          } catch (err) {
+            if (err instanceof InvalidCidError) {
               return toTokenVotingProposalListItem(
                 proposal,
-                UNAVAILABLE_PROPOSAL_METADATA,
+                UNSUPPORTED_PROPOSAL_METADATA_LINK,
               );
             }
-          },
-        ),
-      );
-    } catch (e) {
-      handleGraphQLError(e as Error, "TokenVoting proposals");
-      await this.graphql.ensureOnline();
-      return this.getProposals({
-        daoAddressOrEns: address,
-        limit,
-        status,
-        skip,
-        direction,
-        sortBy,
-      });
-    }
+            return toTokenVotingProposalListItem(
+              proposal,
+              UNAVAILABLE_PROPOSAL_METADATA,
+            );
+          }
+        },
+      ),
+    );
   }
 
   /**
@@ -473,39 +460,35 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    try {
-      const client = this.graphql.getClient();
-      const { tokenVotingPlugin }: {
-        tokenVotingPlugin: SubgraphVotingSettings;
-      } = await client.request(
-        QueryTokenVotingSettings,
-        {
+    const { tokenVotingPlugin }: {
+      tokenVotingPlugin: SubgraphVotingSettings;
+    } = await this.graphql.request(
+      {
+        query: QueryTokenVotingSettings,
+        params: {
           address: pluginAddress.toLowerCase(),
         },
-      );
-      if (!tokenVotingPlugin) {
-        return null;
-      }
-      return {
-        minDuration: parseInt(tokenVotingPlugin.minDuration),
-        supportThreshold: decodeRatio(
-          BigInt(tokenVotingPlugin.supportThreshold),
-          6,
-        ),
-        minParticipation: decodeRatio(
-          BigInt(tokenVotingPlugin.minParticipation),
-          6,
-        ),
-        minProposerVotingPower: BigInt(
-          tokenVotingPlugin.minProposerVotingPower,
-        ),
-        votingMode: tokenVotingPlugin.votingMode,
-      };
-    } catch (e) {
-      handleGraphQLError(e as Error, "plugin settings");
-      await this.graphql.ensureOnline();
-      return this.getVotingSettings(pluginAddress);
+        name: "TokenVoting settings",
+      },
+    );
+    if (!tokenVotingPlugin) {
+      return null;
     }
+    return {
+      minDuration: parseInt(tokenVotingPlugin.minDuration),
+      supportThreshold: decodeRatio(
+        BigInt(tokenVotingPlugin.supportThreshold),
+        6,
+      ),
+      minParticipation: decodeRatio(
+        BigInt(tokenVotingPlugin.minParticipation),
+        6,
+      ),
+      minProposerVotingPower: BigInt(
+        tokenVotingPlugin.minProposerVotingPower,
+      ),
+      votingMode: tokenVotingPlugin.votingMode,
+    };
   }
 
   /**
@@ -521,42 +504,41 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    try {
-      const client = this.graphql.getClient();
-      const { tokenVotingPlugin } = await client.request(
-        QueryTokenVotingPlugin,
+    const { tokenVotingPlugin }: {
+      tokenVotingPlugin: { token: SubgraphErc20Token | SubgraphErc721Token };
+    } = await this.graphql
+      .request(
         {
-          address: pluginAddress.toLowerCase(),
+          query: QueryTokenVotingPlugin,
+          params: {
+            address: pluginAddress.toLowerCase(),
+          },
+          name: "TokenVoting token",
         },
       );
-      if (!tokenVotingPlugin) {
-        return null;
-      }
-      let token: SubgraphErc20Token | SubgraphErc721Token =
-        tokenVotingPlugin.token;
-      // type erc20
-      if (token.__typename === SubgraphContractType.ERC20) {
-        return {
-          address: token.id,
-          name: token.name,
-          symbol: token.symbol,
-          decimals: token.decimals,
-          type: TokenType.ERC20,
-        };
-        // type erc721
-      } else if (token.__typename === SubgraphContractType.ERC721) {
-        return {
-          address: token.id,
-          name: token.name,
-          symbol: token.symbol,
-          type: TokenType.ERC721,
-        };
-      }
+    if (!tokenVotingPlugin) {
       return null;
-    } catch (e) {
-      handleGraphQLError(e as Error, "token");
-      await this.graphql.ensureOnline();
-      return this.getToken(pluginAddress);
     }
+    let token: SubgraphErc20Token | SubgraphErc721Token =
+      tokenVotingPlugin.token;
+    // type erc20
+    if (token.__typename === SubgraphContractType.ERC20) {
+      return {
+        address: token.id,
+        name: token.name,
+        symbol: token.symbol,
+        decimals: token.decimals,
+        type: TokenType.ERC20,
+      };
+      // type erc721
+    } else if (token.__typename === SubgraphContractType.ERC721) {
+      return {
+        address: token.id,
+        name: token.name,
+        symbol: token.symbol,
+        type: TokenType.ERC721,
+      };
+    }
+    return null;
   }
 }

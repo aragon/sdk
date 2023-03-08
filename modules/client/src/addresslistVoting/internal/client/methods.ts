@@ -32,7 +32,6 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  handleGraphQLError,
   IProposalQueryParams,
   IVoteProposalParams,
   ProposalCreationSteps,
@@ -40,6 +39,7 @@ import {
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
+  SubgraphMembers,
   SubgraphVotingSettings,
   VoteProposalStep,
   VoteProposalStepValue,
@@ -306,19 +306,19 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new InvalidAddressError();
     }
 
-    try {
-      const client = this.graphql.getClient();
-      const response = await client.request(QueryAddresslistVotingMembers, {
-        address: pluginAddress.toLowerCase(),
+    const { addresslistVotingPlugin }: {
+      addresslistVotingPlugin: SubgraphMembers;
+    } = await this.graphql
+      .request({
+        query: QueryAddresslistVotingMembers,
+        params: {
+          address: pluginAddress.toLowerCase(),
+        },
+        name: "AddresslistVoting members",
       });
-      return response.addresslistVotingPlugin.members.map((
-        member: { address: string },
-      ) => member.address);
-    } catch (e) {
-      handleGraphQLError(e as Error, "adddresslistVoting members");
-      await this.graphql.ensureOnline();
-      return this.getMembers(pluginAddress);
-    }
+    return addresslistVotingPlugin.members.map((
+      member: { address: string },
+    ) => member.address);
   }
   /**
    * Returns the details of the given proposal
@@ -333,41 +333,38 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
-    try {
-      const client = this.graphql.getClient();
-      const extendedProposalId = getExtendedProposalId(proposalId);
-      const {
-        addresslistVotingProposal,
-      }: {
-        addresslistVotingProposal: SubgraphAddresslistVotingProposal;
-      } = await client.request(QueryAddresslistVotingProposal, {
+    const extendedProposalId = getExtendedProposalId(proposalId);
+    const {
+      addresslistVotingProposal,
+    }: {
+      addresslistVotingProposal: SubgraphAddresslistVotingProposal;
+    } = await this.graphql.request({
+      query: QueryAddresslistVotingProposal,
+      params: {
         proposalId: extendedProposalId,
-      });
-      if (!addresslistVotingProposal) {
-        return null;
-      }
-      try {
-        const metadataCid = resolveIpfsCid(addresslistVotingProposal.metadata);
-        const metadataString = await this.ipfs.fetchString(metadataCid);
-        const metadata = JSON.parse(metadataString) as ProposalMetadata;
-        return toAddresslistVotingProposal(addresslistVotingProposal, metadata);
-        // TODO: Parse and validate schema
-      } catch (err) {
-        if (err instanceof InvalidCidError) {
-          return toAddresslistVotingProposal(
-            addresslistVotingProposal,
-            UNSUPPORTED_PROPOSAL_METADATA_LINK,
-          );
-        }
+      },
+      name: "AddresslistVoting proposal",
+    });
+    if (!addresslistVotingProposal) {
+      return null;
+    }
+    try {
+      const metadataCid = resolveIpfsCid(addresslistVotingProposal.metadata);
+      const metadataString = await this.ipfs.fetchString(metadataCid);
+      const metadata = JSON.parse(metadataString) as ProposalMetadata;
+      return toAddresslistVotingProposal(addresslistVotingProposal, metadata);
+      // TODO: Parse and validate schema
+    } catch (err) {
+      if (err instanceof InvalidCidError) {
         return toAddresslistVotingProposal(
           addresslistVotingProposal,
-          UNAVAILABLE_PROPOSAL_METADATA,
+          UNSUPPORTED_PROPOSAL_METADATA_LINK,
         );
       }
-    } catch (e) {
-      handleGraphQLError(e as Error, "adddresslistVoting proposal");
-      await this.graphql.ensureOnline();
-      return this.getProposal(proposalId);
+      return toAddresslistVotingProposal(
+        addresslistVotingProposal,
+        UNAVAILABLE_PROPOSAL_METADATA,
+      );
     }
   }
 
@@ -413,58 +410,49 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (status) {
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
-    try {
-      const client = this.graphql.getClient();
-      const {
-        addresslistVotingProposals,
-      }: {
-        addresslistVotingProposals: SubgraphAddresslistVotingProposalListItem[];
-      } = await client.request(QueryAddresslistVotingProposals, {
+
+    const {
+      addresslistVotingProposals,
+    }: {
+      addresslistVotingProposals: SubgraphAddresslistVotingProposalListItem[];
+    } = await this.graphql.request({
+      query: QueryAddresslistVotingProposals,
+      params: {
         where,
         limit,
         skip,
         direction,
         sortBy,
-      });
-      await this.ipfs.ensureOnline();
-      return Promise.all(
-        addresslistVotingProposals.map(
-          async (
-            proposal: SubgraphAddresslistVotingProposalListItem,
-          ): Promise<AddresslistVotingProposalListItem> => {
-            // format in the metadata field
-            try {
-              const metadataCid = resolveIpfsCid(proposal.metadata);
-              const stringMetadata = await this.ipfs.fetchString(metadataCid);
-              const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
-              return toAddresslistVotingProposalListItem(proposal, metadata);
-            } catch (err) {
-              if (err instanceof InvalidCidError) {
-                return toAddresslistVotingProposalListItem(
-                  proposal,
-                  UNSUPPORTED_PROPOSAL_METADATA_LINK,
-                );
-              }
+      },
+      name: "AddresslistVoting proposals",
+    });
+    await this.ipfs.ensureOnline();
+    return Promise.all(
+      addresslistVotingProposals.map(
+        async (
+          proposal: SubgraphAddresslistVotingProposalListItem,
+        ): Promise<AddresslistVotingProposalListItem> => {
+          // format in the metadata field
+          try {
+            const metadataCid = resolveIpfsCid(proposal.metadata);
+            const stringMetadata = await this.ipfs.fetchString(metadataCid);
+            const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
+            return toAddresslistVotingProposalListItem(proposal, metadata);
+          } catch (err) {
+            if (err instanceof InvalidCidError) {
               return toAddresslistVotingProposalListItem(
                 proposal,
-                UNAVAILABLE_PROPOSAL_METADATA,
+                UNSUPPORTED_PROPOSAL_METADATA_LINK,
               );
             }
-          },
-        ),
-      );
-    } catch (e) {
-      handleGraphQLError(e as Error, "addresslistVoting proposals");
-      await this.graphql.ensureOnline();
-      return this.getProposals({
-        daoAddressOrEns: address,
-        limit,
-        status,
-        skip,
-        direction,
-        sortBy,
-      });
-    }
+            return toAddresslistVotingProposalListItem(
+              proposal,
+              UNAVAILABLE_PROPOSAL_METADATA,
+            );
+          }
+        },
+      ),
+    );
   }
 
   /**
@@ -480,38 +468,32 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    try {
-      const client = this.graphql.getClient();
-      const { addresslistVotingPlugin }: {
-        addresslistVotingPlugin: SubgraphVotingSettings;
-      } = await client.request(
-        QueryAddresslistVotingSettings,
-        {
-          address: pluginAddress.toLowerCase(),
-        },
-      );
-      if (!addresslistVotingPlugin) {
-        return null;
-      }
-      return {
-        minDuration: parseInt(addresslistVotingPlugin.minDuration),
-        supportThreshold: decodeRatio(
-          BigInt(addresslistVotingPlugin.supportThreshold),
-          6,
-        ),
-        minParticipation: decodeRatio(
-          BigInt(addresslistVotingPlugin.minParticipation),
-          6,
-        ),
-        minProposerVotingPower: BigInt(
-          addresslistVotingPlugin.minProposerVotingPower,
-        ),
-        votingMode: addresslistVotingPlugin.votingMode,
-      };
-    } catch (e) {
-      handleGraphQLError(e as Error, "plugin settings");
-      await this.graphql.ensureOnline();
-      return this.getVotingSettings(pluginAddress);
+    const { addresslistVotingPlugin }: {
+      addresslistVotingPlugin: SubgraphVotingSettings;
+    } = await this.graphql.request({
+      query: QueryAddresslistVotingSettings,
+      params: {
+        address: pluginAddress.toLowerCase(),
+      },
+      name: "AddresslistVoting settings",
+    });
+    if (!addresslistVotingPlugin) {
+      return null;
     }
+    return {
+      minDuration: parseInt(addresslistVotingPlugin.minDuration),
+      supportThreshold: decodeRatio(
+        BigInt(addresslistVotingPlugin.supportThreshold),
+        6,
+      ),
+      minParticipation: decodeRatio(
+        BigInt(addresslistVotingPlugin.minParticipation),
+        6,
+      ),
+      minProposerVotingPower: BigInt(
+        addresslistVotingPlugin.minProposerVotingPower,
+      ),
+      votingMode: addresslistVotingPlugin.votingMode,
+    };
   }
 }

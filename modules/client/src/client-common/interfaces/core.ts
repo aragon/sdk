@@ -39,6 +39,11 @@ export interface IClientGraphQLCore {
   shiftClient: () => void;
   isUp: () => Promise<boolean>;
   ensureOnline: () => Promise<void>;
+  request: <T>({ query, params, name }: {
+    query: string;
+    params: { [key: string]: any };
+    name?: string;
+  }) => Promise<T>;
 }
 
 export interface IClientCore {
