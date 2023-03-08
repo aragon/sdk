@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Addresslist Voting Settings
+title: Token Voting Settings
 ---
 
 ## Update the Token Voting Plugin Settings
