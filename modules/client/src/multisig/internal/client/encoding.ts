@@ -74,12 +74,12 @@ export class MultisigClientEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *
    * @param {UpdateAddressesParams} params
-   * @return {*}  {DaoAction}
+   * @return {*}  {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
   public addAddressesAction(
     params: UpdateAddressesParams,
-  ): DaoAction {
+  ): DaoAction[] {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -95,22 +95,26 @@ export class MultisigClientEncoding extends ClientCore
       "addAddresses",
       [params.members],
     );
-    return {
-      to: params.pluginAddress,
-      value: BigInt(0),
-      data: hexToBytes(hexBytes),
-    };
+    const updateSettingsAction = this.updateMultisigVotingSettings(params);
+    return [
+      {
+        to: params.pluginAddress,
+        value: BigInt(0),
+        data: hexToBytes(hexBytes),
+      },
+      updateSettingsAction,
+    ];
   }
   /**
    * Computes the parameters to be given when creating a proposal that adds addresses to address list
    *
    * @param {UpdateAddressesParams} params
-   * @return {*}  {DaoAction}
+   * @return {*}  {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
   public removeAddressesAction(
     params: UpdateAddressesParams,
-  ): DaoAction {
+  ): DaoAction[] {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -126,11 +130,15 @@ export class MultisigClientEncoding extends ClientCore
       "removeAddresses",
       [params.members],
     );
-    return {
-      to: params.pluginAddress,
-      value: BigInt(0),
-      data: hexToBytes(hexBytes),
-    };
+    const updateSettingsAction = this.updateMultisigVotingSettings(params);
+    return [
+      updateSettingsAction,
+      {
+        to: params.pluginAddress,
+        value: BigInt(0),
+        data: hexToBytes(hexBytes),
+      },
+    ];
   }
   /**
    * Computes the parameters to be given when creating a proposal updates multisig settings

@@ -8,6 +8,7 @@ import {
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import {
   IMultisigClientDecoding,
+  MultisigPluginSettings,
   MultisigVotingSettings,
 } from "../../interfaces";
 // @ts-ignore
@@ -25,31 +26,35 @@ export class MultisigClientDecoding extends ClientCore
   /**
    * Decodes a list of addresses from an encoded add members action
    *
-   * @param {Uint8Array} data
-   * @return {*}  {string[]}
+   * @param {Uint8Array[]} data
+   * @return {*}  {MultisigPluginSettings}
    * @memberof MultisigClientDecoding
    */
-  public addAddressesAction(data: Uint8Array): string[] {
+  public addAddressesAction(data: Uint8Array[]): MultisigPluginSettings {
     const multisigInterface = Multisig__factory.createInterface();
-    const hexBytes = bytesToHex(data);
+    const hexBytes = bytesToHex(data[0]);
 
     const expectedfunction = multisigInterface.getFunction("addAddresses");
     const result = multisigInterface.decodeFunctionData(
       expectedfunction,
       hexBytes,
     );
-    return result[0];
+    const votingSettings = this.updateMultisigVotingSettings(data[1]);
+    return {
+      members: result[0],
+      votingSettings,
+    };
   }
   /**
    * Decodes a list of addresses from an encoded remove members action
    *
-   * @param {Uint8Array} data
-   * @return {*}  {string[]}
+   * @param {Uint8Array[]} data
+   * @return {*}  {MultisigPluginSettings}
    * @memberof MultisigClientDecoding
    */
-  public removeAddressesAction(data: Uint8Array): string[] {
+  public removeAddressesAction(data: Uint8Array[]): MultisigPluginSettings {
     const multisigInterface = Multisig__factory.createInterface();
-    const hexBytes = bytesToHex(data);
+    const hexBytes = bytesToHex(data[1]);
     const expectedfunction = multisigInterface.getFunction(
       "removeAddresses",
     );
@@ -57,7 +62,11 @@ export class MultisigClientDecoding extends ClientCore
       expectedfunction,
       hexBytes,
     );
-    return result[0];
+    const votingSettings = this.updateMultisigVotingSettings(data[0]);
+    return {
+      members: result[0],
+      votingSettings,
+    };
   }
   /**
    * Decodes a list of min approvals from an encoded update min approval action
