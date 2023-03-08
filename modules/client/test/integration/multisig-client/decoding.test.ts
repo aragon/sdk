@@ -6,6 +6,7 @@ import {
   Context,
   ContextPlugin,
   MultisigClient,
+  MultisigPluginSettings,
   MultisigVotingSettings,
   RemoveAddressesParams,
   UpdateMultisigVotingSettingsParams,
@@ -28,19 +29,27 @@ describe("Client Multisig", () => {
       const addAddressesParams: AddAddressesParams = {
         pluginAddress,
         members,
+        votingSettings: {
+          minApprovals: 1,
+          onlyListed: true,
+        },
       };
 
-      const action = client.encoding.addAddressesAction(addAddressesParams);
+      const actions = client.encoding.addAddressesAction(addAddressesParams);
 
-      const decodedMembers: string[] = client.decoding
+      const decodedSettings: MultisigPluginSettings = client.decoding
         .addAddressesAction(
-          action.data,
+          actions.map((action) => action.data),
         );
-
-      for (const member of decodedMembers) {
-        expect(typeof member).toBe("string");
-        expect(member).toBe(member);
-      }
+      decodedSettings.members.forEach((member, index) => {
+        expect(member).toBe(addAddressesParams.members[index]);
+      });
+      expect(decodedSettings.votingSettings.minApprovals).toBe(
+        addAddressesParams.votingSettings.minApprovals,
+      );
+      expect(decodedSettings.votingSettings.onlyListed).toBe(
+        addAddressesParams.votingSettings.onlyListed,
+      );
     });
     it("Should decode the members from an remove members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -56,21 +65,29 @@ describe("Client Multisig", () => {
       const removeAddressesParams: RemoveAddressesParams = {
         pluginAddress,
         members,
+        votingSettings: {
+          minApprovals: 1,
+          onlyListed: true,
+        },
       };
 
-      const action = client.encoding.removeAddressesAction(
+      const actions = client.encoding.removeAddressesAction(
         removeAddressesParams,
       );
 
-      const decodedMembers: string[] = client.decoding
+      const decodedSettings: MultisigPluginSettings = client.decoding
         .removeAddressesAction(
-          action.data,
+          actions.map((action) => action.data),
         );
-
-      for (const member of decodedMembers) {
-        expect(typeof member).toBe("string");
-        expect(member).toBe(member);
-      }
+      decodedSettings.members.forEach((member, index) => {
+        expect(member).toBe(removeAddressesParams.members[index]);
+      });
+      expect(decodedSettings.votingSettings.minApprovals).toBe(
+        removeAddressesParams.votingSettings.minApprovals,
+      );
+      expect(decodedSettings.votingSettings.onlyListed).toBe(
+        removeAddressesParams.votingSettings.onlyListed,
+      );
     });
     it("Should decode the min approvals from an update min approvals action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -106,7 +123,7 @@ describe("Client Multisig", () => {
       const client = new MultisigClient(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
-      expect(() => client.decoding.addAddressesAction(data)).toThrow(
+      expect(() => client.decoding.addAddressesAction([data])).toThrow(
         `data signature does not match function addAddresses. (argument=\"data\", value=\"0x0b1616212121\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });
@@ -126,14 +143,29 @@ describe("Client Multisig", () => {
       const addAddressesParams: AddAddressesParams = {
         pluginAddress,
         members,
+        votingSettings: {
+          minApprovals: 1,
+          onlyListed: false,
+        },
       };
-      const action = client.encoding.addAddressesAction(addAddressesParams);
-      const iface = client.decoding.findInterface(
-        action.data,
-      );
-      expect(iface?.id).toBe("function addAddresses(address[])");
-      expect(iface?.functionName).toBe("addAddresses");
-      expect(iface?.hash).toBe("0x3628731c");
+      const actions = client.encoding.addAddressesAction(addAddressesParams);
+      expect(actions.length).toBe(2);
+      actions.forEach((action, index) => {
+        const iface = client.decoding.findInterface(
+          action.data,
+        );
+        if (index === 0) {
+          expect(iface?.id).toBe("function addAddresses(address[])");
+          expect(iface?.functionName).toBe("addAddresses");
+          expect(iface?.hash).toBe("0x3628731c");
+        } else {
+          expect(iface?.id).toBe(
+            "function updateMultisigSettings(tuple(bool,uint16))",
+          );
+          expect(iface?.functionName).toBe("updateMultisigSettings");
+          expect(iface?.hash).toBe("0x303f4336");
+        }
+      });
     });
 
     it("Should try to get the function of an invalid data and return null", async () => {
