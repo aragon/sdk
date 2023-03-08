@@ -4,7 +4,7 @@
  * @param proms
  */
 export function allSettled(
-  proms: Array<Promise<any>>
+  proms: Array<Promise<any>>,
 ): Promise<
   Array<{ value: any; status: string } | { reason: Error; status: string }>
 > {
@@ -15,4 +15,21 @@ function reflect<T>(prom: Promise<T>) {
   return prom
     .then((value: T) => ({ value, status: "fulfilled" }))
     .catch((reason: T) => ({ reason, status: "rejected" }));
+}
+
+export async function tryUntil<T>({ func, onFail, shouldContinue }: {
+  func: () => Promise<T>;
+  onFail: (e: Error) => void;
+  shouldContinue: () => boolean;
+}) {
+  do {
+    try {
+      const result = await func();
+      // it worked
+      return result;
+    } catch (err) {
+      onFail(err as Error);
+      continue
+    }
+  } while (shouldContinue());
 }

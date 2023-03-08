@@ -53,14 +53,3 @@ export function promiseWithTimeout<T>(
   });
 }
 
-export async function functionRetryWithCondition<T>(
-  func: () => Promise<T>,
-  // should not throw to execute recursivity
-  retryCondition: (e: Error) => Promise<void>,
-): Promise<T> {
-  return func().catch((e) => {
-    return retryCondition(e).then(() =>
-      functionRetryWithCondition(func, retryCondition)
-    );
-  });
-}
