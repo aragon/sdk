@@ -1,34 +1,36 @@
 /* MARKDOWN
 ---
-title: Register Callbacks
+title: Register Callback
 ---
 
 ## Register a New Standard Callback
 
-Encodes the action of registering a new standard callback for the DAO.
+Register a new standard callback for the DAO.
+
+### Encoding
 */
 
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from '../index';
+import { context } from "../../index";
 
 // Initialize the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Initialize the general purpose client from the plugin's context.
 const client: Client = new Client(contextPlugin);
 
-const registerStandardCallbackParams = {
+const params = {
   interfaceId: "0x3134r1er213740123741207831238410972347",
   callbackSelector: "0x382741239807410892375182734892",
   magicNumber: "0x12192304781237401321329450123321"
 };
 
-const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
+const dao: string = "0x123123123123123123123123123123123123";
 
-const registerStandardCallbackAction: DaoAction = client.encoding.registerStandardCallbackAction(
-  daoAddressOrEns,
-  registerStandardCallbackParams
+const action: DaoAction = client.encoding.registerStandardCallbackAction(
+  dao,
+  params
 );
-console.log({ registerStandardCallbackAction });
+console.log({ action });
 
 /* MARKDOWN
 
@@ -41,28 +43,14 @@ console.log({ registerStandardCallbackAction });
 ```
 */
 
-
 /* MARKDOWN
-
----
-title: Register Callback
----
-
-## Decode a "Register Callback" action
-
-Decodes the action of registering a callback.
+### Decoding
 */
 
-import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const registerStandardCallbackAction = client.decoding.registerStandardCallbackAction(new Uint8Array([0, 10, 20, 30]));
-console.log({ registerStandardCallbackAction });
+const decodedParams = client.decoding.registerStandardCallbackAction(
+  action.data
+);
+console.log({ decodedParams });
 
 /* MARKDOWN
 Returns:

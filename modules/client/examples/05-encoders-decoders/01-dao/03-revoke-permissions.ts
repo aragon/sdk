@@ -6,20 +6,23 @@ title: Revoke Permissions
 ## Revoke a Permission
 
 Revokes a permission to a given address (`who`) to perform an action on a contract (`where`).
+
+### Encoding
 */
 
 import {
   Client,
   DaoAction,
   IRevokePermissionParams,
+  IRevokePermissionDecodedParams,
   Permissions
 } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
 
-const revokeParams: IRevokePermissionParams = {
+const params: IRevokePermissionParams = {
   who: "0x1234567890123456789012345678901234567890",
   where: "0x1234567890123456789012345678901234567890",
   permission: Permissions.UPGRADE_PERMISSION // other options: SET_METADATA_PERMISSION, EXECUTE_PERMISSION, WITHDRAW_PERMISSION, SET_SIGNATURE_VALIDATOR_PERMISSION, SET_TRUSTED_FORWARDER_PERMISSION, ROOT_PERMISSION, CREATE_VERSION_PERMISSION, REGISTER_PERMISSION, REGISTER_DAO_PERMISSION, REGISTER_ENS_SUBDOMAIN_PERMISSION, MINT_PERMISSION, MERKLE_MINT_PERMISSION, MODIFY_ALLOWLIST_PERMISSION, SET_CONFIGURATION_PERMISSION
@@ -28,8 +31,11 @@ const revokeParams: IRevokePermissionParams = {
 const daoAddress: string = "0x1234567890123456789012345678901234567890";
 
 // Revokes a permission to a given address to perform an action on a contract.
-const revokePermission: DaoAction = await client.encoding.revokeAction(daoAddress, revokeParams);
-console.log({ revokePermission });
+const action: DaoAction = await client.encoding.revokeAction(
+  daoAddress,
+  params
+);
+console.log({ action });
 
 /* MARKDOWN
 Returns:
@@ -41,32 +47,15 @@ Returns:
   data: Uint8Array[12,34,45...]
 }
 ```
+
+### Decoding
 */
-
-/* MARKDOWN
----
-title: Revoke Permission
----
-
-## Decode the Revoke Permission Action
-
-Decodes the action of a revoke permission transaction.
-*/
-
-import {
-  Client,
-  IRevokePermissionDecodedParams
-} from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Insantiates an Aragon OSx SDK client.
-const client: Client = new Client(context);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
 
 // Decodes the action of a revoke permission transaction.
-const revokeParams: IRevokePermissionDecodedParams = client.decoding.revokeAction(data);
-console.log({ revokeParams });
+const decodedParams: IRevokePermissionDecodedParams = client.decoding.revokeAction(
+  action.data
+);
+console.log({ decodedParams });
 
 /* MARKDOWN
 Returns:
