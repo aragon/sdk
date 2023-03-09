@@ -16,3 +16,14 @@ Hence, the flow is the following:
 4. If the propoosal passes the required approvals and participation, execute the proposal
 5. Success
 */
+
+
+/* MARKDOWN
+---
+title: Action Decoders
+---
+
+## Decoding Actions
+
+Decodes the actions of a transaction to understand them in a human-readable format.
+*/

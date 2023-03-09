@@ -44,3 +44,39 @@ Returns:
 }
 ```
 */
+
+
+/* MARKDOWN
+---
+title: Update Settings
+---
+
+## Decodes the Update Settings Action (Multisig)
+
+Decodes the update settings action for a Multisig plugin.
+*/
+
+import { ContextPlugin, MultisigClient, MultisigVotingSettings } from "@aragon/sdk-client";
+import { context } from "../index";
+
+// Instantiate a plugin context from an Aragon OSx SDK context.
+const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+// Instantiate a Multisig plugin client.
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+
+const data: Uint8Array = new Uint8Array([12, 56]);
+
+// Decodes the update settings action for a Multisig plugin.
+const decodeUpdateMultisigSettings: MultisigVotingSettings = multisigClient.decoding.updateMultisigVotingSettings(data);
+console.log({ decodeUpdateMultisigSettings });
+
+/* MARKDOWN
+Returns:
+
+```
+{
+  minApprovals: 2,
+  onlyListed: false
+}
+```
+*/
