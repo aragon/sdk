@@ -31,7 +31,7 @@ jobs:
       - name: Generate Multisig Docs
         run: yarn run docs:multisig
       - name: Generate examples Docs
-        run: yarn run docs:examples && rsync -r --prune-empty-dirs --include='*/' --include='*.md' --exclude='*' ./modules/client/examples/ ./docs/01-examples/;
+        run: yarn run docs:examples
       - name: Checkout builders-portal
         uses: actions/checkout@v3
         with:
@@ -42,7 +42,7 @@ jobs:
       - name: Clean the docs/sdk folder in the builders-portal
         run: rm -rf $GITHUB_WORKSPACE/builders-portal/docs/sdk
       - name: Copy the docs folder to the builders-portal
-        run: cp -R ./docs $GITHUB_WORKSPACE/builders-portal/docs/sdk
+        run: cp -R ./docs/sdk $GITHUB_WORKSPACE/builders-portal/docs/sdk
       - name: Get short commit hash
         id: hash
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
