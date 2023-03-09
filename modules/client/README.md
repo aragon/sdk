@@ -21,7 +21,7 @@ yarn add @aragon/sdk-client
 
 # Usage
 
-The SDK usage is demonstrated in the [SDK examples section of our developer portal]([examples.md](https://devs.aragon.org/docs/sdk/examples/)).
+The SDK usage is demonstrated in the [SDK examples section of the Developer Portal](https://devs.aragon.org/docs/sdk/examples/).
 
 ## React Native
 In order for the SDK to be used in restricted environments like react native install the following polyfilesand  into your project:  
