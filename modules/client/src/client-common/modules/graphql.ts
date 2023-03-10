@@ -97,12 +97,7 @@ export class GraphqlModule implements IClientGraphQLCore {
         retries--;
         this.shiftClient();
       },
-      shouldRetry: () => {
-        if (retries <= 0) {
-          throw new NoNodesAvailableError("graphql");
-        }
-        return true;
-      },
+      shouldRetry: () => retries > 0,
     });
   }
 }

@@ -61,6 +61,7 @@ import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import { TokenVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
+  EMPTY_PROPOSAL_METADATA_LINK,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
@@ -348,6 +349,11 @@ export class TokenVotingClientMethods extends ClientCore
     });
     if (!tokenVotingProposal) {
       return null;
+    } else if (!tokenVotingProposal.metadata) {
+      return toTokenVotingProposal(
+        tokenVotingProposal,
+        EMPTY_PROPOSAL_METADATA_LINK,
+      );
     }
     // format in the metadata field
     try {
@@ -426,6 +432,12 @@ export class TokenVotingClientMethods extends ClientCore
           proposal: SubgraphTokenVotingProposalListItem,
         ): Promise<TokenVotingProposalListItem> => {
           // format in the metadata field
+          if (!proposal.metadata) {
+            return toTokenVotingProposalListItem(
+              proposal,
+              EMPTY_PROPOSAL_METADATA_LINK,
+            );
+          }
           try {
             const metadataCid = resolveIpfsCid(proposal.metadata);
             const stringMetadata = await this.ipfs.fetchString(metadataCid);

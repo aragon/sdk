@@ -44,6 +44,7 @@ import {
   SubgraphMembers,
 } from "../../../client-common";
 import {
+  EMPTY_PROPOSAL_METADATA_LINK,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
@@ -305,7 +306,7 @@ export class MultisigClientMethods extends ClientCore
     }
     const query = QueryMultisigVotingSettings;
     const params = {
-      address: pluginAddress.toLowerCase()
+      address: pluginAddress.toLowerCase(),
     };
     const name = "Multisig settings";
     type T = { multisigPlugin: SubgraphMultisigVotingSettings };
@@ -336,7 +337,7 @@ export class MultisigClientMethods extends ClientCore
     }
     const query = QueryMultisigMembers;
     const params = {
-      address: pluginAddress.toLowerCase()
+      address: pluginAddress.toLowerCase(),
     };
     const name = "Multisig members";
     type T = { multisigPlugin: SubgraphMembers };
@@ -375,6 +376,11 @@ export class MultisigClientMethods extends ClientCore
     });
     if (!multisigProposal) {
       return null;
+    } else if (!multisigProposal.metadata) {
+      return toMultisigProposal(
+        multisigProposal,
+        EMPTY_PROPOSAL_METADATA_LINK,
+      );
     }
     try {
       const metadataCid = resolveIpfsCid(multisigProposal.metadata);
@@ -459,6 +465,12 @@ export class MultisigClientMethods extends ClientCore
         async (
           proposal: SubgraphMultisigProposalListItem,
         ): Promise<MultisigProposalListItem> => {
+          if (!proposal.metadata) {
+            return toMultisigProposalListItem(
+              proposal,
+              EMPTY_PROPOSAL_METADATA_LINK,
+            );
+          }
           // format in the metadata field
           try {
             const metadataCid = resolveIpfsCid(proposal.metadata);

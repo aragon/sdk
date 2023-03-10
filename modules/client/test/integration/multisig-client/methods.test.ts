@@ -24,7 +24,7 @@ import {
 import { GraphQLError, InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParamsLocalChain,
-  contextParamsMainnet,
+  contextParamsGraphqlWithTimeouts,
   TEST_INVALID_ADDRESS,
   TEST_MULTISIG_DAO_ADDRESS,
   TEST_MULTISIG_PLUGIN_ADDRESS,
@@ -273,7 +273,7 @@ describe("Client Multisig", () => {
 
   describe("Data retrieval", () => {
     it("Should get the voting settings of the plugin", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -286,7 +286,7 @@ describe("Client Multisig", () => {
     });
 
     it("Should get members of the multisig", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -300,7 +300,7 @@ describe("Client Multisig", () => {
     });
 
     it("Should fetch the given proposal", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -378,7 +378,7 @@ describe("Client Multisig", () => {
       expect(typeof proposal.settings.onlyListed).toBe("boolean");
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -388,7 +388,7 @@ describe("Client Multisig", () => {
       expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -422,7 +422,7 @@ describe("Client Multisig", () => {
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -439,7 +439,7 @@ describe("Client Multisig", () => {
       expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
     });
     it("Should get a list of proposals from a dao that has no proposals", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -456,7 +456,7 @@ describe("Client Multisig", () => {
       expect(proposals.length === 0).toBe(true);
     });
     it("Should get a list of proposals from an invalid address", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;

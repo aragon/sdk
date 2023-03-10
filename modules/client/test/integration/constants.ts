@@ -39,19 +39,18 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://httpstat.us/504?sleep=100",
-    },
-    {
-      url:
-        "https://httpstat.us/504?sleep=200",
-    },
-    {
-      url:
-        "https://httpstat.us/504?sleep=300",
-    },
-    {
-      url:
         "https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-goerli/version/v1.0.0/api",
+    },
+  ],
+  timeout: [
+    {
+      url: "https://httpstat.us/504?sleep=100",
+    },
+    {
+      url: "https://httpstat.us/504?sleep=200",
+    },
+    {
+      url: "https://httpstat.us/504?sleep=300",
     },
   ],
   failing: [{ url: "https://bad-url-gateway.io/" }],
@@ -117,4 +116,13 @@ export const contextParamsFailing: ContextParams = {
   web3Providers: web3endpoints.failing,
   ipfsNodes: ipfsEndpoints.failing,
   graphqlNodes: grapqhlEndpoints.failing,
+};
+
+export const contextParamsGraphqlWithTimeouts: ContextParams = {
+  network: "mainnet",
+  signer: new Wallet(TEST_WALLET),
+  daoFactoryAddress: "0x0123456789012345678901234567890123456789",
+  web3Providers: web3endpoints.working,
+  ipfsNodes: ipfsEndpoints.working,
+  graphqlNodes: [...grapqhlEndpoints.timeout, ...grapqhlEndpoints.working],
 };

@@ -58,6 +58,7 @@ import {
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
+  EMPTY_PROPOSAL_METADATA_LINK,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
@@ -347,6 +348,11 @@ export class AddresslistVotingClientMethods extends ClientCore
     });
     if (!addresslistVotingProposal) {
       return null;
+    } else if (!addresslistVotingProposal.metadata) {
+      return toAddresslistVotingProposal(
+        addresslistVotingProposal,
+        EMPTY_PROPOSAL_METADATA_LINK,
+      );
     }
     try {
       const metadataCid = resolveIpfsCid(addresslistVotingProposal.metadata);
@@ -420,7 +426,9 @@ export class AddresslistVotingClientMethods extends ClientCore
       sortBy,
     };
     const name = "AddresslistVoting proposals";
-    type T = { addresslistVotingProposals: SubgraphAddresslistVotingProposalListItem[] };
+    type T = {
+      addresslistVotingProposals: SubgraphAddresslistVotingProposalListItem[];
+    };
     const { addresslistVotingProposals } = await this.graphql.request<T>({
       query,
       params,
@@ -433,6 +441,12 @@ export class AddresslistVotingClientMethods extends ClientCore
           proposal: SubgraphAddresslistVotingProposalListItem,
         ): Promise<AddresslistVotingProposalListItem> => {
           // format in the metadata field
+          if (!proposal.metadata) {
+            return toAddresslistVotingProposalListItem(
+              proposal,
+              EMPTY_PROPOSAL_METADATA_LINK,
+            );
+          }
           try {
             const metadataCid = resolveIpfsCid(proposal.metadata);
             const stringMetadata = await this.ipfs.fetchString(metadataCid);

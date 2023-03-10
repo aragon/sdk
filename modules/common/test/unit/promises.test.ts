@@ -4,21 +4,24 @@ describe("Run and retry", () => {
   it("Should run and retry 3 times", async () => {
     let countFunc = 0;
     let countOnFail = 0;
+    const message = "success"
 
-    await runAndRetry({
+    const res = await runAndRetry({
       func: async () => {
+        countFunc++;
         if (countFunc < 3) {
-          countFunc++;
           throw new Error();
+        } else {
+          return message;
         }
-        // else throw new Error();
       },
       onFail: () => countOnFail++,
       shouldRetry: () => true,
     });
 
     expect(countFunc).toBe(3);
-    expect(countOnFail).toBe(3);
+    expect(res).toBe(message);
+    expect(countOnFail).toBe(2);
   });
   it("Should run and throw", async () => {
     let countRetries = 0;

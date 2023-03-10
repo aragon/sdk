@@ -28,7 +28,7 @@ import {
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParamsLocalChain,
-  contextParamsMainnet,
+  contextParamsGraphqlWithTimeouts,
   TEST_ADDRESSLIST_DAO_ADDDRESS,
   TEST_ADDRESSLIST_PLUGIN_ADDRESS,
   TEST_ADDRESSLIST_PROPOSAL_ID,
@@ -513,7 +513,7 @@ describe("Client Address List", () => {
 
   describe("Data retrieval", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
@@ -529,7 +529,7 @@ describe("Client Address List", () => {
       }
     });
     it("Should fetch the given proposal", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
@@ -629,7 +629,7 @@ describe("Client Address List", () => {
       }
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
@@ -639,7 +639,7 @@ describe("Client Address List", () => {
       expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
@@ -675,7 +675,7 @@ describe("Client Address List", () => {
       }
     });
     it("Should get a list of proposals from a specific dao", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
@@ -692,7 +692,7 @@ describe("Client Address List", () => {
       expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
     });
     it("Should get a list of proposals from a dao that has no proposals", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
@@ -709,7 +709,7 @@ describe("Client Address List", () => {
       expect(proposals.length === 0).toBe(true);
     });
     it("Should get a list of proposals from an invalid address", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
@@ -725,7 +725,7 @@ describe("Client Address List", () => {
       );
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
-      const ctx = new Context(contextParamsMainnet);
+      const ctx = new Context(contextParamsGraphqlWithTimeouts);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 

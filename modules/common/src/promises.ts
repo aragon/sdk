@@ -22,17 +22,20 @@ export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
   onFail?: (e: Error) => void;
   shouldRetry: () => boolean;
 }) {
+  let lastErr: Error;
   do {
     try {
       const result = await func();
       // it worked
       return result;
-    } catch (err) {
+    } catch (err: any) {
+      lastErr = err;
       if (typeof onFail === "function") {
         onFail(err as Error);
-      } else if (!shouldRetry()) {
-        throw err
       }
     }
   } while (shouldRetry());
+
+  // all the iterations failed
+  throw lastErr;
 }

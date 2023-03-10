@@ -75,6 +75,7 @@ import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
 import {
+  EMPTY_DAO_METADATA_LINK,
   UNAVAILABLE_DAO_METADATA,
   UNSUPPORTED_DAO_METADATA_LINK,
 } from "../constants";
@@ -415,6 +416,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const { dao } = await this.graphql.request<T>({ query, params, name });
     if (!dao) {
       return null;
+    } else if (!dao.metadata) {
+      return toDaoDetails(
+        dao,
+        EMPTY_DAO_METADATA_LINK,
+      );
     }
     // TODO use same approach as in graphql
     await this.ipfs.ensureOnline();
@@ -463,6 +469,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return Promise.all(
       daos.map(
         async (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
+          if (!dao.metadata) {
+            return toDaoListItem(
+              dao,
+              EMPTY_DAO_METADATA_LINK,
+            );
+          }
           try {
             const metadataCid = resolveIpfsCid(dao.metadata);
             const stringMetadata = await this.ipfs.fetchString(metadataCid);
