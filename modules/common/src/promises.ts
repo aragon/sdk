@@ -28,8 +28,8 @@ export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
       const result = await func();
       // it worked
       return result;
-    } catch (err: any) {
-      lastErr = err;
+    } catch (err) {
+      lastErr = err as Error;
       if (typeof onFail === "function") {
         onFail(err as Error);
       }
