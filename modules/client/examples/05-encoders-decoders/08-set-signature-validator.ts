@@ -11,7 +11,7 @@ Encodes the action of setting the signatura validator of the DAO.
 */
 
 import { Client, DaoAction } from "@aragon/sdk-client";
-import { context } from '../../index';
+import { context } from '../index';
 
 
 // Instantiates an Aragon OSx SDK client.

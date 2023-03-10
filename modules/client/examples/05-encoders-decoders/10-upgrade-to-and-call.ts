@@ -11,8 +11,8 @@ Encodes the action of upgrading your DAO and doing a subsequent method call.
 */
 
 import { Client, DaoAction } from "@aragon/sdk-client";
-import { UpgradeToAndCallParams } from "../../../dist/interfaces";
-import { context } from "../../index";
+import { UpgradeToAndCallParams } from "../../dist/interfaces";
+import { context } from "../index";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);

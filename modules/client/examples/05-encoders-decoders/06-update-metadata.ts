@@ -11,7 +11,7 @@ Updates the metadata of a given DAO.
 */
 
 import { Client, DaoAction, DaoMetadata } from "@aragon/sdk-client";
-import { context } from "../../index";
+import { context } from "../index";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);

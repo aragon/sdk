@@ -11,7 +11,7 @@ Encodes the action of upgrading the DAO proxy contract to a new implementation a
 */
 
 import { Client, DaoAction } from "@aragon/sdk-client";
-import { context } from "../../index";
+import { context } from "../index";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);

@@ -15,7 +15,7 @@ import {
   DaoAction, 
   RegisterStandardCallbackParams 
 } from "@aragon/sdk-client";
-import { context } from "../../index";
+import { context } from "../index";
 
 // Instantiates a general purpose Client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
