@@ -336,7 +336,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     const extendedProposalId = getExtendedProposalId(proposalId);
     const query = QueryAddresslistVotingProposal;
     const params = {
-      address: extendedProposalId,
+      proposalId: extendedProposalId,
     };
     const name = "AddresslistVoting proposal";
     type T = { addresslistVotingProposal: SubgraphAddresslistVotingProposal };

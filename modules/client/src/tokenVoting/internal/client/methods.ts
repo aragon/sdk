@@ -337,7 +337,7 @@ export class TokenVotingClientMethods extends ClientCore
     const extendedProposalId = getExtendedProposalId(proposalId);
     const query = QueryTokenVotingProposal;
     const params = {
-      address: extendedProposalId,
+      proposalId: extendedProposalId,
     };
     const name = "TokenVoting proposal";
     type T = { tokenVotingProposal: SubgraphTokenVotingProposal };

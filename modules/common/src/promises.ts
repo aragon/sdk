@@ -30,6 +30,8 @@ export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
     } catch (err) {
       if (typeof onFail === "function") {
         onFail(err as Error);
+      } else if (!shouldRetry()) {
+        throw err
       }
     }
   } while (shouldRetry());
