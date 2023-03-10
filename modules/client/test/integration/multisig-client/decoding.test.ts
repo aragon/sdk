@@ -6,7 +6,6 @@ import {
   Context,
   ContextPlugin,
   MultisigClient,
-  MultisigPluginSettings,
   MultisigVotingSettings,
   RemoveAddressesParams,
   UpdateMultisigVotingSettingsParams,
