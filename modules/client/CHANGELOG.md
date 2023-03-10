@@ -13,8 +13,18 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.1.0]
+### Added
+- `prepareInstallation` function to multisig-client, tokenvoting-client and addresslist-client
+- Add `applyInstallation` encoder and decoder to client 
 ### Changed
 - `AddAddresses`and `RemoveAddresses` encoders now return an array of actions one for adding or removing the addresses and other for updating the settings in a specific order for the transaction not to revert
+### Fixed
+- Subgraph making 2 calls in each request
+## [1.0.2]
+  
+Version bump
+
 ## [1.0.1]
 ### Added
 - `settings` to `tokenVotingProposalListItem`
