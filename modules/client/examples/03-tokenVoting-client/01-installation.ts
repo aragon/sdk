@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Token Voting DAO
+title: Create Token Voting DAO
 ---
 
 ## Create a DAO with a Token Voting Plugin Installed

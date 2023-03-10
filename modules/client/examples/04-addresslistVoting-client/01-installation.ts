@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Addresslist Voting DAO
+title: Create Addresslist Voting DAO
 ---
 
 ## Create a DAO with a Addresslist Voting Plugin Installed

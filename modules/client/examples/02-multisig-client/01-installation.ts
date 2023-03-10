@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Multisig DAO
+title: Create Multisig DAO
 ---
 
 ## Create a DAO with a Multisig Installed
