@@ -19,10 +19,8 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../../index";
 
-// Initializes a plugin context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initializes a general purpose client from the Aragon SDK context.
-const client: Client = new Client(contextPlugin);
+// Instantiates an Aragon OSx SDK client.
+const client: Client = new Client(context);
 
 const params: GrantPermissionWithConditionParams = {
   who: "0x1234567890123456789012345678901234567890", // address to which the permission will be granted

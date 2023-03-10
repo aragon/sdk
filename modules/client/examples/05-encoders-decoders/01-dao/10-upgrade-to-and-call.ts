@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: DAO Upgrade and Call
+title: Upgrade To And Call
 ---
 
 ## Upgrade the DAO and Call a Method
@@ -10,14 +10,12 @@ Encodes the action of upgrading your DAO and doing a subsequent method call.
 ### Encoding
 */
 
-import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
+import { Client, DaoAction } from "@aragon/sdk-client";
 import { UpgradeToAndCallParams } from "../../../dist/interfaces";
 import { context } from "../../index";
 
-// Instantiate the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate the general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
+// Instantiates an Aragon OSx SDK client.
+const client: Client = new Client(context);
 
 const upgradeToAndCallParams = {
   implementationAddress: "0x1234567890123456789012345678901234567890", // the implementation address to be upgraded to.

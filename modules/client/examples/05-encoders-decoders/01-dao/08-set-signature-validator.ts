@@ -10,13 +10,12 @@ Encodes the action of setting the signatura validator of the DAO.
 ### Encoding
 */
 
-import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
+import { Client, DaoAction } from "@aragon/sdk-client";
 import { context } from '../../index';
 
-// Initialize the context plugin from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize the general purpose client using the plugin's context.
-const client: Client = new Client(contextPlugin);
+
+// Instantiates an Aragon OSx SDK client.
+const client: Client = new Client(context);
 
 const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
 const signatureValidator: string = "0x1234567890123456789012345678901234567890";

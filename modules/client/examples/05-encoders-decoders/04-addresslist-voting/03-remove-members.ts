@@ -10,17 +10,8 @@ Removes an address from the Addresslist plugin so that this address is no longer
 ### Encoding
 */
 
-import {
-  AddresslistVotingClient,
-  ContextPlugin,
-  DaoAction
-} from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate an AddresslistVoting client.
-const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+import { DaoAction } from "@aragon/sdk-client";
+import { addresslistVotingClient } from "./index";
 
 // Addresses to remove from the AddressList plugin.
 const members: string[] = [

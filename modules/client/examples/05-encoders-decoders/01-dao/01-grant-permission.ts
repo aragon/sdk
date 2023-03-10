@@ -19,7 +19,7 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../../index";
 
-// Instantiates a general purpose Client from the Aragon OSx SDK context.
+// Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
 
 const params: IGrantPermissionParams = {

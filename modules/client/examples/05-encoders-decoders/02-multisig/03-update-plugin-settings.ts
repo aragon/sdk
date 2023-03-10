@@ -11,18 +11,11 @@ Allows you to update the configuration of a Multisig plugin installed in a DAO.
 */
 
 import {
-  ContextPlugin,
   DaoAction,
-  MultisigClient,
   MultisigVotingSettings,
   UpdateMultisigVotingSettingsParams
 } from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const multisigClient = new MultisigClient(contextPlugin);
+import { multisigClient } from "./index";
 
 const updateMinApprovals: UpdateMultisigVotingSettingsParams = {
   votingSettings: {

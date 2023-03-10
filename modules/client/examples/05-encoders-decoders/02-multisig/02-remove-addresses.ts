@@ -11,17 +11,10 @@ Removes a list of addresses from the Multisig plugin of a given DAO so they are 
 */
 
 import {
-  ContextPlugin,
   DaoAction,
-  MultisigClient,
   RemoveAddressesParams
 } from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+import { multisigClient } from "./index";
 
 // List of members to remove from the multisig plugin.
 const members: string[] = [

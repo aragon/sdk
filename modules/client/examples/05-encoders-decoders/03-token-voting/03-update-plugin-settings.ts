@@ -11,18 +11,11 @@ Updates the configuration of a given TokenVoting plugin for a DAO.
 */
 
 import {
-  ContextPlugin,
   DaoAction,
-  TokenVotingClient,
   VotingMode,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiates a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiates a TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
+import { tokenVotingClient } from "./index";
 
 // The new configuration parameters for the plugin
 const configActionPrarms: VotingSettings = {

@@ -11,18 +11,11 @@ Updates the settings of a given AddresslistVoting plugin.
 */
 
 import {
-  AddresslistVotingClient,
-  ContextPlugin,
   DaoAction,
   VotingMode,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiates an AddresslistVoting client.
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+import { addresslistVotingClient } from "./index";
 
 // The action object for updating the plugin settings.
 const configActionPrarms: VotingSettings = {

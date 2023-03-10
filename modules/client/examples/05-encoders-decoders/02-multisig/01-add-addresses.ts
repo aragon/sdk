@@ -12,16 +12,9 @@ Adds new address as members of the Multisig plugin installed in a DAO, so they a
 
 import {
   AddAddressesParams,
-  ContextPlugin,
   DaoAction,
-  MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+import { multisigClient } from "./index";
 
 // The addresses to add as members.
 const members: string[] = [

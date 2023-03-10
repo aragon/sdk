@@ -10,13 +10,11 @@ Encodes the action of setting the DAO's URI.
 ### Encoding
 */
 
-import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
+import { Client, DaoAction } from "@aragon/sdk-client";
 import { context } from "../../index";
 
-// Initializes the Context pluigin from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initializes the general purpose client using the plugin's context.
-const client: Client = new Client(contextPlugin);
+// Instantiates an Aragon OSx SDK client.
+const client: Client = new Client(context);
 
 const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
 

@@ -10,13 +10,15 @@ Register a new standard callback for the DAO.
 ### Encoding
 */
 
-import { Client, ContextPlugin, DaoAction, RegisterStandardCallbackParams } from "@aragon/sdk-client";
+import { 
+  Client, 
+  DaoAction, 
+  RegisterStandardCallbackParams 
+} from "@aragon/sdk-client";
 import { context } from "../../index";
 
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize the general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
+// Instantiates a general purpose Client from the Aragon OSx SDK context.
+const client: Client = new Client(context);
 
 const params = {
   interfaceId: "0x3134r1er213740123741207831238410972347",

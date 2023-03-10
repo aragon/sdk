@@ -10,20 +10,11 @@ Decodes the parameters of a function call from the Addresslist plugin.
 ### Encoding
 */
 
-import {
-  AddresslistVotingClient,
-  ContextPlugin
-} from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate an Addresslist plugin client.
-const client: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+import { addresslistVotingClient } from "./index";
 
 const data: Uint8Array = new Uint8Array([12, 56]);
 
-const functionParams = client.decoding.findInterface(data);
+const functionParams = addresslistVotingClient.decoding.findInterface(data);
 console.log({ functionParams });
 
 /* MARKDOWN

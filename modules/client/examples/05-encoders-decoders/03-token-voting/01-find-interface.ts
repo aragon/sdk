@@ -10,13 +10,7 @@ Decodes the parameters of a function call from the TokenVoting plugin contract.
 ### Decoding
 */
 
-import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a TokenVoting plugin client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
+import { tokenVotingClient } from "./index";
 
 const data: Uint8Array = new Uint8Array([12, 56]);
 

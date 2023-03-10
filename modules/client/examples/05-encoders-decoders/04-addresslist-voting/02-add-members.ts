@@ -10,17 +10,8 @@ Adds a list of addresses to the AddressList plugin so that these new addresses a
 ### Encoding
 */
 
-import {
-  AddresslistVotingClient,
-  DaoAction,
-  ContextPlugin
-} from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an AddresslistVoting client.
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+import { DaoAction } from "@aragon/sdk-client";
+import { addresslistVotingClient } from "./index";
 
 const members: string[] = [
   "0x1357924680135792468013579246801357924680",

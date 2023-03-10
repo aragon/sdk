@@ -10,13 +10,11 @@ Encodes the action of upgrading the DAO proxy contract to a new implementation a
 ### Encoding
 */
 
-import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
+import { Client, DaoAction } from "@aragon/sdk-client";
 import { context } from "../../index";
 
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
+// Instantiates an Aragon OSx SDK client.
+const client: Client = new Client(context);
 
 const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
 const implementationAddress: string = "0x1234567890123456789012345678901234567890";

@@ -11,17 +11,10 @@ Mints vote tokens for an installed TokenVoting plugin.
 */
 
 import {
-  ContextPlugin,
   DaoAction,
   IMintTokenParams,
-  TokenVotingClient
 } from "@aragon/sdk-client";
-import { context } from "../../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
+import { tokenVotingClient } from "./index";
 
 const params: IMintTokenParams = {
   address: "0x1234567890123456789012345678901234567890", // address which will receive the minted tokens
