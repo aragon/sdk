@@ -13,6 +13,8 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Changed
+- `AddAddresses`and `RemoveAddresses` encoders now return an array of actions one for adding or removing the addresses and other for updating the settings in a specific order for the transaction not to revert
 ## [1.0.1]
 ### Added
 - `settings` to `tokenVotingProposalListItem`

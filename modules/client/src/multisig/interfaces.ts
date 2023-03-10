@@ -42,8 +42,8 @@ export interface IMultisigClientMethods extends IClientCore {
 }
 
 export interface IMultisigClientEncoding extends IClientCore {
-  addAddressesAction: (params: AddAddressesParams) => DaoAction;
-  removeAddressesAction: (params: RemoveAddressesParams) => DaoAction;
+  addAddressesAction: (params: AddAddressesParams) => DaoAction[];
+  removeAddressesAction: (params: RemoveAddressesParams) => DaoAction[];
   updateMultisigVotingSettings: (
     params: UpdateMultisigVotingSettingsParams,
   ) => DaoAction;
@@ -86,9 +86,8 @@ export type MultisigPluginSettings = {
   votingSettings: MultisigVotingSettings;
 };
 
-export type UpdateAddressesParams = {
+export type UpdateAddressesParams = MultisigPluginSettings & {
   pluginAddress: string;
-  members: string[];
 };
 export type RemoveAddressesParams = UpdateAddressesParams;
 export type AddAddressesParams = UpdateAddressesParams;
