@@ -16,10 +16,15 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## UPCOMING
+## 1.1.0
+### Added
+- Adds `PluginInstallationPreparationError`
+- `runAndRetry` function
 ### Removes
 - removed `random.ts`
-### Added
-- `runAndRetry` function
+## 1.0.0
+
+Release
 
 ## 0.12.0-beta
 ### Added

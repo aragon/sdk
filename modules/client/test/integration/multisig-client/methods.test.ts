@@ -16,6 +16,8 @@ import {
   CreateMultisigProposalParams,
   IProposalQueryParams,
   MultisigClient,
+  MultisigPluginPrepareInstallationParams,
+  PrepareInstallationStep,
   ProposalCreationSteps,
   ProposalMetadata,
   ProposalSortBy,
@@ -38,6 +40,7 @@ import { ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
@@ -60,6 +63,21 @@ describe("Client Multisig", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
+    LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
+    LIVE_CONTRACTS.goerli.pluginSetupProcessor =
+      deployment.pluginSetupProcessor.address;
+    LIVE_CONTRACTS.goerli.multisigRepo = deployment.multisigRepo.address;
+    LIVE_CONTRACTS.goerli.adminRepo = "";
+    LIVE_CONTRACTS.goerli.addresslistVotingRepo =
+      deployment.addresslistVotingRepo.address;
+    LIVE_CONTRACTS.goerli.tokenVotingRepo = deployment.tokenVotingRepo.address;
+    LIVE_CONTRACTS.goerli.multisigSetup =
+      deployment.multisigPluginSetup.address;
+    LIVE_CONTRACTS.goerli.adminSetup = "";
+    LIVE_CONTRACTS.goerli.addresslistVotingSetup =
+      deployment.addresslistVotingPluginSetup.address;
+    LIVE_CONTRACTS.goerli.tokenVotingSetup =
+      deployment.tokenVotingPluginSetup.address;
     await restoreBlockTime(provider);
   });
 
@@ -172,6 +190,65 @@ describe("Client Multisig", () => {
       const { plugin: pluginAddress } = await buildDao();
 
       await buildProposal(pluginAddress, multisigClient);
+    });
+  });
+
+  describe("Plugin installation", () => {
+    it("Should prepare the installation of a token voting plugin", async () => {
+      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new MultisigClient(ctxPlugin);
+      const { dao } = await buildMultisigDAO(
+        repoAddr,
+      );
+      const installationParams: MultisigPluginPrepareInstallationParams = {
+        settings: {
+          members: [TEST_WALLET_ADDRESS],
+          votingSettings: {
+            minApprovals: 1,
+            onlyListed: true,
+          },
+        },
+        daoAddressOrEns: dao,
+      };
+      const steps = client.methods.prepareInstallation(installationParams);
+      for await (const step of steps) {
+        switch (step.key) {
+          case PrepareInstallationStep.PREPARING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case PrepareInstallationStep.DONE:
+            expect(typeof step.pluginAddress).toBe("string");
+            expect(step.pluginAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(typeof step.pluginRepo).toBe("string");
+            expect(step.pluginRepo).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(Array.isArray(step.helpers)).toBe(true);
+            for (const helper of step.helpers) {
+              expect(typeof helper).toBe("string");
+            }
+            expect(Array.isArray(step.permissions)).toBe(true);
+            for (const permission of step.permissions) {
+              expect(typeof permission.condition).toBe("string");
+              if(permission.condition) {
+                expect(permission.condition).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              }
+              expect(typeof permission.operation).toBe("number");
+              expect(typeof permission.where).toBe("string");
+              expect(permission.where).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof permission.who).toBe("string");
+              expect(permission.who).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            }
+            expect(typeof step.versionTag.build).toBe("number");
+            expect(typeof step.versionTag.release).toBe("number");
+            break;
+        }
+      }
     });
   });
 

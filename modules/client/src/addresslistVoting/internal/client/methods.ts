@@ -12,11 +12,14 @@ import {
   isProposalId,
   NoProviderError,
   NoSignerError,
+  PluginInstallationPreparationError,
   ProposalCreationError,
   resolveIpfsCid,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
+  AddresslistVotingPluginPrepareInstallationParams,
   AddresslistVotingProposal,
   AddresslistVotingProposalListItem,
   IAddresslistVotingClientMethods,
@@ -34,6 +37,8 @@ import {
   findLog,
   IProposalQueryParams,
   IVoteProposalParams,
+  PrepareInstallationStep,
+  PrepareInstallationStepValue,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
@@ -41,6 +46,9 @@ import {
   SortDirection,
   SubgraphMembers,
   SubgraphVotingSettings,
+  SupportedNetworks,
+  SupportedNetworksArray,
+  VersionTag,
   VoteProposalStep,
   VoteProposalStepValue,
   VotingSettings,
@@ -55,13 +63,19 @@ import {
   toAddresslistVotingProposal,
   toAddresslistVotingProposalListItem,
 } from "../utils";
-import { AddresslistVoting__factory } from "@aragon/osx-ethers";
+import {
+  AddresslistVoting__factory,
+  PluginRepo__factory,
+  PluginSetupProcessor__factory,
+} from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   EMPTY_PROPOSAL_METADATA_LINK,
+  LIVE_CONTRACTS,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
+import { AddresslistVotingClientEncoding } from "./encoding";
 
 /**
  * Methods module the SDK Address List Client
@@ -241,6 +255,97 @@ export class AddresslistVotingClientMethods extends ClientCore
       key: ExecuteProposalStep.DONE,
     };
   }
+  /**
+   * Prepares the installation of a token voting plugin in a given dao
+   *
+   * @param {AddresslistVotingPluginPrepareInstallationParams} params
+   * @return {*}  {AsyncGenerator<PrepareInstallationStepValue>}
+   * @memberof MultisigClientMethods
+   */
+  public async *prepareInstallation(
+    params: AddresslistVotingPluginPrepareInstallationParams,
+  ): AsyncGenerator<PrepareInstallationStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    const network = await signer.provider.getNetwork();
+    const networkName = network.name as SupportedNetworks;
+    if (!SupportedNetworksArray.includes(networkName)) {
+      throw new UnsupportedNetworkError(networkName);
+    }
+    // connect to psp contract
+    const pspContract = PluginSetupProcessor__factory.connect(
+      LIVE_CONTRACTS[networkName].pluginSetupProcessor,
+      signer,
+    );
+    // connect to plugin repo
+    const addresslistVotingRepoContract = PluginRepo__factory.connect(
+      LIVE_CONTRACTS[networkName].addresslistVotingRepo,
+      signer,
+    );
+    // use specified version or latest
+    let versionTag: VersionTag | undefined = params.versionTag;
+    if (!params.versionTag) {
+      const latestVersion = await addresslistVotingRepoContract
+        ["getLatestVersion(address)"](
+          LIVE_CONTRACTS[networkName].addresslistVotingSetup,
+        );
+      versionTag = {
+        build: latestVersion.tag.build,
+        release: latestVersion.tag.release,
+      };
+    }
+    // get install data
+    const addresslistVotingPluginInstallItem = AddresslistVotingClientEncoding
+      .getPluginInstallItem(params.settings, networkName);
+    // execute prepareInstallation
+    const tx = await pspContract.prepareInstallation(
+      params.daoAddressOrEns,
+      {
+        pluginSetupRef: {
+          pluginSetupRepo: LIVE_CONTRACTS[networkName].addresslistVotingRepo,
+          versionTag: versionTag!,
+        },
+        data: addresslistVotingPluginInstallItem.data,
+      },
+    );
+
+    yield {
+      key: PrepareInstallationStep.PREPARING,
+      txHash: tx.hash,
+    };
+
+    const receipt = await tx.wait();
+    const pspContractInterface = PluginSetupProcessor__factory
+      .createInterface();
+    const log = findLog(
+      receipt,
+      pspContractInterface,
+      "InstallationPrepared",
+    );
+    if (!log) {
+      throw new ProposalCreationError();
+    }
+
+    const parsedLog = pspContractInterface.parseLog(log);
+    const pluginAddress = parsedLog.args["plugin"];
+    const preparedSetupData = parsedLog.args["preparedSetupData"];
+    if (!(pluginAddress || preparedSetupData)) {
+      throw new PluginInstallationPreparationError();
+    }
+    yield {
+      key: PrepareInstallationStep.DONE,
+      pluginAddress,
+      pluginRepo: LIVE_CONTRACTS[networkName].addresslistVotingRepo,
+      versionTag: versionTag!,
+      permissions: preparedSetupData.permissions,
+      helpers: preparedSetupData.helpers,
+    };
+  }
+
   /**
    * Checks if an user can vote in a proposal
    *

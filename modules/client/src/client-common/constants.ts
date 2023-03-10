@@ -24,18 +24,29 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
 export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
   mainnet: {
     daoFactory: activeContractsList.mainnet.DAOFactory,
+    pluginSetupProcessor: activeContractsList.mainnet.PluginRepoFactory,
     multisigRepo: activeContractsList.mainnet["multisig-repo"],
     adminRepo: activeContractsList.mainnet["admin-repo"],
     addresslistVotingRepo:
       activeContractsList.mainnet["address-list-voting-repo"],
     tokenVotingRepo: activeContractsList.mainnet["token-voting-repo"],
+    multisigSetup: activeContractsList.mainnet.MultisigSetup,
+    adminSetup: activeContractsList.mainnet.AdminSetup,
+    addresslistVotingSetup: activeContractsList.mainnet.AddresslistVotingSetup,
+    tokenVotingSetup: activeContractsList.mainnet.TokenVotingSetup,
   },
   goerli: {
     daoFactory: activeContractsList.goerli.DAOFactory,
+    pluginSetupProcessor: activeContractsList.goerli.PluginSetupProcessor,
     multisigRepo: activeContractsList.goerli["multisig-repo"],
     adminRepo: activeContractsList.goerli["admin-repo"],
     addresslistVotingRepo:
       activeContractsList.goerli["address-list-voting-repo"],
     tokenVotingRepo: activeContractsList.goerli["token-voting-repo"],
+    multisigSetup: activeContractsList.goerli.MultisigSetup,
+    adminSetup: activeContractsList.goerli.AdminSetup,
+    addresslistVotingSetup: activeContractsList.goerli.AddresslistVotingSetup,
+    tokenVotingSetup: activeContractsList.goerli.TokenVotingSetup,
+    
   },
 };

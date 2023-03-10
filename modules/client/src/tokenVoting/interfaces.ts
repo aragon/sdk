@@ -1,17 +1,18 @@
 // This file contains the definitions of the TokenVoting client
 import { BigNumber } from "@ethersproject/bignumber";
 import {
+  CanVoteParams,
   ContractVotingSettings,
   CreateMajorityVotingProposalParams,
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
-  CanVoteParams,
   IClientCore,
   IInterfaceParams,
   IProposalQueryParams,
   IVoteProposalParams,
   MajorityVotingProposalSettings,
+  PrepareInstallationStepValue,
   ProposalBase,
   ProposalCreationStepValue,
   ProposalListItemBase,
@@ -19,6 +20,7 @@ import {
   SubgraphAction,
   SubgraphProposalBase,
   SubgraphVoterListItemBase,
+  VersionTag,
   VoteProposalStepValue,
   VoteValues,
   VotingMode,
@@ -39,6 +41,9 @@ export interface ITokenVotingClientMethods extends IClientCore {
   executeProposal: (
     proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
+  prepareInstallation: (
+    params: TokenVotingPluginPrepareInstallationParams,
+  ) => AsyncGenerator<PrepareInstallationStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
@@ -213,3 +218,9 @@ export type ContractTokenVotingInitParams = [
     BigNumber[], // amounts
   ],
 ];
+
+export type TokenVotingPluginPrepareInstallationParams = {
+  settings: ITokenVotingPluginInstall;
+  daoAddressOrEns: string;
+  versionTag?: VersionTag;
+};

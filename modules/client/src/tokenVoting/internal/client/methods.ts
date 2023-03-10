@@ -13,8 +13,10 @@ import {
   isProposalId,
   NoProviderError,
   NoSignerError,
+  PluginInstallationPreparationError,
   ProposalCreationError,
   resolveIpfsCid,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import {
   CanVoteParams,
@@ -27,6 +29,8 @@ import {
   findLog,
   IProposalQueryParams,
   IVoteProposalParams,
+  PrepareInstallationStep,
+  PrepareInstallationStepValue,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
@@ -34,6 +38,9 @@ import {
   SortDirection,
   SubgraphMembers,
   SubgraphVotingSettings,
+  SupportedNetworks,
+  SupportedNetworksArray,
+  VersionTag,
   VoteProposalStep,
   VoteProposalStepValue,
   VotingSettings,
@@ -47,6 +54,7 @@ import {
   SubgraphErc721Token,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  TokenVotingPluginPrepareInstallationParams,
   TokenVotingProposal,
   TokenVotingProposalListItem,
 } from "../../interfaces";
@@ -58,15 +66,20 @@ import {
   QueryTokenVotingSettings,
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
-import { TokenVoting__factory } from "@aragon/osx-ethers";
+import {
+  PluginRepo__factory,
+  PluginSetupProcessor__factory,
+  TokenVoting__factory,
+} from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   EMPTY_PROPOSAL_METADATA_LINK,
+  LIVE_CONTRACTS,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
 import { TokenType } from "../../../interfaces";
-
+import { TokenVotingClientEncoding } from "./encoding";
 /**
  * Methods module the SDK TokenVoting Client
  */
@@ -238,6 +251,97 @@ export class TokenVotingClientMethods extends ClientCore
     await tx.wait();
     yield {
       key: ExecuteProposalStep.DONE,
+    };
+  }
+
+  /**
+   * Prepares the installation of a token voting plugin in a given dao
+   *
+   * @param {TokenVotingPluginPrepareInstallationParams} params
+   * @return {*}  {AsyncGenerator<PrepareInstallationStepValue>}
+   * @memberof TokenVotingClientMethods
+   */
+  public async *prepareInstallation(
+    params: TokenVotingPluginPrepareInstallationParams,
+  ): AsyncGenerator<PrepareInstallationStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    const network = await signer.provider.getNetwork();
+    const networkName = network.name as SupportedNetworks;
+    if (!SupportedNetworksArray.includes(networkName)) {
+      throw new UnsupportedNetworkError(networkName);
+    }
+    // connect to psp contract
+    const pspContract = PluginSetupProcessor__factory.connect(
+      LIVE_CONTRACTS[networkName].pluginSetupProcessor,
+      signer,
+    );
+    // connect to plugin repo
+    const tokenVotingRepoContract = PluginRepo__factory.connect(
+      LIVE_CONTRACTS[networkName].tokenVotingRepo,
+      signer,
+    );
+    // use specified version or latest
+    let versionTag: VersionTag | undefined = params.versionTag;
+    if (!params.versionTag) {
+      const latestVersion = await tokenVotingRepoContract
+        ["getLatestVersion(address)"](
+          LIVE_CONTRACTS[networkName].tokenVotingSetup,
+        );
+      versionTag = {
+        build: latestVersion.tag.build,
+        release: latestVersion.tag.release,
+      };
+    }
+    // get install data
+    const tokenVotingPluginInstallItem = TokenVotingClientEncoding
+      .getPluginInstallItem(params.settings, networkName);
+    // execute prepareInstallationon
+    const tx = await pspContract.prepareInstallation(
+      params.daoAddressOrEns,
+      {
+        pluginSetupRef: {
+          pluginSetupRepo: LIVE_CONTRACTS[networkName].tokenVotingRepo,
+          versionTag: versionTag!
+        },
+        data: tokenVotingPluginInstallItem.data,
+      },
+    );
+
+    yield {
+      key: PrepareInstallationStep.PREPARING,
+      txHash: tx.hash,
+    };
+
+    const receipt = await tx.wait();
+    const pspContractInterface = PluginSetupProcessor__factory
+      .createInterface();
+    const log = findLog(
+      receipt,
+      pspContractInterface,
+      "InstallationPrepared",
+    );
+    if (!log) {
+      throw new PluginInstallationPreparationError();
+    }
+
+    const parsedLog = pspContractInterface.parseLog(log);
+    const pluginAddress = parsedLog.args["plugin"];
+    const preparedSetupData = parsedLog.args["preparedSetupData"];
+    if (!(pluginAddress || preparedSetupData)) {
+      throw new PluginInstallationPreparationError();
+    }
+    yield {
+      key: PrepareInstallationStep.DONE,
+      pluginAddress,
+      pluginRepo: LIVE_CONTRACTS[networkName].tokenVotingRepo,
+      versionTag: versionTag!,
+      permissions: preparedSetupData.permissions,
+      helpers: preparedSetupData.helpers,
     };
   }
 
