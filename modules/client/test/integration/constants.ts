@@ -118,11 +118,11 @@ export const contextParamsFailing: ContextParams = {
   graphqlNodes: grapqhlEndpoints.failing,
 };
 
-export const contextParamsGraphqlWithTimeouts: ContextParams = {
+export const contextParamsOkWithGraphqlTimeouts: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
   daoFactoryAddress: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   ipfsNodes: ipfsEndpoints.working,
-  graphqlNodes: [...grapqhlEndpoints.timeout, ...grapqhlEndpoints.working],
+  graphqlNodes: grapqhlEndpoints.timeout.concat(grapqhlEndpoints.working),
 };
