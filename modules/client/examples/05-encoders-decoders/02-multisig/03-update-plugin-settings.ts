@@ -6,15 +6,18 @@ title: Multisig Settings
 ## Update the Multisig Plugin Settings
 
 Allows you to update the configuration of a Multisig plugin installed in a DAO.
+
+### Encoding
 */
 
 import {
   ContextPlugin,
   DaoAction,
   MultisigClient,
+  MultisigVotingSettings,
   UpdateMultisigVotingSettingsParams
 } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -30,8 +33,8 @@ const updateMinApprovals: UpdateMultisigVotingSettingsParams = {
 };
 
 // Updates the voting configuration of a Multisig plugin installed in a DAO.
-const updateMultisigConfig: DaoAction = multisigClient.encoding.updateMultisigVotingSettings(updateMinApprovals);
-console.log({ updateMultisigConfig });
+const action: DaoAction = multisigClient.encoding.updateMultisigVotingSettings(updateMinApprovals);
+console.log({ action });
 
 /* MARKDOWN
 Returns:
@@ -43,32 +46,14 @@ Returns:
   data: Uint8Array[12,34,45...]
 }
 ```
+
+### Decoding
 */
 
-
-/* MARKDOWN
----
-title: Update Settings
----
-
-## Decodes the Update Settings Action (Multisig)
-
-Decodes the update settings action for a Multisig plugin.
-*/
-
-import { ContextPlugin, MultisigClient, MultisigVotingSettings } from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Instantiate a plugin context from an Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
 
 // Decodes the update settings action for a Multisig plugin.
-const decodeUpdateMultisigSettings: MultisigVotingSettings = multisigClient.decoding.updateMultisigVotingSettings(data);
-console.log({ decodeUpdateMultisigSettings });
+const decodedParams: MultisigVotingSettings = multisigClient.decoding.updateMultisigVotingSettings(action.data);
+console.log({ decodedParams });
 
 /* MARKDOWN
 Returns:

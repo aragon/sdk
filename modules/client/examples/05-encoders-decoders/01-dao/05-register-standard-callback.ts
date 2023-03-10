@@ -10,7 +10,7 @@ Register a new standard callback for the DAO.
 ### Encoding
 */
 
-import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
+import { Client, ContextPlugin, DaoAction, RegisterStandardCallbackParams } from "@aragon/sdk-client";
 import { context } from "../../index";
 
 // Initialize the plugin's context from the Aragon SDK context.
@@ -47,9 +47,7 @@ console.log({ action });
 ### Decoding
 */
 
-const decodedParams = client.decoding.registerStandardCallbackAction(
-  action.data
-);
+const decodedParams: RegisterStandardCallbackParams = client.decoding.registerStandardCallbackAction(action.data);
 console.log({ decodedParams });
 
 /* MARKDOWN

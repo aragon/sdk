@@ -6,6 +6,8 @@ title: Mint Tokens
 ## Mint Vote Tokens for the TokenVoting Plugin
 
 Mints vote tokens for an installed TokenVoting plugin.
+
+### Encoding
 */
 
 import {
@@ -14,7 +16,7 @@ import {
   IMintTokenParams,
   TokenVotingClient
 } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -28,8 +30,8 @@ const params: IMintTokenParams = {
 
 const minterAddress: string = "0x0987654321098765432109876543210987654321"; // the contract address of the token to mint
 
-const mintTokenAction: DaoAction = tokenVotingClient.encoding.mintTokenAction(minterAddress, params);
-console.log({ mintTokenAction });
+const action: DaoAction = tokenVotingClient.encoding.mintTokenAction(minterAddress, params);
+console.log({ action });
 
 /* MARKDOWN
 Returns:
@@ -41,36 +43,13 @@ Returns:
   data: Uint8Array[12,34,45...]
 }
 ```
+
+### Decoding
 */
-
-
-/* MARKDOWN
----
-title: Mint Token
----
-
-## Decode Mint Token Action
-
-Decodes the parameters of a mint token action from the TokenVoting plugin.
-*/
-
-import {
-  ContextPlugin,
-  IMintTokenParams,
-  TokenVotingClient
-} from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a TokenVoting plugin client.
-const tokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
 
 // Decodes the parameters of a mint token action.
-const decodeMintTokenParams: IMintTokenParams = tokenVotingClient.decoding.mintTokenAction(data);
-console.log({ decodeMintTokenParams });
+const decodedParams: IMintTokenParams = tokenVotingClient.decoding.mintTokenAction(action.data);
+console.log({ decodedParams });
 
 /* MARKDOWN
 Returns:

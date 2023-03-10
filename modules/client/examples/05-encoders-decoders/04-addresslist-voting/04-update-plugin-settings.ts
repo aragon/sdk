@@ -6,6 +6,8 @@ title: Addresslist Voting Settings
 ## Update the Addresslist Voting Plugin Settings
 
 Updates the settings of a given AddresslistVoting plugin.
+
+### Encoding
 */
 
 import {
@@ -15,7 +17,7 @@ import {
   VotingMode,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -33,37 +35,25 @@ const configActionPrarms: VotingSettings = {
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890"; // the address of the AddresslistVoting plugin contract installed in the DAO
 
-const updatePluginSettingsAction: DaoAction = addresslistVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionPrarms);
-console.log({ updatePluginSettingsAction });
-
-
-
+const action: DaoAction = addresslistVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionPrarms);
+console.log({ action });
 
 /* MARKDOWN
----
-title: Update Plugin Settings
----
+Returns:
 
-## Decode the Update Plugin Settings Action for the Addresslist Voting Plugin
+```
+{
+  to: "0x1234567890...",
+  value: 0n,
+  data: Uint8Array[12,34,45...]
+}
+```
 
-Decodes the action of a update plugin settings action.
+### Decoding
 */
 
-import {
-  AddresslistVotingClient,
-  ContextPlugin,
-  VotingSettings,
-} from "@aragon/sdk-client";
-import { context } from "../index";
 
-// Instantiate a plugin context from the simple context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a AddresslistVoting plugin client.
-const clientAddressList = new AddresslistVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const pluginSettings: VotingSettings = clientAddressList.decoding.updatePluginSettingsAction(data);
+const pluginSettings: VotingSettings = addresslistVotingClient.decoding.updatePluginSettingsAction(action.data);
 console.log({ pluginSettings });
 
 /* MARKDOWN

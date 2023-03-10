@@ -6,6 +6,8 @@ title: Add Members
 ## Add Members from the Multisig Plugin
 
 Adds new address as members of the Multisig plugin installed in a DAO, so they are now able to vote on proposals.
+
+### Encoding
 */
 
 import {
@@ -14,12 +16,12 @@ import {
   DaoAction,
   MultisigClient
 } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client.
-const client: MultisigClient = new MultisigClient(contextPlugin);
+const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
 // The addresses to add as members.
 const members: string[] = [
@@ -34,8 +36,8 @@ const addAddressesParams: AddAddressesParams = {
 };
 
 // Adds the addresses as members of the Multisig plugin for a DAO.
-const addAddressesToMultisig: DaoAction = client.encoding.addAddressesAction(addAddressesParams);
-console.log({ addAddressesToMultisig });
+const action: DaoAction = multisigClient.encoding.addAddressesAction(addAddressesParams);
+console.log({ action });
 
 /* MARKDOWN
 Returns:
@@ -47,37 +49,18 @@ Returns:
   data: Uint8Array[12,34,45...]
 }
 ```
+
+### Decoding
 */
 
-
-/* MARKDOWN
----
-title: Add Members
----
-
-## Decode Add Members Action (Multisig)
-
-Decodes the parameters of the add members action from the Multisig plugin.
-*/
-
-import { ContextPlugin, MultisigClient } from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const decodeAddMembersMultisig: string[] = multisigClient.decoding.addAddressesAction(data);
-console.log({ decodeAddMembersMultisig });
+const decodedParams: string[] = multisigClient.decoding.addAddressesAction(action.data);
+console.log({ decodedParams });
 
 /* MARKDOWN
 Returns:
 
 ```
-{ decodeAddMembersMultisig:
+{ decodedParams:
   [
     "0x12345...",
     "0x56789...",

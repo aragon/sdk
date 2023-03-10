@@ -6,10 +6,13 @@ title: DAO Upgrade and Call
 ## Upgrade the DAO and Call a Method
 
 Encodes the action of upgrading your DAO and doing a subsequent method call.
+
+### Encoding
 */
 
 import { Client, ContextPlugin, DaoAction } from "@aragon/sdk-client";
-import { context } from "../index";
+import { UpgradeToAndCallParams } from "../../../dist/interfaces";
+import { context } from "../../index";
 
 // Instantiate the plugin's context from the Aragon SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -24,11 +27,11 @@ const upgradeToAndCallParams = {
 const daoAddressOrEns: string = "0x123123123123123123123123123123123123";
 
 // Encodes the action of upgrading your DAO and doing a subsequent method call.
-const upgradeToAndCallAction: DaoAction = client.encoding.upgradeToAndCallAction(
+const action: DaoAction = client.encoding.upgradeToAndCallAction(
   daoAddressOrEns,
   upgradeToAndCallParams
 );
-console.log({ upgradeToAndCallAction });
+console.log({ action });
 
 /* MARKDOWN
 Returns:
@@ -40,28 +43,12 @@ Returns:
     data: Uint8Array[12,34,45...]
   }
 ```
+
+### Decoding
 */
 
-/* MARKDOWN
----
-title: Upgrade To and Call
----
-
-## Decode an "Upgrade To and Call" action
-
-Decodes the action of upgrading the DAO to a new implementation and calling a function within it.
-*/
-
-import { Client, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Initialize the plugin's context from the Aragon SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Initialize general purpose client from the plugin's context.
-const client: Client = new Client(contextPlugin);
-
-const upgradeToAndCallAction = client.decoding.upgradeToAndCallAction(new Uint8Array([10, 20, 30, 40]));
-console.log({ upgradeToAndCallAction });
+const decodedParams: UpgradeToAndCallParams = client.decoding.upgradeToAndCallAction(action.data);
+console.log({ decodedParams });
 
 /* MARKDOWN
 Returns:

@@ -6,6 +6,8 @@ title: Remove Members
 ## Remove Members from the Multisig Plugin
 
 Removes a list of addresses from the Multisig plugin of a given DAO so they are no longer able to vote on Multisig proposals for that DAO.
+
+### Encoding
 */
 
 import {
@@ -14,7 +16,7 @@ import {
   MultisigClient,
   RemoveAddressesParams
 } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -34,8 +36,8 @@ const removeAddressesParams: RemoveAddressesParams = {
 };
 
 // Removes the addresses from the Multisig plugin of a DAO.
-const removeAddressesFromMultisig: DaoAction = multisigClient.encoding.removeAddressesAction(removeAddressesParams);
-console.log(removeAddressesFromMultisig);
+const action: DaoAction = multisigClient.encoding.removeAddressesAction(removeAddressesParams);
+console.log(action);
 
 /* MARKDOWN
 Returns:
@@ -47,41 +49,19 @@ Returns:
   data: Uint8Array[12,34,45...]
 }
 ```
+
+### Decoding
 */
-
-
-/* MARKDOWN
----
-title: Remove Members
----
-
-## Decode Remove Members Action (Multisig)
-
-Decodes the parameters of the remove members action from the Multisig plugin.
-*/
-
-import {
-  ContextPlugin,
-  MultisigClient
-} from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Instantiates a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiates a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
 
 // Decodes the parameters of the remove members action from the Multisig plugin.
-const decodeRemoveMemberMultisig: string[] = multisigClient.decoding.removeAddressesAction(data);
-console.log({ decodeRemoveMemberMultisig });
+const decodedParams: string[] = multisigClient.decoding.removeAddressesAction(action.data);
+console.log({ decodedParams });
 
 /* MARKDOWN
 Returns:
 
 ```
-{ decodeRemoveMemberMultisig:
+{ decodedParams:
   [
     "0x12345...",
     "0x56789...",

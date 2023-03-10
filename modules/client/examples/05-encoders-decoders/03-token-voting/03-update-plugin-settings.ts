@@ -6,6 +6,8 @@ title: Token Voting Settings
 ## Update the Token Voting Plugin Settings
 
 Updates the configuration of a given TokenVoting plugin for a DAO.
+
+### Encoding
 */
 
 import {
@@ -15,7 +17,7 @@ import {
   VotingMode,
   VotingSettings
 } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -38,30 +40,19 @@ const updatePluginSettingsAction: DaoAction = tokenVotingClient.encoding.updateP
 console.log({ updatePluginSettingsAction });
 
 
-
 /* MARKDOWN
----
-title: Update Plugin Settings
----
+Returns:
 
-## Decode the update plugin settings action for TokenVoting plugin
+```
+{
+  to: "0x1234567890...",
+  value: 0n,
+  data: Uint8Array[12,34,45...]
+}
+```
 
-Decode the parameters of an update plugin settings action for the TokenVoting plugin.
+### Decoding
 */
-
-import {
-  ContextPlugin,
-  TokenVotingClient,
-  VotingSettings
-} from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a TokenVoting plugin client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
 
 // Decodes the parameters of an update plugin settings action.
 const decodeUpdateTokenVotingSettings: VotingSettings = tokenVotingClient.decoding.updatePluginSettingsAction(data);

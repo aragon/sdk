@@ -49,10 +49,10 @@ console.log({ action });
 */
 
 // Decodes the update metadata action.
-const updateDaoMetadataParams: DaoMetadata = await client.decoding.updateDaoMetadataAction(
+const decodedParams: DaoMetadata = await client.decoding.updateDaoMetadataAction(
   action.data
 );
-console.log({ updateDaoMetadataParams });
+console.log({ decodedParams });
 
 /* MARKDOWN
 Returns:
@@ -83,15 +83,15 @@ Decode an update metadata action and expect an IPFS URI containing the CID of th
 */
 
 // Decodes the parameters of an update metadata raw action.
-const decodedParams: string = client.decoding.updateDaoMetadataRawAction(
+const decodedParamsRaw: string = client.decoding.updateDaoMetadataRawAction(
   action.data
 );
-console.log({ decodedParams });
+console.log({ decodedParamsRaw });
 
 /* MARKDOWN
 Returns:
 
 ```
-  { decodedUpdateMetadata: "ipfs://Qm..." }
+  { decodedParamsRaw: "ipfs://Qm..." }
 ```
 */

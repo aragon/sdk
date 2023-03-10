@@ -6,6 +6,8 @@ title: Add Members
 ## Add Members from the Addresslist Voting Plugin
 
 Adds a list of addresses to the AddressList plugin so that these new addresses are able to vote in AddresslistVoting proposals.
+
+### Encoding
 */
 
 import {
@@ -13,7 +15,7 @@ import {
   DaoAction,
   ContextPlugin
 } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -28,8 +30,8 @@ const members: string[] = [
 
 const pluginAddress = "0x0987654321098765432109876543210987654321"; // the address of the AddresslistVoting plugin contract installed in the DAO
 
-const addMembersAction: DaoAction = addresslistVotingClient.encoding.addMembersAction(pluginAddress, members);
-console.log({ addMembersAction });
+const action: DaoAction = addresslistVotingClient.encoding.addMembersAction(pluginAddress, members);
+console.log({ action });
 
 /* MARKDOWN
 Returns:
@@ -41,36 +43,18 @@ Returns:
   data: Uint8Array[12,34,45...]
 }
 ```
+### Decoding
 */
 
-/* MARKDOWN
----
-title: Add Members
----
 
-## Decode Add Members Action (Addresslist)
-
-Decodes the action of adding new members to the Addresslist plugin.
-*/
-
-import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate an Addresslist plugin client.
-const clientAddressList = new AddresslistVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const membersAdded: string[] = clientAddressList.decoding.addMembersAction(data);
-console.log({ membersAdded });
+const decodedParams: string[] = addresslistVotingClient.decoding.addMembersAction(action.data);
+console.log({ decodedParams });
 
 /* MARKDOWN
 Returns:
 
 ```
-{ membersAdded:
+{ decodedParams:
   [
     "0x12345...",
     "0x56789...",

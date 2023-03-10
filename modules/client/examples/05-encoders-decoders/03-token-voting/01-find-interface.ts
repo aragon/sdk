@@ -6,10 +6,12 @@ title: Get Function Parameters
 ## Get Function Parameters from an Encoded Action
 
 Decodes the parameters of a function call from the TokenVoting plugin contract.
+
+### Decoding
 */
 
 import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);

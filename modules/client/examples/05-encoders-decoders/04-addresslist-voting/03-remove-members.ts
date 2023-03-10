@@ -6,6 +6,8 @@ title: Remove Members
 ## Remove Members from the Addresslist Voting Plugin
 
 Removes an address from the Addresslist plugin so that this address is no longer able to vote in AddresslistVoting proposals.
+
+### Encoding
 */
 
 import {
@@ -13,7 +15,7 @@ import {
   ContextPlugin,
   DaoAction
 } from "@aragon/sdk-client";
-import { context } from "../index";
+import { context } from "../../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -29,8 +31,8 @@ const members: string[] = [
 
 const pluginAddress: string = "0x0987654321098765432109876543210987654321"; // the address of the AddresslistVoting plugin contract installed in the DAO
 
-const removeMembersAction: DaoAction = addresslistVotingClient.encoding.removeMembersAction(pluginAddress, members);
-console.log({ removeMembersAction });
+const action: DaoAction = addresslistVotingClient.encoding.removeMembersAction(pluginAddress, members);
+console.log({ action });
 
 /* MARKDOWN
 Returns:
@@ -42,30 +44,12 @@ Returns:
   data: Uint8Array[12,34,45...]
 }
 ```
+
+### Decoding
 */
 
 
-/* MARKDOWN
----
-title: Remove Members
----
-
-## Decode Remove Members Action (Addresslist)
-
-Decodes the action of removing addresses from the AddresslistVoting plugin so they can no longer vote in AddresslistVoting proposals.
-*/
-
-import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
-import { context } from "../index";
-
-// Insantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate an Addresslist plugin client.
-const clientAddressList = new AddresslistVotingClient(contextPlugin);
-
-const data: Uint8Array = new Uint8Array([12, 56]);
-
-const removedMembers: string[] = clientAddressList.decoding.removeMembersAction(data);
+const removedMembers: string[] = addresslistVotingClient.decoding.removeMembersAction(action.data);
 console.log({ removedMembers });
 
 /* MARKDOWN
