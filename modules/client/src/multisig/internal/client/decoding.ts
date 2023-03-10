@@ -8,7 +8,6 @@ import {
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import {
   IMultisigClientDecoding,
-  MultisigPluginSettings,
   MultisigVotingSettings,
 } from "../../interfaces";
 // @ts-ignore
