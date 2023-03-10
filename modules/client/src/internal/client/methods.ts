@@ -8,15 +8,15 @@ import {
 } from "@aragon/osx-ethers";
 import {
   AmountMismatchError,
-  UpdateAllowanceError,
   FailedDepositError,
-  GraphQLError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   IpfsPinError,
+  MissingExecPermissionError,
   NoProviderError,
   NoSignerError,
   resolveIpfsCid,
+  UpdateAllowanceError,
 } from "@aragon/sdk-common";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -42,7 +42,6 @@ import {
   DaoMetadata,
   DaoSortBy,
   DepositParams,
-  UpdateAllowanceStepValue,
   IClientMethods,
   IDaoQueryParams,
   IHasPermissionParams,
@@ -57,6 +56,7 @@ import {
   Transfer,
   TransferSortBy,
   UpdateAllowanceParams,
+  UpdateAllowanceStepValue,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -75,10 +75,10 @@ import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
 import {
+  EMPTY_DAO_METADATA_LINK,
   UNAVAILABLE_DAO_METADATA,
   UNSUPPORTED_DAO_METADATA_LINK,
 } from "../constants";
-import { MissingExecPermissionError } from "@aragon/sdk-common";
 
 /**
  * Methods module the SDK Generic Client
@@ -406,31 +406,34 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!resolvedAddress) {
         throw new InvalidAddressOrEnsError();
       }
-      address = resolvedAddress;
+
+      address = resolvedAddress.toLowerCase();
     }
+    const query = QueryDao;
+    const params = { address };
+    const name = "DAO";
+    type T = { dao: SubgraphDao };
+    const { dao } = await this.graphql.request<T>({ query, params, name });
+    if (!dao) {
+      return null;
+    } else if (!dao.metadata) {
+      return toDaoDetails(
+        dao,
+        EMPTY_DAO_METADATA_LINK,
+      );
+    }
+    // TODO use same approach as in graphql
+    await this.ipfs.ensureOnline();
     try {
-      await this.graphql.ensureOnline();
-      const client = this.graphql.getClient();
-      const { dao }: { dao: SubgraphDao } = await client.request(QueryDao, {
-        address,
-      });
-      if (!dao) {
-        return null;
-      }
-      try {
-        const metadataCid = resolveIpfsCid(dao.metadata);
-        const metadataString = await this.ipfs.fetchString(metadataCid);
-        const metadata = JSON.parse(metadataString) as DaoMetadata;
-        return toDaoDetails(dao, metadata);
-        // TODO: Parse and validate schema
-      } catch (err) {
-        if (err instanceof InvalidCidError) {
-          return toDaoDetails(dao, UNSUPPORTED_DAO_METADATA_LINK);
-        }
-        return toDaoDetails(dao, UNAVAILABLE_DAO_METADATA);
-      }
+      const metadataCid = resolveIpfsCid(dao.metadata);
+      const metadataString = await this.ipfs.fetchString(metadataCid);
+      const metadata = JSON.parse(metadataString) as DaoMetadata;
+      return toDaoDetails(dao, metadata);
     } catch (err) {
-      throw new GraphQLError("DAO");
+      if (err instanceof InvalidCidError) {
+        return toDaoDetails(dao, UNSUPPORTED_DAO_METADATA_LINK);
+      }
+      return toDaoDetails(dao, UNAVAILABLE_DAO_METADATA);
     }
   }
   /**
@@ -451,39 +454,41 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     direction = SortDirection.ASC,
     sortBy = DaoSortBy.CREATED_AT,
   }: IDaoQueryParams): Promise<DaoListItem[]> {
-    try {
-      await this.graphql.ensureOnline();
-      const client = this.graphql.getClient();
-      const { daos }: { daos: SubgraphDaoListItem[] } = await client.request(
-        QueryDaos,
-        {
-          limit,
-          skip,
-          direction,
-          sortBy,
-        },
-      );
-      await this.ipfs.ensureOnline();
-      return Promise.all(
-        daos.map(
-          async (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
-            try {
-              const metadataCid = resolveIpfsCid(dao.metadata);
-              const stringMetadata = await this.ipfs.fetchString(metadataCid);
-              const metadata = JSON.parse(stringMetadata);
-              return toDaoListItem(dao, metadata);
-            } catch (err) {
-              if (err instanceof InvalidCidError) {
-                return toDaoListItem(dao, UNSUPPORTED_DAO_METADATA_LINK);
-              }
-              return toDaoListItem(dao, UNAVAILABLE_DAO_METADATA);
+    const query = QueryDaos;
+    const params = {
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "DAOs";
+    type T = { daos: SubgraphDaoListItem[] };
+    const { daos } = await this.graphql.request<T>({ query, params, name });
+    // TODO use same approach as in graphql
+    await this.ipfs.ensureOnline();
+    return Promise.all(
+      daos.map(
+        async (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
+          if (!dao.metadata) {
+            return toDaoListItem(
+              dao,
+              EMPTY_DAO_METADATA_LINK,
+            );
+          }
+          try {
+            const metadataCid = resolveIpfsCid(dao.metadata);
+            const stringMetadata = await this.ipfs.fetchString(metadataCid);
+            const metadata = JSON.parse(stringMetadata);
+            return toDaoListItem(dao, metadata);
+          } catch (err) {
+            if (err instanceof InvalidCidError) {
+              return toDaoListItem(dao, UNSUPPORTED_DAO_METADATA_LINK);
             }
-          },
-        ),
-      );
-    } catch (err) {
-      throw new GraphQLError("DAO");
-    }
+            return toDaoListItem(dao, UNAVAILABLE_DAO_METADATA);
+          }
+        },
+      ),
+    );
   }
   /**
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
@@ -520,34 +525,31 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         }
         address = resolvedAddress;
       }
-      where = { dao: address };
+      where = { dao: address.toLowerCase() };
     }
-    try {
-      await this.graphql.ensureOnline();
-      const client = this.graphql.getClient();
-      const {
-        tokenBalances,
-      }: { tokenBalances: SubgraphBalance[] } = await client.request(
-        QueryTokenBalances,
-        {
-          where,
-          limit,
-          skip,
-          direction,
-          sortBy,
-        },
-      );
-      if (tokenBalances.length === 0) {
-        return [];
-      }
-      return Promise.all(
-        tokenBalances.map(
-          (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
-        ),
-      );
-    } catch (err) {
-      throw new GraphQLError("balance");
+    const query = QueryTokenBalances;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "dao balances";
+    type T = { tokenBalances: SubgraphBalance[] };
+    const { tokenBalances } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
+    if (tokenBalances.length === 0) {
+      return [];
     }
+    return Promise.all(
+      tokenBalances.map(
+        (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
+      ),
+    );
   }
   /**
    * Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)
@@ -586,37 +588,34 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         }
         address = resolvedAddress;
       }
-      where = { dao: address };
+      where = { dao: address.toLowerCase() };
     }
     if (type) {
       where = { ...where, type: SubgraphTransferTypeMap.get(type) };
     }
-    try {
-      await this.graphql.ensureOnline();
-      const client = this.graphql.getClient();
-      const {
-        tokenTransfers,
-      }: { tokenTransfers: SubgraphTransferListItem[] } = await client.request(
-        QueryTokenTransfers,
-        {
-          where,
-          limit,
-          skip,
-          direction,
-          sortBy,
-        },
-      );
-      if (!tokenTransfers) {
-        return null;
-      }
-      return Promise.all(
-        tokenTransfers.map(
-          (transfer: SubgraphTransferListItem): Transfer =>
-            toTokenTransfer(transfer),
-        ),
-      );
-    } catch {
-      throw new GraphQLError("token transfer");
+    const query = QueryTokenTransfers;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "dao transfers";
+    type T = { tokenTransfers: SubgraphTransferListItem[] };
+    const { tokenTransfers } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
+    if (!tokenTransfers) {
+      return null;
     }
+    return Promise.all(
+      tokenTransfers.map(
+        (transfer: SubgraphTransferListItem): Transfer =>
+          toTokenTransfer(transfer),
+      ),
+    );
   }
 }

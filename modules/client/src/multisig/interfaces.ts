@@ -193,8 +193,3 @@ export type SubgraphMultisigVotingSettings = {
   onlyListed: boolean;
 };
 
-export type SubgraphMultisigMembers = {
-  members: {
-    address: string;
-  }[];
-};

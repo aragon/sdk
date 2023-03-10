@@ -8,6 +8,12 @@ export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
   description: "(the link to the metadata is not supported)",
   resources: [],
 };
+export const EMPTY_PROPOSAL_METADATA_LINK: ProposalMetadata = {
+  title: "(the proposal has no metadata)",
+  summary: "(the current proposal does not have any content defined)",
+  description: "(the current proposal does not have any content defined)",
+  resources: [],
+};
 export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
   title: "(unavailable metadata)",
   summary: "(the proposal metadata is not available)",

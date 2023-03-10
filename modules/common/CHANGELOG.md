@@ -18,6 +18,8 @@ TEMPLATE:
 ## UPCOMING
 ### Removes
 - removed `random.ts`
+### Added
+- `runAndRetry` function
 
 ## 0.12.0-beta
 ### Added

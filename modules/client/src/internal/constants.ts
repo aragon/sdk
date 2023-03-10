@@ -22,6 +22,11 @@ export const UNSUPPORTED_DAO_METADATA_LINK: DaoMetadata = {
   description: "(the metadata link is not supported)",
   links: [],
 };
+export const EMPTY_DAO_METADATA_LINK: DaoMetadata = {
+  name: "(the DAO has no metadata)",
+  description: "(the DAO did not define any content)",
+  links: [],
+};
 
 export const UNAVAILABLE_DAO_METADATA: DaoMetadata = {
   name: "(unavailable metadata)",
