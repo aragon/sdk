@@ -305,17 +305,17 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-
-    const { addresslistVotingPlugin }: {
-      addresslistVotingPlugin: SubgraphMembers;
-    } = await this.graphql
-      .request({
-        query: QueryAddresslistVotingMembers,
-        params: {
-          address: pluginAddress.toLowerCase(),
-        },
-        name: "AddresslistVoting members",
-      });
+    const query = QueryAddresslistVotingMembers;
+    const params = {
+      address: pluginAddress.toLowerCase(),
+    };
+    const name = "AddresslistVotingVoting members";
+    type T = { addresslistVotingPlugin: SubgraphMembers };
+    const { addresslistVotingPlugin } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
     return addresslistVotingPlugin.members.map((
       member: { address: string },
     ) => member.address);
@@ -334,16 +334,16 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     const extendedProposalId = getExtendedProposalId(proposalId);
-    const {
-      addresslistVotingProposal,
-    }: {
-      addresslistVotingProposal: SubgraphAddresslistVotingProposal;
-    } = await this.graphql.request({
-      query: QueryAddresslistVotingProposal,
-      params: {
-        proposalId: extendedProposalId,
-      },
-      name: "AddresslistVoting proposal",
+    const query = QueryAddresslistVotingProposal;
+    const params = {
+      address: extendedProposalId,
+    };
+    const name = "AddresslistVoting proposal";
+    type T = { addresslistVotingProposal: SubgraphAddresslistVotingProposal };
+    const { addresslistVotingProposal } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     if (!addresslistVotingProposal) {
       return null;
@@ -411,20 +411,20 @@ export class AddresslistVotingClientMethods extends ClientCore
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
 
-    const {
-      addresslistVotingProposals,
-    }: {
-      addresslistVotingProposals: SubgraphAddresslistVotingProposalListItem[];
-    } = await this.graphql.request({
-      query: QueryAddresslistVotingProposals,
-      params: {
-        where,
-        limit,
-        skip,
-        direction,
-        sortBy,
-      },
-      name: "AddresslistVoting proposals",
+    const query = QueryAddresslistVotingProposals;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "AddresslistVoting proposals";
+    type T = { addresslistVotingProposals: SubgraphAddresslistVotingProposalListItem[] };
+    const { addresslistVotingProposals } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     await this.ipfs.ensureOnline();
     return Promise.all(
@@ -468,14 +468,16 @@ export class AddresslistVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    const { addresslistVotingPlugin }: {
-      addresslistVotingPlugin: SubgraphVotingSettings;
-    } = await this.graphql.request({
-      query: QueryAddresslistVotingSettings,
-      params: {
-        address: pluginAddress.toLowerCase(),
-      },
-      name: "AddresslistVoting settings",
+    const query = QueryAddresslistVotingSettings;
+    const params = {
+      address: pluginAddress.toLowerCase(),
+    };
+    const name = "AddresslistVoting settings";
+    type T = { addresslistVotingPlugin: SubgraphVotingSettings };
+    const { addresslistVotingPlugin } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     if (!addresslistVotingPlugin) {
       return null;

@@ -305,14 +305,16 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    const { tokenVotingPlugin }: {
-      tokenVotingPlugin: SubgraphMembers;
-    } = await this.graphql.request({
-      query: QueryTokenVotingMembers,
-      params: {
-        address: pluginAddress.toLowerCase(),
-      },
-      name: "TokenVoting members",
+    const query = QueryTokenVotingMembers;
+    const params = {
+      address: pluginAddress.toLowerCase(),
+    };
+    const name = "TokenVoting members";
+    type T = { tokenVotingPlugin: SubgraphMembers };
+    const { tokenVotingPlugin } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     return tokenVotingPlugin.members.map((
       member: { address: string },
@@ -333,16 +335,16 @@ export class TokenVotingClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     const extendedProposalId = getExtendedProposalId(proposalId);
-    const {
-      tokenVotingProposal,
-    }: {
-      tokenVotingProposal: SubgraphTokenVotingProposal;
-    } = await this.graphql.request({
-      query: QueryTokenVotingProposal,
-      params: {
-        proposalId: extendedProposalId,
-      },
-      name: "TokenVoting proposal",
+    const query = QueryTokenVotingProposal;
+    const params = {
+      address: extendedProposalId,
+    };
+    const name = "TokenVoting proposal";
+    type T = { tokenVotingProposal: SubgraphTokenVotingProposal };
+    const { tokenVotingProposal } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     if (!tokenVotingProposal) {
       return null;
@@ -402,21 +404,20 @@ export class TokenVotingClientMethods extends ClientCore
     if (status) {
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
-
-    const {
-      tokenVotingProposals,
-    }: {
-      tokenVotingProposals: SubgraphTokenVotingProposalListItem[];
-    } = await this.graphql.request({
-      query: QueryTokenVotingProposals,
-      params: {
-        where,
-        limit,
-        skip,
-        direction,
-        sortBy,
-      },
-      name: "TokenVoting proposals",
+    const query = QueryTokenVotingProposals;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "TokenVoting proposals";
+    type T = { tokenVotingProposals: SubgraphTokenVotingProposalListItem[] };
+    const { tokenVotingProposals } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     await this.ipfs.ensureOnline();
     return Promise.all(
@@ -460,17 +461,17 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    const { tokenVotingPlugin }: {
-      tokenVotingPlugin: SubgraphVotingSettings;
-    } = await this.graphql.request(
-      {
-        query: QueryTokenVotingSettings,
-        params: {
-          address: pluginAddress.toLowerCase(),
-        },
-        name: "TokenVoting settings",
-      },
-    );
+    const query = QueryTokenVotingSettings;
+    const params = {
+      address: pluginAddress.toLowerCase(),
+    };
+    const name = "TokenVoting settings";
+    type T = { tokenVotingPlugin: SubgraphVotingSettings };
+    const { tokenVotingPlugin } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
     if (!tokenVotingPlugin) {
       return null;
     }
@@ -504,18 +505,19 @@ export class TokenVotingClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
-    const { tokenVotingPlugin }: {
+    const query = QueryTokenVotingPlugin;
+    const params = {
+      address: pluginAddress.toLowerCase(),
+    };
+    const name = "TokenVoting token";
+    type T = {
       tokenVotingPlugin: { token: SubgraphErc20Token | SubgraphErc721Token };
-    } = await this.graphql
-      .request(
-        {
-          query: QueryTokenVotingPlugin,
-          params: {
-            address: pluginAddress.toLowerCase(),
-          },
-          name: "TokenVoting token",
-        },
-      );
+    };
+    const { tokenVotingPlugin } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
     if (!tokenVotingPlugin) {
       return null;
     }

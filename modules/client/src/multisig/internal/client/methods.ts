@@ -303,14 +303,16 @@ export class MultisigClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressOrEnsError();
     }
-    const { multisigPlugin }: {
-      multisigPlugin: SubgraphMultisigVotingSettings;
-    } = await this.graphql.request({
-      query: QueryMultisigVotingSettings,
-      params: {
-        address: pluginAddress.toLowerCase(),
-      },
-      name: "Multisig settings",
+    const query = QueryMultisigVotingSettings;
+    const params = {
+      address: pluginAddress.toLowerCase()
+    };
+    const name = "Multisig settings";
+    type T = { multisigPlugin: SubgraphMultisigVotingSettings };
+    const { multisigPlugin } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     return {
       onlyListed: multisigPlugin.onlyListed,
@@ -332,14 +334,16 @@ export class MultisigClientMethods extends ClientCore
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressOrEnsError();
     }
-    const { multisigPlugin }: {
-      multisigPlugin: SubgraphMembers;
-    } = await this.graphql.request({
-      query: QueryMultisigMembers,
-      params: {
-        address: pluginAddress.toLowerCase(),
-      },
-      name: "Multisig members",
+    const query = QueryMultisigMembers;
+    const params = {
+      address: pluginAddress.toLowerCase()
+    };
+    const name = "Multisig members";
+    type T = { multisigPlugin: SubgraphMembers };
+    const { multisigPlugin } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     return multisigPlugin.members.map((member) => member.address);
   }
@@ -358,16 +362,16 @@ export class MultisigClientMethods extends ClientCore
       throw new InvalidProposalIdError();
     }
     const extendedProposalId = getExtendedProposalId(proposalId);
-    const {
-      multisigProposal,
-    }: {
-      multisigProposal: SubgraphMultisigProposal;
-    } = await this.graphql.request({
-      query: QueryMultisigProposal,
-      params: {
-        proposalId: extendedProposalId,
-      },
-      name: "Multisig proposal",
+    const query = QueryMultisigProposal;
+    const params = {
+      proposalId: extendedProposalId,
+    };
+    const name = "Multisig proposal";
+    type T = { multisigProposal: SubgraphMultisigProposal };
+    const { multisigProposal } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     if (!multisigProposal) {
       return null;
@@ -434,20 +438,20 @@ export class MultisigClientMethods extends ClientCore
     if (status) {
       where = { ...where, ...computeProposalStatusFilter(status) };
     }
-    const {
-      multisigProposals,
-    }: {
-      multisigProposals: SubgraphMultisigProposalListItem[];
-    } = await this.graphql.request({
-      query: QueryMultisigProposals,
-      params: {
-        where,
-        limit,
-        skip,
-        direction,
-        sortBy,
-      },
-      name: "Multisig proposals",
+    const query = QueryMultisigProposals;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "Multisig proposals";
+    type T = { multisigProposals: SubgraphMultisigProposalListItem[] };
+    const { multisigProposals } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
     });
     await this.ipfs.ensureOnline();
     return Promise.all(

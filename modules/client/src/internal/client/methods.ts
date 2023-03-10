@@ -408,13 +408,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
       address = resolvedAddress.toLowerCase();
     }
-    const { dao }: { dao: SubgraphDao } = await this.graphql.request({
-      query: QueryDao,
-      params: {
-        address,
-      },
-      name: "DAO",
-    });
+    const query = QueryDao;
+    const params = { address };
+    const name = "DAO";
+    type T = { dao: SubgraphDao };
+    const { dao } = await this.graphql.request<T>({ query, params, name });
     if (!dao) {
       return null;
     }
@@ -450,19 +448,16 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     direction = SortDirection.ASC,
     sortBy = DaoSortBy.CREATED_AT,
   }: IDaoQueryParams): Promise<DaoListItem[]> {
-    const { daos }: { daos: SubgraphDaoListItem[] } = await this.graphql
-      .request(
-        {
-          query: QueryDaos,
-          params: {
-            limit,
-            skip,
-            direction,
-            sortBy,
-          },
-          name: "DAOs",
-        },
-      );
+    const query = QueryDaos;
+    const params = {
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "DAOs";
+    type T = { daos: SubgraphDaoListItem[] };
+    const { daos } = await this.graphql.request<T>({ query, params, name });
     // TODO use same approach as in graphql
     await this.ipfs.ensureOnline();
     return Promise.all(
@@ -520,21 +515,21 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       }
       where = { dao: address.toLowerCase() };
     }
-    const {
-      tokenBalances,
-    }: { tokenBalances: SubgraphBalance[] } = await this.graphql.request(
-      {
-        query: QueryTokenBalances,
-        params: {
-          where,
-          limit,
-          skip,
-          direction,
-          sortBy,
-        },
-        name: "token balances",
-      },
-    );
+    const query = QueryTokenBalances;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "dao balances";
+    type T = { tokenBalances: SubgraphBalance[] };
+    const { tokenBalances } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
     if (tokenBalances.length === 0) {
       return [];
     }
@@ -586,22 +581,21 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (type) {
       where = { ...where, type: SubgraphTransferTypeMap.get(type) };
     }
-    const {
-      tokenTransfers,
-    }: { tokenTransfers: SubgraphTransferListItem[] } = await this.graphql
-      .request(
-        {
-          query: QueryTokenTransfers,
-          params: {
-            where,
-            limit,
-            skip,
-            direction,
-            sortBy,
-          },
-          name: "dao token transfers",
-        },
-      );
+    const query = QueryTokenTransfers;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "dao transfers";
+    type T = { tokenTransfers: SubgraphTransferListItem[] };
+    const { tokenTransfers } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
     if (!tokenTransfers) {
       return null;
     }

@@ -19,7 +19,7 @@ function reflect<T>(prom: Promise<T>) {
 
 export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
   func: () => Promise<T>;
-  onFail: (e: Error) => void;
+  onFail?: (e: Error) => void;
   shouldRetry: () => boolean;
 }) {
   do {
@@ -28,7 +28,9 @@ export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
       // it worked
       return result;
     } catch (err) {
-      onFail(err as Error);
+      if (typeof onFail === "function") {
+        onFail(err as Error);
+      }
     }
   } while (shouldRetry());
 }

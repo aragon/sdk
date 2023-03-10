@@ -75,11 +75,14 @@ export class GraphqlModule implements IClientGraphQLCore {
     throw new NoNodesAvailableError("graphql");
   }
 
-  public async request({ query, params, name }: {
+  public request({ query, params, name }: {
     query: string;
     params: { [key: string]: any };
     name?: string;
   }) {
+    if (!this.clients.length) {
+      throw new ClientNotInitializedError("graphql");
+    }
     let retries = this.clients.length;
     return runAndRetry({
       func: () => this.getClient().request(query, params),
