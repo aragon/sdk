@@ -37,17 +37,18 @@ describe("Client Multisig", () => {
 
       const actions = client.encoding.addAddressesAction(addAddressesParams);
 
-      const decodedSettings: MultisigPluginSettings = client.decoding
-        .addAddressesAction(
-          actions.map((action) => action.data),
-        );
-      decodedSettings.members.forEach((member, index) => {
+      const decodedMembers: string[] = client.decoding.addAddressesAction(
+        actions[0].data,
+      );
+      const decodedVotingSettings: MultisigVotingSettings = client.decoding
+        .updateMultisigVotingSettings(actions[1].data);
+      decodedMembers.forEach((member, index) => {
         expect(member).toBe(addAddressesParams.members[index]);
       });
-      expect(decodedSettings.votingSettings.minApprovals).toBe(
+      expect(decodedVotingSettings.minApprovals).toBe(
         addAddressesParams.votingSettings.minApprovals,
       );
-      expect(decodedSettings.votingSettings.onlyListed).toBe(
+      expect(decodedVotingSettings.onlyListed).toBe(
         addAddressesParams.votingSettings.onlyListed,
       );
     });
@@ -75,17 +76,18 @@ describe("Client Multisig", () => {
         removeAddressesParams,
       );
 
-      const decodedSettings: MultisigPluginSettings = client.decoding
-        .removeAddressesAction(
-          actions.map((action) => action.data),
-        );
-      decodedSettings.members.forEach((member, index) => {
+      const decodedVotingSettings: MultisigVotingSettings = client.decoding
+        .updateMultisigVotingSettings(actions[0].data);
+      const decodedMembers: string[] = client.decoding.removeAddressesAction(
+        actions[1].data,
+      );
+      decodedMembers.forEach((member, index) => {
         expect(member).toBe(removeAddressesParams.members[index]);
       });
-      expect(decodedSettings.votingSettings.minApprovals).toBe(
+      expect(decodedVotingSettings.minApprovals).toBe(
         removeAddressesParams.votingSettings.minApprovals,
       );
-      expect(decodedSettings.votingSettings.onlyListed).toBe(
+      expect(decodedVotingSettings.onlyListed).toBe(
         removeAddressesParams.votingSettings.onlyListed,
       );
     });
@@ -123,7 +125,7 @@ describe("Client Multisig", () => {
       const client = new MultisigClient(ctxPlugin);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
-      expect(() => client.decoding.addAddressesAction([data])).toThrow(
+      expect(() => client.decoding.addAddressesAction(data)).toThrow(
         `data signature does not match function addAddresses. (argument=\"data\", value=\"0x0b1616212121\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });

@@ -26,35 +26,31 @@ export class MultisigClientDecoding extends ClientCore
   /**
    * Decodes a list of addresses from an encoded add members action
    *
-   * @param {Uint8Array[]} data
-   * @return {*}  {MultisigPluginSettings}
+   * @param {Uint8Array} data
+   * @return {*}  {string[]}
    * @memberof MultisigClientDecoding
    */
-  public addAddressesAction(data: Uint8Array[]): MultisigPluginSettings {
+  public addAddressesAction(data: Uint8Array): string[] {
     const multisigInterface = Multisig__factory.createInterface();
-    const hexBytes = bytesToHex(data[0]);
+    const hexBytes = bytesToHex(data);
 
     const expectedfunction = multisigInterface.getFunction("addAddresses");
     const result = multisigInterface.decodeFunctionData(
       expectedfunction,
       hexBytes,
     );
-    const votingSettings = this.updateMultisigVotingSettings(data[1]);
-    return {
-      members: result[0],
-      votingSettings,
-    };
+    return result[0];
   }
   /**
    * Decodes a list of addresses from an encoded remove members action
    *
-   * @param {Uint8Array[]} data
-   * @return {*}  {MultisigPluginSettings}
+   * @param {Uint8Array} data
+   * @return {*}  {string[]}
    * @memberof MultisigClientDecoding
    */
-  public removeAddressesAction(data: Uint8Array[]): MultisigPluginSettings {
+  public removeAddressesAction(data: Uint8Array): string[] {
     const multisigInterface = Multisig__factory.createInterface();
-    const hexBytes = bytesToHex(data[1]);
+    const hexBytes = bytesToHex(data);
     const expectedfunction = multisigInterface.getFunction(
       "removeAddresses",
     );
@@ -62,11 +58,7 @@ export class MultisigClientDecoding extends ClientCore
       expectedfunction,
       hexBytes,
     );
-    const votingSettings = this.updateMultisigVotingSettings(data[0]);
-    return {
-      members: result[0],
-      votingSettings,
-    };
+    return result[0];
   }
   /**
    * Decodes a list of min approvals from an encoded update min approval action

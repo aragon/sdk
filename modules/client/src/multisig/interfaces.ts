@@ -49,8 +49,8 @@ export interface IMultisigClientEncoding extends IClientCore {
   ) => DaoAction;
 }
 export interface IMultisigClientDecoding extends IClientCore {
-  addAddressesAction: (data: Uint8Array[]) => MultisigPluginSettings;
-  removeAddressesAction: (data: Uint8Array[]) => MultisigPluginSettings;
+  addAddressesAction: (data: Uint8Array) => string[];
+  removeAddressesAction: (data: Uint8Array) => string[];
   updateMultisigVotingSettings: (data: Uint8Array) => MultisigVotingSettings;
   findInterface: (data: Uint8Array) => IInterfaceParams | null;
 }

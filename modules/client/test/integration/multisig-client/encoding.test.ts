@@ -7,6 +7,7 @@ import {
   ContextPlugin,
   MultisigClient,
   MultisigPluginInstallParams,
+  MultisigVotingSettings,
   RemoveAddressesParams,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
@@ -115,16 +116,18 @@ describe("Client Multisig", () => {
         addAddressesParams,
       );
       expect(actions.length).toBe(2);
-      const decodedSettings = client.decoding.addAddressesAction(
-        actions.map((action) => action.data),
+      const decodedMembers: string[] = client.decoding.addAddressesAction(
+        actions[0].data,
       );
-      decodedSettings.members.forEach((member, index) => {
+      const decodedVotingSettings: MultisigVotingSettings = client.decoding
+        .updateMultisigVotingSettings(actions[1].data);
+      decodedMembers.forEach((member, index) => {
         expect(member).toBe(addAddressesParams.members[index]);
       });
-      expect(decodedSettings.votingSettings.minApprovals).toBe(
+      expect(decodedVotingSettings.minApprovals).toBe(
         addAddressesParams.votingSettings.minApprovals,
       );
-      expect(decodedSettings.votingSettings.onlyListed).toBe(
+      expect(decodedVotingSettings.onlyListed).toBe(
         addAddressesParams.votingSettings.onlyListed,
       );
 
@@ -218,16 +221,18 @@ describe("Client Multisig", () => {
         removeAddressesParams,
       );
       expect(actions.length).toBe(2);
-      const decodedSettings = client.decoding.removeAddressesAction(
-        actions.map((action) => action.data),
+      const decodedVotingSettings: MultisigVotingSettings = client.decoding
+        .updateMultisigVotingSettings(actions[0].data);
+      const decodedMembers: string[] = client.decoding.removeAddressesAction(
+        actions[1].data,
       );
-      decodedSettings.members.forEach((member, index) => {
+      decodedMembers.forEach((member, index) => {
         expect(member).toBe(removeAddressesParams.members[index]);
       });
-      expect(decodedSettings.votingSettings.minApprovals).toBe(
+      expect(decodedVotingSettings.minApprovals).toBe(
         removeAddressesParams.votingSettings.minApprovals,
       );
-      expect(decodedSettings.votingSettings.onlyListed).toBe(
+      expect(decodedVotingSettings.onlyListed).toBe(
         removeAddressesParams.votingSettings.onlyListed,
       );
       actions.forEach((action, index) => {
