@@ -1,8 +1,5 @@
-export type SupportedNetworks = "mainnet" | "goerli";
-export const SupportedNetworksArray: SupportedNetworks[] = [
-  "mainnet",
-  "goerli",
-];
+export const SupportedNetworksArray = ["mainnet", "goerli"] as const;
+export type SupportedNetworks = typeof SupportedNetworksArray[number];
 export type NetworkDeployment = {
   daoFactory: string;
   multisigRepo: string;
