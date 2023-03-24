@@ -13,6 +13,12 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Added
+- Add support for mumbai.
+
+### Changed
+- Updates `@aragon/osx-ethers` to v1.2.0.
+
 ## [1.1.0]
 ### Added
 - `prepareInstallation` function to multisig-client, tokenvoting-client and addresslist-client
