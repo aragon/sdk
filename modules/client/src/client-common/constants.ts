@@ -47,6 +47,18 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     adminSetup: activeContractsList.goerli.AdminSetup,
     addresslistVotingSetup: activeContractsList.goerli.AddresslistVotingSetup,
     tokenVotingSetup: activeContractsList.goerli.TokenVotingSetup,
-    
+  },
+  mumbai: {
+    daoFactory: activeContractsList.goerli.DAOFactory,
+    pluginSetupProcessor: activeContractsList.goerli.PluginSetupProcessor,
+    multisigRepo: activeContractsList.goerli["multisig-repo"],
+    adminRepo: activeContractsList.goerli["admin-repo"],
+    addresslistVotingRepo:
+      activeContractsList.goerli["address-list-voting-repo"],
+    tokenVotingRepo: activeContractsList.goerli["token-voting-repo"],
+    multisigSetup: activeContractsList.goerli.MultisigSetup,
+    adminSetup: activeContractsList.goerli.AdminSetup,
+    addresslistVotingSetup: activeContractsList.goerli.AddresslistVotingSetup,
+    tokenVotingSetup: activeContractsList.goerli.TokenVotingSetup,
   },
 };

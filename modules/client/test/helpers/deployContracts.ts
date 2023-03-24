@@ -29,7 +29,7 @@ export interface Deployment {
   addresslistVotingRepo: aragonContracts.PluginRepo;
   addresslistVotingPluginSetup: aragonContracts.AddresslistVotingSetup;
   multisigRepo: aragonContracts.PluginRepo;
-  multisigPluginSetup: aragonContracts.AddresslistVotingSetup;
+  multisigPluginSetup: aragonContracts.MultisigSetup;
   pluginSetupProcessor: aragonContracts.PluginSetupProcessor;
 }
 
