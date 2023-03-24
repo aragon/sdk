@@ -13,6 +13,8 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+
+## [1.2.0]
 ### Added
 - Add support for mumbai.
 
