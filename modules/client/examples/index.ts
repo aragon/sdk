@@ -3,7 +3,7 @@
 title: Getting Started
 ---
 
-## Getting Started With the Aragon OSx SDK
+## Getting Started With the Aragon SDK
 
 ### Before You Begin
 
