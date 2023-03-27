@@ -3,9 +3,9 @@
 title: Getting Started
 ---
 
-## Getting Started with the Aragon OSx SDK
+## Getting Started With the Aragon SDK
 
-### Before you begin
+### Before You Begin
 
 The Aragon OSx SDK is Javascript agnostic, which means you can use it with any Javascript framework, including popular ones like React, Vite, or Vue.
 
@@ -25,7 +25,7 @@ or
 yarn add @aragon/sdk-client
 ```
 
-### Setting up the context
+### Setting up the Context
 
 Then, you'll want to set up the Aragon OSx SDK context within your application to have access to the SDK functions. You can do this at any point within your app.
 
