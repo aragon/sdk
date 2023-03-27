@@ -25,7 +25,7 @@ const client: Client = new Client(context);
 const params: GrantPermissionWithConditionParams = {
   who: "0x1234567890123456789012345678901234567890", // address to which the permission will be granted
   where: "0x2345678901234567890123456789012345678901", // where the permission is granted
-  permission: Permissions.EXECUTE_PERMISSION, // the permission to grant. alternatively: UPGRADE_PERMISSION, SET_METADATA_PERMISSION, WITHDRAW_PERMISSION, SET_SIGNATURE_VALIDATOR, SET_TRUSTED_FORWARDER_PERMISSION, ROOT_PERMISSION, CREATE_VERSION_PERMISSION, REGISTER_DAO_PERMISSION, REGISTER_PERMISSION, REGISTER_ENS_SUBDOMAIN_PERMISSION, MINT_PERMISSION, MERKLE_MINT_PERMISSION, MODIFY_ALLOWLIST_PERMISSION, SET_CONFIGURATION_PERMISSION
+  permission: Permissions.EXECUTE_PERMISSION, // the permission to grant
   condition: "0x3456789012345678901234567890123456789012" // the contract address of the condition which needs to be met in order for the permission to be granted
 };
 
