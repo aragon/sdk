@@ -2,13 +2,14 @@
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import {
+  CanVoteParams,
   Context,
   ContextPlugin,
-  ExecuteProposalStep,
-  CanVoteParams,
   CreateMajorityVotingProposalParams,
+  ExecuteProposalStep,
   IProposalQueryParams,
   IVoteProposalParams,
+  PrepareInstallationStep,
   ProposalCreationSteps,
   ProposalMetadata,
   ProposalSortBy,
@@ -26,7 +27,7 @@ import * as deployContracts from "../../helpers/deployContracts";
 import { InvalidAddressOrEnsError } from "@aragon/sdk-common";
 import {
   contextParamsLocalChain,
-  contextParamsMainnet,
+  contextParamsOkWithGraphqlTimeouts,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
   TEST_TOKEN_VOTING_DAO_ADDRESS,
@@ -42,6 +43,8 @@ import {
   restoreBlockTime,
 } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { TokenVotingPluginPrepareInstallationParams } from "../../../src/tokenVoting/interfaces";
+import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
 describe("Token Voting Client", () => {
   let server: Server;
@@ -64,6 +67,21 @@ describe("Token Voting Client", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
+    LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
+    LIVE_CONTRACTS.goerli.pluginSetupProcessor =
+      deployment.pluginSetupProcessor.address;
+    LIVE_CONTRACTS.goerli.multisigRepo = deployment.multisigRepo.address;
+    LIVE_CONTRACTS.goerli.adminRepo = "";
+    LIVE_CONTRACTS.goerli.addresslistVotingRepo =
+      deployment.addresslistVotingRepo.address;
+    LIVE_CONTRACTS.goerli.tokenVotingRepo = deployment.tokenVotingRepo.address;
+    LIVE_CONTRACTS.goerli.multisigSetup =
+      deployment.multisigPluginSetup.address;
+    LIVE_CONTRACTS.goerli.adminSetup = "";
+    LIVE_CONTRACTS.goerli.addresslistVotingSetup =
+      deployment.addresslistVotingPluginSetup.address;
+    LIVE_CONTRACTS.goerli.tokenVotingSetup =
+      deployment.tokenVotingPluginSetup.address;
   });
 
   afterAll(async () => {
@@ -269,6 +287,79 @@ describe("Token Voting Client", () => {
         await voteProposal(proposalId, client, VoteValues.NO);
         await mineBlock(provider);
         await voteProposal(proposalId, client, VoteValues.YES);
+      });
+    });
+
+    describe("Plugin installation", () => {
+      it("Should prepare the installation of a multisig plugin", async () => {
+        const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
+        networkSpy.mockReturnValueOnce({
+          name: "goerli",
+          chainId: 31337,
+        });
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new TokenVotingClient(ctxPlugin);
+        const { dao } = await buildTokenVotingDAO(
+          repoAddr,
+          VotingMode.VOTE_REPLACEMENT,
+        );
+        const installationParams: TokenVotingPluginPrepareInstallationParams = {
+          settings: {
+            votingSettings: {
+              supportThreshold: 0.5,
+              minParticipation: 0.5,
+              minDuration: 7200,
+              minProposerVotingPower: BigInt(1),
+              votingMode: VotingMode.STANDARD,
+            },
+            newToken: {
+              name: "test",
+              decimals: 18,
+              symbol: "TST",
+              balances: [
+                {
+                  address: TEST_WALLET_ADDRESS,
+                  balance: BigInt(10),
+                },
+              ],
+            },
+          },
+          daoAddressOrEns: dao,
+        };
+        const steps = client.methods.prepareInstallation(installationParams);
+        for await (const step of steps) {
+          switch (step.key) {
+            case PrepareInstallationStep.PREPARING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case PrepareInstallationStep.DONE:
+              expect(typeof step.pluginAddress).toBe("string");
+              expect(step.pluginAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof step.pluginRepo).toBe("string");
+              expect(step.pluginRepo).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(Array.isArray(step.helpers)).toBe(true);
+              for (const helper of step.helpers) {
+                expect(typeof helper).toBe("string");
+              }
+              expect(Array.isArray(step.permissions)).toBe(true);
+              for (const permission of step.permissions) {
+                expect(typeof permission.condition).toBe("string");
+                if(permission.condition) {
+                  expect(permission.condition).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+                }
+                expect(typeof permission.operation).toBe("number");
+                expect(typeof permission.where).toBe("string");
+                expect(permission.where).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+                expect(typeof permission.who).toBe("string");
+                expect(permission.who).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              }
+              expect(typeof step.versionTag.build).toBe("number");
+              expect(typeof step.versionTag.release).toBe("number");
+              break;
+          }
+        }
       });
     });
 
@@ -511,7 +602,7 @@ describe("Token Voting Client", () => {
 
     describe("Data retrieval", () => {
       it("Should get the list of members that can vote in a proposal", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -527,7 +618,7 @@ describe("Token Voting Client", () => {
         }
       });
       it("Should fetch the given proposal", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -643,7 +734,7 @@ describe("Token Voting Client", () => {
         }
       });
       it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -653,7 +744,7 @@ describe("Token Voting Client", () => {
         expect(proposal === null).toBe(true);
       });
       it("Should get a list of proposals filtered by the given criteria", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -726,7 +817,7 @@ describe("Token Voting Client", () => {
         mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
       });
       it("Should get a list of proposals from a specific dao", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -743,7 +834,7 @@ describe("Token Voting Client", () => {
         expect(proposals.length > 0 && proposals.length <= limit).toBe(true);
       });
       it("Should get a list of proposals from a dao that has no proposals", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -760,7 +851,7 @@ describe("Token Voting Client", () => {
         expect(proposals.length === 0).toBe(true);
       });
       it("Should get a list of proposals from an invalid address", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -776,7 +867,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should get the settings of a plugin given a plugin instance address", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -793,7 +884,7 @@ describe("Token Voting Client", () => {
         }
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -804,7 +895,7 @@ describe("Token Voting Client", () => {
         expect(typeof token?.name).toBe("string");
       });
       it("Should return null token details for nonexistent plugin addresses", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 

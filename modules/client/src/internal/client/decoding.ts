@@ -12,12 +12,17 @@ import {
 import {
   ClientCore,
   Context,
+  DecodedApplyInstallationParams,
   getFunctionFragment,
   IInterfaceParams,
 } from "../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { DAO__factory } from "@aragon/osx-ethers";
 import {
+  DAO__factory,
+  PluginSetupProcessor__factory,
+} from "@aragon/osx-ethers";
+import {
+  applyInstallatonParamsFromContract,
   permissionParamsFromContract,
   permissionParamsWitConditionFromContract,
   withdrawParamsFromContract,
@@ -36,6 +41,20 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     super(context);
     Object.freeze(ClientDecoding.prototype);
     Object.freeze(this);
+  }
+  /**
+   * @param {data} Uint8Array
+   * @return {*}  {DecodedApplyInstallationParams}
+   * @memberof ClientDecoding
+   */
+  public applyInstallationAction(
+    data: Uint8Array,
+  ): DecodedApplyInstallationParams {
+    const pspInterface = PluginSetupProcessor__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = pspInterface.getFunction("applyInstallation");
+    const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return applyInstallatonParamsFromContract(result)
   }
   /**
    * Decodes the permission parameters from an encoded grant action
@@ -58,7 +77,9 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @return {*}  {GrantPermissionWithConditionParams}
    * @memberof ClientDecoding
    */
-  public grantWithConditionAction(data: Uint8Array): GrantPermissionWithConditionParams {
+  public grantWithConditionAction(
+    data: Uint8Array,
+  ): GrantPermissionWithConditionParams {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("grantWithCondition");
