@@ -1,39 +1,40 @@
 /* MARKDOWN
-### Prepare the installation of a token addressList plugin
+---
+title: Prepare Installation
+---
+
+## Prepare the Installation of a Multisig Plugin
 */
 
 import {
-  AddresslistVotingPluginPrepareInstallationParams,
   ContextPlugin,
+  MultisigClient,
   PrepareInstallationStep,
-  TokenVotingClient,
-  VotingMode,
+  MultisigPluginPrepareInstallationParams,
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
+
+// Create an Multisig client.
+const multisigClient: MultisigClient = new MultisigClient(
   contextPlugin,
 );
 
-const installationParams: AddresslistVotingPluginPrepareInstallationParams = {
+const installationParams: MultisigPluginPrepareInstallationParams = {
   settings: {
     votingSettings: {
-      supportThreshold: 0.5,
-      minParticipation: 0.5,
-      minDuration: 7200,
-      minProposerVotingPower: BigInt(1),
-      votingMode: VotingMode.STANDARD,
+      minApprovals: 5,
+      onlyListed: true
     },
-    addresses: [
-      "0x1234567890123456789012345678901234567890",
-    ],
+    members: [
+      "0x1234567890123456789012345678901234567890"
+    ]
   },
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
 };
-const steps = tokenVotingClient.methods.prepareInstallation(installationParams);
+const steps = multisigClient.methods.prepareInstallation(installationParams);
 for await (const step of steps) {
   switch (step.key) {
     case PrepareInstallationStep.PREPARING:

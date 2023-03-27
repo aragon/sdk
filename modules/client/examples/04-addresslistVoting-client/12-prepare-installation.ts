@@ -1,12 +1,16 @@
 /* MARKDOWN
-### Prepare the installation of a token voting plugin
+---
+title: Prepare Installation
+---
+
+## Prepare the Installation of a Addresslist Voting Plugin
 */
 
 import {
+  AddresslistVotingPluginPrepareInstallationParams,
   ContextPlugin,
   PrepareInstallationStep,
   TokenVotingClient,
-  TokenVotingPluginPrepareInstallationParams,
   VotingMode,
 } from "@aragon/sdk-client";
 import { context } from "../00-setup/00-getting-started";
@@ -18,7 +22,7 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
   contextPlugin,
 );
 
-const installationParams: TokenVotingPluginPrepareInstallationParams = {
+const installationParams: AddresslistVotingPluginPrepareInstallationParams = {
   settings: {
     votingSettings: {
       supportThreshold: 0.5,
@@ -27,17 +31,9 @@ const installationParams: TokenVotingPluginPrepareInstallationParams = {
       minProposerVotingPower: BigInt(1),
       votingMode: VotingMode.STANDARD,
     },
-    newToken: {
-      name: "test",
-      decimals: 18,
-      symbol: "TST",
-      balances: [
-        {
-          address: "0x1234567890123456789012345678901234567890",
-          balance: BigInt(10),
-        },
-      ],
-    },
+    addresses: [
+      "0x1234567890123456789012345678901234567890",
+    ],
   },
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
 };
