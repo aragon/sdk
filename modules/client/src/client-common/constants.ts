@@ -48,7 +48,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     addresslistVotingSetup: activeContractsList.goerli.AddresslistVotingSetup,
     tokenVotingSetup: activeContractsList.goerli.TokenVotingSetup,
   },
-  mumbai: {
+  maticmum: {
     daoFactory: activeContractsList.mumbai.DAOFactory,
     pluginSetupProcessor: activeContractsList.mumbai.PluginSetupProcessor,
     multisigRepo: activeContractsList.mumbai["multisig-repo"],
@@ -61,7 +61,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     addresslistVotingSetup: activeContractsList.mumbai.AddresslistVotingSetup,
     tokenVotingSetup: activeContractsList.mumbai.TokenVotingSetup,
   },
-  polygon: {
+  matic: {
     daoFactory: activeContractsList.polygon.DAOFactory,
     pluginSetupProcessor: activeContractsList.polygon.PluginSetupProcessor,
     multisigRepo: activeContractsList.polygon["multisig-repo"],
