@@ -16,7 +16,7 @@ export type NetworkDeployment = {
   adminSetup: string;
   addresslistVotingSetup: string;
   tokenVotingSetup: string;
-  publicResolver?: string;
+  ensRegistry?: string;
 };
 
 // This file contains common types, interfaces, and enumerations
