@@ -13,6 +13,9 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.3.1]
+### Fixed
+- Polygon network names
 ## [1.3.0]
 ### Added
 - Add support for polygon.
