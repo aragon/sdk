@@ -7,6 +7,12 @@ title: Remove Members
 
 Removes a list of addresses from the Multisig plugin of a given DAO so they are no longer able to vote on Multisig proposals for that DAO.
 
+## Caveats
+
+This action is usually paired with `updatePluginSettingsAction` to update the minimum approvals required for a multisig proposal to pass.
+In the case of removing addresses the order in which you execute actions matter, so if you are removing members and updating the plugin setting make sure that the order of the actions is first the `updatePluginSettingsAction` and then the `removeAddressesAction`.
+If this is not done correctly the transaction may fail and in the worst case brick the DAO. 
+
 ### Encoding
 */
 

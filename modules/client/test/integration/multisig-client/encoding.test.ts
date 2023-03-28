@@ -7,7 +7,6 @@ import {
   ContextPlugin,
   MultisigClient,
   MultisigPluginInstallParams,
-  MultisigVotingSettings,
   RemoveAddressesParams,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
@@ -53,10 +52,6 @@ describe("Client Multisig", () => {
 
       const addAddressesParams: AddAddressesParams = {
         members,
-        votingSettings: {
-          minApprovals: 1,
-          onlyListed: false,
-        },
         pluginAddress: TEST_INVALID_ADDRESS,
       };
 
@@ -80,10 +75,6 @@ describe("Client Multisig", () => {
 
       const addAddressesParams: AddAddressesParams = {
         members,
-        votingSettings: {
-          minApprovals: 1,
-          onlyListed: false,
-        },
         pluginAddress,
       };
       expect(() =>
@@ -106,46 +97,25 @@ describe("Client Multisig", () => {
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const addAddressesParams: AddAddressesParams = {
         members,
-        votingSettings: {
-          minApprovals: 1,
-          onlyListed: false,
-        },
         pluginAddress,
       };
-      const actions = client.encoding.addAddressesAction(
+      const action = client.encoding.addAddressesAction(
         addAddressesParams,
       );
-      expect(actions.length).toBe(2);
       const decodedMembers: string[] = client.decoding.addAddressesAction(
-        actions[0].data,
+        action.data,
       );
-      const decodedVotingSettings: MultisigVotingSettings = client.decoding
-        .updateMultisigVotingSettings(actions[1].data);
       decodedMembers.forEach((member, index) => {
         expect(member).toBe(addAddressesParams.members[index]);
       });
-      expect(decodedVotingSettings.minApprovals).toBe(
-        addAddressesParams.votingSettings.minApprovals,
-      );
-      expect(decodedVotingSettings.onlyListed).toBe(
-        addAddressesParams.votingSettings.onlyListed,
-      );
 
-      actions.forEach((action, index) => {
-        expect(typeof action).toBe("object");
-        expect(action.data instanceof Uint8Array).toBe(true);
-        expect(action.to).toBe(pluginAddress);
-        expect(action.value.toString()).toBe("0");
-        if (index === 0) {
-          expect(bytesToHex(action.data)).toBe(
-            "0x3628731c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
-          );
-        } else {
-          expect(bytesToHex(action.data)).toBe(
-            "0x303f433600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
-          );
-        }
-      });
+      expect(typeof action).toBe("object");
+      expect(action.data instanceof Uint8Array).toBe(true);
+      expect(action.to).toBe(pluginAddress);
+      expect(action.value.toString()).toBe("0");
+      expect(bytesToHex(action.data)).toBe(
+        "0x3628731c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
+      );
     });
     it("Should create a Multisig client and fail to generate a remove members action with an invalid plugin address", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -163,10 +133,6 @@ describe("Client Multisig", () => {
       const removeAddressesParams: RemoveAddressesParams = {
         members,
         pluginAddress,
-        votingSettings: {
-          minApprovals: 1,
-          onlyListed: false,
-        },
       };
       expect(() => client.encoding.removeAddressesAction(removeAddressesParams))
         .toThrow(new InvalidAddressError());
@@ -188,10 +154,6 @@ describe("Client Multisig", () => {
       const removeAddressesParams: RemoveAddressesParams = {
         members,
         pluginAddress,
-        votingSettings: {
-          minApprovals: 1,
-          onlyListed: false,
-        },
       };
       expect(() => client.encoding.removeAddressesAction(removeAddressesParams))
         .toThrow(new InvalidAddressError());
@@ -212,44 +174,23 @@ describe("Client Multisig", () => {
       const removeAddressesParams: RemoveAddressesParams = {
         members,
         pluginAddress,
-        votingSettings: {
-          minApprovals: 1,
-          onlyListed: false,
-        },
       };
-      const actions = client.encoding.removeAddressesAction(
+      const action = client.encoding.removeAddressesAction(
         removeAddressesParams,
       );
-      expect(actions.length).toBe(2);
-      const decodedVotingSettings: MultisigVotingSettings = client.decoding
-        .updateMultisigVotingSettings(actions[0].data);
       const decodedMembers: string[] = client.decoding.removeAddressesAction(
-        actions[1].data,
+        action.data,
       );
       decodedMembers.forEach((member, index) => {
         expect(member).toBe(removeAddressesParams.members[index]);
       });
-      expect(decodedVotingSettings.minApprovals).toBe(
-        removeAddressesParams.votingSettings.minApprovals,
+      expect(typeof action).toBe("object");
+      expect(action.data instanceof Uint8Array).toBe(true);
+      expect(action.to).toBe(pluginAddress);
+      expect(action.value.toString()).toBe("0");
+      expect(bytesToHex(action.data)).toBe(
+        "0xa84eb99900000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
       );
-      expect(decodedVotingSettings.onlyListed).toBe(
-        removeAddressesParams.votingSettings.onlyListed,
-      );
-      actions.forEach((action, index) => {
-        expect(typeof action).toBe("object");
-        expect(action.data instanceof Uint8Array).toBe(true);
-        expect(action.to).toBe(pluginAddress);
-        expect(action.value.toString()).toBe("0");
-        if (index === 0) {
-          expect(bytesToHex(action.data)).toBe(
-            "0x303f433600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
-          );
-        } else {
-          expect(bytesToHex(action.data)).toBe(
-            "0xa84eb99900000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000135792468013579246801357924680135792468000000000000000000000000024680135792468013579246801357924680135790000000000000000000000000987654321098765432109876543210987654321",
-          );
-        }
-      });
     });
   });
 });

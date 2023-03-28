@@ -7,6 +7,12 @@ title: Add Members
 
 Adds new address as members of the Multisig plugin installed in a DAO, so they are now able to vote on proposals.
 
+## Caveats
+
+This action is usually paired with `updatePluginSettingsAction` to update the minimum approvals required for a multisig proposal to pass.
+In the case of adding addresses the order in which you execute actions matter, so if you are adding members and updating the plugin setting make sure that the order of the actions is first the `addAddressesAction` and then the `updatePluginSettingsAction`.
+If this is not done correctly the transaction may fail and in the worst case brick the DAO. 
+
 ### Encoding
 */
 
