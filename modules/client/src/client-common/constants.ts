@@ -60,6 +60,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     adminSetup: activeContractsList.mumbai.AdminSetup,
     addresslistVotingSetup: activeContractsList.mumbai.AddresslistVotingSetup,
     tokenVotingSetup: activeContractsList.mumbai.TokenVotingSetup,
+    publicResolver: activeContractsList.mumbai.PublicResolver,
   },
   matic: {
     daoFactory: activeContractsList.polygon.DAOFactory,
@@ -73,5 +74,6 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     adminSetup: activeContractsList.polygon.AdminSetup,
     addresslistVotingSetup: activeContractsList.polygon.AddresslistVotingSetup,
     tokenVotingSetup: activeContractsList.polygon.TokenVotingSetup,
-  }
+    publicResolver: activeContractsList.polygon.PublicResolver,
+  },
 };
