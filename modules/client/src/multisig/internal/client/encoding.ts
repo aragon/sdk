@@ -13,9 +13,10 @@ import {
   SupportedNetworksArray,
 } from "../../../client-common";
 import {
+  AddAddressesParams,
   IMultisigClientEncoding,
   MultisigPluginInstallParams,
-  UpdateAddressesParams,
+  RemoveAddressesParams,
   UpdateMultisigVotingSettingsParams,
 } from "../../interfaces";
 // @ts-ignore
@@ -73,13 +74,13 @@ export class MultisigClientEncoding extends ClientCore
   /**
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *
-   * @param {UpdateAddressesParams} params
+   * @param {AddAddressesParams} params
    * @return {*}  {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
   public addAddressesAction(
-    params: UpdateAddressesParams,
-  ): DaoAction[] {
+    params: AddAddressesParams,
+  ): DaoAction {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -95,26 +96,22 @@ export class MultisigClientEncoding extends ClientCore
       "addAddresses",
       [params.members],
     );
-    const updateSettingsAction = this.updateMultisigVotingSettings(params);
-    return [
-      {
-        to: params.pluginAddress,
-        value: BigInt(0),
-        data: hexToBytes(hexBytes),
-      },
-      updateSettingsAction,
-    ];
+    return {
+      to: params.pluginAddress,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
   }
   /**
    * Computes the parameters to be given when creating a proposal that adds addresses to address list
    *
-   * @param {UpdateAddressesParams} params
+   * @param {RemoveAddressesParams} params
    * @return {*}  {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
   public removeAddressesAction(
-    params: UpdateAddressesParams,
-  ): DaoAction[] {
+    params: RemoveAddressesParams,
+  ): DaoAction {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -130,15 +127,11 @@ export class MultisigClientEncoding extends ClientCore
       "removeAddresses",
       [params.members],
     );
-    const updateSettingsAction = this.updateMultisigVotingSettings(params);
-    return [
-      updateSettingsAction,
-      {
-        to: params.pluginAddress,
-        value: BigInt(0),
-        data: hexToBytes(hexBytes),
-      },
-    ];
+    return {
+      to: params.pluginAddress,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
   }
   /**
    * Computes the parameters to be given when creating a proposal updates multisig settings

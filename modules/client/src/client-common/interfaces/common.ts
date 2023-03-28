@@ -1,4 +1,4 @@
-export const SupportedNetworksArray = ["mainnet", "goerli", "mumbai"] as const;
+export const SupportedNetworksArray = ["mainnet", "goerli", "mumbai", "polygon"] as const;
 export type SupportedNetworks = typeof SupportedNetworksArray[number];
 export type NetworkDeployment = {
   daoFactory: string;

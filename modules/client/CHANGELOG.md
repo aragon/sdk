@@ -13,6 +13,13 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.3.0]
+### Added
+- Add support for polygon.
+
+### Changed
+- Updates `@aragon/osx-ethers` to v1.2.1.
+- Reverts the encoding of `addAddresses` and `removeAddresses` in the multisig plugin to return only one action
 
 ## [1.2.0]
 ### Added
