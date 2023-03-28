@@ -1,6 +1,7 @@
 import { IClientConfig } from "../interfaces";
 import { GenericRecord } from "../typings";
 import fetch from "isomorphic-unfetch";
+import { InvalidResponseError, MissingBodyeError } from "../errors";
 
 export namespace Network {
   /**
@@ -37,10 +38,7 @@ export namespace Network {
     });
 
     if (!response.ok) {
-      throw Object.assign(
-        new Error(`${response.status}: ${response.statusText}`),
-        { response },
-      );
+      throw new InvalidResponseError(response);
     }
     return response.json();
   }
@@ -71,14 +69,11 @@ export namespace Network {
     const res = await fetch(endpoint.href, { method, headers, body, signal });
 
     if (!res.ok) {
-      const msg = `${res.status}: ${res.statusText}`;
-      throw Object.assign(new Error(msg), { response: res });
+      throw new InvalidResponseError(res);
     }
 
     if (!res.body) {
-      throw Object.assign(new Error("Missing response body"), {
-        response: res,
-      });
+      throw new MissingBodyeError(res);
     }
     yield* streamedBytes(res.body);
   }

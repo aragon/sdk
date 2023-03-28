@@ -30,6 +30,10 @@ const contextParamsMainnet: ContextParams = {
         "X-API-KEY": IPFS_API_KEY,
       },
     },
+    // Fake url to test that runAndRetry works properly
+    {
+      url: "https://httpstat.us/504?sleep=100"
+    }
   ],
   graphqlNodes: [{
     url:

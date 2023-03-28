@@ -23,7 +23,7 @@ export class GraphqlModule implements IClientGraphQLCore {
    * @returns {GraphQLClient}
    */
   public getClient(): GraphQLClient {
-    if (!this.clients.length) {
+    if (!this.clients.length || !this.clients[this.clientIdx]) {
       throw new ClientNotInitializedError("graphql");
     }
     return this.clients[this.clientIdx];

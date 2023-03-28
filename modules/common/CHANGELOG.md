@@ -16,6 +16,9 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## UPCOMING
+## 1.1.1
+- Adds new error `DataDecodingError`
+- Adds new error `IpfsError`
 ## 1.1.0
 ### Added
 - Adds `PluginInstallationPreparationError`
