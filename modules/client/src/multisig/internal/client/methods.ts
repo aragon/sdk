@@ -420,7 +420,7 @@ export class MultisigClientMethods extends ClientCore
     });
     return {
       onlyListed: multisigPlugin.onlyListed,
-      minApprovals: parseInt(multisigPlugin.minApprovals),
+      minApprovals: multisigPlugin.minApprovals,
     };
   }
   /**

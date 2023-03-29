@@ -39,7 +39,7 @@ const grapqhlEndpoints = {
   working: [
     {
       url:
-        "https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-goerli/version/v1.0.0/api",
+        "https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-goerli/version/v1.1.0/api",
     },
   ],
   timeout: [
