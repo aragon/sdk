@@ -140,7 +140,7 @@ describe("IPFS core module", () => {
       mockedIPFSClient.nodeInfo.mockRejectedValueOnce(new Error());
       const isOnline = await client.ipfs.isUp();
 
-      git add expect(isOnline).toEqual(false);
+      expect(isOnline).toEqual(false);
     }
   });
 });
