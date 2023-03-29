@@ -39,6 +39,9 @@ const contextParamsMainnet: ContextParams = {
   }],
 };
 
+// store cat implementation for when it gets overwritten
+const catImplementation = mockedIPFSClient.cat.getMockImplementation()
+
 describe("IPFS core module", () => {
   it("Should have an API token to test the proxy", () => {
     expect(IPFS_API_KEY.length).toBeGreaterThan(0);
@@ -61,6 +64,8 @@ describe("IPFS core module", () => {
     expect(typeof decodedString).toBe("string");
     expect(recoveredString).toEqual(originalStr);
     expect(decodedString).toEqual(originalStr);
+    // restore cat implementation
+    mockedIPFSClient.cat.mockImplementation(catImplementation);
   });
   it("Should connect to a IPFS node, upload bytes and recover the same string", async () => {
     const context = new Context(contextParamsMainnet);
@@ -93,6 +98,8 @@ describe("IPFS core module", () => {
     expect(typeof decodedString).toBe("string");
     expect(recoveredString).toEqual("Hello There :)");
     expect(decodedString).toEqual("Hello There :)");
+    // restore cat implementation
+    mockedIPFSClient.cat.mockImplementation(catImplementation);
   });
   it("Should work when an IPFS node is functional", async () => {
     const context = new Context(contextParamsMainnet);
@@ -133,7 +140,7 @@ describe("IPFS core module", () => {
       mockedIPFSClient.nodeInfo.mockRejectedValueOnce(new Error());
       const isOnline = await client.ipfs.isUp();
 
-      expect(isOnline).toEqual(false);
+      git add expect(isOnline).toEqual(false);
     }
   });
 });
