@@ -18,6 +18,9 @@ TEMPLATE:
 - Add ipfs optimization.
 ### Fixed
 - Fix plugin installation
+
+### Fixed
+- Wrong typing in subgraph minApprovals
 ## [1.3.1]
 ### Fixed
 - Polygon network names
