@@ -1,6 +1,8 @@
+// mocks need to be at the top of the imports
+import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
+
 import { Wallet } from "@ethersproject/wallet";
 import { Client, Context, ContextParams } from "../../../src";
-
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
@@ -25,15 +27,11 @@ const contextParamsMainnet: ContextParams = {
   web3Providers: web3endpoints.working,
   ipfsNodes: [
     {
-      url: "https://testing-ipfs-0.aragon.network/api/v0",
-      headers: {
-        "X-API-KEY": IPFS_API_KEY,
-      },
+      url: "https://example.com",
     },
-    // Fake url to test that runAndRetry works properly
     {
-      url: "https://httpstat.us/504?sleep=100"
-    }
+      url: "https://example.com",
+    },
   ],
   graphqlNodes: [{
     url:
@@ -49,6 +47,10 @@ describe("IPFS core module", () => {
     const context = new Context(contextParamsMainnet);
     const client = new Client(context);
     const originalStr = "I am a test";
+    mockedIPFSClient.add.mockResolvedValueOnce(new Error());
+    mockedIPFSClient.cat.mockImplementation(async () =>
+      Buffer.from(originalStr)
+    );
     const cid = await client.ipfs.add(originalStr);
     const recoveredString = await client.ipfs.fetchString(cid);
     const recoveredBytes = await client.ipfs.fetchBytes(cid);
@@ -79,6 +81,8 @@ describe("IPFS core module", () => {
       58,
       41,
     ]);
+    mockedIPFSClient.add.mockResolvedValueOnce(new Error());
+    mockedIPFSClient.cat.mockImplementation(async () => originalBytes);
     const cid = await client.ipfs.add(originalBytes);
     const recoveredString = await client.ipfs.fetchString(cid);
     const recoveredBytes = await client.ipfs.fetchBytes(cid);
@@ -123,12 +127,10 @@ describe("IPFS core module", () => {
       expect(isOnline).toEqual(false);
     }
     {
-      const context = new Context(
-        Object.assign({}, contextParamsMainnet, {
-          ipfsNodes: [{ url: "https://does-not-exist-here.random.hb/1234" }],
-        }),
-      );
+      const context = new Context(contextParamsMainnet);
       const client = new Client(context);
+
+      mockedIPFSClient.nodeInfo.mockRejectedValueOnce(new Error());
       const isOnline = await client.ipfs.isUp();
 
       expect(isOnline).toEqual(false);
