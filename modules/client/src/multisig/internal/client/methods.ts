@@ -562,7 +562,6 @@ export class MultisigClientMethods extends ClientCore
       params,
       name,
     });
-    await this.ipfs.ensureOnline();
     return Promise.all(
       multisigProposals.map(
         async (

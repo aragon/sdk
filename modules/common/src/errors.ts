@@ -13,6 +13,11 @@ export class GraphQLError extends Error {
     super("Cannot fetch the " + model + " data from GraphQL");
   }
 }
+export class IpfsError extends Error {
+  constructor() {
+    super("Cannot add or get data from ipfs");
+  }
+}
 export class InvalidAddressOrEnsError extends Error {
   constructor() {
     super("Invalid address or ENS");
@@ -141,5 +146,10 @@ export class NoNodesAvailableError extends Error {
 export class PluginInstallationPreparationError extends Error {
   constructor() {
     super("Failed to install plugin");
+  }
+}
+export class DataDecodingError extends Error {
+  constructor(message: string) {
+    super("Cannot decode data: " + message);
   }
 }

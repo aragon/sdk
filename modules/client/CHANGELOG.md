@@ -13,6 +13,8 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Added
+- Add ipfs optimization.
 ## [1.3.1]
 ### Fixed
 - Polygon network names

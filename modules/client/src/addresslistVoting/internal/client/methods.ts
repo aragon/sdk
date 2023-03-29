@@ -539,7 +539,6 @@ export class AddresslistVotingClientMethods extends ClientCore
       params,
       name,
     });
-    await this.ipfs.ensureOnline();
     return Promise.all(
       addresslistVotingProposals.map(
         async (

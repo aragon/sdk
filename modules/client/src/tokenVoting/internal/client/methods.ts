@@ -306,7 +306,7 @@ export class TokenVotingClientMethods extends ClientCore
       {
         pluginSetupRef: {
           pluginSetupRepo: LIVE_CONTRACTS[networkName].tokenVotingRepo,
-          versionTag: versionTag!
+          versionTag: versionTag!,
         },
         data: tokenVotingPluginInstallItem.data,
       },
@@ -529,7 +529,6 @@ export class TokenVotingClientMethods extends ClientCore
       params,
       name,
     });
-    await this.ipfs.ensureOnline();
     return Promise.all(
       tokenVotingProposals.map(
         async (
