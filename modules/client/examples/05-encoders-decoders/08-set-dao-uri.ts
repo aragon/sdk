@@ -22,7 +22,7 @@ const daoUri: string = "https://the.dao/uri"; // the URI to be defined for the D
 
 const action: DaoAction = client.encoding.setDaoUriAction(
   daoAddressOrEns,
-  daoUri
+  daoUri,
 );
 console.log({ action });
 
@@ -30,11 +30,13 @@ console.log({ action });
 Returns:
 
 ```json
+{ action:
   {
     to: "0x123123123...",
     value: 0n,
     data: Uint8Array[12,34,45...]
   }
+}
 ```
 
 ### Decoding

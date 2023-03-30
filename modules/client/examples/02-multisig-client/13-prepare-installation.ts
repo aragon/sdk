@@ -3,49 +3,38 @@
 title: Prepare Installation
 ---
 
-## Prepare the Installation of a Token Voting Plugin
+## Prepare the Installation of a Multisig Plugin
 */
 
 import {
   ContextPlugin,
+  MultisigClient,
+  MultisigPluginPrepareInstallationParams,
   PrepareInstallationStep,
-  TokenVotingClient,
-  TokenVotingPluginPrepareInstallationParams,
-  VotingMode,
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create an TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
+
+// Create an Multisig client.
+const multisigClient: MultisigClient = new MultisigClient(
   contextPlugin,
 );
 
-const installationParams: TokenVotingPluginPrepareInstallationParams = {
+const installationParams: MultisigPluginPrepareInstallationParams = {
   settings: {
     votingSettings: {
-      supportThreshold: 0.5,
-      minParticipation: 0.5,
-      minDuration: 7200,
-      minProposerVotingPower: BigInt(1),
-      votingMode: VotingMode.STANDARD,
+      minApprovals: 5,
+      onlyListed: true,
     },
-    newToken: {
-      name: "test",
-      decimals: 18,
-      symbol: "TST",
-      balances: [
-        {
-          address: "0x1234567890123456789012345678901234567890",
-          balance: BigInt(10),
-        },
-      ],
-    },
+    members: [
+      "0x1234567890123456789012345678901234567890",
+    ],
   },
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
 };
-const steps = tokenVotingClient.methods.prepareInstallation(installationParams);
+const steps = multisigClient.methods.prepareInstallation(installationParams);
 for await (const step of steps) {
   switch (step.key) {
     case PrepareInstallationStep.PREPARING:
@@ -60,7 +49,8 @@ for await (const step of steps) {
 /* MARKDOWN
 Returns:
 ```tsx
-  step:{
+{
+  step: {
     helpers: ["0x12345...", "0x12345..."]
     pluginRepo: "0x12345...",
     pluginAdddres: "0x12345...",
@@ -78,5 +68,6 @@ Returns:
       }
     ]
   }
+}
 ```
 */

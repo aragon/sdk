@@ -13,7 +13,7 @@ import {
   DaoListItem,
   DaoSortBy,
   IDaoQueryParams,
-  SortDirection
+  SortDirection,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -24,7 +24,7 @@ const queryParams: IDaoQueryParams = {
   skip: 0, // optional
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional
-  sortBy: DaoSortBy.CREATED_AT //optional, alternatively "SUBDOMAIN" (and "POPULARITY" coming soon)
+  sortBy: DaoSortBy.CREATED_AT, //optional, alternatively "SUBDOMAIN" (and "POPULARITY" coming soon)
 };
 
 // Get a list of DAOs from the Aragon DAO registry.

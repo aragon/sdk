@@ -11,7 +11,7 @@ Adds an pin data into one of the specified IPFS nodes and return a IPFS CID prec
 import {
   ContextPlugin,
   MultisigClient,
-  ProposalMetadata
+  ProposalMetadata,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -27,16 +27,16 @@ const metadata: ProposalMetadata = {
   resources: [
     {
       name: "Discord",
-      url: "https://discord.com/..."
+      url: "https://discord.com/...",
     },
     {
       name: "Website",
-      url: "https://website..."
+      url: "https://website...",
     },
   ],
   media: {
     logo: "https://...",
-    header: "https://..."
+    header: "https://...",
   },
 };
 

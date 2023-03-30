@@ -17,9 +17,9 @@ import {
   CreateDaoParams,
   DaoCreationSteps,
   DaoMetadata,
-  IAddresslistVotingPluginInstall,
   GasFeeEstimation,
-  VotingMode
+  IAddresslistVotingPluginInstall,
+  VotingMode,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -27,24 +27,25 @@ import { context } from "../index";
 const client: Client = new Client(context);
 
 // Define the plugins to install and their params.
-const pluginInitParams: IAddresslistVotingPluginInstall = {
+const addresslistVotingPluginInstallParams: IAddresslistVotingPluginInstall = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%
     supportThreshold: 0.5, // 50%
     minProposerVotingPower: BigInt("5000"), // default 0
-    votingMode: VotingMode.VOTE_REPLACEMENT // default is STANDARD. other options: EARLY_EXECUTION, VOTE_REPLACEMENT
+    votingMode: VotingMode.VOTE_REPLACEMENT, // default is STANDARD. other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   },
   addresses: [
     "0x1234567890123456789012345678901234567890",
     "0x2345678901234567890123456789012345678901",
     "0x3456789012345678901234567890123456789012",
-    "0x4567890123456789012345678901234567890123"
-  ]
+    "0x4567890123456789012345678901234567890123",
+  ],
 };
 
 // Encodes the plugin instructions for installing into the DAO with its defined parameters.
-const addresslistVotingInstallPluginInstructions = AddresslistVotingClient.encoding.getPluginInstallItem(pluginInitParams);
+const addresslistVotingPluginInstallItem = AddresslistVotingClient
+  .encoding.getPluginInstallItem(addresslistVotingPluginInstallParams);
 
 const daoMetadata: DaoMetadata = {
   name: "My DAO",
@@ -52,7 +53,7 @@ const daoMetadata: DaoMetadata = {
   avatar: "",
   links: [{
     name: "Web site",
-    url: "https://..."
+    url: "https://...",
   }],
 };
 
@@ -62,11 +63,13 @@ const metadataUri: string = await client.methods.pinMetadata(daoMetadata);
 const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [addresslistVotingInstallPluginInstructions]
+  plugins: [addresslistVotingPluginInstallItem],
 };
 
 // Estimate gas for the transaction.
-const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createParams);
+const estimatedGas: GasFeeEstimation = await client.estimation.createDao(
+  createParams,
+);
 console.log({ avg: estimatedGas.average, max: estimatedGas.max });
 
 // Creates a DAO with a Multisig plugin installed.
@@ -76,13 +79,25 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoCreationSteps.CREATING:
-        console.log({ txHash: step.txHash });
+        console.log({ txHash: step.txHash }); // { txHash: "0xb1c14a49...3e8620b0f5832d61c" }
         break;
       case DaoCreationSteps.DONE:
-        console.log({ daoAddress: step.address, pluginAddresses: step.pluginAddresses });
+        console.log({
+          daoAddress: step.address,
+          pluginAddresses: step.pluginAddresses,
+        });
         break;
     }
   } catch (err) {
     console.error(err);
   }
 }
+/* MARKDOWN
+Returns:
+```tsx
+{
+  daoAddress: "0xb1c14a49...3e8620b0f5832d61c",
+  pluginAddresses: ["0xb1c14a49...3e8620b0f5832d61c", "0xb1c14a49...3e8620b0f5832d61c"]
+}
+```
+*/

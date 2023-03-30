@@ -25,31 +25,33 @@ console.log({ dao });
 Returns:
 
 ```json
-{
-  address: "0x1234567890123456789012345678901234567890",
-  ensDomain: "test.dao.eth",
-  metadata: {
-    name: "test",
-    description: "this is a description",
-    avatar?: "https://wbsite.com/image.jpeg",
-    links: [
+{ dao:
+  {
+    address: "0x1234567890123456789012345678901234567890",
+    ensDomain: "test.dao.eth",
+    metadata: {
+      name: "test",
+      description: "this is a description",
+      avatar?: "https://wbsite.com/image.jpeg",
+      links: [
+        {
+          name: "Website",
+          url: "https://website..."
+        },
+        {
+          name: "Discord",
+          url: "https://discord.com/..."
+        }
+      ]
+    },
+    creationDate: <Date>,
+    plugins: [
       {
-        name: "Website",
-        url: "https://website..."
-      },
-      {
-        name: "Discord",
-        url: "https://discord.com/..."
+        id: token-voting.plugin.dao.eth,
+        instanceAddress: "0x12345..."
       }
     ]
-  },
-  creationDate: <Date>,
-  plugins: [
-    {
-      id: token-voting.plugin.dao.eth,
-      instanceAddress: "0x12345..."
-    }
-  ]
+  }
 }
 ```
 */

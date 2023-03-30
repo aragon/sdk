@@ -12,11 +12,12 @@ This proposal will be created using the TokenVoting plugin as its governance mec
 import {
   ContextPlugin,
   CreateMajorityVotingProposalParams,
+  DaoAction,
   ProposalCreationSteps,
   TokenVotingClient,
+  VoteValues,
   VotingMode,
   VotingSettings,
-  VoteValues
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -24,47 +25,51 @@ import { context } from "../index";
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 // Create a TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
+  contextPlugin,
+);
 
-// Create a config action to set the parameters of how the proposal should be initiated.
+// The contract address of the token voting plugin you have installed in your DAO
+const pluginAddress: string = "0x1234567890123456789012345678901234567890";
+
+// Update
+// [Optional] In case you wanted to pass an action to the proposal, you can configure it here and pass it immediately. An action is the encoded transaction which will get executed when a proposal passes.
+// In this example, we are creating an action to change the settings of a governance plugin to demonstrate how to set it up.
 const configActionParams: VotingSettings = {
   minDuration: 60 * 60 * 24 * 2, // seconds
   minParticipation: 0.25, // 25%
   supportThreshold: 0.5, // 50%
   minProposerVotingPower: BigInt("5000"), // default 0
-  votingMode: VotingMode.EARLY_EXECUTION // default standard, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
+  votingMode: VotingMode.EARLY_EXECUTION, // default STANDARD, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
 };
-
-// The contract address of the token voting plugin you have installed in your DAO
-const pluginAddress: string = "0x1234567890123456789012345678901234567890";
-
-// Update the configuration of the plugin.
-const configAction = tokenVotingClient.encoding.updatePluginSettingsAction(pluginAddress, configActionParams);
+// We need to encode the action so it can executed once the proposal passes.
+const updatePluginSettingsAction: DaoAction = tokenVotingClient.encoding
+  .updatePluginSettingsAction(pluginAddress, configActionParams);
 
 const metadataUri: string = await tokenVotingClient.methods.pinMetadata({
   title: "Test proposal",
-    summary: "This is a test proposal",
-    description: "This is the description of a long test proposal",
-    resources: [
-      {
-        url: "https://thforumurl.com",
-        name: "Forum"
-      }
-    ],
-    media: {
-      header: "https://fileserver.com/header.png",
-      logo: "https://fileserver.com/logo.png"
-    }
-})
+  summary: "This is a test proposal",
+  description: "This is the description of a long test proposal",
+  resources: [
+    {
+      url: "https://thforumurl.com",
+      name: "Forum",
+    },
+  ],
+  media: {
+    header: "https://fileserver.com/header.png",
+    logo: "https://fileserver.com/logo.png",
+  },
+});
 
 const proposalParams: CreateMajorityVotingProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890", // the address of the TokenVoting plugin contract containing all plugin logic.
   metadataUri,
-  actions: [configAction], // optional, if none, leave an empty array `[]`
+  actions: [updatePluginSettingsAction], // optional, if none, leave an empty array `[]`
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
-  creatorVote: VoteValues.YES // default NO, other options: ABSTAIN, YES
+  creatorVote: VoteValues.YES, // default NO, other options: ABSTAIN, YES
 };
 
 // Creates a proposal using the token voting governance mechanism, which executes with the parameters set in the configAction object.
@@ -74,10 +79,10 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case ProposalCreationSteps.CREATING:
-        console.log(step.txHash);
+        console.log(step.txHash); // "0xb1c14a49...3e8620b0f5832d61c"
         break;
       case ProposalCreationSteps.DONE:
-        console.log(step.proposalId);
+        console.log(step.proposalId); // "0xb1c14a49..._0x1"
         break;
     }
   } catch (err) {

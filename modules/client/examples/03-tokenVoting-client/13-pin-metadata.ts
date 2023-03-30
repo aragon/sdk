@@ -10,15 +10,17 @@ Adds and pins data with into one of the specified IPFS nodes and return an IPFS 
 
 import {
   ContextPlugin,
+  ProposalMetadata,
   TokenVotingClient,
-  ProposalMetadata
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
+  contextPlugin,
+);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
@@ -27,21 +29,23 @@ const metadata: ProposalMetadata = {
   resources: [
     {
       name: "Discord",
-      url: "https://discord.com/..."
+      url: "https://discord.com/...",
     },
     {
       name: "Website",
-      url: "https://website..."
+      url: "https://website...",
     },
   ],
   media: {
     logo: "https://...",
-    header: "https://..."
+    header: "https://...",
   },
 };
 
 // Pin the metadata in IPFS to get back the URI.
-const metadataUri: string = await tokenVotingClient.methods.pinMetadata(metadata);
+const metadataUri: string = await tokenVotingClient.methods.pinMetadata(
+  metadata,
+);
 console.log({ metadataUri });
 
 /* MARKDOWN

@@ -15,9 +15,7 @@ import {
   CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
-  VotingSettings,
-  VotingMode,
-  VoteValues
+  VoteValues,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -33,20 +31,22 @@ const metadata: ProposalMetadata = {
   resources: [
     {
       name: "Discord",
-      url: "https://discord.com/..."
+      url: "https://discord.com/...",
     },
     {
       name: "Website",
-      url: "https://website..."
+      url: "https://website...",
     },
   ],
   media: {
     logo: "https://...",
-    header: "https://..."
+    header: "https://...",
   },
 };
 
-const metadataUri: string = await addresslistVotingClient.methods.pinMetadata(metadata);
+const metadataUri: string = await addresslistVotingClient.methods.pinMetadata(
+  metadata,
+);
 
 const pluginAddress = "0x1234567890123456789012345678901234567890"; // the address of the AddresslistVoting plugin installed into the DAO.
 
@@ -58,7 +58,7 @@ const proposalParams: CreateMajorityVotingProposalParams = {
   startDate: new Date(),
   endDate: new Date(),
   executeOnPass: false,
-  creatorVote: VoteValues.YES // otherwise NO or ABSTAIN
+  creatorVote: VoteValues.YES, // otherwise NO or ABSTAIN
 };
 
 const steps = addresslistVotingClient.methods.createProposal(proposalParams);
@@ -67,10 +67,10 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case ProposalCreationSteps.CREATING:
-        console.log(step.txHash);
+        console.log(step.txHash); // "0xb1c14a49...3e8620b0f5832d61c"
         break;
       case ProposalCreationSteps.DONE:
-        console.log(step.proposalId);
+        console.log(step.proposalId); // "0xb1c14a49..._0x1"
         break;
     }
   } catch (err) {

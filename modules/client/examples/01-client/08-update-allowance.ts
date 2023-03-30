@@ -15,7 +15,7 @@ This function updates the allowance approval to the amount specified.
 import {
   Client,
   DaoDepositSteps,
-  UpdateAllowanceParams
+  UpdateAllowanceParams,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -25,7 +25,7 @@ const client: Client = new Client(context);
 const updateAllowanceParams: UpdateAllowanceParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
-  tokenAddress: "0x1234567890123456789012345678901234567890" // token contract adddress
+  tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
 };
 
 const steps = client.methods.updateAllowance(updateAllowanceParams);

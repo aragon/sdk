@@ -14,7 +14,7 @@ import {
   IVoteProposalParams,
   TokenVotingClient,
   VoteProposalStep,
-  VoteValues
+  VoteValues,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -22,11 +22,13 @@ import { context } from "../index";
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 // Create a TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
+  contextPlugin,
+);
 
 const voteParams: IVoteProposalParams = {
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
-  vote: VoteValues.YES // other options: NO, ABSTAIN
+  vote: VoteValues.YES, // alternatively NO, or ABSTAIN
 };
 
 // Creates a vote on a given proposal created by the token voting governance mechanism.

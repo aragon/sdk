@@ -24,10 +24,12 @@ console.log({ functionParams });
 Returns:
 
 ```json
-{
-  id: "function functionName(param1, param2)"
-  functionName: "functionName"
-  hash: "0x12345678"
+{ functionParams:
+  {
+    id: "function functionName(param1, param2)"
+    functionName: "functionName"
+    hash: "0x12345678"
+  }
 }
 ```
 */

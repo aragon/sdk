@@ -13,7 +13,7 @@ import {
   TokenVotingClient,
   VotingMode,
 } from "@aragon/sdk-client";
-import { context } from "../00-setup/00-getting-started";
+import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
@@ -52,6 +52,7 @@ for await (const step of steps) {
 /* MARKDOWN
 Returns:
 ```tsx
+{
   step:{
     helpers: ["0x12345...", "0x12345..."]
     pluginRepo: "0x12345...",
@@ -70,5 +71,6 @@ Returns:
       }
     ]
   }
+}
 ```
 */

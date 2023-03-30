@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Get Function Parameters 
+title: Get Function Parameters
 ---
 
 ## Get function parameters from  encoded action (Addresslist)
@@ -21,10 +21,12 @@ console.log({ functionParams });
 Returns:
 
 ```
-{
-  id: "function functionName(param1, param2)"
-  functionName: "functionName"
-  hash: "0x12345678"
+{ functionParams:
+  {
+    id: "function functionName(param1, param2)"
+    functionName: "functionName"
+    hash: "0x12345678"
+  }
 }
 ```
 */

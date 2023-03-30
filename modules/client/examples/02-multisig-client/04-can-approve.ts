@@ -11,7 +11,7 @@ Checks whether a user is able to participate in a proposal created using the Mul
 import {
   CanApproveParams,
   ContextPlugin,
-  MultisigClient
+  MultisigClient,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -22,7 +22,7 @@ const client: MultisigClient = new MultisigClient(contextPlugin);
 
 const canApproveParams: CanApproveParams = {
   approverAddressOrEns: "0x1234567890123456789012345678901234567890",
-  proposalId: "0x1234567890123456789012345678901234567890_0x0"
+  proposalId: "0x1234567890123456789012345678901234567890_0x0",
 };
 
 // Checks whether the addressOrEns provided is able to approve a given proposal created with the pluginAddress.

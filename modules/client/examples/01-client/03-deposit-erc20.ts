@@ -16,9 +16,9 @@ Deposits ERC-20 tokens to a DAO.
 import {
   Client,
   DaoDepositSteps,
-  GasFeeEstimation,
   DepositParams,
-  TokenType
+  GasFeeEstimation,
+  TokenType,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -29,11 +29,13 @@ const depositParams: DepositParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
   amount: BigInt(10), // amount in wei
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
-  type: TokenType.ERC20 // "erc20" for ERC20 token, otherwise "native" for ETH
+  type: TokenType.ERC20, // "erc20" for ERC20 token, otherwise "native" for ETH
 };
 
 // Estimate how much gas the transaction will cost.
-const estimatedGas: GasFeeEstimation = await client.estimation.deposit(depositParams);
+const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
+  depositParams,
+);
 console.log({ avg: estimatedGas.average, max: estimatedGas.max });
 
 // Deposit the ERC20 tokens.

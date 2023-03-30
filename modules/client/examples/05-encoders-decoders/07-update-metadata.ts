@@ -45,6 +45,18 @@ const action: DaoAction = await client.encoding.updateDaoMetadataAction(
 console.log({ action });
 
 /* MARKDOWN
+Returns:
+
+```json
+{ action:
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  }
+}
+```
+
 ### Decoding
 */
 

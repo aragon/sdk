@@ -11,14 +11,15 @@ Adds and pin data into one of the specified IPFS nodes and return a IPFS CID pre
 import {
   AddresslistVotingClient,
   ContextPlugin,
-  ProposalMetadata
+  ProposalMetadata,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate an AddresslistVoting plugin client.
-const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient: AddresslistVotingClient =
+  new AddresslistVotingClient(contextPlugin);
 
 const proposalMetadata: ProposalMetadata = {
   title: "Test Proposal",
@@ -27,20 +28,21 @@ const proposalMetadata: ProposalMetadata = {
   resources: [
     {
       name: "Discord",
-      url: "https://discord.com/..."
+      url: "https://discord.com/...",
     },
     {
       name: "Website",
-      url: "https://website..."
+      url: "https://website...",
     },
   ],
   media: {
     logo: "https://...",
-    header: "https://..."
+    header: "https://...",
   },
 };
 
-const proposalMetadataUri: string = await addresslistVotingClient.methods.pinMetadata(proposalMetadata);
+const proposalMetadataUri: string = await addresslistVotingClient.methods
+  .pinMetadata(proposalMetadata);
 console.log({ proposalMetadataUri });
 
 /* MARKDOWN

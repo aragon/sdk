@@ -9,20 +9,21 @@ Gets the list of proposals created using the Addresslist Voting plugin.
 */
 
 import {
-  AddresslistVotingProposalListItem,
   AddresslistVotingClient,
+  AddresslistVotingProposalListItem,
   ContextPlugin,
   IProposalQueryParams,
   ProposalSortBy,
   ProposalStatus,
-  SortDirection
+  SortDirection,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate an AddresslistVoting client.
-const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient: AddresslistVotingClient =
+  new AddresslistVotingClient(contextPlugin);
 
 const queryParams: IProposalQueryParams = {
   skip: 0, // optional
@@ -32,7 +33,8 @@ const queryParams: IProposalQueryParams = {
   status: ProposalStatus.ACTIVE, // optional, alternatively PENDING, SUCCEEDED, EXECUTED, DEFEATED
 };
 
-const addresslistVotingProposals: AddresslistVotingProposalListItem[] = await addresslistVotingClient.methods.getProposals(queryParams);
+const addresslistVotingProposals: AddresslistVotingProposalListItem[] =
+  await addresslistVotingClient.methods.getProposals(queryParams);
 console.log({ addresslistVotingProposals });
 
 /* MARKDOWN

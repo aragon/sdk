@@ -17,7 +17,7 @@ import {
   DaoCreationSteps,
   GasFeeEstimation,
   MultisigClient,
-  MultisigPluginInstallParams
+  MultisigPluginInstallParams,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -29,19 +29,20 @@ const members: string[] = [
   "0x1234567890123456789012345678901234567890",
   "0x2345678901234567890123456789012345678901",
   "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123"
+  "0x4567890123456789012345678901234567890123",
 ];
 
-const multisigIntallParams: MultisigPluginInstallParams = {
+const multisigPluginIntallParams: MultisigPluginInstallParams = {
   votingSettings: {
     minApprovals: 1,
-    onlyListed: true
+    onlyListed: true,
   },
-  members
-}
+  members,
+};
 
 // Encodes the parameters of the Multisig plugin. These will get used in the installation plugin for the DAO.
-const multisigInstallPluginEncodedParams = MultisigClient.encoding.getPluginInstallItem(multisigIntallParams);
+const multisigPluginInstallItem = MultisigClient.encoding
+  .getPluginInstallItem(multisigPluginIntallParams);
 
 // Pin metadata to IPFS, returns IPFS CID string.
 const metadataUri: string = await client.methods.pinMetadata({
@@ -50,18 +51,20 @@ const metadataUri: string = await client.methods.pinMetadata({
   avatar: "", // image url
   links: [{
     name: "Web site",
-    url: "https://..."
+    url: "https://...",
   }],
 });
 
 const createParams: CreateDaoParams = {
   metadataUri,
   ensSubdomain: "my-org", // my-org.dao.eth
-  plugins: [multisigInstallPluginEncodedParams]
+  plugins: [multisigPluginInstallItem],
 };
 
 // Estimate gas for the transaction.
-const estimatedGas: GasFeeEstimation = await client.estimation.createDao(createParams);
+const estimatedGas: GasFeeEstimation = await client.estimation.createDao(
+  createParams,
+);
 console.log({ avg: estimatedGas.average, max: estimatedGas.max });
 
 // Creates a DAO with a Multisig plugin installed.
@@ -70,13 +73,26 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoCreationSteps.CREATING:
-        console.log({ txHash: step.txHash });
+        console.log({ txHash: step.txHash }); // { txHash: "0xb1c14a49...3e8620b0f5832d61c" }
         break;
       case DaoCreationSteps.DONE:
-        console.log({ daoAddress: step.address, pluginAddresses: step.pluginAddresses });
+        console.log({
+          daoAddress: step.address,
+          pluginAddresses: step.pluginAddresses,
+        });
         break;
     }
   } catch (err) {
     console.error(err);
   }
 }
+
+/* MARKDOWN
+Returns:
+```tsx
+{
+  daoAddress: "0xb1c14a49...3e8620b0f5832d61c",
+  pluginAddresses: ["0xb1c14a49...3e8620b0f5832d61c", "0xb1c14a49...3e8620b0f5832d61c"]
+}
+```
+*/

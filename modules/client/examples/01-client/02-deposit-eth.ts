@@ -11,9 +11,9 @@ Handles the flow of depositing the native EVM token (when in mainnet, it's ETH) 
 import {
   Client,
   DaoDepositSteps,
-  GasFeeEstimation,
   DepositParams,
-  TokenType
+  GasFeeEstimation,
+  TokenType,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -21,13 +21,15 @@ import { context } from "../index";
 const client: Client = new Client(context);
 
 const depositParams: DepositParams = {
-  daoAddressOrEns: 'my-dao.dao.eth',
+  daoAddressOrEns: "my-dao.dao.eth",
   amount: BigInt(10), // amount in wei
-  type: TokenType.NATIVE // "native" for ETH, otherwise "erc20" for ERC20 tokens
+  type: TokenType.NATIVE, // "native" for ETH, otherwise "erc20" for ERC20 tokens
 };
 
 // Estimate how much gas the transaction will cost.
-const estimatedGas: GasFeeEstimation = await client.estimation.deposit(depositParams);
+const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
+  depositParams,
+);
 console.log({ avg: estimatedGas.average, max: estimatedGas.max });
 
 // Deposit ETH to the DAO.

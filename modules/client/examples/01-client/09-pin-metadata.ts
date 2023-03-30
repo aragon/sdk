@@ -22,8 +22,8 @@ const metadata: DaoMetadata = {
   avatar: "",
   links: [{
     name: "Web site",
-    url: "https://..."
-  }]
+    url: "https://...",
+  }],
 };
 
 // Pin the metadata in IPFS.
