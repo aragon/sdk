@@ -601,7 +601,7 @@ describe("Client Multisig", () => {
       expect(proposals[0].settings.onlyListed).toBe(true);
 
       expect(mockedClient.request).toHaveBeenCalledWith(
-        QueryMultisigProposal,
+        QueryMultisigProposals,
         {
           where: {
             executable: false,
