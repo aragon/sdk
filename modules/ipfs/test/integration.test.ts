@@ -1,4 +1,4 @@
-import { Client } from "../src";
+import { Client, InvalidResponseError } from "../src";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -107,7 +107,7 @@ describe("IPFS client", () => {
   it("Should return an error when trying to cat an invalid cid", async () => {
     const path = "1nv4l1dC1D";
     await expect(client.cat(path)).rejects.toThrow(
-      "500: Internal Server Error",
+      InvalidResponseError,
     );
   });
 

@@ -27,10 +27,16 @@ import {
   TransferType,
   WithdrawParams,
 } from "../interfaces";
-import { Result } from "@ethersproject/abi";
+import { defaultAbiCoder, Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { AddressZero } from "@ethersproject/constants";
+import { PluginSetupProcessor } from "@aragon/osx-ethers";
+import {
+  ApplyInstallationParams,
+  DecodedApplyInstallationParams,
+} from "../client-common";
+import { hexToBytes } from "@aragon/sdk-common";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -229,6 +235,39 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
       proposalId: transfer.proposal?.id || "",
     };
   }
+}
+
+export function applyInstallatonParamsToContract(
+  params: ApplyInstallationParams,
+): PluginSetupProcessor.ApplyInstallationParamsStruct {
+  return {
+    plugin: params.pluginAddress,
+    pluginSetupRef: {
+      pluginSetupRepo: params.pluginRepo,
+      versionTag: params.versionTag,
+    },
+    helpersHash: keccak256(
+      defaultAbiCoder.encode(["address[]"], [params.helpers]),
+    ),
+    permissions: params.permissions,
+  };
+}
+export function applyInstallatonParamsFromContract(
+  result: Result,
+): DecodedApplyInstallationParams {
+  const params = result[1];
+  return {
+    helpersHash: params.helpersHash,
+    permissions: params.permissions.map((permission: any) => {
+      return {
+        ...permission,
+        permissionId: hexToBytes(permission.permissionId),
+      };
+    }),
+    versionTag: params.pluginSetupRef.versionTag,
+    pluginAddress: params.plugin,
+    pluginRepo: params.pluginSetupRef.pluginSetupRepo,
+  };
 }
 
 export function permissionParamsToContract(

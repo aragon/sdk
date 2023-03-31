@@ -1,9 +1,11 @@
 /* MARKDOWN
-## Addresslist governance plugin
+---
+title: Create Addresslist Voting DAO
+---
+
+## Create a DAO with a Addresslist Voting Plugin Installed
 
 The Addresslist governance plugin enables DAOs to preset an address list of approved addresses that can vote on proposals. This plugin is useful for DAOs that want to have a fixed list of addresses that can vote on proposals, without them necessarily having to own any specific tokens.
-
-### Creating a DAO with a AddresslistVoting plugin
 
 In order to create a DAO with a AddresslistVoting plugin, you need to first, encode the instructions for installing the plugin, based also on the pararmeters you define.
 Then, use those encoded instructions when creating your DAO.
@@ -19,7 +21,7 @@ import {
   GasFeeEstimation,
   VotingMode
 } from "@aragon/sdk-client";
-import { context } from "../01-client/01-getting-started";
+import { context } from "../index";
 
 // Instantiate a client from the Aragon OSx SDK context.
 const client: Client = new Client(context);

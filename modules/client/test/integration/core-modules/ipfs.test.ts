@@ -1,6 +1,8 @@
+// mocks need to be at the top of the imports
+import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
+
 import { Wallet } from "@ethersproject/wallet";
 import { Client, Context, ContextParams } from "../../../src";
-
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",
@@ -25,10 +27,10 @@ const contextParamsMainnet: ContextParams = {
   web3Providers: web3endpoints.working,
   ipfsNodes: [
     {
-      url: "https://testing-ipfs-0.aragon.network/api/v0",
-      headers: {
-        "X-API-KEY": IPFS_API_KEY,
-      },
+      url: "https://example.com",
+    },
+    {
+      url: "https://example.com",
     },
   ],
   graphqlNodes: [{
@@ -36,6 +38,9 @@ const contextParamsMainnet: ContextParams = {
       "https://api.thegraph.com/subgraphs/name/aragon/aragon-zaragoza-goerli",
   }],
 };
+
+// store cat implementation for when it gets overwritten
+const catImplementation = mockedIPFSClient.cat.getMockImplementation()
 
 describe("IPFS core module", () => {
   it("Should have an API token to test the proxy", () => {
@@ -45,6 +50,10 @@ describe("IPFS core module", () => {
     const context = new Context(contextParamsMainnet);
     const client = new Client(context);
     const originalStr = "I am a test";
+    mockedIPFSClient.add.mockResolvedValueOnce(new Error());
+    mockedIPFSClient.cat.mockImplementation(async () =>
+      Buffer.from(originalStr)
+    );
     const cid = await client.ipfs.add(originalStr);
     const recoveredString = await client.ipfs.fetchString(cid);
     const recoveredBytes = await client.ipfs.fetchBytes(cid);
@@ -55,6 +64,8 @@ describe("IPFS core module", () => {
     expect(typeof decodedString).toBe("string");
     expect(recoveredString).toEqual(originalStr);
     expect(decodedString).toEqual(originalStr);
+    // restore cat implementation
+    mockedIPFSClient.cat.mockImplementation(catImplementation);
   });
   it("Should connect to a IPFS node, upload bytes and recover the same string", async () => {
     const context = new Context(contextParamsMainnet);
@@ -75,6 +86,8 @@ describe("IPFS core module", () => {
       58,
       41,
     ]);
+    mockedIPFSClient.add.mockResolvedValueOnce(new Error());
+    mockedIPFSClient.cat.mockImplementation(async () => originalBytes);
     const cid = await client.ipfs.add(originalBytes);
     const recoveredString = await client.ipfs.fetchString(cid);
     const recoveredBytes = await client.ipfs.fetchBytes(cid);
@@ -85,6 +98,8 @@ describe("IPFS core module", () => {
     expect(typeof decodedString).toBe("string");
     expect(recoveredString).toEqual("Hello There :)");
     expect(decodedString).toEqual("Hello There :)");
+    // restore cat implementation
+    mockedIPFSClient.cat.mockImplementation(catImplementation);
   });
   it("Should work when an IPFS node is functional", async () => {
     const context = new Context(contextParamsMainnet);
@@ -119,12 +134,10 @@ describe("IPFS core module", () => {
       expect(isOnline).toEqual(false);
     }
     {
-      const context = new Context(
-        Object.assign({}, contextParamsMainnet, {
-          ipfsNodes: [{ url: "https://does-not-exist-here.random.hb/1234" }],
-        }),
-      );
+      const context = new Context(contextParamsMainnet);
       const client = new Client(context);
+
+      mockedIPFSClient.nodeInfo.mockRejectedValueOnce(new Error());
       const isOnline = await client.ipfs.isUp();
 
       expect(isOnline).toEqual(false);

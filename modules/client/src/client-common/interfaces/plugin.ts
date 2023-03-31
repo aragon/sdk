@@ -41,7 +41,7 @@ export type MajorityVotingSettings = MajorityVotingSettingsBase & {
   minProposerVotingPower?: bigint;
 };
 
-export type VotingSettings = MajorityVotingSettings
+export type VotingSettings = MajorityVotingSettings;
 
 export enum VotingMode {
   STANDARD = "Standard",
@@ -57,7 +57,6 @@ export type ContractVotingSettings = [
   BigNumber, // minProposerVotingPower
 ];
 
-
 export type CreateProposalBaseParams = {
   pluginAddress: string;
   actions?: DaoAction[];
@@ -72,7 +71,7 @@ export type CreateMajorityVotingProposalParams = CreateProposalBaseParams & {
   endDate?: Date;
   executeOnPass?: boolean;
   creatorVote?: VoteValues;
-}
+};
 
 export interface IVoteProposalParams {
   vote: VoteValues;
@@ -242,4 +241,53 @@ export type SubgraphVotingSettings = {
   minParticipation: string;
   supportThreshold: string;
   votingMode: VotingMode;
+};
+
+export type SubgraphMembers = {
+  members: {
+    address: string;
+  }[];
+};
+export enum PrepareInstallationStep {
+  PREPARING = "preparing",
+  DONE = "done",
+}
+
+export type PrepareInstallationStepValue =
+  | { key: PrepareInstallationStep.PREPARING; txHash: string }
+  | {
+    key: PrepareInstallationStep.DONE;
+  } & ApplyInstallationParams;
+
+export type ApplyInstallationParamsBase = {
+  permissions: MultiTargetPermission[];
+  versionTag: VersionTag;
+  pluginRepo: string;
+  pluginAddress: string;
+};
+
+export type ApplyInstallationParams = ApplyInstallationParamsBase & {
+  helpers: string[];
+};
+export type DecodedApplyInstallationParams = ApplyInstallationParamsBase & {
+  helpersHash: string;
+};
+
+export type VersionTag = {
+  build: number;
+  release: number;
+};
+
+export enum PermissionOperationType {
+  GRANT = 0,
+  REVOKE = 1,
+  GRANT_WITH_CONDITION = 2,
+}
+
+export type MultiTargetPermission = {
+  operation: PermissionOperationType;
+  where: string;
+  who: string;
+  condition: string;
+  permissionId: Uint8Array;
 };

@@ -1,11 +1,22 @@
-export const SupportedNetworksArray = ["mainnet", "goerli"] as const;
+export const SupportedNetworksArray = [
+  "mainnet",
+  "goerli",
+  "matic",
+  "maticmum",
+] as const;
 export type SupportedNetworks = typeof SupportedNetworksArray[number];
 export type NetworkDeployment = {
   daoFactory: string;
+  pluginSetupProcessor: string;
   multisigRepo: string;
   adminRepo: string;
   addresslistVotingRepo: string;
   tokenVotingRepo: string;
+  multisigSetup: string;
+  adminSetup: string;
+  addresslistVotingSetup: string;
+  tokenVotingSetup: string;
+  ensRegistry?: string;
 };
 
 // This file contains common types, interfaces, and enumerations

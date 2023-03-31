@@ -32,15 +32,12 @@ describe("Client Multisig", () => {
 
       const action = client.encoding.addAddressesAction(addAddressesParams);
 
-      const decodedMembers: string[] = client.decoding
-        .addAddressesAction(
-          action.data,
-        );
-
-      for (const member of decodedMembers) {
-        expect(typeof member).toBe("string");
-        expect(member).toBe(member);
-      }
+      const decodedMembers: string[] = client.decoding.addAddressesAction(
+        action.data,
+      );
+      decodedMembers.forEach((member, index) => {
+        expect(member).toBe(addAddressesParams.members[index]);
+      });
     });
     it("Should decode the members from an remove members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -62,15 +59,12 @@ describe("Client Multisig", () => {
         removeAddressesParams,
       );
 
-      const decodedMembers: string[] = client.decoding
-        .removeAddressesAction(
-          action.data,
-        );
-
-      for (const member of decodedMembers) {
-        expect(typeof member).toBe("string");
-        expect(member).toBe(member);
-      }
+      const decodedMembers: string[] = client.decoding.removeAddressesAction(
+        action.data,
+      );
+      decodedMembers.forEach((member, index) => {
+        expect(member).toBe(removeAddressesParams.members[index]);
+      });
     });
     it("Should decode the min approvals from an update min approvals action", async () => {
       const ctx = new Context(contextParamsLocalChain);

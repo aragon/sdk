@@ -13,6 +13,11 @@ export class GraphQLError extends Error {
     super("Cannot fetch the " + model + " data from GraphQL");
   }
 }
+export class IpfsError extends Error {
+  constructor() {
+    super("Cannot add or get data from ipfs");
+  }
+}
 export class InvalidAddressOrEnsError extends Error {
   constructor() {
     super("Invalid address or ENS");
@@ -125,5 +130,26 @@ export class AmountMismatchError extends Error {
 export class UnsupportedNetworkError extends Error {
   constructor(network: string) {
     super("Unsupported network: " + network);
+  }
+}
+export class ClientNotInitializedError extends Error {
+  constructor(client: string) {
+    super(client + " client is not initialized");
+  }
+}
+export class NoNodesAvailableError extends Error {
+  constructor(name: string) {
+    super("No " + name + " nodes available");
+  }
+}
+
+export class PluginInstallationPreparationError extends Error {
+  constructor() {
+    super("Failed to install plugin");
+  }
+}
+export class DataDecodingError extends Error {
+  constructor(message: string) {
+    super("Cannot decode data: " + message);
   }
 }

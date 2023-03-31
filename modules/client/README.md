@@ -21,9 +21,7 @@ yarn add @aragon/sdk-client
 
 # Usage
 
-An exhaustive list of the SDK features and methods can be found on the **[examples.md](examples.md) file**.
-
-To generate the `examples.md` file run `yarn examples`
+The SDK usage is demonstrated in the [SDK examples section of the Developer Portal](https://devs.aragon.org/docs/sdk/examples/).
 
 ## React Native
 In order for the SDK to be used in restricted environments like react native install the following polyfilesand  into your project:  

@@ -8,11 +8,13 @@ import {
   IClientCore,
   IInterfaceParams,
   IProposalQueryParams,
+  PrepareInstallationStepValue,
   ProposalCreationStepValue,
   ProposalMetadata,
   ProposalMetadataSummary,
   ProposalStatus,
   SubgraphAction,
+  VersionTag,
 } from "../client-common";
 
 // Multisig
@@ -27,6 +29,9 @@ export interface IMultisigClientMethods extends IClientCore {
   executeProposal: (
     proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
+  prepareInstallation: (
+    params: MultisigPluginPrepareInstallationParams,
+  ) => AsyncGenerator<PrepareInstallationStepValue>;
   canApprove: (params: CanApproveParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getVotingSettings: (
@@ -75,6 +80,12 @@ export interface IMultisigClient {
 }
 
 export type MultisigPluginInstallParams = MultisigPluginSettings;
+
+export type MultisigPluginPrepareInstallationParams = {
+  settings: MultisigPluginSettings;
+  daoAddressOrEns: string;
+  versionTag?: VersionTag;
+};
 
 export type MultisigVotingSettings = {
   minApprovals: number;
@@ -194,8 +205,3 @@ export type SubgraphMultisigVotingSettings = {
   onlyListed: boolean;
 };
 
-export type SubgraphMultisigMembers = {
-  members: {
-    address: string;
-  }[];
-};

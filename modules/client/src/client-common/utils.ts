@@ -117,3 +117,4 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
       throw new InvalidVotingModeError();
   }
 }
+

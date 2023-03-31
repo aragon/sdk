@@ -1,17 +1,18 @@
 // This file contains the definitions of the AddressList DAO client
 
 import {
+  CanVoteParams,
   ContractVotingSettings,
   CreateMajorityVotingProposalParams,
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
-  CanVoteParams,
   IClientCore,
   IInterfaceParams,
   IProposalQueryParams,
   IVoteProposalParams,
   MajorityVotingProposalSettings,
+  PrepareInstallationStepValue,
   ProposalBase,
   ProposalCreationStepValue,
   ProposalListItemBase,
@@ -19,6 +20,7 @@ import {
   SubgraphAction,
   SubgraphProposalBase,
   SubgraphVoterListItemBase,
+  VersionTag,
   VoteProposalStepValue,
   VoteValues,
   VotingMode,
@@ -37,6 +39,9 @@ export interface IAddresslistVotingClientMethods extends IClientCore {
   executeProposal: (
     proposalId: string,
   ) => AsyncGenerator<ExecuteProposalStepValue>;
+  prepareInstallation: (
+    params: AddresslistVotingPluginPrepareInstallationParams,
+  ) => AsyncGenerator<PrepareInstallationStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (addressOrEns: string) => Promise<string[]>;
@@ -131,4 +136,10 @@ export type ContractAddresslistVotingInitParams = [
 export type IAddresslistVotingPluginInstall = {
   addresses: string[];
   votingSettings: VotingSettings;
+};
+
+export type AddresslistVotingPluginPrepareInstallationParams = {
+  settings: IAddresslistVotingPluginInstall;
+  daoAddressOrEns: string;
+  versionTag?: VersionTag;
 };

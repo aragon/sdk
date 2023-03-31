@@ -13,9 +13,10 @@ import {
   SupportedNetworksArray,
 } from "../../../client-common";
 import {
+  AddAddressesParams,
   IMultisigClientEncoding,
   MultisigPluginInstallParams,
-  UpdateAddressesParams,
+  RemoveAddressesParams,
   UpdateMultisigVotingSettingsParams,
 } from "../../interfaces";
 // @ts-ignore
@@ -73,12 +74,12 @@ export class MultisigClientEncoding extends ClientCore
   /**
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *
-   * @param {UpdateAddressesParams} params
-   * @return {*}  {DaoAction}
+   * @param {AddAddressesParams} params
+   * @return {*}  {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
   public addAddressesAction(
-    params: UpdateAddressesParams,
+    params: AddAddressesParams,
   ): DaoAction {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
@@ -104,12 +105,12 @@ export class MultisigClientEncoding extends ClientCore
   /**
    * Computes the parameters to be given when creating a proposal that adds addresses to address list
    *
-   * @param {UpdateAddressesParams} params
-   * @return {*}  {DaoAction}
+   * @param {RemoveAddressesParams} params
+   * @return {*}  {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
   public removeAddressesAction(
-    params: UpdateAddressesParams,
+    params: RemoveAddressesParams,
   ): DaoAction {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();

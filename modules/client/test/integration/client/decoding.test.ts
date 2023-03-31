@@ -5,6 +5,7 @@ declare const describe, it, expect;
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import {
+  ApplyInstallationParams,
   Client,
   Context,
   DaoMetadata,
@@ -20,11 +21,13 @@ import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   GrantPermissionWithConditionParams,
+  PermissionIds,
   RegisterStandardCallbackParams,
   TokenType,
   UpgradeToAndCallParams,
 } from "../../../src/interfaces";
-import { bytesToHex } from "@aragon/sdk-common";
+import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
+import { defaultAbiCoder } from "@ethersproject/abi";
 
 describe("Client", () => {
   describe("Action decoders", () => {
@@ -284,7 +287,7 @@ describe("Client", () => {
         type: TokenType.ERC20,
         amount: BigInt(1),
         tokenAddress: "0x1234567890123456789012345678901234567890",
-        recipientAddressOrEns: "0x2345678901234567890123456789012345678901"
+        recipientAddressOrEns: "0x2345678901234567890123456789012345678901",
       };
 
       const updateDaoMetadataAction = await client.encoding
@@ -292,7 +295,9 @@ describe("Client", () => {
           params,
         );
       const iface = client.decoding.findInterface(updateDaoMetadataAction.data);
-      expect(iface?.id).toBe("function transfer(address,uint256) returns (bool)");
+      expect(iface?.id).toBe(
+        "function transfer(address,uint256) returns (bool)",
+      );
       expect(iface?.functionName).toBe("transfer");
       expect(iface?.hash).toBe("0xa9059cbb");
     });
@@ -489,6 +494,80 @@ describe("Client", () => {
       expect(bytesToHex(expectedUpgradeToAndCallParams.data)).toBe(
         bytesToHex(decodedUpgradeToAndCallParams.data),
       );
+    });
+    it("Should decode an apply installation action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const applyInstallationParams: ApplyInstallationParams = {
+        helpers: [
+          "0x1234567890123456789012345678901234567890",
+          "0x2345678901234567890123456789012345678901",
+          "0x3456789012345678901234567890123456789012",
+          "0x4567890123456789012345678901234567890123",
+          "0x5678901234567890123456789012345678901234",
+        ],
+        permissions: [{
+          condition: "0x1234567890123456789012345678901234567890",
+          operation: 1,
+          permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
+          where: "0x1234567890123456789012345678901234567890",
+          who: "0x2345678901234567890123456789012345678901",
+        }],
+        versionTag: {
+          build: 1,
+          release: 1,
+        },
+        pluginRepo: "0x2345678901234567890123456789012345678901",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
+      };
+
+      const action = client.encoding.applyInstallationAction(
+        "0x1234567890123456789012345678901234567890",
+        applyInstallationParams,
+      );
+      const decodedApplyInstallationParams = client.decoding.applyInstallationAction(
+        action.data,
+      );
+      expect(applyInstallationParams.versionTag.build).toBe(
+        decodedApplyInstallationParams.versionTag.build,
+      );
+      expect(applyInstallationParams.versionTag.release).toBe(
+        decodedApplyInstallationParams.versionTag.release,
+      );
+      expect(applyInstallationParams.pluginAddress).toBe(
+        decodedApplyInstallationParams.pluginAddress,
+      );
+      expect(applyInstallationParams.pluginRepo).toBe(
+        decodedApplyInstallationParams.pluginRepo,
+      );
+      expect(keccak256(
+        defaultAbiCoder.encode(["address[]"], [
+          applyInstallationParams.helpers,
+        ]),
+      )).toBe(
+        decodedApplyInstallationParams.helpersHash,
+      );
+      for (const index in applyInstallationParams.permissions) {
+        expect(applyInstallationParams.permissions[index].condition).toBe(
+          decodedApplyInstallationParams.permissions[index].condition,
+        );
+        expect(applyInstallationParams.permissions[index].operation).toBe(
+          decodedApplyInstallationParams.permissions[index].operation,
+        );
+        expect(applyInstallationParams.permissions[index].who).toBe(
+          decodedApplyInstallationParams.permissions[index].who,
+        );
+        expect(applyInstallationParams.permissions[index].where).toBe(
+          decodedApplyInstallationParams.permissions[index].where,
+        );
+        expect(decodedApplyInstallationParams.permissions[index].permissionId).toBeInstanceOf(
+          Uint8Array
+        );
+        expect(bytesToHex(applyInstallationParams.permissions[index].permissionId)).toBe(
+          bytesToHex(decodedApplyInstallationParams.permissions[index].permissionId)
+        );
+      }
     });
   });
 });

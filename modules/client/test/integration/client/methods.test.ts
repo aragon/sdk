@@ -11,6 +11,7 @@ import {
   contextParamsLocalChain,
   contextParamsMainnet,
   IPFS_CID,
+  contextParamsOkWithGraphqlTimeouts,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
   TEST_MULTISIG_PLUGIN_ADDRESS,
@@ -370,7 +371,7 @@ describe("Client", () => {
 
     describe("Data retrieval", () => {
       it("Should get a DAO's metadata with a specific address", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
 
@@ -425,7 +426,7 @@ describe("Client", () => {
         });
       });
       it("Should get a DAO's metadata of an non existent dao and receive null", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const client = new Client(ctx);
         const daoAddress = TEST_NON_EXISTING_ADDRESS;
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -438,14 +439,14 @@ describe("Client", () => {
       });
 
       it("Should get a DAO's metadata of an invalid dao address and throw an error", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const client = new Client(ctx);
         const daoAddress = TEST_INVALID_ADDRESS;
         await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow();
       });
 
       it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
-        const context = new Context(contextParamsMainnet);
+        const context = new Context(contextParamsOkWithGraphqlTimeouts);
         const client = new Client(context);
         const limit = 3;
         const params: IDaoQueryParams = {
@@ -507,7 +508,7 @@ describe("Client", () => {
       });
 
       it("Should get DAOs balances", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
 
@@ -620,7 +621,7 @@ describe("Client", () => {
         });
       });
       it("Should get DAOs balances from a dao with no balances", async () => {
-        const ctx = new Context(contextParamsMainnet);
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
         const client = new Client(ctx);
         const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -634,8 +635,9 @@ describe("Client", () => {
         expect(balances?.length).toBe(0);
       });
 
-      describe("Should get the transfers of a dao", () => {
-        const ctx = new Context(contextParamsMainnet);
+      it("Should get the transfers of a dao", async () => {
+        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const client = new Client(ctx);
         const params: ITransferQueryParams = {
           daoAddressOrEns: TEST_DAO_ADDRESS,
           sortBy: TransferSortBy.CREATED_AT,
@@ -949,13 +951,13 @@ describe("Client", () => {
       test.todo(
         "Should return an empty array when getting the transfers of a DAO that does not exist",
       ); //, async () => {
-      //   const ctx = new Context(contextParamsMainnet);
+      //   const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
       //   const client = new Client(ctx)
-      //   const res = await client.methods.getTransfers(contextParamsMainnet.dao)
+      //   const res = await client.methods.getTransfers(contextParamsOkWithGraphqlTimeouts.dao)
       //   expect(res.length).toBe(0)
       // })
       test.todo("Should fail if the given ENS is invalid"); // async () => {
-      // const ctx = new Context(contextParamsMainnet);
+      // const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
       // const client = new Client(ctx)
       // // will fail when tested on local chain
       // await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(

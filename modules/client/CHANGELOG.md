@@ -13,6 +13,38 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Added
+- Add ipfs optimization.
+## [1.3.1]
+### Fixed
+- Polygon network names
+## [1.3.0]
+### Added
+- Add support for polygon.
+
+### Changed
+- Updates `@aragon/osx-ethers` to v1.2.1.
+- Reverts the encoding of `addAddresses` and `removeAddresses` in the multisig plugin to return only one action
+
+## [1.2.0]
+### Added
+- Add support for mumbai.
+
+### Changed
+- Updates `@aragon/osx-ethers` to v1.2.0.
+
+## [1.1.0]
+### Added
+- `prepareInstallation` function to multisig-client, tokenvoting-client and addresslist-client
+- Add `applyInstallation` encoder and decoder to client 
+### Changed
+- `AddAddresses`and `RemoveAddresses` encoders now return an array of actions one for adding or removing the addresses and other for updating the settings in a specific order for the transaction not to revert
+### Fixed
+- Subgraph making 2 calls in each request
+## [1.0.2]
+  
+Version bump
+
 ## [1.0.1]
 ### Added
 - `settings` to `tokenVotingProposalListItem`
