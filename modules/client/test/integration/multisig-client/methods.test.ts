@@ -14,8 +14,8 @@ import {
   CreateMultisigProposalParams,
   IProposalQueryParams,
   MultisigClient,
-  MultisigProposal,
   MultisigPluginPrepareInstallationParams,
+  MultisigProposal,
   PrepareInstallationStep,
   ProposalCreationSteps,
   ProposalMetadata,
@@ -34,7 +34,6 @@ import {
   contextParamsLocalChain,
   SUBGRAPH_ACTIONS,
   SUBGRAPH_PROPOSAL_BASE,
-  contextParamsOkWithGraphqlTimeouts,
   TEST_INVALID_ADDRESS,
   TEST_MULTISIG_DAO_ADDRESS,
   TEST_MULTISIG_PLUGIN_ADDRESS,
@@ -249,7 +248,7 @@ describe("Client Multisig", () => {
             expect(Array.isArray(step.permissions)).toBe(true);
             for (const permission of step.permissions) {
               expect(typeof permission.condition).toBe("string");
-              if(permission.condition) {
+              if (permission.condition) {
                 expect(permission.condition).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
               }
               expect(typeof permission.operation).toBe("number");
