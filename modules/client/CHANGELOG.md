@@ -13,6 +13,8 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Fixed
+- Error handling if ENS cannot be resolved.
 ### Added
 - Add ipfs optimization.
 ## [1.3.1]
