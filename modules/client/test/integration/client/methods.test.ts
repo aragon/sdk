@@ -9,9 +9,7 @@ import {
   ADDRESS_THREE,
   ADDRESS_TWO,
   contextParamsLocalChain,
-  contextParamsMainnet,
   IPFS_CID,
-  contextParamsOkWithGraphqlTimeouts,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
   TEST_MULTISIG_PLUGIN_ADDRESS,
@@ -371,7 +369,7 @@ describe("Client", () => {
 
     describe("Data retrieval", () => {
       it("Should get a DAO's metadata with a specific address", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
 
@@ -426,7 +424,7 @@ describe("Client", () => {
         });
       });
       it("Should get a DAO's metadata of an non existent dao and receive null", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_NON_EXISTING_ADDRESS;
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -439,14 +437,14 @@ describe("Client", () => {
       });
 
       it("Should get a DAO's metadata of an invalid dao address and throw an error", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_INVALID_ADDRESS;
         await expect(() => client.methods.getDao(daoAddress)).rejects.toThrow();
       });
 
       it("Should retrieve a list of Metadata details of DAO's, based on the given search params", async () => {
-        const context = new Context(contextParamsOkWithGraphqlTimeouts);
+        const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
         const limit = 3;
         const params: IDaoQueryParams = {
@@ -508,7 +506,7 @@ describe("Client", () => {
       });
 
       it("Should get DAOs balances", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_DAO_ADDRESS;
 
@@ -621,7 +619,7 @@ describe("Client", () => {
         });
       });
       it("Should get DAOs balances from a dao with no balances", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const daoAddress = TEST_NO_BALANCES_DAO_ADDRESS;
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -636,8 +634,7 @@ describe("Client", () => {
       });
 
       it("Should get the transfers of a dao", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
-        const client = new Client(ctx);
+        const ctx = new Context(contextParamsLocalChain);
         const params: ITransferQueryParams = {
           daoAddressOrEns: TEST_DAO_ADDRESS,
           sortBy: TransferSortBy.CREATED_AT,

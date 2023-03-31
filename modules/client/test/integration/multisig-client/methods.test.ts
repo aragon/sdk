@@ -50,6 +50,7 @@ import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import {
   QueryMultisigProposal,
+  QueryMultisigProposals,
   QueryMultisigVotingSettings,
 } from "../../../src/multisig/internal/graphql-queries";
 import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-queries/members";
@@ -363,7 +364,7 @@ describe("Client Multisig", () => {
 
   describe("Data retrieval", () => {
     it("Should get the voting settings of the plugin", async () => {
-      const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+      const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -392,7 +393,7 @@ describe("Client Multisig", () => {
     });
 
     it("Should get members of the multisig", async () => {
-      const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+      const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -417,7 +418,7 @@ describe("Client Multisig", () => {
     });
 
     it("Should fetch the given proposal", async () => {
-      const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+      const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
 
@@ -520,7 +521,7 @@ describe("Client Multisig", () => {
       );
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-      const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+      const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -533,7 +534,7 @@ describe("Client Multisig", () => {
       expect(proposal === null).toBe(true);
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
-      const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+      const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -616,7 +617,7 @@ describe("Client Multisig", () => {
       );
     });
     it("Should get a list of proposals from a specific dao", async () => {
-      const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+      const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
@@ -635,7 +636,7 @@ describe("Client Multisig", () => {
       });
       await client.methods.getProposals(params);
       expect(mockedClient.request).toHaveBeenCalledWith(
-        QueryMultisigProposal,
+        QueryMultisigProposals,
         {
           where: {
             dao: address,
@@ -648,7 +649,7 @@ describe("Client Multisig", () => {
       );
     });
     it("Should get a list of proposals from an invalid address", async () => {
-      const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+      const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;

@@ -38,7 +38,6 @@ import {
   contextParamsLocalChain,
   SUBGRAPH_ACTIONS,
   SUBGRAPH_PROPOSAL_BASE,
-  contextParamsOkWithGraphqlTimeouts,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
   TEST_TOKEN_VOTING_DAO_ADDRESS,
@@ -626,7 +625,7 @@ describe("Token Voting Client", () => {
 
     describe("Data retrieval", () => {
       it("Should get the list of members that can vote in a proposal", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -650,7 +649,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should fetch the given proposal", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -788,7 +787,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
 
@@ -813,7 +812,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should get a list of proposals filtered by the given criteria", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -925,7 +924,7 @@ describe("Token Voting Client", () => {
         mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
       });
       it("Should get a list of proposals from a specific dao", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -961,7 +960,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should get a list of proposals from a dao that has no proposals", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -985,7 +984,7 @@ describe("Token Voting Client", () => {
         expect(proposals.length === 0).toBe(true);
       });
       it("Should get a list of proposals from an invalid address", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
@@ -1001,7 +1000,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should get the settings of a plugin given a plugin instance address", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -1033,7 +1032,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -1066,7 +1065,7 @@ describe("Token Voting Client", () => {
         );
       });
       it("Should return null token details for nonexistent plugin addresses", async () => {
-        const ctx = new Context(contextParamsOkWithGraphqlTimeouts);
+        const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
