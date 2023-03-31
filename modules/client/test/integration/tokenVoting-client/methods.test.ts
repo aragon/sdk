@@ -40,8 +40,6 @@ import {
   SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
-  TEST_TOKEN_VOTING_DAO_ADDRESS,
-  TEST_TOKEN_VOTING_PLUGIN_ADDRESS,
   TEST_TOKEN_VOTING_PROPOSAL_ID,
   TEST_TX_HASH,
   TEST_WALLET_ADDRESS,
@@ -369,7 +367,7 @@ describe("Token Voting Client", () => {
               expect(Array.isArray(step.permissions)).toBe(true);
               for (const permission of step.permissions) {
                 expect(typeof permission.condition).toBe("string");
-                if(permission.condition) {
+                if (permission.condition) {
                   expect(permission.condition).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
                 }
                 expect(typeof permission.operation).toBe("number");
@@ -638,14 +636,14 @@ describe("Token Voting Client", () => {
           },
         });
         const wallets = await client.methods.getMembers(
-          TEST_TOKEN_VOTING_PLUGIN_ADDRESS,
+          ADDRESS_ONE,
         );
 
         expect(wallets.length).toBe(2);
         expect(wallets).toMatchObject([ADDRESS_ONE, ADDRESS_TWO]);
         expect(mockedClient.request).toHaveBeenCalledWith(
           QueryTokenVotingMembers,
-          { address: TEST_TOKEN_VOTING_PLUGIN_ADDRESS },
+          { address: ADDRESS_ONE },
         );
       });
       it("Should fetch the given proposal", async () => {
@@ -928,7 +926,7 @@ describe("Token Voting Client", () => {
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
-        const address = TEST_TOKEN_VOTING_DAO_ADDRESS;
+        const address = ADDRESS_ONE;
         const params: IProposalQueryParams = {
           limit,
           sortBy: ProposalSortBy.CREATED_AT,
@@ -1016,7 +1014,7 @@ describe("Token Voting Client", () => {
             votingMode: VotingMode.STANDARD,
           },
         });
-        const pluginAddress: string = TEST_TOKEN_VOTING_PLUGIN_ADDRESS;
+        const pluginAddress: string = ADDRESS_ONE;
         const settings = await client.methods.getVotingSettings(pluginAddress);
         expect(settings === null).toBe(false);
         if (settings) {
@@ -1050,7 +1048,7 @@ describe("Token Voting Client", () => {
           },
         });
 
-        const pluginAddress: string = TEST_TOKEN_VOTING_PLUGIN_ADDRESS;
+        const pluginAddress: string = ADDRESS_ONE;
         const token = await client.methods.getToken(pluginAddress);
         expect(token?.address).toBe(ADDRESS_THREE);
         expect(token?.symbol).toBe("TST");

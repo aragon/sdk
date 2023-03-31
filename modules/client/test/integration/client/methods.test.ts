@@ -12,7 +12,6 @@ import {
   IPFS_CID,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
-  TEST_MULTISIG_PLUGIN_ADDRESS,
   TEST_MULTISIG_PROPOSAL_ID,
   TEST_NO_BALANCES_DAO_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
@@ -392,7 +391,7 @@ describe("Client", () => {
           subdomain: "test",
           metadata: `ipfs://${IPFS_CID}`,
           plugins: [{
-            id: TEST_MULTISIG_PLUGIN_ADDRESS,
+            id: ADDRESS_ONE,
             __typename: SubgraphPluginTypeName.MULTISIG,
           }],
         };
@@ -409,7 +408,7 @@ describe("Client", () => {
 
         expect(dao!.plugins.length).toBe(1);
         expect(dao!.plugins[0].instanceAddress).toBe(
-          TEST_MULTISIG_PLUGIN_ADDRESS,
+          ADDRESS_ONE,
         );
         expect(dao!.plugins[0].id).toBe("multisig.plugin.dao.eth");
         expect(dao!.plugins[0].version).toBe("0.0.1");
@@ -471,7 +470,7 @@ describe("Client", () => {
           subdomain: "test",
           metadata: `ipfs://${IPFS_CID}`,
           plugins: [{
-            id: TEST_MULTISIG_PLUGIN_ADDRESS,
+            id: ADDRESS_ONE,
             __typename: SubgraphPluginTypeName.MULTISIG,
           }],
         };
@@ -489,7 +488,7 @@ describe("Client", () => {
 
         expect(daos[0].plugins.length).toBe(1);
         expect(daos[0].plugins[0].instanceAddress).toBe(
-          TEST_MULTISIG_PLUGIN_ADDRESS,
+          ADDRESS_ONE,
         );
         expect(daos[0].plugins[0].id).toBe("multisig.plugin.dao.eth");
         expect(daos[0].plugins[0].version).toBe("0.0.1");

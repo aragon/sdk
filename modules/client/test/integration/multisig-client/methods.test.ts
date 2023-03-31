@@ -35,8 +35,6 @@ import {
   SUBGRAPH_ACTIONS,
   SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
-  TEST_MULTISIG_DAO_ADDRESS,
-  TEST_MULTISIG_PLUGIN_ADDRESS,
   TEST_MULTISIG_PROPOSAL_ID,
   TEST_NON_EXISTING_ADDRESS,
   TEST_TX_HASH,
@@ -377,7 +375,7 @@ describe("Client Multisig", () => {
         multisigPlugin: subgraphSettings,
       });
       const settings = await client.methods.getVotingSettings(
-        TEST_MULTISIG_PLUGIN_ADDRESS,
+        ADDRESS_ONE,
       );
       expect(settings.minApprovals).toBe(
         parseInt(subgraphSettings.minApprovals),
@@ -386,7 +384,7 @@ describe("Client Multisig", () => {
       expect(mockedClient.request).toHaveBeenCalledWith(
         QueryMultisigVotingSettings,
         {
-          address: TEST_MULTISIG_PLUGIN_ADDRESS,
+          address: ADDRESS_ONE,
         },
       );
     });
@@ -407,12 +405,12 @@ describe("Client Multisig", () => {
       });
 
       const wallets = await client.methods.getMembers(
-        TEST_MULTISIG_PLUGIN_ADDRESS,
+        ADDRESS_ONE,
       );
       expect(wallets.length).toBe(2);
       expect(wallets).toMatchObject(members);
       expect(mockedClient.request).toHaveBeenCalledWith(QueryMultisigMembers, {
-        address: TEST_MULTISIG_PLUGIN_ADDRESS,
+        address: ADDRESS_ONE,
       });
     });
 
@@ -620,7 +618,7 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
-      const address = TEST_MULTISIG_DAO_ADDRESS;
+      const address = ADDRESS_ONE;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,

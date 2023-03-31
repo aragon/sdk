@@ -34,8 +34,6 @@ import {
   SUBGRAPH_ACTIONS,
   SUBGRAPH_PROPOSAL_BASE,
   SUBGRAPH_VOTERS,
-  TEST_ADDRESSLIST_DAO_ADDDRESS,
-  TEST_ADDRESSLIST_PLUGIN_ADDRESS,
   TEST_ADDRESSLIST_PROPOSAL_ID,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
@@ -625,14 +623,14 @@ describe("Client Address List", () => {
       });
 
       const wallets = await client.methods.getMembers(
-        TEST_ADDRESSLIST_PLUGIN_ADDRESS,
+        ADDRESS_ONE,
       );
 
       expect(wallets.length).toBe(1);
       expect(wallets[0]).toBe(ADDRESS_ONE);
       expect(mockedClient.request).toHaveBeenLastCalledWith(
         QueryAddresslistVotingMembers,
-        { address: TEST_ADDRESSLIST_PLUGIN_ADDRESS },
+        { address: ADDRESS_ONE },
       );
     });
     it("Should fetch the given proposal", async () => {
@@ -873,7 +871,7 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
-      const address = TEST_ADDRESSLIST_DAO_ADDDRESS;
+      const address = ADDRESS_ONE;
       const params: IProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
@@ -924,7 +922,7 @@ describe("Client Address List", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
-      const pluginAddress: string = TEST_ADDRESSLIST_PLUGIN_ADDRESS;
+      const pluginAddress: string = ADDRESS_ONE;
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),
       );
