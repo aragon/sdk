@@ -390,16 +390,16 @@ describe("Client", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
       const daoAddress = "0x1234567890123456789012345678901234567890";
-      const action = client.encoding.applyInstallationAction(
+      const actions = client.encoding.applyInstallationAction(
         daoAddress,
         applyInstallationParams,
       );
 
-      expect(typeof action).toBe("object");
-      expect(action.data).toBeInstanceOf(Uint8Array);
+      expect(typeof actions[1]).toBe("object");
+      expect(actions[1].data).toBeInstanceOf(Uint8Array);
 
       const daoInterface = PluginSetupProcessor__factory.createInterface();
-      const hexString = bytesToHex(action.data);
+      const hexString = bytesToHex(actions[1].data);
       const argsDecoded = daoInterface.decodeFunctionData(
         "applyInstallation",
         hexString,

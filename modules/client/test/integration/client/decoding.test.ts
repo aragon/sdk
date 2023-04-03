@@ -522,12 +522,12 @@ describe("Client", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
 
-      const action = client.encoding.applyInstallationAction(
+      const actions = client.encoding.applyInstallationAction(
         "0x1234567890123456789012345678901234567890",
         applyInstallationParams,
       );
       const decodedApplyInstallationParams = client.decoding.applyInstallationAction(
-        action.data,
+        actions[1].data,
       );
       expect(applyInstallationParams.versionTag.build).toBe(
         decodedApplyInstallationParams.versionTag.build,
