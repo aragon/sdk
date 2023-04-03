@@ -201,7 +201,7 @@ export type SubgraphMultisigApproversListItem = {
 };
 
 export type SubgraphMultisigVotingSettings = {
-  minApprovals: string;
+  minApprovals: number;
   onlyListed: boolean;
 };
 

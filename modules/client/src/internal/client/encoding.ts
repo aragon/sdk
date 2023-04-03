@@ -3,6 +3,7 @@ import {
   IClientEncoding,
   IGrantPermissionParams,
   IRevokePermissionParams,
+  Permissions,
   RegisterStandardCallbackParams,
   TokenType,
   UpgradeToAndCallParams,
@@ -13,6 +14,9 @@ import {
   ClientCore,
   Context,
   DaoAction,
+  LIVE_CONTRACTS,
+  SupportedNetworks,
+  SupportedNetworksArray,
 } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -29,7 +33,9 @@ import { erc20ContractAbi } from "../abi/erc20";
 import {
   hexToBytes,
   InvalidAddressError,
+  NoProviderError,
   NoSignerError,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 
@@ -43,8 +49,6 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     Object.freeze(this);
   }
   /**
-   *
-   *
    * @param {string} daoAddress
    * @param {ApplyInstallationParams} params
    * @return {*}  {DaoAction}
@@ -53,9 +57,17 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
   public applyInstallationAction(
     daoAddress: string,
     params: ApplyInstallationParams,
-  ): DaoAction {
+  ): DaoAction[] {
     if (!isAddress(daoAddress)) {
       throw new InvalidAddressError();
+    }
+    const provider = this.web3.getProvider();
+    if (!provider) {
+      throw new NoProviderError();
+    }
+    const network = provider.network.name as SupportedNetworks;
+    if (!SupportedNetworksArray.includes(network)) {
+      throw new UnsupportedNetworkError(network);
     }
     const pspInterface = PluginSetupProcessor__factory.createInterface();
 
@@ -64,11 +76,28 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       daoAddress,
       args,
     ]);
-    return {
-      to: daoAddress,
-      value: BigInt(0),
-      data: hexToBytes(hexBytes),
-    };
+    // Grant ROOT_PERMISION in the DAO to the PSP
+    const grantAction = this.grantAction(daoAddress, {
+      where: daoAddress,
+      who: LIVE_CONTRACTS[network].pluginSetupProcessor,
+      permission: Permissions.ROOT_PERMISSION,
+    });
+
+    // Revoke ROOT_PERMISION in the DAO to the PSP
+    const revokeAction = this.revokeAction(daoAddress, {
+      where: daoAddress,
+      who: LIVE_CONTRACTS[network].pluginSetupProcessor,
+      permission: Permissions.ROOT_PERMISSION,
+    });
+    return [
+      grantAction,
+      {
+        to: LIVE_CONTRACTS[network].pluginSetupProcessor,
+        value: BigInt(0),
+        data: hexToBytes(hexBytes),
+      },
+      revokeAction,
+    ];
   }
   /**
    * Computes the payload to be given when creating a proposal that grants a permission within a DAO

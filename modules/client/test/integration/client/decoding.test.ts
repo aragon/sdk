@@ -28,6 +28,7 @@ import {
 } from "../../../src/interfaces";
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Client", () => {
   describe("Action decoders", () => {
@@ -496,6 +497,11 @@ describe("Client", () => {
       );
     });
     it("Should decode an apply installation action", async () => {
+      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -522,12 +528,13 @@ describe("Client", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
 
-      const action = client.encoding.applyInstallationAction(
+      const actions = client.encoding.applyInstallationAction(
         "0x1234567890123456789012345678901234567890",
         applyInstallationParams,
       );
+      expect(actions.length).toBe(3);
       const decodedApplyInstallationParams = client.decoding.applyInstallationAction(
-        action.data,
+        actions[1].data,
       );
       expect(applyInstallationParams.versionTag.build).toBe(
         decodedApplyInstallationParams.versionTag.build,
