@@ -34,7 +34,7 @@ import { AddressZero } from "@ethersproject/constants";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Client", () => {
-  beforeAll(async () => {
+  beforeAll(() => {
     LIVE_CONTRACTS.goerli.pluginSetupProcessor = AddressZero;
   });
   describe("Action generators", () => {
@@ -406,6 +406,7 @@ describe("Client", () => {
         applyInstallationParams,
       );
 
+      expect(actions.length).toBe(3);
       expect(typeof actions[1]).toBe("object");
       expect(actions[1].data).toBeInstanceOf(Uint8Array);
 

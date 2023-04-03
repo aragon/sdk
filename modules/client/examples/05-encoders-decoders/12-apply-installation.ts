@@ -50,10 +50,14 @@ const actions: DaoAction[] = client.encoding.applyInstallationAction(
   daoAddressOrEns,
   applyInstallationParams
 );
-console.log({ actions });
+console.log(actions);
 
 /* MARKDOWN
-Returns:
+Returns three actions:
+
+- Grant root permission to the Plugin Setup Processor
+- Ask it to apply the installation
+- Revoke the root permission to the Plugin Setup Processor
 
 ```json
 [

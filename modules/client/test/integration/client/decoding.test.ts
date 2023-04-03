@@ -33,7 +33,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
 
 describe("Client", () => {
-  beforeAll(async () => {
+  beforeAll(() => {
     LIVE_CONTRACTS.goerli.pluginSetupProcessor = AddressZero;
   });
   describe("Action decoders", () => {
@@ -537,6 +537,7 @@ describe("Client", () => {
         "0x1234567890123456789012345678901234567890",
         applyInstallationParams,
       );
+      expect(actions.length).toBe(3);
       const decodedApplyInstallationParams = client.decoding.applyInstallationAction(
         actions[1].data,
       );
