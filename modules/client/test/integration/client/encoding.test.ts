@@ -15,7 +15,6 @@ import {
   DaoMetadata,
   IGrantPermissionParams,
   IRevokePermissionParams,
-  LIVE_CONTRACTS,
   Permissions,
   WithdrawParams,
 } from "../../../src";

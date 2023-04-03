@@ -13,7 +13,6 @@ import {
   IGrantPermissionParams,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
-  LIVE_CONTRACTS,
   Permissions,
   WithdrawParams,
 } from "../../../src";

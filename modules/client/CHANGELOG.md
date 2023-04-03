@@ -13,6 +13,7 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.4.0]
 ### Added
 - Add ipfs optimization.
 ### Fixed
