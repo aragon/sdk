@@ -30,13 +30,9 @@ import {
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
-import { AddressZero } from "@ethersproject/constants";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Client", () => {
-  beforeAll(() => {
-    LIVE_CONTRACTS.goerli.pluginSetupProcessor = AddressZero;
-  });
   describe("Action generators", () => {
     it("Should create a client and generate a native withdraw action", async () => {
       const context = new Context(contextParamsLocalChain);
