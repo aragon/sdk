@@ -15,6 +15,7 @@ import {
   DaoMetadata,
   IGrantPermissionParams,
   IRevokePermissionParams,
+  LIVE_CONTRACTS,
   Permissions,
   WithdrawParams,
 } from "../../../src";
@@ -29,8 +30,13 @@ import {
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
+import { AddressZero } from "@ethersproject/constants";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Client", () => {
+  beforeAll(async () => {
+    LIVE_CONTRACTS.goerli.pluginSetupProcessor = AddressZero;
+  });
   describe("Action generators", () => {
     it("Should create a client and generate a native withdraw action", async () => {
       const context = new Context(contextParamsLocalChain);
@@ -364,6 +370,11 @@ describe("Client", () => {
       );
     });
     it("Should encode an applyInstallation action", async () => {
+      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -434,7 +445,9 @@ describe("Client", () => {
           applyInstallationParams.permissions[parseInt(index)].condition,
         );
         expect(argsDecoded[1].permissions[parseInt(index)].permissionId).toBe(
-          bytesToHex(applyInstallationParams.permissions[parseInt(index)].permissionId),
+          bytesToHex(
+            applyInstallationParams.permissions[parseInt(index)].permissionId,
+          ),
         );
       }
     });

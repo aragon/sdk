@@ -13,6 +13,7 @@ import {
   IGrantPermissionParams,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
+  LIVE_CONTRACTS,
   Permissions,
   WithdrawParams,
 } from "../../../src";
@@ -28,8 +29,13 @@ import {
 } from "../../../src/interfaces";
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import { AddressZero } from "@ethersproject/constants";
 
 describe("Client", () => {
+  beforeAll(async () => {
+    LIVE_CONTRACTS.goerli.pluginSetupProcessor = AddressZero;
+  });
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {
       const context = new Context(contextParamsLocalChain);
@@ -496,6 +502,11 @@ describe("Client", () => {
       );
     });
     it("Should decode an apply installation action", async () => {
+      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
