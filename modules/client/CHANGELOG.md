@@ -13,6 +13,9 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.4.1]
+## Fixed
+- Amending the type in subgraph's `minApprovals`
 ## [1.4.0]
 ### Added
 - Add ipfs optimization.
