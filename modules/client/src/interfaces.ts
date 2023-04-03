@@ -429,7 +429,7 @@ export enum AssetBalanceSortBy {
 export enum DaoSortBy {
   CREATED_AT = "createdAt",
   SUBDOMAIN = "subdomain",
-  POPULARITY = "totalProposals", // currently defined as number of proposals
+  // POPULARITY = "totalProposals", // currently defined as number of proposals
 }
 
 export enum SubgraphPluginTypeName {

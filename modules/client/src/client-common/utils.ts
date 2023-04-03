@@ -71,7 +71,7 @@ export function computeProposalStatusFilter(
       where = { executable: true, endDate_lt: now };
       break;
     case ProposalStatus.DEFEATED:
-      where = { executable: false, endDate_lt: now, executed: false };
+      where = { executable: null, endDate_lt: now, executed: false };
       break;
     default:
       throw new Error("invalid proposal status");

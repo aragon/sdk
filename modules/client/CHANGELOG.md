@@ -13,6 +13,10 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.4.2]
+### Fixed
+- Removed not working sortby
+- Fix `Status.DEFEATED` filter
 ### Fixed
 - Error handling if ENS cannot be resolved.
 ### Changed

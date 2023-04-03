@@ -197,9 +197,8 @@ export interface IProposalQueryParams extends IPagination {
 
 export enum ProposalSortBy {
   CREATED_AT = "createdAt",
-  NAME = "name",
-  POPULARITY = "popularity",
-  VOTES = "votes", // currently defined as number of proposals
+  // POPULARITY = "popularity",
+  // VOTES = "votes",
 }
 
 // STEPS
