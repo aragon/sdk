@@ -24,6 +24,8 @@ TEMPLATE:
 ## [1.4.1]
 ## Fixed
 - Amending the type in subgraph's `minApprovals`
+- Removed not working sortby
+- Fix `Status.DEFEATED` filter
 ## [1.4.0]
 ### Added
 - Add ipfs optimization.
