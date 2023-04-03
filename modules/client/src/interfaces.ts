@@ -83,7 +83,7 @@ export interface IClientEncoding extends IClientCore {
   applyInstallationAction: (
     daoAddressOrEns: string,
     params: ApplyInstallationParams,
-  ) => DaoAction;
+  ) => DaoAction[];
 }
 
 export interface IClientDecoding {

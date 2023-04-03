@@ -46,22 +46,38 @@ const applyInstallationParams: ApplyInstallationParams = {
 
 const daoAddressOrEns: string = "0x123123123123123123123123123123123123"; // "my-dao.eth"
 
-const action: DaoAction = client.encoding.applyInstallationAction(
+const actions: DaoAction[] = client.encoding.applyInstallationAction(
   daoAddressOrEns,
   applyInstallationParams
 );
-console.log({ action });
+console.log(actions);
 
 /* MARKDOWN
-Returns:
+Returns three actions:
+
+- Grant root permission to the Plugin Setup Processor
+- Ask it to apply the installation
+- Revoke the root permission to the Plugin Setup Processor
 
 ```json
+[
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  },
+  {
+    to: "0x123123123...",
+    value: 0n,
+    data: Uint8Array[12,34,45...]
+  },
   {
     to: "0x123123123...",
     value: 0n,
     data: Uint8Array[12,34,45...]
   }
-  ```
+]
+```
   */
 
 
@@ -69,9 +85,9 @@ Returns:
 ### Decoding
 */
 
-// Decodes the update settings action for a Multisig plugin.
+// Decodes the apply installation action for a Multisig plugin.
 const decodedParams: DecodedApplyInstallationParams = client.decoding
-  .applyInstallationAction(action.data);
+  .applyInstallationAction(actions[1].data);
 console.log({ decodedParams });
 
 /* MARKDOWN

@@ -29,6 +29,7 @@ import {
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Client", () => {
   describe("Action generators", () => {
@@ -364,6 +365,11 @@ describe("Client", () => {
       );
     });
     it("Should encode an applyInstallation action", async () => {
+      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -390,16 +396,17 @@ describe("Client", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
       const daoAddress = "0x1234567890123456789012345678901234567890";
-      const action = client.encoding.applyInstallationAction(
+      const actions = client.encoding.applyInstallationAction(
         daoAddress,
         applyInstallationParams,
       );
 
-      expect(typeof action).toBe("object");
-      expect(action.data).toBeInstanceOf(Uint8Array);
+      expect(actions.length).toBe(3);
+      expect(typeof actions[1]).toBe("object");
+      expect(actions[1].data).toBeInstanceOf(Uint8Array);
 
       const daoInterface = PluginSetupProcessor__factory.createInterface();
-      const hexString = bytesToHex(action.data);
+      const hexString = bytesToHex(actions[1].data);
       const argsDecoded = daoInterface.decodeFunctionData(
         "applyInstallation",
         hexString,
@@ -434,7 +441,9 @@ describe("Client", () => {
           applyInstallationParams.permissions[parseInt(index)].condition,
         );
         expect(argsDecoded[1].permissions[parseInt(index)].permissionId).toBe(
-          bytesToHex(applyInstallationParams.permissions[parseInt(index)].permissionId),
+          bytesToHex(
+            applyInstallationParams.permissions[parseInt(index)].permissionId,
+          ),
         );
       }
     });
