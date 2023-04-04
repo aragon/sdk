@@ -451,7 +451,7 @@ describe("Client Multisig", () => {
         minApprovals: 5,
         plugin: {
           onlyListed: true,
-          minApprovals: "5",
+          minApprovals: 5,
         },
         ...SUBGRAPH_PROPOSAL_BASE,
       };
@@ -503,7 +503,7 @@ describe("Client Multisig", () => {
         subgraphProposal.approvers.map((approver) => approver.id),
       );
       expect(proposal.settings.minApprovals).toBe(
-        parseInt(subgraphProposal.plugin.minApprovals),
+        subgraphProposal.plugin.minApprovals,
       );
       expect(proposal.settings.onlyListed).toBe(
         subgraphProposal.plugin.onlyListed,

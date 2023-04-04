@@ -632,7 +632,7 @@ describe("Client", () => {
         expect(balances?.length).toBe(0);
       });
 
-      describe("Should get the transfers of a dao", async () => {
+      describe("Should get the transfers of a dao", () => {
         const ctx = new Context(contextParamsLocalChain);
         const params: ITransferQueryParams = {
           daoAddressOrEns: TEST_DAO_ADDRESS,
