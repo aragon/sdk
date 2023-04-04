@@ -41,12 +41,12 @@ const metadata: ProposalMetadata = {
 };
 
 const metadataUri: string = await multisigClient.methods.pinMetadata(metadata);
-console.log({ metadataUri });
+console.log(metadataUri);
 
 /* MARKDOWN
 Returns:
 
 ```json
-  { metadataUri: "ipfs://Qm..." }
+"ipfs://Qm..."
 ```
 */

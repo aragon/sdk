@@ -22,12 +22,12 @@ const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 // Checks whether the signer of the transaction can execute a given proposal.
 const canExecute = await tokenVotingClient.methods.canExecute(proposalId);
-console.log({ canExecute });
+console.log(canExecute);
 
 /* MARKDOWN
 Returns:
 
 ```
-  { canExecute: true }
+true
 ```
 */

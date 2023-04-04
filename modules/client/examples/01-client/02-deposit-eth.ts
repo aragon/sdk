@@ -38,13 +38,25 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoDepositSteps.DEPOSITING:
-        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+        console.log({ txHash: step.txHash });
         break;
       case DaoDepositSteps.DONE:
-        console.log(step.amount); // 10n
+        console.log({ amount: step.amount });
         break;
     }
   } catch (err) {
     console.error(err);
   }
 }
+
+/* MARKDOWN
+Returns:
+```tsx
+{
+  txHash: "0xb1c14a49...3e8620b0f5832d61c"
+}
+{
+  amount: 10n,
+}
+```
+*/

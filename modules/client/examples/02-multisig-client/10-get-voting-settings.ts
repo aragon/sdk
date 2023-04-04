@@ -24,16 +24,14 @@ const daoAddressorEns: string = "0x12345348523485623984752394854320";
 
 const multisigVotingSettings: MultisigVotingSettings = await multisigClient
   .methods.getVotingSettings(daoAddressorEns);
-console.log({ multisigVotingSettings });
+console.log(multisigVotingSettings);
 
 /* MARKDOWN
 Returns:
 ```json
 {
-  multisigVotingSettings: {
-    minApprovals: 4,
-    onlyListed: true
-  }
+  minApprovals: 4,
+  onlyListed: true
 }
 ```
 */

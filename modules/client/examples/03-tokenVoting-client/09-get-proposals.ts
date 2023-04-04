@@ -36,67 +36,65 @@ const queryParams: IProposalQueryParams = {
 
 const tokenVotingProposals: TokenVotingProposalListItem[] =
   await tokenVotingClient.methods.getProposals(queryParams);
-console.log({ tokenVotingProposals });
+console.log(tokenVotingProposals);
 
 /* MARKDOWN
 Returns:
 
 ```
-{ tokenVotingProposals:
-  [
-    {
-      id: "0x12345...",
-      dao: {
-        address: "0x1234567890123456789012345678901234567890",
-        name: "Cool DAO"
-      },
-      creatorAddress: "0x1234567890123456789012345678901234567890",
-      metadata: {
-        title: "Test Proposal",
-        summary: "Test Proposal Summary"
-      },
-      startDate: <Date>,
-      endDate: <Date>,
-      status: "Executed",
-      token: {
-        address: "0x1234567890123456789012345678901234567890,
-        name: "The Token",
-        symbol: "TOK",
-        decimals: 18
-      },
-      results {
-        yes: 100000n,
-        no: 77777n,
-        abstain: 0n
-      }
+[
+  {
+    id: "0x12345...",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
     },
-    {
-      id: "0x12345...",
-      dao: {
-        address: "0x1234567890123456789012345678901234567890",
-        name: "Cool DAO"
-      },
-      creatorAddress: "0x1234567890123456789012345678901234567890",
-      metadata: {
-        title: "Test Proposal 2",
-        summary: "Test Proposal Summary 2"
-      },
-      startDate: <Date>,
-      endDate: <Date>,
-      status: "Pending",
-      token: {
-        address: "0x1234567890123456789012345678901234567890,
-        name: "The Token",
-        symbol: "TOK",
-        decimals: 18
-      },
-      results {
-        yes: 100000n,
-        no: 77777n,
-        abstain: 0n
-      }
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal",
+      summary: "Test Proposal Summary"
+    },
+    startDate: <Date>,
+    endDate: <Date>,
+    status: "Executed",
+    token: {
+      address: "0x1234567890123456789012345678901234567890,
+      name: "The Token",
+      symbol: "TOK",
+      decimals: 18
+    },
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
     }
-  ]
-}
+  },
+  {
+    id: "0x12345...",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
+    },
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal 2",
+      summary: "Test Proposal Summary 2"
+    },
+    startDate: <Date>,
+    endDate: <Date>,
+    status: "Pending",
+    token: {
+      address: "0x1234567890123456789012345678901234567890,
+      name: "The Token",
+      symbol: "TOK",
+      decimals: 18
+    },
+    results {
+      yes: 100000n,
+      no: 77777n,
+      abstain: 0n
+    }
+  }
+]
 ```
 */

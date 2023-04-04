@@ -35,41 +35,39 @@ const queryParams: IProposalQueryParams = {
 
 const multisigProposals: MultisigProposalListItem[] = await multisigClient
   .methods.getProposals(queryParams);
-console.log({ multisigProposals });
+console.log(multisigProposals);
 
 /* MARKDOWN
 Returns:
 
 ```
-{ multisigProposals:
-  [
-    {
-      id: "0x12345...",
-      dao: {
-        address: "0x1234567890123456789012345678901234567890",
-        name: "Cool DAO"
-      };
-      creatorAddress: "0x1234567890123456789012345678901234567890",
-      metadata: {
-        title: "Test Proposal",
-        summary: "Test Proposal Summary"
-      };
-      status: "Executed"
-    },
-    {
-      id: "0x12345...",
-      dao: {
-        address: "0x1234567890123456789012345678901234567890",
-        name: "Cool DAO"
-      };
-      creatorAddress: "0x1234567890123456789012345678901234567890",
-      metadata: {
-        title: "Test Proposal 2",
-        summary: "Test Proposal Summary 2"
-      };
-      status: "Pending"
-    }
-  ]
-}
+[
+  {
+    id: "0x12345...",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal",
+      summary: "Test Proposal Summary"
+    };
+    status: "Executed"
+  },
+  {
+    id: "0x12345...",
+    dao: {
+      address: "0x1234567890123456789012345678901234567890",
+      name: "Cool DAO"
+    };
+    creatorAddress: "0x1234567890123456789012345678901234567890",
+    metadata: {
+      title: "Test Proposal 2",
+      summary: "Test Proposal Summary 2"
+    };
+    status: "Pending"
+  }
+]
 ```
 */

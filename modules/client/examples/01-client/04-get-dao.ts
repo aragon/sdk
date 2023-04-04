@@ -19,39 +19,37 @@ const daoAddressOrEns: string = "0x1234567890123456789012345678901234567890"; //
 
 // Get a DAO's details.
 const dao: DaoDetails | null = await client.methods.getDao(daoAddressOrEns);
-console.log({ dao });
+console.log(dao);
 
 /* MARKDOWN
 Returns:
 
 ```json
-{ dao:
-  {
-    address: "0x1234567890123456789012345678901234567890",
-    ensDomain: "test.dao.eth",
-    metadata: {
-      name: "test",
-      description: "this is a description",
-      avatar?: "https://wbsite.com/image.jpeg",
-      links: [
-        {
-          name: "Website",
-          url: "https://website..."
-        },
-        {
-          name: "Discord",
-          url: "https://discord.com/..."
-        }
-      ]
-    },
-    creationDate: <Date>,
-    plugins: [
+{
+  address: "0x1234567890123456789012345678901234567890",
+  ensDomain: "test.dao.eth",
+  metadata: {
+    name: "test",
+    description: "this is a description",
+    avatar?: "https://wbsite.com/image.jpeg",
+    links: [
       {
-        id: token-voting.plugin.dao.eth,
-        instanceAddress: "0x12345..."
+        name: "Website",
+        url: "https://website..."
+      },
+      {
+        name: "Discord",
+        url: "https://discord.com/..."
       }
     ]
-  }
+  },
+  creationDate: <Date>,
+  plugins: [
+    {
+      id: token-voting.plugin.dao.eth,
+      instanceAddress: "0x12345..."
+    }
+  ]
 }
 ```
 */

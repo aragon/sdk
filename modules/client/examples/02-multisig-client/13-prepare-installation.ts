@@ -38,7 +38,7 @@ const steps = multisigClient.methods.prepareInstallation(installationParams);
 for await (const step of steps) {
   switch (step.key) {
     case PrepareInstallationStep.PREPARING:
-      console.log(step.txHash);
+      console.log({ txHash: step.txHash });
       break;
     case PrepareInstallationStep.DONE:
       console.log({ step });
@@ -49,6 +49,9 @@ for await (const step of steps) {
 /* MARKDOWN
 Returns:
 ```tsx
+{
+  txHash: "0xb1c14a49...3e8620b0f5832d61c"
+}
 {
   step: {
     helpers: ["0x12345...", "0x12345..."]

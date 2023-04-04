@@ -53,6 +53,9 @@ for await (const step of steps) {
 Returns:
 ```tsx
 {
+  txHash: "0xb1c14a49...3e8620b0f5832d61c"
+}
+{
   step:{
     helpers: ["0x12345...", "0x12345..."]
     pluginRepo: "0x12345...",

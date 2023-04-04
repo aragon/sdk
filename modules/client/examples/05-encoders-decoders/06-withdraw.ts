@@ -99,7 +99,7 @@ console.log({ erc20WithdrawAction });
 Returns:
 
 ```json
-{ action:
+{ erc20WithdrawAction:
   {
     to: "0x1234567890...",
     value: 0n;

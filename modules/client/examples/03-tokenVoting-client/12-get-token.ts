@@ -25,27 +25,27 @@ const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 // Get the token details used in the TokenVoting plugin for a given DAO.
 // ERC721 Token coming soon!
 const tokenDetails = await tokenVotingClient.methods.getToken(pluginAddress);
-console.log({ tokenDetails });
+console.log(tokenDetails);
 
 /* MARKDOWN
 Returns:
 
 ```
-  {
-    type: 'erc20',
-    address: "0x123456789000987654323112345678900987654321",
-    name: "Token",
-    symbol: "TOK",
-    decimals: 18
-  }
+{
+  type: 'erc20',
+  address: "0x123456789000987654323112345678900987654321",
+  name: "Token",
+  symbol: "TOK",
+  decimals: 18
+}
 ```
 Or:
 ```
-  {
-    type: 'erc721',
-    address: "0x123456789000987654323112345678900987654321",
-    name: "Token",
-    symbol: "TOK"
-  }
+{
+  type: 'erc721',
+  address: "0x123456789000987654323112345678900987654321",
+  name: "Token",
+  symbol: "TOK"
+}
 ```
 */

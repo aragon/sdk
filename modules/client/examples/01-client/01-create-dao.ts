@@ -83,7 +83,7 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoCreationSteps.CREATING:
-        console.log({ txHash: step.txHash }); // { txHash: "0xb1c14a49...3e8620b0f5832d61c" }
+        console.log({ txHash: step.txHash }); 
         break;
       case DaoCreationSteps.DONE:
         console.log({
@@ -100,6 +100,9 @@ for await (const step of steps) {
 /* MARKDOWN
 Returns:
 ```tsx
+{ 
+  txHash: "0xb1c14a49...3e8620b0f5832d61c"
+}
 {
   daoAddress: "0xb1c14a49...3e8620b0f5832d61c",
   pluginAddresses: ["0xb1c14a49...3e8620b0f5832d61c", "0xb1c14a49...3e8620b0f5832d61c"]

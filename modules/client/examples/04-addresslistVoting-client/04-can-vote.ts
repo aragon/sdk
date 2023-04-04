@@ -28,12 +28,12 @@ const canVoteParams: CanVoteParams = {
 };
 
 const canVote = await addresslistVotingClient.methods.canVote(canVoteParams);
-console.log({ canVote });
+console.log(canVote);
 
 /* MARKDOWN
 Returns:
 
 ```json
-  { canVote: true }
+true
 ```
 */

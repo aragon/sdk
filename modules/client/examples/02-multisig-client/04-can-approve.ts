@@ -27,12 +27,12 @@ const canApproveParams: CanApproveParams = {
 
 // Checks whether the addressOrEns provided is able to approve a given proposal created with the pluginAddress.
 const canApprove = await client.methods.canApprove(canApproveParams);
-console.log({ canApprove });
+console.log(canApprove);
 
 /* MARKDOWN
 Returns:
 
 ```
-  { canApprove: true }
+  true
 ```
 */

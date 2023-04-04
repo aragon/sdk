@@ -15,18 +15,16 @@ import { addresslistVotingClient } from "./index";
 const data: Uint8Array = new Uint8Array([12, 56]);
 
 const functionParams = addresslistVotingClient.decoding.findInterface(data);
-console.log({ functionParams });
+console.log(functionParams);
 
 /* MARKDOWN
 Returns:
 
 ```
-{ functionParams:
-  {
-    id: "function functionName(param1, param2)"
-    functionName: "functionName"
-    hash: "0x12345678"
-  }
+{
+  id: "function functionName(param1, param2)"
+  functionName: "functionName"
+  hash: "0x12345678"
 }
 ```
 */

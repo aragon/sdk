@@ -26,19 +26,18 @@ const pluginAddress: string = "0x1234567890123456789012345678901234567890";
 
 const tokenVotingSettings: VotingSettings | null = await tokenVotingClient
   .methods.getVotingSettings(pluginAddress);
-console.log({ tokenVotingSettings });
+console.log(tokenVotingSettings);
 
 /* MARKDOWN
 Returns:
 
 ```
-{ tokenVotingSettings: {
-    minDuration: 10000, // 10 seconds
-    minParticipation: 0.25, // 25%
-    supportThreshold: 0.5, // 50%
-    minProposerVotingPower: BigInt("5000"),
-    votingMode: "Standard"
-  }
+{
+  minDuration: 10000, // 10 seconds
+  minParticipation: 0.25, // 25%
+  supportThreshold: 0.5, // 50%
+  minProposerVotingPower: BigInt("5000"),
+  votingMode: "Standard"
 }
 ```
 */

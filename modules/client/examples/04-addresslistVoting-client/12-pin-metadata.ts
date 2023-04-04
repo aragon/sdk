@@ -43,10 +43,10 @@ const proposalMetadata: ProposalMetadata = {
 
 const proposalMetadataUri: string = await addresslistVotingClient.methods
   .pinMetadata(proposalMetadata);
-console.log({ proposalMetadataUri });
+console.log(proposalMetadataUri);
 
 /* MARKDOWN
 ```javascript
-  { proposalMetadataUri: ipfs://Qm... }
+"ipfs://Qm..."
 ```
 */

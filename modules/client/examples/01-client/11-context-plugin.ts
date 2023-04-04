@@ -24,4 +24,4 @@ contextPlugin.set({ network: 1 });
 contextPlugin.set({ signer: new Wallet("other private key") });
 contextPlugin.setFull(contextParams);
 
-console.log({ contextPlugin });
+console.log(contextPlugin);

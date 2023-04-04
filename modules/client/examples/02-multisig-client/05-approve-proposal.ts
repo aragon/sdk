@@ -33,7 +33,7 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case ApproveProposalStep.APPROVING:
-        console.log(step.txHash); // "0xb1c14a49...3e8620b0f5832d61c"
+        console.log({ txHash: step.txHash });
         break;
       case ApproveProposalStep.DONE:
         break;
@@ -42,3 +42,12 @@ for await (const step of steps) {
     console.error(err);
   }
 }
+
+/* MARKDOWN
+Returns:
+```tsx
+{
+  txHash: "0xb1c14a49...3e8620b0f5832d61c"
+}
+```
+*/

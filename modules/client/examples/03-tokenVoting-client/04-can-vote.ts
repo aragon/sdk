@@ -32,12 +32,12 @@ const canVoteParams: CanVoteParams = {
 
 // Returns true or false depending on whether the address can vote in the specific proposal.
 const canVote: boolean = await tokenVotingClient.methods.canVote(canVoteParams);
-console.log({ canVote });
+console.log(canVote);
 
 /* MARKDOWN
 Returns:
 
 ```
-  { canVote: true }
+true
 ```
 */

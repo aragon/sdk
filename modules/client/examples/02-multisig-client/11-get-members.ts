@@ -21,18 +21,16 @@ const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
 const multisigMembers: string[] = await multisigClient.methods.getMembers(
   daoAddressorEns,
 );
-console.log({ multisigMembers });
+console.log(multisigMembers);
 
 /* MARKDOWN
 Returns:
 
 ```
-{ multisigMembers:
-  [
-    "0x1234567890...",
-    "0x2345678901...",
-    "0x3456789012..."
-  ]
-}
+[
+  "0x1234567890...",
+  "0x2345678901...",
+  "0x3456789012..."
+]
 ```
 */
