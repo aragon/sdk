@@ -1,6 +1,3 @@
-// @ts-ignore
-declare const describe, it, expect, beforeAll, afterAll;
-
 // mocks need to be at the top of the imports
 import "../../mocks/aragon-sdk-ipfs";
 
@@ -17,8 +14,8 @@ import {
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
-import { deployErc20 } from "./methods.test";
 import { Server } from "ganache";
+import { deployErc20 } from "../../helpers/deploy-erc20";
 
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {

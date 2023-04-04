@@ -402,12 +402,15 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (!provider) {
         throw new NoProviderError();
       }
-      const resolvedAddress = await provider.resolveName(address);
-      if (!resolvedAddress) {
+      try {
+        const resolvedAddress = await provider.resolveName(address);
+        if (!resolvedAddress) {
+          throw new InvalidAddressOrEnsError();
+        }
+        address = resolvedAddress.toLowerCase();
+      } catch {
         throw new InvalidAddressOrEnsError();
       }
-
-      address = resolvedAddress.toLowerCase();
     }
     const query = QueryDao;
     const params = { address };
@@ -578,11 +581,15 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         if (!provider) {
           throw new NoProviderError();
         }
-        const resolvedAddress = await provider.resolveName(address);
-        if (!resolvedAddress) {
+        try {
+          const resolvedAddress = await provider.resolveName(address);
+          if (!resolvedAddress) {
+            throw new InvalidAddressOrEnsError();
+          }
+          address = resolvedAddress;
+        } catch {
           throw new InvalidAddressOrEnsError();
         }
-        address = resolvedAddress;
       }
       where = { dao: address.toLowerCase() };
     }

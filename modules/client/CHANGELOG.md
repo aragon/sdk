@@ -13,6 +13,8 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Fixed
+- Error handling if ENS cannot be resolved.
 ## [1.4.1]
 ## Fixed
 - Amending the type in subgraph's `minApprovals`

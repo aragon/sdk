@@ -503,11 +503,15 @@ export class TokenVotingClientMethods extends ClientCore
         if (!provider) {
           throw new NoProviderError();
         }
-        const resolvedAddress = await provider.resolveName(address);
-        if (!resolvedAddress) {
+        try {
+          const resolvedAddress = await provider.resolveName(address);
+          if (!resolvedAddress) {
+            throw new InvalidAddressOrEnsError();
+          }
+          address = resolvedAddress;
+        } catch {
           throw new InvalidAddressOrEnsError();
         }
-        address = resolvedAddress;
       }
       where = { dao: address.toLowerCase() };
     }

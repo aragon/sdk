@@ -4,7 +4,6 @@ import { UnsupportedProtocolError } from "@aragon/sdk-common";
 import { activeContractsList } from "@aragon/osx-ethers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-// import { GraphQLClient } from "graphql-request";
 
 export { ContextParams } from "./interfaces/context";
 

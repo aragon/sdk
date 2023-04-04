@@ -128,7 +128,7 @@ export function toAssetBalance(balance: SubgraphBalance): AssetBalance {
   } else if (balance.__typename === "ERC721Balance") {
     return {
       type: TokenType.ERC721,
-      name: balance.token.symbol,
+      name: balance.token.name,
       symbol: balance.token.symbol,
       updateDate,
       address: balance.token.id,
