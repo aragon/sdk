@@ -368,7 +368,7 @@ describe("Client Multisig", () => {
         client.graphql.getClient(),
       );
       const subgraphSettings = {
-        minApprovals: "5",
+        minApprovals: 5,
         onlyListed: false,
       };
       mockedClient.request.mockResolvedValueOnce({
@@ -378,7 +378,7 @@ describe("Client Multisig", () => {
         ADDRESS_ONE,
       );
       expect(settings.minApprovals).toBe(
-        parseInt(subgraphSettings.minApprovals),
+        subgraphSettings.minApprovals,
       );
       expect(settings.onlyListed).toBe(subgraphSettings.onlyListed);
       expect(mockedClient.request).toHaveBeenCalledWith(
