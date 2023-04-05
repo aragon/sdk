@@ -186,6 +186,7 @@ export interface IComputeStatusProposal {
   endDate: string;
   executed: boolean;
   executable: boolean;
+  earlyExecutable?: boolean;
 }
 
 export interface IProposalQueryParams extends IPagination {
