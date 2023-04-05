@@ -16,6 +16,8 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## UPCOMING
+### Removed
+- Removes unused constants `modules/common/src/constants.ts`
 ## 1.1.1
 - Adds new error `DataDecodingError`
 - Adds new error `IpfsError`

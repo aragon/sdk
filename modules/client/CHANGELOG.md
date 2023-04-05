@@ -15,6 +15,7 @@ TEMPLATE:
 ## [UPCOMING]
 ### Fixed
 - Error handling if ENS cannot be resolved.
+- Renames `mainnet` to `homestead` in `LIVE_CONTRACTS`.
 ### Changed
 - Uses `earlyExecuted` for proposal state calculation in Addresslistvoting and Tokenvoting.
 ## [1.4.1]

@@ -22,7 +22,7 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
 };
 
 export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
-  mainnet: {
+  homestead: {
     daoFactory: activeContractsList.mainnet.DAOFactory,
     pluginSetupProcessor: activeContractsList.mainnet.PluginRepoFactory,
     multisigRepo: activeContractsList.mainnet["multisig-repo"],

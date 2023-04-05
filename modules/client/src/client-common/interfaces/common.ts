@@ -1,5 +1,5 @@
 export const SupportedNetworksArray = [
-  "mainnet",
+  "homestead",
   "goerli",
   "matic",
   "maticmum",
