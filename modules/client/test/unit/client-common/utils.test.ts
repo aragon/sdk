@@ -9,7 +9,7 @@ describe("client-common utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        executable: false,
+        potentiallyExecutable: false,
         executed: false,
         earlyExecutable: false,
       })).toBe(ProposalStatus.PENDING);
@@ -21,7 +21,7 @@ describe("client-common utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        executable: false,
+        potentiallyExecutable: false,
         executed: true,
         earlyExecutable: false,
       })).toBe(ProposalStatus.EXECUTED);
@@ -33,7 +33,7 @@ describe("client-common utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        executable: false,
+        potentiallyExecutable: false,
         executed: false,
         earlyExecutable: false,
       })).toBe(ProposalStatus.ACTIVE);
@@ -45,7 +45,7 @@ describe("client-common utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        executable: true,
+        potentiallyExecutable: true,
         executed: false,
         earlyExecutable: false,
       })).toBe(ProposalStatus.SUCCEEDED);
@@ -57,7 +57,7 @@ describe("client-common utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        executable: false,
+        potentiallyExecutable: false,
         executed: false,
         earlyExecutable: true,
       })).toBe(ProposalStatus.SUCCEEDED);
@@ -69,7 +69,7 @@ describe("client-common utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        executable: false,
+        potentiallyExecutable: false,
         executed: false,
         earlyExecutable: false,
       })).toBe(ProposalStatus.DEFEATED);

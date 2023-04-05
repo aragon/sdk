@@ -602,7 +602,7 @@ describe("Client Multisig", () => {
         QueryMultisigProposals,
         {
           where: {
-            executable: false,
+            potentiallyExecutable: false,
             endDate_lt: nowFilter,
             executed: false,
           },

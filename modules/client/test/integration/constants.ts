@@ -160,7 +160,7 @@ export const SUBGRAPH_PROPOSAL_BASE: SubgraphProposalBase = {
   executed: false,
   startDate: Math.round(Date.now() / 1000).toString(),
   endDate: Math.round(Date.now() / 1000).toString(),
-  executable: false,
+  potentiallyExecutable: false,
   metadata: `ipfs://${IPFS_CID}`,
 };
 
