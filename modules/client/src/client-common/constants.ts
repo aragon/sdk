@@ -62,7 +62,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     tokenVotingSetup: activeContractsList.mumbai.TokenVotingSetup,
     ensRegistry: activeContractsList.mumbai.ENSRegistry,
   },
-  maticmum: {
+  matic: {
     daoFactory: activeContractsList.polygon.DAOFactory,
     pluginSetupProcessor: activeContractsList.polygon.PluginSetupProcessor,
     multisigRepo: activeContractsList.polygon["multisig-repo"],
