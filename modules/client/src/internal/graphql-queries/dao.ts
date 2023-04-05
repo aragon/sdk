@@ -10,6 +10,14 @@ export const QueryDao = gql`
       plugins{
         id
         __typename
+        installations{
+          appliedVersion{
+            build
+            release{
+              release
+            }
+          }
+        }
       }
     }
   }
@@ -23,6 +31,14 @@ export const QueryDaos = gql`
       plugins{
         id
         __typename
+        installations{
+          appliedVersion{
+            build
+            release{
+              release
+            }
+          }
+        }
       }
     }
   }
