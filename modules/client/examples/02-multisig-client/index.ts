@@ -17,4 +17,4 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 // Creates a Multisig plugin client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
-console.log({ multisigClient });
+console.log(multisigClient);

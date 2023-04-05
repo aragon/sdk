@@ -22,18 +22,18 @@ const metadata: DaoMetadata = {
   avatar: "",
   links: [{
     name: "Web site",
-    url: "https://..."
-  }]
+    url: "https://...",
+  }],
 };
 
 // Pin the metadata in IPFS.
 const metadataUri = await client.methods.pinMetadata(metadata);
-console.log({ metadataUri });
+console.log(metadataUri);
 
 /* MARKDOWN
 Returns:
 
 ```json
-  { metadataUri: "ipfs://Qm..." }
+  "ipfs://Qm..."
 ```
 */

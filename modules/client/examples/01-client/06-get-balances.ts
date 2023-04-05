@@ -18,31 +18,31 @@ const client: Client = new Client(context);
 const daoAddressOrEns: string = "0x12345...";
 
 // Get a DAO's asset balances.
-const daoBalances: AssetBalance[] | null = await client.methods.getDaoBalances({ daoAddressOrEns });
-console.log({ daoBalances });
+const daoBalances: AssetBalance[] | null = await client.methods.getDaoBalances({
+  daoAddressOrEns,
+});
+console.log(daoBalances);
 
 /* MARKDOWN
 Returns:
 
 ```json
-{ daoBalances:
-  [
-    {
-      type: "native",
-      balance: 100000n,
-      lastUpdate: <Date>
-    },
-    {
-      type: "erc20",
-      address: "0x1234567890123456789012345678901234567890"
-      name: "The Token",
-      symbol: "TOK",
-      decimals: 18,
-      balance: 200000n
-      lastUpdate: <Date>
-    },
-    ...
-  ]
-}
+[
+  {
+    type: "native",
+    balance: 100000n,
+    updateDate: <Date>
+  },
+  {
+    type: "erc20",
+    address: "0x1234567890123456789012345678901234567890"
+    name: "The Token",
+    symbol: "TOK",
+    decimals: 18,
+    balance: 200000n
+    updateDate: <Date>
+  },
+  ...
+]
 ```
 */

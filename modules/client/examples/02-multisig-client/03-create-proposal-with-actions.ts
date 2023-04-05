@@ -15,9 +15,13 @@ import {
   MultisigClient,
   ProposalCreationSteps,
   ProposalMetadata,
+  TokenType,
+  WithdrawParams,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
+// Instantiate an Aragon OSx SDK client.
+const client: Client = new Client(context);
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Insantiate a Multisig plugin client.
@@ -48,10 +52,21 @@ const metadataUri: string = await multisigClient.methods.pinMetadata(
   proposalMetadata,
 );
 
+// An action the proposal could take. This is only an example of an action. You can find all encoded actions within our encoders section.
+const withdrawParams: WithdrawParams = {
+  amount: BigInt(10), // amount in wei
+  tokenAddress: "0x1234567890123456789012345678901234567890", // ERC20 token's contract address to withdraw
+  type: TokenType.ERC20,
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890", // address or ENS name to send the assets to
+};
+
+// Encodes the action of withdrawing assets from a given DAO's vault and transfers them over to the recipient address.
+const withdrawAction = await client.encoding.withdrawAction(withdrawParams);
+
 const proposalParams: CreateMultisigProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri,
-  actions: [], // optional - if left as an empty array, no action will be set for the proposal. the action needs to be encoded and will be executed once a proposal passes.
+  actions: [withdrawAction], // optional - if left as an empty array, no action will be set for the proposal. the action needs to be encoded and will be executed once a proposal passes.
 };
 
 // Generates a proposal with the withdraw action as passed in the proposalParams.
@@ -71,10 +86,11 @@ for await (const step of steps) {
     console.error(err);
   }
 }
+
 /* MARKDOWN
 Returns:
 ```tsx
-{ 
+{
   txHash: "0xb1c14a49...3e8620b0f5832d61c"
 }
 {

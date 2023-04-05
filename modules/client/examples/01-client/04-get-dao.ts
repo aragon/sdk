@@ -19,7 +19,7 @@ const daoAddressOrEns: string = "0x1234567890123456789012345678901234567890"; //
 
 // Get a DAO's details.
 const dao: DaoDetails | null = await client.methods.getDao(daoAddressOrEns);
-console.log({ dao });
+console.log(dao);
 
 /* MARKDOWN
 Returns:

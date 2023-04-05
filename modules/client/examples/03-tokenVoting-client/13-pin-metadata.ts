@@ -3,22 +3,24 @@
 title: Pin Metadata
 ---
 
-## Add and Pin Metadata for the Multisig plugin
+## Add and Pin Metadata
 
-Adds an pin data into one of the specified IPFS nodes and return a IPFS CID preceded by "ipfs://"
+Adds and pins data with into one of the specified IPFS nodes and return an IPFS CID preceded by "ipfs://".
 */
 
 import {
   ContextPlugin,
-  MultisigClient,
-  ProposalMetadata
+  ProposalMetadata,
+  TokenVotingClient,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+// Create an TokenVoting client.
+const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
+  contextPlugin,
+);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
@@ -27,26 +29,29 @@ const metadata: ProposalMetadata = {
   resources: [
     {
       name: "Discord",
-      url: "https://discord.com/..."
+      url: "https://discord.com/...",
     },
     {
       name: "Website",
-      url: "https://website..."
+      url: "https://website...",
     },
   ],
   media: {
     logo: "https://...",
-    header: "https://..."
+    header: "https://...",
   },
 };
 
-const metadataUri: string = await multisigClient.methods.pinMetadata(metadata);
-console.log({ metadataUri });
+// Pin the metadata in IPFS to get back the URI.
+const metadataUri: string = await tokenVotingClient.methods.pinMetadata(
+  metadata,
+);
+console.log(metadataUri);
 
 /* MARKDOWN
 Returns:
 
 ```json
-  { metadataUri: "ipfs://Qm..." }
+"ipfs://Qm..."
 ```
 */

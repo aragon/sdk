@@ -22,8 +22,8 @@ const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
 const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
-const proposalDetails: MultisigProposal | null = await multisigClient.methods.getProposal(proposalId);
-console.log({ proposalDetails });
+const multisigProposal: MultisigProposal | null = await multisigClient.methods.getProposal(proposalId);
+console.log(multisigProposal);
 
 /* MARKDOWN
 Returns:
