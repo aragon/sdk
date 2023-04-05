@@ -35,19 +35,21 @@ export function computeProposalStatus(
     parseInt(proposal.startDate) * 1000,
   );
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
+  if (proposal.executed) {
+    return ProposalStatus.EXECUTED;
+  }
   if (startDate >= now) {
     return ProposalStatus.PENDING;
-  } else if (proposal.executed) {
-    return ProposalStatus.EXECUTED;
-  } else if (endDate >= now) {
-    return ProposalStatus.ACTIVE;
-  } else if (
-    proposal.executable
+  }
+  if (
+    proposal.executable || proposal.earlyExecutable
   ) {
     return ProposalStatus.SUCCEEDED;
-  } else {
-    return ProposalStatus.DEFEATED;
   }
+  if (endDate >= now) {
+    return ProposalStatus.ACTIVE;
+  }
+  return ProposalStatus.DEFEATED;
 }
 
 export function computeProposalStatusFilter(
@@ -117,4 +119,3 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
       throw new InvalidVotingModeError();
   }
 }
-

@@ -164,6 +164,7 @@ export type SubgraphTokenVotingProposalListItem = SubgraphProposalBase & {
   minVotingPower: bigint;
   totalVotingPower: string;
   votingMode: VotingMode;
+  earlyExecutable: boolean;
 };
 
 type SubgraphBaseToken = {

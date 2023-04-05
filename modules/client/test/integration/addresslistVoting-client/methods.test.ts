@@ -671,6 +671,7 @@ describe("Client Address List", () => {
         executionDate: Math.round(Date.now() / 1000).toString(),
         executionBlockNumber: "50",
         executionTxHash: TEST_TX_HASH,
+        earlyExecutable: false,
         ...SUBGRAPH_PROPOSAL_BASE,
       };
 

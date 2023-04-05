@@ -15,7 +15,7 @@ This function updates the allowance approval to the amount specified.
 import {
   Client,
   DaoDepositSteps,
-  UpdateAllowanceParams
+  UpdateAllowanceParams,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -25,7 +25,7 @@ const client: Client = new Client(context);
 const updateAllowanceParams: UpdateAllowanceParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
-  tokenAddress: "0x1234567890123456789012345678901234567890" // token contract adddress
+  tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
 };
 
 const steps = client.methods.updateAllowance(updateAllowanceParams);
@@ -34,15 +34,31 @@ for await (const step of steps) {
   try {
     switch (step.key) {
       case DaoDepositSteps.CHECKED_ALLOWANCE:
-        console.log(step.allowance); // 0n
+        console.log({ checkedAllowance: step.allowance });
         break;
       case DaoDepositSteps.UPDATING_ALLOWANCE:
-        console.log(step.txHash); // 0xb1c14a49...3e8620b0f5832d61c
+        console.log({ updateAllowanceTxHash: step.txHash });
         break;
       case DaoDepositSteps.UPDATED_ALLOWANCE:
-        console.log(step.allowance); // 10n
+        console.log({ updatedAllowance: step.allowance });
+        break;
     }
   } catch (err) {
     console.error(err);
   }
 }
+
+/* MARKDOWN
+Returns:
+```tsx
+{
+  checkedAllowance: 0n
+}
+{
+  updateAllowanceTxHash: "0xb1c14a49...3e8620b0f5832d61c"
+}
+{
+  updatedAllowance: 10n
+}
+```
+*/

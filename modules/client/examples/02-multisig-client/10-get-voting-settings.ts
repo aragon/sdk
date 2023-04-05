@@ -11,7 +11,7 @@ Get the settings of a Multisig plugin from a specific DAO.
 import {
   ContextPlugin,
   MultisigClient,
-  MultisigVotingSettings
+  MultisigVotingSettings,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -22,17 +22,16 @@ const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
 const daoAddressorEns: string = "0x12345348523485623984752394854320";
 
-const multisigSettings: MultisigVotingSettings = await multisigClient.methods.getVotingSettings(daoAddressorEns);
-console.log({ multisigSettings });
+const multisigVotingSettings: MultisigVotingSettings = await multisigClient
+  .methods.getVotingSettings(daoAddressorEns);
+console.log(multisigVotingSettings);
 
 /* MARKDOWN
 Returns:
 ```json
 {
-  votingSettings: {
-    minApprovals: 4,
-    onlyListed: true
-  }
+  minApprovals: 4,
+  onlyListed: true
 }
 ```
 */

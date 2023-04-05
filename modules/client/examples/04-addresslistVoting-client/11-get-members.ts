@@ -14,11 +14,14 @@ import { context } from "../index";
 // Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiates an AddressList client.
-const addresslistVotingClient: AddresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient: AddresslistVotingClient =
+  new AddresslistVotingClient(contextPlugin);
 
 const pluginAddress = "0x12345382947301297439127433492834";
 
-const members: string[] = await addresslistVotingClient.methods.getMembers(pluginAddress);
+const members: string[] = await addresslistVotingClient.methods.getMembers(
+  pluginAddress,
+);
 console.log({ members });
 
 /* MARKDOWN

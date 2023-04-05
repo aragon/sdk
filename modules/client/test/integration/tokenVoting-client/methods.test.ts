@@ -680,6 +680,7 @@ describe("Token Voting Client", () => {
           executionDate: Math.round(Date.now() / 1000).toString(),
           executionBlockNumber: "50",
           executionTxHash: TEST_TX_HASH,
+          earlyExecutable: false,
           plugin: {
             token: {
               decimals: 18,

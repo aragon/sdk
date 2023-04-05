@@ -18,7 +18,7 @@ Hence, the flow is the following:
 
 ## Decoding Actions
 
-To obtain the encoded back in readable format, you can decode 
+To obtain the encoded back in readable format, you can decode
 After a sucessful transaction, you can de
 Decodes the actions of a transaction to understand them in a human-readable format.
 */

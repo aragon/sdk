@@ -113,7 +113,9 @@ export type AddresslistVotingProposalResult = {
 
 export type SubgraphAddresslistVotingVoterListItem = SubgraphVoterListItemBase;
 
-export type SubgraphAddresslistVotingProposalListItem = SubgraphProposalBase;
+export type SubgraphAddresslistVotingProposalListItem = SubgraphProposalBase & {
+  earlyExecutable: boolean;
+};
 export type SubgraphAddresslistVotingProposal = SubgraphProposalBase & {
   createdAt: string;
   actions: SubgraphAction[];
@@ -126,6 +128,7 @@ export type SubgraphAddresslistVotingProposal = SubgraphProposalBase & {
   executionDate: string;
   executionBlockNumber: string;
   executionTxHash: string;
+  earlyExecutable: boolean;
 };
 
 export type ContractAddresslistVotingInitParams = [

@@ -3,29 +3,29 @@
 title: Get Proposal
 ---
 
-## Get a Token Voting Proposal by Its ID
+## Get a Addresslist Voting Proposal by Its ID
 
-Gets a specific proposal using the TokenVoting plugin as its governance mechanism.
+Gets a proposal created using the Addresslist Voting plugin.
 */
 
 import {
+  AddresslistVotingClient,
+  AddresslistVotingProposal,
   ContextPlugin,
-  TokenVotingClient,
-  TokenVotingProposal
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from an Aragon OSx SDK context.
+// Instantiates a plugin context from the Aragon OSx SDK context.
 const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-// Create a TokenVoting client.
-const tokenVotingClient: TokenVotingClient = new TokenVotingClient(contextPlugin);
+// Instantiates an AddresslistVoting client.
+const addresslistVotingClient: AddresslistVotingClient =
+  new AddresslistVotingClient(contextPlugin);
 
-// The address of the proposal you want to retrieve.
 const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
-// Get a specific proposal created using the TokenVoting plugin.
-const proposal: TokenVotingProposal | null = await tokenVotingClient.methods.getProposal(proposalId);
-console.log({ proposal });
+const addresslistVotingProposal: AddresslistVotingProposal | null =
+  await addresslistVotingClient.methods.getProposal(proposalId);
+console.log(addresslistVotingProposal);
 
 /* MARKDOWN
 Returns:
@@ -49,7 +49,7 @@ Returns:
       },
       {
         url: "https://docs.com/...",
-        "name: "Document"
+        name: "Document"
       }
     ],
     media: {
@@ -70,36 +70,27 @@ Returns:
       data: [12,13,154...]
     }
   ],
+  status: "Executed",
   result {
-    yes: 700000n,
-    no: 300000n,
-    abstain: 0n
+    yes: 1,
+    no: 1,
+    abstain: 0
   }
-  settings:{
+  settings: {
     minParticipation: 0.5,
     supportThreshold: 0.25,
     minDuration: 7200
   },
-  token: {
-    address: "0x1234567890123456789012345678901234567890,
-    name: "The Token",
-    symbol: "TOK",
-    decimals: 18
-  },
-  usedVotingWeight: 1000000n,
   votes: [
     {
       address: "0x123456789123456789123456789123456789",
-      vote: 2, // VoteValues.YES
-      voteWeight: 700000n
+      vote: 2 // VoteValues.YES
     },
     {
       address: "0x234567891234567891234567891234567890",
-      vote: 3, // VoteValues.NO
-      voteWeight: 300000n
+      vote: 3 // VoteValues.NO
     }
   ]
-  status: "Executed"
 }
 ```
 */

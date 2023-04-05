@@ -52,16 +52,15 @@ export const contextParams: ContextParams = {
   ipfsNodes: [
     {
       url: "https://testing-ipfs-0.aragon.network/api/v0",
-      headers: { "X-API-KEY": IPFS_API_KEY || "" }
+      headers: { "X-API-KEY": IPFS_API_KEY || "" },
     },
   ],
   // Don't change this line. This is how we connect your app to the Aragon subgraph.
   graphqlNodes: [
     {
-      url:
-        "https://subgraph.satsuma-prod.com/aragon/core-goerli/api"
-    }
-  ]
+      url: "https://subgraph.satsuma-prod.com/aragon/core-goerli/api",
+    },
+  ],
 };
 
 // Instantiate the Aragon SDK context
@@ -74,5 +73,3 @@ Update the context with new parameters if you wish to throughout your app.
 context.set({ network: 1 });
 context.set({ signer: new Wallet("private key") }); // if you're using wagmi library, you can also get the signer through their [`useSigner` method](https://wagmi.sh/react/hooks/useSigner) inside a `useEffect` hook.
 context.setFull(contextParams);
-
-
