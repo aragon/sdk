@@ -48,7 +48,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     addresslistVotingSetup: activeContractsList.goerli.AddresslistVotingSetup,
     tokenVotingSetup: activeContractsList.goerli.TokenVotingSetup,
   },
-  "maticmum": {
+  maticmum: {
     daoFactory: activeContractsList.mumbai.DAOFactory,
     pluginSetupProcessor: activeContractsList.mumbai.PluginSetupProcessor,
     multisigRepo: activeContractsList.mumbai["multisig-repo"],

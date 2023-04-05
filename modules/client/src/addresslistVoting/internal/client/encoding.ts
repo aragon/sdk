@@ -22,6 +22,7 @@ import {
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { LIVE_CONTRACTS } from "../../../client-common/constants";
+import { getNetwork, Networkish } from "@ethersproject/providers";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -39,16 +40,17 @@ export class AddresslistVotingClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {IAddresslistVotingPluginInstall} params
-   * @param {SupportedNetworks} network
+   * @param {Networkish} network
    * @return {*}  {IPluginInstallItem}
    * @memberof AddresslistVotingClientEncoding
    */
   static getPluginInstallItem(
     params: IAddresslistVotingPluginInstall,
-    network: SupportedNetworks,
+    network: Networkish,
   ): IPluginInstallItem {
-    if (!SupportedNetworksArray.includes(network)) {
-      throw new UnsupportedNetworkError(network);
+    const networkName = getNetwork(network).name as SupportedNetworks
+    if (!SupportedNetworksArray.includes(networkName)) {
+      throw new UnsupportedNetworkError(networkName);
     }
     const {
       votingMode,
@@ -76,7 +78,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     );
 
     return {
-      id: LIVE_CONTRACTS[network].addresslistVotingRepo,
+      id: LIVE_CONTRACTS[networkName].addresslistVotingRepo,
       data: hexToBytes(hexBytes),
     };
   }

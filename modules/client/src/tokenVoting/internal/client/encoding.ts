@@ -28,6 +28,7 @@ import {
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { LIVE_CONTRACTS } from "../../../client-common/constants";
+import { getNetwork, Networkish } from "@ethersproject/providers";
 
 /**
  * Encoding module the SDK TokenVoting Client
@@ -44,16 +45,17 @@ export class TokenVotingClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {ITokenVotingPluginInstall} params
-   * @param {SupportedNetworks} network
+   * @param {Networkish} network
    * @return {*}  {IPluginInstallItem}
    * @memberof TokenVotingClientEncoding
    */
   static getPluginInstallItem(
     params: ITokenVotingPluginInstall,
-    network: SupportedNetworks,
+    network: Networkish,
   ): IPluginInstallItem {
-    if (!SupportedNetworksArray.includes(network)) {
-      throw new UnsupportedNetworkError(network);
+    const networkName = getNetwork(network).name as SupportedNetworks
+    if (!SupportedNetworksArray.includes(networkName)) {
+      throw new UnsupportedNetworkError(networkName);
     }
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
@@ -66,7 +68,7 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      id: LIVE_CONTRACTS[network].tokenVotingRepo,
+      id: LIVE_CONTRACTS[networkName].tokenVotingRepo,
       data: hexToBytes(hexBytes),
     };
   }

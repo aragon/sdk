@@ -24,6 +24,7 @@ import {
 import { Multisig__factory } from "@aragon/osx-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { LIVE_CONTRACTS } from "../../../client-common/constants";
+import { getNetwork, Networkish } from "@ethersproject/providers";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -39,17 +40,18 @@ export class MultisigClientEncoding extends ClientCore
    * so that the plugin is configured
    *
    * @param {MultisigPluginInstallParams} params
-   * @param {SupportedNetworks} network
+   * @param {Networkish} network
    *
    * @return {*}  {IPluginInstallItem}
    * @memberof MultisigClientEncoding
    */
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
-    network: SupportedNetworks,
+    network: Networkish,
   ): IPluginInstallItem {
-    if (!SupportedNetworksArray.includes(network)) {
-      throw new UnsupportedNetworkError(network);
+    const networkName = getNetwork(network).name as SupportedNetworks
+    if (!SupportedNetworksArray.includes(networkName)) {
+      throw new UnsupportedNetworkError(networkName);
     }
     const hexBytes = defaultAbiCoder.encode(
       // members, [onlyListed, minApprovals]
@@ -66,7 +68,7 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
-      id: LIVE_CONTRACTS[network].multisigRepo,
+      id: LIVE_CONTRACTS[networkName].multisigRepo,
       data: hexToBytes(hexBytes),
     };
   }
