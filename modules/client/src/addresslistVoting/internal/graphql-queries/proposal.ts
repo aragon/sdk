@@ -27,8 +27,8 @@ query AddresslistVotingProposal($proposalId: ID!) {
     startDate
     endDate
     executed
-    executable
     earlyExecutable
+    potentiallyExecutable
     voters{
       voter{
         address
@@ -57,8 +57,8 @@ query AddresslistVotingProposals($where: AddresslistVotingProposal_filter!, $lim
     startDate
     endDate
     executed
-    executable
     earlyExecutable
+    potentiallyExecutable
   }
 }
 `;

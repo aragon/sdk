@@ -178,15 +178,15 @@ export type SubgraphProposalBase = {
   startDate: string;
   endDate: string;
   executed: boolean;
-  executable: boolean;
+  potentiallyExecutable: boolean;
 };
 
 export interface IComputeStatusProposal {
   startDate: string;
   endDate: string;
   executed: boolean;
-  executable: boolean;
   earlyExecutable?: boolean;
+  potentiallyExecutable: boolean;
 }
 
 export interface IProposalQueryParams extends IPagination {
