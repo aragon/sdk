@@ -22,7 +22,7 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
 };
 
 export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
-  mainnet: {
+  homestead: {
     daoFactory: activeContractsList.mainnet.DAOFactory,
     pluginSetupProcessor: activeContractsList.mainnet.PluginRepoFactory,
     multisigRepo: activeContractsList.mainnet["multisig-repo"],
@@ -48,7 +48,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     addresslistVotingSetup: activeContractsList.goerli.AddresslistVotingSetup,
     tokenVotingSetup: activeContractsList.goerli.TokenVotingSetup,
   },
-  mumbai: {
+  "maticmum": {
     daoFactory: activeContractsList.mumbai.DAOFactory,
     pluginSetupProcessor: activeContractsList.mumbai.PluginSetupProcessor,
     multisigRepo: activeContractsList.mumbai["multisig-repo"],
@@ -62,7 +62,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
     tokenVotingSetup: activeContractsList.mumbai.TokenVotingSetup,
     ensRegistry: activeContractsList.mumbai.ENSRegistry,
   },
-  polygon: {
+  maticmum: {
     daoFactory: activeContractsList.polygon.DAOFactory,
     pluginSetupProcessor: activeContractsList.polygon.PluginSetupProcessor,
     multisigRepo: activeContractsList.polygon["multisig-repo"],

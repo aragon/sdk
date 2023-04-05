@@ -15,7 +15,7 @@ TEMPLATE:
 ## [UPCOMING]
 ### Fixed
 - Error handling if ENS cannot be resolved.
-- Renames `matic` and `maticmum` to `polygon` and `mumbai`.
+- Renames `mainnet` to `homestead` in `LIVE_CONTRACTS`.
 ## [1.4.1]
 ## Fixed
 - Amending the type in subgraph's `minApprovals`
