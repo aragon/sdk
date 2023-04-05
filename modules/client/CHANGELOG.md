@@ -15,6 +15,8 @@ TEMPLATE:
 ## [UPCOMING]
 ### Fixed
 - Error handling if ENS cannot be resolved.
+### Changed
+- Uses `earlyExecuted` for proposal state calculation in Addresslistvoting and Tokenvoting.
 ## [1.4.1]
 ## Fixed
 - Amending the type in subgraph's `minApprovals`
