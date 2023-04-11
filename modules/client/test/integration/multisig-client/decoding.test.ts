@@ -8,11 +8,17 @@ import {
   MultisigClient,
   MultisigVotingSettings,
   RemoveAddressesParams,
+  SupportedNetworksArray,
   UpdateMultisigVotingSettingsParams,
 } from "../../../src";
-import { contextParamsLocalChain } from "../constants";
+import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
+
+jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
 
 describe("Client Multisig", () => {
+  beforeAll(() => {
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE
+  });
   describe("Action decoders", () => {
     it("Should decode the members from an add members action", async () => {
       const ctx = new Context(contextParamsLocalChain);

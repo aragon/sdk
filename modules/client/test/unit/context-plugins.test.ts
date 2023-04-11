@@ -1,10 +1,9 @@
 // @ts-ignore
 declare const describe, it, beforeEach, expect, test;
 
-import { ContextPlugin, ContextPluginParams } from "../../src";
+import { ContextPlugin, ContextPluginParams, LIVE_CONTRACTS } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { activeContractsList } from "@aragon/osx-ethers";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
@@ -27,6 +26,7 @@ describe("ContextPlugin instances", () => {
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
       graphqlNodes: [],
+      ipfsNodes: []
     };
   });
   it("Should create an empty context", () => {
@@ -45,7 +45,8 @@ describe("ContextPlugin instances", () => {
     const context = new ContextPlugin(contextParams);
 
     expect(context).toBeInstanceOf(ContextPlugin);
-    expect(context.network).toEqual("mainnet");
+    expect(context.network.name).toEqual("homestead");
+    expect(context.network.chainId).toEqual(1);
     expect(context.signer).toBeInstanceOf(Wallet);
     expect(context.daoFactoryAddress).toEqual("0x1234");
     context.web3Providers?.map((provider) =>
@@ -73,9 +74,10 @@ describe("ContextPlugin instances", () => {
     const context = new ContextPlugin(contextParams);
 
     expect(context).toBeInstanceOf(ContextPlugin);
-    expect(context.network).toEqual("goerli");
+    expect(context.network.name).toEqual("goerli");
+    expect(context.network.chainId).toEqual(5);
     expect(context.daoFactoryAddress).toEqual(
-      activeContractsList.goerli.DAOFactory,
+      LIVE_CONTRACTS.goerli.daoFactory,
     );
   });
 });

@@ -33,6 +33,7 @@ import {
   ITransferQueryParams,
   Permissions,
   SortDirection,
+  SupportedNetworksArray,
   TokenType,
   TransferSortBy,
   TransferType,
@@ -58,6 +59,8 @@ import { GraphQLClient } from "graphql-request";
 import { AddressZero } from "@ethersproject/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+
 describe("Client", () => {
   let daoAddress: string;
   let deployment: deployContracts.Deployment;
@@ -69,6 +72,8 @@ describe("Client", () => {
       server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.ensRegistryAddress =
+        deployment.ensRegistry.address;
       const daoCreation = await deployContracts.createTokenVotingDAO(
         deployment,
         "test-tokenvoting-dao",
@@ -633,15 +638,22 @@ describe("Client", () => {
       });
 
       describe("Should get the transfers of a dao", () => {
-        const ctx = new Context(contextParamsLocalChain);
-        const params: ITransferQueryParams = {
-          daoAddressOrEns: TEST_DAO_ADDRESS,
-          sortBy: TransferSortBy.CREATED_AT,
-          limit: 10,
-          skip: 0,
-          direction: SortDirection.ASC,
-        };
-        let client: Client, mockedClient: jest.Mocked<GraphQLClient>;
+        let client: Client,
+          mockedClient: jest.Mocked<GraphQLClient>,
+          params: ITransferQueryParams,
+          ctx: Context;
+        beforeAll(() => {
+          contextParamsLocalChain.ensRegistryAddress =
+            deployment.ensRegistry.address;
+          ctx = new Context(contextParamsLocalChain);
+          params = {
+            daoAddressOrEns: TEST_DAO_ADDRESS,
+            sortBy: TransferSortBy.CREATED_AT,
+            limit: 10,
+            skip: 0,
+            direction: SortDirection.ASC,
+          };
+        });
 
         beforeEach(() => {
           client = new Client(ctx);

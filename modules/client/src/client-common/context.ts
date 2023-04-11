@@ -1,10 +1,22 @@
 import { ContextParams, ContextState } from "./interfaces/context";
-import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
-import { UnsupportedProtocolError } from "@aragon/sdk-common";
-import { activeContractsList } from "@aragon/osx-ethers";
+import {
+  getNetwork,
+  JsonRpcProvider,
+  Network,
+  Networkish,
+} from "@ethersproject/providers";
+import {
+  EnsUnsuportedByNetworkError,
+  // UndefinedParameterError,
+  UnsupportedNetworkError,
+  UnsupportedProtocolError,
+} from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-
+import { LIVE_CONTRACTS } from "./constants";
+import { SupportedNetworks, SupportedNetworksArray } from "./interfaces/common";
+import { isAddress } from "@ethersproject/address";
+import { Signer } from "@ethersproject/abstract-signer";
 export { ContextParams } from "./interfaces/context";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
@@ -13,104 +25,77 @@ if (typeof process !== "undefined" && process.env?.TESTING) {
   supportedProtocols.push("http:");
 }
 
-// State
-const defaultState: ContextState = {
-  network: "mainnet",
-  web3Providers: [],
-  gasFeeEstimationFactor: DEFAULT_GAS_FEE_ESTIMATION_FACTOR,
-};
-
 export class Context {
-  protected state: ContextState = Object.assign({}, defaultState);
+  protected state: ContextState = {} as ContextState;
   // INTERNAL CONTEXT STATE
-
   /**
    * @param {Object} params
    *
    * @constructor
    */
   constructor(params: Partial<ContextParams>) {
+    // UNCOMMENT FOR MANDATORY PARAMS
+    // check mandatory params
+    // if (!params.network && this.state.network) {
+    //   throw new UndefinedParameterError("network");
+    // }
+    // if (!params.signer) {
+    //   throw new UndefinedParameterError("signer");
+    // }
+    // if (
+    //   !params.web3Providers ||
+    //   (Array.isArray(params.web3Providers) && !params.web3Providers.length)
+    // ) {
+    //   throw new UndefinedParameterError("web3 providers");
+    // }
+    // if (!params.graphqlNodes || !params.graphqlNodes.length) {
+    //   throw new UndefinedParameterError("graphql nodes");
+    // }
+    // if (!params.ipfsNodes || !params.ipfsNodes.length) {
+    //   throw new UndefinedParameterError("ipfs nodes");
+    // }
     this.set(params);
-  }
-
-  /**
-   * Does set and parse the given context configuration object
-   *
-   * @method setFullContext
-   *
-   * @returns {void}
-   *
-   * @private
-   */
-  setFull(contextParams: ContextParams): void {
-    if (!contextParams.network) {
-      throw new Error("Missing network");
-    } else if (!contextParams.daoFactoryAddress) {
-      throw new Error("Missing DAO factory address");
-    } else if (!contextParams.signer) {
-      throw new Error("Please pass the required signer");
-    } else if (!contextParams.web3Providers) {
-      throw new Error("No web3 endpoints defined");
-    } else if (!contextParams.gasFeeEstimationFactor) {
-      throw new Error("No gas fee reducer defined");
-    } else if (!contextParams.ipfsNodes?.length) {
-      throw new Error("No IPFS nodes defined");
-    } else if (!contextParams.graphqlNodes?.length) {
-      throw new Error("No graphql URL defined");
-    }
-
-    this.state = {
-      network: contextParams.network,
-      signer: contextParams.signer,
-      daoFactoryAddress: contextParams.daoFactoryAddress,
-      daoRegistryAddress: contextParams.daoRegistryAddress,
-      pluginRepoRegistryAddress: contextParams.pluginRepoRegistryAddress,
-      web3Providers: Context.resolveWeb3Providers(
-        contextParams.web3Providers,
-        contextParams.network
-      ),
-      gasFeeEstimationFactor: Context.resolveGasFeeEstimationFactor(
-        contextParams.gasFeeEstimationFactor
-      ),
-      ipfs: Context.resolveIpfs(contextParams.ipfsNodes),
-      graphql: Context.resolveGraphql(contextParams.graphqlNodes),
-    };
   }
 
   set(contextParams: Partial<ContextParams>) {
     if (contextParams.network) {
-      this.state.network = contextParams.network;
-    }
-    if (contextParams.daoFactoryAddress) {
-      this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
-    } else if (this.state.network.toString() in activeContractsList) {
-      this.state.daoFactoryAddress =
-        activeContractsList[
-          this.state.network.toString() as keyof typeof activeContractsList
-        ].DAOFactory;
+      this.state.network = Context.resolveNetwork(
+        contextParams.network,
+        contextParams.ensRegistryAddress,
+      );
     }
     if (contextParams.signer) {
       this.state.signer = contextParams.signer;
     }
-    if (contextParams.web3Providers) {
+    if (
+      contextParams.web3Providers ||
+      (Array.isArray(contextParams.web3Providers) &&
+        contextParams.web3Providers.length)
+    ) {
       this.state.web3Providers = Context.resolveWeb3Providers(
         contextParams.web3Providers,
-        this.state.network
+        this.state.network,
       );
-    }
-    if (contextParams.gasFeeEstimationFactor) {
-      this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
-        contextParams.gasFeeEstimationFactor
-      );
-    }
-
-    if (contextParams.ipfsNodes?.length) {
-      this.state.ipfs = Context.resolveIpfs(contextParams.ipfsNodes);
     }
     if (contextParams.graphqlNodes?.length) {
       this.state.graphql = Context.resolveGraphql(contextParams.graphqlNodes);
     }
+    if (contextParams.ipfsNodes?.length) {
+      this.state.ipfs = Context.resolveIpfs(contextParams.ipfsNodes);
+    }
+    if (contextParams.daoFactoryAddress) {
+      this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
+    }
+    if (contextParams.ensRegistryAddress) {
+      this.state.ensRegistryAddress = contextParams.ensRegistryAddress;
+    }
+    if (contextParams.gasFeeEstimationFactor) {
+      this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
+        contextParams.gasFeeEstimationFactor,
+      );
+    }
   }
+
   // GETTERS
 
   /**
@@ -123,7 +108,20 @@ export class Context {
    * @public
    */
   get network() {
-    return this.state.network || defaultState.network;
+    return this.state.network;
+  }
+  /**
+   * Getter for the Signer
+   *
+   * @var signer
+   *
+   * @returns {Signer}
+   *
+   * @public
+   */
+  get ensRegistryAddress(): string | undefined {
+    return this.state.ensRegistryAddress ||
+      LIVE_CONTRACTS[this.state.network.name as SupportedNetworks].ensRegistry;
   }
 
   /**
@@ -135,8 +133,8 @@ export class Context {
    *
    * @public
    */
-  get signer() {
-    return this.state.signer || defaultState.signer;
+  get signer(): Signer {
+    return this.state.signer;
   }
 
   /**
@@ -148,8 +146,8 @@ export class Context {
    *
    * @public
    */
-  get web3Providers() {
-    return this.state.web3Providers || defaultState.web3Providers;
+  get web3Providers(): JsonRpcProvider[] {
+    return this.state.web3Providers;
   }
 
   /**
@@ -161,34 +159,9 @@ export class Context {
    *
    * @public
    */
-  get daoFactoryAddress(): string | undefined {
-    return this.state.daoFactoryAddress;
-  }
-
-  /**
-   * Getter for daoFactoryAddress property
-   *
-   * @var daoFactoryAddress
-   *
-   * @returns {string}
-   *
-   * @public
-   */
-  get daoRegistryAddress(): string | undefined {
-    return this.state.daoRegistryAddress;
-  }
-
-  /**
-   * Getter for daoFactoryAddress property
-   *
-   * @var daoFactoryAddress
-   *
-   * @returns {string}
-   *
-   * @public
-   */
-  get pluginRepoRegistryAddress(): string | undefined {
-    return this.state.pluginRepoRegistryAddress;
+  get daoFactoryAddress(): string {
+    return this.state.daoFactoryAddress ||
+      LIVE_CONTRACTS[this.state.network.name as SupportedNetworks].daoFactory;
   }
 
   /**
@@ -202,7 +175,7 @@ export class Context {
    */
   get gasFeeEstimationFactor(): number {
     return (
-      this.state.gasFeeEstimationFactor || defaultState.gasFeeEstimationFactor
+      this.state.gasFeeEstimationFactor || DEFAULT_GAS_FEE_ESTIMATION_FACTOR
     );
   }
 
@@ -211,12 +184,12 @@ export class Context {
    *
    * @var ipfs
    *
-   * @returns {IpfsClient[] | undefined}
+   * @returns {IpfsClient[]}
    *
    * @public
    */
-  get ipfs(): IpfsClient[] | undefined {
-    return this.state.ipfs || defaultState.ipfs;
+  get ipfs(): IpfsClient[] {
+    return this.state.ipfs;
   }
 
   /**
@@ -224,35 +197,48 @@ export class Context {
    *
    * @var graphql
    *
-   * @returns {GraphQLClient[] | undefined}
+   * @returns {GraphQLClient[]}
    *
    * @public
    */
-  get graphql(): GraphQLClient[] | undefined {
-    return this.state.graphql || defaultState.graphql;
-  }
-
-  // DEFAULT CONTEXT STATE
-  static setDefault(params: Partial<ContextParams>) {
-    if (params.daoFactoryAddress) {
-      defaultState.daoFactoryAddress = params.daoFactoryAddress;
-    }
-    if (params.signer) {
-      defaultState.signer = params.signer;
-    }
-  }
-  static getDefault() {
-    return defaultState;
+  get graphql(): GraphQLClient[] {
+    return this.state.graphql;
   }
 
   // INTERNAL HELPERS
+  private static resolveNetwork(
+    networkish: Networkish,
+    ensRegistryAddress?: string,
+  ): Network {
+    const network = getNetwork(networkish);
+    const networkName = network.name as SupportedNetworks;
+    if (!SupportedNetworksArray.includes(networkName)) {
+      throw new UnsupportedNetworkError(networkName);
+    }
+    if (ensRegistryAddress) {
+      if (!isAddress(ensRegistryAddress)) {
+        console.warn("invalid address, using default");
+        // throw new InvalidAddressError()
+      } else {
+        network.ensAddress = ensRegistryAddress;
+      }
+    }
+    if (!network.ensAddress) {
+      const ensAddress = LIVE_CONTRACTS[networkName].ensRegistry;
+      if (!ensAddress) {
+        throw new EnsUnsuportedByNetworkError(networkName);
+      }
+      network.ensAddress = ensAddress;
+    }
+    return network;
+  }
 
   private static resolveWeb3Providers(
     endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-    network: Networkish
+    network: Network,
   ): JsonRpcProvider[] {
     if (Array.isArray(endpoints)) {
-      return endpoints.map(item => {
+      return endpoints.map((item) => {
         if (typeof item === "string") {
           const url = new URL(item);
           if (!supportedProtocols.includes(url.protocol)) {
@@ -277,10 +263,10 @@ export class Context {
     configs: {
       url: string;
       headers?: Record<string, string>;
-    }[]
+    }[],
   ): IpfsClient[] {
     let clients: IpfsClient[] = [];
-    configs.forEach(config => {
+    configs.forEach((config) => {
       const url = new URL(config.url);
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
@@ -292,7 +278,7 @@ export class Context {
 
   private static resolveGraphql(endpoints: { url: string }[]): GraphQLClient[] {
     let clients: GraphQLClient[] = [];
-    endpoints.forEach(endpoint => {
+    endpoints.forEach((endpoint) => {
       const url = new URL(endpoint.url);
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
@@ -303,12 +289,11 @@ export class Context {
   }
 
   private static resolveGasFeeEstimationFactor(
-    gasFeeEstimationFactor: number
+    gasFeeEstimationFactor: number,
   ): number {
-    if (typeof gasFeeEstimationFactor === "undefined") return 1;
-    else if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
+    if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
       throw new Error(
-        "Gas estimation factor value should be a number between 0 and 1"
+        "Gas estimation factor value should be a number between 0 and 1",
       );
     }
     return gasFeeEstimationFactor;

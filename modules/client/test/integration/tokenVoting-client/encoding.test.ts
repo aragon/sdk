@@ -6,15 +6,21 @@ import {
   ContextPlugin,
   IMintTokenParams,
   ITokenVotingPluginInstall,
+  SupportedNetworksArray,
   TokenVotingClient,
   VotingSettings,
 } from "../../../src";
 
 import { AddressZero } from "@ethersproject/constants";
 import { InvalidAddressError } from "@aragon/sdk-common";
-import { contextParamsLocalChain } from "../constants";
+import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
+
+jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
 
 describe("Token Voting Client", () => {
+  beforeAll(() => {
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE
+  });
   describe("Encoding module", () => {
     it("Should create a TokenVoting client and generate a install entry", async () => {
       const initParams: ITokenVotingPluginInstall = {

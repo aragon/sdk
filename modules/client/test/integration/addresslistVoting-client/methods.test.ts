@@ -20,6 +20,7 @@ import {
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
+  SupportedNetworksArray,
   VoteProposalStep,
   VoteValues,
   VotingMode,
@@ -61,6 +62,8 @@ import {
 import { AddresslistVotingPluginPrepareInstallationParams } from "../../../src/addresslistVoting/interfaces";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
+jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
+
 describe("Client Address List", () => {
   let server: Server;
   let deployment: deployContracts.Deployment;
@@ -71,6 +74,7 @@ describe("Client Address List", () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    contextParamsLocalChain.ensRegistryAddress = deployment.ensRegistry.address;
     repoAddr = deployment.addresslistVotingRepo.address;
 
     if (Array.isArray(contextParamsLocalChain.web3Providers)) {

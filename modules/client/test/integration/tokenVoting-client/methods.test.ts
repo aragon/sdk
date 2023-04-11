@@ -17,6 +17,7 @@ import {
   ProposalStatus,
   SortDirection,
   SubgraphVoteValues,
+  SupportedNetworksArray,
   TokenType,
   TokenVotingClient,
   TokenVotingProposal,
@@ -68,6 +69,8 @@ import {
 import { TokenVotingPluginPrepareInstallationParams } from "../../../src/tokenVoting/interfaces";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
+jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
+
 describe("Token Voting Client", () => {
   let server: Server;
   let deployment: deployContracts.Deployment;
@@ -78,6 +81,7 @@ describe("Token Voting Client", () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    contextParamsLocalChain.ensRegistryAddress = deployment.ensRegistry.address;
     repoAddr = deployment.tokenVotingRepo.address;
 
     if (Array.isArray(contextParamsLocalChain.web3Providers)) {
@@ -89,6 +93,8 @@ describe("Token Voting Client", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
+
+    
     LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
     LIVE_CONTRACTS.goerli.pluginSetupProcessor =
       deployment.pluginSetupProcessor.address;

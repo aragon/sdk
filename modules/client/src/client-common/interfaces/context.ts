@@ -1,25 +1,41 @@
 // This file defines the interfaces of the context object holding client settings
 
 import { Signer } from "@ethersproject/abstract-signer";
-import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
+import { JsonRpcProvider, Network, Networkish } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 
 // Context input parameters
 
 type Web3ContextParams = {
+  // Network should be provided
   network: Networkish;
-  signer?: Signer;
+  // Signer should be provided
+  signer: Signer;
+  // At least one provider should be  given
+  web3Providers: string | JsonRpcProvider | (string | JsonRpcProvider)[];
+  // If not provided uses default from LIVE_CONTRACTS in the provided network
   daoFactoryAddress?: string;
+  // If not provided uses default from LIVE_CONTRACTS in the provided network
+  ensRegistryAddress?: string;
+  // TODO delete because not used
+  // If not provided uses default from LIVE_CONTRACTS in the provided network
   daoRegistryAddress?: string;
+  // If not provided uses default from LIVE_CONTRACTS in the provided network
   pluginRepoRegistryAddress?: string;
-  web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
+  // If not provided usee default value
   gasFeeEstimationFactor?: number;
 };
 type IpfsContextParams = {
-  ipfsNodes?: { url: string; headers?: Record<string, string> }[];
+  // At least one should be provided
+  // TODO?
+  // Make this optional an provide a default one?
+  ipfsNodes: { url: string; headers?: Record<string, string> }[];
 };
 type GraphQLContextParams = {
+  // At least one should be provided
+  // TODO?
+  // Make this optional an provide a default one?
   graphqlNodes: { url: string }[];
 };
 
@@ -30,19 +46,22 @@ export type ContextParams = Web3ContextParams &
 // Context state data
 
 type Web3ContextState = {
-  network: Networkish;
-  signer?: Signer;
-  daoFactoryAddress?: string;
-  daoRegistryAddress?: string;
-  pluginRepoRegistryAddress?: string;
+  network: Network;
+  signer: Signer;
+  // always going to exist because i'll default to LIVE_CONTRACTS
+  daoFactoryAddress: string;
+  // may exist depending on the network
+  ensRegistryAddress?: string;
+  // TODO
+  // delete these 2 arent used
   web3Providers: JsonRpcProvider[];
   gasFeeEstimationFactor: number;
 };
 type IpfsContextState = {
-  ipfs?: IpfsClient[];
+  ipfs: IpfsClient[];
 };
 type GraphQLContextState = {
-  graphql?: GraphQLClient[];
+  graphql: GraphQLClient[];
 };
 
 export type ContextState = Web3ContextState &

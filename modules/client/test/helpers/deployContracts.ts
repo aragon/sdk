@@ -24,6 +24,7 @@ export interface Deployment {
   managingDaoAddress: string;
   daoFactory: aragonContracts.DAOFactory;
   daoRegistry: aragonContracts.DAORegistry;
+  ensRegistry: Contract;
   tokenVotingRepo: aragonContracts.PluginRepo;
   tokenVotingPluginSetup: aragonContracts.TokenVotingSetup;
   addresslistVotingRepo: aragonContracts.PluginRepo;
@@ -274,6 +275,7 @@ export async function deploy(): Promise<Deployment> {
       multisigRepo,
       multisigPluginSetup,
       pluginSetupProcessor,
+      ensRegistry,
     };
   } catch (e) {
     throw e;

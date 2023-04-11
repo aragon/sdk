@@ -9,6 +9,7 @@ import {
   ContextPlugin,
   CreateMajorityVotingProposalParams,
   IVoteProposalParams,
+  SupportedNetworksArray,
   TokenVotingClient,
   VoteValues,
 } from "../../../src";
@@ -18,6 +19,8 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+
 describe("Token Voting Client", () => {
   describe("Estimation Module", () => {
     let server: Server;
@@ -26,6 +29,8 @@ describe("Token Voting Client", () => {
       server = await ganacheSetup.start();
       const deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.ensRegistryAddress =
+        deployment.ensRegistry.address;
     });
 
     afterAll(async () => {

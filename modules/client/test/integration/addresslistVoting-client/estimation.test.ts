@@ -10,12 +10,15 @@ import {
   ContextPlugin,
   CreateMajorityVotingProposalParams,
   IVoteProposalParams,
+  SupportedNetworksArray,
   VoteValues,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
+
+jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
 
 describe("Client Address List", () => {
   describe("Estimation module", () => {
@@ -25,6 +28,7 @@ describe("Client Address List", () => {
       server = await ganacheSetup.start();
       const deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.ensRegistryAddress = deployment.ensRegistry.address;
     });
 
     afterAll(async () => {

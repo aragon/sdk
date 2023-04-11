@@ -153,3 +153,29 @@ export class DataDecodingError extends Error {
     super("Cannot decode data: " + message);
   }
 }
+
+export class UndefinedParameterError extends Error {
+  constructor(parameter: string) {
+    super("No " + parameter + " defined");
+  }
+}
+export class EnsUnsuportedByNetworkError extends Error {
+  constructor(network: string) {
+    super("Network " + network + " dows not support ens");
+  }
+}
+export class InvalidContractAddressError extends Error {
+  constructor() {
+    super("Invalid contract address");
+  }
+}
+export class InvalidContractAbiError extends Error {
+  constructor() {
+    super("Invalid contract ABI");
+  }
+}
+export class CannotEstimateGasError extends Error {
+  constructor() {
+    super("Cannot estimate gas error");
+  }
+}

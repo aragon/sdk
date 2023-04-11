@@ -4,15 +4,9 @@ import {
   ContextPluginState,
   ContextState,
 } from "./interfaces/context";
-// State
-const defaultState: ContextPluginState = {};
 
 export class ContextPlugin extends Context {
-  protected state: ContextState & ContextPluginState = Object.assign(
-    {},
-    Context.getDefault(),
-    defaultState,
-  );
+  protected state: ContextState & ContextPluginState = {} as ContextState & ContextPluginState
 
   // INTERNAL CONTEXT STATE
 
@@ -41,28 +35,8 @@ export class ContextPlugin extends Context {
     return ctxPlugin;
   }
 
-  /**
-   * Does set and parse the given context configuration object
-   *
-   * @method setFull
-   *
-   * @returns {void}
-   *
-   * @private
-   */
-  setFull(contextParams: ContextPluginParams): void {
-    super.setFull(contextParams);
-  }
-
   set(contextParams: Partial<ContextPluginParams>) {
     super.set(contextParams);
   }
 
-  // DEFAULT CONTEXT STATE
-  static setDefault(params: Partial<ContextPluginParams>) {
-    super.setDefault(params);
-  }
-  static getDefault() {
-    return Object.assign(super.getDefault(), defaultState);
-  }
 }

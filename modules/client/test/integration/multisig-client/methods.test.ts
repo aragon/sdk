@@ -23,6 +23,7 @@ import {
   ProposalStatus,
   SortDirection,
   SubgraphMultisigProposal,
+  SupportedNetworksArray,
 } from "../../../src";
 import {
   getExtendedProposalId,
@@ -53,6 +54,8 @@ import {
 import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-queries/members";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
+jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
+
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
   let server: Server;
@@ -63,6 +66,7 @@ describe("Client Multisig", () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    contextParamsLocalChain.ensRegistryAddress = deployment.ensRegistry.address;
     repoAddr = deployment.multisigRepo.address;
 
     if (Array.isArray(contextParamsLocalChain.web3Providers)) {

@@ -10,8 +10,8 @@ import {
   IpfsError,
   NoNodesAvailableError,
   runAndRetry,
+  DataDecodingError
 } from "@aragon/sdk-common";
-import { DataDecodingError } from "@aragon/sdk-common";
 
 export class IPFSModule implements IClientIpfsCore {
   private clientIdx: number = -1;

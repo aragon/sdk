@@ -14,9 +14,10 @@ import {
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
   Permissions,
+  SupportedNetworksArray,
   WithdrawParams,
 } from "../../../src";
-import { contextParamsLocalChain } from "../constants";
+import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
@@ -30,7 +31,12 @@ import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
+jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
+
 describe("Client", () => {
+  beforeAll(() => {
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE
+  });
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {
       const context = new Context(contextParamsLocalChain);

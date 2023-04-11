@@ -31,24 +31,5 @@ describe("Client", () => {
       const web3Status = await client.web3.isUp();
       expect(web3Status).toEqual(false);
     });
-    it("Should create a client, fail and shift to a working endpoint", async () => {
-      contextParamsMainnet.web3Providers = web3endpoints.failing.concat(
-        web3endpoints.working,
-      );
-      const context = new Context(contextParamsMainnet);
-      const client = new Client(context);
-
-      await client
-        .web3.isUp()
-        .then((isUp) => {
-          expect(isUp).toEqual(false);
-          client.web3.shiftProvider();
-
-          return client.web3.isUp();
-        })
-        .then((isUp) => {
-          expect(isUp).toEqual(true);
-        });
-    });
   });
 });

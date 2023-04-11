@@ -1,10 +1,11 @@
 // @ts-ignore
 declare const describe, it, beforeEach, expect, test;
 
-import { Context, ContextParams } from "../../src";
+import { Context, ContextParams, LIVE_CONTRACTS } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { activeContractsList } from "@aragon/osx-ethers";
+import { Client as IpfsClient } from "@aragon/sdk-ipfs";
+import { GraphQLClient } from "graphql-request";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
@@ -27,6 +28,7 @@ describe("Context instances", () => {
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
       graphqlNodes: [],
+      ipfsNodes:[]
     };
   });
   it("Should create an empty context", () => {
@@ -45,18 +47,25 @@ describe("Context instances", () => {
     const context = new Context(contextParams);
 
     expect(context).toBeInstanceOf(Context);
-    expect(context.network).toEqual("mainnet");
+    expect(context.network.name).toEqual("homestead");
+    expect(context.network.chainId).toEqual(1);
     expect(context.signer).toBeInstanceOf(Wallet);
     expect(context.daoFactoryAddress).toEqual("0x1234");
     context.web3Providers?.map((provider) =>
       expect(provider).toBeInstanceOf(JsonRpcProvider)
+    );
+    context.ipfs?.map((ipfsClient) =>
+      expect(ipfsClient).toBeInstanceOf(IpfsClient)
+    );
+    context.graphql?.map((graphqlClient) =>
+      expect(graphqlClient).toBeInstanceOf(GraphQLClient)
     );
     expect(context.gasFeeEstimationFactor).toEqual(0.1);
   });
   it("Should set a new context and have the correct values", () => {
     const context = new Context(contextParams);
     contextParams = {
-      network: "mainnet",
+      network: "goerli",
       signer: new Wallet(TEST_WALLET),
       daoFactoryAddress: "0x2345",
       web3Providers: web3endpoints.working,
@@ -64,14 +73,21 @@ describe("Context instances", () => {
       ipfsNodes: [{ url: "https://localhost", headers: {} }],
       graphqlNodes: [{ url: "https://localhost" }],
     };
-    context.setFull(contextParams);
+    context.set(contextParams);
 
     expect(context).toBeInstanceOf(Context);
-    expect(context.network).toEqual("mainnet");
+    expect(context.network.name).toEqual("goerli");
+    expect(context.network.chainId).toEqual(5);
     expect(context.signer).toBeInstanceOf(Wallet);
     expect(context.daoFactoryAddress).toEqual("0x2345");
     context.web3Providers?.map((provider) =>
       expect(provider).toBeInstanceOf(JsonRpcProvider)
+    );
+    context.ipfs?.map((ipfsClient) =>
+      expect(ipfsClient).toBeInstanceOf(IpfsClient)
+    );
+    context.graphql?.map((graphqlClient) =>
+      expect(graphqlClient).toBeInstanceOf(GraphQLClient)
     );
     expect(context.gasFeeEstimationFactor).toEqual(0.1);
   });
@@ -91,13 +107,23 @@ describe("Context instances", () => {
   });
   it("Should create a context with the correct DAOFactory address from the core-contracts-package", () => {
     contextParams.daoFactoryAddress = "";
-    contextParams.network = "goerli";
+    contextParams.network = "matic";
     const context = new Context(contextParams);
 
     expect(context).toBeInstanceOf(Context);
-    expect(context.network).toEqual("goerli");
+    expect(context.network.name).toEqual("matic");
+    context.web3Providers?.map((provider) =>
+      provider.getNetwork().then((nw)=> {
+        expect(nw.chainId).toEqual(147);
+        expect(nw.name).toEqual("matic");
+        expect(nw.ensAddress).toEqual(LIVE_CONTRACTS.matic.ensRegistry);
+      })
+    );
     expect(context.daoFactoryAddress).toEqual(
-      activeContractsList.goerli.DAOFactory,
+      LIVE_CONTRACTS.matic.daoFactory,
+    );
+    expect(context.ensRegistryAddress).toEqual(
+      LIVE_CONTRACTS.matic.ensRegistry,
     );
   });
 });
