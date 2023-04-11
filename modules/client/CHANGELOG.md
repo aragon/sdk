@@ -24,7 +24,7 @@ TEMPLATE:
 ## [1.4.1]
 ## Fixed
 - Amending the type in subgraph's `minApprovals`
-- Removed not working sortby
+- Leaving only the fields where sortBy is available
 - Fix `Status.DEFEATED` filter
 ## [1.4.0]
 ### Added
