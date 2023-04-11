@@ -86,18 +86,25 @@ export class Context {
 
   setDefault() {
     const networkName = this.state.network.name as SupportedNetworks;
-    this.state.web3Providers = Context.resolveWeb3Providers(
-      WEB3_NODES[networkName],
-      this.state.network,
-    );
-    this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
-    this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
-    this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
-    let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
-    if (!ensRegistry) {
-      ensRegistry = this.network.ensAddress;
+    if (WEB3_NODES[networkName] && WEB3_NODES[networkName].length) {
+      this.state.web3Providers = Context.resolveWeb3Providers(
+        WEB3_NODES[networkName],
+        this.state.network,
+      );
     }
-    this.state.ensRegistryAddress = ensRegistry;
+    if (GRAPHQL_NODES[networkName] && GRAPHQL_NODES[networkName].length) {
+      this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
+    }
+    if (IPFS_NODES[networkName] && IPFS_NODES[networkName].length) {
+      this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
+    }
+    if (LIVE_CONTRACTS[networkName]) {
+      this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
+      let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
+      if (!ensRegistry) {
+        ensRegistry = this.network.ensAddress;
+      }
+    }
     this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
   }
 
