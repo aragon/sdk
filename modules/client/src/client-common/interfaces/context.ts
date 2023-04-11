@@ -9,34 +9,23 @@ import { GraphQLClient } from "graphql-request";
 
 type Web3ContextParams = {
   // Network should be provided
-  network: Networkish;
+  network?: Networkish;
   // Signer should be provided
   signer: Signer;
   // At least one provider should be  given
-  web3Providers: string | JsonRpcProvider | (string | JsonRpcProvider)[];
+  web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   // If not provided uses default from LIVE_CONTRACTS in the provided network
   daoFactoryAddress?: string;
   // If not provided uses default from LIVE_CONTRACTS in the provided network
   ensRegistryAddress?: string;
-  // TODO delete because not used
-  // If not provided uses default from LIVE_CONTRACTS in the provided network
-  daoRegistryAddress?: string;
-  // If not provided uses default from LIVE_CONTRACTS in the provided network
-  pluginRepoRegistryAddress?: string;
   // If not provided usee default value
   gasFeeEstimationFactor?: number;
 };
 type IpfsContextParams = {
-  // At least one should be provided
-  // TODO?
-  // Make this optional an provide a default one?
-  ipfsNodes: { url: string; headers?: Record<string, string> }[];
+  ipfsNodes?: { url: string; headers?: Record<string, string> }[];
 };
 type GraphQLContextParams = {
-  // At least one should be provided
-  // TODO?
-  // Make this optional an provide a default one?
-  graphqlNodes: { url: string }[];
+  graphqlNodes?: { url: string }[];
 };
 
 export type ContextParams = Web3ContextParams &

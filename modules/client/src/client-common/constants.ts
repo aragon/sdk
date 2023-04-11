@@ -21,6 +21,49 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
   resources: [],
 };
 
+// TODO, fill me with data
+export const WEB3_NODES: { [K in SupportedNetworks]: string[] } = {
+  homestead: [],
+  goerli: [],
+  matic: [],
+  maticmum: [],
+};
+
+export const GRAPHQL_NODES: { [K in SupportedNetworks]: { url: string }[] } = {
+  homestead: [{
+    url: "",
+  }],
+  goerli: [{
+    url: "",
+  }],
+  matic: [{
+    url: "",
+  }],
+  maticmum: [{
+    url: "",
+  }],
+};
+
+export const IPFS_NODES: {
+  [K in SupportedNetworks]: {
+    url: string;
+    headers?: Record<string, string> | undefined;
+  }[];
+} = {
+  homestead: [{
+    url: "",
+  }],
+  goerli: [{
+    url: "",
+  }],
+  matic: [{
+    url: "",
+  }],
+  maticmum: [{
+    url: "",
+  }],
+};
+
 export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
   homestead: {
     daoFactory: activeContractsList.mainnet.DAOFactory,

@@ -154,11 +154,6 @@ export class DataDecodingError extends Error {
   }
 }
 
-export class UndefinedParameterError extends Error {
-  constructor(parameter: string) {
-    super("No " + parameter + " defined");
-  }
-}
 export class EnsUnsuportedByNetworkError extends Error {
   constructor(network: string) {
     super("Network " + network + " dows not support ens");

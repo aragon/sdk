@@ -7,13 +7,17 @@ import {
 } from "@ethersproject/providers";
 import {
   EnsUnsuportedByNetworkError,
-  // UndefinedParameterError,
   UnsupportedNetworkError,
   UnsupportedProtocolError,
 } from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-import { LIVE_CONTRACTS } from "./constants";
+import {
+  GRAPHQL_NODES,
+  IPFS_NODES,
+  LIVE_CONTRACTS,
+  WEB3_NODES,
+} from "./constants";
 import { SupportedNetworks, SupportedNetworksArray } from "./interfaces/common";
 import { isAddress } from "@ethersproject/address";
 import { Signer } from "@ethersproject/abstract-signer";
@@ -34,27 +38,9 @@ export class Context {
    * @constructor
    */
   constructor(params: Partial<ContextParams>) {
-    // UNCOMMENT FOR MANDATORY PARAMS
-    // check mandatory params
-    // if (!params.network && this.state.network) {
-    //   throw new UndefinedParameterError("network");
-    // }
-    // if (!params.signer) {
-    //   throw new UndefinedParameterError("signer");
-    // }
-    // if (
-    //   !params.web3Providers ||
-    //   (Array.isArray(params.web3Providers) && !params.web3Providers.length)
-    // ) {
-    //   throw new UndefinedParameterError("web3 providers");
-    // }
-    // if (!params.graphqlNodes || !params.graphqlNodes.length) {
-    //   throw new UndefinedParameterError("graphql nodes");
-    // }
-    // if (!params.ipfsNodes || !params.ipfsNodes.length) {
-    //   throw new UndefinedParameterError("ipfs nodes");
-    // }
-    this.set(params);
+    // set network to mainnet, overrided by the value of params
+    const mergedParams = Object.assign({ network: "mainnet" }, params);
+    this.set(mergedParams);
   }
 
   set(contextParams: Partial<ContextParams>) {
@@ -63,6 +49,8 @@ export class Context {
         contextParams.network,
         contextParams.ensRegistryAddress,
       );
+      // once the network is resolved set default values
+      this.setDefault();
     }
     if (contextParams.signer) {
       this.state.signer = contextParams.signer;
@@ -96,6 +84,23 @@ export class Context {
     }
   }
 
+  setDefault() {
+    const networkName = this.state.network.name as SupportedNetworks;
+    this.state.web3Providers = Context.resolveWeb3Providers(
+      WEB3_NODES[networkName],
+      this.state.network,
+    );
+    this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
+    this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
+    this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
+    let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
+    if (!ensRegistry) {
+      ensRegistry = this.network.ensAddress;
+    }
+    this.state.ensRegistryAddress = ensRegistry;
+    this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
+  }
+
   // GETTERS
 
   /**
@@ -120,8 +125,7 @@ export class Context {
    * @public
    */
   get ensRegistryAddress(): string | undefined {
-    return this.state.ensRegistryAddress ||
-      LIVE_CONTRACTS[this.state.network.name as SupportedNetworks].ensRegistry;
+    return this.state.ensRegistryAddress;
   }
 
   /**
@@ -160,8 +164,7 @@ export class Context {
    * @public
    */
   get daoFactoryAddress(): string {
-    return this.state.daoFactoryAddress ||
-      LIVE_CONTRACTS[this.state.network.name as SupportedNetworks].daoFactory;
+    return this.state.daoFactoryAddress;
   }
 
   /**
@@ -175,7 +178,7 @@ export class Context {
    */
   get gasFeeEstimationFactor(): number {
     return (
-      this.state.gasFeeEstimationFactor || DEFAULT_GAS_FEE_ESTIMATION_FACTOR
+      this.state.gasFeeEstimationFactor
     );
   }
 
