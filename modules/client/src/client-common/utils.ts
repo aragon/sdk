@@ -41,9 +41,7 @@ export function computeProposalStatus(
   if (startDate >= now) {
     return ProposalStatus.PENDING;
   }
-  if (
-    proposal.executable || proposal.earlyExecutable
-  ) {
+  if (proposal.potentiallyExecutable || proposal.earlyExecutable) {
     return ProposalStatus.SUCCEEDED;
   }
   if (endDate >= now) {
@@ -68,10 +66,14 @@ export function computeProposalStatusFilter(
       where = { executed: true };
       break;
     case ProposalStatus.SUCCEEDED:
-      where = { executable: true, endDate_lt: now };
+      where = { potentiallyExecutable: true, endDate_lt: now };
       break;
     case ProposalStatus.DEFEATED:
-      where = { executable: false, endDate_lt: now, executed: false };
+      where = {
+        potentiallyExecutable: false,
+        endDate_lt: now,
+        executed: false,
+      };
       break;
     default:
       throw new Error("invalid proposal status");

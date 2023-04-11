@@ -27,8 +27,8 @@ query TokenVotingProposal($proposalId: ID!) {
     startDate
     endDate
     executed
-    executable
     earlyExecutable
+    potentiallyExecutable
     voters{
       voter{
         address
@@ -69,8 +69,8 @@ query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
     startDate
     endDate
     executed
-    executable
     earlyExecutable
+    potentiallyExecutable
     votingMode
     supportThreshold
     minVotingPower

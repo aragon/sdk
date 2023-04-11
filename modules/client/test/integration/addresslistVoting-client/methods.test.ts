@@ -854,7 +854,7 @@ describe("Client Address List", () => {
         QueryAddresslistVotingProposals,
         {
           where: {
-            executable: false,
+            potentiallyExecutable: false,
             endDate_lt: nowFilter,
             executed: false,
           },

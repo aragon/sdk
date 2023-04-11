@@ -178,15 +178,15 @@ export type SubgraphProposalBase = {
   startDate: string;
   endDate: string;
   executed: boolean;
-  executable: boolean;
+  potentiallyExecutable: boolean;
 };
 
 export interface IComputeStatusProposal {
   startDate: string;
   endDate: string;
   executed: boolean;
-  executable: boolean;
   earlyExecutable?: boolean;
+  potentiallyExecutable: boolean;
 }
 
 export interface IProposalQueryParams extends IPagination {
@@ -197,9 +197,8 @@ export interface IProposalQueryParams extends IPagination {
 
 export enum ProposalSortBy {
   CREATED_AT = "createdAt",
-  NAME = "name",
-  POPULARITY = "popularity",
-  VOTES = "votes", // currently defined as number of proposals
+  // POPULARITY = "popularity",
+  // VOTES = "votes",
 }
 
 // STEPS

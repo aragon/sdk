@@ -909,7 +909,7 @@ describe("Token Voting Client", () => {
           QueryTokenVotingProposals,
           {
             where: {
-              executable: false,
+              potentiallyExecutable: false,
               endDate_lt: nowFilter,
               executed: false,
             },

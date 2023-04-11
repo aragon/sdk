@@ -13,6 +13,10 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.4.2]
+### Fixed
+- Removed not working sortby
+- Fix `Status.DEFEATED` filter
 ### Fixed
 - Error handling if ENS cannot be resolved.
 - Renames `mainnet` to `homestead` in `LIVE_CONTRACTS`.
@@ -21,6 +25,8 @@ TEMPLATE:
 ## [1.4.1]
 ## Fixed
 - Amending the type in subgraph's `minApprovals`
+- Leaving only the fields where sortBy is available
+- Fix `Status.DEFEATED` filter
 ## [1.4.0]
 ### Added
 - Add ipfs optimization.
