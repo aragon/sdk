@@ -21,27 +21,39 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
   resources: [],
 };
 
-// TODO, fill me with data
+// TODO change rpcs to aragon ones
 export const WEB3_NODES: { [K in SupportedNetworks]: string[] } = {
-  homestead: [],
-  goerli: [],
-  matic: [],
-  maticmum: [],
+  homestead: ["https://eth.llamarpc.com"],
+  goerli: ["https://endpoints.omniatech.io/v1/eth/goerli/public"],
+  matic: ["https://polygon.llamarpc.com"],
+  maticmum: ["https://endpoints.omniatech.io/v1/matic/mumbai/public"],
 };
 
 export const GRAPHQL_NODES: { [K in SupportedNetworks]: { url: string }[] } = {
-  homestead: [{
-    url: "",
-  }],
-  goerli: [{
-    url: "",
-  }],
-  matic: [{
-    url: "",
-  }],
-  maticmum: [{
-    url: "",
-  }],
+  homestead: [
+    {
+      url: "https://subgraph.satsuma-prod.com/" + process.env.SATSUMA_API_KEY ||
+        "" + "/aragon/osx-mainnet/api",
+    },
+  ],
+  goerli: [
+    {
+      url: "https://subgraph.satsuma-prod.com/" + process.env.SATSUMA_API_KEY ||
+        "" + "/aragon/osx-goerli/api",
+    },
+  ],
+  matic: [
+    {
+      url: "https://subgraph.satsuma-prod.com/" + process.env.SATSUMA_API_KEY ||
+        "" + "/aragon/osx-polygon/api",
+    },
+  ],
+  maticmum: [
+    {
+      url: "https://subgraph.satsuma-prod.com/" + process.env.SATSUMA_API_KEY ||
+        "" + "/aragon/osx-mumbai/api",
+    },
+  ],
 };
 
 export const IPFS_NODES: {
@@ -50,18 +62,38 @@ export const IPFS_NODES: {
     headers?: Record<string, string> | undefined;
   }[];
 } = {
-  homestead: [{
-    url: "",
-  }],
-  goerli: [{
-    url: "",
-  }],
-  matic: [{
-    url: "",
-  }],
-  maticmum: [{
-    url: "",
-  }],
+  homestead: [
+    {
+      url: "https://ipfs-0.aragon.network",
+      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "" },
+    },
+    {
+      url: "https://ipfs-1.aragon.network",
+      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "" },
+    },
+  ],
+  goerli: [
+    {
+      url: "https://testingipfs-0.aragon.network",
+      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "" },
+    },
+  ],
+  matic: [
+    {
+      url: "https://ipfs-0.aragon.network",
+      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "" },
+    },
+    {
+      url: "https://ipfs-1.aragon.network",
+      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "" },
+    },
+  ],
+  maticmum: [
+    {
+      url: "https://testingipfs-0.aragon.network",
+      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "" },
+    },
+  ],
 };
 
 export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
