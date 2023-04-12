@@ -1,13 +1,9 @@
 import { Context } from "./context";
 import {
   ContextPluginParams,
-  ContextPluginState,
-  ContextState,
 } from "./interfaces/context";
 
 export class ContextPlugin extends Context {
-  protected state: ContextState & ContextPluginState = {} as ContextState & ContextPluginState
-
   // INTERNAL CONTEXT STATE
 
   /**
@@ -15,10 +11,8 @@ export class ContextPlugin extends Context {
    *
    * @constructor
    */
-  constructor(params: Partial<ContextPluginParams>) {
-    super(params);
-
-    this.set(params);
+  constructor(params?: Partial<ContextPluginParams>) {
+    super(params)
   }
 
   /**

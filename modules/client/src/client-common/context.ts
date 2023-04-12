@@ -37,7 +37,7 @@ export class Context {
    *
    * @constructor
    */
-  constructor(params: Partial<ContextParams>) {
+  constructor(params?: Partial<ContextParams>) {
     // set network to mainnet, overrided by the value of params
     const mergedParams = Object.assign({ network: "mainnet" }, params);
     this.set(mergedParams);
@@ -104,6 +104,7 @@ export class Context {
       if (!ensRegistry) {
         ensRegistry = this.network.ensAddress;
       }
+      this.state.ensRegistryAddress = ensRegistry
     }
     this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
   }
