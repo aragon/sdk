@@ -63,6 +63,7 @@ import {
   Erc20TokenDetails,
   SubgraphContractType,
   SubgraphTokenVotingProposal,
+  SubgraphTokenVotingProposalListItem,
 } from "../../../src/tokenVoting/interfaces";
 import { TokenVotingPluginPrepareInstallationParams } from "../../../src/tokenVoting/interfaces";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
@@ -845,22 +846,34 @@ describe("Token Voting Client", () => {
           client.graphql.getClient(),
         );
 
-        mockedClient.request.mockResolvedValueOnce({
-          tokenVotingProposals: [{
-            plugin: {
-              token: {
-                id: ADDRESS_THREE,
-                symbol: "TST",
-                name: "Test",
-                decimals: 18,
-                __typename: SubgraphContractType.ERC20,
-              },
+        const subgraphProposal: SubgraphTokenVotingProposalListItem = {
+          plugin: {
+            token: {
+              id: ADDRESS_THREE,
+              symbol: "TST",
+              name: "Test",
+              decimals: 18,
+              __typename: SubgraphContractType.ERC20,
             },
-            supportThreshold: "50000",
-            totalVotingPower: "5000",
-            minVotingPower: "50",
-            ...SUBGRAPH_PROPOSAL_BASE,
+          },
+          supportThreshold: "50000",
+          totalVotingPower: "5000",
+          minVotingPower: BigInt("50"),
+          voters: [{
+            voter: {
+              address: ADDRESS_ONE,
+            },
+            voteOption: SubgraphVoteValues.YES,
+            voteReplaced: false,
+            votingPower: "500",
           }],
+          votingMode: VotingMode.STANDARD,
+          earlyExecutable: false,
+          ...SUBGRAPH_PROPOSAL_BASE,
+        };
+
+        mockedClient.request.mockResolvedValueOnce({
+          tokenVotingProposals: [subgraphProposal],
         });
         const dateGetTimeSpy = jest.spyOn(Date.prototype, "getTime");
         const now = Date.now();
@@ -904,6 +917,11 @@ describe("Token Voting Client", () => {
         expect(proposals[0].token?.type).toBe(TokenType.ERC20);
         expect((proposals[0].token as Erc20TokenDetails).decimals).toBe(18);
         expect(proposals[0].totalVotingWeight).toBe(BigInt("5000"));
+        expect(proposals[0].votes[0]).toMatchObject({
+          vote: 2,
+          voteReplaced: subgraphProposal.voters[0].voteReplaced,
+          address: subgraphProposal.voters[0].voter.address,
+        });
 
         expect(mockedClient.request).toHaveBeenCalledWith(
           QueryTokenVotingProposals,

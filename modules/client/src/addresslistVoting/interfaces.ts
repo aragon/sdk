@@ -104,6 +104,7 @@ export type AddresslistVotingProposal = ProposalBase & {
 
 export type AddresslistVotingProposalListItem = ProposalListItemBase & {
   result: AddresslistVotingProposalResult;
+  votes: Array<{ address: string; vote: VoteValues; voteReplaced: boolean }>;
 };
 export type AddresslistVotingProposalResult = {
   yes: number;
@@ -115,6 +116,7 @@ export type SubgraphAddresslistVotingVoterListItem = SubgraphVoterListItemBase;
 
 export type SubgraphAddresslistVotingProposalListItem = SubgraphProposalBase & {
   earlyExecutable: boolean;
+  voters: SubgraphAddresslistVotingVoterListItem[];
 };
 export type SubgraphAddresslistVotingProposal = SubgraphProposalBase & {
   createdAt: string;

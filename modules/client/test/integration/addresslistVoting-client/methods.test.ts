@@ -56,6 +56,7 @@ import {
 import {
   AddresslistVotingProposal,
   SubgraphAddresslistVotingProposal,
+  SubgraphAddresslistVotingProposalListItem,
 } from "../../../src/addresslistVoting/interfaces";
 import { AddresslistVotingPluginPrepareInstallationParams } from "../../../src/addresslistVoting/interfaces";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
@@ -815,8 +816,14 @@ describe("Client Address List", () => {
         client.graphql.getClient(),
       );
 
+      const subgraphProposal : SubgraphAddresslistVotingProposalListItem = {
+        ...SUBGRAPH_PROPOSAL_BASE,
+        voters: SUBGRAPH_VOTERS,
+        earlyExecutable: false,
+      }
+
       mockedClient.request.mockResolvedValueOnce({
-        addresslistVotingProposals: [SUBGRAPH_PROPOSAL_BASE],
+        addresslistVotingProposals: [subgraphProposal],
       });
 
       const dateGetTimeSpy = jest.spyOn(Date.prototype, "getTime");
@@ -849,6 +856,16 @@ describe("Client Address List", () => {
       expect(proposals[0].result.abstain).toBe(
         parseInt(SUBGRAPH_PROPOSAL_BASE.abstain),
       );
+      expect(proposals[0].votes[0]).toMatchObject({
+        vote: 2,
+        voteReplaced: subgraphProposal.voters[0].voteReplaced,
+        address: subgraphProposal.voters[0].voter.address,
+      });
+      expect(proposals[0].votes[1]).toMatchObject({
+        vote: 3,
+        voteReplaced: subgraphProposal.voters[1].voteReplaced,
+        address: subgraphProposal.voters[1].voter.address,
+      });
 
       expect(mockedClient.request).toHaveBeenCalledWith(
         QueryAddresslistVotingProposals,

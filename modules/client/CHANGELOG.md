@@ -14,10 +14,11 @@ TEMPLATE:
 -->
 ## [UPCOMING]
 ## [1.4.2]
+### Added
+- Property `votes` to majority voting `proposalListItem`
 ### Fixed
 - Removed not working sortby
 - Fix `Status.DEFEATED` filter
-### Fixed
 - Error handling if ENS cannot be resolved.
 - Renames `mainnet` to `homestead` in `LIVE_CONTRACTS`.
 ### Changed
