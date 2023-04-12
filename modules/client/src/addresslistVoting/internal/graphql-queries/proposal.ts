@@ -29,6 +29,7 @@ query AddresslistVotingProposal($proposalId: ID!) {
     executed
     earlyExecutable
     potentiallyExecutable
+    executionTxHash
     voters{
       voter{
         address

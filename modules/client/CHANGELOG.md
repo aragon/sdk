@@ -17,6 +17,7 @@ TEMPLATE:
 ### Added
 - Property `votes` to majority voting `proposalListItem`
 ### Fixed
+- Fix missing `executionTxHash` on majorty voting proposals
 - Removed not working sortby
 - Fix `Status.DEFEATED` filter
 - Error handling if ENS cannot be resolved.
