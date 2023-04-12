@@ -59,6 +59,13 @@ query AddresslistVotingProposals($where: AddresslistVotingProposal_filter!, $lim
     executed
     earlyExecutable
     potentiallyExecutable
+    voters{
+      voter{
+        address
+      }
+      voteOption
+      voteReplaced
+    }
   }
 }
 `;

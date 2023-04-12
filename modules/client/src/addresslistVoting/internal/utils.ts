@@ -120,6 +120,15 @@ export function toAddresslistVotingProposalListItem(
       no: proposal.no ? parseInt(proposal.no) : 0,
       abstain: proposal.abstain ? parseInt(proposal.abstain) : 0,
     },
+    votes: proposal.voters.map(
+      (voter: SubgraphAddresslistVotingVoterListItem) => {
+        return {
+          voteReplaced: voter.voteReplaced,
+          address: voter.voter.address,
+          vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
+        };
+      },
+    ),
   };
 }
 

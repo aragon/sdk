@@ -153,6 +153,16 @@ export function toTokenVotingProposalListItem(
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     token,
+    votes: proposal.voters.map(
+      (voter: SubgraphTokenVotingVoterListItem) => {
+        return {
+          voteReplaced: voter.voteReplaced,
+          address: voter.voter.address,
+          vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
+          weight: BigInt(voter.votingPower),
+        };
+      },
+    ),
   };
 }
 

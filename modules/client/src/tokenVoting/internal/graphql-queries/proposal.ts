@@ -75,6 +75,14 @@ query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
     supportThreshold
     minVotingPower
     totalVotingPower
+    voters{
+      voter{
+        address
+      }
+      voteReplaced
+      voteOption
+      votingPower
+    }
     plugin{
       token{
         id
