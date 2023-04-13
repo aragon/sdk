@@ -13,6 +13,7 @@ import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
+import { ADDRESS_ONE } from "../integration/constants";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
@@ -111,16 +112,33 @@ describe("Context instances", () => {
   });
   it("Should Change the network and update all the parameters", () => {
     const context = new Context();
+    context.set({
+      ensRegistryAddress: ADDRESS_ONE,
+      graphqlNodes: [
+        {
+          url: "https://example.com/1",
+        },
+        {
+          url: "https://example.com/2",
+        },
+        {
+          url: "https://example.com/3",
+        },
+      ],
+    });
+    // Make sure that the prvious propertis are not modified
+    // with the networ change becaouse now they are on manual
+    // mode
     context.set({ network: "matic" });
     expect(context).toBeInstanceOf(Context);
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
-    expect(context.ensRegistryAddress).toBe(LIVE_CONTRACTS.matic.ensRegistry);
+    expect(context.ensRegistryAddress).toBe(ADDRESS_ONE);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(WEB3_NODES.matic.length);
     expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
-    expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
+    expect(context.graphql.length).toBe(3);
     context.web3Providers.map((provider) => {
       expect(provider).toBeInstanceOf(JsonRpcProvider);
     });
