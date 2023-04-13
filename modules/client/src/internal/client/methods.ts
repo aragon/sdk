@@ -259,13 +259,20 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (tokenAddress && tokenAddress !== AddressZero) {
       // If the target is an ERC20 token, ensure that the amount can be transferred
       // Relay the yield steps to the caller as they are received
-      yield* this.updateAllowance(
-        {
-          amount: params.amount,
-          daoAddressOrEns: daoAddress,
-          tokenAddress,
-        },
-      );
+      const allowedAmount = await this.getAllowance({
+        tokenAddress,
+        daoAddressOrEns: params.daoAddressOrEns,
+      });
+      // only update the allowance if necessary
+      if (allowedAmount < params.amount) {
+        yield* this.updateAllowance(
+          {
+            amount: params.amount,
+            daoAddressOrEns: daoAddress,
+            tokenAddress,
+          },
+        );
+      }
     }
 
     // Doing the transfer
