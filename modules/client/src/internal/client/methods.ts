@@ -42,6 +42,7 @@ import {
   DaoMetadata,
   DaoSortBy,
   DepositParams,
+  GetAllowanceParams,
   IClientMethods,
   IDaoQueryParams,
   IHasPermissionParams,
@@ -65,6 +66,7 @@ import {
   SortDirection,
 } from "../../client-common";
 import {
+  isFunctionInContract,
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
@@ -317,31 +319,65 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else if (!signer.provider) {
       throw new NoProviderError();
     }
-    // TODO
-    // add params check with yup
-
     const tokenInstance = new Contract(
       params.tokenAddress,
       erc20ContractAbi,
       signer,
     );
 
-    const currentAllowance = await tokenInstance.allowance(
-      await signer.getAddress(),
-      params.daoAddressOrEns,
-    );
+    const currentAllowance = await this.getAllowance({
+      daoAddressOrEns: params.daoAddressOrEns,
+      tokenAddress: params.tokenAddress,
+    });
 
     yield {
       key: DaoDepositSteps.CHECKED_ALLOWANCE,
-      allowance: currentAllowance.toBigInt(),
+      allowance: currentAllowance,
     };
 
-    if (currentAllowance.gte(params.amount)) return;
+    const allowanceDelta = currentAllowance - params.amount;
+    let tx!: ContractTransaction;
 
-    const tx: ContractTransaction = await tokenInstance.approve(
-      params.daoAddressOrEns,
-      BigNumber.from(params.amount),
-    );
+    // allowance is already at the desired value
+    if (allowanceDelta === BigInt(0)) {
+      yield {
+        key: DaoDepositSteps.UPDATED_ALLOWANCE,
+        allowance: params.amount,
+      };
+      return;
+    }
+
+    // some ERC20 tokens implement the non-standard but recommend functions
+    // `increaseAllowance` and `decreaseAllowance` to allow the user to change the allowance atomic.
+    // this is prefered because it resolved the frontrunning issue present with the standard allowance function
+    if (
+      allowanceDelta > 0 && await isFunctionInContract(
+        signer.provider,
+        params.tokenAddress,
+        "increaseAllowance(address,uint256)",
+      )
+    ) {
+      tx = await tokenInstance.increaseAllowance(
+        params.daoAddressOrEns,
+        allowanceDelta,
+      );
+    } else if (
+      allowanceDelta < 0 && await isFunctionInContract(
+        signer.provider,
+        params.tokenAddress,
+        "decreaseAllowance(address,uint256)",
+      )
+    ) {
+      tx = await tokenInstance.decreaseAllowance(
+        params.daoAddressOrEns,
+        allowanceDelta * BigInt(-1), // allowance is below 0 and we need it as a positive number
+      );
+    } else {
+      tx = await tokenInstance.approve(
+        params.daoAddressOrEns,
+        params.amount,
+      );
+    }
 
     yield {
       key: DaoDepositSteps.UPDATING_ALLOWANCE,
@@ -363,6 +399,34 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       key: DaoDepositSteps.UPDATED_ALLOWANCE,
       allowance: params.amount,
     };
+  }
+
+  /**
+   * Returns the given allowance for a certain spender on a given token address.
+   *
+   * @param {GetAllowanceParams} params
+   * @return {*}  {Promise<bigint>}
+   * @memberof ClientMethods
+   */
+  public async getAllowance(params: GetAllowanceParams): Promise<bigint> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    const tokenInstance = new Contract(
+      params.tokenAddress,
+      erc20ContractAbi,
+      signer,
+    );
+
+    const allowanceBigNumber = await tokenInstance.allowance(
+      await signer.getAddress(),
+      params.daoAddressOrEns,
+    );
+
+    return allowanceBigNumber.toBigInt();
   }
   /**
    * Checks whether a role is granted by the current DAO's ACL settings

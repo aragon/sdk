@@ -12,7 +12,10 @@ import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { BigNumber } from "@ethersproject/bignumber";
 import { IClientCore } from "./client-common/interfaces/core";
-import { ApplyInstallationParams, DecodedApplyInstallationParams } from "./client-common";
+import {
+  ApplyInstallationParams,
+  DecodedApplyInstallationParams,
+} from "./client-common";
 
 /** Defines the shape of the general purpose Client class */
 export interface IClientMethods extends IClientCore {
@@ -520,3 +523,7 @@ export type ContractPermissionWithConditionParams = [
   string,
 ];
 export type ContractWithdrawParams = [string, string, BigNumber, string];
+export type GetAllowanceParams = {
+  daoAddressOrEns: string;
+  tokenAddress: string;
+};

@@ -37,6 +37,8 @@ import {
   DecodedApplyInstallationParams,
 } from "../client-common";
 import { hexToBytes } from "@aragon/sdk-common";
+import { id } from "@ethersproject/hash";
+import { Provider } from "@ethersproject/providers";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -325,4 +327,50 @@ export function withdrawParamsFromContract(
   }
   // TODO Add ERC721 and ERC1155
   throw new Error("not implemented");
+}
+
+/**
+ * Searches the bytecode of a contract for a given contract.
+ * It returns false if the contract has a fallback or receive function present
+ *
+ * @export
+ * @param {Provider} provider
+ * @param {string} contractAddresss
+ * @param {string} functionSignature
+ * @return {*}  {Promise<boolean>}
+ */
+export async function isFunctionInContract(
+  provider: Provider,
+  contractAddresss: string,
+  functionSignature: string,
+): Promise<boolean> {
+  const bytecode = await provider.getCode(contractAddresss);
+
+  // if the bytecode is shorter than 4 bytes it cannot include the function selector
+  if (bytecode.length < 3) {
+    return false;
+  }
+
+  // if the bytecode doesn't include the function selector it isn't a function of this contract
+  if (!bytecode.includes(id(functionSignature).slice(2, 10))) {
+    return false;
+  }
+
+  // if gas estimatation with no calldata succeed, we can assume there is a fallback function.
+  // this opens the possiblity that it is a false positive
+  try {
+    await provider.estimateGas({ to: contractAddresss });
+    return false;
+  } catch {}
+
+  // if gas estimatation with no calldata succeed but a value, we can assume there is a receive or a payable fallback function.
+  // this opens the possiblity that it is a false positive
+  try {
+    await provider.estimateGas({ to: contractAddresss, value: 1 });
+    return false;
+  } catch {}
+
+  // we can assume that the function is present in the contract.
+  // to be absolute sure one should estimate the gas for the function call and see if it succeeds
+  return true;
 }

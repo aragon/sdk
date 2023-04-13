@@ -79,4 +79,24 @@ export const erc20ContractAbi: ContractInterface = [
     stateMutability: "view",
     type: "function",
   },
+  {
+    name: "increaseAllowance",
+    outputs: [{ type: "bool", name: "" }],
+    inputs: [
+      { type: "address", name: "spender" },
+      { type: "uint256", name: "addedValue" },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    name: "decreaseAllowance",
+    outputs: [{ type: "bool", name: "" }],
+    inputs: [
+      { type: "address", name: "spender" },
+      { type: "uint256", name: "subtractedValue" },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
 ];
