@@ -13,9 +13,12 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Added
+- Updates client method `updateAllowance` to use `increaseAllowance` and `decreaseAllowance` whenever possible.
 ### Fixed
 - Error handling if ENS cannot be resolved.
 - Renames `mainnet` to `homestead` in `LIVE_CONTRACTS`.
+- Only call `updateAllowance` from `deposit` if not enough allowance is available.
 ### Changed
 - Uses `earlyExecuted` for proposal state calculation in Addresslistvoting and Tokenvoting.
 ## [1.4.1]
