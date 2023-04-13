@@ -39,7 +39,7 @@ if (typeof process !== "undefined" && process.env?.TESTING) {
 
 export class Context {
   protected state: ContextState = {} as ContextState;
-  protected manual: ManualState = {
+  protected manualState: ManualState = {
     web3: false,
     daoFactory: false,
     ensRegistry: false,
@@ -80,37 +80,37 @@ export class Context {
         contextParams.web3Providers,
         this.state.network,
       );
-      this.manual.web3 = true;
+      this.manualState.web3 = true;
     }
     if (contextParams.graphqlNodes?.length) {
       this.state.graphql = Context.resolveGraphql(contextParams.graphqlNodes);
-      this.manual.graphql = true;
+      this.manualState.graphql = true;
     }
     if (contextParams.ipfsNodes?.length) {
       this.state.ipfs = Context.resolveIpfs(contextParams.ipfsNodes);
-      this.manual.ipfs = true;
+      this.manualState.ipfs = true;
     }
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
-      this.manual.daoFactory = true;
+      this.manualState.daoFactory = true;
     }
     if (contextParams.ensRegistryAddress) {
       this.state.ensRegistryAddress = contextParams.ensRegistryAddress;
-      this.manual.ensRegistry = true;
+      this.manualState.ensRegistry = true;
     }
     if (contextParams.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
         contextParams.gasFeeEstimationFactor,
       );
-      this.manual.gasFeeEstimationFactor = true;
+      this.manualState.gasFeeEstimationFactor = true;
     }
   }
 
-  setDefault() {
+  private setDefault() {
     const networkName = this.state.network.name as SupportedNetworks;
     if (
       WEB3_NODES[networkName] && WEB3_NODES[networkName].length &&
-      !this.manual.web3
+      !this.manualState.web3
     ) {
       this.state.web3Providers = Context.resolveWeb3Providers(
         WEB3_NODES[networkName],
@@ -119,21 +119,21 @@ export class Context {
     }
     if (
       GRAPHQL_NODES[networkName] && GRAPHQL_NODES[networkName].length &&
-      !this.manual.graphql
+      !this.manualState.graphql
     ) {
       this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
     }
     if (
       IPFS_NODES[networkName] && IPFS_NODES[networkName].length &&
-      !this.manual.ipfs
+      !this.manualState.ipfs
     ) {
       this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
     }
     if (LIVE_CONTRACTS[networkName]) {
-      if (!this.manual.daoFactory) {
+      if (!this.manualState.daoFactory) {
         this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
       }
-      if (!this.manual.ensRegistry) {
+      if (!this.manualState.ensRegistry) {
         let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
         if (!ensRegistry) {
           ensRegistry = this.network.ensAddress;
@@ -141,7 +141,7 @@ export class Context {
         this.state.ensRegistryAddress = ensRegistry;
       }
     }
-    if (!this.manual.gasFeeEstimationFactor) {
+    if (!this.manualState.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
     }
   }
