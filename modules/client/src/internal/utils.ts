@@ -75,10 +75,10 @@ export function toDaoDetails(
           id: SubgraphPluginTypeMap.get(
             plugin.__typename,
           ) as string,
-          installations: plugin.installations.map((installation) => {
+          versions: plugin.installations.map((version) => {
             return {
-              release: installation.appliedVersion.release.release,
-              build: installation.appliedVersion.build
+              release: version.appliedVersion.release.release,
+              build: version.appliedVersion.build
             }
           })
         };
@@ -111,10 +111,10 @@ export function toDaoListItem(
           id: SubgraphPluginTypeMap.get(
             plugin.__typename,
           ) as string,
-          installations: plugin.installations.map((installation) => {
+          versions: plugin.installations.map((version) => {
             return {
-              release: installation.appliedVersion.release.release,
-              build: installation.appliedVersion.build
+              release: version.appliedVersion.release.release,
+              build: version.appliedVersion.build
             }
           })
         };
