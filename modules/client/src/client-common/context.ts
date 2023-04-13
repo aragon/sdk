@@ -24,6 +24,14 @@ import { Signer } from "@ethersproject/abstract-signer";
 export { ContextParams } from "./interfaces/context";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
+type ManualState = {
+  web3: boolean;
+  daoFactory: boolean;
+  ensRegistry: boolean;
+  gasFeeEstimationFactor: boolean;
+  ipfs: boolean;
+  graphql: boolean;
+};
 const supportedProtocols = ["https:"];
 if (typeof process !== "undefined" && process.env?.TESTING) {
   supportedProtocols.push("http:");
@@ -31,6 +39,14 @@ if (typeof process !== "undefined" && process.env?.TESTING) {
 
 export class Context {
   protected state: ContextState = {} as ContextState;
+  protected manual: ManualState = {
+    web3: false,
+    daoFactory: false,
+    ensRegistry: false,
+    gasFeeEstimationFactor: false,
+    ipfs: false,
+    graphql: false,
+  };
   // INTERNAL CONTEXT STATE
   /**
    * @param {Object} params
@@ -64,49 +80,70 @@ export class Context {
         contextParams.web3Providers,
         this.state.network,
       );
+      this.manual.web3 = true;
     }
     if (contextParams.graphqlNodes?.length) {
       this.state.graphql = Context.resolveGraphql(contextParams.graphqlNodes);
+      this.manual.graphql = true;
     }
     if (contextParams.ipfsNodes?.length) {
       this.state.ipfs = Context.resolveIpfs(contextParams.ipfsNodes);
+      this.manual.ipfs = true;
     }
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
+      this.manual.daoFactory = true;
     }
     if (contextParams.ensRegistryAddress) {
       this.state.ensRegistryAddress = contextParams.ensRegistryAddress;
+      this.manual.ensRegistry = true;
     }
     if (contextParams.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
         contextParams.gasFeeEstimationFactor,
       );
+      this.manual.gasFeeEstimationFactor = true;
     }
   }
 
   setDefault() {
     const networkName = this.state.network.name as SupportedNetworks;
-    if (WEB3_NODES[networkName] && WEB3_NODES[networkName].length) {
+    if (
+      WEB3_NODES[networkName] && WEB3_NODES[networkName].length &&
+      !this.manual.web3
+    ) {
       this.state.web3Providers = Context.resolveWeb3Providers(
         WEB3_NODES[networkName],
         this.state.network,
       );
     }
-    if (GRAPHQL_NODES[networkName] && GRAPHQL_NODES[networkName].length) {
+    if (
+      GRAPHQL_NODES[networkName] && GRAPHQL_NODES[networkName].length &&
+      !this.manual.graphql
+    ) {
       this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
     }
-    if (IPFS_NODES[networkName] && IPFS_NODES[networkName].length) {
+    if (
+      IPFS_NODES[networkName] && IPFS_NODES[networkName].length &&
+      !this.manual.ipfs
+    ) {
       this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
     }
     if (LIVE_CONTRACTS[networkName]) {
-      this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
-      let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
-      if (!ensRegistry) {
-        ensRegistry = this.network.ensAddress;
+      if (!this.manual.daoFactory) {
+        this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
       }
-      this.state.ensRegistryAddress = ensRegistry
+      if (!this.manual.ensRegistry) {
+        let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
+        if (!ensRegistry) {
+          ensRegistry = this.network.ensAddress;
+        }
+        this.state.ensRegistryAddress = ensRegistry;
+      }
     }
-    this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
+    if (!this.manual.gasFeeEstimationFactor) {
+      this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
+    }
   }
 
   // GETTERS
