@@ -59,10 +59,10 @@ import { AddressZero } from "@ethersproject/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 
 describe("Client", () => {
-  let daoAddress: string;
-  let deployment: deployContracts.Deployment;
-
   describe("Methods Module tests", () => {
+    let oldObjectFreeze: <T extends Function>(f: T) => T;
+    let daoAddress: string;
+    let deployment: deployContracts.Deployment;
     let server: Server;
 
     beforeAll(async () => {
@@ -75,10 +75,20 @@ describe("Client", () => {
         VotingMode.STANDARD,
       );
       daoAddress = daoCreation.daoAddr;
+
+      oldObjectFreeze = Object.freeze;
+      Object.freeze = (obj: any) => {
+        // Don't freeze our clients so we can spy on them
+        if (obj.constructor.name.startsWith("Client")) {
+          return obj;
+        }
+        return oldObjectFreeze(obj);
+      };
     });
 
     afterAll(async () => {
       await server.close();
+      Object.freeze = oldObjectFreeze;
     });
 
     describe("DAO Creation", () => {
@@ -333,6 +343,44 @@ describe("Client", () => {
             )
           ).toString(),
         ).toBe("7");
+      });
+
+      it("Should not update the allowance if there is enough available", async () => {
+        // override Object.freeze to get a spy on client.methods.updateAllowance
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const tokenContract = await deployErc20(client);
+        const amount = BigInt("1000000000000000000");
+
+        for await (
+          const key of client.methods.updateAllowance({
+            tokenAddress: tokenContract.address,
+            amount,
+            daoAddressOrEns: daoAddress,
+          })
+        ) {
+          key; // make typescript happy by "using" it
+        }
+
+        const updateAllowanceSpy = jest.spyOn(
+          client.methods,
+          "updateAllowance",
+        );
+
+        const depositParams: DepositParams = {
+          type: TokenType.ERC20,
+          daoAddressOrEns: daoAddress,
+          amount,
+          tokenAddress: tokenContract.address,
+        };
+
+        for await (const key of client.methods.deposit(depositParams)) {
+          key; // make typescript happy by "using" it
+        }
+
+        expect(updateAllowanceSpy).toHaveBeenCalledTimes(0);
+
+        updateAllowanceSpy.mockRestore();
       });
 
       it("Check if dao factory has register dao permission in the dao registry", async () => {
