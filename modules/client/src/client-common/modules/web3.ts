@@ -14,7 +14,6 @@ import {
   NoProviderError,
   NoSignerError,
 } from "@aragon/sdk-common";
-import { Wallet } from "@ethersproject/wallet";
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
   private providerIdx: number = -1;
