@@ -5,15 +5,17 @@ import {
   Context,
   ContextPlugin,
   ContextPluginParams,
-  GRAPHQL_NODES,
-  IPFS_NODES,
   LIVE_CONTRACTS,
-  WEB3_NODES,
 } from "../../src";
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
+import {
+  GRAPHQL_NODES,
+  IPFS_NODES,
+  WEB3_NODES,
+} from "../../src/client-common/constants";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
