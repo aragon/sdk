@@ -110,6 +110,67 @@ describe("Context instances", () => {
     );
     expect(context.gasFeeEstimationFactor).toEqual(0.1);
   });
+  it("Should create a context in goerli, update the network and update all the parameters automatically", () => {
+    const context = new Context({ network: "goerli" });
+    expect(context).toBeInstanceOf(Context);
+    expect(context.network.name).toBe("goerli");
+    expect(context.network.chainId).toBe(5);
+    expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.goerli.daoFactory);
+    expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
+    expect(context.gasFeeEstimationFactor).toBe(0.625);
+    expect(context.web3Providers.length).toBe(WEB3_NODES.goerli.length);
+    expect(context.ipfs.length).toBe(IPFS_NODES.goerli.length);
+    expect(context.graphql.length).toBe(GRAPHQL_NODES.goerli.length);
+    context.web3Providers.map((provider) => {
+      expect(provider).toBeInstanceOf(JsonRpcProvider);
+    });
+    context.ipfs.map((ipfsClient) => {
+      expect(ipfsClient).toBeInstanceOf(IpfsClient);
+    });
+    context.graphql.map((graphqlClient) =>
+      expect(graphqlClient).toBeInstanceOf(GraphQLClient)
+    );
+    context.set({ network: "matic" });
+    expect(context.network.name).toBe("matic");
+    expect(context.network.chainId).toBe(137);
+    expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
+    expect(context.ensRegistryAddress).toBe(LIVE_CONTRACTS.matic.ensRegistry);
+    expect(context.gasFeeEstimationFactor).toBe(0.625);
+    expect(context.web3Providers.length).toBe(WEB3_NODES.matic.length);
+    expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
+    expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
+    context.web3Providers.map((provider) => {
+      expect(provider).toBeInstanceOf(JsonRpcProvider);
+    });
+    context.ipfs.map((ipfsClient) => {
+      expect(ipfsClient).toBeInstanceOf(IpfsClient);
+    });
+    context.graphql.map((graphqlClient) =>
+      expect(graphqlClient).toBeInstanceOf(GraphQLClient)
+    );
+  });
+  it("Should create an empty context, update the network and update all the parameters automatically", () => {
+    const context = new Context();
+    expect(context).toBeInstanceOf(Context);
+    context.set({ network: "matic" });
+    expect(context.network.name).toBe("matic");
+    expect(context.network.chainId).toBe(137);
+    expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
+    expect(context.ensRegistryAddress).toBe(LIVE_CONTRACTS.matic.ensRegistry);
+    expect(context.gasFeeEstimationFactor).toBe(0.625);
+    expect(context.web3Providers.length).toBe(WEB3_NODES.matic.length);
+    expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
+    expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
+    context.web3Providers.map((provider) => {
+      expect(provider).toBeInstanceOf(JsonRpcProvider);
+    });
+    context.ipfs.map((ipfsClient) => {
+      expect(ipfsClient).toBeInstanceOf(IpfsClient);
+    });
+    context.graphql.map((graphqlClient) =>
+      expect(graphqlClient).toBeInstanceOf(GraphQLClient)
+    );
+  });
   it("Should Change the network and update all the parameters", () => {
     const context = new Context();
     context.set({

@@ -15,10 +15,10 @@ export interface IClientWeb3Core {
   getMaxFeePerGas: () => Promise<bigint>;
   isUp: () => Promise<boolean>;
   ensureOnline: () => Promise<void>;
-  attachContract:(
+  attachContract: <T>(
     address: string,
     abi: ContractInterface,
-  ) => Contract;
+  ) => Contract & T;
   getDaoFactoryAddress: () => string;
   getApproximateGasFee: (estimatedFee: bigint) => Promise<GasFeeEstimation>;
 }

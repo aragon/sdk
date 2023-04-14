@@ -22,6 +22,8 @@ TEMPLATE:
 - Fix `Status.DEFEATED` filter
 - Error handling if ENS cannot be resolved.
 - Renames `mainnet` to `homestead` in `LIVE_CONTRACTS`.
+- `Context.network` type chges from `Networkish` to `Network`
+- Sdk automatically sets the parameters when not provided 
 ### Changed
 - Uses `earlyExecuted` for proposal state calculation in Addresslistvoting and Tokenvoting.
 ## [1.4.1]

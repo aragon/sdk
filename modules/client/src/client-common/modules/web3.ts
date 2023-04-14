@@ -14,6 +14,7 @@ import {
   NoProviderError,
   NoSignerError,
 } from "@aragon/sdk-common";
+import { Wallet } from "@ethersproject/wallet";
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
   private providerIdx: number = -1;
@@ -88,14 +89,14 @@ export class Web3Module implements IClientWeb3Core {
    * @param abi The Application Binary Inteface of the contract
    * @return A contract instance attached to the given address
    */
-  public attachContract(
+  public attachContract<T>(
     address: string,
     abi: ContractInterface,
-  ): Contract {
+  ): Contract & T {
     if (!address || !isAddress(address)) throw new InvalidAddressError();
     else if (!abi) throw new InvalidContractAbiError();
     const signer = this.getConnectedSigner();
-    return new Contract(address, abi, signer);
+    return new Contract(address, abi, signer) as Contract & T;
   }
 
   /** Calculates the expected maximum gas fee */
