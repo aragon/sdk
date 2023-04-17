@@ -105,7 +105,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
-      const tokenContract = await deployErc20(client);
+      const tokenContract = await deployErc20();
 
       const depositParams: UpdateAllowanceParams = {
         daoAddressOrEns: daoAddress,

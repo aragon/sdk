@@ -4,9 +4,11 @@ import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 
 import {
   CanVoteParams,
+  Client,
   Context,
   ContextPlugin,
   CreateMajorityVotingProposalParams,
+  DaoDepositSteps,
   ExecuteProposalStep,
   IProposalQueryParams,
   IVoteProposalParams,
@@ -65,9 +67,17 @@ import {
   SubgraphContractType,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  UnwrapTokensStep,
+  WrapTokensStep,
 } from "../../../src/tokenVoting/interfaces";
 import { TokenVotingPluginPrepareInstallationParams } from "../../../src/tokenVoting/interfaces";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
+import { deployErc20 } from "../../helpers/deploy-erc20";
+import {
+  GovernanceWrappedERC20__factory,
+  TokenVoting__factory,
+} from "@aragon/osx-ethers";
+import { BigNumber } from "@ethersproject/bignumber";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -240,6 +250,103 @@ describe("Token Voting Client", () => {
           expect(typeof proposalId).toBe("string");
           expect(proposalId).toMatch(/^0x[A-Fa-f0-9]{40}_0x[A-Fa-f0-9]{1,64}$/);
         }
+      });
+    });
+
+    describe("Existing Token Dao", () => {
+      it("Should deploy a token day with an existing token and wrap and unwrap the token used", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const ctxPlugin = ContextPlugin.fromContext(ctx);
+        const client = new Client(ctx);
+        const pluginClient = new TokenVotingClient(ctxPlugin);
+        const erc20 = await deployErc20();
+        const dao = await buildTokenVotingDAO(
+          repoAddr,
+          VotingMode.STANDARD,
+          erc20.address,
+        );
+        const balance = await erc20.balanceOf(TEST_WALLET_ADDRESS) as BigNumber;
+        expect(balance.gte(BigNumber.from(0))).toBe(true);
+        const signer = client.web3.getConnectedSigner();
+        const pluginContract = TokenVoting__factory.connect(dao.plugin, signer);
+        const tokenAddress = await pluginContract.getVotingToken();
+        const wrappetTokenContract = GovernanceWrappedERC20__factory.connect(
+          tokenAddress,
+          signer,
+        );
+        const wrappedBalance = await wrappetTokenContract.balanceOf(
+          TEST_WALLET_ADDRESS,
+        );
+        expect(wrappedBalance.eq(BigNumber.from(0))).toBe(true);
+        // update allowance
+        const updateAllowanceSteps = client.methods.updateAllowance({
+          daoAddressOrEns: tokenAddress,
+          tokenAddress: erc20.address,
+          amount: balance.toBigInt(),
+        });
+        for await (const step of updateAllowanceSteps) {
+          switch (step.key) {
+            case DaoDepositSteps.CHECKED_ALLOWANCE:
+              expect(BigNumber.from(step.allowance).eq(BigNumber.from(0))).toBe(
+                true,
+              );
+              break;
+            case DaoDepositSteps.UPDATING_ALLOWANCE:
+              break;
+            case DaoDepositSteps.UPDATED_ALLOWANCE:
+              expect(BigNumber.from(step.allowance).eq(balance)).toBe(
+                true,
+              );
+              break;
+          }
+        }
+        // wrap tokens
+        const wrappingSteps = pluginClient.methods.wrapTokens({
+          wrappedTokenAddress: tokenAddress,
+          amount: balance.toBigInt(),
+        });
+
+        for await (const step of wrappingSteps) {
+          switch (step.key) {
+            case WrapTokensStep.WRAPPING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case WrapTokensStep.DONE:
+              break;
+          }
+        }
+
+        const balanceAfterWrap = await erc20.balanceOf(
+          TEST_WALLET_ADDRESS,
+        ) as BigNumber;
+        expect(balanceAfterWrap.eq(BigNumber.from(0))).toBe(true);
+        const wrappedBalanceAfterWrap = await wrappetTokenContract.balanceOf(
+          TEST_WALLET_ADDRESS,
+        );
+        expect(wrappedBalanceAfterWrap.eq(balance)).toBe(true);
+        const unwrappingSteps = pluginClient.methods.unwrapTokens({
+          wrappedTokenAddress: tokenAddress,
+          amount: wrappedBalanceAfterWrap.toBigInt(),
+        });
+        for await (const step of unwrappingSteps) {
+          switch (step.key) {
+            case UnwrapTokensStep.UNWRAPPING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case UnwrapTokensStep.DONE:
+              break;
+          }
+        }
+        const balanceAfterUnwrap = await erc20.balanceOf(
+          TEST_WALLET_ADDRESS,
+        ) as BigNumber;
+        expect(balanceAfterUnwrap.eq(balance)).toBe(true);
+        const wrappedBalanceAfterunWrap = await wrappetTokenContract.balanceOf(
+          TEST_WALLET_ADDRESS,
+        );
+        expect(wrappedBalanceAfterunWrap.eq(BigNumber.from(0))).toBe(true);
       });
     });
 

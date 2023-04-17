@@ -168,7 +168,7 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const tokenContract = await deployErc20(client);
+        const tokenContract = await deployErc20();
         const amount = BigInt("1000000000000000000");
         const depositParams: DepositParams = {
           type: TokenType.ERC20,
@@ -225,7 +225,7 @@ describe("Client", () => {
       it("Should ensure allowance for an ERC20 token", async () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
-        const tokenContract = await deployErc20(client);
+        const tokenContract = await deployErc20();
         const amount = BigInt("1000000000000000000");
         const updateAllowanceParams: UpdateAllowanceParams = {
           daoAddressOrEns: daoAddress,
@@ -271,7 +271,7 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
-        const tokenContract = await deployErc20(client);
+        const tokenContract = await deployErc20();
 
         const depositParams: DepositParams = {
           type: TokenType.ERC20,

@@ -7,4 +7,6 @@ export {
   TokenVotingProposal,
   TokenVotingProposalListItem,
   TokenVotingProposalResult,
+  WrapTokensStep,
+  UnwrapTokensStep
 } from "./interfaces";

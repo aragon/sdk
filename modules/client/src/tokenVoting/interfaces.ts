@@ -55,6 +55,10 @@ export interface ITokenVotingClientMethods extends IClientCore {
   getToken: (
     pluginAddress: string,
   ) => Promise<Erc20TokenDetails | Erc721TokenDetails | null>;
+  wrapTokens: (params: WrapTokensParams) => AsyncGenerator<WrapTokensStepValue>;
+  unwrapTokens: (
+    params: UnwrapTokensParams,
+  ) => AsyncGenerator<UnwrapTokensStepValue>;
 }
 
 export interface ITokenVotingClientEncoding extends IClientCore {
@@ -99,6 +103,8 @@ export type ITokenVotingPluginInstall = {
 
 type ExistingTokenParams = {
   address: string;
+  name: string;
+  symbol: string;
 };
 
 type NewTokenParams = {
@@ -228,3 +234,28 @@ export type TokenVotingPluginPrepareInstallationParams = {
   daoAddressOrEns: string;
   versionTag?: VersionTag;
 };
+
+type WrapTokensBase = {
+  wrappedTokenAddress: string;
+  amount: BigInt;
+};
+
+export type WrapTokensParams = WrapTokensBase;
+export type UnwrapTokensParams = WrapTokensBase;
+
+export enum WrapTokensStep {
+  WRAPPING = "wrapping",
+  DONE = "done",
+}
+
+export type WrapTokensStepValue =
+  | { key: WrapTokensStep.WRAPPING; txHash: string }
+  | { key: WrapTokensStep.DONE };
+
+export enum UnwrapTokensStep {
+  UNWRAPPING = "unwrapping",
+  DONE = "done",
+}
+export type UnwrapTokensStepValue =
+  | { key: UnwrapTokensStep.UNWRAPPING; txHash: string }
+  | { key: UnwrapTokensStep.DONE };

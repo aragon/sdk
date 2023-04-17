@@ -13,6 +13,11 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.4.3]
+### Added
+- Add `wrapTokens` and `unwrapTokens` functions
+### Changed
+- `ExistingTokenParams` now requieres `name` and `symbol` properties
 ## [1.4.2]
 ### Added
 - Property `votes` to majority voting `proposalListItem`

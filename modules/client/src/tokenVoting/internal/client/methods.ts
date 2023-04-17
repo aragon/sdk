@@ -57,6 +57,12 @@ import {
   TokenVotingPluginPrepareInstallationParams,
   TokenVotingProposal,
   TokenVotingProposalListItem,
+  UnwrapTokensParams,
+  UnwrapTokensStep,
+  UnwrapTokensStepValue,
+  WrapTokensParams,
+  WrapTokensStep,
+  WrapTokensStepValue,
 } from "../../interfaces";
 import {
   QueryTokenVotingMembers,
@@ -67,6 +73,7 @@ import {
 } from "../graphql-queries";
 import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import {
+  GovernanceWrappedERC20__factory,
   PluginRepo__factory,
   PluginSetupProcessor__factory,
   TokenVoting__factory,
@@ -80,6 +87,7 @@ import {
 } from "../../../client-common/constants";
 import { TokenType } from "../../../interfaces";
 import { TokenVotingClientEncoding } from "./encoding";
+import { BigNumber } from "@ethersproject/bignumber";
 /**
  * Methods module the SDK TokenVoting Client
  */
@@ -342,6 +350,73 @@ export class TokenVotingClientMethods extends ClientCore
       versionTag: versionTag!,
       permissions: preparedSetupData.permissions,
       helpers: preparedSetupData.helpers,
+    };
+  }
+
+  public async *wrapTokens(
+    params: WrapTokensParams,
+  ): AsyncGenerator<WrapTokensStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    if (!isAddress(params.wrappedTokenAddress)) {
+      throw new InvalidAddressError();
+    }
+    const wrappedErc20Contract = GovernanceWrappedERC20__factory.connect(
+      params.wrappedTokenAddress,
+      signer,
+    );
+
+    const account = await signer.getAddress();
+
+    const tx = await wrappedErc20Contract.depositFor(
+      account,
+      BigNumber.from(params.amount),
+    );
+
+    yield {
+      key: WrapTokensStep.WRAPPING,
+      txHash: tx.hash,
+    };
+    await tx.wait();
+    yield {
+      key: WrapTokensStep.DONE,
+    };
+  }
+  public async *unwrapTokens(
+    params: UnwrapTokensParams,
+  ): AsyncGenerator<UnwrapTokensStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (!signer) {
+      throw new NoSignerError();
+    } else if (!signer.provider) {
+      throw new NoProviderError();
+    }
+    if (!isAddress(params.wrappedTokenAddress)) {
+      throw new InvalidAddressError();
+    }
+    const wrappedErc20Contract = GovernanceWrappedERC20__factory.connect(
+      params.wrappedTokenAddress,
+      signer,
+    );
+
+    const account = await signer.getAddress();
+
+    const tx = await wrappedErc20Contract.withdrawTo(
+      account,
+      BigNumber.from(params.amount),
+    );
+
+    yield {
+      key: UnwrapTokensStep.UNWRAPPING,
+      txHash: tx.hash,
+    };
+    await tx.wait();
+    yield {
+      key: UnwrapTokensStep.DONE,
     };
   }
 

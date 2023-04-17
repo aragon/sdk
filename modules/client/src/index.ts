@@ -25,6 +25,7 @@ export {
   IRevokePermissionParams,
   ITransferQueryParams,
   Permissions,
+  RegisterStandardCallbackParams,
   TokenType,
   Transfer,
   TransferSortBy,
@@ -32,5 +33,4 @@ export {
   UpdateAllowanceParams,
   Withdraw,
   WithdrawParams,
-  RegisterStandardCallbackParams,
 } from "./interfaces";
