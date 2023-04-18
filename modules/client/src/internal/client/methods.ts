@@ -340,7 +340,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     const tx: ContractTransaction = await tokenInstance.approve(
       params.daoAddressOrEns,
-      BigNumber.from(params.amount),
+      params.amount,
     );
 
     yield {

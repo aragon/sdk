@@ -237,7 +237,7 @@ export type TokenVotingPluginPrepareInstallationParams = {
 
 type WrapTokensBase = {
   wrappedTokenAddress: string;
-  amount: BigInt;
+  amount: bigint;
 };
 
 export type WrapTokensParams = WrapTokensBase;

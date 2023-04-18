@@ -373,7 +373,7 @@ export class TokenVotingClientMethods extends ClientCore
 
     const tx = await wrappedErc20Contract.depositFor(
       account,
-      BigNumber.from(params.amount),
+      params.amount,
     );
 
     yield {
@@ -405,7 +405,7 @@ export class TokenVotingClientMethods extends ClientCore
 
     const tx = await wrappedErc20Contract.withdrawTo(
       account,
-      BigNumber.from(params.amount),
+      params.amount,
     );
 
     yield {
