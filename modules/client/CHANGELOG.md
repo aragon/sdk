@@ -18,6 +18,14 @@ TEMPLATE:
 - Add `wrapTokens` and `unwrapTokens` functions to support token contract without support for snapshots
 ### Changed
 - `ExistingTokenParams` now requieres `name` and `symbol` properties
+- `client.methods.updateAllowance` is now `client.methods.setAllowance`
+  - `setAllowance` does not check if the current allowance is higher than the new allowance, it just sets the allowance to a new value
+  - The mentioned check is done in the deposit method
+  - The `daoAddressOrEns` parameter was renamed to `spender`
+  - `UpdateAllowanceParams` was renamed to `SetAllowanceParams`
+  - `SetAllowance` now has `SetAllowanceSteps` outside `DaoDEpositSteps`, check examples
+  - `UPDATING_ALLOWANCE` is renamed to `SETTING_ALLOWANCE`
+  - `UPDATED_ALLOWANCE` is renamed to `ALLOWANCE_SET`
 ## [1.4.2]
 ### Added
 - Property `votes` to majority voting `proposalListItem`
