@@ -322,11 +322,6 @@ describe("Token Voting Client", () => {
 
     describe("Plugin installation", () => {
       it("Should prepare the installation of a multisig plugin", async () => {
-        const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
-        networkSpy.mockReturnValueOnce({
-          name: "goerli",
-          chainId: 31337,
-        });
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
@@ -357,6 +352,13 @@ describe("Token Voting Client", () => {
           },
           daoAddressOrEns: dao,
         };
+        const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
+        networkSpy.mockReturnValueOnce(
+          Promise.resolve({
+            name: "goerli",
+            chainId: 31337,
+          }),
+        );
         const steps = client.methods.prepareInstallation(installationParams);
         for await (const step of steps) {
           switch (step.key) {

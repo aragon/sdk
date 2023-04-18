@@ -505,11 +505,7 @@ describe("Client", () => {
       );
     });
     it("Should decode an apply installation action", async () => {
-      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
-      networkSpy.mockReturnValueOnce({
-        name: "goerli",
-        chainId: 31337,
-      });
+      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -535,7 +531,10 @@ describe("Client", () => {
         pluginRepo: "0x2345678901234567890123456789012345678901",
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
-
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
       const actions = client.encoding.applyInstallationAction(
         "0x1234567890123456789012345678901234567890",
         applyInstallationParams,
