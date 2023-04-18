@@ -298,6 +298,8 @@ describe("Token Voting Client", () => {
                 true,
               );
               break;
+            default:
+              throw new Error("Unrecognized state");
           }
         }
         // wrap tokens
@@ -314,6 +316,8 @@ describe("Token Voting Client", () => {
               break;
             case WrapTokensStep.DONE:
               break;
+            default:
+              throw new Error("Unrecognized state");
           }
         }
 
@@ -337,6 +341,8 @@ describe("Token Voting Client", () => {
               break;
             case UnwrapTokensStep.DONE:
               break;
+            default:
+              throw new Error("Unrecognized state");
           }
         }
         const balanceAfterUnwrap = await erc20.balanceOf(

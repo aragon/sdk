@@ -361,8 +361,7 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
-    }
-    if (!isAddress(params.wrappedTokenAddress)) {
+    } else if (!isAddress(params.wrappedTokenAddress)) {
       throw new InvalidAddressError();
     }
     const wrappedErc20Contract = GovernanceWrappedERC20__factory.connect(
@@ -394,8 +393,7 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoSignerError();
     } else if (!signer.provider) {
       throw new NoProviderError();
-    }
-    if (!isAddress(params.wrappedTokenAddress)) {
+    } else if (!isAddress(params.wrappedTokenAddress)) {
       throw new InvalidAddressError();
     }
     const wrappedErc20Contract = GovernanceWrappedERC20__factory.connect(

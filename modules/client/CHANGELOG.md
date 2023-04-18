@@ -15,7 +15,7 @@ TEMPLATE:
 ## [UPCOMING]
 ## [1.4.3]
 ### Added
-- Add `wrapTokens` and `unwrapTokens` functions
+- Add `wrapTokens` and `unwrapTokens` functions to support token contract without support for snapshots
 ### Changed
 - `ExistingTokenParams` now requieres `name` and `symbol` properties
 ## [1.4.2]
