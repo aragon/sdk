@@ -102,10 +102,12 @@ export type ITokenVotingPluginInstall = {
 };
 
 type ExistingTokenParams = {
-  address: string;
-  name: string;
-  symbol: string;
-};
+  tokenAddress: string;
+  wrappedToken: {
+    name: string;
+    symbol: string;
+  };
+}
 
 type NewTokenParams = {
   name: string;

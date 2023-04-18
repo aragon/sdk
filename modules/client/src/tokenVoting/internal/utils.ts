@@ -191,7 +191,7 @@ export function tokenVotingInitParamsToContract(
       params.newToken.balances.map(({ balance }) => BigNumber.from(balance)),
     ];
   } else if (params.useToken) {
-    token = [params.useToken?.address, params.useToken.name, params.useToken.symbol];
+    token = [params.useToken?.tokenAddress, params.useToken.wrappedToken.name, params.useToken.wrappedToken.symbol];
   }
   return [
     Object.values(

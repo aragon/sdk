@@ -58,7 +58,6 @@ export async function buildMultisigDAO(pluginRepoAddress: string) {
 export async function buildTokenVotingDAO(
   pluginRepoAddress: string,
   votingMode: VotingMode = VotingMode.STANDARD,
-  tokenAddress?: string,
 ) {
   const client = new Client(new Context(contextParamsLocalChain));
 
@@ -70,22 +69,13 @@ export async function buildTokenVotingDAO(
       minProposerVotingPower: BigInt(0),
       votingMode,
     },
-  };
-  if (tokenAddress) {
-    pluginInstallParams.useToken = {
-      address: tokenAddress,
-      name: "Wrapped Test Token",
-      symbol: "WTTK",
-    };
-  } else {
-    pluginInstallParams.newToken = {
+    newToken: {
       balances: [{ address: TEST_WALLET_ADDRESS, balance: BigInt(100) }],
       name: "Test Token",
       symbol: "TTK",
       decimals: 18,
-    };
-  }
-
+    },
+  };
   const pluginInstallItem = TokenVotingClient.encoding
     .getPluginInstallItem(pluginInstallParams);
 
@@ -126,9 +116,11 @@ export async function buildExistingTokenVotingDAO(
   const pluginInstallItem = TokenVotingClient.encoding
     .getPluginInstallItem({
       useToken: {
-        name: "Wrapped Test Token",
-        symbol: "WTTK",
-        address: tokenAddress,
+        wrappedToken: {
+          name: "Wrapped Test Token",
+          symbol: "WTTK",
+        },
+        tokenAddress,
       },
       votingSettings: {
         minDuration: 60 * 60,

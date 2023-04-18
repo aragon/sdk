@@ -48,7 +48,7 @@ import {
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { Server } from "ganache";
-import { buildTokenVotingDAO } from "../../helpers/build-daos";
+import { buildExistingTokenVotingDAO, buildTokenVotingDAO } from "../../helpers/build-daos";
 import {
   mineBlock,
   mineBlockWithTimeOffset,
@@ -260,10 +260,10 @@ describe("Token Voting Client", () => {
         const client = new Client(ctx);
         const pluginClient = new TokenVotingClient(ctxPlugin);
         const erc20 = await deployErc20();
-        const dao = await buildTokenVotingDAO(
+        const dao = await buildExistingTokenVotingDAO(
           repoAddr,
-          VotingMode.STANDARD,
           erc20.address,
+          VotingMode.STANDARD,
         );
         const balance = await erc20.balanceOf(TEST_WALLET_ADDRESS) as BigNumber;
         expect(balance.gte(BigNumber.from(0))).toBe(true);
