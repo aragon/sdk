@@ -8,9 +8,9 @@ import {
   CreateDaoParams,
   DepositParams,
   IAddresslistVotingPluginInstall,
+  SetAllowanceParams,
   SupportedNetworksArray,
   TokenType,
-  UpdateAllowanceParams,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
@@ -107,13 +107,13 @@ describe("Client", () => {
 
       const tokenContract = await deployErc20();
 
-      const depositParams: UpdateAllowanceParams = {
-        daoAddressOrEns: daoAddress,
+      const depositParams: SetAllowanceParams = {
+        spender: daoAddress,
         amount: BigInt(1234),
         tokenAddress: tokenContract.address,
       };
 
-      const gasFeesEstimation = await client.estimation.updateAllowance(
+      const gasFeesEstimation = await client.estimation.setAllowance(
         depositParams,
       );
 

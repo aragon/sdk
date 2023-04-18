@@ -8,7 +8,6 @@ import {
   Context,
   ContextPlugin,
   CreateMajorityVotingProposalParams,
-  DaoDepositSteps,
   ExecuteProposalStep,
   IProposalQueryParams,
   IVoteProposalParams,
@@ -17,6 +16,7 @@ import {
   ProposalMetadata,
   ProposalSortBy,
   ProposalStatus,
+  SetAllowanceSteps,
   SortDirection,
   SubgraphVoteValues,
   SupportedNetworksArray,
@@ -48,7 +48,10 @@ import {
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import { Server } from "ganache";
-import { buildExistingTokenVotingDAO, buildTokenVotingDAO } from "../../helpers/build-daos";
+import {
+  buildExistingTokenVotingDAO,
+  buildTokenVotingDAO,
+} from "../../helpers/build-daos";
 import {
   mineBlock,
   mineBlockWithTimeOffset,
@@ -279,21 +282,16 @@ describe("Token Voting Client", () => {
         );
         expect(wrappedBalance.eq(BigNumber.from(0))).toBe(true);
         // update allowance
-        const updateAllowanceSteps = client.methods.updateAllowance({
-          daoAddressOrEns: tokenAddress,
+        const updateAllowanceSteps = client.methods.setAllowance({
+          spender: tokenAddress,
           tokenAddress: erc20.address,
           amount: balance.toBigInt(),
         });
         for await (const step of updateAllowanceSteps) {
           switch (step.key) {
-            case DaoDepositSteps.CHECKED_ALLOWANCE:
-              expect(BigNumber.from(step.allowance).eq(BigNumber.from(0))).toBe(
-                true,
-              );
+            case SetAllowanceSteps.SETTING_ALLOWANCE:
               break;
-            case DaoDepositSteps.UPDATING_ALLOWANCE:
-              break;
-            case DaoDepositSteps.UPDATED_ALLOWANCE:
+            case SetAllowanceSteps.ALLOWANCE_SET:
               expect(BigNumber.from(step.allowance).eq(balance)).toBe(
                 true,
               );

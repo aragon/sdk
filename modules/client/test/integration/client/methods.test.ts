@@ -37,13 +37,14 @@ import {
   TokenType,
   TransferSortBy,
   TransferType,
-  UpdateAllowanceParams,
+  SetAllowanceParams,
   VotingMode,
 } from "../../../src";
 import { MissingExecPermissionError } from "@aragon/sdk-common";
 import { Server } from "ganache";
 import {
   AssetBalanceSortBy,
+  SetAllowanceSteps,
   SubgraphBalance,
   SubgraphDao,
   SubgraphPluginTypeName,
@@ -191,11 +192,11 @@ describe("Client", () => {
               expect(typeof step.allowance).toBe("bigint");
               expect(step.allowance).toBe(BigInt(0));
               break;
-            case DaoDepositSteps.UPDATING_ALLOWANCE:
+            case SetAllowanceSteps.SETTING_ALLOWANCE:
               expect(typeof step.txHash).toBe("string");
               expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
               break;
-            case DaoDepositSteps.UPDATED_ALLOWANCE:
+            case SetAllowanceSteps.ALLOWANCE_SET:
               expect(typeof step.allowance).toBe("bigint");
               expect(step.allowance).toBe(amount);
               break;
@@ -227,25 +228,21 @@ describe("Client", () => {
         const client = new Client(context);
         const tokenContract = await deployErc20();
         const amount = BigInt("1000000000000000000");
-        const updateAllowanceParams: UpdateAllowanceParams = {
-          daoAddressOrEns: daoAddress,
+        const SetAllowanceParams: SetAllowanceParams = {
+          spender: daoAddress,
           amount,
           tokenAddress: tokenContract.address,
         };
 
         for await (
-          const step of client.methods.updateAllowance(updateAllowanceParams)
+          const step of client.methods.setAllowance(SetAllowanceParams)
         ) {
           switch (step.key) {
-            case DaoDepositSteps.CHECKED_ALLOWANCE:
-              expect(typeof step.allowance).toBe("bigint");
-              expect(step.allowance).toBe(BigInt(0));
-              break;
-            case DaoDepositSteps.UPDATING_ALLOWANCE:
+            case SetAllowanceSteps.SETTING_ALLOWANCE:
               expect(typeof step.txHash).toBe("string");
               expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
               break;
-            case DaoDepositSteps.UPDATED_ALLOWANCE:
+            case SetAllowanceSteps.ALLOWANCE_SET:
               expect(typeof step.allowance).toBe("bigint");
               expect(step.allowance).toBe(amount);
               break;

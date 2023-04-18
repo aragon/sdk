@@ -10,9 +10,9 @@ title: Token Wraping
 import {
   Client,
   ContextPlugin,
-  DaoDepositSteps,
-  WrapTokensStep,
+  SetAllowanceSteps,
   TokenVotingClient,
+  WrapTokensStep,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -33,21 +33,18 @@ const wrappedTokenAddress = "0x1234567890123456789012345678901234567890";
 const tokenAddress = "0x2345678901234567890123456789012345678901";
 
 // must give the wrapped token contract allowance to wrap the tokens
-const updateAllowanceSteps = client.methods.updateAllowance({
+const updateAllowanceSteps = client.methods.setAllowance({
   amount,
-  daoAddressOrEns: wrappedTokenAddress,
+  spender: wrappedTokenAddress,
   tokenAddress,
 });
 for await (const step of updateAllowanceSteps) {
   try {
     switch (step.key) {
-      case DaoDepositSteps.CHECKED_ALLOWANCE:
-        console.log(step.allowance);
-        break;
-      case DaoDepositSteps.UPDATING_ALLOWANCE:
+      case SetAllowanceSteps.SETTING_ALLOWANCE:
         console.log(step.txHash);
         break;
-      case DaoDepositSteps.UPDATED_ALLOWANCE:
+      case SetAllowanceSteps.ALLOWANCE_SET:
         console.log(step.allowance);
         break;
     }

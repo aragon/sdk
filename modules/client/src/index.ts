@@ -26,11 +26,12 @@ export {
   ITransferQueryParams,
   Permissions,
   RegisterStandardCallbackParams,
+  SetAllowanceParams,
+  SetAllowanceSteps,
   TokenType,
   Transfer,
   TransferSortBy,
   TransferType,
-  UpdateAllowanceParams,
   Withdraw,
   WithdrawParams,
 } from "./interfaces";
