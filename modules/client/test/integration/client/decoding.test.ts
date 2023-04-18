@@ -31,11 +31,13 @@ import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
-jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
-
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client", () => {
   beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
   });
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {
@@ -539,9 +541,10 @@ describe("Client", () => {
         applyInstallationParams,
       );
       expect(actions.length).toBe(3);
-      const decodedApplyInstallationParams = client.decoding.applyInstallationAction(
-        actions[1].data,
-      );
+      const decodedApplyInstallationParams = client.decoding
+        .applyInstallationAction(
+          actions[1].data,
+        );
       expect(applyInstallationParams.versionTag.build).toBe(
         decodedApplyInstallationParams.versionTag.build,
       );
@@ -574,11 +577,16 @@ describe("Client", () => {
         expect(applyInstallationParams.permissions[index].where).toBe(
           decodedApplyInstallationParams.permissions[index].where,
         );
-        expect(decodedApplyInstallationParams.permissions[index].permissionId).toBeInstanceOf(
-          Uint8Array
-        );
-        expect(bytesToHex(applyInstallationParams.permissions[index].permissionId)).toBe(
-          bytesToHex(decodedApplyInstallationParams.permissions[index].permissionId)
+        expect(decodedApplyInstallationParams.permissions[index].permissionId)
+          .toBeInstanceOf(
+            Uint8Array,
+          );
+        expect(
+          bytesToHex(applyInstallationParams.permissions[index].permissionId),
+        ).toBe(
+          bytesToHex(
+            decodedApplyInstallationParams.permissions[index].permissionId,
+          ),
         );
       }
     });

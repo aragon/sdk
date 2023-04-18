@@ -62,8 +62,10 @@ import {
 import { AddresslistVotingPluginPrepareInstallationParams } from "../../../src/addresslistVoting/interfaces";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
-jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
-
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client Address List", () => {
   let server: Server;
   let deployment: deployContracts.Deployment;

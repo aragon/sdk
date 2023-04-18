@@ -23,9 +23,9 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
 
 // TODO change rpcs to aragon ones
 export const WEB3_NODES: { [K in SupportedNetworks]: string[] } = {
-  homestead: ["https://mainnet.eth.aragon.network"],
+  homestead: ["https://mainnet.eth.aragon.network", "https://eth.llamarpc.com", "https://rpc.mevblocker.io"],
   goerli: ["https://endpoints.omniatech.io/v1/eth/goerli/public"],
-  matic: ["https://polygon.llamarpc.com"],
+  matic: ["https://polygon.llamarpc.com", "https://endpoints.omniatech.io/v1/matic/mainnet/public"],
   maticmum: ["https://endpoints.omniatech.io/v1/matic/mumbai/public"],
 };
 

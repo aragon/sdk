@@ -154,11 +154,6 @@ export class DataDecodingError extends Error {
   }
 }
 
-export class EnsUnsuportedByNetworkError extends Error {
-  constructor(network: string) {
-    super("Network " + network + " does not support ens");
-  }
-}
 export class InvalidContractAddressError extends Error {
   constructor() {
     super("Invalid contract address");

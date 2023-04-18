@@ -69,7 +69,10 @@ import {
 import { TokenVotingPluginPrepareInstallationParams } from "../../../src/tokenVoting/interfaces";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
-jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 
 describe("Token Voting Client", () => {
   let server: Server;
@@ -94,7 +97,6 @@ describe("Token Voting Client", () => {
       );
     }
 
-    
     LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
     LIVE_CONTRACTS.goerli.pluginSetupProcessor =
       deployment.pluginSetupProcessor.address;

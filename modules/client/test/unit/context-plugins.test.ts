@@ -34,11 +34,11 @@ describe("ContextPlugin instances", () => {
     contextParams = {
       network: "mainnet",
       signer: new Wallet(TEST_WALLET),
-      daoFactoryAddress: "0x1234",
+      daoFactoryAddress: "0x1234567890123456789012345678901234567890",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
-      graphqlNodes: [],
-      ipfsNodes: [],
+      graphqlNodes: [{ url: "https://example.com" }],
+      ipfsNodes: [{ url: "https://example.com" }],
     };
   });
   it("Should create an empty context and have default values", () => {

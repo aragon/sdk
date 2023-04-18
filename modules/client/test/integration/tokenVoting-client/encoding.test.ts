@@ -15,11 +15,14 @@ import { AddressZero } from "@ethersproject/constants";
 import { InvalidAddressError } from "@aragon/sdk-common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 
-jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 
 describe("Token Voting Client", () => {
   beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
   });
   describe("Encoding module", () => {
     it("Should create a TokenVoting client and generate a install entry", async () => {

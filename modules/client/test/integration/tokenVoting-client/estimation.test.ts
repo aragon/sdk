@@ -20,6 +20,9 @@ import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 
 describe("Token Voting Client", () => {
   describe("Estimation Module", () => {

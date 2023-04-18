@@ -60,7 +60,9 @@ import { AddressZero } from "@ethersproject/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client", () => {
   let daoAddress: string;
   let deployment: deployContracts.Deployment;

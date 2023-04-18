@@ -6,7 +6,7 @@ import {
   Networkish,
 } from "@ethersproject/providers";
 import {
-  EnsUnsuportedByNetworkError,
+  InvalidAddressError,
   UnsupportedNetworkError,
   UnsupportedProtocolError,
 } from "@aragon/sdk-common";
@@ -24,13 +24,13 @@ import { Signer } from "@ethersproject/abstract-signer";
 export { ContextParams } from "./interfaces/context";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
-type ManualState = {
-  web3: boolean;
-  daoFactory: boolean;
-  ensRegistry: boolean;
+type OverriddenState = {
+  web3Nodes: boolean;
+  daoFactoryAddress: boolean;
+  ensRegistryAddress: boolean;
   gasFeeEstimationFactor: boolean;
-  ipfs: boolean;
-  graphql: boolean;
+  ipfsNodes: boolean;
+  graphqlNodes: boolean;
 };
 const supportedProtocols = ["https:"];
 if (typeof process !== "undefined" && process.env?.TESTING) {
@@ -39,13 +39,13 @@ if (typeof process !== "undefined" && process.env?.TESTING) {
 
 export class Context {
   protected state: ContextState = {} as ContextState;
-  protected manualState: ManualState = {
-    web3: false,
-    daoFactory: false,
-    ensRegistry: false,
+  protected overriden: OverriddenState = {
+    web3Nodes: false,
+    daoFactoryAddress: false,
+    ensRegistryAddress: false,
     gasFeeEstimationFactor: false,
-    ipfs: false,
-    graphql: false,
+    ipfsNodes: false,
+    graphqlNodes: false,
   };
   // INTERNAL CONTEXT STATE
   /**
@@ -66,7 +66,7 @@ export class Context {
         contextParams.ensRegistryAddress,
       );
       // once the network is resolved set default values
-      this.setDefault();
+      this.setNetworkDefaults();
     }
     if (contextParams.signer) {
       this.state.signer = contextParams.signer;
@@ -80,68 +80,79 @@ export class Context {
         contextParams.web3Providers,
         this.state.network,
       );
-      this.manualState.web3 = true;
+      this.overriden.web3Nodes = true;
     }
     if (contextParams.graphqlNodes?.length) {
       this.state.graphql = Context.resolveGraphql(contextParams.graphqlNodes);
-      this.manualState.graphql = true;
+      this.overriden.graphqlNodes = true;
     }
     if (contextParams.ipfsNodes?.length) {
       this.state.ipfs = Context.resolveIpfs(contextParams.ipfsNodes);
-      this.manualState.ipfs = true;
+      this.overriden.ipfsNodes = true;
     }
     if (contextParams.daoFactoryAddress) {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
-      this.manualState.daoFactory = true;
+      this.overriden.daoFactoryAddress = true;
     }
     if (contextParams.ensRegistryAddress) {
       this.state.ensRegistryAddress = contextParams.ensRegistryAddress;
-      this.manualState.ensRegistry = true;
+      this.overriden.ensRegistryAddress = true;
     }
     if (contextParams.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
         contextParams.gasFeeEstimationFactor,
       );
-      this.manualState.gasFeeEstimationFactor = true;
+      this.overriden.gasFeeEstimationFactor = true;
     }
   }
 
-  private setDefault() {
-    const networkName = this.state.network.name as SupportedNetworks;
-    if (
-      WEB3_NODES[networkName] && WEB3_NODES[networkName].length &&
-      !this.manualState.web3
-    ) {
-      this.state.web3Providers = Context.resolveWeb3Providers(
-        WEB3_NODES[networkName],
-        this.state.network,
-      );
+  private setNetworkDefaults() {
+    const networkName = this.network.name as SupportedNetworks;
+    if (WEB3_NODES[networkName] && WEB3_NODES[networkName].length) {
+      if (!this.overriden.web3Nodes) {
+        this.state.web3Providers = Context.resolveWeb3Providers(
+          WEB3_NODES[networkName],
+          this.state.network,
+        );
+      }
+    } else {
+      throw new UnsupportedNetworkError(networkName);
     }
-    if (
-      GRAPHQL_NODES[networkName] && GRAPHQL_NODES[networkName].length &&
-      !this.manualState.graphql
-    ) {
-      this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
+
+    if (GRAPHQL_NODES[networkName] && GRAPHQL_NODES[networkName].length) {
+      if (!this.overriden.graphqlNodes) {
+        this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
+      }
+    } else {
+      throw new UnsupportedNetworkError(networkName);
     }
-    if (
-      IPFS_NODES[networkName] && IPFS_NODES[networkName].length &&
-      !this.manualState.ipfs
-    ) {
-      this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
+
+    if (IPFS_NODES[networkName] && IPFS_NODES[networkName].length) {
+      if (
+        !this.overriden.ipfsNodes
+      ) {
+        this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
+      }
+    } else {
+      throw new UnsupportedNetworkError(networkName);
     }
+
     if (LIVE_CONTRACTS[networkName]) {
-      if (!this.manualState.daoFactory) {
+      if (!this.overriden.daoFactoryAddress) {
         this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
       }
-      if (!this.manualState.ensRegistry) {
+      if (!this.overriden.ensRegistryAddress) {
         let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
         if (!ensRegistry) {
           ensRegistry = this.network.ensAddress;
         }
         this.state.ensRegistryAddress = ensRegistry;
       }
+    } else {
+      throw new UnsupportedNetworkError(networkName);
     }
-    if (!this.manualState.gasFeeEstimationFactor) {
+
+    if (!this.overriden.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
     }
   }
@@ -263,18 +274,19 @@ export class Context {
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }
+
     if (ensRegistryAddress) {
       if (!isAddress(ensRegistryAddress)) {
-        console.warn("invalid address, using default");
-        // throw new InvalidAddressError()
+        throw new InvalidAddressError();
       } else {
         network.ensAddress = ensRegistryAddress;
       }
     }
+
     if (!network.ensAddress) {
       const ensAddress = LIVE_CONTRACTS[networkName].ensRegistry;
       if (!ensAddress) {
-        throw new EnsUnsuportedByNetworkError(networkName);
+        throw new UnsupportedNetworkError(networkName);
       }
       network.ensAddress = ensAddress;
     }

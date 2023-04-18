@@ -54,7 +54,10 @@ import {
 import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-queries/members";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
-jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;

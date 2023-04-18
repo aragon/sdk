@@ -18,7 +18,10 @@ import {
   Permissions,
   WithdrawParams,
 } from "../../../src";
-import { DaoAction, SupportedNetworksArray } from "../../../src/client-common/interfaces/common";
+import {
+  DaoAction,
+  SupportedNetworksArray,
+} from "../../../src/client-common/interfaces/common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import {
   PermissionIds,
@@ -31,11 +34,13 @@ import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
-jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
-
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client", () => {
   beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
   });
   describe("Action generators", () => {
     it("Should create a client and generate a native withdraw action", async () => {

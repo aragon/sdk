@@ -12,11 +12,13 @@ import {
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 
-jest.spyOn(SupportedNetworksArray, 'includes').mockReturnValue(true)
-
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client Address List", () => {
   beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
   });
   describe("Action generators", () => {
     it("Should create an AddressList client and generate a install entry", async () => {
