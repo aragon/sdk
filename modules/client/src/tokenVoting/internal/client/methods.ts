@@ -87,7 +87,6 @@ import {
 } from "../../../client-common/constants";
 import { TokenType } from "../../../interfaces";
 import { TokenVotingClientEncoding } from "./encoding";
-import { BigNumber } from "@ethersproject/bignumber";
 /**
  * Methods module the SDK TokenVoting Client
  */
