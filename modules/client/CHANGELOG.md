@@ -22,8 +22,8 @@ TEMPLATE:
 - Fix `Status.DEFEATED` filter
 - Error handling if ENS cannot be resolved.
 - Renames `mainnet` to `homestead` in `LIVE_CONTRACTS`.
-- `Context.network` type chges from `Networkish` to `Network`
-- Sdk automatically sets the parameters when not provided 
+- `Context.network` type changes from `Networkish` to `Network`
+- Context and ContextPlugin now automatically use the environment settings by default (depending on the ETH network) when no values are provided
 ### Changed
 - Uses `earlyExecuted` for proposal state calculation in Addresslistvoting and Tokenvoting.
 ## [1.4.1]

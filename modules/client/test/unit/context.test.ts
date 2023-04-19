@@ -11,7 +11,7 @@ import { ADDRESS_ONE } from "../integration/constants";
 import {
   GRAPHQL_NODES,
   IPFS_NODES,
-  WEB3_NODES,
+  WEB3_ENDPOINTS,
 } from "../../src/client-common/constants";
 
 const TEST_WALLET =
@@ -46,7 +46,7 @@ describe("Context instances", () => {
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.homestead.daoFactory);
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_NODES.homestead.length);
+    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.homestead.length);
     expect(context.ipfs.length).toBe(IPFS_NODES.homestead.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.homestead.length);
     context.web3Providers.map((provider) => {
@@ -117,7 +117,7 @@ describe("Context instances", () => {
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.goerli.daoFactory);
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_NODES.goerli.length);
+    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.goerli.length);
     expect(context.ipfs.length).toBe(IPFS_NODES.goerli.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.goerli.length);
     context.web3Providers.map((provider) => {
@@ -135,7 +135,7 @@ describe("Context instances", () => {
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
     expect(context.ensRegistryAddress).toBe(LIVE_CONTRACTS.matic.ensRegistry);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_NODES.matic.length);
+    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.matic.length);
     expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
     context.web3Providers.map((provider) => {
@@ -157,7 +157,7 @@ describe("Context instances", () => {
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
     expect(context.ensRegistryAddress).toBe(LIVE_CONTRACTS.matic.ensRegistry);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_NODES.matic.length);
+    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.matic.length);
     expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
     context.web3Providers.map((provider) => {
@@ -196,7 +196,7 @@ describe("Context instances", () => {
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
     expect(context.ensRegistryAddress).toBe(ADDRESS_ONE);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_NODES.matic.length);
+    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.matic.length);
     expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
     expect(context.graphql.length).toBe(3);
     context.web3Providers.map((provider) => {

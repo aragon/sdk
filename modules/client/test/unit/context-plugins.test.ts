@@ -14,7 +14,7 @@ import { GraphQLClient } from "graphql-request";
 import {
   GRAPHQL_NODES,
   IPFS_NODES,
-  WEB3_NODES,
+  WEB3_ENDPOINTS,
 } from "../../src/client-common/constants";
 
 const TEST_WALLET =
@@ -50,7 +50,7 @@ describe("ContextPlugin instances", () => {
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.homestead.daoFactory);
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_NODES.homestead.length);
+    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.homestead.length);
     expect(context.ipfs.length).toBe(IPFS_NODES.homestead.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.homestead.length);
     context.web3Providers.map((provider) => {
@@ -110,7 +110,7 @@ describe("ContextPlugin instances", () => {
     );
     expect(contextPlugin.gasFeeEstimationFactor).toBe(0.625);
     expect(contextPlugin.web3Providers.length).toBe(
-      WEB3_NODES.homestead.length,
+      WEB3_ENDPOINTS.homestead.length,
     );
     expect(contextPlugin.ipfs.length).toBe(IPFS_NODES.homestead.length);
     expect(contextPlugin.graphql.length).toBe(GRAPHQL_NODES.homestead.length);
@@ -134,7 +134,7 @@ describe("ContextPlugin instances", () => {
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
     expect(context.ensRegistryAddress).toBe(LIVE_CONTRACTS.matic.ensRegistry);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_NODES.matic.length);
+    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.matic.length);
     expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
     context.web3Providers.map((provider) => {

@@ -41,8 +41,6 @@ type Web3ContextState = {
   daoFactoryAddress: string;
   // may exist depending on the network
   ensRegistryAddress?: string;
-  // TODO
-  // delete these 2 arent used
   web3Providers: JsonRpcProvider[];
   gasFeeEstimationFactor: number;
 };

@@ -16,7 +16,7 @@ import {
   GRAPHQL_NODES,
   IPFS_NODES,
   LIVE_CONTRACTS,
-  WEB3_NODES,
+  WEB3_ENDPOINTS,
 } from "./constants";
 import { SupportedNetworks, SupportedNetworksArray } from "./interfaces/common";
 import { isAddress } from "@ethersproject/address";
@@ -108,50 +108,39 @@ export class Context {
 
   private setNetworkDefaults() {
     const networkName = this.network.name as SupportedNetworks;
-    if (WEB3_NODES[networkName] && WEB3_NODES[networkName].length) {
-      if (!this.overriden.web3Nodes) {
-        this.state.web3Providers = Context.resolveWeb3Providers(
-          WEB3_NODES[networkName],
-          this.state.network,
-        );
-      }
-    } else {
+    if (
+      !WEB3_ENDPOINTS[networkName]?.length ||
+      !GRAPHQL_NODES[networkName]?.length || !IPFS_NODES[networkName]?.length ||
+      !LIVE_CONTRACTS[networkName]
+    ) {
       throw new UnsupportedNetworkError(networkName);
     }
-
-    if (GRAPHQL_NODES[networkName] && GRAPHQL_NODES[networkName].length) {
-      if (!this.overriden.graphqlNodes) {
-        this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
-      }
-    } else {
-      throw new UnsupportedNetworkError(networkName);
+    if (!this.overriden.web3Nodes) {
+      this.state.web3Providers = Context.resolveWeb3Providers(
+        WEB3_ENDPOINTS[networkName],
+        this.state.network,
+      );
     }
 
-    if (IPFS_NODES[networkName] && IPFS_NODES[networkName].length) {
-      if (
-        !this.overriden.ipfsNodes
-      ) {
-        this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
-      }
-    } else {
-      throw new UnsupportedNetworkError(networkName);
+    if (!this.overriden.graphqlNodes) {
+      this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
     }
 
-    if (LIVE_CONTRACTS[networkName]) {
-      if (!this.overriden.daoFactoryAddress) {
-        this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
-      }
-      if (!this.overriden.ensRegistryAddress) {
-        let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
-        if (!ensRegistry) {
-          ensRegistry = this.network.ensAddress;
-        }
-        this.state.ensRegistryAddress = ensRegistry;
-      }
-    } else {
-      throw new UnsupportedNetworkError(networkName);
+    if (!this.overriden.ipfsNodes) {
+      this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
     }
 
+    if (!this.overriden.daoFactoryAddress) {
+      this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
+    }
+
+    if (!this.overriden.ensRegistryAddress) {
+      let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
+      if (!ensRegistry) {
+        ensRegistry = this.network.ensAddress;
+      }
+      this.state.ensRegistryAddress = ensRegistry;
+    }
     if (!this.overriden.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
     }

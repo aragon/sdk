@@ -16,6 +16,9 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## UPCOMING
+## 1.2.0
+### Added
+- Adds new common error classes `InvalidContractAddressError` `InvalidContractAbiError` `CannotEstimateGasError`
 ### Removed
 - Removes unused constants `modules/common/src/constants.ts`
 ## 1.1.1

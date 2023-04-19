@@ -21,8 +21,7 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
   resources: [],
 };
 
-// TODO change rpcs to aragon ones
-export const WEB3_NODES: { [K in SupportedNetworks]: string[] } = {
+export const WEB3_ENDPOINTS: { [K in SupportedNetworks]: string[] } = {
   homestead: ["https://mainnet.eth.aragon.network", "https://eth.llamarpc.com", "https://rpc.mevblocker.io"],
   goerli: ["https://endpoints.omniatech.io/v1/eth/goerli/public"],
   matic: ["https://polygon.llamarpc.com", "https://endpoints.omniatech.io/v1/matic/mainnet/public"],
@@ -31,7 +30,7 @@ export const WEB3_NODES: { [K in SupportedNetworks]: string[] } = {
 
 const getGraphqlNode = (netowrk: string): string => {
   return `https://subgraph.satsuma-prod.com/${
-    process.env.SATSUMA_API_KEY || ""
+    process.env.SATSUMA_API_KEY || "qHR2wGfc5RLi6"
   }/aragon/${netowrk}/api`;
 };
 
@@ -46,17 +45,17 @@ const IPFS_ENDPOINTS = {
   prod: [
     {
       url: "https://ipfs-0.aragon.network",
-      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "" },
+      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt" },
     },
     {
       url: "https://ipfs-1.aragon.network",
-      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "" },
+      headers: { "X-API-KEY": process.env.IPFS_API_KEY || "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt" },
     },
   ],
   test: [
     {
-      url: "https://testingipfs-0.aragon.network",
-      headers: { "X-API-KEY": process.env.IPFS_TEST_API_KEY || "" },
+      url: "https://testing-ipfs-0.aragon.network",
+      headers: { "X-API-KEY": process.env.IPFS_TEST_API_KEY || "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt" },
     },
   ],
 };
