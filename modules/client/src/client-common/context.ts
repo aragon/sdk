@@ -16,7 +16,6 @@ import {
   GRAPHQL_NODES,
   IPFS_NODES,
   LIVE_CONTRACTS,
-  WEB3_ENDPOINTS,
 } from "./constants";
 import { SupportedNetworks, SupportedNetworksArray } from "./interfaces/common";
 import { isAddress } from "@ethersproject/address";
@@ -25,7 +24,6 @@ export { ContextParams } from "./interfaces/context";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 type OverriddenState = {
-  web3Nodes: boolean;
   daoFactoryAddress: boolean;
   ensRegistryAddress: boolean;
   gasFeeEstimationFactor: boolean;
@@ -40,7 +38,6 @@ if (typeof process !== "undefined" && process.env?.TESTING) {
 export class Context {
   protected state: ContextState = {} as ContextState;
   protected overriden: OverriddenState = {
-    web3Nodes: false,
     daoFactoryAddress: false,
     ensRegistryAddress: false,
     gasFeeEstimationFactor: false,
@@ -80,7 +77,6 @@ export class Context {
         contextParams.web3Providers,
         this.state.network,
       );
-      this.overriden.web3Nodes = true;
     }
     if (contextParams.graphqlNodes?.length) {
       this.state.graphql = Context.resolveGraphql(contextParams.graphqlNodes);
@@ -109,17 +105,11 @@ export class Context {
   private setNetworkDefaults() {
     const networkName = this.network.name as SupportedNetworks;
     if (
-      !WEB3_ENDPOINTS[networkName]?.length ||
-      !GRAPHQL_NODES[networkName]?.length || !IPFS_NODES[networkName]?.length ||
+      !GRAPHQL_NODES[networkName]?.length ||
+      !IPFS_NODES[networkName]?.length ||
       !LIVE_CONTRACTS[networkName]
     ) {
       throw new UnsupportedNetworkError(networkName);
-    }
-    if (!this.overriden.web3Nodes) {
-      this.state.web3Providers = Context.resolveWeb3Providers(
-        WEB3_ENDPOINTS[networkName],
-        this.state.network,
-      );
     }
 
     if (!this.overriden.graphqlNodes) {
@@ -196,7 +186,7 @@ export class Context {
    * @public
    */
   get web3Providers(): JsonRpcProvider[] {
-    return this.state.web3Providers;
+    return this.state.web3Providers || []
   }
 
   /**

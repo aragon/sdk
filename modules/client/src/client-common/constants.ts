@@ -21,13 +21,6 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
   resources: [],
 };
 
-export const WEB3_ENDPOINTS: { [K in SupportedNetworks]: string[] } = {
-  homestead: ["https://mainnet.eth.aragon.network", "https://eth.llamarpc.com", "https://rpc.mevblocker.io"],
-  goerli: ["https://endpoints.omniatech.io/v1/eth/goerli/public"],
-  matic: ["https://polygon.llamarpc.com", "https://endpoints.omniatech.io/v1/matic/mainnet/public"],
-  maticmum: ["https://endpoints.omniatech.io/v1/matic/mumbai/public"],
-};
-
 const getGraphqlNode = (netowrk: string): string => {
   return `https://subgraph.satsuma-prod.com/${
     process.env.SATSUMA_API_KEY || "qHR2wGfc5RLi6"

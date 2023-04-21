@@ -8,11 +8,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 import { ADDRESS_ONE } from "../integration/constants";
-import {
-  GRAPHQL_NODES,
-  IPFS_NODES,
-  WEB3_ENDPOINTS,
-} from "../../src/client-common/constants";
+import { GRAPHQL_NODES, IPFS_NODES } from "../../src/client-common/constants";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
@@ -46,7 +42,7 @@ describe("Context instances", () => {
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.homestead.daoFactory);
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.homestead.length);
+    expect(context.web3Providers.length).toBe(0);
     expect(context.ipfs.length).toBe(IPFS_NODES.homestead.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.homestead.length);
     context.web3Providers.map((provider) => {
@@ -110,14 +106,17 @@ describe("Context instances", () => {
     expect(context.gasFeeEstimationFactor).toEqual(0.1);
   });
   it("Should create a context in goerli, update the network and update all the parameters automatically", () => {
-    const context = new Context({ network: "goerli" });
+    const context = new Context({
+      network: "goerli",
+      web3Providers: "https://eth-goerli.g.alchemy.com/v2/demo",
+    });
     expect(context).toBeInstanceOf(Context);
     expect(context.network.name).toBe("goerli");
     expect(context.network.chainId).toBe(5);
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.goerli.daoFactory);
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.goerli.length);
+    expect(context.web3Providers.length).toBe(1);
     expect(context.ipfs.length).toBe(IPFS_NODES.goerli.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.goerli.length);
     context.web3Providers.map((provider) => {
@@ -129,13 +128,13 @@ describe("Context instances", () => {
     context.graphql.map((graphqlClient) =>
       expect(graphqlClient).toBeInstanceOf(GraphQLClient)
     );
-    context.set({ network: "matic" });
+    context.set({ network: "matic", web3Providers: "https://polygon-rpc.com/" });
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
     expect(context.ensRegistryAddress).toBe(LIVE_CONTRACTS.matic.ensRegistry);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.matic.length);
+    expect(context.web3Providers.length).toBe(1);
     expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
     context.web3Providers.map((provider) => {
@@ -151,13 +150,13 @@ describe("Context instances", () => {
   it("Should create an empty context, update the network and update all the parameters automatically", () => {
     const context = new Context();
     expect(context).toBeInstanceOf(Context);
-    context.set({ network: "matic" });
+    context.set({ network: "matic", web3Providers: "https://polygon-rpc.com/" });
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
     expect(context.ensRegistryAddress).toBe(LIVE_CONTRACTS.matic.ensRegistry);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.matic.length);
+    expect(context.web3Providers.length).toBe(1);
     expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
     expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
     context.web3Providers.map((provider) => {
@@ -196,7 +195,7 @@ describe("Context instances", () => {
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
     expect(context.ensRegistryAddress).toBe(ADDRESS_ONE);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
-    expect(context.web3Providers.length).toBe(WEB3_ENDPOINTS.matic.length);
+    expect(context.web3Providers.length).toBe(0);
     expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
     expect(context.graphql.length).toBe(3);
     context.web3Providers.map((provider) => {

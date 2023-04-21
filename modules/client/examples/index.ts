@@ -46,16 +46,24 @@ export const contextParams: ContextParams = {
   signer: new Wallet("private-key"),
   // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
   // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
+  // By default we will use the one in the ethers-contract package
   daoFactoryAddress: "0x1234381072385710239847120734123847123",
+  // Pass the address of the ensRegistry, if its not provided, for mainnet and worli we will use the defualt ones
+  // For polygon and mumbai we will use the ones deployed by ourselves, you can check them here: https://github.com/aragon/core/blob/develop/active_contracts.json
+  ensRegistryAddress: "0x1234381072385710239847120734123847123",
   // Choose your Web3 provider: Cloudfare, Infura, Alchemy, etc.
+  // Remember to also change it if you change your network
   web3Providers: ["https://rpc.ankr.com/eth_goerli"],
+  // You can use our enpoints by leaving this field empty.
+  // They will point to the correct one depending on the network
   ipfsNodes: [
     {
       url: "https://testing-ipfs-0.aragon.network/api/v0",
       headers: { "X-API-KEY": IPFS_API_KEY || "" },
     },
   ],
-  // Don't change this line. This is how we connect your app to the Aragon subgraph.
+  // You can use our enpoints by leaving this field empty.
+  // They will point to the correct one depending on the network
   graphqlNodes: [
     {
       url: "https://subgraph.satsuma-prod.com/aragon/core-goerli/api",
@@ -72,4 +80,4 @@ Update the context with new parameters if you wish to throughout your app.
 
 context.set({ network: 1 });
 context.set({ signer: new Wallet("private key") }); // if you're using wagmi library, you can also get the signer through their [`useSigner` method](https://wagmi.sh/react/hooks/useSigner) inside a `useEffect` hook.
-context.setFull(contextParams);
+context.set(contextParams);
