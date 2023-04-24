@@ -22,13 +22,13 @@ import { context } from "../index";
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
-const SetAllowanceParams: SetAllowanceParams = {
+const setAllowanceParams: SetAllowanceParams = {
   spender: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
 };
 
-const steps = client.methods.setAllowance(SetAllowanceParams);
+const steps = client.methods.setAllowance(setAllowanceParams);
 
 for await (const step of steps) {
   try {
