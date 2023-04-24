@@ -46,24 +46,24 @@ export const contextParams: ContextParams = {
   signer: new Wallet("private-key"),
   // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
   // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
-  // By default we will use the one in the ethers-contract package
-  daoFactoryAddress: "0x1234381072385710239847120734123847123",
-  // Pass the address of the ensRegistry, if its not provided, for mainnet and worli we will use the defualt ones
-  // For polygon and mumbai we will use the ones deployed by ourselves, you can check them here: https://github.com/aragon/core/blob/develop/active_contracts.json
+  // Optional. Leave it empty to use Aragon's DAO Factory contract and claim a dao.eth subdomain
+  daoFactoryAddress: "0x1234381072385710239847120734123847123", 
+  // Optional. Pass the address of the ensRegistry for networks other than Mainnet or Goerli. 
+  // It will default to the registry deployed by Aragon. You can check them here: https://github.com/aragon/osx/blob/develop/active_contracts.json
   ensRegistryAddress: "0x1234381072385710239847120734123847123",
   // Choose your Web3 provider: Cloudfare, Infura, Alchemy, etc.
-  // Remember to also change it if you change your network
-  web3Providers: ["https://rpc.ankr.com/eth_goerli"],
-  // You can use our enpoints by leaving this field empty.
-  // They will point to the correct one depending on the network
+  // Remember to change the list of providers if a different network is selected
+  web3Providers: ["https://rpc.ankr.com/eth_goerli"],  
+  // Optional. By default, it will use Aragon's provided endpoints. 
+  // They will switch depending on the network (production, development)
   ipfsNodes: [
     {
       url: "https://testing-ipfs-0.aragon.network/api/v0",
       headers: { "X-API-KEY": IPFS_API_KEY || "" },
     },
   ],
-  // You can use our enpoints by leaving this field empty.
-  // They will point to the correct one depending on the network
+  // Optional. By default it will use Aragon's provided endpoints.
+  // They will switch depending on the network (production, development)
   graphqlNodes: [
     {
       url: "https://subgraph.satsuma-prod.com/aragon/core-goerli/api",
@@ -71,8 +71,17 @@ export const contextParams: ContextParams = {
   ],
 };
 
+// Bare minimoum context that will use de default values
+const minimalContextParams:ContextParams =  {
+  network: 'mainnet',
+  web3Providers: 'https://example.com/your_mainnet_rpc',
+  signer: new Wallet('private-key')
+}
+
 // Instantiate the Aragon SDK context
 export const context: Context = new Context(contextParams);
+// Instantiate the Aragon SDK context
+export const minimalContext: Context = new Context(minimalContextParams);
 
 /* MARKDOWN
 Update the context with new parameters if you wish to throughout your app.
