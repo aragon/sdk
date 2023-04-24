@@ -33,12 +33,12 @@ const wrappedTokenAddress = "0x1234567890123456789012345678901234567890";
 const tokenAddress = "0x2345678901234567890123456789012345678901";
 
 // must give the wrapped token contract allowance to wrap the tokens
-const updateAllowanceSteps = client.methods.setAllowance({
+const setAllowanceSteps = client.methods.setAllowance({
   amount,
   spender: wrappedTokenAddress,
   tokenAddress,
 });
-for await (const step of updateAllowanceSteps) {
+for await (const step of setAllowanceSteps) {
   try {
     switch (step.key) {
       case SetAllowanceSteps.SETTING_ALLOWANCE:
