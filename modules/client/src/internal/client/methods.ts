@@ -25,6 +25,7 @@ import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryDao,
   QueryDaos,
+  QueryPlugins,
   QueryTokenBalances,
   QueryTokenTransfers,
 } from "../graphql-queries";
@@ -47,17 +48,23 @@ import {
   IHasPermissionParams,
   ITransferQueryParams,
   PermissionIds,
+  PluginQueryParams,
+  PluginRepo,
+  PluginRepoRelease,
+  PluginRepoReleaseMetadata,
+  PluginSortBy,
   SetAllowanceParams,
   SetAllowanceSteps,
+  SetAllowanceStepValue,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
+  SubgraphPluginRepoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
   TokenType,
   Transfer,
   TransferSortBy,
-  SetAllowanceStepValue,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -69,6 +76,8 @@ import {
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
+  toPluginRepo,
+  toPluginRepoRelease,
   toTokenTransfer,
   unwrapDepositParams,
 } from "../utils";
@@ -77,8 +86,11 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
 import {
   EMPTY_DAO_METADATA_LINK,
+  EMPTY_RELEASE_METADATA_LINK,
   UNAVAILABLE_DAO_METADATA,
+  UNAVAILABLE_RELEASE_METADATA,
   UNSUPPORTED_DAO_METADATA_LINK,
+  UNSUPPORTED_RELEASE_METADATA_LINK,
 } from "../constants";
 
 /**
@@ -622,6 +634,64 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       tokenTransfers.map(
         (transfer: SubgraphTransferListItem): Transfer =>
           toTokenTransfer(transfer),
+      ),
+    );
+  }
+
+  public async getPlugins({
+    limit = 10,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = PluginSortBy.SUBDOMAIN,
+    subdomain,
+  }: PluginQueryParams): Promise<PluginRepo[]> {
+    let where = {};
+    if (subdomain) {
+      where = { subdomain_contains_nocase: subdomain };
+    }
+    const query = QueryPlugins;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "plugin repos";
+    type T = { pluginRepos: SubgraphPluginRepoListItem[] };
+    const { pluginRepos } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
+    return Promise.all(
+      pluginRepos.map(
+        async (pluginRepo: SubgraphPluginRepoListItem): Promise<PluginRepo> => {
+          let pluginRepoReleases: PluginRepoRelease[] = [];
+          for (const release of pluginRepo.releases) {
+            let metadata: PluginRepoReleaseMetadata;
+            if (!release.metadata) {
+              metadata = EMPTY_RELEASE_METADATA_LINK;
+            } else {
+              try {
+                const metadataCid = resolveIpfsCid(release.metadata);
+                const stringMetadata = await this.ipfs.fetchString(metadataCid);
+                const resolvedMetadata = JSON.parse(stringMetadata);
+                metadata = resolvedMetadata;
+              } catch (err) {
+                if (err instanceof InvalidCidError) {
+                  metadata = UNSUPPORTED_RELEASE_METADATA_LINK;
+                }
+                metadata = UNAVAILABLE_RELEASE_METADATA;
+              }
+            }
+            pluginRepoReleases = [
+              ...pluginRepoReleases,
+              toPluginRepoRelease(release, metadata),
+            ];
+          }
+          return toPluginRepo(pluginRepo, pluginRepoReleases);
+        },
       ),
     );
   }

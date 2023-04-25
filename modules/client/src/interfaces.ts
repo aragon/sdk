@@ -41,6 +41,8 @@ export interface IClientMethods extends IClientCore {
   getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
   /** Retrieves metadata for many daos */
   getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
+  /** Retrieves metadata for many daos */
+  getPlugins: (params: PluginQueryParams) => Promise<PluginRepo[]>;
 }
 
 export interface IClientEncoding extends IClientCore {
@@ -523,3 +525,44 @@ export type ContractPermissionWithConditionParams = [
   string,
 ];
 export type ContractWithdrawParams = [string, string, BigNumber, string];
+
+export enum PluginSortBy {
+  SUBDOMAIN = "subdomain",
+}
+
+export type PluginQueryParams = Pagination & {
+  sortBy?: PluginSortBy;
+  subdomain?: string;
+};
+
+export type SubgraphPluginRepoReleaseListItem = {
+  release: number;
+  metadata: string;
+  builds: {
+    build: number;
+  }[];
+};
+
+export type SubgraphPluginRepoListItem = {
+  id: string;
+  subdomain: string;
+  releases: SubgraphPluginRepoReleaseListItem[];
+};
+
+export type PluginRepoReleaseMetadata = {
+  name: string;
+  description: string;
+  images: Object; // TODO specify parameters
+};
+
+export type PluginRepoRelease = {
+  release: number;
+  metadata: PluginRepoReleaseMetadata;
+  builds: number[];
+};
+
+export type PluginRepo = {
+  address: string;
+  subdomain: string;
+  releases: PluginRepoRelease[];
+};

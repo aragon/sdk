@@ -44,9 +44,12 @@ import { MissingExecPermissionError } from "@aragon/sdk-common";
 import { Server } from "ganache";
 import {
   AssetBalanceSortBy,
+  PluginQueryParams,
+  PluginSortBy,
   SetAllowanceSteps,
   SubgraphBalance,
   SubgraphDao,
+  SubgraphPluginRepoListItem,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "../../../src/interfaces";
@@ -976,6 +979,74 @@ describe("Client", () => {
             }
           }
         });
+      });
+      it("Should get a DAO's metadata with a specific address", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+        const defaultCatImplementation = mockedIPFSClient.cat
+          .getMockImplementation();
+
+        mockedIPFSClient.cat.mockResolvedValue(
+          Buffer.from(
+            JSON.stringify({
+              name: "Name",
+              description: "Description",
+              images: {},
+            }),
+          ),
+        );
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const address = "0x1234567890123456789012345678901234567890";
+        const pluginRepo: SubgraphPluginRepoListItem = {
+          id: address,
+          subdomain: "test",
+          releases: [
+            {
+              release: 1,
+              metadata: `ipfs://${IPFS_CID}`,
+              builds: [
+                {
+                  build: 1,
+                },
+                {
+                  build: 2,
+                },
+              ],
+            },
+            {
+              release: 2,
+              metadata: `ipfs://${IPFS_CID}`,
+              builds: [
+                {
+                  build: 1,
+                },
+              ],
+            },
+          ],
+        };
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepos: [pluginRepo],
+        });
+
+        const params: PluginQueryParams = {
+          limit: 10,
+          skip: 0,
+          direction: SortDirection.ASC,
+          sortBy: PluginSortBy.SUBDOMAIN,
+        };
+
+        const plugins = await client.methods.getPlugins(params);
+        expect(plugins.length).toBe(1);
+        expect(plugins[0].releases.length).toBe(2);
+        expect(plugins[0].releases[0].release).toBe(1);
+        expect(plugins[0].releases[0].metadata.name).toBe("Name");
+        expect(plugins[0].releases[0].metadata.description).toBe("Description");
+        expect(plugins[0].releases[0].builds.length).toBe(2);
+        expect(plugins[0].releases[0].builds[0]).toBe(1);
+        mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
       });
 
       test.todo(

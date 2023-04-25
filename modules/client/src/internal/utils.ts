@@ -15,10 +15,15 @@ import {
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
   PermissionIds,
+  PluginRepo,
+  PluginRepoRelease,
+  PluginRepoReleaseMetadata,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
   SubgraphPluginListItem,
+  SubgraphPluginRepoListItem,
+  SubgraphPluginRepoReleaseListItem,
   SubgraphTransferListItem,
   SubgraphTransferType,
   TokenType,
@@ -229,6 +234,28 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
       proposalId: transfer.proposal?.id || "",
     };
   }
+}
+
+export function toPluginRepoRelease(
+  release: SubgraphPluginRepoReleaseListItem,
+  metadata: PluginRepoReleaseMetadata,
+): PluginRepoRelease {
+  return {
+    release: release.release,
+    builds: release.builds.map((build) => build.build),
+    metadata,
+  };
+}
+
+export function toPluginRepo(
+  pluginRepo: SubgraphPluginRepoListItem,
+  releases: PluginRepoRelease[]
+): PluginRepo {
+  return {
+    address: pluginRepo.id,
+    subdomain: pluginRepo.subdomain,
+    releases,
+  };
 }
 
 export function applyInstallatonParamsToContract(
