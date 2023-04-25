@@ -5,6 +5,7 @@ import {
   Context,
   CreateDaoParams,
   DaoCreationSteps,
+  ITokenVotingPluginInstall,
   MultisigClient,
   TokenVotingClient,
   VotingMode,
@@ -60,13 +61,66 @@ export async function buildTokenVotingDAO(
 ) {
   const client = new Client(new Context(contextParamsLocalChain));
 
+  const pluginInstallParams: ITokenVotingPluginInstall = {
+    votingSettings: {
+      minDuration: 60 * 60,
+      minParticipation: 0.5,
+      supportThreshold: 0.5,
+      minProposerVotingPower: BigInt(0),
+      votingMode,
+    },
+    newToken: {
+      balances: [{ address: TEST_WALLET_ADDRESS, balance: BigInt(100) }],
+      name: "Test Token",
+      symbol: "TTK",
+      decimals: 18,
+    },
+  };
+  const pluginInstallItem = TokenVotingClient.encoding
+    .getPluginInstallItem(pluginInstallParams);
+
+  const createDaoParams: CreateDaoParams = {
+    ensSubdomain: "teting-" + Math.random().toString().slice(2),
+    metadataUri: "ipfs://",
+    plugins: [
+      {
+        id: pluginRepoAddress, // TODO: Rename
+        data: pluginInstallItem.data,
+      },
+    ],
+    daoUri: "https://",
+    trustedForwarder: AddressZero,
+  };
+  for await (
+    const step of client.methods.createDao(createDaoParams)
+  ) {
+    switch (step.key) {
+      case DaoCreationSteps.CREATING:
+        break;
+      case DaoCreationSteps.DONE:
+        return {
+          dao: step.address,
+          plugin: step.pluginAddresses[0],
+        };
+    }
+  }
+  throw new Error("DAO not created");
+}
+export async function buildExistingTokenVotingDAO(
+  pluginRepoAddress: string,
+  tokenAddress: string,
+  votingMode: VotingMode = VotingMode.STANDARD,
+) {
+  const client = new Client(new Context(contextParamsLocalChain));
+
   const pluginInstallItem = TokenVotingClient.encoding
     .getPluginInstallItem({
-      newToken: {
-        balances: [{ address: TEST_WALLET_ADDRESS, balance: BigInt(100) }],
-        name: "Test Token",
-        symbol: "TTK",
-        decimals: 18,
+      useToken: {
+        wrappedToken: {
+          name: "Wrapped Test Token",
+          symbol: "WTTK",
+        },
+        tokenAddress,
       },
       votingSettings: {
         minDuration: 60 * 60,

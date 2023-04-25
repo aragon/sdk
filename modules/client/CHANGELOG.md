@@ -13,6 +13,23 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.5.0]
+### Added
+- Add `wrapTokens` and `unwrapTokens` functions to support token contract without support for snapshots
+- `Context.network` type changes from `Networkish` to `Network`
+- Context and ContextPlugin now automatically use the environment settings by default (depending on the ETH network) when no values are provided
+### Changed
+- `ExistingTokenParams` now requieres `name` and `symbol` properties
+- `client.methods.updateAllowance` is now `client.methods.setAllowance`
+  - `setAllowance` does not check if the current allowance is higher than the new allowance, it just sets the allowance to a new value
+  - The mentioned check is done in the deposit method
+  - The `daoAddressOrEns` parameter was renamed to `spender`
+  - `UpdateAllowanceParams` was renamed to `SetAllowanceParams`
+  - `SetAllowance` now has `SetAllowanceSteps` outside `DaoDEpositSteps`, check examples
+  - `UPDATING_ALLOWANCE` is renamed to `SETTING_ALLOWANCE`
+  - `UPDATED_ALLOWANCE` is renamed to `ALLOWANCE_SET`
+- Removed `daoRegistry` from the context because it wasn't being used
+- Removed `pluginRepoRegistry` from the context because it wasn't being used
 ## [1.4.2]
 ### Added
 - Property `votes` to majority voting `proposalListItem`
@@ -22,12 +39,8 @@ TEMPLATE:
 - Fix `Status.DEFEATED` filter
 - Error handling if ENS cannot be resolved.
 - Renames `mainnet` to `homestead` in `LIVE_CONTRACTS`.
-- `Context.network` type changes from `Networkish` to `Network`
-- Context and ContextPlugin now automatically use the environment settings by default (depending on the ETH network) when no values are provided
 ### Changed
 - Uses `earlyExecuted` for proposal state calculation in Addresslistvoting and Tokenvoting.
-- Removed `daoRegistry` from the context because it wasn't being used
-- Removed `pluginRepoRegistry` from the context because it wasn't being used
 ## [1.4.1]
 ## Fixed
 - Amending the type in subgraph's `minApprovals`

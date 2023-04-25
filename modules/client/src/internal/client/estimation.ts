@@ -19,7 +19,7 @@ import {
   DepositParams,
   IClientEstimation,
   TokenType,
-  UpdateAllowanceParams,
+  SetAllowanceParams,
 } from "../../interfaces";
 import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";
@@ -128,12 +128,12 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
   /**
    * Estimates the gas fee of updating the allowance of an ERC20 token
    *
-   * @param {UpdateAllowanceParams} _params
+   * @param {SetAllowanceParams} _params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
-  public async updateAllowance(
-    params: UpdateAllowanceParams,
+  public async setAllowance(
+    params: SetAllowanceParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -145,7 +145,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     }
 
     // resolve ens
-    let daoAddress = params.daoAddressOrEns;
+    let daoAddress = params.spender;
     if (!isAddress(daoAddress)) {
       await this.web3.ensureOnline();
       const provider = this.web3.getProvider();

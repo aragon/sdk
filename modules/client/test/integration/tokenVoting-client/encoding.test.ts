@@ -11,7 +11,6 @@ import {
   VotingSettings,
 } from "../../../src";
 
-import { AddressZero } from "@ethersproject/constants";
 import { InvalidAddressError } from "@aragon/sdk-common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 
@@ -32,8 +31,11 @@ describe("Token Voting Client", () => {
           minParticipation: 0.5,
           supportThreshold: 0.5,
         },
-        useToken: {
-          address: AddressZero,
+        newToken: {
+          name: "Test Token",
+          symbol: "TTK",
+          balances: [],
+          decimals: 18
         },
       };
       const tokenVotingInstallPluginItem = TokenVotingClient.encoding

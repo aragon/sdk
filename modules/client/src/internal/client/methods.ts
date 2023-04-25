@@ -47,6 +47,8 @@ import {
   IHasPermissionParams,
   ITransferQueryParams,
   PermissionIds,
+  SetAllowanceParams,
+  SetAllowanceSteps,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
@@ -55,8 +57,7 @@ import {
   TokenType,
   Transfer,
   TransferSortBy,
-  UpdateAllowanceParams,
-  UpdateAllowanceStepValue,
+  SetAllowanceStepValue,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -255,15 +256,32 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     );
 
     if (tokenAddress && tokenAddress !== AddressZero) {
-      // If the target is an ERC20 token, ensure that the amount can be transferred
-      // Relay the yield steps to the caller as they are received
-      yield* this.updateAllowance(
-        {
-          amount: params.amount,
-          daoAddressOrEns: daoAddress,
-          tokenAddress,
-        },
+      // check current allowance
+      const tokenInstance = new Contract(
+        tokenAddress,
+        erc20ContractAbi,
+        signer,
       );
+      const currentAllowance = await tokenInstance.allowance(
+        await signer.getAddress(),
+        daoAddress,
+      );
+      yield {
+        key: DaoDepositSteps.CHECKED_ALLOWANCE,
+        allowance: currentAllowance.toBigInt(),
+      };
+      // if its lower than the needed, set it to the correct one
+      if (currentAllowance.lt(params.amount)) {
+        // If the target is an ERC20 token, ensure that the amount can be transferred
+        // Relay the yield steps to the caller as they are received
+        yield* this.setAllowance(
+          {
+            amount: params.amount,
+            spender: daoAddress,
+            tokenAddress,
+          },
+        );
+      }
     }
 
     // Doing the transfer
@@ -304,13 +322,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Checks if the allowance is enough and updates it
    *
-   * @param {UpdateAllowanceParams} params
-   * @return {*}  {AsyncGenerator<UpdateAllowanceStepValue>}
+   * @param {SetAllowanceParams} params
+   * @return {*}  {AsyncGenerator<SetAllowanceStepValue>}
    * @memberof ClientMethods
    */
-  public async *updateAllowance(
-    params: UpdateAllowanceParams,
-  ): AsyncGenerator<UpdateAllowanceStepValue> {
+  public async *setAllowance(
+    params: SetAllowanceParams,
+  ): AsyncGenerator<SetAllowanceStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new NoSignerError();
@@ -319,32 +337,18 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
     // TODO
     // add params check with yup
-
     const tokenInstance = new Contract(
       params.tokenAddress,
       erc20ContractAbi,
       signer,
     );
-
-    const currentAllowance = await tokenInstance.allowance(
-      await signer.getAddress(),
-      params.daoAddressOrEns,
-    );
-
-    yield {
-      key: DaoDepositSteps.CHECKED_ALLOWANCE,
-      allowance: currentAllowance.toBigInt(),
-    };
-
-    if (currentAllowance.gte(params.amount)) return;
-
     const tx: ContractTransaction = await tokenInstance.approve(
-      params.daoAddressOrEns,
-      BigNumber.from(params.amount),
+      params.spender,
+      params.amount,
     );
 
     yield {
-      key: DaoDepositSteps.UPDATING_ALLOWANCE,
+      key: SetAllowanceSteps.SETTING_ALLOWANCE,
       txHash: tx.hash,
     };
 
@@ -360,7 +364,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
 
     yield {
-      key: DaoDepositSteps.UPDATED_ALLOWANCE,
+      key: SetAllowanceSteps.ALLOWANCE_SET,
       allowance: params.amount,
     };
   }

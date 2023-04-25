@@ -31,9 +31,9 @@ export interface IClientMethods extends IClientCore {
     params: DepositParams,
   ) => AsyncGenerator<DaoDepositStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
-  updateAllowance: (
-    params: UpdateAllowanceParams,
-  ) => AsyncGenerator<UpdateAllowanceStepValue>;
+  setAllowance: (
+    params: SetAllowanceParams,
+  ) => AsyncGenerator<SetAllowanceStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
   getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
   /** Retrieves metadata for many daos */
@@ -117,7 +117,7 @@ export interface IClientEstimation {
   deposit: (
     params: DepositParams,
   ) => Promise<GasFeeEstimation>;
-  updateAllowance: (params: UpdateAllowanceParams) => Promise<GasFeeEstimation>;
+  setAllowance: (params: SetAllowanceParams) => Promise<GasFeeEstimation>;
 }
 
 export interface IClient {
@@ -258,26 +258,30 @@ export type DepositErc20Params = DepositBaseParams & {
 
 export type DepositParams = DepositEthParams | DepositErc20Params; // | DepositErc721Params;
 
-export type UpdateAllowanceParams = {
-  daoAddressOrEns: string;
+export type SetAllowanceParams = {
+  spender: string;
   amount: bigint;
   tokenAddress: string;
 };
 
 export enum DaoDepositSteps {
   CHECKED_ALLOWANCE = "checkedAllowance",
-  UPDATING_ALLOWANCE = "updatingAllowance",
-  UPDATED_ALLOWANCE = "updatedAllowance",
   DEPOSITING = "depositing",
   DONE = "done",
 }
-export type UpdateAllowanceStepValue =
-  | { key: DaoDepositSteps.CHECKED_ALLOWANCE; allowance: bigint }
-  | { key: DaoDepositSteps.UPDATING_ALLOWANCE; txHash: string }
-  | { key: DaoDepositSteps.UPDATED_ALLOWANCE; allowance: bigint };
+
+export enum SetAllowanceSteps {
+  SETTING_ALLOWANCE = "settingAllowance",
+  ALLOWANCE_SET = "allowanceSet",
+}
+
+export type SetAllowanceStepValue =
+  | { key: SetAllowanceSteps.SETTING_ALLOWANCE; txHash: string }
+  | { key: SetAllowanceSteps.ALLOWANCE_SET; allowance: bigint };
 
 export type DaoDepositStepValue =
-  | UpdateAllowanceStepValue
+  | SetAllowanceStepValue
+  | { key: DaoDepositSteps.CHECKED_ALLOWANCE; allowance: bigint }
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | { key: DaoDepositSteps.DONE; amount: bigint };
 

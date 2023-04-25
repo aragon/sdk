@@ -14,32 +14,29 @@ This function updates the allowance approval to the amount specified.
 
 import {
   Client,
-  DaoDepositSteps,
-  UpdateAllowanceParams,
+  SetAllowanceParams,
+  SetAllowanceSteps,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
-const updateAllowanceParams: UpdateAllowanceParams = {
-  daoAddressOrEns: "0x1234567890123456789012345678901234567890",
+const setAllowanceParams: SetAllowanceParams = {
+  spender: "0x1234567890123456789012345678901234567890",
   amount: BigInt(10), // amount
   tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
 };
 
-const steps = client.methods.updateAllowance(updateAllowanceParams);
+const steps = client.methods.setAllowance(setAllowanceParams);
 
 for await (const step of steps) {
   try {
     switch (step.key) {
-      case DaoDepositSteps.CHECKED_ALLOWANCE:
-        console.log({ checkedAllowance: step.allowance });
-        break;
-      case DaoDepositSteps.UPDATING_ALLOWANCE:
+      case SetAllowanceSteps.SETTING_ALLOWANCE:
         console.log({ updateAllowanceTxHash: step.txHash });
         break;
-      case DaoDepositSteps.UPDATED_ALLOWANCE:
+      case SetAllowanceSteps.ALLOWANCE_SET:
         console.log({ updatedAllowance: step.allowance });
         break;
     }

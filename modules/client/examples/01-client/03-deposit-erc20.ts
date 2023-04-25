@@ -18,6 +18,7 @@ import {
   DaoDepositSteps,
   DepositParams,
   GasFeeEstimation,
+  SetAllowanceSteps,
   TokenType,
 } from "@aragon/sdk-client";
 import { context } from "../index";
@@ -46,10 +47,10 @@ for await (const step of steps) {
       case DaoDepositSteps.CHECKED_ALLOWANCE:
         console.log({ checkedAllowance: step.allowance });
         break;
-      case DaoDepositSteps.UPDATING_ALLOWANCE:
+      case SetAllowanceSteps.SETTING_ALLOWANCE:
         console.log({ updateAllowanceTxHash: step.txHash });
         break;
-      case DaoDepositSteps.UPDATED_ALLOWANCE:
+      case SetAllowanceSteps.ALLOWANCE_SET:
         console.log({ updatedAllowance: step.allowance });
         break;
       case DaoDepositSteps.DEPOSITING:
