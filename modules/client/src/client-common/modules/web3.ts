@@ -1,131 +1,68 @@
 import { Context } from "../../client-common/context";
-import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { isAddress } from "@ethersproject/address";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { Signer } from "@ethersproject/abstract-signer";
 import { GasFeeEstimation } from "../../client-common/interfaces/common";
 import { IClientWeb3Core } from "../interfaces/core";
 import {
+  CannotEstimateGasError,
+  InvalidAddressError,
+  InvalidContractAbiError,
   NoDaoFactory,
-  NoPluginRepoRegistry,
-  NoDaoRegistry,
+  NoNodesAvailableError,
+  NoProviderError,
+  NoSignerError,
 } from "@aragon/sdk-common";
-
-const daoFactoryAddressMap = new Map<Web3Module, string>();
-const daoRegistryAddressMap = new Map<Web3Module, string>();
-const pluginRepoRegistryAddressMap = new Map<Web3Module, string>();
-const gasFeeEstimationFactorMap = new Map<Web3Module, number>();
-const providersMap = new Map<Web3Module, JsonRpcProvider[]>();
-const providerIdxMap = new Map<Web3Module, number>();
-const signerMap = new Map<Web3Module, Signer>();
-
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
+  private providerIdx: number = -1;
+  private context: Context;
 
   constructor(context: Context) {
-    providerIdxMap.set(this, -1);
-    // Storing client data in the private module's scope to prevent external mutation
-    if (context.web3Providers) {
-      providersMap.set(this, context.web3Providers);
-      providerIdxMap.set(this, 0);
-    }
-
-    if (context.signer) {
-      this.useSigner(context.signer);
-    }
-
-    if (context.daoFactoryAddress) {
-      daoFactoryAddressMap.set(this, context.daoFactoryAddress);
-    }
-
-    if (context.daoRegistryAddress) {
-      daoRegistryAddressMap.set(this, context.daoRegistryAddress);
-    }
-
-    if (context.pluginRepoRegistryAddress) {
-      pluginRepoRegistryAddressMap.set(this, context.pluginRepoRegistryAddress);
-    }
-
-    if (context.gasFeeEstimationFactor) {
-      gasFeeEstimationFactorMap.set(this, context.gasFeeEstimationFactor);
-    }
-    Object.freeze(Web3Module.prototype);
-    Object.freeze(this);
-  }
-
-  private get daoFactoryAddress(): string {
-    return daoFactoryAddressMap.get(this) || "";
-  }
-  private get daoRegistryAddress(): string {
-    return daoRegistryAddressMap.get(this) || "";
-  }
-  private get pluginRepoRegistryAddress(): string {
-    return pluginRepoRegistryAddressMap.get(this) || "";
-  }
-  private get gasFeeEstimationFactor(): number {
-    return gasFeeEstimationFactorMap.get(this) || 1;
-  }
-  private get providers(): JsonRpcProvider[] {
-    return providersMap.get(this) || [];
-  }
-  private get providerIdx(): number {
-    return providerIdxMap.get(this)!;
-  }
-  private get signer(): Signer | undefined {
-    return signerMap.get(this);
-  }
-
-  /** Replaces the current signer by the given one */
-  public useSigner(signer: Signer): void {
-    if (!signer) {
-      throw new Error("Empty wallet or signer");
-    }
-    signerMap.set(this, signer);
+    this.context = context;
+    this.providerIdx = Math.floor(Math.random() * context.web3Providers.length);
   }
 
   /** Starts using the next available Web3 provider */
   public shiftProvider(): void {
-    if (!this.providers.length) {
-      throw new Error("No endpoints");
-    } else if (this.providers.length <= 1) {
-      throw new Error("No other endpoints");
+    if (!this.context.web3Providers.length) {
+      throw new NoProviderError();
+    } else if (this.context.web3Providers.length <= 1) {
+      throw new NoNodesAvailableError("web3");
     }
-    providerIdxMap.set(this, (this.providerIdx + 1) % this.providers.length);
+    this.providerIdx = (this.providerIdx + 1) %
+      this.context.web3Providers.length;
   }
 
   /** Retrieves the current signer */
-  public getSigner(): Signer | null {
-    return this.signer || null;
+  public getSigner(): Signer {
+    if (!this.context.signer) {
+      throw new NoSignerError();
+    }
+    return this.context.signer;
+  }
+  /** Returns the currently active network provider */
+  public getProvider(): JsonRpcProvider {
+    if (!this.context.web3Providers[this.providerIdx]) {
+      throw new NoProviderError();
+    }
+    return this.context.web3Providers[this.providerIdx];
   }
 
   /** Returns a signer connected to the current network provider */
   public getConnectedSigner(): Signer {
     let signer = this.getSigner();
-    if (!signer) {
-      throw new Error("No signer");
-    } else if (!signer.provider && !this.getProvider()) {
-      throw new Error("No provider");
-    } else if (signer.provider) {
-      return signer;
+    if (!signer.provider) {
+      const provider = this.getProvider();
+      signer = signer.connect(provider);
     }
-
-    const provider = this.getProvider();
-    if (!provider) throw new Error("No provider");
-
-    signer = signer.connect(provider);
     return signer;
-  }
-
-  /** Returns the currently active network provider */
-  public getProvider(): JsonRpcProvider | null {
-    return this.providers[this.providerIdx] || null;
   }
 
   /** Returns whether the current provider is functional or not */
   public isUp(): Promise<boolean> {
     const provider = this.getProvider();
-    if (!provider) return Promise.reject(new Error("No provider"));
-
     return provider
       .getNetwork()
       .then(() => true)
@@ -133,16 +70,15 @@ export class Web3Module implements IClientWeb3Core {
   }
 
   public async ensureOnline(): Promise<void> {
-    if (!this.providers.length) {
-      return Promise.reject(new Error("No provider"));
+    if (!this.context.web3Providers.length) {
+      throw new NoProviderError();
     }
 
-    for (let i = 0; i < this.providers.length; i++) {
+    for (let i = 0; i < this.context.web3Providers.length; i++) {
       if (await this.isUp()) return;
-
       this.shiftProvider();
     }
-    throw new Error("No providers available");
+    throw new NoNodesAvailableError("web3");
   }
 
   /**
@@ -154,51 +90,34 @@ export class Web3Module implements IClientWeb3Core {
    */
   public attachContract<T>(
     address: string,
-    abi: ContractInterface
+    abi: ContractInterface,
   ): Contract & T {
-    if (!address) throw new Error("Invalid contract address");
-    else if (!abi) throw new Error("Invalid contract ABI");
-
-    const signer = this.getSigner();
-    if (!signer && !this.getProvider()) {
-      throw new Error("No signer");
-    }
-
-    const provider = this.getProvider();
-    if (!provider) throw new Error("No provider");
-
-    const contract = new Contract(address, abi, provider);
-
-    if (!signer) {
-      return contract as Contract & T;
-    } else if (signer instanceof Wallet) {
-      return contract.connect(signer.connect(provider)) as Contract & T;
-    }
-
-    return contract.connect(signer) as Contract & T;
+    if (!address || !isAddress(address)) throw new InvalidAddressError();
+    else if (!abi) throw new InvalidContractAbiError();
+    const signer = this.getConnectedSigner();
+    return new Contract(address, abi, signer) as Contract & T;
   }
 
   /** Calculates the expected maximum gas fee */
   public getMaxFeePerGas(): Promise<bigint> {
     return this.getConnectedSigner()
       .getFeeData()
-      .then(feeData => {
+      .then((feeData) => {
         if (!feeData.maxFeePerGas) {
-          return Promise.reject(new Error("Cannot estimate gas"));
+          throw new CannotEstimateGasError();
         }
         return feeData.maxFeePerGas.toBigInt();
       });
   }
 
   public getApproximateGasFee(estimatedFee: bigint): Promise<GasFeeEstimation> {
-    return this.getMaxFeePerGas().then(maxFeePerGas => {
+    return this.getMaxFeePerGas().then((maxFeePerGas) => {
       const max = estimatedFee * maxFeePerGas;
 
-      const factor =
-        this.gasFeeEstimationFactor * Web3Module.PRECISION_FACTOR_BASE;
+      const factor = this.context.gasFeeEstimationFactor *
+        Web3Module.PRECISION_FACTOR_BASE;
 
-      const average =
-        (max * BigInt(Math.trunc(factor))) /
+      const average = (max * BigInt(Math.trunc(factor))) /
         BigInt(Web3Module.PRECISION_FACTOR_BASE);
 
       return { average, max };
@@ -207,23 +126,9 @@ export class Web3Module implements IClientWeb3Core {
 
   /** Returns the current DAO factory address */
   public getDaoFactoryAddress(): string {
-    if (!this.daoFactoryAddress) {
+    if (!this.context.daoFactoryAddress) {
       throw new NoDaoFactory();
     }
-    return this.daoFactoryAddress;
-  }
-
-  public getPluginRepoRegistryAddress(): string {
-    if (!this.pluginRepoRegistryAddress) {
-      throw new NoPluginRepoRegistry();
-    }
-    return this.pluginRepoRegistryAddress;
-  }
-
-  public getDaoRegistry(): string {
-    if (!this.daoRegistryAddress) {
-      throw new NoDaoRegistry();
-    }
-    return this.daoRegistryAddress;
+    return this.context.daoFactoryAddress;
   }
 }

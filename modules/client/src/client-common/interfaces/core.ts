@@ -4,15 +4,14 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient, PinResponse } from "@aragon/sdk-ipfs";
-import { GasFeeEstimation } from "./common";
 import { GraphQLClient } from "graphql-request";
+import { GasFeeEstimation } from "./common";
 
 export interface IClientWeb3Core {
-  useSigner: (signer: Signer) => void;
   shiftProvider: () => void;
-  getSigner: () => Signer | null;
+  getSigner: () => Signer;
   getConnectedSigner: () => Signer;
-  getProvider: () => JsonRpcProvider | null;
+  getProvider: () => JsonRpcProvider;
   getMaxFeePerGas: () => Promise<bigint>;
   isUp: () => Promise<boolean>;
   ensureOnline: () => Promise<void>;
@@ -21,7 +20,6 @@ export interface IClientWeb3Core {
     abi: ContractInterface,
   ) => Contract & T;
   getDaoFactoryAddress: () => string;
-  getPluginRepoRegistryAddress: () => string;
   getApproximateGasFee: (estimatedFee: bigint) => Promise<GasFeeEstimation>;
 }
 export interface IClientIpfsCore {

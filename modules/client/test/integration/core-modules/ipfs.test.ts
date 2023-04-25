@@ -40,7 +40,7 @@ const contextParamsMainnet: ContextParams = {
 };
 
 // store cat implementation for when it gets overwritten
-const catImplementation = mockedIPFSClient.cat.getMockImplementation()
+const catImplementation = mockedIPFSClient.cat.getMockImplementation();
 
 describe("IPFS core module", () => {
   it("Should have an API token to test the proxy", () => {
@@ -108,32 +108,7 @@ describe("IPFS core module", () => {
 
     expect(isOnline).toEqual(true);
   });
-  it("Should fail when shifting an empty node list", async () => {
-    {
-      const context = new Context(
-        Object.assign({}, contextParamsMainnet, {
-          ipfsNodes: [],
-        }),
-      );
-      const client = new Client(context);
-      expect(() => {
-        client.ipfs.shiftClient();
-      }).toThrow();
-    }
-  });
   it("Should fail when an IPFS node is not working", async () => {
-    {
-      const context = new Context(
-        Object.assign({}, contextParamsMainnet, {
-          ipfsNodes: [],
-        }),
-      );
-      const client = new Client(context);
-      const isOnline = await client.ipfs.isUp();
-
-      expect(isOnline).toEqual(false);
-    }
-    {
       const context = new Context(contextParamsMainnet);
       const client = new Client(context);
 
@@ -141,6 +116,5 @@ describe("IPFS core module", () => {
       const isOnline = await client.ipfs.isUp();
 
       expect(isOnline).toEqual(false);
-    }
   });
 });

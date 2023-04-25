@@ -20,6 +20,7 @@ import {
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
+  SupportedNetworksArray,
   VoteProposalStep,
   VoteValues,
   VotingMode,
@@ -61,6 +62,10 @@ import {
 import { AddresslistVotingPluginPrepareInstallationParams } from "../../../src/addresslistVoting/interfaces";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client Address List", () => {
   let server: Server;
   let deployment: deployContracts.Deployment;
@@ -71,6 +76,7 @@ describe("Client Address List", () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    contextParamsLocalChain.ensRegistryAddress = deployment.ensRegistry.address;
     repoAddr = deployment.addresslistVotingRepo.address;
 
     if (Array.isArray(contextParamsLocalChain.web3Providers)) {
@@ -314,11 +320,6 @@ describe("Client Address List", () => {
 
   describe("Plugin installation", () => {
     it("Should prepare the installation of a token voting plugin", async () => {
-      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
-      networkSpy.mockReturnValueOnce({
-        name: "goerli",
-        chainId: 31337,
-      });
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
@@ -340,6 +341,13 @@ describe("Client Address List", () => {
           },
           daoAddressOrEns: dao,
         };
+      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
+      networkSpy.mockReturnValueOnce(
+        Promise.resolve({
+          name: "goerli",
+          chainId: 31337,
+        }),
+      );
       const steps = client.methods.prepareInstallation(installationParams);
       for await (const step of steps) {
         switch (step.key) {

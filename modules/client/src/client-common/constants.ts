@@ -21,6 +21,70 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
   resources: [],
 };
 
+const getGraphqlNode = (netowrk: SupportedNetworks): string => {
+  return `https://subgraph.satsuma-prod.com/${
+    process.env.SATSUMA_API_KEY || "qHR2wGfc5RLi6"
+  }/aragon/osx-${SupportedNetworksToGraphqlNetworks[netowrk]}/api`;
+};
+
+type GraphqlNetworks = "mainnet" | "goerli" | "polygon" | "mumbai";
+
+const SupportedNetworksToGraphqlNetworks: {
+  [K in SupportedNetworks]: GraphqlNetworks;
+} = {
+  homestead: "mainnet",
+  goerli: "goerli",
+  matic: "polygon",
+  maticmum: "mumbai",
+};
+
+export const GRAPHQL_NODES: { [K in SupportedNetworks]: { url: string }[] } = {
+  homestead: [{ url: getGraphqlNode("homestead") }],
+  goerli: [{ url: getGraphqlNode("goerli") }],
+  matic: [{ url: getGraphqlNode("matic") }],
+  maticmum: [{ url: getGraphqlNode("maticmum") }],
+};
+
+const IPFS_ENDPOINTS = {
+  prod: [
+    {
+      url: "https://ipfs-0.aragon.network",
+      headers: {
+        "X-API-KEY": process.env.IPFS_API_KEY ||
+          "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
+      },
+    },
+    {
+      url: "https://ipfs-1.aragon.network",
+      headers: {
+        "X-API-KEY": process.env.IPFS_API_KEY ||
+          "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
+      },
+    },
+  ],
+  test: [
+    {
+      url: "https://testing-ipfs-0.aragon.network",
+      headers: {
+        "X-API-KEY": process.env.IPFS_TEST_API_KEY ||
+          "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
+      },
+    },
+  ],
+};
+
+export const IPFS_NODES: {
+  [K in SupportedNetworks]: {
+    url: string;
+    headers?: Record<string, string> | undefined;
+  }[];
+} = {
+  homestead: IPFS_ENDPOINTS.prod,
+  goerli: IPFS_ENDPOINTS.test,
+  matic: IPFS_ENDPOINTS.prod,
+  maticmum: IPFS_ENDPOINTS.test,
+};
+
 export const LIVE_CONTRACTS: { [K in SupportedNetworks]: NetworkDeployment } = {
   homestead: {
     daoFactory: activeContractsList.mainnet.DAOFactory,

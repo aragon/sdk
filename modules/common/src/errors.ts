@@ -153,3 +153,19 @@ export class DataDecodingError extends Error {
     super("Cannot decode data: " + message);
   }
 }
+
+export class InvalidContractAddressError extends Error {
+  constructor() {
+    super("Invalid contract address");
+  }
+}
+export class InvalidContractAbiError extends Error {
+  constructor() {
+    super("Invalid contract ABI");
+  }
+}
+export class CannotEstimateGasError extends Error {
+  constructor() {
+    super("Cannot estimate gas error");
+  }
+}

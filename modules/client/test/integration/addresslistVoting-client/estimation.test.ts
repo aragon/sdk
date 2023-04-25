@@ -10,6 +10,7 @@ import {
   ContextPlugin,
   CreateMajorityVotingProposalParams,
   IVoteProposalParams,
+  SupportedNetworksArray,
   VoteValues,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
@@ -17,6 +18,10 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client Address List", () => {
   describe("Estimation module", () => {
     let server: Server;
@@ -25,6 +30,8 @@ describe("Client Address List", () => {
       server = await ganacheSetup.start();
       const deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.ensRegistryAddress =
+        deployment.ensRegistry.address;
     });
 
     afterAll(async () => {

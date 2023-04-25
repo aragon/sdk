@@ -6,11 +6,20 @@ import {
   Context,
   ContextPlugin,
   IAddresslistVotingPluginInstall,
+  SupportedNetworksArray,
   VotingSettings,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
-import { contextParamsLocalChain } from "../constants";
+import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
+
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client Address List", () => {
+  beforeAll(() => {
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+  });
   describe("Action generators", () => {
     it("Should create an AddressList client and generate a install entry", async () => {
       const withdrawParams: IAddresslistVotingPluginInstall = {

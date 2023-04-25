@@ -22,6 +22,6 @@ Update the context with new parameters if you wish to throughout your app.
 
 contextPlugin.set({ network: 1 });
 contextPlugin.set({ signer: new Wallet("other private key") });
-contextPlugin.setFull(contextParams);
+contextPlugin.set(contextParams);
 
 console.log(contextPlugin);

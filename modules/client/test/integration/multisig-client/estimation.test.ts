@@ -10,11 +10,17 @@ import {
   ContextPlugin,
   CreateMultisigProposalParams,
   MultisigClient,
+  SupportedNetworksArray,
 } from "../../../src";
 import { contextParamsLocalChain, TEST_WALLET_ADDRESS } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
+
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 
 describe("Client Multisig", () => {
   describe("Estimation module", () => {
@@ -25,6 +31,8 @@ describe("Client Multisig", () => {
       server = await ganacheSetup.start();
       const deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.ensRegistryAddress =
+        deployment.ensRegistry.address;
       const daoCreation = await deployContracts.createMultisigDAO(
         deployment,
         "test-multisig-dao",

@@ -8,11 +8,24 @@ import {
   MultisigClient,
   MultisigPluginInstallParams,
   RemoveAddressesParams,
+  SupportedNetworksArray,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
-import { contextParamsLocalChain, TEST_INVALID_ADDRESS } from "../constants";
+import {
+  ADDRESS_ONE,
+  contextParamsLocalChain,
+  TEST_INVALID_ADDRESS,
+} from "../constants";
+
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 
 describe("Client Multisig", () => {
+  beforeAll(() => {
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+  });
   describe("Action generators", () => {
     it("Should create an a Multisig install entry", async () => {
       const members: string[] = [

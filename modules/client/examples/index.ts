@@ -43,19 +43,27 @@ export const contextParams: ContextParams = {
   // Choose the network you want to use. You can use "goerli" or "mumbai" for testing, "mainnet" for Ethereum.
   network: "goerli",
   // Depending on how you're configuring your wallet, you may want to pass in a `signer` object here.
-  signer: new Wallet("private-key"),
+  signer: Wallet.createRandom(),
   // Optional on "rinkeby", "arbitrum-rinkeby" or "mumbai"
   // Pass the address of the  `DaoFactory` contract you want to use. You can find it here based on your chain of choice: https://github.com/aragon/core/blob/develop/active_contracts.json
+  // Optional. Leave it empty to use Aragon's DAO Factory contract and claim a dao.eth subdomain
   daoFactoryAddress: "0x1234381072385710239847120734123847123",
+  // Optional. Pass the address of the ensRegistry for networks other than Mainnet or Goerli.
+  // It will default to the registry deployed by Aragon. You can check them here: https://github.com/aragon/osx/blob/develop/active_contracts.json
+  ensRegistryAddress: "0x1234381072385710239847120734123847123",
   // Choose your Web3 provider: Cloudfare, Infura, Alchemy, etc.
+  // Remember to change the list of providers if a different network is selected
   web3Providers: ["https://rpc.ankr.com/eth_goerli"],
+  // Optional. By default, it will use Aragon's provided endpoints.
+  // They will switch depending on the network (production, development)
   ipfsNodes: [
     {
       url: "https://testing-ipfs-0.aragon.network/api/v0",
       headers: { "X-API-KEY": IPFS_API_KEY || "" },
     },
   ],
-  // Don't change this line. This is how we connect your app to the Aragon subgraph.
+  // Optional. By default it will use Aragon's provided endpoints.
+  // They will switch depending on the network (production, development)
   graphqlNodes: [
     {
       url: "https://subgraph.satsuma-prod.com/aragon/core-goerli/api",
@@ -63,8 +71,17 @@ export const contextParams: ContextParams = {
   ],
 };
 
+// Bare minimoum context that will use de default values
+const minimalContextParams: ContextParams = {
+  network: "mainnet",
+  web3Providers: "https://eth.llamarpc.com",
+  signer: Wallet.createRandom(),
+};
+
 // Instantiate the Aragon SDK context
 export const context: Context = new Context(contextParams);
+// Instantiate the Aragon SDK context
+export const minimalContext: Context = new Context(minimalContextParams);
 
 /* MARKDOWN
 Update the context with new parameters if you wish to throughout your app.
@@ -72,4 +89,4 @@ Update the context with new parameters if you wish to throughout your app.
 
 context.set({ network: 1 });
 context.set({ signer: new Wallet("private key") }); // if you're using wagmi library, you can also get the signer through their [`useSigner` method](https://wagmi.sh/react/hooks/useSigner) inside a `useEffect` hook.
-context.setFull(contextParams);
+context.set(contextParams);

@@ -22,8 +22,12 @@ TEMPLATE:
 - Fix `Status.DEFEATED` filter
 - Error handling if ENS cannot be resolved.
 - Renames `mainnet` to `homestead` in `LIVE_CONTRACTS`.
+- `Context.network` type changes from `Networkish` to `Network`
+- Context and ContextPlugin now automatically use the environment settings by default (depending on the ETH network) when no values are provided
 ### Changed
 - Uses `earlyExecuted` for proposal state calculation in Addresslistvoting and Tokenvoting.
+- Removed `daoRegistry` from the context because it wasn't being used
+- Removed `pluginRepoRegistry` from the context because it wasn't being used
 ## [1.4.1]
 ## Fixed
 - Amending the type in subgraph's `minApprovals`

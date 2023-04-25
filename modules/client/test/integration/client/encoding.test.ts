@@ -18,8 +18,11 @@ import {
   Permissions,
   WithdrawParams,
 } from "../../../src";
-import { DaoAction } from "../../../src/client-common/interfaces/common";
-import { contextParamsLocalChain } from "../constants";
+import {
+  DaoAction,
+  SupportedNetworksArray,
+} from "../../../src/client-common/interfaces/common";
+import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import {
   PermissionIds,
   RegisterStandardCallbackParams,
@@ -31,7 +34,14 @@ import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client", () => {
+  beforeAll(() => {
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+  });
   describe("Action generators", () => {
     it("Should create a client and generate a native withdraw action", async () => {
       const context = new Context(contextParamsLocalChain);
@@ -365,11 +375,7 @@ describe("Client", () => {
       );
     });
     it("Should encode an applyInstallation action", async () => {
-      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
-      networkSpy.mockReturnValueOnce({
-        name: "goerli",
-        chainId: 31337,
-      });
+      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -396,6 +402,10 @@ describe("Client", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
       const daoAddress = "0x1234567890123456789012345678901234567890";
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
       const actions = client.encoding.applyInstallationAction(
         daoAddress,
         applyInstallationParams,

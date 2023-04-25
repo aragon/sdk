@@ -23,6 +23,7 @@ import {
   ProposalStatus,
   SortDirection,
   SubgraphMultisigProposal,
+  SupportedNetworksArray,
 } from "../../../src";
 import {
   getExtendedProposalId,
@@ -53,6 +54,11 @@ import {
 import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-queries/members";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
+
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
   let server: Server;
@@ -63,6 +69,7 @@ describe("Client Multisig", () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    contextParamsLocalChain.ensRegistryAddress = deployment.ensRegistry.address;
     repoAddr = deployment.multisigRepo.address;
 
     if (Array.isArray(contextParamsLocalChain.web3Providers)) {
@@ -206,11 +213,6 @@ describe("Client Multisig", () => {
 
   describe("Plugin installation", () => {
     it("Should prepare the installation of a token voting plugin", async () => {
-      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
-      networkSpy.mockReturnValueOnce({
-        name: "goerli",
-        chainId: 31337,
-      });
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
@@ -227,6 +229,13 @@ describe("Client Multisig", () => {
         },
         daoAddressOrEns: dao,
       };
+      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
+      networkSpy.mockReturnValueOnce(
+        Promise.resolve({
+          name: "goerli",
+          chainId: 31337,
+        }),
+      );
       const steps = client.methods.prepareInstallation(installationParams);
       for await (const step of steps) {
         switch (step.key) {

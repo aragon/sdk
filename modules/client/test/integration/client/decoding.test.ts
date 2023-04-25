@@ -14,9 +14,10 @@ import {
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
   Permissions,
+  SupportedNetworksArray,
   WithdrawParams,
 } from "../../../src";
-import { contextParamsLocalChain } from "../constants";
+import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
@@ -30,7 +31,14 @@ import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
 describe("Client", () => {
+  beforeAll(() => {
+    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+  });
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {
       const context = new Context(contextParamsLocalChain);
@@ -497,11 +505,7 @@ describe("Client", () => {
       );
     });
     it("Should decode an apply installation action", async () => {
-      const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
-      networkSpy.mockReturnValueOnce({
-        name: "goerli",
-        chainId: 31337,
-      });
+      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -527,15 +531,19 @@ describe("Client", () => {
         pluginRepo: "0x2345678901234567890123456789012345678901",
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
-
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
       const actions = client.encoding.applyInstallationAction(
         "0x1234567890123456789012345678901234567890",
         applyInstallationParams,
       );
       expect(actions.length).toBe(3);
-      const decodedApplyInstallationParams = client.decoding.applyInstallationAction(
-        actions[1].data,
-      );
+      const decodedApplyInstallationParams = client.decoding
+        .applyInstallationAction(
+          actions[1].data,
+        );
       expect(applyInstallationParams.versionTag.build).toBe(
         decodedApplyInstallationParams.versionTag.build,
       );
@@ -568,11 +576,16 @@ describe("Client", () => {
         expect(applyInstallationParams.permissions[index].where).toBe(
           decodedApplyInstallationParams.permissions[index].where,
         );
-        expect(decodedApplyInstallationParams.permissions[index].permissionId).toBeInstanceOf(
-          Uint8Array
-        );
-        expect(bytesToHex(applyInstallationParams.permissions[index].permissionId)).toBe(
-          bytesToHex(decodedApplyInstallationParams.permissions[index].permissionId)
+        expect(decodedApplyInstallationParams.permissions[index].permissionId)
+          .toBeInstanceOf(
+            Uint8Array,
+          );
+        expect(
+          bytesToHex(applyInstallationParams.permissions[index].permissionId),
+        ).toBe(
+          bytesToHex(
+            decodedApplyInstallationParams.permissions[index].permissionId,
+          ),
         );
       }
     });

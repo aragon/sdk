@@ -35,9 +35,9 @@ describe("Client", () => {
       contextParamsMainnet.web3Providers = web3endpoints.failing.concat(
         web3endpoints.working,
       );
+      jest.spyOn(Math, "random").mockReturnValueOnce(0);
       const context = new Context(contextParamsMainnet);
       const client = new Client(context);
-
       await client
         .web3.isUp()
         .then((isUp) => {

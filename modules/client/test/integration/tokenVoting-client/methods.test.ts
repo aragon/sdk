@@ -17,6 +17,7 @@ import {
   ProposalStatus,
   SortDirection,
   SubgraphVoteValues,
+  SupportedNetworksArray,
   TokenType,
   TokenVotingClient,
   TokenVotingProposal,
@@ -68,6 +69,11 @@ import {
 import { TokenVotingPluginPrepareInstallationParams } from "../../../src/tokenVoting/interfaces";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
+jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
+jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
+  { chainId: 5, name: "goerli" },
+);
+
 describe("Token Voting Client", () => {
   let server: Server;
   let deployment: deployContracts.Deployment;
@@ -78,6 +84,7 @@ describe("Token Voting Client", () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    contextParamsLocalChain.ensRegistryAddress = deployment.ensRegistry.address;
     repoAddr = deployment.tokenVotingRepo.address;
 
     if (Array.isArray(contextParamsLocalChain.web3Providers)) {
@@ -89,6 +96,7 @@ describe("Token Voting Client", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
+
     LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
     LIVE_CONTRACTS.goerli.pluginSetupProcessor =
       deployment.pluginSetupProcessor.address;
@@ -314,11 +322,6 @@ describe("Token Voting Client", () => {
 
     describe("Plugin installation", () => {
       it("Should prepare the installation of a multisig plugin", async () => {
-        const networkSpy = jest.spyOn(JsonRpcProvider, "getNetwork");
-        networkSpy.mockReturnValueOnce({
-          name: "goerli",
-          chainId: 31337,
-        });
         const ctx = new Context(contextParamsLocalChain);
         const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new TokenVotingClient(ctxPlugin);
@@ -349,6 +352,13 @@ describe("Token Voting Client", () => {
           },
           daoAddressOrEns: dao,
         };
+        const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
+        networkSpy.mockReturnValueOnce(
+          Promise.resolve({
+            name: "goerli",
+            chainId: 31337,
+          }),
+        );
         const steps = client.methods.prepareInstallation(installationParams);
         for await (const step of steps) {
           switch (step.key) {
