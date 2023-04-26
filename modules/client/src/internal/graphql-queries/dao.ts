@@ -9,10 +9,12 @@ export const QueryDao = gql`
       createdAt
       plugins{
         id
-        __typename
         installations{
           appliedVersion{
             build
+            pluginRepo {
+              subdomain
+            }
             release{
               release
             }
@@ -30,10 +32,12 @@ export const QueryDaos = gql`
       metadata
       plugins{
         id
-        __typename
         installations{
           appliedVersion{
             build
+            pluginRepo {
+              subdomain
+            }
             release{
               release
             }

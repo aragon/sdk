@@ -19,7 +19,6 @@ import {
   SubgraphDao,
   SubgraphDaoListItem,
   SubgraphPluginListItem,
-  SubgraphPluginTypeMap,
   SubgraphTransferListItem,
   SubgraphTransferType,
   TokenType,
@@ -71,9 +70,8 @@ export function toDaoDetails(
         return plugin.installations.map((installation) => {
           return {
             instanceAddress: plugin.id,
-            id: SubgraphPluginTypeMap.get(
-              plugin.__typename,
-            ) as string,
+            id:
+              `${installation.appliedVersion.pluginRepo.subdomain}.plugin.dao.eth`,
             release: installation.appliedVersion.release.release,
             build: installation.appliedVersion.build,
           };
@@ -102,9 +100,8 @@ export function toDaoListItem(
         return plugin.installations.map((installation) => {
           return {
             instanceAddress: plugin.id,
-            id: SubgraphPluginTypeMap.get(
-              plugin.__typename,
-            ) as string,
+            id:
+              `${installation.appliedVersion.pluginRepo.subdomain}.plugin.dao.eth`,
             release: installation.appliedVersion.release.release,
             build: installation.appliedVersion.build,
           };

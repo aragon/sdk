@@ -47,7 +47,6 @@ import {
   SetAllowanceSteps,
   SubgraphBalance,
   SubgraphDao,
-  SubgraphPluginTypeName,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "../../../src/interfaces";
@@ -396,15 +395,19 @@ describe("Client", () => {
           metadata: `ipfs://${IPFS_CID}`,
           plugins: [{
             id: ADDRESS_ONE,
-            __typename: SubgraphPluginTypeName.MULTISIG,
-            installations: [{
-              appliedVersion: {
-                build: 1,
-                release: {
-                  release: 1,
+            installations: [
+              {
+                appliedVersion: {
+                  pluginRepo: {
+                    subdomain: "multisig",
+                  },
+                  build: 1,
+                  release: {
+                    release: 1,
+                  },
                 },
               },
-            }],
+            ],
           }],
         };
         mockedClient.request.mockResolvedValueOnce({
@@ -484,9 +487,11 @@ describe("Client", () => {
           metadata: `ipfs://${IPFS_CID}`,
           plugins: [{
             id: ADDRESS_ONE,
-            __typename: SubgraphPluginTypeName.MULTISIG,
             installations: [{
               appliedVersion: {
+                pluginRepo: {
+                  subdomain: "multisig",
+                },
                 build: 1,
                 release: {
                   release: 1,

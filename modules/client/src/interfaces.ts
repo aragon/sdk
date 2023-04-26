@@ -440,28 +440,15 @@ export enum DaoSortBy {
   // POPULARITY = "totalProposals", // currently defined as number of proposals
 }
 
-export enum SubgraphPluginTypeName {
-  TOKEN_VOTING = "TokenVotingPlugin",
-  ADDRESS_LIST = "AddresslistVotingPlugin",
-  ADMIN = "AdminPlugin",
-  MULTISIG = "MultisigPlugin",
-}
 
-export const SubgraphPluginTypeMap: Map<
-  SubgraphPluginTypeName,
-  string
-> = new Map([
-  [SubgraphPluginTypeName.TOKEN_VOTING, "token-voting.plugin.dao.eth"],
-  [SubgraphPluginTypeName.ADDRESS_LIST, "address-list-voting.plugin.dao.eth"],
-  [SubgraphPluginTypeName.ADMIN, "admin.plugin.dao.eth"],
-  [SubgraphPluginTypeName.MULTISIG, "multisig.plugin.dao.eth"],
-]);
 
 export type SubgraphPluginListItem = {
   id: string;
-  __typename: SubgraphPluginTypeName;
   installations: {
     appliedVersion: {
+      pluginRepo: {
+        subdomain: string
+      }
       build: number;
       release: {
         release: number;
