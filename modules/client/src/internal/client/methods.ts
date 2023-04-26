@@ -638,6 +638,19 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     );
   }
 
+  /**
+   * Retrieves the list of plugins available on the PluginRegistry
+   *
+   * @param {PluginQueryParams} {
+   *     limit = 10,
+   *     skip = 0,
+   *     direction = SortDirection.ASC,
+   *     sortBy = PluginSortBy.SUBDOMAIN,
+   *     subdomain
+   *   }
+   * @return {*}  {(Promise<PluginRepo[] | null>)}
+   * @memberof ClientMethods
+   */
   public async getPlugins({
     limit = 10,
     skip = 0,
