@@ -391,10 +391,6 @@ export type DaoResourceLink = { name: string; url: string };
 export type InstalledPluginListItem = {
   id: string;
   instanceAddress: string;
-  versions: PluginVersion[];
-};
-
-export type PluginVersion = {
   release: number;
   build: number;
 };
