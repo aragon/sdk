@@ -42,7 +42,7 @@ export interface IClientMethods extends IClientCore {
   /** Retrieves metadata for many daos */
   getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
   /** Retrieves the list of plugins available on the PluginRegistry */
-  getPlugins: (params: PluginQueryParams) => Promise<PluginRepo[]>;
+  getPlugins: (params?: PluginQueryParams) => Promise<PluginRepo[]>;
 }
 
 export interface IClientEncoding extends IClientCore {

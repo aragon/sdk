@@ -657,7 +657,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     direction = SortDirection.ASC,
     sortBy = PluginSortBy.SUBDOMAIN,
     subdomain,
-  }: PluginQueryParams): Promise<PluginRepo[]> {
+  }: PluginQueryParams = {}): Promise<PluginRepo[]> {
     let where = {};
     if (subdomain) {
       where = { subdomain_contains_nocase: subdomain };
