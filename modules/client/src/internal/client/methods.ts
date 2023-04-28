@@ -703,10 +703,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
                 const resolvedMetadata = JSON.parse(stringMetadata);
                 metadata = resolvedMetadata;
               } catch (err) {
+                metadata = UNAVAILABLE_RELEASE_METADATA;
                 if (err instanceof InvalidCidError) {
                   metadata = UNSUPPORTED_RELEASE_METADATA_LINK;
                 }
-                metadata = UNAVAILABLE_RELEASE_METADATA;
               }
             }
             pluginRepoReleases = [
@@ -749,10 +749,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         const resolvedMetadata = JSON.parse(stringMetadata);
         releaseMetadata = resolvedMetadata;
       } catch (err) {
+        releaseMetadata = UNAVAILABLE_RELEASE_METADATA;
         if (err instanceof InvalidCidError) {
           releaseMetadata = UNSUPPORTED_RELEASE_METADATA_LINK;
         }
-        releaseMetadata = UNAVAILABLE_RELEASE_METADATA;
       }
     }
     // get build metadata
@@ -766,10 +766,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         const resolvedMetadata = JSON.parse(stringMetadata);
         buildMetadata = resolvedMetadata;
       } catch (err) {
+        buildMetadata = UNAVAILABLE_BUILD_METADATA;
         if (err instanceof InvalidCidError) {
           buildMetadata = UNSUPPORTED_BUILD_METADATA_LINK;
         }
-        buildMetadata = UNAVAILABLE_BUILD_METADATA;
       }
     }
     return toPluginRepo(pluginVersion, releaseMetadata, buildMetadata);

@@ -369,7 +369,3 @@ export function withdrawParamsFromContract(
   throw new Error("not implemented");
 }
 
-export function isBuildId(buildId: string): boolean {
-  const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_[0-9]{1,64}_[0-9]{1,64}$/i);
-  return regex.test(buildId);
-}
