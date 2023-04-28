@@ -19,7 +19,6 @@ import {
   SubgraphDao,
   SubgraphDaoListItem,
   SubgraphPluginListItem,
-  SubgraphPluginTypeMap,
   SubgraphTransferListItem,
   SubgraphTransferType,
   TokenType,
@@ -67,20 +66,18 @@ export function toDaoDetails(
     plugins: dao.plugins.map(
       (
         plugin: SubgraphPluginListItem,
-      ): InstalledPluginListItem => {
-        return {
-          instanceAddress: plugin.id,
-          // TODO
-          // temporary ens addreses for the plugins
-          id: SubgraphPluginTypeMap.get(
-            plugin.__typename,
-          ) as string,
-          // TODO
-          // update when subgraph returns version
-          version: "0.0.1",
-        };
+      ): InstalledPluginListItem[] => {
+        return plugin.installations.map((installation) => {
+          return {
+            instanceAddress: plugin.id,
+            id:
+              `${installation.appliedVersion.pluginRepo.subdomain}.plugin.dao.eth`,
+            release: installation.appliedVersion.release.release,
+            build: installation.appliedVersion.build,
+          };
+        });
       },
-    ),
+    ).flat(),
   };
 }
 
@@ -96,24 +93,21 @@ export function toDaoListItem(
       description: metadata.description,
       avatar: metadata.avatar || undefined,
     },
-    // TODO update when new subgraph schema is deployed
     plugins: dao.plugins.map(
       (
         plugin: SubgraphPluginListItem,
-      ): InstalledPluginListItem => {
-        return {
-          instanceAddress: plugin.id,
-          // TODO
-          // temporary ens addreses for the plugins
-          id: SubgraphPluginTypeMap.get(
-            plugin.__typename,
-          ) as string,
-          // TODO
-          // update when subgraph returns version
-          version: "0.0.1",
-        };
+      ): InstalledPluginListItem[] => {
+        return plugin.installations.map((installation) => {
+          return {
+            instanceAddress: plugin.id,
+            id:
+              `${installation.appliedVersion.pluginRepo.subdomain}.plugin.dao.eth`,
+            release: installation.appliedVersion.release.release,
+            build: installation.appliedVersion.build,
+          };
+        });
       },
-    ),
+    ).flat(),
   };
 }
 

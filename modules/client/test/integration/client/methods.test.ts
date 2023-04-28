@@ -32,12 +32,12 @@ import {
   IHasPermissionParams,
   ITransferQueryParams,
   Permissions,
+  SetAllowanceParams,
   SortDirection,
   SupportedNetworksArray,
   TokenType,
   TransferSortBy,
   TransferType,
-  SetAllowanceParams,
   VotingMode,
 } from "../../../src";
 import { MissingExecPermissionError } from "@aragon/sdk-common";
@@ -47,7 +47,6 @@ import {
   SetAllowanceSteps,
   SubgraphBalance,
   SubgraphDao,
-  SubgraphPluginTypeName,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "../../../src/interfaces";
@@ -396,7 +395,19 @@ describe("Client", () => {
           metadata: `ipfs://${IPFS_CID}`,
           plugins: [{
             id: ADDRESS_ONE,
-            __typename: SubgraphPluginTypeName.MULTISIG,
+            installations: [
+              {
+                appliedVersion: {
+                  pluginRepo: {
+                    subdomain: "multisig",
+                  },
+                  build: 1,
+                  release: {
+                    release: 1,
+                  },
+                },
+              },
+            ],
           }],
         };
         mockedClient.request.mockResolvedValueOnce({
@@ -415,7 +426,8 @@ describe("Client", () => {
           ADDRESS_ONE,
         );
         expect(dao!.plugins[0].id).toBe("multisig.plugin.dao.eth");
-        expect(dao!.plugins[0].version).toBe("0.0.1");
+        expect(dao!.plugins[0].build).toBe(1);
+        expect(dao!.plugins[0].release).toBe(1);
 
         expect(dao!.metadata.name).toBe("Name");
         expect(dao!.metadata.description).toBe("Description");
@@ -475,7 +487,17 @@ describe("Client", () => {
           metadata: `ipfs://${IPFS_CID}`,
           plugins: [{
             id: ADDRESS_ONE,
-            __typename: SubgraphPluginTypeName.MULTISIG,
+            installations: [{
+              appliedVersion: {
+                pluginRepo: {
+                  subdomain: "multisig",
+                },
+                build: 1,
+                release: {
+                  release: 1,
+                },
+              },
+            }],
           }],
         };
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
@@ -495,7 +517,8 @@ describe("Client", () => {
           ADDRESS_ONE,
         );
         expect(daos[0].plugins[0].id).toBe("multisig.plugin.dao.eth");
-        expect(daos[0].plugins[0].version).toBe("0.0.1");
+        expect(daos[0].plugins[0].build).toBe(1);
+        expect(daos[0].plugins[0].release).toBe(1);
 
         expect(daos[0].metadata.name).toBe("Name");
         expect(daos[0].metadata.description).toBe("Description");
