@@ -41,8 +41,10 @@ export interface IClientMethods extends IClientCore {
   getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
   /** Retrieves metadata for many daos */
   getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
+  /** retrieves the plugin details given an address, release and build */
+  getPlugin: (params: GetPluginParams) => Promise<PluginRepo>;
   /** Retrieves the list of plugins available on the PluginRegistry */
-  getPlugins: (params?: PluginQueryParams) => Promise<PluginRepo[]>;
+  getPlugins: (params?: PluginQueryParams) => Promise<PluginRepoListItem[]>;
 }
 
 export interface IClientEncoding extends IClientCore {
@@ -549,20 +551,57 @@ export type SubgraphPluginRepoListItem = {
   releases: SubgraphPluginRepoReleaseListItem[];
 };
 
+export type SubgraphPluginVersion = {
+  build: number;
+  metadata: string;
+  release: {
+    release: number;
+    metadata: string;
+  };
+  pluginRepo: {
+    id: string;
+    subdomain: string;
+  };
+};
+
 export type PluginRepoReleaseMetadata = {
   name: string;
   description: string;
   images: Object; // TODO specify parameters
 };
+export type PluginRepoBuildMetadata = {
+  ui: string;
+  change: string;
+  pluginSetupABI: Object;
+};
 
 export type PluginRepoRelease = {
   release: number;
   metadata: PluginRepoReleaseMetadata;
-  builds: number[];
+  latestBuild: number;
+};
+
+export type PluginRepoListItem = {
+  address: string;
+  subdomain: string;
+  releases: PluginRepoRelease[];
 };
 
 export type PluginRepo = {
   address: string;
   subdomain: string;
-  releases: PluginRepoRelease[];
+  buildDetails: {
+    metadata: PluginRepoBuildMetadata;
+    build: number;
+  };
+  releaseDetails: {
+    metadata: PluginRepoReleaseMetadata;
+    release: number;
+  };
+};
+
+export type GetPluginParams = {
+  release: number;
+  build: number;
+  pluginAddress: string;
 };

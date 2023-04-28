@@ -1,7 +1,11 @@
 import { DAO__factory } from "@aragon/osx-ethers";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
-import { DaoMetadata, PluginRepoReleaseMetadata } from "../interfaces";
+import {
+  DaoMetadata,
+  PluginRepoBuildMetadata,
+  PluginRepoReleaseMetadata,
+} from "../interfaces";
 import { erc20ContractAbi } from "./abi/erc20";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
@@ -57,4 +61,21 @@ export const UNAVAILABLE_RELEASE_METADATA: PluginRepoReleaseMetadata = {
   name: "(unavailable metadata)",
   description: "(the release metadata is not available)",
   images: {},
+};
+
+export const UNSUPPORTED_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
+  ui: "(unsupported metadata link)",
+  change: "(unsupported metadata link)",
+  pluginSetupABI: {},
+};
+export const EMPTY_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
+  ui: "(the build has no metadata)",
+  change: "(the build has no metadata)",
+  pluginSetupABI: {},
+};
+
+export const UNAVAILABLE_BUILD_METADATA: PluginRepoBuildMetadata = {
+  ui: "(unavailable metadata)",
+  change: "(unavailable metadata)",
+  pluginSetupABI: {},
 };

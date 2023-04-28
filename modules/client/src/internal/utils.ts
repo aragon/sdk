@@ -16,6 +16,8 @@ import {
   IRevokePermissionParams,
   PermissionIds,
   PluginRepo,
+  PluginRepoBuildMetadata,
+  PluginRepoListItem,
   PluginRepoRelease,
   PluginRepoReleaseMetadata,
   SubgraphBalance,
@@ -24,6 +26,7 @@ import {
   SubgraphPluginListItem,
   SubgraphPluginRepoListItem,
   SubgraphPluginRepoReleaseListItem,
+  SubgraphPluginVersion,
   SubgraphTransferListItem,
   SubgraphTransferType,
   TokenType,
@@ -242,19 +245,37 @@ export function toPluginRepoRelease(
 ): PluginRepoRelease {
   return {
     release: release.release,
-    builds: release.builds.map((build) => build.build),
+    latestBuild: Math.max(...release.builds.map((build) => build.build)),
     metadata,
   };
 }
 
-export function toPluginRepo(
+export function toPluginRepoListItem(
   pluginRepo: SubgraphPluginRepoListItem,
-  releases: PluginRepoRelease[]
-): PluginRepo {
+  releases: PluginRepoRelease[],
+): PluginRepoListItem {
   return {
     address: pluginRepo.id,
     subdomain: pluginRepo.subdomain,
     releases,
+  };
+}
+export function toPluginRepo(
+  pluginVersion: SubgraphPluginVersion,
+  releaseMetadata: PluginRepoReleaseMetadata,
+  buildMetadata: PluginRepoBuildMetadata,
+): PluginRepo {
+  return {
+    address: pluginVersion.pluginRepo.id,
+    subdomain: pluginVersion.pluginRepo.subdomain,
+    buildDetails: {
+      build: pluginVersion.build,
+      metadata: buildMetadata,
+    },
+    releaseDetails: {
+      release: pluginVersion.release.release,
+      metadata: releaseMetadata,
+    },
   };
 }
 
@@ -346,4 +367,9 @@ export function withdrawParamsFromContract(
   }
   // TODO Add ERC721 and ERC1155
   throw new Error("not implemented");
+}
+
+export function isBuildId(buildId: string): boolean {
+  const regex = new RegExp(/^0x[A-Fa-f0-9]{40}_[0-9]{1,64}_[0-9]{1,64}$/i);
+  return regex.test(buildId);
 }

@@ -15,3 +15,18 @@ query Plugins($where: PluginRepo_filter!, $limit:Int!, $skip: Int!, $direction: 
   }
 }
 `;
+export const QueryPlugin = gql`
+query Plugin($id: ID!) {
+  pluginVersion(id:$id){
+    build
+    metadata
+    release {
+      release
+      metadata
+    }
+    pluginRepo{
+      subdomain
+    }
+  }
+}
+`;

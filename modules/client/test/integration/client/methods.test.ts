@@ -44,12 +44,14 @@ import { MissingExecPermissionError } from "@aragon/sdk-common";
 import { Server } from "ganache";
 import {
   AssetBalanceSortBy,
+  GetPluginParams,
   PluginQueryParams,
   PluginSortBy,
   SetAllowanceSteps,
   SubgraphBalance,
   SubgraphDao,
   SubgraphPluginRepoListItem,
+  SubgraphPluginVersion,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "../../../src/interfaces";
@@ -1044,9 +1046,75 @@ describe("Client", () => {
         expect(plugins[0].releases[0].release).toBe(1);
         expect(plugins[0].releases[0].metadata.name).toBe("Name");
         expect(plugins[0].releases[0].metadata.description).toBe("Description");
-        expect(plugins[0].releases[0].builds.length).toBe(2);
-        expect(plugins[0].releases[0].builds[0]).toBe(1);
+        expect(plugins[0].releases[0].latestBuild).toBe(2);
         mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
+      });
+      it("Should get a DAO's metadata with a specific address", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        mockedIPFSClient.cat.mockResolvedValueOnce(
+          Buffer.from(
+            JSON.stringify({
+              name: "Name",
+              description: "Description",
+              images: {},
+            }),
+          ),
+        );
+        mockedIPFSClient.cat.mockResolvedValueOnce(
+          Buffer.from(
+            JSON.stringify({
+              ui: "test",
+              change: "test",
+              pluginSetupABI: {},
+            }),
+          ),
+        );
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const address = "0x1234567890123456789012345678901234567890";
+        const pluginVersion: SubgraphPluginVersion = {
+          build: 1,
+          metadata: `ipfs://${IPFS_CID}`,
+          release: {
+            release: 1,
+            metadata: `ipfs://${IPFS_CID}`,
+          },
+          pluginRepo: {
+            id: address,
+            subdomain: "test",
+          },
+        };
+        mockedClient.request.mockResolvedValueOnce({
+          pluginVersion: pluginVersion,
+        });
+        const params: GetPluginParams = {
+          build: 1,
+          release: 1,
+          pluginAddress: address,
+        };
+        const plugin = await client.methods.getPlugin(params);
+        expect(plugin.address).toBe(address);
+        expect(plugin.subdomain).toBe("test");
+        expect(plugin.buildDetails.build).toBe(1);
+        expect(plugin.buildDetails.metadata.ui).toBe("test");
+        expect(typeof plugin.buildDetails.metadata.ui).toBe("string");
+        expect(plugin.buildDetails.metadata.change).toBe("test");
+        expect(typeof plugin.buildDetails.metadata.change).toBe("string");
+        expect(typeof plugin.buildDetails.metadata.pluginSetupABI).toBe(
+          "object",
+        );
+        expect(plugin.releaseDetails.release).toBe(1);
+        expect(plugin.releaseDetails.metadata.name).toBe("Name");
+        expect(typeof plugin.releaseDetails.metadata.name).toBe("string");
+        expect(plugin.releaseDetails.metadata.description).toBe("Description");
+        expect(typeof plugin.releaseDetails.metadata.description).toBe(
+          "string",
+        );
+        expect(typeof plugin.releaseDetails.metadata.images).toBe("object");
       });
 
       test.todo(
