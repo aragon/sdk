@@ -17,15 +17,15 @@ query Plugins($where: PluginRepo_filter!, $limit:Int!, $skip: Int!, $direction: 
 `;
 export const QueryPlugin = gql`
 query Plugin($id: ID!) {
-  pluginVersion(id:$id){
-    build
-    metadata
-    release {
+  pluginRepo(id:$id){
+    subdomain
+    releases(orderBy: release, orderDirection: desc){
       release
       metadata
-    }
-    pluginRepo{
-      subdomain
+      builds(orderBy: build, orderDirection: desc){
+        build
+        metadata
+      }
     }
   }
 }

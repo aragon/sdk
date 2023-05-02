@@ -42,7 +42,7 @@ export interface IClientMethods extends IClientCore {
   /** Retrieves metadata for many daos */
   getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
   /** retrieves the plugin details given an address, release and build */
-  getPlugin: (params: GetPluginParams) => Promise<PluginRepo>;
+  getPlugin: (pluginAddress: string) => Promise<PluginRepo>;
   /** Retrieves the list of plugins available on the PluginRegistry */
   getPlugins: (params?: PluginQueryParams) => Promise<PluginRepoListItem[]>;
 }
@@ -545,23 +545,21 @@ export type SubgraphPluginRepoReleaseListItem = {
   }[];
 };
 
+export type SubgraphPluginRepoRelease = SubgraphPluginRepoReleaseListItem & {
+  builds: {
+    build: number;
+    metadata: string;
+  }[];
+};
+
 export type SubgraphPluginRepoListItem = {
   id: string;
   subdomain: string;
   releases: SubgraphPluginRepoReleaseListItem[];
 };
 
-export type SubgraphPluginVersion = {
-  build: number;
-  metadata: string;
-  release: {
-    release: number;
-    metadata: string;
-  };
-  pluginRepo: {
-    id: string;
-    subdomain: string;
-  };
+export type SubgraphPluginRepo = SubgraphPluginRepoListItem & {
+  releases: SubgraphPluginRepoRelease[];
 };
 
 export type PluginRepoReleaseMetadata = {
@@ -578,7 +576,7 @@ export type PluginRepoBuildMetadata = {
 export type PluginRepoRelease = {
   release: number;
   metadata: PluginRepoReleaseMetadata;
-  latestBuild: number;
+  currentBuild: number;
 };
 
 export type PluginRepoListItem = {
@@ -590,13 +588,15 @@ export type PluginRepoListItem = {
 export type PluginRepo = {
   address: string;
   subdomain: string;
-  buildDetails: {
-    metadata: PluginRepoBuildMetadata;
-    build: number;
-  };
-  releaseDetails: {
-    metadata: PluginRepoReleaseMetadata;
-    release: number;
+  current: {
+    build: {
+      number: number;
+      metadata: PluginRepoBuildMetadata;
+    };
+    release: {
+      number: number;
+      metadata: PluginRepoReleaseMetadata;
+    };
   };
 };
 

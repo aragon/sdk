@@ -24,9 +24,9 @@ import {
   SubgraphDao,
   SubgraphDaoListItem,
   SubgraphPluginListItem,
+  SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
   SubgraphPluginRepoReleaseListItem,
-  SubgraphPluginVersion,
   SubgraphTransferListItem,
   SubgraphTransferType,
   TokenType,
@@ -245,7 +245,7 @@ export function toPluginRepoRelease(
 ): PluginRepoRelease {
   return {
     release: release.release,
-    latestBuild: Math.max(...release.builds.map((build) => build.build)),
+    currentBuild: Math.max(...release.builds.map((build) => build.build)),
     metadata,
   };
 }
@@ -261,20 +261,22 @@ export function toPluginRepoListItem(
   };
 }
 export function toPluginRepo(
-  pluginVersion: SubgraphPluginVersion,
+  pluginRepo: SubgraphPluginRepo,
   releaseMetadata: PluginRepoReleaseMetadata,
   buildMetadata: PluginRepoBuildMetadata,
 ): PluginRepo {
   return {
-    address: pluginVersion.pluginRepo.id,
-    subdomain: pluginVersion.pluginRepo.subdomain,
-    buildDetails: {
-      build: pluginVersion.build,
-      metadata: buildMetadata,
-    },
-    releaseDetails: {
-      release: pluginVersion.release.release,
-      metadata: releaseMetadata,
+    address: pluginRepo.id,
+    subdomain: pluginRepo.subdomain,
+    current: {
+      build: {
+        metadata: buildMetadata,
+        number: pluginRepo.releases[0].builds[0].build,
+      },
+      release: {
+        metadata: releaseMetadata,
+        number: pluginRepo.releases[0].release,
+      },
     },
   };
 }
@@ -368,4 +370,3 @@ export function withdrawParamsFromContract(
   // TODO Add ERC721 and ERC1155
   throw new Error("not implemented");
 }
-

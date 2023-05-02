@@ -50,8 +50,8 @@ import {
   SetAllowanceSteps,
   SubgraphBalance,
   SubgraphDao,
+  SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
-  SubgraphPluginVersion,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "../../../src/interfaces";
@@ -982,7 +982,7 @@ describe("Client", () => {
           }
         });
       });
-      it("Should get a DAO's metadata with a specific address", async () => {
+      it("Should get a list plugin details", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const defaultCatImplementation = mockedIPFSClient.cat
@@ -1046,10 +1046,10 @@ describe("Client", () => {
         expect(plugins[0].releases[0].release).toBe(1);
         expect(plugins[0].releases[0].metadata.name).toBe("Name");
         expect(plugins[0].releases[0].metadata.description).toBe("Description");
-        expect(plugins[0].releases[0].latestBuild).toBe(2);
+        expect(plugins[0].releases[0].currentBuild).toBe(2);
         mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
       });
-      it("Should get a DAO's metadata with a specific address", async () => {
+      it("Should get a plugin details given the address", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
 
@@ -1076,45 +1076,44 @@ describe("Client", () => {
           client.graphql.getClient(),
         );
         const address = "0x1234567890123456789012345678901234567890";
-        const pluginVersion: SubgraphPluginVersion = {
-          build: 1,
-          metadata: `ipfs://${IPFS_CID}`,
-          release: {
-            release: 1,
-            metadata: `ipfs://${IPFS_CID}`,
-          },
-          pluginRepo: {
-            id: address,
-            subdomain: "test",
-          },
+        const pluginRepo: SubgraphPluginRepo = {
+          id: address,
+          subdomain: "test",
+          releases: [
+            {
+              metadata: `ipfs://${IPFS_CID}`,
+              release: 1,
+              builds: [
+                {
+                  metadata: `ipfs://${IPFS_CID}`,
+                  build: 1,
+                },
+              ],
+            },
+          ],
         };
         mockedClient.request.mockResolvedValueOnce({
-          pluginVersion: pluginVersion,
+          pluginRepo,
         });
-        const params: GetPluginParams = {
-          build: 1,
-          release: 1,
-          pluginAddress: address,
-        };
-        const plugin = await client.methods.getPlugin(params);
+        const plugin = await client.methods.getPlugin(address);
         expect(plugin.address).toBe(address);
         expect(plugin.subdomain).toBe("test");
-        expect(plugin.buildDetails.build).toBe(1);
-        expect(plugin.buildDetails.metadata.ui).toBe("test");
-        expect(typeof plugin.buildDetails.metadata.ui).toBe("string");
-        expect(plugin.buildDetails.metadata.change).toBe("test");
-        expect(typeof plugin.buildDetails.metadata.change).toBe("string");
-        expect(typeof plugin.buildDetails.metadata.pluginSetupABI).toBe(
+        expect(plugin.current.build.number).toBe(1);
+        expect(plugin.current.build.metadata.ui).toBe("test");
+        expect(typeof plugin.current.build.metadata.ui).toBe("string");
+        expect(plugin.current.build.metadata.change).toBe("test");
+        expect(typeof plugin.current.build.metadata.change).toBe("string");
+        expect(typeof plugin.current.build.metadata.pluginSetupABI).toBe(
           "object",
         );
-        expect(plugin.releaseDetails.release).toBe(1);
-        expect(plugin.releaseDetails.metadata.name).toBe("Name");
-        expect(typeof plugin.releaseDetails.metadata.name).toBe("string");
-        expect(plugin.releaseDetails.metadata.description).toBe("Description");
-        expect(typeof plugin.releaseDetails.metadata.description).toBe(
+        expect(plugin.current.release.number).toBe(1);
+        expect(plugin.current.release.metadata.name).toBe("Name");
+        expect(typeof plugin.current.release.metadata.name).toBe("string");
+        expect(plugin.current.release.metadata.description).toBe("Description");
+        expect(typeof plugin.current.release.metadata.description).toBe(
           "string",
         );
-        expect(typeof plugin.releaseDetails.metadata.images).toBe("object");
+        expect(typeof plugin.current.release.metadata.images).toBe("object");
       });
 
       test.todo(

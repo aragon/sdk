@@ -63,8 +63,8 @@ import {
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
+  SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
-  SubgraphPluginVersion,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
   TokenType,
@@ -722,29 +722,26 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Get plugin details given an address, release and build
    *
-   * @param {GetPluginParams} params
+   * @param {string} pluginAddress
    * @return {*}  {Promise<PluginRepo>}
    * @memberof ClientMethods
    */
-  public async getPlugin(params: GetPluginParams): Promise<PluginRepo> {
+  public async getPlugin(pluginAddress: string): Promise<PluginRepo> {
     const name = "plugin version";
     const query = QueryPlugin;
-    const queryParams = {
-      id: `${params.pluginAddress}_${params.release}_${params.build}`,
-    };
-    type T = { pluginVersion: SubgraphPluginVersion };
-    const { pluginVersion } = await this.graphql.request<T>({
+    type T = { pluginRepo: SubgraphPluginRepo };
+    const { pluginRepo } = await this.graphql.request<T>({
       query,
-      params: queryParams,
+      params: { id: pluginAddress },
       name,
     });
     // get release metadata
     let releaseMetadata: PluginRepoReleaseMetadata;
-    if (!pluginVersion.release.metadata) {
+    if (!pluginRepo.releases[0].metadata) {
       releaseMetadata = EMPTY_RELEASE_METADATA_LINK;
     } else {
       try {
-        const metadataCid = resolveIpfsCid(pluginVersion.release.metadata);
+        const metadataCid = resolveIpfsCid(pluginRepo.releases[0].metadata);
         const stringMetadata = await this.ipfs.fetchString(metadataCid);
         const resolvedMetadata = JSON.parse(stringMetadata);
         releaseMetadata = resolvedMetadata;
@@ -757,11 +754,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
     // get build metadata
     let buildMetadata: PluginRepoBuildMetadata;
-    if (!pluginVersion.metadata) {
+    if (!pluginRepo.releases[0].builds[0].metadata) {
       buildMetadata = EMPTY_BUILD_METADATA_LINK;
     } else {
       try {
-        const metadataCid = resolveIpfsCid(pluginVersion.metadata);
+        const metadataCid = resolveIpfsCid(
+          pluginRepo.releases[0].builds[0].metadata,
+        );
         const stringMetadata = await this.ipfs.fetchString(metadataCid);
         const resolvedMetadata = JSON.parse(stringMetadata);
         buildMetadata = resolvedMetadata;
@@ -772,6 +771,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         }
       }
     }
-    return toPluginRepo(pluginVersion, releaseMetadata, buildMetadata);
+    return toPluginRepo(pluginRepo, releaseMetadata, buildMetadata);
   }
 }
