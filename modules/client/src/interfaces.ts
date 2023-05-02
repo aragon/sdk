@@ -15,6 +15,8 @@ import { IClientCore } from "./client-common/interfaces/core";
 import {
   ApplyInstallationParams,
   DecodedApplyInstallationParams,
+  ApplyInstallationParamsBase,
+  VersionTag,
 } from "./client-common";
 
 /** Defines the shape of the general purpose Client class */
@@ -41,10 +43,17 @@ export interface IClientMethods extends IClientCore {
   getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
   /** Retrieves metadata for many daos */
   getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
+<<<<<<< HEAD
   /** retrieves the plugin details given an address, release and build */
   getPlugin: (pluginAddress: string) => Promise<PluginRepo>;
   /** Retrieves the list of plugins available on the PluginRegistry */
   getPlugins: (params?: PluginQueryParams) => Promise<PluginRepoListItem[]>;
+=======
+  /** Prepare uninstallation of a plugin */
+  prepareUninstallation: (
+    params: PrepareUninstallationParams,
+  ) => AsyncGenerator<PrepareUninstallationStepValue>;
+>>>>>>> ad87b92 (add plugin uninstallation)
 }
 
 export interface IClientEncoding extends IClientCore {
@@ -91,6 +100,10 @@ export interface IClientEncoding extends IClientCore {
     daoAddressOrEns: string,
     params: ApplyInstallationParams,
   ) => DaoAction[];
+  applyUninstallationAction: (
+    daoAddressOrEns: string,
+    params: ApplyUninstallationParams,
+  ) => DaoAction[];
 }
 
 export interface IClientDecoding {
@@ -117,6 +130,9 @@ export interface IClientDecoding {
   applyInstallationAction: (
     data: Uint8Array,
   ) => DecodedApplyInstallationParams;
+  applyUninstallationAction: (
+    data: Uint8Array,
+  ) => DecodedApplyUninstallationParams;
 }
 
 export interface IClientEstimation {
@@ -600,3 +616,38 @@ export type PluginRepo = {
   };
 };
 
+export type PrepareUninstallationParams = {
+  daoAddressOrEns: string;
+  versionTag: VersionTag;
+  pluginAddress: string;
+  pluginInstallationIndex?: number;
+};
+
+export type SubgraphPluginVersion = {
+  release: {
+    release: number;
+  };
+  build: number;
+};
+
+export type SubgraphPluginPreparation = {
+  helpers: string[];
+  data: string;
+  pluginRepo: {
+    id: string;
+  };
+};
+
+export enum PrepareUninstallationSteps {
+  PREPARING = "preparing",
+  DONE = "done",
+}
+
+export type PrepareUninstallationStepValue =
+  | { key: PrepareUninstallationSteps.PREPARING; txHash: string }
+  | {
+    key: PrepareUninstallationSteps.DONE;
+  } & ApplyUninstallationParams;
+
+export type ApplyUninstallationParams = ApplyInstallationParamsBase;
+export type DecodedApplyUninstallationParams = ApplyInstallationParamsBase;

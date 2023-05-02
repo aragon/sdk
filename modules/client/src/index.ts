@@ -4,6 +4,7 @@ export * from "./tokenVoting";
 export * from "./client-common";
 export * from "./multisig";
 export {
+  ApplyUninstallationParams,
   AssetBalance,
   CreateDaoParams,
   DaoCreationSteps,
@@ -12,6 +13,7 @@ export {
   DaoListItem,
   DaoMetadata,
   DaoSortBy,
+  DecodedApplyUninstallationParams,
   Deposit,
   DepositParams,
   GrantPermissionWithConditionDecodedParams,
@@ -28,6 +30,8 @@ export {
   PluginRepo,
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
+  PrepareUninstallationParams,
+  PrepareUninstallationSteps,
   RegisterStandardCallbackParams,
   SetAllowanceParams,
   SetAllowanceSteps,

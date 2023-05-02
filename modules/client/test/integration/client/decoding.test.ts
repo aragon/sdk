@@ -21,6 +21,7 @@ import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
+  ApplyUninstallationParams,
   GrantPermissionWithConditionParams,
   PermissionIds,
   RegisterStandardCallbackParams,
@@ -503,6 +504,77 @@ describe("Client", () => {
       expect(bytesToHex(expectedUpgradeToAndCallParams.data)).toBe(
         bytesToHex(decodedUpgradeToAndCallParams.data),
       );
+    });
+    it("Should decode an apply uninstallation action", async () => {
+      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const applyUninstallationParams: ApplyUninstallationParams = {
+        permissions: [{
+          condition: "0x1234567890123456789012345678901234567890",
+          operation: 1,
+          permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
+          where: "0x1234567890123456789012345678901234567890",
+          who: "0x2345678901234567890123456789012345678901",
+        }],
+        versionTag: {
+          build: 1,
+          release: 1,
+        },
+        pluginRepo: "0x2345678901234567890123456789012345678901",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
+      };
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
+      const actions = client.encoding.applyUninstallationAction(
+        "0x1234567890123456789012345678901234567890",
+        applyUninstallationParams,
+      );
+      expect(actions.length).toBe(3);
+      const decodedApplyUninstallationParams = client.decoding
+        .applyUninstallationAction(
+          actions[1].data,
+        );
+      expect(applyUninstallationParams.versionTag.build).toBe(
+        decodedApplyUninstallationParams.versionTag.build,
+      );
+      expect(applyUninstallationParams.versionTag.release).toBe(
+        decodedApplyUninstallationParams.versionTag.release,
+      );
+      expect(applyUninstallationParams.pluginAddress).toBe(
+        decodedApplyUninstallationParams.pluginAddress,
+      );
+      expect(applyUninstallationParams.pluginRepo).toBe(
+        decodedApplyUninstallationParams.pluginRepo,
+      );
+      for (const index in applyUninstallationParams.permissions) {
+        expect(applyUninstallationParams.permissions[index].condition).toBe(
+          decodedApplyUninstallationParams.permissions[index].condition,
+        );
+        expect(applyUninstallationParams.permissions[index].operation).toBe(
+          decodedApplyUninstallationParams.permissions[index].operation,
+        );
+        expect(applyUninstallationParams.permissions[index].who).toBe(
+          decodedApplyUninstallationParams.permissions[index].who,
+        );
+        expect(applyUninstallationParams.permissions[index].where).toBe(
+          decodedApplyUninstallationParams.permissions[index].where,
+        );
+        expect(decodedApplyUninstallationParams.permissions[index].permissionId)
+          .toBeInstanceOf(
+            Uint8Array,
+          );
+        expect(
+          bytesToHex(applyUninstallationParams.permissions[index].permissionId),
+        ).toBe(
+          bytesToHex(
+            decodedApplyUninstallationParams.permissions[index].permissionId,
+          ),
+        );
+      }
     });
     it("Should decode an apply installation action", async () => {
       const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");

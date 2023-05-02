@@ -15,6 +15,7 @@ query Plugins($where: PluginRepo_filter!, $limit:Int!, $skip: Int!, $direction: 
   }
 }
 `;
+
 export const QueryPlugin = gql`
 query Plugin($id: ID!) {
   pluginRepo(id:$id){
@@ -27,6 +28,30 @@ query Plugin($id: ID!) {
         metadata
       }
     }
+  }
+}
+`;
+
+export const QueryIPlugin = gql`
+query IPlugin($address: ID!, $where: IPlugin_filter!) {
+	iplugin(id:$address, where:$where){
+		installations{
+      appliedPreparation{
+        helpers
+        data
+        pluginRepo{
+          id
+        }
+      }
+      appliedVersion {
+        pluginVersion{
+          release{
+            release
+          }
+          build
+        }
+      }
+    }    
   }
 }
 `;

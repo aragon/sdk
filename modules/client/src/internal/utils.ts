@@ -1,4 +1,5 @@
 import {
+  ApplyUninstallationParams,
   AssetBalance,
   ContractPermissionParams,
   ContractPermissionWithConditionParams,
@@ -297,6 +298,18 @@ export function applyInstallatonParamsToContract(
     helpersHash: keccak256(
       defaultAbiCoder.encode(["address[]"], [params.helpers]),
     ),
+    permissions: params.permissions,
+  };
+}
+export function applyUninstallationParamsToContract(
+  params: ApplyUninstallationParams,
+): PluginSetupProcessor.ApplyUninstallationParamsStruct {
+  return {
+    plugin: params.pluginAddress,
+    pluginSetupRef: {
+      pluginSetupRepo: params.pluginRepo,
+      versionTag: params.versionTag,
+    },
     permissions: params.permissions,
   };
 }

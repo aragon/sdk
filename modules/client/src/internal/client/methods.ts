@@ -9,12 +9,14 @@ import {
 import {
   AmountMismatchError,
   FailedDepositError,
+  InstallationNotFoundError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   IpfsPinError,
   MissingExecPermissionError,
   NoProviderError,
   NoSignerError,
+  PluginUninstallationPreparationError,
   resolveIpfsCid,
   UpdateAllowanceError,
 } from "@aragon/sdk-common";
@@ -27,6 +29,7 @@ import {
   QueryDaos,
   QueryPlugin,
   QueryPlugins,
+  QueryIPlugin,
   QueryTokenBalances,
   QueryTokenTransfers,
 } from "../graphql-queries";
@@ -56,6 +59,9 @@ import {
   PluginRepoRelease,
   PluginRepoReleaseMetadata,
   PluginSortBy,
+  PrepareUninstallationParams,
+  PrepareUninstallationSteps,
+  PrepareUninstallationStepValue,
   SetAllowanceParams,
   SetAllowanceSteps,
   SetAllowanceStepValue,
@@ -64,6 +70,8 @@ import {
   SubgraphDaoListItem,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
+  SubgraphPluginPreparation,
+  SubgraphPluginVersion,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
   TokenType,
@@ -74,7 +82,9 @@ import {
   ClientCore,
   Context,
   findLog,
+  LIVE_CONTRACTS,
   SortDirection,
+  SupportedNetworks,
 } from "../../client-common";
 import {
   toAssetBalance,
@@ -386,6 +396,92 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield {
       key: SetAllowanceSteps.ALLOWANCE_SET,
       allowance: params.amount,
+    };
+  }
+  /**
+   * Prepare uninstallation of a plugin
+   *
+   * @param {PrepareUninstallationParams} params
+   * @return {*}  {AsyncGenerator<PrepareUninstallationStepValue>}
+   * @memberof ClientMethods
+   */
+  public async *prepareUninstallation(
+    params: PrepareUninstallationParams,
+  ): AsyncGenerator<PrepareUninstallationStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
+    const networkName = (await provider.getNetwork()).name as SupportedNetworks;
+    type T = {
+      iplugin: {
+        installations: {
+          appliedPreparation: SubgraphPluginPreparation;
+          appliedVersion: SubgraphPluginVersion;
+        }[];
+      };
+    };
+    const { iplugin } = await this.graphql.request<T>({
+      query: QueryIPlugin,
+      params: {
+        address: params.pluginAddress.toLowerCase(),
+        where: { dao: params.daoAddressOrEns },
+      },
+      name: "plugin",
+    });
+
+    // filter specified installation
+    const { pluginInstallationIndex = 0 } = params;
+    const filteredInstallation = iplugin.installations.filter(
+      (installation) => {
+        return installation.appliedVersion.build ===
+            params.versionTag.build &&
+          installation.appliedVersion.release.release ===
+            params.versionTag.release;
+      },
+    )[pluginInstallationIndex];
+    if (!filteredInstallation) {
+      throw new InstallationNotFoundError();
+    }
+    // connect to psp contract
+    const pspContract = PluginSetupProcessor__factory.connect(
+      LIVE_CONTRACTS[networkName].pluginSetupProcessor,
+      signer,
+    );
+    const tx = await pspContract.prepareUninstallation(
+      params.daoAddressOrEns,
+      {
+        pluginSetupRef: {
+          pluginSetupRepo:
+            filteredInstallation.appliedPreparation.pluginRepo.id,
+          versionTag: params.versionTag,
+        },
+        setupPayload: {
+          plugin: params.pluginAddress,
+          currentHelpers: filteredInstallation.appliedPreparation.helpers,
+          data: filteredInstallation.appliedPreparation.data,
+        },
+      },
+    );
+    yield {
+      key: PrepareUninstallationSteps.PREPARING,
+      txHash: tx.hash,
+    };
+    const cr = await tx.wait();
+
+    const log = findLog(cr, pspContract.interface, "UninstallationPrepared");
+    if (!log) {
+      throw new PluginUninstallationPreparationError();
+    }
+    const parsedLog = pspContract.interface.parseLog(log);
+    const permissions = parsedLog.args["permissions"];
+    if (!permissions) {
+      throw new PluginUninstallationPreparationError();
+    }
+    yield {
+      key: PrepareUninstallationSteps.DONE,
+      permissions: permissions,
+      pluginRepo: filteredInstallation.appliedPreparation.pluginRepo.id,
+      pluginAddress: params.pluginAddress,
+      versionTag: params.versionTag,
     };
   }
   /**

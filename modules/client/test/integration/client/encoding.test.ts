@@ -24,6 +24,7 @@ import {
 } from "../../../src/client-common/interfaces/common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import {
+  ApplyUninstallationParams,
   PermissionIds,
   RegisterStandardCallbackParams,
   TokenType,
@@ -453,6 +454,82 @@ describe("Client", () => {
         expect(argsDecoded[1].permissions[parseInt(index)].permissionId).toBe(
           bytesToHex(
             applyInstallationParams.permissions[parseInt(index)].permissionId,
+          ),
+        );
+      }
+    });
+    it("Should encode an applyUninstallation action", async () => {
+      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const applyUninstallationParams: ApplyUninstallationParams = {
+        permissions: [{
+          condition: "0x1234567890123456789012345678901234567890",
+          operation: 1,
+          permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
+          where: "0x1234567890123456789012345678901234567890",
+          who: "0x2345678901234567890123456789012345678901",
+        }],
+        versionTag: {
+          build: 1,
+          release: 1,
+        },
+        pluginRepo: "0x2345678901234567890123456789012345678901",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
+      };
+      const daoAddress = "0x1234567890123456789012345678901234567890";
+      networkSpy.mockReturnValueOnce({
+        name: "goerli",
+        chainId: 31337,
+      });
+      const actions = client.encoding.applyUninstallationAction(
+        daoAddress,
+        applyUninstallationParams,
+      );
+
+      expect(actions.length).toBe(3);
+      expect(typeof actions[1]).toBe("object");
+      expect(actions[1].data).toBeInstanceOf(Uint8Array);
+
+      const daoInterface = PluginSetupProcessor__factory.createInterface();
+      const hexString = bytesToHex(actions[1].data);
+      const argsDecoded = daoInterface.decodeFunctionData(
+        "applyUninstallation",
+        hexString,
+      );
+      expect(argsDecoded.length).toBe(2);
+      expect(argsDecoded[0]).toBe(
+        daoAddress,
+      );
+      expect(argsDecoded[1].pluginSetupRef.versionTag.build).toBe(
+        applyUninstallationParams.versionTag.build,
+      );
+      expect(argsDecoded[1].pluginSetupRef.versionTag.release).toBe(
+        applyUninstallationParams.versionTag.release,
+      );
+      expect(argsDecoded[1].plugin).toBe(
+        applyUninstallationParams.pluginAddress,
+      );
+      expect(argsDecoded[1].pluginSetupRef.pluginSetupRepo).toBe(
+        applyUninstallationParams.pluginRepo,
+      );
+      for (const index in argsDecoded[1].permissions) {
+        expect(argsDecoded[1].permissions[parseInt(index)].operation).toBe(
+          applyUninstallationParams.permissions[parseInt(index)].operation,
+        );
+        expect(argsDecoded[1].permissions[parseInt(index)].where).toBe(
+          applyUninstallationParams.permissions[parseInt(index)].where,
+        );
+        expect(argsDecoded[1].permissions[parseInt(index)].who).toBe(
+          applyUninstallationParams.permissions[parseInt(index)].who,
+        );
+        expect(argsDecoded[1].permissions[parseInt(index)].condition).toBe(
+          applyUninstallationParams.permissions[parseInt(index)].condition,
+        );
+        expect(argsDecoded[1].permissions[parseInt(index)].permissionId).toBe(
+          bytesToHex(
+            applyUninstallationParams.permissions[parseInt(index)].permissionId,
           ),
         );
       }
