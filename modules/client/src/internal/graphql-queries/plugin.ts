@@ -19,10 +19,10 @@ export const QueryPlugin = gql`
 query Plugin($id: ID!) {
   pluginRepo(id:$id){
     subdomain
-    releases(orderBy: release, orderDirection: desc){
+    releases(orderBy: release, orderDirection: desc, limit: 1){
       release
       metadata
-      builds(orderBy: build, orderDirection: desc){
+      builds(orderBy: build, orderDirection: desc, limit: 1){
         build
         metadata
       }
