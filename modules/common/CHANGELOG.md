@@ -16,6 +16,8 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## UPCOMING
+## 1.3.0
+- Add new common error classes `InstallationNotFoundError` `PluginUninstallationPreparationError`
 ## 1.2.0
 ### Added
 - Adds new common error classes `InvalidContractAddressError` `InvalidContractAbiError` `CannotEstimateGasError`
