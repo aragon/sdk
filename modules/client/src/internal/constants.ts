@@ -64,18 +64,18 @@ export const UNAVAILABLE_RELEASE_METADATA: PluginRepoReleaseMetadata = {
 };
 
 export const UNSUPPORTED_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
-  ui: "(unsupported metadata link)",
+  ui: "",
   change: "(unsupported metadata link)",
   pluginSetupABI: {},
 };
 export const EMPTY_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
-  ui: "(the build has no metadata)",
+  ui: "",
   change: "(the build has no metadata)",
   pluginSetupABI: {},
 };
 
 export const UNAVAILABLE_BUILD_METADATA: PluginRepoBuildMetadata = {
-  ui: "(unavailable metadata)",
+  ui: "",
   change: "(unavailable metadata)",
   pluginSetupABI: {},
 };

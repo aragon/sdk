@@ -271,11 +271,15 @@ export function toPluginRepo(
     current: {
       build: {
         metadata: buildMetadata,
-        number: pluginRepo.releases[0].builds[0].build,
+        // the subgraph returns only one build ordered by build number 
+        // in descending order, this means it's the latest build
+        number: pluginRepo.releases?.[0]?.builds?.[0]?.build,
       },
       release: {
         metadata: releaseMetadata,
-        number: pluginRepo.releases[0].release,
+        // the subgraph returns only one realease ordered by realease number 
+        // in descending order, this means it's the latest realease
+        number: pluginRepo.releases?.[0]?.release,
       },
     },
   };
