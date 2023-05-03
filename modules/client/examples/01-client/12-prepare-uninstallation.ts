@@ -9,13 +9,9 @@ title: PrepareInstallation
 
 import {
   Client,
-  DaoDepositSteps,
-  DepositParams,
   GasFeeEstimation,
   PrepareUninstallationParams,
   PrepareUninstallationSteps,
-  SetAllowanceSteps,
-  TokenType,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
@@ -24,10 +20,6 @@ const client: Client = new Client(context);
 
 const prepareUninstallationParams: PrepareUninstallationParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
-  versionTag: {
-    build: 1,
-    release: 1,
-  },
   pluginAddress: "0x2345678901234567890123456789012345678901",
 };
 
