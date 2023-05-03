@@ -44,7 +44,6 @@ import {
   DaoMetadata,
   DaoSortBy,
   DepositParams,
-  GetPluginParams,
   IClientMethods,
   IDaoQueryParams,
   IHasPermissionParams,

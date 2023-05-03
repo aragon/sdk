@@ -600,8 +600,3 @@ export type PluginRepo = {
   };
 };
 
-export type GetPluginParams = {
-  release: number;
-  build: number;
-  pluginAddress: string;
-};

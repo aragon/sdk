@@ -44,7 +44,6 @@ import { MissingExecPermissionError } from "@aragon/sdk-common";
 import { Server } from "ganache";
 import {
   AssetBalanceSortBy,
-  GetPluginParams,
   PluginQueryParams,
   PluginSortBy,
   SetAllowanceSteps,
