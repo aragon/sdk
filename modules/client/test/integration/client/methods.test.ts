@@ -981,6 +981,7 @@ describe("Client", () => {
           }
         });
       });
+
       it("Should get a list plugin details", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
@@ -1048,6 +1049,7 @@ describe("Client", () => {
         expect(plugins[0].releases[0].currentBuild).toBe(2);
         mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
       });
+      
       it("Should get a plugin details given the address", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
