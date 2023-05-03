@@ -443,10 +443,6 @@ describe("Client", () => {
         const steps = client.methods.prepareUninstallation(
           {
             daoAddressOrEns: dao,
-            versionTag: {
-              build: 1,
-              release: 1,
-            },
             pluginAddress: plugin,
           },
         );

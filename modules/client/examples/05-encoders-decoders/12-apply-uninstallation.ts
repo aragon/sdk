@@ -15,6 +15,7 @@ import {
   Client,
   DaoAction,
   DecodedApplyUninstallationParams,
+  PermissionOperationType,
 } from "@aragon/sdk-client";
 import { hexToBytes } from "@aragon/sdk-common";
 import { context } from "../index";
@@ -27,7 +28,7 @@ const client: Client = new Client(context);
 const applyUninstallationParams: ApplyUninstallationParams = {
   permissions: [{
     condition: "0x1234567890123456789012345678901234567890",
-    operation: 1,
+    operation: PermissionOperationType.GRANT,
     permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
     where: "0x1234567890123456789012345678901234567890",
     who: "0x2345678901234567890123456789012345678901",

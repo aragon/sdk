@@ -21,12 +21,16 @@ const client: Client = new Client(context);
 const prepareUninstallationParams: PrepareUninstallationParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
   pluginAddress: "0x2345678901234567890123456789012345678901",
+  uninstallationParams: [[
+    "casa",
+  ]],
 };
 
 // Estimate how much gas the transaction will cost.
-const estimatedGas: GasFeeEstimation = await client.estimation.prepareUninstallation(
-  prepareUninstallationParams,
-);
+const estimatedGas: GasFeeEstimation = await client.estimation
+  .prepareUninstallation(
+    prepareUninstallationParams,
+  );
 console.log({ avg: estimatedGas.average, max: estimatedGas.max });
 
 // Deposit the ERC20 tokens.

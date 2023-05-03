@@ -121,7 +121,7 @@ import {
 /**
  * Methods module the SDK Generic Client
  */
-export class ClientMethods<T> extends ClientCore implements IClientMethods<T> {
+export class ClientMethods extends ClientCore implements IClientMethods{
   constructor(context: Context) {
     super(context);
     Object.freeze(ClientMethods.prototype);
@@ -412,8 +412,8 @@ export class ClientMethods<T> extends ClientCore implements IClientMethods<T> {
    * @return {*}  {AsyncGenerator<PrepareUninstallationStepValue>}
    * @memberof ClientMethods
    */
-  public async *prepareUninstallation<U>(
-    params: PrepareUninstallationParams<U>,
+  public async *prepareUninstallation(
+    params: PrepareUninstallationParams,
   ): AsyncGenerator<PrepareUninstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
     const provider = this.web3.getProvider();

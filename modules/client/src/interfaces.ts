@@ -19,7 +19,7 @@ import {
 } from "./client-common";
 
 /** Defines the shape of the general purpose Client class */
-export interface IClientMethods<T> extends IClientCore {
+export interface IClientMethods extends IClientCore {
   createDao: (params: CreateDaoParams) => AsyncGenerator<DaoCreationStepValue>;
   pinMetadata: (params: DaoMetadata) => Promise<string>;
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
@@ -50,7 +50,7 @@ export interface IClientMethods<T> extends IClientCore {
 =======
   /** Prepare uninstallation of a plugin */
   prepareUninstallation: (
-    params: PrepareUninstallationParams<T>,
+    params: PrepareUninstallationParams,
   ) => AsyncGenerator<PrepareUninstallationStepValue>;
 >>>>>>> ad87b92 (add plugin uninstallation)
 }
@@ -142,8 +142,8 @@ export interface IClientEstimation {
   setAllowance: (params: SetAllowanceParams) => Promise<GasFeeEstimation>;
 }
 
-export interface IClient<T> {
-  methods: IClientMethods<T>;
+export interface IClient {
+  methods: IClientMethods;
   encoding: IClientEncoding;
   decoding: IClientDecoding;
   estimation: IClientEstimation;
@@ -613,11 +613,11 @@ export type PluginRepo = {
   };
 };
 
-export type PrepareUninstallationParams<T> = {
+export type PrepareUninstallationParams = {
   daoAddressOrEns: string;
   pluginAddress: string;
   pluginInstallationIndex?: number;
-  uninstallationParams?: T[];
+  uninstallationParams?: any;
 };
 
 export type SubgraphPluginVersion = {
