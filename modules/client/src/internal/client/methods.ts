@@ -12,14 +12,19 @@ import {
   InstallationNotFoundError,
   InvalidAddressOrEnsError,
   InvalidCidError,
+  InvalidPrepareUninstallationAbiError,
+  IpfsFetchError,
   IpfsPinError,
   MissingExecPermissionError,
+  MissingMetadataError,
   NoProviderError,
   NoSignerError,
   PluginUninstallationPreparationError,
   resolveIpfsCid,
   UpdateAllowanceError,
 } from "@aragon/sdk-common";
+
+import { defaultAbiCoder } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
@@ -36,6 +41,7 @@ import {
 import {
   AssetBalance,
   AssetBalanceSortBy,
+  BuildMetadata,
   CreateDaoParams,
   DaoBalancesQueryParams,
   DaoCreationSteps,
@@ -72,6 +78,7 @@ import {
   SubgraphPluginRepoListItem,
   SubgraphPluginPreparation,
   SubgraphPluginVersion,
+  SubgraphPluginInstallation,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
   TokenType,
@@ -114,7 +121,7 @@ import {
 /**
  * Methods module the SDK Generic Client
  */
-export class ClientMethods extends ClientCore implements IClientMethods {
+export class ClientMethods<T> extends ClientCore implements IClientMethods<T> {
   constructor(context: Context) {
     super(context);
     Object.freeze(ClientMethods.prototype);
@@ -405,19 +412,14 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {AsyncGenerator<PrepareUninstallationStepValue>}
    * @memberof ClientMethods
    */
-  public async *prepareUninstallation(
-    params: PrepareUninstallationParams,
+  public async *prepareUninstallation<U>(
+    params: PrepareUninstallationParams<U>,
   ): AsyncGenerator<PrepareUninstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
     const provider = this.web3.getProvider();
     const networkName = (await provider.getNetwork()).name as SupportedNetworks;
     type T = {
-      iplugin: {
-        installations: {
-          appliedPreparation: SubgraphPluginPreparation;
-          appliedVersion: SubgraphPluginVersion;
-        }[];
-      };
+      iplugin: { installations: SubgraphPluginInstallation[] };
     };
     const { iplugin } = await this.graphql.request<T>({
       query: QueryIPlugin,
@@ -430,17 +432,41 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     // filter specified installation
     const { pluginInstallationIndex = 0 } = params;
-    const filteredInstallation = iplugin.installations.filter(
-      (installation) => {
-        return installation.appliedVersion.build ===
-            params.versionTag.build &&
-          installation.appliedVersion.release.release ===
-            params.versionTag.release;
-      },
-    )[pluginInstallationIndex];
-    if (!filteredInstallation) {
+    const selectedInstallation = iplugin.installations[pluginInstallationIndex];
+    if (!selectedInstallation) {
       throw new InstallationNotFoundError();
     }
+    // check if metadata is defined
+    if (!selectedInstallation.appliedVersion.metadata) {
+      throw new MissingMetadataError();
+    }
+    // fetch metadata from ipfs
+    let buildMetadata: BuildMetadata;
+    try {
+      const buildMetadataString = await this.ipfs.fetchString(
+        selectedInstallation.appliedVersion.metadata,
+      );
+      buildMetadata = JSON.parse(buildMetadataString) as BuildMetadata;
+    } catch {
+      throw new IpfsFetchError();
+    }
+    // get unistallation abi
+    let uninstallationAbi = buildMetadata?.pluginSetupABI
+      ?.prepareUninstallation;
+
+    // TODO remove this when metadata is fixed
+    if (uninstallationAbi.length === 1 && uninstallationAbi[0] === "") {
+      uninstallationAbi = [];
+    }
+    if (!uninstallationAbi) {
+      throw new InvalidPrepareUninstallationAbiError();
+    }
+    // encode uninstallation params
+    const { uninstallationParams = [] } = params;
+    const data = defaultAbiCoder.encode(
+      uninstallationAbi,
+      uninstallationParams,
+    );
     // connect to psp contract
     const pspContract = PluginSetupProcessor__factory.connect(
       LIVE_CONTRACTS[networkName].pluginSetupProcessor,
@@ -451,13 +477,16 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       {
         pluginSetupRef: {
           pluginSetupRepo:
-            filteredInstallation.appliedPreparation.pluginRepo.id,
-          versionTag: params.versionTag,
+            selectedInstallation.appliedPreparation.pluginRepo.id,
+          versionTag: {
+            build: selectedInstallation.appliedVersion.build,
+            release: selectedInstallation.appliedVersion.release.release,
+          },
         },
         setupPayload: {
           plugin: params.pluginAddress,
-          currentHelpers: filteredInstallation.appliedPreparation.helpers,
-          data: filteredInstallation.appliedPreparation.data,
+          currentHelpers: selectedInstallation.appliedPreparation.helpers,
+          data,
         },
       },
     );
@@ -479,9 +508,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield {
       key: PrepareUninstallationSteps.DONE,
       permissions: permissions,
-      pluginRepo: filteredInstallation.appliedPreparation.pluginRepo.id,
+      pluginRepo: selectedInstallation.appliedPreparation.pluginRepo.id,
       pluginAddress: params.pluginAddress,
-      versionTag: params.versionTag,
+      versionTag: {
+        build: selectedInstallation.appliedVersion.build,
+        release: selectedInstallation.appliedVersion.release.release,
+      },
     };
   }
   /**

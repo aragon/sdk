@@ -35,23 +35,21 @@ query Plugin($id: ID!) {
 export const QueryIPlugin = gql`
 query IPlugin($address: ID!, $where: IPlugin_filter!) {
 	iplugin(id:$address, where:$where){
-		installations{
+    installations(where:{state: Installed}) {
       appliedPreparation{
         helpers
-        data
-        pluginRepo{
+        pluginRepo {
           id
         }
       }
-      appliedVersion {
-        pluginVersion{
-          release{
-            release
-          }
-          build
+     	appliedVersion {
+        metadata
+        build
+        release{
+          release
         }
       }
-    }    
+    }   
   }
 }
 `;

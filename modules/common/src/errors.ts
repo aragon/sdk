@@ -180,3 +180,14 @@ export class PluginUninstallationPreparationError extends Error {
   }
 }
 
+export class MissingMetadataError {
+  constructor() {
+    throw new Error("Missing metadata");
+  }
+}
+
+export class InvalidPrepareUninstallationAbiError extends Error {
+  constructor() {
+    super("Invalid prepare uninstallation ABI");
+  }
+}

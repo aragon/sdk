@@ -14,13 +14,12 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { IClientCore } from "./client-common/interfaces/core";
 import {
   ApplyInstallationParams,
-  DecodedApplyInstallationParams,
   ApplyInstallationParamsBase,
-  VersionTag,
+  DecodedApplyInstallationParams,
 } from "./client-common";
 
 /** Defines the shape of the general purpose Client class */
-export interface IClientMethods extends IClientCore {
+export interface IClientMethods<T> extends IClientCore {
   createDao: (params: CreateDaoParams) => AsyncGenerator<DaoCreationStepValue>;
   pinMetadata: (params: DaoMetadata) => Promise<string>;
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
@@ -51,7 +50,7 @@ export interface IClientMethods extends IClientCore {
 =======
   /** Prepare uninstallation of a plugin */
   prepareUninstallation: (
-    params: PrepareUninstallationParams,
+    params: PrepareUninstallationParams<T>,
   ) => AsyncGenerator<PrepareUninstallationStepValue>;
 >>>>>>> ad87b92 (add plugin uninstallation)
 }
@@ -143,8 +142,8 @@ export interface IClientEstimation {
   setAllowance: (params: SetAllowanceParams) => Promise<GasFeeEstimation>;
 }
 
-export interface IClient {
-  methods: IClientMethods;
+export interface IClient<T> {
+  methods: IClientMethods<T>;
   encoding: IClientEncoding;
   decoding: IClientDecoding;
   estimation: IClientEstimation;
@@ -460,15 +459,13 @@ export enum DaoSortBy {
   // POPULARITY = "totalProposals", // currently defined as number of proposals
 }
 
-
-
 export type SubgraphPluginListItem = {
   id: string;
   installations: {
     appliedVersion: {
       pluginRepo: {
-        subdomain: string
-      }
+        subdomain: string;
+      };
       build: number;
       release: {
         release: number;
@@ -616,26 +613,31 @@ export type PluginRepo = {
   };
 };
 
-export type PrepareUninstallationParams = {
+export type PrepareUninstallationParams<T> = {
   daoAddressOrEns: string;
-  versionTag: VersionTag;
   pluginAddress: string;
   pluginInstallationIndex?: number;
+  uninstallationParams?: T[];
 };
 
 export type SubgraphPluginVersion = {
   release: {
     release: number;
   };
+  metadata: string;
   build: number;
 };
 
 export type SubgraphPluginPreparation = {
   helpers: string[];
-  data: string;
   pluginRepo: {
     id: string;
   };
+};
+
+export type SubgraphPluginInstallation = {
+  appliedVersion: SubgraphPluginVersion;
+  appliedPreparation: SubgraphPluginPreparation;
 };
 
 export enum PrepareUninstallationSteps {
@@ -651,3 +653,13 @@ export type PrepareUninstallationStepValue =
 
 export type ApplyUninstallationParams = ApplyInstallationParamsBase;
 export type DecodedApplyUninstallationParams = ApplyInstallationParamsBase;
+
+export type BuildMetadata = {
+  ui: string;
+  change: string;
+  pluginSetupABI: {
+    prepareInstallation: string[];
+    prepareUpdate: string[];
+    prepareUninstallation: string[];
+  };
+};

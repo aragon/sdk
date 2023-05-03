@@ -16,7 +16,6 @@ import {
   TEST_NO_BALANCES_DAO_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
   TEST_TX_HASH,
-  TEST_WALLET_ADDRESS,
   // TEST_WALLET,
 } from "../constants";
 import {
@@ -33,8 +32,6 @@ import {
   IHasPermissionParams,
   ITransferQueryParams,
   LIVE_CONTRACTS,
-  MultisigClient,
-  MultisigPluginSettings,
   Permissions,
   SetAllowanceParams,
   SortDirection,
@@ -56,6 +53,7 @@ import {
   SubgraphDao,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
+  SubgraphPluginInstallation,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "../../../src/interfaces";
@@ -401,13 +399,6 @@ describe("Client", () => {
         const { dao, plugin } = await buildMultisigDAO(
           deployment.multisigRepo.address,
         );
-        const installationParams: MultisigPluginSettings = {
-          members: [TEST_WALLET_ADDRESS],
-          votingSettings: {
-            minApprovals: 1,
-            onlyListed: true,
-          },
-        };
         const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
         networkSpy.mockReturnValueOnce(
           Promise.resolve({
@@ -415,22 +406,18 @@ describe("Client", () => {
             chainId: 31337,
           }),
         );
-        const { data } = MultisigClient.encoding.getPluginInstallItem(
-          installationParams,
-          "goerli",
-        );
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
-        const installation = {
+        const installation: SubgraphPluginInstallation = {
           appliedPreparation: {
             helpers: [],
-            data,
             pluginRepo: {
               id: deployment.multisigRepo.address,
             },
           },
           appliedVersion: {
+            metadata: `ipfs://${IPFS_CID}`,
             release: {
               release: 1,
             },
@@ -440,6 +427,19 @@ describe("Client", () => {
         mockedClient.request.mockResolvedValueOnce({
           iplugin: { installations: [installation] },
         });
+        mockedIPFSClient.cat.mockResolvedValueOnce(
+          Buffer.from(
+            JSON.stringify({
+              ui: "",
+              change: "",
+              pluginSetupABI: {
+                prepareInstallation: ["address admin"],
+                prepareUpdate: [],
+                prepareUninstallation: [],
+              },
+            }),
+          ),
+        );
         const steps = client.methods.prepareUninstallation(
           {
             daoAddressOrEns: dao,
