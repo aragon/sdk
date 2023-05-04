@@ -66,16 +66,28 @@ export const UNAVAILABLE_RELEASE_METADATA: PluginRepoReleaseMetadata = {
 export const UNSUPPORTED_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
   ui: "",
   change: "(unsupported metadata link)",
-  pluginSetupABI: {},
+  pluginSetupABI: {
+    prepareInstallation: [],
+    prepareUninstallation: [],
+    prepareUpdate: [],
+  },
 };
 export const EMPTY_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
   ui: "",
   change: "(the build has no metadata)",
-  pluginSetupABI: {},
+  pluginSetupABI: {
+    prepareInstallation: [],
+    prepareUninstallation: [],
+    prepareUpdate: [],
+  },
 };
 
 export const UNAVAILABLE_BUILD_METADATA: PluginRepoBuildMetadata = {
   ui: "",
   change: "(unavailable metadata)",
-  pluginSetupABI: {},
+  pluginSetupABI: {
+    prepareInstallation: [],
+    prepareUninstallation: [],
+    prepareUpdate: [],
+  },
 };

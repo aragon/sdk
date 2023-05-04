@@ -41,7 +41,6 @@ import {
 import {
   AssetBalance,
   AssetBalanceSortBy,
-  BuildMetadata,
   CreateDaoParams,
   DaoBalancesQueryParams,
   DaoCreationSteps,
@@ -76,8 +75,6 @@ import {
   SubgraphDaoListItem,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
-  SubgraphPluginPreparation,
-  SubgraphPluginVersion,
   SubgraphPluginInstallation,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
@@ -441,12 +438,12 @@ export class ClientMethods extends ClientCore implements IClientMethods{
       throw new MissingMetadataError();
     }
     // fetch metadata from ipfs
-    let buildMetadata: BuildMetadata;
+    let buildMetadata: PluginRepoBuildMetadata;
     try {
       const buildMetadataString = await this.ipfs.fetchString(
         selectedInstallation.appliedVersion.metadata,
       );
-      buildMetadata = JSON.parse(buildMetadataString) as BuildMetadata;
+      buildMetadata = JSON.parse(buildMetadataString) as PluginRepoBuildMetadata;
     } catch {
       throw new IpfsFetchError();
     }

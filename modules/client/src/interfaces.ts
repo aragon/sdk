@@ -42,17 +42,14 @@ export interface IClientMethods extends IClientCore {
   getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
   /** Retrieves metadata for many daos */
   getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
-<<<<<<< HEAD
   /** retrieves the plugin details given an address, release and build */
   getPlugin: (pluginAddress: string) => Promise<PluginRepo>;
   /** Retrieves the list of plugins available on the PluginRegistry */
   getPlugins: (params?: PluginQueryParams) => Promise<PluginRepoListItem[]>;
-=======
   /** Prepare uninstallation of a plugin */
   prepareUninstallation: (
     params: PrepareUninstallationParams,
   ) => AsyncGenerator<PrepareUninstallationStepValue>;
->>>>>>> ad87b92 (add plugin uninstallation)
 }
 
 export interface IClientEncoding extends IClientCore {
@@ -580,11 +577,6 @@ export type PluginRepoReleaseMetadata = {
   description: string;
   images: Object; // TODO specify parameters
 };
-export type PluginRepoBuildMetadata = {
-  ui: string;
-  change: string;
-  pluginSetupABI: Object;
-};
 
 export type PluginRepoRelease = {
   release: number;
@@ -654,7 +646,7 @@ export type PrepareUninstallationStepValue =
 export type ApplyUninstallationParams = ApplyInstallationParamsBase;
 export type DecodedApplyUninstallationParams = ApplyInstallationParamsBase;
 
-export type BuildMetadata = {
+export type PluginRepoBuildMetadata = {
   ui: string;
   change: string;
   pluginSetupABI: {
