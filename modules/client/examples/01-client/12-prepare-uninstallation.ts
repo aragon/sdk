@@ -21,9 +21,13 @@ const client: Client = new Client(context);
 const prepareUninstallationParams: PrepareUninstallationParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
   pluginAddress: "0x2345678901234567890123456789012345678901",
-  uninstallationParams: [[
-    "casa",
-  ]],
+  uninstallationParams: [ // Parameters needed by the prepare uninstall abi
+    "test",
+    ["testArrayItem", "testArrayItem2"],
+    {
+      testObjectProp: "testObjectValue",
+    },
+  ],
 };
 
 // Estimate how much gas the transaction will cost.
