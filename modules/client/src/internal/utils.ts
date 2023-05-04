@@ -15,10 +15,18 @@ import {
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
   PermissionIds,
+  PluginRepo,
+  PluginRepoBuildMetadata,
+  PluginRepoListItem,
+  PluginRepoRelease,
+  PluginRepoReleaseMetadata,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
   SubgraphPluginListItem,
+  SubgraphPluginRepo,
+  SubgraphPluginRepoListItem,
+  SubgraphPluginRepoReleaseListItem,
   SubgraphTransferListItem,
   SubgraphTransferType,
   TokenType,
@@ -229,6 +237,52 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
       proposalId: transfer.proposal?.id || "",
     };
   }
+}
+
+export function toPluginRepoRelease(
+  release: SubgraphPluginRepoReleaseListItem,
+  metadata: PluginRepoReleaseMetadata,
+): PluginRepoRelease {
+  return {
+    release: release.release,
+    currentBuild: Math.max(...release.builds.map((build) => build.build)),
+    metadata,
+  };
+}
+
+export function toPluginRepoListItem(
+  pluginRepo: SubgraphPluginRepoListItem,
+  releases: PluginRepoRelease[],
+): PluginRepoListItem {
+  return {
+    address: pluginRepo.id,
+    subdomain: pluginRepo.subdomain,
+    releases,
+  };
+}
+export function toPluginRepo(
+  pluginRepo: SubgraphPluginRepo,
+  releaseMetadata: PluginRepoReleaseMetadata,
+  buildMetadata: PluginRepoBuildMetadata,
+): PluginRepo {
+  return {
+    address: pluginRepo.id,
+    subdomain: pluginRepo.subdomain,
+    current: {
+      build: {
+        metadata: buildMetadata,
+        // the subgraph returns only one build ordered by build number 
+        // in descending order, this means it's the latest build
+        number: pluginRepo.releases?.[0]?.builds?.[0]?.build,
+      },
+      release: {
+        metadata: releaseMetadata,
+        // the subgraph returns only one realease ordered by realease number 
+        // in descending order, this means it's the latest realease
+        number: pluginRepo.releases?.[0]?.release,
+      },
+    },
+  };
 }
 
 export function applyInstallatonParamsToContract(

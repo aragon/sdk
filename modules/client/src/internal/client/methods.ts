@@ -25,6 +25,8 @@ import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryDao,
   QueryDaos,
+  QueryPlugin,
+  QueryPlugins,
   QueryTokenBalances,
   QueryTokenTransfers,
 } from "../graphql-queries";
@@ -47,17 +49,26 @@ import {
   IHasPermissionParams,
   ITransferQueryParams,
   PermissionIds,
+  PluginQueryParams,
+  PluginRepo,
+  PluginRepoBuildMetadata,
+  PluginRepoListItem,
+  PluginRepoRelease,
+  PluginRepoReleaseMetadata,
+  PluginSortBy,
   SetAllowanceParams,
   SetAllowanceSteps,
+  SetAllowanceStepValue,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
+  SubgraphPluginRepo,
+  SubgraphPluginRepoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
   TokenType,
   Transfer,
   TransferSortBy,
-  SetAllowanceStepValue,
 } from "../../interfaces";
 import {
   ClientCore,
@@ -69,6 +80,9 @@ import {
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
+  toPluginRepo,
+  toPluginRepoListItem,
+  toPluginRepoRelease,
   toTokenTransfer,
   unwrapDepositParams,
 } from "../utils";
@@ -76,9 +90,15 @@ import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { id } from "@ethersproject/hash";
 import {
+  EMPTY_BUILD_METADATA_LINK,
   EMPTY_DAO_METADATA_LINK,
+  EMPTY_RELEASE_METADATA_LINK,
+  UNAVAILABLE_BUILD_METADATA,
   UNAVAILABLE_DAO_METADATA,
+  UNAVAILABLE_RELEASE_METADATA,
+  UNSUPPORTED_BUILD_METADATA_LINK,
   UNSUPPORTED_DAO_METADATA_LINK,
+  UNSUPPORTED_RELEASE_METADATA_LINK,
 } from "../constants";
 
 /**
@@ -624,5 +644,132 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           toTokenTransfer(transfer),
       ),
     );
+  }
+
+  /**
+   * Retrieves the list of plugins available on the PluginRegistry
+   *
+   * @param {PluginQueryParams} {
+   *     limit = 10,
+   *     skip = 0,
+   *     direction = SortDirection.ASC,
+   *     sortBy = PluginSortBy.SUBDOMAIN,
+   *     subdomain
+   *   }
+   * @return {*}  {(Promise<PluginRepo[] | null>)}
+   * @memberof ClientMethods
+   */
+  public async getPlugins({
+    limit = 10,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = PluginSortBy.SUBDOMAIN,
+    subdomain,
+  }: PluginQueryParams = {}): Promise<PluginRepoListItem[]> {
+    let where = {};
+    if (subdomain) {
+      where = { subdomain_contains_nocase: subdomain };
+    }
+    const query = QueryPlugins;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "plugin repos";
+    type T = { pluginRepos: SubgraphPluginRepoListItem[] };
+    const { pluginRepos } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
+    return Promise.all(
+      pluginRepos.map(
+        async (
+          pluginRepo: SubgraphPluginRepoListItem,
+        ): Promise<PluginRepoListItem> => {
+          let pluginRepoReleases: PluginRepoRelease[] = [];
+          for (const release of pluginRepo.releases) {
+            let metadata: PluginRepoReleaseMetadata;
+            if (!release.metadata) {
+              metadata = EMPTY_RELEASE_METADATA_LINK;
+            } else {
+              try {
+                const metadataCid = resolveIpfsCid(release.metadata);
+                const stringMetadata = await this.ipfs.fetchString(metadataCid);
+                const resolvedMetadata = JSON.parse(stringMetadata);
+                metadata = resolvedMetadata;
+              } catch (err) {
+                metadata = UNAVAILABLE_RELEASE_METADATA;
+                if (err instanceof InvalidCidError) {
+                  metadata = UNSUPPORTED_RELEASE_METADATA_LINK;
+                }
+              }
+            }
+            pluginRepoReleases = [
+              ...pluginRepoReleases,
+              toPluginRepoRelease(release, metadata),
+            ];
+          }
+          return toPluginRepoListItem(pluginRepo, pluginRepoReleases);
+        },
+      ),
+    );
+  }
+  /**
+   * Get plugin details given an address, release and build
+   *
+   * @param {string} pluginAddress
+   * @return {*}  {Promise<PluginRepo>}
+   * @memberof ClientMethods
+   */
+  public async getPlugin(pluginAddress: string): Promise<PluginRepo> {
+    const name = "plugin version";
+    const query = QueryPlugin;
+    type T = { pluginRepo: SubgraphPluginRepo };
+    const { pluginRepo } = await this.graphql.request<T>({
+      query,
+      params: { id: pluginAddress },
+      name,
+    });
+    // get release metadata
+    let releaseMetadata: PluginRepoReleaseMetadata;
+    if (!pluginRepo.releases[0].metadata) {
+      releaseMetadata = EMPTY_RELEASE_METADATA_LINK;
+    } else {
+      try {
+        const metadataCid = resolveIpfsCid(pluginRepo.releases[0].metadata);
+        const stringMetadata = await this.ipfs.fetchString(metadataCid);
+        const resolvedMetadata = JSON.parse(stringMetadata);
+        releaseMetadata = resolvedMetadata;
+      } catch (err) {
+        releaseMetadata = UNAVAILABLE_RELEASE_METADATA;
+        if (err instanceof InvalidCidError) {
+          releaseMetadata = UNSUPPORTED_RELEASE_METADATA_LINK;
+        }
+      }
+    }
+    // get build metadata
+    let buildMetadata: PluginRepoBuildMetadata;
+    if (!pluginRepo.releases[0].builds[0].metadata) {
+      buildMetadata = EMPTY_BUILD_METADATA_LINK;
+    } else {
+      try {
+        const metadataCid = resolveIpfsCid(
+          pluginRepo.releases[0].builds[0].metadata,
+        );
+        const stringMetadata = await this.ipfs.fetchString(metadataCid);
+        const resolvedMetadata = JSON.parse(stringMetadata);
+        buildMetadata = resolvedMetadata;
+      } catch (err) {
+        buildMetadata = UNAVAILABLE_BUILD_METADATA;
+        if (err instanceof InvalidCidError) {
+          buildMetadata = UNSUPPORTED_BUILD_METADATA_LINK;
+        }
+      }
+    }
+    return toPluginRepo(pluginRepo, releaseMetadata, buildMetadata);
   }
 }

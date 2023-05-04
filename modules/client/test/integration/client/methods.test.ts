@@ -44,9 +44,13 @@ import { MissingExecPermissionError } from "@aragon/sdk-common";
 import { Server } from "ganache";
 import {
   AssetBalanceSortBy,
+  PluginQueryParams,
+  PluginSortBy,
   SetAllowanceSteps,
   SubgraphBalance,
   SubgraphDao,
+  SubgraphPluginRepo,
+  SubgraphPluginRepoListItem,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "../../../src/interfaces";
@@ -976,6 +980,141 @@ describe("Client", () => {
             }
           }
         });
+      });
+
+      it("Should get a list plugin details", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+        const defaultCatImplementation = mockedIPFSClient.cat
+          .getMockImplementation();
+
+        mockedIPFSClient.cat.mockResolvedValue(
+          Buffer.from(
+            JSON.stringify({
+              name: "Name",
+              description: "Description",
+              images: {},
+            }),
+          ),
+        );
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const address = "0x1234567890123456789012345678901234567890";
+        const pluginRepo: SubgraphPluginRepoListItem = {
+          id: address,
+          subdomain: "test",
+          releases: [
+            {
+              release: 1,
+              metadata: `ipfs://${IPFS_CID}`,
+              builds: [
+                {
+                  build: 1,
+                },
+                {
+                  build: 2,
+                },
+              ],
+            },
+            {
+              release: 2,
+              metadata: `ipfs://${IPFS_CID}`,
+              builds: [
+                {
+                  build: 1,
+                },
+              ],
+            },
+          ],
+        };
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepos: [pluginRepo],
+        });
+
+        const params: PluginQueryParams = {
+          limit: 10,
+          skip: 0,
+          direction: SortDirection.ASC,
+          sortBy: PluginSortBy.SUBDOMAIN,
+        };
+
+        const plugins = await client.methods.getPlugins(params);
+        expect(plugins.length).toBe(1);
+        expect(plugins[0].releases.length).toBe(2);
+        expect(plugins[0].releases[0].release).toBe(1);
+        expect(plugins[0].releases[0].metadata.name).toBe("Name");
+        expect(plugins[0].releases[0].metadata.description).toBe("Description");
+        expect(plugins[0].releases[0].currentBuild).toBe(2);
+        mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
+      });
+      
+      it("Should get a plugin details given the address", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        mockedIPFSClient.cat.mockResolvedValueOnce(
+          Buffer.from(
+            JSON.stringify({
+              name: "Name",
+              description: "Description",
+              images: {},
+            }),
+          ),
+        );
+        mockedIPFSClient.cat.mockResolvedValueOnce(
+          Buffer.from(
+            JSON.stringify({
+              ui: "test",
+              change: "test",
+              pluginSetupABI: {},
+            }),
+          ),
+        );
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const address = "0x1234567890123456789012345678901234567890";
+        const pluginRepo: SubgraphPluginRepo = {
+          id: address,
+          subdomain: "test",
+          releases: [
+            {
+              metadata: `ipfs://${IPFS_CID}`,
+              release: 1,
+              builds: [
+                {
+                  metadata: `ipfs://${IPFS_CID}`,
+                  build: 1,
+                },
+              ],
+            },
+          ],
+        };
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo,
+        });
+        const plugin = await client.methods.getPlugin(address);
+        expect(plugin.address).toBe(address);
+        expect(plugin.subdomain).toBe("test");
+        expect(plugin.current.build.number).toBe(1);
+        expect(plugin.current.build.metadata.ui).toBe("test");
+        expect(typeof plugin.current.build.metadata.ui).toBe("string");
+        expect(plugin.current.build.metadata.change).toBe("test");
+        expect(typeof plugin.current.build.metadata.change).toBe("string");
+        expect(typeof plugin.current.build.metadata.pluginSetupABI).toBe(
+          "object",
+        );
+        expect(plugin.current.release.number).toBe(1);
+        expect(plugin.current.release.metadata.name).toBe("Name");
+        expect(typeof plugin.current.release.metadata.name).toBe("string");
+        expect(plugin.current.release.metadata.description).toBe("Description");
+        expect(typeof plugin.current.release.metadata.description).toBe(
+          "string",
+        );
+        expect(typeof plugin.current.release.metadata.images).toBe("object");
       });
 
       test.todo(

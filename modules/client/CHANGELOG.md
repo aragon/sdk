@@ -15,6 +15,9 @@ TEMPLATE:
 ## [UPCOMING]
 ### Fixed
 - Fixed plugin version on the dao subgraph queries
+### Added
+- Add `getPlugins` function
+- Add `getPlugin` function
 ## [1.5.0]
 ### Added
 - Add `wrapTokens` and `unwrapTokens` functions to support token contract without support for snapshots

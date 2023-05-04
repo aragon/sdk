@@ -41,6 +41,10 @@ export interface IClientMethods extends IClientCore {
   getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
   /** Retrieves metadata for many daos */
   getDaos: (params: IDaoQueryParams) => Promise<DaoListItem[]>;
+  /** retrieves the plugin details given an address, release and build */
+  getPlugin: (pluginAddress: string) => Promise<PluginRepo>;
+  /** Retrieves the list of plugins available on the PluginRegistry */
+  getPlugins: (params?: PluginQueryParams) => Promise<PluginRepoListItem[]>;
 }
 
 export interface IClientEncoding extends IClientCore {
@@ -523,3 +527,76 @@ export type ContractPermissionWithConditionParams = [
   string,
 ];
 export type ContractWithdrawParams = [string, string, BigNumber, string];
+
+export enum PluginSortBy {
+  SUBDOMAIN = "subdomain",
+}
+
+export type PluginQueryParams = Pagination & {
+  sortBy?: PluginSortBy;
+  subdomain?: string;
+};
+
+export type SubgraphPluginRepoReleaseListItem = {
+  release: number;
+  metadata: string;
+  builds: {
+    build: number;
+  }[];
+};
+
+export type SubgraphPluginRepoRelease = SubgraphPluginRepoReleaseListItem & {
+  builds: {
+    build: number;
+    metadata: string;
+  }[];
+};
+
+export type SubgraphPluginRepoListItem = {
+  id: string;
+  subdomain: string;
+  releases: SubgraphPluginRepoReleaseListItem[];
+};
+
+export type SubgraphPluginRepo = SubgraphPluginRepoListItem & {
+  releases: SubgraphPluginRepoRelease[];
+};
+
+export type PluginRepoReleaseMetadata = {
+  name: string;
+  description: string;
+  images: Object; // TODO specify parameters
+};
+export type PluginRepoBuildMetadata = {
+  ui: string;
+  change: string;
+  pluginSetupABI: Object;
+};
+
+export type PluginRepoRelease = {
+  release: number;
+  metadata: PluginRepoReleaseMetadata;
+  currentBuild: number;
+};
+
+export type PluginRepoListItem = {
+  address: string;
+  subdomain: string;
+  releases: PluginRepoRelease[];
+};
+
+export type PluginRepo = {
+  address: string;
+  subdomain: string;
+  current: {
+    build: {
+      number: number;
+      metadata: PluginRepoBuildMetadata;
+    };
+    release: {
+      number: number;
+      metadata: PluginRepoReleaseMetadata;
+    };
+  };
+};
+
