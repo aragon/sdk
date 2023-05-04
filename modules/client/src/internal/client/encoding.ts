@@ -101,7 +101,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       revokeAction,
     ];
   }
-  
+
   public applyUninstallationAction(
     daoAddress: string,
     params: ApplyUninstallationParams,

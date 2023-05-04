@@ -18,8 +18,8 @@ import {
   CreateDaoParams,
   DepositParams,
   IClientEstimation,
-  TokenType,
   SetAllowanceParams,
+  TokenType,
 } from "../../interfaces";
 import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";

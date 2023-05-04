@@ -180,9 +180,9 @@ export class PluginUninstallationPreparationError extends Error {
   }
 }
 
-export class MissingMetadataError {
+export class MissingMetadataError extends Error {
   constructor() {
-    throw new Error("Missing metadata");
+    super("Missing metadata");
   }
 }
 

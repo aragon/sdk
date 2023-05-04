@@ -204,4 +204,3 @@ export type SubgraphMultisigVotingSettings = {
   minApprovals: number;
   onlyListed: boolean;
 };
-

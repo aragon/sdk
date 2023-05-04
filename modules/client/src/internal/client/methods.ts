@@ -32,9 +32,9 @@ import { erc20ContractAbi } from "../abi/erc20";
 import {
   QueryDao,
   QueryDaos,
+  QueryIPlugin,
   QueryPlugin,
   QueryPlugins,
-  QueryIPlugin,
   QueryTokenBalances,
   QueryTokenTransfers,
 } from "../graphql-queries";
@@ -73,9 +73,9 @@ import {
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
+  SubgraphPluginInstallation,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
-  SubgraphPluginInstallation,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
   TokenType,
@@ -118,7 +118,7 @@ import {
 /**
  * Methods module the SDK Generic Client
  */
-export class ClientMethods extends ClientCore implements IClientMethods{
+export class ClientMethods extends ClientCore implements IClientMethods {
   constructor(context: Context) {
     super(context);
     Object.freeze(ClientMethods.prototype);
@@ -443,7 +443,9 @@ export class ClientMethods extends ClientCore implements IClientMethods{
       const buildMetadataString = await this.ipfs.fetchString(
         selectedInstallation.appliedVersion.metadata,
       );
-      buildMetadata = JSON.parse(buildMetadataString) as PluginRepoBuildMetadata;
+      buildMetadata = JSON.parse(
+        buildMetadataString,
+      ) as PluginRepoBuildMetadata;
     } catch {
       throw new IpfsFetchError();
     }

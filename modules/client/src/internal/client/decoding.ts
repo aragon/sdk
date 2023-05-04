@@ -55,7 +55,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     const hexBytes = bytesToHex(data);
     const expectedFunction = pspInterface.getFunction("applyInstallation");
     const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
-    return applyInstallatonParamsFromContract(result)
+    return applyInstallatonParamsFromContract(result);
   }
   /**
    * @param {data} Uint8Array
@@ -69,7 +69,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     const hexBytes = bytesToHex(data);
     const expectedFunction = pspInterface.getFunction("applyUninstallation");
     const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
-    return applyInstallatonParamsFromContract(result)
+    return applyInstallatonParamsFromContract(result);
   }
   /**
    * Decodes the permission parameters from an encoded grant action
