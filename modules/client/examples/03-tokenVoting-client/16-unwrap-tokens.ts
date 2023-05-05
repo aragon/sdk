@@ -8,10 +8,8 @@ title: Token Wraping
 */
 
 import {
-    Client,
     ContextPlugin,
     UnwrapTokensStep,
-    WrapTokensStep,
     TokenVotingClient,
   } from "@aragon/sdk-client";
   import { context } from "../index";

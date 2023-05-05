@@ -46,7 +46,7 @@ export interface ITokenVotingClientMethods extends IClientCore {
   ) => AsyncGenerator<PrepareInstallationStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
-  getMembers: (addressOrEns: string) => Promise<string[]>;
+  getMembers: (addressOrEns: string) => Promise<TokenVotingMember[]>;
   getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
@@ -59,6 +59,9 @@ export interface ITokenVotingClientMethods extends IClientCore {
   unwrapTokens: (
     params: UnwrapTokensParams,
   ) => AsyncGenerator<UnwrapTokensStepValue>;
+  delegateTokens: (
+    params: DelegateTokensParams,
+  ) => AsyncGenerator<DelegateTokensStepValue>;
 }
 
 export interface ITokenVotingClientEncoding extends IClientCore {
@@ -107,7 +110,7 @@ type ExistingTokenParams = {
     name: string;
     symbol: string;
   };
-}
+};
 
 type NewTokenParams = {
   name: string;
@@ -261,3 +264,38 @@ export enum UnwrapTokensStep {
 export type UnwrapTokensStepValue =
   | { key: UnwrapTokensStep.UNWRAPPING; txHash: string }
   | { key: UnwrapTokensStep.DONE };
+
+export type DelegateTokensParams = {
+  tokenAddress: string;
+  delegatee: string;
+};
+
+export enum DelegateTokensStep {
+  DELEGATING = "delegating",
+  DONE = "done",
+}
+export type DelegateTokensStepValue = {
+  key: DelegateTokensStep.DELEGATING;
+  txHash: string;
+} | { key: DelegateTokensStep.DONE };
+
+export type SubgraphTokenVotingMember = {
+  address: string;
+  balance: string;
+  votingPower: string;
+  delegatee: {
+    address: string;
+  };
+  delegators: {
+    address: string;
+    balance: string;
+  }[];
+};
+
+export type TokenVotingMember = {
+  address: string;
+  balance: bigint;
+  votingPower: bigint;
+  delegatee: string | null;
+  delegators: { address: string; balance: bigint }[];
+};
