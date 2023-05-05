@@ -755,12 +755,12 @@ describe("Token Voting Client", () => {
         VotingMode.VOTE_REPLACEMENT,
       );
 
-      let steps = client.methods.delegateTokens({
+      const delegateSteps = client.methods.delegateTokens({
         tokenAddress,
         delegatee: ADDRESS_ONE,
       });
 
-      for await (const step of steps) {
+      for await (const step of delegateSteps) {
         switch (step.key) {
           case DelegateTokensStep.DELEGATING:
             expect(typeof step.txHash).toBe("string");
@@ -780,17 +780,17 @@ describe("Token Voting Client", () => {
         tokenAddress,
         signer,
       );
-      let delegates = await erc20Contract.delegates(TEST_WALLET_ADDRESS);
+
+      let delegatee = await client.methods.getDelegatee(tokenAddress);
       const balance = await erc20Contract.balanceOf(TEST_WALLET_ADDRESS);
-      expect(delegates).toBe(ADDRESS_ONE);
+      expect(delegatee).toBe(ADDRESS_ONE);
       expect(balance.eq(100)).toBe(true);
 
-      steps = client.methods.delegateTokens({
+      const undelegateSteps = client.methods.undelegateTokens(
         tokenAddress,
-        delegatee: TEST_WALLET_ADDRESS,
-      });
+      );
 
-      for await (const step of steps) {
+      for await (const step of undelegateSteps) {
         switch (step.key) {
           case DelegateTokensStep.DELEGATING:
             expect(typeof step.txHash).toBe("string");
@@ -805,8 +805,8 @@ describe("Token Voting Client", () => {
             );
         }
       }
-      delegates = await erc20Contract.delegates(TEST_WALLET_ADDRESS);
-      expect(delegates).toBe(TEST_WALLET_ADDRESS);
+      delegatee = await client.methods.getDelegatee(tokenAddress);
+      expect(delegatee).toBe(null);
     });
     describe("Data retrieval", () => {
       it("Should get the list of members that can vote in a proposal", async () => {

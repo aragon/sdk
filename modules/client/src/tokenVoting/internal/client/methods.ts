@@ -74,7 +74,11 @@ import {
   QueryTokenVotingProposals,
   QueryTokenVotingSettings,
 } from "../graphql-queries";
-import { toTokenVotingMember, toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
+import {
+  toTokenVotingMember,
+  toTokenVotingProposal,
+  toTokenVotingProposalListItem,
+} from "../utils";
 import {
   GovernanceERC20__factory,
   GovernanceWrappedERC20__factory,
@@ -415,7 +419,13 @@ export class TokenVotingClientMethods extends ClientCore
       key: UnwrapTokensStep.DONE,
     };
   }
-
+  /**
+   * Delegates all yout voting power to a delegatee
+   *
+   * @param {DelegateTokensParams} params
+   * @return {*}  {AsyncGenerator<DelegateTokensStepValue>}
+   * @memberof TokenVotingClientMethods
+   */
   public async *delegateTokens(
     params: DelegateTokensParams,
   ): AsyncGenerator<DelegateTokensStepValue> {
@@ -433,6 +443,39 @@ export class TokenVotingClientMethods extends ClientCore
     yield {
       key: DelegateTokensStep.DONE,
     };
+  }
+  /**
+   * Undelgates all your voting power from a delegatee
+   *
+   * @param {string} tokenAddress
+   * @return {*}  {AsyncGenerator<DelegateTokensStepValue>}
+   * @memberof TokenVotingClientMethods
+   */
+  public async *undelegateTokens(
+    tokenAddress: string,
+  ): AsyncGenerator<DelegateTokensStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    yield* this.delegateTokens({
+      tokenAddress,
+      delegatee: await signer.getAddress(),
+    });
+  }
+  /**
+   * Gets the delegatee of an address in a specific token
+   *
+   * @param {string} tokenAddress
+   * @return {*}  {Promise<string | null>}
+   * @memberof TokenVotingClientMethods
+   */
+  public async getDelegatee(tokenAddress: string): Promise<string | null> {
+    const signer = this.web3.getConnectedSigner();
+    const governanceErc20Contract = GovernanceERC20__factory.connect(
+      tokenAddress,
+      signer,
+    );
+    const address = await signer.getAddress();
+    const delegatee = await governanceErc20Contract.delegates(address);
+    return address === delegatee ? null : delegatee;
   }
 
   /**

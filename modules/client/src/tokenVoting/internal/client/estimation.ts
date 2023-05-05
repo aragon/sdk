@@ -1,11 +1,22 @@
-import { TokenVoting__factory } from "@aragon/osx-ethers";
+import {
+  GovernanceERC20__factory,
+  TokenVoting__factory,
+} from "@aragon/osx-ethers";
 import {
   ClientCore,
+<<<<<<< HEAD
   GasFeeEstimation,
+=======
+  ContextPlugin,
+>>>>>>> 9a70c2d (fix comments)
   CreateMajorityVotingProposalParams,
+  GasFeeEstimation,
   IVoteProposalParams,
 } from "../../../client-common";
-import { ITokenVotingClientEstimation } from "../../interfaces";
+import {
+  DelegateTokensParams,
+  ITokenVotingClientEstimation,
+} from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   boolArrayToBitmap,
@@ -128,5 +139,43 @@ export class TokenVotingClientEstimation extends ClientCore
       id,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
+  }
+  
+  /**
+   * Estimates the gas fee of delegating voting power to a delegatee
+   *
+   * @param {DelegateTokensParams} params
+   * @return {*}  {Promise<GasFeeEstimation>}
+   * @memberof TokenVotingClientEstimation
+   */
+  public async delegateTokens(
+    params: DelegateTokensParams,
+  ): Promise<GasFeeEstimation> {
+    const signer = this.web3.getConnectedSigner();
+    const governanceErc20Contract = GovernanceERC20__factory.connect(
+      params.tokenAddress,
+      signer,
+    );
+    const estimation = await governanceErc20Contract.estimateGas.delegate(
+      params.delegatee,
+    );
+    return this.web3.getApproximateGasFee(estimation.toBigInt());
+  }
+
+  /**
+   * Estimates the gas fee of undelegating voting power
+   *
+   * @param {string} tokenAddress
+   * @return {*}  {Promise<GasFeeEstimation>}
+   * @memberof TokenVotingClientEstimation
+   */
+  public async undelegateTokens(
+    tokenAddress: string,
+  ): Promise<GasFeeEstimation> {
+    const signer = this.web3.getConnectedSigner();
+    return this.delegateTokens({
+      tokenAddress,
+      delegatee: await signer.getAddress(),
+    });
   }
 }

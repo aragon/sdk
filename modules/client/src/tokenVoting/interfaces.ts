@@ -62,6 +62,10 @@ export interface ITokenVotingClientMethods extends IClientCore {
   delegateTokens: (
     params: DelegateTokensParams,
   ) => AsyncGenerator<DelegateTokensStepValue>;
+  undelegateTokens: (
+    tokenAddress: string,
+  ) => AsyncGenerator<DelegateTokensStepValue>;
+  getDelegatee: (tokenAddress: string) => Promise<string | null>;
 }
 
 export interface ITokenVotingClientEncoding extends IClientCore {
@@ -86,6 +90,12 @@ export interface ITokenVotingClientEstimation extends IClientCore {
   voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
   executeProposal: (
     proposalId: string,
+  ) => Promise<GasFeeEstimation>;
+  delegateTokens: (
+    params: DelegateTokensParams,
+  ) => Promise<GasFeeEstimation>;
+  undelegateTokens: (
+    tokenAddress: string,
   ) => Promise<GasFeeEstimation>;
 }
 
@@ -293,9 +303,15 @@ export type SubgraphTokenVotingMember = {
 };
 
 export type TokenVotingMember = {
+  /** The address of the member */
   address: string;
+  /** The balance of the member */
   balance: bigint;
+  /** The voting power of the member taking into account the delagation */
   votingPower: bigint;
+  /** The address that you delegated yout voting power to
+   *  If null, you are not delegating your voting power */
   delegatee: string | null;
+  /** The list of addresses that delegated their voting power this member */
   delegators: { address: string; balance: bigint }[];
 };

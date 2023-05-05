@@ -1,16 +1,15 @@
 /* MARKDOWN
 ---
-title: Delegate Tokens
+title: Undelegate Tokens
 ---
 
-## Delegates yout token voting power to another address
+## Undelegates yout token voting power from the delegatee address
 
-Delegates your token voting power to another address. To recover yout voting power back just delegate to your own address.
+This is the same as delegating to your own address.
 */
 
 import {
   ContextPlugin,
-  DelegateTokensParams,
   DelegateTokensStep,
   TokenVotingClient,
 } from "@aragon/sdk-client";
@@ -25,12 +24,8 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
   contextPlugin,
 );
 
-const delegateTokensParams: DelegateTokensParams = {
-  delegatee: "0x1234567890123456789012345678901234567890",
-  tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
-};
 
-const steps = tokenVotingClient.methods.delegateTokens(delegateTokensParams);
+const steps = tokenVotingClient.methods.undelegateTokens("0x1234567890123456789012345678901234567890");
 
 for await (const step of steps) {
   try {

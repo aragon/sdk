@@ -14,9 +14,11 @@ TEMPLATE:
 -->
 ## [UPCOMING]
 ### Added
-- Add `delegate` function in `TokenVotingClient`
+- Add `delegateTokens` function in `TokenVotingClient`
+- Add `undelegateTokens` function in `TokenVotingClient`
+- Add `getDelegatee` function in `TokenVotingClient`
 ### Changed
-- `getMembers` function in `TokenVotingClient` no loger returns an `string[]`, not it returns `TokenVotingMember[]` which includes the delegation status of each member
+- Breaking: `getMembers` function in `TokenVotingClient` no loger returns an `string[]`. Now it returns `TokenVotingMember[]` which includes the delegation status of each member
 ## [1.6.0]
 ### Fixed
 - Fixed plugin version on the dao subgraph queries
@@ -26,6 +28,7 @@ TEMPLATE:
 
 ### Changed
 - Properties `signer` and `web3providers` are now optional in the `ContextParams`
+## [1.5.0]
 ### Added
 - Add `wrapTokens` and `unwrapTokens` functions to support token contract without support for snapshots
 - `Context.network` type changes from `Networkish` to `Network`
