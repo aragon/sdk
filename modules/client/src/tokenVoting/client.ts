@@ -22,33 +22,20 @@ import { Networkish } from "@ethersproject/providers";
  */
 export class TokenVotingClient extends ClientCore
   implements ITokenVotingClient {
-  private privateMethods: ITokenVotingClientMethods;
-  private privateEncoding: ITokenVotingClientEncoding;
-  private privateDecoding: ITokenVotingClientDecoding;
-  private privateEstimation: ITokenVotingClientEstimation;
+  public methods: ITokenVotingClientMethods;
+  public encoding: ITokenVotingClientEncoding;
+  public decoding: ITokenVotingClientDecoding;
+  public estimation: ITokenVotingClientEstimation;
 
   constructor(context: ContextPlugin) {
     super(context);
-    this.privateMethods = new TokenVotingClientMethods(context);
-    this.privateEncoding = new TokenVotingClientEncoding(context);
-    this.privateDecoding = new TokenVotingClientDecoding(context);
-    this.privateEstimation = new TokenVotingClientEstimation(context);
+    this.methods = new TokenVotingClientMethods(context);
+    this.encoding = new TokenVotingClientEncoding(context);
+    this.decoding = new TokenVotingClientDecoding(context);
+    this.estimation = new TokenVotingClientEstimation(context);
     Object.freeze(TokenVotingClient.prototype);
     Object.freeze(this);
   }
-  get methods(): ITokenVotingClientMethods {
-    return this.privateMethods;
-  }
-  get encoding(): ITokenVotingClientEncoding {
-    return this.privateEncoding;
-  }
-  get decoding(): ITokenVotingClientDecoding {
-    return this.privateDecoding;
-  }
-  get estimation(): ITokenVotingClientEstimation {
-    return this.privateEstimation;
-  }
-
   static encoding = {
     /**
      * Computes the parameters to be given when creating the DAO,

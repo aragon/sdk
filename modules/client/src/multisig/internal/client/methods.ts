@@ -79,6 +79,8 @@ export class MultisigClientMethods extends ClientCore
   implements IMultisigClientMethods {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(MultisigClientMethods.prototype);
+    Object.freeze(this);
   }
   /**
    * Creates a new proposal on the given multisig plugin contract

@@ -33,6 +33,8 @@ export class MultisigClientEncoding extends ClientCore
   implements IMultisigClientEncoding {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(MultisigClientEncoding.prototype);
+    Object.freeze(this);
   }
 
   /**

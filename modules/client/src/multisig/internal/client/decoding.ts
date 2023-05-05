@@ -21,6 +21,8 @@ export class MultisigClientDecoding extends ClientCore
   implements IMultisigClientDecoding {
   constructor(context: ContextPlugin) {
     super(context);
+    Object.freeze(MultisigClientDecoding.prototype);
+    Object.freeze(this);
   }
   /**
    * Decodes a list of addresses from an encoded add members action
