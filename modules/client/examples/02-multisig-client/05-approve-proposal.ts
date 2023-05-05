@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Approve
+title: Approve Proposal
 ---
 
 ## Approve a Multisig Proposal

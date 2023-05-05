@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Proposal Creation
+title: Create Proposal
 ---
 
 ## Create a Token Voting Proposal
@@ -85,7 +85,7 @@ for await (const step of steps) {
 /* MARKDOWN
 Returns:
 ```tsx
-{ 
+{
   txHash: "0xb1c14a49...3e8620b0f5832d61c"
 }
 {

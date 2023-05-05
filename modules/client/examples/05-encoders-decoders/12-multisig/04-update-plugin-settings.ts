@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Multisig Settings
+title: Update Multisig Settings
 ---
 
 ## Update the Multisig Plugin Settings

@@ -1,12 +1,12 @@
 /* MARKDOWN
 ---
-title: Proposal Actions
+title: Create Proposal with Action
 ---
 
 ## Create a Token Voting Proposal with Actions
 
-Create a proposal using the Token Voting plugin.
-This proposal will be created using the TokenVoting plugin as its governance mechanism.
+Create a proposal with an action using the TokenVoting plugin as its governance mechanism.
+An action is the encoded transaction which will get executed when a proposal passes.
 */
 
 import {

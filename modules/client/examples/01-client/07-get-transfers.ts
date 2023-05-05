@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: DAO Transfers
+title: Get DAO Transfers
 ---
 
 ## Get Transfers from DAO's Activity
