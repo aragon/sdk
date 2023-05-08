@@ -39,8 +39,6 @@ import { toUtf8String } from "@ethersproject/strings";
 export class ClientDecoding extends ClientCore implements IClientDecoding {
   constructor(context: Context) {
     super(context);
-    Object.freeze(ClientDecoding.prototype);
-    Object.freeze(this);
   }
   /**
    * @param {data} Uint8Array

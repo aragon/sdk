@@ -31,8 +31,6 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
     this.encoding = new MultisigClientEncoding(context);
     this.decoding = new MultisigClientDecoding(context);
     this.estimation = new MultisigClientEstimation(context);
-    Object.freeze(MultisigClient.prototype);
-    Object.freeze(this);
   }
 
   static encoding = {

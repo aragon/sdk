@@ -27,7 +27,5 @@ export class Client extends ClientCore implements IClient {
     this.encoding = new ClientEncoding(context);
     this.decoding = new ClientDecoding(context);
     this.estimation = new ClientEstimation(context);
-    Object.freeze(Client.prototype);
-    Object.freeze(this);
   }
 }

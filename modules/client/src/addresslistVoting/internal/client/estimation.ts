@@ -22,8 +22,6 @@ export class AddresslistVotingClientEstimation extends ClientCore
   implements IAddresslistVotingClientEstimation {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(AddresslistVotingClientEstimation.prototype);
-    Object.freeze(this);
   }
 
   /**

@@ -18,8 +18,6 @@ export class AddresslistVotingClientDecoding extends ClientCore
   implements IAddresslistVotingClientDecoding {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(AddresslistVotingClientDecoding.prototype);
-    Object.freeze(this);
   }
 
   /**

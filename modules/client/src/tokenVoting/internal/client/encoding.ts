@@ -37,8 +37,6 @@ export class TokenVotingClientEncoding extends ClientCore
   implements ITokenVotingClientEncoding {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(TokenVotingClientEncoding.prototype);
-    Object.freeze(this);
   }
   /**
    * Computes the parameters to be given when creating the DAO,

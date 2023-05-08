@@ -20,7 +20,6 @@ export abstract class ClientCore implements IClientCore {
     web3Map.set(this, new Web3Module(context));
     ipfsMap.set(this, new IPFSModule(context));
     graphqlMap.set(this, new GraphqlModule(context));
-    Object.freeze(ClientCore.prototype);
   }
 
   get web3(): IClientWeb3Core {

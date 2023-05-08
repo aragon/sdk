@@ -107,8 +107,6 @@ import {
 export class ClientMethods extends ClientCore implements IClientMethods {
   constructor(context: Context) {
     super(context);
-    Object.freeze(ClientMethods.prototype);
-    Object.freeze(this);
   }
   /**
    * Creates a DAO with the given settings and plugins

@@ -45,8 +45,6 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 export class ClientEncoding extends ClientCore implements IClientEncoding {
   constructor(context: Context) {
     super(context);
-    Object.freeze(ClientEncoding.prototype);
-    Object.freeze(this);
   }
   /**
    * @param {string} daoAddress

@@ -33,8 +33,6 @@ export class TokenVotingClient extends ClientCore
     this.encoding = new TokenVotingClientEncoding(context);
     this.decoding = new TokenVotingClientDecoding(context);
     this.estimation = new TokenVotingClientEstimation(context);
-    Object.freeze(TokenVotingClient.prototype);
-    Object.freeze(this);
   }
   static encoding = {
     /**

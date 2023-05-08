@@ -19,8 +19,6 @@ export class TokenVotingClientDecoding extends ClientCore
   implements ITokenVotingClientDecoding {
   constructor(context: ContextPlugin) {
     super(context);
-    Object.freeze(TokenVotingClientDecoding.prototype);
-    Object.freeze(this);
   }
   /**
    * Decodes a dao metadata from an encoded update metadata action

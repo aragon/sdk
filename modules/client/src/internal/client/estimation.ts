@@ -31,8 +31,6 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 export class ClientEstimation extends ClientCore implements IClientEstimation {
   constructor(context: Context) {
     super(context);
-    Object.freeze(ClientEstimation.prototype);
-    Object.freeze(this);
   }
   /**
    * Estimates the gas fee of creating a DAO

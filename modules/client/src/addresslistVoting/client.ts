@@ -33,8 +33,6 @@ export class AddresslistVotingClient extends ClientCore
     this.encoding = new AddresslistVotingClientEncoding(context);
     this.decoding = new AddresslistVotingClientDecoding(context);
     this.estimation = new AddresslistVotingClientEstimation(context);
-    Object.freeze(AddresslistVotingClient.prototype);
-    Object.freeze(this);
   }
 
   static encoding = {
