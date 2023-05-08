@@ -28,6 +28,7 @@ const prepareUninstallationParams: PrepareUninstallationParams = {
       testObjectProp: "testObjectValue",
     },
   ],
+  uninastallationAbi: ["uint256", "string", "string[]", "object"], // optional, if not specified, the abi will be fetched from the plugin metadata
 };
 
 // Estimate how much gas the transaction will cost.

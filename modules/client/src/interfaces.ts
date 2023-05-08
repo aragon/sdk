@@ -609,7 +609,8 @@ export type PrepareUninstallationParams = {
   daoAddressOrEns: string;
   pluginAddress: string;
   pluginInstallationIndex?: number;
-  uninstallationParams?: any;
+  uninstallationParams?: any[];
+  uninstallationAbi?: string[];
 };
 
 export type SubgraphPluginVersion = {
