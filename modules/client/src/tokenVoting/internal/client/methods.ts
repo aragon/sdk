@@ -446,7 +446,7 @@ export class TokenVotingClientMethods extends ClientCore
     };
   }
   /**
-   * Undelgates all your voting power from a delegatee
+   * Delegates all the signer's tokens back to itself
    *
    * @param {string} tokenAddress
    * @return {*}  {AsyncGenerator<UndelegateTokensStepValue>}
@@ -462,7 +462,7 @@ export class TokenVotingClientMethods extends ClientCore
     });
   }
   /**
-   * Gets the delegatee of an address in a specific token
+   * Retrieves the current signer's delegatee for the given token
    *
    * @param {string} tokenAddress
    * @return {*}  {Promise<string | null>}
