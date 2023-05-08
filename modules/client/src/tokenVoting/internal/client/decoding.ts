@@ -1,7 +1,6 @@
 import { bytesToHex } from "@aragon/sdk-common";
 import {
   ClientCore,
-  ContextPlugin,
   decodeUpdatePluginSettingsAction,
   getFunctionFragment,
   IInterfaceParams,
@@ -17,9 +16,6 @@ import { mintTokenParamsFromContract } from "../utils";
  */
 export class TokenVotingClientDecoding extends ClientCore
   implements ITokenVotingClientDecoding {
-  constructor(context: ContextPlugin) {
-    super(context);
-  }
   /**
    * Decodes a dao metadata from an encoded update metadata action
    *

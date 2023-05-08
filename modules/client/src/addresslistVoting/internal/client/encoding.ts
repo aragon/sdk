@@ -6,7 +6,6 @@ import {
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
-  ContextPlugin,
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
@@ -29,10 +28,6 @@ import { getNetwork, Networkish } from "@ethersproject/providers";
  */
 export class AddresslistVotingClientEncoding extends ClientCore
   implements IAddresslistVotingClientEncoding {
-  constructor(context: ContextPlugin) {
-    super(context);
-  }
-
   /**
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured

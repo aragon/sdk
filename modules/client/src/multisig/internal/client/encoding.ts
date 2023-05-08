@@ -6,7 +6,6 @@ import {
 import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
-  ContextPlugin,
   DaoAction,
   IPluginInstallItem,
   SupportedNetworks,
@@ -31,9 +30,6 @@ import { getNetwork, Networkish } from "@ethersproject/providers";
  */
 export class MultisigClientEncoding extends ClientCore
   implements IMultisigClientEncoding {
-  constructor(context: ContextPlugin) {
-    super(context);
-  }
 
   /**
    * Computes the parameters to be given when creating the DAO,

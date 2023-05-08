@@ -5,7 +5,6 @@ import {
 } from "@aragon/sdk-common";
 import {
   ClientCore,
-  ContextPlugin,
   DaoAction,
   encodeUpdateVotingSettingsAction,
   IPluginInstallItem,
@@ -35,9 +34,6 @@ import { getNetwork, Networkish } from "@ethersproject/providers";
  */
 export class TokenVotingClientEncoding extends ClientCore
   implements ITokenVotingClientEncoding {
-  constructor(context: ContextPlugin) {
-    super(context);
-  }
   /**
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured

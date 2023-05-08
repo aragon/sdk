@@ -34,7 +34,6 @@ import {
 import {
   ClientCore,
   computeProposalStatusFilter,
-  ContextPlugin,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
@@ -77,9 +76,6 @@ import { MultisigClientEncoding } from "./encoding";
  */
 export class MultisigClientMethods extends ClientCore
   implements IMultisigClientMethods {
-  constructor(context: ContextPlugin) {
-    super(context);
-  }
   /**
    * Creates a new proposal on the given multisig plugin contract
    *

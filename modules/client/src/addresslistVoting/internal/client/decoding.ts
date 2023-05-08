@@ -1,7 +1,6 @@
 import { bytesToHex } from "@aragon/sdk-common";
 import {
   ClientCore,
-  ContextPlugin,
   decodeUpdatePluginSettingsAction,
   getFunctionFragment,
   IInterfaceParams,
@@ -16,10 +15,6 @@ import { AddresslistVoting__factory } from "@aragon/osx-ethers";
  */
 export class AddresslistVotingClientDecoding extends ClientCore
   implements IAddresslistVotingClientDecoding {
-  constructor(context: ContextPlugin) {
-    super(context);
-  }
-
   /**
    * Decodes a dao metadata from an encoded update metadata action
    *
