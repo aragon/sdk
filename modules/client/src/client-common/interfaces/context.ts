@@ -12,7 +12,7 @@ type Web3ContextParams = {
   network?: Networkish;
   /** Required for Ethereum transactions to work */
   signer?: Signer;
-  /** Required for Ethereum transactions to work */
+  /** Required for Ethereum connectivity to work */
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   /** If not provided uses default from LIVE_CONTRACTS in the provided network */
   daoFactoryAddress?: string;
