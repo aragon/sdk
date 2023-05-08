@@ -10,7 +10,7 @@ This is the same as delegating to your own address.
 
 import {
   ContextPlugin,
-  DelegateTokensStep,
+  UndelegateTokensStep,
   TokenVotingClient,
 } from "@aragon/sdk-client";
 import { context } from "../index";
@@ -24,16 +24,17 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
   contextPlugin,
 );
 
+const tokenAddress = "0x1234567890123456789012345678901234567890"
 
-const steps = tokenVotingClient.methods.undelegateTokens("0x1234567890123456789012345678901234567890");
+const steps = tokenVotingClient.methods.undelegateTokens(tokenAddress);
 
 for await (const step of steps) {
   try {
     switch (step.key) {
-      case DelegateTokensStep.DELEGATING:
+      case UndelegateTokensStep.DELEGATING:
         console.log(step.txHash);
         break;
-      case DelegateTokensStep.DONE:
+      case UndelegateTokensStep.DONE:
         break;
     }
   } catch (err) {

@@ -64,7 +64,7 @@ export interface ITokenVotingClientMethods extends IClientCore {
   ) => AsyncGenerator<DelegateTokensStepValue>;
   undelegateTokens: (
     tokenAddress: string,
-  ) => AsyncGenerator<DelegateTokensStepValue>;
+  ) => AsyncGenerator<UndelegateTokensStepValue>;
   getDelegatee: (tokenAddress: string) => Promise<string | null>;
 }
 
@@ -288,6 +288,9 @@ export type DelegateTokensStepValue = {
   key: DelegateTokensStep.DELEGATING;
   txHash: string;
 } | { key: DelegateTokensStep.DONE };
+
+export const UndelegateTokensStep: typeof DelegateTokensStep = DelegateTokensStep;
+export type UndelegateTokensStepValue = DelegateTokensStepValue
 
 export type SubgraphTokenVotingMember = {
   address: string;

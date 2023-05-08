@@ -60,6 +60,7 @@ import {
   TokenVotingPluginPrepareInstallationParams,
   TokenVotingProposal,
   TokenVotingProposalListItem,
+  UndelegateTokensStepValue,
   UnwrapTokensParams,
   UnwrapTokensStep,
   UnwrapTokensStepValue,
@@ -448,12 +449,12 @@ export class TokenVotingClientMethods extends ClientCore
    * Undelgates all your voting power from a delegatee
    *
    * @param {string} tokenAddress
-   * @return {*}  {AsyncGenerator<DelegateTokensStepValue>}
+   * @return {*}  {AsyncGenerator<UndelegateTokensStepValue>}
    * @memberof TokenVotingClientMethods
    */
   public async *undelegateTokens(
     tokenAddress: string,
-  ): AsyncGenerator<DelegateTokensStepValue> {
+  ): AsyncGenerator<UndelegateTokensStepValue> {
     const signer = this.web3.getConnectedSigner();
     yield* this.delegateTokens({
       tokenAddress,

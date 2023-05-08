@@ -73,6 +73,7 @@ import {
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
   TokenVotingMember,
+  UndelegateTokensStep,
   UnwrapTokensStep,
   WrapTokensStep,
 } from "../../../src/tokenVoting/interfaces";
@@ -792,11 +793,11 @@ describe("Token Voting Client", () => {
 
       for await (const step of undelegateSteps) {
         switch (step.key) {
-          case DelegateTokensStep.DELEGATING:
+          case UndelegateTokensStep.DELEGATING:
             expect(typeof step.txHash).toBe("string");
             expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             break;
-          case DelegateTokensStep.DONE:
+          case UndelegateTokensStep.DONE:
             break;
           default:
             throw new Error(
