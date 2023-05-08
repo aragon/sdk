@@ -793,7 +793,7 @@ describe("Token Voting Client", () => {
 
       for await (const step of undelegateSteps) {
         switch (step.key) {
-          case UndelegateTokensStep.DELEGATING:
+          case UndelegateTokensStep.UNDELEGATING:
             expect(typeof step.txHash).toBe("string");
             expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
             break;

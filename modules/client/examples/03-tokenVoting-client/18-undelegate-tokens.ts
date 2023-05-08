@@ -31,7 +31,7 @@ const steps = tokenVotingClient.methods.undelegateTokens(tokenAddress);
 for await (const step of steps) {
   try {
     switch (step.key) {
-      case UndelegateTokensStep.DELEGATING:
+      case UndelegateTokensStep.UNDELEGATING:
         console.log(step.txHash);
         break;
       case UndelegateTokensStep.DONE:
