@@ -421,7 +421,7 @@ export class TokenVotingClientMethods extends ClientCore
     };
   }
   /**
-   * Delegates all yout voting power to a delegatee
+   * Delegates all the signer's voting power to a delegatee
    *
    * @param {DelegateTokensParams} params
    * @return {*}  {AsyncGenerator<DelegateTokensStepValue>}
