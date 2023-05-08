@@ -67,7 +67,22 @@ Returns:
   txhash: "0xb1c14a49...3e8620b0f5832d61c"
 }
 {
-  permissions: ["0x123...", "0x123..."],
+  permissions: [
+    {
+      operation: 1,
+      where: "0x12345...",
+      who: "0x23456...",
+      condition: "0x78910...",
+      permissionId: [0,10,20...]
+    },
+    {
+      operation: 1,
+      where: "0x3456...",
+      who: "0x4567...",
+      condition: "0x5678...",
+      permissionId: [0,10,20...]
+    }
+  ],
   pluginAddress: "0x1234567890...",
   pluginRepo: "0x1234567890..."
   versionTag: {
