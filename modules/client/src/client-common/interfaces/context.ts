@@ -8,12 +8,12 @@ import { GraphQLClient } from "graphql-request";
 // Context input parameters
 
 type Web3ContextParams = {
-  /** Network should be provided */
+  /** If not provided will use mainnet */
   network?: Networkish;
-  /** Signer should be provided */
-  signer: Signer;
-  /** At least one provider should be  given */
-  web3Providers: string | JsonRpcProvider | (string | JsonRpcProvider)[];
+  /** If not provided interactions with a blockchain will fail */
+  signer?: Signer;
+  /** If not provided interactions with a blockchain will fail */
+  web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
   /** If not provided uses default from LIVE_CONTRACTS in the provided network */
   daoFactoryAddress?: string;
   /** If not provided uses default from LIVE_CONTRACTS in the provided network */
