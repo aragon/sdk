@@ -284,18 +284,19 @@ export enum DelegateTokensStep {
   DELEGATING = "delegating",
   DONE = "done",
 }
-export type DelegateTokensStepBase = {
+
+export enum UndelegateTokensStep {
+  UNDELEGATING = DelegateTokensStep.DELEGATING,
+  DONE = DelegateTokensStep.DONE,
+}
+
+type DelegateTokensStepCommon = {
   key: DelegateTokensStep.DELEGATING | UndelegateTokensStep.UNDELEGATING;
   txHash: string;
 } | { key: DelegateTokensStep.DONE | UndelegateTokensStep.DONE };
 
-// export const UndelegateTokensStep: typeof DelegateTokensStep = DelegateTokensStep;
-export enum UndelegateTokensStep {
-  UNDELEGATING = "delegating",
-  DONE = "done",
-}
-export type UndelegateTokensStepValue = DelegateTokensStepBase;
-export type DelegateTokensStepValue = DelegateTokensStepBase;
+export type UndelegateTokensStepValue = DelegateTokensStepCommon;
+export type DelegateTokensStepValue = DelegateTokensStepCommon;
 
 export type SubgraphTokenVotingMember = {
   address: string;
