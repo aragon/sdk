@@ -272,13 +272,13 @@ export function toPluginRepo(
     current: {
       build: {
         metadata: buildMetadata,
-        // the subgraph returns only one build ordered by build number 
+        // the subgraph returns only one build ordered by build number
         // in descending order, this means it's the latest build
         number: pluginRepo.releases?.[0]?.builds?.[0]?.build,
       },
       release: {
         metadata: releaseMetadata,
-        // the subgraph returns only one realease ordered by realease number 
+        // the subgraph returns only one realease ordered by realease number
         // in descending order, this means it's the latest realease
         number: pluginRepo.releases?.[0]?.release,
       },
@@ -298,7 +298,9 @@ export function applyInstallatonParamsToContract(
     helpersHash: keccak256(
       defaultAbiCoder.encode(["address[]"], [params.helpers]),
     ),
-    permissions: params.permissions,
+    permissions: params.permissions.map((permission) => {
+      return { ...permission, condition: permission.condition || AddressZero };
+    }),
   };
 }
 export function applyUninstallationParamsToContract(
@@ -310,7 +312,9 @@ export function applyUninstallationParamsToContract(
       pluginSetupRepo: params.pluginRepo,
       versionTag: params.versionTag,
     },
-    permissions: params.permissions,
+    permissions: params.permissions.map((permission) => {
+      return { ...permission, condition: permission.condition || AddressZero };
+    }),
   };
 }
 export function applyInstallatonParamsFromContract(

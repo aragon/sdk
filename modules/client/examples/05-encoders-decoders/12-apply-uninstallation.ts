@@ -27,7 +27,6 @@ const client: Client = new Client(context);
 // This variable contains the values received on the prepareUninstallation() method
 const applyUninstallationParams: ApplyUninstallationParams = {
   permissions: [{
-    condition: "0x1234567890123456789012345678901234567890",
     operation: PermissionOperationType.REVOKE,
     permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
     where: "0x1234567890123456789012345678901234567890",
