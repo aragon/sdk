@@ -72,7 +72,6 @@ import {
 } from "../../interfaces";
 import {
   ClientCore,
-  Context,
   findLog,
   SortDirection,
 } from "../../client-common";
@@ -105,11 +104,6 @@ import {
  * Methods module the SDK Generic Client
  */
 export class ClientMethods extends ClientCore implements IClientMethods {
-  constructor(context: Context) {
-    super(context);
-    Object.freeze(ClientMethods.prototype);
-    Object.freeze(this);
-  }
   /**
    * Creates a DAO with the given settings and plugins
    *

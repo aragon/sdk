@@ -7,7 +7,6 @@ import {
 } from "@aragon/sdk-common";
 import {
   ClientCore,
-  ContextPlugin,
   GasFeeEstimation,
 } from "../../../client-common";
 import {
@@ -21,9 +20,6 @@ import { toUtf8Bytes } from "@ethersproject/strings";
  */
 export class MultisigClientEstimation extends ClientCore
   implements IMultisigClientEstimation {
-  constructor(context: ContextPlugin) {
-    super(context);
-  }
 
   /**
    * Estimates the gas fee of creating a proposal on the plugin

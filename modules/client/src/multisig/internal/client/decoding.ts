@@ -1,7 +1,6 @@
 import { bytesToHex } from "@aragon/sdk-common";
 import {
   ClientCore,
-  ContextPlugin,
   getFunctionFragment,
   IInterfaceParams,
 } from "../../../client-common";
@@ -19,9 +18,6 @@ import { Multisig__factory } from "@aragon/osx-ethers";
  */
 export class MultisigClientDecoding extends ClientCore
   implements IMultisigClientDecoding {
-  constructor(context: ContextPlugin) {
-    super(context);
-  }
   /**
    * Decodes a list of addresses from an encoded add members action
    *

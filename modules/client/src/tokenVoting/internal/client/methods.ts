@@ -22,7 +22,6 @@ import {
   CanVoteParams,
   ClientCore,
   computeProposalStatusFilter,
-  ContextPlugin,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
@@ -92,11 +91,6 @@ import { TokenVotingClientEncoding } from "./encoding";
  */
 export class TokenVotingClientMethods extends ClientCore
   implements ITokenVotingClientMethods {
-  constructor(context: ContextPlugin) {
-    super(context);
-    Object.freeze(TokenVotingClientMethods.prototype);
-    Object.freeze(this);
-  }
   /**
    * Creates a new proposal on the given TokenVoting plugin contract
    *

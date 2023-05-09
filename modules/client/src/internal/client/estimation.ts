@@ -13,7 +13,7 @@ import {
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
-import { ClientCore, Context, GasFeeEstimation } from "../../client-common";
+import { ClientCore, GasFeeEstimation } from "../../client-common";
 import {
   CreateDaoParams,
   DepositParams,
@@ -29,11 +29,6 @@ import { toUtf8Bytes } from "@ethersproject/strings";
  * Estimation module the SDK Generic Client
  */
 export class ClientEstimation extends ClientCore implements IClientEstimation {
-  constructor(context: Context) {
-    super(context);
-    Object.freeze(ClientEstimation.prototype);
-    Object.freeze(this);
-  }
   /**
    * Estimates the gas fee of creating a DAO
    *

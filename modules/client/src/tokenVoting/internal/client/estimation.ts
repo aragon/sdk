@@ -1,7 +1,6 @@
 import { TokenVoting__factory } from "@aragon/osx-ethers";
 import {
   ClientCore,
-  ContextPlugin,
   GasFeeEstimation,
   CreateMajorityVotingProposalParams,
   IVoteProposalParams,
@@ -19,11 +18,6 @@ import {
  */
 export class TokenVotingClientEstimation extends ClientCore
   implements ITokenVotingClientEstimation {
-  constructor(context: ContextPlugin) {
-    super(context);
-    Object.freeze(TokenVotingClientEstimation.prototype);
-    Object.freeze(this);
-  }
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *

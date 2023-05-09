@@ -22,31 +22,17 @@ import { Networkish } from "@ethersproject/providers";
  */
 export class AddresslistVotingClient extends ClientCore
   implements IAddresslistVotingClient {
-  private privateMethods: IAddresslistVotingClientMethods;
-  private privateEncoding: IAddresslistVotingClientEncoding;
-  private privateDecoding: IAddresslistVotingClientDecoding;
-  private privateEstimation: IAddresslistVotingClientEstimation;
+  public methods: IAddresslistVotingClientMethods;
+  public encoding: IAddresslistVotingClientEncoding;
+  public decoding: IAddresslistVotingClientDecoding;
+  public estimation: IAddresslistVotingClientEstimation;
 
   constructor(context: ContextPlugin) {
     super(context);
-    this.privateMethods = new AddresslistVotingClientMethods(context);
-    this.privateEncoding = new AddresslistVotingClientEncoding(context);
-    this.privateDecoding = new AddresslistVotingClientDecoding(context);
-    this.privateEstimation = new AddresslistVotingClientEstimation(context);
-    Object.freeze(AddresslistVotingClient.prototype);
-    Object.freeze(this);
-  }
-  get methods(): IAddresslistVotingClientMethods {
-    return this.privateMethods;
-  }
-  get encoding(): IAddresslistVotingClientEncoding {
-    return this.privateEncoding;
-  }
-  get decoding(): IAddresslistVotingClientDecoding {
-    return this.privateDecoding;
-  }
-  get estimation(): IAddresslistVotingClientEstimation {
-    return this.privateEstimation;
+    this.methods = new AddresslistVotingClientMethods(context);
+    this.encoding = new AddresslistVotingClientEncoding(context);
+    this.decoding = new AddresslistVotingClientDecoding(context);
+    this.estimation = new AddresslistVotingClientEstimation(context);
   }
 
   static encoding = {

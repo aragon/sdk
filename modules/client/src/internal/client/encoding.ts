@@ -12,7 +12,6 @@ import {
 import {
   ApplyInstallationParams,
   ClientCore,
-  Context,
   DaoAction,
   LIVE_CONTRACTS,
   SupportedNetworks,
@@ -43,11 +42,6 @@ import { toUtf8Bytes } from "@ethersproject/strings";
  * Encoding module the SDK Generic Client
  */
 export class ClientEncoding extends ClientCore implements IClientEncoding {
-  constructor(context: Context) {
-    super(context);
-    Object.freeze(ClientEncoding.prototype);
-    Object.freeze(this);
-  }
   /**
    * @param {string} daoAddress
    * @param {ApplyInstallationParams} params

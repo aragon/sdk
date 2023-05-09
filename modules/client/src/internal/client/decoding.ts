@@ -11,7 +11,6 @@ import {
 } from "../../interfaces";
 import {
   ClientCore,
-  Context,
   DecodedApplyInstallationParams,
   getFunctionFragment,
   IInterfaceParams,
@@ -37,11 +36,6 @@ import { toUtf8String } from "@ethersproject/strings";
  * Decoding module the SDK Generic Client
  */
 export class ClientDecoding extends ClientCore implements IClientDecoding {
-  constructor(context: Context) {
-    super(context);
-    Object.freeze(ClientDecoding.prototype);
-    Object.freeze(this);
-  }
   /**
    * @param {data} Uint8Array
    * @return {*}  {DecodedApplyInstallationParams}

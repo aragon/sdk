@@ -1,7 +1,6 @@
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import {
   ClientCore,
-  ContextPlugin,
   GasFeeEstimation,
   CreateMajorityVotingProposalParams,
   IVoteProposalParams,
@@ -20,12 +19,6 @@ import {
  */
 export class AddresslistVotingClientEstimation extends ClientCore
   implements IAddresslistVotingClientEstimation {
-  constructor(context: ContextPlugin) {
-    super(context);
-    Object.freeze(AddresslistVotingClientEstimation.prototype);
-    Object.freeze(this);
-  }
-
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *

@@ -30,7 +30,6 @@ import {
   CanVoteParams,
   ClientCore,
   computeProposalStatusFilter,
-  ContextPlugin,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
@@ -82,11 +81,6 @@ import { AddresslistVotingClientEncoding } from "./encoding";
  */
 export class AddresslistVotingClientMethods extends ClientCore
   implements IAddresslistVotingClientMethods {
-  constructor(context: ContextPlugin) {
-    super(context);
-    Object.freeze(AddresslistVotingClientMethods.prototype);
-    Object.freeze(this);
-  }
   /**
    * Creates a new proposal on the given AddressList plugin contract
    *
