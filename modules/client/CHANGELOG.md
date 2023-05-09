@@ -21,6 +21,8 @@ TEMPLATE:
 
 ### Changed
 - Properties `signer` and `web3providers` are now optional in the `ContextParams`
+
+
 ## [1.5.0]
 ### Added
 - Add `wrapTokens` and `unwrapTokens` functions to support token contract without support for snapshots
