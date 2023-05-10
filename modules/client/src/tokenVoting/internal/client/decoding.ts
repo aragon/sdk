@@ -3,11 +3,12 @@ import {
   ClientCore,
   decodeUpdatePluginSettingsAction,
   getFunctionFragment,
-  IInterfaceParams,
+  InterfaceParams,
   VotingSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { IMintTokenParams, ITokenVotingClientDecoding } from "../../interfaces";
+import { MintTokenParams } from "../../types";
+import { ITokenVotingClientDecoding } from "../../interfaces";
 import { IERC20MintableUpgradeable__factory } from "@aragon/osx-ethers";
 import { mintTokenParamsFromContract } from "../utils";
 
@@ -30,10 +31,10 @@ export class TokenVotingClientDecoding extends ClientCore
    * Decodes the mint token params from an encoded mint token action
    *
    * @param {Uint8Array} data
-   * @return {*}  {IMintTokenParams}
+   * @return {*}  {MintTokenParams}
    * @memberof TokenVotingClientDecoding
    */
-  public mintTokenAction(data: Uint8Array): IMintTokenParams {
+  public mintTokenAction(data: Uint8Array): MintTokenParams {
     const votingInterface = IERC20MintableUpgradeable__factory
       .createInterface();
     const hexBytes = bytesToHex(data);
@@ -48,10 +49,10 @@ export class TokenVotingClientDecoding extends ClientCore
    * Returns the decoded function info given the encoded data of an action
    *
    * @param {Uint8Array} data
-   * @return {*}  {(IInterfaceParams | null)}
+   * @return {*}  {(InterfaceParams | null)}
    * @memberof TokenVotingClientDecoding
    */
-  public findInterface(data: Uint8Array): IInterfaceParams | null {
+  public findInterface(data: Uint8Array): InterfaceParams | null {
     try {
       const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
       return {

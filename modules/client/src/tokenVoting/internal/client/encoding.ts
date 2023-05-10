@@ -7,20 +7,15 @@ import {
   ClientCore,
   DaoAction,
   encodeUpdateVotingSettingsAction,
-  IPluginInstallItem,
+  PluginInstallItem,
   SupportedNetworks,
   SupportedNetworksArray,
   VotingSettings,
 } from "../../../client-common";
 import { isAddress } from "@ethersproject/address";
-import {
-  IMintTokenParams,
-  ITokenVotingClientEncoding,
-  ITokenVotingPluginInstall,
-} from "../../interfaces";
-import {
-  IERC20MintableUpgradeable__factory,
-} from "@aragon/osx-ethers";
+import { ITokenVotingClientEncoding } from "../../interfaces";
+import { MintTokenParams, TokenVotingPluginInstall } from "../../types";
+import { IERC20MintableUpgradeable__factory } from "@aragon/osx-ethers";
 import {
   mintTokenParamsToContract,
   tokenVotingInitParamsToContract,
@@ -38,16 +33,16 @@ export class TokenVotingClientEncoding extends ClientCore
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured
    *
-   * @param {ITokenVotingPluginInstall} params
+   * @param {TokenVotingPluginInstall} params
    * @param {Networkish} network
-   * @return {*}  {IPluginInstallItem}
+   * @return {*}  {PluginInstallItem}
    * @memberof TokenVotingClientEncoding
    */
   static getPluginInstallItem(
-    params: ITokenVotingPluginInstall,
+    params: TokenVotingPluginInstall,
     network: Networkish,
-  ): IPluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetworks
+  ): PluginInstallItem {
+    const networkName = getNetwork(network).name as SupportedNetworks;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }
@@ -93,13 +88,13 @@ export class TokenVotingClientEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal that mints an amount of ERC-20 tokens to an address
    *
    * @param {string} minterAddress
-   * @param {IMintTokenParams} params
+   * @param {MintTokenParams} params
    * @return {*}  {DaoAction}
    * @memberof TokenVotingClientEncoding
    */
   public mintTokenAction(
     minterAddress: string,
-    params: IMintTokenParams,
+    params: MintTokenParams,
   ): DaoAction {
     if (!isAddress(minterAddress) || !isAddress(params.address)) {
       throw new InvalidAddressError();

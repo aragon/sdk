@@ -1,9 +1,3 @@
-export { AddresslistVotingClient } from "./client";
-
-export {
-  AddresslistVotingPluginPrepareInstallationParams,
-  AddresslistVotingProposal,
-  AddresslistVotingProposalListItem,
-  AddresslistVotingProposalResult,
-  IAddresslistVotingPluginInstall,
-} from "./interfaces";
+export * from "./client";
+export * from "./interfaces";
+export * from "./types";

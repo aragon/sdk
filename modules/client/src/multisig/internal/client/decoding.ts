@@ -2,16 +2,14 @@ import { bytesToHex } from "@aragon/sdk-common";
 import {
   ClientCore,
   getFunctionFragment,
-  IInterfaceParams,
+  InterfaceParams,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import {
-  IMultisigClientDecoding,
-  MultisigVotingSettings,
-} from "../../interfaces";
+import { MultisigVotingSettings } from "../../types";
 // @ts-ignore
 // todo fix new contracts-ethers
 import { Multisig__factory } from "@aragon/osx-ethers";
+import { IMultisigClientDecoding } from "../../interfaces";
 
 /**
  * Decoding module for the SDK AddressList Client
@@ -83,10 +81,10 @@ export class MultisigClientDecoding extends ClientCore
    * Returns the decoded function info given the encoded data of an action
    *
    * @param {Uint8Array} data
-   * @return {*}  {(IInterfaceParams | null)}
+   * @return {*}  {(InterfaceParams | null)}
    * @memberof MultisigClientDecoding
    */
-  public findInterface(data: Uint8Array): IInterfaceParams | null {
+  public findInterface(data: Uint8Array): InterfaceParams | null {
     try {
       const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
       return {

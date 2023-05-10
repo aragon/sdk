@@ -4,7 +4,6 @@ import {
   IAddresslistVotingClientEncoding,
   IAddresslistVotingClientEstimation,
   IAddresslistVotingClientMethods,
-  IAddresslistVotingPluginInstall,
 } from "./interfaces";
 import { AddresslistVotingClientMethods } from "./internal/client/methods";
 import { AddresslistVotingClientEncoding } from "./internal/client/encoding";
@@ -13,9 +12,10 @@ import { AddresslistVotingClientEstimation } from "./internal/client/estimation"
 import {
   ClientCore,
   ContextPlugin,
-  IPluginInstallItem,
+  PluginInstallItem,
 } from "../client-common";
 import { Networkish } from "@ethersproject/providers";
+import { AddresslistVotingPluginInstall } from "./types";
 
 /**
  * Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO
@@ -40,15 +40,15 @@ export class AddresslistVotingClient extends ClientCore
      * Computes the parameters to be given when creating the DAO,
      * so that the plugin is configured
      *
-     * @param {IAddresslistVotingPluginInstall} params
+     * @param {AddresslistVotingPluginInstall} params
      * @param {Networkish} [network="mainnet"]
-     * @return {*}  {IPluginInstallItem}
+     * @return {*}  {PluginInstallItem}
      * @memberof AddresslistVotingClient
      */
     getPluginInstallItem: (
-      params: IAddresslistVotingPluginInstall,
+      params: AddresslistVotingPluginInstall,
       network: Networkish = "mainnet",
-    ): IPluginInstallItem =>
+    ): PluginInstallItem =>
       AddresslistVotingClientEncoding.getPluginInstallItem(params, network),
   };
 }

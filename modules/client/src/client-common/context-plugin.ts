@@ -1,7 +1,7 @@
 import { Context } from "./context";
 import {
   ContextPluginParams,
-} from "./interfaces/context";
+} from "./types/context";
 
 export class ContextPlugin extends Context {
   // INTERNAL CONTEXT STATE

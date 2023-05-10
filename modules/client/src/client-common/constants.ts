@@ -1,6 +1,6 @@
 import { activeContractsList } from "@aragon/osx-ethers";
-import { NetworkDeployment, SupportedNetworks } from "./interfaces/common";
-import { ProposalMetadata } from "./interfaces/plugin";
+import { NetworkDeployment, SupportedNetworks } from "./types/common";
+import { ProposalMetadata } from "./types/plugin";
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
   title: "(unsupported metadata link)",

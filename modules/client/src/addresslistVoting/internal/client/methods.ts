@@ -18,14 +18,7 @@ import {
   UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
-import {
-  AddresslistVotingPluginPrepareInstallationParams,
-  AddresslistVotingProposal,
-  AddresslistVotingProposalListItem,
-  IAddresslistVotingClientMethods,
-  SubgraphAddresslistVotingProposal,
-  SubgraphAddresslistVotingProposalListItem,
-} from "../../interfaces";
+import { IAddresslistVotingClientMethods } from "../../interfaces";
 import {
   CanVoteParams,
   ClientCore,
@@ -34,8 +27,8 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  IProposalQueryParams,
-  IVoteProposalParams,
+  ProposalQueryParams,
+  VoteProposalParams,
   PrepareInstallationStep,
   PrepareInstallationStepValue,
   ProposalCreationSteps,
@@ -75,6 +68,15 @@ import {
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
 import { AddresslistVotingClientEncoding } from "./encoding";
+import {
+  AddresslistVotingPluginPrepareInstallationParams,
+  AddresslistVotingProposal,
+  AddresslistVotingProposalListItem,
+} from "../../types";
+import {
+  SubgraphAddresslistVotingProposal,
+  SubgraphAddresslistVotingProposalListItem,
+} from "../types";
 
 /**
  * Methods module the SDK Address List Client
@@ -176,12 +178,12 @@ export class AddresslistVotingClientMethods extends ClientCore
   /**
    * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
    *
-   * @param {IVoteProposalParams} params
+   * @param {VoteProposalParams} params
    * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
    * @memberof AddresslistVotingClientMethods
    */
   public async *voteProposal(
-    params: IVoteProposalParams,
+    params: VoteProposalParams,
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -476,7 +478,7 @@ export class AddresslistVotingClientMethods extends ClientCore
   /**
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
-   * @param {IProposalQueryParams} {
+   * @param {ProposalQueryParams} {
    *       daoAddressOrEns,
    *       limit = 10,
    *       status,
@@ -494,7 +496,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = ProposalSortBy.CREATED_AT,
-  }: IProposalQueryParams): Promise<AddresslistVotingProposalListItem[]> {
+  }: ProposalQueryParams): Promise<AddresslistVotingProposalListItem[]> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {

@@ -1,26 +1,31 @@
 import {
   ApplyUninstallationParams,
   AssetBalance,
-  ContractPermissionParams,
-  ContractPermissionWithConditionParams,
   DaoDetails,
   DaoListItem,
   DaoMetadata,
   DepositErc20Params,
   DepositEthParams,
+  GrantPermissionDecodedParams,
+  GrantPermissionParams,
   GrantPermissionWithConditionDecodedParams,
   GrantPermissionWithConditionParams,
-  IGrantPermissionDecodedParams,
-  IGrantPermissionParams,
   InstalledPluginListItem,
-  IRevokePermissionDecodedParams,
-  IRevokePermissionParams,
   PermissionIds,
   PluginRepo,
   PluginRepoBuildMetadata,
   PluginRepoListItem,
   PluginRepoRelease,
   PluginRepoReleaseMetadata,
+  RevokePermissionDecodedParams,
+  RevokePermissionParams,
+  Transfer,
+  TransferType,
+  WithdrawParams,
+} from "../types";
+import {
+  ContractPermissionParams,
+  ContractPermissionWithConditionParams,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
@@ -30,11 +35,7 @@ import {
   SubgraphPluginRepoReleaseListItem,
   SubgraphTransferListItem,
   SubgraphTransferType,
-  TokenType,
-  Transfer,
-  TransferType,
-  WithdrawParams,
-} from "../interfaces";
+} from "./types";
 import { defaultAbiCoder, Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -43,6 +44,7 @@ import { PluginSetupProcessor } from "@aragon/osx-ethers";
 import {
   ApplyInstallationParams,
   DecodedApplyInstallationParams,
+  TokenType,
 } from "../client-common";
 
 export function unwrapDepositParams(
@@ -330,7 +332,7 @@ export function applyInstallatonParamsFromContract(
 }
 
 export function permissionParamsToContract(
-  params: IGrantPermissionParams | IRevokePermissionParams,
+  params: GrantPermissionParams | RevokePermissionParams,
 ): ContractPermissionParams {
   return [params.where, params.who, keccak256(toUtf8Bytes(params.permission))];
 }
@@ -349,7 +351,7 @@ export function permissionWithConditionParamsToContract(
 
 export function permissionParamsFromContract(
   result: Result,
-): IGrantPermissionDecodedParams | IRevokePermissionDecodedParams {
+): GrantPermissionDecodedParams | RevokePermissionDecodedParams {
   return {
     where: result[0],
     who: result[1],

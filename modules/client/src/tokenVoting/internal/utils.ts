@@ -5,16 +5,21 @@ import {
   ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
+  TokenType,
   VoteValues,
   votingSettingsToContract,
 } from "../../client-common";
 import {
-  ContractMintTokenParams,
-  ContractTokenVotingInitParams,
   Erc20TokenDetails,
   Erc721TokenDetails,
-  IMintTokenParams,
-  ITokenVotingPluginInstall,
+  MintTokenParams,
+  TokenVotingPluginInstall,
+  TokenVotingProposal,
+  TokenVotingProposalListItem,
+} from "../types";
+import {
+  ContractMintTokenParams,
+  ContractTokenVotingInitParams,
   SubgraphContractType,
   SubgraphErc20Token,
   SubgraphErc721Token,
@@ -22,10 +27,7 @@ import {
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
   SubgraphTokenVotingVoterListItem,
-  TokenVotingMember,
-  TokenVotingProposal,
-  TokenVotingProposalListItem,
-} from "../interfaces";
+} from "./types";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
@@ -34,7 +36,6 @@ import {
   getCompactProposalId,
   hexToBytes,
 } from "@aragon/sdk-common";
-import { TokenType } from "../../interfaces";
 
 export function toTokenVotingProposal(
   proposal: SubgraphTokenVotingProposal,
@@ -173,12 +174,12 @@ export function toTokenVotingProposalListItem(
 }
 
 export function mintTokenParamsToContract(
-  params: IMintTokenParams,
+  params: MintTokenParams,
 ): ContractMintTokenParams {
   return [params.address, BigNumber.from(params.amount)];
 }
 
-export function mintTokenParamsFromContract(result: Result): IMintTokenParams {
+export function mintTokenParamsFromContract(result: Result): MintTokenParams {
   return {
     address: result[0],
     amount: BigInt(result[1]),
@@ -186,7 +187,7 @@ export function mintTokenParamsFromContract(result: Result): IMintTokenParams {
 }
 
 export function tokenVotingInitParamsToContract(
-  params: ITokenVotingPluginInstall,
+  params: TokenVotingPluginInstall,
 ): ContractTokenVotingInitParams {
   let token: [string, string, string] = ["", "", ""];
   let balances: [string[], BigNumber[]] = [[], []];

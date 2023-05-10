@@ -1,15 +1,13 @@
 import {
   ApplyUninstallationParams,
   GrantPermissionWithConditionParams,
-  IClientEncoding,
-  IGrantPermissionParams,
-  IRevokePermissionParams,
+  GrantPermissionParams,
+  RevokePermissionParams,
   Permissions,
   RegisterStandardCallbackParams,
-  TokenType,
   UpgradeToAndCallParams,
   WithdrawParams,
-} from "../../interfaces";
+} from "../../types";
 import {
   ApplyInstallationParams,
   ClientCore,
@@ -17,6 +15,7 @@ import {
   LIVE_CONTRACTS,
   SupportedNetworks,
   SupportedNetworksArray,
+  TokenType,
 } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -39,6 +38,7 @@ import {
   UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { IClientEncoding } from "../../interfaces";
 
 /**
  * Encoding module the SDK Generic Client
@@ -135,13 +135,13 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * Computes the payload to be given when creating a proposal that grants a permission within a DAO
    *
    * @param {string} daoAddress
-   * @param {IGrantPermissionParams} params
+   * @param {GrantPermissionParams} params
    * @return {*}  {DaoAction}
    * @memberof ClientEncoding
    */
   public grantAction(
     daoAddress: string,
-    params: IGrantPermissionParams,
+    params: GrantPermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where, who } = params;
@@ -213,13 +213,13 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * Computes the payload to be given when creating a proposal that revokes a permission within a DAO
    *
    * @param {string} daoAddress
-   * @param {IRevokePermissionParams} params
+   * @param {RevokePermissionParams} params
    * @return {*}  {DaoAction}
    * @memberof ClientEncoding
    */
   public revokeAction(
     daoAddress: string,
-    params: IRevokePermissionParams,
+    params: RevokePermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where, who } = params;

@@ -22,22 +22,23 @@ import {
   ApproveProposalStepValue,
   CanApproveParams,
   CreateMultisigProposalParams,
-  IMultisigClientMethods,
   MultisigPluginPrepareInstallationParams,
   MultisigProposal,
   MultisigProposalListItem,
   MultisigVotingSettings,
+} from "../../types";
+import {
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
   SubgraphMultisigVotingSettings,
-} from "../../interfaces";
+} from "../types";
 import {
   ClientCore,
   computeProposalStatusFilter,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  IProposalQueryParams,
+  ProposalQueryParams,
   PrepareInstallationStep,
   PrepareInstallationStepValue,
   ProposalCreationSteps,
@@ -62,14 +63,15 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import {
+  QueryMultisigMembers,
   QueryMultisigProposal,
   QueryMultisigProposals,
   QueryMultisigVotingSettings,
 } from "../graphql-queries";
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { QueryMultisigMembers } from "../graphql-queries/members";
 import { MultisigClientEncoding } from "./encoding";
+import { IMultisigClientMethods } from "../../interfaces";
 
 /**
  * Methods module the SDK Address List Client
@@ -504,7 +506,7 @@ export class MultisigClientMethods extends ClientCore
   /**
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
-   * @param {IProposalQueryParams} {
+   * @param {ProposalQueryParams} {
    *       daoAddressOrEns,
    *       limit = 10,
    *       status,
@@ -522,7 +524,7 @@ export class MultisigClientMethods extends ClientCore
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = ProposalSortBy.CREATED_AT,
-  }: IProposalQueryParams): Promise<MultisigProposalListItem[]> {
+  }: ProposalQueryParams): Promise<MultisigProposalListItem[]> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {

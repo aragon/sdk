@@ -1,4 +1,4 @@
-import { ContextParams, ContextState } from "./interfaces/context";
+import { ContextParams, ContextState } from "./types/context";
 import {
   getNetwork,
   JsonRpcProvider,
@@ -17,10 +17,10 @@ import {
   IPFS_NODES,
   LIVE_CONTRACTS,
 } from "./constants";
-import { SupportedNetworks, SupportedNetworksArray } from "./interfaces/common";
+import { SupportedNetworks, SupportedNetworksArray } from "./types/common";
 import { isAddress } from "@ethersproject/address";
 import { Signer } from "@ethersproject/abstract-signer";
-export { ContextParams } from "./interfaces/context";
+export { ContextParams } from "./types/context";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 type OverriddenState = {

@@ -5,7 +5,7 @@ import {
   DaoMetadata,
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
-} from "../interfaces";
+} from "../types";
 import { erc20ContractAbi } from "./abi/erc20";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [

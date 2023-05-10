@@ -47,12 +47,10 @@ import {
   DaoDetails,
   DaoListItem,
   DaoMetadata,
+  DaoQueryParams,
   DaoSortBy,
   DepositParams,
-  IClientMethods,
-  IDaoQueryParams,
-  IHasPermissionParams,
-  ITransferQueryParams,
+  HasPermissionParams,
   PermissionIds,
   PluginQueryParams,
   PluginRepo,
@@ -67,6 +65,11 @@ import {
   SetAllowanceParams,
   SetAllowanceSteps,
   SetAllowanceStepValue,
+  Transfer,
+  TransferQueryParams,
+  TransferSortBy,
+} from "../../types";
+import {
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
@@ -75,17 +78,14 @@ import {
   SubgraphPluginRepoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
-  TokenType,
-  Transfer,
-  TransferSortBy,
-} from "../../interfaces";
+} from "../types";
 import {
   ClientCore,
   findLog,
   LIVE_CONTRACTS,
   MultiTargetPermission,
   SortDirection,
-  SupportedNetworks,
+  TokenType,
 } from "../../client-common";
 import {
   toAssetBalance,
@@ -111,6 +111,7 @@ import {
   UNSUPPORTED_DAO_METADATA_LINK,
   UNSUPPORTED_RELEASE_METADATA_LINK,
 } from "../constants";
+import { IClientMethods } from "../../interfaces";
 
 /**
  * Methods module the SDK Generic Client
@@ -488,11 +489,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Checks whether a role is granted by the current DAO's ACL settings
    *
-   * @param {IHasPermissionParams} params
+   * @param {HasPermissionParams} params
    * @return {*}  {Promise<boolean>}
    * @memberof ClientMethods
    */
-  public async hasPermission(params: IHasPermissionParams): Promise<boolean> {
+  public async hasPermission(params: HasPermissionParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
       throw new NoSignerError();
@@ -561,7 +562,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Retrieves metadata for DAO with given identifier (address or ens domain)
    *
-   * @param {IDaoQueryParams} {
+   * @param {DaoQueryParams} {
    *     limit = 10,
    *     skip = 0,
    *     direction = SortDirection.ASC,
@@ -575,7 +576,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = DaoSortBy.CREATED_AT,
-  }: IDaoQueryParams): Promise<DaoListItem[]> {
+  }: DaoQueryParams): Promise<DaoListItem[]> {
     const query = QueryDaos;
     const params = {
       limit,
@@ -674,7 +675,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)
    *
-   * @param {ITransferQueryParams} {
+   * @param {TransferQueryParams} {
    *     daoAddressOrEns,
    *     type,
    *     limit = 10,
@@ -692,7 +693,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = TransferSortBy.CREATED_AT,
-  }: ITransferQueryParams): Promise<Transfer[] | null> {
+  }: TransferQueryParams): Promise<Transfer[] | null> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {

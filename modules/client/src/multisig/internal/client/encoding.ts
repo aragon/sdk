@@ -7,30 +7,29 @@ import { isAddress } from "@ethersproject/address";
 import {
   ClientCore,
   DaoAction,
-  IPluginInstallItem,
+  PluginInstallItem,
   SupportedNetworks,
   SupportedNetworksArray,
 } from "../../../client-common";
 import {
   AddAddressesParams,
-  IMultisigClientEncoding,
   MultisigPluginInstallParams,
   RemoveAddressesParams,
   UpdateMultisigVotingSettingsParams,
-} from "../../interfaces";
+} from "../../types";
 // @ts-ignore
 // todo fix new contracts-ethers
 import { Multisig__factory } from "@aragon/osx-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { LIVE_CONTRACTS } from "../../../client-common/constants";
 import { getNetwork, Networkish } from "@ethersproject/providers";
+import { IMultisigClientEncoding } from "../../interfaces";
 
 /**
  * Encoding module for the SDK Multisig Client
  */
 export class MultisigClientEncoding extends ClientCore
   implements IMultisigClientEncoding {
-
   /**
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured
@@ -38,14 +37,14 @@ export class MultisigClientEncoding extends ClientCore
    * @param {MultisigPluginInstallParams} params
    * @param {Networkish} network
    *
-   * @return {*}  {IPluginInstallItem}
+   * @return {*}  {PluginInstallItem}
    * @memberof MultisigClientEncoding
    */
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
     network: Networkish,
-  ): IPluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetworks
+  ): PluginInstallItem {
+    const networkName = getNetwork(network).name as SupportedNetworks;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }

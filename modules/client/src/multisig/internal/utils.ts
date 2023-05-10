@@ -5,12 +5,11 @@ import {
   ProposalMetadata,
   SubgraphAction,
 } from "../../client-common";
+import { MultisigProposal, MultisigProposalListItem } from "../types";
 import {
-  MultisigProposal,
-  MultisigProposalListItem,
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
-} from "../interfaces";
+} from "./types";
 
 export function toMultisigProposal(
   proposal: SubgraphMultisigProposal,
