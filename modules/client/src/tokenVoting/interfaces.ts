@@ -280,14 +280,14 @@ export type DelegateTokensParams = {
   delegatee: string;
 };
 
-export enum DelegateTokensStep {
+export const enum DelegateTokensStep {
   DELEGATING = "delegating",
   DONE = "done",
 }
 
-export enum UndelegateTokensStep {
-  UNDELEGATING = DelegateTokensStep.DELEGATING,
-  DONE = DelegateTokensStep.DONE,
+export const enum UndelegateTokensStep {
+  UNDELEGATING = "delegating",
+  DONE = "done",
 }
 
 type DelegateTokensStepCommon = {
