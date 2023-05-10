@@ -4,11 +4,6 @@ import {
 } from "@aragon/osx-ethers";
 import {
   ClientCore,
-<<<<<<< HEAD
-  GasFeeEstimation,
-=======
-  ContextPlugin,
->>>>>>> 9a70c2d (fix comments)
   CreateMajorityVotingProposalParams,
   GasFeeEstimation,
   IVoteProposalParams,
