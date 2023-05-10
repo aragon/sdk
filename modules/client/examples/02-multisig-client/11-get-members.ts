@@ -21,7 +21,7 @@ const daoPluginAddress: string = "0x1234548357023847502348"; // The address of t
 const multisigMembers: string[] = await multisigClient.methods.getMembers(
   daoPluginAddress,
 );
-console.log({ multisigMembers });
+console.log(multisigMembers);
 
 /* MARKDOWN
 Returns:

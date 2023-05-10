@@ -1,9 +1,9 @@
 /* MARKDOWN
 ---
-title: Upgrade DAO
+title: Upgrade To Another Contract
 ---
 
-## Upgrade the DAO
+## Upgrade To Another Contract
 
 Encodes the action of upgrading the DAO proxy contract to a new implementation address.
 
