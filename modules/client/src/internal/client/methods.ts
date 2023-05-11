@@ -12,11 +12,8 @@ import {
   InstallationNotFoundError,
   InvalidAddressOrEnsError,
   InvalidCidError,
-  InvalidPrepareUninstallationAbiError,
-  IpfsFetchError,
   IpfsPinError,
   MissingExecPermissionError,
-  MissingMetadataError,
   NoProviderError,
   NoSignerError,
   PluginUninstallationPreparationError,
@@ -433,41 +430,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!selectedInstallation) {
       throw new InstallationNotFoundError();
     }
-    // use specified abi if provided
-    let uninstallationAbi = params.uninstallationAbi;
-    // if not provided get abi from the metadata
-    if (!uninstallationAbi) {
-      // check if metadata is defined
-      if (!selectedInstallation.appliedVersion.metadata) {
-        throw new MissingMetadataError();
-      }
-      // fetch metadata from ipfs
-      let buildMetadata: PluginRepoBuildMetadata;
-      try {
-        const buildMetadataString = await this.ipfs.fetchString(
-          selectedInstallation.appliedVersion.metadata,
-        );
-        buildMetadata = JSON.parse(
-          buildMetadataString,
-        ) as PluginRepoBuildMetadata;
-      } catch {
-        throw new IpfsFetchError();
-      }
-      // get unistallation abi
-      uninstallationAbi = buildMetadata?.pluginSetupABI
-        ?.prepareUninstallation;
-      
-      if (!uninstallationAbi) {
-        throw new InvalidPrepareUninstallationAbiError();
-      }
-      // TODO remove this when metadata is fixed
-      if (uninstallationAbi.length === 1 && uninstallationAbi[0] === "") {
-        uninstallationAbi = [];
-      }
-    }
-
     // encode uninstallation params
-    const { uninstallationParams = [] } = params;
+    const { uninstallationParams = [], uninstallationAbi = []} = params;
     const data = defaultAbiCoder.encode(
       uninstallationAbi,
       uninstallationParams,

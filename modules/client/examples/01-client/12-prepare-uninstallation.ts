@@ -22,13 +22,10 @@ const prepareUninstallationParams: PrepareUninstallationParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
   pluginAddress: "0x2345678901234567890123456789012345678901",
   uninstallationParams: [ // Parameters needed by the prepare uninstall abi
-    "test",
-    ["testArrayItem", "testArrayItem2"],
-    {
-      testObjectProp: "testObjectValue",
-    },
+    1234,
+    "0x1234567890123456789012345678901234567890",
   ],
-  uninastallationAbi: ["uint256", "string", "string[]", "object"], // optional, if not specified, the abi will be fetched from the plugin metadata
+  uninstallationAbi: ["uint256", "adress"],
 };
 
 // Estimate how much gas the transaction will cost.
@@ -69,7 +66,7 @@ Returns:
 {
   permissions: [
     {
-      operation: 1,
+      operation: 1, // revoke
       where: "0x12345...",
       who: "0x23456...",
       condition: "0x78910...",

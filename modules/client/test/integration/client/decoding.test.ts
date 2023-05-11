@@ -13,6 +13,7 @@ import {
   IGrantPermissionParams,
   IRevokePermissionDecodedParams,
   IRevokePermissionParams,
+  PermissionOperationType,
   Permissions,
   SupportedNetworksArray,
   WithdrawParams,
@@ -31,6 +32,7 @@ import {
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { AddressZero } from "@ethersproject/constants";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -512,7 +514,7 @@ describe("Client", () => {
 
       const applyUninstallationParams: ApplyUninstallationParams = {
         permissions: [{
-          operation: 1,
+          operation: PermissionOperationType.REVOKE,
           permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
           where: "0x1234567890123456789012345678901234567890",
           who: "0x2345678901234567890123456789012345678901",
@@ -550,8 +552,8 @@ describe("Client", () => {
         decodedApplyUninstallationParams.pluginRepo,
       );
       for (const index in applyUninstallationParams.permissions) {
-        expect(applyUninstallationParams.permissions[index].condition).toBe(
-          decodedApplyUninstallationParams.permissions[index].condition,
+        expect(decodedApplyUninstallationParams.permissions[index].condition).toBe(
+          AddressZero,
         );
         expect(applyUninstallationParams.permissions[index].operation).toBe(
           decodedApplyUninstallationParams.permissions[index].operation,

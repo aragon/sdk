@@ -427,19 +427,6 @@ describe("Client", () => {
         mockedClient.request.mockResolvedValueOnce({
           iplugin: { installations: [installation] },
         });
-        mockedIPFSClient.cat.mockResolvedValueOnce(
-          Buffer.from(
-            JSON.stringify({
-              ui: "",
-              change: "",
-              pluginSetupABI: {
-                prepareInstallation: ["address admin"],
-                prepareUpdate: [],
-                prepareUninstallation: [],
-              },
-            }),
-          ),
-        );
         const steps = client.methods.prepareUninstallation(
           {
             daoAddressOrEns: dao,

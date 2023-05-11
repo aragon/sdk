@@ -34,6 +34,7 @@ import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { AddressZero } from "@ethersproject/constants";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -376,7 +377,11 @@ describe("Client", () => {
       );
     });
     it("Should encode an applyInstallation action", async () => {
-      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");
+      const networkSpy = jest.spyOn(
+        JsonRpcProvider.prototype,
+        "network",
+        "get",
+      );
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -459,7 +464,11 @@ describe("Client", () => {
       }
     });
     it("Should encode an applyUninstallation action", async () => {
-      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");
+      const networkSpy = jest.spyOn(
+        JsonRpcProvider.prototype,
+        "network",
+        "get",
+      );
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -524,7 +533,7 @@ describe("Client", () => {
           applyUninstallationParams.permissions[parseInt(index)].who,
         );
         expect(argsDecoded[1].permissions[parseInt(index)].condition).toBe(
-          applyUninstallationParams.permissions[parseInt(index)].condition,
+          AddressZero,
         );
         expect(argsDecoded[1].permissions[parseInt(index)].permissionId).toBe(
           bytesToHex(

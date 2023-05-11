@@ -90,7 +90,7 @@ Returns:
 { decodedParams:
   {
     permissions: [{
-      operation: 1,
+      operation: 1, // REVOKE
       permissionId: Uint8Array([10,20,30]),
       where: "0x1234567890123456789012345678901234567890",
       who: "0x2345678901234567890123456789012345678901",
