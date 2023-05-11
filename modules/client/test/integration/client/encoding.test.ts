@@ -465,7 +465,6 @@ describe("Client", () => {
 
       const applyUninstallationParams: ApplyUninstallationParams = {
         permissions: [{
-          condition: "0x1234567890123456789012345678901234567890",
           operation: 1,
           permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
           where: "0x1234567890123456789012345678901234567890",

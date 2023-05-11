@@ -90,7 +90,6 @@ Returns:
 { decodedParams:
   {
     permissions: [{
-      condition: "0x1234567890123456789012345678901234567890",
       operation: 1,
       permissionId: Uint8Array([10,20,30]),
       where: "0x1234567890123456789012345678901234567890",
