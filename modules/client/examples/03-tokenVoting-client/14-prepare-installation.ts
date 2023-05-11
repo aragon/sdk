@@ -78,7 +78,7 @@ Returns:
         who: "0x12345...",
         where: "0x12345...",
         operation: 1, // GRANT
-        permissionId: Uint8Array([10, 20, 30])
+      permissionId: "0x1234567890..."
       }
     ]
   }
