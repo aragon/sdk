@@ -11,7 +11,7 @@ Enables voting on a proposal using the Addresslist Voting plugin installed withi
 import {
   AddresslistVotingClient,
   ContextPlugin,
-  IVoteProposalParams,
+  VoteProposalParams,
   VoteProposalStep,
   VoteValues,
 } from "@aragon/sdk-client";
@@ -23,7 +23,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const addresslistVotingClient: AddresslistVotingClient =
   new AddresslistVotingClient(contextPlugin);
 
-const voteParams: IVoteProposalParams = {
+const voteParams: VoteProposalParams = {
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES, // alternatively NO, or ABSTAIN
 };

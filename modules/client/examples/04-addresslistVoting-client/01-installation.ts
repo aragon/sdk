@@ -18,7 +18,7 @@ import {
   DaoCreationSteps,
   DaoMetadata,
   GasFeeEstimation,
-  IAddresslistVotingPluginInstall,
+  AddresslistVotingPluginInstall,
   VotingMode,
 } from "@aragon/sdk-client";
 import { context } from "../index";
@@ -27,7 +27,7 @@ import { context } from "../index";
 const client: Client = new Client(context);
 
 // Define the plugins to install and their params.
-const addresslistVotingPluginInstallParams: IAddresslistVotingPluginInstall = {
+const addresslistVotingPluginInstallParams: AddresslistVotingPluginInstall = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%

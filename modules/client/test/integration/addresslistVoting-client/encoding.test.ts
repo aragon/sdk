@@ -5,7 +5,7 @@ import {
   AddresslistVotingClient,
   Context,
   ContextPlugin,
-  IAddresslistVotingPluginInstall,
+  AddresslistVotingPluginInstall,
   SupportedNetworksArray,
   VotingSettings,
 } from "../../../src";
@@ -22,7 +22,7 @@ describe("Client Address List", () => {
   });
   describe("Action generators", () => {
     it("Should create an AddressList client and generate a install entry", async () => {
-      const withdrawParams: IAddresslistVotingPluginInstall = {
+      const withdrawParams: AddresslistVotingPluginInstall = {
         votingSettings: {
           minDuration: 7200, // seconds
           supportThreshold: 0.5,

@@ -13,7 +13,7 @@ By default, retrieves ETH, DAI, USDC and USDT, on Mainnet).
 
 import {
   Client,
-  ITransferQueryParams,
+  TransferQueryParams,
   SortDirection,
   Transfer,
   TransferSortBy,
@@ -24,7 +24,7 @@ import { context } from "../index";
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
-const params: ITransferQueryParams = {
+const params: TransferQueryParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // optional
   sortBy: TransferSortBy.CREATED_AT, // optional
   limit: 10, // optional

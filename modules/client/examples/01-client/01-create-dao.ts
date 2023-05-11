@@ -14,7 +14,7 @@ import {
   DaoCreationSteps,
   DaoMetadata,
   GasFeeEstimation,
-  ITokenVotingPluginInstall,
+  TokenVotingPluginInstall,
   TokenVotingClient,
   VotingMode,
 } from "@aragon/sdk-client";
@@ -38,7 +38,7 @@ const metadataUri = await client.methods.pinMetadata(metadata);
 
 // You need at least one plugin in order to create a DAO. In this example, we'll use the TokenVoting plugin, but feel free to install whichever one best suites your needs. You can find resources on how to do this in the plugin sections.
 // These would be the plugin params if you need to mint a new token for the DAO to enable TokenVoting.
-const tokenVotingPluginInstallParams: ITokenVotingPluginInstall = {
+const tokenVotingPluginInstallParams: TokenVotingPluginInstall = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds
     minParticipation: 0.25, // 25%

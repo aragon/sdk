@@ -12,7 +12,7 @@ import {
   Context,
   ContextPlugin,
   CreateMultisigProposalParams,
-  IProposalQueryParams,
+  ProposalQueryParams,
   MultisigClient,
   MultisigPluginPrepareInstallationParams,
   MultisigProposal,
@@ -22,7 +22,6 @@ import {
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
-  SubgraphMultisigProposal,
   SupportedNetworksArray,
 } from "../../../src";
 import {
@@ -53,6 +52,7 @@ import {
 } from "../../../src/multisig/internal/graphql-queries";
 import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-queries/members";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
+import { SubgraphMultisigProposal } from "../../../src/multisig/internal/types";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -544,7 +544,7 @@ describe("Client Multisig", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
-      const params: IProposalQueryParams = {
+      const params: ProposalQueryParams = {
         limit,
         status: ProposalStatus.DEFEATED,
         sortBy: ProposalSortBy.CREATED_AT,
@@ -628,7 +628,7 @@ describe("Client Multisig", () => {
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
       const address = ADDRESS_ONE;
-      const params: IProposalQueryParams = {
+      const params: ProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
@@ -660,7 +660,7 @@ describe("Client Multisig", () => {
       const client = new MultisigClient(ctxPlugin);
       const limit = 5;
       const address = TEST_INVALID_ADDRESS;
-      const params: IProposalQueryParams = {
+      const params: ProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,

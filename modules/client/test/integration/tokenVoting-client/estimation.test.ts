@@ -8,7 +8,7 @@ import {
   Context,
   ContextPlugin,
   CreateMajorityVotingProposalParams,
-  IVoteProposalParams,
+  VoteProposalParams,
   SupportedNetworksArray,
   TokenVotingClient,
   VoteValues,
@@ -67,7 +67,7 @@ describe("Token Voting Client", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
 
-      const voteParams: IVoteProposalParams = {
+      const voteParams: VoteProposalParams = {
         proposalId: "0x1234567890123456789012345678901234567890_0x0",
         vote: VoteValues.YES,
       };

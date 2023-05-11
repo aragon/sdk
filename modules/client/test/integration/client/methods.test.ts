@@ -20,23 +20,26 @@ import {
 } from "../constants";
 import {
   AddresslistVotingClient,
+  AddresslistVotingPluginInstall,
+  AssetBalanceSortBy,
   Client,
   Context,
   CreateDaoParams,
   DaoCreationSteps,
   DaoDepositSteps,
+  DaoQueryParams,
   DaoSortBy,
   DepositParams,
-  IAddresslistVotingPluginInstall,
-  IDaoQueryParams,
-  IHasPermissionParams,
-  ITransferQueryParams,
-  LIVE_CONTRACTS,
+  HasPermissionParams,
   Permissions,
+  PluginQueryParams,
+  PluginSortBy,
   SetAllowanceParams,
+  SetAllowanceSteps,
   SortDirection,
   SupportedNetworksArray,
   TokenType,
+  TransferQueryParams,
   TransferSortBy,
   TransferType,
   VotingMode,
@@ -44,11 +47,6 @@ import {
 import { MissingExecPermissionError } from "@aragon/sdk-common";
 import { Server } from "ganache";
 import {
-  AssetBalanceSortBy,
-  PluginQueryParams,
-  PluginSortBy,
-  PrepareUninstallationSteps,
-  SetAllowanceSteps,
   SubgraphBalance,
   SubgraphDao,
   SubgraphPluginRepo,
@@ -56,7 +54,7 @@ import {
   SubgraphPluginInstallation,
   SubgraphTransferListItem,
   SubgraphTransferType,
-} from "../../../src/interfaces";
+} from "../../../src/internal/types";
 import { QueryDao, QueryDaos } from "../../../src/internal/graphql-queries/dao";
 import {
   QueryTokenBalances,
@@ -127,7 +125,7 @@ describe("Client", () => {
           avatar: "https://...",
           links: [],
         });
-        const pluginParams: IAddresslistVotingPluginInstall = {
+        const pluginParams: AddresslistVotingPluginInstall = {
           votingSettings: {
             minDuration: 3600,
             minParticipation: 0.5,
@@ -366,7 +364,7 @@ describe("Client", () => {
       it("Check if dao factory has register dao permission in the dao registry", async () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
-        const params: IHasPermissionParams = {
+        const params: HasPermissionParams = {
           daoAddressOrEns: deployment.managingDaoAddress,
           who: deployment.daoFactory.address,
           where: deployment.daoRegistry.address,
@@ -382,7 +380,7 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
         const who = await contextParamsLocalChain.signer?.getAddress();
-        const params: IHasPermissionParams = {
+        const params: HasPermissionParams = {
           daoAddressOrEns: daoAddress,
           who: who!,
           where: daoAddress,
@@ -561,7 +559,7 @@ describe("Client", () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
         const limit = 3;
-        const params: IDaoQueryParams = {
+        const params: DaoQueryParams = {
           limit,
           skip: 0,
           direction: SortDirection.ASC,
@@ -761,7 +759,7 @@ describe("Client", () => {
       describe("Should get the transfers of a dao", () => {
         let client: Client,
           mockedClient: jest.Mocked<GraphQLClient>,
-          params: ITransferQueryParams,
+          params: TransferQueryParams,
           ctx: Context;
         beforeAll(() => {
           contextParamsLocalChain.ensRegistryAddress =

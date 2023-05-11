@@ -10,10 +10,10 @@ Mints vote tokens for an installed TokenVoting plugin.
 ### Encoding
 */
 
-import { DaoAction, IMintTokenParams } from "@aragon/sdk-client";
+import { DaoAction, MintTokenParams } from "@aragon/sdk-client";
 import { tokenVotingClient } from "./index";
 
-const params: IMintTokenParams = {
+const params: MintTokenParams = {
   address: "0x1234567890123456789012345678901234567890", // address which will receive the minted tokens
   amount: BigInt(10), // amount of tokens they will receive
 };
@@ -43,7 +43,7 @@ Returns:
 */
 
 // Decodes the parameters of a mint token action.
-const decodedParams: IMintTokenParams = tokenVotingClient.decoding
+const decodedParams: MintTokenParams = tokenVotingClient.decoding
   .mintTokenAction(action.data);
 console.log({ decodedParams });
 

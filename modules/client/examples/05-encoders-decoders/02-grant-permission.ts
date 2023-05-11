@@ -13,8 +13,8 @@ Grants permission with the name (`permission`) to an address (`who`) to perform 
 import {
   Client,
   DaoAction,
-  IGrantPermissionDecodedParams,
-  IGrantPermissionParams,
+  GrantPermissionDecodedParams,
+  GrantPermissionParams,
   Permissions,
 } from "@aragon/sdk-client";
 import { context } from "../index";
@@ -22,7 +22,7 @@ import { context } from "../index";
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
 
-const params: IGrantPermissionParams = {
+const params: GrantPermissionParams = {
   who: "0x1234567890123456789012345678901234567890",
   where: "0x1234567890123456789012345678901234567890",
   permission: Permissions.UPGRADE_PERMISSION,
@@ -50,7 +50,7 @@ Returns:
 */
 
 // Decodes the data of a grant permission action.
-const decodedParams: IGrantPermissionDecodedParams = client.decoding
+const decodedParams: GrantPermissionDecodedParams = client.decoding
   .grantAction(
     action.data,
   );

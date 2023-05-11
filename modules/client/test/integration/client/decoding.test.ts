@@ -9,11 +9,10 @@ import {
   Client,
   Context,
   DaoMetadata,
-  IGrantPermissionDecodedParams,
-  IGrantPermissionParams,
-  IRevokePermissionDecodedParams,
-  IRevokePermissionParams,
-  PermissionOperationType,
+  GrantPermissionDecodedParams,
+  GrantPermissionParams,
+  RevokePermissionDecodedParams,
+  RevokePermissionParams,
   Permissions,
   SupportedNetworksArray,
   WithdrawParams,
@@ -28,8 +27,8 @@ import {
   RegisterStandardCallbackParams,
   TokenType,
   UpgradeToAndCallParams,
-} from "../../../src/interfaces";
-import { bytesToHex } from "@aragon/sdk-common";
+} from "../../../src";
+import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
@@ -50,7 +49,7 @@ describe("Client", () => {
         "0x2468013579246801357924680135792468013579",
         "0x1357924680135792468013579246801357924680",
       ];
-      const paramsArray: IGrantPermissionParams[] = [
+      const paramsArray: GrantPermissionParams[] = [
         {
           who: "0x1234567890123456789012345678901234567890",
           where: "0x1234567890123456789012345678901234567890",
@@ -65,7 +64,7 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.grantAction(daoAddresses[i], params);
-        const decodedParams: IGrantPermissionDecodedParams = client.decoding
+        const decodedParams: GrantPermissionDecodedParams = client.decoding
           .grantAction(
             action.data,
           );
@@ -86,7 +85,7 @@ describe("Client", () => {
         "0x2468013579246801357924680135792468013579",
         "0x1357924680135792468013579246801357924680",
       ];
-      const paramsArray: IRevokePermissionParams[] = [
+      const paramsArray: RevokePermissionParams[] = [
         {
           who: "0x1234567890123456789012345678901234567890",
           where: "0x1234567890123456789012345678901234567890",
@@ -101,7 +100,7 @@ describe("Client", () => {
       for (let i = 0; i < paramsArray.length; i++) {
         const params = paramsArray[i];
         const action = client.encoding.revokeAction(daoAddresses[i], params);
-        const decodedParams: IRevokePermissionDecodedParams = client.decoding
+        const decodedParams: RevokePermissionDecodedParams = client.decoding
           .revokeAction(
             action.data,
           );

@@ -10,7 +10,7 @@ Gets the proposals made using the Multisig plugin for a given DAO.
 
 import {
   ContextPlugin,
-  IProposalQueryParams,
+  ProposalQueryParams,
   MultisigClient,
   MultisigProposalListItem,
   ProposalSortBy,
@@ -24,7 +24,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const queryParams: IProposalQueryParams = {
+const queryParams: ProposalQueryParams = {
   skip: 0, // optional
   limit: 10, // optional
   direction: SortDirection.ASC, // optional. otherwise, DESC

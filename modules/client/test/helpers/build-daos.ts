@@ -5,7 +5,7 @@ import {
   Context,
   CreateDaoParams,
   DaoCreationSteps,
-  ITokenVotingPluginInstall,
+  TokenVotingPluginInstall,
   MultisigClient,
   TokenVotingClient,
   VotingMode,
@@ -62,7 +62,7 @@ export async function buildTokenVotingDAO(
 ) {
   const client = new Client(new Context(contextParamsLocalChain));
 
-  const pluginInstallParams: ITokenVotingPluginInstall = {
+  const pluginInstallParams: TokenVotingPluginInstall = {
     votingSettings: {
       minDuration: 60 * 60,
       minParticipation: 0.5,

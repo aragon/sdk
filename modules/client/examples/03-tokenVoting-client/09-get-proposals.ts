@@ -10,7 +10,7 @@ Gets all proposals from a DAO that are created using the TokenVoting plugin as i
 
 import {
   ContextPlugin,
-  IProposalQueryParams,
+  ProposalQueryParams,
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
@@ -26,7 +26,7 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
   contextPlugin,
 );
 
-const queryParams: IProposalQueryParams = {
+const queryParams: ProposalQueryParams = {
   skip: 0, // optional
   limit: 10, // optional
   direction: SortDirection.ASC, // optional, otherwise DESC ("descending")

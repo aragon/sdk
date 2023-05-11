@@ -7,20 +7,22 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   AddresslistVotingClient,
+  AddresslistVotingPluginPrepareInstallationParams,
+  AddresslistVotingProposal,
   CanVoteParams,
   Context,
   ContextPlugin,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
-  IProposalQueryParams,
-  IVoteProposalParams,
   PrepareInstallationStep,
   ProposalCreationSteps,
   ProposalMetadata,
+  ProposalQueryParams,
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
   SupportedNetworksArray,
+  VoteProposalParams,
   VoteProposalStep,
   VoteValues,
   VotingMode,
@@ -55,11 +57,9 @@ import {
   QueryAddresslistVotingProposals,
 } from "../../../src/addresslistVoting/internal/graphql-queries";
 import {
-  AddresslistVotingProposal,
   SubgraphAddresslistVotingProposal,
   SubgraphAddresslistVotingProposalListItem,
-} from "../../../src/addresslistVoting/interfaces";
-import { AddresslistVotingPluginPrepareInstallationParams } from "../../../src/addresslistVoting/interfaces";
+} from "../../../src/addresslistVoting/internal/types";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
@@ -200,7 +200,7 @@ describe("Client Address List", () => {
     client: AddresslistVotingClient,
     voteValue: VoteValues = VoteValues.YES,
   ) {
-    const voteParams: IVoteProposalParams = {
+    const voteParams: VoteProposalParams = {
       proposalId,
       vote: voteValue,
     };
@@ -794,7 +794,7 @@ describe("Client Address List", () => {
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
       const status = ProposalStatus.DEFEATED;
-      const params: IProposalQueryParams = {
+      const params: ProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
@@ -824,11 +824,11 @@ describe("Client Address List", () => {
         client.graphql.getClient(),
       );
 
-      const subgraphProposal : SubgraphAddresslistVotingProposalListItem = {
+      const subgraphProposal: SubgraphAddresslistVotingProposalListItem = {
         ...SUBGRAPH_PROPOSAL_BASE,
         voters: SUBGRAPH_VOTERS,
         earlyExecutable: false,
-      }
+      };
 
       mockedClient.request.mockResolvedValueOnce({
         addresslistVotingProposals: [subgraphProposal],
@@ -898,7 +898,7 @@ describe("Client Address List", () => {
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
       const address = ADDRESS_ONE;
-      const params: IProposalQueryParams = {
+      const params: ProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
@@ -934,7 +934,7 @@ describe("Client Address List", () => {
       const client = new AddresslistVotingClient(ctxPlugin);
       const limit = 5;
       const address = TEST_INVALID_ADDRESS;
-      const params: IProposalQueryParams = {
+      const params: ProposalQueryParams = {
         limit,
         sortBy: ProposalSortBy.CREATED_AT,
         direction: SortDirection.ASC,
