@@ -17,7 +17,6 @@ import {
   DecodedApplyUninstallationParams,
   PermissionOperationType,
 } from "@aragon/sdk-client";
-import { hexToBytes } from "@aragon/sdk-common";
 import { context } from "../index";
 import { PermissionIds } from "../../dist/interfaces";
 
@@ -28,7 +27,7 @@ const client: Client = new Client(context);
 const applyUninstallationParams: ApplyUninstallationParams = {
   permissions: [{
     operation: PermissionOperationType.REVOKE,
-    permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
+    permissionId: PermissionIds.EXECUTE_PERMISSION_ID,
     where: "0x1234567890123456789012345678901234567890",
     who: "0x2345678901234567890123456789012345678901",
   }],

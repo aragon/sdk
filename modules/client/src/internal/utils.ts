@@ -44,7 +44,6 @@ import {
   ApplyInstallationParams,
   DecodedApplyInstallationParams,
 } from "../client-common";
-import { hexToBytes } from "@aragon/sdk-common";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -326,7 +325,7 @@ export function applyInstallatonParamsFromContract(
     permissions: params.permissions.map((permission: any) => {
       return {
         ...permission,
-        permissionId: hexToBytes(permission.permissionId),
+        permissionId: permission.permissionId,
       };
     }),
     versionTag: params.pluginSetupRef.versionTag,

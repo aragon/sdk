@@ -31,7 +31,7 @@ import {
   UpgradeToAndCallParams,
 } from "../../../src/interfaces";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
-import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
+import { bytesToHex } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
@@ -396,7 +396,7 @@ describe("Client", () => {
         permissions: [{
           condition: "0x1234567890123456789012345678901234567890",
           operation: 1,
-          permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
+          permissionId: PermissionIds.EXECUTE_PERMISSION_ID,
           where: "0x1234567890123456789012345678901234567890",
           who: "0x2345678901234567890123456789012345678901",
         }],
@@ -457,9 +457,8 @@ describe("Client", () => {
           applyInstallationParams.permissions[parseInt(index)].condition,
         );
         expect(argsDecoded[1].permissions[parseInt(index)].permissionId).toBe(
-          bytesToHex(
-            applyInstallationParams.permissions[parseInt(index)].permissionId,
-          ),
+          applyInstallationParams.permissions[parseInt(index)]
+            .permissionId,
         );
       }
     });
@@ -475,7 +474,7 @@ describe("Client", () => {
       const applyUninstallationParams: ApplyUninstallationParams = {
         permissions: [{
           operation: 1,
-          permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
+          permissionId: PermissionIds.EXECUTE_PERMISSION_ID,
           where: "0x1234567890123456789012345678901234567890",
           who: "0x2345678901234567890123456789012345678901",
         }],
@@ -536,9 +535,8 @@ describe("Client", () => {
           AddressZero,
         );
         expect(argsDecoded[1].permissions[parseInt(index)].permissionId).toBe(
-          bytesToHex(
-            applyUninstallationParams.permissions[parseInt(index)].permissionId,
-          ),
+          applyUninstallationParams.permissions[parseInt(index)]
+            .permissionId,
         );
       }
     });

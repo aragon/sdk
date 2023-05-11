@@ -29,7 +29,7 @@ import {
   TokenType,
   UpgradeToAndCallParams,
 } from "../../../src/interfaces";
-import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
+import { bytesToHex } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
@@ -508,14 +508,18 @@ describe("Client", () => {
       );
     });
     it("Should decode an apply uninstallation action", async () => {
-      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");
+      const networkSpy = jest.spyOn(
+        JsonRpcProvider.prototype,
+        "network",
+        "get",
+      );
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
       const applyUninstallationParams: ApplyUninstallationParams = {
         permissions: [{
           operation: PermissionOperationType.REVOKE,
-          permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
+          permissionId: PermissionIds.EXECUTE_PERMISSION_ID,
           where: "0x1234567890123456789012345678901234567890",
           who: "0x2345678901234567890123456789012345678901",
         }],
@@ -552,9 +556,10 @@ describe("Client", () => {
         decodedApplyUninstallationParams.pluginRepo,
       );
       for (const index in applyUninstallationParams.permissions) {
-        expect(decodedApplyUninstallationParams.permissions[index].condition).toBe(
-          AddressZero,
-        );
+        expect(decodedApplyUninstallationParams.permissions[index].condition)
+          .toBe(
+            AddressZero,
+          );
         expect(applyUninstallationParams.permissions[index].operation).toBe(
           decodedApplyUninstallationParams.permissions[index].operation,
         );
@@ -564,21 +569,19 @@ describe("Client", () => {
         expect(applyUninstallationParams.permissions[index].where).toBe(
           decodedApplyUninstallationParams.permissions[index].where,
         );
-        expect(decodedApplyUninstallationParams.permissions[index].permissionId)
-          .toBeInstanceOf(
-            Uint8Array,
-          );
         expect(
-          bytesToHex(applyUninstallationParams.permissions[index].permissionId),
+          applyUninstallationParams.permissions[index].permissionId,
         ).toBe(
-          bytesToHex(
-            decodedApplyUninstallationParams.permissions[index].permissionId,
-          ),
+          decodedApplyUninstallationParams.permissions[index].permissionId,
         );
       }
     });
     it("Should decode an apply installation action", async () => {
-      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "network", "get");
+      const networkSpy = jest.spyOn(
+        JsonRpcProvider.prototype,
+        "network",
+        "get",
+      );
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -593,7 +596,7 @@ describe("Client", () => {
         permissions: [{
           condition: "0x1234567890123456789012345678901234567890",
           operation: 1,
-          permissionId: hexToBytes(PermissionIds.EXECUTE_PERMISSION_ID),
+          permissionId: PermissionIds.EXECUTE_PERMISSION_ID,
           where: "0x1234567890123456789012345678901234567890",
           who: "0x2345678901234567890123456789012345678901",
         }],
@@ -649,16 +652,12 @@ describe("Client", () => {
         expect(applyInstallationParams.permissions[index].where).toBe(
           decodedApplyInstallationParams.permissions[index].where,
         );
-        expect(decodedApplyInstallationParams.permissions[index].permissionId)
-          .toBeInstanceOf(
-            Uint8Array,
-          );
         expect(
-          bytesToHex(applyInstallationParams.permissions[index].permissionId),
+          applyInstallationParams.permissions[index]
+            .permissionId,
         ).toBe(
-          bytesToHex(
-            decodedApplyInstallationParams.permissions[index].permissionId,
-          ),
+          decodedApplyInstallationParams.permissions[index]
+            .permissionId,
         );
       }
     });
