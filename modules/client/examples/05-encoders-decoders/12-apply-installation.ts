@@ -36,7 +36,7 @@ const applyInstallationParams: ApplyInstallationParams = {
   permissions: [{
     condition: "0x1234567890123456789012345678901234567890",
     operation: PermissionOperationType.GRANT_WITH_CONDITION,
-    permissionId: PermissionIds.EXECUTE_PERMISSION_ID, // hexToBytes("PermissionIds.EXECUTE_PERMISSION_ID")
+    permissionId: PermissionIds.EXECUTE_PERMISSION_ID, // hash("EXECUTE_PERMISSION_ID")
     where: "0x1234567890123456789012345678901234567890",
     who: "0x2345678901234567890123456789012345678901",
   }],
