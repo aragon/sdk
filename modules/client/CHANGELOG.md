@@ -13,12 +13,15 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## [1.7.0]
 ### Added
 - Add `delegateTokens` function in `TokenVotingClient`
 - Add `undelegateTokens` function in `TokenVotingClient`
 - Add `getDelegatee` function in `TokenVotingClient`
+- Add `prepareUninstallation` function in `Client`
 ### Changed
 - Breaking: `getMembers` function in `TokenVotingClient` no loger returns an `string[]`. Now it returns `TokenVotingMember[]` which includes the delegation status of each member
+- `condition` is now an optional parameter in `MultiTargetPermission`  
 ## [1.6.0]
 ### Fixed
 - Fixed plugin version on the dao subgraph queries
