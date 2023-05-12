@@ -322,12 +322,7 @@ export function applyInstallatonParamsFromContract(
   const params = result[1];
   return {
     helpersHash: params.helpersHash,
-    permissions: params.permissions.map((permission: any) => {
-      return {
-        ...permission,
-        permissionId: permission.permissionId,
-      };
-    }),
+    permissions: params.permissions,
     versionTag: params.pluginSetupRef.versionTag,
     pluginAddress: params.plugin,
     pluginRepo: params.pluginSetupRef.pluginSetupRepo,
