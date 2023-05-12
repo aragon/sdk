@@ -169,3 +169,25 @@ export class CannotEstimateGasError extends Error {
     super("Cannot estimate gas error");
   }
 }
+export class InstallationNotFoundError extends Error {
+  constructor() {
+    super("Installation not found");
+  }
+}
+export class PluginUninstallationPreparationError extends Error {
+  constructor() {
+    super("plugin uninstallation error");
+  }
+}
+
+export class MissingMetadataError extends Error {
+  constructor() {
+    super("Missing metadata");
+  }
+}
+
+export class InvalidPrepareUninstallationAbiError extends Error {
+  constructor() {
+    super("Invalid prepare uninstallation ABI");
+  }
+}

@@ -1,5 +1,6 @@
 import {
   DaoMetadata,
+  DecodedApplyUninstallationParams,
   GrantPermissionWithConditionParams,
   IClientDecoding,
   IGrantPermissionDecodedParams,
@@ -48,7 +49,21 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     const hexBytes = bytesToHex(data);
     const expectedFunction = pspInterface.getFunction("applyInstallation");
     const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
-    return applyInstallatonParamsFromContract(result)
+    return applyInstallatonParamsFromContract(result);
+  }
+  /**
+   * @param {data} Uint8Array
+   * @return {*}  {DecodedApplyInstallationParams}
+   * @memberof ClientDecoding
+   */
+  public applyUninstallationAction(
+    data: Uint8Array,
+  ): DecodedApplyUninstallationParams {
+    const pspInterface = PluginSetupProcessor__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = pspInterface.getFunction("applyUninstallation");
+    const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return applyInstallatonParamsFromContract(result);
   }
   /**
    * Decodes the permission parameters from an encoded grant action

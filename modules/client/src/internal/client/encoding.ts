@@ -1,4 +1,5 @@
 import {
+  ApplyUninstallationParams,
   GrantPermissionWithConditionParams,
   IClientEncoding,
   IGrantPermissionParams,
@@ -24,6 +25,7 @@ import {
 } from "@aragon/osx-ethers";
 import {
   applyInstallatonParamsToContract,
+  applyUninstallationParamsToContract,
   permissionParamsToContract,
   permissionWithConditionParamsToContract,
 } from "../utils";
@@ -67,6 +69,42 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
 
     const args = applyInstallatonParamsToContract(params);
     const hexBytes = pspInterface.encodeFunctionData("applyInstallation", [
+      daoAddress,
+      args,
+    ]);
+    // Grant ROOT_PERMISION in the DAO to the PSP
+    const grantAction = this.grantAction(daoAddress, {
+      where: daoAddress,
+      who: LIVE_CONTRACTS[network].pluginSetupProcessor,
+      permission: Permissions.ROOT_PERMISSION,
+    });
+
+    // Revoke ROOT_PERMISION in the DAO to the PSP
+    const revokeAction = this.revokeAction(daoAddress, {
+      where: daoAddress,
+      who: LIVE_CONTRACTS[network].pluginSetupProcessor,
+      permission: Permissions.ROOT_PERMISSION,
+    });
+    return [
+      grantAction,
+      {
+        to: LIVE_CONTRACTS[network].pluginSetupProcessor,
+        value: BigInt(0),
+        data: hexToBytes(hexBytes),
+      },
+      revokeAction,
+    ];
+  }
+
+  public applyUninstallationAction(
+    daoAddress: string,
+    params: ApplyUninstallationParams,
+  ): DaoAction[] {
+    const provider = this.web3.getProvider();
+    const network = provider.network.name as SupportedNetworks;
+    const pspInterface = PluginSetupProcessor__factory.createInterface();
+    const args = applyUninstallationParamsToContract(params);
+    const hexBytes = pspInterface.encodeFunctionData("applyUninstallation", [
       daoAddress,
       args,
     ]);

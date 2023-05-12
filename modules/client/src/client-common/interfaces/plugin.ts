@@ -288,6 +288,6 @@ export type MultiTargetPermission = {
   operation: PermissionOperationType;
   where: string;
   who: string;
-  condition: string;
-  permissionId: Uint8Array;
+  condition?: string;
+  permissionId: string;
 };

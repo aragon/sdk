@@ -1,4 +1,5 @@
 import {
+  ApplyUninstallationParams,
   AssetBalance,
   ContractPermissionParams,
   ContractPermissionWithConditionParams,
@@ -43,7 +44,6 @@ import {
   ApplyInstallationParams,
   DecodedApplyInstallationParams,
 } from "../client-common";
-import { hexToBytes } from "@aragon/sdk-common";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -271,13 +271,13 @@ export function toPluginRepo(
     current: {
       build: {
         metadata: buildMetadata,
-        // the subgraph returns only one build ordered by build number 
+        // the subgraph returns only one build ordered by build number
         // in descending order, this means it's the latest build
         number: pluginRepo.releases?.[0]?.builds?.[0]?.build,
       },
       release: {
         metadata: releaseMetadata,
-        // the subgraph returns only one realease ordered by realease number 
+        // the subgraph returns only one realease ordered by realease number
         // in descending order, this means it's the latest realease
         number: pluginRepo.releases?.[0]?.release,
       },
@@ -297,7 +297,23 @@ export function applyInstallatonParamsToContract(
     helpersHash: keccak256(
       defaultAbiCoder.encode(["address[]"], [params.helpers]),
     ),
-    permissions: params.permissions,
+    permissions: params.permissions.map((permission) => {
+      return { ...permission, condition: permission.condition || AddressZero };
+    }),
+  };
+}
+export function applyUninstallationParamsToContract(
+  params: ApplyUninstallationParams,
+): PluginSetupProcessor.ApplyUninstallationParamsStruct {
+  return {
+    plugin: params.pluginAddress,
+    pluginSetupRef: {
+      pluginSetupRepo: params.pluginRepo,
+      versionTag: params.versionTag,
+    },
+    permissions: params.permissions.map((permission) => {
+      return { ...permission, condition: permission.condition || AddressZero };
+    }),
   };
 }
 export function applyInstallatonParamsFromContract(
@@ -306,12 +322,7 @@ export function applyInstallatonParamsFromContract(
   const params = result[1];
   return {
     helpersHash: params.helpersHash,
-    permissions: params.permissions.map((permission: any) => {
-      return {
-        ...permission,
-        permissionId: hexToBytes(permission.permissionId),
-      };
-    }),
+    permissions: params.permissions,
     versionTag: params.pluginSetupRef.versionTag,
     pluginAddress: params.plugin,
     pluginRepo: params.pluginSetupRef.pluginSetupRepo,
