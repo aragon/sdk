@@ -69,14 +69,12 @@ Returns:
       operation: 1, // revoke
       where: "0x12345...",
       who: "0x23456...",
-      condition: "0x78910...",
       permissionId: "0x1234567890..."
     },
     {
       operation: 1, //REVOKE
       where: "0x3456...",
       who: "0x4567...",
-      condition: "0x5678...",
       permissionId: "0x1234567890..."
     }
   ],
