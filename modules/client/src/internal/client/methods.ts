@@ -84,6 +84,7 @@ import {
   Context,
   findLog,
   LIVE_CONTRACTS,
+  MultiTargetPermission,
   SortDirection,
   SupportedNetworks,
 } from "../../client-common";
@@ -476,7 +477,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
     yield {
       key: PrepareUninstallationSteps.DONE,
-      permissions: permissions,
+      permissions: permissions.map((permission: MultiTargetPermission) => ({
+        operation: permission.operation,
+        where: permission.where,
+        who: permission.who,
+        permissionId: permission.permissionId,
+      })),
       pluginRepo: selectedInstallation.appliedPreparation.pluginRepo.id,
       pluginAddress: params.pluginAddress,
       versionTag: {

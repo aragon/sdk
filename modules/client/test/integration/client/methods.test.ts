@@ -452,8 +452,8 @@ describe("Client", () => {
               expect(typeof step.versionTag.release).toBe("number");
               expect(step.versionTag.release).toBe(1);
               for (const permission of step.permissions) {
-                expect(typeof permission.condition).toBe("string");
                 if (permission.condition) {
+                  expect(typeof permission.condition).toBe("string");
                   expect(permission.condition).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
                 }
                 expect(typeof permission.operation).toBe("number");
