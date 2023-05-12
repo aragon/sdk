@@ -14,6 +14,7 @@ import {
   contextParamsLocalChain,
   TEST_WALLET_ADDRESS,
 } from "../integration/constants";
+import { TokenVoting__factory } from "@aragon/osx-ethers";
 
 export async function buildMultisigDAO(pluginRepoAddress: string) {
   const client = new Client(new Context(contextParamsLocalChain));
@@ -91,6 +92,7 @@ export async function buildTokenVotingDAO(
     daoUri: "https://",
     trustedForwarder: AddressZero,
   };
+  let dao, plugin;
   for await (
     const step of client.methods.createDao(createDaoParams)
   ) {
@@ -98,9 +100,19 @@ export async function buildTokenVotingDAO(
       case DaoCreationSteps.CREATING:
         break;
       case DaoCreationSteps.DONE:
+        dao = step.address;
+        plugin = step.pluginAddresses[0];
+        const signer = client.web3.getConnectedSigner();
+        const tokenVotingContract = TokenVoting__factory.connect(
+          plugin,
+          signer,
+        );
+        const tokenAddress = await tokenVotingContract.getVotingToken()
+
         return {
-          dao: step.address,
-          plugin: step.pluginAddresses[0],
+          dao,
+          plugin,
+          tokenAddress,
         };
     }
   }

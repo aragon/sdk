@@ -46,7 +46,7 @@ export interface ITokenVotingClientMethods extends IClientCore {
   ) => AsyncGenerator<PrepareInstallationStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
-  getMembers: (addressOrEns: string) => Promise<string[]>;
+  getMembers: (addressOrEns: string) => Promise<TokenVotingMember[]>;
   getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;
   getProposals: (
     params: IProposalQueryParams,
@@ -59,6 +59,13 @@ export interface ITokenVotingClientMethods extends IClientCore {
   unwrapTokens: (
     params: UnwrapTokensParams,
   ) => AsyncGenerator<UnwrapTokensStepValue>;
+  delegateTokens: (
+    params: DelegateTokensParams,
+  ) => AsyncGenerator<DelegateTokensStepValue>;
+  undelegateTokens: (
+    tokenAddress: string,
+  ) => AsyncGenerator<UndelegateTokensStepValue>;
+  getDelegatee: (tokenAddress: string) => Promise<string | null>;
 }
 
 export interface ITokenVotingClientEncoding extends IClientCore {
@@ -84,6 +91,12 @@ export interface ITokenVotingClientEstimation extends IClientCore {
   executeProposal: (
     proposalId: string,
   ) => Promise<GasFeeEstimation>;
+  delegateTokens: (
+    params: DelegateTokensParams,
+  ) => Promise<GasFeeEstimation>;
+  undelegateTokens: (
+    tokenAddress: string,
+  ) => Promise<GasFeeEstimation>;
 }
 
 /** Defines the shape of the Token client class */
@@ -107,7 +120,7 @@ type ExistingTokenParams = {
     name: string;
     symbol: string;
   };
-}
+};
 
 type NewTokenParams = {
   name: string;
@@ -261,3 +274,53 @@ export enum UnwrapTokensStep {
 export type UnwrapTokensStepValue =
   | { key: UnwrapTokensStep.UNWRAPPING; txHash: string }
   | { key: UnwrapTokensStep.DONE };
+
+export type DelegateTokensParams = {
+  tokenAddress: string;
+  delegatee: string;
+};
+
+export const enum DelegateTokensStep {
+  DELEGATING = "delegating",
+  DONE = "done",
+}
+
+export const enum UndelegateTokensStep {
+  UNDELEGATING = "delegating",
+  DONE = "done",
+}
+
+type DelegateTokensStepCommon = {
+  key: DelegateTokensStep.DELEGATING | UndelegateTokensStep.UNDELEGATING;
+  txHash: string;
+} | { key: DelegateTokensStep.DONE | UndelegateTokensStep.DONE };
+
+export type UndelegateTokensStepValue = DelegateTokensStepCommon;
+export type DelegateTokensStepValue = DelegateTokensStepCommon;
+
+export type SubgraphTokenVotingMember = {
+  address: string;
+  balance: string;
+  votingPower: string;
+  delegatee: {
+    address: string;
+  };
+  delegators: {
+    address: string;
+    balance: string;
+  }[];
+};
+
+export type TokenVotingMember = {
+  /** The address of the member */
+  address: string;
+  /** The balance of the member */
+  balance: bigint;
+  /** The voting power of the member taking into account the delagation */
+  votingPower: bigint;
+  /** The address that you delegated yout voting power to
+   *  If null, you are not delegating your voting power */
+  delegatee: string | null;
+  /** The list of addresses that delegated their voting power this member */
+  delegators: { address: string; balance: bigint }[];
+};

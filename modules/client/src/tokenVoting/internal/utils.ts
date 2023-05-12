@@ -18,16 +18,22 @@ import {
   SubgraphContractType,
   SubgraphErc20Token,
   SubgraphErc721Token,
+  SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
   SubgraphTokenVotingVoterListItem,
+  TokenVotingMember,
   TokenVotingProposal,
   TokenVotingProposalListItem,
 } from "../interfaces";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
-import { decodeRatio, getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
+import {
+  decodeRatio,
+  getCompactProposalId,
+  hexToBytes,
+} from "@aragon/sdk-common";
 import { TokenType } from "../../interfaces";
 
 export function toTokenVotingProposal(
@@ -128,7 +134,7 @@ export function toTokenVotingProposalListItem(
       address: proposal.dao.id,
       name: proposal.dao.subdomain,
     },
-    settings:{
+    settings: {
       supportThreshold: decodeRatio(BigInt(proposal.supportThreshold), 6),
       duration: parseInt(proposal.endDate) -
         parseInt(proposal.startDate),
@@ -191,7 +197,11 @@ export function tokenVotingInitParamsToContract(
       params.newToken.balances.map(({ balance }) => BigNumber.from(balance)),
     ];
   } else if (params.useToken) {
-    token = [params.useToken?.tokenAddress, params.useToken.wrappedToken.name, params.useToken.wrappedToken.symbol];
+    token = [
+      params.useToken?.tokenAddress,
+      params.useToken.wrappedToken.name,
+      params.useToken.wrappedToken.symbol,
+    ];
   }
   return [
     Object.values(
@@ -223,4 +233,25 @@ function parseToken(
     };
   }
   return token;
+}
+
+export function toTokenVotingMember(
+  member: SubgraphTokenVotingMember,
+): TokenVotingMember {
+  return {
+    address: member.address,
+    votingPower: BigInt(member.votingPower),
+    balance: BigInt(member.balance),
+    delegatee: member.delegatee.address === member.address
+      ? null
+      : member.delegatee.address,
+    delegators: member.delegators.filter((delegator) =>
+      delegator.address !== member.address
+    ).map((delegator) => {
+      return {
+        address: delegator.address,
+        balance: BigInt(delegator.balance),
+      };
+    }),
+  };
 }

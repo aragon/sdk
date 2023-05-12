@@ -5,6 +5,15 @@ query TokenVotingMembers($address: ID!) {
     tokenVotingPlugin(id: $address){
         members {
             address
+            balance
+            votingPower
+            delegatee {
+                address
+            }
+            delegators {
+                address
+                balance
+            }
         }
     }
 }

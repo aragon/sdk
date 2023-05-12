@@ -14,7 +14,11 @@ import {
   VoteValues,
 } from "../../../src";
 
-import { contextParamsLocalChain } from "../constants";
+import {
+  ADDRESS_ONE,
+  ADDRESS_TWO,
+  contextParamsLocalChain,
+} from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
@@ -83,6 +87,39 @@ describe("Token Voting Client", () => {
       const estimation = await client.estimation.executeProposal(
         "0x1234567890123456789012345678901234567890_0x0",
       );
+
+      expect(typeof estimation).toEqual("object");
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+    });
+
+    it("Should estimate the gas fees for delegating voting power", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new TokenVotingClient(ctxPlugin);
+
+      const estimation = await client.estimation.delegateTokens(
+        {
+          tokenAddress: ADDRESS_ONE,
+          delegatee: ADDRESS_TWO,
+        },
+      );
+
+      expect(typeof estimation).toEqual("object");
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+    });
+
+    it("Should estimate the gas fees for undelegating voting power", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new TokenVotingClient(ctxPlugin);
+
+      const estimation = await client.estimation.undelegateTokens(ADDRESS_ONE);
 
       expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");

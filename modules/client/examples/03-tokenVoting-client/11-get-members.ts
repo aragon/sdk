@@ -8,7 +8,11 @@ title: Get Members
 Returns an array with the addresses of all the members of a specific DAO which has the TokenVoting plugin installed.
 */
 
-import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
+import {
+  ContextPlugin,
+  TokenVotingClient,
+  TokenVotingMember,
+} from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate a plugin context from the Aragon OSx SDK context.
@@ -20,7 +24,7 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
 
 const pluginAddress: string = "0x12345384572394756239846529574932532985"; // the address of the plugin that DAO has installed. You can find this through getting the DAO details.
 
-const members: string[] = await tokenVotingClient.methods.getMembers(
+const members: TokenVotingMember[] = await tokenVotingClient.methods.getMembers(
   pluginAddress,
 );
 console.log(members);
@@ -30,11 +34,32 @@ Returns:
 
 ```json
 [
-  "0x1234567890123456789012345678901234567890",
-  "0x2345678901234567890123456789012345678901",
-  "0x3456789012345678901234567890123456789012",
-  "0x4567890123456789012345678901234567890123",
-  "0x5678901234567890123456789012345678901234"
+  {
+    "address": "0x1234567890123456789012345678901234567890",
+    "balance": 100n,
+    "delegatee": "0x2345678901234567890123456789012345678901",
+    "votingPower": 0n,
+    "delegators": []
+  },
+  {
+    "address": "0x2345678901234567890123456789012345678901",
+    "balance": 0n,
+    "delegatee": null,
+    "votingPower": 100n,
+    "delegators": [
+      {
+        "address": "0x1234567890123456789012345678901234567890",
+        "balance": 100n
+      }
+    ]
+  },
+  {
+    "address": "0x3456789012345678901234567890123456789012",
+    "balance": 200n,
+    "delegatee": null,
+    "votingPower": 200n,
+    "delegators": []
+  }
 ]
 ```
 */

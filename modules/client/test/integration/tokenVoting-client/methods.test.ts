@@ -66,10 +66,14 @@ import {
   QueryTokenVotingSettings,
 } from "../../../src/tokenVoting/internal/graphql-queries";
 import {
+  DelegateTokensStep,
   Erc20TokenDetails,
   SubgraphContractType,
+  SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  TokenVotingMember,
+  UndelegateTokensStep,
   UnwrapTokensStep,
   WrapTokensStep,
 } from "../../../src/tokenVoting/interfaces";
@@ -77,6 +81,7 @@ import { TokenVotingPluginPrepareInstallationParams } from "../../../src/tokenVo
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 import {
+  GovernanceERC20__factory,
   GovernanceWrappedERC20__factory,
   TokenVoting__factory,
 } from "@aragon/osx-ethers";
@@ -742,7 +747,68 @@ describe("Token Voting Client", () => {
         }
       });
     });
+    it("Should delegate tokens to another address and undelegate them afterwards", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const ctxPlugin = ContextPlugin.fromContext(ctx);
+      const client = new TokenVotingClient(ctxPlugin);
+      const { tokenAddress } = await buildTokenVotingDAO(
+        repoAddr,
+        VotingMode.VOTE_REPLACEMENT,
+      );
 
+      const delegateSteps = client.methods.delegateTokens({
+        tokenAddress,
+        delegatee: ADDRESS_ONE,
+      });
+
+      for await (const step of delegateSteps) {
+        switch (step.key) {
+          case DelegateTokensStep.DELEGATING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case DelegateTokensStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected delegate tokens step: " +
+                Object.keys(step).join(", "),
+            );
+        }
+      }
+      const signer = client.web3.getConnectedSigner();
+      const erc20Contract = GovernanceERC20__factory.connect(
+        tokenAddress,
+        signer,
+      );
+
+      let delegatee = await client.methods.getDelegatee(tokenAddress);
+      const balance = await erc20Contract.balanceOf(TEST_WALLET_ADDRESS);
+      expect(delegatee).toBe(ADDRESS_ONE);
+      expect(balance.eq(100)).toBe(true);
+
+      const undelegateSteps = client.methods.undelegateTokens(
+        tokenAddress,
+      );
+
+      for await (const step of undelegateSteps) {
+        switch (step.key) {
+          case UndelegateTokensStep.UNDELEGATING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case UndelegateTokensStep.DONE:
+            break;
+          default:
+            throw new Error(
+              "Unexpected delegate tokens step: " +
+                Object.keys(step).join(", "),
+            );
+        }
+      }
+      delegatee = await client.methods.getDelegatee(tokenAddress);
+      expect(delegatee).toBe(null);
+    });
     describe("Data retrieval", () => {
       it("Should get the list of members that can vote in a proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
@@ -752,17 +818,80 @@ describe("Token Voting Client", () => {
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
+        const subgraphMembers: SubgraphTokenVotingMember[] = [
+          {
+            balance: "100",
+            address: ADDRESS_ONE,
+            delegatee: {
+              address: ADDRESS_TWO,
+            },
+            votingPower: "0",
+            delegators: [],
+          },
+          {
+            address: ADDRESS_TWO,
+            balance: "200",
+            votingPower: "300",
+            delegatee: {
+              address: ADDRESS_TWO,
+            },
+            delegators: [
+              {
+                address: ADDRESS_ONE,
+                balance: "100",
+              },
+            ],
+          },
+          {
+            address: ADDRESS_THREE,
+            balance: "300",
+            votingPower: "300",
+            delegatee: {
+              address: ADDRESS_THREE,
+            },
+            delegators: [
+              {
+                address: ADDRESS_THREE,
+                balance: "300",
+              },
+            ],
+          },
+        ];
         mockedClient.request.mockResolvedValueOnce({
           tokenVotingPlugin: {
-            members: [{ address: ADDRESS_ONE }, { address: ADDRESS_TWO }],
+            members: subgraphMembers,
           },
         });
-        const wallets = await client.methods.getMembers(
+        const members = await client.methods.getMembers(
           ADDRESS_ONE,
         );
+        const expectedMembers: TokenVotingMember[] = [
+          {
+            address: ADDRESS_ONE,
+            balance: BigInt(100),
+            votingPower: BigInt(0),
+            delegatee: ADDRESS_TWO,
+            delegators: [],
+          },
+          {
+            address: ADDRESS_TWO,
+            balance: BigInt(200),
+            votingPower: BigInt(300),
+            delegatee: null,
+            delegators: [{ address: ADDRESS_ONE, balance: BigInt(100) }],
+          },
+          {
+            address: ADDRESS_THREE,
+            balance: BigInt(300),
+            votingPower: BigInt(300),
+            delegatee: null,
+            delegators: [],
+          },
+        ];
 
-        expect(wallets.length).toBe(2);
-        expect(wallets).toMatchObject([ADDRESS_ONE, ADDRESS_TWO]);
+        expect(members.length).toBe(3);
+        expect(members).toMatchObject(expectedMembers);
+
         expect(mockedClient.request).toHaveBeenCalledWith(
           QueryTokenVotingMembers,
           { address: ADDRESS_ONE },

@@ -35,7 +35,6 @@ import {
   ProposalMetadata,
   ProposalSortBy,
   SortDirection,
-  SubgraphMembers,
   SubgraphVotingSettings,
   SupportedNetworks,
   SupportedNetworksArray,
@@ -45,17 +44,23 @@ import {
   VotingSettings,
 } from "../../../client-common";
 import {
+  DelegateTokensParams,
+  DelegateTokensStep,
+  DelegateTokensStepValue,
   Erc20TokenDetails,
   Erc721TokenDetails,
   ITokenVotingClientMethods,
   SubgraphContractType,
   SubgraphErc20Token,
   SubgraphErc721Token,
+  SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  TokenVotingMember,
   TokenVotingPluginPrepareInstallationParams,
   TokenVotingProposal,
   TokenVotingProposalListItem,
+  UndelegateTokensStepValue,
   UnwrapTokensParams,
   UnwrapTokensStep,
   UnwrapTokensStepValue,
@@ -70,8 +75,13 @@ import {
   QueryTokenVotingProposals,
   QueryTokenVotingSettings,
 } from "../graphql-queries";
-import { toTokenVotingProposal, toTokenVotingProposalListItem } from "../utils";
 import {
+  toTokenVotingMember,
+  toTokenVotingProposal,
+  toTokenVotingProposalListItem,
+} from "../utils";
+import {
+  GovernanceERC20__factory,
   GovernanceWrappedERC20__factory,
   PluginRepo__factory,
   PluginSetupProcessor__factory,
@@ -410,6 +420,64 @@ export class TokenVotingClientMethods extends ClientCore
       key: UnwrapTokensStep.DONE,
     };
   }
+  /**
+   * Delegates all the signer's voting power to a delegatee
+   *
+   * @param {DelegateTokensParams} params
+   * @return {*}  {AsyncGenerator<DelegateTokensStepValue>}
+   * @memberof TokenVotingClientMethods
+   */
+  public async *delegateTokens(
+    params: DelegateTokensParams,
+  ): AsyncGenerator<DelegateTokensStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    const governanceErc20Contract = GovernanceERC20__factory.connect(
+      params.tokenAddress,
+      signer,
+    );
+    const tx = await governanceErc20Contract.delegate(params.delegatee);
+    yield {
+      key: DelegateTokensStep.DELEGATING,
+      txHash: tx.hash,
+    };
+    await tx.wait();
+    yield {
+      key: DelegateTokensStep.DONE,
+    };
+  }
+  /**
+   * Delegates all the signer's tokens back to itself
+   *
+   * @param {string} tokenAddress
+   * @return {*}  {AsyncGenerator<UndelegateTokensStepValue>}
+   * @memberof TokenVotingClientMethods
+   */
+  public async *undelegateTokens(
+    tokenAddress: string,
+  ): AsyncGenerator<UndelegateTokensStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    yield* this.delegateTokens({
+      tokenAddress,
+      delegatee: await signer.getAddress(),
+    });
+  }
+  /**
+   * Retrieves the current signer's delegatee for the given token
+   *
+   * @param {string} tokenAddress
+   * @return {*}  {Promise<string | null>}
+   * @memberof TokenVotingClientMethods
+   */
+  public async getDelegatee(tokenAddress: string): Promise<string | null> {
+    const signer = this.web3.getConnectedSigner();
+    const governanceErc20Contract = GovernanceERC20__factory.connect(
+      tokenAddress,
+      signer,
+    );
+    const address = await signer.getAddress();
+    const delegatee = await governanceErc20Contract.delegates(address);
+    return address === delegatee ? null : delegatee;
+  }
 
   /**
    * Checks if an user can vote in a proposal
@@ -472,7 +540,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @return {*}  {Promise<string[]>}
    * @memberof TokenVotingClient
    */
-  public async getMembers(pluginAddress: string): Promise<string[]> {
+  public async getMembers(pluginAddress: string): Promise<TokenVotingMember[]> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -481,15 +549,15 @@ export class TokenVotingClientMethods extends ClientCore
       address: pluginAddress.toLowerCase(),
     };
     const name = "TokenVoting members";
-    type T = { tokenVotingPlugin: SubgraphMembers };
+    type T = { tokenVotingPlugin: { members: SubgraphTokenVotingMember[] } };
     const { tokenVotingPlugin } = await this.graphql.request<T>({
       query,
       params,
       name,
     });
     return tokenVotingPlugin.members.map((
-      member: { address: string },
-    ) => member.address);
+      member: SubgraphTokenVotingMember,
+    ) => toTokenVotingMember(member));
   }
 
   /**
