@@ -16,6 +16,7 @@ import {
   Permissions,
   SupportedNetworksArray,
   WithdrawParams,
+  PermissionOperationType,
 } from "../../../src";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
@@ -28,7 +29,7 @@ import {
   TokenType,
   UpgradeToAndCallParams,
 } from "../../../src";
-import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
+import { bytesToHex } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";

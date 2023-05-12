@@ -13,6 +13,7 @@ import {
   Erc20TokenDetails,
   Erc721TokenDetails,
   MintTokenParams,
+  TokenVotingMember,
   TokenVotingPluginInstall,
   TokenVotingProposal,
   TokenVotingProposalListItem,

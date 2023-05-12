@@ -50,6 +50,7 @@ import {
   DelegateTokensStepValue,
   Erc20TokenDetails,
   Erc721TokenDetails,
+  TokenVotingMember,
   TokenVotingPluginPrepareInstallationParams,
   TokenVotingProposal,
   TokenVotingProposalListItem,
@@ -65,6 +66,7 @@ import {
   SubgraphContractType,
   SubgraphErc20Token,
   SubgraphErc721Token,
+  SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
 } from "../types";

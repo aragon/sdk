@@ -1,4 +1,9 @@
-import { Pagination, PluginInstallItem, TokenType } from "./client-common";
+import {
+  ApplyInstallationParamsBase,
+  Pagination,
+  PluginInstallItem,
+  TokenType,
+} from "./client-common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 
@@ -82,10 +87,15 @@ export type PluginRepoReleaseMetadata = {
   description: string;
   images: Object; // TODO specify parameters
 };
+
 export type PluginRepoBuildMetadata = {
   ui: string;
   change: string;
-  pluginSetupABI: Object;
+  pluginSetupABI: {
+    prepareInstallation: string[];
+    prepareUpdate: string[];
+    prepareUninstallation: string[];
+  };
 };
 
 export type PluginRepoRelease = {
@@ -278,6 +288,27 @@ export enum SetAllowanceSteps {
 export type SetAllowanceStepValue =
   | { key: SetAllowanceSteps.SETTING_ALLOWANCE; txHash: string }
   | { key: SetAllowanceSteps.ALLOWANCE_SET; allowance: bigint };
+
+/* Uninstallation */
+export type PrepareUninstallationParams = {
+  daoAddressOrEns: string;
+  pluginAddress: string;
+  pluginInstallationIndex?: number;
+  uninstallationParams?: any[];
+  uninstallationAbi?: string[];
+};
+export enum PrepareUninstallationSteps {
+  PREPARING = "preparing",
+  DONE = "done",
+}
+export type PrepareUninstallationStepValue =
+  | { key: PrepareUninstallationSteps.PREPARING; txHash: string }
+  | {
+    key: PrepareUninstallationSteps.DONE;
+  } & ApplyUninstallationParams;
+
+export type ApplyUninstallationParams = ApplyInstallationParamsBase;
+export type DecodedApplyUninstallationParams = ApplyInstallationParamsBase;
 
 /* Permissions */
 type PermissionParamsBase = {

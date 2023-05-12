@@ -107,3 +107,41 @@ export enum UnwrapTokensStep {
 export type UnwrapTokensStepValue =
   | { key: UnwrapTokensStep.UNWRAPPING; txHash: string }
   | { key: UnwrapTokensStep.DONE };
+
+/* Delegate */
+export type DelegateTokensParams = {
+  tokenAddress: string;
+  delegatee: string;
+};
+
+export const enum DelegateTokensStep {
+  DELEGATING = "delegating",
+  DONE = "done",
+}
+
+export const enum UndelegateTokensStep {
+  UNDELEGATING = "delegating",
+  DONE = "done",
+}
+
+type DelegateTokensStepCommon = {
+  key: DelegateTokensStep.DELEGATING | UndelegateTokensStep.UNDELEGATING;
+  txHash: string;
+} | { key: DelegateTokensStep.DONE | UndelegateTokensStep.DONE };
+
+export type UndelegateTokensStepValue = DelegateTokensStepCommon;
+export type DelegateTokensStepValue = DelegateTokensStepCommon;
+
+export type TokenVotingMember = {
+  /** The address of the member */
+  address: string;
+  /** The balance of the member */
+  balance: bigint;
+  /** The voting power of the member taking into account the delagation */
+  votingPower: bigint;
+  /** The address that you delegated yout voting power to
+   *  If null, you are not delegating your voting power */
+  delegatee: string | null;
+  /** The list of addresses that delegated their voting power this member */
+  delegators: { address: string; balance: bigint }[];
+};

@@ -10,6 +10,7 @@ import {
 
 import {
   ApplyInstallationParams,
+  ApplyUninstallationParams,
   Client,
   Context,
   DaoMetadata,

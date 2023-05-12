@@ -7,21 +7,25 @@ import {
   GasFeeEstimation,
   IClientCore,
   InterfaceParams,
-  VoteProposalParams,
   PrepareInstallationStepValue,
   ProposalCreationStepValue,
   ProposalMetadata,
+  ProposalQueryParams,
+  VoteProposalParams,
   VoteProposalStepValue,
   VotingSettings,
-  ProposalQueryParams,
 } from "../client-common";
 import {
+  DelegateTokensParams,
+  DelegateTokensStepValue,
   Erc20TokenDetails,
   Erc721TokenDetails,
   MintTokenParams,
+  TokenVotingMember,
   TokenVotingPluginPrepareInstallationParams,
   TokenVotingProposal,
   TokenVotingProposalListItem,
+  UndelegateTokensStepValue,
   UnwrapTokensParams,
   UnwrapTokensStepValue,
   WrapTokensParams,
@@ -106,54 +110,3 @@ export interface ITokenVotingClient {
   decoding: ITokenVotingClientDecoding;
   estimation: ITokenVotingClientEstimation;
 }
-// Factory init params
-
-export type DelegateTokensParams = {
-  tokenAddress: string;
-  delegatee: string;
-};
-
-export const enum DelegateTokensStep {
-  DELEGATING = "delegating",
-  DONE = "done",
-}
-
-export const enum UndelegateTokensStep {
-  UNDELEGATING = "delegating",
-  DONE = "done",
-}
-
-type DelegateTokensStepCommon = {
-  key: DelegateTokensStep.DELEGATING | UndelegateTokensStep.UNDELEGATING;
-  txHash: string;
-} | { key: DelegateTokensStep.DONE | UndelegateTokensStep.DONE };
-
-export type UndelegateTokensStepValue = DelegateTokensStepCommon;
-export type DelegateTokensStepValue = DelegateTokensStepCommon;
-
-export type SubgraphTokenVotingMember = {
-  address: string;
-  balance: string;
-  votingPower: string;
-  delegatee: {
-    address: string;
-  };
-  delegators: {
-    address: string;
-    balance: string;
-  }[];
-};
-
-export type TokenVotingMember = {
-  /** The address of the member */
-  address: string;
-  /** The balance of the member */
-  balance: bigint;
-  /** The voting power of the member taking into account the delagation */
-  votingPower: bigint;
-  /** The address that you delegated yout voting power to
-   *  If null, you are not delegating your voting power */
-  delegatee: string | null;
-  /** The list of addresses that delegated their voting power this member */
-  delegators: { address: string; balance: bigint }[];
-};

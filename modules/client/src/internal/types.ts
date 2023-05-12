@@ -107,3 +107,25 @@ export type SubgraphPluginRepoListItem = {
 export type SubgraphPluginRepo = SubgraphPluginRepoListItem & {
   releases: SubgraphPluginRepoRelease[];
 };
+
+
+export type SubgraphPluginVersion = {
+  release: {
+    release: number;
+  };
+  metadata: string;
+  build: number;
+};
+
+export type SubgraphPluginPreparation = {
+  helpers: string[];
+  pluginRepo: {
+    id: string;
+  };
+};
+
+export type SubgraphPluginInstallation = {
+  appliedVersion: SubgraphPluginVersion;
+  appliedPreparation: SubgraphPluginPreparation;
+};
+
