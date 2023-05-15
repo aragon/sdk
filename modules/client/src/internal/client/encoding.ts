@@ -3,7 +3,6 @@ import {
   GrantPermissionWithConditionParams,
   GrantPermissionParams,
   RevokePermissionParams,
-  Permissions,
   RegisterStandardCallbackParams,
   UpgradeToAndCallParams,
   WithdrawParams,
@@ -39,6 +38,7 @@ import {
 } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IClientEncoding } from "../../interfaces";
+import { Permissions } from "../../constants";
 
 /**
  * Encoding module the SDK Generic Client
