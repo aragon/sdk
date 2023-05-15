@@ -169,8 +169,8 @@ export class AddresslistVotingClientMethods extends ClientCore
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);
       return `ipfs://${cid}`;
-    } catch {
-      throw new IpfsPinError();
+    } catch (e) {
+      throw new IpfsPinError(e);
     }
   }
   /**

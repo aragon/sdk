@@ -162,8 +162,8 @@ export class MultisigClientMethods extends ClientCore
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);
       return `ipfs://${cid}`;
-    } catch {
-      throw new IpfsPinError();
+    } catch (e) {
+      throw new IpfsPinError(e);
     }
   }
   /**
@@ -538,8 +538,8 @@ export class MultisigClientMethods extends ClientCore
             throw new InvalidAddressOrEnsError();
           }
           address = resolvedAddress;
-        } catch {
-          throw new InvalidAddressOrEnsError();
+        } catch (e) {
+          throw new InvalidAddressOrEnsError(e);
         }
       }
       where = { dao: address.toLowerCase() };
