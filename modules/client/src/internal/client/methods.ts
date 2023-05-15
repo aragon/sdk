@@ -85,7 +85,7 @@ import {
   LIVE_CONTRACTS,
   MultiTargetPermission,
   SortDirection,
-  SupportedNetworks,
+  SupportedNetwork,
   TokenType,
 } from "../../client-common";
 import {
@@ -408,7 +408,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): AsyncGenerator<PrepareUninstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
     const provider = this.web3.getProvider();
-    const networkName = (await provider.getNetwork()).name as SupportedNetworks;
+    const networkName = (await provider.getNetwork()).name as SupportedNetwork;
     type T = {
       iplugin: { installations: SubgraphPluginInstallation[] };
     };

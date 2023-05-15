@@ -38,7 +38,7 @@ import {
   SortDirection,
   SubgraphMembers,
   SubgraphVotingSettings,
-  SupportedNetworks,
+  SupportedNetwork,
   SupportedNetworksArray,
   VersionTag,
   VoteProposalStep,
@@ -268,7 +268,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
     const network = await signer.provider.getNetwork();
-    const networkName = network.name as SupportedNetworks;
+    const networkName = network.name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }

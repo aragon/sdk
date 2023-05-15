@@ -14,26 +14,28 @@ TEMPLATE:
 -->
 ## [UPCOMING]
 ### Changed
-- IAddresslistVotingPluginInstall => AddresslistVotingPluginInstall
-- ITokenVotingPluginInstall => TokenVotingPluginInstall
-- IMintTokenParams => MintTokenParams
-- IPluginInstallItem => PluginInstallItem
-- IDaoQueryParams => DaoQueryParams
-- ITransferQueryParams => TransferQueryParams
-- IPermissionParamsBase => PermissionParamsBase
-- IGrantPermissionParams => GrantPermissionParams
-- IRevokePermissionParams => RevokePermissionParams
-- IGrantPermissionDecodedParams => GrantPermissionDecodedParams
-- IRevokePermissionDecodedParams => RevokePermissionDecodedParams
-- IHasPermissionParams => HasPermissionParams
-- IPermissionParamsBase => IPermissionParamsBase
-- IPermissionParamsBase => IPermissionParamsBase
-- IPermissionParamsBase => IPermissionParamsBase
-- ITransferQueryParams => TransferQueryParams
-- IInterfaceParams => InterfaceParams
-- IVoteProposalParams => VoteProposalParams
-- ICanVoteParams => CanVoteParams
-- IProposalQueryParams => ProposalQueryParams
+- Renamed:
+  - `IAddresslistVotingPluginInstall` => `AddresslistVotingPluginInstall`
+  - `ITokenVotingPluginInstall` => `TokenVotingPluginInstall`
+  - `IMintTokenParams` => `MintTokenParams`
+  - `IPluginInstallItem` => `PluginInstallItem`
+  - `IDaoQueryParams` => `DaoQueryParams`
+  - `ITransferQueryParams` => `TransferQueryParams`
+  - `IPermissionParamsBase` => `PermissionParamsBase`
+  - `IGrantPermissionParams` => `GrantPermissionParams`
+  - `IRevokePermissionParams` => `RevokePermissionParams`
+  - `IGrantPermissionDecodedParams` => `GrantPermissionDecodedParams`
+  - `IRevokePermissionDecodedParams` => `RevokePermissionDecodedParams`
+  - `IHasPermissionParams` => `HasPermissionParams`
+  - `IPermissionParamsBase` => `IPermissionParamsBase`
+  - `IPermissionParamsBase` => `IPermissionParamsBase`
+  - `IPermissionParamsBase` => `IPermissionParamsBase`
+  - `ITransferQueryParams` => `TransferQueryParams`
+  - `IInterfaceParams` => `InterfaceParams`
+  - `IVoteProposalParams` => `VoteProposalParams`
+  - `ICanVoteParams` => `CanVoteParams`
+  - `IProposalQueryParams` => `ProposalQueryParams`
+  - `SupportedNetworks` => `SupportedNetwork`
 ## [1.7.0]
 ### Added
 - Add `delegateTokens` function in `TokenVotingClient`

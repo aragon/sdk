@@ -17,7 +17,7 @@ import {
   IPFS_NODES,
   LIVE_CONTRACTS,
 } from "./constants";
-import { SupportedNetworks, SupportedNetworksArray } from "./types/common";
+import { SupportedNetwork, SupportedNetworksArray } from "./types/common";
 import { isAddress } from "@ethersproject/address";
 import { Signer } from "@ethersproject/abstract-signer";
 export { ContextParams } from "./types/context";
@@ -103,7 +103,7 @@ export class Context {
   }
 
   private setNetworkDefaults() {
-    const networkName = this.network.name as SupportedNetworks;
+    const networkName = this.network.name as SupportedNetwork;
     if (
       !GRAPHQL_NODES[networkName]?.length ||
       !IPFS_NODES[networkName]?.length ||
@@ -249,7 +249,7 @@ export class Context {
     ensRegistryAddress?: string,
   ): Network {
     const network = getNetwork(networkish);
-    const networkName = network.name as SupportedNetworks;
+    const networkName = network.name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }

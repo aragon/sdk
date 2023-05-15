@@ -8,7 +8,7 @@ import {
   DaoAction,
   encodeUpdateVotingSettingsAction,
   PluginInstallItem,
-  SupportedNetworks,
+  SupportedNetwork,
   SupportedNetworksArray,
   VotingSettings,
 } from "../../../client-common";
@@ -42,7 +42,7 @@ export class TokenVotingClientEncoding extends ClientCore
     params: TokenVotingPluginInstall,
     network: Networkish,
   ): PluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetworks;
+    const networkName = getNetwork(network).name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }

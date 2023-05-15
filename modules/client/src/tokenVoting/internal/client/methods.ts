@@ -35,7 +35,7 @@ import {
   ProposalSortBy,
   SortDirection,
   SubgraphVotingSettings,
-  SupportedNetworks,
+  SupportedNetwork,
   SupportedNetworksArray,
   TokenType,
   VersionTag,
@@ -284,7 +284,7 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
     const network = await signer.provider.getNetwork();
-    const networkName = network.name as SupportedNetworks;
+    const networkName = network.name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }

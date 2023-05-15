@@ -9,7 +9,7 @@ import {
   DaoAction,
   encodeUpdateVotingSettingsAction,
   PluginInstallItem,
-  SupportedNetworks,
+  SupportedNetwork,
   SupportedNetworksArray,
   VotingSettings,
   votingSettingsToContract,
@@ -39,7 +39,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     params: AddresslistVotingPluginInstall,
     network: Networkish,
   ): PluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetworks;
+    const networkName = getNetwork(network).name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }

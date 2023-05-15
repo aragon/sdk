@@ -12,7 +12,7 @@ import {
   ClientCore,
   DaoAction,
   LIVE_CONTRACTS,
-  SupportedNetworks,
+  SupportedNetwork,
   SupportedNetworksArray,
   TokenType,
 } from "../../client-common";
@@ -61,7 +61,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     if (!provider) {
       throw new NoProviderError();
     }
-    const network = provider.network.name as SupportedNetworks;
+    const network = provider.network.name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(network)) {
       throw new UnsupportedNetworkError(network);
     }
@@ -101,7 +101,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     params: ApplyUninstallationParams,
   ): DaoAction[] {
     const provider = this.web3.getProvider();
-    const network = provider.network.name as SupportedNetworks;
+    const network = provider.network.name as SupportedNetwork;
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const args = applyUninstallationParamsToContract(params);
     const hexBytes = pspInterface.encodeFunctionData("applyUninstallation", [

@@ -8,7 +8,7 @@ import {
   ClientCore,
   DaoAction,
   PluginInstallItem,
-  SupportedNetworks,
+  SupportedNetwork,
   SupportedNetworksArray,
 } from "../../../client-common";
 import {
@@ -44,7 +44,7 @@ export class MultisigClientEncoding extends ClientCore
     params: MultisigPluginInstallParams,
     network: Networkish,
   ): PluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetworks;
+    const networkName = getNetwork(network).name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }

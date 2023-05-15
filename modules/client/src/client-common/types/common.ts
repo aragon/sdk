@@ -4,7 +4,7 @@ export const SupportedNetworksArray = [
   "matic",
   "maticmum",
 ] as const;
-export type SupportedNetworks = typeof SupportedNetworksArray[number];
+export type SupportedNetwork = typeof SupportedNetworksArray[number];
 export type NetworkDeployment = {
   daoFactory: string;
   pluginSetupProcessor: string;
