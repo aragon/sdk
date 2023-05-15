@@ -51,7 +51,6 @@ import {
   DaoSortBy,
   DepositParams,
   HasPermissionParams,
-  PermissionIds,
   PluginQueryParams,
   PluginRepo,
   PluginRepoBuildMetadata,
@@ -113,6 +112,7 @@ import {
   UNSUPPORTED_RELEASE_METADATA_LINK,
 } from "../constants";
 import { IClientMethods } from "../../interfaces";
+import { PermissionIds } from "../../constants";
 
 /**
  * Methods module the SDK Generic Client

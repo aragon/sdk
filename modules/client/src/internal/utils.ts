@@ -11,7 +11,6 @@ import {
   GrantPermissionWithConditionDecodedParams,
   GrantPermissionWithConditionParams,
   InstalledPluginListItem,
-  PermissionIds,
   PluginRepo,
   PluginRepoBuildMetadata,
   PluginRepoListItem,
@@ -46,6 +45,7 @@ import {
   DecodedApplyInstallationParams,
   TokenType,
 } from "../client-common";
+import { PermissionIds } from "../constants";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
