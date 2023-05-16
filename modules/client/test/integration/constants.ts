@@ -7,7 +7,7 @@ import {
   SubgraphVoteValues,
 } from "../../src";
 
-const IPFS_API_KEY = process.env.IPFS_API_KEY || "";
+const IPFS_API_KEY = process?.env?.IPFS_API_KEY || "";
 
 export const web3endpoints = {
   working: [
@@ -19,7 +19,7 @@ export const web3endpoints = {
 const ipfsEndpoints = {
   working: [
     {
-      url: process.env.IPFS_ENDPOINT || "https://ipfs.example.com/",
+      url: process?.env?.IPFS_ENDPOINT || "https://ipfs.example.com/",
       headers: {
         "X-API-KEY": IPFS_API_KEY,
       },
