@@ -22,9 +22,9 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
 };
 
 const getGraphqlNode = (netowrk: SupportedNetwork): string => {
-  return `https://subgraph.satsuma-prod.com/${
-    process?.env?.SATSUMA_API_KEY || "qHR2wGfc5RLi6"
-  }/aragon/osx-${SupportedNetworksToGraphqlNetworks[netowrk]}/api`;
+  return `https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-${
+    SupportedNetworksToGraphqlNetworks[netowrk]
+  }/api`;
 };
 
 type GraphqlNetworks = "mainnet" | "goerli" | "polygon" | "mumbai";
@@ -50,15 +50,13 @@ const IPFS_ENDPOINTS = {
     {
       url: "https://ipfs-0.aragon.network",
       headers: {
-        "X-API-KEY": process?.env?.IPFS_API_KEY ||
-          "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
+        "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
       },
     },
     {
       url: "https://ipfs-1.aragon.network",
       headers: {
-        "X-API-KEY": process?.env?.IPFS_API_KEY ||
-          "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
+        "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
       },
     },
   ],
@@ -66,8 +64,7 @@ const IPFS_ENDPOINTS = {
     {
       url: "https://testing-ipfs-0.aragon.network",
       headers: {
-        "X-API-KEY": process?.env?.IPFS_TEST_API_KEY ||
-          "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
+        "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
       },
     },
   ],
