@@ -3,7 +3,7 @@ import {
   MajorityVotingBase__factory,
 } from "@aragon/osx-ethers";
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
-import { VotingMode, VotingSettings } from "./interfaces/plugin";
+import { VotingMode, VotingSettings } from "./types/plugin";
 import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { votingModeFromContracts, votingModeToContracts } from "./utils";

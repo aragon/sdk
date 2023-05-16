@@ -10,26 +10,24 @@ import {
 
 import {
   ApplyInstallationParams,
+  ApplyUninstallationParams,
   Client,
   Context,
   DaoMetadata,
-  IGrantPermissionParams,
-  IRevokePermissionParams,
+  GrantPermissionParams,
+  PermissionIds,
   Permissions,
+  RegisterStandardCallbackParams,
+  RevokePermissionParams,
+  TokenType,
+  UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../../src";
 import {
   DaoAction,
   SupportedNetworksArray,
-} from "../../../src/client-common/interfaces/common";
+} from "../../../src/client-common/types/common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
-import {
-  ApplyUninstallationParams,
-  PermissionIds,
-  RegisterStandardCallbackParams,
-  TokenType,
-  UpgradeToAndCallParams,
-} from "../../../src/interfaces";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { bytesToHex } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
@@ -94,7 +92,7 @@ describe("Client", () => {
         "0x2468013579246801357924680135792468013579",
         "0x1357924680135792468013579246801357924680",
       ];
-      const paramsArray: IGrantPermissionParams[] = [
+      const paramsArray: GrantPermissionParams[] = [
         {
           who: "0x0987654321098765432109876543210987654321",
           where: "0x0987654321098765432109876543210987654321",
@@ -129,7 +127,7 @@ describe("Client", () => {
         "0x2468013579246801357924680135792468013579",
         "0x1357924680135792468013579246801357924680",
       ];
-      const paramsArray: IRevokePermissionParams[] = [
+      const paramsArray: RevokePermissionParams[] = [
         {
           who: "0x0987654321098765432109876543210987654321",
           where: "0x0987654321098765432109876543210987654321",

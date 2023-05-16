@@ -7,7 +7,7 @@ import {
   Context,
   CreateDaoParams,
   DepositParams,
-  IAddresslistVotingPluginInstall,
+  AddresslistVotingPluginInstall,
   SetAllowanceParams,
   SupportedNetworksArray,
   TokenType,
@@ -47,7 +47,7 @@ describe("Client", () => {
       const daoName = "TokenVotingDAO-" + Math.floor(Math.random() * 9999) +
         1;
 
-      const pluginParams: IAddresslistVotingPluginInstall = {
+      const pluginParams: AddresslistVotingPluginInstall = {
         votingSettings: {
           minDuration: 3600,
           minParticipation: 0.5,

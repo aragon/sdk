@@ -3,8 +3,8 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { isAddress } from "@ethersproject/address";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { Signer } from "@ethersproject/abstract-signer";
-import { GasFeeEstimation } from "../../client-common/interfaces/common";
-import { IClientWeb3Core } from "../interfaces/core";
+import { GasFeeEstimation } from "../types/common";
+import { IClientWeb3Core } from "../interfaces";
 import {
   CannotEstimateGasError,
   InvalidAddressError,

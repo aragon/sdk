@@ -14,8 +14,8 @@ import {
   DaoCreationSteps,
   DaoMetadata,
   GasFeeEstimation,
-  ITokenVotingPluginInstall,
   TokenVotingClient,
+  TokenVotingPluginInstall,
   VotingMode,
 } from "@aragon/sdk-client";
 import { context } from "../index";
@@ -25,7 +25,7 @@ const client: Client = new Client(context);
 
 // You can do different types of installations, depending on your needs.
 // For ex, these would be the plugin params if you want to use an already-existing ERC20 token.
-const tokenVotingPluginInstallParams1: ITokenVotingPluginInstall = {
+const tokenVotingPluginInstallParams1: TokenVotingPluginInstall = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds (minimum amount is 3600)
     minParticipation: 0.25, // 25%
@@ -34,12 +34,16 @@ const tokenVotingPluginInstallParams1: ITokenVotingPluginInstall = {
     votingMode: VotingMode.STANDARD, // default standard, other options: EARLY_EXECUTION, VOTE_REPLACEMENT
   },
   useToken: {
-    address: "0x23847102387419273491234", // contract address of the token to use as the voting token
+    tokenAddress: "0x23847102387419273491234", // contract address of the token to use as the voting token
+    wrappedToken: {
+      name: "Wrapped Token", // the name of your token
+      symbol: "WTK", // the symbol for your token. shouldn't be more than 5 letters
+    },
   },
 };
 
 // These would be the plugin params if you need to mint a new token for the DAO to enable TokenVoting.
-const tokenVotingPluginInstallParams2: ITokenVotingPluginInstall = {
+const tokenVotingPluginInstallParams2: TokenVotingPluginInstall = {
   votingSettings: {
     minDuration: 60 * 60 * 24 * 2, // seconds (minimum amount is 3600)
     minParticipation: 0.25, // 25%

@@ -26,19 +26,20 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  IProposalQueryParams,
-  IVoteProposalParams,
   PrepareInstallationStep,
   PrepareInstallationStepValue,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
+  ProposalQueryParams,
   ProposalSortBy,
   SortDirection,
   SubgraphVotingSettings,
-  SupportedNetworks,
+  SupportedNetwork,
   SupportedNetworksArray,
+  TokenType,
   VersionTag,
+  VoteProposalParams,
   VoteProposalStep,
   VoteProposalStepValue,
   VotingSettings,
@@ -49,13 +50,6 @@ import {
   DelegateTokensStepValue,
   Erc20TokenDetails,
   Erc721TokenDetails,
-  ITokenVotingClientMethods,
-  SubgraphContractType,
-  SubgraphErc20Token,
-  SubgraphErc721Token,
-  SubgraphTokenVotingMember,
-  SubgraphTokenVotingProposal,
-  SubgraphTokenVotingProposalListItem,
   TokenVotingMember,
   TokenVotingPluginPrepareInstallationParams,
   TokenVotingProposal,
@@ -67,7 +61,15 @@ import {
   WrapTokensParams,
   WrapTokensStep,
   WrapTokensStepValue,
-} from "../../interfaces";
+} from "../../types";
+import {
+  SubgraphContractType,
+  SubgraphErc20Token,
+  SubgraphErc721Token,
+  SubgraphTokenVotingMember,
+  SubgraphTokenVotingProposal,
+  SubgraphTokenVotingProposalListItem,
+} from "../types";
 import {
   QueryTokenVotingMembers,
   QueryTokenVotingPlugin,
@@ -94,8 +96,8 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "../../../client-common/constants";
-import { TokenType } from "../../../interfaces";
 import { TokenVotingClientEncoding } from "./encoding";
+import { ITokenVotingClientMethods } from "../../interfaces";
 /**
  * Methods module the SDK TokenVoting Client
  */
@@ -193,13 +195,13 @@ export class TokenVotingClientMethods extends ClientCore
   /**
    * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
    *
-   * @param {IVoteProposalParams} params
+   * @param {VoteProposalParams} params
    * @param {VoteValues} vote
    * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
    * @memberof TokenVotingClient
    */
   public async *voteProposal(
-    params: IVoteProposalParams,
+    params: VoteProposalParams,
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -282,7 +284,7 @@ export class TokenVotingClientMethods extends ClientCore
       throw new NoProviderError();
     }
     const network = await signer.provider.getNetwork();
-    const networkName = network.name as SupportedNetworks;
+    const networkName = network.name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }
@@ -616,7 +618,7 @@ export class TokenVotingClientMethods extends ClientCore
   /**
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
-   * @param {IProposalQueryParams} params
+   * @param {ProposalQueryParams} params
    * @return {*}  {Promise<TokenVotingProposalListItem[]>}
    * @memberof TokenVotingClient
    */
@@ -627,7 +629,7 @@ export class TokenVotingClientMethods extends ClientCore
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = ProposalSortBy.CREATED_AT,
-  }: IProposalQueryParams): Promise<TokenVotingProposalListItem[]> {
+  }: ProposalQueryParams): Promise<TokenVotingProposalListItem[]> {
     let where = {};
     let address = daoAddressOrEns;
     if (address) {

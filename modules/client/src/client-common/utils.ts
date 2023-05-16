@@ -1,11 +1,11 @@
 import { IDAO } from "@aragon/osx-ethers";
 import { ContractReceipt } from "@ethersproject/contracts";
-import { VoteValues, VotingMode } from "../client-common/interfaces/plugin";
+import { VoteValues, VotingMode } from "./types/plugin";
 import {
   CreateMajorityVotingProposalParams,
   IComputeStatusProposal,
   ProposalStatus,
-} from "./interfaces/plugin";
+} from "./types/plugin";
 
 import { Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";

@@ -12,7 +12,7 @@ import {
   AddresslistVotingClient,
   AddresslistVotingProposalListItem,
   ContextPlugin,
-  IProposalQueryParams,
+  ProposalQueryParams,
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
@@ -25,7 +25,7 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const addresslistVotingClient: AddresslistVotingClient =
   new AddresslistVotingClient(contextPlugin);
 
-const queryParams: IProposalQueryParams = {
+const queryParams: ProposalQueryParams = {
   skip: 0, // optional
   limit: 10, // optional,
   direction: SortDirection.ASC, // optional

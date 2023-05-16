@@ -2,30 +2,25 @@
 
 import {
   CanVoteParams,
-  ContractVotingSettings,
   CreateMajorityVotingProposalParams,
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
   IClientCore,
-  IInterfaceParams,
-  IProposalQueryParams,
-  IVoteProposalParams,
-  MajorityVotingProposalSettings,
+  InterfaceParams,
+  ProposalQueryParams,
+  VoteProposalParams,
   PrepareInstallationStepValue,
-  ProposalBase,
   ProposalCreationStepValue,
-  ProposalListItemBase,
   ProposalMetadata,
-  SubgraphAction,
-  SubgraphProposalBase,
-  SubgraphVoterListItemBase,
-  VersionTag,
   VoteProposalStepValue,
-  VoteValues,
-  VotingMode,
   VotingSettings,
 } from "../client-common";
+import {
+  AddresslistVotingPluginPrepareInstallationParams,
+  AddresslistVotingProposal,
+  AddresslistVotingProposalListItem,
+} from "./types";
 
 // Address List
 export interface IAddresslistVotingClientMethods extends IClientCore {
@@ -34,7 +29,7 @@ export interface IAddresslistVotingClientMethods extends IClientCore {
   ) => AsyncGenerator<ProposalCreationStepValue>;
   pinMetadata: (params: ProposalMetadata) => Promise<string>;
   voteProposal: (
-    params: IVoteProposalParams,
+    params: VoteProposalParams,
   ) => AsyncGenerator<VoteProposalStepValue>;
   executeProposal: (
     proposalId: string,
@@ -49,7 +44,7 @@ export interface IAddresslistVotingClientMethods extends IClientCore {
     propoosalId: string,
   ) => Promise<AddresslistVotingProposal | null>;
   getProposals: (
-    params: IProposalQueryParams,
+    params: ProposalQueryParams,
   ) => Promise<AddresslistVotingProposalListItem[]>;
   getVotingSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
 }
@@ -72,13 +67,13 @@ export interface IAddresslistVotingClientDecoding extends IClientCore {
   updatePluginSettingsAction: (data: Uint8Array) => VotingSettings;
   addMembersAction: (data: Uint8Array) => string[];
   removeMembersAction: (data: Uint8Array) => string[];
-  findInterface: (data: Uint8Array) => IInterfaceParams | null;
+  findInterface: (data: Uint8Array) => InterfaceParams | null;
 }
 export interface IAddresslistVotingClientEstimation extends IClientCore {
   createProposal: (
     params: CreateMajorityVotingProposalParams,
   ) => Promise<GasFeeEstimation>;
-  voteProposal: (params: IVoteProposalParams) => Promise<GasFeeEstimation>;
+  voteProposal: (params: VoteProposalParams) => Promise<GasFeeEstimation>;
   executeProposal: (
     proposalId: string,
   ) => Promise<GasFeeEstimation>;
@@ -90,61 +85,3 @@ export interface IAddresslistVotingClient {
   decoding: IAddresslistVotingClientDecoding;
   estimation: IAddresslistVotingClientEstimation;
 }
-
-export type AddresslistVotingProposal = ProposalBase & {
-  result: AddresslistVotingProposalResult;
-  settings: MajorityVotingProposalSettings;
-  votes: Array<{ address: string; vote: VoteValues; voteReplaced: boolean }>;
-  totalVotingWeight: number;
-  creationBlockNumber: number;
-  executionDate: Date | null;
-  executionBlockNumber: number | null;
-  executionTxHash: string | null;
-};
-
-export type AddresslistVotingProposalListItem = ProposalListItemBase & {
-  result: AddresslistVotingProposalResult;
-  votes: Array<{ address: string; vote: VoteValues; voteReplaced: boolean }>;
-};
-export type AddresslistVotingProposalResult = {
-  yes: number;
-  no: number;
-  abstain: number;
-};
-
-export type SubgraphAddresslistVotingVoterListItem = SubgraphVoterListItemBase;
-
-export type SubgraphAddresslistVotingProposalListItem = SubgraphProposalBase & {
-  earlyExecutable: boolean;
-  voters: SubgraphAddresslistVotingVoterListItem[];
-};
-export type SubgraphAddresslistVotingProposal = SubgraphProposalBase & {
-  createdAt: string;
-  actions: SubgraphAction[];
-  supportThreshold: string;
-  minVotingPower: string;
-  voters: SubgraphAddresslistVotingVoterListItem[];
-  totalVotingPower: string;
-  votingMode: VotingMode;
-  creationBlockNumber: string;
-  executionDate: string;
-  executionBlockNumber: string;
-  executionTxHash: string;
-  earlyExecutable: boolean;
-};
-
-export type ContractAddresslistVotingInitParams = [
-  ContractVotingSettings,
-  string[], // addresses
-];
-
-export type IAddresslistVotingPluginInstall = {
-  addresses: string[];
-  votingSettings: VotingSettings;
-};
-
-export type AddresslistVotingPluginPrepareInstallationParams = {
-  settings: IAddresslistVotingPluginInstall;
-  daoAddressOrEns: string;
-  versionTag?: VersionTag;
-};

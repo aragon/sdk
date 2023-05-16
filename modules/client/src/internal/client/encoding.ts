@@ -1,22 +1,20 @@
 import {
   ApplyUninstallationParams,
   GrantPermissionWithConditionParams,
-  IClientEncoding,
-  IGrantPermissionParams,
-  IRevokePermissionParams,
-  Permissions,
+  GrantPermissionParams,
+  RevokePermissionParams,
   RegisterStandardCallbackParams,
-  TokenType,
   UpgradeToAndCallParams,
   WithdrawParams,
-} from "../../interfaces";
+} from "../../types";
 import {
   ApplyInstallationParams,
   ClientCore,
   DaoAction,
   LIVE_CONTRACTS,
-  SupportedNetworks,
+  SupportedNetwork,
   SupportedNetworksArray,
+  TokenType,
 } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -39,6 +37,8 @@ import {
   UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { IClientEncoding } from "../../interfaces";
+import { Permissions } from "../../constants";
 
 /**
  * Encoding module the SDK Generic Client
@@ -61,7 +61,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     if (!provider) {
       throw new NoProviderError();
     }
-    const network = provider.network.name as SupportedNetworks;
+    const network = provider.network.name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(network)) {
       throw new UnsupportedNetworkError(network);
     }
@@ -101,7 +101,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     params: ApplyUninstallationParams,
   ): DaoAction[] {
     const provider = this.web3.getProvider();
-    const network = provider.network.name as SupportedNetworks;
+    const network = provider.network.name as SupportedNetwork;
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const args = applyUninstallationParamsToContract(params);
     const hexBytes = pspInterface.encodeFunctionData("applyUninstallation", [
@@ -135,13 +135,13 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * Computes the payload to be given when creating a proposal that grants a permission within a DAO
    *
    * @param {string} daoAddress
-   * @param {IGrantPermissionParams} params
+   * @param {GrantPermissionParams} params
    * @return {*}  {DaoAction}
    * @memberof ClientEncoding
    */
   public grantAction(
     daoAddress: string,
-    params: IGrantPermissionParams,
+    params: GrantPermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where, who } = params;
@@ -213,13 +213,13 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * Computes the payload to be given when creating a proposal that revokes a permission within a DAO
    *
    * @param {string} daoAddress
-   * @param {IRevokePermissionParams} params
+   * @param {RevokePermissionParams} params
    * @return {*}  {DaoAction}
    * @memberof ClientEncoding
    */
   public revokeAction(
     daoAddress: string,
-    params: IRevokePermissionParams,
+    params: RevokePermissionParams,
   ): DaoAction {
     const signer = this.web3.getSigner();
     const { where, who } = params;

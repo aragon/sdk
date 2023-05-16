@@ -9,7 +9,7 @@ import {
   Context,
   ContextPlugin,
   CreateMajorityVotingProposalParams,
-  IVoteProposalParams,
+  VoteProposalParams,
   SupportedNetworksArray,
   VoteValues,
 } from "../../../src";
@@ -66,7 +66,7 @@ describe("Client Address List", () => {
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new AddresslistVotingClient(ctxPlugin);
 
-      const voteParams: IVoteProposalParams = {
+      const voteParams: VoteProposalParams = {
         proposalId: "0x1234567890123456789012345678901234567890_0x0",
         vote: VoteValues.YES,
       };

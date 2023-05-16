@@ -5,7 +5,7 @@ import { bytesToHex } from "@aragon/sdk-common";
 import {
   Context,
   ContextPlugin,
-  IMintTokenParams,
+  MintTokenParams,
   SupportedNetworksArray,
   TokenVotingClient,
   VotingMode,
@@ -60,7 +60,7 @@ describe("Token Voting Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
-      const params: IMintTokenParams = {
+      const params: MintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
       };

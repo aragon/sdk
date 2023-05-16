@@ -7,7 +7,7 @@ import {
 import { ClientError, GraphQLClient } from "graphql-request";
 import { Context } from "../../client-common/context";
 import { QueryStatus } from "../graphql-queries";
-import { IClientGraphQLCore } from "../interfaces/core";
+import { IClientGraphQLCore } from "../interfaces";
 
 export class GraphqlModule implements IClientGraphQLCore {
   private clientIdx: number = -1;

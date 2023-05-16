@@ -1,21 +1,29 @@
 // This file contains the definitions of the AddressList DAO client
 
 import {
-  CreateProposalBaseParams,
   DaoAction,
   ExecuteProposalStepValue,
   GasFeeEstimation,
   IClientCore,
-  IInterfaceParams,
-  IProposalQueryParams,
+  InterfaceParams,
+  ProposalQueryParams,
   PrepareInstallationStepValue,
   ProposalCreationStepValue,
   ProposalMetadata,
-  ProposalMetadataSummary,
-  ProposalStatus,
-  SubgraphAction,
-  VersionTag,
 } from "../client-common";
+import {
+  AddAddressesParams,
+  ApproveMultisigProposalParams,
+  ApproveProposalStepValue,
+  CanApproveParams,
+  CreateMultisigProposalParams,
+  MultisigPluginPrepareInstallationParams,
+  MultisigProposal,
+  MultisigProposalListItem,
+  MultisigVotingSettings,
+  RemoveAddressesParams,
+  UpdateMultisigVotingSettingsParams,
+} from "./types";
 
 // Multisig
 export interface IMultisigClientMethods extends IClientCore {
@@ -42,7 +50,7 @@ export interface IMultisigClientMethods extends IClientCore {
   ) => Promise<string[]>;
   getProposal: (proposalId: string) => Promise<MultisigProposal | null>;
   getProposals: (
-    params: IProposalQueryParams,
+    params: ProposalQueryParams,
   ) => Promise<MultisigProposalListItem[]>;
 }
 
@@ -57,7 +65,7 @@ export interface IMultisigClientDecoding extends IClientCore {
   addAddressesAction: (data: Uint8Array) => string[];
   removeAddressesAction: (data: Uint8Array) => string[];
   updateMultisigVotingSettings: (data: Uint8Array) => MultisigVotingSettings;
-  findInterface: (data: Uint8Array) => IInterfaceParams | null;
+  findInterface: (data: Uint8Array) => InterfaceParams | null;
 }
 export interface IMultisigClientEstimation extends IClientCore {
   createProposal: (
@@ -78,129 +86,3 @@ export interface IMultisigClient {
   decoding: IMultisigClientDecoding;
   estimation: IMultisigClientEstimation;
 }
-
-export type MultisigPluginInstallParams = MultisigPluginSettings;
-
-export type MultisigPluginPrepareInstallationParams = {
-  settings: MultisigPluginSettings;
-  daoAddressOrEns: string;
-  versionTag?: VersionTag;
-};
-
-export type MultisigVotingSettings = {
-  minApprovals: number;
-  onlyListed: boolean;
-};
-
-export type MultisigPluginSettings = {
-  members: string[];
-  votingSettings: MultisigVotingSettings;
-};
-
-export type UpdateAddressesParams = {
-  pluginAddress: string;
-  members: string[];
-};
-export type RemoveAddressesParams = UpdateAddressesParams;
-export type AddAddressesParams = UpdateAddressesParams;
-
-export type UpdateMultisigVotingSettingsParams = {
-  pluginAddress: string;
-  votingSettings: MultisigVotingSettings;
-};
-
-export type CreateMultisigProposalParams = CreateProposalBaseParams & {
-  approve?: boolean;
-  tryExecution?: boolean;
-  startDate?: Date;
-  /** Date at which the proposal will expire if not approved */
-  endDate?: Date;
-};
-
-export type ApproveMultisigProposalParams = {
-  proposalId: string;
-  tryExecution: boolean;
-};
-
-export type CanApproveParams = {
-  proposalId: string;
-  approverAddressOrEns: string;
-};
-
-export enum ApproveProposalStep {
-  APPROVING = "approving",
-  DONE = "done",
-}
-
-export type ApproveProposalStepValue =
-  | { key: ApproveProposalStep.APPROVING; txHash: string }
-  | { key: ApproveProposalStep.DONE };
-
-type MultisigProposalBase = {
-  id: string;
-  settings: MultisigVotingSettings;
-  dao: {
-    address: string;
-    name: string;
-  };
-  creatorAddress: string;
-  status: ProposalStatus;
-  startDate: Date;
-  endDate: Date;
-  approvals: string[];
-};
-
-export type MultisigProposalListItem = MultisigProposalBase & {
-  metadata: ProposalMetadataSummary;
-};
-
-export type MultisigProposal = MultisigProposalBase & {
-  creationDate: Date;
-  creationBlockNumber: number;
-  executionDate: Date | null;
-  executionBlockNumber: number | null;
-  executionTxHash: string | null;
-  metadata: ProposalMetadata;
-  actions: DaoAction[];
-};
-
-type SubgraphProposalBase = {
-  id: string;
-  dao: {
-    id: string;
-    subdomain: string;
-  };
-  creator: string;
-  metadata: string;
-  executed: boolean;
-  createdAt: string;
-  startDate: string;
-  endDate: string;
-};
-
-export type SubgraphMultisigProposalBase = SubgraphProposalBase & {
-  plugin: SubgraphMultisigVotingSettings;
-  minApprovals: number;
-  potentiallyExecutable: boolean;
-  approvers: { id: string }[];
-  // TODO change on subgraph fix
-  // approvers: SubgraphMultisigApproversListItem[];
-};
-
-export type SubgraphMultisigProposalListItem = SubgraphMultisigProposalBase;
-export type SubgraphMultisigProposal = SubgraphMultisigProposalBase & {
-  actions: SubgraphAction[];
-  executionTxHash: string;
-  executionDate: string;
-  executionBlockNumber: string;
-  creationBlockNumber: string;
-};
-
-export type SubgraphMultisigApproversListItem = {
-  approver: { id: string };
-};
-
-export type SubgraphMultisigVotingSettings = {
-  minApprovals: number;
-  onlyListed: boolean;
-};

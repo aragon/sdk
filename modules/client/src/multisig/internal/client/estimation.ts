@@ -5,22 +5,18 @@ import {
   NoProviderError,
   NoSignerError,
 } from "@aragon/sdk-common";
-import {
-  ClientCore,
-  GasFeeEstimation,
-} from "../../../client-common";
+import { ClientCore, GasFeeEstimation } from "../../../client-common";
+import { IMultisigClientEstimation } from "../../interfaces";
+import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   ApproveMultisigProposalParams,
   CreateMultisigProposalParams,
-  IMultisigClientEstimation,
-} from "../../interfaces";
-import { toUtf8Bytes } from "@ethersproject/strings";
+} from "../../types";
 /**
  * Estimation module the SDK Address List Client
  */
 export class MultisigClientEstimation extends ClientCore
   implements IMultisigClientEstimation {
-
   /**
    * Estimates the gas fee of creating a proposal on the plugin
    *

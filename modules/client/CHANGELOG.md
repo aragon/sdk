@@ -13,6 +13,29 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Changed
+- Renamed:
+  - `IAddresslistVotingPluginInstall` => `AddresslistVotingPluginInstall`
+  - `ITokenVotingPluginInstall` => `TokenVotingPluginInstall`
+  - `IMintTokenParams` => `MintTokenParams`
+  - `IPluginInstallItem` => `PluginInstallItem`
+  - `IDaoQueryParams` => `DaoQueryParams`
+  - `ITransferQueryParams` => `TransferQueryParams`
+  - `IPermissionParamsBase` => `PermissionParamsBase`
+  - `IGrantPermissionParams` => `GrantPermissionParams`
+  - `IRevokePermissionParams` => `RevokePermissionParams`
+  - `IGrantPermissionDecodedParams` => `GrantPermissionDecodedParams`
+  - `IRevokePermissionDecodedParams` => `RevokePermissionDecodedParams`
+  - `IHasPermissionParams` => `HasPermissionParams`
+  - `IPermissionParamsBase` => `IPermissionParamsBase`
+  - `IPermissionParamsBase` => `IPermissionParamsBase`
+  - `IPermissionParamsBase` => `IPermissionParamsBase`
+  - `ITransferQueryParams` => `TransferQueryParams`
+  - `IInterfaceParams` => `InterfaceParams`
+  - `IVoteProposalParams` => `VoteProposalParams`
+  - `ICanVoteParams` => `CanVoteParams`
+  - `IProposalQueryParams` => `ProposalQueryParams`
+  - `SupportedNetworks` => `SupportedNetwork`
 ## [1.7.0]
 ### Added
 - Add `delegateTokens` function in `TokenVotingClient`
@@ -23,6 +46,7 @@ TEMPLATE:
 - Breaking: `getMembers` function in `TokenVotingClient` no loger returns an `string[]`. Now it returns `TokenVotingMember[]` which includes the delegation status of each member
 - `condition` is now an optional parameter in `MultiTargetPermission`  
 ## [1.6.0]
+
 ### Fixed
 - Fixed plugin version on the dao subgraph queries
 ### Added

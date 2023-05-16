@@ -109,12 +109,12 @@ describe("IPFS core module", () => {
     expect(isOnline).toEqual(true);
   });
   it("Should fail when an IPFS node is not working", async () => {
-      const context = new Context(contextParamsMainnet);
-      const client = new Client(context);
+    const context = new Context(contextParamsMainnet);
+    const client = new Client(context);
 
-      mockedIPFSClient.nodeInfo.mockRejectedValueOnce(new Error());
-      const isOnline = await client.ipfs.isUp();
+    mockedIPFSClient.nodeInfo.mockRejectedValueOnce(new Error());
+    const isOnline = await client.ipfs.isUp();
 
-      expect(isOnline).toEqual(false);
+    expect(isOnline).toEqual(false);
   });
 });

@@ -8,12 +8,13 @@ import {
   Context,
   ContextPlugin,
   CreateMajorityVotingProposalParams,
+  DelegateTokensStep,
+  Erc20TokenDetails,
   ExecuteProposalStep,
-  IProposalQueryParams,
-  IVoteProposalParams,
   PrepareInstallationStep,
   ProposalCreationSteps,
   ProposalMetadata,
+  ProposalQueryParams,
   ProposalSortBy,
   ProposalStatus,
   SetAllowanceSteps,
@@ -22,10 +23,16 @@ import {
   SupportedNetworksArray,
   TokenType,
   TokenVotingClient,
+  TokenVotingMember,
+  TokenVotingPluginPrepareInstallationParams,
   TokenVotingProposal,
+  UndelegateTokensStep,
+  UnwrapTokensStep,
+  VoteProposalParams,
   VoteProposalStep,
   VoteValues,
   VotingMode,
+  WrapTokensStep,
 } from "../../../src";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
@@ -66,18 +73,11 @@ import {
   QueryTokenVotingSettings,
 } from "../../../src/tokenVoting/internal/graphql-queries";
 import {
-  DelegateTokensStep,
-  Erc20TokenDetails,
   SubgraphContractType,
   SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
-  TokenVotingMember,
-  UndelegateTokensStep,
-  UnwrapTokensStep,
-  WrapTokensStep,
-} from "../../../src/tokenVoting/interfaces";
-import { TokenVotingPluginPrepareInstallationParams } from "../../../src/tokenVoting/interfaces";
+} from "../../../src/tokenVoting/internal/types";
 import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 import {
@@ -219,7 +219,7 @@ describe("Token Voting Client", () => {
     client: TokenVotingClient,
     voteValue: VoteValues = VoteValues.YES,
   ) {
-    const voteParams: IVoteProposalParams = {
+    const voteParams: VoteProposalParams = {
       proposalId,
       vote: voteValue,
     };
@@ -1067,7 +1067,7 @@ describe("Token Voting Client", () => {
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
         const status = ProposalStatus.DEFEATED;
-        const params: IProposalQueryParams = {
+        const params: ProposalQueryParams = {
           limit,
           sortBy: ProposalSortBy.CREATED_AT,
           direction: SortDirection.ASC,
@@ -1196,7 +1196,7 @@ describe("Token Voting Client", () => {
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
         const address = ADDRESS_ONE;
-        const params: IProposalQueryParams = {
+        const params: ProposalQueryParams = {
           limit,
           sortBy: ProposalSortBy.CREATED_AT,
           direction: SortDirection.ASC,
@@ -1232,7 +1232,7 @@ describe("Token Voting Client", () => {
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
         const address = TEST_NON_EXISTING_ADDRESS;
-        const params: IProposalQueryParams = {
+        const params: ProposalQueryParams = {
           limit,
           sortBy: ProposalSortBy.CREATED_AT,
           direction: SortDirection.ASC,
@@ -1256,7 +1256,7 @@ describe("Token Voting Client", () => {
         const client = new TokenVotingClient(ctxPlugin);
         const limit = 5;
         const address = TEST_INVALID_ADDRESS;
-        const params: IProposalQueryParams = {
+        const params: ProposalQueryParams = {
           limit,
           sortBy: ProposalSortBy.CREATED_AT,
           direction: SortDirection.ASC,

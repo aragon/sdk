@@ -3,7 +3,7 @@ import {
   ClientCore,
   decodeUpdatePluginSettingsAction,
   getFunctionFragment,
-  IInterfaceParams,
+  InterfaceParams,
   VotingSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
@@ -65,10 +65,10 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * Returns the decoded function info given the encoded data of an action
    *
    * @param {Uint8Array} data
-   * @return {*}  {(IInterfaceParams | null)}
+   * @return {*}  {(InterfaceParams | null)}
    * @memberof AddresslistVotingClientDecoding
    */
-  public findInterface(data: Uint8Array): IInterfaceParams | null {
+  public findInterface(data: Uint8Array): InterfaceParams | null {
     try {
       const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
       return {

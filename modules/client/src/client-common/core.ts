@@ -3,7 +3,7 @@ import {
   IClientGraphQLCore,
   IClientIpfsCore,
   IClientWeb3Core,
-} from "./interfaces/core";
+} from "./interfaces";
 import { Context } from "./context";
 import { Web3Module } from "./modules/web3";
 import { IPFSModule } from "./modules/ipfs";

@@ -1,5 +1,5 @@
 import { Context } from "../../client-common/context";
-import { IClientIpfsCore } from "../interfaces/core";
+import { IClientIpfsCore } from "../interfaces";
 import {
   Client as IpfsClient,
   ClientError,

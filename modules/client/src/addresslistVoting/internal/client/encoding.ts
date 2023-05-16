@@ -8,20 +8,18 @@ import {
   ClientCore,
   DaoAction,
   encodeUpdateVotingSettingsAction,
-  IPluginInstallItem,
-  SupportedNetworks,
+  PluginInstallItem,
+  SupportedNetwork,
   SupportedNetworksArray,
   VotingSettings,
   votingSettingsToContract,
 } from "../../../client-common";
-import {
-  IAddresslistVotingClientEncoding,
-  IAddresslistVotingPluginInstall,
-} from "../../interfaces";
+import { IAddresslistVotingClientEncoding } from "../../interfaces";
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { LIVE_CONTRACTS } from "../../../client-common/constants";
 import { getNetwork, Networkish } from "@ethersproject/providers";
+import { AddresslistVotingPluginInstall } from "../../types";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -32,16 +30,16 @@ export class AddresslistVotingClientEncoding extends ClientCore
    * Computes the parameters to be given when creating the DAO,
    * so that the plugin is configured
    *
-   * @param {IAddresslistVotingPluginInstall} params
+   * @param {AddresslistVotingPluginInstall} params
    * @param {Networkish} network
-   * @return {*}  {IPluginInstallItem}
+   * @return {*}  {PluginInstallItem}
    * @memberof AddresslistVotingClientEncoding
    */
   static getPluginInstallItem(
-    params: IAddresslistVotingPluginInstall,
+    params: AddresslistVotingPluginInstall,
     network: Networkish,
-  ): IPluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetworks
+  ): PluginInstallItem {
+    const networkName = getNetwork(network).name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }

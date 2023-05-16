@@ -1,5 +1,5 @@
 import { BigNumber } from "@ethersproject/bignumber";
-import { DaoAction, IPagination } from "./common";
+import { DaoAction, Pagination } from "./common";
 
 /**
  * Contains the states of a proposal. Note that on chain
@@ -73,16 +73,16 @@ export type CreateMajorityVotingProposalParams = CreateProposalBaseParams & {
   creatorVote?: VoteValues;
 };
 
-export interface IVoteProposalParams {
+export type VoteProposalParams = {
   vote: VoteValues;
   proposalId: string;
-}
+};
 
-export interface CanVoteParams {
+export type CanVoteParams = {
   proposalId: string;
   voterAddressOrEns: string;
   vote: VoteValues;
-}
+};
 
 /**
  * Contains the human-readable information about a proposal
@@ -120,6 +120,16 @@ export type ProposalBase = {
   creationDate: Date;
   actions: Array<DaoAction>;
   status: ProposalStatus;
+  creationBlockNumber: number;
+  executionDate: Date | null;
+  executionBlockNumber: number | null;
+  executionTxHash: string | null;
+};
+
+export type ProposalVoteBase = {
+  address: string;
+  vote: VoteValues;
+  voteReplaced: boolean;
 };
 
 // Short version
@@ -189,11 +199,11 @@ export interface IComputeStatusProposal {
   potentiallyExecutable: boolean;
 }
 
-export interface IProposalQueryParams extends IPagination {
+export type ProposalQueryParams = Pagination & {
   sortBy?: ProposalSortBy;
   status?: ProposalStatus;
   daoAddressOrEns?: string;
-}
+};
 
 export enum ProposalSortBy {
   CREATED_AT = "createdAt",

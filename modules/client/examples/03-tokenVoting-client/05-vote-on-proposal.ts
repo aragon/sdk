@@ -11,7 +11,7 @@ The amount of votes submitted depends on the amount of tokens the signer address
 
 import {
   ContextPlugin,
-  IVoteProposalParams,
+  VoteProposalParams,
   TokenVotingClient,
   VoteProposalStep,
   VoteValues,
@@ -26,7 +26,7 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
   contextPlugin,
 );
 
-const voteParams: IVoteProposalParams = {
+const voteParams: VoteProposalParams = {
   proposalId: "0x1234567890123456789012345678901234567890_0x0",
   vote: VoteValues.YES, // alternatively NO, or ABSTAIN
 };

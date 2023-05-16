@@ -12,7 +12,6 @@ Grants permission with the name (`permission`) to an address (`who`) to perform 
 
 import {
   Client,
-  ContextPlugin,
   DaoAction,
   GrantPermissionWithConditionParams,
   Permissions,

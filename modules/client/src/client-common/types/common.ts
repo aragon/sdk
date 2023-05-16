@@ -4,7 +4,7 @@ export const SupportedNetworksArray = [
   "matic",
   "maticmum",
 ] as const;
-export type SupportedNetworks = typeof SupportedNetworksArray[number];
+export type SupportedNetwork = typeof SupportedNetworksArray[number];
 export type NetworkDeployment = {
   daoFactory: string;
   pluginSetupProcessor: string;
@@ -33,7 +33,7 @@ export enum DaoRole {
  * Contains the payload passed to the global DAO factory so that
  * plugins can be initialized
  */
-export interface IPluginInstallItem {
+export interface PluginInstallItem {
   id: string; // ENS domain or address of the plugin's Repo
   data: Uint8Array;
 }
@@ -77,8 +77,14 @@ export enum SortDirection {
   DESC = "desc",
 }
 
-export interface IInterfaceParams {
+export interface InterfaceParams {
   id: string;
   functionName: string;
   hash: string;
+}
+
+export enum TokenType {
+  NATIVE = "native",
+  ERC20 = "erc20",
+  ERC721 = "erc721",
 }

@@ -6,12 +6,9 @@ import {
   ClientCore,
   CreateMajorityVotingProposalParams,
   GasFeeEstimation,
-  IVoteProposalParams,
+  VoteProposalParams,
 } from "../../../client-common";
-import {
-  DelegateTokensParams,
-  ITokenVotingClientEstimation,
-} from "../../interfaces";
+import { ITokenVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   boolArrayToBitmap,
@@ -19,6 +16,7 @@ import {
   NoProviderError,
   NoSignerError,
 } from "@aragon/sdk-common";
+import { DelegateTokensParams } from "../../types";
 /**
  * Estimation module the SDK TokenVoting Client
  */
@@ -74,12 +72,12 @@ export class TokenVotingClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of casting a vote on a proposal
    *
-   * @param {IVoteProposalParams} params
+   * @param {VoteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async voteProposal(
-    params: IVoteProposalParams,
+    params: VoteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {
@@ -135,7 +133,7 @@ export class TokenVotingClientEstimation extends ClientCore
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
-  
+
   /**
    * Estimates the gas fee of delegating voting power to a delegatee
    *

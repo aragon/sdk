@@ -1,44 +1,8 @@
-export { Client } from "./client";
+export * from "./client";
 export * from "./addresslistVoting";
 export * from "./tokenVoting";
 export * from "./client-common";
 export * from "./multisig";
-export {
-  ApplyUninstallationParams,
-  AssetBalance,
-  CreateDaoParams,
-  DaoCreationSteps,
-  DaoDepositSteps,
-  DaoDetails,
-  DaoListItem,
-  DaoMetadata,
-  DaoSortBy,
-  DecodedApplyUninstallationParams,
-  Deposit,
-  DepositParams,
-  GrantPermissionWithConditionDecodedParams,
-  GrantPermissionWithConditionParams,
-  IDaoQueryParams,
-  IGrantPermissionDecodedParams,
-  IGrantPermissionParams,
-  IHasPermissionParams,
-  InstalledPluginListItem,
-  IRevokePermissionDecodedParams,
-  IRevokePermissionParams,
-  ITransferQueryParams,
-  Permissions,
-  PluginRepo,
-  PluginRepoBuildMetadata,
-  PluginRepoReleaseMetadata,
-  PrepareUninstallationParams,
-  PrepareUninstallationSteps,
-  RegisterStandardCallbackParams,
-  SetAllowanceParams,
-  SetAllowanceSteps,
-  TokenType,
-  Transfer,
-  TransferSortBy,
-  TransferType,
-  Withdraw,
-  WithdrawParams,
-} from "./interfaces";
+export * from "./interfaces";
+export * from "./types";
+export * from "./constants";

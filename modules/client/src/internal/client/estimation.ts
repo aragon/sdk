@@ -13,17 +13,16 @@ import {
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
-import { ClientCore, GasFeeEstimation } from "../../client-common";
+import { ClientCore, GasFeeEstimation, TokenType } from "../../client-common";
 import {
   CreateDaoParams,
   DepositParams,
-  IClientEstimation,
   SetAllowanceParams,
-  TokenType,
-} from "../../interfaces";
+} from "../../types";
 import { unwrapDepositParams } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { IClientEstimation } from "../../interfaces";
 
 /**
  * Estimation module the SDK Generic Client

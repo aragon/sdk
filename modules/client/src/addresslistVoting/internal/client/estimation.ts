@@ -1,9 +1,9 @@
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import {
   ClientCore,
-  GasFeeEstimation,
   CreateMajorityVotingProposalParams,
-  IVoteProposalParams,
+  GasFeeEstimation,
+  VoteProposalParams,
 } from "../../../client-common";
 import { IAddresslistVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -70,12 +70,12 @@ export class AddresslistVotingClientEstimation extends ClientCore
   /**
    * Estimates the gas fee of casting a vote on a proposal
    *
-   * @param {IVoteProposalParams} params
+   * @param {VoteProposalParams} params
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
   public async voteProposal(
-    params: IVoteProposalParams,
+    params: VoteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     if (!signer) {

@@ -2,19 +2,19 @@ import {
   DaoMetadata,
   DecodedApplyUninstallationParams,
   GrantPermissionWithConditionParams,
-  IClientDecoding,
-  IGrantPermissionDecodedParams,
-  IRevokePermissionDecodedParams,
+  GrantPermissionDecodedParams,
+  RevokePermissionDecodedParams,
   RegisterStandardCallbackParams,
-  TokenType,
   UpgradeToAndCallParams,
   WithdrawParams,
-} from "../../interfaces";
+} from "../../types";
+
 import {
   ClientCore,
   DecodedApplyInstallationParams,
   getFunctionFragment,
-  IInterfaceParams,
+  InterfaceParams,
+  TokenType
 } from "../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import {
@@ -32,6 +32,7 @@ import { erc20ContractAbi } from "../abi/erc20";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
 import { toUtf8String } from "@ethersproject/strings";
+import { IClientDecoding } from "../../interfaces";
 
 /**
  * Decoding module the SDK Generic Client
@@ -69,10 +70,10 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the permission parameters from an encoded grant action
    *
    * @param {Uint8Array} data
-   * @return {*}  {IGrantPermissionDecodedParams}
+   * @return {*}  {GrantPermissionDecodedParams}
    * @memberof ClientDecoding
    */
-  public grantAction(data: Uint8Array): IGrantPermissionDecodedParams {
+  public grantAction(data: Uint8Array): GrantPermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("grant");
@@ -99,10 +100,10 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the permission parameters from an encoded revoke action
    *
    * @param {Uint8Array} data
-   * @return {*}  {IRevokePermissionDecodedParams}
+   * @return {*}  {RevokePermissionDecodedParams}
    * @memberof ClientDecoding
    */
-  public revokeAction(data: Uint8Array): IRevokePermissionDecodedParams {
+  public revokeAction(data: Uint8Array): RevokePermissionDecodedParams {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("revoke");
@@ -275,10 +276,10 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Returns the decoded function info given the encoded data of an action
    *
    * @param {Uint8Array} data
-   * @return {*}  {(IInterfaceParams | null)}
+   * @return {*}  {(InterfaceParams | null)}
    * @memberof ClientDecoding
    */
-  public findInterface(data: Uint8Array): IInterfaceParams | null {
+  public findInterface(data: Uint8Array): InterfaceParams | null {
     try {
       const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
       return {

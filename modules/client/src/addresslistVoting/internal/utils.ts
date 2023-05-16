@@ -1,4 +1,8 @@
-import { decodeRatio, getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
+import {
+  decodeRatio,
+  getCompactProposalId,
+  hexToBytes,
+} from "@aragon/sdk-common";
 import {
   computeProposalStatus,
   ContractVotingSettings,
@@ -10,14 +14,16 @@ import {
   votingSettingsToContract,
 } from "../../client-common";
 import {
+  AddresslistVotingPluginInstall,
   AddresslistVotingProposal,
   AddresslistVotingProposalListItem,
+} from "../types";
+import {
   ContractAddresslistVotingInitParams,
-  IAddresslistVotingPluginInstall,
   SubgraphAddresslistVotingProposal,
   SubgraphAddresslistVotingProposalListItem,
   SubgraphAddresslistVotingVoterListItem,
-} from "../interfaces";
+} from "./types";
 
 export function toAddresslistVotingProposal(
   proposal: SubgraphAddresslistVotingProposal,
@@ -133,7 +139,7 @@ export function toAddresslistVotingProposalListItem(
 }
 
 export function addresslistVotingInitParamsToContract(
-  params: IAddresslistVotingPluginInstall,
+  params: AddresslistVotingPluginInstall,
 ): ContractAddresslistVotingInitParams {
   return [
     Object.values(

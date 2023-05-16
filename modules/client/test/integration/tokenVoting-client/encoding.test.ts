@@ -4,8 +4,8 @@ declare const describe, it, expect;
 import {
   Context,
   ContextPlugin,
-  IMintTokenParams,
-  ITokenVotingPluginInstall,
+  MintTokenParams,
+  TokenVotingPluginInstall,
   SupportedNetworksArray,
   TokenVotingClient,
   VotingSettings,
@@ -25,7 +25,7 @@ describe("Token Voting Client", () => {
   });
   describe("Encoding module", () => {
     it("Should create a TokenVoting client and generate a install entry", async () => {
-      const initParams: ITokenVotingPluginInstall = {
+      const initParams: TokenVotingPluginInstall = {
         votingSettings: {
           minDuration: 7200,
           minParticipation: 0.5,
@@ -87,7 +87,7 @@ describe("Token Voting Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
-      const params: IMintTokenParams = {
+      const params: MintTokenParams = {
         address: "0xinvalid_address",
         amount: BigInt(10),
       };
@@ -100,7 +100,7 @@ describe("Token Voting Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
-      const params: IMintTokenParams = {
+      const params: MintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
       };
@@ -113,7 +113,7 @@ describe("Token Voting Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const ctxPlugin = ContextPlugin.fromContext(ctx);
       const client = new TokenVotingClient(ctxPlugin);
-      const params: IMintTokenParams = {
+      const params: MintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
       };

@@ -16,10 +16,9 @@ import {
   DaoAction,
   DecodedApplyInstallationParams,
   PermissionOperationType,
+  PermissionIds,
 } from "@aragon/sdk-client";
-import { hexToBytes } from "@aragon/sdk-common";
 import { context } from "../index";
-import { PermissionIds } from "../../dist/interfaces";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);
