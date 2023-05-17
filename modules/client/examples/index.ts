@@ -82,7 +82,7 @@ export const contextParams: ContextParams = {
 };
 
 
-// AFter defining the context parameters, you'll use them to instantiate the Aragon SDK context
+// After defining the context parameters, you'll use them to instantiate the Aragon SDK context
 export const context: Context = new Context(contextParams); // or minimalContextParams
 // Instantiate the Aragon SDK context
 export const minimalContext: Context = new Context(minimalContextParams);
