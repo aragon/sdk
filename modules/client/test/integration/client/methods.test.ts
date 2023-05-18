@@ -51,9 +51,9 @@ import { Server } from "ganache";
 import {
   SubgraphBalance,
   SubgraphDao,
+  SubgraphPluginInstallation,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
-  SubgraphPluginInstallation,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "../../../src/internal/types";
@@ -492,22 +492,22 @@ describe("Client", () => {
           id: TEST_DAO_ADDRESS,
           subdomain: "test",
           metadata: `ipfs://${IPFS_CID}`,
-          plugins: [{
-            id: ADDRESS_ONE,
-            installations: [
-              {
-                appliedVersion: {
-                  pluginRepo: {
-                    subdomain: "multisig",
-                  },
-                  build: 1,
-                  release: {
-                    release: 1,
-                  },
+          plugins: [
+            {
+              appliedVersion: {
+                build: 1,
+                release: {
+                  release: 1,
                 },
               },
-            ],
-          }],
+              appliedPreparation: {
+                pluginAddress: ADDRESS_ONE,
+              },
+              appliedPluginRepo: {
+                subdomain: "multisig",
+              },
+            },
+          ],
         };
         mockedClient.request.mockResolvedValueOnce({
           dao: subgraphDao,
@@ -584,20 +584,22 @@ describe("Client", () => {
           id: TEST_DAO_ADDRESS,
           subdomain: "test",
           metadata: `ipfs://${IPFS_CID}`,
-          plugins: [{
-            id: ADDRESS_ONE,
-            installations: [{
+          plugins: [
+            {
               appliedVersion: {
-                pluginRepo: {
-                  subdomain: "multisig",
-                },
                 build: 1,
                 release: {
                   release: 1,
                 },
               },
-            }],
-          }],
+              appliedPreparation: {
+                pluginAddress: ADDRESS_ONE,
+              },
+              appliedPluginRepo: {
+                subdomain: "multisig",
+              },
+            },
+          ],
         };
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),

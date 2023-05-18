@@ -2,7 +2,6 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { TransferType } from "../types";
 
 export type SubgraphPluginListItem = {
-  id: string;
   appliedPreparation: {
     pluginAddress: string;
   };
