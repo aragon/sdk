@@ -76,18 +76,15 @@ export function toDaoDetails(
     plugins: dao.plugins.map(
       (
         plugin: SubgraphPluginListItem,
-      ): InstalledPluginListItem[] => {
-        return plugin.installations.map((installation) => {
-          return {
-            instanceAddress: plugin.id,
-            id:
-              `${installation.appliedVersion.pluginRepo.subdomain}.plugin.dao.eth`,
-            release: installation.appliedVersion.release.release,
-            build: installation.appliedVersion.build,
-          };
-        });
-      },
-    ).flat(),
+      ): InstalledPluginListItem => (
+        {
+          id: `${plugin.appliedPluginRepo.subdomain}.plugin.dao.eth`,
+          release: plugin.appliedVersion.release.release,
+          build: plugin.appliedVersion.build,
+          instanceAddress: plugin.appliedPreparation.pluginAddress,
+        }
+      ),
+    ),
   };
 }
 
@@ -106,18 +103,15 @@ export function toDaoListItem(
     plugins: dao.plugins.map(
       (
         plugin: SubgraphPluginListItem,
-      ): InstalledPluginListItem[] => {
-        return plugin.installations.map((installation) => {
-          return {
-            instanceAddress: plugin.id,
-            id:
-              `${installation.appliedVersion.pluginRepo.subdomain}.plugin.dao.eth`,
-            release: installation.appliedVersion.release.release,
-            build: installation.appliedVersion.build,
-          };
-        });
-      },
-    ).flat(),
+      ): InstalledPluginListItem => (
+        {
+          id: `${plugin.appliedPluginRepo.subdomain}.plugin.dao.eth`,
+          release: plugin.appliedVersion.release.release,
+          build: plugin.appliedVersion.build,
+          instanceAddress: plugin.appliedPreparation.pluginAddress,
+        }
+      ),
+    ),
   };
 }
 

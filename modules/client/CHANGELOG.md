@@ -13,6 +13,9 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## Fixes
+- Add support for new subgraph plugin schema
+## [1.8.0]
 ### Changed
 - Renamed:
   - `IAddresslistVotingPluginInstall` => `AddresslistVotingPluginInstall`

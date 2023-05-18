@@ -3,17 +3,18 @@ import { TransferType } from "../types";
 
 export type SubgraphPluginListItem = {
   id: string;
-  installations: {
-    appliedVersion: {
-      pluginRepo: {
-        subdomain: string
-      }
-      build: number;
-      release: {
-        release: number;
-      };
+  appliedPreparation: {
+    pluginAddress: string;
+  };
+  appliedPluginRepo: {
+    subdomain: string;
+  };
+  appliedVersion: {
+    build: number;
+    release: {
+      release: number;
     };
-  }[];
+  };
 };
 
 type SubgraphDaoBase = {
@@ -108,7 +109,6 @@ export type SubgraphPluginRepo = SubgraphPluginRepoListItem & {
   releases: SubgraphPluginRepoRelease[];
 };
 
-
 export type SubgraphPluginVersion = {
   release: {
     release: number;
@@ -128,4 +128,3 @@ export type SubgraphPluginInstallation = {
   appliedVersion: SubgraphPluginVersion;
   appliedPreparation: SubgraphPluginPreparation;
 };
-

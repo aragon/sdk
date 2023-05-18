@@ -8,16 +8,16 @@ export const QueryDao = gql`
       metadata
       createdAt
       plugins{
-        id
-        installations{
-          appliedVersion{
-            build
-            pluginRepo {
-              subdomain
-            }
-            release{
-              release
-            }
+        appliedPreparation {
+          pluginAddress
+        }
+        appliedPluginRepo {
+          subdomain
+        }
+        appliedVersion{
+          build
+          release {
+            release
           }
         }
       }
@@ -31,16 +31,16 @@ export const QueryDaos = gql`
       subdomain
       metadata
       plugins{
-        id
-        installations{
-          appliedVersion{
-            build
-            pluginRepo {
-              subdomain
-            }
-            release{
-              release
-            }
+        appliedPreparation {
+          pluginAddress
+        }
+        appliedPluginRepo {
+          subdomain
+        }
+        appliedVersion{
+          build
+          release {
+            release
           }
         }
       }
