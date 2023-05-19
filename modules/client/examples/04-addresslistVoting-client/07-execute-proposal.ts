@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Execution
+title: Execution Proposal
 ---
 
 ## Execute a TokenVoting Proposal

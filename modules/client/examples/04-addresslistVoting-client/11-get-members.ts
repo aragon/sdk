@@ -17,10 +17,10 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 const addresslistVotingClient: AddresslistVotingClient =
   new AddresslistVotingClient(contextPlugin);
 
-const pluginAddress = "0x12345382947301297439127433492834";
+const daoPluginAddress = "0x12345382947301297439127433492834"; // The address of the plugin that DAO has installed. You can find this by calling `getDao(daoAddress)` and getting the DAO details .
 
 const members: string[] = await addresslistVotingClient.methods.getMembers(
-  pluginAddress,
+  daoPluginAddress,
 );
 console.log({ members });
 

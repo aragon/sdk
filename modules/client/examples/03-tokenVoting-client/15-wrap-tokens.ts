@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Token Wraping
+title: Wrap Tokens
 ---
 
 ## Wrap ERC-20 tokens

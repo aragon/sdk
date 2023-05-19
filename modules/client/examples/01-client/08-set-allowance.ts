@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: ERC-20 Allowance
+title: Update ERC-20 Allowance
 ---
 
 ## Updates an ERC-20 Tokens' Allowance

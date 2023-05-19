@@ -16,10 +16,10 @@ const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig plugin client.
 const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
 
-const daoAddressorEns: string = "0x1234548357023847502348"; // or my-dao.dao.eth
+const daoPluginAddress: string = "0x1234548357023847502348"; // The address of the plugin that DAO has installed. You can find this through calling `getDao(daoAddress)` and getting the DAO details .
 
 const multisigMembers: string[] = await multisigClient.methods.getMembers(
-  daoAddressorEns,
+  daoPluginAddress,
 );
 console.log(multisigMembers);
 

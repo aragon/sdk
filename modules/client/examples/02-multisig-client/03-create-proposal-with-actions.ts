@@ -1,11 +1,12 @@
 /* MARKDOWN
 ---
-title: Proposal Creation
+title: Create a Proposal with Actions
 ---
 
 ## Create a Multisig Proposal
 
-Creates a proposal whose governance mechanism is the Multisig plugin and its defined configuration.
+Creates a proposal with actions whose governance mechanism is the Multisig plugin and its defined configuration.
+The actions are what will get executed once the proposal passes.
 */
 
 import {
