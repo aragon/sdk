@@ -13,6 +13,9 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## Fixes
+- List all the plugins installed on a DAO by using an updated subgraph query
+## [1.8.0]
 ### Changed
 - Renamed:
   - `IAddresslistVotingPluginInstall` => `AddresslistVotingPluginInstall`
