@@ -50,7 +50,7 @@ const minimalContextParams: ContextParams = {
 
 // OPTION B: For a more advanced option, you can use the following ContextParams. This will allow you to use your own custom values if desired.
 export const contextParams: ContextParams = {
-  // Choose the network you want to use. You can use "goerli" (Ethereum) or "maticmum" (Polygon) for testing, or "mainnet" (Ethereum) and "polygon" (Polygon) for mainnet.
+  // Choose the network you want to use. You can use "goerli" (Ethereum) or "maticmum" (Mumbai) for testing, or "mainnet" (Ethereum) and "polygon" (Polygon) for mainnet.
   network: "goerli",
   // This is the account that will be signing transactions for your app. You can use also use a specific account where you have funds, through passing it `new Wallet("your-wallets-private-key")` or pass it in dynamically when someone connects their wallet to your dApp.
   signer: Wallet.createRandom(),
