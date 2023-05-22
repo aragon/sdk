@@ -287,6 +287,18 @@ export type SetAllowanceStepValue =
   | { key: SetAllowanceSteps.SETTING_ALLOWANCE; txHash: string }
   | { key: SetAllowanceSteps.ALLOWANCE_SET; allowance: bigint };
 
+/* Installation  */
+export type PrepareInstallationParams = {
+  daoAddressOrEns: string;
+  pluginRepo: string;
+  version?: {
+    build: number;
+    release: number;
+  };
+  installationParams?: any[];
+  installationAbi?: string[];
+};
+
 /* Uninstallation */
 export type PrepareUninstallationParams = {
   daoAddressOrEns: string;

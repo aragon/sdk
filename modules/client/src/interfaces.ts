@@ -9,6 +9,7 @@ import { IClientCore } from "./client-common/interfaces";
 import {
   ApplyInstallationParams,
   DecodedApplyInstallationParams,
+  PrepareInstallationStepValue,
 } from "./client-common";
 import {
   ApplyUninstallationParams,
@@ -30,6 +31,7 @@ import {
   PluginQueryParams,
   PluginRepo,
   PluginRepoListItem,
+  PrepareInstallationParams,
   PrepareUninstallationParams,
   PrepareUninstallationStepValue,
   RegisterStandardCallbackParams,
@@ -71,6 +73,10 @@ export interface IClientMethods extends IClientCore {
   getPlugin: (pluginAddress: string) => Promise<PluginRepo>;
   /** Retrieves the list of plugins available on the PluginRegistry */
   getPlugins: (params?: PluginQueryParams) => Promise<PluginRepoListItem[]>;
+  /** Prepare installation of a plugin */
+  prepareInstallation: (
+    params: PrepareInstallationParams,
+  ) => AsyncGenerator<PrepareInstallationStepValue>;
   /** Prepare uninstallation of a plugin */
   prepareUninstallation: (
     params: PrepareUninstallationParams,

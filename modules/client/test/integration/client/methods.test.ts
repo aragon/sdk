@@ -35,6 +35,7 @@ import {
   Permissions,
   PluginQueryParams,
   PluginSortBy,
+  PrepareInstallationStep,
   PrepareUninstallationSteps,
   SetAllowanceParams,
   SetAllowanceSteps,
@@ -393,10 +394,10 @@ describe("Client", () => {
         expect(hasPermission).toBe(false);
       });
 
-      it("Should prepare the uninstallation of a plugin", async () => {
+      it("Should prepare the installation of a plugin", async () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
-        const { dao, plugin } = await buildMultisigDAO(
+        const { dao } = await buildMultisigDAO(
           deployment.multisigRepo.address,
         );
         const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
@@ -406,43 +407,23 @@ describe("Client", () => {
             chainId: 31337,
           }),
         );
-        const mockedClient = mockedGraphqlRequest.getMockedInstance(
-          client.graphql.getClient(),
-        );
-        const installation: SubgraphPluginInstallation = {
-          appliedPreparation: {
-            helpers: [],
-            pluginRepo: {
-              id: deployment.multisigRepo.address,
-            },
-          },
-          appliedVersion: {
-            metadata: `ipfs://${IPFS_CID}`,
-            release: {
-              release: 1,
-            },
-            build: 1,
-          },
-        };
-        mockedClient.request.mockResolvedValueOnce({
-          iplugin: { installations: [installation] },
-        });
-        const steps = client.methods.prepareUninstallation(
+        const steps = client.methods.prepareInstallation(
           {
             daoAddressOrEns: dao,
-            pluginAddress: plugin,
+            pluginRepo: deployment.multisigRepo.address,
+            installationAbi: [ "address[]", "tuple(bool, uint16)"],
+            installationParams: [["0x1234567890123456789012345678901234567890"], [true, 1]],
           },
         );
 
         for await (const step of steps) {
           switch (step.key) {
-            case PrepareUninstallationSteps.PREPARING:
+            case PrepareInstallationStep.PREPARING:
               expect(typeof step.txHash).toBe("string");
               expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
               break;
-            case PrepareUninstallationSteps.DONE:
+            case PrepareInstallationStep.DONE:
               expect(typeof step.pluginAddress).toBe("string");
-              expect(step.pluginAddress).toBe(plugin);
               expect(step.pluginAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
               expect(typeof step.pluginRepo).toBe("string");
               expect(step.pluginRepo).toBe(deployment.multisigRepo.address);
@@ -466,6 +447,79 @@ describe("Client", () => {
           }
         }
       });
+    });
+    it("Should prepare the uninstallation of a plugin", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const { dao, plugin } = await buildMultisigDAO(
+        deployment.multisigRepo.address,
+      );
+      const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
+      networkSpy.mockReturnValueOnce(
+        Promise.resolve({
+          name: "goerli",
+          chainId: 31337,
+        }),
+      );
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      const installation: SubgraphPluginInstallation = {
+        appliedPreparation: {
+          helpers: [],
+          pluginRepo: {
+            id: deployment.multisigRepo.address,
+          },
+        },
+        appliedVersion: {
+          metadata: `ipfs://${IPFS_CID}`,
+          release: {
+            release: 1,
+          },
+          build: 1,
+        },
+      };
+      mockedClient.request.mockResolvedValueOnce({
+        iplugin: { installations: [installation] },
+      });
+      const steps = client.methods.prepareUninstallation(
+        {
+          daoAddressOrEns: dao,
+          pluginAddress: plugin,
+        },
+      );
+
+      for await (const step of steps) {
+        switch (step.key) {
+          case PrepareUninstallationSteps.PREPARING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case PrepareUninstallationSteps.DONE:
+            expect(typeof step.pluginAddress).toBe("string");
+            expect(step.pluginAddress).toBe(plugin);
+            expect(step.pluginAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(typeof step.pluginRepo).toBe("string");
+            expect(step.pluginRepo).toBe(deployment.multisigRepo.address);
+            expect(step.pluginRepo).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(typeof step.versionTag.build).toBe("number");
+            expect(step.versionTag.build).toBe(1);
+            expect(typeof step.versionTag.release).toBe("number");
+            expect(step.versionTag.release).toBe(1);
+            for (const permission of step.permissions) {
+              if (permission.condition) {
+                expect(typeof permission.condition).toBe("string");
+                expect(permission.condition).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              }
+              expect(typeof permission.operation).toBe("number");
+              expect(typeof permission.where).toBe("string");
+              expect(permission.where).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof permission.who).toBe("string");
+              expect(permission.who).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            }
+            break;
+        }
+      }
     });
 
     describe("Data retrieval", () => {
