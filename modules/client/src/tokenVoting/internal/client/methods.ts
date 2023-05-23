@@ -12,7 +12,6 @@ import {
   IpfsPinError,
   isProposalId,
   NoProviderError,
-  NoSignerError,
   PluginInstallationPreparationError,
   ProposalCreationError,
   resolveIpfsCid,
@@ -114,11 +113,6 @@ export class TokenVotingClientMethods extends ClientCore
     params: CreateMajorityVotingProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
@@ -204,11 +198,6 @@ export class TokenVotingClientMethods extends ClientCore
     params: VoteProposalParams,
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
@@ -243,11 +232,6 @@ export class TokenVotingClientMethods extends ClientCore
     proposalId: string,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
@@ -278,12 +262,7 @@ export class TokenVotingClientMethods extends ClientCore
     params: TokenVotingPluginPrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
-    const network = await signer.provider.getNetwork();
+    const network = await this.web3.getProvider().getNetwork();
     const networkName = network.name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
@@ -362,11 +341,7 @@ export class TokenVotingClientMethods extends ClientCore
     params: WrapTokensParams,
   ): AsyncGenerator<WrapTokensStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    } else if (!isAddress(params.wrappedTokenAddress)) {
+    if (!isAddress(params.wrappedTokenAddress)) {
       throw new InvalidAddressError();
     }
     const wrappedErc20Contract = GovernanceWrappedERC20__factory.connect(
@@ -394,11 +369,7 @@ export class TokenVotingClientMethods extends ClientCore
     params: UnwrapTokensParams,
   ): AsyncGenerator<UnwrapTokensStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    } else if (!isAddress(params.wrappedTokenAddress)) {
+    if (!isAddress(params.wrappedTokenAddress)) {
       throw new InvalidAddressError();
     }
     const wrappedErc20Contract = GovernanceWrappedERC20__factory.connect(
@@ -489,9 +460,8 @@ export class TokenVotingClientMethods extends ClientCore
    */
   public async canVote(params: CanVoteParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer.provider) {
-      throw new NoProviderError();
-    } else if (!isAddress(params.voterAddressOrEns)) {
+
+    if (!isAddress(params.voterAddressOrEns)) {
       throw new InvalidAddressError();
     }
 
@@ -519,11 +489,6 @@ export class TokenVotingClientMethods extends ClientCore
     proposalId: string,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 

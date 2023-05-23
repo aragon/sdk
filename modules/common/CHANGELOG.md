@@ -16,6 +16,9 @@ TEMPLATE:
 - Fix 1, 2, 3
 -->
 ## UPCOMING
+### Added
+- Cause parameter in errors
+- Add new common error classes `InvalidEnsError` and  `DepositNativeTokenError`
 ## 1.3.0
 - Add new common error classes `InstallationNotFoundError` `PluginUninstallationPreparationError`
 ## 1.2.0

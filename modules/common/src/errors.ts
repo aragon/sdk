@@ -204,3 +204,15 @@ export class InvalidPrepareUninstallationAbiError extends SdkError {
     super("Invalid prepare uninstallation ABI", cause);
   }
 }
+
+export class InvalidEnsError extends SdkError {
+  constructor(cause?: any) {
+    super("Invalid subdomain format: use a-z, 0-9 and -", cause);
+  }
+}
+
+export class DepositNativeTokenError extends SdkError {
+  constructor(cause?: any) {
+    super("Please, use the token's transfer function directly", cause);
+  }
+}

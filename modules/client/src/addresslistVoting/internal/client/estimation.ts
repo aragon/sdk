@@ -7,12 +7,7 @@ import {
 } from "../../../client-common";
 import { IAddresslistVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import {
-  boolArrayToBitmap,
-  decodeProposalId,
-  NoProviderError,
-  NoSignerError,
-} from "@aragon/sdk-common";
+import { boolArrayToBitmap, decodeProposalId } from "@aragon/sdk-common";
 
 /**
  * Estimation module the SDK Address List Client
@@ -30,11 +25,6 @@ export class AddresslistVotingClientEstimation extends ClientCore
     params: CreateMajorityVotingProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -78,11 +68,6 @@ export class AddresslistVotingClientEstimation extends ClientCore
     params: VoteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
@@ -112,11 +97,6 @@ export class AddresslistVotingClientEstimation extends ClientCore
     proposalId: string,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(
       proposalId,

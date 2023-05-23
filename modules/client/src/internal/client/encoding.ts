@@ -1,9 +1,9 @@
 import {
   ApplyUninstallationParams,
-  GrantPermissionWithConditionParams,
   GrantPermissionParams,
-  RevokePermissionParams,
+  GrantPermissionWithConditionParams,
   RegisterStandardCallbackParams,
+  RevokePermissionParams,
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../types";
@@ -33,7 +33,6 @@ import {
   hexToBytes,
   InvalidAddressError,
   NoProviderError,
-  NoSignerError,
   UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -143,14 +142,11 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: GrantPermissionParams,
   ): DaoAction {
-    const signer = this.web3.getSigner();
     const { where, who } = params;
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (
+    if (
       !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
     ) {
-      throw new Error("Invalid address");
+      throw new InvalidAddressError();
     }
     const daoInterface = DAO__factory.createInterface();
     const args = permissionParamsToContract(
@@ -180,11 +176,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: GrantPermissionWithConditionParams,
   ): DaoAction {
-    const signer = this.web3.getSigner();
     const { where, who } = params;
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (
+    if (
       !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
     ) {
       throw new InvalidAddressError();
@@ -221,14 +214,11 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: RevokePermissionParams,
   ): DaoAction {
-    const signer = this.web3.getSigner();
     const { where, who } = params;
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (
+    if (
       !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
     ) {
-      throw new Error("Invalid address");
+      throw new InvalidAddressError();
     }
     const daoInterface = DAO__factory.createInterface();
     const args = permissionParamsToContract(

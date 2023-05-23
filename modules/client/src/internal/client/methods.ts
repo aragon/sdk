@@ -12,10 +12,10 @@ import {
   InstallationNotFoundError,
   InvalidAddressOrEnsError,
   InvalidCidError,
+  InvalidEnsError,
   IpfsPinError,
   MissingExecPermissionError,
   NoProviderError,
-  NoSignerError,
   PluginUninstallationPreparationError,
   resolveIpfsCid,
   UpdateAllowanceError,
@@ -129,14 +129,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     params: CreateDaoParams,
   ): AsyncGenerator<DaoCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    } else if (
+    if (
       params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
     ) {
-      throw new Error("Invalid subdomain format: use a-z, 0-9 and -");
+      throw new InvalidEnsError();
     }
 
     const daoFactoryInstance = DAOFactory__factory.connect(
@@ -269,11 +265,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     params: DepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new Error("A signer is needed");
-    } else if (!signer.provider) {
-      throw new Error("A web3 provider is needed");
-    }
 
     if (params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20) {
       throw new Error("Please, use the token's transfer function directly");
@@ -358,11 +349,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     params: SetAllowanceParams,
   ): AsyncGenerator<SetAllowanceStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
     // TODO
     // add params check with yup
     const tokenInstance = new Contract(
@@ -496,11 +482,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    */
   public async hasPermission(params: HasPermissionParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
     // connect to the managing dao
     const daoInstance = DAO__factory.connect(params.daoAddressOrEns, signer);
     return daoInstance.hasPermission(

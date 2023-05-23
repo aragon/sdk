@@ -1,10 +1,5 @@
 import { Multisig__factory } from "@aragon/osx-ethers";
-import {
-  boolArrayToBitmap,
-  decodeProposalId,
-  NoProviderError,
-  NoSignerError,
-} from "@aragon/sdk-common";
+import { boolArrayToBitmap, decodeProposalId } from "@aragon/sdk-common";
 import { ClientCore, GasFeeEstimation } from "../../../client-common";
 import { IMultisigClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -28,11 +23,6 @@ export class MultisigClientEstimation extends ClientCore
     params: CreateMultisigProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
@@ -75,11 +65,6 @@ export class MultisigClientEstimation extends ClientCore
     params: ApproveMultisigProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
     const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
     );
@@ -106,11 +91,6 @@ export class MultisigClientEstimation extends ClientCore
     proposalId: string,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(
       proposalId,
