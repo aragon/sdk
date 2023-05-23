@@ -254,8 +254,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);
       return `ipfs://${cid}`;
-    } catch {
-      throw new IpfsPinError();
+    } catch (e) {
+      throw new IpfsPinError(e);
     }
   }
   /**
@@ -428,7 +428,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       throw new InstallationNotFoundError();
     }
     // encode uninstallation params
-    const { uninstallationParams = [], uninstallationAbi = []} = params;
+    const { uninstallationParams = [], uninstallationAbi = [] } = params;
     const data = defaultAbiCoder.encode(
       uninstallationAbi,
       uninstallationParams,
@@ -531,8 +531,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           throw new InvalidAddressOrEnsError();
         }
         address = resolvedAddress.toLowerCase();
-      } catch {
-        throw new InvalidAddressOrEnsError();
+      } catch (e) {
+        throw new InvalidAddressOrEnsError(e);
       }
     }
     const query = QueryDao;
@@ -710,8 +710,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
             throw new InvalidAddressOrEnsError();
           }
           address = resolvedAddress;
-        } catch {
-          throw new InvalidAddressOrEnsError();
+        } catch (e) {
+          throw new InvalidAddressOrEnsError(e);
         }
       }
       where = { dao: address.toLowerCase() };
