@@ -117,6 +117,11 @@ import {
  * Methods module the SDK Generic Client
  */
 export class ClientMethods extends ClientCore implements IClientMethods {
+  public async *prepareInstallation(
+    params: PrepareInstallationParams,
+  ): AsyncGenerator<PrepareInstallationStepValue> {
+    yield* prepareGenericInstallation(this.web3, params);
+  }
   /**
    * Creates a DAO with the given settings and plugins
    *

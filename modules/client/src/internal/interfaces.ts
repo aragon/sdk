@@ -71,6 +71,10 @@ export interface IClientMethods {
   prepareUninstallation: (
     params: PrepareUninstallationParams,
   ) => AsyncGenerator<PrepareUninstallationStepValue>;
+  /** Prepare uninstallation of a plugin */
+  prepareInstallation: (
+    params: PrepareInstallationParams,
+  ) => AsyncGenerator<PrepareInstallationStepValue>;
 }
 
 export interface IClientEncoding {

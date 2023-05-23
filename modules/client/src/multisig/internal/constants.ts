@@ -13,3 +13,8 @@ export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
     "updateMultisigSettings",
   ).format("minimal"),
 ];
+
+export const INSTALLATION_ABI: string[] = [
+  "address[]",
+  "tuple(bool, uint16)",
+];

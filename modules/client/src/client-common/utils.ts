@@ -1,4 +1,10 @@
-import { IDAO } from "@aragon/osx-ethers";
+import {
+  IDAO,
+  PluginRepo__factory,
+  PluginSetupProcessor,
+  PluginSetupProcessor__factory,
+} from "@aragon/osx-ethers";
+import { ContractReceipt } from "@ethersproject/contracts";
 import { VoteValues, VotingMode } from "./types/plugin";
 import {
   CreateMajorityVotingProposalParams,
@@ -12,6 +18,31 @@ import {
   getFunctionFragment,
   ProposalStatus,
 } from "@aragon/sdk-client-common";
+import { FunctionFragment, Interface } from "@ethersproject/abi";
+import { id } from "@ethersproject/hash";
+import { Log } from "@ethersproject/providers";
+import { DaoAction } from "./types";
+import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
+import {
+  InvalidAddressError,
+  InvalidVotingModeError,
+  PluginInstallationPreparationError,
+  bytesToHex
+} from "@aragon/sdk-common";
+import {
+  ApplyInstallationParams,
+  DecodedApplyInstallationParams,
+  PrepareInstallationParams,
+  PrepareInstallationStep,
+  PrepareInstallationStepValue,
+  SupportedNetwork,
+} from "./types";
+import { defaultAbiCoder, Result } from "@ethersproject/abi";
+import { keccak256 } from "@ethersproject/keccak256";
+import { AddressZero } from "@ethersproject/constants";
+import { IClientWeb3Core } from "./interfaces";
+import { LIVE_CONTRACTS } from "./constants";
+import  {isAddress} from "@ethersproject/address";
 
 export function unwrapProposalParams(
   params: CreateMajorityVotingProposalParams,
@@ -94,6 +125,7 @@ export function votingModeToContracts(votingMode: VotingMode): number {
       throw new InvalidVotingModeError();
   }
 }
+
 export function votingModeFromContracts(votingMode: number): VotingMode {
   switch (votingMode) {
     case 0:
@@ -149,4 +181,94 @@ export function isFailingProposal(actions: DaoAction[] = []): boolean {
     }
   }
   return false;
+}
+
+
+export function applyInstallatonParamsFromContract(
+  result: Result,
+): DecodedApplyInstallationParams {
+  const params = result[1];
+  return {
+    helpersHash: params.helpersHash,
+    permissions: params.permissions,
+    versionTag: params.pluginSetupRef.versionTag,
+    pluginAddress: params.plugin,
+    pluginRepo: params.pluginSetupRef.pluginSetupRepo,
+  };
+}
+
+export async function* prepareGenericInstallation(
+  web3: IClientWeb3Core,
+  params: PrepareInstallationParams,
+): AsyncGenerator<PrepareInstallationStepValue> {
+  // todo web 3 as params
+  const signer = web3.getConnectedSigner();
+  const provider = web3.getProvider();
+  if (!isAddress(params.pluginRepo)) {
+    throw new InvalidAddressError();
+  }
+  const networkName = (await provider.getNetwork()).name as SupportedNetwork;
+  let version = params.version;
+  // if version is not specified install latest version
+  if (!version) {
+    const pluginRepo = PluginRepo__factory.connect(
+      params.pluginRepo,
+      signer,
+    );
+    const currentRelease = await pluginRepo.latestRelease();
+    const latestVersion = await pluginRepo["getLatestVersion(uint8)"](
+      currentRelease,
+    );
+    version = latestVersion.tag;
+  }
+  // encode installation params
+  const { installationParams = [], installationAbi = [] } = params;
+  const data = defaultAbiCoder.encode(
+    installationAbi,
+    installationParams,
+  );
+  // connect to psp contract
+  const pspContract = PluginSetupProcessor__factory.connect(
+    LIVE_CONTRACTS[networkName].pluginSetupProcessor,
+    signer,
+  );
+  const tx = await pspContract.prepareInstallation(params.daoAddressOrEns, {
+    pluginSetupRef: {
+      pluginSetupRepo: params.pluginRepo,
+      versionTag: version,
+    },
+    data,
+  });
+
+  yield {
+    key: PrepareInstallationStep.PREPARING,
+    txHash: tx.hash,
+  };
+
+  const receipt = await tx.wait();
+  const pspContractInterface = PluginSetupProcessor__factory
+    .createInterface();
+  const log = findLog(
+    receipt,
+    pspContractInterface,
+    "InstallationPrepared",
+  );
+  if (!log) {
+    throw new PluginInstallationPreparationError();
+  }
+  const parsedLog = pspContractInterface.parseLog(log);
+  const pluginAddress = parsedLog.args["plugin"];
+  const preparedSetupData = parsedLog.args["preparedSetupData"];
+  if (!(pluginAddress || preparedSetupData)) {
+    throw new PluginInstallationPreparationError();
+  }
+
+  yield {
+    key: PrepareInstallationStep.DONE,
+    pluginAddress,
+    pluginRepo: params.pluginRepo,
+    versionTag: version,
+    permissions: preparedSetupData.permissions,
+    helpers: preparedSetupData.helpers,
+  };
 }

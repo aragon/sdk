@@ -14,3 +14,8 @@ export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
     "removeAddresses",
   ).format("minimal"),
 ];
+
+export const INSTALLATION_ABI: string[] = [
+  "tuple(uint8, uint64, uint64, uint64, uint256)",
+  "address[]",
+];

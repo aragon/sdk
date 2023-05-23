@@ -49,11 +49,7 @@ export class MultisigClientEncoding extends ClientCore
       throw new UnsupportedNetworkError(networkName);
     }
     const hexBytes = defaultAbiCoder.encode(
-      // members, [onlyListed, minApprovals]
-      [
-        "address[]",
-        "tuple(bool, uint16)",
-      ],
+      INSTALLATION_ABI,
       [
         params.members,
         [

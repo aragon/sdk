@@ -31,6 +31,12 @@ import {
  * Estimation module the SDK Generic Client
  */
 export class ClientEstimation extends ClientCore implements IClientEstimation {
+  public async prepareInstallation(
+    _params: PrepareInstallationParams,
+  ): Promise<GasFeeEstimation> {
+    return {average: BigInt(0), max: BigInt(0)}
+    // return this.estimation.prepareInstallation(params);
+  }
   /**
    * Estimates the gas fee of creating a DAO
    *

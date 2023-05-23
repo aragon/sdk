@@ -22,6 +22,7 @@ import {
   SupportedNetwork,
   SupportedNetworksArray,
 } from "@aragon/sdk-client-common";
+import { INSTALLATION_ABI } from "../constants";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -54,10 +55,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     } = votingSettingsToContract(params.votingSettings);
 
     const hexBytes = defaultAbiCoder.encode(
-      [
-        "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
-        "address[] members",
-      ],
+      INSTALLATION_ABI,
       [
         [
           votingMode,
