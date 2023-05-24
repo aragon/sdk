@@ -1,4 +1,9 @@
-import { activeContractsList } from "@aragon/osx-ethers";
+import {
+  activeContractsList,
+  AddresslistVoting__factory,
+  MajorityVotingBase__factory,
+  Multisig__factory,
+} from "@aragon/osx-ethers";
 import { NetworkDeployment, SupportedNetwork } from "./types/common";
 import { ProposalMetadata } from "./types/plugin";
 
@@ -138,3 +143,24 @@ export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
     ensRegistry: activeContractsList.polygon.ENSRegistry,
   },
 };
+
+export const FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES = [
+  Multisig__factory.createInterface().getFunction("addAddresses")
+    .format("minimal"),
+  Multisig__factory.createInterface().getFunction(
+    "removeAddresses",
+  ).format("minimal"),
+  Multisig__factory.createInterface().getFunction(
+    "updateMultisigSettings",
+  ).format("minimal"),
+  MajorityVotingBase__factory.createInterface().getFunction(
+    "updateVotingSettings",
+  )
+    .format("minimal"),
+  AddresslistVoting__factory.createInterface().getFunction("addAddresses")
+    .format("minimal"),
+  AddresslistVoting__factory.createInterface().getFunction(
+    "removeAddresses",
+  ).format("minimal"),
+];
+

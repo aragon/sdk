@@ -10,7 +10,12 @@ import {
 import { Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import { Log } from "@ethersproject/providers";
-import { InvalidVotingModeError } from "@aragon/sdk-common";
+import {
+  InvalidVotingModeError,
+} from "@aragon/sdk-common";
+import { DaoAction } from "./types";
+import { getFunctionFragment } from "./encoding";
+import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./constants";
 
 export function unwrapProposalParams(
   params: CreateMajorityVotingProposalParams,
@@ -120,4 +125,51 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
     default:
       throw new InvalidVotingModeError();
   }
+}
+
+export function isFailingProposal(actions: DaoAction[]): boolean {
+  const functionNames: string[] = [];
+  // store the function names of the actions
+  for (const action of actions) {
+    try {
+      const fragment = getFunctionFragment(
+        action.data,
+        FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES,
+      );
+      console.log(fragment);
+      functionNames.push(
+        fragment.name,
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  for (const [i, functionName] of functionNames.entries()) {
+    // if I add addresses, we must update the settings after
+    if (functionName === "addAddresses") {
+      // if there is not an updateVotingSettings after addAddresses then the proposal will fail
+      if (
+        functionNames.indexOf("updateVotingSettings", i) === -1 &&
+        functionNames.indexOf("updateMultisigSettings", i) === -1
+      ) {
+        return true;
+      }
+      // if I remove addresses, we must update the settings befor
+    } else if (functionName === "removeAddresses") {
+      // if there is not an updateVotingSettings before removeAddresses then the proposal will fail
+      const updateVotingSettingsIndex = functionNames.indexOf(
+        "updateVotingSettings",
+      ); // if there is not an updateVotingSettings before removeAddresses then the proposal will fail
+      const updateMultisigSettingsIndex = functionNames.indexOf(
+        "updateMultisigSettings",
+      );
+      if (
+        (updateVotingSettingsIndex === -1 || updateVotingSettingsIndex > i) &&
+        (updateMultisigSettingsIndex === -1 || updateMultisigSettingsIndex > i)
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
 }

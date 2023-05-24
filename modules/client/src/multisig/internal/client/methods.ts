@@ -49,6 +49,7 @@ import {
   SupportedNetwork,
   SupportedNetworksArray,
   VersionTag,
+  isFailingProposal,
 } from "../../../client-common";
 import {
   EMPTY_PROPOSAL_METADATA_LINK,
@@ -71,6 +72,7 @@ import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { MultisigClientEncoding } from "./encoding";
 import { IMultisigClientMethods } from "../../interfaces";
+import { InvalidActionsOrderError } from "@aragon/sdk-common";
 
 /**
  * Methods module the SDK Address List Client
@@ -88,6 +90,10 @@ export class MultisigClientMethods extends ClientCore
     params: CreateMultisigProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
+
+    if (isFailingProposal(params.actions || [])) {
+      throw new InvalidActionsOrderError();
+    }
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,

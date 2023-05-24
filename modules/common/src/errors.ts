@@ -216,3 +216,8 @@ export class DepositNativeTokenError extends SdkError {
     super("Please, use the token's transfer function directly", cause);
   }
 }
+export class InvalidActionsOrderError extends SdkError {
+  constructor(cause?: Error) {
+    super("invalid actions, the types or order of the actions may cause the execution to fail", cause);
+  }
+}
