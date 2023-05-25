@@ -754,6 +754,7 @@ describe("Client Address List", () => {
       expect(proposal.executionBlockNumber).toBe(
         parseInt(subgraphProposal.executionBlockNumber),
       );
+      expect(typeof proposal.potentiallyExecutable).toBe('boolean');
 
       // check function call
       expect(mockedClient.request).lastCalledWith(

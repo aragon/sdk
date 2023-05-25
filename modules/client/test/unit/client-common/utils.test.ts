@@ -51,8 +51,8 @@ describe("client-common utils", () => {
       })).toBe(ProposalStatus.SUCCEEDED);
     });
     it("should return SUCCEDED if earlyExecutable = true", () => {
-      const endDate = (Date.now() / 1000) + 500;
-      const startDate = (Date.now() / 1000) - 500;
+      const endDate = (Date.now() / 1000) - 1000;
+      const startDate = (Date.now() / 1000) - 1500;
 
       expect(computeProposalStatus({
         endDate: endDate.toString(),

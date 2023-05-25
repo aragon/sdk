@@ -97,6 +97,7 @@ export function toAddresslistVotingProposal(
         };
       },
     ),
+    potentiallyExecutable: proposal.potentiallyExecutable,
   };
 }
 export function toAddresslistVotingProposalListItem(

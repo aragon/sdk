@@ -67,6 +67,7 @@ export function toMultisigProposal(
     approvals: proposal.approvers.map(
       (approver) => approver.id.slice(0, 42),
     ),
+    potentiallyExecutable: proposal.potentiallyExecutable,
   };
 }
 export function toMultisigProposalListItem(

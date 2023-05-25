@@ -1027,6 +1027,7 @@ describe("Token Voting Client", () => {
         expect(proposal.token?.symbol).toBe("TST");
         expect(proposal.token?.type).toBe(TokenType.ERC20);
         expect((proposal.token as Erc20TokenDetails).decimals).toBe(18);
+        expect(typeof proposal.potentiallyExecutable).toBe('boolean');
 
         // check function call
         expect(mockedClient.request).lastCalledWith(

@@ -124,6 +124,7 @@ export type ProposalBase = {
   executionDate: Date | null;
   executionBlockNumber: number | null;
   executionTxHash: string | null;
+  potentiallyExecutable: boolean;
 };
 
 export type ProposalVoteBase = {

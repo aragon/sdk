@@ -517,6 +517,7 @@ describe("Client Multisig", () => {
       expect(proposal.settings.onlyListed).toBe(
         subgraphProposal.plugin.onlyListed,
       );
+      expect(typeof proposal.potentiallyExecutable).toBe('boolean');
 
       // check function call
       expect(mockedClient.request).lastCalledWith(

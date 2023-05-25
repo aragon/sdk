@@ -90,7 +90,8 @@ Returns:
       address: "0x234567891234567891234567891234567890",
       vote: 3 // VoteValues.NO
     }
-  ]
+  ],
+  potentiallyExecutable: <boolean>,
 }
 ```
 */

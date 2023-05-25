@@ -41,11 +41,11 @@ export function computeProposalStatus(
   if (startDate >= now) {
     return ProposalStatus.PENDING;
   }
-  if (proposal.potentiallyExecutable || proposal.earlyExecutable) {
-    return ProposalStatus.SUCCEEDED;
-  }
   if (endDate >= now) {
     return ProposalStatus.ACTIVE;
+  }
+  if (proposal.potentiallyExecutable || proposal.earlyExecutable) {
+    return ProposalStatus.SUCCEEDED;
   }
   return ProposalStatus.DEFEATED;
 }
