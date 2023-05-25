@@ -5,10 +5,9 @@ import {
   PluginRepo__factory,
 } from "@aragon/osx-ethers";
 import {
+  DepositNativeTokenError,
   InvalidAddressOrEnsError,
   NoProviderError,
-  NoSignerError,
-  NoTokenAddress,
 } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
@@ -37,11 +36,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    */
   public async createDao(params: CreateDaoParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    } else if (
+    if (
       params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
     ) {
       throw new Error("Invalid subdomain format: use a-z, 0-9 and -");
@@ -92,14 +87,9 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     params: DepositParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     if (params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20) {
-      throw new Error("Please, use the token's transfer function directly");
+      throw new DepositNativeTokenError();
     }
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
@@ -130,14 +120,6 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     params: SetAllowanceParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    } else if (!params.tokenAddress) {
-      throw new NoTokenAddress();
-    }
-
     // resolve ens
     let daoAddress = params.spender;
     if (!isAddress(daoAddress)) {

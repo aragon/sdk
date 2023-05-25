@@ -11,7 +11,6 @@ import {
   IpfsPinError,
   isProposalId,
   NoProviderError,
-  NoSignerError,
   PluginInstallationPreparationError,
   ProposalCreationError,
   resolveIpfsCid,
@@ -27,13 +26,12 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  ProposalQueryParams,
-  VoteProposalParams,
   PrepareInstallationStep,
   PrepareInstallationStepValue,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
+  ProposalQueryParams,
   ProposalSortBy,
   SortDirection,
   SubgraphMembers,
@@ -41,6 +39,7 @@ import {
   SupportedNetwork,
   SupportedNetworksArray,
   VersionTag,
+  VoteProposalParams,
   VoteProposalStep,
   VoteProposalStepValue,
   VotingSettings,
@@ -94,11 +93,6 @@ export class AddresslistVotingClientMethods extends ClientCore
     params: CreateMajorityVotingProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
@@ -186,11 +180,6 @@ export class AddresslistVotingClientMethods extends ClientCore
     params: VoteProposalParams,
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
@@ -228,11 +217,6 @@ export class AddresslistVotingClientMethods extends ClientCore
     proposalId: string,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
@@ -262,12 +246,8 @@ export class AddresslistVotingClientMethods extends ClientCore
     params: AddresslistVotingPluginPrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
-    const network = await signer.provider.getNetwork();
+
+    const network = await this.web3.getProvider().getNetwork();
     const networkName = network.name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
@@ -351,11 +331,6 @@ export class AddresslistVotingClientMethods extends ClientCore
    */
   public async canVote(params: CanVoteParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer.provider) {
-      throw new NoProviderError();
-    } else if (!isAddress(params.voterAddressOrEns)) {
-      throw new InvalidAddressError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
@@ -380,11 +355,6 @@ export class AddresslistVotingClientMethods extends ClientCore
     proposalId: string,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 

@@ -10,12 +10,7 @@ import {
 } from "../../../client-common";
 import { ITokenVotingClientEstimation } from "../../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import {
-  boolArrayToBitmap,
-  decodeProposalId,
-  NoProviderError,
-  NoSignerError,
-} from "@aragon/sdk-common";
+import { boolArrayToBitmap, decodeProposalId } from "@aragon/sdk-common";
 import { DelegateTokensParams } from "../../types";
 /**
  * Estimation module the SDK TokenVoting Client
@@ -33,11 +28,6 @@ export class TokenVotingClientEstimation extends ClientCore
     params: CreateMajorityVotingProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
@@ -80,11 +70,6 @@ export class TokenVotingClientEstimation extends ClientCore
     params: VoteProposalParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
@@ -114,11 +99,6 @@ export class TokenVotingClientEstimation extends ClientCore
     proposalId: string,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(
       proposalId,

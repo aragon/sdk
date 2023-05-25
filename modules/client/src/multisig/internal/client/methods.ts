@@ -9,7 +9,6 @@ import {
   IpfsPinError,
   isProposalId,
   NoProviderError,
-  NoSignerError,
   PluginInstallationPreparationError,
   ProposalCreationError,
   resolveIpfsCid,
@@ -38,12 +37,12 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
-  ProposalQueryParams,
   PrepareInstallationStep,
   PrepareInstallationStepValue,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalMetadata,
+  ProposalQueryParams,
   ProposalSortBy,
   SortDirection,
   SubgraphMembers,
@@ -89,11 +88,6 @@ export class MultisigClientMethods extends ClientCore
     params: CreateMultisigProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
@@ -179,11 +173,6 @@ export class MultisigClientMethods extends ClientCore
     params: ApproveMultisigProposalParams,
   ): AsyncGenerator<ApproveProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const multisigContract = Multisig__factory.connect(
@@ -218,11 +207,6 @@ export class MultisigClientMethods extends ClientCore
     proposalId: string,
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
@@ -257,12 +241,7 @@ export class MultisigClientMethods extends ClientCore
     params: MultisigPluginPrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
-    const network = await signer.provider.getNetwork();
+    const network = await this.web3.getProvider().getNetwork();
     const networkName = network.name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
@@ -347,11 +326,6 @@ export class MultisigClientMethods extends ClientCore
     params: CanApproveParams,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
     if (!isAddress(params.approverAddressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
@@ -375,11 +349,6 @@ export class MultisigClientMethods extends ClientCore
     proposalId: string,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
-    if (!signer) {
-      throw new NoSignerError();
-    } else if (!signer.provider) {
-      throw new NoProviderError();
-    }
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
