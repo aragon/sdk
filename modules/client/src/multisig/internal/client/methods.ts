@@ -12,7 +12,6 @@ import {
   PluginInstallationPreparationError,
   ProposalCreationError,
   resolveIpfsCid,
-  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -46,8 +45,6 @@ import {
   ProposalSortBy,
   SortDirection,
   SubgraphMembers,
-  SupportedNetwork,
-  SupportedNetworksArray,
   VersionTag,
 } from "../../../client-common";
 import {
@@ -241,11 +238,7 @@ export class MultisigClientMethods extends ClientCore
     params: MultisigPluginPrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    const network = await this.web3.getProvider().getNetwork();
-    const networkName = network.name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
-      throw new UnsupportedNetworkError(networkName);
-    }
+    const networkName = this.web3.getNetworkName();
     // connect to psp contract
     const pspContract = PluginSetupProcessor__factory.connect(
       LIVE_CONTRACTS[networkName].pluginSetupProcessor,

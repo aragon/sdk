@@ -3,7 +3,11 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { isAddress } from "@ethersproject/address";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { Signer } from "@ethersproject/abstract-signer";
-import { GasFeeEstimation } from "../types/common";
+import {
+  GasFeeEstimation,
+  SupportedNetwork,
+  SupportedNetworksArray,
+} from "../types/common";
 import { IClientWeb3Core } from "../interfaces";
 import {
   CannotEstimateGasError,
@@ -13,6 +17,7 @@ import {
   NoNodesAvailableError,
   NoProviderError,
   NoSignerError,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
@@ -48,6 +53,15 @@ export class Web3Module implements IClientWeb3Core {
       throw new NoProviderError();
     }
     return this.context.web3Providers[this.providerIdx];
+  }
+
+  /** Returns the currently active network */
+  public getNetworkName(): SupportedNetwork {
+    const networkName = this.context.network.name as SupportedNetwork;
+    if (!SupportedNetworksArray.includes(networkName)) {
+      throw new UnsupportedNetworkError(networkName);
+    }
+    return networkName;
   }
 
   /** Returns a signer connected to the current network provider */
