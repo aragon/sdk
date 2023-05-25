@@ -46,24 +46,12 @@ export class AddresslistVotingClientEncoding extends ClientCore
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }
-    const {
-      votingMode,
-      supportThreshold,
-      minParticipation,
-      minDuration,
-      minProposerVotingPower,
-    } = votingSettingsToContract(params.votingSettings);
-
     const hexBytes = defaultAbiCoder.encode(
       INSTALLATION_ABI,
       [
-        [
-          votingMode,
-          supportThreshold,
-          minParticipation,
-          minDuration,
-          minProposerVotingPower,
-        ],
+        Object.values(
+          votingSettingsToContract(params.votingSettings),
+        ) as ContractVotingSettings,
         params.addresses,
       ],
     );
