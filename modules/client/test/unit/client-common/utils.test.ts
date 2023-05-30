@@ -122,8 +122,8 @@ describe("client-common utils", () => {
   });
 });
 
-describe("Compute failing proposals", () => {
-  it("Should return true because the proposal changes the min approvals and then updates the addresses", async () => {
+describe("Detect failing proposals", () => {
+  it("isFailingProposal should return true because the proposal changes the min approvals and then updates the addresses", async () => {
     const actions: DaoAction[] = [
       UPDATE_MULTISIG_SETTINGS_ACTION,
       ADD_ADDRESSES_ACTION,
@@ -132,7 +132,7 @@ describe("Compute failing proposals", () => {
       true,
     );
   });
-  it("Should return true because the proposal removes addresses and then updates the settings", async () => {
+  it("isFailingProposal should return true because the proposal removes addresses and then updates the settings", async () => {
     const actions: DaoAction[] = [
       REMOVE_ADDRESSES_ACTION,
       UPDATE_MULTISIG_SETTINGS_ACTION,
@@ -141,7 +141,7 @@ describe("Compute failing proposals", () => {
       true,
     );
   });
-  it("Should return false because the proposal adds addresses, changes the min approvals and then removes addresses", async () => {
+  it("isFailingProposal should return false because the proposal adds addresses, changes the min approvals and then removes addresses", async () => {
     const actions: DaoAction[] = [
       ADD_ADDRESSES_ACTION,
       UPDATE_MULTISIG_SETTINGS_ACTION,
@@ -151,7 +151,7 @@ describe("Compute failing proposals", () => {
       false,
     );
   });
-  it("Should return false because ther is no actions", async () => {
+  it("Should return false because there is no actions", async () => {
     const actions: DaoAction[] = [];
     expect(isFailingProposal(actions)).toBe(
       false,

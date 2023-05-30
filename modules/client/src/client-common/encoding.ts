@@ -2,12 +2,16 @@ import {
   MajorityVotingBase,
   MajorityVotingBase__factory,
 } from "@aragon/osx-ethers";
-import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
+import {
+  bytesToHex,
+  decodeRatio,
+  encodeRatio,
+  hexToBytes,
+} from "@aragon/sdk-common";
 import { VotingMode, VotingSettings } from "./types/plugin";
-import { FunctionFragment, Interface, Result } from "@ethersproject/abi";
+import { Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { votingModeFromContracts, votingModeToContracts } from "./utils";
-import { encodeRatio, decodeRatio } from "@aragon/sdk-common";
 
 export function decodeUpdatePluginSettingsAction(
   data: Uint8Array,
@@ -58,13 +62,4 @@ export function votingSettingsToContract(
     minDuration: BigNumber.from(params.minDuration),
     minProposerVotingPower: BigNumber.from(params.minProposerVotingPower || 0),
   };
-}
-
-export function getFunctionFragment(
-  data: Uint8Array,
-  availableFunctions: string[],
-): FunctionFragment {
-  const hexBytes = bytesToHex(data);
-  const iface = new Interface(availableFunctions);
-  return iface.getFunction(hexBytes.substring(0, 10));
 }

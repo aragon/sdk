@@ -7,15 +7,13 @@ import {
   ProposalStatus,
 } from "./types/plugin";
 
-import { Interface } from "@ethersproject/abi";
+import { Interface, FunctionFragment } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import { Log } from "@ethersproject/providers";
-import {
-  InvalidVotingModeError,
-} from "@aragon/sdk-common";
+import { InvalidVotingModeError, bytesToHex } from "@aragon/sdk-common";
 import { DaoAction } from "./types";
-import { getFunctionFragment } from "./encoding";
-import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./constants";
+import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
+
 
 export function unwrapProposalParams(
   params: CreateMajorityVotingProposalParams,
@@ -127,7 +125,7 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
   }
 }
 
-export function isFailingProposal(actions: DaoAction[]): boolean {
+export function isFailingProposal(actions: DaoAction[] = []): boolean {
   const functionNames: string[] = [];
   // store the function names of the actions
   for (const action of actions) {
@@ -136,13 +134,10 @@ export function isFailingProposal(actions: DaoAction[]): boolean {
         action.data,
         FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES,
       );
-      console.log(fragment);
       functionNames.push(
         fragment.name,
       );
-    } catch (e) {
-      console.log(e);
-    }
+    } catch {}
   }
   for (const [i, functionName] of functionNames.entries()) {
     // if I add addresses, we must update the settings after
@@ -172,4 +167,13 @@ export function isFailingProposal(actions: DaoAction[]): boolean {
     }
   }
   return false;
+}
+
+export function getFunctionFragment(
+  data: Uint8Array,
+  availableFunctions: string[],
+): FunctionFragment {
+  const hexBytes = bytesToHex(data);
+  const iface = new Interface(availableFunctions);
+  return iface.getFunction(hexBytes.substring(0, 10));
 }
