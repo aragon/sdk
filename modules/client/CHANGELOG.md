@@ -14,7 +14,7 @@ TEMPLATE:
 -->
 ## [UPCOMING]
 ## Changed
-- Errors now throw caouse
+- Errors now report the cause more clearly
 - Internal refactor of signer and network
 ## [1.8.1]
 ## Fixes
