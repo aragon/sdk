@@ -47,7 +47,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
       throw new UnsupportedNetworkError(networkName);
     }
     const hexBytes = defaultAbiCoder.encode(
-      INSTALLATION_ABI,
+      getNamedTypesFromMetadata(INSTALLATION_ABI),
       [
         Object.values(
           votingSettingsToContract(params.votingSettings),

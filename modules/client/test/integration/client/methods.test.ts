@@ -413,7 +413,7 @@ describe("Client", () => {
           {
             daoAddressOrEns: dao,
             pluginRepo: deployment.multisigRepo.address,
-            installationAbi: [ "address[]", "tuple(bool, uint16)"],
+            installationAbi: INSTALLATION_ABI,
             installationParams: [["0x1234567890123456789012345678901234567890"], [true, 1]],
           },
         );

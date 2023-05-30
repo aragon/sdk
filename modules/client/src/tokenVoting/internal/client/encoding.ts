@@ -50,7 +50,7 @@ export class TokenVotingClientEncoding extends ClientCore
     }
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
-      INSTALLATION_ABI,
+      getNamedTypesFromMetadata(INSTALLATION_ABI),
       args,
     );
     return {
