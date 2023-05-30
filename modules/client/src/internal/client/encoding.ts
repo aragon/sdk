@@ -12,8 +12,6 @@ import {
   ClientCore,
   DaoAction,
   LIVE_CONTRACTS,
-  SupportedNetwork,
-  SupportedNetworksArray,
   TokenType,
 } from "../../client-common";
 import { isAddress } from "@ethersproject/address";
@@ -32,8 +30,6 @@ import { erc20ContractAbi } from "../abi/erc20";
 import {
   hexToBytes,
   InvalidAddressError,
-  NoProviderError,
-  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IClientEncoding } from "../../interfaces";
@@ -56,14 +52,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     if (!isAddress(daoAddress)) {
       throw new InvalidAddressError();
     }
-    const provider = this.web3.getProvider();
-    if (!provider) {
-      throw new NoProviderError();
-    }
-    const network = provider.network.name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(network)) {
-      throw new UnsupportedNetworkError(network);
-    }
+    const network = this.web3.getNetworkName();
     const pspInterface = PluginSetupProcessor__factory.createInterface();
 
     const args = applyInstallatonParamsToContract(params);
@@ -99,8 +88,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: ApplyUninstallationParams,
   ): DaoAction[] {
-    const provider = this.web3.getProvider();
-    const network = provider.network.name as SupportedNetwork;
+    const network = this.web3.getNetworkName();
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const args = applyUninstallationParamsToContract(params);
     const hexBytes = pspInterface.encodeFunctionData("applyUninstallation", [

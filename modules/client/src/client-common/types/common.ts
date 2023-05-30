@@ -1,10 +1,13 @@
-export const SupportedNetworksArray = [
-  "homestead",
-  "goerli",
-  "matic",
-  "maticmum",
-] as const;
-export type SupportedNetwork = typeof SupportedNetworksArray[number];
+export enum SupportedNetwork {
+  MAINNET = "homestead",
+  GOERLI = "goerli",
+  POLYGON = "matic",
+  MUMBAI = "maticmum",
+}
+
+export const SupportedNetworksArray = Object.values(SupportedNetwork);
+
+
 export type NetworkDeployment = {
   daoFactory: string;
   pluginSetupProcessor: string;

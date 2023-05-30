@@ -32,17 +32,21 @@ type GraphqlNetworks = "mainnet" | "goerli" | "polygon" | "mumbai";
 const SupportedNetworksToGraphqlNetworks: {
   [K in SupportedNetwork]: GraphqlNetworks;
 } = {
-  homestead: "mainnet",
-  goerli: "goerli",
-  matic: "polygon",
-  maticmum: "mumbai",
+  [SupportedNetwork.MAINNET]: "mainnet",
+  [SupportedNetwork.GOERLI]: "goerli",
+  [SupportedNetwork.POLYGON]: "polygon",
+  [SupportedNetwork.MUMBAI]: "mumbai",
 };
 
 export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
-  homestead: [{ url: getGraphqlNode("homestead") }],
-  goerli: [{ url: getGraphqlNode("goerli") }],
-  matic: [{ url: getGraphqlNode("matic") }],
-  maticmum: [{ url: getGraphqlNode("maticmum") }],
+  [SupportedNetwork.MAINNET]: [{
+    url: getGraphqlNode(SupportedNetwork.MAINNET),
+  }],
+  [SupportedNetwork.GOERLI]: [{ url: getGraphqlNode(SupportedNetwork.GOERLI) }],
+  [SupportedNetwork.POLYGON]: [{
+    url: getGraphqlNode(SupportedNetwork.POLYGON),
+  }],
+  [SupportedNetwork.MUMBAI]: [{ url: getGraphqlNode(SupportedNetwork.MUMBAI) }],
 };
 
 const IPFS_ENDPOINTS = {
@@ -76,14 +80,14 @@ export const IPFS_NODES: {
     headers?: Record<string, string> | undefined;
   }[];
 } = {
-  homestead: IPFS_ENDPOINTS.prod,
-  goerli: IPFS_ENDPOINTS.test,
-  matic: IPFS_ENDPOINTS.prod,
-  maticmum: IPFS_ENDPOINTS.test,
+  [SupportedNetwork.MAINNET]: IPFS_ENDPOINTS.prod,
+  [SupportedNetwork.GOERLI]: IPFS_ENDPOINTS.test,
+  [SupportedNetwork.POLYGON]: IPFS_ENDPOINTS.prod,
+  [SupportedNetwork.MUMBAI]: IPFS_ENDPOINTS.test,
 };
 
 export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
-  homestead: {
+  [SupportedNetwork.MAINNET]: {
     daoFactory: activeContractsList.mainnet.DAOFactory,
     pluginSetupProcessor: activeContractsList.mainnet.PluginRepoFactory,
     multisigRepo: activeContractsList.mainnet["multisig-repo"],
@@ -96,7 +100,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
     addresslistVotingSetup: activeContractsList.mainnet.AddresslistVotingSetup,
     tokenVotingSetup: activeContractsList.mainnet.TokenVotingSetup,
   },
-  goerli: {
+  [SupportedNetwork.GOERLI]: {
     daoFactory: activeContractsList.goerli.DAOFactory,
     pluginSetupProcessor: activeContractsList.goerli.PluginSetupProcessor,
     multisigRepo: activeContractsList.goerli["multisig-repo"],
@@ -109,7 +113,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
     addresslistVotingSetup: activeContractsList.goerli.AddresslistVotingSetup,
     tokenVotingSetup: activeContractsList.goerli.TokenVotingSetup,
   },
-  maticmum: {
+  [SupportedNetwork.MUMBAI]: {
     daoFactory: activeContractsList.mumbai.DAOFactory,
     pluginSetupProcessor: activeContractsList.mumbai.PluginSetupProcessor,
     multisigRepo: activeContractsList.mumbai["multisig-repo"],
@@ -123,7 +127,7 @@ export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
     tokenVotingSetup: activeContractsList.mumbai.TokenVotingSetup,
     ensRegistry: activeContractsList.mumbai.ENSRegistry,
   },
-  matic: {
+  [SupportedNetwork.POLYGON]: {
     daoFactory: activeContractsList.polygon.DAOFactory,
     pluginSetupProcessor: activeContractsList.polygon.PluginSetupProcessor,
     multisigRepo: activeContractsList.polygon["multisig-repo"],

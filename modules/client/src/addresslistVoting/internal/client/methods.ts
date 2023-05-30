@@ -14,7 +14,6 @@ import {
   PluginInstallationPreparationError,
   ProposalCreationError,
   resolveIpfsCid,
-  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import { IAddresslistVotingClientMethods } from "../../interfaces";
@@ -36,8 +35,6 @@ import {
   SortDirection,
   SubgraphMembers,
   SubgraphVotingSettings,
-  SupportedNetwork,
-  SupportedNetworksArray,
   VersionTag,
   VoteProposalParams,
   VoteProposalStep,
@@ -246,12 +243,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     params: AddresslistVotingPluginPrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
-
-    const network = await this.web3.getProvider().getNetwork();
-    const networkName = network.name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
-      throw new UnsupportedNetworkError(networkName);
-    }
+    const networkName = this.web3.getNetworkName();
     // connect to psp contract
     const pspContract = PluginSetupProcessor__factory.connect(
       LIVE_CONTRACTS[networkName].pluginSetupProcessor,
