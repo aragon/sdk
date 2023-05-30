@@ -13,6 +13,10 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+## Changed
+- Errors now throw caouse
+- Internal refactor of signer and network
+## [1.8.1]
 ## Fixes
 - List all the plugins installed on a DAO by using an updated subgraph query
 ## [1.8.0]
