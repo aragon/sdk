@@ -39,10 +39,10 @@ const SupportedNetworksToGraphqlNetworks: {
 };
 
 export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
-  homestead: [{ url: getGraphqlNode("homestead") }],
-  goerli: [{ url: getGraphqlNode("goerli") }],
-  matic: [{ url: getGraphqlNode("matic") }],
-  maticmum: [{ url: getGraphqlNode("maticmum") }],
+  homestead: [{ url: getGraphqlNode(SupportedNetwork.MAINNET) }],
+  goerli: [{ url: getGraphqlNode(SupportedNetwork.GOERLI) }],
+  matic: [{ url: getGraphqlNode(SupportedNetwork.POLYGON) }],
+  maticmum: [{ url: getGraphqlNode(SupportedNetwork.MUMBAI) }],
 };
 
 const IPFS_ENDPOINTS = {
