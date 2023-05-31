@@ -8,17 +8,13 @@ title: Execution Proposal
 Executes the actions set within a proposal made using the TokenVoting plugin.
 */
 
-import {
-  ContextPlugin,
-  ExecuteProposalStep,
-  TokenVotingClient,
-} from "@aragon/sdk-client";
+import { ExecuteProposalStep, TokenVotingClient } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Insantiate a TokenVoting client.
-const tokenVotingClient = new TokenVotingClient(contextPlugin);
+const tokenVotingClient = new TokenVotingClient(context);
 
 const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 

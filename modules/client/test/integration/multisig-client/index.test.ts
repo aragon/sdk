@@ -6,18 +6,17 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { Context, ContextPlugin, MultisigClient } from "../../../src";
+import { Context, MultisigClient } from "../../../src";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 
-import { contextParamsMainnet, contextParamsFailing } from "../constants";
+import { contextParamsFailing, contextParamsMainnet } from "../constants";
 
 describe("Client Multisig", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParamsMainnet);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       expect(client).toBeInstanceOf(MultisigClient);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
@@ -40,8 +39,7 @@ describe("Client Multisig", () => {
 
     it("Should create a failing client", async () => {
       const ctx = new Context(contextParamsFailing);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       expect(client).toBeInstanceOf(MultisigClient);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);

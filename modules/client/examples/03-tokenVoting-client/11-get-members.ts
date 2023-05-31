@@ -8,18 +8,12 @@ title: Get Members
 Returns an array with the addresses of all the members of a specific DAO which has the TokenVoting plugin installed.
 */
 
-import {
-  ContextPlugin,
-  TokenVotingClient,
-  TokenVotingMember,
-} from "@aragon/sdk-client";
+import { TokenVotingClient, TokenVotingMember } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create a TokenVoting client
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
-  contextPlugin,
+  context,
 );
 
 const pluginAddress: string = "0x12345384572394756239846529574932532985"; //  The address of the plugin that DAO has installed. You can find this by calling `getDao(daoAddress)` and getting the DAO details .

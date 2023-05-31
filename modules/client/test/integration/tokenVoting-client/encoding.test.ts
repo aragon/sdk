@@ -3,11 +3,10 @@ declare const describe, it, expect;
 
 import {
   Context,
-  ContextPlugin,
   MintTokenParams,
-  TokenVotingPluginInstall,
   SupportedNetworksArray,
   TokenVotingClient,
+  TokenVotingPluginInstall,
   VotingSettings,
 } from "../../../src";
 
@@ -35,7 +34,7 @@ describe("Token Voting Client", () => {
           name: "Test Token",
           symbol: "TTK",
           balances: [],
-          decimals: 18
+          decimals: 18,
         },
       };
       const tokenVotingInstallPluginItem = TokenVotingClient.encoding
@@ -48,8 +47,7 @@ describe("Token Voting Client", () => {
     });
     it("Should encode an update plugin settings action and fail with an invalid address", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const params: VotingSettings = {
         minDuration: 7200,
         supportThreshold: 0.5,
@@ -63,8 +61,7 @@ describe("Token Voting Client", () => {
     });
     it("Should encode an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const params: VotingSettings = {
         minDuration: 7200,
         supportThreshold: 0.5,
@@ -85,8 +82,7 @@ describe("Token Voting Client", () => {
     });
     it("Should encode a mint action with an invalid recipient address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const params: MintTokenParams = {
         address: "0xinvalid_address",
         amount: BigInt(10),
@@ -98,8 +94,7 @@ describe("Token Voting Client", () => {
     });
     it("Should encode a mint action with an invalid token address and fail", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const params: MintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
@@ -111,8 +106,7 @@ describe("Token Voting Client", () => {
     });
     it("Should encode a TokenVoting token mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const params: MintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),

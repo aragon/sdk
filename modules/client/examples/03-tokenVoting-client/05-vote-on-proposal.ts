@@ -10,20 +10,16 @@ The amount of votes submitted depends on the amount of tokens the signer address
 */
 
 import {
-  ContextPlugin,
-  VoteProposalParams,
   TokenVotingClient,
+  VoteProposalParams,
   VoteProposalStep,
   VoteValues,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
 // Create a TokenVoting client.
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
-  contextPlugin,
+  context,
 );
 
 const voteParams: VoteProposalParams = {

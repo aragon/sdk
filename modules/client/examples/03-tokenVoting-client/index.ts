@@ -16,8 +16,8 @@ import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate the ContextPlugin from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 
 // Create a TokenVoting client.
-const tokenVotingClient = new TokenVotingClient(contextPlugin);
+const tokenVotingClient = new TokenVotingClient(context);
 console.log(tokenVotingClient);

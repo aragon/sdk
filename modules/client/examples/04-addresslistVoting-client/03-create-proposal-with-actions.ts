@@ -10,7 +10,6 @@ Creates a proposal with an action(s) to get executed upon the proposal passes. W
 
 import {
   AddresslistVotingClient,
-  ContextPlugin,
   CreateMajorityVotingProposalParams,
   MajorityVotingSettings,
   ProposalCreationSteps,
@@ -21,10 +20,10 @@ import {
 import { context } from "../index";
 
 // Create a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Create an AddresslistVoting client from the Aragon OSx SDK context.
 const addresslistVotingClient: AddresslistVotingClient =
-  new AddresslistVotingClient(contextPlugin);
+  new AddresslistVotingClient(context);
 
 // [Optional] You can add encoded actions to the proposal. These actions are the encoded transactions which will be executed when a transaction passes.
 // In this example, we are updating the plugin settings as an action that you may want upon a proposal approval.

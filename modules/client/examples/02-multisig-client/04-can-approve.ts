@@ -8,17 +8,11 @@ title: Check Approval Rights
 Checks whether a user is able to participate in a proposal created using the Multisig plugin.
 */
 
-import {
-  CanApproveParams,
-  ContextPlugin,
-  MultisigClient,
-} from "@aragon/sdk-client";
+import { CanApproveParams, MultisigClient } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client.
-const client: MultisigClient = new MultisigClient(contextPlugin);
+const client: MultisigClient = new MultisigClient(context);
 
 const canApproveParams: CanApproveParams = {
   approverAddressOrEns: "0x1234567890123456789012345678901234567890",

@@ -8,17 +8,13 @@ title: Execute Proposal
 Executes the actions set within a proposal made using the Multisig plugin.
 */
 
-import {
-  ContextPlugin,
-  ExecuteProposalStep,
-  MultisigClient,
-} from "@aragon/sdk-client";
+import { ExecuteProposalStep, MultisigClient } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Insantiate a Multisig client.
-const multisigClient = new MultisigClient(contextPlugin);
+const multisigClient = new MultisigClient(context);
 
 const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 

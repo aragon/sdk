@@ -10,7 +10,6 @@ Then, you can create proposals using the `createProposal` method in your `TokenV
 */
 
 import {
-  ContextPlugin,
   CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
@@ -19,12 +18,9 @@ import {
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
 // Create a TokenVoting client.
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
-  contextPlugin,
+  context,
 );
 
 const metadata: ProposalMetadata = {

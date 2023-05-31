@@ -11,7 +11,6 @@ Within this proposal, only addresses in the approved list of the Addresslist Vot
 
 import {
   AddresslistVotingClient,
-  ContextPlugin,
   CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
   ProposalMetadata,
@@ -20,9 +19,9 @@ import {
 import { context } from "../index";
 
 // Create a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Create an AddresslistVoting client.
-const addresslistVotingClient = new AddresslistVotingClient(contextPlugin);
+const addresslistVotingClient = new AddresslistVotingClient(context);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",
@@ -62,7 +61,6 @@ const proposalParams: CreateMajorityVotingProposalParams = {
 };
 
 const steps = addresslistVotingClient.methods.createProposal(proposalParams);
-
 
 for await (const step of steps) {
   try {

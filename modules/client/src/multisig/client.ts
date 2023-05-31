@@ -9,11 +9,7 @@ import { MultisigClientMethods } from "./internal/client/methods";
 import { MultisigClientEncoding } from "./internal/client/encoding";
 import { MultisigClientDecoding } from "./internal/client/decoding";
 import { MultisigClientEstimation } from "./internal/client/estimation";
-import {
-  ClientCore,
-  ContextPlugin,
-  PluginInstallItem,
-} from "../client-common";
+import { ClientCore, Context, PluginInstallItem } from "../client-common";
 import { Networkish } from "@ethersproject/providers";
 import { MultisigPluginInstallParams } from "./types";
 
@@ -25,7 +21,7 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
   public encoding: IMultisigClientEncoding;
   public decoding: IMultisigClientDecoding;
   public estimation: IMultisigClientEstimation;
-  constructor(context: ContextPlugin) {
+  constructor(context: Context) {
     super(context);
     this.methods = new MultisigClientMethods(context);
     this.encoding = new MultisigClientEncoding(context);

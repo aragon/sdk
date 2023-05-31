@@ -9,20 +9,17 @@ Gets the proposals made using the Multisig plugin for a given DAO.
 */
 
 import {
-  ContextPlugin,
-  ProposalQueryParams,
   MultisigClient,
   MultisigProposalListItem,
+  ProposalQueryParams,
   ProposalSortBy,
   ProposalStatus,
   SortDirection,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+const multisigClient: MultisigClient = new MultisigClient(context);
 
 const queryParams: ProposalQueryParams = {
   skip: 0, // optional

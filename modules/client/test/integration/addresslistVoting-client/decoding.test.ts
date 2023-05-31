@@ -4,7 +4,6 @@ declare const describe, it, expect;
 import {
   AddresslistVotingClient,
   Context,
-  ContextPlugin,
   SupportedNetworksArray,
   VotingMode,
   VotingSettings,
@@ -22,8 +21,7 @@ describe("Client Address List", () => {
   describe("Action decoders", () => {
     it("Should decode the plugin settings from an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
       const params: VotingSettings = {
         minDuration: 100000,
         minParticipation: 0.25,
@@ -55,16 +53,14 @@ describe("Client Address List", () => {
 
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow();
     });
     it("Should decode a add members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -83,8 +79,7 @@ describe("Client Address List", () => {
     });
     it("Should decode a remove members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -107,8 +102,7 @@ describe("Client Address List", () => {
 
     it("Should get the function for a given action data", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const params: VotingSettings = {
         minDuration: 100000,
@@ -135,8 +129,7 @@ describe("Client Address List", () => {
 
     it("Should try to get the function of an invalid data and return null", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
       const iface = client.decoding.findInterface(data);
       expect(iface).toBe(null);

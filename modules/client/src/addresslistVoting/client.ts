@@ -9,11 +9,7 @@ import { AddresslistVotingClientMethods } from "./internal/client/methods";
 import { AddresslistVotingClientEncoding } from "./internal/client/encoding";
 import { AddresslistVotingClientDecoding } from "./internal/client/decoding";
 import { AddresslistVotingClientEstimation } from "./internal/client/estimation";
-import {
-  ClientCore,
-  ContextPlugin,
-  PluginInstallItem,
-} from "../client-common";
+import { ClientCore, Context, PluginInstallItem } from "../client-common";
 import { Networkish } from "@ethersproject/providers";
 import { AddresslistVotingPluginInstall } from "./types";
 
@@ -27,7 +23,7 @@ export class AddresslistVotingClient extends ClientCore
   public decoding: IAddresslistVotingClientDecoding;
   public estimation: IAddresslistVotingClientEstimation;
 
-  constructor(context: ContextPlugin) {
+  constructor(context: Context) {
     super(context);
     this.methods = new AddresslistVotingClientMethods(context);
     this.encoding = new AddresslistVotingClientEncoding(context);

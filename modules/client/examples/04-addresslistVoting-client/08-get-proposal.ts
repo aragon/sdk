@@ -11,15 +11,14 @@ Gets a proposal created using the Addresslist Voting plugin.
 import {
   AddresslistVotingClient,
   AddresslistVotingProposal,
-  ContextPlugin,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Instantiates an AddresslistVoting client.
 const addresslistVotingClient: AddresslistVotingClient =
-  new AddresslistVotingClient(contextPlugin);
+  new AddresslistVotingClient(context);
 
 const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 

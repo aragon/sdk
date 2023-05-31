@@ -11,7 +11,6 @@ The actions are what will get executed once the proposal passes.
 
 import {
   Client,
-  ContextPlugin,
   CreateMultisigProposalParams,
   MultisigClient,
   ProposalCreationSteps,
@@ -23,10 +22,9 @@ import { context } from "../index";
 
 // Instantiate an Aragon OSx SDK client.
 const client: Client = new Client(context);
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Insantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+const multisigClient: MultisigClient = new MultisigClient(context);
 
 const proposalMetadata: ProposalMetadata = {
   title: "Test Proposal",

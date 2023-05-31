@@ -7,19 +7,15 @@ title: Prepare Installation
 */
 
 import {
-  ContextPlugin,
   MultisigClient,
   MultisigPluginPrepareInstallationParams,
   PrepareInstallationStep,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
 // Create an Multisig client.
 const multisigClient: MultisigClient = new MultisigClient(
-  contextPlugin,
+  context,
 );
 
 const installationParams: MultisigPluginPrepareInstallationParams = {

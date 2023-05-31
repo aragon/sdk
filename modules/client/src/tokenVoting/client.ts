@@ -9,11 +9,7 @@ import { TokenVotingClientMethods } from "./internal/client/methods";
 import { TokenVotingClientEncoding } from "./internal/client/encoding";
 import { TokenVotingClientDecoding } from "./internal/client/decoding";
 import { TokenVotingClientEstimation } from "./internal/client/estimation";
-import {
-  ClientCore,
-  ContextPlugin,
-  PluginInstallItem,
-} from "../client-common";
+import { ClientCore, Context, PluginInstallItem } from "../client-common";
 import { Networkish } from "@ethersproject/providers";
 import { TokenVotingPluginInstall } from "./types";
 
@@ -27,7 +23,7 @@ export class TokenVotingClient extends ClientCore
   public decoding: ITokenVotingClientDecoding;
   public estimation: ITokenVotingClientEstimation;
 
-  constructor(context: ContextPlugin) {
+  constructor(context: Context) {
     super(context);
     this.methods = new TokenVotingClientMethods(context);
     this.encoding = new TokenVotingClientEncoding(context);

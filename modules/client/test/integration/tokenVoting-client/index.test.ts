@@ -8,15 +8,14 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-import { contextParamsMainnet, contextParamsFailing } from "../constants";
-import { TokenVotingClient, Context, ContextPlugin } from "../../../src";
+import { contextParamsFailing, contextParamsMainnet } from "../constants";
+import { Context, TokenVotingClient } from "../../../src";
 
 describe("Token Voting Client", () => {
   describe("Client instances", () => {
     it("Should create a working client", async () => {
       const ctx = new Context(contextParamsMainnet);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
 
       expect(client).toBeInstanceOf(TokenVotingClient);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);
@@ -39,8 +38,7 @@ describe("Token Voting Client", () => {
 
     it("Should create a failing client", async () => {
       const ctx = new Context(contextParamsFailing);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
 
       expect(client).toBeInstanceOf(TokenVotingClient);
       expect(client.web3.getProvider()).toBeInstanceOf(JsonRpcProvider);

@@ -10,18 +10,14 @@ This function returns a boolean indicating whether an address can vote in a spec
 
 import {
   CanVoteParams,
-  ContextPlugin,
   TokenVotingClient,
   VoteValues,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
-
 // Create an TokenVoting client.
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
-  contextPlugin,
+  context,
 );
 
 const canVoteParams: CanVoteParams = {
