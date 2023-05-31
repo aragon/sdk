@@ -7,13 +7,12 @@ import {
   ProposalStatus,
 } from "./types/plugin";
 
-import { Interface, FunctionFragment } from "@ethersproject/abi";
+import { FunctionFragment, Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import { Log } from "@ethersproject/providers";
-import { InvalidVotingModeError, bytesToHex } from "@aragon/sdk-common";
+import { bytesToHex, InvalidVotingModeError } from "@aragon/sdk-common";
 import { DaoAction } from "./types";
 import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
-
 
 export function unwrapProposalParams(
   params: CreateMajorityVotingProposalParams,
@@ -126,19 +125,19 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
 }
 
 export function isFailingProposal(actions: DaoAction[] = []): boolean {
-  const functionNames: string[] = [];
   // store the function names of the actions
-  for (const action of actions) {
+  const functionNames: string[] = actions.map((action) => {
     try {
       const fragment = getFunctionFragment(
         action.data,
         FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES,
       );
-      functionNames.push(
-        fragment.name,
-      );
-    } catch {}
-  }
+      return fragment.name;
+    } catch {
+      return "";
+    }
+  }).filter((name) => name !== "");
+  
   for (const [i, functionName] of functionNames.entries()) {
     // if I add addresses, we must update the settings after
     if (functionName === "addAddresses") {
