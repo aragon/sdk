@@ -20,7 +20,6 @@ import { IAddresslistVotingClientMethods } from "../interfaces";
 import {
   CanVoteParams,
   computeProposalStatusFilter,
-  ContractVotingSettings,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
@@ -47,9 +46,7 @@ import {
   toAddresslistVotingProposal,
   toAddresslistVotingProposalListItem,
 } from "../utils";
-import {
-  AddresslistVoting__factory,
-} from "@aragon/osx-ethers";
+import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   AddresslistVotingPluginPrepareInstallationParams,
@@ -259,9 +256,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: [
-        Object.values(
-          votingSettingsToContract(params.settings.votingSettings),
-        ) as ContractVotingSettings,
+        votingSettingsToContract(params.settings.votingSettings),
         params.settings.addresses,
       ],
     });
