@@ -172,7 +172,7 @@ describe("Detect failing proposals", () => {
       false,
     );
   });
-  it("Should return false because there is no actions", async () => {
+  it("Should return false because there are no actions", async () => {
     const actions: DaoAction[] = [];
     expect(isFailingProposal(actions)).toBe(
       false,
