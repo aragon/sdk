@@ -15,6 +15,9 @@ import { context } from "../index";
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
+// Obtained from the plugin metadata
+const installationAbi = [ ... ];
+
 const prepareInstallationParams: PrepareInstallationParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
   pluginRepo: "0x2345678901234567890123456789012345678901",
@@ -22,7 +25,7 @@ const prepareInstallationParams: PrepareInstallationParams = {
     1234,
     "0x1234567890123456789012345678901234567890",
   ],
-  installationAbi: ["uint256", "adress"],
+  installationAbi,,
 };
 
 // prepare installation
