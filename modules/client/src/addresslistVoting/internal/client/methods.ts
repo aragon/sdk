@@ -25,6 +25,7 @@ import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   findLog,
+  isFailingProposal,
   PrepareInstallationStep,
   PrepareInstallationStepValue,
   ProposalCreationSteps,
@@ -73,6 +74,7 @@ import {
   SubgraphAddresslistVotingProposal,
   SubgraphAddresslistVotingProposalListItem,
 } from "../types";
+import { AlwaysFailingProposalError } from "@aragon/sdk-common";
 
 /**
  * Methods module the SDK Address List Client
@@ -90,6 +92,10 @@ export class AddresslistVotingClientMethods extends ClientCore
     params: CreateMajorityVotingProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
+
+    if (isFailingProposal(params.actions)) {
+      throw new AlwaysFailingProposalError();
+    }
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
