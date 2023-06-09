@@ -25,7 +25,7 @@ const contextParamsMainnet: ContextParams = {
   web3Providers: web3endpoints.working,
   ipfsNodes: [
     {
-      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      url: "https://test.ipfs.aragon.network/api/v0",
       headers: {
         "X-API-KEY": IPFS_API_KEY,
       },

@@ -8,7 +8,7 @@ const IPFS_API_KEY = process.env.IPFS_API_KEY ||
     .toString()
     .trim();
 
-const IPFS_CLUSTER_URL = "https://testing-ipfs-0.aragon.network/api/v0";
+const IPFS_CLUSTER_URL = "https://test.ipfs.aragon.network/api/v0";
 // const IPFS_CLUSTER_URL = "http://127.0.0.1:5001/api/v0/";
 
 describe("IPFS client", () => {
