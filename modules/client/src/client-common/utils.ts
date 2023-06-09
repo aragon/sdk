@@ -21,16 +21,16 @@ import {
 import { FunctionFragment, Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import { Log } from "@ethersproject/providers";
-import { DaoAction } from "./types";
 import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
 import {
+  bytesToHex,
   InvalidAddressError,
   InvalidVotingModeError,
   PluginInstallationPreparationError,
-  bytesToHex
 } from "@aragon/sdk-common";
 import {
   ApplyInstallationParams,
+  DaoAction,
   DecodedApplyInstallationParams,
   MetadataAbiInput,
   PrepareInstallationParams,
@@ -38,7 +38,12 @@ import {
   PrepareInstallationStepValue,
   SupportedNetwork,
 } from "./types";
-import { defaultAbiCoder, Result } from "@ethersproject/abi";
+import {
+  defaultAbiCoder,
+  FunctionFragment,
+  Interface,
+  Result,
+} from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { AddressZero } from "@ethersproject/constants";
 import { IClientWeb3Core } from "./interfaces";
@@ -223,11 +228,58 @@ export function getNamedTypesFromMetadata(
   });
 }
 
+export async function prepareGenericInstallationEstimation(
+  web3: IClientWeb3Core,
+  params: PrepareInstallationParams,
+) {
+  const signer = web3.getConnectedSigner();
+  const provider = web3.getProvider();
+  if (!isAddress(params.pluginRepo)) {
+    throw new InvalidAddressError();
+  }
+  const networkName = (await provider.getNetwork()).name as SupportedNetwork;
+  let version = params.version;
+  // if version is not specified install latest version
+  if (!version) {
+    const pluginRepo = PluginRepo__factory.connect(
+      params.pluginRepo,
+      signer,
+    );
+    const currentRelease = await pluginRepo.latestRelease();
+    const latestVersion = await pluginRepo["getLatestVersion(uint8)"](
+      currentRelease,
+    );
+    version = latestVersion.tag;
+  }
+  // encode installation params
+  const { installationParams = [], installationAbi = [] } = params;
+  const data = defaultAbiCoder.encode(
+    getNamedTypesFromMetadata(installationAbi),
+    installationParams,
+  );
+  // connect to psp contract
+  const pspContract = PluginSetupProcessor__factory.connect(
+    LIVE_CONTRACTS[networkName].pluginSetupProcessor,
+    signer,
+  );
+
+  const gasEstimation = await pspContract.estimateGas.prepareInstallation(
+    params.daoAddressOrEns,
+    {
+      pluginSetupRef: {
+        pluginSetupRepo: params.pluginRepo,
+        versionTag: version,
+      },
+      data,
+    },
+  );
+  return web3.getApproximateGasFee(gasEstimation.toBigInt());
+}
+
 export async function* prepareGenericInstallation(
   web3: IClientWeb3Core,
   params: PrepareInstallationParams,
 ): AsyncGenerator<PrepareInstallationStepValue> {
-  // todo web 3 as params
   const signer = web3.getConnectedSigner();
   const provider = web3.getProvider();
   if (!isAddress(params.pluginRepo)) {

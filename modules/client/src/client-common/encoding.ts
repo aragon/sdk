@@ -69,6 +69,6 @@ export function votingSettingsToContract(
     BigNumber.from(encodeRatio(params.supportThreshold, 6)),
     BigNumber.from(encodeRatio(params.minParticipation, 6)),
     BigNumber.from(params.minDuration),
-    BigNumber.from(params.minProposerVotingPower || 0),
+    BigNumber.from(params.minProposerVotingPower ?? 0),
   ];
 }

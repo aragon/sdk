@@ -13,6 +13,16 @@ import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
+<<<<<<< HEAD
+=======
+  ClientCore,
+  GasFeeEstimation,
+  prepareGenericInstallationEstimation,
+  PrepareInstallationParams,
+  TokenType,
+} from "../../client-common";
+import {
+>>>>>>> 331deba2 (add estimation for generic plugin installation)
   CreateDaoParams,
   DepositParams,
   SetAllowanceParams,
@@ -32,10 +42,9 @@ import {
  */
 export class ClientEstimation extends ClientCore implements IClientEstimation {
   public async prepareInstallation(
-    _params: PrepareInstallationParams,
+    params: PrepareInstallationParams,
   ): Promise<GasFeeEstimation> {
-    return {average: BigInt(0), max: BigInt(0)}
-    // return this.estimation.prepareInstallation(params);
+    return prepareGenericInstallationEstimation(this.web3, params);
   }
   /**
    * Estimates the gas fee of creating a DAO
