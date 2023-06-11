@@ -1,16 +1,18 @@
 import { bytesToHex } from "@aragon/sdk-common";
 import {
-  ClientCore,
   decodeUpdatePluginSettingsAction,
-  getFunctionFragment,
-  InterfaceParams,
   VotingSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { MintTokenParams } from "../../types";
-import { ITokenVotingClientDecoding } from "../../interfaces";
+import { ITokenVotingClientDecoding } from "../interfaces";
 import { IERC20MintableUpgradeable__factory } from "@aragon/osx-ethers";
 import { mintTokenParamsFromContract } from "../utils";
+import {
+  ClientCore,
+  getFunctionFragment,
+  InterfaceParams,
+} from "@aragon/sdk-client-common";
 
 /**
  * Decoding module the SDK TokenVoting Client

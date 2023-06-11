@@ -4,12 +4,11 @@ declare const describe, it, expect;
 import {
   AddresslistVotingClient,
   AddresslistVotingPluginInstall,
-  Context,
-  SupportedNetworksArray,
   VotingSettings,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

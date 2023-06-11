@@ -1,14 +1,18 @@
 // @ts-ignore
 declare const describe, it, beforeEach, expect, test;
 
-import { Context, ContextParams, LIVE_CONTRACTS } from "../../src";
-
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 import { ADDRESS_ONE } from "../integration/constants";
-import { GRAPHQL_NODES, IPFS_NODES } from "../../src/client-common/constants";
+import {
+  Context,
+  ContextParams,
+  GRAPHQL_NODES,
+  IPFS_NODES,
+  LIVE_CONTRACTS,
+} from "@aragon/sdk-client-common";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
@@ -128,7 +132,10 @@ describe("Context instances", () => {
     context.graphql.map((graphqlClient) =>
       expect(graphqlClient).toBeInstanceOf(GraphQLClient)
     );
-    context.set({ network: "matic", web3Providers: "https://polygon-rpc.com/" });
+    context.set({
+      network: "matic",
+      web3Providers: "https://polygon-rpc.com/",
+    });
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);
@@ -150,7 +157,10 @@ describe("Context instances", () => {
   it("Should create an empty context, update the network and update all the parameters automatically", () => {
     const context = new Context();
     expect(context).toBeInstanceOf(Context);
-    context.set({ network: "matic", web3Providers: "https://polygon-rpc.com/" });
+    context.set({
+      network: "matic",
+      web3Providers: "https://polygon-rpc.com/",
+    });
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
     expect(context.daoFactoryAddress).toBe(LIVE_CONTRACTS.matic.daoFactory);

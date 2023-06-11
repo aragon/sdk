@@ -4,14 +4,15 @@ import {
   IMultisigClientEncoding,
   IMultisigClientEstimation,
   IMultisigClientMethods,
-} from "./interfaces";
+} from "./internal/interfaces";
 import { MultisigClientMethods } from "./internal/client/methods";
 import { MultisigClientEncoding } from "./internal/client/encoding";
 import { MultisigClientDecoding } from "./internal/client/decoding";
 import { MultisigClientEstimation } from "./internal/client/estimation";
-import { ClientCore, Context, PluginInstallItem } from "../client-common";
 import { Networkish } from "@ethersproject/providers";
 import { MultisigPluginInstallParams } from "./types";
+import { ClientCore, Context } from "@aragon/sdk-client-common";
+import { PluginInstallItem } from "@aragon/sdk-client-common";
 
 /**
  * Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO

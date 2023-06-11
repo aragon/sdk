@@ -9,19 +9,13 @@ import {
   ApproveMultisigProposalParams,
   ApproveProposalStep,
   CanApproveParams,
-  Context,
   CreateMultisigProposalParams,
   MultisigClient,
   MultisigPluginPrepareInstallationParams,
   MultisigProposal,
-  PrepareInstallationStep,
   ProposalCreationSteps,
-  ProposalMetadata,
   ProposalQueryParams,
   ProposalSortBy,
-  ProposalStatus,
-  SortDirection,
-  SupportedNetworksArray,
 } from "../../../src";
 import {
   getExtendedProposalId,
@@ -50,8 +44,16 @@ import {
   QueryMultisigVotingSettings,
 } from "../../../src/multisig/internal/graphql-queries";
 import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-queries/members";
-import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 import { SubgraphMultisigProposal } from "../../../src/multisig/internal/types";
+import {
+  Context,
+  LIVE_CONTRACTS,
+  PrepareInstallationStep,
+  ProposalMetadata,
+  ProposalStatus,
+  SortDirection,
+  SupportedNetworksArray,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

@@ -6,9 +6,7 @@ import "../../mocks/aragon-sdk-ipfs";
 
 import {
   AddresslistVotingClient,
-  Context,
   CreateMajorityVotingProposalParams,
-  SupportedNetworksArray,
   VoteProposalParams,
   VoteValues,
 } from "../../../src";
@@ -16,6 +14,7 @@ import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

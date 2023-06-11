@@ -1,10 +1,9 @@
 // @ts-ignore
 declare const describe, it, expect;
 
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 import {
   AddresslistVotingClient,
-  Context,
-  SupportedNetworksArray,
   VotingMode,
   VotingSettings,
 } from "../../../src";

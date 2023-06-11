@@ -6,15 +6,14 @@ import "../../mocks/aragon-sdk-ipfs";
 
 import {
   ApproveMultisigProposalParams,
-  Context,
   CreateMultisigProposalParams,
   MultisigClient,
-  SupportedNetworksArray,
 } from "../../../src";
 import { contextParamsLocalChain, TEST_WALLET_ADDRESS } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

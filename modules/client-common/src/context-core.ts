@@ -1,12 +1,9 @@
 import {
-  ContextParams,
-  ContextState,
-  GRAPHQL_NODES,
-  IPFS_NODES,
-  LIVE_CONTRACTS,
-  SupportedNetwork,
-  SupportedNetworksArray,
-} from ".";
+  getNetwork,
+  JsonRpcProvider,
+  Network,
+  Networkish,
+} from "@ethersproject/providers";
 import {
   InvalidAddressError,
   UnsupportedNetworkError,
@@ -14,14 +11,15 @@ import {
 } from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-import {
-  getNetwork,
-  JsonRpcProvider,
-  Network,
-  Networkish,
-} from "@ethersproject/providers";
 import { isAddress } from "@ethersproject/address";
 import { Signer } from "@ethersproject/abstract-signer";
+import {
+  ContextParams,
+  ContextState,
+  SupportedNetwork,
+  SupportedNetworksArray,
+} from "./types";
+import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 type OverriddenState = {
@@ -57,7 +55,6 @@ export abstract class ContextCore {
     this.set(mergedParams);
   }
 
-
   set(contextParams: Partial<ContextParams>) {
     if (contextParams.network) {
       this.state.network = ContextCore.resolveNetwork(
@@ -81,7 +78,9 @@ export abstract class ContextCore {
       );
     }
     if (contextParams.graphqlNodes?.length) {
-      this.state.graphql = ContextCore.resolveGraphql(contextParams.graphqlNodes);
+      this.state.graphql = ContextCore.resolveGraphql(
+        contextParams.graphqlNodes,
+      );
       this.overriden.graphqlNodes = true;
     }
     if (contextParams.ipfsNodes?.length) {
@@ -97,9 +96,10 @@ export abstract class ContextCore {
       this.overriden.ensRegistryAddress = true;
     }
     if (contextParams.gasFeeEstimationFactor) {
-      this.state.gasFeeEstimationFactor = ContextCore.resolveGasFeeEstimationFactor(
-        contextParams.gasFeeEstimationFactor,
-      );
+      this.state.gasFeeEstimationFactor = ContextCore
+        .resolveGasFeeEstimationFactor(
+          contextParams.gasFeeEstimationFactor,
+        );
       this.overriden.gasFeeEstimationFactor = true;
     }
   }
@@ -115,7 +115,9 @@ export abstract class ContextCore {
     }
 
     if (!this.overriden.graphqlNodes) {
-      this.state.graphql = ContextCore.resolveGraphql(GRAPHQL_NODES[networkName]);
+      this.state.graphql = ContextCore.resolveGraphql(
+        GRAPHQL_NODES[networkName],
+      );
     }
 
     if (!this.overriden.ipfsNodes) {

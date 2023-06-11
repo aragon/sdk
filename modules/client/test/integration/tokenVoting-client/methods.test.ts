@@ -5,22 +5,15 @@ import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 import {
   CanVoteParams,
   Client,
-  Context,
   CreateMajorityVotingProposalParams,
   DelegateTokensStep,
   Erc20TokenDetails,
   ExecuteProposalStep,
-  PrepareInstallationStep,
   ProposalCreationSteps,
-  ProposalMetadata,
   ProposalQueryParams,
   ProposalSortBy,
-  ProposalStatus,
   SetAllowanceSteps,
-  SortDirection,
   SubgraphVoteValues,
-  SupportedNetworksArray,
-  TokenType,
   TokenVotingClient,
   TokenVotingMember,
   TokenVotingPluginPrepareInstallationParams,
@@ -77,7 +70,6 @@ import {
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
 } from "../../../src/tokenVoting/internal/types";
-import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 import {
   GovernanceERC20__factory,
@@ -85,6 +77,16 @@ import {
   TokenVoting__factory,
 } from "@aragon/osx-ethers";
 import { BigNumber } from "@ethersproject/bignumber";
+import {
+  Context,
+  LIVE_CONTRACTS,
+  PrepareInstallationStep,
+  ProposalMetadata,
+  ProposalStatus,
+  SortDirection,
+  SupportedNetworksArray,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

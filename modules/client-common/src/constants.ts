@@ -1,5 +1,6 @@
 import { activeContractsList } from "@aragon/osx-ethers";
-import { NetworkDeployment, SupportedNetwork } from "./types";
+import { ProposalMetadata, SupportedNetwork } from "./types";
+import { NetworkDeployment } from "./internal";
 
 type GraphqlNetworks = "mainnet" | "goerli" | "polygon" | "mumbai";
 
@@ -10,6 +11,26 @@ const SupportedNetworksToGraphqlNetworks: {
   [SupportedNetwork.GOERLI]: "goerli",
   [SupportedNetwork.POLYGON]: "polygon",
   [SupportedNetwork.MUMBAI]: "mumbai",
+};
+
+
+export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
+  title: "(unsupported metadata link)",
+  summary: "(the link to the metadata is not supported)",
+  description: "(the link to the metadata is not supported)",
+  resources: [],
+};
+export const EMPTY_PROPOSAL_METADATA_LINK: ProposalMetadata = {
+  title: "(the proposal has no metadata)",
+  summary: "(the current proposal does not have any content defined)",
+  description: "(the current proposal does not have any content defined)",
+  resources: [],
+};
+export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
+  title: "(unavailable metadata)",
+  summary: "(the proposal metadata is not available)",
+  description: "(the proposal metadata is not available)",
+  resources: [],
 };
 
 const getGraphqlNode = (netowrk: SupportedNetwork): string => {

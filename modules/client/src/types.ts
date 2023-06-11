@@ -3,7 +3,7 @@ import {
   Pagination,
   PluginInstallItem,
   TokenType,
-} from "./client-common";
+} from "@aragon/sdk-client-common";
 
 /* DAO creation */
 export type CreateDaoParams = {

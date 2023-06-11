@@ -16,27 +16,20 @@ import {
   resolveIpfsCid,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
-import { IAddresslistVotingClientMethods } from "../../interfaces";
+import { IAddresslistVotingClientMethods } from "../interfaces";
 import {
   CanVoteParams,
-  ClientCore,
   computeProposalStatusFilter,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  findLog,
   isFailingProposal,
-  PrepareInstallationStep,
-  PrepareInstallationStepValue,
   ProposalCreationSteps,
   ProposalCreationStepValue,
-  ProposalMetadata,
   ProposalQueryParams,
   ProposalSortBy,
-  SortDirection,
   SubgraphMembers,
   SubgraphVotingSettings,
-  VersionTag,
   VoteProposalParams,
   VoteProposalStep,
   VoteProposalStepValue,
@@ -58,12 +51,6 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import {
-  EMPTY_PROPOSAL_METADATA_LINK,
-  LIVE_CONTRACTS,
-  UNAVAILABLE_PROPOSAL_METADATA,
-  UNSUPPORTED_PROPOSAL_METADATA_LINK,
-} from "../../../client-common/constants";
 import { AddresslistVotingClientEncoding } from "./encoding";
 import {
   AddresslistVotingPluginPrepareInstallationParams,
@@ -75,6 +62,19 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../types";
 import { AlwaysFailingProposalError } from "@aragon/sdk-common";
+import {
+  ClientCore,
+  EMPTY_PROPOSAL_METADATA_LINK,
+  findLog,
+  LIVE_CONTRACTS,
+  PrepareInstallationStep,
+  PrepareInstallationStepValue,
+  ProposalMetadata,
+  SortDirection,
+  UNAVAILABLE_PROPOSAL_METADATA,
+  UNSUPPORTED_PROPOSAL_METADATA_LINK,
+  VersionTag,
+} from "@aragon/sdk-client-common";
 
 /**
  * Methods module the SDK Address List Client

@@ -1,18 +1,17 @@
 import { IDAO } from "@aragon/osx-ethers";
-import { ContractReceipt } from "@ethersproject/contracts";
 import { VoteValues, VotingMode } from "./types/plugin";
 import {
   CreateMajorityVotingProposalParams,
   IComputeStatusProposal,
-  ProposalStatus,
 } from "./types/plugin";
 
-import { FunctionFragment, Interface } from "@ethersproject/abi";
-import { id } from "@ethersproject/hash";
-import { Log } from "@ethersproject/providers";
-import { bytesToHex, InvalidVotingModeError } from "@aragon/sdk-common";
-import { DaoAction } from "./types";
+import { InvalidVotingModeError } from "@aragon/sdk-common";
 import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
+import {
+  DaoAction,
+  getFunctionFragment,
+  ProposalStatus,
+} from "@aragon/sdk-client-common";
 
 export function unwrapProposalParams(
   params: CreateMajorityVotingProposalParams,
@@ -83,22 +82,6 @@ export function computeProposalStatusFilter(
   return where;
 }
 
-export function findLog(
-  receipt: ContractReceipt,
-  iface: Interface,
-  eventName: string,
-): Log | undefined {
-  return receipt.logs.find(
-    (log) =>
-      log.topics[0] ===
-        id(
-          iface.getEvent(eventName).format(
-            "sighash",
-          ),
-        ),
-  );
-}
-
 export function votingModeToContracts(votingMode: VotingMode): number {
   switch (votingMode) {
     case VotingMode.STANDARD:
@@ -137,7 +120,7 @@ export function isFailingProposal(actions: DaoAction[] = []): boolean {
       return "";
     }
   }).filter((name) => name !== "");
-  
+
   for (const [i, functionName] of functionNames.entries()) {
     // if I add addresses, we must update the settings after
     if (functionName === "addAddresses") {
@@ -166,13 +149,4 @@ export function isFailingProposal(actions: DaoAction[] = []): boolean {
     }
   }
   return false;
-}
-
-export function getFunctionFragment(
-  data: Uint8Array,
-  availableFunctions: string[],
-): FunctionFragment {
-  const hexBytes = bytesToHex(data);
-  const iface = new Interface(availableFunctions);
-  return iface.getFunction(hexBytes.substring(0, 10));
 }

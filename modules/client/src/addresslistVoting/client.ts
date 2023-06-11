@@ -4,14 +4,14 @@ import {
   IAddresslistVotingClientEncoding,
   IAddresslistVotingClientEstimation,
   IAddresslistVotingClientMethods,
-} from "./interfaces";
+} from "./internal/interfaces";
 import { AddresslistVotingClientMethods } from "./internal/client/methods";
 import { AddresslistVotingClientEncoding } from "./internal/client/encoding";
 import { AddresslistVotingClientDecoding } from "./internal/client/decoding";
 import { AddresslistVotingClientEstimation } from "./internal/client/estimation";
-import { ClientCore, Context, PluginInstallItem } from "../client-common";
 import { Networkish } from "@ethersproject/providers";
 import { AddresslistVotingPluginInstall } from "./types";
+import { ClientCore, Context, PluginInstallItem } from "@aragon/sdk-client-common";
 
 /**
  * Provider a generic client with high level methods to manage and interact an Address List Voting plugin installed in a DAO

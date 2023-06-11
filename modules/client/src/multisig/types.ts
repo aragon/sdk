@@ -1,9 +1,9 @@
 import {
-  CreateProposalBaseParams,
   ProposalBase,
   ProposalListItemBase,
   VersionTag,
-} from "../client-common";
+} from "@aragon/sdk-client-common";
+import { CreateProposalBaseParams } from "../client-common";
 
 /* Installation */
 export type MultisigPluginInstallParams = MultisigPluginSettings;

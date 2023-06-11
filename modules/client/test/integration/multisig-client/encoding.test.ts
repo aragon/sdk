@@ -3,11 +3,9 @@ declare const describe, it, expect;
 
 import {
   AddAddressesParams,
-  Context,
   MultisigClient,
   MultisigPluginInstallParams,
   RemoveAddressesParams,
-  SupportedNetworksArray,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import {
@@ -15,6 +13,7 @@ import {
   contextParamsLocalChain,
   TEST_INVALID_ADDRESS,
 } from "../constants";
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

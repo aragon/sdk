@@ -2,7 +2,8 @@
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import { Wallet } from "@ethersproject/wallet";
-import { Client, Context, ContextParams } from "../../../src";
+import { Client } from "../../../src";
+import { Context, ContextParams } from "@aragon/sdk-client-common";
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
     "YjQ3N1JoRUNmOHM4c2RNN1hya0xCczJ3SGM0a0NNd3BiY0ZDNTVLdCAg==",

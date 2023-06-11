@@ -5,21 +5,23 @@ import {
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
-  ClientCore,
-  DaoAction,
   encodeUpdateVotingSettingsAction,
-  PluginInstallItem,
-  SupportedNetwork,
-  SupportedNetworksArray,
   VotingSettings,
   votingSettingsToContract,
 } from "../../../client-common";
-import { IAddresslistVotingClientEncoding } from "../../interfaces";
+import { IAddresslistVotingClientEncoding } from "../interfaces";
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { LIVE_CONTRACTS } from "../../../client-common/constants";
 import { getNetwork, Networkish } from "@ethersproject/providers";
 import { AddresslistVotingPluginInstall } from "../../types";
+import {
+  ClientCore,
+  DaoAction,
+  LIVE_CONTRACTS,
+  PluginInstallItem,
+  SupportedNetwork,
+  SupportedNetworksArray,
+} from "@aragon/sdk-client-common";
 
 /**
  * Encoding module for the SDK AddressList Client

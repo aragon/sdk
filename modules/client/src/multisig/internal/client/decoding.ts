@@ -1,15 +1,15 @@
 import { bytesToHex } from "@aragon/sdk-common";
-import {
-  ClientCore,
-  getFunctionFragment,
-  InterfaceParams,
-} from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { MultisigVotingSettings } from "../../types";
 // @ts-ignore
 // todo fix new contracts-ethers
 import { Multisig__factory } from "@aragon/osx-ethers";
-import { IMultisigClientDecoding } from "../../interfaces";
+import { IMultisigClientDecoding } from "../interfaces";
+import {
+  ClientCore,
+  getFunctionFragment,
+  InterfaceParams,
+} from "@aragon/sdk-client-common";
 
 /**
  * Decoding module for the SDK AddressList Client

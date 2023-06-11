@@ -10,17 +10,11 @@ import {
   AddresslistVotingPluginPrepareInstallationParams,
   AddresslistVotingProposal,
   CanVoteParams,
-  Context,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
-  PrepareInstallationStep,
   ProposalCreationSteps,
-  ProposalMetadata,
   ProposalQueryParams,
   ProposalSortBy,
-  ProposalStatus,
-  SortDirection,
-  SupportedNetworksArray,
   VoteProposalParams,
   VoteProposalStep,
   VoteValues,
@@ -59,7 +53,15 @@ import {
   SubgraphAddresslistVotingProposal,
   SubgraphAddresslistVotingProposalListItem,
 } from "../../../src/addresslistVoting/internal/types";
-import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
+import {
+  Context,
+  LIVE_CONTRACTS,
+  PrepareInstallationStep,
+  ProposalMetadata,
+  ProposalStatus,
+  SortDirection,
+  SupportedNetworksArray,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

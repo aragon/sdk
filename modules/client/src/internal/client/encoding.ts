@@ -7,13 +7,6 @@ import {
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../types";
-import {
-  ApplyInstallationParams,
-  ClientCore,
-  DaoAction,
-  LIVE_CONTRACTS,
-  TokenType,
-} from "../../client-common";
 import { isAddress } from "@ethersproject/address";
 import {
   DAO__factory,
@@ -27,13 +20,17 @@ import {
 } from "../utils";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
-import {
-  hexToBytes,
-  InvalidAddressError,
-} from "@aragon/sdk-common";
+import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { IClientEncoding } from "../../interfaces";
+import { IClientEncoding } from "../interfaces";
 import { Permissions } from "../../constants";
+import {
+  ApplyInstallationParams,
+  ClientCore,
+  DaoAction,
+  LIVE_CONTRACTS,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 /**
  * Encoding module the SDK Generic Client

@@ -6,8 +6,6 @@ import {
 import {
   computeProposalStatus,
   ContractVotingSettings,
-  DaoAction,
-  ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,
@@ -24,6 +22,7 @@ import {
   SubgraphAddresslistVotingProposalListItem,
   SubgraphAddresslistVotingVoterListItem,
 } from "./types";
+import { DaoAction, ProposalMetadata } from "@aragon/sdk-client-common";
 
 export function toAddresslistVotingProposal(
   proposal: SubgraphAddresslistVotingProposal,

@@ -1,7 +1,8 @@
 import { ContractFactory } from "@ethersproject/contracts";
-import { Client, Context } from "../../src";
+import { Client } from "../../src";
 import { erc20ContractAbi } from "../../src/internal/abi/erc20";
 import { contextParamsLocalChain } from "../integration/constants";
+import { Context } from "@aragon/sdk-client-common";
 
 export function deployErc20() {
   const client = new Client(new Context(contextParamsLocalChain));

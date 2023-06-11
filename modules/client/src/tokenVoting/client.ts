@@ -4,14 +4,18 @@ import {
   ITokenVotingClientEncoding,
   ITokenVotingClientEstimation,
   ITokenVotingClientMethods,
-} from "./interfaces";
+} from "./internal/interfaces";
 import { TokenVotingClientMethods } from "./internal/client/methods";
 import { TokenVotingClientEncoding } from "./internal/client/encoding";
 import { TokenVotingClientDecoding } from "./internal/client/decoding";
 import { TokenVotingClientEstimation } from "./internal/client/estimation";
-import { ClientCore, Context, PluginInstallItem } from "../client-common";
 import { Networkish } from "@ethersproject/providers";
 import { TokenVotingPluginInstall } from "./types";
+import {
+  ClientCore,
+  Context,
+  PluginInstallItem,
+} from "@aragon/sdk-client-common";
 
 /**
  * Provider a generic client with high level methods to manage and interact a Token Voting plugin installed in a DAO

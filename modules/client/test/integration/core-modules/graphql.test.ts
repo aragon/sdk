@@ -1,5 +1,6 @@
 import { Wallet } from "@ethersproject/wallet";
-import { Client, Context, ContextParams } from "../../../src";
+import { Client } from "../../../src";
+import { Context, ContextParams } from "@aragon/sdk-client-common";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(

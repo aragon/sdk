@@ -1,13 +1,24 @@
-// This file defines the interfaces of the context object holding client settings
-
 import { Signer } from "@ethersproject/abstract-signer";
 import { JsonRpcProvider, Network, Networkish } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 
+export type NetworkDeployment = {
+  daoFactory: string;
+  pluginSetupProcessor: string;
+  multisigRepo: string;
+  adminRepo: string;
+  addresslistVotingRepo: string;
+  tokenVotingRepo: string;
+  multisigSetup: string;
+  adminSetup: string;
+  addresslistVotingSetup: string;
+  tokenVotingSetup: string;
+  ensRegistry?: string;
+};
 // Context input parameters
 
-type Web3ContextParams = {
+export type Web3ContextParams = {
   /** Defaults to mainnet */
   network?: Networkish;
   /** Required for Ethereum transactions to work */
@@ -21,23 +32,16 @@ type Web3ContextParams = {
   /** If not provided uses default value */
   gasFeeEstimationFactor?: number;
 };
-type IpfsContextParams = {
+export type IpfsContextParams = {
   /** If not provided uses default value */
   ipfsNodes?: { url: string; headers?: Record<string, string> }[];
 };
-type GraphQLContextParams = {
+export type GraphQLContextParams = {
   /** If not provided uses default value */
   graphqlNodes?: { url: string }[];
 };
 
-export type ContextParams =
-  & Web3ContextParams
-  & IpfsContextParams
-  & GraphQLContextParams;
-
-// Context state data
-
-type Web3ContextState = {
+export type Web3ContextState = {
   network: Network;
   signer: Signer;
   // always going to exist because i'll default to LIVE_CONTRACTS
@@ -47,15 +51,9 @@ type Web3ContextState = {
   web3Providers: JsonRpcProvider[];
   gasFeeEstimationFactor: number;
 };
-type IpfsContextState = {
+export type IpfsContextState = {
   ipfs: IpfsClient[];
 };
-type GraphQLContextState = {
+export type GraphQLContextState = {
   graphql: GraphQLClient[];
 };
-
-export type ContextState =
-  & Web3ContextState
-  & IpfsContextState
-  & GraphQLContextState;
-

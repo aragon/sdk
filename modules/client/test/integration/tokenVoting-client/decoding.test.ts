@@ -3,15 +3,14 @@ declare const describe, it, expect;
 
 import { bytesToHex } from "@aragon/sdk-common";
 import {
-  Context,
   MintTokenParams,
-  SupportedNetworksArray,
   TokenVotingClient,
   VotingMode,
   VotingSettings,
 } from "../../../src";
 
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

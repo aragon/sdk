@@ -5,18 +5,18 @@ import {
 } from "@aragon/sdk-ipfs";
 import {
   ClientNotInitializedError,
-  DataDecodingError,
   IpfsError,
   NoNodesAvailableError,
   runAndRetry,
+  DataDecodingError
 } from "@aragon/sdk-common";
 import { IClientIpfsCore } from "../interfaces";
-import { ContextCore } from "../../context-core";
+import { Context } from "../../context";
 
 export class IPFSModule implements IClientIpfsCore {
   private clientIdx: number = -1;
   private clients: IpfsClient[] = [];
-  constructor(context: ContextCore) {
+  constructor(context: Context) {
     // Storing client data in the private module's scope to prevent external mutation
     if (context.ipfs?.length) {
       this.clients = context.ipfs;

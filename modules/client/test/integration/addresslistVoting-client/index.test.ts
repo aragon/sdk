@@ -6,11 +6,12 @@ import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { AddresslistVotingClient, Context } from "../../../src";
+import { AddresslistVotingClient } from "../../../src";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 
 import { contextParamsFailing, contextParamsMainnet } from "../constants";
+import { Context } from "@aragon/sdk-client-common";
 
 describe("Client Address List", () => {
   describe("Client instances", () => {

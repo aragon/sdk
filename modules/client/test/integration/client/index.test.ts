@@ -3,8 +3,9 @@ declare const describe, it, expect;
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { Client, Context } from "../../../src";
+import { Client } from "../../../src";
 import { contextParamsMainnet, web3endpoints } from "../constants";
+import { Context } from "@aragon/sdk-client-common";
 
 describe("Client", () => {
   describe("Client instances", () => {

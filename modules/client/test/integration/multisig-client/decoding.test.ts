@@ -1,13 +1,12 @@
 // @ts-ignore
 declare const describe, it, expect;
 
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 import {
   AddAddressesParams,
-  Context,
   MultisigClient,
   MultisigVotingSettings,
   RemoveAddressesParams,
-  SupportedNetworksArray,
   UpdateMultisigVotingSettingsParams,
 } from "../../../src";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";

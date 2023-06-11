@@ -4,16 +4,11 @@ import {
   UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import {
-  ClientCore,
-  DaoAction,
   encodeUpdateVotingSettingsAction,
-  PluginInstallItem,
-  SupportedNetwork,
-  SupportedNetworksArray,
   VotingSettings,
 } from "../../../client-common";
 import { isAddress } from "@ethersproject/address";
-import { ITokenVotingClientEncoding } from "../../interfaces";
+import { ITokenVotingClientEncoding } from "../interfaces";
 import { MintTokenParams, TokenVotingPluginInstall } from "../../types";
 import { IERC20MintableUpgradeable__factory } from "@aragon/osx-ethers";
 import {
@@ -21,8 +16,15 @@ import {
   tokenVotingInitParamsToContract,
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { LIVE_CONTRACTS } from "../../../client-common/constants";
 import { getNetwork, Networkish } from "@ethersproject/providers";
+import {
+  ClientCore,
+  DaoAction,
+  LIVE_CONTRACTS,
+  PluginInstallItem,
+  SupportedNetwork,
+  SupportedNetworksArray,
+} from "@aragon/sdk-client-common";
 
 /**
  * Encoding module the SDK TokenVoting Client

@@ -9,30 +9,30 @@ import {
 } from "@aragon/osx-ethers";
 
 import {
-  ApplyInstallationParams,
   ApplyUninstallationParams,
   Client,
-  Context,
   DaoMetadata,
   GrantPermissionParams,
   PermissionIds,
   Permissions,
   RegisterStandardCallbackParams,
   RevokePermissionParams,
-  TokenType,
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../../src";
-import {
-  DaoAction,
-  SupportedNetworksArray,
-} from "../../../src/client-common/types/common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { bytesToHex } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
+import {
+  ApplyInstallationParams,
+  Context,
+  DaoAction,
+  SupportedNetworksArray,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

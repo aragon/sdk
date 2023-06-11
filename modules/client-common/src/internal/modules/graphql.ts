@@ -5,14 +5,14 @@ import {
   runAndRetry,
 } from "@aragon/sdk-common";
 import { ClientError, GraphQLClient } from "graphql-request";
-import { QueryStatus } from "../graphql-queries";
 import { IClientGraphQLCore } from "../interfaces";
-import { ContextCore } from "../../context-core";
+import { Context } from "../../context";
+import { QueryStatus } from "../graphql-queries";
 
 export class GraphqlModule implements IClientGraphQLCore {
   private clientIdx: number = -1;
   private clients: GraphQLClient[] = [];
-  constructor(context: ContextCore) {
+  constructor(context: Context) {
     if (context.graphql?.length) {
       this.clients = context.graphql;
       this.clientIdx = Math.floor(Math.random() * context.graphql.length);
