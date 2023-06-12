@@ -9,7 +9,7 @@ Use the ContextCore class to create an extended Context for you own plugin. Now 
 
 */
 
-import { ContextCore } from "../src";
+import { Context, ContextCore, SupportedNetwork } from "../src";
 
 // define a custom context params
 type MyContextParams = {
@@ -28,20 +28,37 @@ export class MyContext extends ContextCore {
   }
 }
 
-// define a custom context with default values
-const context = new MyContext();
+// obtained from the host UI (Web3, Subgraph and IPFS)
+const genericUiCtx: Context = new Context(/* ... */);
+
+// define our custom context
+const context1 = new MyContext({ myParam: "hello world" }, genericUiCtx);
 
 // call extended client functions
-console.log(context.daoFactoryAddress);
-console.log(context.ensRegistryAddress);
-console.log(context.myParam);
+console.log(context1.network);
+console.log(context1.myParam);
 // ...
 
 /* MARKDOWN
   Returns:
   ```tsx
-  0x1234567890...
-  0x2345678901...
+  matic
+  hello world
+  ```
+  */
+
+// define a custom context with default values
+const context2 = new MyContext();
+
+// call extended client functions
+console.log(context2.network);
+console.log(context2.myParam);
+// ...
+
+/* MARKDOWN
+  Returns:
+  ```tsx
+  mainnet
   default
   ```
   */
