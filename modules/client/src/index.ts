@@ -5,5 +5,6 @@ export * from "./client-common";
 export * from "./multisig";
 export * from "./types";
 export * from "./constants";
-// TODO review
-export * from "@aragon/sdk-client-common"
+
+// Selective reexports for completeness
+export { Context, ContextParams } from "@aragon/sdk-client-common";
