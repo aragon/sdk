@@ -1,11 +1,11 @@
 /* MARKDOWN
 ---
-title: Extend client
+title: Extend context
 ---
 
-## Extend client
+## Extend contex
 
-Use the ClientCore class to create an extended client. Now you can add custom functions and properties to the client.
+Use the ContextCore class to create an extended Context. Now you can add custom parameters to your client
 
 */
 
