@@ -1,15 +1,15 @@
 /* MARKDOWN
 ---
-title: Extend context
+title: Extended context
 ---
 
-## Extend contex
+## Extended contex
 
-Use the ContextCore class to create an extended Context. Now you can add custom parameters to your client
+Use the ContextCore class to create an extended Context for you own plugin. Now you can receive a generic base context with Web3, Subgraph and IPFS capabilities add custom parameters for your client on top.
 
 */
 
-import { ClientCore, ContextCore } from "../src";
+import { ContextCore } from "../src";
 
 // define a custom context params
 type MyContextParams = {
@@ -17,7 +17,7 @@ type MyContextParams = {
 };
 
 // define a custom context that extends the ContextCore class
-class MyContext extends ContextCore {
+export class MyContext extends ContextCore {
   public myParam: string;
   constructor(
     customContextParams?: Partial<MyContextParams>,
@@ -32,8 +32,9 @@ class MyContext extends ContextCore {
 const context = new MyContext();
 
 // call extended client functions
-console.log(context.daoFactoryAddress)
-console.log(context.ensRegistryAddress)
+console.log(context.daoFactoryAddress);
+console.log(context.ensRegistryAddress);
+console.log(context.myParam);
 // ...
 
 /* MARKDOWN
@@ -41,5 +42,6 @@ console.log(context.ensRegistryAddress)
   ```tsx
   0x1234567890...
   0x2345678901...
+  default
   ```
   */
