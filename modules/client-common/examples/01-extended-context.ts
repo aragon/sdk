@@ -40,12 +40,12 @@ console.log(context1.myParam);
 // ...
 
 /* MARKDOWN
-  Returns:
-  ```tsx
-  matic
-  hello world
-  ```
-  */
+Returns:
+```tsx
+matic
+hello world
+```
+*/
 
 // define a custom context with default values
 const context2 = new MyContext();
@@ -56,9 +56,9 @@ console.log(context2.myParam);
 // ...
 
 /* MARKDOWN
-  Returns:
-  ```tsx
-  mainnet
-  default
-  ```
-  */
+Returns:
+```tsx
+mainnet
+default
+```
+*/

@@ -49,9 +49,9 @@ console.log(client.customFunction());
 console.log(client.customFunction3());
 
 /* MARKDOWN
-  Returns:
-  ```tsx
-  hello world
-  default
-  ```
-  */
+Returns:
+```tsx
+hello world
+default
+```
+*/
