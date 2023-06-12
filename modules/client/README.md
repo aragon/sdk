@@ -55,17 +55,12 @@ See `ClientCore` ([source](./src/internal/core.ts)):
 When updating a `ClientXXX` (plugin) class:
 
 - **Update first** all affected enum's, types and interfaces in
-  `src/internal/interfaces/plugins.ts`
+  `src/internal/interfaces.ts`
 
 When updating the `Client` class:
 
 - **Update first** all affected enum's, types and interfaces in
-  `src/internal/interfaces/client.ts`
-
-When updating the `ClientCore` class:
-
-- **Update first** all affected enum's, types and interfaces in
-  `src/internal/interfaces/core.ts`
+  `src/internal/interfaces.ts`
 
 ## Developing a new Plugin client
 
