@@ -12,24 +12,24 @@ Use the ClientCore class to create an extended client. Now you can add custom fu
 import { ClientCore, ContextCore } from "../src";
 
 // define a custom context params
-type CustomContextParams = {
-  customParam: string;
+type MyContextParams = {
+  myParam: string;
 };
 
 // define a custom context that extends the ContextCore class
-class CustomContext extends ContextCore {
-  public customParam: string;
+class MyContext extends ContextCore {
+  public myParam: string;
   constructor(
-    customContextParams?: Partial<CustomContextParams>,
+    customContextParams?: Partial<MyContextParams>,
     context?: ContextCore,
   ) {
     super(context);
-    this.customParam = customContextParams?.customParam || "default";
+    this.myParam = customContextParams?.myParam || "default";
   }
 }
 
 // define a custom context with default values
-const context = new CustomContext();
+const context = new MyContext();
 
 // call extended client functions
 console.log(context.daoFactoryAddress)

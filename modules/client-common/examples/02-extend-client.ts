@@ -12,28 +12,28 @@ Use the ClientCore class to create an extended client. Now you can add custom fu
 import { ClientCore, ContextCore } from "../src";
 
 // define a custom context params
-type CustomContextParams = {
-  customParam: string;
+type MyContextParams = {
+  myParam: string;
 };
 
 // define a custom context that extends the ContextCore class
-class CustomContext extends ContextCore {
-  public customParam: string;
+class MyContext extends ContextCore {
+  public myParam: string;
   constructor(
-    customContextParams?: Partial<CustomContextParams>,
+    customContextParams?: Partial<MyContextParams>,
     context?: ContextCore,
   ) {
     super(context);
-    this.customParam = customContextParams?.customParam || "default";
+    this.myParam = customContextParams?.myParam || "default";
   }
 }
 
 // define a custom client that extends the ClientCore class
-class CustomClient extends ClientCore {
-  protected customParam: string;
-  constructor(ctx: CustomContext) {
+class MyClient extends ClientCore {
+  protected myParam: string;
+  constructor(ctx: MyContext) {
     super(ctx);
-    this.customParam = ctx.customParam;
+    this.myParam = ctx.myParam;
   }
   public async customFunction() {
     return "hello world";
@@ -46,14 +46,14 @@ class CustomClient extends ClientCore {
     const ipfsClient = this.ipfs.getClient();
   }
   public async customFunction3() {
-    return this.customParam;
+    return this.myParam;
   }
 }
 
 // define a custom context with default values
-const context = new CustomContext();
+const context = new MyContext();
 // define a custom client
-const client = new CustomClient(context);
+const client = new MyClient(context);
 
 // call extended client functions
 console.log(client.customFunction())
