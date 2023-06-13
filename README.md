@@ -7,7 +7,7 @@
   •
   <a href="http://eepurl.com/icA7oj">Join our Developer Community</a>
   •
-<a href="https://aragonproject.typeform.com/dx-contribution">Contribute</a>
+  <a href="https://aragonproject.typeform.com/dx-contribution">Contribute</a>
 </p>
 
 <br/>
