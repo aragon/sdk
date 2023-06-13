@@ -1,15 +1,43 @@
-![Aragon](https://res.cloudinary.com/dacofvu8m/image/upload/v1677353961/Aragon%20CodeArena/osx_blue_logo_lqrvkr.png)
+![Aragon](https://res.cloudinary.com/duvrxe0m9/image/upload/v1686656588/aragon-sdk_tjosse.png)
 
-# Aragon JS SDK
+<p align="center">
+  <a href="https://aragon.org/">Aragon website</a>
+  •
+  <a href="https://devs.aragon.org/">Developer Portal</a>
+  •
+  <a href="http://eepurl.com/icA7oj">Join our Developer Community</a>
+  •
+<a href="https://aragonproject.typeform.com/dx-contribution">Contribute</a>
+</p>
 
-Welcome to the Aragon JS SDK! This SDK allows you to interact with Aragon OSx
-using JavaScript. Whether you are a developer wanting to build on top of Aragon,
-or looking to contribute to the SDK itself, you are in the right place! This
-folder contains all the JS packages available on NPM:
+<br/>
 
-- [Client](./modules/client)
-- [IPFS](./modules/ipfs)
-- [Common](./modules/common)
+# Aragon OSx SDK
+
+Welcome to the Aragon OSx SDK!
+
+The Aragon OSx SDK enables you to interact with the Aragon OSx product using
+pure JavaScript (with Typescript support).
+
+Whether you're a developer building a custom DAO or your own dApp, the Aragon
+OSx SDK is your gateway to Aragon OSx' functionality. The Aragon OSx protocol is
+a secure and modular DAO framework for building custom organizations on-chain.
+
+Within this repository, you will find the following JS packages available
+already on NPM for install:
+
+- [Client](./modules/client): The package you'll be mostly interacting with. It
+  is the package containing all functions querying the Aragon OSx subgraph to
+  fetch information about DAOs and call on certain plugins to perform actions.
+- [IPFS](./modules/ipfs): This package provides a wrapper to send requests to an
+  IPFS Cluster using the IPFS API. It supports standard requests as well as
+  streamed requests, and is used under the hood to send requests by the other
+  packages.
+- [Common](./modules/common): This package provides the general purpose
+  components to use across the entire Aragon SDK like the shared `interfaces`,
+  `constants`, etc.
+
+<br/>
 
 ## Developer Quick Start
 
@@ -77,6 +105,8 @@ returns
 
 checkout the [SDK Docs](https://devs.aragon.org/docs/sdk) for more info.
 
+<br/>
+
 ## Available scripts
 
 - `yarn build`
@@ -88,9 +118,13 @@ checkout the [SDK Docs](https://devs.aragon.org/docs/sdk) for more info.
 - `yarn test`
   - Runs the test suite on all modules
 
+<br/>
+
 ## Development
 
 Run `yarn build` to compile the individual packages. Run `yarn test` on them.
+
+<br/>
 
 ## Automatic publishing
 
