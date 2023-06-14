@@ -8,13 +8,11 @@ title: Get Members
 Gets the list of addresses able to participate in a Multisig proposal for a given DAO that has the Multisig plugin installed.
 */
 
-import { ContextPlugin, MultisigClient } from "@aragon/sdk-client";
+import { MultisigClient } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+const multisigClient: MultisigClient = new MultisigClient(context);
 
 const daoPluginAddress: string = "0x1234548357023847502348"; // The address of the plugin that DAO has installed. You can find this through calling `getDao(daoAddress)` and getting the DAO details .
 

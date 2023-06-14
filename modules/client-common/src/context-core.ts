@@ -1,4 +1,3 @@
-import { ContextParams, ContextState } from "./types/context";
 import {
   getNetwork,
   JsonRpcProvider,
@@ -12,15 +11,15 @@ import {
 } from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-import {
-  GRAPHQL_NODES,
-  IPFS_NODES,
-  LIVE_CONTRACTS,
-} from "./constants";
-import { SupportedNetwork, SupportedNetworksArray } from "./types/common";
 import { isAddress } from "@ethersproject/address";
 import { Signer } from "@ethersproject/abstract-signer";
-export { ContextParams } from "./types/context";
+import {
+  ContextParams,
+  ContextState,
+  SupportedNetwork,
+  SupportedNetworksArray,
+} from "./types";
+import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 type OverriddenState = {
@@ -35,7 +34,7 @@ if (typeof process !== "undefined" && process?.env?.TESTING) {
   supportedProtocols.push("http:");
 }
 
-export class Context {
+export abstract class ContextCore {
   protected state: ContextState = {} as ContextState;
   protected overriden: OverriddenState = {
     daoFactoryAddress: false,
@@ -58,7 +57,7 @@ export class Context {
 
   set(contextParams: Partial<ContextParams>) {
     if (contextParams.network) {
-      this.state.network = Context.resolveNetwork(
+      this.state.network = ContextCore.resolveNetwork(
         contextParams.network,
         contextParams.ensRegistryAddress,
       );
@@ -73,17 +72,19 @@ export class Context {
       (Array.isArray(contextParams.web3Providers) &&
         contextParams.web3Providers.length)
     ) {
-      this.state.web3Providers = Context.resolveWeb3Providers(
+      this.state.web3Providers = ContextCore.resolveWeb3Providers(
         contextParams.web3Providers,
         this.state.network,
       );
     }
     if (contextParams.graphqlNodes?.length) {
-      this.state.graphql = Context.resolveGraphql(contextParams.graphqlNodes);
+      this.state.graphql = ContextCore.resolveGraphql(
+        contextParams.graphqlNodes,
+      );
       this.overriden.graphqlNodes = true;
     }
     if (contextParams.ipfsNodes?.length) {
-      this.state.ipfs = Context.resolveIpfs(contextParams.ipfsNodes);
+      this.state.ipfs = ContextCore.resolveIpfs(contextParams.ipfsNodes);
       this.overriden.ipfsNodes = true;
     }
     if (contextParams.daoFactoryAddress) {
@@ -95,9 +96,10 @@ export class Context {
       this.overriden.ensRegistryAddress = true;
     }
     if (contextParams.gasFeeEstimationFactor) {
-      this.state.gasFeeEstimationFactor = Context.resolveGasFeeEstimationFactor(
-        contextParams.gasFeeEstimationFactor,
-      );
+      this.state.gasFeeEstimationFactor = ContextCore
+        .resolveGasFeeEstimationFactor(
+          contextParams.gasFeeEstimationFactor,
+        );
       this.overriden.gasFeeEstimationFactor = true;
     }
   }
@@ -113,11 +115,13 @@ export class Context {
     }
 
     if (!this.overriden.graphqlNodes) {
-      this.state.graphql = Context.resolveGraphql(GRAPHQL_NODES[networkName]);
+      this.state.graphql = ContextCore.resolveGraphql(
+        GRAPHQL_NODES[networkName],
+      );
     }
 
     if (!this.overriden.ipfsNodes) {
-      this.state.ipfs = Context.resolveIpfs(IPFS_NODES[networkName]);
+      this.state.ipfs = ContextCore.resolveIpfs(IPFS_NODES[networkName]);
     }
 
     if (!this.overriden.daoFactoryAddress) {
@@ -186,7 +190,7 @@ export class Context {
    * @public
    */
   get web3Providers(): JsonRpcProvider[] {
-    return this.state.web3Providers || []
+    return this.state.web3Providers || [];
   }
 
   /**

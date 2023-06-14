@@ -18,23 +18,15 @@ import {
 } from "@aragon/sdk-common";
 import {
   CanVoteParams,
-  ClientCore,
   computeProposalStatusFilter,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  findLog,
-  PrepareInstallationStep,
-  PrepareInstallationStepValue,
   ProposalCreationSteps,
   ProposalCreationStepValue,
-  ProposalMetadata,
   ProposalQueryParams,
   ProposalSortBy,
-  SortDirection,
   SubgraphVotingSettings,
-  TokenType,
-  VersionTag,
   VoteProposalParams,
   VoteProposalStep,
   VoteProposalStepValue,
@@ -86,14 +78,22 @@ import {
   TokenVoting__factory,
 } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { TokenVotingClientEncoding } from "./encoding";
+import { ITokenVotingClientMethods } from "../interfaces";
 import {
+  ClientCore,
   EMPTY_PROPOSAL_METADATA_LINK,
+  findLog,
   LIVE_CONTRACTS,
+  PrepareInstallationStep,
+  PrepareInstallationStepValue,
+  ProposalMetadata,
+  SortDirection,
+  TokenType,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
-} from "../../../client-common/constants";
-import { TokenVotingClientEncoding } from "./encoding";
-import { ITokenVotingClientMethods } from "../../interfaces";
+  VersionTag,
+} from "@aragon/sdk-client-common";
 /**
  * Methods module the SDK TokenVoting Client
  */

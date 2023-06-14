@@ -8,18 +8,12 @@ title: Get Settings
 Gets the settings defined for a specific TokenVoting plugin governance mechanism installed in a DAO.
 */
 
-import {
-  ContextPlugin,
-  TokenVotingClient,
-  VotingSettings,
-} from "@aragon/sdk-client";
+import { TokenVotingClient, VotingSettings } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Create an Addresslist Client
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
-  contextPlugin,
+  context,
 );
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890";

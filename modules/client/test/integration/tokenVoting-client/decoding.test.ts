@@ -3,16 +3,14 @@ declare const describe, it, expect;
 
 import { bytesToHex } from "@aragon/sdk-common";
 import {
-  Context,
-  ContextPlugin,
   MintTokenParams,
-  SupportedNetworksArray,
   TokenVotingClient,
   VotingMode,
   VotingSettings,
 } from "../../../src";
 
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -26,8 +24,7 @@ describe("Token Voting Client", () => {
   describe("Action decoders", () => {
     it("Should decode the plugin settings from an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const params: VotingSettings = {
         minDuration: 100000,
         minParticipation: 0.25,
@@ -58,8 +55,7 @@ describe("Token Voting Client", () => {
     });
     it("Should decode a mint action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const params: MintTokenParams = {
         address: "0x1234567890123456789012345678901234567890",
         amount: BigInt(10),
@@ -78,8 +74,7 @@ describe("Token Voting Client", () => {
 
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.updatePluginSettingsAction(data)).toThrow();
@@ -87,8 +82,7 @@ describe("Token Voting Client", () => {
 
     it("Should get the function for a given action data", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const params: VotingSettings = {
         minDuration: 100000,
         minParticipation: 0.25,
@@ -114,8 +108,7 @@ describe("Token Voting Client", () => {
 
     it("Should try to get the function of an invalid data and return null", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
       const iface = client.decoding.findInterface(data);
       expect(iface).toBe(null);

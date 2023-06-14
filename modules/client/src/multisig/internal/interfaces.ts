@@ -2,15 +2,16 @@
 
 import {
   DaoAction,
-  ExecuteProposalStepValue,
   GasFeeEstimation,
-  IClientCore,
   InterfaceParams,
-  ProposalQueryParams,
   PrepareInstallationStepValue,
-  ProposalCreationStepValue,
   ProposalMetadata,
-} from "../client-common";
+} from "@aragon/sdk-client-common";
+import {
+  ExecuteProposalStepValue,
+  ProposalCreationStepValue,
+  ProposalQueryParams,
+} from "../../client-common";
 import {
   AddAddressesParams,
   ApproveMultisigProposalParams,
@@ -23,10 +24,10 @@ import {
   MultisigVotingSettings,
   RemoveAddressesParams,
   UpdateMultisigVotingSettingsParams,
-} from "./types";
+} from "../types";
 
 // Multisig
-export interface IMultisigClientMethods extends IClientCore {
+export interface IMultisigClientMethods {
   createProposal: (
     params: CreateMultisigProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
@@ -54,20 +55,20 @@ export interface IMultisigClientMethods extends IClientCore {
   ) => Promise<MultisigProposalListItem[]>;
 }
 
-export interface IMultisigClientEncoding extends IClientCore {
+export interface IMultisigClientEncoding {
   addAddressesAction: (params: AddAddressesParams) => DaoAction;
   removeAddressesAction: (params: RemoveAddressesParams) => DaoAction;
   updateMultisigVotingSettings: (
     params: UpdateMultisigVotingSettingsParams,
   ) => DaoAction;
 }
-export interface IMultisigClientDecoding extends IClientCore {
+export interface IMultisigClientDecoding {
   addAddressesAction: (data: Uint8Array) => string[];
   removeAddressesAction: (data: Uint8Array) => string[];
   updateMultisigVotingSettings: (data: Uint8Array) => MultisigVotingSettings;
   findInterface: (data: Uint8Array) => InterfaceParams | null;
 }
-export interface IMultisigClientEstimation extends IClientCore {
+export interface IMultisigClientEstimation {
   createProposal: (
     params: CreateMultisigProposalParams,
   ) => Promise<GasFeeEstimation>;

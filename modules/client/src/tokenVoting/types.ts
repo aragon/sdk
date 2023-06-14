@@ -1,10 +1,12 @@
 import {
-  MajorityVotingProposalSettings,
   ProposalBase,
   ProposalListItemBase,
-  ProposalVoteBase,
   TokenType,
   VersionTag,
+} from "@aragon/sdk-client-common";
+import {
+  MajorityVotingProposalSettings,
+  ProposalVoteBase,
   VotingSettings,
 } from "../client-common";
 

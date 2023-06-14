@@ -1,21 +1,14 @@
 import {
   DaoMetadata,
   DecodedApplyUninstallationParams,
-  GrantPermissionWithConditionParams,
   GrantPermissionDecodedParams,
-  RevokePermissionDecodedParams,
+  GrantPermissionWithConditionParams,
   RegisterStandardCallbackParams,
+  RevokePermissionDecodedParams,
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../types";
 
-import {
-  ClientCore,
-  DecodedApplyInstallationParams,
-  getFunctionFragment,
-  InterfaceParams,
-  TokenType
-} from "../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import {
   DAO__factory,
@@ -32,7 +25,14 @@ import { erc20ContractAbi } from "../abi/erc20";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
 import { toUtf8String } from "@ethersproject/strings";
-import { IClientDecoding } from "../../interfaces";
+import { IClientDecoding } from "../interfaces";
+import {
+  ClientCore,
+  DecodedApplyInstallationParams,
+  getFunctionFragment,
+  InterfaceParams,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 /**
  * Decoding module the SDK Generic Client

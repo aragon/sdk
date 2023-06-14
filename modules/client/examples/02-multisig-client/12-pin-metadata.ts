@@ -8,17 +8,11 @@ title: Pin Metadata
 Adds an pin data into one of the specified IPFS nodes and return a IPFS CID preceded by "ipfs://"
 */
 
-import {
-  ContextPlugin,
-  MultisigClient,
-  ProposalMetadata,
-} from "@aragon/sdk-client";
+import { MultisigClient, ProposalMetadata } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig plugin client.
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+const multisigClient: MultisigClient = new MultisigClient(context);
 
 const metadata: ProposalMetadata = {
   title: "Test Proposal",

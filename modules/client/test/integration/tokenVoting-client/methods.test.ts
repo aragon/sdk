@@ -5,23 +5,15 @@ import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 import {
   CanVoteParams,
   Client,
-  Context,
-  ContextPlugin,
   CreateMajorityVotingProposalParams,
   DelegateTokensStep,
   Erc20TokenDetails,
   ExecuteProposalStep,
-  PrepareInstallationStep,
   ProposalCreationSteps,
-  ProposalMetadata,
   ProposalQueryParams,
   ProposalSortBy,
-  ProposalStatus,
   SetAllowanceSteps,
-  SortDirection,
   SubgraphVoteValues,
-  SupportedNetworksArray,
-  TokenType,
   TokenVotingClient,
   TokenVotingMember,
   TokenVotingPluginPrepareInstallationParams,
@@ -78,7 +70,6 @@ import {
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
 } from "../../../src/tokenVoting/internal/types";
-import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 import {
   GovernanceERC20__factory,
@@ -86,6 +77,16 @@ import {
   TokenVoting__factory,
 } from "@aragon/osx-ethers";
 import { BigNumber } from "@ethersproject/bignumber";
+import {
+  Context,
+  LIVE_CONTRACTS,
+  PrepareInstallationStep,
+  ProposalMetadata,
+  ProposalStatus,
+  SortDirection,
+  SupportedNetworksArray,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -243,8 +244,7 @@ describe("Token Voting Client", () => {
     describe("Proposal Creation", () => {
       it("Should create a new proposal locally", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const daoEntries = await buildDaos();
 
@@ -264,9 +264,8 @@ describe("Token Voting Client", () => {
     describe("Existing Token Dao", () => {
       it("Should deploy a token day with an existing token and wrap and unwrap the token used", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
         const client = new Client(ctx);
-        const pluginClient = new TokenVotingClient(ctxPlugin);
+        const pluginClient = new TokenVotingClient(ctx);
         const erc20 = await deployErc20();
         const dao = await buildExistingTokenVotingDAO(
           repoAddr,
@@ -362,8 +361,7 @@ describe("Token Voting Client", () => {
     describe("Can vote", () => {
       it("Should check if an user can vote in a TokenVoting proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const daoEntries = await buildDaos();
 
@@ -392,8 +390,7 @@ describe("Token Voting Client", () => {
     describe("Vote on a proposal", () => {
       it("Should vote on a proposal locally", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const daoEntries = await buildDaos();
 
@@ -414,8 +411,7 @@ describe("Token Voting Client", () => {
 
       it("Should replace a vote on a proposal locally", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const { plugin: pluginAddress } = await buildTokenVotingDAO(
           repoAddr,
@@ -439,8 +435,7 @@ describe("Token Voting Client", () => {
     describe("Plugin installation", () => {
       it("Should prepare the installation of a multisig plugin", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
         const { dao } = await buildTokenVotingDAO(
           repoAddr,
           VotingMode.VOTE_REPLACEMENT,
@@ -514,8 +509,7 @@ describe("Token Voting Client", () => {
     describe("Can execute", () => {
       it("Should check if an user can execute a standard voting proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const { plugin: pluginAddress } = await buildTokenVotingDAO(
           repoAddr,
@@ -545,8 +539,7 @@ describe("Token Voting Client", () => {
 
       it("Should check if an user can execute an early execution proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const { plugin: pluginAddress } = await buildTokenVotingDAO(
           repoAddr,
@@ -575,8 +568,7 @@ describe("Token Voting Client", () => {
 
       it("Should check if an user can execute a vote replacement proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const { plugin: pluginAddress } = await buildTokenVotingDAO(
           repoAddr,
@@ -616,8 +608,7 @@ describe("Token Voting Client", () => {
     describe("Execute proposal", () => {
       it("Should execute a standard voting proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const { plugin: pluginAddress } = await buildTokenVotingDAO(
           repoAddr,
@@ -660,8 +651,7 @@ describe("Token Voting Client", () => {
 
       it("Should execute an early execution proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const { plugin: pluginAddress } = await buildTokenVotingDAO(
           repoAddr,
@@ -703,8 +693,7 @@ describe("Token Voting Client", () => {
 
       it("Should execute a vote replacement proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const { plugin: pluginAddress } = await buildTokenVotingDAO(
           repoAddr,
@@ -749,8 +738,7 @@ describe("Token Voting Client", () => {
     });
     it("Should delegate tokens to another address and undelegate them afterwards", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
       const { tokenAddress } = await buildTokenVotingDAO(
         repoAddr,
         VotingMode.VOTE_REPLACEMENT,
@@ -812,8 +800,7 @@ describe("Token Voting Client", () => {
     describe("Data retrieval", () => {
       it("Should get the list of members that can vote in a proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
@@ -899,8 +886,7 @@ describe("Token Voting Client", () => {
       });
       it("Should fetch the given proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const ipfsMetadata = {
           title: "Title",
@@ -1038,8 +1024,7 @@ describe("Token Voting Client", () => {
       });
       it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
 
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
@@ -1063,8 +1048,7 @@ describe("Token Voting Client", () => {
       });
       it("Should get a list of proposals filtered by the given criteria", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
         const limit = 5;
         const status = ProposalStatus.DEFEATED;
         const params: ProposalQueryParams = {
@@ -1192,8 +1176,7 @@ describe("Token Voting Client", () => {
       });
       it("Should get a list of proposals from a specific dao", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
         const limit = 5;
         const address = ADDRESS_ONE;
         const params: ProposalQueryParams = {
@@ -1228,8 +1211,7 @@ describe("Token Voting Client", () => {
       });
       it("Should get a list of proposals from a dao that has no proposals", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
         const limit = 5;
         const address = TEST_NON_EXISTING_ADDRESS;
         const params: ProposalQueryParams = {
@@ -1252,8 +1234,7 @@ describe("Token Voting Client", () => {
       });
       it("Should get a list of proposals from an invalid address", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
         const limit = 5;
         const address = TEST_INVALID_ADDRESS;
         const params: ProposalQueryParams = {
@@ -1268,8 +1249,7 @@ describe("Token Voting Client", () => {
       });
       it("Should get the settings of a plugin given a plugin instance address", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
@@ -1300,8 +1280,7 @@ describe("Token Voting Client", () => {
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
@@ -1333,8 +1312,7 @@ describe("Token Voting Client", () => {
       });
       it("Should return null token details for nonexistent plugin addresses", async () => {
         const ctx = new Context(contextParamsLocalChain);
-        const ctxPlugin = ContextPlugin.fromContext(ctx);
-        const client = new TokenVotingClient(ctxPlugin);
+        const client = new TokenVotingClient(ctx);
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );

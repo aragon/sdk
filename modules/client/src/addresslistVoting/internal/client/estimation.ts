@@ -1,13 +1,12 @@
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import {
-  ClientCore,
   CreateMajorityVotingProposalParams,
-  GasFeeEstimation,
   VoteProposalParams,
 } from "../../../client-common";
-import { IAddresslistVotingClientEstimation } from "../../interfaces";
+import { IAddresslistVotingClientEstimation } from "../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { boolArrayToBitmap, decodeProposalId } from "@aragon/sdk-common";
+import { ClientCore, GasFeeEstimation } from "@aragon/sdk-client-common";
 
 /**
  * Estimation module the SDK Address List Client

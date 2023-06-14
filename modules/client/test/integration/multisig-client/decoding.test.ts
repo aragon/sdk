@@ -1,14 +1,12 @@
 // @ts-ignore
 declare const describe, it, expect;
 
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 import {
   AddAddressesParams,
-  Context,
-  ContextPlugin,
   MultisigClient,
   MultisigVotingSettings,
   RemoveAddressesParams,
-  SupportedNetworksArray,
   UpdateMultisigVotingSettingsParams,
 } from "../../../src";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
@@ -24,8 +22,7 @@ describe("Client Multisig", () => {
   describe("Action decoders", () => {
     it("Should decode the members from an add members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const members: string[] = [
@@ -49,8 +46,7 @@ describe("Client Multisig", () => {
     });
     it("Should decode the members from an remove members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const members: string[] = [
@@ -76,8 +72,7 @@ describe("Client Multisig", () => {
     });
     it("Should decode the min approvals from an update min approvals action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
       const updateMinApprovalsParams: UpdateMultisigVotingSettingsParams = {
@@ -104,8 +99,7 @@ describe("Client Multisig", () => {
 
     it("Should try to decode a invalid action and with the update plugin settings decoder return an error", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() => client.decoding.addAddressesAction(data)).toThrow(
@@ -115,8 +109,7 @@ describe("Client Multisig", () => {
 
     it("Should get the function for a given action data", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const pluginAddress = "0x1234567890123456789012345678901234567890";
 
@@ -140,8 +133,7 @@ describe("Client Multisig", () => {
 
     it("Should try to get the function of an invalid data and return null", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
       const iface = client.decoding.findInterface(data);
       expect(iface).toBe(null);

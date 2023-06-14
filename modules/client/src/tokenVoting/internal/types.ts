@@ -72,15 +72,15 @@ export type SubgraphTokenVotingProposal =
     executionBlockNumber: string;
   };
 
-  export type SubgraphTokenVotingMember = {
+export type SubgraphTokenVotingMember = {
+  address: string;
+  balance: string;
+  votingPower: string;
+  delegatee: {
+    address: string;
+  };
+  delegators: {
     address: string;
     balance: string;
-    votingPower: string;
-    delegatee: {
-      address: string;
-    };
-    delegators: {
-      address: string;
-      balance: string;
-    }[];
-  };
+  }[];
+};

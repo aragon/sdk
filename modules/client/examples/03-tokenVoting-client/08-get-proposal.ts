@@ -8,25 +8,22 @@ title: Get Proposal
 Gets a specific proposal using the TokenVoting plugin as its governance mechanism.
 */
 
-import {
-  ContextPlugin,
-  TokenVotingClient,
-  TokenVotingProposal,
-} from "@aragon/sdk-client";
+import { TokenVotingClient, TokenVotingProposal } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate a plugin context from an Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Create a TokenVoting client.
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
-  contextPlugin,
+  context,
 );
 
 // The address of the proposal you want to retrieve.
 const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
 // Get a specific proposal created using the TokenVoting plugin.
-const tokenVotingProposal: TokenVotingProposal | null = await tokenVotingClient.methods
+const tokenVotingProposal: TokenVotingProposal | null = await tokenVotingClient
+  .methods
   .getProposal(proposalId);
 console.log(tokenVotingProposal);
 

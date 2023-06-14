@@ -5,7 +5,7 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient, PinResponse } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-import { GasFeeEstimation, SupportedNetwork } from "./types/common";
+import { GasFeeEstimation, SupportedNetwork } from "../types";
 
 export interface IClientWeb3Core {
   shiftProvider: () => void;

@@ -1,11 +1,11 @@
 import { Wallet } from "@ethersproject/wallet";
 import {
-  ContextParams,
   SubgraphAction,
   SubgraphProposalBase,
   SubgraphVoterListItemBase,
   SubgraphVoteValues,
 } from "../../src";
+import { ContextParams } from "@aragon/sdk-client-common";
 
 const IPFS_API_KEY = process?.env?.IPFS_API_KEY || "";
 

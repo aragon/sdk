@@ -1,20 +1,21 @@
 // This file contains the definitions of the TokenVoting client
 import {
-  CanVoteParams,
-  CreateMajorityVotingProposalParams,
   DaoAction,
-  ExecuteProposalStepValue,
   GasFeeEstimation,
-  IClientCore,
   InterfaceParams,
   PrepareInstallationStepValue,
-  ProposalCreationStepValue,
   ProposalMetadata,
+} from "@aragon/sdk-client-common";
+import {
+  CanVoteParams,
+  CreateMajorityVotingProposalParams,
+  ExecuteProposalStepValue,
+  ProposalCreationStepValue,
   ProposalQueryParams,
   VoteProposalParams,
   VoteProposalStepValue,
   VotingSettings,
-} from "../client-common";
+} from "../../client-common";
 import {
   DelegateTokensParams,
   DelegateTokensStepValue,
@@ -30,11 +31,11 @@ import {
   UnwrapTokensStepValue,
   WrapTokensParams,
   WrapTokensStepValue,
-} from "./types";
+} from "../types";
 
 // TokenVoting
 
-export interface ITokenVotingClientMethods extends IClientCore {
+export interface ITokenVotingClientMethods {
   createProposal: (
     params: CreateMajorityVotingProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
@@ -72,7 +73,7 @@ export interface ITokenVotingClientMethods extends IClientCore {
   getDelegatee: (tokenAddress: string) => Promise<string | null>;
 }
 
-export interface ITokenVotingClientEncoding extends IClientCore {
+export interface ITokenVotingClientEncoding {
   updatePluginSettingsAction: (
     pluginAddress: string,
     params: VotingSettings,
@@ -82,12 +83,12 @@ export interface ITokenVotingClientEncoding extends IClientCore {
     params: MintTokenParams,
   ) => DaoAction;
 }
-export interface ITokenVotingClientDecoding extends IClientCore {
+export interface ITokenVotingClientDecoding {
   updatePluginSettingsAction: (data: Uint8Array) => VotingSettings;
   mintTokenAction: (data: Uint8Array) => MintTokenParams;
   findInterface: (data: Uint8Array) => InterfaceParams | null;
 }
-export interface ITokenVotingClientEstimation extends IClientCore {
+export interface ITokenVotingClientEstimation {
   createProposal: (
     params: CreateMajorityVotingProposalParams,
   ) => Promise<GasFeeEstimation>;

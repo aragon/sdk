@@ -40,12 +40,8 @@ import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { AddressZero } from "@ethersproject/constants";
 import { PluginSetupProcessor } from "@aragon/osx-ethers";
-import {
-  ApplyInstallationParams,
-  DecodedApplyInstallationParams,
-  TokenType,
-} from "../client-common";
 import { PermissionIds } from "../constants";
+import { ApplyInstallationParams, DecodedApplyInstallationParams, TokenType } from "@aragon/sdk-client-common";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,

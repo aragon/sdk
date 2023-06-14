@@ -12,10 +12,10 @@ import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Instantiates an AddressList client.
 const addresslistVotingClient: AddresslistVotingClient =
-  new AddresslistVotingClient(contextPlugin);
+  new AddresslistVotingClient(context);
 
 const daoPluginAddress = "0x12345382947301297439127433492834"; // The address of the plugin that DAO has installed. You can find this by calling `getDao(daoAddress)` and getting the DAO details .
 

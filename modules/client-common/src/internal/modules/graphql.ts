@@ -5,9 +5,9 @@ import {
   runAndRetry,
 } from "@aragon/sdk-common";
 import { ClientError, GraphQLClient } from "graphql-request";
-import { Context } from "../../client-common/context";
-import { QueryStatus } from "../graphql-queries";
 import { IClientGraphQLCore } from "../interfaces";
+import { Context } from "../../context";
+import { QueryStatus } from "../graphql-queries";
 
 export class GraphqlModule implements IClientGraphQLCore {
   private clientIdx: number = -1;

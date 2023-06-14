@@ -5,34 +5,34 @@ declare const describe, it, expect;
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import {
-  ApplyInstallationParams,
+  ApplyUninstallationParams,
   Client,
-  Context,
   DaoMetadata,
   GrantPermissionDecodedParams,
   GrantPermissionParams,
+  GrantPermissionWithConditionParams,
+  PermissionIds,
+  Permissions,
+  RegisterStandardCallbackParams,
   RevokePermissionDecodedParams,
   RevokePermissionParams,
-  Permissions,
-  SupportedNetworksArray,
+  UpgradeToAndCallParams,
   WithdrawParams,
-  PermissionOperationType,
 } from "../../../src";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import {
-  ApplyUninstallationParams,
-  GrantPermissionWithConditionParams,
-  PermissionIds,
-  RegisterStandardCallbackParams,
-  TokenType,
-  UpgradeToAndCallParams,
-} from "../../../src";
 import { bytesToHex } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
+import {
+  ApplyInstallationParams,
+  Context,
+  PermissionOperationType,
+  SupportedNetworksArray,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

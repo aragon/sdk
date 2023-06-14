@@ -3,12 +3,9 @@ declare const describe, it, expect;
 
 import {
   AddAddressesParams,
-  Context,
-  ContextPlugin,
   MultisigClient,
   MultisigPluginInstallParams,
   RemoveAddressesParams,
-  SupportedNetworksArray,
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import {
@@ -16,6 +13,7 @@ import {
   contextParamsLocalChain,
   TEST_INVALID_ADDRESS,
 } from "../constants";
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -53,8 +51,7 @@ describe("Client Multisig", () => {
 
     it("Should create a Multisig client and fail to generate a addn members action with an invalid plugin address", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const members: string[] = [
         "0x1234567890123456789012345678901234567890",
@@ -74,8 +71,7 @@ describe("Client Multisig", () => {
 
     it("Should create a Multisig client and fail to generate an add members action with an invalid member address", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const members: string[] = [
         "0x1234567890123456789012345678901234567890",
@@ -98,8 +94,7 @@ describe("Client Multisig", () => {
     });
     it("Should create a Multisig client and an add members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",
@@ -132,8 +127,7 @@ describe("Client Multisig", () => {
     });
     it("Should create a Multisig client and fail to generate a remove members action with an invalid plugin address", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const members: string[] = [
         "0x1234567890123456789012345678901234567890",
@@ -153,8 +147,7 @@ describe("Client Multisig", () => {
 
     it("Should create a Multisig client and fail to generate a remove members action with an invalid member address", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const members: string[] = [
         "0x1234567890123456789012345678901234567890",
@@ -173,8 +166,7 @@ describe("Client Multisig", () => {
     });
     it("Should create a Multisig client and a remove members action", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const members: string[] = [
         "0x1357924680135792468013579246801357924680",

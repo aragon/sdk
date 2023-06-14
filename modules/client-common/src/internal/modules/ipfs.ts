@@ -1,5 +1,3 @@
-import { Context } from "../../client-common/context";
-import { IClientIpfsCore } from "../interfaces";
 import {
   Client as IpfsClient,
   ClientError,
@@ -12,6 +10,8 @@ import {
   runAndRetry,
   DataDecodingError
 } from "@aragon/sdk-common";
+import { IClientIpfsCore } from "../interfaces";
+import { Context } from "../../context";
 
 export class IPFSModule implements IClientIpfsCore {
   private clientIdx: number = -1;

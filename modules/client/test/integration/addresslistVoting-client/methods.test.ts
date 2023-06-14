@@ -10,18 +10,11 @@ import {
   AddresslistVotingPluginPrepareInstallationParams,
   AddresslistVotingProposal,
   CanVoteParams,
-  Context,
-  ContextPlugin,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
-  PrepareInstallationStep,
   ProposalCreationSteps,
-  ProposalMetadata,
   ProposalQueryParams,
   ProposalSortBy,
-  ProposalStatus,
-  SortDirection,
-  SupportedNetworksArray,
   VoteProposalParams,
   VoteProposalStep,
   VoteValues,
@@ -60,7 +53,15 @@ import {
   SubgraphAddresslistVotingProposal,
   SubgraphAddresslistVotingProposalListItem,
 } from "../../../src/addresslistVoting/internal/types";
-import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
+import {
+  Context,
+  LIVE_CONTRACTS,
+  PrepareInstallationStep,
+  ProposalMetadata,
+  ProposalStatus,
+  SortDirection,
+  SupportedNetworksArray,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -224,8 +225,7 @@ describe("Client Address List", () => {
   describe("Proposal Creation", () => {
     it("Should create a new proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const daoEntries = await buildDaos();
 
@@ -244,8 +244,7 @@ describe("Client Address List", () => {
   describe("Can vote", () => {
     it("Should check if an user can vote in an Address List proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const daoEntries = await buildDaos();
 
@@ -274,8 +273,7 @@ describe("Client Address List", () => {
   describe("Vote on a proposal", () => {
     it("Should vote on a proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const daoEntries = await buildDaos();
 
@@ -295,8 +293,7 @@ describe("Client Address List", () => {
     });
     it("Should replace a vote on a proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const { plugin: pluginAddress } = await buildAddressListVotingDAO(
         repoAddr,
@@ -321,8 +318,7 @@ describe("Client Address List", () => {
   describe("Plugin installation", () => {
     it("Should prepare the installation of a token voting plugin", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
       const { dao } = await buildAddressListVotingDAO(
         repoAddr,
         VotingMode.VOTE_REPLACEMENT,
@@ -387,8 +383,7 @@ describe("Client Address List", () => {
   describe("Can execute", () => {
     it("Should check if an user can execute a standard voting proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const { plugin: pluginAddress } = await buildAddressListVotingDAO(
         repoAddr,
@@ -418,8 +413,7 @@ describe("Client Address List", () => {
 
     it("Should check if an user can execute an early execution proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const { plugin: pluginAddress } = await buildAddressListVotingDAO(
         repoAddr,
@@ -448,8 +442,7 @@ describe("Client Address List", () => {
 
     it("Should check if an user can execute a vote replacement proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const { plugin: pluginAddress } = await buildAddressListVotingDAO(
         repoAddr,
@@ -489,8 +482,7 @@ describe("Client Address List", () => {
   describe("Execute proposal", () => {
     it("Should execute a standard voting proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const { plugin: pluginAddress } = await buildAddressListVotingDAO(
         repoAddr,
@@ -531,8 +523,7 @@ describe("Client Address List", () => {
 
     it("Should execute an early execution proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const { plugin: pluginAddress } = await buildAddressListVotingDAO(
         repoAddr,
@@ -572,8 +563,7 @@ describe("Client Address List", () => {
 
     it("Should execute a vote replacement proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const { plugin: pluginAddress } = await buildAddressListVotingDAO(
         repoAddr,
@@ -617,8 +607,7 @@ describe("Client Address List", () => {
   describe("Data retrieval", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),
@@ -644,8 +633,7 @@ describe("Client Address List", () => {
     });
     it("Should fetch the given proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const proposalId = TEST_ADDRESSLIST_PROPOSAL_ID;
 
@@ -765,8 +753,7 @@ describe("Client Address List", () => {
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
 
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),
@@ -790,8 +777,7 @@ describe("Client Address List", () => {
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
       const limit = 5;
       const status = ProposalStatus.DEFEATED;
       const params: ProposalQueryParams = {
@@ -894,8 +880,7 @@ describe("Client Address List", () => {
     });
     it("Should get a list of proposals from a specific dao", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
       const limit = 5;
       const address = ADDRESS_ONE;
       const params: ProposalQueryParams = {
@@ -930,8 +915,7 @@ describe("Client Address List", () => {
     });
     it("Should get a list of proposals from an invalid address", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
       const limit = 5;
       const address = TEST_INVALID_ADDRESS;
       const params: ProposalQueryParams = {
@@ -946,8 +930,7 @@ describe("Client Address List", () => {
     });
     it("Should get the settings of a plugin given a plugin instance address", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new AddresslistVotingClient(ctxPlugin);
+      const client = new AddresslistVotingClient(ctx);
       const pluginAddress: string = ADDRESS_ONE;
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),

@@ -5,13 +5,6 @@ import {
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
-  ClientCore,
-  DaoAction,
-  PluginInstallItem,
-  SupportedNetwork,
-  SupportedNetworksArray,
-} from "../../../client-common";
-import {
   AddAddressesParams,
   MultisigPluginInstallParams,
   RemoveAddressesParams,
@@ -21,9 +14,16 @@ import {
 // todo fix new contracts-ethers
 import { Multisig__factory } from "@aragon/osx-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { LIVE_CONTRACTS } from "../../../client-common/constants";
 import { getNetwork, Networkish } from "@ethersproject/providers";
-import { IMultisigClientEncoding } from "../../interfaces";
+import { IMultisigClientEncoding } from "../interfaces";
+import {
+  ClientCore,
+  DaoAction,
+  LIVE_CONTRACTS,
+  PluginInstallItem,
+  SupportedNetwork,
+  SupportedNetworksArray,
+} from "@aragon/sdk-client-common";
 
 /**
  * Encoding module for the SDK Multisig Client

@@ -8,21 +8,16 @@ title: Get Proposal
 Get the proposal details of a given proposal made using the Multisig plugin.
 */
 
-import {
-  ContextPlugin,
-  MultisigClient,
-  MultisigProposal
-} from "@aragon/sdk-client";
+import { MultisigClient, MultisigProposal } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate a Multisig client
-const multisigClient: MultisigClient = new MultisigClient(contextPlugin);
+const multisigClient: MultisigClient = new MultisigClient(context);
 
 const proposalId: string = "0x1234567890123456789012345678901234567890_0x0";
 
-const multisigProposal: MultisigProposal | null = await multisigClient.methods.getProposal(proposalId);
+const multisigProposal: MultisigProposal | null = await multisigClient.methods
+  .getProposal(proposalId);
 console.log(multisigProposal);
 
 /* MARKDOWN

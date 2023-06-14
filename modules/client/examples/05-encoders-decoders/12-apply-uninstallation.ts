@@ -15,10 +15,10 @@ import {
   Client,
   DaoAction,
   DecodedApplyUninstallationParams,
+  PermissionIds,
   PermissionOperationType,
 } from "@aragon/sdk-client";
 import { context } from "../index";
-import { PermissionIds } from "../../dist/interfaces";
 
 // Instantiates an Aragon OSx SDK client.
 const client: Client = new Client(context);

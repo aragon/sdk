@@ -12,15 +12,14 @@ This function enables Multisig members to approve a proposal.
 import {
   ApproveMultisigProposalParams,
   ApproveProposalStep,
-  ContextPlugin,
   MultisigClient,
 } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Insantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Instantiate a Multisig client
-const multisigClient = new MultisigClient(contextPlugin);
+const multisigClient = new MultisigClient(context);
 
 const approveParams: ApproveMultisigProposalParams = {
   proposalId: "0x1234567890123456789012345678901234567890_0x0",

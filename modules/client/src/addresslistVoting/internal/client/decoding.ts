@@ -1,14 +1,16 @@
 import { bytesToHex } from "@aragon/sdk-common";
 import {
-  ClientCore,
   decodeUpdatePluginSettingsAction,
-  getFunctionFragment,
-  InterfaceParams,
   VotingSettings,
 } from "../../../client-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
-import { IAddresslistVotingClientDecoding } from "../../interfaces";
+import { IAddresslistVotingClientDecoding } from "../interfaces";
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
+import {
+  ClientCore,
+  getFunctionFragment,
+  InterfaceParams,
+} from "@aragon/sdk-client-common";
 
 /**
  * Decoding module for the SDK AddressList Client

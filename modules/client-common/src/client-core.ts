@@ -1,13 +1,13 @@
 import {
+  GraphqlModule,
   IClientCore,
   IClientGraphQLCore,
   IClientIpfsCore,
   IClientWeb3Core,
-} from "./interfaces";
+  IPFSModule,
+  Web3Module,
+} from "./internal";
 import { Context } from "./context";
-import { Web3Module } from "./modules/web3";
-import { IPFSModule } from "./modules/ipfs";
-import { GraphqlModule } from "./modules/graphql";
 
 /**
  * Provides the low level foundation so that subclasses have ready-made access to Web3, IPFS and GraphQL primitives

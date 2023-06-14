@@ -1,24 +1,25 @@
+import {
+  DaoAction,
+  Pagination,
+  ProposalStatus,
+} from "@aragon/sdk-client-common";
 import { BigNumber } from "@ethersproject/bignumber";
-import { DaoAction, Pagination } from "./common";
-
 /**
  * Contains the states of a proposal. Note that on chain
  * proposals cannot be in draft state
  */
-export enum ProposalStatus {
-  ACTIVE = "Active",
-  PENDING = "Pending",
-  SUCCEEDED = "Succeeded",
-  EXECUTED = "Executed",
-  DEFEATED = "Defeated",
-}
-
 export enum VoteValues {
   // NONE = 0,
   ABSTAIN = 1,
   YES = 2,
   NO = 3,
 }
+
+export type ProposalVoteBase = {
+  address: string;
+  vote: VoteValues;
+  voteReplaced: boolean;
+};
 
 // TYPES
 
@@ -82,68 +83,6 @@ export type CanVoteParams = {
   proposalId: string;
   voterAddressOrEns: string;
   vote: VoteValues;
-};
-
-/**
- * Contains the human-readable information about a proposal
- */
-export type ProposalMetadata = {
-  title: string;
-  summary: string;
-  description: string;
-  resources: Array<{ url: string; name: string }>;
-  media?: {
-    header?: string;
-    logo?: string;
-  };
-};
-
-/**
- * Contains the human-readable information about a proposal
- */
-export type ProposalMetadataSummary = {
-  title: string;
-  summary: string;
-};
-
-// Long version
-export type ProposalBase = {
-  id: string;
-  dao: {
-    address: string;
-    name: string;
-  };
-  creatorAddress: string;
-  metadata: ProposalMetadata;
-  startDate: Date;
-  endDate: Date;
-  creationDate: Date;
-  actions: Array<DaoAction>;
-  status: ProposalStatus;
-  creationBlockNumber: number;
-  executionDate: Date | null;
-  executionBlockNumber: number | null;
-  executionTxHash: string | null;
-};
-
-export type ProposalVoteBase = {
-  address: string;
-  vote: VoteValues;
-  voteReplaced: boolean;
-};
-
-// Short version
-export type ProposalListItemBase = {
-  id: string;
-  dao: {
-    address: string;
-    name: string;
-  };
-  creatorAddress: string;
-  metadata: ProposalMetadataSummary;
-  startDate: Date;
-  endDate: Date;
-  status: ProposalStatus;
 };
 
 export enum SubgraphVoteValues {
@@ -257,47 +196,4 @@ export type SubgraphMembers = {
   members: {
     address: string;
   }[];
-};
-export enum PrepareInstallationStep {
-  PREPARING = "preparing",
-  DONE = "done",
-}
-
-export type PrepareInstallationStepValue =
-  | { key: PrepareInstallationStep.PREPARING; txHash: string }
-  | {
-    key: PrepareInstallationStep.DONE;
-  } & ApplyInstallationParams;
-
-export type ApplyInstallationParamsBase = {
-  permissions: MultiTargetPermission[];
-  versionTag: VersionTag;
-  pluginRepo: string;
-  pluginAddress: string;
-};
-
-export type ApplyInstallationParams = ApplyInstallationParamsBase & {
-  helpers: string[];
-};
-export type DecodedApplyInstallationParams = ApplyInstallationParamsBase & {
-  helpersHash: string;
-};
-
-export type VersionTag = {
-  build: number;
-  release: number;
-};
-
-export enum PermissionOperationType {
-  GRANT = 0,
-  REVOKE = 1,
-  GRANT_WITH_CONDITION = 2,
-}
-
-export type MultiTargetPermission = {
-  operation: PermissionOperationType;
-  where: string;
-  who: string;
-  condition?: string;
-  permissionId: string;
 };

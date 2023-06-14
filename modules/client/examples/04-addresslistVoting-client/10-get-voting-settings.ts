@@ -8,18 +8,12 @@ title: Get Settings
 Get the settings established for a given AddresslistVoting plugin.
 */
 
-import {
-  AddresslistVotingClient,
-  ContextPlugin,
-  VotingSettings,
-} from "@aragon/sdk-client";
+import { AddresslistVotingClient, VotingSettings } from "@aragon/sdk-client";
 import { context } from "../index";
 
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 // Instantiate an AddresslistVoting client.
 const addresslistVotingClient: AddresslistVotingClient =
-  new AddresslistVotingClient(contextPlugin);
+  new AddresslistVotingClient(context);
 
 const pluginAddress: string = "0x1234567890123456789012345678901234567890"; // the address of the AddresslistVoting plugin contract installed in the DAO.
 

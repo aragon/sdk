@@ -3,20 +3,22 @@ import "../../mocks/aragon-sdk-ipfs";
 
 import {
   AddresslistVotingClient,
+  AddresslistVotingPluginInstall,
   Client,
-  Context,
   CreateDaoParams,
   DepositParams,
-  AddresslistVotingPluginInstall,
   SetAllowanceParams,
-  SupportedNetworksArray,
-  TokenType,
 } from "../../../src";
 import { contextParamsLocalChain } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 import { deployErc20 } from "../../helpers/deploy-erc20";
+import {
+  Context,
+  SupportedNetworksArray,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

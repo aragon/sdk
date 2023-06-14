@@ -3,15 +3,14 @@ import {
   TokenVoting__factory,
 } from "@aragon/osx-ethers";
 import {
-  ClientCore,
   CreateMajorityVotingProposalParams,
-  GasFeeEstimation,
   VoteProposalParams,
 } from "../../../client-common";
-import { ITokenVotingClientEstimation } from "../../interfaces";
+import { ITokenVotingClientEstimation } from "../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { boolArrayToBitmap, decodeProposalId } from "@aragon/sdk-common";
 import { DelegateTokensParams } from "../../types";
+import { ClientCore, GasFeeEstimation } from "@aragon/sdk-client-common";
 /**
  * Estimation module the SDK TokenVoting Client
  */

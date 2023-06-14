@@ -10,3 +10,7 @@ client:
 ipfs:
 - ./modules/ipfs/**/*
 - ./modules/ipfs/*
+
+client-common:
+- ./modules/client-common/**/*
+- ./modules/client-common/*

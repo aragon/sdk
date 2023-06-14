@@ -1,12 +1,12 @@
 import { Multisig__factory } from "@aragon/osx-ethers";
 import { boolArrayToBitmap, decodeProposalId } from "@aragon/sdk-common";
-import { ClientCore, GasFeeEstimation } from "../../../client-common";
-import { IMultisigClientEstimation } from "../../interfaces";
+import { IMultisigClientEstimation } from "../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   ApproveMultisigProposalParams,
   CreateMultisigProposalParams,
 } from "../../types";
+import { ClientCore, GasFeeEstimation } from "@aragon/sdk-client-common";
 /**
  * Estimation module the SDK Address List Client
  */

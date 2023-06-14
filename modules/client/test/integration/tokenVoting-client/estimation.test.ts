@@ -5,12 +5,9 @@ declare const describe, it, expect, beforeAll, afterAll;
 import "../../mocks/aragon-sdk-ipfs";
 
 import {
-  Context,
-  ContextPlugin,
   CreateMajorityVotingProposalParams,
-  VoteProposalParams,
-  SupportedNetworksArray,
   TokenVotingClient,
+  VoteProposalParams,
   VoteValues,
 } from "../../../src";
 
@@ -22,6 +19,7 @@ import {
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
+import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -46,8 +44,7 @@ describe("Token Voting Client", () => {
 
     it("Should estimate the gas fees for creating a new proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
 
       const proposalParams: CreateMajorityVotingProposalParams = {
         pluginAddress: "0x1234567890123456789012345678901234567890",
@@ -64,8 +61,7 @@ describe("Token Voting Client", () => {
     });
     it("Should estimate the gas fees for casting a vote", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
 
       const voteParams: VoteProposalParams = {
         proposalId: "0x1234567890123456789012345678901234567890_0x0",
@@ -81,8 +77,7 @@ describe("Token Voting Client", () => {
     });
     it("Should estimate the gas fees for executing a proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
 
       const estimation = await client.estimation.executeProposal(
         "0x1234567890123456789012345678901234567890_0x0",
@@ -97,8 +92,7 @@ describe("Token Voting Client", () => {
 
     it("Should estimate the gas fees for delegating voting power", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
 
       const estimation = await client.estimation.delegateTokens(
         {
@@ -116,8 +110,7 @@ describe("Token Voting Client", () => {
 
     it("Should estimate the gas fees for undelegating voting power", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new TokenVotingClient(ctxPlugin);
+      const client = new TokenVotingClient(ctx);
 
       const estimation = await client.estimation.undelegateTokens(ADDRESS_ONE);
 

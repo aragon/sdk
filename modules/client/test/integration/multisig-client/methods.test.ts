@@ -9,20 +9,13 @@ import {
   ApproveMultisigProposalParams,
   ApproveProposalStep,
   CanApproveParams,
-  Context,
-  ContextPlugin,
   CreateMultisigProposalParams,
-  ProposalQueryParams,
   MultisigClient,
   MultisigPluginPrepareInstallationParams,
   MultisigProposal,
-  PrepareInstallationStep,
   ProposalCreationSteps,
-  ProposalMetadata,
+  ProposalQueryParams,
   ProposalSortBy,
-  ProposalStatus,
-  SortDirection,
-  SupportedNetworksArray,
 } from "../../../src";
 import {
   getExtendedProposalId,
@@ -51,8 +44,16 @@ import {
   QueryMultisigVotingSettings,
 } from "../../../src/multisig/internal/graphql-queries";
 import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-queries/members";
-import { LIVE_CONTRACTS } from "../../../src/client-common/constants";
 import { SubgraphMultisigProposal } from "../../../src/multisig/internal/types";
+import {
+  Context,
+  LIVE_CONTRACTS,
+  PrepareInstallationStep,
+  ProposalMetadata,
+  ProposalStatus,
+  SortDirection,
+  SupportedNetworksArray,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
@@ -202,8 +203,7 @@ describe("Client Multisig", () => {
   describe("Proposal Creation", () => {
     it("Should create a new proposal locally", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const multisigClient = new MultisigClient(ctxPlugin);
+      const multisigClient = new MultisigClient(ctx);
 
       const { plugin: pluginAddress } = await buildDao();
 
@@ -214,8 +214,7 @@ describe("Client Multisig", () => {
   describe("Plugin installation", () => {
     it("Should prepare the installation of a token voting plugin", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       const { dao } = await buildMultisigDAO(
         repoAddr,
       );
@@ -275,8 +274,7 @@ describe("Client Multisig", () => {
   describe("Can approve", () => {
     it("Should check if an user can approve in a multisig instance", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       // const address = await client.web3.getSigner()?.getAddress();
 
       const { plugin: pluginAddress } = await buildDao();
@@ -303,8 +301,7 @@ describe("Client Multisig", () => {
   describe("Approve proposal", () => {
     it("Should approve a local proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const { plugin: pluginAddress } = await buildDao();
 
@@ -316,8 +313,7 @@ describe("Client Multisig", () => {
   describe("Can execute", () => {
     it("Should check if an user can execute in a multisig instance", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const { plugin: pluginAddress } = await buildDao();
 
@@ -338,8 +334,7 @@ describe("Client Multisig", () => {
   describe("Execute proposal", () => {
     it("Should execute a local proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const { plugin: pluginAddress } = await buildDao();
 
@@ -371,8 +366,7 @@ describe("Client Multisig", () => {
   describe("Data retrieval", () => {
     it("Should get the voting settings of the plugin", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),
       );
@@ -400,8 +394,7 @@ describe("Client Multisig", () => {
 
     it("Should get members of the multisig", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),
       );
@@ -425,8 +418,7 @@ describe("Client Multisig", () => {
 
     it("Should fetch the given proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
 
       const proposalId = TEST_MULTISIG_PROPOSAL_ID;
 
@@ -528,8 +520,7 @@ describe("Client Multisig", () => {
     });
     it("Should fetch the given proposal and fail because the proposal does not exist", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),
       );
@@ -541,8 +532,7 @@ describe("Client Multisig", () => {
     });
     it("Should get a list of proposals filtered by the given criteria", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       const limit = 5;
       const params: ProposalQueryParams = {
         limit,
@@ -624,8 +614,7 @@ describe("Client Multisig", () => {
     });
     it("Should get a list of proposals from a specific dao", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       const limit = 5;
       const address = ADDRESS_ONE;
       const params: ProposalQueryParams = {
@@ -656,8 +645,7 @@ describe("Client Multisig", () => {
     });
     it("Should get a list of proposals from an invalid address", async () => {
       const ctx = new Context(contextParamsLocalChain);
-      const ctxPlugin = ContextPlugin.fromContext(ctx);
-      const client = new MultisigClient(ctxPlugin);
+      const client = new MultisigClient(ctx);
       const limit = 5;
       const address = TEST_INVALID_ADDRESS;
       const params: ProposalQueryParams = {

@@ -31,29 +31,16 @@ import {
   SubgraphMultisigVotingSettings,
 } from "../types";
 import {
-  ClientCore,
   computeProposalStatusFilter,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  findLog,
-  PrepareInstallationStep,
-  PrepareInstallationStepValue,
+  isFailingProposal,
   ProposalCreationSteps,
   ProposalCreationStepValue,
-  ProposalMetadata,
   ProposalQueryParams,
   ProposalSortBy,
-  SortDirection,
   SubgraphMembers,
-  VersionTag,
-  isFailingProposal,
 } from "../../../client-common";
-import {
-  EMPTY_PROPOSAL_METADATA_LINK,
-  LIVE_CONTRACTS,
-  UNAVAILABLE_PROPOSAL_METADATA,
-  UNSUPPORTED_PROPOSAL_METADATA_LINK,
-} from "../../../client-common/constants";
 import {
   Multisig__factory,
   PluginRepo__factory,
@@ -68,8 +55,21 @@ import {
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { MultisigClientEncoding } from "./encoding";
-import { IMultisigClientMethods } from "../../interfaces";
+import { IMultisigClientMethods } from "../interfaces";
 import { AlwaysFailingProposalError } from "@aragon/sdk-common";
+import {
+  ClientCore,
+  EMPTY_PROPOSAL_METADATA_LINK,
+  findLog,
+  LIVE_CONTRACTS,
+  PrepareInstallationStep,
+  PrepareInstallationStepValue,
+  ProposalMetadata,
+  SortDirection,
+  UNAVAILABLE_PROPOSAL_METADATA,
+  UNSUPPORTED_PROPOSAL_METADATA_LINK,
+  VersionTag,
+} from "@aragon/sdk-client-common";
 
 /**
  * Methods module the SDK Address List Client

@@ -8,14 +8,14 @@ title: Token Voting
 With an instance of the `TokenVotingClient`
 */
 
-import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
+import { TokenVotingClient } from "@aragon/sdk-client";
 import { context } from "../../index";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
+
 // Instantiates a TokenVoting client.
 export const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
-  contextPlugin,
+  context,
 );
 
 /* MARKDOWN

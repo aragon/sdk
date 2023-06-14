@@ -8,23 +8,17 @@ title: Undelegate Tokens
 This is the same as delegating to your own address.
 */
 
-import {
-  ContextPlugin,
-  UndelegateTokensStep,
-  TokenVotingClient,
-} from "@aragon/sdk-client";
+import { TokenVotingClient, UndelegateTokensStep } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
-// Instantiate a plugin context from the Aragon OSx SDK context.
-const contextPlugin: ContextPlugin = ContextPlugin.fromContext(context);
 
 // Create a TokenVoting client.
 const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
-  contextPlugin,
+  context,
 );
 
-const tokenAddress = "0x1234567890123456789012345678901234567890"
+const tokenAddress = "0x1234567890123456789012345678901234567890";
 
 const steps = tokenVotingClient.methods.undelegateTokens(tokenAddress);
 

@@ -1,6 +1,18 @@
 import { activeContractsList } from "@aragon/osx-ethers";
-import { NetworkDeployment, SupportedNetwork } from "./types/common";
-import { ProposalMetadata } from "./types/plugin";
+import { ProposalMetadata, SupportedNetwork } from "./types";
+import { NetworkDeployment } from "./internal";
+
+type GraphqlNetworks = "mainnet" | "goerli" | "polygon" | "mumbai";
+
+const SupportedNetworksToGraphqlNetworks: {
+  [K in SupportedNetwork]: GraphqlNetworks;
+} = {
+  [SupportedNetwork.MAINNET]: "mainnet",
+  [SupportedNetwork.GOERLI]: "goerli",
+  [SupportedNetwork.POLYGON]: "polygon",
+  [SupportedNetwork.MUMBAI]: "mumbai",
+};
+
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
   title: "(unsupported metadata link)",
@@ -27,17 +39,6 @@ const getGraphqlNode = (netowrk: SupportedNetwork): string => {
   }/api`;
 };
 
-type GraphqlNetworks = "mainnet" | "goerli" | "polygon" | "mumbai";
-
-const SupportedNetworksToGraphqlNetworks: {
-  [K in SupportedNetwork]: GraphqlNetworks;
-} = {
-  [SupportedNetwork.MAINNET]: "mainnet",
-  [SupportedNetwork.GOERLI]: "goerli",
-  [SupportedNetwork.POLYGON]: "polygon",
-  [SupportedNetwork.MUMBAI]: "mumbai",
-};
-
 export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
   [SupportedNetwork.MAINNET]: [{
     url: getGraphqlNode(SupportedNetwork.MAINNET),
@@ -52,7 +53,13 @@ export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
 const IPFS_ENDPOINTS = {
   prod: [
     {
-      url: "https://prod.ipfs.aragon.network",
+      url: "https://ipfs-0.aragon.network",
+      headers: {
+        "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
+      },
+    },
+    {
+      url: "https://ipfs-1.aragon.network",
       headers: {
         "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
       },
@@ -60,7 +67,7 @@ const IPFS_ENDPOINTS = {
   ],
   test: [
     {
-      url: "https://test.ipfs.aragon.network",
+      url: "https://testing-ipfs-0.aragon.network",
       headers: {
         "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
       },

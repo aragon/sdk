@@ -1,11 +1,8 @@
 import {
   computeProposalStatus,
   ContractVotingSettings,
-  DaoAction,
-  ProposalMetadata,
   SubgraphAction,
   SubgraphVoteValuesMap,
-  TokenType,
   VoteValues,
   votingSettingsToContract,
 } from "../../client-common";
@@ -37,6 +34,11 @@ import {
   getCompactProposalId,
   hexToBytes,
 } from "@aragon/sdk-common";
+import {
+  DaoAction,
+  ProposalMetadata,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 export function toTokenVotingProposal(
   proposal: SubgraphTokenVotingProposal,

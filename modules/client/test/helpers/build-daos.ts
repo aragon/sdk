@@ -2,7 +2,6 @@ import { AddressZero } from "@ethersproject/constants";
 import {
   AddresslistVotingClient,
   Client,
-  Context,
   CreateDaoParams,
   DaoCreationSteps,
   TokenVotingPluginInstall,
@@ -15,6 +14,7 @@ import {
   TEST_WALLET_ADDRESS,
 } from "../integration/constants";
 import { TokenVoting__factory } from "@aragon/osx-ethers";
+import { Context } from "@aragon/sdk-client-common";
 
 export async function buildMultisigDAO(pluginRepoAddress: string) {
   const client = new Client(new Context(contextParamsLocalChain));

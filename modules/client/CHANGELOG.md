@@ -13,7 +13,12 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
-## Changed
+### Changed
+- ContextPlugin is now Context
+- `ContextPlugin.from(Context)` is no longer necessary
+
+## [1.8.2]
+### Changed
 - Errors now report the cause more clearly
 - Internal refactor of signer and network
 ## [1.8.1]

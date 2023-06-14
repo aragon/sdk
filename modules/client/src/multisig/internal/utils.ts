@@ -1,15 +1,11 @@
 import { getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
-import {
-  computeProposalStatus,
-  DaoAction,
-  ProposalMetadata,
-  SubgraphAction,
-} from "../../client-common";
+import { computeProposalStatus, SubgraphAction } from "../../client-common";
 import { MultisigProposal, MultisigProposalListItem } from "../types";
 import {
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
 } from "./types";
+import { DaoAction, ProposalMetadata } from "@aragon/sdk-client-common";
 
 export function toMultisigProposal(
   proposal: SubgraphMultisigProposal,

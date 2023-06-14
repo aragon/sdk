@@ -1,15 +1,11 @@
 // This file contains the definitions of the general purpose DAO client
-
-import {
-  DaoAction,
-  GasFeeEstimation,
-  InterfaceParams,
-} from "./client-common/types/common";
-import { IClientCore } from "./client-common/interfaces";
 import {
   ApplyInstallationParams,
+  DaoAction,
   DecodedApplyInstallationParams,
-} from "./client-common";
+  GasFeeEstimation,
+  InterfaceParams,
+} from "@aragon/sdk-client-common";
 import {
   ApplyUninstallationParams,
   AssetBalance,
@@ -41,10 +37,10 @@ import {
   TransferQueryParams,
   UpgradeToAndCallParams,
   WithdrawParams,
-} from "./types";
+} from "../types";
 
 /** Defines the shape of the general purpose Client class */
-export interface IClientMethods extends IClientCore {
+export interface IClientMethods {
   createDao: (params: CreateDaoParams) => AsyncGenerator<DaoCreationStepValue>;
   pinMetadata: (params: DaoMetadata) => Promise<string>;
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
@@ -77,7 +73,7 @@ export interface IClientMethods extends IClientCore {
   ) => AsyncGenerator<PrepareUninstallationStepValue>;
 }
 
-export interface IClientEncoding extends IClientCore {
+export interface IClientEncoding {
   grantAction: (
     daoAddress: string,
     params: GrantPermissionParams,

@@ -79,14 +79,6 @@ import {
   SubgraphTransferTypeMap,
 } from "../types";
 import {
-  ClientCore,
-  findLog,
-  LIVE_CONTRACTS,
-  MultiTargetPermission,
-  SortDirection,
-  TokenType,
-} from "../../client-common";
-import {
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
@@ -110,8 +102,16 @@ import {
   UNSUPPORTED_DAO_METADATA_LINK,
   UNSUPPORTED_RELEASE_METADATA_LINK,
 } from "../constants";
-import { IClientMethods } from "../../interfaces";
+import { IClientMethods } from "../interfaces";
 import { PermissionIds } from "../../constants";
+import {
+  ClientCore,
+  findLog,
+  LIVE_CONTRACTS,
+  MultiTargetPermission,
+  SortDirection,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 /**
  * Methods module the SDK Generic Client

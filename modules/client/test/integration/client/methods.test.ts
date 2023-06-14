@@ -23,7 +23,6 @@ import {
   AddresslistVotingPluginInstall,
   AssetBalanceSortBy,
   Client,
-  Context,
   CreateDaoParams,
   DaoCreationSteps,
   DaoDepositSteps,
@@ -31,16 +30,12 @@ import {
   DaoSortBy,
   DepositParams,
   HasPermissionParams,
-  LIVE_CONTRACTS,
   Permissions,
   PluginQueryParams,
   PluginSortBy,
   PrepareUninstallationSteps,
   SetAllowanceParams,
   SetAllowanceSteps,
-  SortDirection,
-  SupportedNetworksArray,
-  TokenType,
   TransferQueryParams,
   TransferSortBy,
   TransferType,
@@ -67,6 +62,13 @@ import { AddressZero } from "@ethersproject/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import {
+  Context,
+  LIVE_CONTRACTS,
+  SortDirection,
+  SupportedNetworksArray,
+  TokenType,
+} from "@aragon/sdk-client-common";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

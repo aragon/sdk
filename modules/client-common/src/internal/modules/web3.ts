@@ -1,14 +1,7 @@
-import { Context } from "../../client-common/context";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { isAddress } from "@ethersproject/address";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { Signer } from "@ethersproject/abstract-signer";
-import {
-  GasFeeEstimation,
-  SupportedNetwork,
-  SupportedNetworksArray,
-} from "../types/common";
-import { IClientWeb3Core } from "../interfaces";
 import {
   CannotEstimateGasError,
   InvalidAddressError,
@@ -19,6 +12,13 @@ import {
   NoSignerError,
   UnsupportedNetworkError,
 } from "@aragon/sdk-common";
+import { IClientWeb3Core } from "../interfaces";
+import { Context } from "../../context";
+import {
+  GasFeeEstimation,
+  SupportedNetwork,
+  SupportedNetworksArray,
+} from "../../types";
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
   private providerIdx: number = -1;

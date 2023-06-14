@@ -1,29 +1,30 @@
 // This file contains the definitions of the AddressList DAO client
 
 import {
+  DaoAction,
+  GasFeeEstimation,
+  InterfaceParams,
+  PrepareInstallationStepValue,
+  ProposalMetadata,
+} from "@aragon/sdk-client-common";
+import {
   CanVoteParams,
   CreateMajorityVotingProposalParams,
-  DaoAction,
   ExecuteProposalStepValue,
-  GasFeeEstimation,
-  IClientCore,
-  InterfaceParams,
+  ProposalCreationStepValue,
   ProposalQueryParams,
   VoteProposalParams,
-  PrepareInstallationStepValue,
-  ProposalCreationStepValue,
-  ProposalMetadata,
   VoteProposalStepValue,
   VotingSettings,
-} from "../client-common";
+} from "../../client-common";
 import {
   AddresslistVotingPluginPrepareInstallationParams,
   AddresslistVotingProposal,
   AddresslistVotingProposalListItem,
-} from "./types";
+} from "../types";
 
 // Address List
-export interface IAddresslistVotingClientMethods extends IClientCore {
+export interface IAddresslistVotingClientMethods {
   createProposal: (
     params: CreateMajorityVotingProposalParams,
   ) => AsyncGenerator<ProposalCreationStepValue>;
@@ -49,7 +50,7 @@ export interface IAddresslistVotingClientMethods extends IClientCore {
   getVotingSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
 }
 
-export interface IAddresslistVotingClientEncoding extends IClientCore {
+export interface IAddresslistVotingClientEncoding {
   updatePluginSettingsAction: (
     pluginAddress: string,
     params: VotingSettings,
@@ -63,13 +64,13 @@ export interface IAddresslistVotingClientEncoding extends IClientCore {
     members: string[],
   ) => DaoAction;
 }
-export interface IAddresslistVotingClientDecoding extends IClientCore {
+export interface IAddresslistVotingClientDecoding {
   updatePluginSettingsAction: (data: Uint8Array) => VotingSettings;
   addMembersAction: (data: Uint8Array) => string[];
   removeMembersAction: (data: Uint8Array) => string[];
   findInterface: (data: Uint8Array) => InterfaceParams | null;
 }
-export interface IAddresslistVotingClientEstimation extends IClientCore {
+export interface IAddresslistVotingClientEstimation {
   createProposal: (
     params: CreateMajorityVotingProposalParams,
   ) => Promise<GasFeeEstimation>;
