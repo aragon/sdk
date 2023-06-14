@@ -9,9 +9,9 @@ import {
   IpfsPinError,
   isProposalId,
   NoProviderError,
-  PluginInstallationPreparationError,
   ProposalCreationError,
   resolveIpfsCid,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -43,8 +43,6 @@ import {
 } from "../../../client-common";
 import {
   Multisig__factory,
-  PluginRepo__factory,
-  PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import {
   QueryMultisigMembers,
@@ -54,7 +52,6 @@ import {
 } from "../graphql-queries";
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { MultisigClientEncoding } from "./encoding";
 import { IMultisigClientMethods } from "../interfaces";
 import { AlwaysFailingProposalError } from "@aragon/sdk-common";
 import {
@@ -62,14 +59,16 @@ import {
   EMPTY_PROPOSAL_METADATA_LINK,
   findLog,
   LIVE_CONTRACTS,
-  PrepareInstallationStep,
+  prepareGenericInstallation,
   PrepareInstallationStepValue,
   ProposalMetadata,
   SortDirection,
+  SupportedNetwork,
+  SupportedNetworksArray,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
-  VersionTag,
 } from "@aragon/sdk-client-common";
+import { INSTALLATION_ABI } from "../constants";
 
 /**
  * Methods module the SDK Address List Client
@@ -243,76 +242,25 @@ export class MultisigClientMethods extends ClientCore
   public async *prepareInstallation(
     params: MultisigPluginPrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
-    const signer = this.web3.getConnectedSigner();
-    const networkName = this.web3.getNetworkName();
-    // connect to psp contract
-    const pspContract = PluginSetupProcessor__factory.connect(
-      LIVE_CONTRACTS[networkName].pluginSetupProcessor,
-      signer,
-    );
-    // connect to plugin repo
-    const multisigRepoContract = PluginRepo__factory.connect(
-      LIVE_CONTRACTS[networkName].multisigRepo,
-      signer,
-    );
-    // use specified version or latest
-    let versionTag: VersionTag | undefined = params.versionTag;
-    if (!params.versionTag) {
-      const latestVersion = await multisigRepoContract
-        ["getLatestVersion(address)"](
-          LIVE_CONTRACTS[networkName].multisigSetup,
-        );
-      versionTag = {
-        build: latestVersion.tag.build,
-        release: latestVersion.tag.release,
-      };
+    const network = await this.web3.getProvider().getNetwork();
+    const networkName = network.name as SupportedNetwork;
+    if (!SupportedNetworksArray.includes(networkName)) {
+      throw new UnsupportedNetworkError(networkName);
     }
-    // get install data
-    const multisigPluginInstallItem = MultisigClientEncoding
-      .getPluginInstallItem(params.settings, networkName);
-    // execute prepareInstallation
-    const tx = await pspContract.prepareInstallation(
-      params.daoAddressOrEns,
-      {
-        pluginSetupRef: {
-          pluginSetupRepo: LIVE_CONTRACTS[networkName].multisigRepo,
-          versionTag: versionTag!,
-        },
-        data: multisigPluginInstallItem.data,
-      },
-    );
-
-    yield {
-      key: PrepareInstallationStep.PREPARING,
-      txHash: tx.hash,
-    };
-
-    const receipt = await tx.wait();
-    const pspContractInterface = PluginSetupProcessor__factory
-      .createInterface();
-    const log = findLog(
-      receipt,
-      pspContractInterface,
-      "InstallationPrepared",
-    );
-    if (!log) {
-      throw new ProposalCreationError();
-    }
-
-    const parsedLog = pspContractInterface.parseLog(log);
-    const pluginAddress = parsedLog.args["plugin"];
-    const preparedSetupData = parsedLog.args["preparedSetupData"];
-    if (!(pluginAddress || preparedSetupData)) {
-      throw new PluginInstallationPreparationError();
-    }
-    yield {
-      key: PrepareInstallationStep.DONE,
-      pluginAddress,
+    // todo params
+    yield* prepareGenericInstallation(this.web3, {
+      daoAddressOrEns: params.daoAddressOrEns,
       pluginRepo: LIVE_CONTRACTS[networkName].multisigRepo,
-      versionTag: versionTag!,
-      permissions: preparedSetupData.permissions,
-      helpers: preparedSetupData.helpers,
-    };
+      version: params.versionTag,
+      installationAbi: INSTALLATION_ABI,
+      installationParams: [
+        params.settings.members,
+        [
+          params.settings.votingSettings.onlyListed,
+          params.settings.votingSettings.minApprovals,
+        ],
+      ],
+    });
   }
   /**
    * Checks whether the current proposal can be approved by the given address

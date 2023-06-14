@@ -20,11 +20,13 @@ import { getNetwork, Networkish } from "@ethersproject/providers";
 import {
   ClientCore,
   DaoAction,
+  getNamedTypesFromMetadata,
   LIVE_CONTRACTS,
   PluginInstallItem,
   SupportedNetwork,
   SupportedNetworksArray,
 } from "@aragon/sdk-client-common";
+import { INSTALLATION_ABI } from "../constants";
 
 /**
  * Encoding module the SDK TokenVoting Client
@@ -50,12 +52,7 @@ export class TokenVotingClientEncoding extends ClientCore
     }
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
-      // ["votingMode","supportThreshold", "minParticipation", "minDuration"], ["address","name","symbol"][ "receivers","amount"]
-      [
-        "tuple(uint8 votingMode, uint64 supportThreshold, uint64 minParticipation, uint64 minDuration, uint256 minProposerVotingPower) votingSettings",
-        "tuple(address addr, string name, string symbol) tokenSettings",
-        "tuple(address[] receivers, uint256[] amounts) mintSettings",
-      ],
+      getNamedTypesFromMetadata(INSTALLATION_ABI),
       args,
     );
     return {

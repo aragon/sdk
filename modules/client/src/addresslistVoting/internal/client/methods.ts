@@ -11,9 +11,9 @@ import {
   IpfsPinError,
   isProposalId,
   NoProviderError,
-  PluginInstallationPreparationError,
   ProposalCreationError,
   resolveIpfsCid,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import { IAddresslistVotingClientMethods } from "../interfaces";
@@ -34,6 +34,7 @@ import {
   VoteProposalStep,
   VoteProposalStepValue,
   VotingSettings,
+  votingSettingsToContract,
 } from "../../../client-common";
 import {
   QueryAddresslistVotingMembers,
@@ -45,13 +46,8 @@ import {
   toAddresslistVotingProposal,
   toAddresslistVotingProposalListItem,
 } from "../utils";
-import {
-  AddresslistVoting__factory,
-  PluginRepo__factory,
-  PluginSetupProcessor__factory,
-} from "@aragon/osx-ethers";
+import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { AddresslistVotingClientEncoding } from "./encoding";
 import {
   AddresslistVotingPluginPrepareInstallationParams,
   AddresslistVotingProposal,
@@ -67,14 +63,16 @@ import {
   EMPTY_PROPOSAL_METADATA_LINK,
   findLog,
   LIVE_CONTRACTS,
-  PrepareInstallationStep,
+  prepareGenericInstallation,
   PrepareInstallationStepValue,
   ProposalMetadata,
   SortDirection,
+  SupportedNetwork,
+  SupportedNetworksArray,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
-  VersionTag,
 } from "@aragon/sdk-client-common";
+import { INSTALLATION_ABI } from "../constants";
 
 /**
  * Methods module the SDK Address List Client
@@ -248,76 +246,21 @@ export class AddresslistVotingClientMethods extends ClientCore
   public async *prepareInstallation(
     params: AddresslistVotingPluginPrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
-    const signer = this.web3.getConnectedSigner();
-    const networkName = this.web3.getNetworkName();
-    // connect to psp contract
-    const pspContract = PluginSetupProcessor__factory.connect(
-      LIVE_CONTRACTS[networkName].pluginSetupProcessor,
-      signer,
-    );
-    // connect to plugin repo
-    const addresslistVotingRepoContract = PluginRepo__factory.connect(
-      LIVE_CONTRACTS[networkName].addresslistVotingRepo,
-      signer,
-    );
-    // use specified version or latest
-    let versionTag: VersionTag | undefined = params.versionTag;
-    if (!params.versionTag) {
-      const latestVersion = await addresslistVotingRepoContract
-        ["getLatestVersion(address)"](
-          LIVE_CONTRACTS[networkName].addresslistVotingSetup,
-        );
-      versionTag = {
-        build: latestVersion.tag.build,
-        release: latestVersion.tag.release,
-      };
+    const network = await this.web3.getProvider().getNetwork();
+    const networkName = network.name as SupportedNetwork;
+    if (!SupportedNetworksArray.includes(networkName)) {
+      throw new UnsupportedNetworkError(networkName);
     }
-    // get install data
-    const addresslistVotingPluginInstallItem = AddresslistVotingClientEncoding
-      .getPluginInstallItem(params.settings, networkName);
-    // execute prepareInstallation
-    const tx = await pspContract.prepareInstallation(
-      params.daoAddressOrEns,
-      {
-        pluginSetupRef: {
-          pluginSetupRepo: LIVE_CONTRACTS[networkName].addresslistVotingRepo,
-          versionTag: versionTag!,
-        },
-        data: addresslistVotingPluginInstallItem.data,
-      },
-    );
-
-    yield {
-      key: PrepareInstallationStep.PREPARING,
-      txHash: tx.hash,
-    };
-
-    const receipt = await tx.wait();
-    const pspContractInterface = PluginSetupProcessor__factory
-      .createInterface();
-    const log = findLog(
-      receipt,
-      pspContractInterface,
-      "InstallationPrepared",
-    );
-    if (!log) {
-      throw new ProposalCreationError();
-    }
-
-    const parsedLog = pspContractInterface.parseLog(log);
-    const pluginAddress = parsedLog.args["plugin"];
-    const preparedSetupData = parsedLog.args["preparedSetupData"];
-    if (!(pluginAddress || preparedSetupData)) {
-      throw new PluginInstallationPreparationError();
-    }
-    yield {
-      key: PrepareInstallationStep.DONE,
-      pluginAddress,
+    yield* prepareGenericInstallation(this.web3, {
+      daoAddressOrEns: params.daoAddressOrEns,
       pluginRepo: LIVE_CONTRACTS[networkName].addresslistVotingRepo,
-      versionTag: versionTag!,
-      permissions: preparedSetupData.permissions,
-      helpers: preparedSetupData.helpers,
-    };
+      version: params.versionTag,
+      installationAbi: INSTALLATION_ABI,
+      installationParams: [
+        votingSettingsToContract(params.settings.votingSettings),
+        params.settings.addresses,
+      ],
+    });
   }
 
   /**

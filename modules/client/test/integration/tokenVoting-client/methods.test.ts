@@ -464,11 +464,13 @@ describe("Token Voting Client", () => {
           daoAddressOrEns: dao,
         };
         const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
-        networkSpy.mockReturnValueOnce(
+        const defaultGetNetworkImplementation = networkSpy
+          .getMockImplementation();
+        networkSpy.mockImplementation(() =>
           Promise.resolve({
             name: "goerli",
             chainId: 31337,
-          }),
+          })
         );
         const steps = client.methods.prepareInstallation(installationParams);
         for await (const step of steps) {
@@ -503,6 +505,7 @@ describe("Token Voting Client", () => {
               break;
           }
         }
+        networkSpy.mockImplementation(defaultGetNetworkImplementation);
       });
     });
 

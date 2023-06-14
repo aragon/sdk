@@ -19,11 +19,13 @@ import { IMultisigClientEncoding } from "../interfaces";
 import {
   ClientCore,
   DaoAction,
+  getNamedTypesFromMetadata,
   LIVE_CONTRACTS,
   PluginInstallItem,
   SupportedNetwork,
   SupportedNetworksArray,
 } from "@aragon/sdk-client-common";
+import { INSTALLATION_ABI } from "../constants";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -49,11 +51,7 @@ export class MultisigClientEncoding extends ClientCore
       throw new UnsupportedNetworkError(networkName);
     }
     const hexBytes = defaultAbiCoder.encode(
-      // members, [onlyListed, minApprovals]
-      [
-        "address[]",
-        "tuple(bool, uint16)",
-      ],
+      getNamedTypesFromMetadata(INSTALLATION_ABI),
       [
         params.members,
         [

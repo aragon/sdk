@@ -24,6 +24,8 @@ import { IClientEstimation } from "../interfaces";
 import {
   ClientCore,
   GasFeeEstimation,
+  prepareGenericInstallationEstimation,
+  PrepareInstallationParams,
   TokenType,
 } from "@aragon/sdk-client-common";
 
@@ -31,6 +33,11 @@ import {
  * Estimation module the SDK Generic Client
  */
 export class ClientEstimation extends ClientCore implements IClientEstimation {
+  public async prepareInstallation(
+    params: PrepareInstallationParams,
+  ): Promise<GasFeeEstimation> {
+    return prepareGenericInstallationEstimation(this.web3, params);
+  }
   /**
    * Estimates the gas fee of creating a DAO
    *

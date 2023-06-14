@@ -9,9 +9,12 @@ import { InvalidVotingModeError } from "@aragon/sdk-common";
 import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
 import {
   DaoAction,
+  DecodedApplyInstallationParams,
   getFunctionFragment,
   ProposalStatus,
 } from "@aragon/sdk-client-common";
+
+import { Result } from "@ethersproject/abi";
 
 export function unwrapProposalParams(
   params: CreateMajorityVotingProposalParams,
@@ -94,6 +97,7 @@ export function votingModeToContracts(votingMode: VotingMode): number {
       throw new InvalidVotingModeError();
   }
 }
+
 export function votingModeFromContracts(votingMode: number): VotingMode {
   switch (votingMode) {
     case 0:
@@ -149,4 +153,17 @@ export function isFailingProposal(actions: DaoAction[] = []): boolean {
     }
   }
   return false;
+}
+
+export function applyInstallatonParamsFromContract(
+  result: Result,
+): DecodedApplyInstallationParams {
+  const params = result[1];
+  return {
+    helpersHash: params.helpersHash,
+    permissions: params.permissions,
+    versionTag: params.pluginSetupRef.versionTag,
+    pluginAddress: params.plugin,
+    pluginRepo: params.pluginSetupRef.pluginSetupRepo,
+  };
 }
