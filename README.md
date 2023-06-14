@@ -39,36 +39,90 @@ already on NPM for install:
 
 <br/>
 
-## Developer Quick Start
+## Quick Start
 
 The Aragon OSx SDK is Javascript agnostic, which means you can use it with any
-Javascript framework, including popular ones like React, Vite, or Vue. The
-examples in this readme are written using NodeJS
+Javascript framework, including popular ones like NodeJS, Deno, React, Vite, or
+Vue. The examples in this README are written using NodeJS.
 
-First things first install the client with
+<br/>
+
+### 1. initialize a new project
+
+If you do not already have a project to work with, create a new one with npm (or
+your package manager of choice)
 
 ```sh
-yarn add @aragon/sdk-client
+npm init
 ```
 
-or
+That will generate a package.json file for you to start running your Javascript
+project.
+
+<br/>
+
+### 2. Install the Aragon OSx SDK
+
+Install the SDK and the ethers with. _**Note**_ Aragon SDK uses ethers version5.
+Although version 6 may work, we suggest using the same version5 for
+compatibility
 
 ```sh
-npm install @aragon/sdk-client
+npm install @aragon/sdk-client @ethers@5
 ```
 
-Then, you'll want to set up the Aragon OSx SDK context within your application
-to have access to the SDK functions.
+optionally you can also enable typescript
+
+```sh
+npx tsc --init
+```
+
+even if you are building with it will give you access to better intellisense
+
+<br/>
+
+### 3. Create an entry File
+
+create a new file `index.ts` (or `index.js`) and import ethers and the SDK. This
+is where we will setup the SDK and call its functions
 
 ```typescript
-// 1. Create a context
-const minimalContextParams = {
+import { Wallet } from "ethers";
+import { Client, Context, ContextParams } from "@aragon/sdk-client";
+
+const main = async () => {
+  // ...
+};
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.log(error);
+    process.exit(1);
+  });
+```
+
+#### 4. Configure the SDK
+
+In order to set up the configuration for the Aragon SDK, we want to create a
+"context" variable which will give us access to the web3 provider and signer
+handling the SDK transactions.
+
+```typescript
+const contextParams: ContextParams = {
   network: "mainnet",
   web3Providers: "https://rpc.ankr.com/eth",
   signer: Wallet.createRandom(),
+  // Optional, but without it the client will not be able to resolve IPFS content
+  ipfsNodes: [
+    {
+      url: "https://testing-ipfs-0.aragon.network/api/v0",
+      headers: { "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt" },
+    },
+  ],
 };
 
-const context = new Context(minimalContextParams);
+const context: Context = new Context(contextParams);
 ```
 
 Next thing you'll want to do is set up the general purpose client so you can
@@ -76,34 +130,81 @@ call on the SDK functions. This client is used to interact with any DAO on the
 network you're connected to.
 
 ```typescript
-const client = new Client(context);
+const client: Client = new Client(context);
 ```
 
-Now test its all working by fetching an array of DAOs
+<br/>
+
+### 5. Using the SDK
+
+Now test its all working by fetching information about the Aragon Association
+multisig
 
 ```typescript
-console.log(await client.methods.getDaos({ limit: 5 }));
+console.log(await client.methods.getDao("aa.dao.eth"));
 ```
 
-returns
+our final code should look like this
 
 ```typescript
-[
-  {
-    address: "0xf2d594f3c93c19d7b1a6f15b5489ffce4b01f7da",
-    ensDomain: "management.dao.eth",
-    metadata: {
-      name: "(the DAO has no metadata)",
-      description: "(the DAO did not define any content)",
-      avatar: undefined,
-    },
-    plugins: [[Object]],
+import { Wallet } from "ethers";
+import { Client, Context } from "@aragon/sdk-client";
+
+const main = async () => {
+  const contextParams: ContextParams = {
+    network: "mainnet",
+    web3Providers: "https://rpc.ankr.com/eth",
+    signer: Wallet.createRandom(),
+    // Optional, but without it the client will not be able to resolve IPFS content
+    ipfsNodes: [
+      {
+        url: "https://testing-ipfs-0.aragon.network/api/v0",
+        headers: { "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt" },
+      },
+    ],
+  };
+
+  const context: Context = new Context(contextParams);
+  const client: Client = new Client(context);
+
+  console.log(await client.methods.getDao("aa.dao.eth"));
+};
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.log(error);
+    process.exit(1);
+  });
+```
+
+Now lets run the program in out console We should see the information related to
+the AA Multisig
+
+```typescript
+{
+  address: '0xec10f0f223e52f2d939c7372b62ef2f55173282f',
+  ensDomain: 'aa.dao.eth',
+  metadata: {
+    name: 'AA Multisig',
+    description: 'This is Aragon Association budget vault on the new aragonOSx stack. ',
+    avatar: 'ipfs://QmT8PDLFQDWaAUoKw4BYziWQNVKChJY3CGi5eNpECi7ufD',
+    links: [ [Object] ]
   },
-  // ...
-];
+  creationDate: 2023-06-07T07:41:23.000Z,
+  plugins: [
+    {
+      instanceAddress: '0xa2dee0b38d2cfadeb52f2b5a738b5ea7e037dce9',
+      id: 'multisig.plugin.dao.eth',
+      release: 1,
+      build: 1
+    }
+  ]
+}
 ```
 
-checkout the [SDK Docs](https://devs.aragon.org/docs/sdk) for more info.
+For additional information on the SDK capabilities, make sure you check out
+[Aragon's Developer Portal](https://devs.aragon.org) for more information.
 
 <br/>
 
