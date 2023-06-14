@@ -47,7 +47,7 @@ Vue. The examples in this README are written using NodeJS.
 
 <br/>
 
-### 1. initialize a new project
+### 1. Initialize a new project
 
 If you do not already have a project to work with, create a new one with npm (or
 your package manager of choice)
@@ -63,8 +63,8 @@ project.
 
 ### 2. Install the Aragon OSx SDK
 
-Install the SDK and the ethers with. _**Note**_ Aragon SDK uses ethers version5.
-Although version 6 may work, we suggest using the same version5 for
+Install the SDK and the ethers package. _**Note**_ Aragon SDK uses ethers
+version5. Although version 6 may work, we suggest using the same version5 for
 compatibility
 
 ```sh
@@ -137,7 +137,7 @@ const client: Client = new Client(context);
 
 ### 5. Using the SDK
 
-Now test its all working by fetching information about the Aragon Association
+Now test it's all working by fetching information about the Aragon Association
 multisig
 
 ```typescript
@@ -178,8 +178,8 @@ main()
   });
 ```
 
-Now lets run the program in out console We should see the information related to
-the AA Multisig
+Now run the program, in out console we should see the information related to the
+AA Multisig
 
 ```typescript
 {
