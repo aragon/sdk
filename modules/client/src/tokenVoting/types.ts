@@ -68,6 +68,10 @@ export type Erc721TokenDetails = TokenBaseDetails & {
   type: TokenType.ERC721;
 };
 
+export type Erc20WrapperTokenDetails = Erc20TokenDetails & {
+  underlyingToken: Erc20TokenDetails;
+};
+
 export type TokenBaseDetails = {
   address: string;
   name: string;

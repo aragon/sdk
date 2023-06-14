@@ -37,6 +37,7 @@ import {
   DelegateTokensStep,
   DelegateTokensStepValue,
   Erc20TokenDetails,
+  Erc20WrapperTokenDetails,
   Erc721TokenDetails,
   TokenVotingMember,
   TokenVotingPluginPrepareInstallationParams,
@@ -53,6 +54,7 @@ import {
 import {
   SubgraphContractType,
   SubgraphErc20Token,
+  SubgraphErc20WrapperToken,
   SubgraphErc721Token,
   SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
@@ -656,7 +658,9 @@ export class TokenVotingClientMethods extends ClientCore
    */
   public async getToken(
     pluginAddress: string,
-  ): Promise<Erc20TokenDetails | Erc721TokenDetails | null> {
+  ): Promise<
+    Erc20TokenDetails | Erc721TokenDetails | Erc20WrapperTokenDetails | null
+  > {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -666,7 +670,12 @@ export class TokenVotingClientMethods extends ClientCore
     };
     const name = "TokenVoting token";
     type T = {
-      tokenVotingPlugin: { token: SubgraphErc20Token | SubgraphErc721Token };
+      tokenVotingPlugin: {
+        token:
+          | SubgraphErc20Token
+          | SubgraphErc721Token
+          | SubgraphErc20WrapperToken;
+      };
     };
     const { tokenVotingPlugin } = await this.graphql.request<T>({
       query,
@@ -676,8 +685,10 @@ export class TokenVotingClientMethods extends ClientCore
     if (!tokenVotingPlugin) {
       return null;
     }
-    let token: SubgraphErc20Token | SubgraphErc721Token =
-      tokenVotingPlugin.token;
+    let token:
+      | SubgraphErc20Token
+      | SubgraphErc721Token
+      | SubgraphErc20WrapperToken = tokenVotingPlugin.token;
     // type erc20
     if (token.__typename === SubgraphContractType.ERC20) {
       return {
@@ -694,6 +705,22 @@ export class TokenVotingClientMethods extends ClientCore
         name: token.name,
         symbol: token.symbol,
         type: TokenType.ERC721,
+      };
+      // type erc20Wrapper
+    } else if (token.__typename === SubgraphContractType.ERC20_WRAPPER) {
+      return {
+        address: token.id,
+        name: token.name,
+        symbol: token.symbol,
+        decimals: token.decimals,
+        underlyingToken: {
+          address: token.underlyingToken.id,
+          name: token.underlyingToken.name,
+          symbol: token.underlyingToken.symbol,
+          decimals: token.underlyingToken.decimals,
+          type: TokenType.ERC20,
+        },
+        type: TokenType.ERC20,
       };
     }
     return null;

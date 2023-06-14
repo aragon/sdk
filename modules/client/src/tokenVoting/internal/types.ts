@@ -50,12 +50,18 @@ export enum SubgraphTokenType {
 }
 export enum SubgraphContractType {
   ERC20 = "ERC20Contract",
+  ERC20_WRAPPER = "ERC20WrapperContract",
   ERC721 = "ERC721Contract",
 }
 
 export type SubgraphErc20Token = SubgraphBaseToken & {
   __typename: SubgraphContractType.ERC20;
   decimals: number;
+};
+export type SubgraphErc20WrapperToken = SubgraphBaseToken & {
+  __typename: SubgraphContractType.ERC20_WRAPPER;
+  decimals: number;
+  underlyingToken: SubgraphErc20Token;
 };
 export type SubgraphErc721Token = SubgraphBaseToken & {
   __typename: SubgraphContractType.ERC721;
