@@ -17,6 +17,7 @@ import { AddresslistVotingPluginInstall } from "../../types";
 import {
   ClientCore,
   DaoAction,
+  getNamedTypesFromMetadata,
   LIVE_CONTRACTS,
   PluginInstallItem,
   SupportedNetwork,

@@ -33,7 +33,6 @@ import {
   Permissions,
   PluginQueryParams,
   PluginSortBy,
-  PrepareInstallationStep,
   PrepareUninstallationSteps,
   SetAllowanceParams,
   SetAllowanceSteps,
@@ -66,10 +65,12 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import {
   Context,
   LIVE_CONTRACTS,
+  PrepareInstallationStep,
   SortDirection,
   SupportedNetworksArray,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { INSTALLATION_ABI } from "../../../src/multisig/internal/constants";
 
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(

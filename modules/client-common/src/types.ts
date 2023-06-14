@@ -50,6 +50,27 @@ export type DaoAction = {
   data: Uint8Array;
 };
 
+
+export type MetadataAbiInput = {
+  name: string;
+  type: string;
+  internalType: string;
+  description: string;
+  components?: MetadataAbiInput[];
+};
+
+
+export type PrepareInstallationParams = {
+  daoAddressOrEns: string;
+  pluginRepo: string;
+  version?: {
+    build: number;
+    release: number;
+  };
+  installationParams?: any[];
+  installationAbi?: MetadataAbiInput[];
+};
+
 export enum PrepareInstallationStep {
   PREPARING = "preparing",
   DONE = "done",

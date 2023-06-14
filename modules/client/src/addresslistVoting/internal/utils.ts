@@ -5,7 +5,6 @@ import {
 } from "@aragon/sdk-common";
 import {
   computeProposalStatus,
-  ContractVotingSettings,
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,

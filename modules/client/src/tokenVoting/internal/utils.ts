@@ -1,6 +1,5 @@
 import {
   computeProposalStatus,
-  ContractVotingSettings,
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,

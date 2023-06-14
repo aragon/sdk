@@ -63,13 +63,14 @@ import {
   EMPTY_PROPOSAL_METADATA_LINK,
   findLog,
   LIVE_CONTRACTS,
-  PrepareInstallationStep,
+  prepareGenericInstallation,
   PrepareInstallationStepValue,
   ProposalMetadata,
   SortDirection,
+  SupportedNetwork,
+  SupportedNetworksArray,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
-  VersionTag,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
 

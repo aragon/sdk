@@ -13,16 +13,6 @@ import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
 import {
-<<<<<<< HEAD
-=======
-  ClientCore,
-  GasFeeEstimation,
-  prepareGenericInstallationEstimation,
-  PrepareInstallationParams,
-  TokenType,
-} from "../../client-common";
-import {
->>>>>>> 331deba2 (add estimation for generic plugin installation)
   CreateDaoParams,
   DepositParams,
   SetAllowanceParams,
@@ -34,6 +24,8 @@ import { IClientEstimation } from "../interfaces";
 import {
   ClientCore,
   GasFeeEstimation,
+  prepareGenericInstallationEstimation,
+  PrepareInstallationParams,
   TokenType,
 } from "@aragon/sdk-client-common";
 

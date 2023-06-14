@@ -2,7 +2,7 @@ import {
   IERC20MintableUpgradeable__factory,
   MajorityVotingBase__factory,
 } from "@aragon/osx-ethers";
-import { MetadataAbiInput } from "../../client-common";
+import { MetadataAbiInput } from "@aragon/sdk-client-common";
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
   MajorityVotingBase__factory.createInterface().getFunction(
     "updateVotingSettings",

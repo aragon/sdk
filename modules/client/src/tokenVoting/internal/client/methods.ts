@@ -77,22 +77,23 @@ import {
   TokenVoting__factory,
 } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { TokenVotingClientEncoding } from "./encoding";
 import { ITokenVotingClientMethods } from "../interfaces";
 import {
   ClientCore,
   EMPTY_PROPOSAL_METADATA_LINK,
   findLog,
   LIVE_CONTRACTS,
-  PrepareInstallationStep,
+  prepareGenericInstallation,
   PrepareInstallationStepValue,
   ProposalMetadata,
   SortDirection,
+  SupportedNetwork,
+  SupportedNetworksArray,
   TokenType,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
-  VersionTag,
 } from "@aragon/sdk-client-common";
+import { INSTALLATION_ABI } from "../constants";
 /**
  * Methods module the SDK TokenVoting Client
  */

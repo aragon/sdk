@@ -43,8 +43,6 @@ import {
 } from "../../../client-common";
 import {
   Multisig__factory,
-  PluginRepo__factory,
-  PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import {
   QueryMultisigMembers,
@@ -54,7 +52,6 @@ import {
 } from "../graphql-queries";
 import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { MultisigClientEncoding } from "./encoding";
 import { IMultisigClientMethods } from "../interfaces";
 import { AlwaysFailingProposalError } from "@aragon/sdk-common";
 import {
@@ -62,14 +59,16 @@ import {
   EMPTY_PROPOSAL_METADATA_LINK,
   findLog,
   LIVE_CONTRACTS,
-  PrepareInstallationStep,
+  prepareGenericInstallation,
   PrepareInstallationStepValue,
   ProposalMetadata,
   SortDirection,
+  SupportedNetwork,
+  SupportedNetworksArray,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
-  VersionTag,
 } from "@aragon/sdk-client-common";
+import { INSTALLATION_ABI } from "../constants";
 
 /**
  * Methods module the SDK Address List Client
