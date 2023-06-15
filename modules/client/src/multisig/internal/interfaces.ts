@@ -48,6 +48,7 @@ export interface IMultisigClientMethods {
   ) => Promise<MultisigVotingSettings>;
   getMembers: (
     addressOrEns: string,
+    blockNumber?: number,
   ) => Promise<string[]>;
   getProposal: (proposalId: string) => Promise<MultisigProposal | null>;
   getProposals: (

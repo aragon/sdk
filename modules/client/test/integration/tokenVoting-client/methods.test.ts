@@ -1348,8 +1348,8 @@ describe("Token Voting Client", () => {
         expect(token.decimals).toBe(18);
         expect(token.type).toBe(TokenType.ERC20);
         expect(token.underlyingToken.address).toBe(ADDRESS_TWO);
-        expect(token.underlyingToken.name).toBe("TST");
-        expect(token.underlyingToken.symbol).toBe("Test");
+        expect(token.underlyingToken.symbol).toBe("TST");
+        expect(token.underlyingToken.name).toBe("Test");
         expect(token.underlyingToken.decimals).toBe(18);
         expect(token.underlyingToken.type).toBe(TokenType.ERC20);
 

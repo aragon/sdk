@@ -40,7 +40,7 @@ export interface IAddresslistVotingClientMethods {
   ) => AsyncGenerator<PrepareInstallationStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
-  getMembers: (addressOrEns: string) => Promise<string[]>;
+  getMembers: (addressOrEns: string, blockNumber?: number) => Promise<string[]>;
   getProposal: (
     propoosalId: string,
   ) => Promise<AddresslistVotingProposal | null>;
