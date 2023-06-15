@@ -11,6 +11,5 @@ export const web3endpoints = {
 };
 
 export const DEFAULT_IPFS_ENDPOINTS = [
-  "https://ipfs-0.aragon.network/",
-  "https://ipfs-1.aragon.network/",
+  "https://prod.ipfs.aragon.network/",
 ];

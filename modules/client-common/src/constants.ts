@@ -36,7 +36,7 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
 const getGraphqlNode = (netowrk: SupportedNetwork): string => {
   return `https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-${
     SupportedNetworksToGraphqlNetworks[netowrk]
-  }/api`;
+  }/version/v1.2.0/api`;
 };
 
 export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
@@ -53,13 +53,7 @@ export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
 const IPFS_ENDPOINTS = {
   prod: [
     {
-      url: "https://ipfs-0.aragon.network",
-      headers: {
-        "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
-      },
-    },
-    {
-      url: "https://ipfs-1.aragon.network",
+      url: "https://prod.ipfs.aragon.network",
       headers: {
         "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
       },
@@ -67,7 +61,7 @@ const IPFS_ENDPOINTS = {
   ],
   test: [
     {
-      url: "https://testing-ipfs-0.aragon.network",
+      url: "https://test.ipfs.aragon.network",
       headers: {
         "X-API-KEY": "b477RhECf8s8sdM7XrkLBs2wHc4kCMwpbcFC55Kt",
       },
