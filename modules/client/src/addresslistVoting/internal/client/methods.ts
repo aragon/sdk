@@ -311,16 +311,21 @@ export class AddresslistVotingClientMethods extends ClientCore
    *
    * @async
    * @param {string} pluginAddress
+   * @param {number} blockNumber
    * @return {*}  {Promise<string[]>}
    * @memberof AddresslistVotingClientMethods
    */
-  public async getMembers(pluginAddress: string): Promise<string[]> {
+  public async getMembers(
+    pluginAddress: string,
+    blockNumber?: number,
+  ): Promise<string[]> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
     const query = QueryAddresslistVotingMembers;
     const params = {
       address: pluginAddress.toLowerCase(),
+      block: blockNumber ? { number: blockNumber } : null,
     };
     const name = "AddresslistVotingVoting members";
     type T = { addresslistVotingPlugin: SubgraphMembers };

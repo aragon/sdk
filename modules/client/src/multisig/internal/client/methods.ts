@@ -41,9 +41,7 @@ import {
   ProposalSortBy,
   SubgraphMembers,
 } from "../../../client-common";
-import {
-  Multisig__factory,
-} from "@aragon/osx-ethers";
+import { Multisig__factory } from "@aragon/osx-ethers";
 import {
   QueryMultisigMembers,
   QueryMultisigProposal,
@@ -340,12 +338,14 @@ export class MultisigClientMethods extends ClientCore
   /**
    * returns the members of the multisig
    *
-   * @param {string} addressOrEns
+   * @param {string} pluginAddress
+   * @param {number} blockNumber
    * @return {*}  {Promise<string[]>}
    * @memberof MultisigClientMethods
    */
   public async getMembers(
     pluginAddress: string,
+    blockNumber?: number,
   ): Promise<string[]> {
     // TODO
     // update this with yup validation
@@ -355,6 +355,7 @@ export class MultisigClientMethods extends ClientCore
     const query = QueryMultisigMembers;
     const params = {
       address: pluginAddress.toLowerCase(),
+      block: blockNumber ? { number: blockNumber } : null,
     };
     const name = "Multisig members";
     type T = { multisigPlugin: SubgraphMembers };

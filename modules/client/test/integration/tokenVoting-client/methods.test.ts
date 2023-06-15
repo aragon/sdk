@@ -8,6 +8,7 @@ import {
   CreateMajorityVotingProposalParams,
   DelegateTokensStep,
   Erc20TokenDetails,
+  Erc20WrapperTokenDetails,
   ExecuteProposalStep,
   ProposalCreationSteps,
   ProposalQueryParams,
@@ -1305,6 +1306,52 @@ describe("Token Voting Client", () => {
         expect(token?.symbol).toBe("TST");
         expect(token?.name).toBe("test");
         expect((token as Erc20TokenDetails).decimals).toBe(18);
+
+        expect(mockedClient.request).toHaveBeenCalledWith(
+          QueryTokenVotingPlugin,
+          {
+            address: pluginAddress,
+          },
+        );
+      });
+      it("Should get the token details of a plugin given a plugin instance address with a wrapped token", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          tokenVotingPlugin: {
+            token: {
+              id: ADDRESS_THREE,
+              name: "Wrapped Test",
+              symbol: "WTST",
+              decimals: 18,
+              __typename: SubgraphContractType.ERC20_WRAPPER,
+              underlyingToken: {
+                id: ADDRESS_TWO,
+                name: "Test",
+                symbol: "TST",
+                decimals: 18,
+              },
+            },
+          },
+        });
+
+        const pluginAddress: string = ADDRESS_ONE;
+        const token = await client.methods.getToken(
+          pluginAddress,
+        ) as Erc20WrapperTokenDetails;
+        expect(token.address).toBe(ADDRESS_THREE);
+        expect(token.symbol).toBe("WTST");
+        expect(token.name).toBe("Wrapped Test");
+        expect(token.decimals).toBe(18);
+        expect(token.type).toBe(TokenType.ERC20);
+        expect(token.underlyingToken.address).toBe(ADDRESS_TWO);
+        expect(token.underlyingToken.symbol).toBe("TST");
+        expect(token.underlyingToken.name).toBe("Test");
+        expect(token.underlyingToken.decimals).toBe(18);
+        expect(token.underlyingToken.type).toBe(TokenType.ERC20);
 
         expect(mockedClient.request).toHaveBeenCalledWith(
           QueryTokenVotingPlugin,

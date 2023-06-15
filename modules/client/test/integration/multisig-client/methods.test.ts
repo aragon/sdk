@@ -411,11 +411,13 @@ describe("Client Multisig", () => {
 
       const wallets = await client.methods.getMembers(
         ADDRESS_ONE,
+        123456,
       );
       expect(wallets.length).toBe(2);
       expect(wallets).toMatchObject(members);
       expect(mockedClient.request).toHaveBeenCalledWith(QueryMultisigMembers, {
         address: ADDRESS_ONE,
+        block: { number: 123456 }
       });
     });
 

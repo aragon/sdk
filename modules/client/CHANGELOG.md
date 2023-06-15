@@ -13,6 +13,9 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Added
+- Suport for ERC20Wrapper and `underlyingToken`
+- Add block number to get members query
 ### Changed
 - ContextPlugin is now Context
 - `ContextPlugin.from(Context)` is no longer necessary

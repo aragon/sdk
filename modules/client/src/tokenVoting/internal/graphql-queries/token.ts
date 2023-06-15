@@ -8,6 +8,14 @@ query TokenVotingPlugin($address: ID!) {
       name
       symbol
       __typename
+      ...on ERC20WrapperContract {
+        underlyingToken{
+          id
+          name
+          symbol
+          decimals
+        }
+      }
       ...on ERC20Contract {
         decimals
       }
