@@ -50,14 +50,18 @@ Vue. The examples in this README are written using NodeJS.
 ### 1. Initialize a new project
 
 If you do not already have a project to work with, create a new one with npm (or
-your package manager of choice)
+your package manager of choice).
 
 ```sh
 npm init
 ```
 
 That will generate a package.json file for you to start running your Javascript
-project.
+project. Optionally you can also enable typescript.
+
+```sh
+npx tsc --init
+```
 
 <br/>
 
@@ -65,33 +69,25 @@ project.
 
 Install the SDK and the ethers package. _**Note**_ Aragon SDK uses ethers
 version5. Although version 6 may work, we suggest using the same version5 for
-compatibility
+compatibility:
 
 ```sh
 npm install @aragon/sdk-client @ethers@5
 ```
 
-optionally you can also enable typescript
-
-```sh
-npx tsc --init
-```
-
-even if you are building with it will give you access to better intellisense
-
 <br/>
 
-### 3. Create an entry File
+### 3. Create an entry file
 
-create a new file `index.ts` (or `index.js`) and import ethers and the SDK. This
-is where we will setup the SDK and call its functions
+Create a new file `index.ts` (or `index.js`) and import ethers and the SDK. This
+is where we will setup the SDK and call its functions.
 
 ```typescript
 import { Wallet } from "ethers";
 import { Client, Context, ContextParams } from "@aragon/sdk-client";
 
 const main = async () => {
-  // ...
+  // This is where we will config the SDK in our next step
 };
 
 main()
@@ -102,11 +98,13 @@ main()
   });
 ```
 
-#### 4. Configure the SDK
+### 4. Configure the SDK
 
 In order to set up the configuration for the Aragon SDK, we want to create a
 "context" variable which will give us access to the web3 provider and signer
-handling the SDK transactions.
+handling the SDK transactions. In this example, we are using a random wallet
+since we are not sending any transactions. However this should ideally be the
+connected wallet.
 
 ```typescript
 const contextParams: ContextParams = {
@@ -125,8 +123,10 @@ const contextParams: ContextParams = {
 const context: Context = new Context(contextParams);
 ```
 
-Next thing you'll want to do is set up the general purpose client so you can
-call on the SDK functions. This client is used to interact with any DAO on the
+Next thing you'll want to do is set up the general purpose `Client` so you can
+call on the general purpose SDK functions. These are things like `getDaos`,
+`getDaoBalances`, etc. This client is used to interact with any DAO on the
+network you're connected to. This client is used to interact with any DAO on the
 network you're connected to.
 
 ```typescript
@@ -137,14 +137,14 @@ const client: Client = new Client(context);
 
 ### 5. Using the SDK
 
-Now test it's all working by fetching information about the Aragon Association
-multisig
+In order to test our SDK set up works, we will try fetching information a
+multisig DAO.
 
 ```typescript
 console.log(await client.methods.getDao("aa.dao.eth"));
 ```
 
-our final code should look like this
+Our final code should look like this:
 
 ```typescript
 import { Wallet } from "ethers";
@@ -178,8 +178,12 @@ main()
   });
 ```
 
-Now run the program, in out console we should see the information related to the
-AA Multisig
+In order to run the program and get the information details on the aa.dao.eth
+DAO, go to the terminal and run:
+
+```sh
+node index.ts
+```
 
 ```typescript
 {
@@ -203,8 +207,8 @@ AA Multisig
 }
 ```
 
-For additional information on the SDK capabilities, make sure you check out
-[Aragon's Developer Portal](https://devs.aragon.org) for more information.
+> For additional information on the SDK capabilities, make sure you check out
+> [Aragon's Developer Portal](https://devs.aragon.org) for more information.
 
 <br/>
 
