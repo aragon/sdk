@@ -345,3 +345,8 @@ export type UpgradeToAndCallParams = {
   implementationAddress: string;
   data: Uint8Array;
 };
+
+export type InitializeFromParams = {
+  version: [number, number, number];
+  initData?: Uint8Array;
+};

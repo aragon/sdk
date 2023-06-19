@@ -3,6 +3,7 @@ import {
   DecodedApplyUninstallationParams,
   GrantPermissionDecodedParams,
   GrantPermissionWithConditionParams,
+  InitializeFromParams,
   RegisterStandardCallbackParams,
   RevokePermissionDecodedParams,
   UpgradeToAndCallParams,
@@ -276,6 +277,27 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       implementationAddress: result[0],
       data: hexToBytes(result[1]),
     };
+  }
+
+  
+/**
+ * Decodes the initializeFrom params from an initializeFromAction
+ *
+ * @param {Uint8Array} data
+ * @return {*}  {InitializeFromParams}
+ * @memberof ClientDecoding
+ */
+public initializeFromAction(data: Uint8Array): InitializeFromParams {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = daoInterface.getFunction(
+      "initializeFrom",
+    );
+    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return {
+      version: result[0],
+      initData: hexToBytes(result[1]),
+    }
   }
 
   /**

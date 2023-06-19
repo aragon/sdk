@@ -127,3 +127,4 @@ export type SubgraphPluginInstallation = {
   appliedVersion: SubgraphPluginVersion;
   appliedPreparation: SubgraphPluginPreparation;
 };
+

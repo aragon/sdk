@@ -2,6 +2,7 @@ import {
   ApplyUninstallationParams,
   GrantPermissionParams,
   GrantPermissionWithConditionParams,
+  InitializeFromParams,
   RegisterStandardCallbackParams,
   RevokePermissionParams,
   UpgradeToAndCallParams,
@@ -407,6 +408,30 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     const hexBytes = daoInterface.encodeFunctionData("upgradeToAndCall", [
       params.implementationAddress,
       params.data,
+    ]);
+    return {
+      to: daoAddressOrEns,
+      value: BigInt(0),
+      data: hexToBytes(hexBytes),
+    };
+  }
+
+  /**
+   * Computes an action to be passed to the upgradeToAndCallAction method when upgrading a DAO to a new version.
+   *
+   * @param {string} daoAddressOrEns
+   * @param {InitializeFromParams} params
+   * @return {*}
+   * @memberof ClientEncoding
+   */
+  public initializeFromAction(
+    daoAddressOrEns: string,
+    params: InitializeFromParams,
+  ) {
+    const daoInterface = DAO__factory.createInterface();
+    const hexBytes = daoInterface.encodeFunctionData("initializeFrom", [
+      params.version,
+      params.initData ?? new Uint8Array(),
     ]);
     return {
       to: daoAddressOrEns,

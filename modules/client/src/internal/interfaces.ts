@@ -25,6 +25,7 @@ import {
   GrantPermissionParams,
   GrantPermissionWithConditionParams,
   HasPermissionParams,
+  InitializeFromParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoListItem,
@@ -127,6 +128,10 @@ export interface IClientEncoding {
     daoAddressOrEns: string,
     params: ApplyUninstallationParams,
   ) => DaoAction[];
+  initializeFromAction: (
+    daoAddressOrEns: string,
+    params: InitializeFromParams,
+  ) => DaoAction;
 }
 
 export interface IClientDecoding {
@@ -156,6 +161,9 @@ export interface IClientDecoding {
   applyUninstallationAction: (
     data: Uint8Array,
   ) => DecodedApplyUninstallationParams;
+  initializeFromAction: (
+    data: Uint8Array,
+  ) => InitializeFromParams;
 }
 
 export interface IClientEstimation {
