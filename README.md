@@ -126,7 +126,6 @@ const context: Context = new Context(contextParams);
 Next thing you'll want to do is set up the general purpose `Client` so you can
 call on the general purpose SDK functions. These are things like `getDaos`,
 `getDaoBalances`, etc. This client is used to interact with any DAO on the
-network you're connected to. This client is used to interact with any DAO on the
 network you're connected to.
 
 ```typescript
