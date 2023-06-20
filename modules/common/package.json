@@ -1,7 +1,7 @@
 {
   "name": "@aragon/sdk-common",
   "author": "Aragon Association",
-  "version": "1.5.0",
+  "version": "1.4.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/sdk-common.esm.js",
