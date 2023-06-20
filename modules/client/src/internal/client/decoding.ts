@@ -20,7 +20,13 @@ import {
   permissionParamsWitConditionFromContract,
   withdrawParamsFromContract,
 } from "../utils";
-import { bytesToHex, hexToBytes, resolveIpfsCid } from "@aragon/sdk-common";
+import {
+  bytesToHex,
+  hexToBytes,
+  InvalidActionError,
+  IpfsError,
+  resolveIpfsCid,
+} from "@aragon/sdk-common";
 import { erc20ContractAbi } from "../abi/erc20";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
@@ -33,7 +39,6 @@ import {
   InterfaceParams,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { InvalidActionError, IpfsError } from "@aragon/sdk-common";
 
 /**
  * Decoding module the SDK Generic Client
