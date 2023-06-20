@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 ## UPCOMING
 ### Added
+- Neew error classes `SizeMismatchError`, `InvalidProposalStatusError`, `NotImplementedError`, `InvalidActionError`, `InvalidSubdomainError`, `InvalidGasEstimationFactorError` and `UseTransferError`
+## 1.4.0
+### Added
 - Cause parameter in errors
 - Add new common error classes `InvalidEnsError` and  `DepositNativeTokenError`
 ## 1.3.0

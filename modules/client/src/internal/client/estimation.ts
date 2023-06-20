@@ -7,6 +7,7 @@ import {
 import {
   DepositNativeTokenError,
   InvalidAddressOrEnsError,
+  InvalidSubdomainError,
   NoProviderError,
 } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
@@ -50,7 +51,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     if (
       params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
     ) {
-      throw new Error("Invalid subdomain format: use a-z, 0-9 and -");
+      throw new InvalidSubdomainError();
     }
 
     const daoInstance = DAOFactory__factory.connect(

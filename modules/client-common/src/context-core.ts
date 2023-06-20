@@ -8,6 +8,7 @@ import {
   InvalidAddressError,
   UnsupportedNetworkError,
   UnsupportedProtocolError,
+  InvalidGasEstimationFactorError,
 } from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
@@ -335,9 +336,7 @@ export abstract class ContextCore {
     gasFeeEstimationFactor: number,
   ): number {
     if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
-      throw new Error(
-        "Gas estimation factor value should be a number between 0 and 1",
-      );
+      throw new InvalidGasEstimationFactorError();
     }
     return gasFeeEstimationFactor;
   }

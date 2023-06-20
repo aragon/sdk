@@ -73,7 +73,7 @@ export class TokenVotingClientEncoding extends ClientCore
     params: VotingSettings,
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
-      throw new Error("Invalid plugin address");
+      throw new InvalidAddressError();
     }
     // TODO: check if to and value are correct
     return {

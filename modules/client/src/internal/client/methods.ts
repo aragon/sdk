@@ -8,6 +8,7 @@ import {
 } from "@aragon/osx-ethers";
 import {
   AmountMismatchError,
+  DaoCreationError,
   FailedDepositError,
   InstallationNotFoundError,
   InvalidAddressOrEnsError,
@@ -19,6 +20,7 @@ import {
   PluginUninstallationPreparationError,
   resolveIpfsCid,
   UpdateAllowanceError,
+  UseTransferError,
 } from "@aragon/sdk-common";
 
 import { defaultAbiCoder } from "@ethersproject/abi";
@@ -220,7 +222,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     );
 
     if (!log) {
-      throw new Error("Failed to create DAO");
+      throw new DaoCreationError();
     }
 
     // Plugin logs
@@ -234,7 +236,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // DAO logs
     const parsedLog = daoFactoryInterface.parseLog(log);
     if (!parsedLog.args["dao"]) {
-      throw new Error("Failed to create DAO");
+      throw new DaoCreationError();
     }
 
     yield {
@@ -274,7 +276,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const signer = this.web3.getConnectedSigner();
 
     if (params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20) {
-      throw new Error("Please, use the token's transfer function directly");
+      throw new UseTransferError();
     }
 
     const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(

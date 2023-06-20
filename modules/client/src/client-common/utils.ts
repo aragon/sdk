@@ -5,7 +5,10 @@ import {
   IComputeStatusProposal,
 } from "./types/plugin";
 
-import { InvalidVotingModeError } from "@aragon/sdk-common";
+import {
+  InvalidProposalStatusError,
+  InvalidVotingModeError,
+} from "@aragon/sdk-common";
 import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
 import {
   DaoAction,
@@ -80,7 +83,7 @@ export function computeProposalStatusFilter(
       };
       break;
     default:
-      throw new Error("invalid proposal status");
+      throw new InvalidProposalStatusError();
   }
   return where;
 }

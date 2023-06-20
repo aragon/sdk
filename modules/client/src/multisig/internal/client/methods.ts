@@ -11,6 +11,7 @@ import {
   NoProviderError,
   ProposalCreationError,
   resolveIpfsCid,
+  SizeMismatchError,
   UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
@@ -98,9 +99,7 @@ export class MultisigClientMethods extends ClientCore
       params.failSafeActions?.length &&
       params.failSafeActions.length !== params.actions?.length
     ) {
-      throw new Error(
-        "Size mismatch: actions and failSafeActions should match",
-      );
+      throw new SizeMismatchError();
     }
     const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
 

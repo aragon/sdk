@@ -33,6 +33,7 @@ import {
   InterfaceParams,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { InvalidActionError, IpfsError } from "@aragon/sdk-common";
 
 /**
  * Decoding module the SDK Generic Client
@@ -148,7 +149,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
         abiObject.tokenStandard,
       );
     }
-    throw new Error("The received action is not recognized");
+    throw new InvalidActionError();
   }
   /**
    * Decodes a dao metadata ipfs uri from an encoded update metadata action
@@ -183,8 +184,8 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     try {
       const stringMetadata = await this.ipfs.fetchString(ipfsCid);
       return JSON.parse(stringMetadata);
-    } catch {
-      throw new Error("Error reading data from IPFS");
+    } catch (e) {
+      throw new IpfsError(e);
     }
   }
   /**
