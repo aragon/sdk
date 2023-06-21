@@ -1,0 +1,83 @@
+name: Scan vulnerable dependencies 
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+
+jobs:
+
+  scan-vuln-deps-in-repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set myvars
+        id: myvars
+        run: |
+          branchname=$(echo ${GITHUB_REF#refs/heads/} | tr '/' '-' )
+          dateinsecs=$(date +%s)
+          githashshort=$(git rev-parse --short HEAD)
+          echo "BRANCH_NAME=$branchname" >> $GITHUB_OUTPUT
+          echo "GIT_HASH_SHORT=$githashshort" >> $GITHUB_OUTPUT
+          echo "DATE_IN_SECS=$dateinsecs" >> $GITHUB_OUTPUT
+
+      ## The 'fs' scan mode requires *.lock files in order to scan for vulns
+      ## and to collect license info of packages you should run npm install before.
+      - name: Setup NodeJS before scanning with Trivy
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: 'yarn'
+
+      - name: Install deps before scanning with Trivy
+        run: yarn install
+        # run: yarn install --frozen-lockfile
+
+      # - name: Build subpackages
+      #   run: yarn run build
+
+      - name: Scan in Repo (html)
+        uses: aquasecurity/trivy-action@master
+        if: success() || failure()
+        with:
+          scan-type: fs
+          scanners: vuln,secret,config
+          scan-ref: .
+          format: template
+          template: '@/contrib/html.tpl'
+          output: trivy-results-repo-${{ steps.myvars.outputs.GIT_HASH_SHORT }}.html
+        env:
+          TRIVY_USERNAME: ${{ github.repository_owner }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Scan in Repo (sarif)
+        uses: aquasecurity/trivy-action@master
+        if: success() || failure()
+        with:
+          scan-type: fs
+          scanners: vuln,secret,config
+          scan-ref: .
+          format: sarif
+          output: trivy-results-repo-${{ steps.myvars.outputs.GIT_HASH_SHORT }}.sarif
+        env:
+          TRIVY_USERNAME: ${{ github.repository_owner }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Repo Scan Results as Artifact
+        uses: actions/upload-artifact@v3
+        if: success() || failure()
+        with:
+          name: trivy-results-repo-${{ steps.myvars.outputs.DATE_IN_SECS }}
+          path: trivy-results-repo-${{ steps.myvars.outputs.GIT_HASH_SHORT }}.*
+
+      - name: Load Repo Scan Results (sarif) to Github
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        #if: false        ## false = bypass
+        with:
+          sarif_file: trivy-results-repo-${{ steps.myvars.outputs.GIT_HASH_SHORT }}.sarif
+          category: vulns-in-repo
