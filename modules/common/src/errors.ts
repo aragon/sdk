@@ -268,6 +268,9 @@ export class UseTransferError extends SdkError {
 
 export class InvalidGasEstimationFactorError extends SdkError {
   constructor(cause?: Error) {
-    super("Gas estimation factor value should be a number between 0 and 1", cause);
+    super(
+      "Gas estimation factor value should be a number between 0 and 1",
+      cause,
+    );
   }
 }

@@ -6,9 +6,9 @@ import {
 } from "@ethersproject/providers";
 import {
   InvalidAddressError,
+  InvalidGasEstimationFactorError,
   UnsupportedNetworkError,
   UnsupportedProtocolError,
-  InvalidGasEstimationFactorError,
 } from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
