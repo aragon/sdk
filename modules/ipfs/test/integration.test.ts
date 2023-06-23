@@ -1,4 +1,11 @@
 import { Client, InvalidResponseError } from "../src";
+import {
+  ADD_CONTENT,
+  ADD_RESPONSE,
+  CAT_RESPONSE,
+  NODE_INFO_RESPONSE,
+} from "./constants";
+import { Network } from "../src/internal/network";
 
 const IPFS_API_KEY = process.env.IPFS_API_KEY ||
   Buffer.from(
@@ -13,10 +20,15 @@ const IPFS_CLUSTER_URL = "https://test.ipfs.aragon.network/api/v0";
 
 describe("IPFS client", () => {
   let client: Client;
-  beforeEach(() => {
+  let networkSpy: jest.SpyInstance;
+  beforeAll(() => {
     client = new Client(IPFS_CLUSTER_URL, {
       "X-API-KEY": IPFS_API_KEY,
     });
+    networkSpy = jest.spyOn(Network, "request");
+  });
+  afterEach(() => {
+    networkSpy.mockReset();
   });
 
   // NOTE: Not currently allowed by the IPFS cluster Proxy
@@ -28,75 +40,90 @@ describe("IPFS client", () => {
   // });
 
   it("Should get the info of a node", async () => {
+    networkSpy.mockResolvedValueOnce(NODE_INFO_RESPONSE);
     const versionInfo = await client.nodeInfo();
     expect(typeof versionInfo.id).toBe("string");
-    expect(versionInfo.id !== "").toBe(true);
+    expect(versionInfo.id).toBe(NODE_INFO_RESPONSE.ID);
   });
 
   it("Should upload a string and recover the same string", async () => {
-    const content = "I am a test";
-    const { hash } = await client.add(content);
-    expect(hash).toBe("QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK");
+    networkSpy.mockResolvedValueOnce(ADD_RESPONSE)
+      .mockResolvedValueOnce(
+        CAT_RESPONSE,
+      );
+    const { hash } = await client.add(CAT_RESPONSE);
+    expect(hash).toBe(ADD_RESPONSE.Hash);
     const recoveredBytes = await client.cat(hash);
     const recoveredContent = new TextDecoder().decode(recoveredBytes);
     expect(typeof recoveredBytes).toBe("object");
     expect(typeof recoveredContent).toBe("string");
-    expect(recoveredContent).toEqual(content);
+    expect(recoveredContent).toEqual(ADD_CONTENT);
   });
 
   it("Should upload a Uint8Array and recover the same thing", async () => {
-    const content = new Uint8Array([80, 81, 82, 83, 84, 85, 86, 87, 88, 89]);
-    const { hash } = await client.add(content);
-    expect(hash).toBe("QmZF4kLy8CXzoDt7PQCpLLN97E8D5xx3inxm5bjBXdoNGP");
+    networkSpy.mockResolvedValueOnce(ADD_RESPONSE)
+      .mockResolvedValueOnce(
+        CAT_RESPONSE,
+      );
+    const { hash } = await client.add(CAT_RESPONSE);
+    expect(hash).toBe(ADD_RESPONSE.Hash);
     const recoveredBytes = await client.cat(hash);
-    expect(recoveredBytes.toString()).toEqual("80,81,82,83,84,85,86,87,88,89");
+    expect(recoveredBytes.toString()).toEqual(CAT_RESPONSE.toString());
   });
 
   it("Should upload a file and recover the same content", async () => {
-    const content = "I am a test file";
-    const file = new File([content], "hello.txt", { type: "text/plain" });
+    const file = new File([ADD_CONTENT], "hello.txt", { type: "text/plain" });
+    networkSpy.mockResolvedValueOnce(ADD_RESPONSE)
+      .mockResolvedValueOnce(
+        CAT_RESPONSE,
+      );
     const { hash } = await client.add(file);
-    expect(hash).toBe("Qmf8RhZg6dVgThtYfmiSYKK63ZjSirv2RAZs3jwhNBcMsc");
+    expect(hash).toBe(ADD_RESPONSE.Hash);
     const recoveredBytes = await client.cat(hash);
     const recoveredContent = new TextDecoder().decode(recoveredBytes);
     expect(typeof recoveredBytes).toBe("object");
     expect(typeof recoveredContent).toBe("string");
-    expect(recoveredContent).toEqual(content);
+    expect(recoveredContent).toEqual(ADD_CONTENT);
   });
 
   it("Should upload a blob and recover the same content", async () => {
-    const content = "I am a test blob";
-    const blob = new Blob([content], { type: "text/plain" });
+    const blob = new Blob([ADD_CONTENT], { type: "text/plain" });
+    networkSpy.mockResolvedValueOnce(ADD_RESPONSE)
+      .mockResolvedValueOnce(
+        CAT_RESPONSE,
+      );
     const { hash } = await client.add(blob);
-    expect(hash).toBe("QmZ3Hyrq1wgfq5aadwRfesNbcEBAczecxrtFMiMVjsfyN8");
+    expect(hash).toBe(ADD_RESPONSE.Hash);
     const recoveredBytes = await client.cat(hash);
     const recoveredContent = new TextDecoder().decode(recoveredBytes);
     expect(typeof recoveredBytes).toBe("object");
     expect(typeof recoveredContent).toBe("string");
-    expect(recoveredContent).toEqual(content);
+    expect(recoveredContent).toEqual(ADD_CONTENT);
   });
 
   it("The same content should produce the same CiD no matter the format", async () => {
-    const string = "I am a test message";
-    const buffer = new Uint8Array(Buffer.from(string));
-    const file = new File([string], "hello.txt", { type: "text/plain" });
-    const blob = new Blob([string], { type: "text/plain" });
+    const buffer = new Uint8Array(Buffer.from(ADD_CONTENT));
+    const file = new File([ADD_CONTENT], "hello.txt", { type: "text/plain" });
+    const blob = new Blob([ADD_CONTENT], { type: "text/plain" });
 
-    const { hash: hash1 } = await client.add(string);
+    networkSpy.mockResolvedValue(ADD_RESPONSE);
+    const { hash: hash1 } = await client.add(ADD_CONTENT);
     const { hash: hash2 } = await client.add(buffer);
     const { hash: hash3 } = await client.add(file);
     const { hash: hash4 } = await client.add(blob);
 
-    expect(hash1).toBe("QmYiXFNmFH5ffBofzna52px2CSBXVdNg1eP2A2tyuJ8a5z");
-    expect(hash2).toBe("QmYiXFNmFH5ffBofzna52px2CSBXVdNg1eP2A2tyuJ8a5z");
-    expect(hash3).toBe("QmYiXFNmFH5ffBofzna52px2CSBXVdNg1eP2A2tyuJ8a5z");
-    expect(hash4).toBe("QmYiXFNmFH5ffBofzna52px2CSBXVdNg1eP2A2tyuJ8a5z");
+    expect(hash1).toBe(ADD_RESPONSE.Hash);
+    expect(hash2).toBe(ADD_RESPONSE.Hash);
+    expect(hash3).toBe(ADD_RESPONSE.Hash);
+    expect(hash4).toBe(ADD_RESPONSE.Hash);
 
+    networkSpy.mockReset();
+    networkSpy.mockResolvedValue(CAT_RESPONSE);
     const recoveredBytes = await client.cat(hash1);
     const recoveredContent = new TextDecoder().decode(recoveredBytes);
     expect(typeof recoveredBytes).toBe("object");
     expect(typeof recoveredContent).toBe("string");
-    expect(recoveredContent).toEqual(string);
+    expect(recoveredContent).toEqual(ADD_CONTENT);
   });
 
   it("Should return an error when trying to cat an empty string", async () => {
