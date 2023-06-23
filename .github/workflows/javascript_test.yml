@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Use Node ${{ matrix.node }}
         uses: actions/setup-node@v3
@@ -35,7 +35,7 @@ jobs:
           cache: "yarn"
           node-version: ${{ matrix.node }}
  
-      - name: install deps
+      - name: Install deps
         run: yarn install --frozen-lockfile
 
       - name: Build subpackages
@@ -46,7 +46,7 @@ jobs:
         env:
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
 
-      - name: Unit test
+      - name: Run unit tests
         run: yarn test --testPathIgnorePatterns=modules/client/test/integration --ci --coverage  --passWithNoTests
         env:
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}

@@ -1,4 +1,4 @@
-# Aragon Client Common changelog
+# Aragon JS SDK (client-common) changelog
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
