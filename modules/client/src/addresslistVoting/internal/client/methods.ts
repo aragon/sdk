@@ -57,7 +57,10 @@ import {
   SubgraphAddresslistVotingProposal,
   SubgraphAddresslistVotingProposalListItem,
 } from "../types";
-import { AlwaysFailingProposalError } from "@aragon/sdk-common";
+import {
+  AlwaysFailingProposalError,
+  SizeMismatchError,
+} from "@aragon/sdk-common";
 import {
   ClientCore,
   EMPTY_PROPOSAL_METADATA_LINK,
@@ -104,9 +107,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       params.failSafeActions?.length &&
       params.failSafeActions.length !== params.actions?.length
     ) {
-      throw new Error(
-        "Size mismatch: actions and failSafeActions should match",
-      );
+      throw new SizeMismatchError();
     }
     const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
 

@@ -41,7 +41,12 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 import { AddressZero } from "@ethersproject/constants";
 import { PluginSetupProcessor } from "@aragon/osx-ethers";
 import { PermissionIds } from "../constants";
-import { ApplyInstallationParams, DecodedApplyInstallationParams, TokenType } from "@aragon/sdk-client-common";
+import {
+  ApplyInstallationParams,
+  DecodedApplyInstallationParams,
+  TokenType,
+} from "@aragon/sdk-client-common";
+import { NotImplementedError } from "@aragon/sdk-common";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -375,5 +380,5 @@ export function withdrawParamsFromContract(
     };
   }
   // TODO Add ERC721 and ERC1155
-  throw new Error("not implemented");
+  throw new NotImplementedError("Only ERC20 tokens are supported");
 }

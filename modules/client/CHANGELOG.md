@@ -14,6 +14,9 @@ TEMPLATE:
 -->
 ## [UPCOMING]
 ### Added
+- Add usage of common errors in all the code
+## [1.9.0]
+### Added
 - Suport for ERC20Wrapper and `underlyingToken`
 - Add block number to get members query
 ### Changed

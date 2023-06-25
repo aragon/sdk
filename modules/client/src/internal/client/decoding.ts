@@ -20,7 +20,13 @@ import {
   permissionParamsWitConditionFromContract,
   withdrawParamsFromContract,
 } from "../utils";
-import { bytesToHex, hexToBytes, resolveIpfsCid } from "@aragon/sdk-common";
+import {
+  bytesToHex,
+  hexToBytes,
+  InvalidActionError,
+  IpfsError,
+  resolveIpfsCid,
+} from "@aragon/sdk-common";
 import { erc20ContractAbi } from "../abi/erc20";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
@@ -148,7 +154,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
         abiObject.tokenStandard,
       );
     }
-    throw new Error("The received action is not recognized");
+    throw new InvalidActionError();
   }
   /**
    * Decodes a dao metadata ipfs uri from an encoded update metadata action
@@ -183,8 +189,8 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     try {
       const stringMetadata = await this.ipfs.fetchString(ipfsCid);
       return JSON.parse(stringMetadata);
-    } catch {
-      throw new Error("Error reading data from IPFS");
+    } catch (e) {
+      throw new IpfsError(e);
     }
   }
   /**

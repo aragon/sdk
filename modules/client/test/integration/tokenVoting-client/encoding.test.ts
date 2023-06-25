@@ -56,7 +56,7 @@ describe("Token Voting Client", () => {
       const pluginAddress = "0xinvalid_address";
       expect(() =>
         client.encoding.updatePluginSettingsAction(pluginAddress, params)
-      ).toThrow("Invalid plugin address");
+      ).toThrow(new InvalidAddressError());
     });
     it("Should encode an update plugin settings action", async () => {
       const ctx = new Context(contextParamsLocalChain);

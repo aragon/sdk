@@ -101,6 +101,11 @@ export class ProposalCreationError extends SdkError {
     super("Failed to create proposal", cause);
   }
 }
+export class DaoCreationError extends SdkError {
+  constructor(cause?: any) {
+    super("Failed to create DAO", cause);
+  }
+}
 
 export class MissingExecPermissionError extends SdkError {
   constructor(cause?: any) {
@@ -218,6 +223,54 @@ export class DepositNativeTokenError extends SdkError {
 }
 export class AlwaysFailingProposalError extends SdkError {
   constructor(cause?: Error) {
-    super("invalid actions, the types or order of the actions may cause the execution to fail", cause);
+    super(
+      "invalid actions, the types or order of the actions may cause the execution to fail",
+      cause,
+    );
+  }
+}
+
+export class SizeMismatchError extends SdkError {
+  constructor(cause?: Error) {
+    super("Size mismatch: actions and failSafeActions should match", cause);
+  }
+}
+
+export class InvalidProposalStatusError extends SdkError {
+  constructor(cause?: Error) {
+    super("Invalid proposal status", cause);
+  }
+}
+
+export class NotImplementedError extends SdkError {
+  constructor(message?: string, cause?: Error) {
+    super(`Not implemented: ${message}`, cause);
+  }
+}
+
+export class InvalidActionError extends SdkError {
+  constructor(cause?: Error) {
+    super("The received action is not recognized", cause);
+  }
+}
+
+export class InvalidSubdomainError extends SdkError {
+  constructor(cause?: Error) {
+    super("Invalid subdomain format: use a-z, 0-9 and -", cause);
+  }
+}
+
+export class UseTransferError extends SdkError {
+  constructor(cause?: Error) {
+    super("Please, use the token's transfer function directly", cause);
+  }
+}
+
+export class InvalidGasEstimationFactorError extends SdkError {
+  constructor(cause?: Error) {
+    super(
+      "Gas estimation factor value should be a number between 0 and 1",
+      cause,
+    );
   }
 }

@@ -20,7 +20,13 @@ import {
 } from "../utils";
 import { Contract } from "@ethersproject/contracts";
 import { erc20ContractAbi } from "../abi/erc20";
-import { hexToBytes, InvalidAddressError } from "@aragon/sdk-common";
+import {
+  hexToBytes,
+  InvalidAddressError,
+  InvalidAddressOrEnsError,
+  InvalidEnsError,
+  NotImplementedError,
+} from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IClientEncoding } from "../interfaces";
 import { Permissions } from "../../constants";
@@ -236,7 +242,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
         params.recipientAddressOrEns,
       );
       if (!resolvedAddress) {
-        throw new Error("invalid ens");
+        throw new InvalidAddressOrEnsError();
       }
       to = resolvedAddress;
     }
@@ -246,7 +252,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
         return { to, value: params.amount, data: new Uint8Array() };
       case TokenType.ERC20:
         if (!params.tokenAddress) {
-          throw new Error("Empty token contract address");
+          throw new InvalidAddressError();
         }
 
         const iface = new Contract(
@@ -262,8 +268,9 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           value: BigInt(0),
           data: hexToBytes(data),
         };
+      default:
+        throw new NotImplementedError("Token type not supported");
     }
-    throw new Error("Unsupported token type");
   }
   /**
    * Computes the payload to be given when creating a proposal that updates the metadata the DAO
@@ -283,7 +290,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
         daoAddressOrEns,
       );
       if (!resolvedAddress) {
-        throw new Error("Invalid ENS");
+        throw new InvalidEnsError();
       }
       address = resolvedAddress;
     }

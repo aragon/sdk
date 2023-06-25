@@ -1,5 +1,9 @@
 import { Multisig__factory } from "@aragon/osx-ethers";
-import { boolArrayToBitmap, decodeProposalId } from "@aragon/sdk-common";
+import {
+  boolArrayToBitmap,
+  decodeProposalId,
+  SizeMismatchError,
+} from "@aragon/sdk-common";
 import { IMultisigClientEstimation } from "../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
@@ -33,9 +37,7 @@ export class MultisigClientEstimation extends ClientCore
       params.failSafeActions?.length &&
       params.failSafeActions.length !== params.actions?.length
     ) {
-      throw new Error(
-        "Size mismatch: actions and failSafeActions should match",
-      );
+      throw new SizeMismatchError();
     }
     const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
 
