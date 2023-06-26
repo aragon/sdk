@@ -1,4 +1,5 @@
 name: Javascript Test
+
 on:
   workflow_call:
     inputs:
