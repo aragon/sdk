@@ -24,14 +24,18 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: 'develop'
+      - name: Setup Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
       - name: Get package-list from label-list
         id: matrix
         run: |
-          ## [ aaa-123, bbb-ccc-release, ddd-release ]
-          LABEL_LIST="${{ toJson(github.event.pull_request.labels.*.name) }}"
-          ## [aaa-123,bbb-ccc,ddd]
-          PKG_LIST=$(echo $LABEL_LIST | sed 's/\(\s\|-release\)//g')
+          PKG_LIST=$(python ./.github/scripts/generate_release_matrix.py)
+          echo $PKG_LIST
           echo "pkg_list=$PKG_LIST" >> $GITHUB_OUTPUT
+        env:
+          PULL_LABELS: ${{ toJson(github.event.pull_request.labels) }}
 
   release:
     name: Set Github Tag after PR
@@ -39,9 +43,7 @@ jobs:
     needs: [prepare]
     strategy:
       fail-fast: true
-      matrix:
-        # example: [client, common, client-common]
-        package: ${{ needs.prepare.outputs.PACKAGE_LIST }}
+      matrix: ${{ fromJson(needs.prepare.outputs.PACKAGE_LIST) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

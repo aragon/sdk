@@ -54,6 +54,6 @@ for label in labels:
             'package': label_name[:trigger_substring_index],
         })
         hasLabels = True
- 
-print("hasLabels=" + str(hasLabels) + " >> $GITHUB_OUTPUT")
-print("matrix=" + json.dumps({'include': matrix}) + " >> $GITHUB_OUTPUT")
+# print("hasLabels=" + str(hasLabels) + " >> $GITHUB_OUTPUT")
+# print("matrix=" + json.dumps({'include': matrix}) + " >> $GITHUB_OUTPUT")
+print(json.dumps({'include': matrix}))
