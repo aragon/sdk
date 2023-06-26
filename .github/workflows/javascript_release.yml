@@ -1,12 +1,6 @@
 name: Javascript Release
 
 on:
-  workflow_call:
-    inputs:
-      run:
-        description: "Forces a run if true"
-        required: false
-        type: boolean
   pull_request:
     types:
       - closed
@@ -24,37 +18,30 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged
     outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
-      hasLabels: ${{ steps.matrix.outputs.hasLabels }}
+      PACKAGE_LIST: ${{ steps.matrix.outputs.pkg_list }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           ref: 'develop'
-      - name: Setup Python environment
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-      - name: Generate release-matrix based on current Github Labels
+      - name: Get package-list from label-list
         id: matrix
         run: |
-          echo "Current Labels list (only names): ${{ toJson(github.event.pull_request.labels.*.name) }}"
-          python ./.github/scripts/generate_release_matrix.py
-        env:
-          PULL_LABELS: ${{ toJson(github.event.pull_request.labels) }}
-      - name: Check vars
-        run: |
-          echo "value of hasLabels: ${{ steps.matrix.outputs.hasLabels }}"
-          echo "value of matrix: ${{ steps.matrix.outputs.matrix }}"
+          ## [ aaa-123, bbb-ccc-release, ddd-release ]
+          LABEL_LIST="${{ toJson(github.event.pull_request.labels.*.name) }}"
+          ## [aaa-123,bbb-ccc,ddd]
+          PKG_LIST="echo $LABEL_LIST | sed 's/\(\s\|-release\)//g'"
+          echo "pkg_list=$PKG_LIST"  >> $GITHUB_OUTPUT
 
   release:
     name: Set Github Tag after PR
     runs-on: ubuntu-latest
     needs: [prepare]
-    if: ${{ needs.prepare.outputs.hasLabels == 'True' }}
     strategy:
       fail-fast: true
-      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+      matrix:
+        # example: [client, common, client-common]
+        package: ${{ needs.prepare.outputs.PACKAGE_LIST }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
