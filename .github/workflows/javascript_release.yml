@@ -30,8 +30,8 @@ jobs:
           ## [ aaa-123, bbb-ccc-release, ddd-release ]
           LABEL_LIST="${{ toJson(github.event.pull_request.labels.*.name) }}"
           ## [aaa-123,bbb-ccc,ddd]
-          PKG_LIST="echo $LABEL_LIST | sed 's/\(\s\|-release\)//g'"
-          echo "pkg_list=$PKG_LIST"  >> $GITHUB_OUTPUT
+          PKG_LIST=$(echo $LABEL_LIST | sed 's/\(\s\|-release\)//g')
+          echo "pkg_list=$PKG_LIST" >> $GITHUB_OUTPUT
 
   release:
     name: Set Github Tag after PR
