@@ -1,3 +1,5 @@
+# These labels (common, client, ipfs and client-common) are only informative.
+# While the labels <pkg-name>-release are for trriggering the release process.
 
 common:
 - ./modules/common/**/*

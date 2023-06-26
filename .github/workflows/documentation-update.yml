@@ -12,14 +12,15 @@ jobs:
     permissions: read-all
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.ARABOT_PAT }}
+      - name: Checkout sdk repo
+        uses: actions/checkout@v3
+        # with:
+        #   token: ${{ secrets.ARABOT_PAT }}
       - name: Install node
         uses: actions/setup-node@v3
         with:
-          cache: "yarn"
-          node-version: 16
+          cache: 'yarn'
+          node-version: 16.x
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Generate Client Docs
@@ -32,13 +33,13 @@ jobs:
         run: yarn run docs:multisig
       - name: Generate examples Docs
         run: yarn run docs:examples
-      - name: Checkout builders-portal
+      - name: Checkout builders-portal repo
         uses: actions/checkout@v3
         with:
           repository: aragon/builders-portal
           ref: staging
           path: builders-portal
-          token: ${{ secrets.ARABOT_PAT }}
+          # token: ${{ secrets.ARABOT_PAT }}
       - name: Clean the docs/sdk folder in the builders-portal
         run: rm -rf $GITHUB_WORKSPACE/builders-portal/docs/sdk
       - name: Copy the docs folder to the builders-portal
