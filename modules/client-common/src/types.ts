@@ -17,6 +17,14 @@ export type ContextState =
   & IpfsContextState
   & GraphQLContextState;
 
+export type OverriddenState = {
+  daoFactoryAddress: boolean;
+  ensRegistryAddress: boolean;
+  gasFeeEstimationFactor: boolean;
+  ipfsNodes: boolean;
+  graphqlNodes: boolean;
+};
+
 export enum SupportedNetwork {
   MAINNET = "homestead",
   GOERLI = "goerli",
@@ -50,7 +58,6 @@ export type DaoAction = {
   data: Uint8Array;
 };
 
-
 export type MetadataAbiInput = {
   name: string;
   type: string;
@@ -58,7 +65,6 @@ export type MetadataAbiInput = {
   description: string;
   components?: MetadataAbiInput[];
 };
-
 
 export type PrepareInstallationParams = {
   daoAddressOrEns: string;
@@ -115,7 +121,6 @@ export type MultiTargetPermission = {
   permissionId: string;
 };
 
-
 export type Pagination = {
   skip?: number;
   limit?: number;
@@ -139,7 +144,6 @@ export enum TokenType {
   ERC721 = "erc721",
 }
 
-
 /**
  * Contains the human-readable information about a proposal
  */
@@ -161,7 +165,6 @@ export type ProposalMetadataSummary = {
   title: string;
   summary: string;
 };
-
 
 export enum ProposalStatus {
   ACTIVE = "Active",

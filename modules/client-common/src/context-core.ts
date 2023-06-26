@@ -17,19 +17,13 @@ import { Signer } from "@ethersproject/abstract-signer";
 import {
   ContextParams,
   ContextState,
+  OverriddenState,
   SupportedNetwork,
   SupportedNetworksArray,
 } from "./types";
 import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
-type OverriddenState = {
-  daoFactoryAddress: boolean;
-  ensRegistryAddress: boolean;
-  gasFeeEstimationFactor: boolean;
-  ipfsNodes: boolean;
-  graphqlNodes: boolean;
-};
 const supportedProtocols = ["https:"];
 if (typeof process !== "undefined" && process?.env?.TESTING) {
   supportedProtocols.push("http:");
