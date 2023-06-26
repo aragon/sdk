@@ -55,5 +55,5 @@ for label in labels:
         })
         hasLabels = True
  
-print("hasLabels=" + str(hasLabels) + ">> $GITHUB_OUTPUT")
-print("matrix=" + json.dumps({'include': matrix}) + ">> $GITHUB_OUTPUT")
+print("hasLabels=" + str(hasLabels) + " >> $GITHUB_OUTPUT")
+print("matrix=" + json.dumps({'include': matrix}) + " >> $GITHUB_OUTPUT")
