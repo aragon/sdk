@@ -14,6 +14,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+## 1.0.2
+### Changed
+- Fixed the ESM import path
+
+## 1.0.1
 ### Added
 - Add usage of common errors in all the code
 - Export of OverridenState
