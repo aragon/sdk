@@ -1,9 +1,10 @@
 {
   "name": "@aragon/sdk-client-common",
   "author": "Aragon Association",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "main": "dist/index.js",
+  "module": "dist/sdk-client-common.esm.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
@@ -37,14 +38,13 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "module": "dist/plugin-client.esm.js",
   "size-limit": [
     {
-      "path": "dist/plugin-client.cjs.production.min.js",
+      "path": "dist/sdk-client-common.cjs.production.min.js",
       "limit": "10 KB"
     },
     {
-      "path": "dist/plugin-client.esm.js",
+      "path": "dist/sdk-client-common.esm.js",
       "limit": "10 KB"
     }
   ],
