@@ -13,6 +13,10 @@ TEMPLATE:
 
 -->
 ## [UPCOMING]
+### Changed
+- Bumped the client-common dependency
+
+## [1.9.1]
 ### Added
 - Add usage of common errors in all the code
 ## [1.9.0]
