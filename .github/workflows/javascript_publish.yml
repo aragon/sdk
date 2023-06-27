@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Get values (package and verrsion) from Github Tag
+      - name: Get package and version from Github Tag
         id: tag-info
         run: |
           GITHUB_REF="${{ github.ref }}"
@@ -65,7 +65,7 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build subpackages
         run: yarn run build
-      - name: Publish npm pkg (${{ needs.check_tag.outputs.package }} - ${{ needs.check_tag.outputs.version }})
+      - name: Publish NPM pkg (${{ needs.check_tag.outputs.package }} - ${{ needs.check_tag.outputs.version }})
         run: yarn publish --no-git-tag-version --new-version ${{ needs.check_tag.outputs.version }}
         working-directory: ./modules/${{ needs.check_tag.outputs.package }}
         env:
@@ -74,7 +74,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.x
-          # architecture: "x64"
       # - name: Checkout code (develop branch)
       #   uses: actions/checkout@v3
       #   with:
@@ -85,8 +84,9 @@ jobs:
         run: python ./.github/scripts/generate_release_notes.py "./modules/${{ needs.check_tag.outputs.package }}/CHANGELOG.md"
       - name: Add NPM pkg info to release-notes.txt
         run: |
-          echo "### NPM Packages" > release-notes.txt
-          echo "- [@aragon/sdk-${{ needs.check_tag.outputs.package }} version ${{ needs.check_tag.outputs.version }}](https://www.npmjs.com/package/@aragon/sdk-${{ needs.check_tag.outputs.package }})" > release-notes.txt
+          echo "### NPM Packages" >> release-notes.txt
+          echo "- [@aragon/sdk-${{ needs.check_tag.outputs.package }} version ${{ needs.check_tag.outputs.version }}](https://www.npmjs.com/package/@aragon/sdk-${{ needs.check_tag.outputs.package }})" >> release-notes.txt
+          echo " " >> release-notes.txt
       - name: Create a Github Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
