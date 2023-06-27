@@ -84,9 +84,9 @@ jobs:
         run: python ./.github/scripts/generate_release_notes.py "./modules/${{ needs.check_tag.outputs.package }}/CHANGELOG.md"
       - name: Add NPM pkg info to release-notes.txt
         run: |
-          echo "### NPM Packages" > release-notes.txt
-          echo "- [@aragon/sdk-${{ needs.check_tag.outputs.package }} version ${{ needs.check_tag.outputs.version }}](https://www.npmjs.com/package/@aragon/sdk-${{ needs.check_tag.outputs.package }})" > release-notes.txt
-          echo " " > release-notes.txt
+          echo "### NPM Packages" >> release-notes.txt
+          echo "- [@aragon/sdk-${{ needs.check_tag.outputs.package }} version ${{ needs.check_tag.outputs.version }}](https://www.npmjs.com/package/@aragon/sdk-${{ needs.check_tag.outputs.package }})" >> release-notes.txt
+          echo " " >> release-notes.txt
       - name: Create a Github Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
