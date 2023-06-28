@@ -33,9 +33,9 @@ jobs:
         id: matrix
         run: |
           PKG_LIST=$(python ./.github/scripts/generate_release_matrix.py)
-          PR_LABEL_LIST="${{ github.event.pull_request.labels.*.name }}"
+          PR_LABEL_LIST="${{ toJson(github.event.pull_request.labels.*.name) }}"
           echo "Pkg list: $PKG_LIST"
-          echo "PR label list: $PR_LABEL_LIST"
+          echo "Label list: $PR_LABEL_LIST"
           echo "pkg_list=$PKG_LIST" >> $GITHUB_OUTPUT
           echo "pr_label_list="$PR_LABEL_LIST" >> $GITHUB_OUTPUT"
         env:
