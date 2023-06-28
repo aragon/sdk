@@ -15,6 +15,9 @@ TEMPLATE:
 ### Fixed
 - Fix 1, 2, 3
 -->
+
+## [UPCOMING]
+
 ## 1.5.0
 ### Added
 - New error classes `SizeMismatchError`, `InvalidProposalStatusError`, `NotImplementedError`, `InvalidActionError`, `InvalidSubdomainError`, `InvalidGasEstimationFactorError` and `UseTransferError`

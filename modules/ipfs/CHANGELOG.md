@@ -17,10 +17,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-### 1.1.0
+
+## 1.1.0
 - Add common errors with response embedded
-### 1.0.0
-### 0.3.0-beta
+## 1.0.0
+
+## 0.3.0-beta
 
 Release candidate 1
 

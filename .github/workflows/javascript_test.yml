@@ -1,4 +1,4 @@
-name: Javascript Test
+name: 00-JS-Test
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: Javascript Release
+name: 01-JS-Release
 
 on:
   pull_request:
@@ -19,6 +19,7 @@ jobs:
     if: github.event.pull_request.merged
     outputs:
       PACKAGE_LIST: ${{ steps.matrix.outputs.pkg_list }}
+      PULL_REQUEST_LABEL_LIST: ${{ steps.matrix.outputs.pr_label_list }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -32,8 +33,11 @@ jobs:
         id: matrix
         run: |
           PKG_LIST=$(python ./.github/scripts/generate_release_matrix.py)
-          echo $PKG_LIST
+          PR_LABEL_LIST="${{ toJson(github.event.pull_request.labels.*.name) }}"
+          echo "Pkg list: $PKG_LIST"
+          echo "Label list: $PR_LABEL_LIST"
           echo "pkg_list=$PKG_LIST" >> $GITHUB_OUTPUT
+          echo "pr_label_list="$PR_LABEL_LIST" >> $GITHUB_OUTPUT"
         env:
           PULL_LABELS: ${{ toJson(github.event.pull_request.labels) }}
 
@@ -41,7 +45,8 @@ jobs:
     name: Set Github Tag
     runs-on: ubuntu-latest
     needs: [prepare]
-    if: ${{ contains( github.event.pull_request.labels.*.name, '-release' ) }}
+    #if: ${{ contains( github.event.pull_request.labels.*.name, '-release' ) }}
+    if: contains(needs.prepare.outputs.PULL_REQUEST_LABEL_LIST, '-release')
     strategy:
       fail-fast: true
       matrix: ${{ fromJson(needs.prepare.outputs.PACKAGE_LIST) }}
@@ -59,7 +64,7 @@ jobs:
       - name: Set Github Tag via API
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.ARABOT_PAT }}
+          github-token: ${{ secrets.ARABOT_PAT_TRIGGER_WORKFLOW }}
           script: |
             github.rest.git.createRef({
               owner: context.repo.owner,
