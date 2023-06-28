@@ -15,9 +15,9 @@ TEMPLATE:
 ### Fixed
 - Fix 1, 2, 3
 -->
-## UPCOMING
+## 1.5.0
 ### Added
-- Neew error classes `SizeMismatchError`, `InvalidProposalStatusError`, `NotImplementedError`, `InvalidActionError`, `InvalidSubdomainError`, `InvalidGasEstimationFactorError` and `UseTransferError`
+- New error classes `SizeMismatchError`, `InvalidProposalStatusError`, `NotImplementedError`, `InvalidActionError`, `InvalidSubdomainError`, `InvalidGasEstimationFactorError` and `UseTransferError`
 ## 1.4.0
 ### Added
 - Cause parameter in errors
