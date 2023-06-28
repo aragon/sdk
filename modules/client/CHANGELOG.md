@@ -9,9 +9,13 @@ TEMPLATE:
 ### Added
 - Feature 1, 2, 3
 
+### Changed
 - Change 1, 2, 3
 
+### Fixed
+- Fix 1, 2, 3
 -->
+
 ## [UPCOMING]
 ### Changed
 - Bumped the client-common dependency
