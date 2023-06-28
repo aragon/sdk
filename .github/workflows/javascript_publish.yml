@@ -1,4 +1,4 @@
-name: Javascript Publish
+name: 02-JS-Publish
 
 on:
   push:
