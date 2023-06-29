@@ -37,7 +37,7 @@ jobs:
           echo "Pkg list: $PKG_LIST"
           echo "Label list: $PR_LABEL_LIST"
           echo "pkg_list=$PKG_LIST" >> $GITHUB_OUTPUT
-          echo "pr_label_list="$PR_LABEL_LIST" >> $GITHUB_OUTPUT"
+          echo "pr_label_list='$PR_LABEL_LIST'" >> $GITHUB_OUTPUT
         env:
           PULL_LABELS: ${{ toJson(github.event.pull_request.labels) }}
 
