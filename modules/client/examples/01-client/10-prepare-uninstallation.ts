@@ -1,9 +1,12 @@
 /* MARKDOWN
 ---
-title: PrepareInstallation
+title: Prepare Uninstallation
 ---
 
-### Prepare Uninstallation of a plugin
+### Prepare the uninstallation of a plugin
+
+The `prepareUninstallation` method performs the prior steps so that a DAO proposal can eventually apply the removal of a Plugin. 
+The proposal will need an Action calling the `applyUninstallation` function. 
 
 */
 

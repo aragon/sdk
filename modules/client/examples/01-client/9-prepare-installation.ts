@@ -1,8 +1,12 @@
 /* MARKDOWN
 ---
-title: PrepareInstallation
+title: Prepare Installation
 ---
 ### Prepare installation of a plugin
+
+The `prepareInstallation` method performs the prior steps so that a DAO proposal can eventually apply the installation of a Plugin to the given DAO.
+A governance proposal will need to be created with an action calling `applyInstallation`.
+
 */
 
 import { Client } from "@aragon/sdk-client";
@@ -16,12 +20,14 @@ import { context } from "../index";
 const client: Client = new Client(context);
 
 // Obtained from the plugin metadata
+// See an example: https://github.com/aragon/simple-storage-example-plugin/blob/main/contracts/release1/build3/build-metadata-R1B3.json#L7-L20
 const installationAbi = [/* ... */];
 
 const prepareInstallationParams: PrepareInstallationParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
   pluginRepo: "0x2345678901234567890123456789012345678901",
-  installationParams: [ // Parameters needed by the prepare install abi
+  installationParams: [
+    // Parameters needed by the prepareInstallation function (example)
     1234,
     "0x1234567890123456789012345678901234567890",
   ],
