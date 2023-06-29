@@ -7,6 +7,8 @@ title: Prepare Installation
 The `prepareInstallation` method performs the prior steps so that a DAO proposal can eventually apply the installation of a Plugin to the given DAO.
 A governance proposal will need to be created with an action calling `applyInstallation`.
 
+For more details see https://devs.aragon.org/docs/sdk/examples/encoders-decoders/apply-installation#encoding
+
 */
 
 import { Client } from "@aragon/sdk-client";

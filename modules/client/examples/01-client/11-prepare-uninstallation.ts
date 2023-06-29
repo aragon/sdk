@@ -8,6 +8,8 @@ title: Prepare Uninstallation
 The `prepareUninstallation` method performs the prior steps so that a DAO proposal can eventually apply the removal of a Plugin. 
 The proposal will need an Action calling the `applyUninstallation` function. 
 
+For more details see https://devs.aragon.org/docs/sdk/examples/encoders-decoders/apply-uninstallation#encoding
+
 */
 
 import {
