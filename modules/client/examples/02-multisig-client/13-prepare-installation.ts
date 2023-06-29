@@ -9,8 +9,8 @@ title: Prepare Installation
 import {
   MultisigClient,
   MultisigPluginPrepareInstallationParams,
-  PrepareInstallationStep,
 } from "@aragon/sdk-client";
+import { PrepareInstallationStep } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Create an Multisig client.

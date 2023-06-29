@@ -7,11 +7,11 @@ title: Prepare Installation
 */
 
 import {
-  PrepareInstallationStep,
   TokenVotingClient,
   TokenVotingPluginPrepareInstallationParams,
   VotingMode,
 } from "@aragon/sdk-client";
+import { PrepareInstallationStep } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Create an TokenVoting client.

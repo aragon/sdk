@@ -12,8 +12,8 @@ import {
   CreateMultisigProposalParams,
   MultisigClient,
   ProposalCreationSteps,
-  ProposalMetadata,
 } from "@aragon/sdk-client";
+import { ProposalMetadata } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Insantiate a Multisig plugin client.

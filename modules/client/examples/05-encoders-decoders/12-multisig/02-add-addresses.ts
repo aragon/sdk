@@ -16,7 +16,8 @@ If this is not done correctly the transaction may fail and in the worst case bri
 ### Encoding
 */
 
-import { AddAddressesParams, DaoAction } from "@aragon/sdk-client";
+import { AddAddressesParams } from "@aragon/sdk-client";
+import { DaoAction } from "@aragon/sdk-client-common";
 import { multisigClient } from "./index";
 
 // The addresses to add as members.

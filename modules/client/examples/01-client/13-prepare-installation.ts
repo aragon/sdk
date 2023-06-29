@@ -5,18 +5,18 @@ title: PrepareInstallation
 ### Prepare installation of a plugin
 */
 
+import { Client } from "@aragon/sdk-client";
 import {
-  Client,
   PrepareInstallationParams,
   PrepareInstallationStep,
-} from "@aragon/sdk-client";
+} from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
 const client: Client = new Client(context);
 
 // Obtained from the plugin metadata
-const installationAbi = [ ... ];
+const installationAbi = [/* ... */];
 
 const prepareInstallationParams: PrepareInstallationParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
@@ -25,7 +25,7 @@ const prepareInstallationParams: PrepareInstallationParams = {
     1234,
     "0x1234567890123456789012345678901234567890",
   ],
-  installationAbi,,
+  installationAbi,
 };
 
 // prepare installation

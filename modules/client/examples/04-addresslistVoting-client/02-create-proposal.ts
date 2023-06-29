@@ -13,9 +13,9 @@ import {
   AddresslistVotingClient,
   CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
-  ProposalMetadata,
   VoteValues,
 } from "@aragon/sdk-client";
+import { ProposalMetadata } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Create a plugin context from the Aragon OSx SDK context.

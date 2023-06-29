@@ -19,10 +19,9 @@ In order for a withdrawal to be successful, the address executing it must have `
 
 import {
   Client,
-  DaoAction,
-  TokenType,
   WithdrawParams,
 } from "@aragon/sdk-client";
+import { DaoAction, TokenType } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiates an Aragon OSx SDK client.

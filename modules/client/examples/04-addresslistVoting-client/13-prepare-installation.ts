@@ -8,10 +8,10 @@ title: Prepare Installation
 
 import {
   AddresslistVotingPluginPrepareInstallationParams,
-  PrepareInstallationStep,
   TokenVotingClient,
   VotingMode,
 } from "@aragon/sdk-client";
+import { PrepareInstallationStep } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Create an TokenVoting client.

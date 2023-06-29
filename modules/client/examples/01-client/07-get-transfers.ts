@@ -14,11 +14,11 @@ By default, retrieves ETH, DAI, USDC and USDT, on Mainnet).
 import {
   Client,
   TransferQueryParams,
-  SortDirection,
   Transfer,
   TransferSortBy,
   TransferType,
 } from "@aragon/sdk-client";
+import { SortDirection } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.

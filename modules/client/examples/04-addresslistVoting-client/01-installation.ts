@@ -13,14 +13,14 @@ Then, use those encoded instructions when creating your DAO.
 
 import {
   AddresslistVotingClient,
+  AddresslistVotingPluginInstall,
   Client,
   CreateDaoParams,
   DaoCreationSteps,
   DaoMetadata,
-  GasFeeEstimation,
-  AddresslistVotingPluginInstall,
   VotingMode,
 } from "@aragon/sdk-client";
+import { GasFeeEstimation } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate a client from the Aragon OSx SDK context.

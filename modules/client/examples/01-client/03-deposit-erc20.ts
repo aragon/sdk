@@ -17,10 +17,9 @@ import {
   Client,
   DaoDepositSteps,
   DepositParams,
-  GasFeeEstimation,
   SetAllowanceSteps,
-  TokenType,
 } from "@aragon/sdk-client";
+import { GasFeeEstimation, TokenType } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.

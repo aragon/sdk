@@ -9,10 +9,10 @@ title: PrepareInstallation
 
 import {
   Client,
-  GasFeeEstimation,
   PrepareUninstallationParams,
   PrepareUninstallationSteps,
 } from "@aragon/sdk-client";
+import { GasFeeEstimation } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
