@@ -16,7 +16,8 @@ If this is not done correctly the transaction may fail and in the worst case bri
 ### Encoding
 */
 
-import { DaoAction, RemoveAddressesParams } from "@aragon/sdk-client";
+import { RemoveAddressesParams } from "@aragon/sdk-client";
+import { DaoAction } from "@aragon/sdk-client-common";
 import { multisigClient } from "./index";
 
 // List of members to remove from the multisig plugin.

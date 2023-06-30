@@ -13,11 +13,11 @@ import {
   CreateDaoParams,
   DaoCreationSteps,
   DaoMetadata,
-  GasFeeEstimation,
   TokenVotingClient,
   TokenVotingPluginInstall,
   VotingMode,
 } from "@aragon/sdk-client";
+import { GasFeeEstimation } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Insantiate the general purpose client from the Aragon OSx SDK context.

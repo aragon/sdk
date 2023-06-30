@@ -12,11 +12,11 @@ Revokes a permission to a given address (`who`) to perform an action on a contra
 
 import {
   Client,
-  DaoAction,
   RevokePermissionDecodedParams,
   RevokePermissionParams,
   Permissions,
 } from "@aragon/sdk-client";
+import { DaoAction } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiates an Aragon OSx SDK client.

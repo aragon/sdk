@@ -8,7 +8,7 @@ title: Get Members
 Gets an array of all addresses able to vote in a specific AddresslistVoting DAO proposal.
 */
 
-import { AddresslistVotingClient, ContextPlugin } from "@aragon/sdk-client";
+import { AddresslistVotingClient } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiates a plugin context from the Aragon OSx SDK context.

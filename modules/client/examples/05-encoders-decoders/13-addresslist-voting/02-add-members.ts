@@ -10,7 +10,7 @@ Adds a list of addresses to the AddressList plugin so that these new addresses a
 ### Encoding
 */
 
-import { DaoAction } from "@aragon/sdk-client";
+import { DaoAction } from "@aragon/sdk-client-common";
 import { addresslistVotingClient } from "./index";
 
 const members: string[] = [
