@@ -8,6 +8,8 @@ import {
 import { ContextParams } from "@aragon/sdk-client-common";
 
 const IPFS_API_KEY = process?.env?.IPFS_API_KEY || "";
+const SATSUMA_ENDPOINT =
+  "https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-goerli/version/v1.2.1/api";
 
 export const web3endpoints = {
   working: [
@@ -44,8 +46,7 @@ const ipfsEndpoints = {
 const grapqhlEndpoints = {
   working: [
     {
-      url:
-        "https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-goerli/version/v1.1.0/api",
+      url: SATSUMA_ENDPOINT,
     },
   ],
   timeout: [

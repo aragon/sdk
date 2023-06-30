@@ -5,6 +5,8 @@ import {
   DecodedApplyInstallationParams,
   GasFeeEstimation,
   InterfaceParams,
+  PrepareInstallationParams,
+  PrepareInstallationStepValue,
 } from "@aragon/sdk-client-common";
 import {
   ApplyUninstallationParams,

@@ -18,6 +18,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
+- Amending a missing interface
+
+## [1.9.2]
+### Changed
 - Bumped the client-common dependency
 
 ## [1.9.1]
