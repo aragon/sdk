@@ -11,11 +11,10 @@ Gets all proposals from a DAO that are created using the TokenVoting plugin as i
 import {
   ProposalQueryParams,
   ProposalSortBy,
-  ProposalStatus,
-  SortDirection,
   TokenVotingClient,
   TokenVotingProposalListItem,
 } from "@aragon/sdk-client";
+import { ProposalStatus, SortDirection } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Create a plugin context from the Aragon SDK.

@@ -13,8 +13,8 @@ import {
   DaoListItem,
   DaoSortBy,
   DaoQueryParams,
-  SortDirection,
 } from "@aragon/sdk-client";
+import { SortDirection } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.

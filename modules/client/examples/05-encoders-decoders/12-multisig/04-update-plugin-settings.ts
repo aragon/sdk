@@ -11,10 +11,10 @@ Allows you to update the configuration of a Multisig plugin installed in a DAO.
 */
 
 import {
-  DaoAction,
   MultisigVotingSettings,
   UpdateMultisigVotingSettingsParams,
 } from "@aragon/sdk-client";
+import { DaoAction } from "@aragon/sdk-client-common";
 import { multisigClient } from "./index";
 
 const params: UpdateMultisigVotingSettingsParams = {

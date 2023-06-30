@@ -11,13 +11,13 @@ An action is the encoded transaction which will get executed when a proposal pas
 
 import {
   CreateMajorityVotingProposalParams,
-  DaoAction,
   ProposalCreationSteps,
   TokenVotingClient,
   VoteValues,
   VotingMode,
   VotingSettings,
 } from "@aragon/sdk-client";
+import { DaoAction } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Create a TokenVoting client.
