@@ -31,7 +31,7 @@ Returns:
 ```
 {
   type: 'erc20',
-  address: "0x123456789000987654323112345678900987654321",
+  address: "0x1234567890987654323112345678900987654321",
   name: "Token",
   symbol: "TOK",
   decimals: 18
@@ -40,8 +40,25 @@ Returns:
 Or:
 ```
 {
+  address: '0x1234567890987654323112345678900987654321',
+  name: 'Wrapped Token',
+  symbol: 'wTOK',
+  decimals: 18,
+  underlyingToken: {
+    address: '0x012345678900098765432311234567890098765432',
+    name: 'Token',
+    symbol: 'TOK',
+    decimals: 18,
+    type: 'erc20'
+  },
+  type: 'erc20'
+}
+```
+Or:
+```
+{
   type: 'erc721',
-  address: "0x123456789000987654323112345678900987654321",
+  address: "0x1234567890987654323112345678900987654321",
   name: "Token",
   symbol: "TOK"
 }
