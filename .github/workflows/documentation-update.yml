@@ -33,17 +33,17 @@ jobs:
         run: yarn run docs:multisig
       - name: Generate examples Docs
         run: yarn run docs:examples
-      - name: Checkout builders-portal repo
+      - name: Checkout developer-portal repo
         uses: actions/checkout@v3
         with:
-          repository: aragon/builders-portal
+          repository: aragon/developer-portal
           ref: staging
-          path: builders-portal
+          path: developer-portal
           # token: ${{ secrets.ARABOT_PAT }}
-      - name: Clean the docs/sdk folder in the builders-portal
-        run: rm -rf $GITHUB_WORKSPACE/builders-portal/docs/sdk
-      - name: Copy the docs folder to the builders-portal
-        run: cp -R ./docs/sdk $GITHUB_WORKSPACE/builders-portal/docs/sdk
+      - name: Clean the docs/sdk folder in the developer-portal
+        run: rm -rf $GITHUB_WORKSPACE/developer-portal/docs/sdk
+      - name: Copy the docs folder to the developer-portal
+        run: cp -R ./docs/sdk $GITHUB_WORKSPACE/developer-portal/docs/sdk
       - name: Get short commit hash
         id: hash
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
@@ -51,7 +51,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.ARABOT_PAT }}
-          path: builders-portal
+          path: developer-portal
           commit-message: 'Update the Aragon SDK docs by commit ${{ steps.hash.outputs.sha_short }}'
           committer: 'Arabot <arabot-1@users.noreply.github.com>'
           branch: patch/aragon-sdk-docs
