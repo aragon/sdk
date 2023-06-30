@@ -14,10 +14,9 @@ import {
   CreateMultisigProposalParams,
   MultisigClient,
   ProposalCreationSteps,
-  ProposalMetadata,
-  TokenType,
   WithdrawParams,
 } from "@aragon/sdk-client";
+import { ProposalMetadata, TokenType } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate an Aragon OSx SDK client.

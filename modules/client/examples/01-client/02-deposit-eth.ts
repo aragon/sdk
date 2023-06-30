@@ -8,13 +8,8 @@ title: Deposit ETH
 Handles the flow of depositing the native EVM token (when in mainnet, it's ETH) to an Aragon OSx DAO.
 */
 
-import {
-  Client,
-  DaoDepositSteps,
-  DepositParams,
-  GasFeeEstimation,
-  TokenType,
-} from "@aragon/sdk-client";
+import { Client, DaoDepositSteps, DepositParams } from "@aragon/sdk-client";
+import { GasFeeEstimation, TokenType } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.

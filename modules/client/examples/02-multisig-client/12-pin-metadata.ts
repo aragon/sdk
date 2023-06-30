@@ -8,7 +8,8 @@ title: Pin Metadata
 Adds an pin data into one of the specified IPFS nodes and return a IPFS CID preceded by "ipfs://"
 */
 
-import { MultisigClient, ProposalMetadata } from "@aragon/sdk-client";
+import { MultisigClient } from "@aragon/sdk-client";
+import { ProposalMetadata } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate a Multisig plugin client.

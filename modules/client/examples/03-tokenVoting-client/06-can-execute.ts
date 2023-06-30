@@ -8,7 +8,7 @@ title: Check Execution
 Checks whether the signer of the transaction is able to execute actions approved and created by proposals from the TokenVoting plugin.
 */
 
-import { ContextPlugin, TokenVotingClient } from "@aragon/sdk-client";
+import { TokenVotingClient } from "@aragon/sdk-client";
 import { context } from "../index";
 
 // Instantiate a TokenVoting client.

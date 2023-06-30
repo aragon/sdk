@@ -18,6 +18,14 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
+- Amended an issue that would return an empty `decimals` field on wrapped tokens
+
+## [1.9.3]
+### Changed
+- Amending a missing interface
+
+## [1.9.2]
+### Changed
 - Bumped the client-common dependency
 
 ## [1.9.1]

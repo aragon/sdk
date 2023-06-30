@@ -1,18 +1,23 @@
 /* MARKDOWN
 ---
-title: PrepareInstallation
+title: Prepare Uninstallation
 ---
 
-### Prepare Uninstallation of a plugin
+### Prepare the uninstallation of a plugin
+
+The `prepareUninstallation` method performs the prior steps so that a DAO proposal can eventually apply the removal of a Plugin. 
+The proposal will need an Action calling the `applyUninstallation` function. 
+
+For more details see https://devs.aragon.org/docs/sdk/examples/encoders-decoders/apply-uninstallation#encoding
 
 */
 
 import {
   Client,
-  GasFeeEstimation,
   PrepareUninstallationParams,
   PrepareUninstallationSteps,
 } from "@aragon/sdk-client";
+import { GasFeeEstimation } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiate the general purpose client from the Aragon OSx SDK context.
@@ -21,7 +26,8 @@ const client: Client = new Client(context);
 const prepareUninstallationParams: PrepareUninstallationParams = {
   daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
   pluginAddress: "0x2345678901234567890123456789012345678901",
-  uninstallationParams: [ // Parameters needed by the prepare uninstall abi
+  uninstallationParams: [
+    // Example parameters needed by the plugin's prepareUninstall function
     1234,
     "0x1234567890123456789012345678901234567890",
   ],

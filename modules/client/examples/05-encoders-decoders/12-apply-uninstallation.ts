@@ -13,11 +13,10 @@ Encodes the action of applying a plugin uninstallation.
 import {
   ApplyUninstallationParams,
   Client,
-  DaoAction,
   DecodedApplyUninstallationParams,
   PermissionIds,
-  PermissionOperationType,
 } from "@aragon/sdk-client";
+import { DaoAction, PermissionOperationType } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiates an Aragon OSx SDK client.

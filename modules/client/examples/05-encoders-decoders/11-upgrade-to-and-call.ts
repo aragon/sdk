@@ -10,7 +10,8 @@ Encodes the action of upgrading your DAO and doing a subsequent method call.
 ### Encoding
 */
 
-import { Client, DaoAction, UpgradeToAndCallParams } from "@aragon/sdk-client";
+import { Client, UpgradeToAndCallParams } from "@aragon/sdk-client";
+import { DaoAction } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiates an Aragon OSx SDK client.

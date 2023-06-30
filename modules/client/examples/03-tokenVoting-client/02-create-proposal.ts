@@ -12,10 +12,10 @@ Then, you can create proposals using the `createProposal` method in your `TokenV
 import {
   CreateMajorityVotingProposalParams,
   ProposalCreationSteps,
-  ProposalMetadata,
   TokenVotingClient,
   VoteValues,
 } from "@aragon/sdk-client";
+import { ProposalMetadata } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Create a TokenVoting client.
