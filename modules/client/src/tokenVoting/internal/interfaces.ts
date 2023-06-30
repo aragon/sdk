@@ -20,6 +20,7 @@ import {
   DelegateTokensParams,
   DelegateTokensStepValue,
   Erc20TokenDetails,
+  Erc20WrapperTokenDetails,
   Erc721TokenDetails,
   MintTokenParams,
   TokenVotingMember,
@@ -59,7 +60,9 @@ export interface ITokenVotingClientMethods {
   getVotingSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
   getToken: (
     pluginAddress: string,
-  ) => Promise<Erc20TokenDetails | Erc721TokenDetails | null>;
+  ) => Promise<
+    Erc20TokenDetails | Erc20WrapperTokenDetails | Erc721TokenDetails | null
+  >;
   wrapTokens: (params: WrapTokensParams) => AsyncGenerator<WrapTokensStepValue>;
   unwrapTokens: (
     params: UnwrapTokensParams,
