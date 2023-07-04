@@ -18,6 +18,11 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
+- Added a timeout to `getDaos()` and `getProposals()`, so that an individual lengthy fetch doesn't block everything indefinitely
+- Improve the PR template
+
+## [1.9.4]
+### Changed
 - Amended an issue that would return an empty `decimals` field on wrapped tokens
 
 ## [1.9.3]

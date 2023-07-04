@@ -11,6 +11,7 @@ import {
   IpfsPinError,
   isProposalId,
   NoProviderError,
+  promiseWithTimeout,
   ProposalCreationError,
   resolveIpfsCid,
   UnsupportedNetworkError,
@@ -66,6 +67,7 @@ import {
   EMPTY_PROPOSAL_METADATA_LINK,
   findLog,
   LIVE_CONTRACTS,
+  MULTI_FETCH_TIMEOUT,
   prepareGenericInstallation,
   PrepareInstallationStepValue,
   ProposalMetadata,
@@ -470,7 +472,11 @@ export class AddresslistVotingClientMethods extends ClientCore
           }
           try {
             const metadataCid = resolveIpfsCid(proposal.metadata);
-            const stringMetadata = await this.ipfs.fetchString(metadataCid);
+            // Avoid blocking Promise.all if this individual fetch takes too long
+            const stringMetadata = await promiseWithTimeout(
+              this.ipfs.fetchString(metadataCid),
+              MULTI_FETCH_TIMEOUT,
+            );
             const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
             return toAddresslistVotingProposalListItem(proposal, metadata);
           } catch (err) {

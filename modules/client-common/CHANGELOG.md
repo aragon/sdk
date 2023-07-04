@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+## 1.1.0
+- Added `MULTI_FETCH_TIMEOUT` for operations involving many remote data fetches
+
 ## 1.0.2
 ### Changed
 - Fixed the ESM import path
