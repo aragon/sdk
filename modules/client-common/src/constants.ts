@@ -2,6 +2,10 @@ import { activeContractsList } from "@aragon/osx-ethers";
 import { ProposalMetadata, SupportedNetwork } from "./types";
 import { NetworkDeployment } from "./internal";
 
+/** Timeout that will be applied to operations involving
+ * many fetch requests that could take a long time */
+export const MULTI_FETCH_TIMEOUT = 7 * 1000;
+
 type GraphqlNetworks = "mainnet" | "goerli" | "polygon" | "mumbai";
 
 const SupportedNetworksToGraphqlNetworks: {
@@ -12,7 +16,6 @@ const SupportedNetworksToGraphqlNetworks: {
   [SupportedNetwork.POLYGON]: "polygon",
   [SupportedNetwork.MUMBAI]: "mumbai",
 };
-
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
   title: "(unsupported metadata link)",

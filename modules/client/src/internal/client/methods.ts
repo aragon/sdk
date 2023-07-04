@@ -18,6 +18,7 @@ import {
   MissingExecPermissionError,
   NoProviderError,
   PluginUninstallationPreparationError,
+  promiseWithTimeout,
   resolveIpfsCid,
   UpdateAllowanceError,
   UseTransferError,
@@ -110,6 +111,7 @@ import {
   ClientCore,
   findLog,
   LIVE_CONTRACTS,
+  MULTI_FETCH_TIMEOUT,
   MultiTargetPermission,
   prepareGenericInstallation,
   PrepareInstallationParams,
@@ -588,7 +590,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           }
           try {
             const metadataCid = resolveIpfsCid(dao.metadata);
-            const stringMetadata = await this.ipfs.fetchString(metadataCid);
+            // Avoid blocking Promise.all if this individual fetch takes too long
+            const stringMetadata = await promiseWithTimeout(
+              this.ipfs.fetchString(metadataCid),
+              MULTI_FETCH_TIMEOUT,
+            );
             const metadata = JSON.parse(stringMetadata);
             return toDaoListItem(dao, metadata);
           } catch (err) {
@@ -656,10 +662,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (tokenBalances.length === 0) {
       return [];
     }
-    return Promise.all(
-      tokenBalances.map(
-        (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
-      ),
+    return tokenBalances.map(
+      (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
     );
   }
   /**
@@ -726,11 +730,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!tokenTransfers) {
       return null;
     }
-    return Promise.all(
-      tokenTransfers.map(
-        (transfer: SubgraphTransferListItem): Transfer =>
-          toTokenTransfer(transfer),
-      ),
+    return tokenTransfers.map(
+      (transfer: SubgraphTransferListItem): Transfer =>
+        toTokenTransfer(transfer),
     );
   }
 
@@ -786,7 +788,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
             } else {
               try {
                 const metadataCid = resolveIpfsCid(release.metadata);
-                const stringMetadata = await this.ipfs.fetchString(metadataCid);
+                // Avoid blocking Promise.all if this individual fetch takes too long
+                const stringMetadata = await promiseWithTimeout(
+                  this.ipfs.fetchString(metadataCid),
+                  MULTI_FETCH_TIMEOUT,
+                );
                 const resolvedMetadata = JSON.parse(stringMetadata);
                 metadata = resolvedMetadata;
               } catch (err) {
