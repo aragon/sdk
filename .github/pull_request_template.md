@@ -20,6 +20,6 @@ Task ID: [OS-XXX]()
 - [ ] I have made corresponding changes to the documentation.
 - [ ] My changes generate no new warnings.
 - [ ] Any dependent changes have been merged and published in downstream modules.
-- [ ] I ran all tests with success and extended them if necessary.
+- [ ] I ran all tests with success and extended them when possible.
 - [ ] I have updated the `CHANGELOG.md` file in the root folder of the package after the `[UPCOMING]` title and before the latest version.
 - [ ] I have tested my code on the test network.
