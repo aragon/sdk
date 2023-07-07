@@ -64,6 +64,7 @@ export type Erc20TokenDetails = TokenBaseDetails & {
   decimals: number;
   type: TokenType.ERC20;
 };
+
 export type Erc721TokenDetails = TokenBaseDetails & {
   type: TokenType.ERC721;
 };
