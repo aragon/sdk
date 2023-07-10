@@ -57,10 +57,7 @@ import {
   SubgraphAddresslistVotingProposal,
   SubgraphAddresslistVotingProposalListItem,
 } from "../types";
-import {
-  AlwaysFailingProposalError,
-  SizeMismatchError,
-} from "@aragon/sdk-common";
+import { SizeMismatchError } from "@aragon/sdk-common";
 import {
   ClientCore,
   EMPTY_PROPOSAL_METADATA_LINK,
