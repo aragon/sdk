@@ -36,7 +36,6 @@ import {
   computeProposalStatusFilter,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  isFailingProposal,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalQueryParams,

@@ -24,7 +24,6 @@ import {
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
-  isFailingProposal,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalQueryParams,
