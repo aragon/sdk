@@ -215,7 +215,7 @@ export function tokenVotingInitParamsToContract(
   ];
 }
 
-function parseToken(
+export function parseToken(
   subgraphToken:
     | SubgraphErc20Token
     | SubgraphErc721Token
