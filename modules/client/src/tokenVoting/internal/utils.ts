@@ -7,6 +7,7 @@ import {
 } from "../../client-common";
 import {
   Erc20TokenDetails,
+  Erc20WrapperTokenDetails,
   Erc721TokenDetails,
   MintTokenParams,
   TokenVotingMember,
@@ -19,6 +20,7 @@ import {
   ContractTokenVotingInitParams,
   SubgraphContractType,
   SubgraphErc20Token,
+  SubgraphErc20WrapperToken,
   SubgraphErc721Token,
   SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
@@ -213,10 +215,13 @@ export function tokenVotingInitParamsToContract(
   ];
 }
 
-function parseToken(
-  subgraphToken: SubgraphErc20Token | SubgraphErc721Token,
+export function parseToken(
+  subgraphToken:
+    | SubgraphErc20Token
+    | SubgraphErc721Token
+    | SubgraphErc20WrapperToken,
 ): Erc20TokenDetails | Erc721TokenDetails | null {
-  let token: Erc721TokenDetails | Erc20TokenDetails | null = null;
+  let token: Erc721TokenDetails | Erc20TokenDetails| Erc20WrapperTokenDetails | null = null;
   if (subgraphToken.__typename === SubgraphContractType.ERC20) {
     token = {
       address: subgraphToken.id,
@@ -231,6 +236,21 @@ function parseToken(
       symbol: subgraphToken.symbol,
       name: subgraphToken.name,
       type: TokenType.ERC721,
+    };
+  } else if (subgraphToken.__typename === SubgraphContractType.ERC20_WRAPPER) {
+    token = {
+      address: subgraphToken.id,
+      symbol: subgraphToken.symbol,
+      name: subgraphToken.name,
+      decimals: subgraphToken.decimals,
+      type: TokenType.ERC20,
+      underlyingToken: {
+        address: subgraphToken.underlyingToken.id,
+        symbol: subgraphToken.underlyingToken.symbol,
+        name: subgraphToken.underlyingToken.name,
+        decimals: subgraphToken.underlyingToken.decimals,
+        type: TokenType.ERC20,
+      },
     };
   }
   return token;

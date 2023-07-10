@@ -18,6 +18,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
+- Amended an issue that would prevent details from the underlying token to be returned in `parseToken()`
+
+## [1.9.5]
+### Changed
 - Added a timeout to `getDaos()` and `getProposals()`, so that an individual lengthy fetch doesn't block everything indefinitely
 - Improve the PR template
 
