@@ -18,9 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
-- Temporarely remove `isFailingProposal` check
+- Bypass `isFailingProposal()` before a full implementation improves the false positives
 
-## [1.9.5]
+## [1.9.6]
 ### Changed
 - Amended an issue that would prevent details from the underlying token to be returned in `parseToken()`
 
