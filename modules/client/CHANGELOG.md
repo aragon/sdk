@@ -18,6 +18,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
+- Temporarely remove `isFailingProposal` check
+
+## [1.9.5]
+### Changed
 - Amended an issue that would prevent details from the underlying token to be returned in `parseToken()`
 
 ## [1.9.5]
