@@ -87,10 +87,11 @@ export class MultisigClientMethods extends ClientCore
     params: CreateMultisigProposalParams,
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
-
-    if (isFailingProposal(params.actions)) {
-      throw new AlwaysFailingProposalError();
-    }
+    // TODO
+    // implement a more sophisticated isFailingProposal function
+    // if (isFailingProposal(params.actions)) {
+    //   throw new AlwaysFailingProposalError();
+    // }
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,

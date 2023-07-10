@@ -96,9 +96,11 @@ export class AddresslistVotingClientMethods extends ClientCore
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
 
-    if (isFailingProposal(params.actions)) {
-      throw new AlwaysFailingProposalError();
-    }
+    // TODO
+    // implement a more sophisticated isFailingProposal function
+    // if (isFailingProposal(params.actions)) {
+    //   throw new AlwaysFailingProposalError();
+    // }
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
