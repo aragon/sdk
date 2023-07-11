@@ -213,12 +213,28 @@ export async function deploy(): Promise<Deployment> {
       id("REGISTER_PLUGIN_REPO_PERMISSION"),
     );
 
+    // Deploying the base contracts for the Token Voting Plugin
+    const governanceErc20Factory = new aragonContracts
+      .GovernanceERC20__factory();
+    const governanceWrappedErc20Factory = new aragonContracts
+      .GovernanceWrappedERC20__factory();
+    const governanceErc20Instance = await governanceErc20Factory.connect(
+      deployOwnerWallet,
+    ).deploy(AddressZero, "Test Token", "TTK", { amounts: [], receivers: [] });
+    const governanceErc20WrappedInstance = await governanceWrappedErc20Factory
+      .connect(
+        deployOwnerWallet,
+      ).deploy(AddressZero, "Wrapped Test Token", "wTTK");
+
     // Token Voting Plugin
     const tokenVotingSetupFactory = new aragonContracts
       .TokenVotingSetup__factory();
     const tokenVotingPluginSetup = await tokenVotingSetupFactory
       .connect(deployOwnerWallet)
-      .deploy();
+      .deploy(
+        governanceErc20Instance.address,
+        governanceErc20WrappedInstance.address,
+      );
 
     const tokenRepoAddress = await deployPlugin(
       "token-voting",
