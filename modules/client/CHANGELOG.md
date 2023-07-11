@@ -18,6 +18,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Changed
+- Updates `@aragon/osx-ethers` to v1.3.0-rc0.
+
+## [1.9.7]
+### Changed
 - Bypass `isFailingProposal()` before a full implementation improves the false positives
 
 ## [1.9.6]
