@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Changed
+- Updates `@aragon/osx-ethers` to v1.3.0-rc0.
 
 ## 1.1.0
 - Added `MULTI_FETCH_TIMEOUT` for operations involving many remote data fetches
