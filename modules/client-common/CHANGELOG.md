@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+- Tests for `getNamedTypesFromMetadata`
 ### Changed
 - Updates `@aragon/osx-ethers` to v1.3.0-rc0.
 
