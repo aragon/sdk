@@ -1165,7 +1165,6 @@ describe("Token Voting Client", () => {
           QueryTokenVotingProposals,
           {
             where: {
-              potentiallyExecutable: false,
               endDate_lt: nowFilter,
               executed: false,
             },

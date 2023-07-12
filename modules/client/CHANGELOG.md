@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+- Bug while filtering multisig propsals by status
+- Bug computing proposal status
 ### Changed
 - Updates `@aragon/osx-ethers` to v1.3.0-rc0.
 
