@@ -49,8 +49,8 @@ export function computeProposalStatus(
     return ProposalStatus.PENDING;
   }
   if (
-    (proposal.potentiallyExecutable || proposal.earlyExecutable) &&
-    endDate >= now
+    (now > endDate || proposal.earlyExecutable) &&
+    proposal.potentiallyExecutable
   ) {
     return ProposalStatus.SUCCEEDED;
   }
@@ -67,21 +67,22 @@ export function computeProposalStatusFilter(
   const now = Math.round(new Date().getTime() / 1000).toString();
   switch (status) {
     case ProposalStatus.PENDING:
-      where = { startDate_gte: now };
+      where = { startDate_gte: now, potentiallyExecutable: false, executed: false };
       break;
     case ProposalStatus.ACTIVE:
-      where = { startDate_lt: now, endDate_gte: now, executed: false };
+      where = { startDate_lt: now, endDate_gte: now, executed: false, potentiallyExecutable: false };
       break;
     case ProposalStatus.EXECUTED:
       where = { executed: true };
       break;
     case ProposalStatus.SUCCEEDED:
-      where = { potentiallyExecutable: true, endDate_lt: now };
+      where = { potentiallyExecutable: true };
       break;
     case ProposalStatus.DEFEATED:
       where = {
         endDate_lt: now,
         executed: false,
+        potentiallyExecutable: false,
       };
       break;
     default:
