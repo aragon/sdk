@@ -4,16 +4,16 @@ import { TransferType } from "../types";
 export type SubgraphPluginListItem = {
   appliedPreparation: {
     pluginAddress: string;
-  };
+  } | null;
   appliedPluginRepo: {
     subdomain: string;
-  };
+  } | null; 
   appliedVersion: {
     build: number;
     release: {
       release: number;
     };
-  };
+  } | null;
 };
 
 type SubgraphDaoBase = {

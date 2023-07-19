@@ -74,18 +74,23 @@ export function toDaoDetails(
     },
     creationDate: new Date(parseInt(dao.createdAt) * 1000),
     // TODO update when new subgraph schema is deployed
-    plugins: dao.plugins.map(
-      (
-        plugin: SubgraphPluginListItem,
-      ): InstalledPluginListItem => (
-        {
-          id: `${plugin.appliedPluginRepo.subdomain}.plugin.dao.eth`,
-          release: plugin.appliedVersion.release.release,
-          build: plugin.appliedVersion.build,
-          instanceAddress: plugin.appliedPreparation.pluginAddress,
-        }
+    // filter out plugins that are not applied
+    plugins: dao.plugins.filter(
+      (plugin) => plugin.appliedPreparation && plugin.appliedVersion && plugin.appliedPluginRepo,
+    )
+      .map(
+        (
+          plugin: SubgraphPluginListItem,
+        ): InstalledPluginListItem => (
+          {
+            // we checked with the filter above that these are not null
+            id: `${plugin.appliedPluginRepo!.subdomain}.plugin.dao.eth`,
+            release: plugin.appliedVersion!.release.release,
+            build: plugin.appliedVersion!.build,
+            instanceAddress: plugin.appliedPreparation!.pluginAddress,
+          }
+        ),
       ),
-    ),
   };
 }
 
@@ -101,15 +106,19 @@ export function toDaoListItem(
       description: metadata.description,
       avatar: metadata.avatar || undefined,
     },
-    plugins: dao.plugins.map(
+    plugins: dao.plugins.filter(
+      (plugin) => plugin.appliedPreparation && plugin.appliedVersion && plugin.appliedPluginRepo,
+    )
+    .map(
       (
         plugin: SubgraphPluginListItem,
       ): InstalledPluginListItem => (
         {
-          id: `${plugin.appliedPluginRepo.subdomain}.plugin.dao.eth`,
-          release: plugin.appliedVersion.release.release,
-          build: plugin.appliedVersion.build,
-          instanceAddress: plugin.appliedPreparation.pluginAddress,
+          // we checked with the filter above that these are not null
+          id: `${plugin.appliedPluginRepo!.subdomain}.plugin.dao.eth`,
+          release: plugin.appliedVersion!.release.release,
+          build: plugin.appliedVersion!.build,
+          instanceAddress: plugin.appliedPreparation!.pluginAddress,
         }
       ),
     ),
