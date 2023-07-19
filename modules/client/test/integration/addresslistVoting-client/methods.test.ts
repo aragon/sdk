@@ -871,6 +871,7 @@ describe("Client Address List", () => {
           where: {
             endDate_lt: nowFilter,
             executed: false,
+            potentiallyExecutable: false,
           },
           skip: 0,
           limit: params.limit,

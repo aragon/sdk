@@ -70,7 +70,7 @@ export function computeProposalStatusFilter(
       where = { startDate_gte: now, potentiallyExecutable: false, executed: false };
       break;
     case ProposalStatus.ACTIVE:
-      where = { startDate_lt: now, endDate_gte: now, executed: false, potentiallyExecutable: false };
+      where = { startDate_lt: now, endDate_gte: now, executed: false };
       break;
     case ProposalStatus.EXECUTED:
       where = { executed: true };
