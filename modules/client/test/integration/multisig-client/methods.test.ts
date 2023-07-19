@@ -417,7 +417,7 @@ describe("Client Multisig", () => {
       expect(wallets).toMatchObject(members);
       expect(mockedClient.request).toHaveBeenCalledWith(QueryMultisigMembers, {
         address: ADDRESS_ONE,
-        block: { number: 123456 }
+        block: { number: 123456 },
       });
     });
 

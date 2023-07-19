@@ -222,7 +222,11 @@ export function parseToken(
     | SubgraphErc721Token
     | SubgraphErc20WrapperToken,
 ): Erc20TokenDetails | Erc721TokenDetails | null {
-  let token: Erc721TokenDetails | Erc20TokenDetails| Erc20WrapperTokenDetails | null = null;
+  let token:
+    | Erc721TokenDetails
+    | Erc20TokenDetails
+    | Erc20WrapperTokenDetails
+    | null = null;
   if (subgraphToken.__typename === SubgraphContractType.ERC20) {
     token = {
       address: subgraphToken.id,

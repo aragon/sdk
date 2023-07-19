@@ -347,6 +347,6 @@ export type UpgradeToAndCallParams = {
 };
 
 export type InitializeFromParams = {
-  version: [number, number, number];
+  previousVersion: [number, number, number];
   initData?: Uint8Array;
 };

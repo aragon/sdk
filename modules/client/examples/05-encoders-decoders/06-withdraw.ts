@@ -17,10 +17,7 @@ In order for a withdrawal to be successful, the address executing it must have `
 #### Encoding
 */
 
-import {
-  Client,
-  WithdrawParams,
-} from "@aragon/sdk-client";
+import { Client, WithdrawParams } from "@aragon/sdk-client";
 import { DaoAction, TokenType } from "@aragon/sdk-client-common";
 import { context } from "../index";
 

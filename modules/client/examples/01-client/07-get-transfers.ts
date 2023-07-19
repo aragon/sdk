@@ -13,8 +13,8 @@ By default, retrieves ETH, DAI, USDC and USDT, on Mainnet).
 
 import {
   Client,
-  TransferQueryParams,
   Transfer,
+  TransferQueryParams,
   TransferSortBy,
   TransferType,
 } from "@aragon/sdk-client";

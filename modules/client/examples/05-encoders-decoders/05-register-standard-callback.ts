@@ -10,10 +10,7 @@ Register a new standard callback for the DAO.
 ### Encoding
 */
 
-import {
-  Client,
-  RegisterStandardCallbackParams,
-} from "@aragon/sdk-client";
+import { Client, RegisterStandardCallbackParams } from "@aragon/sdk-client";
 import { DaoAction } from "@aragon/sdk-client-common";
 import { context } from "../index";
 

@@ -1,1 +1,1 @@
-export * from './ERC1967'
+export * from "./ERC1967";

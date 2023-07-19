@@ -430,7 +430,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
   ) {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("initializeFrom", [
-      params.version,
+      params.previousVersion,
       params.initData ?? new Uint8Array(),
     ]);
     return {

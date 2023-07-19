@@ -13,8 +13,8 @@ import {
   CreateDaoParams,
   DaoCreationSteps,
   DaoMetadata,
-  TokenVotingPluginInstall,
   TokenVotingClient,
+  TokenVotingPluginInstall,
   VotingMode,
 } from "@aragon/sdk-client";
 import { GasFeeEstimation } from "@aragon/sdk-client-common";

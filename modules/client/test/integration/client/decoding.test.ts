@@ -666,7 +666,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
       const params: InitializeFromParams = {
-        version: [1, 0, 0],
+        previousVersion: [1, 0, 0],
         initData: new Uint8Array([0, 1, 2, 3]),
       };
       const action = await client.encoding.initializeFromAction(
@@ -674,8 +674,10 @@ describe("Client", () => {
         params,
       );
       const decodedParams = client.decoding.initializeFromAction(action.data);
-      for (const index in params.version) {
-        expect(params.version[index]).toBe(decodedParams.version[index]);
+      for (const index in params.previousVersion) {
+        expect(params.previousVersion[index]).toBe(
+          decodedParams.previousVersion[index],
+        );
       }
       expect(bytesToHex(params.initData as Uint8Array)).toBe(
         bytesToHex(decodedParams.initData as Uint8Array),

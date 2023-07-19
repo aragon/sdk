@@ -543,7 +543,7 @@ describe("Client", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
       const params: InitializeFromParams = {
-        version: [1, 0, 0],
+        previousVersion: [1, 0, 0],
         initData: new Uint8Array([0, 1, 2, 3]),
       };
       const action = client.encoding.initializeFromAction(
@@ -562,7 +562,7 @@ describe("Client", () => {
       expect(argsDecoded.length).toBe(2);
       for (const index in argsDecoded[0]) {
         expect(argsDecoded[0][parseInt(index)]).toBe(
-          params.version[parseInt(index)],
+          params.previousVersion[parseInt(index)],
         );
       }
       expect(argsDecoded[1]).toBe(
