@@ -1,6 +1,5 @@
 import { hexToBytes } from "@aragon/sdk-common";
 import {
-  computeProposalStatus,
   isFailingProposal,
 } from "../../../src";
 import { Multisig__factory } from "@aragon/osx-ethers";
@@ -56,82 +55,6 @@ const UPGRADE_TO_ACTION = {
   ),
 };
 
-describe("client-common utils", () => {
-  describe("computeProposalStatus", () => {
-    it("should return PENDING", () => {
-      const endDate = Date.now() / 1000;
-      const startDate = (Date.now() / 1000) + 500;
-
-      expect(computeProposalStatus({
-        endDate: endDate.toString(),
-        startDate: startDate.toString(),
-        potentiallyExecutable: false,
-        executed: false,
-        earlyExecutable: false,
-      })).toBe(ProposalStatus.PENDING);
-    });
-    it("should return EXECUTED", () => {
-      const endDate = Date.now() / 1000;
-      const startDate = (Date.now() / 1000) - 500;
-
-      expect(computeProposalStatus({
-        endDate: endDate.toString(),
-        startDate: startDate.toString(),
-        potentiallyExecutable: false,
-        executed: true,
-        earlyExecutable: false,
-      })).toBe(ProposalStatus.EXECUTED);
-    });
-    it("should return ACTIVE", () => {
-      const endDate = (Date.now() / 1000) + 500;
-      const startDate = (Date.now() / 1000) - 500;
-
-      expect(computeProposalStatus({
-        endDate: endDate.toString(),
-        startDate: startDate.toString(),
-        potentiallyExecutable: false,
-        executed: false,
-        earlyExecutable: false,
-      })).toBe(ProposalStatus.ACTIVE);
-    });
-    it("should return SUCCEDED if executable = true", () => {
-      const endDate = Date.now() / 1000;
-      const startDate = (Date.now() / 1000) - 500;
-
-      expect(computeProposalStatus({
-        endDate: endDate.toString(),
-        startDate: startDate.toString(),
-        potentiallyExecutable: true,
-        executed: false,
-        earlyExecutable: false,
-      })).toBe(ProposalStatus.SUCCEEDED);
-    });
-    it("should return SUCCEDED if earlyExecutable = true", () => {
-      const endDate = (Date.now() / 1000) + 500;
-      const startDate = (Date.now() / 1000) - 500;
-
-      expect(computeProposalStatus({
-        endDate: endDate.toString(),
-        startDate: startDate.toString(),
-        potentiallyExecutable: false,
-        executed: false,
-        earlyExecutable: true,
-      })).toBe(ProposalStatus.SUCCEEDED);
-    });
-    it("should return DEFEATED", () => {
-      const endDate = (Date.now() / 1000) - 200;
-      const startDate = (Date.now() / 1000) - 500;
-
-      expect(computeProposalStatus({
-        endDate: endDate.toString(),
-        startDate: startDate.toString(),
-        potentiallyExecutable: false,
-        executed: false,
-        earlyExecutable: false,
-      })).toBe(ProposalStatus.DEFEATED);
-    });
-  });
-});
 
 describe("Detect failing proposals", () => {
   it("isFailingProposal should return true because the proposal changes the min approvals and then updates the addresses", async () => {

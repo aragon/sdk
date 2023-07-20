@@ -1,6 +1,6 @@
-import { TokenType } from "@aragon/sdk-client-common";
-import { SubgraphContractType } from "../../../src/tokenVoting/internal/types";
-import { parseToken } from "../../../src/tokenVoting/internal/utils";
+import { ProposalStatus, TokenType } from "@aragon/sdk-client-common";
+import { SubgraphContractType, SubgraphTokenVotingProposal } from "../../../src/tokenVoting/internal/types";
+import { computeProposalStatus, parseToken } from "../../../src/tokenVoting/internal/utils";
 
 describe("tokenVoting-client utils", () => {
   describe("parseToken", () => {
@@ -73,6 +73,80 @@ describe("tokenVoting-client utils", () => {
             symbol: "TT",
         });
         expect(token).toEqual(null);
+    });
+  });
+  describe("computeProposalStatus", () => {
+    it("should return PENDING", () => {
+      const endDate = Date.now() / 1000;
+      const startDate = (Date.now() / 1000) + 500;
+
+      expect(computeProposalStatus({
+        endDate: endDate.toString(),
+        startDate: startDate.toString(),
+        potentiallyExecutable: false,
+        executed: false,
+        earlyExecutable: false,
+      } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.PENDING);
+    });
+    it("should return EXECUTED", () => {
+      const endDate = Date.now() / 1000;
+      const startDate = (Date.now() / 1000) - 500;
+
+      expect(computeProposalStatus({
+        endDate: endDate.toString(),
+        startDate: startDate.toString(),
+        potentiallyExecutable: false,
+        executed: true,
+        earlyExecutable: false,
+      } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.EXECUTED);
+    });
+    it("should return ACTIVE", () => {
+      const endDate = (Date.now() / 1000) + 500;
+      const startDate = (Date.now() / 1000) - 500;
+
+      expect(computeProposalStatus({
+        endDate: endDate.toString(),
+        startDate: startDate.toString(),
+        potentiallyExecutable: false,
+        executed: false,
+        earlyExecutable: false,
+      } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.ACTIVE);
+    });
+    it("should return SUCCEDED if executable = true", () => {
+      const endDate = Date.now() / 1000;
+      const startDate = (Date.now() / 1000) - 500;
+
+      expect(computeProposalStatus({
+        endDate: endDate.toString(),
+        startDate: startDate.toString(),
+        potentiallyExecutable: true,
+        executed: false,
+        earlyExecutable: false,
+      } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
+    });
+    it("should return SUCCEDED if earlyExecutable = true", () => {
+      const endDate = (Date.now() / 1000) + 500;
+      const startDate = (Date.now() / 1000) - 500;
+
+      expect(computeProposalStatus({
+        endDate: endDate.toString(),
+        startDate: startDate.toString(),
+        potentiallyExecutable: false,
+        executed: false,
+        earlyExecutable: true,
+      } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
+    });
+    it("should return DEFEATED", () => {
+      const endDate = (Date.now() / 1000) - 200;
+      const startDate = (Date.now() / 1000) - 500;
+
+      expect(computeProposalStatus({
+        endDate: endDate.toString(),
+        startDate: startDate.toString(),
+        potentiallyExecutable: false,
+        executed: false,
+        earlyExecutable: false,
+      } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.DEFEATED);
     });
   });
 });
