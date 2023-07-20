@@ -1,11 +1,15 @@
-import { getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
-import { computeProposalStatus, SubgraphAction } from "../../client-common";
+import { InvalidProposalStatusError, getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
+import { SubgraphAction } from "../../client-common";
 import { MultisigProposal, MultisigProposalListItem } from "../types";
 import {
   SubgraphMultisigProposal,
   SubgraphMultisigProposalListItem,
 } from "./types";
-import { DaoAction, ProposalMetadata } from "@aragon/sdk-client-common";
+import {
+  DaoAction,
+  ProposalMetadata,
+  ProposalStatus,
+} from "@aragon/sdk-client-common";
 
 export function toMultisigProposal(
   proposal: SubgraphMultisigProposal,
@@ -97,4 +101,55 @@ export function toMultisigProposalListItem(
     endDate,
     status: computeProposalStatus(proposal),
   };
+}
+
+export function computeProposalStatus(
+  proposal: SubgraphMultisigProposal | SubgraphMultisigProposalListItem,
+): ProposalStatus {
+  const now = new Date();
+  const startDate = new Date(
+    parseInt(proposal.startDate) * 1000,
+  );
+  const endDate = new Date(parseInt(proposal.endDate) * 1000);
+  if (proposal.executed) {
+    return ProposalStatus.EXECUTED;
+  }
+  if (now < startDate) {
+    return ProposalStatus.PENDING;
+  }
+  if (proposal.potentiallyExecutable && now < endDate) {
+    return ProposalStatus.SUCCEEDED;
+  }
+  if (now < endDate) {
+    return ProposalStatus.ACTIVE;
+  }
+  return ProposalStatus.DEFEATED;
+}
+
+export function computeProposalStatusFilter(status: ProposalStatus) {
+  let where = {};
+  const now = Math.round(new Date().getTime() / 1000).toString();
+  switch (status) {
+    case ProposalStatus.PENDING:
+      where = { startDate_gte: now };
+      break;
+    case ProposalStatus.ACTIVE:
+      where = { startDate_lt: now, endDate_gte: now, executed: false };
+      break;
+    case ProposalStatus.EXECUTED:
+      where = { executed: true };
+      break;
+    case ProposalStatus.SUCCEEDED:
+      where = { potentiallyExecutable: true, endDate_gte: now };
+      break;
+    case ProposalStatus.DEFEATED:
+      where = {
+        endDate_lt: now,
+        executed: false,
+      };
+      break;
+    default:
+      throw new InvalidProposalStatusError();
+  }
+  return where;
 }

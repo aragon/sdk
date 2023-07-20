@@ -20,7 +20,6 @@ import {
 } from "@aragon/sdk-common";
 import {
   CanVoteParams,
-  computeProposalStatusFilter,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
@@ -70,6 +69,7 @@ import {
   QueryTokenVotingSettings,
 } from "../graphql-queries";
 import {
+  computeProposalStatusFilter,
   tokenVotingInitParamsToContract,
   toTokenVotingMember,
   toTokenVotingProposal,

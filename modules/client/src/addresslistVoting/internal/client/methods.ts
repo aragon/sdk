@@ -20,7 +20,6 @@ import { isAddress } from "@ethersproject/address";
 import { IAddresslistVotingClientMethods } from "../interfaces";
 import {
   CanVoteParams,
-  computeProposalStatusFilter,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
@@ -45,6 +44,7 @@ import {
 import {
   toAddresslistVotingProposal,
   toAddresslistVotingProposalListItem,
+  computeProposalStatusFilter
 } from "../utils";
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";

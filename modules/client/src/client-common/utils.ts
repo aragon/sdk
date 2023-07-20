@@ -2,11 +2,9 @@ import { IDAO } from "@aragon/osx-ethers";
 import { VoteValues, VotingMode } from "./types/plugin";
 import {
   CreateMajorityVotingProposalParams,
-  IComputeStatusProposal,
 } from "./types/plugin";
 
 import {
-  InvalidProposalStatusError,
   InvalidVotingModeError,
 } from "@aragon/sdk-common";
 import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
@@ -14,7 +12,6 @@ import {
   DaoAction,
   DecodedApplyInstallationParams,
   getFunctionFragment,
-  ProposalStatus,
 } from "@aragon/sdk-client-common";
 
 import { Result } from "@ethersproject/abi";
@@ -32,60 +29,6 @@ export function unwrapProposalParams(
     params.executeOnPass ?? false,
     params.creatorVote ?? VoteValues.ABSTAIN,
   ];
-}
-
-export function computeProposalStatus(
-  proposal: IComputeStatusProposal,
-): ProposalStatus {
-  const now = new Date();
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
-  const endDate = new Date(parseInt(proposal.endDate) * 1000);
-  if (proposal.executed) {
-    return ProposalStatus.EXECUTED;
-  }
-  if (startDate >= now) {
-    return ProposalStatus.PENDING;
-  }
-  if (proposal.potentiallyExecutable || proposal.earlyExecutable) {
-    return ProposalStatus.SUCCEEDED;
-  }
-  if (endDate >= now) {
-    return ProposalStatus.ACTIVE;
-  }
-  return ProposalStatus.DEFEATED;
-}
-
-export function computeProposalStatusFilter(
-  status: ProposalStatus,
-): Object {
-  let where = {};
-  const now = Math.round(new Date().getTime() / 1000).toString();
-  switch (status) {
-    case ProposalStatus.PENDING:
-      where = { startDate_gte: now };
-      break;
-    case ProposalStatus.ACTIVE:
-      where = { startDate_lt: now, endDate_gte: now, executed: false };
-      break;
-    case ProposalStatus.EXECUTED:
-      where = { executed: true };
-      break;
-    case ProposalStatus.SUCCEEDED:
-      where = { potentiallyExecutable: true, endDate_lt: now };
-      break;
-    case ProposalStatus.DEFEATED:
-      where = {
-        potentiallyExecutable: false,
-        endDate_lt: now,
-        executed: false,
-      };
-      break;
-    default:
-      throw new InvalidProposalStatusError();
-  }
-  return where;
 }
 
 export function votingModeToContracts(votingMode: VotingMode): number {
