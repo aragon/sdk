@@ -76,13 +76,12 @@ export function computeProposalStatusFilter(
       where = { executed: true };
       break;
     case ProposalStatus.SUCCEEDED:
-      where = { potentiallyExecutable: true };
+      where = { potentiallyExecutable: true, endDate_lt: now };
       break;
     case ProposalStatus.DEFEATED:
       where = {
         endDate_lt: now,
         executed: false,
-        potentiallyExecutable: false,
       };
       break;
     default:

@@ -125,7 +125,7 @@ describe("client-common utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: false,
+        potentiallyExecutable: true,
         executed: false,
         earlyExecutable: false,
       })).toBe(ProposalStatus.DEFEATED);
