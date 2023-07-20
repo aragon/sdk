@@ -29,7 +29,7 @@ export type SubgraphTokenVotingVoterListItem = SubgraphVoterListItemBase & {
 
 export type SubgraphTokenVotingProposalListItem = SubgraphProposalBase & {
   plugin: {
-    token: SubgraphErc20Token | SubgraphErc721Token;
+    token: SubgraphErc20Token | SubgraphErc721Token | SubgraphErc20WrapperToken;
   };
   voters: SubgraphTokenVotingVoterListItem[];
   supportThreshold: string;

@@ -35,6 +35,7 @@ import {
   InvalidAddressOrEnsError,
 } from "@aragon/sdk-common";
 import {
+  ADDRESS_FOUR,
   ADDRESS_ONE,
   ADDRESS_THREE,
   ADDRESS_TWO,
@@ -67,6 +68,7 @@ import {
 } from "../../../src/tokenVoting/internal/graphql-queries";
 import {
   SubgraphContractType,
+  SubgraphErc20WrapperToken,
   SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
@@ -1084,34 +1086,68 @@ describe("Token Voting Client", () => {
           client.graphql.getClient(),
         );
 
-        const subgraphProposal: SubgraphTokenVotingProposalListItem = {
-          plugin: {
-            token: {
-              id: ADDRESS_THREE,
-              symbol: "TST",
-              name: "Test",
-              decimals: 18,
-              __typename: SubgraphContractType.ERC20,
+        const subgraphProposals: SubgraphTokenVotingProposalListItem[] = [
+          {
+            plugin: {
+              token: {
+                id: ADDRESS_THREE,
+                symbol: "TST",
+                name: "Test",
+                decimals: 18,
+                __typename: SubgraphContractType.ERC20,
+              },
             },
+            supportThreshold: "50000",
+            totalVotingPower: "5000",
+            minVotingPower: BigInt("50"),
+            voters: [{
+              voter: {
+                address: ADDRESS_ONE,
+              },
+              voteOption: SubgraphVoteValues.YES,
+              voteReplaced: false,
+              votingPower: "500",
+            }],
+            votingMode: VotingMode.STANDARD,
+            earlyExecutable: false,
+            ...SUBGRAPH_PROPOSAL_BASE,
           },
-          supportThreshold: "50000",
-          totalVotingPower: "5000",
-          minVotingPower: BigInt("50"),
-          voters: [{
-            voter: {
-              address: ADDRESS_ONE,
+          {
+            plugin: {
+              token: {
+                id: ADDRESS_THREE,
+                symbol: "TST",
+                name: "Test",
+                decimals: 18,
+                __typename: SubgraphContractType.ERC20_WRAPPER,
+                underlyingToken: {
+                  id: ADDRESS_FOUR,
+                  symbol: "TST",
+                  name: "Test",
+                  decimals: 18,
+                  __typename: SubgraphContractType.ERC20,
+                },
+              },
             },
-            voteOption: SubgraphVoteValues.YES,
-            voteReplaced: false,
-            votingPower: "500",
-          }],
-          votingMode: VotingMode.STANDARD,
-          earlyExecutable: false,
-          ...SUBGRAPH_PROPOSAL_BASE,
-        };
+            supportThreshold: "50000",
+            totalVotingPower: "5000",
+            minVotingPower: BigInt("50"),
+            voters: [{
+              voter: {
+                address: ADDRESS_ONE,
+              },
+              voteOption: SubgraphVoteValues.YES,
+              voteReplaced: false,
+              votingPower: "500",
+            }],
+            votingMode: VotingMode.STANDARD,
+            earlyExecutable: false,
+            ...SUBGRAPH_PROPOSAL_BASE,
+          },
+        ];
 
         mockedClient.request.mockResolvedValueOnce({
-          tokenVotingProposals: [subgraphProposal],
+          tokenVotingProposals: subgraphProposals,
         });
         const dateGetTimeSpy = jest.spyOn(Date.prototype, "getTime");
         const now = Date.now();
@@ -1121,46 +1157,79 @@ describe("Token Voting Client", () => {
         dateGetTimeSpy.mockRestore();
 
         expect(Array.isArray(proposals)).toBe(true);
-        expect(proposals.length).toBe(1);
-        expect(proposals[0].id).toBe(SUBGRAPH_PROPOSAL_BASE.id);
-        expect(proposals[0].dao.address).toBe(SUBGRAPH_PROPOSAL_BASE.dao.id);
-        expect(proposals[0].dao.name).toBe(
-          SUBGRAPH_PROPOSAL_BASE.dao.subdomain,
-        );
-        expect(proposals[0].creatorAddress).toBe(
-          SUBGRAPH_PROPOSAL_BASE.creator,
-        );
-        expect(proposals[0].metadata.title).toBe(ipfsMetadata.title);
-        expect(proposals[0].metadata.summary).toBe(ipfsMetadata.summary);
-        expect(proposals[0].startDate.getTime()).toBe(
-          parseInt(SUBGRAPH_PROPOSAL_BASE.startDate) * 1000,
-        );
-        expect(proposals[0].endDate.getTime()).toBe(
-          parseInt(SUBGRAPH_PROPOSAL_BASE.endDate) * 1000,
-        );
-        expect(proposals[0].status).toBe("Defeated");
-        // result
-        expect(proposals[0].result.yes).toBe(
-          BigInt(SUBGRAPH_PROPOSAL_BASE.yes),
-        );
-        expect(proposals[0].result.no).toBe(
-          BigInt(SUBGRAPH_PROPOSAL_BASE.no),
-        );
-        expect(proposals[0].result.abstain).toBe(
-          BigInt(SUBGRAPH_PROPOSAL_BASE.abstain),
-        );
-        expect(proposals[0].token?.address).toBe(ADDRESS_THREE);
-        expect(proposals[0].token?.name).toBe("Test");
-        expect(proposals[0].token?.symbol).toBe("TST");
-        expect(proposals[0].token?.type).toBe(TokenType.ERC20);
-        expect((proposals[0].token as Erc20TokenDetails).decimals).toBe(18);
-        expect(proposals[0].totalVotingWeight).toBe(BigInt("5000"));
-        expect(proposals[0].votes[0]).toMatchObject({
-          vote: 2,
-          voteReplaced: subgraphProposal.voters[0].voteReplaced,
-          address: subgraphProposal.voters[0].voter.address,
-        });
-
+        expect(proposals.length).toBe(2);
+        for (const [index, proposal] of proposals.entries()) {
+          expect(proposal.id).toBe(subgraphProposals[index].id);
+          expect(proposal.dao.address).toBe(subgraphProposals[index].dao.id);
+          expect(proposal.dao.name).toBe(
+            subgraphProposals[index].dao.subdomain,
+          );
+          expect(proposal.creatorAddress).toBe(
+            subgraphProposals[index].creator,
+          );
+          expect(proposal.metadata.title).toBe(ipfsMetadata.title);
+          expect(proposal.metadata.summary).toBe(ipfsMetadata.summary);
+          expect(proposal.startDate.getTime()).toBe(
+            parseInt(subgraphProposals[index].startDate) * 1000,
+          );
+          expect(proposal.endDate.getTime()).toBe(
+            parseInt(subgraphProposals[index].endDate) * 1000,
+          );
+          expect(proposal.status).toBe("Defeated");
+          // result
+          expect(proposal.result.yes).toBe(
+            BigInt(subgraphProposals[index].yes),
+          );
+          expect(proposal.result.no).toBe(
+            BigInt(subgraphProposals[index].no),
+          );
+          expect(proposal.result.abstain).toBe(
+            BigInt(subgraphProposals[index].abstain),
+          );
+          expect(proposal.token?.address).toBe(
+            subgraphProposals[index].plugin.token.id,
+          );
+          expect(proposal.token?.name).toBe(
+            subgraphProposals[index].plugin.token.name,
+          );
+          expect(proposal.token?.symbol).toBe(
+            subgraphProposals[index].plugin.token.symbol,
+          );
+          if (
+            subgraphProposals[index].plugin.token.__typename ===
+              SubgraphContractType.ERC20
+          ) {
+            expect(proposal.token?.type).toBe(TokenType.ERC20);
+            expect((proposal.token as Erc20TokenDetails).decimals).toBe(18);
+          }
+          if (
+            subgraphProposals[index].plugin.token.__typename ===
+              SubgraphContractType.ERC20_WRAPPER
+          ) {
+            expect(proposal.token?.type).toBe(TokenType.ERC20);
+            expect((proposal.token as Erc20WrapperTokenDetails).decimals).toBe(
+              18,
+            );
+            const token = subgraphProposals[index].plugin
+              .token as SubgraphErc20WrapperToken;
+            expect((proposal.token as Erc20WrapperTokenDetails).underlyingToken)
+              .toMatchObject({
+                address: token.underlyingToken.id,
+                name: token.underlyingToken.name,
+                symbol: token.underlyingToken.symbol,
+                type: TokenType.ERC20,
+              });
+          }
+          expect(proposal.totalVotingWeight).toBe(
+            BigInt(subgraphProposals[index].totalVotingPower),
+          );
+          expect(proposal.votes[0]).toMatchObject({
+            vote: 2,
+            voteReplaced: subgraphProposals[index].voters[0].voteReplaced,
+            address: subgraphProposals[index].voters[0].voter.address,
+          });
+        }
+        
         expect(mockedClient.request).toHaveBeenCalledWith(
           QueryTokenVotingProposals,
           {
