@@ -17,10 +17,14 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-### Fixed
+### Fixes
 - Underlying tokens queries in getProposal and getProposals
 - Plugins query failing due to prepared but not applied installations
+- Ipfs default endpoinst missing api/v0
 ## [1.10.0-rc1]
+### Fixes
+- Update common-client version
+## [1.10.0-rc0]
 ### Changed
 - Updates `@aragon/osx-ethers` to v1.3.0-rc0.
 
