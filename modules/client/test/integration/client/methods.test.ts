@@ -565,6 +565,11 @@ describe("Client", () => {
                 subdomain: "multisig",
               },
             },
+            {
+              appliedVersion: null,
+              appliedPreparation: null,
+              appliedPluginRepo: null
+            }
           ],
         };
         mockedClient.request.mockResolvedValueOnce({
@@ -582,6 +587,7 @@ describe("Client", () => {
         expect(dao!.plugins[0].instanceAddress).toBe(
           ADDRESS_ONE,
         );
+        expect(dao!.plugins.length).toBe(1);
         expect(dao!.plugins[0].id).toBe("multisig.plugin.dao.eth");
         expect(dao!.plugins[0].build).toBe(1);
         expect(dao!.plugins[0].release).toBe(1);

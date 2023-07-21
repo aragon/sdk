@@ -17,6 +17,10 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+- Underlying tokens queries in getProposal and getProposals
+- Plugins query failing due to prepared but not applied installations
+## [1.10.0-rc1]
 ### Changed
 - Updates `@aragon/osx-ethers` to v1.3.0-rc0.
 
