@@ -47,6 +47,15 @@ query TokenVotingProposal($proposalId: ID!) {
         ...on ERC20Contract {
           decimals
         }
+        ...on ERC20WrapperContract {
+          decimals
+          underlyingToken{
+            id
+            name
+            symbol
+            decimals
+          }
+        }
       }
     }
     totalVotingPower
@@ -92,6 +101,15 @@ query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
         __typename
         ...on ERC20Contract {
           decimals
+        }
+        ...on ERC20WrapperContract {
+          decimals
+          underlyingToken{
+            id
+            name
+            symbol
+            decimals
+          }
         }
       }
     }
