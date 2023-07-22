@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+- Default ipfs endpoints
+## 1.2.0-rc0
 ### Added
 - Tests for `getNamedTypesFromMetadata`
 ### Changed
