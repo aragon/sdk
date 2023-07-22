@@ -445,7 +445,7 @@ export async function createAddresslistDAO(
       votingMode,
       minProposerVotingPower: BigInt(0),
     },
-  });
+  }, (await deployment.daoFactory.provider.getNetwork()).name);
 
   const pluginInstallItems = [
     {

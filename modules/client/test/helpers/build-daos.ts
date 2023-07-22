@@ -26,7 +26,7 @@ export async function buildMultisigDAO(pluginRepoAddress: string) {
         minApprovals: 1,
         onlyListed: true,
       },
-    });
+    }, client.web3.getProvider().network.name);
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
@@ -78,7 +78,10 @@ export async function buildTokenVotingDAO(
     },
   };
   const pluginInstallItem = TokenVotingClient.encoding
-    .getPluginInstallItem(pluginInstallParams);
+    .getPluginInstallItem(
+      pluginInstallParams,
+      client.web3.getProvider().network.name
+    );
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
@@ -141,7 +144,7 @@ export async function buildExistingTokenVotingDAO(
         minProposerVotingPower: BigInt(0),
         votingMode,
       },
-    });
+    }, client.web3.getProvider().network.name);
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
@@ -187,7 +190,7 @@ export async function buildAddressListVotingDAO(
         minProposerVotingPower: BigInt(0),
         votingMode,
       },
-    });
+    }, client.web3.getProvider().network.name);
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),

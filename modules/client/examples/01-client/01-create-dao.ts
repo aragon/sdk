@@ -62,7 +62,7 @@ const tokenVotingPluginInstallParams: TokenVotingPluginInstall = {
 
 // Creates a TokenVoting plugin client with the parameteres defined above (with an existing token).
 const tokenVotingInstallItem = TokenVotingClient.encoding
-  .getPluginInstallItem(tokenVotingPluginInstallParams);
+  .getPluginInstallItem(tokenVotingPluginInstallParams, "goerli");
 
 const createDaoParams: CreateDaoParams = {
   metadataUri,

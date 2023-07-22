@@ -12,9 +12,11 @@ import { InvalidAddressError } from "@aragon/sdk-common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
+const NETWORK_NAME = "goerli";
+
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: "goerli" },
+  { chainId: 5, name: NETWORK_NAME },
 );
 
 describe("Token Voting Client", () => {
@@ -39,6 +41,7 @@ describe("Token Voting Client", () => {
       const tokenVotingInstallPluginItem = TokenVotingClient.encoding
         .getPluginInstallItem(
           initParams,
+          NETWORK_NAME
         );
 
       expect(typeof tokenVotingInstallPluginItem).toBe("object");

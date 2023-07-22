@@ -42,7 +42,7 @@ const multisigPluginIntallParams: MultisigPluginInstallParams = {
 
 // Encodes the parameters of the Multisig plugin. These will get used in the installation plugin for the DAO.
 const multisigPluginInstallItem = MultisigClient.encoding
-  .getPluginInstallItem(multisigPluginIntallParams);
+  .getPluginInstallItem(multisigPluginIntallParams, "goerli");
 
 // Pin metadata to IPFS, returns IPFS CID string.
 const metadataUri: string = await client.methods.pinMetadata({

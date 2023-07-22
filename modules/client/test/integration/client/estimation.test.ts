@@ -20,9 +20,11 @@ import {
   TokenType,
 } from "@aragon/sdk-client-common";
 
+const NETWORK_NAME = "goerli";
+
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: "goerli" },
+  { chainId: 5, name: NETWORK_NAME },
 );
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
@@ -62,7 +64,7 @@ describe("Client", () => {
       };
 
       const addresslistVotingPlugin = AddresslistVotingClient.encoding
-        .getPluginInstallItem(pluginParams);
+        .getPluginInstallItem(pluginParams, NETWORK_NAME);
       addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
 
       const daoCreationParams: CreateDaoParams = {
