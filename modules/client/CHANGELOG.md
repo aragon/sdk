@@ -19,6 +19,7 @@ TEMPLATE:
 ## [UPCOMING]
 ### Added
 - Added `initializeFrom` encoders and decoders 
+- Support for ERC721 deposits and withdrawals
 ### Fixes
 - Fix status calculation for token voting proposals
 - Make the `network` parameter required on `getPluginInstallItem`
