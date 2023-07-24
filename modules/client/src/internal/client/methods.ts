@@ -20,7 +20,6 @@ import {
   promiseWithTimeout,
   resolveIpfsCid,
   UpdateAllowanceError,
-  UseTransferError,
 } from "@aragon/sdk-common";
 
 import { defaultAbiCoder } from "@ethersproject/abi";
@@ -276,54 +275,48 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     params: DepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
-    // check if is a supported token
-    if (
-      ![TokenType.NATIVE, TokenType.ERC20, TokenType.ERC721].includes(
-        params.type,
-      )
-    ) {
-      throw new UseTransferError();
-    }
-
-    if (params.type === TokenType.ERC20 || params.type === TokenType.NATIVE) {
-      // check and update allowance if needed
-      if (
-        params.type === TokenType.ERC20 && params.tokenAddress &&
-        params.tokenAddress !== AddressZero
-      ) {
-        const { tokenAddress, daoAddressOrEns } = params;
-        // check current allowance
-        const tokenInstance = new Contract(
-          tokenAddress,
-          ERC20_ABI,
-          signer,
-        );
-        const currentAllowance = await tokenInstance.allowance(
-          await signer.getAddress(),
-          daoAddressOrEns,
-        );
-        yield {
-          key: DaoDepositSteps.CHECKED_ALLOWANCE,
-          allowance: currentAllowance.toBigInt(),
-        };
-        // if its lower than the needed, set it to the correct one
-        if (currentAllowance.lt(params.amount)) {
-          // If the target is an ERC20 token, ensure that the amount can be transferred
-          // Relay the yield steps to the caller as they are received
-          yield* this.setAllowance(
-            {
-              amount: params.amount,
-              spender: daoAddressOrEns,
-              tokenAddress,
-            },
+    switch (params.type) {
+      case TokenType.ERC20 || TokenType.NATIVE:
+        // check and update allowance if needed
+        if (
+          params.type === TokenType.ERC20 && params.tokenAddress &&
+          params.tokenAddress !== AddressZero
+        ) {
+          const { tokenAddress, daoAddressOrEns } = params;
+          // check current allowance
+          const tokenInstance = new Contract(
+            tokenAddress,
+            ERC20_ABI,
+            signer,
           );
+          const currentAllowance = await tokenInstance.allowance(
+            await signer.getAddress(),
+            daoAddressOrEns,
+          );
+          yield {
+            key: DaoDepositSteps.CHECKED_ALLOWANCE,
+            allowance: currentAllowance.toBigInt(),
+          };
+          // if its lower than the needed, set it to the correct one
+          if (currentAllowance.lt(params.amount)) {
+            // If the target is an ERC20 token, ensure that the amount can be transferred
+            // Relay the yield steps to the caller as they are received
+            yield* this.setAllowance(
+              {
+                amount: params.amount,
+                spender: daoAddressOrEns,
+                tokenAddress,
+              },
+            );
+          }
         }
-      }
-      yield* depositErc20(signer, params);
-    } else if (params.type === TokenType.ERC721) {
-      yield* depositErc721(signer, params);
-    } else {
-      throw new NotImplementedError("Token type not implemented");
+        yield* depositErc20(signer, params);
+        break;
+      case TokenType.ERC721:
+        yield* depositErc721(signer, params);
+        break;
+      default:
+        throw new NotImplementedError("Token type not valid, use transfer function instead");
     }
   }
 
