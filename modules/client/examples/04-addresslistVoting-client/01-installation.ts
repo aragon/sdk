@@ -45,7 +45,7 @@ const addresslistVotingPluginInstallParams: AddresslistVotingPluginInstall = {
 
 // Encodes the plugin instructions for installing into the DAO with its defined parameters.
 const addresslistVotingPluginInstallItem = AddresslistVotingClient
-  .encoding.getPluginInstallItem(addresslistVotingPluginInstallParams);
+  .encoding.getPluginInstallItem(addresslistVotingPluginInstallParams, "goerli");
 
 const daoMetadata: DaoMetadata = {
   name: "My DAO",

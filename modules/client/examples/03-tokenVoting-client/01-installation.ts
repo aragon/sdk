@@ -75,10 +75,10 @@ const tokenVotingPluginInstallParams2: TokenVotingPluginInstall = {
 
 // Creates a TokenVoting plugin client with the parameteres defined above (with an existing token).
 const tokenVotingPluginInstallItem1 = TokenVotingClient.encoding
-  .getPluginInstallItem(tokenVotingPluginInstallParams1);
+  .getPluginInstallItem(tokenVotingPluginInstallParams1, "goerli");
 // Creates a TokenVoting plugin client with the parameteres defined above (with newly minted tokens).
 const tokenVotingPluginInstallItem2 = TokenVotingClient.encoding
-  .getPluginInstallItem(tokenVotingPluginInstallParams2);
+  .getPluginInstallItem(tokenVotingPluginInstallParams2, "goerli");
 
 const daoMetadata: DaoMetadata = {
   name: "My DAO",

@@ -15,9 +15,11 @@ import {
 } from "../constants";
 import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
 
+const NETWORK_NAME = "goerli";
+
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: "goerli" },
+  { chainId: 5, name: NETWORK_NAME },
 );
 
 describe("Client Multisig", () => {
@@ -43,6 +45,7 @@ describe("Client Multisig", () => {
       const installPluginItemItem = MultisigClient.encoding
         .getPluginInstallItem(
           multisigIntallParams,
+          NETWORK_NAME
         );
 
       expect(typeof installPluginItemItem).toBe("object");

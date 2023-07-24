@@ -16,6 +16,8 @@ import {
 import { TokenVoting__factory } from "@aragon/osx-ethers";
 import { Context } from "@aragon/sdk-client-common";
 
+const NETWORK_NAME = "goerli";
+
 export async function buildMultisigDAO(pluginRepoAddress: string) {
   const client = new Client(new Context(contextParamsLocalChain));
 
@@ -26,7 +28,7 @@ export async function buildMultisigDAO(pluginRepoAddress: string) {
         minApprovals: 1,
         onlyListed: true,
       },
-    });
+    }, NETWORK_NAME);
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
@@ -78,7 +80,10 @@ export async function buildTokenVotingDAO(
     },
   };
   const pluginInstallItem = TokenVotingClient.encoding
-    .getPluginInstallItem(pluginInstallParams);
+    .getPluginInstallItem(
+      pluginInstallParams,
+      NETWORK_NAME
+    );
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
@@ -141,7 +146,7 @@ export async function buildExistingTokenVotingDAO(
         minProposerVotingPower: BigInt(0),
         votingMode,
       },
-    });
+    }, NETWORK_NAME);
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
@@ -187,7 +192,7 @@ export async function buildAddressListVotingDAO(
         minProposerVotingPower: BigInt(0),
         votingMode,
       },
-    });
+    }, NETWORK_NAME);
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),

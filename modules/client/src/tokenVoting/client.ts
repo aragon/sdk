@@ -46,7 +46,7 @@ export class TokenVotingClient extends ClientCore
      */
     getPluginInstallItem: (
       params: TokenVotingPluginInstall,
-      network: Networkish = "mainnet",
+      network: Networkish,
     ): PluginInstallItem =>
       TokenVotingClientEncoding.getPluginInstallItem(params, network),
   };

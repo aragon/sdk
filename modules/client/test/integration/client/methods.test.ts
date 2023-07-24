@@ -72,9 +72,11 @@ import {
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../../../src/multisig/internal/constants";
 
+const NETWORK_NAME = "goerli";
+
 jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
 jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: "goerli" },
+  { chainId: 5, name: NETWORK_NAME },
 );
 describe("Client", () => {
   let daoAddress: string;
@@ -144,7 +146,7 @@ describe("Client", () => {
         };
 
         const addresslistVotingPlugin = AddresslistVotingClient.encoding
-          .getPluginInstallItem(pluginParams);
+          .getPluginInstallItem(pluginParams, NETWORK_NAME);
         addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
 
         const daoCreationParams: CreateDaoParams = {
