@@ -28,7 +28,8 @@ import {
   IpfsError,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
-import { erc20ContractAbi } from "../abi/erc20";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
 import { toUtf8String } from "@ethersproject/strings";
@@ -40,7 +41,6 @@ import {
   InterfaceParams,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { ERC721_ABI } from "../abi/erc721";
 
 /**
  * Decoding module the SDK Generic Client
@@ -143,7 +143,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     const abiObjects = [
       {
         tokenStandard: TokenType.ERC20,
-        abi: erc20ContractAbi,
+        abi: ERC20_ABI,
         function: "transfer",
       },
       {

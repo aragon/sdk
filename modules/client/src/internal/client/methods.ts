@@ -29,7 +29,8 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
-import { erc20ContractAbi } from "../abi/erc20";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import {
   QueryDao,
   QueryDaos,
@@ -120,7 +121,6 @@ import {
   SortDirection,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { ERC721_ABI } from "../abi/erc721";
 
 /**
  * Methods module the SDK Generic Client
@@ -295,7 +295,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         // check current allowance
         const tokenInstance = new Contract(
           tokenAddress,
-          erc20ContractAbi,
+          ERC20_ABI,
           signer,
         );
         const currentAllowance = await tokenInstance.allowance(
@@ -406,7 +406,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // add params check with yup
     const tokenInstance = new Contract(
       params.tokenAddress,
-      erc20ContractAbi,
+      ERC20_ABI,
       signer,
     );
     const tx: ContractTransaction = await tokenInstance.approve(

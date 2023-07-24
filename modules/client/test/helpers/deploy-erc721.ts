@@ -2,7 +2,7 @@ import { Client } from "../../src";
 import { contextParamsLocalChain } from "../integration/constants";
 import { Context } from "@aragon/sdk-client-common";
 import { ContractFactory } from "@ethersproject/contracts";
-import { ERC721_ABI } from "../../src/internal/abi/erc721";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 
 export function deployErc721() {
   const client = new Client(new Context(contextParamsLocalChain));

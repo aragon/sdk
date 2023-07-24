@@ -20,7 +20,8 @@ import {
   permissionWithConditionParamsToContract,
 } from "../utils";
 import { Contract } from "@ethersproject/contracts";
-import { erc20ContractAbi } from "../abi/erc20";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import {
   hexToBytes,
   InvalidAddressError,
@@ -38,7 +39,6 @@ import {
   LIVE_CONTRACTS,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { ERC721_ABI } from "../abi/erc721";
 import { Interface } from "@ethersproject/abi";
 
 /**
@@ -261,7 +261,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
 
         iface = new Contract(
           params.tokenAddress,
-          erc20ContractAbi,
+          ERC20_ABI,
         ).interface;
         data = iface.encodeFunctionData("transfer", [
           params.recipientAddressOrEns,
@@ -283,11 +283,14 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           params.tokenAddress,
           ERC721_ABI,
         ).interface;
-        data = iface.encodeFunctionData("safeTransferFrom(address,address,uint256)", [
-          params.daoAddressOrEns, // from
-          params.recipientAddressOrEns, // to
-          params.tokenId, // tokenId
-        ]);
+        data = iface.encodeFunctionData(
+          "safeTransferFrom(address,address,uint256)",
+          [
+            params.daoAddressOrEns, // from
+            params.recipientAddressOrEns, // to
+            params.tokenId, // tokenId
+          ],
+        );
         return {
           to: params.tokenAddress,
           value: BigInt(0),

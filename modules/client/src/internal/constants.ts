@@ -6,10 +6,15 @@ import {
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
 } from "../types";
-import { erc20ContractAbi } from "./abi/erc20";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
-  new Contract(AddressZero, erc20ContractAbi).interface.getFunction("transfer")
+  new Contract(AddressZero, ERC20_ABI).interface.getFunction("transfer")
+    .format("minimal"),
+  new Contract(AddressZero, ERC721_ABI).interface.getFunction(
+    "safeTransferFrom(address,address,uint256)",
+  )
     .format("minimal"),
   DAO__factory.createInterface().getFunction("grant").format("minimal"),
   DAO__factory.createInterface().getFunction("grantWithCondition").format(
