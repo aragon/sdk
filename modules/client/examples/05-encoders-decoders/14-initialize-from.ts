@@ -1,23 +1,17 @@
 /* MARKDOWN
 ---
-title: Apply Uninstallation
+title: Initialize From
 ---
 
-## Apply a Plugin Uninstallation
+## Upgrade a DAO to a new version
 
-Encodes the action of applying a plugin uninstallation.
+Encodes the action for upgrading the dao to a new version and passing initialization data of the new version.
 
 ### Encoding
 */
 
-import {
-  Client,
-  DecodedApplyUninstallationParams,
-  InitializeFromParams,
-  MultisigClient,
-  PermissionIds,
-} from "@aragon/sdk-client";
-import { DaoAction, PermissionOperationType } from "@aragon/sdk-client-common";
+import { Client, InitializeFromParams } from "@aragon/sdk-client";
+import { DaoAction } from "@aragon/sdk-client-common";
 import { context } from "../index";
 
 // Instantiates an Aragon OSx SDK client.
@@ -58,22 +52,9 @@ console.log({ decodedParams });
   Returns:
 
   ```json
-  { decodedParams:
-    {
-      permissions: [{
-        operation: 1, // REVOKE
-        permissionId: Uint8Array([10,20,30]),
-        where: "0x1234567890123456789012345678901234567890",
-        who: "0x2345678901234567890123456789012345678901",
-      }],
-      versionTag: {
-        build: 1,
-        release: 1,
-      },
-      pluginRepo: "0x2345678901234567890123456789012345678901",
-      pluginAddress: "0x1234567890123456789012345678901234567890",
-      };
-    }
+  {
+    previousVersion: [1, 0, 0],
+    initData: Uint8Array[12,34,45...]
   }
   ```
   */
