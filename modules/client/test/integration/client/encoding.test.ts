@@ -105,6 +105,8 @@ describe("Client", () => {
 
       expect(typeof withdrawAction).toBe("object");
       expect(withdrawAction.data).toBeInstanceOf(Uint8Array);
+      expect(withdrawAction.to).toBe(withdrawParams.tokenAddress);
+      expect(withdrawAction.value).toBe(BigInt(0));
       expect(bytesToHex(withdrawAction.data)).toBe(
         "0x42842e0e00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a",
       );

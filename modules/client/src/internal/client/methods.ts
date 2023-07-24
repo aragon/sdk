@@ -7,9 +7,7 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import {
-  AmountMismatchError,
   DaoCreationError,
-  FailedDepositError,
   InstallationNotFoundError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -30,7 +28,6 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
-import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import {
   QueryDao,
   QueryDaos,
@@ -84,6 +81,8 @@ import {
   SubgraphTransferTypeMap,
 } from "../types";
 import {
+  depositErc20,
+  depositErc721,
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
@@ -91,7 +90,6 @@ import {
   toPluginRepoListItem,
   toPluginRepoRelease,
   toTokenTransfer,
-  unwrapDepositParams,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -278,20 +276,22 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     params: DepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
-
+    // check if is a supported token
     if (
-      params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20 &&
-      params.type !== TokenType.ERC721
+      ![TokenType.NATIVE, TokenType.ERC20, TokenType.ERC721].includes(
+        params.type,
+      )
     ) {
       throw new UseTransferError();
     }
 
     if (params.type === TokenType.ERC20 || params.type === TokenType.NATIVE) {
-      const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-        params,
-      );
-
-      if (tokenAddress && tokenAddress !== AddressZero) {
+      // check and update allowance if needed
+      if (
+        params.type === TokenType.ERC20 && params.tokenAddress &&
+        params.tokenAddress !== AddressZero
+      ) {
+        const { tokenAddress, daoAddressOrEns } = params;
         // check current allowance
         const tokenInstance = new Contract(
           tokenAddress,
@@ -300,7 +300,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         );
         const currentAllowance = await tokenInstance.allowance(
           await signer.getAddress(),
-          daoAddress,
+          daoAddressOrEns,
         );
         yield {
           key: DaoDepositSteps.CHECKED_ALLOWANCE,
@@ -313,79 +313,15 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           yield* this.setAllowance(
             {
               amount: params.amount,
-              spender: daoAddress,
+              spender: daoAddressOrEns,
               tokenAddress,
             },
           );
         }
       }
-
-      // Doing the transfer
-      const daoInstance = DAO__factory.connect(daoAddress, signer);
-      const override: { value?: bigint } = {};
-
-      if (tokenAddress === AddressZero) {
-        // Ether
-        override.value = amount;
-      }
-
-      const tx = await daoInstance.deposit(
-        tokenAddress,
-        amount,
-        reference,
-        override,
-      );
-      yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
-
-      const cr = await tx.wait();
-      const log = findLog(cr, daoInstance.interface, "Deposited");
-      if (!log) {
-        throw new FailedDepositError();
-      }
-
-      const daoInterface = DAO__factory.createInterface();
-      const parsedLog = daoInterface.parseLog(log);
-
-      if (!amount.toString() === parsedLog.args["amount"]) {
-        throw new AmountMismatchError(
-          amount,
-          parsedLog.args["amount"].toBigInt(),
-        );
-      }
-      yield { key: DaoDepositSteps.DONE, amount: amount };
+      yield* depositErc20(signer, params);
     } else if (params.type === TokenType.ERC721) {
-      const nftInstance = new Contract(
-        params.tokenAddress,
-        ERC721_ABI,
-        signer,
-      );
-
-      // Doing the transfer
-      const tx = await nftInstance["safeTransferFrom(address,address,uint256)"](
-        await signer.getAddress(),
-        params.daoAddressOrEns,
-        params.tokenId,
-      );
-
-      const cr = await tx.wait();
-
-      const log = findLog(cr, nftInstance.interface, "Transfer");
-
-      if (!log) {
-        throw new FailedDepositError();
-      }
-
-      const parsedLog = nftInstance.interface.parseLog(log);
-      if (
-        !parsedLog.args["tokenId"] ||
-        parsedLog.args["tokenId"].toString() !== params.tokenId.toString()
-      ) {
-        throw new FailedDepositError();
-      }
-      yield {
-        key: DaoDepositSteps.DONE,
-        tokenId: params.tokenId,
-      };
+      yield* depositErc721(signer, params);
     } else {
       throw new NotImplementedError("Token type not implemented");
     }
