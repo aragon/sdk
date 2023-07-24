@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Fixes
+- Fix status calculation for token voting proposals
+## [1.10.1-rc1]
+### Fixes
 - Underlying tokens queries in getProposal and getProposals
 - Plugins query failing due to prepared but not applied installations
 - Ipfs default endpoinst missing api/v0
