@@ -20,10 +20,10 @@ import {
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../../src";
-import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
+import { ADDRESS_ONE, ADDRESS_THREE, ADDRESS_TWO, contextParamsLocalChain } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { bytesToHex } from "@aragon/sdk-common";
+import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
@@ -134,11 +134,14 @@ describe("Client", () => {
         withdrawAction.value,
         withdrawAction.data,
       );
-
-      expect(decoded.amount).toBe(withdrawParams.amount);
-      expect(decoded.recipientAddressOrEns).toBe(
-        withdrawParams.recipientAddressOrEns,
-      );
+      if (decoded.type === TokenType.NATIVE) {
+        expect(decoded.amount).toBe(withdrawParams.amount);
+        expect(decoded.recipientAddressOrEns).toBe(
+          withdrawParams.recipientAddressOrEns,
+        );
+      } else {
+        fail("TokenType should be NATIVE");
+      }
     });
 
     it("Should decode an encoded raw withdraw action of an erc20 token", async () => {
@@ -160,12 +163,41 @@ describe("Client", () => {
           withdrawAction.value,
           withdrawAction.data,
         );
-
-      expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
-      expect(decodedWithdrawParams.recipientAddressOrEns).toBe(
-        withdrawParams.recipientAddressOrEns,
+      if (decodedWithdrawParams.type === TokenType.ERC20) {
+        expect(decodedWithdrawParams.amount).toBe(withdrawParams.amount);
+        expect(decodedWithdrawParams.recipientAddressOrEns).toBe(
+          withdrawParams.recipientAddressOrEns,
+        );
+        expect(withdrawAction.to).toBe(withdrawParams.tokenAddress);
+      } else {
+        fail("TokenType should be ERC20");
+      }
+    });
+    it("Should decode an encoded withdraw action of an erc721 token", async () => {
+      const data =
+        "0x42842e0e00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a";
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params = client.decoding.withdrawAction(
+        ADDRESS_ONE,
+        BigInt(0),
+        hexToBytes(data),
       );
-      expect(withdrawAction.to).toBe(withdrawParams.tokenAddress);
+      if (params.type === TokenType.ERC721) {
+        expect(params.type).toBe(TokenType.ERC721);
+        expect(params.tokenId).toBe(BigInt(10));
+        expect(params.daoAddressOrEns).toBe(
+          ADDRESS_THREE,
+        )
+        expect(params.recipientAddressOrEns).toBe(
+          ADDRESS_TWO,
+        );
+        expect(params.tokenAddress).toBe(
+          ADDRESS_ONE,
+        );
+      } else {
+        fail("TokenType should be ERC721");
+      }
     });
 
     it("Should decode an encoded update metadata action", async () => {
@@ -252,13 +284,11 @@ describe("Client", () => {
       const data = new Uint8Array([11, 22, 22, 33, 33, 33]);
 
       expect(() =>
-        client.decoding.withdrawAction(
-          "0x1234567890123456789012345678901234567890",
-          BigInt(10),
+        client.decoding.setDaoUriAction(
           data,
         )
       ).toThrow(
-        `data signature does not match function transfer. (argument=\"data\", value=\"0x0b1616212121\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
+        `data signature does not match function setDaoURI. (argument=\"data\", value=\"0x0b1616212121\", code=INVALID_ARGUMENT, version=abi/5.7.0)`,
       );
     });
 

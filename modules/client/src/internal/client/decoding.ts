@@ -40,6 +40,7 @@ import {
   InterfaceParams,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { ERC721_ABI } from "../abi/erc721";
 
 /**
  * Decoding module the SDK Generic Client
@@ -139,21 +140,33 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     }
 
     // ERC20 and other
-    const abiObjects = [{
-      tokenStandard: TokenType.ERC20,
-      abi: erc20ContractAbi,
-    }];
+    const abiObjects = [
+      {
+        tokenStandard: TokenType.ERC20,
+        abi: erc20ContractAbi,
+        function: "transfer",
+      },
+      {
+        tokenStandard: TokenType.ERC721,
+        abi: ERC721_ABI,
+        function: "safeTransferFrom(address,address,uint256)",
+      },
+    ];
     for (const abiObject of abiObjects) {
-      const hexBytes = bytesToHex(data);
-      const iface = new Contract(AddressZero, abiObject.abi).interface;
-      const expectedFunction = iface.getFunction("transfer");
-      const result = iface.decodeFunctionData(expectedFunction, hexBytes);
-      return withdrawParamsFromContract(
-        to,
-        value,
-        result,
-        abiObject.tokenStandard,
-      );
+      try {
+        const hexBytes = bytesToHex(data);
+        const iface = new Contract(AddressZero, abiObject.abi).interface;
+        const expectedFunction = iface.getFunction(abiObject.function);
+        const result = iface.decodeFunctionData(expectedFunction, hexBytes);
+        return withdrawParamsFromContract(
+          to,
+          value,
+          result,
+          abiObject.tokenStandard,
+        );
+      } catch (e) {
+        continue;
+      }
     }
     throw new InvalidActionError();
   }

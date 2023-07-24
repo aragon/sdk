@@ -119,16 +119,13 @@ Returns:
 
 { erc20DecodedParams:
   {
-    type: "native",
+    type: "erc20",
     recipientAddressOrEns: "0x1234567890123456789012345678901234567890",
     amount: 10n,
     tokenAddress: "0x1234567890123456789012345678901234567890",
   }
 }
 
-:::info
-Work in progress.
-:::
 */
 
 /* MARKDOWN
@@ -136,16 +133,14 @@ Work in progress.
 
 #### Encoding
 
-:::info
-Work in progress.
-:::
 */
 
 params = {
-  type: TokenType.ERC721, // TODO!!
+  type: TokenType.ERC721, 
   tokenAddress: "0x1234567890123456789012345678901234567890", // ERFC721's token contract address
-  amount: BigInt(10), // TODO!!
+  tokenId: BigInt(10),
   recipientAddressOrEns: "0x1234567890123456789012345678901234567890", // the address to transfer the funds to
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890", // the address of the DAO
 };
 
 const erc721WithdrawAction: DaoAction = await client.encoding.withdrawAction(
@@ -156,9 +151,6 @@ console.log({ erc721WithdrawAction });
 /* MARKDOWN
 #### Decoding
 
-:::info
-Work in progress.
-:::
 */
 
 const erc721DecodedParams = client.decoding.withdrawAction(
@@ -170,8 +162,11 @@ console.log({ erc721DecodedParams });
 
 /* MARKDOWN
 Returns:
-
-:::info
-Work in progress.
-:::
+{
+  type: TokenType.ERC721;
+  tokenAddress: "0x1234567890123456789012345678901234567890";
+  tokenId: 10n;
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890";
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890";
+}
 */

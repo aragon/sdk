@@ -179,7 +179,7 @@ type WithdrawErc20Params = WithdrawParamsBase & {
 type WithdrawErc721Params = WithdrawParamsBase & {
   type: TokenType.ERC721;
   tokenAddress: string;
-  tokenId: string;
+  tokenId: bigint;
   daoAddressOrEns: string;
 };
 

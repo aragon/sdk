@@ -380,14 +380,24 @@ export function withdrawParamsFromContract(
   result: Result,
   tokenStandard: TokenType,
 ): WithdrawParams {
-  if (tokenStandard === TokenType.ERC20) {
-    return {
-      type: TokenType.ERC20,
-      tokenAddress: to,
-      recipientAddressOrEns: result[0],
-      amount: BigInt(result[1]),
-    };
+  switch (tokenStandard) {
+    case TokenType.ERC20:
+      return {
+        type: TokenType.ERC20,
+        tokenAddress: to,
+        recipientAddressOrEns: result[0],
+        amount: BigInt(result[1]),
+      };
+    case TokenType.ERC721:
+      return {
+        type: TokenType.ERC721,
+        tokenAddress: to,
+        recipientAddressOrEns: result[1],
+        tokenId: BigInt(result[2]),
+        daoAddressOrEns: result[0],
+      }
   }
+
   // TODO Add ERC721 and ERC1155
-  throw new NotImplementedError("Only ERC20 tokens are supported");
+  throw new NotImplementedError("Token standard not supported");
 }

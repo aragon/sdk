@@ -283,7 +283,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           params.tokenAddress,
           ERC721_ABI,
         ).interface;
-        data = iface.encodeFunctionData("safeTransferFrom", [
+        data = iface.encodeFunctionData("safeTransferFrom(address,address,uint256)", [
           params.daoAddressOrEns, // from
           params.recipientAddressOrEns, // to
           params.tokenId, // tokenId

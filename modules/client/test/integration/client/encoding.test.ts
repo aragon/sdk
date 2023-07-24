@@ -21,7 +21,7 @@ import {
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../../src";
-import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
+import { ADDRESS_ONE, ADDRESS_THREE, ADDRESS_TWO, contextParamsLocalChain } from "../constants";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { bytesToHex } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
@@ -84,6 +84,29 @@ describe("Client", () => {
       expect(withdrawAction.data).toBeInstanceOf(Uint8Array);
       expect(bytesToHex(withdrawAction.data)).toBe(
         "0xa9059cbb0000000000000000000000001234567890123456789012345678901234567890000000000000000000000000000000000000000000000000000000000000000a",
+      );
+    });
+
+    it("Should create a client and generate an ERC721 withdraw action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const withdrawParams: WithdrawParams = {
+        type: TokenType.ERC721,
+        tokenAddress: ADDRESS_ONE,
+        recipientAddressOrEns: ADDRESS_TWO,
+        daoAddressOrEns: ADDRESS_THREE,
+        tokenId: BigInt(10),
+      };
+
+      const withdrawAction = await client.encoding.withdrawAction(
+        withdrawParams,
+      );
+
+      expect(typeof withdrawAction).toBe("object");
+      expect(withdrawAction.data).toBeInstanceOf(Uint8Array);
+      expect(bytesToHex(withdrawAction.data)).toBe(
+        "0x42842e0e00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a",
       );
     });
     it("Should create a client and generate a grant action", () => {
