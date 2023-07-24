@@ -17,6 +17,7 @@ import {
   IpfsPinError,
   MissingExecPermissionError,
   NoProviderError,
+  NotImplementedError,
   PluginUninstallationPreparationError,
   promiseWithTimeout,
   resolveIpfsCid,
@@ -119,6 +120,7 @@ import {
   SortDirection,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { ERC721_ABI } from "../abi/erc721";
 
 /**
  * Methods module the SDK Generic Client
@@ -277,76 +279,116 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
 
-    if (params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20) {
+    if (
+      params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20 &&
+      params.type !== TokenType.ERC721
+    ) {
       throw new UseTransferError();
     }
 
-    const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params,
-    );
+    if (params.type === TokenType.ERC20 || params.type === TokenType.NATIVE) {
+      const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
+        params,
+      );
 
-    if (tokenAddress && tokenAddress !== AddressZero) {
-      // check current allowance
-      const tokenInstance = new Contract(
+      if (tokenAddress && tokenAddress !== AddressZero) {
+        // check current allowance
+        const tokenInstance = new Contract(
+          tokenAddress,
+          erc20ContractAbi,
+          signer,
+        );
+        const currentAllowance = await tokenInstance.allowance(
+          await signer.getAddress(),
+          daoAddress,
+        );
+        yield {
+          key: DaoDepositSteps.CHECKED_ALLOWANCE,
+          allowance: currentAllowance.toBigInt(),
+        };
+        // if its lower than the needed, set it to the correct one
+        if (currentAllowance.lt(params.amount)) {
+          // If the target is an ERC20 token, ensure that the amount can be transferred
+          // Relay the yield steps to the caller as they are received
+          yield* this.setAllowance(
+            {
+              amount: params.amount,
+              spender: daoAddress,
+              tokenAddress,
+            },
+          );
+        }
+      }
+
+      // Doing the transfer
+      const daoInstance = DAO__factory.connect(daoAddress, signer);
+      const override: { value?: bigint } = {};
+
+      if (tokenAddress === AddressZero) {
+        // Ether
+        override.value = amount;
+      }
+
+      const tx = await daoInstance.deposit(
         tokenAddress,
-        erc20ContractAbi,
-        signer,
+        amount,
+        reference,
+        override,
       );
-      const currentAllowance = await tokenInstance.allowance(
-        await signer.getAddress(),
-        daoAddress,
-      );
-      yield {
-        key: DaoDepositSteps.CHECKED_ALLOWANCE,
-        allowance: currentAllowance.toBigInt(),
-      };
-      // if its lower than the needed, set it to the correct one
-      if (currentAllowance.lt(params.amount)) {
-        // If the target is an ERC20 token, ensure that the amount can be transferred
-        // Relay the yield steps to the caller as they are received
-        yield* this.setAllowance(
-          {
-            amount: params.amount,
-            spender: daoAddress,
-            tokenAddress,
-          },
+      yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
+
+      const cr = await tx.wait();
+      const log = findLog(cr, daoInstance.interface, "Deposited");
+      if (!log) {
+        throw new FailedDepositError();
+      }
+
+      const daoInterface = DAO__factory.createInterface();
+      const parsedLog = daoInterface.parseLog(log);
+
+      if (!amount.toString() === parsedLog.args["amount"]) {
+        throw new AmountMismatchError(
+          amount,
+          parsedLog.args["amount"].toBigInt(),
         );
       }
-    }
-
-    // Doing the transfer
-    const daoInstance = DAO__factory.connect(daoAddress, signer);
-    const override: { value?: bigint } = {};
-
-    if (tokenAddress === AddressZero) {
-      // Ether
-      override.value = amount;
-    }
-
-    const tx = await daoInstance.deposit(
-      tokenAddress,
-      amount,
-      reference,
-      override,
-    );
-    yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
-
-    const cr = await tx.wait();
-    const log = findLog(cr, daoInstance.interface, "Deposited");
-    if (!log) {
-      throw new FailedDepositError();
-    }
-
-    const daoInterface = DAO__factory.createInterface();
-    const parsedLog = daoInterface.parseLog(log);
-
-    if (!amount.toString() === parsedLog.args["amount"]) {
-      throw new AmountMismatchError(
-        amount,
-        parsedLog.args["amount"].toBigInt(),
+      yield { key: DaoDepositSteps.DONE, amount: amount };
+    } else if (params.type === TokenType.ERC721) {
+      const nftInstance = new Contract(
+        params.tokenAddress,
+        ERC721_ABI,
+        signer,
       );
+
+      // Doing the transfer
+      const tx = await nftInstance["safeTransferFrom(address,address,uint256)"](
+        await signer.getAddress(),
+        params.daoAddressOrEns,
+        params.tokenId,
+      );
+
+      const cr = await tx.wait();
+
+      const log = findLog(cr, nftInstance.interface, "Transfer");
+
+      if (!log) {
+        throw new FailedDepositError();
+      }
+
+      const parsedLog = nftInstance.interface.parseLog(log);
+      if (
+        !parsedLog.args["tokenId"] ||
+        parsedLog.args["tokenId"].toString() !== params.tokenId.toString()
+      ) {
+        throw new FailedDepositError();
+      }
+      yield {
+        key: DaoDepositSteps.DONE,
+        tokenId: params.tokenId,
+      };
+    } else {
+      throw new NotImplementedError("Token type not implemented");
     }
-    yield { key: DaoDepositSteps.DONE, amount: amount };
   }
 
   /**

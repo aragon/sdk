@@ -293,6 +293,7 @@ describe("Token Voting Client", () => {
           spender: tokenAddress,
           tokenAddress: erc20.address,
           amount: balance.toBigInt(),
+          type: TokenType.ERC20,
         });
         for await (const step of updateAllowanceSteps) {
           switch (step.key) {
