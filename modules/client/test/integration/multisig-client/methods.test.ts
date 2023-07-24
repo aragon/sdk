@@ -606,7 +606,6 @@ describe("Client Multisig", () => {
         QueryMultisigProposals,
         {
           where: {
-            potentiallyExecutable: false,
             endDate_lt: nowFilter,
             executed: false,
           },

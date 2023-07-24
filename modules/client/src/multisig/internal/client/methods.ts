@@ -33,7 +33,6 @@ import {
   SubgraphMultisigVotingSettings,
 } from "../types";
 import {
-  computeProposalStatusFilter,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
   ProposalCreationSteps,
@@ -49,7 +48,7 @@ import {
   QueryMultisigProposals,
   QueryMultisigVotingSettings,
 } from "../graphql-queries";
-import { toMultisigProposal, toMultisigProposalListItem } from "../utils";
+import { computeProposalStatusFilter, toMultisigProposal, toMultisigProposalListItem } from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IMultisigClientMethods } from "../interfaces";
 import {

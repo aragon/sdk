@@ -130,14 +130,6 @@ export type SubgraphProposalBase = {
   potentiallyExecutable: boolean;
 };
 
-export interface IComputeStatusProposal {
-  startDate: string;
-  endDate: string;
-  executed: boolean;
-  earlyExecutable?: boolean;
-  potentiallyExecutable: boolean;
-}
-
 export type ProposalQueryParams = Pagination & {
   sortBy?: ProposalSortBy;
   status?: ProposalStatus;
