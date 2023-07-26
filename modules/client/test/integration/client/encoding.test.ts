@@ -13,6 +13,7 @@ import {
   Client,
   DaoMetadata,
   GrantPermissionParams,
+  InitializeFromParams,
   PermissionIds,
   Permissions,
   RegisterStandardCallbackParams,
@@ -537,6 +538,36 @@ describe("Client", () => {
             .permissionId,
         );
       }
+    });
+    it("Should encode an initializeFrom action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params: InitializeFromParams = {
+        previousVersion: [1, 0, 0],
+        initData: new Uint8Array([0, 1, 2, 3]),
+      };
+      const action = client.encoding.initializeFromAction(
+        "0x1234567890123456789012345678901234567890",
+        params,
+      );
+      expect(typeof action).toBe("object");
+      expect(action.data).toBeInstanceOf(Uint8Array);
+
+      const daoInterface = DAO__factory.createInterface();
+      const hexString = bytesToHex(action.data);
+      const argsDecoded = daoInterface.decodeFunctionData(
+        "initializeFrom",
+        hexString,
+      );
+      expect(argsDecoded.length).toBe(2);
+      for (const index in argsDecoded[0]) {
+        expect(argsDecoded[0][parseInt(index)]).toBe(
+          params.previousVersion[parseInt(index)],
+        );
+      }
+      expect(argsDecoded[1]).toBe(
+        bytesToHex(params.initData as Uint8Array),
+      );
     });
   });
 });

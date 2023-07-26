@@ -4,9 +4,9 @@ import {
   Client,
   CreateDaoParams,
   DaoCreationSteps,
-  TokenVotingPluginInstall,
   MultisigClient,
   TokenVotingClient,
+  TokenVotingPluginInstall,
   VotingMode,
 } from "../../src";
 import {
@@ -112,7 +112,7 @@ export async function buildTokenVotingDAO(
           plugin,
           signer,
         );
-        const tokenAddress = await tokenVotingContract.getVotingToken()
+        const tokenAddress = await tokenVotingContract.getVotingToken();
 
         return {
           dao,

@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+- Added `initializeFrom` encoders and decoders 
 ### Fixes
 - Fix status calculation for token voting proposals
 - Make the `network` parameter required on `getPluginInstallItem`

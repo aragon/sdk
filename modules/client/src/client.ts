@@ -9,7 +9,7 @@ import {
   IClientEstimation,
   IClientMethods,
 } from "./internal/interfaces";
-import { Context, ClientCore } from "@aragon/sdk-client-common";
+import { ClientCore, Context } from "@aragon/sdk-client-common";
 
 /**
  * Provider a generic client with high level methods to manage and interact with DAO's

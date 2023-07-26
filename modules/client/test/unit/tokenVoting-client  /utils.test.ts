@@ -65,14 +65,14 @@ describe("tokenVoting-client utils", () => {
       });
     });
     it("should return null", () => {
-        const token = parseToken({
-            // @ts-ignore
-            __typename: "Other",
-            id: "0x1234567890123456789012345678901234567890",
-            name: "TestToken",
-            symbol: "TT",
-        });
-        expect(token).toEqual(null);
+      const token = parseToken({
+        // @ts-ignore
+        __typename: "Other",
+        id: "0x1234567890123456789012345678901234567890",
+        name: "TestToken",
+        symbol: "TT",
+      });
+      expect(token).toEqual(null);
     });
   });
   describe("computeProposalStatus", () => {

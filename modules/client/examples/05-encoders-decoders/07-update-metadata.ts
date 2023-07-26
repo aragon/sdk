@@ -24,13 +24,13 @@ const metadataParams: DaoMetadata = {
   links: [
     {
       url: "https://discord.com/...",
-      name: "Discord"
+      name: "Discord",
     },
     {
       url: "https://twitter.com/...",
-      name: "Twitter"
-    }
-  ]
+      name: "Twitter",
+    },
+  ],
 };
 
 const daoAddressOrEns: string = "0x123458235832745982839878932332423"; // or my-dao.dao.eth
@@ -41,7 +41,7 @@ const ipfsUri: string = await client.methods.pinMetadata(metadataParams);
 // Update the metadata of a given DAO.
 const action: DaoAction = await client.encoding.updateDaoMetadataAction(
   daoAddressOrEns,
-  ipfsUri
+  ipfsUri,
 );
 console.log({ action });
 
@@ -62,9 +62,10 @@ Returns:
 */
 
 // Decodes the update metadata action.
-const decodedParams: DaoMetadata = await client.decoding.updateDaoMetadataAction(
-  action.data
-);
+const decodedParams: DaoMetadata = await client.decoding
+  .updateDaoMetadataAction(
+    action.data,
+  );
 console.log({ decodedParams });
 
 /* MARKDOWN
@@ -97,7 +98,7 @@ Decode an update metadata action and expect an IPFS URI containing the CID of th
 
 // Decodes the parameters of an update metadata raw action.
 const decodedParamsRaw: string = client.decoding.updateDaoMetadataRawAction(
-  action.data
+  action.data,
 );
 console.log({ decodedParamsRaw });
 

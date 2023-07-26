@@ -11,6 +11,7 @@ import {
   GrantPermissionDecodedParams,
   GrantPermissionParams,
   GrantPermissionWithConditionParams,
+  InitializeFromParams,
   PermissionIds,
   Permissions,
   RegisterStandardCallbackParams,
@@ -660,6 +661,27 @@ describe("Client", () => {
             .permissionId,
         );
       }
+    });
+    it("Should decode an initialize from action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params: InitializeFromParams = {
+        previousVersion: [1, 0, 0],
+        initData: new Uint8Array([0, 1, 2, 3]),
+      };
+      const action = await client.encoding.initializeFromAction(
+        "0x1234567890123456789012345678901234567890",
+        params,
+      );
+      const decodedParams = client.decoding.initializeFromAction(action.data);
+      for (const index in params.previousVersion) {
+        expect(params.previousVersion[index]).toBe(
+          decodedParams.previousVersion[index],
+        );
+      }
+      expect(bytesToHex(params.initData as Uint8Array)).toBe(
+        bytesToHex(decodedParams.initData as Uint8Array),
+      );
     });
   });
 });
