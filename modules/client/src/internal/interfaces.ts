@@ -78,6 +78,10 @@ export interface IClientMethods {
   prepareInstallation: (
     params: PrepareInstallationParams,
   ) => AsyncGenerator<PrepareInstallationStepValue>;
+    // gets the protol version of a dao
+  getProtocolVersion: (
+    daoAddress: string,
+  ) => Promise<[number, number, number]>;
 }
 
 export interface IClientEncoding {

@@ -41,7 +41,10 @@ import {
   TransferType,
   VotingMode,
 } from "../../../src";
-import { MissingExecPermissionError } from "@aragon/sdk-common";
+import {
+  InvalidAddressError,
+  MissingExecPermissionError,
+} from "@aragon/sdk-common";
 import { Server } from "ganache";
 import {
   SubgraphBalance,
@@ -603,8 +606,8 @@ describe("Client", () => {
             {
               appliedVersion: null,
               appliedPreparation: null,
-              appliedPluginRepo: null
-            }
+              appliedPluginRepo: null,
+            },
           ],
         };
         mockedClient.request.mockResolvedValueOnce({
@@ -1311,6 +1314,24 @@ describe("Client", () => {
           "string",
         );
         expect(typeof plugin.current.release.metadata.images).toBe("object");
+      });
+
+      it("Should get the protocol version of an invalid dao address and throw an error", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+        const daoAddress = TEST_INVALID_ADDRESS;
+        await expect(() => client.methods.getProtocolVersion(daoAddress))
+          .rejects.toThrow(InvalidAddressError);
+      });
+
+      it("Should get the protocol version of a dao", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+        const protocolVersion = await client.methods.getProtocolVersion(
+          daoAddress,
+        );
+        
+        expect(protocolVersion).toMatchObject([1, 3, 0]);
       });
 
       test.todo(

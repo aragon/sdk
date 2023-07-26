@@ -11,6 +11,7 @@ import {
   DaoCreationError,
   FailedDepositError,
   InstallationNotFoundError,
+  InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidEnsError,
@@ -924,5 +925,15 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       }
     }
     return toPluginRepo(pluginRepo, releaseMetadata, buildMetadata);
+  }
+  public async getProtocolVersion(
+    daoAddress: string,
+  ): Promise<[number, number, number]> {
+    if (!isAddress(daoAddress)) {
+      throw new InvalidAddressError();
+    }
+    const signer = this.web3.getConnectedSigner();
+    const daoInstance = DAO__factory.connect(daoAddress, signer);
+    return daoInstance.protocolVersion();
   }
 }
