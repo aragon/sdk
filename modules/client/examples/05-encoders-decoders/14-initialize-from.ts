@@ -20,7 +20,7 @@ const client: Client = new Client(context);
 // This variable contains the values received on the ininitializeFrom() method
 const initializeFromParams: InitializeFromParams = {
   previousVersion: [1, 0, 0],
-  initData: new Uint8Array([12, 34, 45]), // initialization data for the new version to be pased to upgradeToAndCall()
+  initData: new Uint8Array([12, 34, 45, 85, 95, 45, 73]), // initialization data for the new version to be pased to upgradeToAndCall()
 };
 
 const daoAddressOrEns: string = "0x123123123123123123123123123123123123"; // "my-dao.eth"
