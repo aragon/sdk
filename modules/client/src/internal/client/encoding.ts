@@ -20,7 +20,7 @@ import {
   permissionWithConditionParamsToContract,
 } from "../utils";
 import { Contract } from "@ethersproject/contracts";
-import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import {
   hexToBytes,

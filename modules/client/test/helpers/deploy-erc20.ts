@@ -2,7 +2,7 @@ import { ContractFactory } from "@ethersproject/contracts";
 import { Client } from "../../src";
 import { contextParamsLocalChain } from "../integration/constants";
 import { Context } from "@aragon/sdk-client-common";
-import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 
 export function deployErc20() {
   const client = new Client(new Context(contextParamsLocalChain));
@@ -16,5 +16,5 @@ export function deployErc20() {
   );
 
   // If your contract requires constructor args, you can specify them here
-  return factory.deploy();
+  return factory.deploy("Test", "TOK");
 }

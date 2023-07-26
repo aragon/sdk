@@ -50,10 +50,16 @@ import {
   findLog,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { AmountMismatchError, FailedDepositError, NotImplementedError } from "@aragon/sdk-common";
+import {
+  AmountMismatchError,
+  FailedDepositError,
+  NotImplementedError,
+} from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract } from "@ethersproject/contracts";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
+import { BigNumber } from "@ethersproject/bignumber";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -490,4 +496,25 @@ export async function* depositErc20(
     );
   }
   yield { key: DaoDepositSteps.DONE, amount: amount };
+}
+
+export async function getCurrentAllowance(
+  signer: Signer,
+  params: {
+    tokenAddress: string;
+    daoAddressOrEns: string;
+  },
+): Promise<BigNumber> {
+  const { tokenAddress, daoAddressOrEns } = params;
+  // check current allowance
+  const tokenContract = new Contract(
+    tokenAddress,
+    ERC20_ABI,
+    signer,
+  );
+  const currentAllowance = await tokenContract.allowance(
+    await signer.getAddress(),
+    daoAddressOrEns,
+  );
+  return currentAllowance;
 }

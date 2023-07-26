@@ -26,7 +26,7 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
-import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import {
   QueryDao,
   QueryDaos,
@@ -82,6 +82,7 @@ import {
 import {
   depositErc20,
   depositErc721,
+  getCurrentAllowance,
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
@@ -282,17 +283,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           params.type === TokenType.ERC20 && params.tokenAddress &&
           params.tokenAddress !== AddressZero
         ) {
-          const { tokenAddress, daoAddressOrEns } = params;
-          // check current allowance
-          const tokenInstance = new Contract(
-            tokenAddress,
-            ERC20_ABI,
-            signer,
-          );
-          const currentAllowance = await tokenInstance.allowance(
-            await signer.getAddress(),
-            daoAddressOrEns,
-          );
+          // get current allowance
+          const currentAllowance = await getCurrentAllowance(signer, params);
           yield {
             key: DaoDepositSteps.CHECKED_ALLOWANCE,
             allowance: currentAllowance.toBigInt(),
@@ -304,8 +296,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
             yield* this.setAllowance(
               {
                 amount: params.amount,
-                spender: daoAddressOrEns,
-                tokenAddress,
+                spender: params.daoAddressOrEns,
+                tokenAddress: params.tokenAddress,
               },
             );
           }
@@ -316,7 +308,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         yield* depositErc721(signer, params);
         break;
       default:
-        throw new NotImplementedError("Token type not valid, use transfer function instead");
+        throw new NotImplementedError(
+          "Token type not valid, use transfer function instead",
+        );
     }
   }
 
