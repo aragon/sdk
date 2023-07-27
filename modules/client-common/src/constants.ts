@@ -1,12 +1,18 @@
 import { activeContractsList } from "@aragon/osx-ethers";
 import { ProposalMetadata, SupportedNetwork } from "./types";
 import { NetworkDeployment } from "./internal";
+import { Network } from "@ethersproject/networks";
 
 /** Timeout that will be applied to operations involving
  * many fetch requests that could take a long time */
 export const MULTI_FETCH_TIMEOUT = 7 * 1000;
 
-type GraphqlNetworks = "mainnet" | "goerli" | "polygon" | "mumbai";
+type GraphqlNetworks =
+  | "mainnet"
+  | "goerli"
+  | "polygon"
+  | "mumbai"
+  | "baseTestnet";
 
 const SupportedNetworksToGraphqlNetworks: {
   [K in SupportedNetwork]: GraphqlNetworks;
@@ -15,6 +21,8 @@ const SupportedNetworksToGraphqlNetworks: {
   [SupportedNetwork.GOERLI]: "goerli",
   [SupportedNetwork.POLYGON]: "polygon",
   [SupportedNetwork.MUMBAI]: "mumbai",
+  [SupportedNetwork.BASE_GOERLI]: "baseTestnet",
+//  [SupportedNetwork.LOCAL]: "" as GraphqlNetworks,
 };
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
@@ -51,6 +59,9 @@ export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
     url: getGraphqlNode(SupportedNetwork.POLYGON),
   }],
   [SupportedNetwork.MUMBAI]: [{ url: getGraphqlNode(SupportedNetwork.MUMBAI) }],
+  [SupportedNetwork.BASE_GOERLI]: [{
+    url: getGraphqlNode(SupportedNetwork.BASE_GOERLI),
+  }],
 };
 
 const IPFS_ENDPOINTS = {
@@ -82,6 +93,7 @@ export const IPFS_NODES: {
   [SupportedNetwork.GOERLI]: IPFS_ENDPOINTS.test,
   [SupportedNetwork.POLYGON]: IPFS_ENDPOINTS.prod,
   [SupportedNetwork.MUMBAI]: IPFS_ENDPOINTS.test,
+  [SupportedNetwork.BASE_GOERLI]: IPFS_ENDPOINTS.test,
 };
 
 export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
@@ -139,4 +151,25 @@ export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
     tokenVotingSetup: activeContractsList.polygon.TokenVotingSetup,
     ensRegistry: activeContractsList.polygon.ENSRegistry,
   },
+  [SupportedNetwork.BASE_GOERLI]: {
+    daoFactory: activeContractsList.baseGoerli.DAOFactory,
+    pluginSetupProcessor: activeContractsList.baseGoerli.PluginSetupProcessor,
+    multisigRepo: activeContractsList.baseGoerli["multisig-repo"],
+    adminRepo: activeContractsList.baseGoerli["admin-repo"],
+    addresslistVotingRepo:
+      activeContractsList.baseGoerli["address-list-voting-repo"],
+    tokenVotingRepo: activeContractsList.baseGoerli["token-voting-repo"],
+    multisigSetup: activeContractsList.baseGoerli.MultisigSetup,
+    adminSetup: activeContractsList.baseGoerli.AdminSetup,
+    addresslistVotingSetup:
+      activeContractsList.baseGoerli.AddresslistVotingSetup,
+    tokenVotingSetup: activeContractsList.baseGoerli.TokenVotingSetup,
+    ensRegistry: activeContractsList.baseGoerli.ENSRegistry,
+  },
 };
+export const ADDITIONAL_NETWORKS: Network[] = [
+  {
+    name: "baseGoerli",
+    chainId: 84531,
+  },
+];

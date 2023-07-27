@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@aragon/osx-ethers": "1.3.0-rc0",
-    "@aragon/sdk-client-common": "^1.2.1-rc0",
+    "@aragon/sdk-client-common": "^1.3.0-rc0",
     "@aragon/sdk-common": "^1.5.0",
     "@aragon/sdk-ipfs": "^1.1.0",
     "@ethersproject/abstract-signer": "^5.5.0",
