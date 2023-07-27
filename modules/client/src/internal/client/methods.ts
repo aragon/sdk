@@ -7,7 +7,9 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import {
+  AmountMismatchError,
   DaoCreationError,
+  FailedDepositError,
   InstallationNotFoundError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -27,6 +29,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import {
   QueryDao,
   QueryDaos,
@@ -50,6 +53,9 @@ import {
   DaoMetadata,
   DaoQueryParams,
   DaoSortBy,
+  DepositErc20Params,
+  DepositErc721Params,
+  DepositEthParams,
   DepositParams,
   HasPermissionParams,
   PluginQueryParams,
@@ -80,9 +86,6 @@ import {
   SubgraphTransferTypeMap,
 } from "../types";
 import {
-  depositErc20,
-  depositErc721,
-  getCurrentAllowance,
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
@@ -275,43 +278,134 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async *deposit(
     params: DepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
-    const signer = this.web3.getConnectedSigner();
     switch (params.type) {
       case TokenType.ERC20 || TokenType.NATIVE:
-        // check and update allowance if needed
-        if (
-          params.type === TokenType.ERC20 && params.tokenAddress &&
-          params.tokenAddress !== AddressZero
-        ) {
-          // get current allowance
-          const currentAllowance = await getCurrentAllowance(signer, params);
-          yield {
-            key: DaoDepositSteps.CHECKED_ALLOWANCE,
-            allowance: currentAllowance.toBigInt(),
-          };
-          // if its lower than the needed, set it to the correct one
-          if (currentAllowance.lt(params.amount)) {
-            // If the target is an ERC20 token, ensure that the amount can be transferred
-            // Relay the yield steps to the caller as they are received
-            yield* this.setAllowance(
-              {
-                amount: params.amount,
-                spender: params.daoAddressOrEns,
-                tokenAddress: params.tokenAddress,
-              },
-            );
-          }
-        }
-        yield* depositErc20(signer, params);
+        yield* this.depositErc20(params);
         break;
       case TokenType.ERC721:
-        yield* depositErc721(signer, params);
+        yield* this.depositErc721(params);
         break;
       default:
         throw new NotImplementedError(
           "Token type not valid, use transfer function instead",
         );
     }
+  }
+
+  private async *depositErc20(
+    params: DepositErc20Params | DepositEthParams,
+  ): AsyncGenerator<DaoDepositStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (
+      params.type === TokenType.ERC20 && params.tokenAddress &&
+      params.tokenAddress !== AddressZero
+    ) {
+      const { tokenAddress, daoAddressOrEns } = params;
+      // check current allowance
+      const tokenContract = new Contract(
+        tokenAddress,
+        ERC20_ABI,
+        signer,
+      );
+      const currentAllowance = await tokenContract.allowance(
+        await signer.getAddress(),
+        daoAddressOrEns,
+      );
+      yield {
+        key: DaoDepositSteps.CHECKED_ALLOWANCE,
+        allowance: currentAllowance.toBigInt(),
+      };
+      // if its lower than the needed, set it to the correct one
+      if (currentAllowance.lt(params.amount)) {
+        // If the target is an ERC20 token, ensure that the amount can be transferred
+        // Relay the yield steps to the caller as they are received
+        yield* this.setAllowance(
+          {
+            amount: params.amount,
+            spender: params.daoAddressOrEns,
+            tokenAddress: params.tokenAddress,
+          },
+        );
+      }
+    }
+    let tokenAddress = AddressZero;
+    if (params.type === TokenType.ERC20) {
+      tokenAddress = params.tokenAddress;
+    }
+    const {
+      amount,
+      daoAddressOrEns,
+    } = params;
+    // Doing the transfer
+    const daoInstance = DAO__factory.connect(daoAddressOrEns, signer);
+    const override: { value?: bigint } = {};
+
+    if (tokenAddress === AddressZero) {
+      // Ether
+      override.value = params.amount;
+    }
+
+    const tx = await daoInstance.deposit(
+      tokenAddress,
+      amount,
+      "",
+      override,
+    );
+    yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
+
+    const cr = await tx.wait();
+    const log = findLog(cr, daoInstance.interface, "Deposited");
+    if (!log) {
+      throw new FailedDepositError();
+    }
+
+    const daoInterface = DAO__factory.createInterface();
+    const parsedLog = daoInterface.parseLog(log);
+
+    if (!amount.toString() === parsedLog.args["amount"]) {
+      throw new AmountMismatchError(
+        amount,
+        parsedLog.args["amount"].toBigInt(),
+      );
+    }
+    yield { key: DaoDepositSteps.DONE, amount: amount };
+  }
+
+  private async *depositErc721(
+    params: DepositErc721Params,
+  ): AsyncGenerator<DaoDepositStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    const erc721Contract = new Contract(
+      params.tokenAddress,
+      ERC721_ABI,
+      signer,
+    );
+    const tx = await erc721Contract
+      ["safeTransferFrom(address,address,uint256)"](
+        await signer.getAddress(),
+        params.daoAddressOrEns,
+        params.tokenId,
+      );
+
+    const cr = await tx.wait();
+
+    const log = findLog(cr, erc721Contract.interface, "Transfer");
+
+    if (!log) {
+      throw new FailedDepositError();
+    }
+
+    const parsedLog = erc721Contract.interface.parseLog(log);
+    if (
+      !parsedLog.args["tokenId"] ||
+      parsedLog.args["tokenId"].toString() !== params.tokenId.toString()
+    ) {
+      throw new FailedDepositError();
+    }
+    yield {
+      key: DaoDepositSteps.DONE,
+      tokenId: params.tokenId,
+    };
   }
 
   /**

@@ -1,13 +1,10 @@
 import {
   ApplyUninstallationParams,
   AssetBalance,
-  DaoDepositSteps,
-  DaoDepositStepValue,
   DaoDetails,
   DaoListItem,
   DaoMetadata,
   DepositErc20Params,
-  DepositErc721Params,
   DepositEthParams,
   GrantPermissionDecodedParams,
   GrantPermissionParams,
@@ -42,24 +39,14 @@ import { defaultAbiCoder, Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { AddressZero } from "@ethersproject/constants";
-import { DAO__factory, PluginSetupProcessor } from "@aragon/osx-ethers";
+import { PluginSetupProcessor } from "@aragon/osx-ethers";
 import { PermissionIds } from "../constants";
 import {
   ApplyInstallationParams,
   DecodedApplyInstallationParams,
-  findLog,
   TokenType,
 } from "@aragon/sdk-client-common";
-import {
-  AmountMismatchError,
-  FailedDepositError,
-  NotImplementedError,
-} from "@aragon/sdk-common";
-import { Signer } from "@ethersproject/abstract-signer";
-import { Contract } from "@ethersproject/contracts";
-import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
-import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
-import { BigNumber } from "@ethersproject/bignumber";
+import { NotImplementedError } from "@aragon/sdk-common";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -417,104 +404,4 @@ export function withdrawParamsFromContract(
 
   // TODO Add ERC1155
   throw new NotImplementedError("Token standard not supported");
-}
-
-export async function* depositErc721(
-  signer: Signer,
-  params: DepositErc721Params,
-): AsyncGenerator<DaoDepositStepValue> {
-  const erc721Contract = new Contract(params.tokenAddress, ERC721_ABI, signer);
-  const tx = await erc721Contract["safeTransferFrom(address,address,uint256)"](
-    await signer.getAddress(),
-    params.daoAddressOrEns,
-    params.tokenId,
-  );
-
-  const cr = await tx.wait();
-
-  const log = findLog(cr, erc721Contract.interface, "Transfer");
-
-  if (!log) {
-    throw new FailedDepositError();
-  }
-
-  const parsedLog = erc721Contract.interface.parseLog(log);
-  if (
-    !parsedLog.args["tokenId"] ||
-    parsedLog.args["tokenId"].toString() !== params.tokenId.toString()
-  ) {
-    throw new FailedDepositError();
-  }
-  yield {
-    key: DaoDepositSteps.DONE,
-    tokenId: params.tokenId,
-  };
-}
-
-export async function* depositErc20(
-  signer: Signer,
-  params: DepositErc20Params | DepositEthParams,
-): AsyncGenerator<DaoDepositStepValue> {
-  let tokenAddress = AddressZero;
-  if (params.type === TokenType.ERC20) {
-    tokenAddress = params.tokenAddress;
-  }
-  const {
-    amount,
-    daoAddressOrEns,
-  } = params;
-  // Doing the transfer
-  const daoInstance = DAO__factory.connect(daoAddressOrEns, signer);
-  const override: { value?: bigint } = {};
-
-  if (tokenAddress === AddressZero) {
-    // Ether
-    override.value = params.amount;
-  }
-
-  const tx = await daoInstance.deposit(
-    tokenAddress,
-    amount,
-    "",
-    override,
-  );
-  yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
-
-  const cr = await tx.wait();
-  const log = findLog(cr, daoInstance.interface, "Deposited");
-  if (!log) {
-    throw new FailedDepositError();
-  }
-
-  const daoInterface = DAO__factory.createInterface();
-  const parsedLog = daoInterface.parseLog(log);
-
-  if (!amount.toString() === parsedLog.args["amount"]) {
-    throw new AmountMismatchError(
-      amount,
-      parsedLog.args["amount"].toBigInt(),
-    );
-  }
-  yield { key: DaoDepositSteps.DONE, amount: amount };
-}
-
-export async function getCurrentAllowance(
-  signer: Signer,
-  params: {
-    tokenAddress: string;
-    daoAddressOrEns: string;
-  },
-): Promise<BigNumber> {
-  const { tokenAddress, daoAddressOrEns } = params;
-  // check current allowance
-  const tokenContract = new Contract(
-    tokenAddress,
-    ERC20_ABI,
-    signer,
-  );
-  const currentAllowance = await tokenContract.allowance(
-    await signer.getAddress(),
-    daoAddressOrEns,
-  );
-  return currentAllowance;
 }
