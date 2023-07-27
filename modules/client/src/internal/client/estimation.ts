@@ -12,7 +12,7 @@ import {
 } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
-import { erc20ContractAbi } from "../abi/erc20";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import {
   CreateDaoParams,
   DepositParams,
@@ -149,7 +149,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
 
     const contract = new Contract(
       params.tokenAddress,
-      erc20ContractAbi,
+      ERC20_ABI,
       signer,
     );
     return contract.estimateGas.approve(

@@ -60,6 +60,7 @@ import {
 import { GraphQLClient } from "graphql-request";
 import { AddressZero } from "@ethersproject/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
+import { deployErc721 } from "../../helpers/deploy-erc721";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import {
@@ -195,6 +196,35 @@ describe("Client", () => {
     });
 
     describe("DAO deposit", () => {
+      it("Should allow to deposit an ERC721", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+
+        const erc721Contract = await deployErc721();
+        const tokenId = BigInt(0);
+        expect(await erc721Contract.ownerOf(tokenId)).toBe(
+          await client.web3.getConnectedSigner().getAddress(),
+        );
+        const steps = client.methods.deposit({
+          type: TokenType.ERC721,
+          daoAddressOrEns: daoAddress,
+          tokenId,
+          tokenAddress: erc721Contract.address,
+        });
+        for await (const step of steps) {
+          switch (step.key) {
+            case DaoDepositSteps.DEPOSITING:
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoDepositSteps.DONE:
+              expect(step.tokenId?.toString()).toBe(tokenId.toString());
+              break;
+          }
+        }
+        expect(
+          await erc721Contract.ownerOf(tokenId),
+        ).toBe(daoAddress);
+      });
       it("Should allow to deposit ERC20 (no prior allowance)", async () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);

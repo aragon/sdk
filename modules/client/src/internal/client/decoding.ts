@@ -28,7 +28,8 @@ import {
   IpfsError,
   resolveIpfsCid,
 } from "@aragon/sdk-common";
-import { erc20ContractAbi } from "../abi/erc20";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
 import { toUtf8String } from "@ethersproject/strings";
@@ -139,21 +140,33 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     }
 
     // ERC20 and other
-    const abiObjects = [{
-      tokenStandard: TokenType.ERC20,
-      abi: erc20ContractAbi,
-    }];
+    const abiObjects = [
+      {
+        tokenStandard: TokenType.ERC20,
+        abi: ERC20_ABI,
+        function: "transfer",
+      },
+      {
+        tokenStandard: TokenType.ERC721,
+        abi: ERC721_ABI,
+        function: "safeTransferFrom(address,address,uint256)",
+      },
+    ];
     for (const abiObject of abiObjects) {
-      const hexBytes = bytesToHex(data);
-      const iface = new Contract(AddressZero, abiObject.abi).interface;
-      const expectedFunction = iface.getFunction("transfer");
-      const result = iface.decodeFunctionData(expectedFunction, hexBytes);
-      return withdrawParamsFromContract(
-        to,
-        value,
-        result,
-        abiObject.tokenStandard,
-      );
+      try {
+        const hexBytes = bytesToHex(data);
+        const iface = new Contract(AddressZero, abiObject.abi).interface;
+        const expectedFunction = iface.getFunction(abiObject.function);
+        const result = iface.decodeFunctionData(expectedFunction, hexBytes);
+        return withdrawParamsFromContract(
+          to,
+          value,
+          result,
+          abiObject.tokenStandard,
+        );
+      } catch (e) {
+        continue;
+      }
     }
     throw new InvalidActionError();
   }

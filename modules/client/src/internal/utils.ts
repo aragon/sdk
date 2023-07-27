@@ -76,7 +76,9 @@ export function toDaoDetails(
     // TODO update when new subgraph schema is deployed
     // filter out plugins that are not applied
     plugins: dao.plugins.filter(
-      (plugin) => plugin.appliedPreparation && plugin.appliedVersion && plugin.appliedPluginRepo,
+      (plugin) =>
+        plugin.appliedPreparation && plugin.appliedVersion &&
+        plugin.appliedPluginRepo,
     )
       .map(
         (
@@ -107,21 +109,23 @@ export function toDaoListItem(
       avatar: metadata.avatar || undefined,
     },
     plugins: dao.plugins.filter(
-      (plugin) => plugin.appliedPreparation && plugin.appliedVersion && plugin.appliedPluginRepo,
+      (plugin) =>
+        plugin.appliedPreparation && plugin.appliedVersion &&
+        plugin.appliedPluginRepo,
     )
-    .map(
-      (
-        plugin: SubgraphPluginListItem,
-      ): InstalledPluginListItem => (
-        {
-          // we checked with the filter above that these are not null
-          id: `${plugin.appliedPluginRepo!.subdomain}.plugin.dao.eth`,
-          release: plugin.appliedVersion!.release.release,
-          build: plugin.appliedVersion!.build,
-          instanceAddress: plugin.appliedPreparation!.pluginAddress,
-        }
+      .map(
+        (
+          plugin: SubgraphPluginListItem,
+        ): InstalledPluginListItem => (
+          {
+            // we checked with the filter above that these are not null
+            id: `${plugin.appliedPluginRepo!.subdomain}.plugin.dao.eth`,
+            release: plugin.appliedVersion!.release.release,
+            build: plugin.appliedVersion!.build,
+            instanceAddress: plugin.appliedPreparation!.pluginAddress,
+          }
+        ),
       ),
-    ),
   };
 }
 
@@ -380,14 +384,24 @@ export function withdrawParamsFromContract(
   result: Result,
   tokenStandard: TokenType,
 ): WithdrawParams {
-  if (tokenStandard === TokenType.ERC20) {
-    return {
-      type: TokenType.ERC20,
-      tokenAddress: to,
-      recipientAddressOrEns: result[0],
-      amount: BigInt(result[1]),
-    };
+  switch (tokenStandard) {
+    case TokenType.ERC20:
+      return {
+        type: TokenType.ERC20,
+        tokenAddress: to,
+        recipientAddressOrEns: result[0],
+        amount: BigInt(result[1]),
+      };
+    case TokenType.ERC721:
+      return {
+        type: TokenType.ERC721,
+        tokenAddress: to,
+        recipientAddressOrEns: result[1],
+        tokenId: BigInt(result[2]),
+        daoAddressOrEns: result[0],
+      };
   }
-  // TODO Add ERC721 and ERC1155
-  throw new NotImplementedError("Only ERC20 tokens are supported");
+
+  // TODO Add ERC1155
+  throw new NotImplementedError("Token standard not supported");
 }

@@ -17,18 +17,19 @@ import {
   IpfsPinError,
   MissingExecPermissionError,
   NoProviderError,
+  NotImplementedError,
   PluginUninstallationPreparationError,
   promiseWithTimeout,
   resolveIpfsCid,
   UpdateAllowanceError,
-  UseTransferError,
 } from "@aragon/sdk-common";
 
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
-import { erc20ContractAbi } from "../abi/erc20";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import {
   QueryDao,
   QueryDaos,
@@ -52,6 +53,9 @@ import {
   DaoMetadata,
   DaoQueryParams,
   DaoSortBy,
+  DepositErc20Params,
+  DepositErc721Params,
+  DepositEthParams,
   DepositParams,
   HasPermissionParams,
   PluginQueryParams,
@@ -89,7 +93,6 @@ import {
   toPluginRepoListItem,
   toPluginRepoRelease,
   toTokenTransfer,
-  unwrapDepositParams,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -275,26 +278,38 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async *deposit(
     params: DepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
-    const signer = this.web3.getConnectedSigner();
-
-    if (params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20) {
-      throw new UseTransferError();
+    switch (params.type) {
+      case TokenType.ERC20 || TokenType.NATIVE:
+        yield* this.depositErc20(params);
+        break;
+      case TokenType.ERC721:
+        yield* this.depositErc721(params);
+        break;
+      default:
+        throw new NotImplementedError(
+          "Token type not valid, use transfer function instead",
+        );
     }
+  }
 
-    const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params,
-    );
-
-    if (tokenAddress && tokenAddress !== AddressZero) {
+  private async *depositErc20(
+    params: DepositErc20Params | DepositEthParams,
+  ): AsyncGenerator<DaoDepositStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    if (
+      params.type === TokenType.ERC20 && params.tokenAddress &&
+      params.tokenAddress !== AddressZero
+    ) {
+      const { tokenAddress, daoAddressOrEns } = params;
       // check current allowance
-      const tokenInstance = new Contract(
+      const tokenContract = new Contract(
         tokenAddress,
-        erc20ContractAbi,
+        ERC20_ABI,
         signer,
       );
-      const currentAllowance = await tokenInstance.allowance(
+      const currentAllowance = await tokenContract.allowance(
         await signer.getAddress(),
-        daoAddress,
+        daoAddressOrEns,
       );
       yield {
         key: DaoDepositSteps.CHECKED_ALLOWANCE,
@@ -307,26 +322,33 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         yield* this.setAllowance(
           {
             amount: params.amount,
-            spender: daoAddress,
-            tokenAddress,
+            spender: params.daoAddressOrEns,
+            tokenAddress: params.tokenAddress,
           },
         );
       }
     }
-
+    let tokenAddress = AddressZero;
+    if (params.type === TokenType.ERC20) {
+      tokenAddress = params.tokenAddress;
+    }
+    const {
+      amount,
+      daoAddressOrEns,
+    } = params;
     // Doing the transfer
-    const daoInstance = DAO__factory.connect(daoAddress, signer);
+    const daoInstance = DAO__factory.connect(daoAddressOrEns, signer);
     const override: { value?: bigint } = {};
 
     if (tokenAddress === AddressZero) {
       // Ether
-      override.value = amount;
+      override.value = params.amount;
     }
 
     const tx = await daoInstance.deposit(
       tokenAddress,
       amount,
-      reference,
+      "",
       override,
     );
     yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
@@ -349,6 +371,43 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield { key: DaoDepositSteps.DONE, amount: amount };
   }
 
+  private async *depositErc721(
+    params: DepositErc721Params,
+  ): AsyncGenerator<DaoDepositStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    const erc721Contract = new Contract(
+      params.tokenAddress,
+      ERC721_ABI,
+      signer,
+    );
+    const tx = await erc721Contract
+      ["safeTransferFrom(address,address,uint256)"](
+        await signer.getAddress(),
+        params.daoAddressOrEns,
+        params.tokenId,
+      );
+
+    const cr = await tx.wait();
+
+    const log = findLog(cr, erc721Contract.interface, "Transfer");
+
+    if (!log) {
+      throw new FailedDepositError();
+    }
+
+    const parsedLog = erc721Contract.interface.parseLog(log);
+    if (
+      !parsedLog.args["tokenId"] ||
+      parsedLog.args["tokenId"].toString() !== params.tokenId.toString()
+    ) {
+      throw new FailedDepositError();
+    }
+    yield {
+      key: DaoDepositSteps.DONE,
+      tokenId: params.tokenId,
+    };
+  }
+
   /**
    * Checks if the allowance is enough and updates it
    *
@@ -364,7 +423,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // add params check with yup
     const tokenInstance = new Contract(
       params.tokenAddress,
-      erc20ContractAbi,
+      ERC20_ABI,
       signer,
     );
     const tx: ContractTransaction = await tokenInstance.approve(

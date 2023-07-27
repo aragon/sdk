@@ -260,12 +260,6 @@ export class InvalidSubdomainError extends SdkError {
   }
 }
 
-export class UseTransferError extends SdkError {
-  constructor(cause?: Error) {
-    super("Please, use the token's transfer function directly", cause);
-  }
-}
-
 export class InvalidGasEstimationFactorError extends SdkError {
   constructor(cause?: Error) {
     super(

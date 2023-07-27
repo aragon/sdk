@@ -20,7 +20,8 @@ import {
   permissionWithConditionParamsToContract,
 } from "../utils";
 import { Contract } from "@ethersproject/contracts";
-import { erc20ContractAbi } from "../abi/erc20";
+import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import {
   hexToBytes,
   InvalidAddressError,
@@ -38,6 +39,7 @@ import {
   LIVE_CONTRACTS,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { Interface } from "@ethersproject/abi";
 
 /**
  * Encoding module the SDK Generic Client
@@ -247,7 +249,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       }
       to = resolvedAddress;
     }
-
+    let iface: Interface;
+    let data: string;
     switch (params.type) {
       case TokenType.NATIVE:
         return { to, value: params.amount, data: new Uint8Array() };
@@ -256,14 +259,38 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           throw new InvalidAddressError();
         }
 
-        const iface = new Contract(
+        iface = new Contract(
           params.tokenAddress,
-          erc20ContractAbi,
+          ERC20_ABI,
         ).interface;
-        const data = iface.encodeFunctionData("transfer", [
+        data = iface.encodeFunctionData("transfer", [
           params.recipientAddressOrEns,
           params.amount,
         ]);
+        return {
+          to: params.tokenAddress,
+          value: BigInt(0),
+          data: hexToBytes(data),
+        };
+      case TokenType.ERC721:
+        if (
+          !params.tokenAddress || !params.daoAddressOrEns ||
+          !params.recipientAddressOrEns
+        ) {
+          throw new InvalidAddressError();
+        }
+        iface = new Contract(
+          params.tokenAddress,
+          ERC721_ABI,
+        ).interface;
+        data = iface.encodeFunctionData(
+          "safeTransferFrom(address,address,uint256)",
+          [
+            params.daoAddressOrEns, // from
+            params.recipientAddressOrEns, // to
+            params.tokenId, // tokenId
+          ],
+        );
         return {
           to: params.tokenAddress,
           value: BigInt(0),
