@@ -949,7 +949,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     let version: [number, number, number];
     try {
       version = await protocolInstance.protocolVersion();
-    } catch (e: any) {
+    } catch (e) {
       // ethers5 throws an cannot estimate gas limit which could mean a lot of things
       // so this is not accurate
       version = [1, 0, 0];
