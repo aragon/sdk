@@ -3,6 +3,7 @@ import {
   DAOFactory,
   DAOFactory__factory,
   DAORegistry__factory,
+  IProtocolVersion__factory,
   PluginRepo__factory,
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
@@ -926,14 +927,33 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
     return toPluginRepo(pluginRepo, releaseMetadata, buildMetadata);
   }
+  /**
+   * Returns the protocol version of a contract
+   * if the transaction fails returns [1,0,0]
+   *
+   * @param {string} contractAddress
+   * @return {*}  {Promise<[number, number, number]>}
+   * @memberof ClientMethods
+   */
   public async getProtocolVersion(
-    daoAddress: string,
+    contractAddress: string,
   ): Promise<[number, number, number]> {
-    if (!isAddress(daoAddress)) {
+    if (!isAddress(contractAddress)) {
       throw new InvalidAddressError();
     }
     const signer = this.web3.getConnectedSigner();
-    const daoInstance = DAO__factory.connect(daoAddress, signer);
-    return daoInstance.protocolVersion();
+    const protocolInstance = IProtocolVersion__factory.connect(
+      contractAddress,
+      signer,
+    );
+    let version: [number, number, number];
+    try {
+      version = await protocolInstance.protocolVersion();
+    } catch (e: any) {
+      // ethers5 throws an cannot estimate gas limit which could mean a lot of things
+      // so this is not accurate
+      version = [1, 0, 0];
+    }
+    return version;
   }
 }

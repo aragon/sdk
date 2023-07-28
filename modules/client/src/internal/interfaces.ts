@@ -80,7 +80,7 @@ export interface IClientMethods {
   ) => AsyncGenerator<PrepareInstallationStepValue>;
     // gets the protol version of a dao
   getProtocolVersion: (
-    daoAddress: string,
+    contractAddress: string,
   ) => Promise<[number, number, number]>;
 }
 
