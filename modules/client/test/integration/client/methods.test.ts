@@ -4,6 +4,7 @@ import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
+import * as deployV1Contracts from "../../helpers/deploy-v1-contracts";
 import {
   ADDRESS_ONE,
   ADDRESS_THREE,
@@ -84,6 +85,7 @@ jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
 );
 describe("Client", () => {
   let daoAddress: string;
+  let daoAddressV1: string;
   let deployment: deployContracts.Deployment;
 
   describe("Methods Module tests", () => {
@@ -92,6 +94,7 @@ describe("Client", () => {
     beforeAll(async () => {
       server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
+      const deploymentV1 = await deployV1Contracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
@@ -100,7 +103,13 @@ describe("Client", () => {
         "test-tokenvoting-dao",
         VotingMode.STANDARD,
       );
+      const daoCreationV1 = await deployV1Contracts.createTokenVotingDAO(
+        deploymentV1,
+        "test-tokenvoting-dao",
+        VotingMode.STANDARD,
+      );
       daoAddress = daoCreation.daoAddr;
+      daoAddressV1 = daoCreationV1.daoAddr;
       LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
       LIVE_CONTRACTS.goerli.pluginSetupProcessor =
         deployment.pluginSetupProcessor.address;
@@ -1330,8 +1339,17 @@ describe("Client", () => {
         const protocolVersion = await client.methods.getProtocolVersion(
           daoAddress,
         );
-        
+
         expect(protocolVersion).toMatchObject([1, 3, 0]);
+      });
+      it("Should get the protocol version of a dao in version 1", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+        const protocolVersion = await client.methods.getProtocolVersion(
+          daoAddressV1,
+        );
+
+        expect(protocolVersion).toMatchObject([1, 0, 0]);
       });
 
       test.todo(

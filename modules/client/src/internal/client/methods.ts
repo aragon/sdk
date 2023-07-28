@@ -950,7 +950,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     try {
       version = await protocolInstance.protocolVersion();
     } catch (e) {
-      // ethers5 throws an cannot estimate gas limit which could mean a lot of things
+      // ethers5 throws an call exception error which could mean a lot of things
       // so this is not accurate
       version = [1, 0, 0];
     }
