@@ -14,6 +14,7 @@ export const web3endpoints = {
 
 export const DEFAULT_IPFS_ENDPOINTS = [
   "https://prod.ipfs.aragon.network/api/v0/",
+  "https://test.ipfs.aragon.network/api/v0/",
 ];
 
 export const TEST_ABI: MetadataAbiInput[] = [
