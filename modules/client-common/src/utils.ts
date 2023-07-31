@@ -10,6 +10,7 @@ import {
   bytesToHex,
   InvalidAddressError,
   PluginInstallationPreparationError,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import {
   MetadataAbiInput,
@@ -204,23 +205,28 @@ export async function* prepareGenericInstallation(
 export function getNetwork(networkish: Networkish): Network {
   let network: Network | undefined;
   for (const nw of ADDITIONAL_NETWORKS) {
-    if (typeof networkish === "string") {
-      if (networkish === nw.name) {
-        network = nw;
-      }
-    } else if (typeof networkish === "number") {
-      if (networkish === nw.chainId) {
-        network = nw;
-      }
-    } else if (typeof networkish === "object") {
-      if (networkish.name === nw.name && networkish.chainId === nw.chainId) {
-        network = nw;
-      }
+    switch (typeof networkish) {
+      case "string":
+        if (networkish === nw.name) {
+          network = nw;
+        }
+        break;
+      case "number":
+        if (networkish === nw.chainId) {
+          network = nw;
+        }
+        break;
+      case "object":
+        if (networkish.name === nw.name && networkish.chainId === nw.chainId) {
+          network = nw;
+        }
+        break;
+      default:
+        throw new UnsupportedNetworkError(networkish);
     }
   }
   if (!network) {
     network = ethersGetNetwork(networkish);
   }
-
   return network;
 }
