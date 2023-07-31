@@ -1,6 +1,10 @@
 import { FunctionFragment, Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
-import { Log, Networkish } from "@ethersproject/providers";
+import {
+  getNetwork as ethersGetNetwork,
+  Log,
+  Networkish,
+} from "@ethersproject/providers";
 import { ContractReceipt } from "@ethersproject/contracts";
 import {
   bytesToHex,
@@ -23,7 +27,6 @@ import { ADDITIONAL_NETWORKS, LIVE_CONTRACTS } from "./constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { isAddress } from "@ethersproject/address";
 import { Network } from "@ethersproject/networks";
-import { getNetwork as ethersGetNetwork } from "@ethersproject/providers";
 
 export function findLog(
   receipt: ContractReceipt,
@@ -215,7 +218,7 @@ export function getNetwork(networkish: Networkish): Network {
       }
     }
   }
-  if(!network){
+  if (!network) {
     network = ethersGetNetwork(networkish);
   }
 
