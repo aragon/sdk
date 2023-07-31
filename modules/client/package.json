@@ -54,6 +54,7 @@
     "ganache": "^7.5.0",
     "glob": "^8.0.3",
     "husky": "^7.0.4",
+    "osx-ethers-v1": "npm:@aragon/osx-ethers@1.2.1",
     "size-limit": "^7.0.8",
     "tsdx": "^0.14.1",
     "tslib": "^2.3.1",
