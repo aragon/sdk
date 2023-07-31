@@ -246,4 +246,31 @@ describe("Context instances", () => {
       LIVE_CONTRACTS.matic.ensRegistry,
     );
   });
+  it("Should create a context with baseGoerli as network and have the correct values", () => {
+    const contextParams = {
+      network: "baseGoerli",
+      web3Providers: "https://goerli.base.org",
+    };
+    const context = new TestContext(contextParams);
+    expect(context).toBeInstanceOf(TestContext);
+    expect(context.network.name).toBe("baseGoerli");
+    expect(context.network.chainId).toBe(84531);
+    expect(context.daoFactoryAddress).toBe(
+      LIVE_CONTRACTS.baseGoerli.daoFactory,
+    );
+    expect(context.ensRegistryAddress).toBe(
+      LIVE_CONTRACTS.baseGoerli.ensRegistry,
+    );
+    expect(context.gasFeeEstimationFactor).toBe(0.625);
+    expect(context.web3Providers.length).toBe(1);
+    for (const provider of context.web3Providers) {
+      expect(provider).toBeInstanceOf(JsonRpcProvider);
+      expect(provider.connection.url).toBe("https://goerli.base.org/");
+      provider.getNetwork().then((nw) => {
+        expect(nw.chainId).toEqual(84531);
+        expect(nw.name).toEqual("baseGoerli");
+        expect(nw.ensAddress).toEqual(LIVE_CONTRACTS.baseGoerli.ensRegistry);
+      });
+    }
+  });
 });

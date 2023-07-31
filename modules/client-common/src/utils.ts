@@ -1,11 +1,16 @@
 import { FunctionFragment, Interface } from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
-import { Log } from "@ethersproject/providers";
+import {
+  getNetwork as ethersGetNetwork,
+  Log,
+  Networkish,
+} from "@ethersproject/providers";
 import { ContractReceipt } from "@ethersproject/contracts";
 import {
   bytesToHex,
   InvalidAddressError,
   PluginInstallationPreparationError,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import {
   MetadataAbiInput,
@@ -19,9 +24,10 @@ import {
   PluginRepo__factory,
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
-import { LIVE_CONTRACTS } from "./constants";
+import { ADDITIONAL_NETWORKS, LIVE_CONTRACTS } from "./constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { isAddress } from "@ethersproject/address";
+import { Network } from "@ethersproject/networks";
 
 export function findLog(
   receipt: ContractReceipt,
@@ -194,4 +200,33 @@ export async function* prepareGenericInstallation(
     permissions: preparedSetupData.permissions,
     helpers: preparedSetupData.helpers,
   };
+}
+
+export function getNetwork(networkish: Networkish): Network {
+  let network: Network | undefined;
+  for (const nw of ADDITIONAL_NETWORKS) {
+    switch (typeof networkish) {
+      case "string":
+        if (networkish === nw.name) {
+          network = nw;
+        }
+        break;
+      case "number":
+        if (networkish === nw.chainId) {
+          network = nw;
+        }
+        break;
+      case "object":
+        if (networkish.name === nw.name && networkish.chainId === nw.chainId) {
+          network = nw;
+        }
+        break;
+      default:
+        throw new UnsupportedNetworkError(networkish);
+    }
+  }
+  if (!network) {
+    network = ethersGetNetwork(networkish);
+  }
+  return network;
 }

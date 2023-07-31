@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+- Support for baseGoerli network
+## 1.2.1-rc0
 ### Fixed
 - Default ipfs endpoints
 ## 1.2.0-rc0

@@ -12,12 +12,13 @@ import {
 import { IAddresslistVotingClientEncoding } from "../interfaces";
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { getNetwork, Networkish } from "@ethersproject/providers";
+import { Networkish } from "@ethersproject/providers";
 import { AddresslistVotingPluginInstall } from "../../types";
 import {
   ClientCore,
   DaoAction,
   getNamedTypesFromMetadata,
+  getNetwork,
   LIVE_CONTRACTS,
   PluginInstallItem,
   SupportedNetwork,

@@ -1,5 +1,4 @@
 import {
-  getNetwork,
   JsonRpcProvider,
   Network,
   Networkish,
@@ -22,6 +21,7 @@ import {
   SupportedNetworksArray,
 } from "./types";
 import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
+import { getNetwork } from "./utils";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 const supportedProtocols = ["https:"];

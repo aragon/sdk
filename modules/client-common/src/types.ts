@@ -30,6 +30,7 @@ export enum SupportedNetwork {
   GOERLI = "goerli",
   POLYGON = "matic",
   MUMBAI = "maticmum",
+  BASE_GOERLI = "baseGoerli",
 }
 
 export const SupportedNetworksArray = Object.values(SupportedNetwork);

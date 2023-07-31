@@ -16,11 +16,12 @@ import {
   tokenVotingInitParamsToContract,
 } from "../utils";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { getNetwork, Networkish } from "@ethersproject/providers";
+import { Networkish } from "@ethersproject/providers";
 import {
   ClientCore,
   DaoAction,
   getNamedTypesFromMetadata,
+  getNetwork,
   LIVE_CONTRACTS,
   PluginInstallItem,
   SupportedNetwork,

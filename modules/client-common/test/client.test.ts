@@ -69,4 +69,32 @@ describe("Test an extended client", () => {
     expect(graphqlClient).toBeDefined();
     
   });
+
+  it("Should create a client with baseGoerli context parameters", async () => {
+    const contextParams: ContextParams = {
+      network: "baseGoerli",
+      signer: new Wallet(TEST_WALLET),
+      web3Providers: "https://goerli.base.org"
+    }
+    const ctx = new TestContext(contextParams);
+    const client = new TestClient(ctx);
+    expect(client).toBeDefined();
+    expect(ctx).toBeDefined();
+    expect(client.web3).toBeDefined();
+    expect(client.ipfs).toBeDefined();
+    expect(client.graphql).toBeDefined();
+
+    const networkName = client.web3.getNetworkName()
+    expect(networkName).toBe("baseGoerli");
+    const signer = client.web3.getConnectedSigner();
+    expect(signer).toBeDefined();
+    expect(await signer.getAddress()).toBe(TEST_WALLET_ADDRESS);
+
+    const ipfsClient = client.ipfs.getClient();
+    expect(ipfsClient).toBeDefined();
+    expect(DEFAULT_IPFS_ENDPOINTS.includes(ipfsClient.url.toString())).toBe(true);
+
+    const graphqlClient = client.graphql.getClient();
+    expect(graphqlClient).toBeDefined();
+  })
 });

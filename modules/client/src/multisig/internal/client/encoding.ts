@@ -14,12 +14,13 @@ import {
 // todo fix new contracts-ethers
 import { Multisig__factory } from "@aragon/osx-ethers";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { getNetwork, Networkish } from "@ethersproject/providers";
+import { Networkish } from "@ethersproject/providers";
 import { IMultisigClientEncoding } from "../interfaces";
 import {
   ClientCore,
   DaoAction,
   getNamedTypesFromMetadata,
+  getNetwork,
   LIVE_CONTRACTS,
   PluginInstallItem,
   SupportedNetwork,
