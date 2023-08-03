@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Added
+- Support for baseMainnet network
+## 1.11.0-rc1
+### Added
 - Added `initializeFrom` encoders and decoders 
 - Support for ERC721 deposits and withdrawals
 - Added `getProtocolVersion` function
