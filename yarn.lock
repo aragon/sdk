@@ -10,10 +10,10 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aragon/osx-ethers@1.3.0-rc0.1", "@aragon/osx-ethers@^1.3.0-rc0.1":
-  version "1.3.0-rc0.1"
-  resolved "https://registry.yarnpkg.com/@aragon/osx-ethers/-/osx-ethers-1.3.0-rc0.1.tgz#d8168205d76edfae42e961d5eab5e545c1bacb99"
-  integrity sha512-KjaEoIXG6+P6cxfX2FzmlTc+A67+l44FxpnSSW0GljyI5kcdFlXIrsgOeyj8iIcKo2iHsCkPibjjNgSc3sP6QA==
+"@aragon/osx-ethers@1.3.0-rc0.2", "@aragon/osx-ethers@^1.3.0-rc0.2":
+  version "1.3.0-rc0.2"
+  resolved "https://registry.yarnpkg.com/@aragon/osx-ethers/-/osx-ethers-1.3.0-rc0.2.tgz#820f325ee8514bc6e598135bba2501f124d92d31"
+  integrity sha512-PpsmyZOBRQPElEsiLNkoGg/4j+oJn8SJC6S0oN837k5JofkleLbOdZgUmB0SHmL98hvcE157MoRZ4YM+IXbhhA==
   dependencies:
     ethers "^5.6.2"
 

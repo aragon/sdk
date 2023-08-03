@@ -12,7 +12,8 @@ type GraphqlNetworks =
   | "goerli"
   | "polygon"
   | "mumbai"
-  | "baseTestnet";
+  | "baseGoerli"
+  | "baseMainnet";
 
 const SupportedNetworksToGraphqlNetworks: {
   [K in SupportedNetwork]: GraphqlNetworks;
@@ -21,8 +22,9 @@ const SupportedNetworksToGraphqlNetworks: {
   [SupportedNetwork.GOERLI]: "goerli",
   [SupportedNetwork.POLYGON]: "polygon",
   [SupportedNetwork.MUMBAI]: "mumbai",
-  [SupportedNetwork.BASE_GOERLI]: "baseTestnet",
-//  [SupportedNetwork.LOCAL]: "" as GraphqlNetworks,
+  [SupportedNetwork.BASE_GOERLI]: "baseGoerli",
+  [SupportedNetwork.BASE]: "baseMainnet",
+  //  [SupportedNetwork.LOCAL]: "" as GraphqlNetworks,
 };
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
@@ -47,7 +49,7 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
 const getGraphqlNode = (netowrk: SupportedNetwork): string => {
   return `https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-${
     SupportedNetworksToGraphqlNetworks[netowrk]
-  }/version/v1.2.0/api`;
+  }/version/v1.2.2/api`;
 };
 
 export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
@@ -59,6 +61,7 @@ export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
     url: getGraphqlNode(SupportedNetwork.POLYGON),
   }],
   [SupportedNetwork.MUMBAI]: [{ url: getGraphqlNode(SupportedNetwork.MUMBAI) }],
+  [SupportedNetwork.BASE]: [{ url: getGraphqlNode(SupportedNetwork.BASE) }],
   [SupportedNetwork.BASE_GOERLI]: [{
     url: getGraphqlNode(SupportedNetwork.BASE_GOERLI),
   }],
@@ -93,6 +96,7 @@ export const IPFS_NODES: {
   [SupportedNetwork.GOERLI]: IPFS_ENDPOINTS.test,
   [SupportedNetwork.POLYGON]: IPFS_ENDPOINTS.prod,
   [SupportedNetwork.MUMBAI]: IPFS_ENDPOINTS.test,
+  [SupportedNetwork.BASE]: IPFS_ENDPOINTS.prod,
   [SupportedNetwork.BASE_GOERLI]: IPFS_ENDPOINTS.test,
 };
 
@@ -151,6 +155,21 @@ export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
     tokenVotingSetup: activeContractsList.polygon.TokenVotingSetup,
     ensRegistry: activeContractsList.polygon.ENSRegistry,
   },
+  [SupportedNetwork.BASE]: {
+    daoFactory: activeContractsList.baseMainnet.DAOFactory,
+    pluginSetupProcessor: activeContractsList.baseMainnet.PluginSetupProcessor,
+    multisigRepo: activeContractsList.baseMainnet["multisig-repo"],
+    adminRepo: activeContractsList.baseMainnet["admin-repo"],
+    addresslistVotingRepo:
+      activeContractsList.baseMainnet["address-list-voting-repo"],
+    tokenVotingRepo: activeContractsList.baseMainnet["token-voting-repo"],
+    multisigSetup: activeContractsList.baseMainnet.MultisigSetup,
+    adminSetup: activeContractsList.baseMainnet.AdminSetup,
+    addresslistVotingSetup:
+      activeContractsList.baseMainnet.AddresslistVotingSetup,
+    tokenVotingSetup: activeContractsList.baseMainnet.TokenVotingSetup,
+    ensRegistry: activeContractsList.baseMainnet.ENSRegistry,
+  },
   [SupportedNetwork.BASE_GOERLI]: {
     daoFactory: activeContractsList.baseGoerli.DAOFactory,
     pluginSetupProcessor: activeContractsList.baseGoerli.PluginSetupProcessor,
@@ -171,5 +190,9 @@ export const ADDITIONAL_NETWORKS: Network[] = [
   {
     name: "baseGoerli",
     chainId: 84531,
+  },
+  {
+    name: "base",
+    chainId: 8453,
   },
 ];

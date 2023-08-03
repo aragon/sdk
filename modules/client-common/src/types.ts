@@ -30,6 +30,7 @@ export enum SupportedNetwork {
   GOERLI = "goerli",
   POLYGON = "matic",
   MUMBAI = "maticmum",
+  BASE = "base",
   BASE_GOERLI = "baseGoerli",
 }
 

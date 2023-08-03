@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Added
+- Support for baseMainnet network
+## 1.3.0-rc0
+### Added
 - Support for baseGoerli network
 ## 1.2.1-rc0
 ### Fixed
