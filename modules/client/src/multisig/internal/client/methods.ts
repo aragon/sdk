@@ -48,7 +48,11 @@ import {
   QueryMultisigProposals,
   QueryMultisigVotingSettings,
 } from "../graphql-queries";
-import { computeProposalStatusFilter, toMultisigProposal, toMultisigProposalListItem } from "../utils";
+import {
+  computeProposalStatusFilter,
+  toMultisigProposal,
+  toMultisigProposalListItem,
+} from "../utils";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IMultisigClientMethods } from "../interfaces";
 import {
@@ -307,11 +311,13 @@ export class MultisigClientMethods extends ClientCore
    * Returns the voting settings
    *
    * @param {string} addressOrEns
+   * @param {number} blockNumber
    * @return {*}  {Promise<MultisigVotingSettings>}
    * @memberof MultisigClientMethods
    */
   public async getVotingSettings(
     pluginAddress: string,
+    blockNumber?: number,
   ): Promise<MultisigVotingSettings> {
     // TODO
     // update this with yup validation
@@ -321,6 +327,7 @@ export class MultisigClientMethods extends ClientCore
     const query = QueryMultisigVotingSettings;
     const params = {
       address: pluginAddress.toLowerCase(),
+      block: blockNumber ? { number: blockNumber } : null,
     };
     const name = "Multisig settings";
     type T = { multisigPlugin: SubgraphMultisigVotingSettings };

@@ -47,7 +47,10 @@ export interface IAddresslistVotingClientMethods {
   getProposals: (
     params: ProposalQueryParams,
   ) => Promise<AddresslistVotingProposalListItem[]>;
-  getVotingSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
+  getVotingSettings: (
+    pluginAddress: string,
+    blockNumber?: number,
+  ) => Promise<VotingSettings | null>;
 }
 
 export interface IAddresslistVotingClientEncoding {

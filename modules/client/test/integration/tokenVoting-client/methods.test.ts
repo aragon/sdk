@@ -887,7 +887,7 @@ describe("Token Voting Client", () => {
 
         expect(mockedClient.request).toHaveBeenCalledWith(
           QueryTokenVotingMembers,
-          { address: ADDRESS_ONE },
+          { address: ADDRESS_ONE, block: null },
         );
       });
       it("Should fetch the given proposal", async () => {
@@ -1229,7 +1229,7 @@ describe("Token Voting Client", () => {
             address: subgraphProposals[index].voters[0].voter.address,
           });
         }
-        
+
         expect(mockedClient.request).toHaveBeenCalledWith(
           QueryTokenVotingProposals,
           {
@@ -1348,7 +1348,7 @@ describe("Token Voting Client", () => {
         }
         expect(mockedClient.request).toHaveBeenCalledWith(
           QueryTokenVotingSettings,
-          { address: pluginAddress },
+          { address: pluginAddress, block: null },
         );
       });
       it("Should get the token details of a plugin given a plugin instance address", async () => {

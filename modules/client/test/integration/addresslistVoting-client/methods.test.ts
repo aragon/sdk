@@ -48,6 +48,7 @@ import {
   QueryAddresslistVotingMembers,
   QueryAddresslistVotingProposal,
   QueryAddresslistVotingProposals,
+  QueryAddresslistVotingSettings,
 } from "../../../src/addresslistVoting/internal/graphql-queries";
 import {
   SubgraphAddresslistVotingProposal,
@@ -956,6 +957,13 @@ describe("Client Address List", () => {
       expect(settings!.minParticipation).toBe(0.3);
       expect(settings!.supportThreshold).toBe(0.4);
       expect(settings!.minProposerVotingPower).toBe(BigInt(200000));
+      expect(mockedClient.request).toHaveBeenCalledWith(
+        QueryAddresslistVotingSettings,
+        {
+          address: ADDRESS_ONE,
+          block: null,
+        },
+      );
     });
   });
 });
