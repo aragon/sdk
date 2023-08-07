@@ -66,23 +66,14 @@ import { AddressZero } from "@ethersproject/constants";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 import { deployErc721 } from "../../helpers/deploy-erc721";
 import { buildMultisigDAO } from "../../helpers/build-daos";
-import { JsonRpcProvider } from "@ethersproject/providers";
 import {
   Context,
-  LIVE_CONTRACTS,
   PrepareInstallationStep,
   SortDirection,
-  SupportedNetworksArray,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../../../src/multisig/internal/constants";
 
-const NETWORK_NAME = "goerli";
-
-jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: NETWORK_NAME },
-);
 describe("Client", () => {
   let daoAddress: string;
   let daoAddressV1: string;
@@ -96,9 +87,26 @@ describe("Client", () => {
       deployment = await deployContracts.deploy();
       const deploymentV1 = await deployV1Contracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.pluginSetupProcessorAddress =
+        deployment.pluginSetupProcessor.address;
+      contextParamsLocalChain.multisigRepoAddress =
+        deployment.multisigRepo.address;
+      contextParamsLocalChain.adminRepoAddress = "";
+      contextParamsLocalChain.addresslistVotingRepoAddress =
+        deployment.addresslistVotingRepo.address;
+      contextParamsLocalChain.tokenVotingRepoAddress =
+        deployment.tokenVotingRepo.address;
+      contextParamsLocalChain.multisigSetupAddress =
+        deployment.multisigPluginSetup.address;
+      contextParamsLocalChain.adminSetupAddress = "";
+      contextParamsLocalChain.addresslistVotingSetupAddress =
+        deployment.addresslistVotingPluginSetup.address;
+      contextParamsLocalChain.tokenVotingSetupAddress =
+        deployment.tokenVotingPluginSetup.address;
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
-      const daoCreation = await deployContracts.createTokenVotingDAO(
+
+        const daoCreation = await deployContracts.createTokenVotingDAO(
         deployment,
         "test-tokenvoting-dao",
         VotingMode.STANDARD,
@@ -110,22 +118,6 @@ describe("Client", () => {
       );
       daoAddress = daoCreation.daoAddr;
       daoAddressV1 = daoCreationV1.daoAddr;
-      LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
-      LIVE_CONTRACTS.goerli.pluginSetupProcessor =
-        deployment.pluginSetupProcessor.address;
-      LIVE_CONTRACTS.goerli.multisigRepo = deployment.multisigRepo.address;
-      LIVE_CONTRACTS.goerli.adminRepo = "";
-      LIVE_CONTRACTS.goerli.addresslistVotingRepo =
-        deployment.addresslistVotingRepo.address;
-      LIVE_CONTRACTS.goerli.tokenVotingRepo =
-        deployment.tokenVotingRepo.address;
-      LIVE_CONTRACTS.goerli.multisigSetup =
-        deployment.multisigPluginSetup.address;
-      LIVE_CONTRACTS.goerli.adminSetup = "";
-      LIVE_CONTRACTS.goerli.addresslistVotingSetup =
-        deployment.addresslistVotingPluginSetup.address;
-      LIVE_CONTRACTS.goerli.tokenVotingSetup =
-        deployment.tokenVotingPluginSetup.address;
     });
 
     afterAll(async () => {
@@ -159,7 +151,7 @@ describe("Client", () => {
         };
 
         const addresslistVotingPlugin = AddresslistVotingClient.encoding
-          .getPluginInstallItem(pluginParams, NETWORK_NAME);
+          .getPluginInstallItem(pluginParams, "local");
         addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
 
         const daoCreationParams: CreateDaoParams = {
@@ -447,13 +439,6 @@ describe("Client", () => {
         const { dao } = await buildMultisigDAO(
           deployment.multisigRepo.address,
         );
-        const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
-        networkSpy.mockReturnValueOnce(
-          Promise.resolve({
-            name: "goerli",
-            chainId: 31337,
-          }),
-        );
         const steps = client.methods.prepareInstallation(
           {
             daoAddressOrEns: dao,
@@ -503,13 +488,6 @@ describe("Client", () => {
         const client = new Client(context);
         const { dao, plugin } = await buildMultisigDAO(
           deployment.multisigRepo.address,
-        );
-        const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
-        networkSpy.mockReturnValueOnce(
-          Promise.resolve({
-            name: "goerli",
-            chainId: 31337,
-          }),
         );
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),

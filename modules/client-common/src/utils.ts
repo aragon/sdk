@@ -129,14 +129,12 @@ export async function prepareGenericInstallationEstimation(
 
 export async function* prepareGenericInstallation(
   web3: IClientWeb3Core,
-  params: PrepareInstallationParams,
+  params: PrepareInstallationParams & { pluginSetupProcessorAddress: string },
 ): AsyncGenerator<PrepareInstallationStepValue> {
   const signer = web3.getConnectedSigner();
-  const provider = web3.getProvider();
   if (!isAddress(params.pluginRepo)) {
     throw new InvalidAddressError();
   }
-  const networkName = (await provider.getNetwork()).name as SupportedNetwork;
   let version = params.version;
   // if version is not specified install latest version
   if (!version) {
@@ -158,7 +156,7 @@ export async function* prepareGenericInstallation(
   );
   // connect to psp contract
   const pspContract = PluginSetupProcessor__factory.connect(
-    LIVE_CONTRACTS[networkName].pluginSetupProcessor,
+    params.pluginSetupProcessorAddress,
     signer,
   );
   const tx = await pspContract.prepareInstallation(params.daoAddressOrEns, {

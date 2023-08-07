@@ -140,9 +140,79 @@ export class Web3Module implements IClientWeb3Core {
 
   /** Returns the current DAO factory address */
   public getDaoFactoryAddress(): string {
-    if (!this.context.daoFactoryAddress) {
+    if (!this.context.daoFactoryAddress || !isAddress(this.context.daoFactoryAddress)) {
       throw new NoDaoFactory();
     }
     return this.context.daoFactoryAddress;
+  }
+
+  public getPluginSetupProcessorAddress(): string {
+    if (!this.context.pluginSetupProcessorAddress || !isAddress(this.context.pluginSetupProcessorAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.pluginSetupProcessorAddress;
+  }
+
+  public getMultisigRepoAddress(): string {
+    if (!this.context.multisigRepoAddress || !isAddress(this.context.multisigRepoAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.multisigRepoAddress;
+  }
+
+  public getAdminRepoAddress(): string {
+    if (!this.context.adminRepoAddress || !isAddress(this.context.adminRepoAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.adminRepoAddress;
+  }
+
+  public getAddresslistVotingRepoAddress(): string {
+    if(!this.context.addresslistVotingRepoAddress || !isAddress(this.context.addresslistVotingRepoAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.addresslistVotingRepoAddress;
+  }
+
+  public getTokenVotingRepoAddress(): string {
+    if (!this.context.tokenVotingRepoAddress || !isAddress(this.context.tokenVotingRepoAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.tokenVotingRepoAddress;
+  }
+
+  public getMultisigSetupAddress(): string {
+    if (!this.context.multisigSetupAddress || !isAddress(this.context.multisigSetupAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.multisigSetupAddress;
+  }
+
+  public getAdminSetupAddress(): string {
+    if (!this.context.adminSetupAddress || !isAddress(this.context.adminSetupAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.adminSetupAddress;
+  }
+
+  public getAddresslistVotingSetupAddress(): string {
+    if (!this.context.addresslistVotingSetupAddress || !isAddress(this.context.addresslistVotingSetupAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.addresslistVotingSetupAddress;
+  }
+
+  public getTokenVotingSetupAddress(): string {
+    if (!this.context.tokenVotingSetupAddress || !isAddress(this.context.tokenVotingSetupAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.tokenVotingSetupAddress;
+  }
+
+  public getEnsRegistryAddress(): string {
+    if (!this.context.ensRegistryAddress || !isAddress(this.context.ensRegistryAddress)) {
+      throw new InvalidAddressError();
+    }
+    return this.context.ensRegistryAddress;
   }
 }

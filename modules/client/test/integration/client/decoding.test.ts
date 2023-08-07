@@ -20,28 +20,28 @@ import {
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../../src";
-import { ADDRESS_ONE, ADDRESS_THREE, ADDRESS_TWO, contextParamsLocalChain } from "../constants";
+import {
+  ADDRESS_ONE,
+  ADDRESS_THREE,
+  ADDRESS_TWO,
+  contextParamsLocalChain,
+} from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
 import {
   ApplyInstallationParams,
   Context,
   PermissionOperationType,
-  SupportedNetworksArray,
   TokenType,
 } from "@aragon/sdk-client-common";
 
-jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: "goerli" },
-);
 describe("Client", () => {
   beforeAll(() => {
     contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+    contextParamsLocalChain.pluginSetupProcessorAddress = ADDRESS_TWO;
   });
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {
@@ -188,7 +188,7 @@ describe("Client", () => {
         expect(params.tokenId).toBe(BigInt(10));
         expect(params.daoAddressOrEns).toBe(
           ADDRESS_THREE,
-        )
+        );
         expect(params.recipientAddressOrEns).toBe(
           ADDRESS_TWO,
         );
@@ -539,11 +539,6 @@ describe("Client", () => {
       );
     });
     it("Should decode an apply uninstallation action", async () => {
-      const networkSpy = jest.spyOn(
-        JsonRpcProvider.prototype,
-        "network",
-        "get",
-      );
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -561,10 +556,6 @@ describe("Client", () => {
         pluginRepo: "0x2345678901234567890123456789012345678901",
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
-      networkSpy.mockReturnValueOnce({
-        name: "goerli",
-        chainId: 31337,
-      });
       const actions = client.encoding.applyUninstallationAction(
         "0x1234567890123456789012345678901234567890",
         applyUninstallationParams,
@@ -608,11 +599,6 @@ describe("Client", () => {
       }
     });
     it("Should decode an apply installation action", async () => {
-      const networkSpy = jest.spyOn(
-        JsonRpcProvider.prototype,
-        "network",
-        "get",
-      );
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -638,10 +624,6 @@ describe("Client", () => {
         pluginRepo: "0x2345678901234567890123456789012345678901",
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
-      networkSpy.mockReturnValueOnce({
-        name: "goerli",
-        chainId: 31337,
-      });
       const actions = client.encoding.applyInstallationAction(
         "0x1234567890123456789012345678901234567890",
         applyInstallationParams,

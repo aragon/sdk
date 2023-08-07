@@ -21,27 +21,27 @@ import {
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../../../src";
-import { ADDRESS_ONE, ADDRESS_THREE, ADDRESS_TWO, contextParamsLocalChain } from "../constants";
+import {
+  ADDRESS_ONE,
+  ADDRESS_THREE,
+  ADDRESS_TWO,
+  contextParamsLocalChain,
+} from "../constants";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
 import { bytesToHex } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
-import { JsonRpcProvider } from "@ethersproject/providers";
 import { AddressZero } from "@ethersproject/constants";
 import {
   ApplyInstallationParams,
   Context,
   DaoAction,
-  SupportedNetworksArray,
   TokenType,
 } from "@aragon/sdk-client-common";
 
-jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: "goerli" },
-);
 describe("Client", () => {
   beforeAll(() => {
     contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+    contextParamsLocalChain.pluginSetupProcessorAddress = ADDRESS_TWO;
   });
   describe("Action generators", () => {
     it("Should create a client and generate a native withdraw action", async () => {
@@ -401,11 +401,6 @@ describe("Client", () => {
       );
     });
     it("Should encode an applyInstallation action", async () => {
-      const networkSpy = jest.spyOn(
-        JsonRpcProvider.prototype,
-        "network",
-        "get",
-      );
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -432,10 +427,6 @@ describe("Client", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
       const daoAddress = "0x1234567890123456789012345678901234567890";
-      networkSpy.mockReturnValueOnce({
-        name: "goerli",
-        chainId: 31337,
-      });
       const actions = client.encoding.applyInstallationAction(
         daoAddress,
         applyInstallationParams,
@@ -487,11 +478,6 @@ describe("Client", () => {
       }
     });
     it("Should encode an applyUninstallation action", async () => {
-      const networkSpy = jest.spyOn(
-        JsonRpcProvider.prototype,
-        "network",
-        "get",
-      );
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -510,10 +496,6 @@ describe("Client", () => {
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
       const daoAddress = "0x1234567890123456789012345678901234567890";
-      networkSpy.mockReturnValueOnce({
-        name: "goerli",
-        chainId: 31337,
-      });
       const actions = client.encoding.applyUninstallationAction(
         daoAddress,
         applyUninstallationParams,

@@ -36,7 +36,6 @@ import {
   ApplyInstallationParams,
   ClientCore,
   DaoAction,
-  LIVE_CONTRACTS,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { Interface } from "@ethersproject/abi";
@@ -58,7 +57,6 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     if (!isAddress(daoAddress)) {
       throw new InvalidAddressError();
     }
-    const network = this.web3.getNetworkName();
     const pspInterface = PluginSetupProcessor__factory.createInterface();
 
     const args = applyInstallatonParamsToContract(params);
@@ -66,23 +64,24 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       daoAddress,
       args,
     ]);
+    const pspAddress = this.web3.getPluginSetupProcessorAddress()
     // Grant ROOT_PERMISION in the DAO to the PSP
     const grantAction = this.grantAction(daoAddress, {
       where: daoAddress,
-      who: LIVE_CONTRACTS[network].pluginSetupProcessor,
+      who: pspAddress,
       permission: Permissions.ROOT_PERMISSION,
     });
 
     // Revoke ROOT_PERMISION in the DAO to the PSP
     const revokeAction = this.revokeAction(daoAddress, {
       where: daoAddress,
-      who: LIVE_CONTRACTS[network].pluginSetupProcessor,
+      who: pspAddress,
       permission: Permissions.ROOT_PERMISSION,
     });
     return [
       grantAction,
       {
-        to: LIVE_CONTRACTS[network].pluginSetupProcessor,
+        to: pspAddress,
         value: BigInt(0),
         data: hexToBytes(hexBytes),
       },
@@ -94,30 +93,30 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: ApplyUninstallationParams,
   ): DaoAction[] {
-    const network = this.web3.getNetworkName();
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const args = applyUninstallationParamsToContract(params);
     const hexBytes = pspInterface.encodeFunctionData("applyUninstallation", [
       daoAddress,
       args,
     ]);
+    const pspAddress = this.web3.getPluginSetupProcessorAddress()
     // Grant ROOT_PERMISION in the DAO to the PSP
     const grantAction = this.grantAction(daoAddress, {
       where: daoAddress,
-      who: LIVE_CONTRACTS[network].pluginSetupProcessor,
+      who: pspAddress,
       permission: Permissions.ROOT_PERMISSION,
     });
 
     // Revoke ROOT_PERMISION in the DAO to the PSP
     const revokeAction = this.revokeAction(daoAddress, {
       where: daoAddress,
-      who: LIVE_CONTRACTS[network].pluginSetupProcessor,
+      who: pspAddress,
       permission: Permissions.ROOT_PERMISSION,
     });
     return [
       grantAction,
       {
-        to: LIVE_CONTRACTS[network].pluginSetupProcessor,
+        to: pspAddress,
         value: BigInt(0),
         data: hexToBytes(hexBytes),
       },

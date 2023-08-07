@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Added
+- Support for local chains
+## 1.4.0-rc0
+### Added
 - Support for baseMainnet network
 ## 1.3.0-rc0
 ### Added

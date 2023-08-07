@@ -13,7 +13,8 @@ type GraphqlNetworks =
   | "polygon"
   | "mumbai"
   | "baseGoerli"
-  | "baseMainnet";
+  | "baseMainnet"
+  | "local";
 
 const SupportedNetworksToGraphqlNetworks: {
   [K in SupportedNetwork]: GraphqlNetworks;
@@ -24,7 +25,7 @@ const SupportedNetworksToGraphqlNetworks: {
   [SupportedNetwork.MUMBAI]: "mumbai",
   [SupportedNetwork.BASE_GOERLI]: "baseGoerli",
   [SupportedNetwork.BASE]: "baseMainnet",
-  //  [SupportedNetwork.LOCAL]: "" as GraphqlNetworks,
+  [SupportedNetwork.LOCAL]: "local",
 };
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
@@ -65,6 +66,7 @@ export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
   [SupportedNetwork.BASE_GOERLI]: [{
     url: getGraphqlNode(SupportedNetwork.BASE_GOERLI),
   }],
+  [SupportedNetwork.LOCAL]: [{ url: getGraphqlNode(SupportedNetwork.LOCAL) }],
 };
 
 const IPFS_ENDPOINTS = {
@@ -98,6 +100,7 @@ export const IPFS_NODES: {
   [SupportedNetwork.MUMBAI]: IPFS_ENDPOINTS.test,
   [SupportedNetwork.BASE]: IPFS_ENDPOINTS.prod,
   [SupportedNetwork.BASE_GOERLI]: IPFS_ENDPOINTS.test,
+  [SupportedNetwork.LOCAL]: IPFS_ENDPOINTS.test,
 };
 
 export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
@@ -185,6 +188,19 @@ export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
     tokenVotingSetup: activeContractsList.baseGoerli.TokenVotingSetup,
     ensRegistry: activeContractsList.baseGoerli.ENSRegistry,
   },
+  [SupportedNetwork.LOCAL]: {
+    daoFactory: "",
+    pluginSetupProcessor: "",
+    multisigRepo: "",
+    adminRepo: "",
+    addresslistVotingRepo: "",
+    tokenVotingRepo: "",
+    multisigSetup: "",
+    adminSetup: "",
+    addresslistVotingSetup: "",
+    tokenVotingSetup: "",
+    ensRegistry: "",
+  },
 };
 export const ADDITIONAL_NETWORKS: Network[] = [
   {
@@ -194,5 +210,9 @@ export const ADDITIONAL_NETWORKS: Network[] = [
   {
     name: "base",
     chainId: 8453,
+  },
+  {
+    name: "local",
+    chainId: 31337,
   },
 ];

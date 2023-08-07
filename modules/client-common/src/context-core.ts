@@ -1,8 +1,4 @@
-import {
-  JsonRpcProvider,
-  Network,
-  Networkish,
-} from "@ethersproject/providers";
+import { JsonRpcProvider, Network, Networkish } from "@ethersproject/providers";
 import {
   InvalidAddressError,
   InvalidGasEstimationFactorError,
@@ -33,6 +29,15 @@ export abstract class ContextCore {
   protected state: ContextState = {} as ContextState;
   protected overriden: OverriddenState = {
     daoFactoryAddress: false,
+    pluginSetupProcessorAddress: false,
+    multisigRepoAddress: false,
+    adminRepoAddress: false,
+    addresslistVotingRepoAddress: false,
+    tokenVotingRepoAddress: false,
+    multisigSetupAddress: false,
+    adminSetupAddress: false,
+    addresslistVotingSetupAddress: false,
+    tokenVotingSetupAddress: false,
     ensRegistryAddress: false,
     gasFeeEstimationFactor: false,
     ipfsNodes: false,
@@ -86,6 +91,47 @@ export abstract class ContextCore {
       this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
       this.overriden.daoFactoryAddress = true;
     }
+    if (contextParams.pluginSetupProcessorAddress) {
+      this.state.pluginSetupProcessorAddress =
+        contextParams.pluginSetupProcessorAddress;
+      this.overriden.pluginSetupProcessorAddress = true;
+    }
+    if (contextParams.multisigRepoAddress) {
+      this.state.multisigRepoAddress = contextParams.multisigRepoAddress;
+      this.overriden.multisigRepoAddress = true;
+    }
+    if (contextParams.adminRepoAddress) {
+      this.state.adminRepoAddress = contextParams.adminRepoAddress;
+      this.overriden.adminRepoAddress = true;
+    }
+    if (contextParams.addresslistVotingRepoAddress) {
+      this.state.addresslistVotingRepoAddress =
+        contextParams.addresslistVotingRepoAddress;
+      this.overriden.addresslistVotingRepoAddress = true;
+    }
+    if (contextParams.tokenVotingRepoAddress) {
+      this.state.tokenVotingRepoAddress = contextParams.tokenVotingRepoAddress;
+      this.overriden.tokenVotingRepoAddress = true;
+    }
+    if (contextParams.multisigSetupAddress) {
+      this.state.multisigSetupAddress = contextParams.multisigSetupAddress;
+      this.overriden.multisigSetupAddress = true;
+    }
+    if (contextParams.adminSetupAddress) {
+      this.state.adminSetupAddress = contextParams.adminSetupAddress;
+      this.overriden.adminSetupAddress = true;
+    }
+    if (contextParams.addresslistVotingSetupAddress) {
+      this.state.addresslistVotingSetupAddress =
+        contextParams.addresslistVotingSetupAddress;
+      this.overriden.addresslistVotingSetupAddress = true;
+    }
+    if (contextParams.tokenVotingSetupAddress) {
+      this.state.tokenVotingSetupAddress =
+        contextParams.tokenVotingSetupAddress;
+      this.overriden.tokenVotingSetupAddress = true;
+    }
+
     if (contextParams.ensRegistryAddress) {
       this.state.ensRegistryAddress = contextParams.ensRegistryAddress;
       this.overriden.ensRegistryAddress = true;
@@ -121,6 +167,48 @@ export abstract class ContextCore {
 
     if (!this.overriden.daoFactoryAddress) {
       this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
+    }
+
+    if (!this.overriden.pluginSetupProcessorAddress) {
+      this.state.pluginSetupProcessorAddress =
+        LIVE_CONTRACTS[networkName].pluginSetupProcessor;
+    }
+
+    if (!this.overriden.multisigRepoAddress) {
+      this.state.multisigRepoAddress = LIVE_CONTRACTS[networkName].multisigRepo;
+    }
+
+    if (!this.overriden.adminRepoAddress) {
+      this.state.adminRepoAddress = LIVE_CONTRACTS[networkName].adminRepo;
+    }
+
+    if (!this.overriden.addresslistVotingRepoAddress) {
+      this.state.addresslistVotingRepoAddress =
+        LIVE_CONTRACTS[networkName].addresslistVotingRepo;
+    }
+
+    if (!this.overriden.tokenVotingRepoAddress) {
+      this.state.tokenVotingRepoAddress =
+        LIVE_CONTRACTS[networkName].tokenVotingRepo;
+    }
+
+    if (!this.overriden.multisigSetupAddress) {
+      this.state.multisigSetupAddress =
+        LIVE_CONTRACTS[networkName].multisigSetup;
+    }
+
+    if (!this.overriden.adminSetupAddress) {
+      this.state.adminSetupAddress = LIVE_CONTRACTS[networkName].adminSetup;
+    }
+
+    if (!this.overriden.addresslistVotingSetupAddress) {
+      this.state.addresslistVotingSetupAddress =
+        LIVE_CONTRACTS[networkName].addresslistVotingSetup;
+    }
+
+    if (!this.overriden.tokenVotingSetupAddress) {
+      this.state.tokenVotingSetupAddress =
+        LIVE_CONTRACTS[networkName].tokenVotingSetup;
     }
 
     if (!this.overriden.ensRegistryAddress) {
@@ -199,6 +287,96 @@ export abstract class ContextCore {
    */
   get daoFactoryAddress(): string {
     return this.state.daoFactoryAddress;
+  }
+
+  /**
+   * Getter for pluginSetupProcessorAddress property
+   * @var pluginSetupProcessorAddress
+   * @returns {string}
+   * @public
+   */
+  get pluginSetupProcessorAddress(): string {
+    return this.state.pluginSetupProcessorAddress;
+  }
+  /**
+   * Getter for multisigRepoAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get multisigRepoAddress(): string {
+    return this.state.multisigRepoAddress;
+  }
+  /**
+   * Getter for adminRepoAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get adminRepoAddress(): string {
+    return this.state.adminRepoAddress;
+  }
+  /**
+   * Getter for addresslistVotingRepoAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get addresslistVotingRepoAddress(): string {
+    return this.state.addresslistVotingRepoAddress;
+  }
+  /**
+   * Getter for tokenVotingRepoAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get tokenVotingRepoAddress(): string {
+    return this.state.tokenVotingRepoAddress;
+  }
+  /**
+   * Getter for multisigSetupAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get multisigSetupAddress(): string {
+    return this.state.multisigSetupAddress;
+  }
+  /**
+   * Getter for adminSetupAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get adminSetupAddress(): string {
+    return this.state.adminSetupAddress;
+  }
+  /**
+   * Getter for addresslistVotingSetupAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get addresslistVotingSetupAddress(): string {
+    return this.state.addresslistVotingSetupAddress;
+  }
+  /**
+   * Getter for tokenVotingSetupAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get tokenVotingSetupAddress(): string {
+    return this.state.tokenVotingSetupAddress;
   }
 
   /**

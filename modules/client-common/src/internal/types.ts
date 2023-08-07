@@ -25,9 +25,19 @@ export type Web3ContextParams = {
   signer?: Signer;
   /** Required for Ethereum connectivity to work */
   web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
-  /** If not provided uses default from LIVE_CONTRACTS in the provided network */
+  /** If any contract is not provided it will use the default from LIVE_CONTRACTS in the provided network */
+  // TODO
+  // when plugin split happens, remove this and put them on each specific context
   daoFactoryAddress?: string;
-  /** If not provided uses default from LIVE_CONTRACTS in the provided network */
+  pluginSetupProcessorAddress?: string;
+  multisigRepoAddress?: string;
+  adminRepoAddress?: string;
+  addresslistVotingRepoAddress?: string;
+  tokenVotingRepoAddress?: string;
+  multisigSetupAddress?: string;
+  adminSetupAddress?: string;
+  addresslistVotingSetupAddress?: string;
+  tokenVotingSetupAddress?: string;
   ensRegistryAddress?: string;
   /** If not provided uses default value */
   gasFeeEstimationFactor?: number;
@@ -46,6 +56,15 @@ export type Web3ContextState = {
   signer: Signer;
   // always going to exist because i'll default to LIVE_CONTRACTS
   daoFactoryAddress: string;
+  pluginSetupProcessorAddress: string;
+  multisigRepoAddress: string;
+  adminRepoAddress: string;
+  addresslistVotingRepoAddress: string;
+  tokenVotingRepoAddress: string;
+  multisigSetupAddress: string;
+  adminSetupAddress: string;
+  addresslistVotingSetupAddress: string;
+  tokenVotingSetupAddress: string;
   // may exist depending on the network
   ensRegistryAddress?: string;
   web3Providers: JsonRpcProvider[];

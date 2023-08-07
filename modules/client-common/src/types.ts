@@ -19,6 +19,15 @@ export type ContextState =
 
 export type OverriddenState = {
   daoFactoryAddress: boolean;
+  pluginSetupProcessorAddress: boolean;
+  multisigRepoAddress: boolean;
+  adminRepoAddress: boolean;
+  addresslistVotingRepoAddress: boolean;
+  tokenVotingRepoAddress: boolean;
+  multisigSetupAddress: boolean;
+  adminSetupAddress: boolean;
+  addresslistVotingSetupAddress: boolean;
+  tokenVotingSetupAddress: boolean;
   ensRegistryAddress: boolean;
   gasFeeEstimationFactor: boolean;
   ipfsNodes: boolean;
@@ -32,6 +41,7 @@ export enum SupportedNetwork {
   MUMBAI = "maticmum",
   BASE = "base",
   BASE_GOERLI = "baseGoerli",
+  LOCAL = "local",
 }
 
 export const SupportedNetworksArray = Object.values(SupportedNetwork);
