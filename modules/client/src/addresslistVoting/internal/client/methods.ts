@@ -42,9 +42,9 @@ import {
   QueryAddresslistVotingSettings,
 } from "../graphql-queries";
 import {
+  computeProposalStatusFilter,
   toAddresslistVotingProposal,
   toAddresslistVotingProposalListItem,
-  computeProposalStatusFilter
 } from "../utils";
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -498,11 +498,13 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Returns the settings of a plugin given the address of the plugin instance
    *
    * @param {string} pluginAddress
+   * @param {number} blockNumber
    * @return {*}  {(Promise<VotingSettings | null>)}
    * @memberof AddresslistVotingClientMethods
    */
   public async getVotingSettings(
     pluginAddress: string,
+    blockNumber?: number,
   ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -510,6 +512,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     const query = QueryAddresslistVotingSettings;
     const params = {
       address: pluginAddress.toLowerCase(),
+      block: blockNumber ? { number: blockNumber } : null,
     };
     const name = "AddresslistVoting settings";
     type T = { addresslistVotingPlugin: SubgraphVotingSettings };

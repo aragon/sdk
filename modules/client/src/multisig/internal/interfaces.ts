@@ -45,6 +45,7 @@ export interface IMultisigClientMethods {
   canExecute: (proposalId: string) => Promise<boolean>;
   getVotingSettings: (
     addressOrEns: string,
+    blockNumber?: number,
   ) => Promise<MultisigVotingSettings>;
   getMembers: (
     addressOrEns: string,

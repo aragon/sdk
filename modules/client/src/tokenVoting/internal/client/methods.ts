@@ -442,16 +442,21 @@ export class TokenVotingClientMethods extends ClientCore
    *
    * @async
    * @param {string} pluginAddress
+   * @param {number} blockNumber
    * @return {*}  {Promise<string[]>}
    * @memberof TokenVotingClient
    */
-  public async getMembers(pluginAddress: string): Promise<TokenVotingMember[]> {
+  public async getMembers(
+    pluginAddress: string,
+    blockNumber?: number,
+  ): Promise<TokenVotingMember[]> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
     const query = QueryTokenVotingMembers;
     const params = {
       address: pluginAddress.toLowerCase(),
+      block: blockNumber ? { number: blockNumber } : null,
     };
     const name = "TokenVoting members";
     type T = { tokenVotingPlugin: { members: SubgraphTokenVotingMember[] } };
@@ -614,11 +619,13 @@ export class TokenVotingClientMethods extends ClientCore
    * Returns the settings of a plugin given the address of the plugin instance
    *
    * @param {string} pluginAddress
+   * @param {number} blockNumber
    * @return {*}  {Promise<VotingSettings>}
    * @memberof TokenVotingClient
    */
   public async getVotingSettings(
     pluginAddress: string,
+    blockNumber?: number,
   ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -626,6 +633,7 @@ export class TokenVotingClientMethods extends ClientCore
     const query = QueryTokenVotingSettings;
     const params = {
       address: pluginAddress.toLowerCase(),
+      block: blockNumber ? { number: blockNumber } : null,
     };
     const name = "TokenVoting settings";
     type T = { tokenVotingPlugin: SubgraphVotingSettings };

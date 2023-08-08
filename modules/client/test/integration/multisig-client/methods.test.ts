@@ -391,6 +391,7 @@ describe("Client Multisig", () => {
         QueryMultisigVotingSettings,
         {
           address: ADDRESS_ONE,
+          block: null,
         },
       );
     });

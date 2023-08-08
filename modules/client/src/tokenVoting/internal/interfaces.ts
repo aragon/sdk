@@ -52,12 +52,18 @@ export interface ITokenVotingClientMethods {
   ) => AsyncGenerator<PrepareInstallationStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
-  getMembers: (addressOrEns: string) => Promise<TokenVotingMember[]>;
+  getMembers: (
+    addressOrEns: string,
+    blockNumber?: number,
+  ) => Promise<TokenVotingMember[]>;
   getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;
   getProposals: (
     params: ProposalQueryParams,
   ) => Promise<TokenVotingProposalListItem[]>;
-  getVotingSettings: (pluginAddress: string) => Promise<VotingSettings | null>;
+  getVotingSettings: (
+    pluginAddress: string,
+    blockNumber?: number,
+  ) => Promise<VotingSettings | null>;
   getToken: (
     pluginAddress: string,
   ) => Promise<

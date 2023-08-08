@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Added
+- Block param on `getVotingSettings` and `getMembers` functions to allow for historical data
+## 1.11.0-rc1
+### Added
 - Support for baseMainnet network
 ## 1.11.0-rc1
 ### Added
