@@ -20,17 +20,18 @@ export interface IClientWeb3Core {
     address: string,
     abi: ContractInterface,
   ) => Contract & T;
-  getDaoFactoryAddress: () => string;
-  getPluginSetupProcessorAddress: () => string;
-  getMultisigRepoAddress: () => string;
-  getAdminRepoAddress: () => string;
-  getAddresslistVotingRepoAddress: () => string;
-  getTokenVotingRepoAddress: () => string;
-  getMultisigSetupAddress: () => string;
-  getAdminSetupAddress: () => string;
-  getAddresslistVotingSetupAddress: () => string;
-  getTokenVotingSetupAddress: () => string;
-  getEnsRegistryAddress: () => string;
+  readonly daoFactoryAddress: string;
+  readonly pluginSetupProcessorAddress: string;
+  readonly ensRegistryAddress: string;
+  // TODO: remove these
+  readonly multisigRepoAddress: string;
+  readonly multisigSetupAddress: string;
+  readonly adminRepoAddress: string;
+  readonly adminSetupAddress: string;
+  readonly addresslistVotingRepoAddress: string;
+  readonly addresslistVotingSetupAddress: string;
+  readonly tokenVotingRepoAddress: string;
+  readonly tokenVotingSetupAddress: string;
   getApproximateGasFee: (estimatedFee: bigint) => Promise<GasFeeEstimation>;
 }
 export interface IClientIpfsCore {

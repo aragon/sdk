@@ -250,7 +250,7 @@ export class MultisigClientMethods extends ClientCore
     // todo params
     yield* prepareGenericInstallation(this.web3, {
       daoAddressOrEns: params.daoAddressOrEns,
-      pluginRepo: this.web3.getMultisigRepoAddress(),
+      pluginRepo: this.web3.multisigRepoAddress,
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: [
@@ -260,7 +260,7 @@ export class MultisigClientMethods extends ClientCore
           params.settings.votingSettings.minApprovals,
         ],
       ],
-      pluginSetupProcessorAddress: this.web3.getPluginSetupProcessorAddress(),
+      pluginSetupProcessorAddress: this.web3.pluginSetupProcessorAddress,
     });
   }
   /**

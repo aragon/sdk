@@ -64,7 +64,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       daoAddress,
       args,
     ]);
-    const pspAddress = this.web3.getPluginSetupProcessorAddress()
+    const pspAddress = this.web3.pluginSetupProcessorAddress
     // Grant ROOT_PERMISION in the DAO to the PSP
     const grantAction = this.grantAction(daoAddress, {
       where: daoAddress,
@@ -99,7 +99,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       daoAddress,
       args,
     ]);
-    const pspAddress = this.web3.getPluginSetupProcessorAddress()
+    const pspAddress = this.web3.pluginSetupProcessorAddress
     // Grant ROOT_PERMISION in the DAO to the PSP
     const grantAction = this.grantAction(daoAddress, {
       where: daoAddress,

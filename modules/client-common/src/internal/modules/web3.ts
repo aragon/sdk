@@ -6,7 +6,6 @@ import {
   CannotEstimateGasError,
   InvalidAddressError,
   InvalidContractAbiError,
-  NoDaoFactory,
   NoNodesAvailableError,
   NoProviderError,
   NoSignerError,
@@ -138,81 +137,124 @@ export class Web3Module implements IClientWeb3Core {
     });
   }
 
+  /** FRAMEWORK ADDRESSES */
   /** Returns the current DAO factory address */
-  public getDaoFactoryAddress(): string {
-    if (!this.context.daoFactoryAddress || !isAddress(this.context.daoFactoryAddress)) {
-      throw new NoDaoFactory();
-    }
-    return this.context.daoFactoryAddress;
-  }
-
-  public getPluginSetupProcessorAddress(): string {
-    if (!this.context.pluginSetupProcessorAddress || !isAddress(this.context.pluginSetupProcessorAddress)) {
+  get daoFactoryAddress(): string {
+    const daoFactoryAddress = this.context.daoFactoryAddress;
+    if (!daoFactoryAddress || !isAddress(daoFactoryAddress)) {
       throw new InvalidAddressError();
     }
-    return this.context.pluginSetupProcessorAddress;
+    return daoFactoryAddress;
   }
 
-  public getMultisigRepoAddress(): string {
-    if (!this.context.multisigRepoAddress || !isAddress(this.context.multisigRepoAddress)) {
+  /** Returns the current plugin setup processor address */
+  get pluginSetupProcessorAddress(): string {
+    const pluginSetupProcessorAddress =
+      this.context.pluginSetupProcessorAddress;
+    if (
+      !pluginSetupProcessorAddress || !isAddress(pluginSetupProcessorAddress)
+    ) {
       throw new InvalidAddressError();
     }
-    return this.context.multisigRepoAddress;
+    return pluginSetupProcessorAddress;
   }
 
-  public getAdminRepoAddress(): string {
-    if (!this.context.adminRepoAddress || !isAddress(this.context.adminRepoAddress)) {
+  /** Returns the current ens registry address */
+  get ensRegistryAddress(): string {
+    const ensRegistryAddress = this.context.ensRegistryAddress;
+    if (!ensRegistryAddress || !isAddress(ensRegistryAddress)) {
       throw new InvalidAddressError();
     }
-    return this.context.adminRepoAddress;
+    return ensRegistryAddress;
   }
 
-  public getAddresslistVotingRepoAddress(): string {
-    if(!this.context.addresslistVotingRepoAddress || !isAddress(this.context.addresslistVotingRepoAddress)) {
+  // TODO:
+  // Remove this on code split
+  /** MULTISIG PLUGIN ADDRESSES */
+  get multisigRepoAddress(): string {
+    const multisigRepoAddress = this.context.multisigRepoAddress;
+    if (!multisigRepoAddress || !isAddress(multisigRepoAddress)) {
       throw new InvalidAddressError();
     }
-    return this.context.addresslistVotingRepoAddress;
+    return multisigRepoAddress;
   }
 
-  public getTokenVotingRepoAddress(): string {
-    if (!this.context.tokenVotingRepoAddress || !isAddress(this.context.tokenVotingRepoAddress)) {
+  get multisigSetupAddress(): string {
+    const multisigSetupAddress = this.context.multisigSetupAddress;
+    if (!multisigSetupAddress || !isAddress(multisigSetupAddress)) {
       throw new InvalidAddressError();
     }
-    return this.context.tokenVotingRepoAddress;
+    return multisigSetupAddress;
+  }
+  // TODO:
+  // Remove this on code split
+  /** TOKENVOTING PLUGIN ADDRESSES */
+
+  /** Returns the current token voting repo address */
+  get tokenVotingRepoAddress(): string {
+    const tokenVotingRepoAddress = this.context.tokenVotingRepoAddress;
+    if (!tokenVotingRepoAddress || !isAddress(tokenVotingRepoAddress)) {
+      throw new InvalidAddressError();
+    }
+    return tokenVotingRepoAddress;
   }
 
-  public getMultisigSetupAddress(): string {
-    if (!this.context.multisigSetupAddress || !isAddress(this.context.multisigSetupAddress)) {
+  /** Returns the current token voting setup address */
+  get tokenVotingSetupAddress(): string {
+    const tokenVotingSetupAddress = this.context.tokenVotingSetupAddress;
+    if (!tokenVotingSetupAddress || !isAddress(tokenVotingSetupAddress)) {
       throw new InvalidAddressError();
     }
-    return this.context.multisigSetupAddress;
+    return tokenVotingSetupAddress;
   }
 
-  public getAdminSetupAddress(): string {
-    if (!this.context.adminSetupAddress || !isAddress(this.context.adminSetupAddress)) {
+  // TODO:
+  // Remove this on code split
+  /** ADDRESSLISTVOTING PLUGIN ADDRESSES */
+
+  /** Returns the current addresslist voting repo address */
+  get addresslistVotingRepoAddress(): string {
+    const addresslistVotingRepoAddress =
+      this.context.addresslistVotingRepoAddress;
+    if (
+      !addresslistVotingRepoAddress || !isAddress(addresslistVotingRepoAddress)
+    ) {
       throw new InvalidAddressError();
     }
-    return this.context.adminSetupAddress;
+    return addresslistVotingRepoAddress;
+  }
+  /** Returns the current addresslist voting setup address */
+  get addresslistVotingSetupAddress(): string {
+    const addresslistVotingSetupAddress =
+      this.context.addresslistVotingSetupAddress;
+    if (
+      !addresslistVotingSetupAddress ||
+      !isAddress(addresslistVotingSetupAddress)
+    ) {
+      throw new InvalidAddressError();
+    }
+    return addresslistVotingSetupAddress;
   }
 
-  public getAddresslistVotingSetupAddress(): string {
-    if (!this.context.addresslistVotingSetupAddress || !isAddress(this.context.addresslistVotingSetupAddress)) {
+  // TODO:
+  // Remove this on code split
+  /* ADMIN PLUGIN ADDRESSES */
+
+  /** Returns the current admin repo address */
+  get adminRepoAddress(): string {
+    const adminRepoAddress = this.context.adminRepoAddress;
+    if (!adminRepoAddress || !isAddress(adminRepoAddress)) {
       throw new InvalidAddressError();
     }
-    return this.context.addresslistVotingSetupAddress;
+    return adminRepoAddress;
   }
 
-  public getTokenVotingSetupAddress(): string {
-    if (!this.context.tokenVotingSetupAddress || !isAddress(this.context.tokenVotingSetupAddress)) {
+  /** Returns the current admin setup address */
+  get adminSetupAddress(): string {
+    const adminSetupAddress = this.context.adminSetupAddress;
+    if (!adminSetupAddress || !isAddress(adminSetupAddress)) {
       throw new InvalidAddressError();
     }
-    return this.context.tokenVotingSetupAddress;
-  }
-
-  public getEnsRegistryAddress(): string {
-    if (!this.context.ensRegistryAddress || !isAddress(this.context.ensRegistryAddress)) {
-      throw new InvalidAddressError();
-    }
-    return this.context.ensRegistryAddress;
+    return adminSetupAddress;
   }
 }

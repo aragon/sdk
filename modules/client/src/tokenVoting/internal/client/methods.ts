@@ -267,11 +267,11 @@ export class TokenVotingClientMethods extends ClientCore
     }
     yield* prepareGenericInstallation(this.web3, {
       daoAddressOrEns: params.daoAddressOrEns,
-      pluginRepo: this.web3.getTokenVotingRepoAddress(),
+      pluginRepo: this.web3.tokenVotingRepoAddress,
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: tokenVotingInitParamsToContract(params.settings),
-      pluginSetupProcessorAddress: this.web3.getPluginSetupProcessorAddress(),
+      pluginSetupProcessorAddress: this.web3.pluginSetupProcessorAddress,
     });
   }
 
