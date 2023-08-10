@@ -383,6 +383,7 @@ export function withdrawParamsFromContract(
   _value: bigint,
   result: Result,
   tokenStandard: TokenType,
+  isBatch: boolean,
 ): WithdrawParams {
   switch (tokenStandard) {
     case TokenType.ERC20:
@@ -400,8 +401,24 @@ export function withdrawParamsFromContract(
         tokenId: BigInt(result[2]),
         daoAddressOrEns: result[0],
       };
+    case TokenType.ERC1155:
+      let tokenIds: bigint[], amounts: bigint[];
+      if (isBatch) {
+        tokenIds = result[2].map((id: string) => BigInt(id));
+        amounts = result[3].map((amount: string) => BigInt(amount));
+      } else {
+        tokenIds = [BigInt(result[2])];
+        amounts = [BigInt(result[3])];
+      }
+      return {
+        type: TokenType.ERC1155,
+        tokenAddress: to,
+        recipientAddressOrEns: result[1],
+        tokenIds,
+        amounts,
+        daoAddressOrEns: result[0],
+      };
   }
 
-  // TODO Add ERC1155
   throw new NotImplementedError("Token standard not supported");
 }

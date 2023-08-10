@@ -143,10 +143,18 @@ export type DepositErc721Params = DepositBaseParams & {
   tokenId: bigint;
 };
 
+export type DepositErc1155Params = DepositBaseParams & {
+  type: TokenType.ERC1155;
+  tokenAddress: string;
+  tokenIds: bigint[];
+  amounts: bigint[];
+};
+
 export type DepositParams =
   | DepositEthParams
   | DepositErc20Params
-  | DepositErc721Params;
+  | DepositErc721Params
+  | DepositErc1155Params;
 
 export enum DaoDepositSteps {
   CHECKED_ALLOWANCE = "checkedAllowance",
@@ -158,7 +166,13 @@ export type DaoDepositStepValue =
   | SetAllowanceStepValue
   | { key: DaoDepositSteps.CHECKED_ALLOWANCE; allowance: bigint }
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
-  | { key: DaoDepositSteps.DONE; amount?: bigint, tokenId?: bigint }
+  | {
+    key: DaoDepositSteps.DONE;
+    amount?: bigint;
+    tokenId?: bigint;
+    tokenIds?: bigint[];
+    amounts?: bigint[];
+  };
 
 /* Withdrawals */
 type WithdrawParamsBase = {
@@ -183,10 +197,19 @@ type WithdrawErc721Params = WithdrawParamsBase & {
   daoAddressOrEns: string;
 };
 
+type WithdrawErc1155Params = WithdrawParamsBase & {
+  type: TokenType.ERC1155;
+  daoAddressOrEns: string;
+  tokenAddress: string;
+  tokenIds: bigint[];
+  amounts: bigint[];
+};
+
 export type WithdrawParams =
   | WithdrawEthParams
   | WithdrawErc20Params
-  | WithdrawErc721Params;
+  | WithdrawErc721Params
+  | WithdrawErc1155Params;
 
 /* Balances */
 type AssetBalanceBase = {

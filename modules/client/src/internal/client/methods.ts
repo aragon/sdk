@@ -23,6 +23,7 @@ import {
   PluginUninstallationPreparationError,
   promiseWithTimeout,
   resolveIpfsCid,
+  SizeMismatchError,
   UpdateAllowanceError,
 } from "@aragon/sdk-common";
 
@@ -32,6 +33,7 @@ import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
+import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
 import {
   QueryDao,
   QueryDaos,
@@ -55,6 +57,7 @@ import {
   DaoMetadata,
   DaoQueryParams,
   DaoSortBy,
+  DepositErc1155Params,
   DepositErc20Params,
   DepositErc721Params,
   DepositEthParams,
@@ -123,6 +126,7 @@ import {
   SortDirection,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { InvalidParameter } from "@aragon/sdk-common";
 
 /**
  * Methods module the SDK Generic Client
@@ -289,6 +293,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       case TokenType.ERC721:
         yield* this.depositErc721(params);
         break;
+      case TokenType.ERC1155:
+        yield* this.depositErc1155(params);
+        break;
       default:
         throw new NotImplementedError(
           "Token type not valid, use transfer function instead",
@@ -409,6 +416,74 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield {
       key: DaoDepositSteps.DONE,
       tokenId: params.tokenId,
+    };
+  }
+
+  private async *depositErc1155(
+    params: DepositErc1155Params,
+  ): AsyncGenerator<DaoDepositStepValue> {
+    // if length is 0, throw
+    if (!params.tokenIds.length || !params.amounts.length) {
+      throw new InvalidParameter("tokenIds or amounts cannot be empty");
+    }
+    // if tokenIds and amounts length are different, throw
+    if (
+      params.tokenIds.length !== params.amounts.length
+    ) {
+      throw new SizeMismatchError();
+    }
+
+    const signer = this.web3.getConnectedSigner();
+    const erc1155Contract = new Contract(
+      params.tokenAddress,
+      ERC1155_ABI,
+      signer,
+    );
+
+    let tx: ContractTransaction, logName: string, logArg: string;
+    if (params.tokenIds.length === 1) {
+      tx = await erc1155Contract
+        ["safeTransferFrom(address,address,uint256,uint256,bytes)"](
+          await signer.getAddress(),
+          params.daoAddressOrEns,
+          params.tokenIds[0],
+          params.amounts[0],
+          new Uint8Array([]),
+        );
+      logName = "TransferSingle";
+      logArg = "id"
+    } else {
+      tx = await erc1155Contract
+        ["safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)"](
+          await signer.getAddress(),
+          params.daoAddressOrEns,
+          params.tokenIds,
+          params.amounts,
+          new Uint8Array([]),
+        );
+      logName = "TransferBatch";
+      logArg = "ids"
+    }
+
+    const cr = await tx.wait();
+
+    const log = findLog(cr, erc1155Contract.interface, logName);
+
+    if (!log) {
+      throw new FailedDepositError();
+    }
+
+    const parsedLog = erc1155Contract.interface.parseLog(log);
+    if (
+      !parsedLog.args[logArg] ||
+      parsedLog.args[logArg].toString() !== params.tokenIds.toString()
+    ) {
+      throw new FailedDepositError();
+    }
+    yield {
+      key: DaoDepositSteps.DONE,
+      tokenIds: params.tokenIds,
+      amounts: params.amounts,
     };
   }
 

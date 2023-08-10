@@ -111,6 +111,31 @@ describe("Client", () => {
         "0x42842e0e00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a",
       );
     });
+    it("Should create a client and generate an ERC1155 withdraw action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const withdrawParams: WithdrawParams = {
+        type: TokenType.ERC1155,
+        tokenAddress: ADDRESS_ONE,
+        recipientAddressOrEns: ADDRESS_TWO,
+        daoAddressOrEns: ADDRESS_THREE,
+        tokenIds: [BigInt(10)],
+        amounts: [BigInt(20)],
+      };
+
+      const withdrawAction = await client.encoding.withdrawAction(
+        withdrawParams,
+      );
+
+      expect(typeof withdrawAction).toBe("object");
+      expect(withdrawAction.data).toBeInstanceOf(Uint8Array);
+      expect(withdrawAction.to).toBe(withdrawParams.tokenAddress);
+      expect(withdrawAction.value).toBe(BigInt(0));
+      expect(bytesToHex(withdrawAction.data)).toBe(
+        "0xf242432a00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000",
+      );
+    });
     it("Should create a client and generate a grant action", () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
