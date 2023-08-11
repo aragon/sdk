@@ -287,7 +287,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     params: DepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     switch (params.type) {
-      case TokenType.ERC20 || TokenType.NATIVE:
+      case TokenType.NATIVE:
+      case TokenType.ERC20:
         yield* this.depositErc20(params);
         break;
       case TokenType.ERC721:

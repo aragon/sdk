@@ -4,7 +4,9 @@ import {
   DaoDetails,
   DaoListItem,
   DaoMetadata,
+  DepositErc1155Params,
   DepositErc20Params,
+  DepositErc721Params,
   DepositEthParams,
   GrantPermissionDecodedParams,
   GrantPermissionParams,
@@ -39,14 +41,19 @@ import { defaultAbiCoder, Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { AddressZero } from "@ethersproject/constants";
-import { PluginSetupProcessor } from "@aragon/osx-ethers";
+import { DAO__factory, PluginSetupProcessor } from "@aragon/osx-ethers";
 import { PermissionIds } from "../constants";
 import {
   ApplyInstallationParams,
   DecodedApplyInstallationParams,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { NotImplementedError } from "@aragon/sdk-common";
+import { InvalidParameter, NotImplementedError, SizeMismatchError } from "@aragon/sdk-common";
+import { Signer } from "@ethersproject/abstract-signer";
+import { Contract } from "@ethersproject/contracts";
+import { BigNumber } from "@ethersproject/bignumber";
+import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
+import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -419,6 +426,82 @@ export function withdrawParamsFromContract(
         daoAddressOrEns: result[0],
       };
   }
-
   throw new NotImplementedError("Token standard not supported");
+}
+
+export async function estimateErc20Deposit(
+  signer: Signer,
+  params: DepositErc20Params | DepositEthParams,
+): Promise<BigNumber> {
+  let tokenAddress;
+  if (params.type === TokenType.NATIVE) {
+    tokenAddress = AddressZero;
+  } else {
+    tokenAddress = params.tokenAddress;
+  }
+  const daoInstance = DAO__factory.connect(params.daoAddressOrEns, signer);
+  return await daoInstance.estimateGas.deposit(
+    tokenAddress,
+    params.amount,
+    "",
+  );
+}
+
+export async function estimateErc721Deposit(
+  signer: Signer,
+  params: DepositErc721Params,
+): Promise<BigNumber> {
+  const erc721Contract = new Contract(
+    params.tokenAddress,
+    ERC721_ABI,
+    signer,
+  );
+  return erc721Contract.estimateGas
+    ["safeTransferFrom(address,address,uint256)"](
+      await signer.getAddress(),
+      params.daoAddressOrEns,
+      params.tokenId,
+    );
+}
+
+export async function estimateErc1155Deposit(
+  signer: Signer,
+  params: DepositErc1155Params,
+): Promise<BigNumber> {
+  // if length is 0, throw
+  if (!params.tokenIds.length || !params.amounts.length) {
+    throw new InvalidParameter("tokenIds or amounts cannot be empty");
+  }
+  // if tokenIds and amounts length are different, throw
+  if (
+    params.tokenIds.length !== params.amounts.length
+  ) {
+    throw new SizeMismatchError();
+  }
+  const erc1155Contract = new Contract(
+    params.tokenAddress,
+    ERC1155_ABI,
+    signer,
+  );
+  let estimation: BigNumber;
+  if (params.tokenIds.length === 1) {
+    estimation = await erc1155Contract.estimateGas
+      ["safeTransferFrom(address,address,uint256,uint256,bytes)"](
+        await signer.getAddress(),
+        params.daoAddressOrEns,
+        params.tokenIds[0],
+        params.amounts[0],
+        new Uint8Array(0),
+      );
+  } else {
+    estimation = await erc1155Contract.estimateGas
+      ["safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)"](
+        await signer.getAddress(),
+        params.daoAddressOrEns,
+        params.tokenIds,
+        params.amounts,
+        new Uint8Array(0),
+      );
+  }
+  return estimation;
 }
