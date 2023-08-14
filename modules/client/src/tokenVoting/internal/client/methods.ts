@@ -776,7 +776,6 @@ export class TokenVotingClientMethods extends ClientCore
       ERC165_ABI,
       signer,
     );
-    // TODO: check if is a contract
     try {
       if (!await contract.supportsInterface(ERC165_INTERFACE_ID)) {
         throw new ERC165NotSupportedError();
