@@ -80,6 +80,7 @@ export interface ITokenVotingClientMethods {
     tokenAddress: string,
   ) => AsyncGenerator<UndelegateTokensStepValue>;
   getDelegatee: (tokenAddress: string) => Promise<string | null>;
+  isTokenGovernanceCompatible: (tokenAddress: string) => Promise<boolean>;
 }
 
 export interface ITokenVotingClientEncoding {

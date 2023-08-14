@@ -71,7 +71,8 @@
     "@ethersproject/contracts": "^5.5.0",
     "@ethersproject/providers": "^5.5.0",
     "@ethersproject/wallet": "^5.6.0",
-    "@openzeppelin/contracts": "^4.9.2",
+    "@openzeppelin/contracts": "^4.8.1",
+    "@openzeppelin/contracts-upgradeable": "^4.8.1",
     "graphql": "^16.5.0",
     "graphql-request": "^4.3.0"
   },

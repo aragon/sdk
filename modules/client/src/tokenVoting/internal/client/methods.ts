@@ -97,7 +97,16 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "@aragon/sdk-client-common";
-import { INSTALLATION_ABI } from "../constants";
+import {
+  GOVERNANCE_INTERFACES_SUPPORTED,
+  INSTALLATION_ABI,
+  TOKEN_INTERFACES_REQUIRED,
+  // SUPPORTED_GOVERNANCE_TOKEN_INTERFACES,
+} from "../constants";
+// import { abi as ERC20_VOTES_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
+import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
+import { Contract } from "@ethersproject/contracts";
+
 /**
  * Methods module the SDK TokenVoting Client
  */
@@ -739,5 +748,60 @@ export class TokenVotingClientMethods extends ClientCore
       };
     }
     return null;
+  }
+
+  /**
+   *Check valid address
+   chck if its a contract, if not return message
+   if is contract, check if it supports ERC165
+   if erc165 is true,
+   - check if ERC20 or ERCUpgradeable
+   CHECK: 
+    IVotes or
+    IVotesUpgradeable or
+    GovernaceErc20 or
+    GovernaceWrappedErc20 or
+   *
+   * @param {string} tokenAddress
+   * @return {*}  {Promise<boolean>}
+   * @memberof TokenVotingClientMethods
+   */
+  public async isTokenGovernanceCompatible(
+    tokenAddress: string,
+  ): Promise<boolean> {
+    const signer = this.web3.getConnectedSigner();
+    if(!isAddress(tokenAddress)) {
+      throw new InvalidAddressError();
+    }
+    const provider = this.web3.getProvider();
+    if (await provider.getCode(tokenAddress) === "0x") {
+      throw new Error("not a contract");
+    }
+    const contract = new Contract(
+      tokenAddress,
+      ERC165_ABI,
+      signer,
+    );
+      // TODO: check if is a contract
+    try {
+      for (const iface of TOKEN_INTERFACES_REQUIRED) {
+        const isSupported = await contract.supportsInterface(iface);
+        if (!isSupported) {
+          // TODO: throw a custom error
+          throw new Error();
+        }
+      }
+      for (const iface of GOVERNANCE_INTERFACES_SUPPORTED) {
+        const isSupported = await contract.supportsInterface(iface);
+        if (isSupported) {
+          return true;
+        }
+      }
+    // TODO: throw a custom error
+      throw new Error();
+    } catch {
+      // if it thorws, means it does not impolement The ERC165 interface
+      throw new Error();
+    }
   }
 }

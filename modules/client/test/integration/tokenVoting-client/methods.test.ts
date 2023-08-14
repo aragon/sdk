@@ -1426,6 +1426,36 @@ describe("Token Voting Client", () => {
         const token = await client.methods.getToken(pluginAddress);
         expect(token).toBe(null);
       });
+
+      it("Should check if a ERC20 is compatible with governance and return false", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        const erc20Token = await deployErc20();
+        expect(() =>
+          client.methods.isTokenGovernanceCompatible(
+            erc20Token.address,
+          )
+        ).rejects.toThrow();
+      });
+      it("Should check if ERC721 is compatible with governance and return false", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        const erc721Token = await deployErc721();
+        expect(() =>
+          client.methods.isTokenGovernanceCompatible(
+            erc721Token.address,
+          )
+        ).rejects.toThrow();
+      });
+      it("Should check if GovernanceERC20 is compatible with governance and return true", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        const dao = await buildTokenVotingDAO(repoAddr, VotingMode.STANDARD);
+        const isCompatible = await client.methods.isTokenGovernanceCompatible(
+          dao.tokenAddress,
+        );
+        expect(isCompatible).toBe(true);
+      });
     });
   });
 });
