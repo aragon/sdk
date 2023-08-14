@@ -8,8 +8,8 @@ export function isProposalId(propoosalId: string): boolean {
 export function getInterfaceId(iface: Interface): string {
   let interfaceId = Zero;
   const functions: string[] = Object.keys(iface.functions);
-  for (let i = 0; i < functions.length; i++) {
-    interfaceId = interfaceId.xor(iface.getSighash(functions[i]));
+  for (const func of functions) {
+    interfaceId = interfaceId.xor(iface.getSighash(func));
   }
   return interfaceId.toHexString();
 }

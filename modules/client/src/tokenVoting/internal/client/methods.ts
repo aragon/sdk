@@ -4,7 +4,10 @@ import {
   decodeProposalId,
   decodeRatio,
   encodeProposalId,
+  ERC165NotSupportedError,
+  ERC20NotSupportedError,
   getExtendedProposalId,
+  GoveranceNotSupportedError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -12,6 +15,7 @@ import {
   IpfsPinError,
   isProposalId,
   NoProviderError,
+  NotAContractError,
   promiseWithTimeout,
   ProposalCreationError,
   resolveIpfsCid,
@@ -102,16 +106,9 @@ import {
   ERC20_INTERFACE_ID,
   GOVERNANCE_INTERFACES_SUPPORTED,
   INSTALLATION_ABI,
-  TOKEN_INTERFACES_REQUIRED,
-  // SUPPORTED_GOVERNANCE_TOKEN_INTERFACES,
 } from "../constants";
-// import { abi as ERC20_VOTES_ABI } from "@openzeppelin/contracts/build/contracts/ERC20Votes.json";
 import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
 import { Contract } from "@ethersproject/contracts";
-import { ERC165NotSupportedError } from "@aragon/sdk-common";
-import { ERC20NotSupportedError } from "@aragon/sdk-common";
-import { GoveranceNotSupportedError } from "@aragon/sdk-common";
-import { NotAContractError } from "@aragon/sdk-common";
 
 /**
  * Methods module the SDK TokenVoting Client

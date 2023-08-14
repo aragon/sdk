@@ -28,7 +28,6 @@ import { ADDITIONAL_NETWORKS, LIVE_CONTRACTS } from "./constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { isAddress } from "@ethersproject/address";
 import { Network } from "@ethersproject/networks";
-import { Zero } from "@ethersproject/constants";
 
 export function findLog(
   receipt: ContractReceipt,
@@ -228,13 +227,4 @@ export function getNetwork(networkish: Networkish): Network {
     network = ethersGetNetwork(networkish);
   }
   return network;
-}
-
-export function getInterfaceId(iface: Interface): string {
-  let interfaceId = Zero;
-  const functions: string[] = Object.keys(iface.functions);
-  for (let i = 0; i < functions.length; i++) {
-    interfaceId = interfaceId.xor(iface.getSighash(functions[i]));
-  }
-  return interfaceId.toHexString();
 }
