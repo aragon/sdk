@@ -76,6 +76,7 @@ import {
   SubgraphTokenVotingProposalListItem,
 } from "../../../src/tokenVoting/internal/types";
 import { deployErc20 } from "../../helpers/deploy-erc20";
+import { deployErc721 } from "../../helpers/deploy-erc721";
 import {
   GovernanceERC20__factory,
   GovernanceWrappedERC20__factory,
