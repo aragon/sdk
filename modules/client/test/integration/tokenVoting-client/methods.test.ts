@@ -1438,7 +1438,7 @@ describe("Token Voting Client", () => {
           client.methods.isTokenGovernanceCompatible(
             erc20Token.address,
           )
-        ).rejects.toThrow(new ERC165NotSupportedError());
+        ).rejects.toThrow(ERC165NotSupportedError)
       });
       it("Should check if ERC721 is compatible with governance and throw", async () => {
         const ctx = new Context(contextParamsLocalChain);
@@ -1448,7 +1448,7 @@ describe("Token Voting Client", () => {
           client.methods.isTokenGovernanceCompatible(
             erc721Token.address,
           )
-        ).rejects.toThrow(new ERC20NotSupportedError());
+        ).rejects.toThrow(ERC20NotSupportedError);
       });
       it("Should check if GovernanceERC20 is compatible with governance and return true", async () => {
         const ctx = new Context(contextParamsLocalChain);

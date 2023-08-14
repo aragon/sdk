@@ -790,7 +790,13 @@ export class TokenVotingClientMethods extends ClientCore
         }
       }
       throw new GoveranceNotSupportedError();
-    } catch {
+    } catch (e) {
+      if (
+        e instanceof GoveranceNotSupportedError ||
+        e instanceof ERC20NotSupportedError
+      ) {
+        throw e;
+      }
       throw new ERC165NotSupportedError();
     }
   }
