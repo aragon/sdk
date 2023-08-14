@@ -276,3 +276,36 @@ export class InvalidParameter extends SdkError {
     );
   }
 }
+export class NotAContractError extends SdkError {
+  constructor(cause?: Error) {
+    super(
+      "The provided address does not point to a contract or the contract is not deployed",
+      cause,
+    );
+  }
+}
+
+export class ERC165NotSupportedError extends SdkError {
+  constructor(cause?: Error) {
+    super(
+      "ERC165 is not supported by the contract at the provided address",
+      cause,
+    );
+  }
+}
+export class ERC20NotSupportedError extends SdkError {
+  constructor(cause?: Error) {
+    super(
+      "ERC20 is not supported by the contract at the provided address",
+      cause,
+    );
+  }
+}
+export class GoveranceNotSupportedError extends SdkError {
+  constructor(cause?: Error) {
+    super(
+      "The contract at the provided address does not support governance",
+      cause,
+    );
+  }
+}

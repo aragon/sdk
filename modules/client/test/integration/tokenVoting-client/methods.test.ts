@@ -31,6 +31,8 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 
 import {
+  ERC165NotSupportedError,
+  ERC20NotSupportedError,
   getExtendedProposalId,
   InvalidAddressOrEnsError,
 } from "@aragon/sdk-common";
@@ -1427,7 +1429,7 @@ describe("Token Voting Client", () => {
         expect(token).toBe(null);
       });
 
-      it("Should check if a ERC20 is compatible with governance and return false", async () => {
+      it("Should check if a ERC20 is compatible with governance and throw", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const erc20Token = await deployErc20();
@@ -1435,9 +1437,9 @@ describe("Token Voting Client", () => {
           client.methods.isTokenGovernanceCompatible(
             erc20Token.address,
           )
-        ).rejects.toThrow();
+        ).rejects.toThrow(new ERC165NotSupportedError());
       });
-      it("Should check if ERC721 is compatible with governance and return false", async () => {
+      it("Should check if ERC721 is compatible with governance and throw", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const erc721Token = await deployErc721();
@@ -1445,7 +1447,7 @@ describe("Token Voting Client", () => {
           client.methods.isTokenGovernanceCompatible(
             erc721Token.address,
           )
-        ).rejects.toThrow();
+        ).rejects.toThrow(new ERC20NotSupportedError());
       });
       it("Should check if GovernanceERC20 is compatible with governance and return true", async () => {
         const ctx = new Context(contextParamsLocalChain);

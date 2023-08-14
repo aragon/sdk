@@ -124,10 +124,12 @@ export const ERC20_FUNCTIONS = [
   "function allowance(address _owner, address _spender) public view returns (uint256 remaining)",
 ];
 
-export const TOKEN_INTERFACES_REQUIRED = [
-  getInterfaceId(new Interface(ERC165_ABI)),
-  getInterfaceId(new Interface(ERC20_FUNCTIONS)),
-];
+export const ERC20_INTERFACE_ID = getInterfaceId(
+  new Interface(ERC20_FUNCTIONS),
+);
+export const ERC165_INTERFACE_ID = getInterfaceId(
+  new Interface(ERC165_ABI),
+);
 
 export const GOVERNANCE_INTERFACES_SUPPORTED = [
   getInterfaceId(new Interface(IVOTES_UPGRADEABLE_ABI)),
