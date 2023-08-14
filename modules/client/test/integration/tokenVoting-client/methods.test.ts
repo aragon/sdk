@@ -34,7 +34,9 @@ import {
   ERC165NotSupportedError,
   ERC20NotSupportedError,
   getExtendedProposalId,
+  InvalidAddressError,
   InvalidAddressOrEnsError,
+  NotAContractError,
 } from "@aragon/sdk-common";
 import {
   ADDRESS_FOUR,
@@ -1449,6 +1451,24 @@ describe("Token Voting Client", () => {
             erc721Token.address,
           )
         ).rejects.toThrow(ERC20NotSupportedError);
+      });
+      it("Should be called with an invalid address and throw", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        expect(() =>
+          client.methods.isTokenGovernanceCompatible(
+            "0x123",
+          )
+        ).rejects.toThrow(InvalidAddressError);
+      });
+      it("Should be called with wallet invalid address and throw", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        expect(() =>
+          client.methods.isTokenGovernanceCompatible(
+            TEST_WALLET_ADDRESS,
+          )
+        ).rejects.toThrow(NotAContractError);
       });
       it("Should check if GovernanceERC20 is compatible with governance and return true", async () => {
         const ctx = new Context(contextParamsLocalChain);

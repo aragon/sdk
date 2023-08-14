@@ -764,10 +764,12 @@ export class TokenVotingClientMethods extends ClientCore
     tokenAddress: string,
   ): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
+    // check if is address
     if (!isAddress(tokenAddress)) {
       throw new InvalidAddressError();
     }
     const provider = this.web3.getProvider();
+    // check if is a contract
     if (await provider.getCode(tokenAddress) === "0x") {
       throw new NotAContractError();
     }
