@@ -21,7 +21,7 @@ TEMPLATE:
 - Block param on `getVotingSettings` and `getMembers` functions to allow for historical data
 - Support for local chains
 - Support for ERC1155 deposits and withdrawals
-- `isTokenGovernanceCompatible` function
+- `isTokenVotingCompatibleToken` function
 ## [1.12.0-rc1]
 ### Added
 - Support for baseMainnet network
