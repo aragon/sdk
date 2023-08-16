@@ -206,7 +206,7 @@ describe("Client", () => {
       }
     });
       it("Should decode an encoded withdraw action of an erc1155 token", async () => {
-        // encoded withdraw erc1155 acttion data
+        // encoded withdraw erc1155 action data
         // type: ERC1155
         // tokenAddress: 0x000000000000000000000000000000000001
         // recipientAddressOrEns: 0x000000000000000000000000000000000002
