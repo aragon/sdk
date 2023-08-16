@@ -14,18 +14,8 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 import { deployErc20 } from "../../helpers/deploy-erc20";
-import {
-  Context,
-  SupportedNetworksArray,
-  TokenType,
-} from "@aragon/sdk-client-common";
+import { Context, TokenType } from "@aragon/sdk-client-common";
 
-const NETWORK_NAME = "goerli";
-
-jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: NETWORK_NAME },
-);
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
   let deployment: deployContracts.Deployment;
@@ -64,7 +54,7 @@ describe("Client", () => {
       };
 
       const addresslistVotingPlugin = AddresslistVotingClient.encoding
-        .getPluginInstallItem(pluginParams, NETWORK_NAME);
+        .getPluginInstallItem(pluginParams, "local");
       addresslistVotingPlugin.id = deployment.addresslistVotingRepo.address;
 
       const daoCreationParams: CreateDaoParams = {

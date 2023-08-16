@@ -13,14 +13,7 @@ import {
   contextParamsLocalChain,
   TEST_INVALID_ADDRESS,
 } from "../constants";
-import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
-
-const NETWORK_NAME = "goerli";
-
-jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: NETWORK_NAME },
-);
+import { Context } from "@aragon/sdk-client-common";
 
 describe("Client Multisig", () => {
   beforeAll(() => {
@@ -45,7 +38,7 @@ describe("Client Multisig", () => {
       const installPluginItemItem = MultisigClient.encoding
         .getPluginInstallItem(
           multisigIntallParams,
-          NETWORK_NAME
+          "local",
         );
 
       expect(typeof installPluginItemItem).toBe("object");

@@ -59,7 +59,6 @@ import {
   ClientCore,
   EMPTY_PROPOSAL_METADATA_LINK,
   findLog,
-  LIVE_CONTRACTS,
   MULTI_FETCH_TIMEOUT,
   prepareGenericInstallation,
   PrepareInstallationStepValue,
@@ -248,10 +247,11 @@ export class MultisigClientMethods extends ClientCore
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }
-    // todo params
+    // TODO
+    // Check params with yup
     yield* prepareGenericInstallation(this.web3, {
       daoAddressOrEns: params.daoAddressOrEns,
-      pluginRepo: LIVE_CONTRACTS[networkName].multisigRepo,
+      pluginRepo: this.web3.getAddress("multisigRepoAddress"),
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: [
@@ -261,6 +261,9 @@ export class MultisigClientMethods extends ClientCore
           params.settings.votingSettings.minApprovals,
         ],
       ],
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
     });
   }
   /**

@@ -115,7 +115,6 @@ import { PermissionIds } from "../../constants";
 import {
   ClientCore,
   findLog,
-  LIVE_CONTRACTS,
   MULTI_FETCH_TIMEOUT,
   MultiTargetPermission,
   prepareGenericInstallation,
@@ -132,7 +131,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async *prepareInstallation(
     params: PrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
-    yield* prepareGenericInstallation(this.web3, params);
+    yield* prepareGenericInstallation(this.web3, {
+      ...params,
+      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
+    });
   }
   /**
    * Creates a DAO with the given settings and plugins
@@ -152,7 +154,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
 
     const daoFactoryInstance = DAOFactory__factory.connect(
-      this.web3.getDaoFactoryAddress(),
+      this.web3.getAddress("daoFactoryAddress"),
       signer,
     );
 
@@ -465,7 +467,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     params: PrepareUninstallationParams,
   ): AsyncGenerator<PrepareUninstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    const networkName = this.web3.getNetworkName();
     type T = {
       iplugin: { installations: SubgraphPluginInstallation[] };
     };
@@ -492,7 +493,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     );
     // connect to psp contract
     const pspContract = PluginSetupProcessor__factory.connect(
-      LIVE_CONTRACTS[networkName].pluginSetupProcessor,
+      this.web3.getAddress("pluginSetupProcessorAddress"),
       signer,
     );
     const tx = await pspContract.prepareUninstallation(

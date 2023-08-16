@@ -1,4 +1,5 @@
 import {
+  DeployedAddresses,
   GraphQLContextParams,
   GraphQLContextState,
   IpfsContextParams,
@@ -17,13 +18,15 @@ export type ContextState =
   & IpfsContextState
   & GraphQLContextState;
 
-export type OverriddenState = {
-  daoFactoryAddress: boolean;
-  ensRegistryAddress: boolean;
-  gasFeeEstimationFactor: boolean;
-  ipfsNodes: boolean;
-  graphqlNodes: boolean;
-};
+export type OverriddenState =
+  & {
+    [key in DeployedAddresses]: boolean;
+  }
+  & {
+    gasFeeEstimationFactor: boolean;
+    ipfsNodes: boolean;
+    graphqlNodes: boolean;
+  };
 
 export enum SupportedNetwork {
   MAINNET = "homestead",
@@ -32,6 +35,7 @@ export enum SupportedNetwork {
   MUMBAI = "maticmum",
   BASE = "base",
   BASE_GOERLI = "baseGoerli",
+  LOCAL = "local",
 }
 
 export const SupportedNetworksArray = Object.values(SupportedNetwork);

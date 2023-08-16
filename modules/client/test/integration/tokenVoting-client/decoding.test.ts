@@ -10,12 +10,7 @@ import {
 } from "../../../src";
 
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
-import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
-
-jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: "goerli" },
-);
+import { Context } from "@aragon/sdk-client-common";
 
 describe("Token Voting Client", () => {
   beforeAll(() => {

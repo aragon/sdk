@@ -1,7 +1,7 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
+import { Context } from "@aragon/sdk-client-common";
 import {
   AddAddressesParams,
   MultisigClient,
@@ -11,10 +11,6 @@ import {
 } from "../../../src";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 
-jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: "goerli" },
-);
 describe("Client Multisig", () => {
   beforeAll(() => {
     contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;

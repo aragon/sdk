@@ -86,7 +86,6 @@ import {
   ClientCore,
   EMPTY_PROPOSAL_METADATA_LINK,
   findLog,
-  LIVE_CONTRACTS,
   MULTI_FETCH_TIMEOUT,
   prepareGenericInstallation,
   PrepareInstallationStepValue,
@@ -268,10 +267,13 @@ export class TokenVotingClientMethods extends ClientCore
     }
     yield* prepareGenericInstallation(this.web3, {
       daoAddressOrEns: params.daoAddressOrEns,
-      pluginRepo: LIVE_CONTRACTS[networkName].tokenVotingRepo,
+      pluginRepo: this.web3.getAddress("tokenVotingRepoAddress"),
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: tokenVotingInitParamsToContract(params.settings),
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
     });
   }
 

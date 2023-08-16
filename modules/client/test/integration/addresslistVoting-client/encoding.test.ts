@@ -8,14 +8,8 @@ import {
 } from "../../../src";
 import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
-import { Context, SupportedNetworksArray } from "@aragon/sdk-client-common";
+import { Context } from "@aragon/sdk-client-common";
 
-const NETWORK_NAME = "goerli";
-
-jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: NETWORK_NAME },
-);
 describe("Client Address List", () => {
   beforeAll(() => {
     contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
@@ -39,7 +33,7 @@ describe("Client Address List", () => {
       const installPluginItemItem = AddresslistVotingClient.encoding
         .getPluginInstallItem(
           withdrawParams,
-          NETWORK_NAME,
+          "local",
         );
 
       expect(typeof installPluginItemItem).toBe("object");

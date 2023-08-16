@@ -55,7 +55,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     }
 
     const daoInstance = DAOFactory__factory.connect(
-      this.web3.getDaoFactoryAddress(),
+      this.web3.getAddress("daoFactoryAddress"),
       signer,
     );
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];

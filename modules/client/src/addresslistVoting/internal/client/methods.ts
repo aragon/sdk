@@ -62,7 +62,6 @@ import {
   ClientCore,
   EMPTY_PROPOSAL_METADATA_LINK,
   findLog,
-  LIVE_CONTRACTS,
   MULTI_FETCH_TIMEOUT,
   prepareGenericInstallation,
   PrepareInstallationStepValue,
@@ -254,13 +253,14 @@ export class AddresslistVotingClientMethods extends ClientCore
     }
     yield* prepareGenericInstallation(this.web3, {
       daoAddressOrEns: params.daoAddressOrEns,
-      pluginRepo: LIVE_CONTRACTS[networkName].addresslistVotingRepo,
+      pluginRepo: this.web3.getAddress("addresslistVotingRepoAddress"),
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: [
         votingSettingsToContract(params.settings.votingSettings),
         params.settings.addresses,
       ],
+      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
     });
   }
 

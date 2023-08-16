@@ -16,7 +16,7 @@ import {
 import { TokenVoting__factory } from "@aragon/osx-ethers";
 import { Context } from "@aragon/sdk-client-common";
 
-const NETWORK_NAME = "goerli";
+const NETWORK_NAME = "local";
 
 export async function buildMultisigDAO(pluginRepoAddress: string) {
   const client = new Client(new Context(contextParamsLocalChain));
@@ -82,7 +82,7 @@ export async function buildTokenVotingDAO(
   const pluginInstallItem = TokenVotingClient.encoding
     .getPluginInstallItem(
       pluginInstallParams,
-      NETWORK_NAME
+      NETWORK_NAME,
     );
 
   const createDaoParams: CreateDaoParams = {

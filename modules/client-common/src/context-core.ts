@@ -1,8 +1,4 @@
-import {
-  JsonRpcProvider,
-  Network,
-  Networkish,
-} from "@ethersproject/providers";
+import { JsonRpcProvider, Network, Networkish } from "@ethersproject/providers";
 import {
   InvalidAddressError,
   InvalidGasEstimationFactorError,
@@ -22,6 +18,7 @@ import {
 } from "./types";
 import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
 import { getNetwork } from "./utils";
+import { DeployedAddressesArray } from "./internal";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 const supportedProtocols = ["https:"];
@@ -33,6 +30,15 @@ export abstract class ContextCore {
   protected state: ContextState = {} as ContextState;
   protected overriden: OverriddenState = {
     daoFactoryAddress: false,
+    pluginSetupProcessorAddress: false,
+    multisigRepoAddress: false,
+    adminRepoAddress: false,
+    addresslistVotingRepoAddress: false,
+    tokenVotingRepoAddress: false,
+    multisigSetupAddress: false,
+    adminSetupAddress: false,
+    addresslistVotingSetupAddress: false,
+    tokenVotingSetupAddress: false,
     ensRegistryAddress: false,
     gasFeeEstimationFactor: false,
     ipfsNodes: false,
@@ -82,14 +88,14 @@ export abstract class ContextCore {
       this.state.ipfs = ContextCore.resolveIpfs(contextParams.ipfsNodes);
       this.overriden.ipfsNodes = true;
     }
-    if (contextParams.daoFactoryAddress) {
-      this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
-      this.overriden.daoFactoryAddress = true;
+    // Set all the available addresses
+    for (const address of DeployedAddressesArray) {
+      if (contextParams[address]) {
+        this.state[address] = contextParams[address]!;
+        this.overriden[address] = true;
+      }
     }
-    if (contextParams.ensRegistryAddress) {
-      this.state.ensRegistryAddress = contextParams.ensRegistryAddress;
-      this.overriden.ensRegistryAddress = true;
-    }
+
     if (contextParams.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = ContextCore
         .resolveGasFeeEstimationFactor(
@@ -119,17 +125,19 @@ export abstract class ContextCore {
       this.state.ipfs = ContextCore.resolveIpfs(IPFS_NODES[networkName]);
     }
 
-    if (!this.overriden.daoFactoryAddress) {
-      this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
+    for (const address of DeployedAddressesArray) {
+      if (!this.overriden[address]) {
+        let defaultAddress = LIVE_CONTRACTS[networkName][address];
+        // custom check for ensRegistryAddress
+        if (address === "ensRegistryAddress" && !defaultAddress) {
+          defaultAddress = this.network.ensAddress;
+        }
+        if (defaultAddress) {
+          this.state[address] = defaultAddress;
+        }
+      }
     }
 
-    if (!this.overriden.ensRegistryAddress) {
-      let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
-      if (!ensRegistry) {
-        ensRegistry = this.network.ensAddress;
-      }
-      this.state.ensRegistryAddress = ensRegistry;
-    }
     if (!this.overriden.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
     }
@@ -202,6 +210,96 @@ export abstract class ContextCore {
   }
 
   /**
+   * Getter for pluginSetupProcessorAddress property
+   * @var pluginSetupProcessorAddress
+   * @returns {string}
+   * @public
+   */
+  get pluginSetupProcessorAddress(): string {
+    return this.state.pluginSetupProcessorAddress;
+  }
+  /**
+   * Getter for multisigRepoAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get multisigRepoAddress(): string {
+    return this.state.multisigRepoAddress;
+  }
+  /**
+   * Getter for adminRepoAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get adminRepoAddress(): string {
+    return this.state.adminRepoAddress;
+  }
+  /**
+   * Getter for addresslistVotingRepoAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get addresslistVotingRepoAddress(): string {
+    return this.state.addresslistVotingRepoAddress;
+  }
+  /**
+   * Getter for tokenVotingRepoAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get tokenVotingRepoAddress(): string {
+    return this.state.tokenVotingRepoAddress;
+  }
+  /**
+   * Getter for multisigSetupAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get multisigSetupAddress(): string {
+    return this.state.multisigSetupAddress;
+  }
+  /**
+   * Getter for adminSetupAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get adminSetupAddress(): string {
+    return this.state.adminSetupAddress;
+  }
+  /**
+   * Getter for addresslistVotingSetupAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get addresslistVotingSetupAddress(): string {
+    return this.state.addresslistVotingSetupAddress;
+  }
+  /**
+   * Getter for tokenVotingSetupAddress property
+   *
+   * @readonly
+   * @type {string}
+   * @memberof ContextCore
+   */
+  get tokenVotingSetupAddress(): string {
+    return this.state.tokenVotingSetupAddress;
+  }
+
+  /**
    * Getter for the gas fee reducer used in estimations
    *
    * @var gasFeeEstimationFactor
@@ -262,7 +360,7 @@ export abstract class ContextCore {
     }
 
     if (!network.ensAddress) {
-      const ensAddress = LIVE_CONTRACTS[networkName].ensRegistry;
+      const ensAddress = LIVE_CONTRACTS[networkName].ensRegistryAddress;
       if (!ensAddress) {
         throw new UnsupportedNetworkError(networkName);
       }

@@ -82,19 +82,12 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import {
   Context,
-  LIVE_CONTRACTS,
   PrepareInstallationStep,
   ProposalMetadata,
   ProposalStatus,
   SortDirection,
-  SupportedNetworksArray,
   TokenType,
 } from "@aragon/sdk-client-common";
-
-jest.spyOn(SupportedNetworksArray, "includes").mockReturnValue(true);
-jest.spyOn(Context.prototype, "network", "get").mockReturnValue(
-  { chainId: 5, name: "goerli" },
-);
 
 describe("Token Voting Client", () => {
   let server: Server;
@@ -105,7 +98,24 @@ describe("Token Voting Client", () => {
   beforeAll(async () => {
     server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
+
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    contextParamsLocalChain.pluginSetupProcessorAddress =
+      deployment.pluginSetupProcessor.address;
+    contextParamsLocalChain.multisigRepoAddress =
+      deployment.multisigRepo.address;
+    contextParamsLocalChain.adminRepoAddress = "";
+    contextParamsLocalChain.addresslistVotingRepoAddress =
+      deployment.addresslistVotingRepo.address;
+    contextParamsLocalChain.tokenVotingRepoAddress =
+      deployment.tokenVotingRepo.address;
+    contextParamsLocalChain.multisigSetupAddress =
+      deployment.multisigPluginSetup.address;
+    contextParamsLocalChain.adminSetupAddress = "";
+    contextParamsLocalChain.addresslistVotingSetupAddress =
+      deployment.addresslistVotingPluginSetup.address;
+    contextParamsLocalChain.tokenVotingSetupAddress =
+      deployment.tokenVotingPluginSetup.address;
     contextParamsLocalChain.ensRegistryAddress = deployment.ensRegistry.address;
     repoAddr = deployment.tokenVotingRepo.address;
 
@@ -118,22 +128,6 @@ describe("Token Voting Client", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
-
-    LIVE_CONTRACTS.goerli.daoFactory = deployment.daoFactory.address;
-    LIVE_CONTRACTS.goerli.pluginSetupProcessor =
-      deployment.pluginSetupProcessor.address;
-    LIVE_CONTRACTS.goerli.multisigRepo = deployment.multisigRepo.address;
-    LIVE_CONTRACTS.goerli.adminRepo = "";
-    LIVE_CONTRACTS.goerli.addresslistVotingRepo =
-      deployment.addresslistVotingRepo.address;
-    LIVE_CONTRACTS.goerli.tokenVotingRepo = deployment.tokenVotingRepo.address;
-    LIVE_CONTRACTS.goerli.multisigSetup =
-      deployment.multisigPluginSetup.address;
-    LIVE_CONTRACTS.goerli.adminSetup = "";
-    LIVE_CONTRACTS.goerli.addresslistVotingSetup =
-      deployment.addresslistVotingPluginSetup.address;
-    LIVE_CONTRACTS.goerli.tokenVotingSetup =
-      deployment.tokenVotingPluginSetup.address;
   });
 
   afterAll(async () => {
@@ -436,7 +430,7 @@ describe("Token Voting Client", () => {
     });
 
     describe("Plugin installation", () => {
-      it("Should prepare the installation of a multisig plugin", async () => {
+      it("Should prepare the installation of tokenVoting plugin", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const { dao } = await buildTokenVotingDAO(
@@ -466,15 +460,6 @@ describe("Token Voting Client", () => {
           },
           daoAddressOrEns: dao,
         };
-        const networkSpy = jest.spyOn(JsonRpcProvider.prototype, "getNetwork");
-        const defaultGetNetworkImplementation = networkSpy
-          .getMockImplementation();
-        networkSpy.mockImplementation(() =>
-          Promise.resolve({
-            name: "goerli",
-            chainId: 31337,
-          })
-        );
         const steps = client.methods.prepareInstallation(installationParams);
         for await (const step of steps) {
           switch (step.key) {
@@ -508,7 +493,6 @@ describe("Token Voting Client", () => {
               break;
           }
         }
-        networkSpy.mockImplementation(defaultGetNetworkImplementation);
       });
     });
 

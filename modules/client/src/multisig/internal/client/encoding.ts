@@ -62,7 +62,7 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
-      id: LIVE_CONTRACTS[networkName].multisigRepo,
+      id: LIVE_CONTRACTS[networkName].multisigRepoAddress,
       data: hexToBytes(hexBytes),
     };
   }

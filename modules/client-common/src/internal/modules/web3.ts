@@ -6,7 +6,6 @@ import {
   CannotEstimateGasError,
   InvalidAddressError,
   InvalidContractAbiError,
-  NoDaoFactory,
   NoNodesAvailableError,
   NoProviderError,
   NoSignerError,
@@ -19,6 +18,7 @@ import {
   SupportedNetwork,
   SupportedNetworksArray,
 } from "../../types";
+import { DeployedAddresses } from "../types";
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
   private providerIdx: number = -1;
@@ -138,11 +138,12 @@ export class Web3Module implements IClientWeb3Core {
     });
   }
 
-  /** Returns the current DAO factory address */
-  public getDaoFactoryAddress(): string {
-    if (!this.context.daoFactoryAddress) {
-      throw new NoDaoFactory();
+  /** FRAMEWORK ADDRESSES */
+  public getAddress(addressName: DeployedAddresses): string {
+    const address = this.context[addressName];
+    if (!address || !isAddress(address)) {
+      throw new InvalidAddressError();
     }
-    return this.context.daoFactoryAddress;
-  }
+    return address;
+  }  
 }
