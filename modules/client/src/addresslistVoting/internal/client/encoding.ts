@@ -57,7 +57,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     );
 
     return {
-      id: LIVE_CONTRACTS[networkName].addresslistVotingRepo,
+      id: LIVE_CONTRACTS[networkName].addresslistVotingRepoAddress,
       data: hexToBytes(hexBytes),
     };
   }

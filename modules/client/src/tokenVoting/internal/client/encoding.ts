@@ -57,7 +57,7 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      id: LIVE_CONTRACTS[networkName].tokenVotingRepo,
+      id: LIVE_CONTRACTS[networkName].tokenVotingRepoAddress,
       data: hexToBytes(hexBytes),
     };
   }
