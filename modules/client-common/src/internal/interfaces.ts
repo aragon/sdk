@@ -6,6 +6,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient, PinResponse } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 import { GasFeeEstimation, SupportedNetwork } from "../types";
+import { AvailableAddresses } from "./types";
 
 export interface IClientWeb3Core {
   shiftProvider: () => void;
@@ -20,18 +21,7 @@ export interface IClientWeb3Core {
     address: string,
     abi: ContractInterface,
   ) => Contract & T;
-  readonly daoFactoryAddress: string;
-  readonly pluginSetupProcessorAddress: string;
-  readonly ensRegistryAddress: string;
-  // TODO: remove these
-  readonly multisigRepoAddress: string;
-  readonly multisigSetupAddress: string;
-  readonly adminRepoAddress: string;
-  readonly adminSetupAddress: string;
-  readonly addresslistVotingRepoAddress: string;
-  readonly addresslistVotingSetupAddress: string;
-  readonly tokenVotingRepoAddress: string;
-  readonly tokenVotingSetupAddress: string;
+  getAddress: (addressName: AvailableAddresses) => string;
   getApproximateGasFee: (estimatedFee: bigint) => Promise<GasFeeEstimation>;
 }
 export interface IClientIpfsCore {

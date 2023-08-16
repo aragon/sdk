@@ -18,6 +18,7 @@ import {
   SupportedNetwork,
   SupportedNetworksArray,
 } from "../../types";
+import { AvailableAddresses } from "../types";
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
   private providerIdx: number = -1;
@@ -138,123 +139,11 @@ export class Web3Module implements IClientWeb3Core {
   }
 
   /** FRAMEWORK ADDRESSES */
-  /** Returns the current DAO factory address */
-  get daoFactoryAddress(): string {
-    const daoFactoryAddress = this.context.daoFactoryAddress;
-    if (!daoFactoryAddress || !isAddress(daoFactoryAddress)) {
+  public getAddress(addressName: AvailableAddresses): string {
+    const address = this.context[addressName];
+    if (!address || !isAddress(address)) {
       throw new InvalidAddressError();
     }
-    return daoFactoryAddress;
-  }
-
-  /** Returns the current plugin setup processor address */
-  get pluginSetupProcessorAddress(): string {
-    const pluginSetupProcessorAddress =
-      this.context.pluginSetupProcessorAddress;
-    if (
-      !pluginSetupProcessorAddress || !isAddress(pluginSetupProcessorAddress)
-    ) {
-      throw new InvalidAddressError();
-    }
-    return pluginSetupProcessorAddress;
-  }
-
-  /** Returns the current ens registry address */
-  get ensRegistryAddress(): string {
-    const ensRegistryAddress = this.context.ensRegistryAddress;
-    if (!ensRegistryAddress || !isAddress(ensRegistryAddress)) {
-      throw new InvalidAddressError();
-    }
-    return ensRegistryAddress;
-  }
-
-  // TODO:
-  // Remove this on code split
-  /** MULTISIG PLUGIN ADDRESSES */
-  get multisigRepoAddress(): string {
-    const multisigRepoAddress = this.context.multisigRepoAddress;
-    if (!multisigRepoAddress || !isAddress(multisigRepoAddress)) {
-      throw new InvalidAddressError();
-    }
-    return multisigRepoAddress;
-  }
-
-  get multisigSetupAddress(): string {
-    const multisigSetupAddress = this.context.multisigSetupAddress;
-    if (!multisigSetupAddress || !isAddress(multisigSetupAddress)) {
-      throw new InvalidAddressError();
-    }
-    return multisigSetupAddress;
-  }
-  // TODO:
-  // Remove this on code split
-  /** TOKENVOTING PLUGIN ADDRESSES */
-
-  /** Returns the current token voting repo address */
-  get tokenVotingRepoAddress(): string {
-    const tokenVotingRepoAddress = this.context.tokenVotingRepoAddress;
-    if (!tokenVotingRepoAddress || !isAddress(tokenVotingRepoAddress)) {
-      throw new InvalidAddressError();
-    }
-    return tokenVotingRepoAddress;
-  }
-
-  /** Returns the current token voting setup address */
-  get tokenVotingSetupAddress(): string {
-    const tokenVotingSetupAddress = this.context.tokenVotingSetupAddress;
-    if (!tokenVotingSetupAddress || !isAddress(tokenVotingSetupAddress)) {
-      throw new InvalidAddressError();
-    }
-    return tokenVotingSetupAddress;
-  }
-
-  // TODO:
-  // Remove this on code split
-  /** ADDRESSLISTVOTING PLUGIN ADDRESSES */
-
-  /** Returns the current addresslist voting repo address */
-  get addresslistVotingRepoAddress(): string {
-    const addresslistVotingRepoAddress =
-      this.context.addresslistVotingRepoAddress;
-    if (
-      !addresslistVotingRepoAddress || !isAddress(addresslistVotingRepoAddress)
-    ) {
-      throw new InvalidAddressError();
-    }
-    return addresslistVotingRepoAddress;
-  }
-  /** Returns the current addresslist voting setup address */
-  get addresslistVotingSetupAddress(): string {
-    const addresslistVotingSetupAddress =
-      this.context.addresslistVotingSetupAddress;
-    if (
-      !addresslistVotingSetupAddress ||
-      !isAddress(addresslistVotingSetupAddress)
-    ) {
-      throw new InvalidAddressError();
-    }
-    return addresslistVotingSetupAddress;
-  }
-
-  // TODO:
-  // Remove this on code split
-  /* ADMIN PLUGIN ADDRESSES */
-
-  /** Returns the current admin repo address */
-  get adminRepoAddress(): string {
-    const adminRepoAddress = this.context.adminRepoAddress;
-    if (!adminRepoAddress || !isAddress(adminRepoAddress)) {
-      throw new InvalidAddressError();
-    }
-    return adminRepoAddress;
-  }
-
-  /** Returns the current admin setup address */
-  get adminSetupAddress(): string {
-    const adminSetupAddress = this.context.adminSetupAddress;
-    if (!adminSetupAddress || !isAddress(adminSetupAddress)) {
-      throw new InvalidAddressError();
-    }
-    return adminSetupAddress;
-  }
+    return address;
+  }  
 }

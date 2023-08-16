@@ -1,4 +1,5 @@
 import {
+  AvailableAddresses,
   GraphQLContextParams,
   GraphQLContextState,
   IpfsContextParams,
@@ -17,22 +18,15 @@ export type ContextState =
   & IpfsContextState
   & GraphQLContextState;
 
-export type OverriddenState = {
-  daoFactoryAddress: boolean;
-  pluginSetupProcessorAddress: boolean;
-  multisigRepoAddress: boolean;
-  adminRepoAddress: boolean;
-  addresslistVotingRepoAddress: boolean;
-  tokenVotingRepoAddress: boolean;
-  multisigSetupAddress: boolean;
-  adminSetupAddress: boolean;
-  addresslistVotingSetupAddress: boolean;
-  tokenVotingSetupAddress: boolean;
-  ensRegistryAddress: boolean;
-  gasFeeEstimationFactor: boolean;
-  ipfsNodes: boolean;
-  graphqlNodes: boolean;
-};
+export type OverriddenState =
+  & {
+    [key in AvailableAddresses]: boolean;
+  }
+  & {
+    gasFeeEstimationFactor: boolean;
+    ipfsNodes: boolean;
+    graphqlNodes: boolean;
+  };
 
 export enum SupportedNetwork {
   MAINNET = "homestead",

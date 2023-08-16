@@ -99,7 +99,7 @@ export abstract class ContextCore {
     if (contextParams.multisigRepoAddress) {
       this.state.multisigRepoAddress = contextParams.multisigRepoAddress;
       this.overriden.multisigRepoAddress = true;
-    }
+      }
     if (contextParams.adminRepoAddress) {
       this.state.adminRepoAddress = contextParams.adminRepoAddress;
       this.overriden.adminRepoAddress = true;
@@ -216,7 +216,9 @@ export abstract class ContextCore {
       if (!ensRegistry) {
         ensRegistry = this.network.ensAddress;
       }
-      this.state.ensRegistryAddress = ensRegistry;
+      // ensRegistry exists because the networks that
+      // dont have it in the network object have a default value
+      this.state.ensRegistryAddress = ensRegistry!;
     }
     if (!this.overriden.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;

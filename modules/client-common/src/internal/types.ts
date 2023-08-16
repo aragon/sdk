@@ -16,32 +16,35 @@ export type NetworkDeployment = {
   tokenVotingSetup: string;
   ensRegistry?: string;
 };
+
+export type AvailableAddresses =
+  | "daoFactoryAddress"
+  | "pluginSetupProcessorAddress"
+  | "multisigRepoAddress"
+  | "adminRepoAddress"
+  | "addresslistVotingRepoAddress"
+  | "tokenVotingRepoAddress"
+  | "multisigSetupAddress"
+  | "adminSetupAddress"
+  | "addresslistVotingSetupAddress"
+  | "tokenVotingSetupAddress"
+  | "ensRegistryAddress";
 // Context input parameters
 
-export type Web3ContextParams = {
-  /** Defaults to mainnet */
-  network?: Networkish;
-  /** Required for Ethereum transactions to work */
-  signer?: Signer;
-  /** Required for Ethereum connectivity to work */
-  web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
+export type Web3ContextParams =
   /** If any contract is not provided it will use the default from LIVE_CONTRACTS in the provided network */
-  // TODO
-  // when plugin split happens, remove this and put them on each specific context
-  daoFactoryAddress?: string;
-  pluginSetupProcessorAddress?: string;
-  multisigRepoAddress?: string;
-  adminRepoAddress?: string;
-  addresslistVotingRepoAddress?: string;
-  tokenVotingRepoAddress?: string;
-  multisigSetupAddress?: string;
-  adminSetupAddress?: string;
-  addresslistVotingSetupAddress?: string;
-  tokenVotingSetupAddress?: string;
-  ensRegistryAddress?: string;
-  /** If not provided uses default value */
-  gasFeeEstimationFactor?: number;
-};
+  & {
+    [address in AvailableAddresses]?: string;
+  }
+  & {
+    /** Defaults to mainnet */
+    network?: Networkish;
+    /** Required for Ethereum transactions to work */
+    signer?: Signer;
+    /** Required for Ethereum connectivity to work */
+    web3Providers?: string | JsonRpcProvider | (string | JsonRpcProvider)[];
+    gasFeeEstimationFactor?: number;
+  };
 export type IpfsContextParams = {
   /** If not provided uses default value */
   ipfsNodes?: { url: string; headers?: Record<string, string> }[];
@@ -51,25 +54,16 @@ export type GraphQLContextParams = {
   graphqlNodes?: { url: string }[];
 };
 
-export type Web3ContextState = {
-  network: Network;
-  signer: Signer;
-  // always going to exist because i'll default to LIVE_CONTRACTS
-  daoFactoryAddress: string;
-  pluginSetupProcessorAddress: string;
-  multisigRepoAddress: string;
-  adminRepoAddress: string;
-  addresslistVotingRepoAddress: string;
-  tokenVotingRepoAddress: string;
-  multisigSetupAddress: string;
-  adminSetupAddress: string;
-  addresslistVotingSetupAddress: string;
-  tokenVotingSetupAddress: string;
-  // may exist depending on the network
-  ensRegistryAddress?: string;
-  web3Providers: JsonRpcProvider[];
-  gasFeeEstimationFactor: number;
-};
+export type Web3ContextState =
+  & {
+    [address in AvailableAddresses]: string;
+  }
+  & {
+    network: Network;
+    signer: Signer;
+    web3Providers: JsonRpcProvider[];
+    gasFeeEstimationFactor: number;
+  };
 export type IpfsContextState = {
   ipfs: IpfsClient[];
 };
