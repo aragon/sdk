@@ -14,11 +14,7 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 import { deployErc20 } from "../../helpers/deploy-erc20";
-import {
-  Context,
-  SupportedNetworksArray,
-  TokenType,
-} from "@aragon/sdk-client-common";
+import { Context, TokenType } from "@aragon/sdk-client-common";
 import { deployErc1155 } from "../../helpers/deploy-erc1155";
 import { deployErc721 } from "../../helpers/deploy-erc721";
 
