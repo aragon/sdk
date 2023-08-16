@@ -1,5 +1,5 @@
 import {
-  AvailableAddresses,
+  DeployedAddresses,
   GraphQLContextParams,
   GraphQLContextState,
   IpfsContextParams,
@@ -20,7 +20,7 @@ export type ContextState =
 
 export type OverriddenState =
   & {
-    [key in AvailableAddresses]: boolean;
+    [key in DeployedAddresses]: boolean;
   }
   & {
     gasFeeEstimationFactor: boolean;

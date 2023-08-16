@@ -4,7 +4,7 @@ import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 
 // Create a readonly string array from the keys of NetworkDeployment
-export const AvailableAddressesArray = [
+export const DeployedAddressesArray = [
   "daoFactoryAddress",
   "pluginSetupProcessorAddress",
   "multisigRepoAddress",
@@ -18,12 +18,12 @@ export const AvailableAddressesArray = [
   "ensRegistryAddress",
 ] as const;
 // export the type from the readonly string array
-export type AvailableAddresses = typeof AvailableAddressesArray[number];
+export type DeployedAddresses = typeof DeployedAddressesArray[number];
 // Override helper type
 type Override<T, U> = Omit<T, keyof U> & U;
 export type NetworkDeployment = Override<
   {
-    [address in AvailableAddresses]: string;
+    [address in DeployedAddresses]: string;
   },
   { ensRegistryAddress?: string }
 >;
@@ -32,7 +32,7 @@ export type NetworkDeployment = Override<
 export type Web3ContextParams =
   /** If any contract is not provided it will use the default from LIVE_CONTRACTS in the provided network */
   & {
-    [address in AvailableAddresses]?: string;
+    [address in DeployedAddresses]?: string;
   }
   & {
     /** Defaults to mainnet */
@@ -55,7 +55,7 @@ export type GraphQLContextParams = {
 export type Web3ContextState =
   & Override<
     {
-      [address in AvailableAddresses]: string;
+      [address in DeployedAddresses]: string;
     },
     { ensRegistryAddress?: string }
   >

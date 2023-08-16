@@ -18,7 +18,7 @@ import {
 } from "./types";
 import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
 import { getNetwork } from "./utils";
-import { AvailableAddressesArray } from "./internal";
+import { DeployedAddressesArray } from "./internal";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 const supportedProtocols = ["https:"];
@@ -89,7 +89,7 @@ export abstract class ContextCore {
       this.overriden.ipfsNodes = true;
     }
     // Set all the available addresses
-    for (const address of AvailableAddressesArray) {
+    for (const address of DeployedAddressesArray) {
       if (contextParams[address]) {
         this.state[address] = contextParams[address]!;
         this.overriden[address] = true;
@@ -125,7 +125,7 @@ export abstract class ContextCore {
       this.state.ipfs = ContextCore.resolveIpfs(IPFS_NODES[networkName]);
     }
 
-    for (const address of AvailableAddressesArray) {
+    for (const address of DeployedAddressesArray) {
       if (!this.overriden[address]) {
         let defaultAddress = LIVE_CONTRACTS[networkName][address];
         // custom check for ensRegistryAddress
