@@ -3,32 +3,30 @@ import { JsonRpcProvider, Network, Networkish } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 
-export type NetworkDeployment = {
-  daoFactory: string;
-  pluginSetupProcessor: string;
-  multisigRepo: string;
-  adminRepo: string;
-  addresslistVotingRepo: string;
-  tokenVotingRepo: string;
-  multisigSetup: string;
-  adminSetup: string;
-  addresslistVotingSetup: string;
-  tokenVotingSetup: string;
-  ensRegistry?: string;
-};
-
-export type AvailableAddresses =
-  | "daoFactoryAddress"
-  | "pluginSetupProcessorAddress"
-  | "multisigRepoAddress"
-  | "adminRepoAddress"
-  | "addresslistVotingRepoAddress"
-  | "tokenVotingRepoAddress"
-  | "multisigSetupAddress"
-  | "adminSetupAddress"
-  | "addresslistVotingSetupAddress"
-  | "tokenVotingSetupAddress"
-  | "ensRegistryAddress";
+// Create a readonly string array from the keys of NetworkDeployment
+export const AvailableAddressesArray = [
+  "daoFactoryAddress",
+  "pluginSetupProcessorAddress",
+  "multisigRepoAddress",
+  "adminRepoAddress",
+  "addresslistVotingRepoAddress",
+  "tokenVotingRepoAddress",
+  "multisigSetupAddress",
+  "adminSetupAddress",
+  "addresslistVotingSetupAddress",
+  "tokenVotingSetupAddress",
+  "ensRegistryAddress",
+] as const;
+// export the type from the readonly string array
+export type AvailableAddresses = typeof AvailableAddressesArray[number];
+// Override helper type
+type Override<T, U> = Omit<T, keyof U> & U;
+export type NetworkDeployment = Override<
+  {
+    [address in AvailableAddresses]: string;
+  },
+  { ensRegistryAddress?: string }
+>;
 // Context input parameters
 
 export type Web3ContextParams =
@@ -55,9 +53,12 @@ export type GraphQLContextParams = {
 };
 
 export type Web3ContextState =
-  & {
-    [address in AvailableAddresses]: string;
-  }
+  & Override<
+    {
+      [address in AvailableAddresses]: string;
+    },
+    { ensRegistryAddress?: string }
+  >
   & {
     network: Network;
     signer: Signer;

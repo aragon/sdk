@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Changed
+- LIVE_CONTRACTS props now end with Address
+
 ### Added
 - Support for local chains
 ## 1.4.0-rc0

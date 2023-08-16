@@ -18,6 +18,7 @@ import {
 } from "./types";
 import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
 import { getNetwork } from "./utils";
+import { AvailableAddressesArray } from "./internal";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 const supportedProtocols = ["https:"];
@@ -87,55 +88,14 @@ export abstract class ContextCore {
       this.state.ipfs = ContextCore.resolveIpfs(contextParams.ipfsNodes);
       this.overriden.ipfsNodes = true;
     }
-    if (contextParams.daoFactoryAddress) {
-      this.state.daoFactoryAddress = contextParams.daoFactoryAddress;
-      this.overriden.daoFactoryAddress = true;
-    }
-    if (contextParams.pluginSetupProcessorAddress) {
-      this.state.pluginSetupProcessorAddress =
-        contextParams.pluginSetupProcessorAddress;
-      this.overriden.pluginSetupProcessorAddress = true;
-    }
-    if (contextParams.multisigRepoAddress) {
-      this.state.multisigRepoAddress = contextParams.multisigRepoAddress;
-      this.overriden.multisigRepoAddress = true;
+    // Set all the available addresses
+    for (const address of AvailableAddressesArray) {
+      if (contextParams[address]) {
+        this.state[address] = contextParams[address]!;
+        this.overriden[address] = true;
       }
-    if (contextParams.adminRepoAddress) {
-      this.state.adminRepoAddress = contextParams.adminRepoAddress;
-      this.overriden.adminRepoAddress = true;
-    }
-    if (contextParams.addresslistVotingRepoAddress) {
-      this.state.addresslistVotingRepoAddress =
-        contextParams.addresslistVotingRepoAddress;
-      this.overriden.addresslistVotingRepoAddress = true;
-    }
-    if (contextParams.tokenVotingRepoAddress) {
-      this.state.tokenVotingRepoAddress = contextParams.tokenVotingRepoAddress;
-      this.overriden.tokenVotingRepoAddress = true;
-    }
-    if (contextParams.multisigSetupAddress) {
-      this.state.multisigSetupAddress = contextParams.multisigSetupAddress;
-      this.overriden.multisigSetupAddress = true;
-    }
-    if (contextParams.adminSetupAddress) {
-      this.state.adminSetupAddress = contextParams.adminSetupAddress;
-      this.overriden.adminSetupAddress = true;
-    }
-    if (contextParams.addresslistVotingSetupAddress) {
-      this.state.addresslistVotingSetupAddress =
-        contextParams.addresslistVotingSetupAddress;
-      this.overriden.addresslistVotingSetupAddress = true;
-    }
-    if (contextParams.tokenVotingSetupAddress) {
-      this.state.tokenVotingSetupAddress =
-        contextParams.tokenVotingSetupAddress;
-      this.overriden.tokenVotingSetupAddress = true;
     }
 
-    if (contextParams.ensRegistryAddress) {
-      this.state.ensRegistryAddress = contextParams.ensRegistryAddress;
-      this.overriden.ensRegistryAddress = true;
-    }
     if (contextParams.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = ContextCore
         .resolveGasFeeEstimationFactor(
@@ -165,61 +125,19 @@ export abstract class ContextCore {
       this.state.ipfs = ContextCore.resolveIpfs(IPFS_NODES[networkName]);
     }
 
-    if (!this.overriden.daoFactoryAddress) {
-      this.state.daoFactoryAddress = LIVE_CONTRACTS[networkName].daoFactory;
-    }
-
-    if (!this.overriden.pluginSetupProcessorAddress) {
-      this.state.pluginSetupProcessorAddress =
-        LIVE_CONTRACTS[networkName].pluginSetupProcessor;
-    }
-
-    if (!this.overriden.multisigRepoAddress) {
-      this.state.multisigRepoAddress = LIVE_CONTRACTS[networkName].multisigRepo;
-    }
-
-    if (!this.overriden.adminRepoAddress) {
-      this.state.adminRepoAddress = LIVE_CONTRACTS[networkName].adminRepo;
-    }
-
-    if (!this.overriden.addresslistVotingRepoAddress) {
-      this.state.addresslistVotingRepoAddress =
-        LIVE_CONTRACTS[networkName].addresslistVotingRepo;
-    }
-
-    if (!this.overriden.tokenVotingRepoAddress) {
-      this.state.tokenVotingRepoAddress =
-        LIVE_CONTRACTS[networkName].tokenVotingRepo;
-    }
-
-    if (!this.overriden.multisigSetupAddress) {
-      this.state.multisigSetupAddress =
-        LIVE_CONTRACTS[networkName].multisigSetup;
-    }
-
-    if (!this.overriden.adminSetupAddress) {
-      this.state.adminSetupAddress = LIVE_CONTRACTS[networkName].adminSetup;
-    }
-
-    if (!this.overriden.addresslistVotingSetupAddress) {
-      this.state.addresslistVotingSetupAddress =
-        LIVE_CONTRACTS[networkName].addresslistVotingSetup;
-    }
-
-    if (!this.overriden.tokenVotingSetupAddress) {
-      this.state.tokenVotingSetupAddress =
-        LIVE_CONTRACTS[networkName].tokenVotingSetup;
-    }
-
-    if (!this.overriden.ensRegistryAddress) {
-      let ensRegistry = LIVE_CONTRACTS[networkName].ensRegistry;
-      if (!ensRegistry) {
-        ensRegistry = this.network.ensAddress;
+    for (const address of AvailableAddressesArray) {
+      if (!this.overriden[address]) {
+        let defaultAddress = LIVE_CONTRACTS[networkName][address];
+        // custom check for ensRegistryAddress
+        if (address === "ensRegistryAddress" && !defaultAddress) {
+          defaultAddress = this.network.ensAddress;
+        }
+        if (defaultAddress) {
+          this.state[address] = defaultAddress;
+        }
       }
-      // ensRegistry exists because the networks that
-      // dont have it in the network object have a default value
-      this.state.ensRegistryAddress = ensRegistry!;
     }
+
     if (!this.overriden.gasFeeEstimationFactor) {
       this.state.gasFeeEstimationFactor = DEFAULT_GAS_FEE_ESTIMATION_FACTOR;
     }
@@ -442,7 +360,7 @@ export abstract class ContextCore {
     }
 
     if (!network.ensAddress) {
-      const ensAddress = LIVE_CONTRACTS[networkName].ensRegistry;
+      const ensAddress = LIVE_CONTRACTS[networkName].ensRegistryAddress;
       if (!ensAddress) {
         throw new UnsupportedNetworkError(networkName);
       }

@@ -110,7 +110,7 @@ export async function prepareGenericInstallationEstimation(
   );
   // connect to psp contract
   const pspContract = PluginSetupProcessor__factory.connect(
-    LIVE_CONTRACTS[networkName].pluginSetupProcessor,
+    LIVE_CONTRACTS[networkName].pluginSetupProcessorAddress,
     signer,
   );
 
