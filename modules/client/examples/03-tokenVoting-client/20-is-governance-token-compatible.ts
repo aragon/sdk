@@ -20,13 +20,16 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
 
 const tokenAddress = "0x1234567890123456789012345678901234567890"; // token contract adddress
 
-const delegatee = tokenVotingClient.methods.isTokenGovernanceCompatible(tokenAddress);
+const compatibility = tokenVotingClient.methods.isTokenVotingCompatibleToken(tokenAddress);
 
-console.log(delegatee);
+console.log(compatibility);
 
 /* MARKDOWN
   Returns:
   ```ts
-    true // throw if the token is not compatible
+    // "compatible" if is erc20 and erc165
+    // "needsWrap" if is erc20 and not erc165 or compatible with voting
+    // "incompatible" if is not erc20
+    compatible
   ```
   */

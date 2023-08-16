@@ -115,18 +115,7 @@ export const INSTALLATION_ABI: MetadataAbiInput[] = [
   },
 ];
 
-export const ERC20_FUNCTIONS = [
-  "function totalSupply() public view returns (uint256)",
-  "function balanceOf(address _owner) public view returns (uint256 balance)",
-  "function transfer(address _to, uint256 _value) public returns (bool success)",
-  "function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)",
-  "function approve(address _spender, uint256 _value) public returns (bool success)",
-  "function allowance(address _owner, address _spender) public view returns (uint256 remaining)",
-];
 
-export const ERC20_INTERFACE_ID = getInterfaceId(
-  new Interface(ERC20_FUNCTIONS),
-);
 export const ERC165_INTERFACE_ID = getInterfaceId(
   new Interface(ERC165_ABI),
 );
@@ -134,6 +123,5 @@ export const ERC165_INTERFACE_ID = getInterfaceId(
 export const GOVERNANCE_INTERFACES_SUPPORTED = [
   getInterfaceId(new Interface(IVOTES_UPGRADEABLE_ABI)),
   getInterfaceId(new Interface(IVOTES_ABI)),
-  getInterfaceId(IERC20MintableUpgradeable__factory.createInterface()),
   getInterfaceId(IGovernanceWrappedERC20__factory.createInterface()),
 ];
