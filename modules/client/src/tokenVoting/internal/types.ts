@@ -93,6 +93,6 @@ export type SubgraphTokenVotingMember = {
 
 export enum TokenVotingTokenCompatibility {
   COMPATIBLE = "compatible",
-  NEEDS_WRAP = "needsWrap",
+  NEEDS_WRAPPING = "needsWrapping",
   INCOMPATIBLE = "incompatible",
 }
