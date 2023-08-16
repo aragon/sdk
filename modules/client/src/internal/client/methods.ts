@@ -133,7 +133,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): AsyncGenerator<PrepareInstallationStepValue> {
     yield* prepareGenericInstallation(this.web3, {
       ...params,
-      pluginSetupProcessorAddress: this.web3.pluginSetupProcessorAddress,
+      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
     });
   }
   /**
@@ -154,7 +154,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
 
     const daoFactoryInstance = DAOFactory__factory.connect(
-      this.web3.daoFactoryAddress,
+      this.web3.getAddress("daoFactoryAddress"),
       signer,
     );
 
@@ -493,7 +493,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     );
     // connect to psp contract
     const pspContract = PluginSetupProcessor__factory.connect(
-      this.web3.pluginSetupProcessorAddress,
+      this.web3.getAddress("pluginSetupProcessorAddress"),
       signer,
     );
     const tx = await pspContract.prepareUninstallation(

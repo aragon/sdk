@@ -253,14 +253,14 @@ export class AddresslistVotingClientMethods extends ClientCore
     }
     yield* prepareGenericInstallation(this.web3, {
       daoAddressOrEns: params.daoAddressOrEns,
-      pluginRepo: this.web3.addresslistVotingRepoAddress,
+      pluginRepo: this.web3.getAddress("addresslistVotingRepoAddress"),
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: [
         votingSettingsToContract(params.settings.votingSettings),
         params.settings.addresses,
       ],
-      pluginSetupProcessorAddress: this.web3.pluginSetupProcessorAddress,
+      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
     });
   }
 
