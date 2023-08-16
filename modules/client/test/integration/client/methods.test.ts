@@ -499,6 +499,45 @@ describe("Client", () => {
         ).toBe("7");
       });
 
+      it("Should allow to deposit native toekn", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+
+        const provider = client.web3.getProvider();
+
+        const amount = BigInt(7);
+
+        const depositParams: DepositParams = {
+          type: TokenType.NATIVE,
+          daoAddressOrEns: daoAddress,
+          amount,
+        };
+
+        // Deposit
+        for await (const step of client.methods.deposit(depositParams)) {
+          switch (step.key) {
+            case DaoDepositSteps.DEPOSITING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoDepositSteps.DONE:
+              expect(typeof step.amount).toBe("bigint");
+              expect(step.amount).toBe(BigInt(7));
+              break;
+            default:
+              throw new Error(
+                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
+              );
+          }
+        }
+
+        const daoBalance = await provider.getBalance(daoAddress);
+        expect(
+          daoBalance.toString(),
+        ).toBe(amount.toString());
+
+      });
+
       it("Check if dao factory has register dao permission in the dao registry", async () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);

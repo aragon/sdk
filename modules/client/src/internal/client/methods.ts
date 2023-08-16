@@ -288,6 +288,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): AsyncGenerator<DaoDepositStepValue> {
     switch (params.type) {
       case TokenType.NATIVE:
+        yield* this.depositNative(params);
+        break;
       case TokenType.ERC20:
         yield* this.depositErc20(params);
         break;
@@ -304,64 +306,78 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
   }
 
-  private async *depositErc20(
-    params: DepositErc20Params | DepositEthParams,
+  private async *depositNative(
+    params: DepositEthParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (
-      params.type === TokenType.ERC20 && params.tokenAddress &&
-      params.tokenAddress !== AddressZero
-    ) {
-      const { tokenAddress, daoAddressOrEns } = params;
-      // check current allowance
-      const tokenContract = new Contract(
-        tokenAddress,
-        ERC20_ABI,
-        signer,
-      );
-      const currentAllowance = await tokenContract.allowance(
-        await signer.getAddress(),
-        daoAddressOrEns,
-      );
-      yield {
-        key: DaoDepositSteps.CHECKED_ALLOWANCE,
-        allowance: currentAllowance.toBigInt(),
-      };
-      // if its lower than the needed, set it to the correct one
-      if (currentAllowance.lt(params.amount)) {
-        // If the target is an ERC20 token, ensure that the amount can be transferred
-        // Relay the yield steps to the caller as they are received
-        yield* this.setAllowance(
-          {
-            amount: params.amount,
-            spender: params.daoAddressOrEns,
-            tokenAddress: params.tokenAddress,
-          },
-        );
-      }
-    }
-    let tokenAddress = AddressZero;
-    if (params.type === TokenType.ERC20) {
-      tokenAddress = params.tokenAddress;
-    }
-    const {
+    const { daoAddressOrEns, amount } = params;
+    const override: { value?: bigint } = { value: params.amount };
+    const daoInstance = DAO__factory.connect(daoAddressOrEns, signer);
+
+    const tx = await daoInstance.deposit(
+      AddressZero,
       amount,
+      "",
+      override,
+    );
+    yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
+
+    const cr = await tx.wait();
+    const log = findLog(cr, daoInstance.interface, "Deposited");
+    if (!log) {
+      throw new FailedDepositError();
+    }
+
+    const daoInterface = DAO__factory.createInterface();
+    const parsedLog = daoInterface.parseLog(log);
+
+    if (!amount.toString() === parsedLog.args["amount"]) {
+      throw new AmountMismatchError(
+        amount,
+        parsedLog.args["amount"].toBigInt(),
+      );
+    }
+    yield { key: DaoDepositSteps.DONE, amount: amount };
+  }
+  
+  private async *depositErc20(
+    params: DepositErc20Params,
+  ): AsyncGenerator<DaoDepositStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    const { tokenAddress, daoAddressOrEns, amount } = params;
+    // check current allowance
+    const tokenContract = new Contract(
+      tokenAddress,
+      ERC20_ABI,
+      signer,
+    );
+    const currentAllowance = await tokenContract.allowance(
+      await signer.getAddress(),
       daoAddressOrEns,
-    } = params;
+    );
+    yield {
+      key: DaoDepositSteps.CHECKED_ALLOWANCE,
+      allowance: currentAllowance.toBigInt(),
+    };
+    // if its lower than the needed, set it to the correct one
+    if (currentAllowance.lt(params.amount)) {
+      // If the target is an ERC20 token, ensure that the amount can be transferred
+      // Relay the yield steps to the caller as they are received
+      yield* this.setAllowance(
+        {
+          amount: params.amount,
+          spender: params.daoAddressOrEns,
+          tokenAddress: params.tokenAddress,
+        },
+      );
+    }
     // Doing the transfer
     const daoInstance = DAO__factory.connect(daoAddressOrEns, signer);
-    const override: { value?: bigint } = {};
-
-    if (tokenAddress === AddressZero) {
-      // Ether
-      override.value = params.amount;
-    }
 
     const tx = await daoInstance.deposit(
       tokenAddress,
       amount,
       "",
-      override,
     );
     yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
 
