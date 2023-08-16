@@ -778,7 +778,7 @@ export class TokenVotingClientMethods extends ClientCore
       signer,
     );
 
-    if (!isERC20Token(tokenAddress, signer)) {
+    if (!await isERC20Token(tokenAddress, signer)) {
       return TokenVotingTokenCompatibility.INCOMPATIBLE;
     }
     try {
