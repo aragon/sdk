@@ -247,7 +247,8 @@ export class MultisigClientMethods extends ClientCore
     if (!SupportedNetworksArray.includes(networkName)) {
       throw new UnsupportedNetworkError(networkName);
     }
-    // todo params
+    // TODO
+    // Check params with yup
     yield* prepareGenericInstallation(this.web3, {
       daoAddressOrEns: params.daoAddressOrEns,
       pluginRepo: this.web3.getAddress("multisigRepoAddress"),
