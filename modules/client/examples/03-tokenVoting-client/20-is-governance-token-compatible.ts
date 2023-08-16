@@ -1,6 +1,6 @@
 /* MARKDOWN
 ---
-title: Is governance token compatible
+title: Is TokenVoting compatible token
 ---
 
 ## Check if a token is compatible with the TokenVoting Plugin as an underlying token
