@@ -31,8 +31,6 @@ import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 
 import {
-  ERC165NotSupportedError,
-  ERC20NotSupportedError,
   getExtendedProposalId,
   InvalidAddressError,
   InvalidAddressOrEnsError,
@@ -76,6 +74,7 @@ import {
   SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  TokenVotingTokenCompatibility,
 } from "../../../src/tokenVoting/internal/types";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 import { deployErc721 } from "../../helpers/deploy-erc721";
@@ -1436,27 +1435,27 @@ describe("Token Voting Client", () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const erc20Token = await deployErc20();
-        expect(() =>
-          client.methods.isTokenGovernanceCompatible(
-            erc20Token.address,
-          )
-        ).rejects.toThrow(ERC165NotSupportedError)
+        const compatibility = client.methods.isTokenVotingCompatibleToken(
+          erc20Token.address,
+        );
+        expect(compatibility).toBe(
+          TokenVotingTokenCompatibility.NEEDS_WRAPPING,
+        );
       });
       it("Should check if ERC721 is compatible with governance and throw", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const erc721Token = await deployErc721();
-        expect(() =>
-          client.methods.isTokenGovernanceCompatible(
-            erc721Token.address,
-          )
-        ).rejects.toThrow(ERC20NotSupportedError);
+        const compatibility = client.methods.isTokenVotingCompatibleToken(
+          erc721Token.address,
+        );
+        expect(compatibility).toBe(TokenVotingTokenCompatibility.INCOMPATIBLE);
       });
       it("Should be called with an invalid address and throw", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         expect(() =>
-          client.methods.isTokenGovernanceCompatible(
+          client.methods.isTokenVotingCompatibleToken(
             "0x123",
           )
         ).rejects.toThrow(InvalidAddressError);
@@ -1465,7 +1464,7 @@ describe("Token Voting Client", () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         expect(() =>
-          client.methods.isTokenGovernanceCompatible(
+          client.methods.isTokenVotingCompatibleToken(
             TEST_WALLET_ADDRESS,
           )
         ).rejects.toThrow(NotAContractError);
@@ -1474,10 +1473,10 @@ describe("Token Voting Client", () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const dao = await buildTokenVotingDAO(repoAddr, VotingMode.STANDARD);
-        const isCompatible = await client.methods.isTokenGovernanceCompatible(
+        const isCompatible = await client.methods.isTokenVotingCompatibleToken(
           dao.tokenAddress,
         );
-        expect(isCompatible).toBe(true);
+        expect(isCompatible).toBe(TokenVotingTokenCompatibility.COMPATIBLE);
       });
     });
   });

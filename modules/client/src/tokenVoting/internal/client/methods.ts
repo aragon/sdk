@@ -783,7 +783,7 @@ export class TokenVotingClientMethods extends ClientCore
     }
     try {
       if (!await contract.supportsInterface(ERC165_INTERFACE_ID)) {
-        return TokenVotingTokenCompatibility.NEEDS_WRAP;
+        return TokenVotingTokenCompatibility.NEEDS_WRAPPING;
       }
       for (const iface of GOVERNANCE_INTERFACES_SUPPORTED) {
         const isSupported = await contract.supportsInterface(iface);
@@ -791,9 +791,9 @@ export class TokenVotingClientMethods extends ClientCore
           return TokenVotingTokenCompatibility.COMPATIBLE;
         }
       }
-      return TokenVotingTokenCompatibility.NEEDS_WRAP;
+      return TokenVotingTokenCompatibility.NEEDS_WRAPPING;
     } catch (e) {
-      return TokenVotingTokenCompatibility.NEEDS_WRAP;
+      return TokenVotingTokenCompatibility.NEEDS_WRAPPING;
     }
   }
 }
