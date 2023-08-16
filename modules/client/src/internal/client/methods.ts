@@ -16,6 +16,7 @@ import {
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidEnsError,
+  InvalidParameter,
   IpfsPinError,
   MissingExecPermissionError,
   NoProviderError,
@@ -126,7 +127,6 @@ import {
   SortDirection,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { InvalidParameter } from "@aragon/sdk-common";
 
 /**
  * Methods module the SDK Generic Client
@@ -452,7 +452,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           new Uint8Array([]),
         );
       logName = "TransferSingle";
-      logArg = "id"
+      logArg = "id";
     } else {
       tx = await erc1155Contract
         ["safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)"](
@@ -463,7 +463,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           new Uint8Array([]),
         );
       logName = "TransferBatch";
-      logArg = "ids"
+      logArg = "ids";
     }
 
     const cr = await tx.wait();
