@@ -174,7 +174,7 @@ describe("Client", () => {
       }
     });
     it("Should decode an encoded withdraw action of an erc721 token", async () => {
-      // encoded withdraw erc721 acttion data
+      // encoded withdraw erc721 action data
       // type: ERC721
       // tokenAddress: 0x000000000000000000000000000000000003
       // tokenId: 10
