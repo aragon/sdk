@@ -33,6 +33,7 @@ import {
   WrapTokensParams,
   WrapTokensStepValue,
 } from "../types";
+import { TokenVotingTokenCompatibility } from "./types";
 
 // TokenVoting
 
@@ -80,7 +81,7 @@ export interface ITokenVotingClientMethods {
     tokenAddress: string,
   ) => AsyncGenerator<UndelegateTokensStepValue>;
   getDelegatee: (tokenAddress: string) => Promise<string | null>;
-  isTokenGovernanceCompatible: (tokenAddress: string) => Promise<boolean>;
+  isTokenVotingCompatibleToken: (tokenAddress: string) => Promise<TokenVotingTokenCompatibility>;
 }
 
 export interface ITokenVotingClientEncoding {

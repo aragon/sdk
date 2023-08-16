@@ -4,10 +4,7 @@ import {
   decodeProposalId,
   decodeRatio,
   encodeProposalId,
-  ERC165NotSupportedError,
-  ERC20NotSupportedError,
   getExtendedProposalId,
-  GoveranceNotSupportedError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -64,6 +61,7 @@ import {
   SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  TokenVotingTokenCompatibility,
 } from "../types";
 import {
   QueryTokenVotingMembers,
@@ -74,6 +72,7 @@ import {
 } from "../graphql-queries";
 import {
   computeProposalStatusFilter,
+  isERC20Token,
   tokenVotingInitParamsToContract,
   toTokenVotingMember,
   toTokenVotingProposal,
@@ -103,12 +102,12 @@ import {
 } from "@aragon/sdk-client-common";
 import {
   ERC165_INTERFACE_ID,
-  ERC20_INTERFACE_ID,
   GOVERNANCE_INTERFACES_SUPPORTED,
   INSTALLATION_ABI,
 } from "../constants";
 import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
 import { Contract } from "@ethersproject/contracts";
+import { AddressZero } from "@ethersproject/constants";
 
 /**
  * Methods module the SDK TokenVoting Client
@@ -757,15 +756,15 @@ export class TokenVotingClientMethods extends ClientCore
    * Checks if the given token is compatible with the TokenVoting plugin
    *
    * @param {string} tokenAddress
-   * @return {*}  {Promise<boolean>}
+   * @return {*}  {Promise<TokenVotingTokenCompatibility>}
    * @memberof TokenVotingClientMethods
    */
-  public async isTokenGovernanceCompatible(
+  public async isTokenVotingCompatibleToken(
     tokenAddress: string,
-  ): Promise<boolean> {
+  ): Promise<TokenVotingTokenCompatibility> {
     const signer = this.web3.getConnectedSigner();
     // check if is address
-    if (!isAddress(tokenAddress)) {
+    if (!isAddress(tokenAddress) || tokenAddress === AddressZero) {
       throw new InvalidAddressError();
     }
     const provider = this.web3.getProvider();
@@ -778,28 +777,23 @@ export class TokenVotingClientMethods extends ClientCore
       ERC165_ABI,
       signer,
     );
+
+    if (!isERC20Token(tokenAddress, signer)) {
+      return TokenVotingTokenCompatibility.INCOMPATIBLE;
+    }
     try {
       if (!await contract.supportsInterface(ERC165_INTERFACE_ID)) {
-        throw new ERC165NotSupportedError();
-      }
-      if (!await contract.supportsInterface(ERC20_INTERFACE_ID)) {
-        throw new ERC20NotSupportedError();
+        return TokenVotingTokenCompatibility.NEEDS_WRAP;
       }
       for (const iface of GOVERNANCE_INTERFACES_SUPPORTED) {
         const isSupported = await contract.supportsInterface(iface);
         if (isSupported) {
-          return true;
+          return TokenVotingTokenCompatibility.COMPATIBLE;
         }
       }
-      throw new GoveranceNotSupportedError();
+      return TokenVotingTokenCompatibility.NEEDS_WRAP;
     } catch (e) {
-      if (
-        e instanceof GoveranceNotSupportedError ||
-        e instanceof ERC20NotSupportedError
-      ) {
-        throw e;
-      }
-      throw new ERC165NotSupportedError();
+      return TokenVotingTokenCompatibility.NEEDS_WRAP;
     }
   }
 }

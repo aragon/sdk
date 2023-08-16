@@ -41,6 +41,9 @@ import {
   ProposalStatus,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { Signer } from "@ethersproject/abstract-signer";
+import { Contract } from "@ethersproject/contracts";
+import { abi as ERC_20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 
 export function toTokenVotingProposal(
   proposal: SubgraphTokenVotingProposal,
@@ -282,8 +285,6 @@ export function toTokenVotingMember(
   };
 }
 
-
-
 export function computeProposalStatus(
   proposal: SubgraphTokenVotingProposal | SubgraphTokenVotingProposalListItem,
 ): ProposalStatus {
@@ -334,4 +335,28 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
       throw new InvalidProposalStatusError();
   }
   return where;
+}
+
+export async function isERC20Token(
+  tokenAddress: string,
+  signer: Signer,
+): Promise<boolean> {
+  const contract = new Contract(
+    tokenAddress,
+    ERC_20_ABI,
+    signer,
+  );
+  // Check that it has the balanceOf function
+  try {
+    await contract.balanceOf(signer.getAddress());
+    try {
+      await contract.metadata.tokenURI(0);
+      return false;
+    } catch {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+  // check that is not an ERC721
 }
