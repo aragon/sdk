@@ -279,7 +279,7 @@ export class InvalidParameter extends SdkError {
 export class NotAContractError extends SdkError {
   constructor(cause?: Error) {
     super(
-      "The provided address does not point to a contract or the contract is not deployed",
+      "The provided address does not point to a contract",
       cause,
     );
   }
