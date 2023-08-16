@@ -1432,7 +1432,7 @@ describe("Token Voting Client", () => {
         expect(token).toBe(null);
       });
 
-      it("Should check if a ERC20 is compatible with governance and throw", async () => {
+      it("Should check if a ERC20 is compatible with the TokenVotingSetup and throw", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const erc20Token = await deployErc20();
