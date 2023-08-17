@@ -17,6 +17,10 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixes
+- Support for ERC115Transfers and balances
+## [1.13.0-rc1]
+
 ### Added
 - Block param on `getVotingSettings` and `getMembers` functions to allow for historical data
 - Support for local chains
