@@ -30,6 +30,7 @@ import {
 } from "@aragon/sdk-common";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
+import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
 import { toUtf8String } from "@ethersproject/strings";
@@ -144,13 +145,27 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
       {
         tokenStandard: TokenType.ERC20,
         abi: ERC20_ABI,
+        batch: false,
         function: "transfer",
       },
       {
         tokenStandard: TokenType.ERC721,
         abi: ERC721_ABI,
+        batch: false,
         function: "safeTransferFrom(address,address,uint256)",
       },
+      {
+        tokenStandard: TokenType.ERC1155,
+        abi: ERC1155_ABI,
+        batch: true,
+        function: "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)",
+      },
+      {
+        tokenStandard: TokenType.ERC1155,
+        abi: ERC1155_ABI,
+        batch: false,
+        function: "safeTransferFrom(address,address,uint256,uint256,bytes)",
+      }
     ];
     for (const abiObject of abiObjects) {
       try {
@@ -163,6 +178,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
           value,
           result,
           abiObject.tokenStandard,
+          abiObject.batch,
         );
       } catch (e) {
         continue;

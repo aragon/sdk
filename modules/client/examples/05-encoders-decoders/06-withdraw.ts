@@ -136,7 +136,7 @@ Returns:
 */
 
 params = {
-  type: TokenType.ERC721, 
+  type: TokenType.ERC721,
   tokenAddress: "0x1234567890123456789012345678901234567890", // ERFC721's token contract address
   tokenId: BigInt(10),
   recipientAddressOrEns: "0x1234567890123456789012345678901234567890", // the address to transfer the funds to
@@ -168,5 +168,49 @@ Returns:
   tokenId: 10n;
   daoAddressOrEns: "0x1234567890123456789012345678901234567890";
   recipientAddressOrEns: "0x1234567890123456789012345678901234567890";
+}
+*/
+/* MARKDOWN
+### NFT (ERC-1155) Tokens
+
+#### Encoding
+
+*/
+
+params = {
+  type: TokenType.ERC1155,
+  tokenAddress: "0x1234567890123456789012345678901234567890", // ERFC721's token contract address
+  tokenIds: [BigInt(10)], // array of token ids
+  amounts: [BigInt(20)], // array of amounts
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890", // the address to transfer the funds to
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890", // the address of the DAO
+};
+
+const erc1155WithdrawAction: DaoAction = await client.encoding.withdrawAction(
+  params,
+);
+console.log({ erc1155WithdrawAction });
+
+/* MARKDOWN
+#### Decoding
+
+*/
+
+const erc1155WithdrawDecodedParams = client.decoding.withdrawAction(
+  erc1155WithdrawAction.to,
+  erc1155WithdrawAction.value,
+  erc1155WithdrawAction.data,
+);
+console.log({ erc1155WithdrawDecodedParams });
+
+/* MARKDOWN
+Returns:
+{
+  type: TokenType.ERC1155,
+  tokenAddress: "0x1234567890123456789012345678901234567890",
+  tokenIds: [10n],
+  amounts: [20n],
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890",
+  recipientAddressOrEns: "0x1234567890123456789012345678901234567890",
 }
 */

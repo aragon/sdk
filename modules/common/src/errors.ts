@@ -268,3 +268,11 @@ export class InvalidGasEstimationFactorError extends SdkError {
     );
   }
 }
+export class InvalidParameter extends SdkError {
+  constructor(message?: string, cause?: Error) {
+    super(
+      "Invalid parameter:" + message,
+      cause,
+    );
+  }
+}

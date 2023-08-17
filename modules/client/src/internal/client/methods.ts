@@ -16,6 +16,7 @@ import {
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidEnsError,
+  InvalidParameter,
   IpfsPinError,
   MissingExecPermissionError,
   NoProviderError,
@@ -23,6 +24,7 @@ import {
   PluginUninstallationPreparationError,
   promiseWithTimeout,
   resolveIpfsCid,
+  SizeMismatchError,
   UpdateAllowanceError,
 } from "@aragon/sdk-common";
 
@@ -32,6 +34,7 @@ import { AddressZero } from "@ethersproject/constants";
 import { Contract, ContractTransaction } from "@ethersproject/contracts";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
+import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
 import {
   QueryDao,
   QueryDaos,
@@ -55,6 +58,7 @@ import {
   DaoMetadata,
   DaoQueryParams,
   DaoSortBy,
+  DepositErc1155Params,
   DepositErc20Params,
   DepositErc721Params,
   DepositEthParams,
@@ -283,11 +287,17 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     params: DepositParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     switch (params.type) {
-      case TokenType.ERC20 || TokenType.NATIVE:
+      case TokenType.NATIVE:
+        yield* this.depositNative(params);
+        break;
+      case TokenType.ERC20:
         yield* this.depositErc20(params);
         break;
       case TokenType.ERC721:
         yield* this.depositErc721(params);
+        break;
+      case TokenType.ERC1155:
+        yield* this.depositErc1155(params);
         break;
       default:
         throw new NotImplementedError(
@@ -296,64 +306,78 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
   }
 
-  private async *depositErc20(
-    params: DepositErc20Params | DepositEthParams,
+  private async *depositNative(
+    params: DepositEthParams,
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (
-      params.type === TokenType.ERC20 && params.tokenAddress &&
-      params.tokenAddress !== AddressZero
-    ) {
-      const { tokenAddress, daoAddressOrEns } = params;
-      // check current allowance
-      const tokenContract = new Contract(
-        tokenAddress,
-        ERC20_ABI,
-        signer,
-      );
-      const currentAllowance = await tokenContract.allowance(
-        await signer.getAddress(),
-        daoAddressOrEns,
-      );
-      yield {
-        key: DaoDepositSteps.CHECKED_ALLOWANCE,
-        allowance: currentAllowance.toBigInt(),
-      };
-      // if its lower than the needed, set it to the correct one
-      if (currentAllowance.lt(params.amount)) {
-        // If the target is an ERC20 token, ensure that the amount can be transferred
-        // Relay the yield steps to the caller as they are received
-        yield* this.setAllowance(
-          {
-            amount: params.amount,
-            spender: params.daoAddressOrEns,
-            tokenAddress: params.tokenAddress,
-          },
-        );
-      }
-    }
-    let tokenAddress = AddressZero;
-    if (params.type === TokenType.ERC20) {
-      tokenAddress = params.tokenAddress;
-    }
-    const {
+    const { daoAddressOrEns, amount } = params;
+    const override: { value?: bigint } = { value: params.amount };
+    const daoInstance = DAO__factory.connect(daoAddressOrEns, signer);
+
+    const tx = await daoInstance.deposit(
+      AddressZero,
       amount,
+      "",
+      override,
+    );
+    yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
+
+    const cr = await tx.wait();
+    const log = findLog(cr, daoInstance.interface, "Deposited");
+    if (!log) {
+      throw new FailedDepositError();
+    }
+
+    const daoInterface = DAO__factory.createInterface();
+    const parsedLog = daoInterface.parseLog(log);
+
+    if (!amount.toString() === parsedLog.args["amount"]) {
+      throw new AmountMismatchError(
+        amount,
+        parsedLog.args["amount"].toBigInt(),
+      );
+    }
+    yield { key: DaoDepositSteps.DONE, amount: amount };
+  }
+  
+  private async *depositErc20(
+    params: DepositErc20Params,
+  ): AsyncGenerator<DaoDepositStepValue> {
+    const signer = this.web3.getConnectedSigner();
+    const { tokenAddress, daoAddressOrEns, amount } = params;
+    // check current allowance
+    const tokenContract = new Contract(
+      tokenAddress,
+      ERC20_ABI,
+      signer,
+    );
+    const currentAllowance = await tokenContract.allowance(
+      await signer.getAddress(),
       daoAddressOrEns,
-    } = params;
+    );
+    yield {
+      key: DaoDepositSteps.CHECKED_ALLOWANCE,
+      allowance: currentAllowance.toBigInt(),
+    };
+    // if its lower than the needed, set it to the correct one
+    if (currentAllowance.lt(params.amount)) {
+      // If the target is an ERC20 token, ensure that the amount can be transferred
+      // Relay the yield steps to the caller as they are received
+      yield* this.setAllowance(
+        {
+          amount: params.amount,
+          spender: params.daoAddressOrEns,
+          tokenAddress: params.tokenAddress,
+        },
+      );
+    }
     // Doing the transfer
     const daoInstance = DAO__factory.connect(daoAddressOrEns, signer);
-    const override: { value?: bigint } = {};
-
-    if (tokenAddress === AddressZero) {
-      // Ether
-      override.value = params.amount;
-    }
 
     const tx = await daoInstance.deposit(
       tokenAddress,
       amount,
       "",
-      override,
     );
     yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
 
@@ -409,6 +433,74 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield {
       key: DaoDepositSteps.DONE,
       tokenId: params.tokenId,
+    };
+  }
+
+  private async *depositErc1155(
+    params: DepositErc1155Params,
+  ): AsyncGenerator<DaoDepositStepValue> {
+    // if length is 0, throw
+    if (!params.tokenIds.length || !params.amounts.length) {
+      throw new InvalidParameter("tokenIds or amounts cannot be empty");
+    }
+    // if tokenIds and amounts length are different, throw
+    if (
+      params.tokenIds.length !== params.amounts.length
+    ) {
+      throw new SizeMismatchError();
+    }
+
+    const signer = this.web3.getConnectedSigner();
+    const erc1155Contract = new Contract(
+      params.tokenAddress,
+      ERC1155_ABI,
+      signer,
+    );
+
+    let tx: ContractTransaction, logName: string, logArg: string;
+    if (params.tokenIds.length === 1) {
+      tx = await erc1155Contract
+        ["safeTransferFrom(address,address,uint256,uint256,bytes)"](
+          await signer.getAddress(),
+          params.daoAddressOrEns,
+          params.tokenIds[0],
+          params.amounts[0],
+          new Uint8Array([]),
+        );
+      logName = "TransferSingle";
+      logArg = "id";
+    } else {
+      tx = await erc1155Contract
+        ["safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)"](
+          await signer.getAddress(),
+          params.daoAddressOrEns,
+          params.tokenIds,
+          params.amounts,
+          new Uint8Array([]),
+        );
+      logName = "TransferBatch";
+      logArg = "ids";
+    }
+
+    const cr = await tx.wait();
+
+    const log = findLog(cr, erc1155Contract.interface, logName);
+
+    if (!log) {
+      throw new FailedDepositError();
+    }
+
+    const parsedLog = erc1155Contract.interface.parseLog(log);
+    if (
+      !parsedLog.args[logArg] ||
+      parsedLog.args[logArg].toString() !== params.tokenIds.toString()
+    ) {
+      throw new FailedDepositError();
+    }
+    yield {
+      key: DaoDepositSteps.DONE,
+      tokenIds: params.tokenIds,
+      amounts: params.amounts,
     };
   }
 

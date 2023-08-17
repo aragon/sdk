@@ -1,14 +1,13 @@
 import {
-  DAO__factory,
   DAOFactory,
   DAOFactory__factory,
   PluginRepo__factory,
 } from "@aragon/osx-ethers";
 import {
-  DepositNativeTokenError,
   InvalidAddressOrEnsError,
   InvalidSubdomainError,
   NoProviderError,
+  NotImplementedError,
 } from "@aragon/sdk-common";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
@@ -18,7 +17,11 @@ import {
   DepositParams,
   SetAllowanceParams,
 } from "../../types";
-import { unwrapDepositParams } from "../utils";
+import {
+  estimateErc1155Deposit,
+  estimateErc20Deposit,
+  estimateErc721Deposit,
+} from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IClientEstimation } from "../interfaces";
@@ -29,6 +32,7 @@ import {
   PrepareInstallationParams,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { BigNumber } from "@ethersproject/bignumber";
 
 /**
  * Estimation module the SDK Generic Client
@@ -95,32 +99,30 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
-  public deposit(
+  public async deposit(
     params: DepositParams,
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-
-    if (params.type !== TokenType.NATIVE && params.type !== TokenType.ERC20) {
-      throw new DepositNativeTokenError();
+    let estimation: BigNumber;
+    switch (params.type) {
+      case TokenType.NATIVE:
+      case TokenType.ERC20:
+        estimation = await estimateErc20Deposit(signer, params);
+        break;
+      case TokenType.ERC721:
+        estimation = await estimateErc721Deposit(signer, params);
+        break;
+      case TokenType.ERC1155:
+        estimation = await estimateErc1155Deposit(signer, params);
+        break;
+      default:
+        throw new NotImplementedError(
+          "Token type not valid",
+        );
     }
-
-    const [daoAddress, amount, tokenAddress, reference] = unwrapDepositParams(
-      params,
-    );
-
-    const daoInstance = DAO__factory.connect(daoAddress, signer);
-
-    const override: { value?: bigint } = {};
-    if (tokenAddress === AddressZero) {
-      override.value = amount;
-    }
-
-    return daoInstance.estimateGas
-      .deposit(tokenAddress, amount, reference, override)
-      .then((gasLimit) => {
-        return this.web3.getApproximateGasFee(gasLimit.toBigInt());
-      });
+    return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
+
   /**
    * Estimates the gas fee of updating the allowance of an ERC20 token
    *

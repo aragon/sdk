@@ -22,12 +22,15 @@ import {
 import { Contract } from "@ethersproject/contracts";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
+import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
 import {
   hexToBytes,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidEnsError,
+  InvalidParameter,
   NotImplementedError,
+  SizeMismatchError,
 } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IClientEncoding } from "../interfaces";
@@ -290,6 +293,51 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
             params.tokenId, // tokenId
           ],
         );
+        return {
+          to: params.tokenAddress,
+          value: BigInt(0),
+          data: hexToBytes(data),
+        };
+      case TokenType.ERC1155:
+        if (params.tokenIds.length !== params.amounts.length) {
+          throw new SizeMismatchError();
+        }
+        if (params.tokenIds.length === 0 || params.amounts.length === 0) {
+          throw new InvalidParameter("tokenIds or amounts cannot be empty");
+        }
+        if (
+          !params.tokenAddress || !params.recipientAddressOrEns ||
+          !params.daoAddressOrEns
+        ) {
+          throw new InvalidAddressError();
+        }
+        iface = new Contract(
+          params.tokenAddress,
+          ERC1155_ABI,
+        ).interface;
+        if (params.tokenIds.length === 1) {
+          data = iface.encodeFunctionData(
+            "safeTransferFrom(address,address,uint256,uint256,bytes)",
+            [
+              params.daoAddressOrEns, // from
+              params.recipientAddressOrEns, // to
+              params.tokenIds[0], // tokenId
+              params.amounts[0], // amount
+              new Uint8Array(), // data
+            ],
+          );
+        } else {
+          data = iface.encodeFunctionData(
+            "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)",
+            [
+              params.daoAddressOrEns, // from
+              params.recipientAddressOrEns, // to
+              params.tokenIds, // tokenIds
+              params.amounts, // amounts
+              new Uint8Array(), // data
+            ],
+          );
+        }
         return {
           to: params.tokenAddress,
           value: BigInt(0),

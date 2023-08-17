@@ -174,6 +174,12 @@ describe("Client", () => {
       }
     });
     it("Should decode an encoded withdraw action of an erc721 token", async () => {
+      // encoded withdraw erc721 action data
+      // type: ERC721
+      // tokenAddress: 0x000000000000000000000000000000000003
+      // tokenId: 10
+      // recipientAddressOrEns: 0x000000000000000000000000000000000002
+      // daoAddressOrEns: 0x000000000000000000000000000000000001
       const data =
         "0x42842e0e00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a";
       const context = new Context(contextParamsLocalChain);
@@ -198,6 +204,40 @@ describe("Client", () => {
       } else {
         fail("TokenType should be ERC721");
       }
+    });
+      it("Should decode an encoded withdraw action of an erc1155 token", async () => {
+        // encoded withdraw erc1155 action data
+        // type: ERC1155
+        // tokenAddress: 0x000000000000000000000000000000000001
+        // recipientAddressOrEns: 0x000000000000000000000000000000000002
+        // daoAddressOrEns: 0x000000000000000000000000000000000003
+        // tokenIds: [10]
+        // amounts: [20]
+        const data =
+          "0xf242432a00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000";
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const params = client.decoding.withdrawAction(
+          ADDRESS_ONE,
+          BigInt(0),
+          hexToBytes(data),
+        );
+        if (params.type === TokenType.ERC1155) {
+          expect(params.type).toBe(TokenType.ERC1155);
+          expect(params.tokenIds.toString()).toBe([BigInt(10)].toString());
+          expect(params.amounts.toString()).toBe([BigInt(20)].toString());
+          expect(params.daoAddressOrEns).toBe(
+            ADDRESS_THREE,
+          )
+          expect(params.recipientAddressOrEns).toBe(
+            ADDRESS_TWO,
+          );
+          expect(params.tokenAddress).toBe(
+            ADDRESS_ONE,
+          );
+        } else {
+          fail("TokenType should be ERC1155");
+        }
     });
 
     it("Should decode an encoded update metadata action", async () => {

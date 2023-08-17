@@ -73,6 +73,7 @@ import {
   TokenType,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../../../src/multisig/internal/constants";
+import { deployErc1155 } from "../../helpers/deploy-erc1155";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -200,6 +201,101 @@ describe("Client", () => {
     });
 
     describe("DAO deposit", () => {
+      it("Should allow to deposit an ERC1155", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+
+        const erc1155Contract = await deployErc1155();
+        const tokenId = BigInt(0);
+        const deployer = await client.web3.getConnectedSigner().getAddress();
+        const deployerBalance = await erc1155Contract.balanceOf(
+          deployer,
+          tokenId,
+        );
+        expect(deployerBalance.toString()).toBe("10");
+        const steps = client.methods.deposit({
+          type: TokenType.ERC1155,
+          daoAddressOrEns: daoAddress,
+          tokenIds: [tokenId],
+          amounts: [BigInt(7)],
+          tokenAddress: erc1155Contract.address,
+        });
+        for await (const step of steps) {
+          switch (step.key) {
+            case DaoDepositSteps.DEPOSITING:
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoDepositSteps.DONE:
+              expect(step.tokenIds?.length).toBe(1);
+              expect(step.tokenIds?.[0].toString()).toBe(tokenId.toString());
+              expect(step.amounts?.length).toBe(1);
+              expect(step.amounts?.[0].toString()).toBe(BigInt(7).toString());
+              break;
+          }
+        }
+        const daoBalance = await erc1155Contract.balanceOf(daoAddress, tokenId);
+        expect(daoBalance.toString()).toBe("7");
+      });
+      it("Should allow to batch deposit an ERC1155", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+
+        const erc1155Contract = await deployErc1155();
+        const deployer = await client.web3.getConnectedSigner().getAddress();
+        const tokenIds = [BigInt(0), BigInt(1), BigInt(2)];
+        const amounts = [BigInt(7), BigInt(8), BigInt(9)];
+        const deployerBalanceId0 = await erc1155Contract.balanceOf(
+          deployer,
+          tokenIds[0],
+        );
+        const deployerBalanceId1 = await erc1155Contract.balanceOf(
+          deployer,
+          tokenIds[1],
+        );
+        const deployerBalanceId2 = await erc1155Contract.balanceOf(
+          deployer,
+          tokenIds[2],
+        );
+        expect(deployerBalanceId0.toString()).toBe("10");
+        expect(deployerBalanceId1.toString()).toBe("10");
+        expect(deployerBalanceId2.toString()).toBe("10");
+        const steps = client.methods.deposit({
+          type: TokenType.ERC1155,
+          daoAddressOrEns: daoAddress,
+          tokenIds,
+          amounts,
+          tokenAddress: erc1155Contract.address,
+        });
+        for await (const step of steps) {
+          switch (step.key) {
+            case DaoDepositSteps.DEPOSITING:
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoDepositSteps.DONE:
+              expect(step.tokenIds?.length).toBe(3);
+              expect(step.tokenIds?.toString()).toBe(tokenIds.toString());
+              expect(step.amounts?.length).toBe(3);
+              expect(step.amounts?.toString()).toBe(amounts.toString());
+              break;
+          }
+        }
+        const daoBalanceId0 = await erc1155Contract.balanceOf(
+          daoAddress,
+          tokenIds[0],
+        );
+        const daoBalanceId1 = await erc1155Contract.balanceOf(
+          daoAddress,
+          tokenIds[1],
+        );
+        const daoBalanceId2 = await erc1155Contract.balanceOf(
+          daoAddress,
+          tokenIds[2],
+        );
+
+        expect(daoBalanceId0.toString()).toBe(amounts[0].toString());
+        expect(daoBalanceId1.toString()).toBe(amounts[1].toString());
+        expect(daoBalanceId2.toString()).toBe(amounts[2].toString());
+      });
       it("Should allow to deposit an ERC721", async () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
@@ -401,6 +497,45 @@ describe("Client", () => {
             )
           ).toString(),
         ).toBe("7");
+      });
+
+      it("Should allow to deposit native toekn", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+
+        const provider = client.web3.getProvider();
+
+        const amount = BigInt(7);
+
+        const depositParams: DepositParams = {
+          type: TokenType.NATIVE,
+          daoAddressOrEns: daoAddress,
+          amount,
+        };
+
+        // Deposit
+        for await (const step of client.methods.deposit(depositParams)) {
+          switch (step.key) {
+            case DaoDepositSteps.DEPOSITING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case DaoDepositSteps.DONE:
+              expect(typeof step.amount).toBe("bigint");
+              expect(step.amount).toBe(BigInt(7));
+              break;
+            default:
+              throw new Error(
+                "Unexpected DAO deposit step: " + JSON.stringify(step, null, 2),
+              );
+          }
+        }
+
+        const daoBalance = await provider.getBalance(daoAddress);
+        expect(
+          daoBalance.toString(),
+        ).toBe(amount.toString());
+
       });
 
       it("Check if dao factory has register dao permission in the dao registry", async () => {
