@@ -145,5 +145,5 @@ export class Web3Module implements IClientWeb3Core {
       throw new InvalidAddressError();
     }
     return address;
-  }  
+  }
 }

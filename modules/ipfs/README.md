@@ -116,6 +116,7 @@ console.log(recoveredBytes);
 ```
 
 ### Decoding as text
+
 ```ts
 const recoveredString = new TextDecoder().decode(recoveredBytes);
 console.log(recoveredString);
@@ -135,7 +136,8 @@ console.log(pins);
 // ["QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK"]
 ```
 
-**Note:** Using IPFS pin on the Aragon IPFS cluster may be restricted. Use IPFS add instead.
+**Note:** Using IPFS pin on the Aragon IPFS cluster may be restricted. Use IPFS
+add instead.
 
 ## IPFS unpin
 
@@ -150,7 +152,7 @@ console.log(pins);
 // ["QmeJ4kRW21RRgjywi9ydvY44kfx71x2WbRq7ik5xh5zBZK"]
 ```
 
-**Note:** Using IPFS unpin on the Aragon IPFS cluster may be restricted. 
+**Note:** Using IPFS unpin on the Aragon IPFS cluster may be restricted.
 
 # Testing
 

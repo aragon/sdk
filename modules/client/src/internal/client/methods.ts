@@ -137,7 +137,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): AsyncGenerator<PrepareInstallationStepValue> {
     yield* prepareGenericInstallation(this.web3, {
       ...params,
-      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
     });
   }
   /**
@@ -339,7 +341,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
     yield { key: DaoDepositSteps.DONE, amount: amount };
   }
-  
+
   private async *depositErc20(
     params: DepositErc20Params,
   ): AsyncGenerator<DaoDepositStepValue> {

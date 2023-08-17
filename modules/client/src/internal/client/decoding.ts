@@ -158,14 +158,15 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
         tokenStandard: TokenType.ERC1155,
         abi: ERC1155_ABI,
         batch: true,
-        function: "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)",
+        function:
+          "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)",
       },
       {
         tokenStandard: TokenType.ERC1155,
         abi: ERC1155_ABI,
         batch: false,
         function: "safeTransferFrom(address,address,uint256,uint256,bytes)",
-      }
+      },
     ];
     for (const abiObject of abiObjects) {
       try {

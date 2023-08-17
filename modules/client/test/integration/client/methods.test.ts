@@ -107,7 +107,7 @@ describe("Client", () => {
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
 
-        const daoCreation = await deployContracts.createTokenVotingDAO(
+      const daoCreation = await deployContracts.createTokenVotingDAO(
         deployment,
         "test-tokenvoting-dao",
         VotingMode.STANDARD,
@@ -535,7 +535,6 @@ describe("Client", () => {
         expect(
           daoBalance.toString(),
         ).toBe(amount.toString());
-
       });
 
       it("Check if dao factory has register dao permission in the dao registry", async () => {

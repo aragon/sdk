@@ -5,10 +5,10 @@ import {
 } from "@aragon/sdk-ipfs";
 import {
   ClientNotInitializedError,
+  DataDecodingError,
   IpfsError,
   NoNodesAvailableError,
   runAndRetry,
-  DataDecodingError
 } from "@aragon/sdk-common";
 import { IClientIpfsCore } from "../interfaces";
 import { Context } from "../../context";

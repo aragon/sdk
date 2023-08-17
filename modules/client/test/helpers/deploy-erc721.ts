@@ -16,7 +16,11 @@ export async function deployErc721() {
     ERC721_ABI_BYTECODE,
     signer,
   );
-  const contract = await factory.deploy("Test NFT", "TNFT", "https://example.org/metadata.json");
+  const contract = await factory.deploy(
+    "Test NFT",
+    "TNFT",
+    "https://example.org/metadata.json",
+  );
   await contract.mint(signer.getAddress());
   return contract;
 }

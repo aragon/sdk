@@ -1,4 +1,8 @@
-import { InvalidProposalStatusError, getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
+import {
+  getCompactProposalId,
+  hexToBytes,
+  InvalidProposalStatusError,
+} from "@aragon/sdk-common";
 import { SubgraphAction } from "../../client-common";
 import { MultisigProposal, MultisigProposalListItem } from "../types";
 import {

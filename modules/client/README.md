@@ -21,14 +21,20 @@ yarn add @aragon/sdk-client
 
 # Usage
 
-The SDK usage is demonstrated in the [SDK examples section of the Developer Portal](https://devs.aragon.org/docs/sdk/examples/).
+The SDK usage is demonstrated in the
+[SDK examples section of the Developer Portal](https://devs.aragon.org/docs/sdk/examples/).
 
 ## React Native
-In order for the SDK to be used in restricted environments like react native install the following polyfilesand  into your project:  
--  [@ethersproject/shims](https://www.npmjs.com/package/@ethersproject/shims)
--  [react-native-url-polyfill](https://www.npmjs.com/package/react-native-url-polyfill)
 
-Then import them like the following **before** you import the Aragon SDK package:  
+In order for the SDK to be used in restricted environments like react native
+install the following polyfilesand into your project:
+
+- [@ethersproject/shims](https://www.npmjs.com/package/@ethersproject/shims)
+- [react-native-url-polyfill](https://www.npmjs.com/package/react-native-url-polyfill)
+
+Then import them like the following **before** you import the Aragon SDK
+package:
+
 ```javascript
 import "@ethersproject/shims";
 import "react-native-url-polyfill/auto";
@@ -48,7 +54,8 @@ See `ClientCore` ([source](./src/internal/core.ts)):
   - Web3, contracts, signing
   - IPFS
   - GraphQL
-- Inherited by classes like `Client` and all plugin classes like `TokenVotingClient`.
+- Inherited by classes like `Client` and all plugin classes like
+  `TokenVotingClient`.
 
 ## Common interfaces, types, enum's
 
@@ -65,7 +72,8 @@ When updating the `Client` class:
 ## Developing a new Plugin client
 
 Create a new class that `extends` from `ClientCore`, receives a `Context` on the
-`constructor` and follows the structure of [TokenVotingClient](./src/tokenVoting/client.ts).
+`constructor` and follows the structure of
+[TokenVotingClient](./src/tokenVoting/client.ts).
 
 # Testing
 

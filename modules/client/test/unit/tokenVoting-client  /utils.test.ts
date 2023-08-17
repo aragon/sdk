@@ -1,6 +1,12 @@
 import { ProposalStatus, TokenType } from "@aragon/sdk-client-common";
-import { SubgraphContractType, SubgraphTokenVotingProposal } from "../../../src/tokenVoting/internal/types";
-import { computeProposalStatus, parseToken } from "../../../src/tokenVoting/internal/utils";
+import {
+  SubgraphContractType,
+  SubgraphTokenVotingProposal,
+} from "../../../src/tokenVoting/internal/types";
+import {
+  computeProposalStatus,
+  parseToken,
+} from "../../../src/tokenVoting/internal/utils";
 
 describe("tokenVoting-client utils", () => {
   describe("parseToken", () => {

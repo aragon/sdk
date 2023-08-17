@@ -4,7 +4,7 @@ describe("Run and retry", () => {
   it("Should run and retry 3 times", async () => {
     let countFunc = 0;
     let countOnFail = 0;
-    const message = "success"
+    const message = "success";
 
     const res = await runAndRetry({
       func: async () => {

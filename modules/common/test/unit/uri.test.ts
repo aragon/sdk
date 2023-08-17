@@ -54,21 +54,20 @@ describe("MultiUri Class", () => {
       "ipfs://QmSH4tFQd6zqPW9b8ryvtrnbhr9HATyetmWxtGgWUJ33ik/some/path";
     const pathCid = uri.substring(7);
     let pathIdx = pathCid.indexOf("/");
-    const cid = pathCid.substring(0,pathIdx)
-    const path = pathCid.substring(pathIdx)
-    const multiuri = new MultiUri(uri)
+    const cid = pathCid.substring(0, pathIdx);
+    const path = pathCid.substring(pathIdx);
+    const multiuri = new MultiUri(uri);
     expect(multiuri.http.length).toBe(0);
     expect(multiuri.ipfs!.cid).toBe(cid);
     expect(multiuri.ipfs!.path).toBe(path);
     expect(multiuri.ipfsCid!).toBe(cid);
   });
   it("Should get an ipfs cid with path", () => {
-    const pathCid =
-      "QmSH4tFQd6zqPW9b8ryvtrnbhr9HATyetmWxtGgWUJ33ik/some/path";
+    const pathCid = "QmSH4tFQd6zqPW9b8ryvtrnbhr9HATyetmWxtGgWUJ33ik/some/path";
     let pathIdx = pathCid.indexOf("/");
-    const cid = pathCid.substring(0,pathIdx)
-    const path = pathCid.substring(pathIdx)
-    const multiuri = new MultiUri(pathCid)
+    const cid = pathCid.substring(0, pathIdx);
+    const path = pathCid.substring(pathIdx);
+    const multiuri = new MultiUri(pathCid);
     expect(multiuri.http.length).toBe(0);
     expect(multiuri.ipfs!.cid).toBe(cid);
     expect(multiuri.ipfs!.path).toBe(path);

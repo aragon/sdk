@@ -260,7 +260,9 @@ export class AddresslistVotingClientMethods extends ClientCore
         votingSettingsToContract(params.settings.votingSettings),
         params.settings.addresses,
       ],
-      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
     });
   }
 

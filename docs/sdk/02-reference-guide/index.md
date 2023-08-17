@@ -4,7 +4,8 @@ title: Reference Guide
 
 ## Overview
 
-This section contains the auto-generated documentation of the individual clients that the `@aragon/sdk-client` is offering:
+This section contains the auto-generated documentation of the individual clients
+that the `@aragon/sdk-client` is offering:
 
 - [Generic SDK Client](./01-client.md)
 - [Multisig Client](./02-multisig.md)

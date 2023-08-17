@@ -27,23 +27,27 @@ yarn add @aragon/sdk-client
 
 ### Usage
 
-The use of the different SDK features and methods is demonstrated in the [Examples (coming soon)](./01-examples/index.md) section.
+The use of the different SDK features and methods is demonstrated in the
+[Examples (coming soon)](./01-examples/index.md) section.
 
-An extensive documentation of the different clients can be found in the auto-generated [Reference Guide](./02-reference-guide/index.md) section.
+An extensive documentation of the different clients can be found in the
+auto-generated [Reference Guide](./02-reference-guide/index.md) section.
 
 #### React Native
 
-In order for the SDK to be used in restricted environments like react native install the following polyfills into your project:
+In order for the SDK to be used in restricted environments like react native
+install the following polyfills into your project:
 
 - [@ethersproject/shims](https://www.npmjs.com/package/@ethersproject/shims)
 - [react-native-url-polyfill](https://www.npmjs.com/package/react-native-url-polyfill)
 
-Then import them like the following **before** you import the Aragon SDK package:
+Then import them like the following **before** you import the Aragon SDK
+package:
 
 ```javascript
-import '@ethersproject/shims';
-import 'react-native-url-polyfill/auto';
-import {Client} from '@aragon/sdk-client';
+import "@ethersproject/shims";
+import "react-native-url-polyfill/auto";
+import { Client } from "@aragon/sdk-client";
 ```
 
 ### Development
@@ -59,7 +63,8 @@ See `ClientCore` (`/src/internal/core.ts`):
   - Web3, contracts, signing
   - IPFS
   - GraphQL
-- Inherited by classes like `Client` and all plugin classes like `TokenVotingClient`.
+- Inherited by classes like `Client` and all plugin classes like
+  `TokenVotingClient`.
 
 #### Common interfaces, types, enums
 
@@ -81,4 +86,5 @@ When updating the `ClientCore` class:
 #### Developing a new Plugin client
 
 Create a new class that `extends` from `ClientCore`, receives a `Context` on the
-`constructor` and follows the structure of `TokenVotingClient` (`./src/tokenVoting/client.ts`).
+`constructor` and follows the structure of `TokenVotingClient`
+(`./src/tokenVoting/client.ts`).

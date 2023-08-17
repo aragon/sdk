@@ -7,7 +7,7 @@ export type SubgraphPluginListItem = {
   } | null;
   appliedPluginRepo: {
     subdomain: string;
-  } | null; 
+  } | null;
   appliedVersion: {
     build: number;
     release: {

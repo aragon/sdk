@@ -17,49 +17,45 @@ Deposits ERC-1155 tokens to a DAO.
 - If multiple token IDs are provided, the safeBatchTransferFrom function is called.
 */
 
-import {
-    Client,
-    DaoDepositSteps,
-    DepositParams,
-  } from "@aragon/sdk-client";
-  import { GasFeeEstimation, TokenType } from "@aragon/sdk-client-common";
-  import { context } from "../index";
-  
-  // Instantiate the general purpose client from the Aragon OSx SDK context.
-  const client: Client = new Client(context);
-  
-  const depositParams: DepositParams = {
-    daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
-    tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
-    type: TokenType.ERC1155, // "erc1155" for ERC1155 token
-    tokenIds: [BigInt(1)], // token ID of the ERC-1155 token
-    amounts: [BigInt(1)], // amount of the ERC-1155 token to deposit
-  };
-  
-  // Estimate how much gas the transaction will cost.
-  const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
-    depositParams,
-  );
-  console.log({ avg: estimatedGas.average, max: estimatedGas.max });
-  
-  // Deposit the ERC1155 tokens.
-  const steps = client.methods.deposit(depositParams);
-  for await (const step of steps) {
-    try {
-      switch (step.key) {
-        case DaoDepositSteps.DEPOSITING:
-          console.log({ depositingTxHash: step.txHash });
-          break;
-        case DaoDepositSteps.DONE:
-          console.log({ tokenId: step.tokenIds, amount: step.amounts });
-          break;
-      }
-    } catch (err) {
-      console.error(err);
+import { Client, DaoDepositSteps, DepositParams } from "@aragon/sdk-client";
+import { GasFeeEstimation, TokenType } from "@aragon/sdk-client-common";
+import { context } from "../index";
+
+// Instantiate the general purpose client from the Aragon OSx SDK context.
+const client: Client = new Client(context);
+
+const depositParams: DepositParams = {
+  daoAddressOrEns: "0x1234567890123456789012345678901234567890", // my-dao.dao.eth
+  tokenAddress: "0x1234567890123456789012345678901234567890", // token contract adddress
+  type: TokenType.ERC1155, // "erc1155" for ERC1155 token
+  tokenIds: [BigInt(1)], // token ID of the ERC-1155 token
+  amounts: [BigInt(1)], // amount of the ERC-1155 token to deposit
+};
+
+// Estimate how much gas the transaction will cost.
+const estimatedGas: GasFeeEstimation = await client.estimation.deposit(
+  depositParams,
+);
+console.log({ avg: estimatedGas.average, max: estimatedGas.max });
+
+// Deposit the ERC1155 tokens.
+const steps = client.methods.deposit(depositParams);
+for await (const step of steps) {
+  try {
+    switch (step.key) {
+      case DaoDepositSteps.DEPOSITING:
+        console.log({ depositingTxHash: step.txHash });
+        break;
+      case DaoDepositSteps.DONE:
+        console.log({ tokenId: step.tokenIds, amount: step.amounts });
+        break;
     }
+  } catch (err) {
+    console.error(err);
   }
-  
-  /* MARKDOWN
+}
+
+/* MARKDOWN
   Returns:
   ```tsx
   {
@@ -71,4 +67,3 @@ import {
   }
   ```
   */
-  

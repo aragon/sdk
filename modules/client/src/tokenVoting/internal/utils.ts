@@ -340,7 +340,7 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
 /**
  * Checks if the given address is an ERC20 token
  * This function isn not 100% accurate.
- * It just checks if the token has a balanceOf 
+ * It just checks if the token has a balanceOf
  * function and a decimals function
  *
  * @export

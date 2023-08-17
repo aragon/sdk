@@ -52,4 +52,3 @@ export function promiseWithTimeout<T>(
     return prom.then((result) => resolve(result)).catch((err) => reject(err));
   });
 }
-

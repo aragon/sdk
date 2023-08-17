@@ -115,7 +115,6 @@ export const INSTALLATION_ABI: MetadataAbiInput[] = [
   },
 ];
 
-
 export const ERC165_INTERFACE_ID = getInterfaceId(
   new Interface(ERC165_ABI),
 );

@@ -20,7 +20,9 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
 
 const tokenAddress = "0x1234567890123456789012345678901234567890"; // token contract adddress
 
-const compatibility = tokenVotingClient.methods.isTokenVotingCompatibleToken(tokenAddress);
+const compatibility = tokenVotingClient.methods.isTokenVotingCompatibleToken(
+  tokenAddress,
+);
 
 console.log(compatibility);
 

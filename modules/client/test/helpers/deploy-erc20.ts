@@ -10,7 +10,7 @@ import {
 export async function deployErc20() {
   const client = new Client(new Context(contextParamsLocalChain));
   const signer = client.web3.getConnectedSigner();
-  
+
   const factory = new ContractFactory(
     ERC20_ABI,
     ERC20_ABI_BYTECODE,

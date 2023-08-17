@@ -48,7 +48,11 @@ import {
   DecodedApplyInstallationParams,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { InvalidParameter, NotImplementedError, SizeMismatchError } from "@aragon/sdk-common";
+import {
+  InvalidParameter,
+  NotImplementedError,
+  SizeMismatchError,
+} from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract } from "@ethersproject/contracts";
 import { BigNumber } from "@ethersproject/bignumber";
