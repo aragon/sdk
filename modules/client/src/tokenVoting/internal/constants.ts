@@ -120,7 +120,7 @@ export const ERC165_INTERFACE_ID = getInterfaceId(
   new Interface(ERC165_ABI),
 );
 
-export const GOVERNANCE_INTERFACES_SUPPORTED = [
+export const GOVERNANCE_SUPPORTED_INTERFACE_IDS = [
   getInterfaceId(new Interface(IVOTES_UPGRADEABLE_ABI)),
   getInterfaceId(new Interface(IVOTES_ABI)),
   getInterfaceId(IGovernanceWrappedERC20__factory.createInterface()),

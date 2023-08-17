@@ -102,7 +102,7 @@ import {
 } from "@aragon/sdk-client-common";
 import {
   ERC165_INTERFACE_ID,
-  GOVERNANCE_INTERFACES_SUPPORTED,
+  GOVERNANCE_SUPPORTED_INTERFACE_IDS,
   INSTALLATION_ABI,
 } from "../constants";
 import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
@@ -785,8 +785,8 @@ export class TokenVotingClientMethods extends ClientCore
       if (!await contract.supportsInterface(ERC165_INTERFACE_ID)) {
         return TokenVotingTokenCompatibility.NEEDS_WRAPPING;
       }
-      for (const iface of GOVERNANCE_INTERFACES_SUPPORTED) {
-        const isSupported = await contract.supportsInterface(iface);
+      for (const interfaceId of GOVERNANCE_SUPPORTED_INTERFACE_IDS) {
+        const isSupported = await contract.supportsInterface(interfaceId);
         if (isSupported) {
           return TokenVotingTokenCompatibility.COMPATIBLE;
         }
