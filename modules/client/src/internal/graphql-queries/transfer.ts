@@ -32,6 +32,13 @@ query TokenTransfers($where: TokenTransfer_filter!, $limit:Int!, $skip: Int!, $d
     ... on NativeTransfer {
       amount
     }
+    ...on ERC1155Transfer{
+      amount
+      tokenId
+      token {
+        id
+      }
+    }
   }
 }
 `;
