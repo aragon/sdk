@@ -1438,7 +1438,7 @@ describe("Token Voting Client", () => {
         const compatibility = await client.methods.isTokenVotingCompatibleToken(
           erc20Token.address,
         );
-        expect(compatibility).toBe(
+        await expect(compatibility).toBe(
           TokenVotingTokenCompatibility.NEEDS_WRAPPING,
         );
       });
@@ -1454,7 +1454,7 @@ describe("Token Voting Client", () => {
       it("Should be called with an invalid address and throw InvalidAddressError", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
-        expect(() =>
+        await expect(() =>
           client.methods.isTokenVotingCompatibleToken(
             "0x123",
           )
@@ -1463,7 +1463,7 @@ describe("Token Voting Client", () => {
       it("Should be called with wallet invalid address and throw NotAContractError", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
-        expect(() =>
+        await expect(() =>
           client.methods.isTokenVotingCompatibleToken(
             TEST_WALLET_ADDRESS,
           )
