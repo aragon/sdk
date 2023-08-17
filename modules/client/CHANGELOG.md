@@ -19,6 +19,7 @@ TEMPLATE:
 ## [UPCOMING]
 ### Fixes
 - Support for ERC115Transfers and balances
+
 ## [1.13.0-rc1]
 
 ### Added
