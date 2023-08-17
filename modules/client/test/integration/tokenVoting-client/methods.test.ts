@@ -1438,7 +1438,7 @@ describe("Token Voting Client", () => {
         const compatibility = await client.methods.isTokenVotingCompatibleToken(
           erc20Token.address,
         );
-        await expect(compatibility).toBe(
+        expect(compatibility).toBe(
           TokenVotingTokenCompatibility.NEEDS_WRAPPING,
         );
       });
