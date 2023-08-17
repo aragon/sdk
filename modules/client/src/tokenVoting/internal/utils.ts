@@ -337,7 +337,6 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
   return where;
 }
 
-
 /**
  * Checks if the given address is an ERC20 token
  * This function isn not 100% accurate.
