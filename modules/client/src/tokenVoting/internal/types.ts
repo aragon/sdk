@@ -90,3 +90,9 @@ export type SubgraphTokenVotingMember = {
     balance: string;
   }[];
 };
+
+export enum TokenVotingTokenCompatibility {
+  COMPATIBLE = "compatible",
+  NEEDS_WRAPPING = "needsWrapping",
+  INCOMPATIBLE = "incompatible",
+}

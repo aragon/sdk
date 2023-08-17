@@ -32,7 +32,9 @@ import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   getExtendedProposalId,
+  InvalidAddressError,
   InvalidAddressOrEnsError,
+  NotAContractError,
 } from "@aragon/sdk-common";
 import {
   ADDRESS_FOUR,
@@ -72,8 +74,10 @@ import {
   SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  TokenVotingTokenCompatibility,
 } from "../../../src/tokenVoting/internal/types";
 import { deployErc20 } from "../../helpers/deploy-erc20";
+import { deployErc721 } from "../../helpers/deploy-erc721";
 import {
   GovernanceERC20__factory,
   GovernanceWrappedERC20__factory,
@@ -1425,6 +1429,54 @@ describe("Token Voting Client", () => {
         const pluginAddress: string = TEST_NON_EXISTING_ADDRESS;
         const token = await client.methods.getToken(pluginAddress);
         expect(token).toBe(null);
+      });
+
+      it("Should check if a ERC20 is compatible with the TokenVotingSetup and return needs wrapping", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        const erc20Token = await deployErc20();
+        const compatibility = await client.methods.isTokenVotingCompatibleToken(
+          erc20Token.address,
+        );
+        expect(compatibility).toBe(
+          TokenVotingTokenCompatibility.NEEDS_WRAPPING,
+        );
+      });
+      it("Should check if ERC721 is compatible with governance and return incompatible", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        const erc721Token = await deployErc721();
+        const compatibility = await client.methods.isTokenVotingCompatibleToken(
+          erc721Token.address,
+        );
+        expect(compatibility).toBe(TokenVotingTokenCompatibility.INCOMPATIBLE);
+      });
+      it("Should be called with an invalid address and throw InvalidAddressError", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        await expect(() =>
+          client.methods.isTokenVotingCompatibleToken(
+            "0x123",
+          )
+        ).rejects.toThrow(InvalidAddressError);
+      });
+      it("Should be called with wallet invalid address and throw NotAContractError", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        await expect(() =>
+          client.methods.isTokenVotingCompatibleToken(
+            TEST_WALLET_ADDRESS,
+          )
+        ).rejects.toThrow(NotAContractError);
+      });
+      it("Should check if GovernanceERC20 is compatible with governance and return compatible", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+        const dao = await buildTokenVotingDAO(repoAddr, VotingMode.STANDARD);
+        const isCompatible = await client.methods.isTokenVotingCompatibleToken(
+          dao.tokenAddress,
+        );
+        expect(isCompatible).toBe(TokenVotingTokenCompatibility.COMPATIBLE);
       });
     });
   });

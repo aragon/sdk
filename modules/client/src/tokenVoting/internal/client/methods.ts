@@ -12,6 +12,7 @@ import {
   IpfsPinError,
   isProposalId,
   NoProviderError,
+  NotAContractError,
   promiseWithTimeout,
   ProposalCreationError,
   resolveIpfsCid,
@@ -60,6 +61,7 @@ import {
   SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  TokenVotingTokenCompatibility,
 } from "../types";
 import {
   QueryTokenVotingMembers,
@@ -70,6 +72,7 @@ import {
 } from "../graphql-queries";
 import {
   computeProposalStatusFilter,
+  isERC20Token,
   tokenVotingInitParamsToContract,
   toTokenVotingMember,
   toTokenVotingProposal,
@@ -97,7 +100,15 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "@aragon/sdk-client-common";
-import { INSTALLATION_ABI } from "../constants";
+import {
+  ERC165_INTERFACE_ID,
+  GOVERNANCE_SUPPORTED_INTERFACE_IDS,
+  INSTALLATION_ABI,
+} from "../constants";
+import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
+import { Contract } from "@ethersproject/contracts";
+import { AddressZero } from "@ethersproject/constants";
+
 /**
  * Methods module the SDK TokenVoting Client
  */
@@ -739,5 +750,50 @@ export class TokenVotingClientMethods extends ClientCore
       };
     }
     return null;
+  }
+
+  /**
+   * Checks if the given token is compatible with the TokenVoting plugin
+   *
+   * @param {string} tokenAddress
+   * @return {*}  {Promise<TokenVotingTokenCompatibility>}
+   * @memberof TokenVotingClientMethods
+   */
+  public async isTokenVotingCompatibleToken(
+    tokenAddress: string,
+  ): Promise<TokenVotingTokenCompatibility> {
+    const signer = this.web3.getConnectedSigner();
+    // check if is address
+    if (!isAddress(tokenAddress) || tokenAddress === AddressZero) {
+      throw new InvalidAddressError();
+    }
+    const provider = this.web3.getProvider();
+    // check if is a contract
+    if (await provider.getCode(tokenAddress) === "0x") {
+      throw new NotAContractError();
+    }
+    const contract = new Contract(
+      tokenAddress,
+      ERC165_ABI,
+      signer,
+    );
+
+    if (!await isERC20Token(tokenAddress, signer)) {
+      return TokenVotingTokenCompatibility.INCOMPATIBLE;
+    }
+    try {
+      if (!await contract.supportsInterface(ERC165_INTERFACE_ID)) {
+        return TokenVotingTokenCompatibility.NEEDS_WRAPPING;
+      }
+      for (const interfaceId of GOVERNANCE_SUPPORTED_INTERFACE_IDS) {
+        const isSupported = await contract.supportsInterface(interfaceId);
+        if (isSupported) {
+          return TokenVotingTokenCompatibility.COMPATIBLE;
+        }
+      }
+      return TokenVotingTokenCompatibility.NEEDS_WRAPPING;
+    } catch (e) {
+      return TokenVotingTokenCompatibility.NEEDS_WRAPPING;
+    }
   }
 }

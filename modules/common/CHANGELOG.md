@@ -17,7 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-
+### Added
+- New error classes
+- `getInterfaceId` function
 ## 1.5.0
 ### Added
 - New error classes `SizeMismatchError`, `InvalidProposalStatusError`, `NotImplementedError`, `InvalidActionError`, `InvalidSubdomainError`, `InvalidGasEstimationFactorError` and `UseTransferError`

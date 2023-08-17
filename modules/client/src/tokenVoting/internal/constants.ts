@@ -1,8 +1,15 @@
 import {
   IERC20MintableUpgradeable__factory,
+  IGovernanceWrappedERC20__factory,
   MajorityVotingBase__factory,
 } from "@aragon/osx-ethers";
+import { getInterfaceId } from "@aragon/sdk-common";
 import { MetadataAbiInput } from "@aragon/sdk-client-common";
+import { abi as IVOTES_ABI } from "@openzeppelin/contracts/build/contracts/IVotes.json";
+import { abi as IVOTES_UPGRADEABLE_ABI } from "@openzeppelin/contracts-upgradeable/build/contracts/IVotesUpgradeable.json";
+import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
+import { Interface } from "@ethersproject/abi";
+
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
   MajorityVotingBase__factory.createInterface().getFunction(
     "updateVotingSettings",
@@ -106,4 +113,15 @@ export const INSTALLATION_ABI: MetadataAbiInput[] = [
     description:
       "The token mint settings struct containing the `receivers` and `amounts`.",
   },
+];
+
+
+export const ERC165_INTERFACE_ID = getInterfaceId(
+  new Interface(ERC165_ABI),
+);
+
+export const GOVERNANCE_SUPPORTED_INTERFACE_IDS = [
+  getInterfaceId(new Interface(IVOTES_UPGRADEABLE_ABI)),
+  getInterfaceId(new Interface(IVOTES_ABI)),
+  getInterfaceId(IGovernanceWrappedERC20__factory.createInterface()),
 ];
