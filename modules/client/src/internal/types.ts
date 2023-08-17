@@ -7,7 +7,7 @@ export type SubgraphPluginListItem = {
   } | null;
   appliedPluginRepo: {
     subdomain: string;
-  } | null; 
+  } | null;
   appliedVersion: {
     build: number;
     release: {
@@ -79,7 +79,7 @@ export type ContractPermissionWithConditionParams = [
   string,
   string,
   string,
-  string,
+  string
 ];
 export type ContractWithdrawParams = [string, string, BigNumber, string];
 

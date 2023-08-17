@@ -50,7 +50,7 @@ export class Client {
    */
   add(
     file: File | Blob | Uint8Array | string,
-    options?: AddOptions,
+    options?: AddOptions
   ): Promise<AddResponse> {
     return API.add(this, file, options);
   }

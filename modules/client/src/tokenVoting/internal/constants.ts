@@ -11,11 +11,11 @@ import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC16
 import { Interface } from "@ethersproject/abi";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
-  MajorityVotingBase__factory.createInterface().getFunction(
-    "updateVotingSettings",
-  )
+  MajorityVotingBase__factory.createInterface()
+    .getFunction("updateVotingSettings")
     .format("minimal"),
-  IERC20MintableUpgradeable__factory.createInterface().getFunction("mint")
+  IERC20MintableUpgradeable__factory.createInterface()
+    .getFunction("mint")
     .format("minimal"),
 ];
 
@@ -115,10 +115,7 @@ export const INSTALLATION_ABI: MetadataAbiInput[] = [
   },
 ];
 
-
-export const ERC165_INTERFACE_ID = getInterfaceId(
-  new Interface(ERC165_ABI),
-);
+export const ERC165_INTERFACE_ID = getInterfaceId(new Interface(ERC165_ABI));
 
 export const GOVERNANCE_SUPPORTED_INTERFACE_IDS = [
   getInterfaceId(new Interface(IVOTES_UPGRADEABLE_ABI)),

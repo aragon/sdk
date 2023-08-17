@@ -1,3 +1,3 @@
-export * from "./graphql";
-export * from "./ipfs";
-export * from "./web3";
+export * from './graphql';
+export * from './ipfs';
+export * from './web3';

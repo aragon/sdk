@@ -14,7 +14,7 @@ export class MultiUri {
         item = item.substring(7);
       }
       const idx = item.indexOf("/");
-      const cid = (idx < 0) ? item : item.substring(0, idx);
+      const cid = idx < 0 ? item : item.substring(0, idx);
 
       if (!IPFS_CID_REGEX.test(cid)) continue;
       return cid;
@@ -55,14 +55,13 @@ export class MultiUri {
     return null;
   }
   get http() {
-    return this.items.filter((item) =>
-      item.startsWith("http://") || item.startsWith("https://")
+    return this.items.filter(
+      item => item.startsWith("http://") || item.startsWith("https://")
     );
   }
 }
 
-const IPFS_CID_REGEX =
-  /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
+const IPFS_CID_REGEX = /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
 
 /** Attempts to parse the given string as a URL and returns the IPFS CiD contained in it.
  * Alternatively it tries to use the raw value after validating it.

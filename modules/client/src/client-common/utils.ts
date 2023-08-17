@@ -1,12 +1,8 @@
 import { IDAO } from "@aragon/osx-ethers";
 import { VoteValues, VotingMode } from "./types/plugin";
-import {
-  CreateMajorityVotingProposalParams,
-} from "./types/plugin";
+import { CreateMajorityVotingProposalParams } from "./types/plugin";
 
-import {
-  InvalidVotingModeError,
-} from "@aragon/sdk-common";
+import { InvalidVotingModeError } from "@aragon/sdk-common";
 import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
 import {
   DaoAction,
@@ -17,7 +13,7 @@ import {
 import { Result } from "@ethersproject/abi";
 
 export function unwrapProposalParams(
-  params: CreateMajorityVotingProposalParams,
+  params: CreateMajorityVotingProposalParams
 ): [string, IDAO.ActionStruct[], number, number, boolean, number] {
   return [
     params.metadataUri,
@@ -59,17 +55,19 @@ export function votingModeFromContracts(votingMode: number): VotingMode {
 
 export function isFailingProposal(actions: DaoAction[] = []): boolean {
   // store the function names of the actions
-  const functionNames: string[] = actions.map((action) => {
-    try {
-      const fragment = getFunctionFragment(
-        action.data,
-        FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES,
-      );
-      return fragment.name;
-    } catch {
-      return "";
-    }
-  }).filter((name) => name !== "");
+  const functionNames: string[] = actions
+    .map(action => {
+      try {
+        const fragment = getFunctionFragment(
+          action.data,
+          FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES
+        );
+        return fragment.name;
+      } catch {
+        return "";
+      }
+    })
+    .filter(name => name !== "");
 
   for (const [i, functionName] of functionNames.entries()) {
     // if I add addresses, we must update the settings after
@@ -85,10 +83,10 @@ export function isFailingProposal(actions: DaoAction[] = []): boolean {
     } else if (functionName === "removeAddresses") {
       // if there is not an updateVotingSettings before removeAddresses then the proposal will fail
       const updateVotingSettingsIndex = functionNames.indexOf(
-        "updateVotingSettings",
+        "updateVotingSettings"
       ); // if there is not an updateVotingSettings before removeAddresses then the proposal will fail
       const updateMultisigSettingsIndex = functionNames.indexOf(
-        "updateMultisigSettings",
+        "updateMultisigSettings"
       );
       if (
         (updateVotingSettingsIndex === -1 || updateVotingSettingsIndex > i) &&
@@ -102,7 +100,7 @@ export function isFailingProposal(actions: DaoAction[] = []): boolean {
 }
 
 export function applyInstallatonParamsFromContract(
-  result: Result,
+  result: Result
 ): DecodedApplyInstallationParams {
   const params = result[1];
   return {

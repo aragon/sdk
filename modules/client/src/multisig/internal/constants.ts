@@ -5,14 +5,15 @@ import { MetadataAbiInput } from "@aragon/sdk-client-common";
 
 // TODO update with function names
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
-  Multisig__factory.createInterface().getFunction("addAddresses")
+  Multisig__factory.createInterface()
+    .getFunction("addAddresses")
     .format("minimal"),
-  Multisig__factory.createInterface().getFunction(
-    "removeAddresses",
-  ).format("minimal"),
-  Multisig__factory.createInterface().getFunction(
-    "updateMultisigSettings",
-  ).format("minimal"),
+  Multisig__factory.createInterface()
+    .getFunction("removeAddresses")
+    .format("minimal"),
+  Multisig__factory.createInterface()
+    .getFunction("updateMultisigSettings")
+    .format("minimal"),
 ];
 
 export const INSTALLATION_ABI: MetadataAbiInput[] = [

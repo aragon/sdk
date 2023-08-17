@@ -122,13 +122,13 @@ export class TokenVotingClientMethods extends ClientCore
    * @memberof TokenVotingClient
    */
   public async *createProposal(
-    params: CreateMajorityVotingProposalParams,
+    params: CreateMajorityVotingProposalParams
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
 
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
-      signer,
+      signer
     );
 
     if (
@@ -149,7 +149,7 @@ export class TokenVotingClientMethods extends ClientCore
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
       params.creatorVote || 0,
-      params.executeOnPass || false,
+      params.executeOnPass || false
     );
 
     yield {
@@ -162,7 +162,7 @@ export class TokenVotingClientMethods extends ClientCore
     const log = findLog(
       receipt,
       tokenVotingContractInterface,
-      "ProposalCreated",
+      "ProposalCreated"
     );
     if (!log) {
       throw new ProposalCreationError();
@@ -205,7 +205,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @memberof TokenVotingClient
    */
   public async *voteProposal(
-    params: VoteProposalParams,
+    params: VoteProposalParams
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
 
@@ -213,14 +213,10 @@ export class TokenVotingClientMethods extends ClientCore
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
 
-    const tx = await tokenVotingContract.vote(
-      id,
-      params.vote,
-      false,
-    );
+    const tx = await tokenVotingContract.vote(id, params.vote, false);
 
     yield {
       key: VoteProposalStep.VOTING,
@@ -239,7 +235,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @memberof TokenVotingClient
    */
   public async *executeProposal(
-    proposalId: string,
+    proposalId: string
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
 
@@ -247,7 +243,7 @@ export class TokenVotingClientMethods extends ClientCore
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
     const tx = await tokenVotingContract.execute(id);
 
@@ -269,7 +265,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @memberof TokenVotingClientMethods
    */
   public async *prepareInstallation(
-    params: TokenVotingPluginPrepareInstallationParams,
+    params: TokenVotingPluginPrepareInstallationParams
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const network = await this.web3.getProvider().getNetwork();
     const networkName = network.name as SupportedNetwork;
@@ -283,13 +279,13 @@ export class TokenVotingClientMethods extends ClientCore
       installationAbi: INSTALLATION_ABI,
       installationParams: tokenVotingInitParamsToContract(params.settings),
       pluginSetupProcessorAddress: this.web3.getAddress(
-        "pluginSetupProcessorAddress",
+        "pluginSetupProcessorAddress"
       ),
     });
   }
 
   public async *wrapTokens(
-    params: WrapTokensParams,
+    params: WrapTokensParams
   ): AsyncGenerator<WrapTokensStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!isAddress(params.wrappedTokenAddress)) {
@@ -297,15 +293,12 @@ export class TokenVotingClientMethods extends ClientCore
     }
     const wrappedErc20Contract = GovernanceWrappedERC20__factory.connect(
       params.wrappedTokenAddress,
-      signer,
+      signer
     );
 
     const account = await signer.getAddress();
 
-    const tx = await wrappedErc20Contract.depositFor(
-      account,
-      params.amount,
-    );
+    const tx = await wrappedErc20Contract.depositFor(account, params.amount);
 
     yield {
       key: WrapTokensStep.WRAPPING,
@@ -317,7 +310,7 @@ export class TokenVotingClientMethods extends ClientCore
     };
   }
   public async *unwrapTokens(
-    params: UnwrapTokensParams,
+    params: UnwrapTokensParams
   ): AsyncGenerator<UnwrapTokensStepValue> {
     const signer = this.web3.getConnectedSigner();
     if (!isAddress(params.wrappedTokenAddress)) {
@@ -325,15 +318,12 @@ export class TokenVotingClientMethods extends ClientCore
     }
     const wrappedErc20Contract = GovernanceWrappedERC20__factory.connect(
       params.wrappedTokenAddress,
-      signer,
+      signer
     );
 
     const account = await signer.getAddress();
 
-    const tx = await wrappedErc20Contract.withdrawTo(
-      account,
-      params.amount,
-    );
+    const tx = await wrappedErc20Contract.withdrawTo(account, params.amount);
 
     yield {
       key: UnwrapTokensStep.UNWRAPPING,
@@ -352,12 +342,12 @@ export class TokenVotingClientMethods extends ClientCore
    * @memberof TokenVotingClientMethods
    */
   public async *delegateTokens(
-    params: DelegateTokensParams,
+    params: DelegateTokensParams
   ): AsyncGenerator<DelegateTokensStepValue> {
     const signer = this.web3.getConnectedSigner();
     const governanceErc20Contract = GovernanceERC20__factory.connect(
       params.tokenAddress,
-      signer,
+      signer
     );
     const tx = await governanceErc20Contract.delegate(params.delegatee);
     yield {
@@ -377,7 +367,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @memberof TokenVotingClientMethods
    */
   public async *undelegateTokens(
-    tokenAddress: string,
+    tokenAddress: string
   ): AsyncGenerator<UndelegateTokensStepValue> {
     const signer = this.web3.getConnectedSigner();
     yield* this.delegateTokens({
@@ -396,7 +386,7 @@ export class TokenVotingClientMethods extends ClientCore
     const signer = this.web3.getConnectedSigner();
     const governanceErc20Contract = GovernanceERC20__factory.connect(
       tokenAddress,
-      signer,
+      signer
     );
     const address = await signer.getAddress();
     const delegatee = await governanceErc20Contract.delegates(address);
@@ -420,12 +410,12 @@ export class TokenVotingClientMethods extends ClientCore
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
     return tokenVotingContract.callStatic.canVote(
       id,
       params.voterAddressOrEns,
-      params.vote,
+      params.vote
     );
   }
 
@@ -436,16 +426,14 @@ export class TokenVotingClientMethods extends ClientCore
    * @return {*}  {Promise<boolean>}
    * @memberof TokenVotingClientMethods
    */
-  public async canExecute(
-    proposalId: string,
-  ): Promise<boolean> {
+  public async canExecute(proposalId: string): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
 
     return tokenVotingContract.canExecute(id);
@@ -461,7 +449,7 @@ export class TokenVotingClientMethods extends ClientCore
    */
   public async getMembers(
     pluginAddress: string,
-    blockNumber?: number,
+    blockNumber?: number
   ): Promise<TokenVotingMember[]> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -478,9 +466,9 @@ export class TokenVotingClientMethods extends ClientCore
       params,
       name,
     });
-    return tokenVotingPlugin.members.map((
-      member: SubgraphTokenVotingMember,
-    ) => toTokenVotingMember(member));
+    return tokenVotingPlugin.members.map((member: SubgraphTokenVotingMember) =>
+      toTokenVotingMember(member)
+    );
   }
 
   /**
@@ -491,7 +479,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @memberof TokenVotingClient
    */
   public async getProposal(
-    proposalId: string,
+    proposalId: string
   ): Promise<TokenVotingProposal | null> {
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
@@ -513,7 +501,7 @@ export class TokenVotingClientMethods extends ClientCore
     } else if (!tokenVotingProposal.metadata) {
       return toTokenVotingProposal(
         tokenVotingProposal,
-        EMPTY_PROPOSAL_METADATA_LINK,
+        EMPTY_PROPOSAL_METADATA_LINK
       );
     }
     // format in the metadata field
@@ -527,12 +515,12 @@ export class TokenVotingClientMethods extends ClientCore
       if (err instanceof InvalidCidError) {
         return toTokenVotingProposal(
           tokenVotingProposal,
-          UNSUPPORTED_PROPOSAL_METADATA_LINK,
+          UNSUPPORTED_PROPOSAL_METADATA_LINK
         );
       }
       return toTokenVotingProposal(
         tokenVotingProposal,
-        UNAVAILABLE_PROPOSAL_METADATA,
+        UNAVAILABLE_PROPOSAL_METADATA
       );
     }
   }
@@ -593,13 +581,13 @@ export class TokenVotingClientMethods extends ClientCore
     return Promise.all(
       tokenVotingProposals.map(
         async (
-          proposal: SubgraphTokenVotingProposalListItem,
+          proposal: SubgraphTokenVotingProposalListItem
         ): Promise<TokenVotingProposalListItem> => {
           // format in the metadata field
           if (!proposal.metadata) {
             return toTokenVotingProposalListItem(
               proposal,
-              EMPTY_PROPOSAL_METADATA_LINK,
+              EMPTY_PROPOSAL_METADATA_LINK
             );
           }
           try {
@@ -607,7 +595,7 @@ export class TokenVotingClientMethods extends ClientCore
             // Avoid blocking Promise.all if this individual fetch takes too long
             const stringMetadata = await promiseWithTimeout(
               this.ipfs.fetchString(metadataCid),
-              MULTI_FETCH_TIMEOUT,
+              MULTI_FETCH_TIMEOUT
             );
             const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
             return toTokenVotingProposalListItem(proposal, metadata);
@@ -615,16 +603,16 @@ export class TokenVotingClientMethods extends ClientCore
             if (err instanceof InvalidCidError) {
               return toTokenVotingProposalListItem(
                 proposal,
-                UNSUPPORTED_PROPOSAL_METADATA_LINK,
+                UNSUPPORTED_PROPOSAL_METADATA_LINK
               );
             }
             return toTokenVotingProposalListItem(
               proposal,
-              UNAVAILABLE_PROPOSAL_METADATA,
+              UNAVAILABLE_PROPOSAL_METADATA
             );
           }
-        },
-      ),
+        }
+      )
     );
   }
 
@@ -638,7 +626,7 @@ export class TokenVotingClientMethods extends ClientCore
    */
   public async getVotingSettings(
     pluginAddress: string,
-    blockNumber?: number,
+    blockNumber?: number
   ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -662,15 +650,13 @@ export class TokenVotingClientMethods extends ClientCore
       minDuration: parseInt(tokenVotingPlugin.minDuration),
       supportThreshold: decodeRatio(
         BigInt(tokenVotingPlugin.supportThreshold),
-        6,
+        6
       ),
       minParticipation: decodeRatio(
         BigInt(tokenVotingPlugin.minParticipation),
-        6,
+        6
       ),
-      minProposerVotingPower: BigInt(
-        tokenVotingPlugin.minProposerVotingPower,
-      ),
+      minProposerVotingPower: BigInt(tokenVotingPlugin.minProposerVotingPower),
       votingMode: tokenVotingPlugin.votingMode,
     };
   }
@@ -683,7 +669,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @memberof TokenVotingClient
    */
   public async getToken(
-    pluginAddress: string,
+    pluginAddress: string
   ): Promise<
     Erc20TokenDetails | Erc721TokenDetails | Erc20WrapperTokenDetails | null
   > {
@@ -760,7 +746,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @memberof TokenVotingClientMethods
    */
   public async isTokenVotingCompatibleToken(
-    tokenAddress: string,
+    tokenAddress: string
   ): Promise<TokenVotingTokenCompatibility> {
     const signer = this.web3.getConnectedSigner();
     // check if is address
@@ -769,20 +755,16 @@ export class TokenVotingClientMethods extends ClientCore
     }
     const provider = this.web3.getProvider();
     // check if is a contract
-    if (await provider.getCode(tokenAddress) === "0x") {
+    if ((await provider.getCode(tokenAddress)) === "0x") {
       throw new NotAContractError();
     }
-    const contract = new Contract(
-      tokenAddress,
-      ERC165_ABI,
-      signer,
-    );
+    const contract = new Contract(tokenAddress, ERC165_ABI, signer);
 
-    if (!await isERC20Token(tokenAddress, signer)) {
+    if (!(await isERC20Token(tokenAddress, signer))) {
       return TokenVotingTokenCompatibility.INCOMPATIBLE;
     }
     try {
-      if (!await contract.supportsInterface(ERC165_INTERFACE_ID)) {
+      if (!(await contract.supportsInterface(ERC165_INTERFACE_ID))) {
         return TokenVotingTokenCompatibility.NEEDS_WRAPPING;
       }
       for (const interfaceId of GOVERNANCE_SUPPORTED_INTERFACE_IDS) {

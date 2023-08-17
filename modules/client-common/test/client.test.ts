@@ -9,11 +9,11 @@ class TestContext extends ContextCore {
   }
 }
 
-class TestClient extends ClientCore {
-  constructor(context: TestContext) {
-    super(context);
+  class TestClient extends ClientCore {
+    constructor(context: TestContext) {
+      super(context);
+    }
   }
-}
 
 describe("Test an extended client", () => {
   it("Should create a client with the default context parameters", async () => {

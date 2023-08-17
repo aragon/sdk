@@ -48,7 +48,11 @@ import {
   DecodedApplyInstallationParams,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { InvalidParameter, NotImplementedError, SizeMismatchError } from "@aragon/sdk-common";
+import {
+  InvalidParameter,
+  NotImplementedError,
+  SizeMismatchError,
+} from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract } from "@ethersproject/contracts";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -56,7 +60,7 @@ import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC72
 import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
 
 export function unwrapDepositParams(
-  params: DepositEthParams | DepositErc20Params,
+  params: DepositEthParams | DepositErc20Params
 ): [string, bigint, string, string] {
   return [
     params.daoAddressOrEns,
@@ -68,7 +72,7 @@ export function unwrapDepositParams(
 
 export function toDaoDetails(
   dao: SubgraphDao,
-  metadata: DaoMetadata,
+  metadata: DaoMetadata
 ): DaoDetails {
   return {
     address: dao.id,
@@ -82,30 +86,28 @@ export function toDaoDetails(
     creationDate: new Date(parseInt(dao.createdAt) * 1000),
     // TODO update when new subgraph schema is deployed
     // filter out plugins that are not applied
-    plugins: dao.plugins.filter(
-      (plugin) =>
-        plugin.appliedPreparation && plugin.appliedVersion &&
-        plugin.appliedPluginRepo,
-    )
+    plugins: dao.plugins
+      .filter(
+        plugin =>
+          plugin.appliedPreparation &&
+          plugin.appliedVersion &&
+          plugin.appliedPluginRepo
+      )
       .map(
-        (
-          plugin: SubgraphPluginListItem,
-        ): InstalledPluginListItem => (
-          {
-            // we checked with the filter above that these are not null
-            id: `${plugin.appliedPluginRepo!.subdomain}.plugin.dao.eth`,
-            release: plugin.appliedVersion!.release.release,
-            build: plugin.appliedVersion!.build,
-            instanceAddress: plugin.appliedPreparation!.pluginAddress,
-          }
-        ),
+        (plugin: SubgraphPluginListItem): InstalledPluginListItem => ({
+          // we checked with the filter above that these are not null
+          id: `${plugin.appliedPluginRepo!.subdomain}.plugin.dao.eth`,
+          release: plugin.appliedVersion!.release.release,
+          build: plugin.appliedVersion!.build,
+          instanceAddress: plugin.appliedPreparation!.pluginAddress,
+        })
       ),
   };
 }
 
 export function toDaoListItem(
   dao: SubgraphDaoListItem,
-  metadata: DaoMetadata,
+  metadata: DaoMetadata
 ): DaoListItem {
   return {
     address: dao.id,
@@ -115,23 +117,21 @@ export function toDaoListItem(
       description: metadata.description,
       avatar: metadata.avatar || undefined,
     },
-    plugins: dao.plugins.filter(
-      (plugin) =>
-        plugin.appliedPreparation && plugin.appliedVersion &&
-        plugin.appliedPluginRepo,
-    )
+    plugins: dao.plugins
+      .filter(
+        plugin =>
+          plugin.appliedPreparation &&
+          plugin.appliedVersion &&
+          plugin.appliedPluginRepo
+      )
       .map(
-        (
-          plugin: SubgraphPluginListItem,
-        ): InstalledPluginListItem => (
-          {
-            // we checked with the filter above that these are not null
-            id: `${plugin.appliedPluginRepo!.subdomain}.plugin.dao.eth`,
-            release: plugin.appliedVersion!.release.release,
-            build: plugin.appliedVersion!.build,
-            instanceAddress: plugin.appliedPreparation!.pluginAddress,
-          }
-        ),
+        (plugin: SubgraphPluginListItem): InstalledPluginListItem => ({
+          // we checked with the filter above that these are not null
+          id: `${plugin.appliedPluginRepo!.subdomain}.plugin.dao.eth`,
+          release: plugin.appliedVersion!.release.release,
+          build: plugin.appliedVersion!.build,
+          instanceAddress: plugin.appliedPreparation!.pluginAddress,
+        })
       ),
   };
 }
@@ -258,18 +258,18 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
 
 export function toPluginRepoRelease(
   release: SubgraphPluginRepoReleaseListItem,
-  metadata: PluginRepoReleaseMetadata,
+  metadata: PluginRepoReleaseMetadata
 ): PluginRepoRelease {
   return {
     release: release.release,
-    currentBuild: Math.max(...release.builds.map((build) => build.build)),
+    currentBuild: Math.max(...release.builds.map(build => build.build)),
     metadata,
   };
 }
 
 export function toPluginRepoListItem(
   pluginRepo: SubgraphPluginRepoListItem,
-  releases: PluginRepoRelease[],
+  releases: PluginRepoRelease[]
 ): PluginRepoListItem {
   return {
     address: pluginRepo.id,
@@ -280,7 +280,7 @@ export function toPluginRepoListItem(
 export function toPluginRepo(
   pluginRepo: SubgraphPluginRepo,
   releaseMetadata: PluginRepoReleaseMetadata,
-  buildMetadata: PluginRepoBuildMetadata,
+  buildMetadata: PluginRepoBuildMetadata
 ): PluginRepo {
   return {
     address: pluginRepo.id,
@@ -303,7 +303,7 @@ export function toPluginRepo(
 }
 
 export function applyInstallatonParamsToContract(
-  params: ApplyInstallationParams,
+  params: ApplyInstallationParams
 ): PluginSetupProcessor.ApplyInstallationParamsStruct {
   return {
     plugin: params.pluginAddress,
@@ -312,15 +312,15 @@ export function applyInstallatonParamsToContract(
       versionTag: params.versionTag,
     },
     helpersHash: keccak256(
-      defaultAbiCoder.encode(["address[]"], [params.helpers]),
+      defaultAbiCoder.encode(["address[]"], [params.helpers])
     ),
-    permissions: params.permissions.map((permission) => {
+    permissions: params.permissions.map(permission => {
       return { ...permission, condition: permission.condition || AddressZero };
     }),
   };
 }
 export function applyUninstallationParamsToContract(
-  params: ApplyUninstallationParams,
+  params: ApplyUninstallationParams
 ): PluginSetupProcessor.ApplyUninstallationParamsStruct {
   return {
     plugin: params.pluginAddress,
@@ -328,13 +328,13 @@ export function applyUninstallationParamsToContract(
       pluginSetupRepo: params.pluginRepo,
       versionTag: params.versionTag,
     },
-    permissions: params.permissions.map((permission) => {
+    permissions: params.permissions.map(permission => {
       return { ...permission, condition: permission.condition || AddressZero };
     }),
   };
 }
 export function applyInstallatonParamsFromContract(
-  result: Result,
+  result: Result
 ): DecodedApplyInstallationParams {
   const params = result[1];
   return {
@@ -347,12 +347,12 @@ export function applyInstallatonParamsFromContract(
 }
 
 export function permissionParamsToContract(
-  params: GrantPermissionParams | RevokePermissionParams,
+  params: GrantPermissionParams | RevokePermissionParams
 ): ContractPermissionParams {
   return [params.where, params.who, keccak256(toUtf8Bytes(params.permission))];
 }
 export function permissionWithConditionParamsToContract(
-  params: GrantPermissionWithConditionParams,
+  params: GrantPermissionWithConditionParams
 ): ContractPermissionWithConditionParams {
   return [
     ...permissionParamsToContract({
@@ -365,19 +365,20 @@ export function permissionWithConditionParamsToContract(
 }
 
 export function permissionParamsFromContract(
-  result: Result,
+  result: Result
 ): GrantPermissionDecodedParams | RevokePermissionDecodedParams {
   return {
     where: result[0],
     who: result[1],
     permissionId: result[2],
-    permission: Object.keys(PermissionIds)
-      .find((k) => PermissionIds[k] === result[2])
-      ?.replace(/_ID$/, "") || "",
+    permission:
+      Object.keys(PermissionIds)
+        .find(k => PermissionIds[k] === result[2])
+        ?.replace(/_ID$/, "") || "",
   };
 }
 export function permissionParamsWitConditionFromContract(
-  result: Result,
+  result: Result
 ): GrantPermissionWithConditionDecodedParams {
   return {
     ...permissionParamsFromContract(result),
@@ -390,7 +391,7 @@ export function withdrawParamsFromContract(
   _value: bigint,
   result: Result,
   tokenStandard: TokenType,
-  isBatch: boolean,
+  isBatch: boolean
 ): WithdrawParams {
   switch (tokenStandard) {
     case TokenType.ERC20:
@@ -431,7 +432,7 @@ export function withdrawParamsFromContract(
 
 export async function estimateErc20Deposit(
   signer: Signer,
-  params: DepositErc20Params | DepositEthParams,
+  params: DepositErc20Params | DepositEthParams
 ): Promise<BigNumber> {
   let tokenAddress;
   if (params.type === TokenType.NATIVE) {
@@ -440,68 +441,57 @@ export async function estimateErc20Deposit(
     tokenAddress = params.tokenAddress;
   }
   const daoInstance = DAO__factory.connect(params.daoAddressOrEns, signer);
-  return await daoInstance.estimateGas.deposit(
-    tokenAddress,
-    params.amount,
-    "",
-  );
+  return await daoInstance.estimateGas.deposit(tokenAddress, params.amount, "");
 }
 
 export async function estimateErc721Deposit(
   signer: Signer,
-  params: DepositErc721Params,
+  params: DepositErc721Params
 ): Promise<BigNumber> {
-  const erc721Contract = new Contract(
-    params.tokenAddress,
-    ERC721_ABI,
-    signer,
-  );
-  return erc721Contract.estimateGas
-    ["safeTransferFrom(address,address,uint256)"](
-      await signer.getAddress(),
-      params.daoAddressOrEns,
-      params.tokenId,
-    );
+  const erc721Contract = new Contract(params.tokenAddress, ERC721_ABI, signer);
+  return erc721Contract.estimateGas[
+    "safeTransferFrom(address,address,uint256)"
+  ](await signer.getAddress(), params.daoAddressOrEns, params.tokenId);
 }
 
 export async function estimateErc1155Deposit(
   signer: Signer,
-  params: DepositErc1155Params,
+  params: DepositErc1155Params
 ): Promise<BigNumber> {
   // if length is 0, throw
   if (!params.tokenIds.length || !params.amounts.length) {
     throw new InvalidParameter("tokenIds or amounts cannot be empty");
   }
   // if tokenIds and amounts length are different, throw
-  if (
-    params.tokenIds.length !== params.amounts.length
-  ) {
+  if (params.tokenIds.length !== params.amounts.length) {
     throw new SizeMismatchError();
   }
   const erc1155Contract = new Contract(
     params.tokenAddress,
     ERC1155_ABI,
-    signer,
+    signer
   );
   let estimation: BigNumber;
   if (params.tokenIds.length === 1) {
-    estimation = await erc1155Contract.estimateGas
-      ["safeTransferFrom(address,address,uint256,uint256,bytes)"](
-        await signer.getAddress(),
-        params.daoAddressOrEns,
-        params.tokenIds[0],
-        params.amounts[0],
-        new Uint8Array(0),
-      );
+    estimation = await erc1155Contract.estimateGas[
+      "safeTransferFrom(address,address,uint256,uint256,bytes)"
+    ](
+      await signer.getAddress(),
+      params.daoAddressOrEns,
+      params.tokenIds[0],
+      params.amounts[0],
+      new Uint8Array(0)
+    );
   } else {
-    estimation = await erc1155Contract.estimateGas
-      ["safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)"](
-        await signer.getAddress(),
-        params.daoAddressOrEns,
-        params.tokenIds,
-        params.amounts,
-        new Uint8Array(0),
-      );
+    estimation = await erc1155Contract.estimateGas[
+      "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)"
+    ](
+      await signer.getAddress(),
+      params.daoAddressOrEns,
+      params.tokenIds,
+      params.amounts,
+      new Uint8Array(0)
+    );
   }
   return estimation;
 }

@@ -42,7 +42,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    */
   static getPluginInstallItem(
     params: AddresslistVotingPluginInstall,
-    network: Networkish,
+    network: Networkish
   ): PluginInstallItem {
     const networkName = getNetwork(network).name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
@@ -50,10 +50,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     }
     const hexBytes = defaultAbiCoder.encode(
       getNamedTypesFromMetadata(INSTALLATION_ABI),
-      [
-        votingSettingsToContract(params.votingSettings),
-        params.addresses,
-      ],
+      [votingSettingsToContract(params.votingSettings), params.addresses]
     );
 
     return {
@@ -72,7 +69,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
-    params: VotingSettings,
+    params: VotingSettings
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -103,10 +100,9 @@ export class AddresslistVotingClientEncoding extends ClientCore
     }
     const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
-    const hexBytes = votingInterface.encodeFunctionData(
-      "addAddresses",
-      [members],
-    );
+    const hexBytes = votingInterface.encodeFunctionData("addAddresses", [
+      members,
+    ]);
     return {
       to: pluginAddress,
       value: BigInt(0),
@@ -123,7 +119,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    */
   public removeMembersAction(
     pluginAddress: string,
-    members: string[],
+    members: string[]
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -135,10 +131,9 @@ export class AddresslistVotingClientEncoding extends ClientCore
     }
     const votingInterface = AddresslistVoting__factory.createInterface();
     // get hex bytes
-    const hexBytes = votingInterface.encodeFunctionData(
-      "removeAddresses",
-      [members],
-    );
+    const hexBytes = votingInterface.encodeFunctionData("removeAddresses", [
+      members,
+    ]);
     return {
       to: pluginAddress,
       value: BigInt(0),

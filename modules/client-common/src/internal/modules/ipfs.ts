@@ -2,16 +2,16 @@ import {
   Client as IpfsClient,
   ClientError,
   PinResponse,
-} from "@aragon/sdk-ipfs";
+} from '@aragon/sdk-ipfs';
 import {
   ClientNotInitializedError,
   IpfsError,
   NoNodesAvailableError,
   runAndRetry,
-  DataDecodingError
-} from "@aragon/sdk-common";
-import { IClientIpfsCore } from "../interfaces";
-import { Context } from "../../context";
+  DataDecodingError,
+} from '@aragon/sdk-common';
+import { IClientIpfsCore } from '../interfaces';
+import { Context } from '../../context';
 
 export class IPFSModule implements IClientIpfsCore {
   private clientIdx: number = -1;
@@ -26,7 +26,7 @@ export class IPFSModule implements IClientIpfsCore {
 
   public getClient(): IpfsClient {
     if (!this.clients.length || !this.clients[this.clientIdx]) {
-      throw new ClientNotInitializedError("ipfs");
+      throw new ClientNotInitializedError('ipfs');
     }
     return this.clients[this.clientIdx];
   }
@@ -36,9 +36,9 @@ export class IPFSModule implements IClientIpfsCore {
    */
   public shiftClient(): void {
     if (!this.clients.length) {
-      throw new ClientNotInitializedError("ipfs");
+      throw new ClientNotInitializedError('ipfs');
     } else if (this.clients?.length < 2) {
-      throw new NoNodesAvailableError("ipfs");
+      throw new NoNodesAvailableError('ipfs');
     }
     this.clientIdx = (this.clientIdx + 1) % this.clients.length;
   }
@@ -46,18 +46,21 @@ export class IPFSModule implements IClientIpfsCore {
   /** Returns `true` if the current client is on line */
   public isUp(): Promise<boolean> {
     if (!this.clients?.length) return Promise.resolve(false);
-    return this.getClient().nodeInfo().then(() => true).catch(() => false);
+    return this.getClient()
+      .nodeInfo()
+      .then(() => true)
+      .catch(() => false);
   }
 
   public async ensureOnline(): Promise<void> {
     if (!this.clients.length) {
-      throw new ClientNotInitializedError("ipfs");
+      throw new ClientNotInitializedError('ipfs');
     }
     for (let i = 0; i < this.clients?.length; i++) {
       if (await this.isUp()) return;
       this.shiftClient();
     }
-    throw new NoNodesAvailableError("ipfs");
+    throw new NoNodesAvailableError('ipfs');
   }
 
   public getOnlineClient(): Promise<IpfsClient> {
@@ -67,9 +70,9 @@ export class IPFSModule implements IClientIpfsCore {
   // IPFS METHODS
 
   public async add(input: string | Uint8Array): Promise<string> {
-    return this.runAndRetryHelper(() => this.getClient().add(input)).then((
-      res,
-    ) => res.hash);
+    return this.runAndRetryHelper(() => this.getClient().add(input)).then(
+      res => res.hash
+    );
   }
 
   public pin(input: string): Promise<PinResponse> {
@@ -82,7 +85,7 @@ export class IPFSModule implements IClientIpfsCore {
 
   private runAndRetryHelper<T>(f: () => Promise<T>): Promise<T> {
     if (!this.clients.length) {
-      throw new ClientNotInitializedError("ipfs");
+      throw new ClientNotInitializedError('ipfs');
     }
     let retries = this.clients.length;
     return runAndRetry({
@@ -104,8 +107,8 @@ export class IPFSModule implements IClientIpfsCore {
 
   public fetchString(cid: string): Promise<string> {
     return this.fetchBytes(cid)
-      .then((bytes) => new TextDecoder().decode(bytes))
-      .catch((e) => {
+      .then(bytes => new TextDecoder().decode(bytes))
+      .catch(e => {
         throw new DataDecodingError(e.message);
       });
   }

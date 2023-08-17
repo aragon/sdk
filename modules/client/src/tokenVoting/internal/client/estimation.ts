@@ -28,13 +28,13 @@ export class TokenVotingClientEstimation extends ClientCore
    * @memberof TokenVotingClientEstimation
    */
   public async createProposal(
-    params: CreateMajorityVotingProposalParams,
+    params: CreateMajorityVotingProposalParams
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
 
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
-      signer,
+      signer
     );
 
     if (
@@ -48,16 +48,15 @@ export class TokenVotingClientEstimation extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const estimatedGasFee = await tokenVotingContract.estimateGas
-      .createProposal(
-        toUtf8Bytes(params.metadataUri),
-        params.actions || [],
-        allowFailureMap,
-        Math.round(startTimestamp / 1000),
-        Math.round(endTimestamp / 1000),
-        params.creatorVote || 0,
-        params.executeOnPass || false,
-      );
+    const estimatedGasFee = await tokenVotingContract.estimateGas.createProposal(
+      toUtf8Bytes(params.metadataUri),
+      params.actions || [],
+      allowFailureMap,
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
+      params.creatorVote || 0,
+      params.executeOnPass || false
+    );
     return this.web3.getApproximateGasFee(estimatedGasFee.toBigInt());
   }
   /**
@@ -68,23 +67,21 @@ export class TokenVotingClientEstimation extends ClientCore
    * @memberof TokenVotingClientEstimation
    */
   public async voteProposal(
-    params: VoteProposalParams,
+    params: VoteProposalParams
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
 
-    const { pluginAddress, id } = decodeProposalId(
-      params.proposalId,
-    );
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
 
     const estimation = await tokenVotingContract.estimateGas.vote(
       id,
       params.vote,
-      false,
+      false
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
@@ -96,22 +93,16 @@ export class TokenVotingClientEstimation extends ClientCore
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
-  public async executeProposal(
-    proposalId: string,
-  ): Promise<GasFeeEstimation> {
+  public async executeProposal(proposalId: string): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
 
-    const { pluginAddress, id } = decodeProposalId(
-      proposalId,
-    );
+    const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
-    const estimation = await tokenVotingContract.estimateGas.execute(
-      id,
-    );
+    const estimation = await tokenVotingContract.estimateGas.execute(id);
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
 
@@ -123,15 +114,15 @@ export class TokenVotingClientEstimation extends ClientCore
    * @memberof TokenVotingClientEstimation
    */
   public async delegateTokens(
-    params: DelegateTokensParams,
+    params: DelegateTokensParams
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     const governanceErc20Contract = GovernanceERC20__factory.connect(
       params.tokenAddress,
-      signer,
+      signer
     );
     const estimation = await governanceErc20Contract.estimateGas.delegate(
-      params.delegatee,
+      params.delegatee
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
@@ -144,7 +135,7 @@ export class TokenVotingClientEstimation extends ClientCore
    * @memberof TokenVotingClientEstimation
    */
   public async undelegateTokens(
-    tokenAddress: string,
+    tokenAddress: string
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     return this.delegateTokens({

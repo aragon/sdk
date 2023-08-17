@@ -47,19 +47,13 @@ import { abi as ERC_20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20
 
 export function toTokenVotingProposal(
   proposal: SubgraphTokenVotingProposal,
-  metadata: ProposalMetadata,
+  metadata: ProposalMetadata
 ): TokenVotingProposal {
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
+  const startDate = new Date(parseInt(proposal.startDate) * 1000);
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
-  const creationDate = new Date(
-    parseInt(proposal.createdAt) * 1000,
-  );
+  const creationDate = new Date(parseInt(proposal.createdAt) * 1000);
   const executionDate = proposal.executionDate
-    ? new Date(
-      parseInt(proposal.executionDate) * 1000,
-    )
+    ? new Date(parseInt(proposal.executionDate) * 1000)
     : null;
   let usedVotingWeight: bigint = BigInt(0);
   for (const voter of proposal.voters) {
@@ -94,7 +88,7 @@ export function toTokenVotingProposal(
           to: action.to,
           value: BigInt(action.value),
         };
-      },
+      }
     ),
     status: computeProposalStatus(proposal),
     result: {
@@ -104,37 +98,32 @@ export function toTokenVotingProposal(
     },
     settings: {
       supportThreshold: decodeRatio(BigInt(proposal.supportThreshold), 6),
-      duration: parseInt(proposal.endDate) -
-        parseInt(proposal.startDate),
+      duration: parseInt(proposal.endDate) - parseInt(proposal.startDate),
       minParticipation: decodeRatio(
         (BigInt(proposal.minVotingPower) * BigInt(1000000)) /
           BigInt(proposal.totalVotingPower),
-        6,
+        6
       ),
     },
     token,
     usedVotingWeight,
     totalVotingWeight: BigInt(proposal.totalVotingPower),
-    votes: proposal.voters.map(
-      (voter: SubgraphTokenVotingVoterListItem) => {
-        return {
-          voteReplaced: voter.voteReplaced,
-          address: voter.voter.address,
-          vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
-          weight: BigInt(voter.votingPower),
-        };
-      },
-    ),
+    votes: proposal.voters.map((voter: SubgraphTokenVotingVoterListItem) => {
+      return {
+        voteReplaced: voter.voteReplaced,
+        address: voter.voter.address,
+        vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
+        weight: BigInt(voter.votingPower),
+      };
+    }),
   };
 }
 
 export function toTokenVotingProposalListItem(
   proposal: SubgraphTokenVotingProposalListItem,
-  metadata: ProposalMetadata,
+  metadata: ProposalMetadata
 ): TokenVotingProposalListItem {
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
+  const startDate = new Date(parseInt(proposal.startDate) * 1000);
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   const token = parseToken(proposal.plugin.token);
   return {
@@ -145,12 +134,11 @@ export function toTokenVotingProposalListItem(
     },
     settings: {
       supportThreshold: decodeRatio(BigInt(proposal.supportThreshold), 6),
-      duration: parseInt(proposal.endDate) -
-        parseInt(proposal.startDate),
+      duration: parseInt(proposal.endDate) - parseInt(proposal.startDate),
       minParticipation: decodeRatio(
         (BigInt(proposal.minVotingPower) * BigInt(1000000)) /
           BigInt(proposal.totalVotingPower),
-        6,
+        6
       ),
     },
     creatorAddress: proposal.creator,
@@ -168,21 +156,19 @@ export function toTokenVotingProposalListItem(
       abstain: proposal.abstain ? BigInt(proposal.abstain) : BigInt(0),
     },
     token,
-    votes: proposal.voters.map(
-      (voter: SubgraphTokenVotingVoterListItem) => {
-        return {
-          voteReplaced: voter.voteReplaced,
-          address: voter.voter.address,
-          vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
-          weight: BigInt(voter.votingPower),
-        };
-      },
-    ),
+    votes: proposal.voters.map((voter: SubgraphTokenVotingVoterListItem) => {
+      return {
+        voteReplaced: voter.voteReplaced,
+        address: voter.voter.address,
+        vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
+        weight: BigInt(voter.votingPower),
+      };
+    }),
   };
 }
 
 export function mintTokenParamsToContract(
-  params: MintTokenParams,
+  params: MintTokenParams
 ): ContractMintTokenParams {
   return [params.address, BigNumber.from(params.amount)];
 }
@@ -195,14 +181,14 @@ export function mintTokenParamsFromContract(result: Result): MintTokenParams {
 }
 
 export function tokenVotingInitParamsToContract(
-  params: TokenVotingPluginInstall,
+  params: TokenVotingPluginInstall
 ): ContractTokenVotingInitParams {
   let token: [string, string, string] = ["", "", ""];
   let balances: [string[], BigNumber[]] = [[], []];
   if (params.newToken) {
     token = [AddressZero, params.newToken.name, params.newToken.symbol];
     balances = [
-      params.newToken.balances.map((balance) => balance.address),
+      params.newToken.balances.map(balance => balance.address),
       params.newToken.balances.map(({ balance }) => BigNumber.from(balance)),
     ];
   } else if (params.useToken) {
@@ -212,18 +198,14 @@ export function tokenVotingInitParamsToContract(
       params.useToken.wrappedToken.symbol,
     ];
   }
-  return [
-    votingSettingsToContract(params.votingSettings),
-    token,
-    balances,
-  ];
+  return [votingSettingsToContract(params.votingSettings), token, balances];
 }
 
 export function parseToken(
   subgraphToken:
     | SubgraphErc20Token
     | SubgraphErc721Token
-    | SubgraphErc20WrapperToken,
+    | SubgraphErc20WrapperToken
 ): Erc20TokenDetails | Erc721TokenDetails | null {
   let token:
     | Erc721TokenDetails
@@ -265,33 +247,32 @@ export function parseToken(
 }
 
 export function toTokenVotingMember(
-  member: SubgraphTokenVotingMember,
+  member: SubgraphTokenVotingMember
 ): TokenVotingMember {
   return {
     address: member.address,
     votingPower: BigInt(member.votingPower),
     balance: BigInt(member.balance),
-    delegatee: member.delegatee.address === member.address
-      ? null
-      : member.delegatee.address,
-    delegators: member.delegators.filter((delegator) =>
-      delegator.address !== member.address
-    ).map((delegator) => {
-      return {
-        address: delegator.address,
-        balance: BigInt(delegator.balance),
-      };
-    }),
+    delegatee:
+      member.delegatee.address === member.address
+        ? null
+        : member.delegatee.address,
+    delegators: member.delegators
+      .filter(delegator => delegator.address !== member.address)
+      .map(delegator => {
+        return {
+          address: delegator.address,
+          balance: BigInt(delegator.balance),
+        };
+      }),
   };
 }
 
 export function computeProposalStatus(
-  proposal: SubgraphTokenVotingProposal | SubgraphTokenVotingProposalListItem,
+  proposal: SubgraphTokenVotingProposal | SubgraphTokenVotingProposalListItem
 ): ProposalStatus {
   const now = new Date();
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
+  const startDate = new Date(parseInt(proposal.startDate) * 1000);
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   if (proposal.executed) {
     return ProposalStatus.EXECUTED;
@@ -340,7 +321,7 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
 /**
  * Checks if the given address is an ERC20 token
  * This function isn not 100% accurate.
- * It just checks if the token has a balanceOf 
+ * It just checks if the token has a balanceOf
  * function and a decimals function
  *
  * @export
@@ -350,13 +331,9 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
  */
 export async function isERC20Token(
   tokenAddress: string,
-  signer: Signer,
+  signer: Signer
 ): Promise<boolean> {
-  const contract = new Contract(
-    tokenAddress,
-    ERC_20_ABI,
-    signer,
-  );
+  const contract = new Contract(tokenAddress, ERC_20_ABI, signer);
   try {
     await Promise.all([
       contract.balanceOf(await signer.getAddress()),

@@ -133,11 +133,13 @@ import {
  */
 export class ClientMethods extends ClientCore implements IClientMethods {
   public async *prepareInstallation(
-    params: PrepareInstallationParams,
+    params: PrepareInstallationParams
   ): AsyncGenerator<PrepareInstallationStepValue> {
     yield* prepareGenericInstallation(this.web3, {
       ...params,
-      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress"
+      ),
     });
   }
   /**
@@ -148,18 +150,16 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async *createDao(
-    params: CreateDaoParams,
+    params: CreateDaoParams
   ): AsyncGenerator<DaoCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
-    if (
-      params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
-    ) {
+    if (params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9-]+$/)) {
       throw new InvalidEnsError();
     }
 
     const daoFactoryInstance = DAOFactory__factory.connect(
       this.web3.getAddress("daoFactoryAddress"),
-      signer,
+      signer
     );
 
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
@@ -168,7 +168,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
       const currentRelease = await repo.latestRelease();
       const latestVersion = await repo["getLatestVersion(uint8)"](
-        currentRelease,
+        currentRelease
       );
       pluginInstallationData.push({
         pluginSetupRef: {
@@ -182,11 +182,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // check if at least one plugin requests EXECUTE_PERMISSION on the DAO
     // This check isn't 100% correct all the time
     // simulate the DAO creation to get an address
-    const pluginSetupProcessorAddr = await daoFactoryInstance
-      .pluginSetupProcessor();
+    const pluginSetupProcessorAddr = await daoFactoryInstance.pluginSetupProcessor();
     const pluginSetupProcessor = PluginSetupProcessor__factory.connect(
       pluginSetupProcessorAddr,
-      signer,
+      signer
     );
     let execPermissionFound = false;
 
@@ -194,11 +193,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const daoBaseAddr = await daoFactoryInstance.daoBase();
     // simulates each plugin installation seperately to get the requested permissions
     for (const installData of pluginInstallationData) {
-      const pluginSetupProcessorResponse = await pluginSetupProcessor.callStatic
-        .prepareInstallation(daoBaseAddr, installData);
+      const pluginSetupProcessorResponse = await pluginSetupProcessor.callStatic.prepareInstallation(
+        daoBaseAddr,
+        installData
+      );
       const found = pluginSetupProcessorResponse[1].permissions.find(
-        (permission) =>
-          permission.permissionId === PermissionIds.EXECUTE_PERMISSION_ID,
+        permission =>
+          permission.permissionId === PermissionIds.EXECUTE_PERMISSION_ID
       );
       if (found) {
         execPermissionFound = true;
@@ -217,7 +218,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         daoURI: params.daoUri || "",
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
-      pluginInstallationData,
+      pluginInstallationData
     );
 
     yield {
@@ -229,9 +230,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const daoFactoryInterface = DAORegistry__factory.createInterface();
     // find dao address using the dao registry address
     const log = receipt.logs?.find(
-      (e) =>
+      e =>
         e.topics[0] ===
-          id(daoFactoryInterface.getEvent("DAORegistered").format("sighash")),
+        id(daoFactoryInterface.getEvent("DAORegistered").format("sighash"))
     );
 
     if (!log) {
@@ -241,9 +242,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // Plugin logs
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const installedLogs = receipt.logs?.filter(
-      (e) =>
+      e =>
         e.topics[0] ===
-          id(pspInterface.getEvent("InstallationApplied").format("sighash")),
+        id(pspInterface.getEvent("InstallationApplied").format("sighash"))
     );
 
     // DAO logs
@@ -256,7 +257,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       key: DaoCreationSteps.DONE,
       address: parsedLog.args["dao"],
       pluginAddresses: installedLogs.map(
-        (log) => pspInterface.parseLog(log).args[1],
+        log => pspInterface.parseLog(log).args[1]
       ),
     };
   }
@@ -284,7 +285,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async *deposit(
-    params: DepositParams,
+    params: DepositParams
   ): AsyncGenerator<DaoDepositStepValue> {
     switch (params.type) {
       case TokenType.NATIVE:
@@ -301,25 +302,20 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         break;
       default:
         throw new NotImplementedError(
-          "Token type not valid, use transfer function instead",
+          "Token type not valid, use transfer function instead"
         );
     }
   }
 
   private async *depositNative(
-    params: DepositEthParams,
+    params: DepositEthParams
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
     const { daoAddressOrEns, amount } = params;
     const override: { value?: bigint } = { value: params.amount };
     const daoInstance = DAO__factory.connect(daoAddressOrEns, signer);
 
-    const tx = await daoInstance.deposit(
-      AddressZero,
-      amount,
-      "",
-      override,
-    );
+    const tx = await daoInstance.deposit(AddressZero, amount, "", override);
     yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
 
     const cr = await tx.wait();
@@ -334,26 +330,22 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!amount.toString() === parsedLog.args["amount"]) {
       throw new AmountMismatchError(
         amount,
-        parsedLog.args["amount"].toBigInt(),
+        parsedLog.args["amount"].toBigInt()
       );
     }
     yield { key: DaoDepositSteps.DONE, amount: amount };
   }
-  
+
   private async *depositErc20(
-    params: DepositErc20Params,
+    params: DepositErc20Params
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
     const { tokenAddress, daoAddressOrEns, amount } = params;
     // check current allowance
-    const tokenContract = new Contract(
-      tokenAddress,
-      ERC20_ABI,
-      signer,
-    );
+    const tokenContract = new Contract(tokenAddress, ERC20_ABI, signer);
     const currentAllowance = await tokenContract.allowance(
       await signer.getAddress(),
-      daoAddressOrEns,
+      daoAddressOrEns
     );
     yield {
       key: DaoDepositSteps.CHECKED_ALLOWANCE,
@@ -363,22 +355,16 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (currentAllowance.lt(params.amount)) {
       // If the target is an ERC20 token, ensure that the amount can be transferred
       // Relay the yield steps to the caller as they are received
-      yield* this.setAllowance(
-        {
-          amount: params.amount,
-          spender: params.daoAddressOrEns,
-          tokenAddress: params.tokenAddress,
-        },
-      );
+      yield* this.setAllowance({
+        amount: params.amount,
+        spender: params.daoAddressOrEns,
+        tokenAddress: params.tokenAddress,
+      });
     }
     // Doing the transfer
     const daoInstance = DAO__factory.connect(daoAddressOrEns, signer);
 
-    const tx = await daoInstance.deposit(
-      tokenAddress,
-      amount,
-      "",
-    );
+    const tx = await daoInstance.deposit(tokenAddress, amount, "");
     yield { key: DaoDepositSteps.DEPOSITING, txHash: tx.hash };
 
     const cr = await tx.wait();
@@ -393,27 +379,24 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!amount.toString() === parsedLog.args["amount"]) {
       throw new AmountMismatchError(
         amount,
-        parsedLog.args["amount"].toBigInt(),
+        parsedLog.args["amount"].toBigInt()
       );
     }
     yield { key: DaoDepositSteps.DONE, amount: amount };
   }
 
   private async *depositErc721(
-    params: DepositErc721Params,
+    params: DepositErc721Params
   ): AsyncGenerator<DaoDepositStepValue> {
     const signer = this.web3.getConnectedSigner();
     const erc721Contract = new Contract(
       params.tokenAddress,
       ERC721_ABI,
-      signer,
+      signer
     );
-    const tx = await erc721Contract
-      ["safeTransferFrom(address,address,uint256)"](
-        await signer.getAddress(),
-        params.daoAddressOrEns,
-        params.tokenId,
-      );
+    const tx = await erc721Contract[
+      "safeTransferFrom(address,address,uint256)"
+    ](await signer.getAddress(), params.daoAddressOrEns, params.tokenId);
 
     const cr = await tx.wait();
 
@@ -437,16 +420,14 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   }
 
   private async *depositErc1155(
-    params: DepositErc1155Params,
+    params: DepositErc1155Params
   ): AsyncGenerator<DaoDepositStepValue> {
     // if length is 0, throw
     if (!params.tokenIds.length || !params.amounts.length) {
       throw new InvalidParameter("tokenIds or amounts cannot be empty");
     }
     // if tokenIds and amounts length are different, throw
-    if (
-      params.tokenIds.length !== params.amounts.length
-    ) {
+    if (params.tokenIds.length !== params.amounts.length) {
       throw new SizeMismatchError();
     }
 
@@ -454,30 +435,32 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const erc1155Contract = new Contract(
       params.tokenAddress,
       ERC1155_ABI,
-      signer,
+      signer
     );
 
     let tx: ContractTransaction, logName: string, logArg: string;
     if (params.tokenIds.length === 1) {
-      tx = await erc1155Contract
-        ["safeTransferFrom(address,address,uint256,uint256,bytes)"](
-          await signer.getAddress(),
-          params.daoAddressOrEns,
-          params.tokenIds[0],
-          params.amounts[0],
-          new Uint8Array([]),
-        );
+      tx = await erc1155Contract[
+        "safeTransferFrom(address,address,uint256,uint256,bytes)"
+      ](
+        await signer.getAddress(),
+        params.daoAddressOrEns,
+        params.tokenIds[0],
+        params.amounts[0],
+        new Uint8Array([])
+      );
       logName = "TransferSingle";
       logArg = "id";
     } else {
-      tx = await erc1155Contract
-        ["safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)"](
-          await signer.getAddress(),
-          params.daoAddressOrEns,
-          params.tokenIds,
-          params.amounts,
-          new Uint8Array([]),
-        );
+      tx = await erc1155Contract[
+        "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)"
+      ](
+        await signer.getAddress(),
+        params.daoAddressOrEns,
+        params.tokenIds,
+        params.amounts,
+        new Uint8Array([])
+      );
       logName = "TransferBatch";
       logArg = "ids";
     }
@@ -512,19 +495,15 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async *setAllowance(
-    params: SetAllowanceParams,
+    params: SetAllowanceParams
   ): AsyncGenerator<SetAllowanceStepValue> {
     const signer = this.web3.getConnectedSigner();
     // TODO
     // add params check with yup
-    const tokenInstance = new Contract(
-      params.tokenAddress,
-      ERC20_ABI,
-      signer,
-    );
+    const tokenInstance = new Contract(params.tokenAddress, ERC20_ABI, signer);
     const tx: ContractTransaction = await tokenInstance.approve(
       params.spender,
-      params.amount,
+      params.amount
     );
 
     yield {
@@ -556,7 +535,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async *prepareUninstallation(
-    params: PrepareUninstallationParams,
+    params: PrepareUninstallationParams
   ): AsyncGenerator<PrepareUninstallationStepValue> {
     const signer = this.web3.getConnectedSigner();
     type T = {
@@ -581,31 +560,27 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const { uninstallationParams = [], uninstallationAbi = [] } = params;
     const data = defaultAbiCoder.encode(
       uninstallationAbi,
-      uninstallationParams,
+      uninstallationParams
     );
     // connect to psp contract
     const pspContract = PluginSetupProcessor__factory.connect(
       this.web3.getAddress("pluginSetupProcessorAddress"),
-      signer,
+      signer
     );
-    const tx = await pspContract.prepareUninstallation(
-      params.daoAddressOrEns,
-      {
-        pluginSetupRef: {
-          pluginSetupRepo:
-            selectedInstallation.appliedPreparation.pluginRepo.id,
-          versionTag: {
-            build: selectedInstallation.appliedVersion.build,
-            release: selectedInstallation.appliedVersion.release.release,
-          },
-        },
-        setupPayload: {
-          plugin: params.pluginAddress,
-          currentHelpers: selectedInstallation.appliedPreparation.helpers,
-          data,
+    const tx = await pspContract.prepareUninstallation(params.daoAddressOrEns, {
+      pluginSetupRef: {
+        pluginSetupRepo: selectedInstallation.appliedPreparation.pluginRepo.id,
+        versionTag: {
+          build: selectedInstallation.appliedVersion.build,
+          release: selectedInstallation.appliedVersion.release.release,
         },
       },
-    );
+      setupPayload: {
+        plugin: params.pluginAddress,
+        currentHelpers: selectedInstallation.appliedPreparation.helpers,
+        data,
+      },
+    });
     yield {
       key: PrepareUninstallationSteps.PREPARING,
       txHash: tx.hash,
@@ -652,7 +627,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       params.where,
       params.who,
       id(params.permission),
-      params.data || new Uint8Array([]),
+      params.data || new Uint8Array([])
     );
   }
   /**
@@ -688,10 +663,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!dao) {
       return null;
     } else if (!dao.metadata) {
-      return toDaoDetails(
-        dao,
-        EMPTY_DAO_METADATA_LINK,
-      );
+      return toDaoDetails(dao, EMPTY_DAO_METADATA_LINK);
     }
     try {
       const metadataCid = resolveIpfsCid(dao.metadata);
@@ -737,17 +709,14 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       daos.map(
         async (dao: SubgraphDaoListItem): Promise<DaoListItem> => {
           if (!dao.metadata) {
-            return toDaoListItem(
-              dao,
-              EMPTY_DAO_METADATA_LINK,
-            );
+            return toDaoListItem(dao, EMPTY_DAO_METADATA_LINK);
           }
           try {
             const metadataCid = resolveIpfsCid(dao.metadata);
             // Avoid blocking Promise.all if this individual fetch takes too long
             const stringMetadata = await promiseWithTimeout(
               this.ipfs.fetchString(metadataCid),
-              MULTI_FETCH_TIMEOUT,
+              MULTI_FETCH_TIMEOUT
             );
             const metadata = JSON.parse(stringMetadata);
             return toDaoListItem(dao, metadata);
@@ -757,8 +726,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
             }
             return toDaoListItem(dao, UNAVAILABLE_DAO_METADATA);
           }
-        },
-      ),
+        }
+      )
     );
   }
   /**
@@ -817,7 +786,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return [];
     }
     return tokenBalances.map(
-      (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance),
+      (balance: SubgraphBalance): AssetBalance => toAssetBalance(balance)
     );
   }
   /**
@@ -886,7 +855,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
     return tokenTransfers.map(
       (transfer: SubgraphTransferListItem): Transfer =>
-        toTokenTransfer(transfer),
+        toTokenTransfer(transfer)
     );
   }
 
@@ -932,7 +901,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return Promise.all(
       pluginRepos.map(
         async (
-          pluginRepo: SubgraphPluginRepoListItem,
+          pluginRepo: SubgraphPluginRepoListItem
         ): Promise<PluginRepoListItem> => {
           let pluginRepoReleases: PluginRepoRelease[] = [];
           for (const release of pluginRepo.releases) {
@@ -945,7 +914,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
                 // Avoid blocking Promise.all if this individual fetch takes too long
                 const stringMetadata = await promiseWithTimeout(
                   this.ipfs.fetchString(metadataCid),
-                  MULTI_FETCH_TIMEOUT,
+                  MULTI_FETCH_TIMEOUT
                 );
                 const resolvedMetadata = JSON.parse(stringMetadata);
                 metadata = resolvedMetadata;
@@ -962,8 +931,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
             ];
           }
           return toPluginRepoListItem(pluginRepo, pluginRepoReleases);
-        },
-      ),
+        }
+      )
     );
   }
   /**
@@ -1006,7 +975,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     } else {
       try {
         const metadataCid = resolveIpfsCid(
-          pluginRepo.releases[0].builds[0].metadata,
+          pluginRepo.releases[0].builds[0].metadata
         );
         const stringMetadata = await this.ipfs.fetchString(metadataCid);
         const resolvedMetadata = JSON.parse(stringMetadata);
@@ -1029,7 +998,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async getProtocolVersion(
-    contractAddress: string,
+    contractAddress: string
   ): Promise<[number, number, number]> {
     if (!isAddress(contractAddress)) {
       throw new InvalidAddressError();
@@ -1037,7 +1006,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const signer = this.web3.getConnectedSigner();
     const protocolInstance = IProtocolVersion__factory.connect(
       contractAddress,
-      signer,
+      signer
     );
     let version: [number, number, number];
     try {

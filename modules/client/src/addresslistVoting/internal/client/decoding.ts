@@ -40,7 +40,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
     const expectedfunction = votingInterface.getFunction("addAddresses");
     const result = votingInterface.decodeFunctionData(
       expectedfunction,
-      hexBytes,
+      hexBytes
     );
     return result[0];
   }
@@ -54,12 +54,10 @@ export class AddresslistVotingClientDecoding extends ClientCore
   public removeMembersAction(data: Uint8Array): string[] {
     const votingInterface = AddresslistVoting__factory.createInterface();
     const hexBytes = bytesToHex(data);
-    const expectedfunction = votingInterface.getFunction(
-      "removeAddresses",
-    );
+    const expectedfunction = votingInterface.getFunction("removeAddresses");
     const result = votingInterface.decodeFunctionData(
       expectedfunction,
-      hexBytes,
+      hexBytes
     );
     return result[0];
   }

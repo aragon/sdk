@@ -24,13 +24,13 @@ export class MultisigClientEstimation extends ClientCore
    * @memberof MultisigClientEstimation
    */
   public async createProposal(
-    params: CreateMultisigProposalParams,
+    params: CreateMultisigProposalParams
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
-      signer,
+      signer
     );
 
     if (
@@ -51,7 +51,7 @@ export class MultisigClientEstimation extends ClientCore
       params.approve || false,
       params.tryExecution || true,
       Math.round(startTimestamp / 1000),
-      Math.round(endTimestamp / 1000),
+      Math.round(endTimestamp / 1000)
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
@@ -64,21 +64,16 @@ export class MultisigClientEstimation extends ClientCore
    * @memberof MultisigClientEstimation
    */
   public async approveProposal(
-    params: ApproveMultisigProposalParams,
+    params: ApproveMultisigProposalParams
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    const { pluginAddress, id } = decodeProposalId(
-      params.proposalId,
-    );
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
-    const multisigContract = Multisig__factory.connect(
-      pluginAddress,
-      signer,
-    );
+    const multisigContract = Multisig__factory.connect(pluginAddress, signer);
 
     const estimation = await multisigContract.estimateGas.approve(
       id,
-      params.tryExecution,
+      params.tryExecution
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
@@ -89,23 +84,14 @@ export class MultisigClientEstimation extends ClientCore
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof MultisigClientEstimation
    */
-  public async executeProposal(
-    proposalId: string,
-  ): Promise<GasFeeEstimation> {
+  public async executeProposal(proposalId: string): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
 
-    const { pluginAddress, id } = decodeProposalId(
-      proposalId,
-    );
+    const { pluginAddress, id } = decodeProposalId(proposalId);
 
-    const multisigContract = Multisig__factory.connect(
-      pluginAddress,
-      signer,
-    );
+    const multisigContract = Multisig__factory.connect(pluginAddress, signer);
 
-    const estimation = await multisigContract.estimateGas.execute(
-      id,
-    );
+    const estimation = await multisigContract.estimateGas.execute(id);
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
 }

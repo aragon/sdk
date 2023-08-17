@@ -4,7 +4,7 @@
  * @param proms
  */
 export function allSettled(
-  proms: Array<Promise<any>>,
+  proms: Array<Promise<any>>
 ): Promise<
   Array<{ value: any; status: string } | { reason: Error; status: string }>
 > {
@@ -17,7 +17,11 @@ function reflect<T>(prom: Promise<T>) {
     .catch((reason: T) => ({ reason, status: "rejected" }));
 }
 
-export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
+export async function runAndRetry<T>({
+  func,
+  onFail,
+  shouldRetry,
+}: {
   func: () => Promise<T>;
   onFail?: (e: Error) => void;
   shouldRetry: () => boolean;

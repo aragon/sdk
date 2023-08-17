@@ -47,7 +47,7 @@ export class AddresslistVotingClient extends ClientCore
      */
     getPluginInstallItem: (
       params: AddresslistVotingPluginInstall,
-      network: Networkish,
+      network: Networkish
     ): PluginInstallItem =>
       AddresslistVotingClientEncoding.getPluginInstallItem(params, network),
   };

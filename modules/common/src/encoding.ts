@@ -13,9 +13,7 @@ export function hexToBytes(hexString: string): Uint8Array {
   hexString = strip0x(hexString);
   const bytes = [];
   for (let i = 0; i < hexString.length; i += 2) {
-    bytes.push(
-      parseInt(hexString.substring(i, i + 2), 16),
-    );
+    bytes.push(parseInt(hexString.substring(i, i + 2), 16));
   }
   return Uint8Array.from(bytes);
 }
@@ -76,11 +74,9 @@ export function encodeRatio(ratio: number, digits: number): number {
   if (ratio < 0 || ratio > 1) {
     throw new Error("The ratio value should range between 0 and 1");
   } else if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
-    throw new Error(
-      "The number of digits should range between 1 and 15",
-    );
+    throw new Error("The number of digits should range between 1 and 15");
   }
-  return Math.round(ratio * (10 ** digits));
+  return Math.round(ratio * 10 ** digits);
 }
 /**
  * Decodes a value received from a smart contract to a number with
@@ -92,17 +88,17 @@ export function encodeRatio(ratio: number, digits: number): number {
  */
 export function decodeRatio(
   onChainValue: bigint | number,
-  digits: number,
+  digits: number
 ): number {
   if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
     throw new Error(
-      "The number of digits should be a positive integer between 1 and 15",
+      "The number of digits should be a positive integer between 1 and 15"
     );
   } else if (onChainValue > 10 ** digits) {
     throw new Error("The value is out of range");
   }
 
-  return Number(onChainValue) / (10 ** digits);
+  return Number(onChainValue) / 10 ** digits;
 }
 
 /** Encodes the particles of a proposalId into a globally unque value for subgraph */
@@ -116,7 +112,7 @@ export function encodeProposalId(pluginAddress: string, id: number) {
 
 /** Decodes a proposalId from subgraph and returns the original pluginAddress and the nonce */
 export function decodeProposalId(
-  proposalId: string,
+  proposalId: string
 ): { pluginAddress: string; id: number } {
   if (!isProposalId(proposalId)) {
     throw new Error("Invalid proposalId");
@@ -167,14 +163,14 @@ export function boolArrayToBitmap(bools?: Array<boolean>) {
 
 /** Transforms an array of booleans into a bitmap big integer */
 export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
-  if (bitmap >= (BigInt(1) << BigInt(256))) {
+  if (bitmap >= BigInt(1) << BigInt(256)) {
     throw new Error("The bitmap value is too big");
   }
 
   const result: Array<boolean> = [];
   for (let i = 0; i < 256; i++) {
     const mask = BigInt(1) << BigInt(i);
-    result.push((bitmap & mask) != BigInt(0));
+    result.push((bitmap & mask) !== BigInt(0));
   }
 
   return result;

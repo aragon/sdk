@@ -29,19 +29,13 @@ import {
 
 export function toAddresslistVotingProposal(
   proposal: SubgraphAddresslistVotingProposal,
-  metadata: ProposalMetadata,
+  metadata: ProposalMetadata
 ): AddresslistVotingProposal {
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
+  const startDate = new Date(parseInt(proposal.startDate) * 1000);
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
-  const creationDate = new Date(
-    parseInt(proposal.createdAt) * 1000,
-  );
+  const creationDate = new Date(parseInt(proposal.createdAt) * 1000);
   const executionDate = proposal.executionDate
-    ? new Date(
-      parseInt(proposal.executionDate) * 1000,
-    )
+    ? new Date(parseInt(proposal.executionDate) * 1000)
     : null;
   return {
     id: getCompactProposalId(proposal.id),
@@ -71,7 +65,7 @@ export function toAddresslistVotingProposal(
           to: action.to,
           value: BigInt(action.value),
         };
-      },
+      }
     ),
     status: computeProposalStatus(proposal),
     result: {
@@ -84,10 +78,9 @@ export function toAddresslistVotingProposal(
       minParticipation: decodeRatio(
         (BigInt(proposal.minVotingPower) * BigInt(1000000)) /
           BigInt(proposal.totalVotingPower),
-        6,
+        6
       ),
-      duration: parseInt(proposal.endDate) -
-        parseInt(proposal.startDate),
+      duration: parseInt(proposal.endDate) - parseInt(proposal.startDate),
     },
     totalVotingWeight: parseInt(proposal.totalVotingPower),
     votes: proposal.voters.map(
@@ -97,17 +90,15 @@ export function toAddresslistVotingProposal(
           address: voter.voter.address,
           vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
         };
-      },
+      }
     ),
   };
 }
 export function toAddresslistVotingProposalListItem(
   proposal: SubgraphAddresslistVotingProposalListItem,
-  metadata: ProposalMetadata,
+  metadata: ProposalMetadata
 ): AddresslistVotingProposalListItem {
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
+  const startDate = new Date(parseInt(proposal.startDate) * 1000);
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   return {
     id: getCompactProposalId(proposal.id),
@@ -135,29 +126,24 @@ export function toAddresslistVotingProposalListItem(
           address: voter.voter.address,
           vote: SubgraphVoteValuesMap.get(voter.voteOption) as VoteValues,
         };
-      },
+      }
     ),
   };
 }
 
 export function addresslistVotingInitParamsToContract(
-  params: AddresslistVotingPluginInstall,
+  params: AddresslistVotingPluginInstall
 ): ContractAddresslistVotingInitParams {
-  return [
-    votingSettingsToContract(params.votingSettings),
-    params.addresses,
-  ];
+  return [votingSettingsToContract(params.votingSettings), params.addresses];
 }
 
 export function computeProposalStatus(
   proposal:
     | SubgraphAddresslistVotingProposal
-    | SubgraphAddresslistVotingProposalListItem,
+    | SubgraphAddresslistVotingProposalListItem
 ): ProposalStatus {
   const now = new Date();
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
+  const startDate = new Date(parseInt(proposal.startDate) * 1000);
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   if (proposal.executed) {
     return ProposalStatus.EXECUTED;

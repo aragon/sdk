@@ -1,7 +1,7 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { isAddress } from "@ethersproject/address";
-import { Contract, ContractInterface } from "@ethersproject/contracts";
-import { Signer } from "@ethersproject/abstract-signer";
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { isAddress } from '@ethersproject/address';
+import { Contract, ContractInterface } from '@ethersproject/contracts';
+import { Signer } from '@ethersproject/abstract-signer';
 import {
   CannotEstimateGasError,
   InvalidAddressError,
@@ -10,15 +10,15 @@ import {
   NoProviderError,
   NoSignerError,
   UnsupportedNetworkError,
-} from "@aragon/sdk-common";
-import { IClientWeb3Core } from "../interfaces";
-import { Context } from "../../context";
+} from '@aragon/sdk-common';
+import { IClientWeb3Core } from '../interfaces';
+import { Context } from '../../context';
 import {
   GasFeeEstimation,
   SupportedNetwork,
   SupportedNetworksArray,
-} from "../../types";
-import { DeployedAddresses } from "../types";
+} from '../../types';
+import { DeployedAddresses } from '../types';
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
   private providerIdx: number = -1;
@@ -34,10 +34,10 @@ export class Web3Module implements IClientWeb3Core {
     if (!this.context.web3Providers.length) {
       throw new NoProviderError();
     } else if (this.context.web3Providers.length <= 1) {
-      throw new NoNodesAvailableError("web3");
+      throw new NoNodesAvailableError('web3');
     }
-    this.providerIdx = (this.providerIdx + 1) %
-      this.context.web3Providers.length;
+    this.providerIdx =
+      (this.providerIdx + 1) % this.context.web3Providers.length;
   }
 
   /** Retrieves the current signer */
@@ -92,7 +92,7 @@ export class Web3Module implements IClientWeb3Core {
       if (await this.isUp()) return;
       this.shiftProvider();
     }
-    throw new NoNodesAvailableError("web3");
+    throw new NoNodesAvailableError('web3');
   }
 
   /**
@@ -104,7 +104,7 @@ export class Web3Module implements IClientWeb3Core {
    */
   public attachContract<T>(
     address: string,
-    abi: ContractInterface,
+    abi: ContractInterface
   ): Contract & T {
     if (!address || !isAddress(address)) throw new InvalidAddressError();
     else if (!abi) throw new InvalidContractAbiError();
@@ -116,7 +116,7 @@ export class Web3Module implements IClientWeb3Core {
   public getMaxFeePerGas(): Promise<bigint> {
     return this.getConnectedSigner()
       .getFeeData()
-      .then((feeData) => {
+      .then(feeData => {
         if (!feeData.maxFeePerGas) {
           throw new CannotEstimateGasError();
         }
@@ -125,13 +125,14 @@ export class Web3Module implements IClientWeb3Core {
   }
 
   public getApproximateGasFee(estimatedFee: bigint): Promise<GasFeeEstimation> {
-    return this.getMaxFeePerGas().then((maxFeePerGas) => {
+    return this.getMaxFeePerGas().then(maxFeePerGas => {
       const max = estimatedFee * maxFeePerGas;
 
-      const factor = this.context.gasFeeEstimationFactor *
-        Web3Module.PRECISION_FACTOR_BASE;
+      const factor =
+        this.context.gasFeeEstimationFactor * Web3Module.PRECISION_FACTOR_BASE;
 
-      const average = (max * BigInt(Math.trunc(factor))) /
+      const average =
+        (max * BigInt(Math.trunc(factor))) /
         BigInt(Web3Module.PRECISION_FACTOR_BASE);
 
       return { average, max };
@@ -145,5 +146,5 @@ export class Web3Module implements IClientWeb3Core {
       throw new InvalidAddressError();
     }
     return address;
-  }  
+  }
 }

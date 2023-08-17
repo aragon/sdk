@@ -29,31 +29,28 @@ import {
 // Multisig
 export interface IMultisigClientMethods {
   createProposal: (
-    params: CreateMultisigProposalParams,
+    params: CreateMultisigProposalParams
   ) => AsyncGenerator<ProposalCreationStepValue>;
   pinMetadata: (params: ProposalMetadata) => Promise<string>;
   approveProposal: (
-    params: ApproveMultisigProposalParams,
+    params: ApproveMultisigProposalParams
   ) => AsyncGenerator<ApproveProposalStepValue>;
   executeProposal: (
-    proposalId: string,
+    proposalId: string
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   prepareInstallation: (
-    params: MultisigPluginPrepareInstallationParams,
+    params: MultisigPluginPrepareInstallationParams
   ) => AsyncGenerator<PrepareInstallationStepValue>;
   canApprove: (params: CanApproveParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getVotingSettings: (
     addressOrEns: string,
-    blockNumber?: number,
+    blockNumber?: number
   ) => Promise<MultisigVotingSettings>;
-  getMembers: (
-    addressOrEns: string,
-    blockNumber?: number,
-  ) => Promise<string[]>;
+  getMembers: (addressOrEns: string, blockNumber?: number) => Promise<string[]>;
   getProposal: (proposalId: string) => Promise<MultisigProposal | null>;
   getProposals: (
-    params: ProposalQueryParams,
+    params: ProposalQueryParams
   ) => Promise<MultisigProposalListItem[]>;
 }
 
@@ -61,7 +58,7 @@ export interface IMultisigClientEncoding {
   addAddressesAction: (params: AddAddressesParams) => DaoAction;
   removeAddressesAction: (params: RemoveAddressesParams) => DaoAction;
   updateMultisigVotingSettings: (
-    params: UpdateMultisigVotingSettingsParams,
+    params: UpdateMultisigVotingSettingsParams
   ) => DaoAction;
 }
 export interface IMultisigClientDecoding {
@@ -72,14 +69,12 @@ export interface IMultisigClientDecoding {
 }
 export interface IMultisigClientEstimation {
   createProposal: (
-    params: CreateMultisigProposalParams,
+    params: CreateMultisigProposalParams
   ) => Promise<GasFeeEstimation>;
   approveProposal: (
-    params: ApproveMultisigProposalParams,
+    params: ApproveMultisigProposalParams
   ) => Promise<GasFeeEstimation>;
-  executeProposal: (
-    proposalId: string,
-  ) => Promise<GasFeeEstimation>;
+  executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
 }
 
 /** Defines the shape of the AddressList client class */

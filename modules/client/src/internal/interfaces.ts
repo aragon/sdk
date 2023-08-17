@@ -48,19 +48,17 @@ export interface IClientMethods {
   pinMetadata: (params: DaoMetadata) => Promise<string>;
   /** Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoBalances: (
-    params: DaoBalancesQueryParams,
+    params: DaoBalancesQueryParams
   ) => Promise<AssetBalance[] | null>;
   /** Retrieves the list of transfers from or to the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet*/
   getDaoTransfers: (params: TransferQueryParams) => Promise<Transfer[] | null>;
   /** Checks whether a role is granted by the current DAO's ACL settings */
   hasPermission: (params: HasPermissionParams) => Promise<boolean>;
   /** Deposits ether or an ERC20 token */
-  deposit: (
-    params: DepositParams,
-  ) => AsyncGenerator<DaoDepositStepValue>;
+  deposit: (params: DepositParams) => AsyncGenerator<DaoDepositStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
   setAllowance: (
-    params: SetAllowanceParams,
+    params: SetAllowanceParams
   ) => AsyncGenerator<SetAllowanceStepValue>;
   /** Retrieves metadata for DAO with given identifier (address or ens domain)*/
   getDao: (daoAddressOrEns: string) => Promise<DaoDetails | null>;
@@ -72,109 +70,95 @@ export interface IClientMethods {
   getPlugins: (params?: PluginQueryParams) => Promise<PluginRepoListItem[]>;
   /** Prepare uninstallation of a plugin */
   prepareUninstallation: (
-    params: PrepareUninstallationParams,
+    params: PrepareUninstallationParams
   ) => AsyncGenerator<PrepareUninstallationStepValue>;
   /** Prepare uninstallation of a plugin */
   prepareInstallation: (
-    params: PrepareInstallationParams,
+    params: PrepareInstallationParams
   ) => AsyncGenerator<PrepareInstallationStepValue>;
-    // gets the protol version of a dao
+  // gets the protol version of a dao
   getProtocolVersion: (
-    contractAddress: string,
+    contractAddress: string
   ) => Promise<[number, number, number]>;
 }
 
 export interface IClientEncoding {
-  grantAction: (
-    daoAddress: string,
-    params: GrantPermissionParams,
-  ) => DaoAction;
+  grantAction: (daoAddress: string, params: GrantPermissionParams) => DaoAction;
   grantWithConditionAction: (
     daoAddress: string,
-    params: GrantPermissionWithConditionParams,
+    params: GrantPermissionWithConditionParams
   ) => DaoAction;
   revokeAction: (
     daoAddress: string,
-    params: RevokePermissionParams,
+    params: RevokePermissionParams
   ) => DaoAction;
-  withdrawAction: (
-    parameters: WithdrawParams,
-  ) => Promise<DaoAction>;
+  withdrawAction: (parameters: WithdrawParams) => Promise<DaoAction>;
   updateDaoMetadataAction: (
     daoAddressOrEns: string,
-    metadataUri: string,
+    metadataUri: string
   ) => Promise<DaoAction>;
-  setDaoUriAction: (
-    daoAddressOrEns: string,
-    daoUri: string,
-  ) => DaoAction;
+  setDaoUriAction: (daoAddressOrEns: string, daoUri: string) => DaoAction;
   registerStandardCallbackAction: (
     daoAddressOrEns: string,
-    params: RegisterStandardCallbackParams,
+    params: RegisterStandardCallbackParams
   ) => DaoAction;
   setSignatureValidatorAction: (
     daoAddressOrEns: string,
-    signatureValidator: string,
+    signatureValidator: string
   ) => DaoAction;
   upgradeToAction: (
     daoAddressOrEns: string,
-    implementationAddress: string,
+    implementationAddress: string
   ) => DaoAction;
   upgradeToAndCallAction: (
     daoAddressOrEns: string,
-    params: UpgradeToAndCallParams,
+    params: UpgradeToAndCallParams
   ) => DaoAction;
   applyInstallationAction: (
     daoAddressOrEns: string,
-    params: ApplyInstallationParams,
+    params: ApplyInstallationParams
   ) => DaoAction[];
   applyUninstallationAction: (
     daoAddressOrEns: string,
-    params: ApplyUninstallationParams,
+    params: ApplyUninstallationParams
   ) => DaoAction[];
   initializeFromAction: (
     daoAddressOrEns: string,
-    params: InitializeFromParams,
+    params: InitializeFromParams
   ) => DaoAction;
 }
 
 export interface IClientDecoding {
   grantAction: (data: Uint8Array) => GrantPermissionDecodedParams;
   grantWithConditionAction: (
-    data: Uint8Array,
+    data: Uint8Array
   ) => GrantPermissionWithConditionParams;
   revokeAction: (data: Uint8Array) => RevokePermissionDecodedParams;
   withdrawAction: (
     to: string,
     value: bigint,
-    data: Uint8Array,
+    data: Uint8Array
   ) => WithdrawParams;
   updateDaoMetadataRawAction: (data: Uint8Array) => string;
   updateDaoMetadataAction: (data: Uint8Array) => Promise<DaoMetadata>;
   setDaoUriAction: (data: Uint8Array) => string;
   registerStandardCallbackAction: (
-    data: Uint8Array,
+    data: Uint8Array
   ) => RegisterStandardCallbackParams;
   setSignatureValidatorAction: (data: Uint8Array) => string;
   upgradeToAction: (data: Uint8Array) => string;
   upgradeToAndCallAction: (data: Uint8Array) => UpgradeToAndCallParams;
   findInterface: (data: Uint8Array) => InterfaceParams | null;
-  applyInstallationAction: (
-    data: Uint8Array,
-  ) => DecodedApplyInstallationParams;
+  applyInstallationAction: (data: Uint8Array) => DecodedApplyInstallationParams;
   applyUninstallationAction: (
-    data: Uint8Array,
+    data: Uint8Array
   ) => DecodedApplyUninstallationParams;
-  initializeFromAction: (
-    data: Uint8Array,
-  ) => InitializeFromParams;
+  initializeFromAction: (data: Uint8Array) => InitializeFromParams;
 }
 
 export interface IClientEstimation {
   createDao: (params: CreateDaoParams) => Promise<GasFeeEstimation>;
-  deposit: (
-    params: DepositParams,
-  ) => Promise<GasFeeEstimation>;
+  deposit: (params: DepositParams) => Promise<GasFeeEstimation>;
   setAllowance: (params: SetAllowanceParams) => Promise<GasFeeEstimation>;
 }
 

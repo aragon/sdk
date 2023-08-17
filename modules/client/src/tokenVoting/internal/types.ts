@@ -14,12 +14,12 @@ export type ContractTokenVotingInitParams = [
   [
     string, // address
     string, // name
-    string, // symbol
+    string // symbol
   ],
   [
     string[], // receivers,
-    BigNumber[], // amounts
-  ],
+    BigNumber[] // amounts
+  ]
 ];
 
 /* Subgraph types */
@@ -67,16 +67,14 @@ export type SubgraphErc721Token = SubgraphBaseToken & {
   __typename: SubgraphContractType.ERC721;
 };
 
-export type SubgraphTokenVotingProposal =
-  & SubgraphTokenVotingProposalListItem
-  & {
-    createdAt: string;
-    actions: SubgraphAction[];
-    creationBlockNumber: string;
-    executionDate: string;
-    executionTxHash: string;
-    executionBlockNumber: string;
-  };
+export type SubgraphTokenVotingProposal = SubgraphTokenVotingProposalListItem & {
+  createdAt: string;
+  actions: SubgraphAction[];
+  creationBlockNumber: string;
+  executionDate: string;
+  executionTxHash: string;
+  executionBlockNumber: string;
+};
 
 export type SubgraphTokenVotingMember = {
   address: string;

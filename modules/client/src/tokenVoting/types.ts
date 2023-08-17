@@ -131,10 +131,12 @@ export const enum UndelegateTokensStep {
   DONE = "done",
 }
 
-type DelegateTokensStepCommon = {
-  key: DelegateTokensStep.DELEGATING | UndelegateTokensStep.UNDELEGATING;
-  txHash: string;
-} | { key: DelegateTokensStep.DONE | UndelegateTokensStep.DONE };
+type DelegateTokensStepCommon =
+  | {
+      key: DelegateTokensStep.DELEGATING | UndelegateTokensStep.UNDELEGATING;
+      txHash: string;
+    }
+  | { key: DelegateTokensStep.DONE | UndelegateTokensStep.DONE };
 
 export type UndelegateTokensStepValue = DelegateTokensStepCommon;
 export type DelegateTokensStepValue = DelegateTokensStepCommon;

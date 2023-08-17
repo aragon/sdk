@@ -26,46 +26,40 @@ import {
 // Address List
 export interface IAddresslistVotingClientMethods {
   createProposal: (
-    params: CreateMajorityVotingProposalParams,
+    params: CreateMajorityVotingProposalParams
   ) => AsyncGenerator<ProposalCreationStepValue>;
   pinMetadata: (params: ProposalMetadata) => Promise<string>;
   voteProposal: (
-    params: VoteProposalParams,
+    params: VoteProposalParams
   ) => AsyncGenerator<VoteProposalStepValue>;
   executeProposal: (
-    proposalId: string,
+    proposalId: string
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   prepareInstallation: (
-    params: AddresslistVotingPluginPrepareInstallationParams,
+    params: AddresslistVotingPluginPrepareInstallationParams
   ) => AsyncGenerator<PrepareInstallationStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (addressOrEns: string, blockNumber?: number) => Promise<string[]>;
   getProposal: (
-    propoosalId: string,
+    propoosalId: string
   ) => Promise<AddresslistVotingProposal | null>;
   getProposals: (
-    params: ProposalQueryParams,
+    params: ProposalQueryParams
   ) => Promise<AddresslistVotingProposalListItem[]>;
   getVotingSettings: (
     pluginAddress: string,
-    blockNumber?: number,
+    blockNumber?: number
   ) => Promise<VotingSettings | null>;
 }
 
 export interface IAddresslistVotingClientEncoding {
   updatePluginSettingsAction: (
     pluginAddress: string,
-    params: VotingSettings,
+    params: VotingSettings
   ) => DaoAction;
-  addMembersAction: (
-    pluginAddress: string,
-    members: string[],
-  ) => DaoAction;
-  removeMembersAction: (
-    pluginAddress: string,
-    members: string[],
-  ) => DaoAction;
+  addMembersAction: (pluginAddress: string, members: string[]) => DaoAction;
+  removeMembersAction: (pluginAddress: string, members: string[]) => DaoAction;
 }
 export interface IAddresslistVotingClientDecoding {
   updatePluginSettingsAction: (data: Uint8Array) => VotingSettings;
@@ -75,12 +69,10 @@ export interface IAddresslistVotingClientDecoding {
 }
 export interface IAddresslistVotingClientEstimation {
   createProposal: (
-    params: CreateMajorityVotingProposalParams,
+    params: CreateMajorityVotingProposalParams
   ) => Promise<GasFeeEstimation>;
   voteProposal: (params: VoteProposalParams) => Promise<GasFeeEstimation>;
-  executeProposal: (
-    proposalId: string,
-  ) => Promise<GasFeeEstimation>;
+  executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
 }
 /** Defines the shape of the AddressList client class */
 export interface IAddresslistVotingClient {

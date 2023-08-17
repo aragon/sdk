@@ -30,7 +30,7 @@ export class MultisigClientDecoding extends ClientCore
     const expectedfunction = multisigInterface.getFunction("addAddresses");
     const result = multisigInterface.decodeFunctionData(
       expectedfunction,
-      hexBytes,
+      hexBytes
     );
     return result[0];
   }
@@ -44,12 +44,10 @@ export class MultisigClientDecoding extends ClientCore
   public removeAddressesAction(data: Uint8Array): string[] {
     const multisigInterface = Multisig__factory.createInterface();
     const hexBytes = bytesToHex(data);
-    const expectedfunction = multisigInterface.getFunction(
-      "removeAddresses",
-    );
+    const expectedfunction = multisigInterface.getFunction("removeAddresses");
     const result = multisigInterface.decodeFunctionData(
       expectedfunction,
-      hexBytes,
+      hexBytes
     );
     return result[0];
   }
@@ -61,16 +59,16 @@ export class MultisigClientDecoding extends ClientCore
    * @memberof MultisigClientDecoding
    */
   public updateMultisigVotingSettings(
-    data: Uint8Array,
+    data: Uint8Array
   ): MultisigVotingSettings {
     const multisigInterface = Multisig__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedfunction = multisigInterface.getFunction(
-      "updateMultisigSettings",
+      "updateMultisigSettings"
     );
     const result = multisigInterface.decodeFunctionData(
       expectedfunction,
-      hexBytes,
+      hexBytes
     );
     return {
       minApprovals: result[0].minApprovals,

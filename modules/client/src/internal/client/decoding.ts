@@ -53,7 +53,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public applyInstallationAction(
-    data: Uint8Array,
+    data: Uint8Array
   ): DecodedApplyInstallationParams {
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const hexBytes = bytesToHex(data);
@@ -67,7 +67,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public applyUninstallationAction(
-    data: Uint8Array,
+    data: Uint8Array
   ): DecodedApplyUninstallationParams {
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const hexBytes = bytesToHex(data);
@@ -97,7 +97,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public grantWithConditionAction(
-    data: Uint8Array,
+    data: Uint8Array
   ): GrantPermissionWithConditionParams {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
@@ -129,7 +129,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public withdrawAction(
     to: string,
     value: bigint,
-    data: Uint8Array,
+    data: Uint8Array
   ): WithdrawParams {
     // Native
     if (!data?.length) {
@@ -158,14 +158,15 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
         tokenStandard: TokenType.ERC1155,
         abi: ERC1155_ABI,
         batch: true,
-        function: "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)",
+        function:
+          "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)",
       },
       {
         tokenStandard: TokenType.ERC1155,
         abi: ERC1155_ABI,
         batch: false,
         function: "safeTransferFrom(address,address,uint256,uint256,bytes)",
-      }
+      },
     ];
     for (const abiObject of abiObjects) {
       try {
@@ -178,7 +179,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
           value,
           result,
           abiObject.tokenStandard,
-          abiObject.batch,
+          abiObject.batch
         );
       } catch (e) {
         continue;
@@ -245,12 +246,12 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public registerStandardCallbackAction(
-    data: Uint8Array,
+    data: Uint8Array
   ): RegisterStandardCallbackParams {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction(
-      "registerStandardCallback",
+      "registerStandardCallback"
     );
     const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     return {
@@ -266,23 +267,17 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @return {*}  {string}
    * @memberof ClientDecoding
    */
-  public setSignatureValidatorAction(
-    data: Uint8Array,
-  ): string {
+  public setSignatureValidatorAction(data: Uint8Array): string {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
-    const expectedFunction = daoInterface.getFunction(
-      "setSignatureValidator",
-    );
+    const expectedFunction = daoInterface.getFunction("setSignatureValidator");
     const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     return result[0];
   }
   public upgradeToAction(data: Uint8Array): string {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
-    const expectedFunction = daoInterface.getFunction(
-      "upgradeTo",
-    );
+    const expectedFunction = daoInterface.getFunction("upgradeTo");
     const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     return result[0];
   }
@@ -293,14 +288,10 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @return {*}  {UpgradeToAndCallParams}
    * @memberof ClientDecoding
    */
-  public upgradeToAndCallAction(
-    data: Uint8Array,
-  ): UpgradeToAndCallParams {
+  public upgradeToAndCallAction(data: Uint8Array): UpgradeToAndCallParams {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
-    const expectedFunction = daoInterface.getFunction(
-      "upgradeToAndCall",
-    );
+    const expectedFunction = daoInterface.getFunction("upgradeToAndCall");
     const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     return {
       implementationAddress: result[0],
@@ -318,9 +309,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public initializeFromAction(data: Uint8Array): InitializeFromParams {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
-    const expectedFunction = daoInterface.getFunction(
-      "initializeFrom",
-    );
+    const expectedFunction = daoInterface.getFunction("initializeFrom");
     const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
     return {
       previousVersion: result[0],

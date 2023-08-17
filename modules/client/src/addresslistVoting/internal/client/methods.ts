@@ -87,7 +87,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof AddresslistVotingClientMethods
    */
   public async *createProposal(
-    params: CreateMajorityVotingProposalParams,
+    params: CreateMajorityVotingProposalParams
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
 
@@ -99,7 +99,7 @@ export class AddresslistVotingClientMethods extends ClientCore
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
-      signer,
+      signer
     );
 
     if (
@@ -120,7 +120,7 @@ export class AddresslistVotingClientMethods extends ClientCore
       Math.round(startTimestamp / 1000),
       Math.round(endTimestamp / 1000),
       params.creatorVote || 0,
-      params.executeOnPass || false,
+      params.executeOnPass || false
     );
 
     yield {
@@ -129,13 +129,12 @@ export class AddresslistVotingClientMethods extends ClientCore
     };
 
     const receipt = await tx.wait();
-    const addresslistContractInterface = AddresslistVoting__factory
-      .createInterface();
+    const addresslistContractInterface = AddresslistVoting__factory.createInterface();
 
     const log = findLog(
       receipt,
       addresslistContractInterface,
-      "ProposalCreated",
+      "ProposalCreated"
     );
 
     if (!log) {
@@ -178,7 +177,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof AddresslistVotingClientMethods
    */
   public async *voteProposal(
-    params: VoteProposalParams,
+    params: VoteProposalParams
   ): AsyncGenerator<VoteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
 
@@ -186,14 +185,10 @@ export class AddresslistVotingClientMethods extends ClientCore
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
 
-    const tx = await addresslistContract.vote(
-      id,
-      params.vote,
-      false,
-    );
+    const tx = await addresslistContract.vote(id, params.vote, false);
 
     yield {
       key: VoteProposalStep.VOTING,
@@ -215,7 +210,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof AddresslistVotingClientMethods
    */
   public async *executeProposal(
-    proposalId: string,
+    proposalId: string
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
 
@@ -223,7 +218,7 @@ export class AddresslistVotingClientMethods extends ClientCore
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
     const tx = await addresslistContract.execute(id);
 
@@ -244,7 +239,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async *prepareInstallation(
-    params: AddresslistVotingPluginPrepareInstallationParams,
+    params: AddresslistVotingPluginPrepareInstallationParams
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const network = await this.web3.getProvider().getNetwork();
     const networkName = network.name as SupportedNetwork;
@@ -260,7 +255,9 @@ export class AddresslistVotingClientMethods extends ClientCore
         votingSettingsToContract(params.settings.votingSettings),
         params.settings.addresses,
       ],
-      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress"
+      ),
     });
   }
 
@@ -278,12 +275,12 @@ export class AddresslistVotingClientMethods extends ClientCore
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
     return addresslistContract.callStatic.canVote(
       id,
       params.voterAddressOrEns,
-      params.vote,
+      params.vote
     );
   }
   /**
@@ -293,16 +290,14 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @return {*}  {Promise<boolean>}
    * @memberof AddresslistVotingClientMethods
    */
-  public async canExecute(
-    proposalId: string,
-  ): Promise<boolean> {
+  public async canExecute(proposalId: string): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
 
     return addresslistContract.canExecute(id);
@@ -318,7 +313,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    */
   public async getMembers(
     pluginAddress: string,
-    blockNumber?: number,
+    blockNumber?: number
   ): Promise<string[]> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -335,9 +330,9 @@ export class AddresslistVotingClientMethods extends ClientCore
       params,
       name,
     });
-    return addresslistVotingPlugin.members.map((
-      member: { address: string },
-    ) => member.address);
+    return addresslistVotingPlugin.members.map(
+      (member: { address: string }) => member.address
+    );
   }
   /**
    * Returns the details of the given proposal
@@ -347,7 +342,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof AddresslistVotingClientMethods
    */
   public async getProposal(
-    proposalId: string,
+    proposalId: string
   ): Promise<AddresslistVotingProposal | null> {
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
@@ -369,7 +364,7 @@ export class AddresslistVotingClientMethods extends ClientCore
     } else if (!addresslistVotingProposal.metadata) {
       return toAddresslistVotingProposal(
         addresslistVotingProposal,
-        EMPTY_PROPOSAL_METADATA_LINK,
+        EMPTY_PROPOSAL_METADATA_LINK
       );
     }
     try {
@@ -382,12 +377,12 @@ export class AddresslistVotingClientMethods extends ClientCore
       if (err instanceof InvalidCidError) {
         return toAddresslistVotingProposal(
           addresslistVotingProposal,
-          UNSUPPORTED_PROPOSAL_METADATA_LINK,
+          UNSUPPORTED_PROPOSAL_METADATA_LINK
         );
       }
       return toAddresslistVotingProposal(
         addresslistVotingProposal,
-        UNAVAILABLE_PROPOSAL_METADATA,
+        UNAVAILABLE_PROPOSAL_METADATA
       );
     }
   }
@@ -459,13 +454,13 @@ export class AddresslistVotingClientMethods extends ClientCore
     return Promise.all(
       addresslistVotingProposals.map(
         async (
-          proposal: SubgraphAddresslistVotingProposalListItem,
+          proposal: SubgraphAddresslistVotingProposalListItem
         ): Promise<AddresslistVotingProposalListItem> => {
           // format in the metadata field
           if (!proposal.metadata) {
             return toAddresslistVotingProposalListItem(
               proposal,
-              EMPTY_PROPOSAL_METADATA_LINK,
+              EMPTY_PROPOSAL_METADATA_LINK
             );
           }
           try {
@@ -473,7 +468,7 @@ export class AddresslistVotingClientMethods extends ClientCore
             // Avoid blocking Promise.all if this individual fetch takes too long
             const stringMetadata = await promiseWithTimeout(
               this.ipfs.fetchString(metadataCid),
-              MULTI_FETCH_TIMEOUT,
+              MULTI_FETCH_TIMEOUT
             );
             const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
             return toAddresslistVotingProposalListItem(proposal, metadata);
@@ -481,16 +476,16 @@ export class AddresslistVotingClientMethods extends ClientCore
             if (err instanceof InvalidCidError) {
               return toAddresslistVotingProposalListItem(
                 proposal,
-                UNSUPPORTED_PROPOSAL_METADATA_LINK,
+                UNSUPPORTED_PROPOSAL_METADATA_LINK
               );
             }
             return toAddresslistVotingProposalListItem(
               proposal,
-              UNAVAILABLE_PROPOSAL_METADATA,
+              UNAVAILABLE_PROPOSAL_METADATA
             );
           }
-        },
-      ),
+        }
+      )
     );
   }
 
@@ -504,7 +499,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    */
   public async getVotingSettings(
     pluginAddress: string,
-    blockNumber?: number,
+    blockNumber?: number
   ): Promise<VotingSettings | null> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -528,14 +523,14 @@ export class AddresslistVotingClientMethods extends ClientCore
       minDuration: parseInt(addresslistVotingPlugin.minDuration),
       supportThreshold: decodeRatio(
         BigInt(addresslistVotingPlugin.supportThreshold),
-        6,
+        6
       ),
       minParticipation: decodeRatio(
         BigInt(addresslistVotingPlugin.minParticipation),
-        6,
+        6
       ),
       minProposerVotingPower: BigInt(
-        addresslistVotingPlugin.minProposerVotingPower,
+        addresslistVotingPlugin.minProposerVotingPower
       ),
       votingMode: addresslistVotingPlugin.votingMode,
     };

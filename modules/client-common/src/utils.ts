@@ -1,53 +1,47 @@
-import { FunctionFragment, Interface } from "@ethersproject/abi";
-import { id } from "@ethersproject/hash";
+import { FunctionFragment, Interface } from '@ethersproject/abi';
+import { id } from '@ethersproject/hash';
 import {
   getNetwork as ethersGetNetwork,
   Log,
   Networkish,
-} from "@ethersproject/providers";
-import { ContractReceipt } from "@ethersproject/contracts";
+} from '@ethersproject/providers';
+import { ContractReceipt } from '@ethersproject/contracts';
 import {
   bytesToHex,
   InvalidAddressError,
   PluginInstallationPreparationError,
   UnsupportedNetworkError,
-} from "@aragon/sdk-common";
+} from '@aragon/sdk-common';
 import {
   MetadataAbiInput,
   PrepareInstallationParams,
   PrepareInstallationStep,
   PrepareInstallationStepValue,
   SupportedNetwork,
-} from "./types";
-import { IClientWeb3Core } from "./internal";
+} from './types';
+import { IClientWeb3Core } from './internal';
 import {
   PluginRepo__factory,
   PluginSetupProcessor__factory,
-} from "@aragon/osx-ethers";
-import { ADDITIONAL_NETWORKS, LIVE_CONTRACTS } from "./constants";
-import { defaultAbiCoder } from "@ethersproject/abi";
-import { isAddress } from "@ethersproject/address";
-import { Network } from "@ethersproject/networks";
+} from '@aragon/osx-ethers';
+import { ADDITIONAL_NETWORKS, LIVE_CONTRACTS } from './constants';
+import { defaultAbiCoder } from '@ethersproject/abi';
+import { isAddress } from '@ethersproject/address';
+import { Network } from '@ethersproject/networks';
 
 export function findLog(
   receipt: ContractReceipt,
   iface: Interface,
-  eventName: string,
+  eventName: string
 ): Log | undefined {
   return receipt.logs.find(
-    (log) =>
-      log.topics[0] ===
-        id(
-          iface.getEvent(eventName).format(
-            "sighash",
-          ),
-        ),
+    log => log.topics[0] === id(iface.getEvent(eventName).format('sighash'))
   );
 }
 
 export function getFunctionFragment(
   data: Uint8Array,
-  availableFunctions: string[],
+  availableFunctions: string[]
 ): FunctionFragment {
   const hexBytes = bytesToHex(data);
   const iface = new Interface(availableFunctions);
@@ -55,22 +49,22 @@ export function getFunctionFragment(
 }
 
 export function getNamedTypesFromMetadata(
-  inputs: MetadataAbiInput[] = [],
+  inputs: MetadataAbiInput[] = []
 ): string[] {
-  return inputs.map((input) => {
-    if (input.type.startsWith("tuple")) {
+  return inputs.map(input => {
+    if (input.type.startsWith('tuple')) {
       const tupleResult = getNamedTypesFromMetadata(input.components).join(
-        ", ",
+        ', '
       );
 
       let tupleString = `tuple(${tupleResult})`;
 
-      if (input.type.endsWith("[]")) {
-        tupleString = tupleString.concat("[]");
+      if (input.type.endsWith('[]')) {
+        tupleString = tupleString.concat('[]');
       }
 
       return tupleString;
-    } else if (input.type.endsWith("[]")) {
+    } else if (input.type.endsWith('[]')) {
       const baseType = input.type.slice(0, -2);
       return `${baseType}[] ${input.name}`;
     } else {
@@ -81,7 +75,7 @@ export function getNamedTypesFromMetadata(
 
 export async function prepareGenericInstallationEstimation(
   web3: IClientWeb3Core,
-  params: PrepareInstallationParams,
+  params: PrepareInstallationParams
 ) {
   const signer = web3.getConnectedSigner();
   const provider = web3.getProvider();
@@ -92,13 +86,10 @@ export async function prepareGenericInstallationEstimation(
   let version = params.version;
   // if version is not specified install latest version
   if (!version) {
-    const pluginRepo = PluginRepo__factory.connect(
-      params.pluginRepo,
-      signer,
-    );
+    const pluginRepo = PluginRepo__factory.connect(params.pluginRepo, signer);
     const currentRelease = await pluginRepo.latestRelease();
-    const latestVersion = await pluginRepo["getLatestVersion(uint8)"](
-      currentRelease,
+    const latestVersion = await pluginRepo['getLatestVersion(uint8)'](
+      currentRelease
     );
     version = latestVersion.tag;
   }
@@ -106,12 +97,12 @@ export async function prepareGenericInstallationEstimation(
   const { installationParams = [], installationAbi = [] } = params;
   const data = defaultAbiCoder.encode(
     getNamedTypesFromMetadata(installationAbi),
-    installationParams,
+    installationParams
   );
   // connect to psp contract
   const pspContract = PluginSetupProcessor__factory.connect(
     LIVE_CONTRACTS[networkName].pluginSetupProcessorAddress,
-    signer,
+    signer
   );
 
   const gasEstimation = await pspContract.estimateGas.prepareInstallation(
@@ -122,14 +113,14 @@ export async function prepareGenericInstallationEstimation(
         versionTag: version,
       },
       data,
-    },
+    }
   );
   return web3.getApproximateGasFee(gasEstimation.toBigInt());
 }
 
 export async function* prepareGenericInstallation(
   web3: IClientWeb3Core,
-  params: PrepareInstallationParams & { pluginSetupProcessorAddress: string },
+  params: PrepareInstallationParams & { pluginSetupProcessorAddress: string }
 ): AsyncGenerator<PrepareInstallationStepValue> {
   const signer = web3.getConnectedSigner();
   if (!isAddress(params.pluginRepo)) {
@@ -138,13 +129,10 @@ export async function* prepareGenericInstallation(
   let version = params.version;
   // if version is not specified install latest version
   if (!version) {
-    const pluginRepo = PluginRepo__factory.connect(
-      params.pluginRepo,
-      signer,
-    );
+    const pluginRepo = PluginRepo__factory.connect(params.pluginRepo, signer);
     const currentRelease = await pluginRepo.latestRelease();
-    const latestVersion = await pluginRepo["getLatestVersion(uint8)"](
-      currentRelease,
+    const latestVersion = await pluginRepo['getLatestVersion(uint8)'](
+      currentRelease
     );
     version = latestVersion.tag;
   }
@@ -152,12 +140,12 @@ export async function* prepareGenericInstallation(
   const { installationParams = [], installationAbi = [] } = params;
   const data = defaultAbiCoder.encode(
     getNamedTypesFromMetadata(installationAbi),
-    installationParams,
+    installationParams
   );
   // connect to psp contract
   const pspContract = PluginSetupProcessor__factory.connect(
     params.pluginSetupProcessorAddress,
-    signer,
+    signer
   );
   const tx = await pspContract.prepareInstallation(params.daoAddressOrEns, {
     pluginSetupRef: {
@@ -173,19 +161,14 @@ export async function* prepareGenericInstallation(
   };
 
   const receipt = await tx.wait();
-  const pspContractInterface = PluginSetupProcessor__factory
-    .createInterface();
-  const log = findLog(
-    receipt,
-    pspContractInterface,
-    "InstallationPrepared",
-  );
+  const pspContractInterface = PluginSetupProcessor__factory.createInterface();
+  const log = findLog(receipt, pspContractInterface, 'InstallationPrepared');
   if (!log) {
     throw new PluginInstallationPreparationError();
   }
   const parsedLog = pspContractInterface.parseLog(log);
-  const pluginAddress = parsedLog.args["plugin"];
-  const preparedSetupData = parsedLog.args["preparedSetupData"];
+  const pluginAddress = parsedLog.args['plugin'];
+  const preparedSetupData = parsedLog.args['preparedSetupData'];
   if (!(pluginAddress || preparedSetupData)) {
     throw new PluginInstallationPreparationError();
   }
@@ -204,17 +187,17 @@ export function getNetwork(networkish: Networkish): Network {
   let network: Network | undefined;
   for (const nw of ADDITIONAL_NETWORKS) {
     switch (typeof networkish) {
-      case "string":
+      case 'string':
         if (networkish === nw.name) {
           network = nw;
         }
         break;
-      case "number":
+      case 'number':
         if (networkish === nw.chainId) {
           network = nw;
         }
         break;
-      case "object":
+      case 'object':
         if (networkish.name === nw.name && networkish.chainId === nw.chainId) {
           network = nw;
         }

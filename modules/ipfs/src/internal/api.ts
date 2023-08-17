@@ -20,15 +20,15 @@ export namespace API {
   /** Gets cluster version */
   export function version(
     cluster: IClientConfig,
-    options: VersionOptions = {},
+    options: VersionOptions = {}
   ): Promise<VersionResponse> {
     return Network.request(cluster, "version", {
       method: "POST",
       params: Helpers.getVersionParams(options),
       signal: options.signal,
     })
-      .then((response) => Helpers.toVersionResponse(response))
-      .catch((e) => {
+      .then(response => Helpers.toVersionResponse(response))
+      .catch(e => {
         throw Helpers.handleError(e);
       });
   }
@@ -36,15 +36,15 @@ export namespace API {
   /** Gets the cluster node information */
   export function nodeInfo(
     cluster: IClientConfig,
-    options = {} as NodeInfoOptions,
+    options = {} as NodeInfoOptions
   ): Promise<NodeInfoResponse> {
     return Network.request(cluster, "id", {
       method: "POST",
       params: Helpers.getNodeInfoParams(options),
       signal: options.signal,
     })
-      .then((response) => Helpers.toNodeInfoResponse(response))
-      .catch((e) => {
+      .then(response => Helpers.toNodeInfoResponse(response))
+      .catch(e => {
         throw Helpers.handleError(e);
       });
   }
@@ -53,7 +53,7 @@ export namespace API {
   export function add(
     cluster: IClientConfig,
     file: File | Blob | Uint8Array | string,
-    options: AddOptions = {},
+    options: AddOptions = {}
   ): Promise<AddResponse> {
     if (
       !(file instanceof File) &&
@@ -79,8 +79,8 @@ export namespace API {
       body,
       signal: options.signal,
     })
-      .then((response) => Helpers.toAddResponse(response))
-      .catch((e) => {
+      .then(response => Helpers.toAddResponse(response))
+      .catch(e => {
         throw Helpers.handleError(e);
       });
   }
@@ -89,7 +89,7 @@ export namespace API {
   export async function cat(
     cluster: IClientConfig,
     path: string,
-    options: CatOptions = {},
+    options: CatOptions = {}
   ): Promise<Uint8Array> {
     if (!path) {
       throw new Error("Invalid CID");
@@ -109,36 +109,32 @@ export namespace API {
   export function pin(
     cluster: IClientConfig,
     path: string,
-    options: PinOptions = {},
+    options: PinOptions = {}
   ): Promise<PinResponse> {
-    return Network
-      .request(cluster, "pin/add", {
-        params: {
-          ...Helpers.getPinOptions(options),
-          arg: path,
-        },
-        method: "POST",
-        signal: options.signal,
-      })
-      .then((response) => Helpers.toPinResponse(response));
+    return Network.request(cluster, "pin/add", {
+      params: {
+        ...Helpers.getPinOptions(options),
+        arg: path,
+      },
+      method: "POST",
+      signal: options.signal,
+    }).then(response => Helpers.toPinResponse(response));
   }
 
   /** Unpins the given path or CiD or IPFS/IPNS path from the cluster */
   export function unpin(
     cluster: IClientConfig,
     path: string,
-    options: UnpinOptions = {},
+    options: UnpinOptions = {}
   ): Promise<PinResponse> {
-    return Network
-      .request(cluster, "pin/rm", {
-        params: {
-          ...Helpers.getUnpinOptions(options),
-          arg: path,
-        },
-        method: "POST",
-        signal: options.signal,
-      })
-      .then((response) => Helpers.toPinResponse(response));
+    return Network.request(cluster, "pin/rm", {
+      params: {
+        ...Helpers.getUnpinOptions(options),
+        arg: path,
+      },
+      method: "POST",
+      signal: options.signal,
+    }).then(response => Helpers.toPinResponse(response));
   }
 }
 

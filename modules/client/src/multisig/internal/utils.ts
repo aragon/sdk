@@ -1,4 +1,8 @@
-import { InvalidProposalStatusError, getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
+import {
+  InvalidProposalStatusError,
+  getCompactProposalId,
+  hexToBytes,
+} from "@aragon/sdk-common";
 import { SubgraphAction } from "../../client-common";
 import { MultisigProposal, MultisigProposalListItem } from "../types";
 import {
@@ -13,21 +17,13 @@ import {
 
 export function toMultisigProposal(
   proposal: SubgraphMultisigProposal,
-  metadata: ProposalMetadata,
+  metadata: ProposalMetadata
 ): MultisigProposal {
-  const creationDate = new Date(
-    parseInt(proposal.createdAt) * 1000,
-  );
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
-  const endDate = new Date(
-    parseInt(proposal.endDate) * 1000,
-  );
+  const creationDate = new Date(parseInt(proposal.createdAt) * 1000);
+  const startDate = new Date(parseInt(proposal.startDate) * 1000);
+  const endDate = new Date(parseInt(proposal.endDate) * 1000);
   const executionDate = proposal.executionDate
-    ? new Date(
-      parseInt(proposal.executionDate) * 1000,
-    )
+    ? new Date(parseInt(proposal.executionDate) * 1000)
     : null;
   return {
     id: getCompactProposalId(proposal.id),
@@ -61,24 +57,18 @@ export function toMultisigProposal(
           to: action.to,
           value: BigInt(action.value),
         };
-      },
+      }
     ),
     status: computeProposalStatus(proposal),
-    approvals: proposal.approvers.map(
-      (approver) => approver.id.slice(0, 42),
-    ),
+    approvals: proposal.approvers.map(approver => approver.id.slice(0, 42)),
   };
 }
 export function toMultisigProposalListItem(
   proposal: SubgraphMultisigProposalListItem,
-  metadata: ProposalMetadata,
+  metadata: ProposalMetadata
 ): MultisigProposalListItem {
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
-  const endDate = new Date(
-    parseInt(proposal.endDate) * 1000,
-  );
+  const startDate = new Date(parseInt(proposal.startDate) * 1000);
+  const endDate = new Date(parseInt(proposal.endDate) * 1000);
   return {
     id: getCompactProposalId(proposal.id),
     dao: {
@@ -90,9 +80,7 @@ export function toMultisigProposalListItem(
       title: metadata.title,
       summary: metadata.summary,
     },
-    approvals: proposal.approvers.map(
-      (approver) => approver.id.slice(0, 42),
-    ),
+    approvals: proposal.approvers.map(approver => approver.id.slice(0, 42)),
     settings: {
       onlyListed: proposal.plugin.onlyListed,
       minApprovals: proposal.minApprovals,
@@ -104,12 +92,10 @@ export function toMultisigProposalListItem(
 }
 
 export function computeProposalStatus(
-  proposal: SubgraphMultisigProposal | SubgraphMultisigProposalListItem,
+  proposal: SubgraphMultisigProposal | SubgraphMultisigProposalListItem
 ): ProposalStatus {
   const now = new Date();
-  const startDate = new Date(
-    parseInt(proposal.startDate) * 1000,
-  );
+  const startDate = new Date(parseInt(proposal.startDate) * 1000);
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
   if (proposal.executed) {
     return ProposalStatus.EXECUTED;

@@ -6,36 +6,32 @@ import {
   IpfsContextState,
   Web3ContextParams,
   Web3ContextState,
-} from "./internal";
+} from './internal';
 
-export type ContextParams =
-  & Web3ContextParams
-  & IpfsContextParams
-  & GraphQLContextParams;
+export type ContextParams = Web3ContextParams &
+  IpfsContextParams &
+  GraphQLContextParams;
 
-export type ContextState =
-  & Web3ContextState
-  & IpfsContextState
-  & GraphQLContextState;
+export type ContextState = Web3ContextState &
+  IpfsContextState &
+  GraphQLContextState;
 
-export type OverriddenState =
-  & {
-    [key in DeployedAddresses]: boolean;
-  }
-  & {
-    gasFeeEstimationFactor: boolean;
-    ipfsNodes: boolean;
-    graphqlNodes: boolean;
-  };
+export type OverriddenState = {
+  [key in DeployedAddresses]: boolean;
+} & {
+  gasFeeEstimationFactor: boolean;
+  ipfsNodes: boolean;
+  graphqlNodes: boolean;
+};
 
 export enum SupportedNetwork {
-  MAINNET = "homestead",
-  GOERLI = "goerli",
-  POLYGON = "matic",
-  MUMBAI = "maticmum",
-  BASE = "base",
-  BASE_GOERLI = "baseGoerli",
-  LOCAL = "local",
+  MAINNET = 'homestead',
+  GOERLI = 'goerli',
+  POLYGON = 'matic',
+  MUMBAI = 'maticmum',
+  BASE = 'base',
+  BASE_GOERLI = 'baseGoerli',
+  LOCAL = 'local',
 }
 
 export const SupportedNetworksArray = Object.values(SupportedNetwork);
@@ -84,15 +80,15 @@ export type PrepareInstallationParams = {
 };
 
 export enum PrepareInstallationStep {
-  PREPARING = "preparing",
-  DONE = "done",
+  PREPARING = 'preparing',
+  DONE = 'done',
 }
 
 export type PrepareInstallationStepValue =
   | { key: PrepareInstallationStep.PREPARING; txHash: string }
-  | {
-    key: PrepareInstallationStep.DONE;
-  } & ApplyInstallationParams;
+  | ({
+      key: PrepareInstallationStep.DONE;
+    } & ApplyInstallationParams);
 
 export type ApplyInstallationParamsBase = {
   permissions: MultiTargetPermission[];
@@ -134,8 +130,8 @@ export type Pagination = {
 };
 
 export enum SortDirection {
-  ASC = "asc",
-  DESC = "desc",
+  ASC = 'asc',
+  DESC = 'desc',
 }
 
 export interface InterfaceParams {
@@ -145,10 +141,10 @@ export interface InterfaceParams {
 }
 
 export enum TokenType {
-  NATIVE = "native",
-  ERC20 = "erc20",
-  ERC721 = "erc721",
-  ERC1155 = "erc1155",
+  NATIVE = 'native',
+  ERC20 = 'erc20',
+  ERC721 = 'erc721',
+  ERC1155 = 'erc1155',
 }
 
 /**
@@ -174,11 +170,11 @@ export type ProposalMetadataSummary = {
 };
 
 export enum ProposalStatus {
-  ACTIVE = "Active",
-  PENDING = "Pending",
-  SUCCEEDED = "Succeeded",
-  EXECUTED = "Executed",
-  DEFEATED = "Defeated",
+  ACTIVE = 'Active',
+  PENDING = 'Pending',
+  SUCCEEDED = 'Succeeded',
+  EXECUTED = 'Executed',
+  DEFEATED = 'Defeated',
 }
 
 // Long version

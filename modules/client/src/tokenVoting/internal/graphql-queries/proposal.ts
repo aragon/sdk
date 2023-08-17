@@ -1,118 +1,130 @@
 import { gql } from "graphql-request";
 
 export const QueryTokenVotingProposal = gql`
-query TokenVotingProposal($proposalId: ID!) {
-  tokenVotingProposal(id: $proposalId){
-    id
-    dao {
+  query TokenVotingProposal($proposalId: ID!) {
+    tokenVotingProposal(id: $proposalId) {
       id
-      subdomain
-    }
-    creator
-    metadata
-    createdAt
-    creationBlockNumber
-    executionDate
-    executionBlockNumber
-    actions {
-      to
-      value
-      data
-    }
-    yes,
-    no,
-    abstain
-    votingMode
-    supportThreshold
-    startDate
-    endDate
-    executed
-    earlyExecutable
-    potentiallyExecutable
-    executionTxHash
-    voters{
-      voter{
-        address
-      }
-      voteReplaced
-      voteOption
-      votingPower
-    }
-    plugin {
-      token {
+      dao {
         id
-        name
-        symbol
-        __typename
-        ...on ERC20Contract {
-          decimals
+        subdomain
+      }
+      creator
+      metadata
+      createdAt
+      creationBlockNumber
+      executionDate
+      executionBlockNumber
+      actions {
+        to
+        value
+        data
+      }
+      yes
+      no
+      abstain
+      votingMode
+      supportThreshold
+      startDate
+      endDate
+      executed
+      earlyExecutable
+      potentiallyExecutable
+      executionTxHash
+      voters {
+        voter {
+          address
         }
-        ...on ERC20WrapperContract {
-          decimals
-          underlyingToken{
-            id
-            name
-            symbol
+        voteReplaced
+        voteOption
+        votingPower
+      }
+      plugin {
+        token {
+          id
+          name
+          symbol
+          __typename
+          ... on ERC20Contract {
             decimals
+          }
+          ... on ERC20WrapperContract {
+            decimals
+            underlyingToken {
+              id
+              name
+              symbol
+              decimals
+            }
           }
         }
       }
+      totalVotingPower
+      minVotingPower
     }
-    totalVotingPower
-    minVotingPower
   }
-}
 `;
 export const QueryTokenVotingProposals = gql`
-query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: TokenVotingProposal_orderBy!) {
-  tokenVotingProposals(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
-    id
-    dao {
+  query TokenVotingProposals(
+    $where: TokenVotingProposal_filter!
+    $limit: Int!
+    $skip: Int!
+    $direction: OrderDirection!
+    $sortBy: TokenVotingProposal_orderBy!
+  ) {
+    tokenVotingProposals(
+      where: $where
+      first: $limit
+      skip: $skip
+      orderDirection: $direction
+      orderBy: $sortBy
+    ) {
       id
-      subdomain
-    }
-    creator
-    metadata
-    yes,
-    no,
-    abstain
-    startDate
-    endDate
-    executed
-    earlyExecutable
-    potentiallyExecutable
-    votingMode
-    supportThreshold
-    minVotingPower
-    totalVotingPower
-    voters{
-      voter{
-        address
-      }
-      voteReplaced
-      voteOption
-      votingPower
-    }
-    plugin{
-      token{
+      dao {
         id
-        name
-        symbol
-        __typename
-        ...on ERC20Contract {
-          decimals
+        subdomain
+      }
+      creator
+      metadata
+      yes
+      no
+      abstain
+      startDate
+      endDate
+      executed
+      earlyExecutable
+      potentiallyExecutable
+      votingMode
+      supportThreshold
+      minVotingPower
+      totalVotingPower
+      voters {
+        voter {
+          address
         }
-        ...on ERC20WrapperContract {
-          decimals
-          underlyingToken{
-            id
-            name
-            symbol
+        voteReplaced
+        voteOption
+        votingPower
+      }
+      plugin {
+        token {
+          id
+          name
+          symbol
+          __typename
+          ... on ERC20Contract {
             decimals
+          }
+          ... on ERC20WrapperContract {
+            decimals
+            underlyingToken {
+              id
+              name
+              symbol
+              decimals
+            }
           }
         }
       }
     }
   }
-}
 `;

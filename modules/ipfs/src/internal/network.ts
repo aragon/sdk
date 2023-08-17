@@ -20,7 +20,7 @@ export namespace Network {
       params?: GenericRecord;
       body?: BodyInit;
       signal?: AbortSignal;
-    },
+    }
   ) {
     const { url, headers } = config;
     const endpoint = new URL(path, url);
@@ -56,7 +56,7 @@ export namespace Network {
       params?: GenericRecord;
       body?: BodyInit;
       signal?: AbortSignal;
-    },
+    }
   ) {
     const endpoint = new URL(path, url);
     for (const [key, value] of Object.entries(params || {})) {
@@ -79,7 +79,7 @@ export namespace Network {
   }
 
   async function* streamedBytes(
-    stream: ReadableStream<Uint8Array>,
+    stream: ReadableStream<Uint8Array>
   ): AsyncGenerator<Uint8Array> {
     let error = null;
     const reader = stream.getReader();

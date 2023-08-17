@@ -8,7 +8,7 @@ import { TimeoutError } from "./errors";
 export function promiseFuncWithTimeout<T>(
   func: () => Promise<T>,
   timeout: number,
-  timeoutMessage?: string,
+  timeoutMessage?: string
 ): Promise<T> {
   if (typeof func !== "function") throw new Error("Invalid function");
   else if (isNaN(timeout) || timeout < 0) throw new Error("Invalid timeout");
@@ -16,12 +16,12 @@ export function promiseFuncWithTimeout<T>(
   return new Promise((resolve, reject) => {
     setTimeout(
       () => reject(new TimeoutError(timeoutMessage || "Time out")),
-      timeout,
+      timeout
     );
 
     return func()
-      .then((result) => resolve(result))
-      .catch((err) => reject(err));
+      .then(result => resolve(result))
+      .catch(err => reject(err));
   });
 }
 
@@ -33,7 +33,7 @@ export function promiseFuncWithTimeout<T>(
 export function promiseWithTimeout<T>(
   prom: Promise<T>,
   timeout: number,
-  timeoutMessage?: string,
+  timeoutMessage?: string
 ): Promise<T> {
   if (
     !prom ||
@@ -46,10 +46,9 @@ export function promiseWithTimeout<T>(
   return new Promise((resolve, reject) => {
     setTimeout(
       () => reject(new TimeoutError(timeoutMessage || "Time out")),
-      timeout,
+      timeout
     );
 
-    return prom.then((result) => resolve(result)).catch((err) => reject(err));
+    return prom.then(result => resolve(result)).catch(err => reject(err));
   });
 }
-

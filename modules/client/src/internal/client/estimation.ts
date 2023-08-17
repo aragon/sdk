@@ -39,7 +39,7 @@ import { BigNumber } from "@ethersproject/bignumber";
  */
 export class ClientEstimation extends ClientCore implements IClientEstimation {
   public async prepareInstallation(
-    params: PrepareInstallationParams,
+    params: PrepareInstallationParams
   ): Promise<GasFeeEstimation> {
     return prepareGenericInstallationEstimation(this.web3, params);
   }
@@ -52,15 +52,13 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    */
   public async createDao(params: CreateDaoParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
-    if (
-      params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
-    ) {
+    if (params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9-]+$/)) {
       throw new InvalidSubdomainError();
     }
 
     const daoInstance = DAOFactory__factory.connect(
       this.web3.getAddress("daoFactoryAddress"),
-      signer,
+      signer
     );
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
     for (const plugin of params.plugins) {
@@ -68,7 +66,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
 
       const currentRelease = await repo.latestRelease();
       const latestVersion = await repo["getLatestVersion(uint8)"](
-        currentRelease,
+        currentRelease
       );
       pluginInstallationData.push({
         pluginSetupRef: {
@@ -86,7 +84,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
         daoURI: params.daoUri || "",
         trustedForwarder: params.trustedForwarder || AddressZero,
       },
-      pluginInstallationData,
+      pluginInstallationData
     );
 
     return this.web3.getApproximateGasFee(gasEstimation.toBigInt());
@@ -99,9 +97,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
-  public async deposit(
-    params: DepositParams,
-  ): Promise<GasFeeEstimation> {
+  public async deposit(params: DepositParams): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     let estimation: BigNumber;
     switch (params.type) {
@@ -116,9 +112,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
         estimation = await estimateErc1155Deposit(signer, params);
         break;
       default:
-        throw new NotImplementedError(
-          "Token type not valid",
-        );
+        throw new NotImplementedError("Token type not valid");
     }
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
@@ -131,7 +125,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * @memberof ClientEstimation
    */
   public async setAllowance(
-    params: SetAllowanceParams,
+    params: SetAllowanceParams
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
     // resolve ens
@@ -149,16 +143,11 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
       daoAddress = resolvedAddress;
     }
 
-    const contract = new Contract(
-      params.tokenAddress,
-      ERC20_ABI,
-      signer,
-    );
-    return contract.estimateGas.approve(
-      daoAddress,
-      params.amount,
-    ).then((gasLimit) => {
-      return this.web3.getApproximateGasFee(gasLimit.toBigInt());
-    });
+    const contract = new Contract(params.tokenAddress, ERC20_ABI, signer);
+    return contract.estimateGas
+      .approve(daoAddress, params.amount)
+      .then(gasLimit => {
+        return this.web3.getApproximateGasFee(gasLimit.toBigInt());
+      });
   }
 }

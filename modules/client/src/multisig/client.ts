@@ -43,7 +43,7 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
 
     getPluginInstallItem: (
       params: MultisigPluginInstallParams,
-      network: Networkish,
+      network: Networkish
     ): PluginInstallItem =>
       MultisigClientEncoding.getPluginInstallItem(params, network),
   };

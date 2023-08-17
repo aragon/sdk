@@ -5,15 +5,15 @@ import {
 import { MetadataAbiInput } from "@aragon/sdk-client-common";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
-  MajorityVotingBase__factory.createInterface().getFunction(
-    "updateVotingSettings",
-  )
+  MajorityVotingBase__factory.createInterface()
+    .getFunction("updateVotingSettings")
     .format("minimal"),
-  AddresslistVoting__factory.createInterface().getFunction("addAddresses")
+  AddresslistVoting__factory.createInterface()
+    .getFunction("addAddresses")
     .format("minimal"),
-  AddresslistVoting__factory.createInterface().getFunction(
-    "removeAddresses",
-  ).format("minimal"),
+  AddresslistVoting__factory.createInterface()
+    .getFunction("removeAddresses")
+    .format("minimal"),
 ];
 
 export const INSTALLATION_ABI: MetadataAbiInput[] = [

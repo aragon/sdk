@@ -45,7 +45,7 @@ export class TokenVotingClientEncoding extends ClientCore
    */
   static getPluginInstallItem(
     params: TokenVotingPluginInstall,
-    network: Networkish,
+    network: Networkish
   ): PluginInstallItem {
     const networkName = getNetwork(network).name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
@@ -54,7 +54,7 @@ export class TokenVotingClientEncoding extends ClientCore
     const args = tokenVotingInitParamsToContract(params);
     const hexBytes = defaultAbiCoder.encode(
       getNamedTypesFromMetadata(INSTALLATION_ABI),
-      args,
+      args
     );
     return {
       id: LIVE_CONTRACTS[networkName].tokenVotingRepoAddress,
@@ -71,7 +71,7 @@ export class TokenVotingClientEncoding extends ClientCore
    */
   public updatePluginSettingsAction(
     pluginAddress: string,
-    params: VotingSettings,
+    params: VotingSettings
   ): DaoAction {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
@@ -94,13 +94,12 @@ export class TokenVotingClientEncoding extends ClientCore
    */
   public mintTokenAction(
     minterAddress: string,
-    params: MintTokenParams,
+    params: MintTokenParams
   ): DaoAction {
     if (!isAddress(minterAddress) || !isAddress(params.address)) {
       throw new InvalidAddressError();
     }
-    const votingInterface = IERC20MintableUpgradeable__factory
-      .createInterface();
+    const votingInterface = IERC20MintableUpgradeable__factory.createInterface();
     const args = mintTokenParamsToContract(params);
     // get hex bytes
     const hexBytes = votingInterface.encodeFunctionData("mint", args);

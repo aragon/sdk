@@ -1,21 +1,21 @@
-import { Signer } from "@ethersproject/abstract-signer";
-import { JsonRpcProvider, Network, Networkish } from "@ethersproject/providers";
-import { Client as IpfsClient } from "@aragon/sdk-ipfs";
-import { GraphQLClient } from "graphql-request";
+import { Signer } from '@ethersproject/abstract-signer';
+import { JsonRpcProvider, Network, Networkish } from '@ethersproject/providers';
+import { Client as IpfsClient } from '@aragon/sdk-ipfs';
+import { GraphQLClient } from 'graphql-request';
 
 // Create a readonly string array from the keys of NetworkDeployment
 export const DeployedAddressesArray = [
-  "daoFactoryAddress",
-  "pluginSetupProcessorAddress",
-  "multisigRepoAddress",
-  "adminRepoAddress",
-  "addresslistVotingRepoAddress",
-  "tokenVotingRepoAddress",
-  "multisigSetupAddress",
-  "adminSetupAddress",
-  "addresslistVotingSetupAddress",
-  "tokenVotingSetupAddress",
-  "ensRegistryAddress",
+  'daoFactoryAddress',
+  'pluginSetupProcessorAddress',
+  'multisigRepoAddress',
+  'adminRepoAddress',
+  'addresslistVotingRepoAddress',
+  'tokenVotingRepoAddress',
+  'multisigSetupAddress',
+  'adminSetupAddress',
+  'addresslistVotingSetupAddress',
+  'tokenVotingSetupAddress',
+  'ensRegistryAddress',
 ] as const;
 // export the type from the readonly string array
 export type DeployedAddresses = typeof DeployedAddressesArray[number];
@@ -31,10 +31,9 @@ export type NetworkDeployment = Override<
 
 export type Web3ContextParams =
   /** If any contract is not provided it will use the default from LIVE_CONTRACTS in the provided network */
-  & {
+  {
     [address in DeployedAddresses]?: string;
-  }
-  & {
+  } & {
     /** Defaults to mainnet */
     network?: Networkish;
     /** Required for Ethereum transactions to work */
@@ -52,19 +51,17 @@ export type GraphQLContextParams = {
   graphqlNodes?: { url: string }[];
 };
 
-export type Web3ContextState =
-  & Override<
-    {
-      [address in DeployedAddresses]: string;
-    },
-    { ensRegistryAddress?: string }
-  >
-  & {
-    network: Network;
-    signer: Signer;
-    web3Providers: JsonRpcProvider[];
-    gasFeeEstimationFactor: number;
-  };
+export type Web3ContextState = Override<
+  {
+    [address in DeployedAddresses]: string;
+  },
+  { ensRegistryAddress?: string }
+> & {
+  network: Network;
+  signer: Signer;
+  web3Providers: JsonRpcProvider[];
+  gasFeeEstimationFactor: number;
+};
 export type IpfsContextState = {
   ipfs: IpfsClient[];
 };

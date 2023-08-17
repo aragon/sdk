@@ -6,8 +6,8 @@ import {
   IClientWeb3Core,
   IPFSModule,
   Web3Module,
-} from "./internal";
-import { Context } from "./context";
+} from './internal';
+import { Context } from './context';
 
 /**
  * Provides the low level foundation so that subclasses have ready-made access to Web3, IPFS and GraphQL primitives

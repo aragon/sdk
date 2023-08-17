@@ -39,59 +39,61 @@ import { TokenVotingTokenCompatibility } from "./types";
 
 export interface ITokenVotingClientMethods {
   createProposal: (
-    params: CreateMajorityVotingProposalParams,
+    params: CreateMajorityVotingProposalParams
   ) => AsyncGenerator<ProposalCreationStepValue>;
   pinMetadata: (params: ProposalMetadata) => Promise<string>;
   voteProposal: (
-    params: VoteProposalParams,
+    params: VoteProposalParams
   ) => AsyncGenerator<VoteProposalStepValue>;
   executeProposal: (
-    proposalId: string,
+    proposalId: string
   ) => AsyncGenerator<ExecuteProposalStepValue>;
   prepareInstallation: (
-    params: TokenVotingPluginPrepareInstallationParams,
+    params: TokenVotingPluginPrepareInstallationParams
   ) => AsyncGenerator<PrepareInstallationStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (
     addressOrEns: string,
-    blockNumber?: number,
+    blockNumber?: number
   ) => Promise<TokenVotingMember[]>;
   getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;
   getProposals: (
-    params: ProposalQueryParams,
+    params: ProposalQueryParams
   ) => Promise<TokenVotingProposalListItem[]>;
   getVotingSettings: (
     pluginAddress: string,
-    blockNumber?: number,
+    blockNumber?: number
   ) => Promise<VotingSettings | null>;
   getToken: (
-    pluginAddress: string,
+    pluginAddress: string
   ) => Promise<
     Erc20TokenDetails | Erc20WrapperTokenDetails | Erc721TokenDetails | null
   >;
   wrapTokens: (params: WrapTokensParams) => AsyncGenerator<WrapTokensStepValue>;
   unwrapTokens: (
-    params: UnwrapTokensParams,
+    params: UnwrapTokensParams
   ) => AsyncGenerator<UnwrapTokensStepValue>;
   delegateTokens: (
-    params: DelegateTokensParams,
+    params: DelegateTokensParams
   ) => AsyncGenerator<DelegateTokensStepValue>;
   undelegateTokens: (
-    tokenAddress: string,
+    tokenAddress: string
   ) => AsyncGenerator<UndelegateTokensStepValue>;
   getDelegatee: (tokenAddress: string) => Promise<string | null>;
-  isTokenVotingCompatibleToken: (tokenAddress: string) => Promise<TokenVotingTokenCompatibility>;
+  isTokenVotingCompatibleToken: (
+    tokenAddress: string
+  ) => Promise<TokenVotingTokenCompatibility>;
 }
 
 export interface ITokenVotingClientEncoding {
   updatePluginSettingsAction: (
     pluginAddress: string,
-    params: VotingSettings,
+    params: VotingSettings
   ) => DaoAction;
   mintTokenAction: (
     minterAddress: string,
-    params: MintTokenParams,
+    params: MintTokenParams
   ) => DaoAction;
 }
 export interface ITokenVotingClientDecoding {
@@ -101,18 +103,12 @@ export interface ITokenVotingClientDecoding {
 }
 export interface ITokenVotingClientEstimation {
   createProposal: (
-    params: CreateMajorityVotingProposalParams,
+    params: CreateMajorityVotingProposalParams
   ) => Promise<GasFeeEstimation>;
   voteProposal: (params: VoteProposalParams) => Promise<GasFeeEstimation>;
-  executeProposal: (
-    proposalId: string,
-  ) => Promise<GasFeeEstimation>;
-  delegateTokens: (
-    params: DelegateTokensParams,
-  ) => Promise<GasFeeEstimation>;
-  undelegateTokens: (
-    tokenAddress: string,
-  ) => Promise<GasFeeEstimation>;
+  executeProposal: (proposalId: string) => Promise<GasFeeEstimation>;
+  delegateTokens: (params: DelegateTokensParams) => Promise<GasFeeEstimation>;
+  undelegateTokens: (tokenAddress: string) => Promise<GasFeeEstimation>;
 }
 
 /** Defines the shape of the Token client class */

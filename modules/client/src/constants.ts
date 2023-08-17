@@ -21,7 +21,7 @@ const Permissions = {
 
 const PermissionIds = Object.entries(Permissions).reduce(
   (acc, [k, v]) => ({ ...acc, [k + "_ID"]: keccak256(toUtf8Bytes(v)) }),
-  {} as { [k: string]: string },
+  {} as { [k: string]: string }
 );
 Object.freeze(Permissions);
 export { Permissions };

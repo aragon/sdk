@@ -1,12 +1,12 @@
 // This file contains the definition of the low level network clients
 
-import { Signer } from "@ethersproject/abstract-signer";
-import { Contract, ContractInterface } from "@ethersproject/contracts";
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { Client as IpfsClient, PinResponse } from "@aragon/sdk-ipfs";
-import { GraphQLClient } from "graphql-request";
-import { GasFeeEstimation, SupportedNetwork } from "../types";
-import { DeployedAddresses } from "./types";
+import { Signer } from '@ethersproject/abstract-signer';
+import { Contract, ContractInterface } from '@ethersproject/contracts';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { Client as IpfsClient, PinResponse } from '@aragon/sdk-ipfs';
+import { GraphQLClient } from 'graphql-request';
+import { GasFeeEstimation, SupportedNetwork } from '../types';
+import { DeployedAddresses } from './types';
 
 export interface IClientWeb3Core {
   shiftProvider: () => void;
@@ -17,10 +17,7 @@ export interface IClientWeb3Core {
   getMaxFeePerGas: () => Promise<bigint>;
   isUp: () => Promise<boolean>;
   ensureOnline: () => Promise<void>;
-  attachContract: <T>(
-    address: string,
-    abi: ContractInterface,
-  ) => Contract & T;
+  attachContract: <T>(address: string, abi: ContractInterface) => Contract & T;
   getAddress: (addressName: DeployedAddresses) => string;
   getApproximateGasFee: (estimatedFee: bigint) => Promise<GasFeeEstimation>;
 }
@@ -39,7 +36,11 @@ export interface IClientGraphQLCore {
   shiftClient: () => void;
   isUp: () => Promise<boolean>;
   ensureOnline: () => Promise<void>;
-  request: <T>({ query, params, name }: {
+  request: <T>({
+    query,
+    params,
+    name,
+  }: {
     query: string;
     params: { [key: string]: any };
     name?: string;

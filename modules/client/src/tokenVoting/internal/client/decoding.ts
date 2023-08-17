@@ -37,13 +37,12 @@ export class TokenVotingClientDecoding extends ClientCore
    * @memberof TokenVotingClientDecoding
    */
   public mintTokenAction(data: Uint8Array): MintTokenParams {
-    const votingInterface = IERC20MintableUpgradeable__factory
-      .createInterface();
+    const votingInterface = IERC20MintableUpgradeable__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedfunction = votingInterface.getFunction("mint");
     const result = votingInterface.decodeFunctionData(
       expectedfunction,
-      hexBytes,
+      hexBytes
     );
     return mintTokenParamsFromContract(result);
   }

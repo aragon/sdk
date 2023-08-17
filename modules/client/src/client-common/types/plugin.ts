@@ -55,7 +55,7 @@ export type ContractVotingSettings = [
   BigNumber, // supportThreshold
   BigNumber, // minParticipation
   BigNumber, // minDuration
-  BigNumber, // minProposerVotingPower
+  BigNumber // minProposerVotingPower
 ];
 
 export type CreateProposalBaseParams = {

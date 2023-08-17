@@ -23,3 +23,4 @@ Task ID: [OS-XXX]()
 - [ ] I ran all tests with success and extended them when possible.
 - [ ] I have updated the `CHANGELOG.md` file in the root folder of the package after the `[UPCOMING]` title and before the latest version.
 - [ ] I have tested my code on the test network.
+- [ ] I have formatted my code with `yarn lint`.

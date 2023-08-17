@@ -9,7 +9,7 @@ import {
 /* Contract types */
 export type ContractAddresslistVotingInitParams = [
   ContractVotingSettings,
-  string[], // addresses
+  string[] // addresses
 ];
 
 /* Subgraph types */

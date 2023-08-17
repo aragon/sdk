@@ -167,12 +167,12 @@ export type DaoDepositStepValue =
   | { key: DaoDepositSteps.CHECKED_ALLOWANCE; allowance: bigint }
   | { key: DaoDepositSteps.DEPOSITING; txHash: string }
   | {
-    key: DaoDepositSteps.DONE;
-    amount?: bigint;
-    tokenId?: bigint;
-    tokenIds?: bigint[];
-    amounts?: bigint[];
-  };
+      key: DaoDepositSteps.DONE;
+      amount?: bigint;
+      tokenId?: bigint;
+      tokenIds?: bigint[];
+      amounts?: bigint[];
+    };
 
 /* Withdrawals */
 type WithdrawParamsBase = {
@@ -284,18 +284,22 @@ export enum TransferType {
   WITHDRAW = "withdraw",
 }
 
-export type Deposit =
-  & (NativeTokenTransfer | Erc20TokenTransfer | Erc721TokenTransfer)
-  & {
-    type: TransferType.DEPOSIT;
-  };
+export type Deposit = (
+  | NativeTokenTransfer
+  | Erc20TokenTransfer
+  | Erc721TokenTransfer
+) & {
+  type: TransferType.DEPOSIT;
+};
 
-export type Withdraw =
-  & (NativeTokenTransfer | Erc20TokenTransfer | Erc721TokenTransfer)
-  & {
-    type: TransferType.WITHDRAW;
-    proposalId: string;
-  };
+export type Withdraw = (
+  | NativeTokenTransfer
+  | Erc20TokenTransfer
+  | Erc721TokenTransfer
+) & {
+  type: TransferType.WITHDRAW;
+  proposalId: string;
+};
 
 export type TransferQueryParams = Pagination & {
   sortBy?: TransferSortBy;
@@ -338,9 +342,9 @@ export enum PrepareUninstallationSteps {
 }
 export type PrepareUninstallationStepValue =
   | { key: PrepareUninstallationSteps.PREPARING; txHash: string }
-  | {
-    key: PrepareUninstallationSteps.DONE;
-  } & ApplyUninstallationParams;
+  | ({
+      key: PrepareUninstallationSteps.DONE;
+    } & ApplyUninstallationParams);
 
 export type ApplyUninstallationParams = ApplyInstallationParamsBase;
 export type DecodedApplyUninstallationParams = ApplyInstallationParamsBase;

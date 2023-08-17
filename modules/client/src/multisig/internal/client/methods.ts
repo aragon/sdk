@@ -84,7 +84,7 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async *createProposal(
-    params: CreateMultisigProposalParams,
+    params: CreateMultisigProposalParams
   ): AsyncGenerator<ProposalCreationStepValue> {
     const signer = this.web3.getConnectedSigner();
     // TODO
@@ -95,7 +95,7 @@ export class MultisigClientMethods extends ClientCore
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
-      signer,
+      signer
     );
 
     if (
@@ -116,7 +116,7 @@ export class MultisigClientMethods extends ClientCore
       params.approve || false,
       params.tryExecution || false,
       Math.round(startTimestamp / 1000),
-      Math.round(endTimestamp / 1000),
+      Math.round(endTimestamp / 1000)
     );
 
     yield {
@@ -125,13 +125,8 @@ export class MultisigClientMethods extends ClientCore
     };
 
     const receipt = await tx.wait();
-    const multisigContractInterface = Multisig__factory
-      .createInterface();
-    const log = findLog(
-      receipt,
-      multisigContractInterface,
-      "ProposalCreated",
-    );
+    const multisigContractInterface = Multisig__factory.createInterface();
+    const log = findLog(receipt, multisigContractInterface, "ProposalCreated");
     if (!log) {
       throw new ProposalCreationError();
     }
@@ -172,20 +167,14 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async *approveProposal(
-    params: ApproveMultisigProposalParams,
+    params: ApproveMultisigProposalParams
   ): AsyncGenerator<ApproveProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
-    const multisigContract = Multisig__factory.connect(
-      pluginAddress,
-      signer,
-    );
+    const multisigContract = Multisig__factory.connect(pluginAddress, signer);
 
-    const tx = await multisigContract.approve(
-      id,
-      params.tryExecution,
-    );
+    const tx = await multisigContract.approve(id, params.tryExecution);
 
     yield {
       key: ApproveProposalStep.APPROVING,
@@ -206,20 +195,15 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async *executeProposal(
-    proposalId: string,
+    proposalId: string
   ): AsyncGenerator<ExecuteProposalStepValue> {
     const signer = this.web3.getConnectedSigner();
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
-    const multisigContract = Multisig__factory.connect(
-      pluginAddress,
-      signer,
-    );
+    const multisigContract = Multisig__factory.connect(pluginAddress, signer);
 
-    const tx = await multisigContract.execute(
-      id,
-    );
+    const tx = await multisigContract.execute(id);
 
     yield {
       key: ExecuteProposalStep.EXECUTING,
@@ -240,7 +224,7 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async *prepareInstallation(
-    params: MultisigPluginPrepareInstallationParams,
+    params: MultisigPluginPrepareInstallationParams
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const network = await this.web3.getProvider().getNetwork();
     const networkName = network.name as SupportedNetwork;
@@ -262,7 +246,7 @@ export class MultisigClientMethods extends ClientCore
         ],
       ],
       pluginSetupProcessorAddress: this.web3.getAddress(
-        "pluginSetupProcessorAddress",
+        "pluginSetupProcessorAddress"
       ),
     });
   }
@@ -273,19 +257,14 @@ export class MultisigClientMethods extends ClientCore
    * @return {*}  {Promise<boolean>}
    * @memberof MultisigClientMethods
    */
-  public async canApprove(
-    params: CanApproveParams,
-  ): Promise<boolean> {
+  public async canApprove(params: CanApproveParams): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
     if (!isAddress(params.approverAddressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
-    const multisigContract = Multisig__factory.connect(
-      pluginAddress,
-      signer,
-    );
+    const multisigContract = Multisig__factory.connect(pluginAddress, signer);
 
     return multisigContract.canApprove(id, params.approverAddressOrEns);
   }
@@ -296,17 +275,12 @@ export class MultisigClientMethods extends ClientCore
    * @return {*}  {Promise<boolean>}
    * @memberof MultisigClientMethods
    */
-  public async canExecute(
-    proposalId: string,
-  ): Promise<boolean> {
+  public async canExecute(proposalId: string): Promise<boolean> {
     const signer = this.web3.getConnectedSigner();
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
-    const multisigContract = Multisig__factory.connect(
-      pluginAddress,
-      signer,
-    );
+    const multisigContract = Multisig__factory.connect(pluginAddress, signer);
 
     return multisigContract.canExecute(id);
   }
@@ -320,7 +294,7 @@ export class MultisigClientMethods extends ClientCore
    */
   public async getVotingSettings(
     pluginAddress: string,
-    blockNumber?: number,
+    blockNumber?: number
   ): Promise<MultisigVotingSettings> {
     // TODO
     // update this with yup validation
@@ -354,7 +328,7 @@ export class MultisigClientMethods extends ClientCore
    */
   public async getMembers(
     pluginAddress: string,
-    blockNumber?: number,
+    blockNumber?: number
   ): Promise<string[]> {
     // TODO
     // update this with yup validation
@@ -373,7 +347,7 @@ export class MultisigClientMethods extends ClientCore
       params,
       name,
     });
-    return multisigPlugin.members.map((member) => member.address);
+    return multisigPlugin.members.map(member => member.address);
   }
 
   /**
@@ -384,7 +358,7 @@ export class MultisigClientMethods extends ClientCore
    * @memberof MultisigClientMethods
    */
   public async getProposal(
-    proposalId: string,
+    proposalId: string
   ): Promise<MultisigProposal | null> {
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
@@ -404,10 +378,7 @@ export class MultisigClientMethods extends ClientCore
     if (!multisigProposal) {
       return null;
     } else if (!multisigProposal.metadata) {
-      return toMultisigProposal(
-        multisigProposal,
-        EMPTY_PROPOSAL_METADATA_LINK,
-      );
+      return toMultisigProposal(multisigProposal, EMPTY_PROPOSAL_METADATA_LINK);
     }
     try {
       const metadataCid = resolveIpfsCid(multisigProposal.metadata);
@@ -419,12 +390,12 @@ export class MultisigClientMethods extends ClientCore
       if (err instanceof InvalidCidError) {
         return toMultisigProposal(
           multisigProposal,
-          UNSUPPORTED_PROPOSAL_METADATA_LINK,
+          UNSUPPORTED_PROPOSAL_METADATA_LINK
         );
       }
       return toMultisigProposal(
         multisigProposal,
-        UNAVAILABLE_PROPOSAL_METADATA,
+        UNAVAILABLE_PROPOSAL_METADATA
       );
     }
   }
@@ -493,12 +464,12 @@ export class MultisigClientMethods extends ClientCore
     return Promise.all(
       multisigProposals.map(
         async (
-          proposal: SubgraphMultisigProposalListItem,
+          proposal: SubgraphMultisigProposalListItem
         ): Promise<MultisigProposalListItem> => {
           if (!proposal.metadata) {
             return toMultisigProposalListItem(
               proposal,
-              EMPTY_PROPOSAL_METADATA_LINK,
+              EMPTY_PROPOSAL_METADATA_LINK
             );
           }
           // format in the metadata field
@@ -507,7 +478,7 @@ export class MultisigClientMethods extends ClientCore
             // Avoid blocking Promise.all if this individual fetch takes too long
             const stringMetadata = await promiseWithTimeout(
               this.ipfs.fetchString(metadataCid),
-              MULTI_FETCH_TIMEOUT,
+              MULTI_FETCH_TIMEOUT
             );
             const metadata = JSON.parse(stringMetadata) as ProposalMetadata;
             return toMultisigProposalListItem(proposal, metadata);
@@ -515,16 +486,16 @@ export class MultisigClientMethods extends ClientCore
             if (err instanceof InvalidCidError) {
               return toMultisigProposalListItem(
                 proposal,
-                UNSUPPORTED_PROPOSAL_METADATA_LINK,
+                UNSUPPORTED_PROPOSAL_METADATA_LINK
               );
             }
             return toMultisigProposalListItem(
               proposal,
-              UNAVAILABLE_PROPOSAL_METADATA,
+              UNAVAILABLE_PROPOSAL_METADATA
             );
           }
-        },
-      ),
+        }
+      )
     );
   }
 }

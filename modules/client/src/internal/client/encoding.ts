@@ -55,7 +55,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public applyInstallationAction(
     daoAddress: string,
-    params: ApplyInstallationParams,
+    params: ApplyInstallationParams
   ): DaoAction[] {
     if (!isAddress(daoAddress)) {
       throw new InvalidAddressError();
@@ -94,7 +94,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
 
   public applyUninstallationAction(
     daoAddress: string,
-    params: ApplyUninstallationParams,
+    params: ApplyUninstallationParams
   ): DaoAction[] {
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const args = applyUninstallationParamsToContract(params);
@@ -136,22 +136,18 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public grantAction(
     daoAddress: string,
-    params: GrantPermissionParams,
+    params: GrantPermissionParams
   ): DaoAction {
     const { where, who } = params;
-    if (
-      !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
-    ) {
+    if (!isAddress(where) || !isAddress(who) || !isAddress(daoAddress)) {
       throw new InvalidAddressError();
     }
     const daoInterface = DAO__factory.createInterface();
-    const args = permissionParamsToContract(
-      {
-        who,
-        where,
-        permission: params.permission,
-      },
-    );
+    const args = permissionParamsToContract({
+      who,
+      where,
+      permission: params.permission,
+    });
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("grant", args);
     return {
@@ -170,27 +166,23 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public grantWithConditionAction(
     daoAddress: string,
-    params: GrantPermissionWithConditionParams,
+    params: GrantPermissionWithConditionParams
   ): DaoAction {
     const { where, who } = params;
-    if (
-      !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
-    ) {
+    if (!isAddress(where) || !isAddress(who) || !isAddress(daoAddress)) {
       throw new InvalidAddressError();
     }
     const daoInterface = DAO__factory.createInterface();
-    const args = permissionWithConditionParamsToContract(
-      {
-        who,
-        where,
-        permission: params.permission,
-        condition: params.condition,
-      },
-    );
+    const args = permissionWithConditionParamsToContract({
+      who,
+      where,
+      permission: params.permission,
+      condition: params.condition,
+    });
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData(
       "grantWithCondition",
-      args,
+      args
     );
     return {
       to: daoAddress,
@@ -208,22 +200,18 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public revokeAction(
     daoAddress: string,
-    params: RevokePermissionParams,
+    params: RevokePermissionParams
   ): DaoAction {
     const { where, who } = params;
-    if (
-      !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
-    ) {
+    if (!isAddress(where) || !isAddress(who) || !isAddress(daoAddress)) {
       throw new InvalidAddressError();
     }
     const daoInterface = DAO__factory.createInterface();
-    const args = permissionParamsToContract(
-      {
-        who,
-        where,
-        permission: params.permission,
-      },
-    );
+    const args = permissionParamsToContract({
+      who,
+      where,
+      permission: params.permission,
+    });
     // get hex bytes
     const hexBytes = daoInterface.encodeFunctionData("revoke", args);
     return {
@@ -243,9 +231,9 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
   public async withdrawAction(params: WithdrawParams): Promise<DaoAction> {
     let to = params.recipientAddressOrEns;
     if (!isAddress(params.recipientAddressOrEns)) {
-      const resolvedAddress = await this.web3.getSigner()?.resolveName(
-        params.recipientAddressOrEns,
-      );
+      const resolvedAddress = await this.web3
+        .getSigner()
+        ?.resolveName(params.recipientAddressOrEns);
       if (!resolvedAddress) {
         throw new InvalidAddressOrEnsError();
       }
@@ -261,10 +249,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           throw new InvalidAddressError();
         }
 
-        iface = new Contract(
-          params.tokenAddress,
-          ERC20_ABI,
-        ).interface;
+        iface = new Contract(params.tokenAddress, ERC20_ABI).interface;
         data = iface.encodeFunctionData("transfer", [
           params.recipientAddressOrEns,
           params.amount,
@@ -276,22 +261,20 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
         };
       case TokenType.ERC721:
         if (
-          !params.tokenAddress || !params.daoAddressOrEns ||
+          !params.tokenAddress ||
+          !params.daoAddressOrEns ||
           !params.recipientAddressOrEns
         ) {
           throw new InvalidAddressError();
         }
-        iface = new Contract(
-          params.tokenAddress,
-          ERC721_ABI,
-        ).interface;
+        iface = new Contract(params.tokenAddress, ERC721_ABI).interface;
         data = iface.encodeFunctionData(
           "safeTransferFrom(address,address,uint256)",
           [
             params.daoAddressOrEns, // from
             params.recipientAddressOrEns, // to
             params.tokenId, // tokenId
-          ],
+          ]
         );
         return {
           to: params.tokenAddress,
@@ -306,15 +289,13 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           throw new InvalidParameter("tokenIds or amounts cannot be empty");
         }
         if (
-          !params.tokenAddress || !params.recipientAddressOrEns ||
+          !params.tokenAddress ||
+          !params.recipientAddressOrEns ||
           !params.daoAddressOrEns
         ) {
           throw new InvalidAddressError();
         }
-        iface = new Contract(
-          params.tokenAddress,
-          ERC1155_ABI,
-        ).interface;
+        iface = new Contract(params.tokenAddress, ERC1155_ABI).interface;
         if (params.tokenIds.length === 1) {
           data = iface.encodeFunctionData(
             "safeTransferFrom(address,address,uint256,uint256,bytes)",
@@ -324,7 +305,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
               params.tokenIds[0], // tokenId
               params.amounts[0], // amount
               new Uint8Array(), // data
-            ],
+            ]
           );
         } else {
           data = iface.encodeFunctionData(
@@ -335,7 +316,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
               params.tokenIds, // tokenIds
               params.amounts, // amounts
               new Uint8Array(), // data
-            ],
+            ]
           );
         }
         return {
@@ -357,13 +338,13 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public async updateDaoMetadataAction(
     daoAddressOrEns: string,
-    metadataUri: string,
+    metadataUri: string
   ): Promise<DaoAction> {
     let address = daoAddressOrEns;
     if (!isAddress(daoAddressOrEns)) {
-      const resolvedAddress = await this.web3.getSigner()?.resolveName(
-        daoAddressOrEns,
-      );
+      const resolvedAddress = await this.web3
+        .getSigner()
+        ?.resolveName(daoAddressOrEns);
       if (!resolvedAddress) {
         throw new InvalidEnsError();
       }
@@ -387,10 +368,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * @return {*}  {DaoAction}
    * @memberof ClientEncoding
    */
-  public setDaoUriAction(
-    daoAddressOrEns: string,
-    daoUri: string,
-  ): DaoAction {
+  public setDaoUriAction(daoAddressOrEns: string, daoUri: string): DaoAction {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("setDaoURI", [daoUri]);
     return {
@@ -409,12 +387,12 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public registerStandardCallbackAction(
     daoAddressOrEns: string,
-    params: RegisterStandardCallbackParams,
+    params: RegisterStandardCallbackParams
   ): DaoAction {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData(
       "registerStandardCallback",
-      [params.interfaceId, params.callbackSelector, params.magicNumber],
+      [params.interfaceId, params.callbackSelector, params.magicNumber]
     );
     return {
       to: daoAddressOrEns,
@@ -432,7 +410,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public setSignatureValidatorAction(
     daoAddressOrEns: string,
-    signatureValidator: string,
+    signatureValidator: string
   ): DaoAction {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("setSignatureValidator", [
@@ -454,7 +432,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public upgradeToAction(
     daoAddressOrEns: string,
-    implementationAddress: string,
+    implementationAddress: string
   ): DaoAction {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("upgradeTo", [
@@ -476,7 +454,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public upgradeToAndCallAction(
     daoAddressOrEns: string,
-    params: UpgradeToAndCallParams,
+    params: UpgradeToAndCallParams
   ): DaoAction {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("upgradeToAndCall", [
@@ -500,7 +478,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    */
   public initializeFromAction(
     daoAddressOrEns: string,
-    params: InitializeFromParams,
+    params: InitializeFromParams
   ) {
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("initializeFrom", [

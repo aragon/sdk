@@ -1,29 +1,29 @@
-import { JsonRpcProvider, Network, Networkish } from "@ethersproject/providers";
+import { JsonRpcProvider, Network, Networkish } from '@ethersproject/providers';
 import {
   InvalidAddressError,
   InvalidGasEstimationFactorError,
   UnsupportedNetworkError,
   UnsupportedProtocolError,
-} from "@aragon/sdk-common";
-import { Client as IpfsClient } from "@aragon/sdk-ipfs";
-import { GraphQLClient } from "graphql-request";
-import { isAddress } from "@ethersproject/address";
-import { Signer } from "@ethersproject/abstract-signer";
+} from '@aragon/sdk-common';
+import { Client as IpfsClient } from '@aragon/sdk-ipfs';
+import { GraphQLClient } from 'graphql-request';
+import { isAddress } from '@ethersproject/address';
+import { Signer } from '@ethersproject/abstract-signer';
 import {
   ContextParams,
   ContextState,
   OverriddenState,
   SupportedNetwork,
   SupportedNetworksArray,
-} from "./types";
-import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
-import { getNetwork } from "./utils";
-import { DeployedAddressesArray } from "./internal";
+} from './types';
+import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from './constants';
+import { getNetwork } from './utils';
+import { DeployedAddressesArray } from './internal';
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
-const supportedProtocols = ["https:"];
-if (typeof process !== "undefined" && process?.env?.TESTING) {
-  supportedProtocols.push("http:");
+const supportedProtocols = ['https:'];
+if (typeof process !== 'undefined' && process?.env?.TESTING) {
+  supportedProtocols.push('http:');
 }
 
 export abstract class ContextCore {
@@ -52,7 +52,7 @@ export abstract class ContextCore {
    */
   constructor(params?: Partial<ContextParams>) {
     // set network to mainnet, overrided by the value of params
-    const mergedParams = Object.assign({ network: "mainnet" }, params);
+    const mergedParams = Object.assign({ network: 'mainnet' }, params);
     this.set(mergedParams);
   }
 
@@ -60,7 +60,7 @@ export abstract class ContextCore {
     if (contextParams.network) {
       this.state.network = ContextCore.resolveNetwork(
         contextParams.network,
-        contextParams.ensRegistryAddress,
+        contextParams.ensRegistryAddress
       );
       // once the network is resolved set default values
       this.setNetworkDefaults();
@@ -75,12 +75,12 @@ export abstract class ContextCore {
     ) {
       this.state.web3Providers = ContextCore.resolveWeb3Providers(
         contextParams.web3Providers,
-        this.state.network,
+        this.state.network
       );
     }
     if (contextParams.graphqlNodes?.length) {
       this.state.graphql = ContextCore.resolveGraphql(
-        contextParams.graphqlNodes,
+        contextParams.graphqlNodes
       );
       this.overriden.graphqlNodes = true;
     }
@@ -97,10 +97,9 @@ export abstract class ContextCore {
     }
 
     if (contextParams.gasFeeEstimationFactor) {
-      this.state.gasFeeEstimationFactor = ContextCore
-        .resolveGasFeeEstimationFactor(
-          contextParams.gasFeeEstimationFactor,
-        );
+      this.state.gasFeeEstimationFactor = ContextCore.resolveGasFeeEstimationFactor(
+        contextParams.gasFeeEstimationFactor
+      );
       this.overriden.gasFeeEstimationFactor = true;
     }
   }
@@ -117,7 +116,7 @@ export abstract class ContextCore {
 
     if (!this.overriden.graphqlNodes) {
       this.state.graphql = ContextCore.resolveGraphql(
-        GRAPHQL_NODES[networkName],
+        GRAPHQL_NODES[networkName]
       );
     }
 
@@ -129,7 +128,7 @@ export abstract class ContextCore {
       if (!this.overriden[address]) {
         let defaultAddress = LIVE_CONTRACTS[networkName][address];
         // custom check for ensRegistryAddress
-        if (address === "ensRegistryAddress" && !defaultAddress) {
+        if (address === 'ensRegistryAddress' && !defaultAddress) {
           defaultAddress = this.network.ensAddress;
         }
         if (defaultAddress) {
@@ -309,9 +308,7 @@ export abstract class ContextCore {
    * @public
    */
   get gasFeeEstimationFactor(): number {
-    return (
-      this.state.gasFeeEstimationFactor
-    );
+    return this.state.gasFeeEstimationFactor;
   }
 
   /**
@@ -343,7 +340,7 @@ export abstract class ContextCore {
   // INTERNAL HELPERS
   private static resolveNetwork(
     networkish: Networkish,
-    ensRegistryAddress?: string,
+    ensRegistryAddress?: string
   ): Network {
     const network = getNetwork(networkish);
     const networkName = network.name as SupportedNetwork;
@@ -371,11 +368,11 @@ export abstract class ContextCore {
 
   private static resolveWeb3Providers(
     endpoints: string | JsonRpcProvider | (string | JsonRpcProvider)[],
-    network: Network,
+    network: Network
   ): JsonRpcProvider[] {
     if (Array.isArray(endpoints)) {
-      return endpoints.map((item) => {
-        if (typeof item === "string") {
+      return endpoints.map(item => {
+        if (typeof item === 'string') {
           const url = new URL(item);
           if (!supportedProtocols.includes(url.protocol)) {
             throw new UnsupportedProtocolError(url.protocol);
@@ -384,7 +381,7 @@ export abstract class ContextCore {
         }
         return item;
       });
-    } else if (typeof endpoints === "string") {
+    } else if (typeof endpoints === 'string') {
       const url = new URL(endpoints);
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
@@ -399,10 +396,10 @@ export abstract class ContextCore {
     configs: {
       url: string;
       headers?: Record<string, string>;
-    }[],
+    }[]
   ): IpfsClient[] {
     let clients: IpfsClient[] = [];
-    configs.forEach((config) => {
+    configs.forEach(config => {
       const url = new URL(config.url);
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
@@ -414,7 +411,7 @@ export abstract class ContextCore {
 
   private static resolveGraphql(endpoints: { url: string }[]): GraphQLClient[] {
     let clients: GraphQLClient[] = [];
-    endpoints.forEach((endpoint) => {
+    endpoints.forEach(endpoint => {
       const url = new URL(endpoint.url);
       if (!supportedProtocols.includes(url.protocol)) {
         throw new UnsupportedProtocolError(url.protocol);
@@ -425,7 +422,7 @@ export abstract class ContextCore {
   }
 
   private static resolveGasFeeEstimationFactor(
-    gasFeeEstimationFactor: number,
+    gasFeeEstimationFactor: number
   ): number {
     if (gasFeeEstimationFactor < 0 || gasFeeEstimationFactor > 1) {
       throw new InvalidGasEstimationFactorError();

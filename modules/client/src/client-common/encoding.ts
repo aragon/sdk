@@ -15,36 +15,30 @@ import {
 } from "./types/plugin";
 
 export function decodeUpdatePluginSettingsAction(
-  data: Uint8Array,
+  data: Uint8Array
 ): VotingSettings {
   const votingInterface = MajorityVotingBase__factory.createInterface();
   const hexBytes = bytesToHex(data);
   const expectedfunction = votingInterface.getFunction("updateVotingSettings");
-  const result = votingInterface.decodeFunctionData(
-    expectedfunction,
-    hexBytes,
-  );
+  const result = votingInterface.decodeFunctionData(expectedfunction, hexBytes);
   return pluginSettingsFromContract(result);
 }
 
 export function encodeUpdateVotingSettingsAction(
-  params: VotingSettings,
+  params: VotingSettings
 ): Uint8Array {
   const votingInterface = MajorityVotingBase__factory.createInterface();
   const args = votingSettingsToContract(params);
   // get hex bytes
-  const hexBytes = votingInterface.encodeFunctionData(
-    "updateVotingSettings",
-    [
-      {
-        votingMode: args[0],
-        supportThreshold: args[1],
-        minParticipation: args[2],
-        minDuration: args[3],
-        minProposerVotingPower: args[4],
-      },
-    ],
-  );
+  const hexBytes = votingInterface.encodeFunctionData("updateVotingSettings", [
+    {
+      votingMode: args[0],
+      supportThreshold: args[1],
+      minParticipation: args[2],
+      minDuration: args[3],
+      minProposerVotingPower: args[4],
+    },
+  ]);
   // Strip 0x => encode in Uint8Array
   return hexToBytes(hexBytes);
 }
@@ -60,11 +54,11 @@ function pluginSettingsFromContract(result: Result): VotingSettings {
 }
 
 export function votingSettingsToContract(
-  params: VotingSettings,
+  params: VotingSettings
 ): ContractVotingSettings {
   return [
     BigNumber.from(
-      votingModeToContracts(params.votingMode || VotingMode.STANDARD),
+      votingModeToContracts(params.votingMode || VotingMode.STANDARD)
     ),
     BigNumber.from(encodeRatio(params.supportThreshold, 6)),
     BigNumber.from(encodeRatio(params.minParticipation, 6)),

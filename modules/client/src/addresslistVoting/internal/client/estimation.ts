@@ -25,13 +25,13 @@ export class AddresslistVotingClientEstimation extends ClientCore
    * @memberof AddresslistVotingClientEstimation
    */
   public async createProposal(
-    params: CreateMajorityVotingProposalParams,
+    params: CreateMajorityVotingProposalParams
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
-      signer,
+      signer
     );
 
     if (
@@ -45,16 +45,15 @@ export class AddresslistVotingClientEstimation extends ClientCore
     const startTimestamp = params.startDate?.getTime() || 0;
     const endTimestamp = params.endDate?.getTime() || 0;
 
-    const estimatedGasFee = await addresslistContract.estimateGas
-      .createProposal(
-        toUtf8Bytes(params.metadataUri),
-        params.actions || [],
-        allowFailureMap,
-        Math.round(startTimestamp / 1000),
-        Math.round(endTimestamp / 1000),
-        params.creatorVote || 0,
-        params.executeOnPass || false,
-      );
+    const estimatedGasFee = await addresslistContract.estimateGas.createProposal(
+      toUtf8Bytes(params.metadataUri),
+      params.actions || [],
+      allowFailureMap,
+      Math.round(startTimestamp / 1000),
+      Math.round(endTimestamp / 1000),
+      params.creatorVote || 0,
+      params.executeOnPass || false
+    );
     return this.web3.getApproximateGasFee(estimatedGasFee.toBigInt());
   }
 
@@ -66,23 +65,21 @@ export class AddresslistVotingClientEstimation extends ClientCore
    * @memberof AddresslistVotingClientEstimation
    */
   public async voteProposal(
-    params: VoteProposalParams,
+    params: VoteProposalParams
   ): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
 
-    const { pluginAddress, id } = decodeProposalId(
-      params.proposalId,
-    );
+    const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
 
     const estimation = await addresslistContract.estimateGas.vote(
       id,
       params.vote,
-      false,
+      false
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
@@ -94,22 +91,16 @@ export class AddresslistVotingClientEstimation extends ClientCore
    * @return {*}  {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
-  public async executeProposal(
-    proposalId: string,
-  ): Promise<GasFeeEstimation> {
+  public async executeProposal(proposalId: string): Promise<GasFeeEstimation> {
     const signer = this.web3.getConnectedSigner();
 
-    const { pluginAddress, id } = decodeProposalId(
-      proposalId,
-    );
+    const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      signer
     );
-    const estimation = await addresslistContract.estimateGas.execute(
-      id,
-    );
+    const estimation = await addresslistContract.estimateGas.execute(id);
     return this.web3.getApproximateGasFee(estimation.toBigInt());
   }
 }

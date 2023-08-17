@@ -45,7 +45,7 @@ export class MultisigClientEncoding extends ClientCore
    */
   static getPluginInstallItem(
     params: MultisigPluginInstallParams,
-    network: Networkish,
+    network: Networkish
   ): PluginInstallItem {
     const networkName = getNetwork(network).name as SupportedNetwork;
     if (!SupportedNetworksArray.includes(networkName)) {
@@ -55,11 +55,8 @@ export class MultisigClientEncoding extends ClientCore
       getNamedTypesFromMetadata(INSTALLATION_ABI),
       [
         params.members,
-        [
-          params.votingSettings.onlyListed,
-          params.votingSettings.minApprovals,
-        ],
-      ],
+        [params.votingSettings.onlyListed, params.votingSettings.minApprovals],
+      ]
     );
     return {
       id: LIVE_CONTRACTS[networkName].multisigRepoAddress,
@@ -74,9 +71,7 @@ export class MultisigClientEncoding extends ClientCore
    * @return {*}  {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
-  public addAddressesAction(
-    params: AddAddressesParams,
-  ): DaoAction {
+  public addAddressesAction(params: AddAddressesParams): DaoAction {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -88,10 +83,9 @@ export class MultisigClientEncoding extends ClientCore
     }
     const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
-    const hexBytes = multisigInterface.encodeFunctionData(
-      "addAddresses",
-      [params.members],
-    );
+    const hexBytes = multisigInterface.encodeFunctionData("addAddresses", [
+      params.members,
+    ]);
     return {
       to: params.pluginAddress,
       value: BigInt(0),
@@ -105,9 +99,7 @@ export class MultisigClientEncoding extends ClientCore
    * @return {*}  {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
-  public removeAddressesAction(
-    params: RemoveAddressesParams,
-  ): DaoAction {
+  public removeAddressesAction(params: RemoveAddressesParams): DaoAction {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
     }
@@ -119,10 +111,9 @@ export class MultisigClientEncoding extends ClientCore
     }
     const multisigInterface = Multisig__factory.createInterface();
     // get hex bytes
-    const hexBytes = multisigInterface.encodeFunctionData(
-      "removeAddresses",
-      [params.members],
-    );
+    const hexBytes = multisigInterface.encodeFunctionData("removeAddresses", [
+      params.members,
+    ]);
     return {
       to: params.pluginAddress,
       value: BigInt(0),
@@ -137,7 +128,7 @@ export class MultisigClientEncoding extends ClientCore
    * @memberof MultisigClientEncoding
    */
   public updateMultisigVotingSettings(
-    params: UpdateMultisigVotingSettingsParams,
+    params: UpdateMultisigVotingSettingsParams
   ): DaoAction {
     if (!isAddress(params.pluginAddress)) {
       throw new InvalidAddressError();
@@ -146,7 +137,7 @@ export class MultisigClientEncoding extends ClientCore
     // get hex bytes
     const hexBytes = multisigInterface.encodeFunctionData(
       "updateMultisigSettings",
-      [params.votingSettings],
+      [params.votingSettings]
     );
     return {
       to: params.pluginAddress,

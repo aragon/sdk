@@ -141,7 +141,7 @@ export class AmountMismatchError extends SdkError {
   constructor(expected: bigint, received: bigint, cause?: any) {
     super(
       `Deposited amount mismatch. Expected: ${expected}, received: ${received}`,
-      cause,
+      cause
     );
   }
 }
@@ -225,7 +225,7 @@ export class AlwaysFailingProposalError extends SdkError {
   constructor(cause?: Error) {
     super(
       "invalid actions, the types or order of the actions may cause the execution to fail",
-      cause,
+      cause
     );
   }
 }
@@ -264,24 +264,17 @@ export class InvalidGasEstimationFactorError extends SdkError {
   constructor(cause?: Error) {
     super(
       "Gas estimation factor value should be a number between 0 and 1",
-      cause,
+      cause
     );
   }
 }
 export class InvalidParameter extends SdkError {
   constructor(message?: string, cause?: Error) {
-    super(
-      "Invalid parameter:" + message,
-      cause,
-    );
+    super("Invalid parameter:" + message, cause);
   }
 }
 export class NotAContractError extends SdkError {
   constructor(cause?: Error) {
-    super(
-      "The provided address does not point to a contract",
-      cause,
-    );
+    super("The provided address does not point to a contract", cause);
   }
 }
-
