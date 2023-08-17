@@ -1431,27 +1431,27 @@ describe("Token Voting Client", () => {
         expect(token).toBe(null);
       });
 
-      it("Should check if a ERC20 is compatible with the TokenVotingSetup and throw", async () => {
+      it("Should check if a ERC20 is compatible with the TokenVotingSetup and return needs wrapping", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const erc20Token = await deployErc20();
-        const compatibility = client.methods.isTokenVotingCompatibleToken(
+        const compatibility = await client.methods.isTokenVotingCompatibleToken(
           erc20Token.address,
         );
         expect(compatibility).toBe(
           TokenVotingTokenCompatibility.NEEDS_WRAPPING,
         );
       });
-      it("Should check if ERC721 is compatible with governance and throw", async () => {
+      it("Should check if ERC721 is compatible with governance and return incompatible", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const erc721Token = await deployErc721();
-        const compatibility = client.methods.isTokenVotingCompatibleToken(
+        const compatibility = await client.methods.isTokenVotingCompatibleToken(
           erc721Token.address,
         );
         expect(compatibility).toBe(TokenVotingTokenCompatibility.INCOMPATIBLE);
       });
-      it("Should be called with an invalid address and throw", async () => {
+      it("Should be called with an invalid address and throw InvalidAddressError", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         expect(() =>
@@ -1460,7 +1460,7 @@ describe("Token Voting Client", () => {
           )
         ).rejects.toThrow(InvalidAddressError);
       });
-      it("Should be called with wallet invalid address and throw", async () => {
+      it("Should be called with wallet invalid address and throw NotAContractError", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         expect(() =>
@@ -1469,7 +1469,7 @@ describe("Token Voting Client", () => {
           )
         ).rejects.toThrow(NotAContractError);
       });
-      it("Should check if GovernanceERC20 is compatible with governance and return true", async () => {
+      it("Should check if GovernanceERC20 is compatible with governance and return compatible", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
         const dao = await buildTokenVotingDAO(repoAddr, VotingMode.STANDARD);

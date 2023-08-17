@@ -337,6 +337,18 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
   return where;
 }
 
+
+/**
+ * Checks if the given address is an ERC20 token
+ * This function isn not 100% accurate.
+ * It just checks if the token has a balanceOf 
+ * function and a decimals function
+ *
+ * @export
+ * @param {string} tokenAddress
+ * @param {Signer} signer
+ * @return {*}  {Promise<boolean>}
+ */
 export async function isERC20Token(
   tokenAddress: string,
   signer: Signer,
@@ -346,17 +358,13 @@ export async function isERC20Token(
     ERC_20_ABI,
     signer,
   );
-  // Check that it has the balanceOf function
   try {
-    await contract.balanceOf(signer.getAddress());
-    try {
-      await contract.metadata.tokenURI(0);
-      return false;
-    } catch {
-      return true;
-    }
+    await Promise.all([
+      contract.balanceOf(await signer.getAddress()),
+      contract.decimals(),
+    ]);
+    return true;
   } catch {
     return false;
   }
-  // check that is not an ERC721
 }
