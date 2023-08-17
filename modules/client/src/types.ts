@@ -213,13 +213,13 @@ export type WithdrawParams =
 
 /* Balances */
 type AssetBalanceBase = {
+  id: string;
   address: string;
-  name: string;
-  symbol: string;
   updateDate: Date;
 };
 
 type NativeAssetBalance = {
+  id: string;
   type: TokenType.NATIVE;
   balance: bigint;
   updateDate: Date;
@@ -228,9 +228,24 @@ type Erc20AssetBalance = AssetBalanceBase & {
   type: TokenType.ERC20;
   balance: bigint;
   decimals: number;
+  name: string;
+  symbol: string;
 };
 type Erc721AssetBalance = AssetBalanceBase & {
   type: TokenType.ERC721;
+  tokenIds: bigint[];
+  name: string;
+  symbol: string;
+};
+
+type Erc1155AssetBalance = AssetBalanceBase & {
+  type: TokenType.ERC1155;
+  balances: {
+    id: string;
+    tokenId: bigint;
+    amount: bigint;
+  }[];
+  metadataUri: string;
 };
 
 export type DaoBalancesQueryParams = Pagination & {
@@ -244,7 +259,8 @@ export enum AssetBalanceSortBy {
 export type AssetBalance =
   | NativeAssetBalance
   | Erc20AssetBalance
-  | Erc721AssetBalance;
+  | Erc721AssetBalance
+  | Erc1155AssetBalance;
 
 /* Transfers */
 
@@ -279,19 +295,38 @@ type Erc20TokenTransfer = TokenTransferBase & {
   };
 };
 
+type Erc1155TokenTransfer = TokenTransferBase & {
+  tokenType: TokenType.ERC1155;
+  tokenId: bigint;
+  token: {
+    address: string;
+  }
+  amount: bigint;
+};
+
 export enum TransferType {
   DEPOSIT = "deposit",
   WITHDRAW = "withdraw",
 }
 
 export type Deposit =
-  & (NativeTokenTransfer | Erc20TokenTransfer | Erc721TokenTransfer)
+  & (
+    | NativeTokenTransfer
+    | Erc20TokenTransfer
+    | Erc721TokenTransfer
+    | Erc1155TokenTransfer
+  )
   & {
     type: TransferType.DEPOSIT;
   };
 
 export type Withdraw =
-  & (NativeTokenTransfer | Erc20TokenTransfer | Erc721TokenTransfer)
+  & (
+    | NativeTokenTransfer
+    | Erc20TokenTransfer
+    | Erc721TokenTransfer
+    | Erc1155TokenTransfer
+  )
   & {
     type: TransferType.WITHDRAW;
     proposalId: string;

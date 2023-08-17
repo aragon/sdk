@@ -20,9 +20,21 @@ query TokenBalances($where: TokenBalance_filter!, $limit:Int!, $skip: Int!, $dir
         symbol
         id
       }
+      tokenIds
     }
     ... on NativeBalance {
       balance
+    }
+    ... on ERC1155Balance {
+      metadataUri
+      token {
+        id
+      }
+      balances {
+        amount
+        id
+        tokenId
+      }
     }
   }
 }

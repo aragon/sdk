@@ -107,7 +107,7 @@ describe("Client", () => {
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
 
-        const daoCreation = await deployContracts.createTokenVotingDAO(
+      const daoCreation = await deployContracts.createTokenVotingDAO(
         deployment,
         "test-tokenvoting-dao",
         VotingMode.STANDARD,
@@ -535,7 +535,6 @@ describe("Client", () => {
         expect(
           daoBalance.toString(),
         ).toBe(amount.toString());
-
       });
 
       it("Check if dao factory has register dao permission in the dao registry", async () => {
@@ -864,18 +863,15 @@ describe("Client", () => {
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
+        const lastUpdated = Math.round(Date.now() / 1000).toString();
         const subgraphBalanceNative: SubgraphBalance = {
+          id: ADDRESS_ONE,
           __typename: "NativeBalance",
-          token: {
-            id: ADDRESS_ONE,
-            name: "TestToken",
-            symbol: "TST",
-            decimals: 18,
-          },
           balance: "50",
-          lastUpdated: Math.round(Date.now() / 1000).toString(),
+          lastUpdated,
         };
         const subgraphBalanceERC20: SubgraphBalance = {
+          id: ADDRESS_ONE,
           __typename: "ERC20Balance",
           token: {
             id: ADDRESS_TWO,
@@ -887,28 +883,50 @@ describe("Client", () => {
           lastUpdated: Math.round(Date.now() / 1000).toString(),
         };
         const subgraphBalanceERC721: SubgraphBalance = {
+          id: ADDRESS_ONE,
           __typename: "ERC721Balance",
           token: {
-            id: ADDRESS_THREE,
+            id: ADDRESS_TWO,
             name: "TestToken",
             symbol: "TST",
-            decimals: 18,
           },
-          balance: "50",
-          lastUpdated: Math.round(Date.now() / 1000).toString(),
+          tokenIds: ["20", "30"],
+          lastUpdated,
+        };
+        const subgraphBalanceERC1155: SubgraphBalance = {
+          id: ADDRESS_ONE,
+          __typename: "ERC1155Balance",
+          metadataUri: "https://example.org/{id}.json",
+          lastUpdated,
+          token: {
+            id: ADDRESS_TWO,
+          },
+          balances: [
+            {
+              id: ADDRESS_THREE,
+              amount: "10",
+              tokenId: "20",
+            },
+            {
+              id: ADDRESS_THREE,
+              amount: "10",
+              tokenId: "30",
+            },
+          ],
         };
         mockedClient.request.mockResolvedValueOnce({
           tokenBalances: [
             subgraphBalanceNative,
             subgraphBalanceERC721,
             subgraphBalanceERC20,
+            subgraphBalanceERC1155,
           ],
         });
 
         const balances = await client.methods.getDaoBalances({
           daoAddressOrEns: daoAddress,
         });
-        expect(balances!.length).toBe(3);
+        expect(balances!.length).toBe(4);
         if (balances && balances.length > 0) {
           expect(balances[0].type).toBe(TokenType.NATIVE);
           if (balances[0].type === TokenType.NATIVE) {
@@ -955,6 +973,24 @@ describe("Client", () => {
             );
             expect(balances[2].updateDate).toMatchObject(
               new Date(parseInt(subgraphBalanceERC20.lastUpdated) * 1000),
+            );
+          }
+
+          expect(balances[3].type).toBe(TokenType.ERC1155);
+          if (balances[3].type === TokenType.ERC1155) {
+            expect(balances[3].address).toBe(
+              subgraphBalanceERC1155.token.id,
+            );
+            expect(balances[3].balances.length).toBe(2);
+            for (const index in balances[3].balances) {
+              const balance = balances[3].balances[index];
+              const subgraphBalance = subgraphBalanceERC1155.balances[index];
+              expect(balance.id).toBe(subgraphBalance.id);
+              expect(balance.tokenId).toBe(BigInt(subgraphBalance.tokenId));
+              expect(balance.amount).toBe(BigInt(subgraphBalance.amount));
+            }
+            expect(balances[3].updateDate).toMatchObject(
+              new Date(parseInt(subgraphBalanceERC1155.lastUpdated) * 1000),
             );
           }
         }
@@ -1038,12 +1074,6 @@ describe("Client", () => {
             proposal: {
               id: TEST_MULTISIG_PROPOSAL_ID,
             },
-            token: {
-              id: AddressZero,
-              name: "TestToken",
-              symbol: "TST",
-              decimals: 18,
-            },
           };
           mockedClient.request.mockResolvedValueOnce({
             tokenTransfers: [subgraphTransfer],
@@ -1074,7 +1104,6 @@ describe("Client", () => {
           const subgraphTransfer: SubgraphTransferListItem = {
             __typename: "ERC721Transfer",
             type: SubgraphTransferType.DEPOSIT,
-            amount: "50",
             createdAt: Math.round(Date.now() / 1000).toString(),
             txHash: TEST_TX_HASH,
             from: ADDRESS_ONE,
@@ -1086,7 +1115,6 @@ describe("Client", () => {
               id: AddressZero,
               name: "TestToken",
               symbol: "TST",
-              decimals: 18,
             },
           };
           mockedClient.request.mockResolvedValueOnce({
@@ -1162,6 +1190,49 @@ describe("Client", () => {
             }
           }
         });
+        it("deposit erc1155 transfer", async () => {
+          const subgraphTransfer: SubgraphTransferListItem = {
+            __typename: "ERC1155Transfer",
+            type: SubgraphTransferType.DEPOSIT,
+            amount: "50",
+            tokenId: "20",
+            createdAt: Math.round(Date.now() / 1000).toString(),
+            txHash: TEST_TX_HASH,
+            from: ADDRESS_ONE,
+            to: ADDRESS_TWO,
+            proposal: {
+              id: TEST_MULTISIG_PROPOSAL_ID,
+            },
+            token: {
+              id: AddressZero,
+            },
+          };
+          mockedClient.request.mockResolvedValueOnce({
+            tokenTransfers: [subgraphTransfer],
+          });
+
+          const transfers = await client.methods.getDaoTransfers(params);
+          expect(transfers?.length).toBe(1);
+          if (transfers && transfers.length > 0) {
+            const transfer = transfers[0];
+            expect(transfer.type).toBe(TransferType.DEPOSIT);
+            expect(transfer.tokenType).toBe(TokenType.ERC1155);
+            if (
+              transfer.type === TransferType.DEPOSIT &&
+              transfer.tokenType === TokenType.ERC1155
+            ) {
+              expect(transfer.creationDate).toMatchObject(
+                new Date(parseInt(subgraphTransfer.createdAt) * 1000),
+              );
+              expect(transfer.transactionId).toBe(subgraphTransfer.txHash);
+              expect(transfer.from).toBe(subgraphTransfer.from);
+              expect(transfer.to).toBe(subgraphTransfer.to);
+              expect(transfer.token.address).toBe(subgraphTransfer.token.id);
+              expect(transfer.tokenId).toBe(BigInt(subgraphTransfer.tokenId));
+              expect(transfer.amount).toBe(BigInt(subgraphTransfer.amount));
+            }
+          }
+        });
         it("withdraw native transfer", async () => {
           const subgraphTransfer: SubgraphTransferListItem = {
             __typename: "NativeTransfer",
@@ -1173,12 +1244,6 @@ describe("Client", () => {
             to: ADDRESS_TWO,
             proposal: {
               id: TEST_MULTISIG_PROPOSAL_ID,
-            },
-            token: {
-              id: AddressZero,
-              name: "TestToken",
-              symbol: "TST",
-              decimals: 18,
             },
           };
           mockedClient.request.mockResolvedValueOnce({
@@ -1211,7 +1276,6 @@ describe("Client", () => {
           const subgraphTransfer: SubgraphTransferListItem = {
             __typename: "ERC721Transfer",
             type: SubgraphTransferType.WITHDRAW,
-            amount: "50",
             createdAt: Math.round(Date.now() / 1000).toString(),
             txHash: TEST_TX_HASH,
             from: ADDRESS_ONE,
@@ -1223,7 +1287,6 @@ describe("Client", () => {
               id: AddressZero,
               name: "TestToken",
               symbol: "TST",
-              decimals: 18,
             },
           };
           mockedClient.request.mockResolvedValueOnce({
@@ -1297,6 +1360,50 @@ describe("Client", () => {
               expect(transfer.token.address).toBe(subgraphTransfer.token.id);
               expect(transfer.token.name).toBe(subgraphTransfer.token.name);
               expect(transfer.token.symbol).toBe(subgraphTransfer.token.symbol);
+              expect(transfer.amount).toBe(BigInt(subgraphTransfer.amount));
+            }
+          }
+        });
+        it("withdraw erc1155 transfer", async () => {
+          const subgraphTransfer: SubgraphTransferListItem = {
+            __typename: "ERC1155Transfer",
+            type: SubgraphTransferType.WITHDRAW,
+            amount: "50",
+            createdAt: Math.round(Date.now() / 1000).toString(),
+            txHash: TEST_TX_HASH,
+            from: ADDRESS_ONE,
+            to: ADDRESS_TWO,
+            proposal: {
+              id: TEST_MULTISIG_PROPOSAL_ID,
+            },
+            token: {
+              id: AddressZero,
+            },
+            tokenId: "20",
+          };
+          mockedClient.request.mockResolvedValueOnce({
+            tokenTransfers: [subgraphTransfer],
+          });
+
+          const transfers = await client.methods.getDaoTransfers(params);
+          expect(transfers?.length).toBe(1);
+          if (transfers && transfers.length > 0) {
+            const transfer = transfers[0];
+            expect(transfer.type).toBe(TransferType.WITHDRAW);
+            expect(transfer.tokenType).toBe(TokenType.ERC1155);
+            if (
+              transfer.type === TransferType.WITHDRAW &&
+              transfer.tokenType === TokenType.ERC1155
+            ) {
+              expect(transfer.creationDate).toMatchObject(
+                new Date(parseInt(subgraphTransfer.createdAt) * 1000),
+              );
+              expect(transfer.transactionId).toBe(subgraphTransfer.txHash);
+              expect(transfer.from).toBe(subgraphTransfer.from);
+              expect(transfer.to).toBe(subgraphTransfer.to);
+              expect(transfer.proposalId).toBe(subgraphTransfer.proposal.id);
+              expect(transfer.token.address).toBe(subgraphTransfer.token.id);
+              expect(transfer.tokenId).toBe(BigInt(subgraphTransfer.tokenId));
               expect(transfer.amount).toBe(BigInt(subgraphTransfer.amount));
             }
           }

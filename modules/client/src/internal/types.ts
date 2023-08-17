@@ -7,7 +7,7 @@ export type SubgraphPluginListItem = {
   } | null;
   appliedPluginRepo: {
     subdomain: string;
-  } | null; 
+  } | null;
   appliedVersion: {
     build: number;
     release: {
@@ -29,24 +29,52 @@ export type SubgraphDao = SubgraphDaoBase & {
 
 export type SubgraphDaoListItem = SubgraphDaoBase;
 
-export type SubgraphBalance = {
-  __typename: string;
-  token: {
-    id: string;
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
-  balance: string;
+type SubgraphBalanceBase = {
+  id: string;
   lastUpdated: string;
+  __typename: string;
 };
+
+export type SubgraphErc20Balance = SubgraphBalanceBase & {
+  __typename: "ERC20Balance";
+  balance: string;
+  token: SubgraphErc20Token;
+};
+
+export type SubgraphErc721Balance = SubgraphBalanceBase & {
+  __typename: "ERC721Balance";
+  token: SubgraphErc721Token;
+  tokenIds: string[];
+};
+
+export type SubgraphNativeBalance = SubgraphBalanceBase & {
+  __typename: "NativeBalance";
+  balance: string;
+};
+
+export type SubgraphErc1155Balance = SubgraphBalanceBase & {
+  __typename: "ERC1155Balance";
+  metadataUri: string;
+  token: SubgraphErc1155Token;
+  balances: {
+    amount: string;
+    id: string;
+    tokenId: string;
+  }[];
+};
+
+export type SubgraphBalance =
+  | SubgraphErc20Balance
+  | SubgraphErc721Balance
+  | SubgraphNativeBalance
+  | SubgraphErc1155Balance;
 
 export enum SubgraphTransferType {
   DEPOSIT = "Deposit",
   WITHDRAW = "Withdraw",
 }
 
-export type SubgraphTransferListItem = {
+type SubgraphTransferListItemBase = {
   from: string;
   to: string;
   type: SubgraphTransferType;
@@ -55,17 +83,54 @@ export type SubgraphTransferListItem = {
   proposal: {
     id: string | null;
   };
-  amount: string;
-  token: SubgraphToken;
-  __typename: string;
 };
 
-export type SubgraphToken = {
+export type SubgraphErc20TransferListItem = SubgraphTransferListItemBase & {
+  __typename: "ERC20Transfer";
+  amount: string;
+  token: SubgraphErc20Token;
+};
+
+export type SubgraphErc721TransferListItem = SubgraphTransferListItemBase & {
+  __typename: "ERC721Transfer";
+  token: SubgraphErc721Token;
+};
+
+export type SubgraphNativeTransferListItem = SubgraphTransferListItemBase & {
+  __typename: "NativeTransfer";
+  amount: string;
+};
+
+export type SubgraphErc1155TransferListItem = SubgraphTransferListItemBase & {
+  __typename: "ERC1155Transfer";
+  amount: string;
+  tokenId: string;
+  token: SubgraphErc1155Token;
+};
+
+export type SubgraphTransferListItem =
+  | SubgraphErc20TransferListItem
+  | SubgraphErc721TransferListItem
+  | SubgraphNativeTransferListItem
+  | SubgraphErc1155TransferListItem;
+
+type SubgraphTokenBase = {
   id: string;
+};
+
+export type SubgraphErc20Token = SubgraphTokenBase & {
   name: string;
   symbol: string;
   decimals: number;
 };
+
+export type SubgraphErc721Token = SubgraphTokenBase & {
+  name: string;
+  symbol: string;
+};
+
+export type SubgraphErc1155Token = SubgraphTokenBase;
+
 export const SubgraphTransferTypeMap: Map<
   TransferType,
   SubgraphTransferType
