@@ -17,6 +17,10 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+- Add generic prepare update function
+- Add generic prepare update estimation function
+## 1.5.0-rc0
 ### Changed
 -  Renamed `LIVE_CONTRACTS` properties
 

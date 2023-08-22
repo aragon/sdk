@@ -71,3 +71,23 @@ export type IpfsContextState = {
 export type GraphQLContextState = {
   graphql: GraphQLClient[];
 };
+
+export type SubgraphPluginInstallation = {
+  appliedVersion: SubgraphPluginVersion;
+  appliedPreparation: SubgraphPluginPreparation;
+};
+
+export type SubgraphPluginVersion = {
+  release: {
+    release: number;
+  };
+  metadata: string;
+  build: number;
+};
+
+export type SubgraphPluginPreparation = {
+  helpers: string[];
+  pluginRepo: {
+    id: string;
+  };
+};

@@ -18,6 +18,9 @@ TEMPLATE:
 
 ## [UPCOMING]
 ### Added
+- New error classes `InvalidVersionError` and `PluginUpdatePreparationError`
+## 1.6.0
+### Added
 - New error classes
 - `getInterfaceId` function
 ## 1.5.0

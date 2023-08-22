@@ -8,18 +8,30 @@ import {
 import { ContractReceipt } from "@ethersproject/contracts";
 import {
   bytesToHex,
+  hexToBytes,
+  InstallationNotFoundError,
   InvalidAddressError,
+  InvalidVersionError,
   PluginInstallationPreparationError,
+  PluginUpdatePreparationError,
   UnsupportedNetworkError,
 } from "@aragon/sdk-common";
 import {
+  GasFeeEstimation,
   MetadataAbiInput,
   PrepareInstallationParams,
   PrepareInstallationStep,
   PrepareInstallationStepValue,
+  PrepareUpdateParams,
+  PrepareUpdateStep,
+  PrepareUpdateStepValue,
   SupportedNetwork,
 } from "./types";
-import { IClientWeb3Core } from "./internal";
+import {
+  IClientGraphQLCore,
+  IClientWeb3Core,
+  SubgraphPluginInstallation,
+} from "./internal";
 import {
   PluginRepo__factory,
   PluginSetupProcessor__factory,
@@ -28,6 +40,7 @@ import { ADDITIONAL_NETWORKS, LIVE_CONTRACTS } from "./constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { isAddress } from "@ethersproject/address";
 import { Network } from "@ethersproject/networks";
+import { QueryIPlugin } from "./internal/graphql-queries";
 
 export function findLog(
   receipt: ContractReceipt,
@@ -188,12 +201,153 @@ export async function* prepareGenericInstallation(
   if (!(pluginAddress || preparedSetupData)) {
     throw new PluginInstallationPreparationError();
   }
-
   yield {
     key: PrepareInstallationStep.DONE,
     pluginAddress,
     pluginRepo: params.pluginRepo,
     versionTag: version,
+    permissions: preparedSetupData.permissions,
+    helpers: preparedSetupData.helpers,
+  };
+}
+export async function prepareGenericUpdateEstimation(
+  web3: IClientWeb3Core,
+  params: PrepareUpdateParams & { pluginSetupProcessorAddress: string },
+): Promise<GasFeeEstimation> {
+  const signer = web3.getConnectedSigner();
+  const currentVersionTag = { build: 1, release: 1 };
+  // check if version is valid
+  if (
+    params.newVersion.release !==
+      currentVersionTag.release ||
+    params.newVersion.build <= currentVersionTag.build
+  ) {
+    throw new InvalidVersionError();
+  }
+  // encode update params
+  const { updateParams = [], updateAbi = [] } = params;
+  const data = defaultAbiCoder.encode(
+    getNamedTypesFromMetadata(updateAbi),
+    updateParams,
+  );
+  // connect to psp contract
+  const pspContract = PluginSetupProcessor__factory.connect(
+    params.pluginSetupProcessorAddress,
+    signer,
+  );
+  const prepareUpdateParams = {
+    currentVersionTag,
+    newVersionTag: params.newVersion,
+    pluginSetupRepo: params.pluginRepo,
+    setupPayload: {
+      plugin: params.pluginAddress,
+      currentHelpers: [],
+      data,
+    },
+  };
+
+  const gasEstimation = await pspContract.estimateGas.prepareUpdate(
+    params.daoAddressOrEns,
+    prepareUpdateParams,
+  );
+  return web3.getApproximateGasFee(gasEstimation.toBigInt());
+}
+
+export async function* prepareGenericUpdate(
+  web3: IClientWeb3Core,
+  graphql: IClientGraphQLCore,
+  params: PrepareUpdateParams & {
+    pluginSetupProcessorAddress: string;
+  },
+): AsyncGenerator<PrepareUpdateStepValue> {
+  const signer = web3.getConnectedSigner();
+  type T = {
+    iplugin: { installations: SubgraphPluginInstallation[] };
+  };
+  const { iplugin } = await graphql.request<T>({
+    query: QueryIPlugin,
+    params: {
+      address: params.pluginAddress.toLowerCase(),
+      where: { dao: params.daoAddressOrEns.toLowerCase() },
+    },
+    name: "plugin",
+  });
+
+  // filter specified installation
+  const { pluginInstallationIndex = 0 } = params;
+  const selectedInstallation = iplugin.installations[pluginInstallationIndex];
+  if (!selectedInstallation) {
+    throw new InstallationNotFoundError();
+  }
+  // check if version is valid
+  if (
+    params.newVersion.release !==
+      selectedInstallation.appliedVersion.release.release ||
+    params.newVersion.build <= selectedInstallation.appliedVersion.build
+  ) {
+    throw new InvalidVersionError();
+  }
+  // encode update params
+  const { updateParams = [], updateAbi = [] } = params;
+  const data = defaultAbiCoder.encode(
+    getNamedTypesFromMetadata(updateAbi),
+    updateParams,
+  );
+  // connect to psp contract
+  const pspContract = PluginSetupProcessor__factory.connect(
+    params.pluginSetupProcessorAddress,
+    signer,
+  );
+
+  const prepareUpdateParams = {
+    currentVersionTag: {
+      build: selectedInstallation.appliedVersion.build,
+      release: selectedInstallation.appliedVersion.release.release,
+    },
+    newVersionTag: params.newVersion,
+    pluginSetupRepo: params.pluginRepo,
+    setupPayload: {
+      plugin: params.pluginAddress,
+      currentHelpers: selectedInstallation.appliedPreparation.helpers,
+      data,
+    },
+  };
+  const tx = await pspContract.prepareUpdate(
+    params.daoAddressOrEns,
+    prepareUpdateParams,
+  );
+  yield {
+    key: PrepareUpdateStep.PREPARING,
+    txHash: tx.hash,
+  };
+  const receipt = await tx.wait();
+  const pspContractInterface = PluginSetupProcessor__factory
+    .createInterface();
+  const log = findLog(
+    receipt,
+    pspContractInterface,
+    "UpdatePrepared",
+  );
+  if (!log) {
+    throw new PluginUpdatePreparationError();
+  }
+  const parsedLog = pspContractInterface.parseLog(log);
+  const versionTag = parsedLog.args["versionTag"];
+  const preparedSetupData = parsedLog.args["preparedSetupData"];
+  const initData = parsedLog.args["initData"];
+  if (
+    !versionTag || versionTag.build !== params.newVersion.build ||
+    versionTag.release !== params.newVersion.release || !preparedSetupData ||
+    !initData
+  ) {
+    throw new PluginUpdatePreparationError();
+  }
+  yield {
+    key: PrepareUpdateStep.DONE,
+    versionTag,
+    pluginRepo: params.pluginRepo,
+    pluginAddress: params.pluginAddress,
+    initData: hexToBytes(initData),
     permissions: preparedSetupData.permissions,
     helpers: preparedSetupData.helpers,
   };
