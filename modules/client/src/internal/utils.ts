@@ -53,7 +53,9 @@ import { DAO__factory, PluginSetupProcessor } from "@aragon/osx-ethers";
 import { PermissionIds } from "../constants";
 import {
   ApplyInstallationParams,
+  ApplyUpdateParams,
   DecodedApplyInstallationParams,
+  DecodedApplyUpdateParams,
   TokenType,
 } from "@aragon/sdk-client-common";
 import {
@@ -449,6 +451,37 @@ export function applyInstallatonParamsFromContract(
     versionTag: params.pluginSetupRef.versionTag,
     pluginAddress: params.plugin,
     pluginRepo: params.pluginSetupRef.pluginSetupRepo,
+  };
+}
+export function applyUpdateParamsToContract(
+  params: ApplyUpdateParams,
+): PluginSetupProcessor.ApplyUpdateParamsStruct {
+  return {
+    plugin: params.pluginAddress,
+    pluginSetupRef: {
+      pluginSetupRepo: params.pluginRepo,
+      versionTag: params.versionTag,
+    },
+    initData: params.initData,
+    helpersHash: keccak256(
+      defaultAbiCoder.encode(["address[]"], [params.helpers]),
+    ),
+    permissions: params.permissions.map((permission) => {
+      return { ...permission, condition: permission.condition || AddressZero };
+    }),
+  };
+}
+export function applyUpdateParamsFromContract(
+  result: Result,
+): DecodedApplyUpdateParams {
+  const params = result[1];
+  return {
+    helpersHash: params.helpersHash,
+    permissions: params.permissions,
+    versionTag: params.pluginSetupRef.versionTag,
+    pluginAddress: params.plugin,
+    pluginRepo: params.pluginSetupRef.pluginSetupRepo,
+    initData: params.initData,
   };
 }
 

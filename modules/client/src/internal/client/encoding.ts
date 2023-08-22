@@ -16,6 +16,7 @@ import {
 import {
   applyInstallatonParamsToContract,
   applyUninstallationParamsToContract,
+  applyUpdateParamsToContract,
   permissionParamsToContract,
   permissionWithConditionParamsToContract,
 } from "../utils";
@@ -37,6 +38,7 @@ import { IClientEncoding } from "../interfaces";
 import { Permissions } from "../../constants";
 import {
   ApplyInstallationParams,
+  ApplyUpdateParams,
   ClientCore,
   DaoAction,
   TokenType,
@@ -126,6 +128,49 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       revokeAction,
     ];
   }
+  /**
+   * Computes the payload to be given when creating a proposal that applies an update to a plugin
+   *
+   * @param {string} daoAddress
+   * @param {ApplyUpdateParams} params
+   * @return {*}  {DaoAction[]}
+   * @memberof ClientEncoding
+   */
+  public applyUpdateAction(
+    daoAddress: string,
+    params: ApplyUpdateParams,
+  ): DaoAction[] {
+    const pspInterface = PluginSetupProcessor__factory.createInterface();
+    const args = applyUpdateParamsToContract(params);
+
+    const hexBytes = pspInterface.encodeFunctionData("applyUpdate", [
+      daoAddress,
+      args,
+    ]);
+    const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
+    // Grant ROOT_PERMISION in the DAO to the PSP
+    const grantAction = this.grantAction(daoAddress, {
+      where: daoAddress,
+      who: pspAddress,
+      permission: Permissions.ROOT_PERMISSION,
+    });
+    // Revoke ROOT_PERMISION in the DAO to the PSP
+    const revokeAction = this.revokeAction(daoAddress, {
+      where: daoAddress,
+      who: pspAddress,
+      permission: Permissions.ROOT_PERMISSION,
+    });
+    return [
+      grantAction,
+      {
+        to: pspAddress,
+        value: BigInt(0),
+        data: hexToBytes(hexBytes),
+      },
+      revokeAction,
+    ];
+  }
+
   /**
    * Computes the payload to be given when creating a proposal that grants a permission within a DAO
    *

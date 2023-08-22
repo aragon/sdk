@@ -10,7 +10,11 @@ import {
   VoteProposalParams,
   VoteValues,
 } from "../../../src";
-import { contextParamsLocalChain } from "../constants";
+import {
+  ADDRESS_ONE,
+  ADDRESS_TWO,
+  contextParamsLocalChain,
+} from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
@@ -24,6 +28,10 @@ describe("Client Address List", () => {
       server = await ganacheSetup.start();
       const deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.pluginSetupProcessorAddress =
+        deployment.pluginSetupProcessor.address;
+      contextParamsLocalChain.addresslistVotingRepoAddress =
+        deployment.addresslistVotingRepo.address;
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
     });
@@ -79,6 +87,26 @@ describe("Client Address List", () => {
       const estimation = await client.estimation.executeProposal(
         "0x1234567890123456789012345678901234567890_0x0",
       );
+
+      expect(typeof estimation).toEqual("object");
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+    });
+
+    it("Should estimate the gas fees for preparing an update", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new AddresslistVotingClient(ctx);
+
+      const estimation = await client.estimation.prepareUpdate({
+        pluginAddress: ADDRESS_ONE,
+        daoAddressOrEns: ADDRESS_TWO,
+        newVersion: {
+          build: 1,
+          release: 2,
+        },
+      });
 
       expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");

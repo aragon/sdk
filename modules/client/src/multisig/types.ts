@@ -1,4 +1,5 @@
 import {
+  MetadataAbiInput,
   ProposalBase,
   ProposalListItemBase,
   VersionTag,
@@ -76,4 +77,14 @@ export type MultisigProposalListItem = ProposalListItemBase & {
 export type MultisigProposal = ProposalBase & {
   approvals: string[];
   settings: MultisigVotingSettings;
+};
+
+/* Prepare Update */
+export type MultisigPluginPrepareUpdateParams = {
+  pluginAddress: string;
+  daoAddressOrEns: string;
+  newVersion: VersionTag;
+  updateParams?: any;
+  updateAbi?: MetadataAbiInput[];
+  pluginInstallationIndex?: number;
 };

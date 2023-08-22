@@ -9,21 +9,33 @@ import {
   CreateMultisigProposalParams,
   MultisigClient,
 } from "../../../src";
-import { contextParamsLocalChain, TEST_WALLET_ADDRESS } from "../constants";
+import {
+  // ADDRESS_ONE,
+  // ADDRESS_TWO,
+  contextParamsLocalChain,
+  TEST_WALLET_ADDRESS,
+} from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 import { Context } from "@aragon/sdk-client-common";
+import { buildMultisigDAO } from "../../helpers/build-daos";
+import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
 
 describe("Client Multisig", () => {
   describe("Estimation module", () => {
     let pluginAddress: string;
     let server: Server;
+    let deployment: deployContracts.Deployment;
 
     beforeAll(async () => {
       server = await ganacheSetup.start();
-      const deployment = await deployContracts.deploy();
+      deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.multisigRepoAddress =
+        deployment.multisigRepo.address;
+      contextParamsLocalChain.pluginSetupProcessorAddress =
+        deployment.pluginSetupProcessor.address;
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
       const daoCreation = await deployContracts.createMultisigDAO(
@@ -95,6 +107,31 @@ describe("Client Multisig", () => {
       const estimation = await client.estimation.executeProposal(
         "0x1234567890123456789012345678901234567890_0x0",
       );
+
+      expect(typeof estimation).toEqual("object");
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+    });
+    it("Should estimate the gas fees for preparing an update", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new MultisigClient(ctx);
+
+      const { dao, plugin } = await buildMultisigDAO(
+        deployment.multisigRepo.address,
+      );
+
+      await createMultisigPluginBuild(1, deployment.multisigRepo.address);
+
+      const estimation = await client.estimation.prepareUpdate({
+        pluginAddress: plugin,
+        daoAddressOrEns: dao,
+        newVersion: {
+          build: 1,
+          release: 2,
+        },
+      });
 
       expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");

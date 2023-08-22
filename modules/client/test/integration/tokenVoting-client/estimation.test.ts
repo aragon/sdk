@@ -29,6 +29,10 @@ describe("Token Voting Client", () => {
       server = await ganacheSetup.start();
       const deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.tokenVotingRepoAddress =
+        deployment.tokenVotingRepo.address;
+      contextParamsLocalChain.pluginSetupProcessorAddress =
+        deployment.pluginSetupProcessor.address;
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
     });
@@ -108,6 +112,25 @@ describe("Token Voting Client", () => {
       const client = new TokenVotingClient(ctx);
 
       const estimation = await client.estimation.undelegateTokens(ADDRESS_ONE);
+
+      expect(typeof estimation).toEqual("object");
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+    });
+    it("Should estimate the gas fees for preparing an update", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new TokenVotingClient(ctx);
+
+      const estimation = await client.estimation.prepareUpdate({
+        pluginAddress: ADDRESS_ONE,
+        daoAddressOrEns: ADDRESS_TWO,
+        newVersion: {
+          build: 1,
+          release: 2,
+        },
+      });
 
       expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");

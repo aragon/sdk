@@ -4,6 +4,7 @@ import {
   GasFeeEstimation,
   InterfaceParams,
   PrepareInstallationStepValue,
+  PrepareUpdateStepValue,
   ProposalMetadata,
 } from "@aragon/sdk-client-common";
 import {
@@ -25,6 +26,7 @@ import {
   MintTokenParams,
   TokenVotingMember,
   TokenVotingPluginPrepareInstallationParams,
+  TokenVotingPluginPrepareUpdateParams,
   TokenVotingProposal,
   TokenVotingProposalListItem,
   UndelegateTokensStepValue,
@@ -51,6 +53,9 @@ export interface ITokenVotingClientMethods {
   prepareInstallation: (
     params: TokenVotingPluginPrepareInstallationParams,
   ) => AsyncGenerator<PrepareInstallationStepValue>;
+  prepareUpdate: (
+    params: TokenVotingPluginPrepareUpdateParams,
+  ) => AsyncGenerator<PrepareUpdateStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (
@@ -81,7 +86,9 @@ export interface ITokenVotingClientMethods {
     tokenAddress: string,
   ) => AsyncGenerator<UndelegateTokensStepValue>;
   getDelegatee: (tokenAddress: string) => Promise<string | null>;
-  isTokenVotingCompatibleToken: (tokenAddress: string) => Promise<TokenVotingTokenCompatibility>;
+  isTokenVotingCompatibleToken: (
+    tokenAddress: string,
+  ) => Promise<TokenVotingTokenCompatibility>;
 }
 
 export interface ITokenVotingClientEncoding {
@@ -112,6 +119,9 @@ export interface ITokenVotingClientEstimation {
   ) => Promise<GasFeeEstimation>;
   undelegateTokens: (
     tokenAddress: string,
+  ) => Promise<GasFeeEstimation>;
+  prepareUpdate: (
+    params: TokenVotingPluginPrepareUpdateParams,
   ) => Promise<GasFeeEstimation>;
 }
 

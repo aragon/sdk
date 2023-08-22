@@ -122,8 +122,11 @@ import {
   MULTI_FETCH_TIMEOUT,
   MultiTargetPermission,
   prepareGenericInstallation,
+  prepareGenericUpdate,
   PrepareInstallationParams,
   PrepareInstallationStepValue,
+  PrepareUpdateParams,
+  PrepareUpdateStepValue,
   SortDirection,
   TokenType,
 } from "@aragon/sdk-client-common";
@@ -137,7 +140,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): AsyncGenerator<PrepareInstallationStepValue> {
     yield* prepareGenericInstallation(this.web3, {
       ...params,
-      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
     });
   }
   /**
@@ -339,7 +344,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
     yield { key: DaoDepositSteps.DONE, amount: amount };
   }
-  
+
   private async *depositErc20(
     params: DepositErc20Params,
   ): AsyncGenerator<DaoDepositStepValue> {
@@ -566,7 +571,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       query: QueryIPlugin,
       params: {
         address: params.pluginAddress.toLowerCase(),
-        where: { dao: params.daoAddressOrEns },
+        where: { dao: params.daoAddressOrEns.toLowerCase() },
       },
       name: "plugin",
     });
@@ -636,6 +641,27 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         release: selectedInstallation.appliedVersion.release.release,
       },
     };
+  }
+  /**
+   * Prepare update of a plugin
+   *
+   * @param {PrepareUpdateParams} params
+   * @return {*}  {AsyncGenerator<PrepareUpdateStepValue>}
+   * @memberof ClientMethods
+   */
+  public async *prepareUpdate(
+    params: PrepareUpdateParams,
+  ): AsyncGenerator<PrepareUpdateStepValue> {
+    yield* prepareGenericUpdate(
+      this.web3,
+      this.graphql,
+      {
+        ...params,
+        pluginSetupProcessorAddress: this.web3.getAddress(
+          "pluginSetupProcessorAddress",
+        ),
+      },
+    );
   }
   /**
    * Checks whether a role is granted by the current DAO's ACL settings

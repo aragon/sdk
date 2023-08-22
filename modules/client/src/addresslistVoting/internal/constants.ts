@@ -15,7 +15,13 @@ export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
     "removeAddresses",
   ).format("minimal"),
 ];
-
+// TODO:
+// use abi from plugin metadata
+export const UPDATE_ABI: { [build: number]: MetadataAbiInput[] } = {
+  1: [],
+};
+// TODO:
+// use abi from plugin metadata
 export const INSTALLATION_ABI: MetadataAbiInput[] = [
   {
     components: [

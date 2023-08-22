@@ -69,16 +69,24 @@ import { buildMultisigDAO } from "../../helpers/build-daos";
 import {
   Context,
   PrepareInstallationStep,
+  PrepareUpdateStep,
   SortDirection,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../../../src/multisig/internal/constants";
 import { deployErc1155 } from "../../helpers/deploy-erc1155";
+import { createPluginBuild } from "../../helpers/create-plugin-build";
+import {
+  MultisigSetup__factory,
+  PluginRepo__factory,
+} from "@aragon/osx-ethers";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 describe("Client", () => {
   let daoAddress: string;
   let daoAddressV1: string;
   let deployment: deployContracts.Deployment;
+  let deploymentV1: deployV1Contracts.Deployment;
 
   describe("Methods Module tests", () => {
     let server: Server;
@@ -86,7 +94,7 @@ describe("Client", () => {
     beforeAll(async () => {
       server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
-      const deploymentV1 = await deployV1Contracts.deploy();
+      deploymentV1 = await deployV1Contracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
       contextParamsLocalChain.pluginSetupProcessorAddress =
         deployment.pluginSetupProcessor.address;
@@ -680,6 +688,111 @@ describe("Client", () => {
                 expect(permission.who).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
               }
               break;
+          }
+        }
+      });
+      it("Should prepare the update of a plugin", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const { dao, plugin } = await buildMultisigDAO(
+          deployment.multisigRepo.address,
+        );
+        // deply a new build to be able to update
+        // this has to be done after creating the DAO beacause
+        // the default behaivour is using the latest version
+        const provider = new JsonRpcProvider("http://127.0.0.1:8545");
+        const deployer = provider.getSigner();
+        const multisigFactory = new MultisigSetup__factory();
+        const newSetup = await multisigFactory
+          .connect(deployer)
+          .deploy();
+        const release = 1;
+        await createPluginBuild(
+          release,
+          deployment.multisigRepo.address,
+          deployer,
+          newSetup.address,
+        );
+        const pluginSetupInstance = PluginRepo__factory.connect(
+          deployment.multisigRepo.address,
+          deployer,
+        );
+        const version = await pluginSetupInstance["getLatestVersion(uint8)"](
+          release,
+        );
+
+        expect(version.tag.release).toBe(release);
+        expect(version.tag.build).toBe(2);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const installation: SubgraphPluginInstallation = {
+          appliedPreparation: {
+            helpers: [],
+            pluginRepo: {
+              id: deployment.multisigRepo.address,
+            },
+          },
+          appliedVersion: {
+            metadata: `ipfs://${IPFS_CID}`,
+            release: {
+              release: 1,
+            },
+            build: 1,
+          },
+        };
+        mockedClient.request.mockResolvedValueOnce({
+          iplugin: { installations: [installation] },
+        });
+        const steps = client.methods.prepareUpdate(
+          {
+            daoAddressOrEns: dao,
+            pluginAddress: plugin,
+            pluginRepo: deployment.multisigRepo.address,
+            newVersion: {
+              release: 1,
+              build: 2,
+            },
+          },
+        );
+        for await (const step of steps) {
+          switch (step.key) {
+            case PrepareUpdateStep.PREPARING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case PrepareUpdateStep.DONE:
+              expect(typeof step.pluginAddress).toBe("string");
+              expect(step.pluginAddress).toBe(plugin);
+              expect(step.initData instanceof Uint8Array).toBe(true);
+              expect(step.pluginAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof step.pluginRepo).toBe("string");
+              expect(step.pluginRepo).toBe(deployment.multisigRepo.address);
+              expect(step.pluginRepo).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof step.versionTag.build).toBe("number");
+              expect(step.versionTag.build).toBe(2);
+              expect(typeof step.versionTag.release).toBe("number");
+              expect(step.versionTag.release).toBe(1);
+              for (const permission of step.permissions) {
+                if (permission.condition) {
+                  expect(typeof permission.condition).toBe("string");
+                  expect(permission.condition).toMatch(
+                    /^0x[A-Fa-f0-9]{40}$/i,
+                  );
+                }
+                expect(typeof permission.operation).toBe("number");
+                expect(typeof permission.where).toBe("string");
+                expect(permission.where).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+                expect(typeof permission.who).toBe("string");
+                expect(permission.who).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              }
+              break;
+            default:
+              throw new Error(
+                "Unexpected DAO prepare update step: " +
+                  JSON.stringify(step, null, 2),
+              );
           }
         }
       });

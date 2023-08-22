@@ -42,6 +42,7 @@ import {
   ADDRESS_THREE,
   ADDRESS_TWO,
   contextParamsLocalChain,
+  IPFS_CID,
   SUBGRAPH_ACTIONS,
   SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
@@ -81,17 +82,20 @@ import { deployErc721 } from "../../helpers/deploy-erc721";
 import {
   GovernanceERC20__factory,
   GovernanceWrappedERC20__factory,
+  PluginRepo__factory,
   TokenVoting__factory,
 } from "@aragon/osx-ethers";
 import { BigNumber } from "@ethersproject/bignumber";
 import {
   Context,
   PrepareInstallationStep,
+  PrepareUpdateStep,
   ProposalMetadata,
   ProposalStatus,
   SortDirection,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { createTokenVotingPluginBuild } from "../../helpers/create-plugin-build";
 
 describe("Token Voting Client", () => {
   let server: Server;
@@ -495,6 +499,104 @@ describe("Token Voting Client", () => {
               expect(typeof step.versionTag.build).toBe("number");
               expect(typeof step.versionTag.release).toBe("number");
               break;
+          }
+        }
+      });
+    });
+
+    describe("Plugin update", () => {
+      it("Should update prepare a plugin update for a tokenVotingPlugin", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+
+        const { dao, plugin, tokenAddress } = await buildTokenVotingDAO(
+          deployment.tokenVotingRepo.address,
+        );
+        const release = 1;
+        await createTokenVotingPluginBuild(
+          release,
+          deployment.tokenVotingRepo.address,
+        );
+
+        const pluginSetupInstance = PluginRepo__factory.connect(
+          deployment.tokenVotingRepo.address,
+          client.web3.getConnectedSigner(),
+        );
+        const version = await pluginSetupInstance["getLatestVersion(uint8)"](
+          release,
+        );
+
+        expect(version.tag.release).toBe(release);
+        expect(version.tag.build).toBe(2);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const installation = {
+          appliedPreparation: {
+            helpers: [tokenAddress],
+            pluginRepo: {
+              id: deployment.tokenVotingRepo.address,
+            },
+          },
+          appliedVersion: {
+            metadata: `ipfs://${IPFS_CID}`,
+            release: {
+              release: 1,
+            },
+            build: 1,
+          },
+        };
+        mockedClient.request.mockResolvedValueOnce({
+          iplugin: { installations: [installation] },
+        });
+        const steps = client.methods.prepareUpdate(
+          {
+            daoAddressOrEns: dao,
+            pluginAddress: plugin,
+            newVersion: {
+              release: 1,
+              build: 2,
+            },
+          },
+        );
+        for await (const step of steps) {
+          switch (step.key) {
+            case PrepareUpdateStep.PREPARING:
+              expect(typeof step.txHash).toBe("string");
+              expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+              break;
+            case PrepareUpdateStep.DONE:
+              expect(typeof step.pluginAddress).toBe("string");
+              expect(step.pluginAddress).toBe(plugin);
+              expect(step.initData instanceof Uint8Array).toBe(true);
+              expect(step.pluginAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof step.pluginRepo).toBe("string");
+              expect(step.pluginRepo).toBe(deployment.tokenVotingRepo.address);
+              expect(step.pluginRepo).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof step.versionTag.build).toBe("number");
+              expect(step.versionTag.build).toBe(2);
+              expect(typeof step.versionTag.release).toBe("number");
+              expect(step.versionTag.release).toBe(1);
+              for (const permission of step.permissions) {
+                if (permission.condition) {
+                  expect(typeof permission.condition).toBe("string");
+                  expect(permission.condition).toMatch(
+                    /^0x[A-Fa-f0-9]{40}$/i,
+                  );
+                }
+                expect(typeof permission.operation).toBe("number");
+                expect(typeof permission.where).toBe("string");
+                expect(permission.where).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+                expect(typeof permission.who).toBe("string");
+                expect(permission.who).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              }
+              break;
+            default:
+              throw new Error(
+                "Unexpected DAO prepare update step: " +
+                  JSON.stringify(step, null, 2),
+              );
           }
         }
       });

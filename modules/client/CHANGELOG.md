@@ -17,6 +17,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+- Add prepareUpdate function to all clients
 ### Changed
 - All addresses are now lowercased on subgraph methods
 - Use signer only when transactions need to be signed, else use provider
