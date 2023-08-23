@@ -115,7 +115,7 @@ describe("Client Address List", () => {
       );
       const installation = SUBGRAPH_PLUGIN_INSTALLATION;
       installation.appliedPreparation.pluginRepo.id =
-        deployment.tokenVotingRepo.address;
+        deployment.addresslistVotingRepo.address;
       installation.appliedPreparation.helpers = [];
       mockedClient.request.mockResolvedValueOnce({
         iplugin: { installations: [installation] },

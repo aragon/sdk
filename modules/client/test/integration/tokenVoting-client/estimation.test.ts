@@ -127,10 +127,10 @@ describe("Token Voting Client", () => {
       const ctx = new Context(contextParamsLocalChain);
       const client = new TokenVotingClient(ctx);
       const { dao, plugin, tokenAddress } = await buildTokenVotingDAO(
-        deployment.multisigRepo.address,
+        deployment.tokenVotingRepo.address,
       );
 
-      await createTokenVotingPluginBuild(1, deployment.multisigRepo.address);
+      await createTokenVotingPluginBuild(1, deployment.tokenVotingRepo.address);
 
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),
@@ -144,8 +144,8 @@ describe("Token Voting Client", () => {
       });
 
       const estimation = await client.estimation.prepareUpdate({
-        pluginAddress: dao,
-        daoAddressOrEns: plugin,
+        pluginAddress: plugin,
+        daoAddressOrEns: dao,
         newVersion: {
           build: 2,
           release: 1,
