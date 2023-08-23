@@ -123,7 +123,7 @@ export class MultisigClientEstimation extends ClientCore
   public async prepareUpdate(
     params: MultisigPluginPrepareUpdateParams,
   ): Promise<GasFeeEstimation> {
-    return await prepareGenericUpdateEstimation(this.web3, {
+    return await prepareGenericUpdateEstimation(this.web3, this.graphql, {
       ...params,
       pluginSetupProcessorAddress: this.web3.getAddress(
         "pluginSetupProcessorAddress",

@@ -29,6 +29,7 @@ import {
   contextParamsLocalChain,
   IPFS_CID,
   SUBGRAPH_ACTIONS,
+  SUBGRAPH_PLUGIN_INSTALLATION,
   SUBGRAPH_PROPOSAL_BASE,
   SUBGRAPH_VOTERS,
   TEST_ADDRESSLIST_PROPOSAL_ID,
@@ -401,21 +402,10 @@ describe("Client Address List", () => {
       const mockedClient = mockedGraphqlRequest.getMockedInstance(
         client.graphql.getClient(),
       );
-      const installation = {
-        appliedPreparation: {
-          helpers: [],
-          pluginRepo: {
-            id: deployment.addresslistVotingRepo.address,
-          },
-        },
-        appliedVersion: {
-          metadata: `ipfs://${IPFS_CID}`,
-          release: {
-            release: 1,
-          },
-          build: 1,
-        },
-      };
+      const installation = SUBGRAPH_PLUGIN_INSTALLATION;
+      installation.appliedPreparation.pluginRepo.id =
+        deployment.tokenVotingRepo.address;
+      installation.appliedPreparation.helpers = [];
       mockedClient.request.mockResolvedValueOnce({
         iplugin: { installations: [installation] },
       });

@@ -1,3 +1,4 @@
+import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 // @ts-ignore
 declare const describe, it, expect, beforeAll, afterAll;
 
@@ -15,19 +16,22 @@ import {
   ADDRESS_ONE,
   ADDRESS_TWO,
   contextParamsLocalChain,
+  SUBGRAPH_PLUGIN_INSTALLATION,
 } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 import { Context } from "@aragon/sdk-client-common";
+import { buildTokenVotingDAO } from "../../helpers/build-daos";
+import { createTokenVotingPluginBuild } from "../../helpers/create-plugin-build";
 
 describe("Token Voting Client", () => {
   describe("Estimation Module", () => {
     let server: Server;
-
+    let deployment: deployContracts.Deployment;
     beforeAll(async () => {
       server = await ganacheSetup.start();
-      const deployment = await deployContracts.deploy();
+      deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
       contextParamsLocalChain.tokenVotingRepoAddress =
         deployment.tokenVotingRepo.address;
@@ -122,13 +126,29 @@ describe("Token Voting Client", () => {
     it("Should estimate the gas fees for preparing an update", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const client = new TokenVotingClient(ctx);
+      const { dao, plugin, tokenAddress } = await buildTokenVotingDAO(
+        deployment.multisigRepo.address,
+      );
+
+      await createTokenVotingPluginBuild(1, deployment.multisigRepo.address);
+
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      const installation = SUBGRAPH_PLUGIN_INSTALLATION;
+      installation.appliedPreparation.pluginRepo.id =
+        deployment.tokenVotingRepo.address;
+      installation.appliedPreparation.helpers = [tokenAddress];
+      mockedClient.request.mockResolvedValueOnce({
+        iplugin: { installations: [installation] },
+      });
 
       const estimation = await client.estimation.prepareUpdate({
-        pluginAddress: ADDRESS_ONE,
-        daoAddressOrEns: ADDRESS_TWO,
+        pluginAddress: dao,
+        daoAddressOrEns: plugin,
         newVersion: {
-          build: 1,
-          release: 2,
+          build: 2,
+          release: 1,
         },
       });
 

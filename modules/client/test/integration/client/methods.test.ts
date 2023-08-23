@@ -11,6 +11,7 @@ import {
   ADDRESS_TWO,
   contextParamsLocalChain,
   IPFS_CID,
+  SUBGRAPH_PLUGIN_INSTALLATION,
   TEST_DAO_ADDRESS,
   TEST_INVALID_ADDRESS,
   TEST_MULTISIG_PROPOSAL_ID,
@@ -727,21 +728,10 @@ describe("Client", () => {
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
-        const installation: SubgraphPluginInstallation = {
-          appliedPreparation: {
-            helpers: [],
-            pluginRepo: {
-              id: deployment.multisigRepo.address,
-            },
-          },
-          appliedVersion: {
-            metadata: `ipfs://${IPFS_CID}`,
-            release: {
-              release: 1,
-            },
-            build: 1,
-          },
-        };
+        const installation = SUBGRAPH_PLUGIN_INSTALLATION;
+        installation.appliedPreparation.pluginRepo.id =
+          deployment.tokenVotingRepo.address;
+        installation.appliedPreparation.helpers = [];
         mockedClient.request.mockResolvedValueOnce({
           iplugin: { installations: [installation] },
         });

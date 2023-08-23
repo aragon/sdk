@@ -1,4 +1,4 @@
-// mocks need to be at the top of the imports
+import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 import "../../mocks/aragon-sdk-ipfs";
 
 import {
@@ -10,10 +10,8 @@ import {
   SetAllowanceParams,
 } from "../../../src";
 import {
-  ADDRESS_ONE,
-  ADDRESS_THREE,
-  ADDRESS_TWO,
   contextParamsLocalChain,
+  SUBGRAPH_PLUGIN_INSTALLATION,
 } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
@@ -22,6 +20,8 @@ import { deployErc20 } from "../../helpers/deploy-erc20";
 import { Context, TokenType } from "@aragon/sdk-client-common";
 import { deployErc1155 } from "../../helpers/deploy-erc1155";
 import { deployErc721 } from "../../helpers/deploy-erc721";
+import { buildMultisigDAO } from "../../helpers/build-daos";
+import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
 
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
@@ -190,14 +190,29 @@ describe("Client", () => {
     it("Should estimate the gas fees for preparing an update", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const client = new Client(ctx);
+      const { dao, plugin } = await buildMultisigDAO(
+        deployment.multisigRepo.address,
+      );
+
+      await createMultisigPluginBuild(1, deployment.multisigRepo.address);
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      const installation = SUBGRAPH_PLUGIN_INSTALLATION;
+      installation.appliedPreparation.pluginRepo.id =
+        deployment.tokenVotingRepo.address;
+      installation.appliedPreparation.helpers = [];
+      mockedClient.request.mockResolvedValueOnce({
+        iplugin: { installations: [installation] },
+      });
 
       const estimation = await client.estimation.prepareUpdate({
-        pluginAddress: ADDRESS_ONE,
-        pluginRepo: ADDRESS_TWO,
-        daoAddressOrEns: ADDRESS_THREE,
+        pluginAddress: plugin,
+        pluginRepo: deployment.multisigRepo.address,
+        daoAddressOrEns: dao,
         newVersion: {
-          build: 1,
-          release: 2,
+          build: 2,
+          release: 1,
         },
       });
 

@@ -1,3 +1,4 @@
+import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 // @ts-ignore
 declare const describe, it, expect, beforeAll, afterAll;
 
@@ -10,9 +11,8 @@ import {
   MultisigClient,
 } from "../../../src";
 import {
-  // ADDRESS_ONE,
-  // ADDRESS_TWO,
   contextParamsLocalChain,
+  SUBGRAPH_PLUGIN_INSTALLATION,
   TEST_WALLET_ADDRESS,
 } from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
@@ -121,6 +121,16 @@ describe("Client Multisig", () => {
       const { dao, plugin } = await buildMultisigDAO(
         deployment.multisigRepo.address,
       );
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      const installation = SUBGRAPH_PLUGIN_INSTALLATION;
+      installation.appliedPreparation.pluginRepo.id =
+        deployment.tokenVotingRepo.address;
+      installation.appliedPreparation.helpers = [];
+      mockedClient.request.mockResolvedValueOnce({
+        iplugin: { installations: [installation] },
+      });
 
       await createMultisigPluginBuild(1, deployment.multisigRepo.address);
 
@@ -128,8 +138,8 @@ describe("Client Multisig", () => {
         pluginAddress: plugin,
         daoAddressOrEns: dao,
         newVersion: {
-          build: 1,
-          release: 2,
+          build: 2,
+          release: 1,
         },
       });
 

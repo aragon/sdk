@@ -169,7 +169,7 @@ export class TokenVotingClientEstimation extends ClientCore
   public async prepareUpdate(
     params: TokenVotingPluginPrepareUpdateParams,
   ): Promise<GasFeeEstimation> {
-    return await prepareGenericUpdateEstimation(this.web3, {
+    return await prepareGenericUpdateEstimation(this.web3, this.graphql, {
       ...params,
       pluginSetupProcessorAddress: this.web3.getAddress(
         "pluginSetupProcessorAddress",

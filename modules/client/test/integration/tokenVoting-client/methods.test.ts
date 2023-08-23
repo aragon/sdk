@@ -44,6 +44,7 @@ import {
   contextParamsLocalChain,
   IPFS_CID,
   SUBGRAPH_ACTIONS,
+  SUBGRAPH_PLUGIN_INSTALLATION,
   SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
@@ -532,21 +533,10 @@ describe("Token Voting Client", () => {
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
-        const installation = {
-          appliedPreparation: {
-            helpers: [tokenAddress],
-            pluginRepo: {
-              id: deployment.tokenVotingRepo.address,
-            },
-          },
-          appliedVersion: {
-            metadata: `ipfs://${IPFS_CID}`,
-            release: {
-              release: 1,
-            },
-            build: 1,
-          },
-        };
+        const installation = SUBGRAPH_PLUGIN_INSTALLATION;
+        installation.appliedPreparation.pluginRepo.id =
+          deployment.tokenVotingRepo.address;
+        installation.appliedPreparation.helpers = [tokenAddress];
         mockedClient.request.mockResolvedValueOnce({
           iplugin: { installations: [installation] },
         });

@@ -212,15 +212,33 @@ export async function* prepareGenericInstallation(
 }
 export async function prepareGenericUpdateEstimation(
   web3: IClientWeb3Core,
+  graphql: IClientGraphQLCore,
   params: PrepareUpdateParams & { pluginSetupProcessorAddress: string },
 ): Promise<GasFeeEstimation> {
   const signer = web3.getConnectedSigner();
-  const currentVersionTag = { build: 1, release: 1 };
+  type T = {
+    iplugin: { installations: SubgraphPluginInstallation[] };
+  };
+  const { iplugin } = await graphql.request<T>({
+    query: QueryIPlugin,
+    params: {
+      address: params.pluginAddress.toLowerCase(),
+      where: { dao: params.daoAddressOrEns.toLowerCase() },
+    },
+    name: "plugin",
+  });
+
+  // filter specified installation
+  const { pluginInstallationIndex = 0 } = params;
+  const selectedInstallation = iplugin.installations[pluginInstallationIndex];
+  if (!selectedInstallation) {
+    throw new InstallationNotFoundError();
+  }
   // check if version is valid
   if (
     params.newVersion.release !==
-      currentVersionTag.release ||
-    params.newVersion.build <= currentVersionTag.build
+      selectedInstallation.appliedVersion.release.release ||
+    params.newVersion.build <= selectedInstallation.appliedVersion.build
   ) {
     throw new InvalidVersionError();
   }
@@ -236,12 +254,15 @@ export async function prepareGenericUpdateEstimation(
     signer,
   );
   const prepareUpdateParams = {
-    currentVersionTag,
+    currentVersionTag: {
+      build: selectedInstallation.appliedVersion.build,
+      release: selectedInstallation.appliedVersion.release.release,
+    },
     newVersionTag: params.newVersion,
     pluginSetupRepo: params.pluginRepo,
     setupPayload: {
       plugin: params.pluginAddress,
-      currentHelpers: [],
+      currentHelpers: selectedInstallation.appliedPreparation.helpers,
       data,
     },
   };

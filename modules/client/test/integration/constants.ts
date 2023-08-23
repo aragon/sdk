@@ -174,3 +174,19 @@ export const contextParamsOkWithGraphqlTimeouts: ContextParams = {
   ipfsNodes: ipfsEndpoints.working,
   graphqlNodes: grapqhlEndpoints.timeout.concat(grapqhlEndpoints.working),
 };
+
+export const SUBGRAPH_PLUGIN_INSTALLATION = {
+  appliedPreparation: {
+    helpers: ["0x1234567890123456789012345678901234567890"],
+    pluginRepo: {
+      id: "0x1234567890123456789012345678901234567890",
+    },
+  },
+  appliedVersion: {
+    metadata: `ipfs://${IPFS_CID}`,
+    release: {
+      release: 1,
+    },
+    build: 1,
+  },
+};
