@@ -663,7 +663,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async getDao(daoAddressOrEns: string): Promise<DaoDetails | null> {
-    let address = daoAddressOrEns;
+    let address = daoAddressOrEns.toLowerCase();
     if (!isAddress(address)) {
       await this.web3.ensureOnline();
       const provider = this.web3.getProvider();
@@ -979,7 +979,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     type T = { pluginRepo: SubgraphPluginRepo };
     const { pluginRepo } = await this.graphql.request<T>({
       query,
-      params: { id: pluginAddress },
+      params: { id: pluginAddress.toLowerCase() },
       name,
     });
     // get release metadata
