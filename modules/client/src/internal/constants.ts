@@ -9,6 +9,8 @@ import {
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 
+export const DEPOSIT_ESTIMATION_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199"
+
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
   new Contract(AddressZero, ERC20_ABI).interface.getFunction("transfer")
     .format("minimal"),

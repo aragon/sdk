@@ -19,6 +19,7 @@ TEMPLATE:
 ## [UPCOMING]
 ### Changed
 - All addresses are now lowercased on subgraph methods
+- Use signer only when transactions need to be signed, else use provider
 ## [1.13.1-rc1]
 ### Fixes
 - Support for ERC115Transfers and balances

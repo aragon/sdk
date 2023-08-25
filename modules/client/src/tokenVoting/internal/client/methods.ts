@@ -410,7 +410,7 @@ export class TokenVotingClientMethods extends ClientCore
    * @returns {*}  {Promise<boolean>}
    */
   public async canVote(params: CanVoteParams): Promise<boolean> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     if (!isAddress(params.voterAddressOrEns)) {
       throw new InvalidAddressError();
@@ -420,7 +420,7 @@ export class TokenVotingClientMethods extends ClientCore
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
     return tokenVotingContract.callStatic.canVote(
       id,
@@ -439,13 +439,13 @@ export class TokenVotingClientMethods extends ClientCore
   public async canExecute(
     proposalId: string,
   ): Promise<boolean> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
 
     return tokenVotingContract.canExecute(id);
@@ -762,7 +762,6 @@ export class TokenVotingClientMethods extends ClientCore
   public async isTokenVotingCompatibleToken(
     tokenAddress: string,
   ): Promise<TokenVotingTokenCompatibility> {
-    const signer = this.web3.getConnectedSigner();
     // check if is address
     if (!isAddress(tokenAddress) || tokenAddress === AddressZero) {
       throw new InvalidAddressError();
@@ -775,10 +774,10 @@ export class TokenVotingClientMethods extends ClientCore
     const contract = new Contract(
       tokenAddress,
       ERC165_ABI,
-      signer,
+      provider,
     );
 
-    if (!await isERC20Token(tokenAddress, signer)) {
+    if (!await isERC20Token(tokenAddress, provider)) {
       return TokenVotingTokenCompatibility.INCOMPATIBLE;
     }
     try {

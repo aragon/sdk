@@ -41,9 +41,9 @@ import {
   ProposalStatus,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { Signer } from "@ethersproject/abstract-signer";
 import { Contract } from "@ethersproject/contracts";
 import { abi as ERC_20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 export function toTokenVotingProposal(
   proposal: SubgraphTokenVotingProposal,
@@ -340,7 +340,7 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
 /**
  * Checks if the given address is an ERC20 token
  * This function isn not 100% accurate.
- * It just checks if the token has a balanceOf 
+ * It just checks if the token has a balanceOf
  * function and a decimals function
  *
  * @export
@@ -350,7 +350,7 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
  */
 export async function isERC20Token(
   tokenAddress: string,
-  signer: Signer,
+  signer: JsonRpcProvider,
 ): Promise<boolean> {
   const contract = new Contract(
     tokenAddress,
@@ -359,7 +359,7 @@ export async function isERC20Token(
   );
   try {
     await Promise.all([
-      contract.balanceOf(await signer.getAddress()),
+      contract.balanceOf(AddressZero),
       contract.decimals(),
     ]);
     return true;

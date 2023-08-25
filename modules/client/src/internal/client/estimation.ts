@@ -51,7 +51,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * @memberof ClientEstimation
    */
   public async createDao(params: CreateDaoParams): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
     if (
       params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
     ) {
@@ -60,11 +60,11 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
 
     const daoInstance = DAOFactory__factory.connect(
       this.web3.getAddress("daoFactoryAddress"),
-      signer,
+      provider,
     );
     const pluginInstallationData: DAOFactory.PluginSettingsStruct[] = [];
     for (const plugin of params.plugins) {
-      const repo = PluginRepo__factory.connect(plugin.id, signer);
+      const repo = PluginRepo__factory.connect(plugin.id, provider);
 
       const currentRelease = await repo.latestRelease();
       const latestVersion = await repo["getLatestVersion(uint8)"](

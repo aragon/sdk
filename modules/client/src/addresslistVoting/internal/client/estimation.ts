@@ -27,11 +27,11 @@ export class AddresslistVotingClientEstimation extends ClientCore
   public async createProposal(
     params: CreateMajorityVotingProposalParams,
   ): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const addresslistContract = AddresslistVoting__factory.connect(
       params.pluginAddress,
-      signer,
+      provider,
     );
 
     if (
@@ -68,7 +68,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
   public async voteProposal(
     params: VoteProposalParams,
   ): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
@@ -76,7 +76,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
 
     const estimation = await addresslistContract.estimateGas.vote(
@@ -97,7 +97,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
   public async executeProposal(
     proposalId: string,
   ): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const { pluginAddress, id } = decodeProposalId(
       proposalId,
@@ -105,7 +105,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
     const estimation = await addresslistContract.estimateGas.execute(
       id,
