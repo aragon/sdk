@@ -220,7 +220,7 @@ export type PrepareUpdateParams = {
   daoAddressOrEns: string;
   pluginInstallationIndex?: number;
   newVersion: VersionTag;
-  updateParams?: any;
+  updateParams?: any[];
   updateAbi?: MetadataAbiInput[];
   pluginRepo: string;
 };

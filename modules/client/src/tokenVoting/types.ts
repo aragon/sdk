@@ -1,5 +1,6 @@
 import {
   MetadataAbiInput,
+  PrepareUpdateParams,
   ProposalBase,
   ProposalListItemBase,
   TokenType,
@@ -91,14 +92,10 @@ export type TokenVotingPluginPrepareInstallationParams = {
   versionTag?: VersionTag;
 };
 
-export type TokenVotingPluginPrepareUpdateParams = {
-  pluginAddress: string;
-  daoAddressOrEns: string;
-  newVersion: VersionTag;
-  updateParams?: any;
-  updateAbi?: MetadataAbiInput[];
-  pluginInstallationIndex?: number;
-};
+export type TokenVotingPluginPrepareUpdateParams = Omit<
+  PrepareUpdateParams,
+  "pluginRepo"
+>;
 
 type WrapTokensBase = {
   wrappedTokenAddress: string;

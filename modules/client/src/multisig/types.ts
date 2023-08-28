@@ -1,5 +1,6 @@
 import {
   MetadataAbiInput,
+  PrepareUpdateParams,
   ProposalBase,
   ProposalListItemBase,
   VersionTag,
@@ -80,11 +81,7 @@ export type MultisigProposal = ProposalBase & {
 };
 
 /* Prepare Update */
-export type MultisigPluginPrepareUpdateParams = {
-  pluginAddress: string;
-  daoAddressOrEns: string;
-  newVersion: VersionTag;
-  updateParams?: any;
-  updateAbi?: MetadataAbiInput[];
-  pluginInstallationIndex?: number;
-};
+export type MultisigPluginPrepareUpdateParams = Omit<
+  PrepareUpdateParams,
+  "pluginRepo"
+>;

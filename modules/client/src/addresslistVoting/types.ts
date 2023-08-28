@@ -1,5 +1,6 @@
 import {
   MetadataAbiInput,
+  PrepareUpdateParams,
   ProposalBase,
   ProposalListItemBase,
   VersionTag,
@@ -39,11 +40,7 @@ export type AddresslistVotingPluginPrepareInstallationParams = {
   versionTag?: VersionTag;
 };
 
-export type AddresslistVotingPluginPrepareUpdateParams = {
-  pluginAddress: string;
-  daoAddressOrEns: string;
-  newVersion: VersionTag;
-  updateParams?: any;
-  updateAbi?: MetadataAbiInput[];
-  pluginInstallationIndex?: number;
-};
+export type AddresslistVotingPluginPrepareUpdateParams = Omit<
+  PrepareUpdateParams,
+  "pluginRepo"
+>;

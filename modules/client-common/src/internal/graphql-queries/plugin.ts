@@ -2,9 +2,9 @@ import { gql } from "graphql-request";
 
 export const QueryIPlugin = gql`
 query IPlugin($address: ID!, $where: IPlugin_filter!) {
-	iplugin(id:$address, where:$where){
+	iplugin(id:$address, where:$where) {
     installations(where:{state: Installed}) {
-      appliedPreparation{
+      appliedPreparation {
         helpers
         pluginRepo {
           id
@@ -13,7 +13,7 @@ query IPlugin($address: ID!, $where: IPlugin_filter!) {
      	appliedVersion {
         metadata
         build
-        release{
+        release {
           release
         }
       }

@@ -698,7 +698,7 @@ describe("Client", () => {
         const { dao, plugin } = await buildMultisigDAO(
           deployment.multisigRepo.address,
         );
-        // deply a new build to be able to update
+        // deploy a new build to be able to update
         // this has to be done after creating the DAO beacause
         // the default behaivour is using the latest version
         const provider = new JsonRpcProvider("http://127.0.0.1:8545");

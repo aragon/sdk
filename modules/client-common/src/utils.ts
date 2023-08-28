@@ -34,6 +34,7 @@ import {
 } from "./internal";
 import {
   PluginRepo__factory,
+  PluginSetupProcessor,
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import { ADDITIONAL_NETWORKS, LIVE_CONTRACTS } from "./constants";
@@ -210,12 +211,11 @@ export async function* prepareGenericInstallation(
     helpers: preparedSetupData.helpers,
   };
 }
-export async function prepareGenericUpdateEstimation(
-  web3: IClientWeb3Core,
+
+async function getPrepareUpdateParams(
   graphql: IClientGraphQLCore,
-  params: PrepareUpdateParams & { pluginSetupProcessorAddress: string },
-): Promise<GasFeeEstimation> {
-  const signer = web3.getConnectedSigner();
+  params: PrepareUpdateParams,
+): Promise<PluginSetupProcessor.PrepareUpdateParamsStruct> {
   type T = {
     iplugin: { installations: SubgraphPluginInstallation[] };
   };
@@ -248,12 +248,7 @@ export async function prepareGenericUpdateEstimation(
     getNamedTypesFromMetadata(updateAbi),
     updateParams,
   );
-  // connect to psp contract
-  const pspContract = PluginSetupProcessor__factory.connect(
-    params.pluginSetupProcessorAddress,
-    signer,
-  );
-  const prepareUpdateParams = {
+  return {
     currentVersionTag: {
       build: selectedInstallation.appliedVersion.build,
       release: selectedInstallation.appliedVersion.release.release,
@@ -266,7 +261,20 @@ export async function prepareGenericUpdateEstimation(
       data,
     },
   };
+}
 
+export async function prepareGenericUpdateEstimation(
+  web3: IClientWeb3Core,
+  graphql: IClientGraphQLCore,
+  params: PrepareUpdateParams & { pluginSetupProcessorAddress: string },
+): Promise<GasFeeEstimation> {
+  const signer = web3.getConnectedSigner();
+  const prepareUpdateParams = await getPrepareUpdateParams(graphql, params);
+  // connect to psp contract
+  const pspContract = PluginSetupProcessor__factory.connect(
+    params.pluginSetupProcessorAddress,
+    signer,
+  );
   const gasEstimation = await pspContract.estimateGas.prepareUpdate(
     params.daoAddressOrEns,
     prepareUpdateParams,
@@ -282,57 +290,13 @@ export async function* prepareGenericUpdate(
   },
 ): AsyncGenerator<PrepareUpdateStepValue> {
   const signer = web3.getConnectedSigner();
-  type T = {
-    iplugin: { installations: SubgraphPluginInstallation[] };
-  };
-  const { iplugin } = await graphql.request<T>({
-    query: QueryIPlugin,
-    params: {
-      address: params.pluginAddress.toLowerCase(),
-      where: { dao: params.daoAddressOrEns.toLowerCase() },
-    },
-    name: "plugin",
-  });
-
-  // filter specified installation
-  const { pluginInstallationIndex = 0 } = params;
-  const selectedInstallation = iplugin.installations[pluginInstallationIndex];
-  if (!selectedInstallation) {
-    throw new InstallationNotFoundError();
-  }
-  // check if version is valid
-  if (
-    params.newVersion.release !==
-      selectedInstallation.appliedVersion.release.release ||
-    params.newVersion.build <= selectedInstallation.appliedVersion.build
-  ) {
-    throw new InvalidVersionError();
-  }
-  // encode update params
-  const { updateParams = [], updateAbi = [] } = params;
-  const data = defaultAbiCoder.encode(
-    getNamedTypesFromMetadata(updateAbi),
-    updateParams,
-  );
+  const prepareUpdateParams = await getPrepareUpdateParams(graphql, params);
   // connect to psp contract
   const pspContract = PluginSetupProcessor__factory.connect(
     params.pluginSetupProcessorAddress,
     signer,
   );
 
-  const prepareUpdateParams = {
-    currentVersionTag: {
-      build: selectedInstallation.appliedVersion.build,
-      release: selectedInstallation.appliedVersion.release.release,
-    },
-    newVersionTag: params.newVersion,
-    pluginSetupRepo: params.pluginRepo,
-    setupPayload: {
-      plugin: params.pluginAddress,
-      currentHelpers: selectedInstallation.appliedPreparation.helpers,
-      data,
-    },
-  };
   const tx = await pspContract.prepareUpdate(
     params.daoAddressOrEns,
     prepareUpdateParams,
