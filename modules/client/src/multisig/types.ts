@@ -1,5 +1,4 @@
 import {
-  MetadataAbiInput,
   PrepareUpdateParams,
   ProposalBase,
   ProposalListItemBase,
