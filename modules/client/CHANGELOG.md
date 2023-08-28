@@ -17,6 +17,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Changed
+- All addresses are now lowercased on subgraph methods
+## [1.13.1-rc1]
 ### Fixes
 - Support for ERC115Transfers and balances
 
