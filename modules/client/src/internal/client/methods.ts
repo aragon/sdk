@@ -645,9 +645,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async hasPermission(params: HasPermissionParams): Promise<boolean> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
     // connect to the managing dao
-    const daoInstance = DAO__factory.connect(params.daoAddressOrEns, signer);
+    const daoInstance = DAO__factory.connect(params.daoAddressOrEns, provider);
     return daoInstance.hasPermission(
       params.where,
       params.who,
@@ -1034,10 +1034,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!isAddress(contractAddress)) {
       throw new InvalidAddressError();
     }
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
     const protocolInstance = IProtocolVersion__factory.connect(
       contractAddress,
-      signer,
+      provider,
     );
     let version: [number, number, number];
     try {

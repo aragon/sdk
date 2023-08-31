@@ -272,13 +272,13 @@ export class AddresslistVotingClientMethods extends ClientCore
    * @memberof AddresslistVotingClientMethods
    */
   public async canVote(params: CanVoteParams): Promise<boolean> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const { pluginAddress, id } = decodeProposalId(params.proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
     return addresslistContract.callStatic.canVote(
       id,
@@ -296,13 +296,13 @@ export class AddresslistVotingClientMethods extends ClientCore
   public async canExecute(
     proposalId: string,
   ): Promise<boolean> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const addresslistContract = AddresslistVoting__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
 
     return addresslistContract.canExecute(id);

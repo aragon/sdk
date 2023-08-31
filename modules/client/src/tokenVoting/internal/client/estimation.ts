@@ -30,11 +30,11 @@ export class TokenVotingClientEstimation extends ClientCore
   public async createProposal(
     params: CreateMajorityVotingProposalParams,
   ): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
-      signer,
+      provider,
     );
 
     if (
@@ -70,7 +70,7 @@ export class TokenVotingClientEstimation extends ClientCore
   public async voteProposal(
     params: VoteProposalParams,
   ): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
@@ -78,7 +78,7 @@ export class TokenVotingClientEstimation extends ClientCore
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
 
     const estimation = await tokenVotingContract.estimateGas.vote(
@@ -99,7 +99,7 @@ export class TokenVotingClientEstimation extends ClientCore
   public async executeProposal(
     proposalId: string,
   ): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const { pluginAddress, id } = decodeProposalId(
       proposalId,
@@ -107,7 +107,7 @@ export class TokenVotingClientEstimation extends ClientCore
 
     const tokenVotingContract = TokenVoting__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
     const estimation = await tokenVotingContract.estimateGas.execute(
       id,
@@ -125,10 +125,10 @@ export class TokenVotingClientEstimation extends ClientCore
   public async delegateTokens(
     params: DelegateTokensParams,
   ): Promise<GasFeeEstimation> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
     const governanceErc20Contract = GovernanceERC20__factory.connect(
       params.tokenAddress,
-      signer,
+      provider,
     );
     const estimation = await governanceErc20Contract.estimateGas.delegate(
       params.delegatee,

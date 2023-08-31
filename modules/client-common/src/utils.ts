@@ -83,7 +83,6 @@ export async function prepareGenericInstallationEstimation(
   web3: IClientWeb3Core,
   params: PrepareInstallationParams,
 ) {
-  const signer = web3.getConnectedSigner();
   const provider = web3.getProvider();
   if (!isAddress(params.pluginRepo)) {
     throw new InvalidAddressError();
@@ -94,7 +93,7 @@ export async function prepareGenericInstallationEstimation(
   if (!version) {
     const pluginRepo = PluginRepo__factory.connect(
       params.pluginRepo,
-      signer,
+      provider,
     );
     const currentRelease = await pluginRepo.latestRelease();
     const latestVersion = await pluginRepo["getLatestVersion(uint8)"](
@@ -111,7 +110,7 @@ export async function prepareGenericInstallationEstimation(
   // connect to psp contract
   const pspContract = PluginSetupProcessor__factory.connect(
     LIVE_CONTRACTS[networkName].pluginSetupProcessorAddress,
-    signer,
+    provider,
   );
 
   const gasEstimation = await pspContract.estimateGas.prepareInstallation(

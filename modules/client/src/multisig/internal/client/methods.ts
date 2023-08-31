@@ -276,7 +276,7 @@ export class MultisigClientMethods extends ClientCore
   public async canApprove(
     params: CanApproveParams,
   ): Promise<boolean> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
     if (!isAddress(params.approverAddressOrEns)) {
       throw new InvalidAddressOrEnsError();
     }
@@ -284,7 +284,7 @@ export class MultisigClientMethods extends ClientCore
 
     const multisigContract = Multisig__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
 
     return multisigContract.canApprove(id, params.approverAddressOrEns);
@@ -299,13 +299,13 @@ export class MultisigClientMethods extends ClientCore
   public async canExecute(
     proposalId: string,
   ): Promise<boolean> {
-    const signer = this.web3.getConnectedSigner();
+    const provider = this.web3.getProvider();
 
     const { pluginAddress, id } = decodeProposalId(proposalId);
 
     const multisigContract = Multisig__factory.connect(
       pluginAddress,
-      signer,
+      provider,
     );
 
     return multisigContract.canExecute(id);
