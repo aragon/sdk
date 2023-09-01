@@ -1,5 +1,4 @@
 import {
-  ApplyUninstallationParams,
   GrantPermissionParams,
   GrantPermissionWithConditionParams,
   InitializeFromParams,
@@ -29,21 +28,36 @@ import {
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidEnsError,
-  InvalidParameter,
   NotImplementedError,
-  SizeMismatchError,
 } from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IClientEncoding } from "../interfaces";
-import { Permissions } from "../../constants";
 import {
+  AddressOrEnsSchema,
   ApplyInstallationParams,
   ApplyUpdateParams,
+  ApplyInstallationSchema,
+  ApplyUninstallationParams,
+  ApplyUninstallationSchema,
   ClientCore,
   DaoAction,
+  IpfsUriSchema,
+  Permissions,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { Interface } from "@ethersproject/abi";
+import {
+  InitializeFromSchema,
+  PermissionBaseSchema,
+  PermissionWithConditionSchema,
+  RegisterStandardCallbackSchema,
+  UpgradeToAndCallSchema,
+  WithdrawErc1155Schema,
+  WithdrawErc20Schema,
+  WithdrawErc721Schema,
+  WithdrawEthSchema,
+} from "../schemas";
+import { string } from "yup";
 
 /**
  * Encoding module the SDK Generic Client
@@ -59,9 +73,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: ApplyInstallationParams,
   ): DaoAction[] {
-    if (!isAddress(daoAddress)) {
-      throw new InvalidAddressError();
-    }
+    AddressOrEnsSchema.strict().validate(daoAddress);
+    ApplyInstallationSchema.strict().validate(params);
     const pspInterface = PluginSetupProcessor__factory.createInterface();
 
     const args = applyInstallatonParamsToContract(params);
@@ -98,6 +111,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: ApplyUninstallationParams,
   ): DaoAction[] {
+    AddressOrEnsSchema.strict().validate(daoAddress);
+    ApplyUninstallationSchema.strict().validate(params);
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const args = applyUninstallationParamsToContract(params);
     const hexBytes = pspInterface.encodeFunctionData("applyUninstallation", [
@@ -183,6 +198,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: GrantPermissionParams,
   ): DaoAction {
+    AddressOrEnsSchema.strict().validate(daoAddress);
+    PermissionBaseSchema.strict().validate(params);
     const { where, who } = params;
     if (
       !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
@@ -217,6 +234,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: GrantPermissionWithConditionParams,
   ): DaoAction {
+    AddressOrEnsSchema.strict().validate(daoAddress);
+    PermissionWithConditionSchema.strict().validate(params);
     const { where, who } = params;
     if (
       !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
@@ -255,6 +274,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddress: string,
     params: RevokePermissionParams,
   ): DaoAction {
+    AddressOrEnsSchema.strict().validate(daoAddress);
+    PermissionBaseSchema.strict().validate(params);
     const { where, who } = params;
     if (
       !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
@@ -300,11 +321,10 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     let data: string;
     switch (params.type) {
       case TokenType.NATIVE:
+        WithdrawEthSchema.strict().validate(params);
         return { to, value: params.amount, data: new Uint8Array() };
       case TokenType.ERC20:
-        if (!params.tokenAddress) {
-          throw new InvalidAddressError();
-        }
+        WithdrawErc20Schema.strict().validate(params);
 
         iface = new Contract(
           params.tokenAddress,
@@ -320,12 +340,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           data: hexToBytes(data),
         };
       case TokenType.ERC721:
-        if (
-          !params.tokenAddress || !params.daoAddressOrEns ||
-          !params.recipientAddressOrEns
-        ) {
-          throw new InvalidAddressError();
-        }
+        WithdrawErc721Schema.strict().validate(params);
         iface = new Contract(
           params.tokenAddress,
           ERC721_ABI,
@@ -344,18 +359,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           data: hexToBytes(data),
         };
       case TokenType.ERC1155:
-        if (params.tokenIds.length !== params.amounts.length) {
-          throw new SizeMismatchError();
-        }
-        if (params.tokenIds.length === 0 || params.amounts.length === 0) {
-          throw new InvalidParameter("tokenIds or amounts cannot be empty");
-        }
-        if (
-          !params.tokenAddress || !params.recipientAddressOrEns ||
-          !params.daoAddressOrEns
-        ) {
-          throw new InvalidAddressError();
-        }
+        WithdrawErc1155Schema.strict().validate(params);
         iface = new Contract(
           params.tokenAddress,
           ERC1155_ABI,
@@ -404,6 +408,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddressOrEns: string,
     metadataUri: string,
   ): Promise<DaoAction> {
+    AddressOrEnsSchema.strict().validate(daoAddressOrEns);
+    IpfsUriSchema.strict().validate(metadataUri);
     let address = daoAddressOrEns;
     if (!isAddress(daoAddressOrEns)) {
       const resolvedAddress = await this.web3.getSigner()?.resolveName(
@@ -436,6 +442,9 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddressOrEns: string,
     daoUri: string,
   ): DaoAction {
+    AddressOrEnsSchema.strict().validate(daoAddressOrEns);
+    string().url().strict().validate(daoUri);
+
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("setDaoURI", [daoUri]);
     return {
@@ -456,6 +465,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddressOrEns: string,
     params: RegisterStandardCallbackParams,
   ): DaoAction {
+    AddressOrEnsSchema.strict().validate(daoAddressOrEns);
+    RegisterStandardCallbackSchema.strict().validate(params);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData(
       "registerStandardCallback",
@@ -479,6 +490,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddressOrEns: string,
     signatureValidator: string,
   ): DaoAction {
+    AddressOrEnsSchema.strict().validate(daoAddressOrEns);
+    AddressOrEnsSchema.strict().validate(signatureValidator);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("setSignatureValidator", [
       signatureValidator,
@@ -501,6 +514,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddressOrEns: string,
     implementationAddress: string,
   ): DaoAction {
+    AddressOrEnsSchema.strict().validate(daoAddressOrEns);
+    AddressOrEnsSchema.strict().validate(implementationAddress);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("upgradeTo", [
       implementationAddress,
@@ -523,6 +538,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddressOrEns: string,
     params: UpgradeToAndCallParams,
   ): DaoAction {
+    AddressOrEnsSchema.strict().validate(daoAddressOrEns);
+    UpgradeToAndCallSchema.strict().validate(params);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("upgradeToAndCall", [
       params.implementationAddress,
@@ -547,6 +564,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     daoAddressOrEns: string,
     params: InitializeFromParams,
   ) {
+    AddressOrEnsSchema.strict().validate(daoAddressOrEns);
+    InitializeFromSchema.strict().validate(params);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = daoInterface.encodeFunctionData("initializeFrom", [
       params.previousVersion,

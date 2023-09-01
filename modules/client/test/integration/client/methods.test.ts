@@ -40,6 +40,8 @@ import {
   PluginSortBy,
   PluginUpdateProposalInValidityCause,
   PrepareUninstallationSteps,
+  PluginQueryParams,
+  PluginSortBy,
   SetAllowanceParams,
   SetAllowanceSteps,
   SubgraphAction,
@@ -83,6 +85,9 @@ import {
   LIVE_CONTRACTS,
   PrepareInstallationStep,
   PrepareUpdateStep,
+  Permissions,
+  PrepareInstallationStep,
+  PrepareUninstallationSteps,
   SortDirection,
   SupportedVersion,
   TokenType,
@@ -97,6 +102,7 @@ import {
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { toSubgraphAction } from "../../helpers/subgraph";
 import { SupportedPluginRepo } from "../../../src/internal/constants";
+import { ValidationError } from "yup";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -166,7 +172,7 @@ describe("Client", () => {
         const ipfsUri = await client.methods.pinMetadata({
           name: daoName,
           description: "this is a dao",
-          avatar: "https://...",
+          // avatar: "https://...",
           links: [],
         });
         const pluginParams: AddresslistVotingPluginInstall = {
@@ -212,7 +218,7 @@ describe("Client", () => {
         }
       });
 
-      it("should fail if no execute_permission is requested", async () => {
+      it("should fail if no plugins are specified", async () => {
         const context = new Context(contextParamsLocalChain);
         const client = new Client(context);
 
@@ -226,7 +232,7 @@ describe("Client", () => {
         };
 
         await expect(client.methods.createDao(daoCreationParams).next()).rejects
-          .toMatchObject(new MissingExecPermissionError());
+          .toEqual(new ValidationError("plugins field must have at least 1 items"));
       });
     });
 
@@ -335,6 +341,7 @@ describe("Client", () => {
         expect(await erc721Contract.ownerOf(tokenId)).toBe(
           await client.web3.getConnectedSigner().getAddress(),
         );
+
         const steps = client.methods.deposit({
           type: TokenType.ERC721,
           daoAddressOrEns: daoAddress,
@@ -1674,7 +1681,7 @@ describe("Client", () => {
         const client = new Client(ctx);
         const daoAddress = TEST_INVALID_ADDRESS;
         await expect(() => client.methods.getProtocolVersion(daoAddress))
-          .rejects.toThrow(InvalidAddressError);
+          .rejects.toThrow(ValidationError);
       });
 
       it("Should get the protocol version of a dao", async () => {

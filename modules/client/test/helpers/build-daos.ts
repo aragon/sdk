@@ -15,6 +15,7 @@ import {
 } from "../integration/constants";
 import { TokenVoting__factory } from "@aragon/osx-ethers";
 import { Context } from "@aragon/sdk-client-common";
+import { TEST_HTTP_URI, TEST_IPFS_URI_V0 } from "../constants";
 
 const NETWORK_NAME = "local";
 
@@ -32,14 +33,14 @@ export async function buildMultisigDAO(pluginRepoAddress: string) {
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
-    metadataUri: "ipfs://",
+    metadataUri: TEST_IPFS_URI_V0,
     plugins: [
       {
         id: pluginRepoAddress, // TODO: Rename
         data: pluginInstallItem.data,
       },
     ],
-    daoUri: "https://",
+    daoUri: TEST_HTTP_URI,
     trustedForwarder: AddressZero,
   };
   for await (
@@ -87,14 +88,14 @@ export async function buildTokenVotingDAO(
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
-    metadataUri: "ipfs://",
+    metadataUri: TEST_IPFS_URI_V0,
     plugins: [
       {
         id: pluginRepoAddress, // TODO: Rename
         data: pluginInstallItem.data,
       },
     ],
-    daoUri: "https://",
+    daoUri: TEST_HTTP_URI,
     trustedForwarder: AddressZero,
   };
   let dao, plugin;
@@ -150,14 +151,14 @@ export async function buildExistingTokenVotingDAO(
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
-    metadataUri: "ipfs://",
+    metadataUri: TEST_IPFS_URI_V0,
     plugins: [
       {
         id: pluginRepoAddress, // TODO: Rename
         data: pluginInstallItem.data,
       },
     ],
-    daoUri: "https://",
+    daoUri: TEST_HTTP_URI,
     trustedForwarder: AddressZero,
   };
   for await (
@@ -196,14 +197,14 @@ export async function buildAddressListVotingDAO(
 
   const createDaoParams: CreateDaoParams = {
     ensSubdomain: "teting-" + Math.random().toString().slice(2),
-    metadataUri: "ipfs://",
+    metadataUri: TEST_IPFS_URI_V0,
     plugins: [
       {
         id: pluginRepoAddress, // TODO: Rename
         data: pluginInstallItem.data,
       },
     ],
-    daoUri: "https://",
+    daoUri: TEST_HTTP_URI,
     trustedForwarder: AddressZero,
   };
   for await (

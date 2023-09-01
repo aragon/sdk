@@ -74,7 +74,8 @@
     "@openzeppelin/contracts": "^4.8.1",
     "@openzeppelin/contracts-upgradeable": "^4.8.1",
     "graphql": "^16.5.0",
-    "graphql-request": "^4.3.0"
+    "graphql-request": "^4.3.0",
+    "yup": "^1.2.0"
   },
   "jest": {
     "testEnvironment": "../../test-environment.js",

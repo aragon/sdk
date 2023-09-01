@@ -18,6 +18,10 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+## [1.14.0]
+### Added
+
+- Add input validation on client functions
 
 ### Added
 
@@ -29,7 +33,6 @@ TEMPLATE:
 
 - All addresses are now lowercased on subgraph methods
 - Use signer only when transactions need to be signed, else use provider
-
 ## [1.13.1-rc1]
 
 ### Fixes

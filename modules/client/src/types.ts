@@ -1,5 +1,4 @@
 import {
-  ApplyInstallationParamsBase,
   MetadataAbiInput,
   Pagination,
   PluginInstallItem,
@@ -365,27 +364,6 @@ export enum SetAllowanceSteps {
 export type SetAllowanceStepValue =
   | { key: SetAllowanceSteps.SETTING_ALLOWANCE; txHash: string }
   | { key: SetAllowanceSteps.ALLOWANCE_SET; allowance: bigint };
-
-/* Uninstallation */
-export type PrepareUninstallationParams = {
-  daoAddressOrEns: string;
-  pluginAddress: string;
-  pluginInstallationIndex?: number;
-  uninstallationParams?: any[];
-  uninstallationAbi?: string[];
-};
-export enum PrepareUninstallationSteps {
-  PREPARING = "preparing",
-  DONE = "done",
-}
-export type PrepareUninstallationStepValue =
-  | { key: PrepareUninstallationSteps.PREPARING; txHash: string }
-  | {
-    key: PrepareUninstallationSteps.DONE;
-  } & ApplyUninstallationParams;
-
-export type ApplyUninstallationParams = ApplyInstallationParamsBase;
-export type DecodedApplyUninstallationParams = ApplyInstallationParamsBase;
 
 /* Permissions */
 type PermissionParamsBase = {
