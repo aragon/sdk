@@ -52,7 +52,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
   public async prepareInstallation(
     params: PrepareInstallationParams,
   ): Promise<GasFeeEstimation> {
-    PrepareInstallationSchema.strict().validate(params);
+    await PrepareInstallationSchema.strict().validate(params);
     return prepareGenericInstallationEstimation(this.web3, params);
   }
   /**
@@ -63,7 +63,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * @memberof ClientEstimation
    */
   public async createDao(params: CreateDaoParams): Promise<GasFeeEstimation> {
-    CreateDaoSchema.strict().validate(params);
+    await CreateDaoSchema.strict().validate(params);
     const provider = this.web3.getProvider();
 
     const daoInstance = DAOFactory__factory.connect(
@@ -114,19 +114,19 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     let estimation: BigNumber;
     switch (params.type) {
       case TokenType.NATIVE:
-        DepositEthSchema.strict().validate(params);
+        await DepositEthSchema.strict().validate(params);
         estimation = await estimateNativeDeposit(signer, params);
         break;
       case TokenType.ERC20:
-        DepositErc20Schema.strict().validate(params);
+        await DepositErc20Schema.strict().validate(params);
         estimation = await estimateErc20Deposit(signer, params);
         break;
       case TokenType.ERC721:
-        DepositErc721Schema.strict().validate(params);
+        await DepositErc721Schema.strict().validate(params);
         estimation = await estimateErc721Deposit(signer, params);
         break;
       case TokenType.ERC1155:
-        DepositErc1155Schema.strict().validate(params);
+        await DepositErc1155Schema.strict().validate(params);
         estimation = await estimateErc1155Deposit(signer, params);
         break;
       default:
@@ -147,7 +147,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
   public async setAllowance(
     params: SetAllowanceParams,
   ): Promise<GasFeeEstimation> {
-    SetAllowanceSchema.strict().validate(params);
+    await SetAllowanceSchema.strict().validate(params);
     const signer = this.web3.getConnectedSigner();
     // resolve ens
     let daoAddress = params.spender;

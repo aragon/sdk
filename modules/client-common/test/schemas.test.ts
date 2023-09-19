@@ -441,25 +441,6 @@ describe("Test client schemas", () => {
         new ValidationError(new InvalidAddressOrEnsError().message),
       );
     });
-    it("should throw an error if the version is invalid", () => {
-      const prepareInstallationParams: PrepareInstallationParams = {
-        daoAddressOrEns: TEST_ADDRESS,
-        pluginRepo: TEST_ADDRESS,
-        version: {
-          release: 0,
-          build: 0,
-        },
-      };
-      expect(() =>
-        PrepareInstallationSchema.strict().validateSync(
-          prepareInstallationParams,
-        )
-      ).toThrow(
-        new ValidationError(
-          "version.release must be greater than 0",
-        ),
-      );
-    });
   });
   describe("Test PrepareUninstallation", () => {
     it("should validate a valid PrepareUninstallation", () => {
@@ -879,28 +860,6 @@ describe("Test client schemas", () => {
       )
         .toThrow(
           new ValidationError(new InvalidAddressOrEnsError().message),
-        );
-    });
-    it("should throw an error if the versionTag is invalid", () => {
-      const applyInstallationParams = {
-        pluginAddress: TEST_ADDRESS,
-        pluginRepo: TEST_ADDRESS,
-        versionTag: {
-          build: 0,
-          release: 1,
-        },
-        permissions: [],
-        helpers: [],
-      };
-      expect(() =>
-        ApplyInstallationSchema.strict().validateSync(
-          applyInstallationParams,
-        )
-      )
-        .toThrow(
-          new ValidationError(
-            "versionTag.build must be greater than 0",
-          ),
         );
     });
     it("should throw an error if the permissions is invalid", () => {

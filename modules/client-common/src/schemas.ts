@@ -10,6 +10,7 @@ import {
 } from "@aragon/sdk-common";
 import { array, mixed, number, object, string } from "yup";
 import { isAddress } from "@ethersproject/address";
+import { ANY_ADDRESS } from "./internal/constants";
 
 export const BigintSchema = mixed().test(
   "isBigint",
@@ -21,6 +22,11 @@ export const AddressOrEnsSchema = string().notRequired().test(
   new InvalidAddressOrEnsError().message,
   (value) => value ? isAddress(value) || isEnsName(value) : true,
 );
+export const AddressOrEnsWithoutAnySchema = string().notRequired().test(
+  "isAddressOrEnsWithoutAny",
+  new InvalidAddressOrEnsError().message,
+  (value) => value ? (isAddress(value) || isEnsName(value)) && value !== ANY_ADDRESS : true
+  );
 export const VersionTagSchema = object({
   build: number().moreThan(0).required(),
   release: number().moreThan(0).required(),
@@ -63,8 +69,8 @@ export const PrepareUninstallationSchema = object({
 export const MultiTargetPermissionSchema = object({
   operation: number().required().oneOf([0, 1, 2]),
   permissionId: string().required(),
-  where: AddressOrEnsSchema.required(),
-  who: AddressOrEnsSchema.required(),
+  where: AddressOrEnsWithoutAnySchema.required(),
+  who: AddressOrEnsWithoutAnySchema.required(),
   condition: string().notRequired(),
 });
 

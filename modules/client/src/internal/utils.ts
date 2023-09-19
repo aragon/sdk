@@ -600,7 +600,7 @@ export async function estimateNativeDeposit(
   signer: Signer,
   params: DepositEthParams,
 ): Promise<BigNumber> {
-  DepositEthSchema.strict().validateSync(params);
+  await DepositEthSchema.strict().validate(params);
   const daoInstance = DAO__factory.connect(params.daoAddressOrEns, signer);
   return await daoInstance.estimateGas.deposit(
     AddressZero,
@@ -613,7 +613,7 @@ export async function estimateErc20Deposit(
   signer: Signer,
   params: DepositErc20Params,
 ): Promise<BigNumber> {
-  DepositErc20Schema.strict().validateSync(params);
+  await DepositErc20Schema.strict().validate(params);
   const daoInstance = DAO__factory.connect(params.daoAddressOrEns, signer);
   return await daoInstance.estimateGas.deposit(
     params.tokenAddress,
@@ -626,7 +626,7 @@ export async function estimateErc721Deposit(
   signer: Signer,
   params: DepositErc721Params,
 ): Promise<BigNumber> {
-  DepositErc721Schema.strict().validateSync(params);
+  await DepositErc721Schema.strict().validate(params);
   const erc721Contract = new Contract(
     params.tokenAddress,
     ERC721_ABI,
@@ -644,7 +644,7 @@ export async function estimateErc1155Deposit(
   signer: Signer,
   params: DepositErc1155Params,
 ): Promise<BigNumber> {
-  DepositErc1155Schema.strict().validateSync(params);
+  await DepositErc1155Schema.strict().validate(params);
   const erc1155Contract = new Contract(
     params.tokenAddress,
     ERC1155_ABI,
