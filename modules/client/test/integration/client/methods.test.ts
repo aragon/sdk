@@ -172,7 +172,6 @@ describe("Client", () => {
         const ipfsUri = await client.methods.pinMetadata({
           name: daoName,
           description: "this is a dao",
-          // avatar: "https://...",
           links: [],
         });
         const pluginParams: AddresslistVotingPluginInstall = {
