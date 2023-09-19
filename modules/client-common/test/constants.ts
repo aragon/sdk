@@ -125,8 +125,8 @@ export const TEST_IPFS_URI_V1 =
 export const TEST_INVALID_IPFS_URI =
   "ipfs://QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR-invalid";
 
-export const TEST_HTTP_URI = "http://test.com";
-export const TEST_INVALID_HTTP_URI = "http://te?st.com-invalid";
+export const TEST_HTTP_URI = "https://test.com";
+export const TEST_INVALID_HTTP_URI = "https://te?st.com-invalid";
 
 export const TEST_SUBDOMAIN = "test";
 export const TEST_INVALID_SUBDOMAIN = "test.invalid";

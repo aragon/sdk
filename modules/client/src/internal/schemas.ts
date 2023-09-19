@@ -62,7 +62,7 @@ export const DepositErc1155Schema = object({
   "isSameLength",
   new SizeMismatchError("tokenIds", "amounts").message,
   function (value) {
-    const v = value as any;
+    const v = value;
     return v.tokenIds && v.amounts
       ? v.tokenIds.length === v.amounts.length
       : true;
@@ -141,7 +141,7 @@ export const WithdrawErc1155Schema = object({
   "isSameLength",
   new SizeMismatchError("tokenIds", "amounts").message,
   function (value) {
-    const v = value as any;
+    const v = value;
     return v.tokenIds && v.amounts
       ? v.tokenIds.length === v.amounts.length
       : true;
