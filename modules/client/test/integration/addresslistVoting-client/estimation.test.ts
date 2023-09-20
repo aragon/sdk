@@ -1,3 +1,4 @@
+import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 // @ts-ignore
 declare const describe, it, expect, beforeAll, afterAll;
 
@@ -10,20 +11,30 @@ import {
   VoteProposalParams,
   VoteValues,
 } from "../../../src";
-import { contextParamsLocalChain } from "../constants";
+import {
+  contextParamsLocalChain,
+  SUBGRAPH_PLUGIN_INSTALLATION,
+} from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
 import { Context } from "@aragon/sdk-client-common";
+import { buildAddressListVotingDAO } from "../../helpers/build-daos";
+import { createAddresslistVotingPluginBuild } from "../../helpers/create-plugin-build";
 
 describe("Client Address List", () => {
   describe("Estimation module", () => {
     let server: Server;
+    let deployment: deployContracts.Deployment;
 
     beforeAll(async () => {
       server = await ganacheSetup.start();
-      const deployment = await deployContracts.deploy();
+      deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.pluginSetupProcessorAddress =
+        deployment.pluginSetupProcessor.address;
+      contextParamsLocalChain.addresslistVotingRepoAddress =
+        deployment.addresslistVotingRepo.address;
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
     });
@@ -79,6 +90,45 @@ describe("Client Address List", () => {
       const estimation = await client.estimation.executeProposal(
         "0x1234567890123456789012345678901234567890_0x0",
       );
+
+      expect(typeof estimation).toEqual("object");
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
+    });
+
+    it("Should estimate the gas fees for preparing an update", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new AddresslistVotingClient(ctx);
+
+      const { dao, plugin } = await buildAddressListVotingDAO(
+        deployment.addresslistVotingRepo.address,
+      );
+
+      await createAddresslistVotingPluginBuild(
+        1,
+        deployment.addresslistVotingRepo.address,
+      );
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      const installation = SUBGRAPH_PLUGIN_INSTALLATION;
+      installation.appliedPreparation.pluginRepo.id =
+        deployment.addresslistVotingRepo.address;
+      installation.appliedPreparation.helpers = [];
+      mockedClient.request.mockResolvedValueOnce({
+        iplugin: { installations: [installation] },
+      });
+
+      const estimation = await client.estimation.prepareUpdate({
+        pluginAddress: plugin,
+        daoAddressOrEns: dao,
+        newVersion: {
+          build: 2,
+          release: 1,
+        },
+      });
 
       expect(typeof estimation).toEqual("object");
       expect(typeof estimation.average).toEqual("bigint");

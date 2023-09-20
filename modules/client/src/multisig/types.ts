@@ -1,4 +1,5 @@
 import {
+  PrepareUpdateParams,
   ProposalBase,
   ProposalListItemBase,
   VersionTag,
@@ -77,3 +78,9 @@ export type MultisigProposal = ProposalBase & {
   approvals: string[];
   settings: MultisigVotingSettings;
 };
+
+/* Prepare Update */
+export type MultisigPluginPrepareUpdateParams = Omit<
+  PrepareUpdateParams,
+  "pluginRepo"
+>;

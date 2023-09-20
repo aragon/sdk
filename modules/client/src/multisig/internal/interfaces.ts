@@ -5,6 +5,7 @@ import {
   GasFeeEstimation,
   InterfaceParams,
   PrepareInstallationStepValue,
+  PrepareUpdateStepValue,
   ProposalMetadata,
 } from "@aragon/sdk-client-common";
 import {
@@ -19,6 +20,7 @@ import {
   CanApproveParams,
   CreateMultisigProposalParams,
   MultisigPluginPrepareInstallationParams,
+  MultisigPluginPrepareUpdateParams,
   MultisigProposal,
   MultisigProposalListItem,
   MultisigVotingSettings,
@@ -41,6 +43,9 @@ export interface IMultisigClientMethods {
   prepareInstallation: (
     params: MultisigPluginPrepareInstallationParams,
   ) => AsyncGenerator<PrepareInstallationStepValue>;
+  prepareUpdate: (
+    params: MultisigPluginPrepareUpdateParams,
+  ) => AsyncGenerator<PrepareUpdateStepValue>;
   canApprove: (params: CanApproveParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getVotingSettings: (
@@ -79,6 +84,9 @@ export interface IMultisigClientEstimation {
   ) => Promise<GasFeeEstimation>;
   executeProposal: (
     proposalId: string,
+  ) => Promise<GasFeeEstimation>;
+  prepareUpdate: (
+    params: MultisigPluginPrepareUpdateParams,
   ) => Promise<GasFeeEstimation>;
 }
 

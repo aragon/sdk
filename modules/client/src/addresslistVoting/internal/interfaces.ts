@@ -5,6 +5,7 @@ import {
   GasFeeEstimation,
   InterfaceParams,
   PrepareInstallationStepValue,
+  PrepareUpdateStepValue,
   ProposalMetadata,
 } from "@aragon/sdk-client-common";
 import {
@@ -19,6 +20,7 @@ import {
 } from "../../client-common";
 import {
   AddresslistVotingPluginPrepareInstallationParams,
+  AddresslistVotingPluginPrepareUpdateParams,
   AddresslistVotingProposal,
   AddresslistVotingProposalListItem,
 } from "../types";
@@ -38,6 +40,9 @@ export interface IAddresslistVotingClientMethods {
   prepareInstallation: (
     params: AddresslistVotingPluginPrepareInstallationParams,
   ) => AsyncGenerator<PrepareInstallationStepValue>;
+  prepareUpdate: (
+    params: AddresslistVotingPluginPrepareUpdateParams,
+  ) => AsyncGenerator<PrepareUpdateStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (addressOrEns: string, blockNumber?: number) => Promise<string[]>;
@@ -81,6 +86,9 @@ export interface IAddresslistVotingClientEstimation {
   executeProposal: (
     proposalId: string,
   ) => Promise<GasFeeEstimation>;
+  prepareUpdate(
+    params: AddresslistVotingPluginPrepareUpdateParams,
+  ): Promise<GasFeeEstimation>;
 }
 /** Defines the shape of the AddressList client class */
 export interface IAddresslistVotingClient {

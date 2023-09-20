@@ -17,6 +17,7 @@ import {
 } from "@aragon/osx-ethers";
 import {
   applyInstallatonParamsFromContract,
+  applyUpdateParamsFromContract,
   permissionParamsFromContract,
   permissionParamsWitConditionFromContract,
   withdrawParamsFromContract,
@@ -38,6 +39,7 @@ import { IClientDecoding } from "../interfaces";
 import {
   ClientCore,
   DecodedApplyInstallationParams,
+  DecodedApplyUpdateParams,
   getFunctionFragment,
   InterfaceParams,
   TokenType,
@@ -75,6 +77,24 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
     return applyInstallatonParamsFromContract(result);
   }
+
+  /**
+   * Decodes the apply update parameters from an encoded apply update action
+   *
+   * @param {Uint8Array} data
+   * @return {*}  {DecodedApplyUpdateParams}
+   * @memberof ClientDecoding
+   */
+  public applyUpdateAction(
+    data: Uint8Array,
+  ): DecodedApplyUpdateParams {
+    const pspInterface = PluginSetupProcessor__factory.createInterface();
+    const hexBytes = bytesToHex(data);
+    const expectedFunction = pspInterface.getFunction("applyUpdate");
+    const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
+    return applyUpdateParamsFromContract(result);
+  }
+
   /**
    * Decodes the permission parameters from an encoded grant action
    *
@@ -158,14 +178,15 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
         tokenStandard: TokenType.ERC1155,
         abi: ERC1155_ABI,
         batch: true,
-        function: "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)",
+        function:
+          "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)",
       },
       {
         tokenStandard: TokenType.ERC1155,
         abi: ERC1155_ABI,
         batch: false,
         function: "safeTransferFrom(address,address,uint256,uint256,bytes)",
-      }
+      },
     ];
     for (const abiObject of abiObjects) {
       try {

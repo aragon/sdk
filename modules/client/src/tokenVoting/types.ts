@@ -1,4 +1,5 @@
 import {
+  PrepareUpdateParams,
   ProposalBase,
   ProposalListItemBase,
   TokenType,
@@ -89,6 +90,11 @@ export type TokenVotingPluginPrepareInstallationParams = {
   daoAddressOrEns: string;
   versionTag?: VersionTag;
 };
+
+export type TokenVotingPluginPrepareUpdateParams = Omit<
+  PrepareUpdateParams,
+  "pluginRepo"
+>;
 
 type WrapTokensBase = {
   wrappedTokenAddress: string;

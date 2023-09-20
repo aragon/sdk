@@ -285,3 +285,19 @@ export class NotAContractError extends SdkError {
   }
 }
 
+export class InvalidVersionError extends SdkError {
+  constructor(cause?: string) {
+    super(
+      "The new version and the current version should have the same release number and the new build number should be greater than the current build number",
+      cause,
+    );
+  }
+}
+export class PluginUpdatePreparationError extends SdkError {
+  constructor(cause?: string) {
+    super(
+      "Failed to prepare plugin update",
+      cause,
+    );
+  }
+}

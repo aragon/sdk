@@ -214,3 +214,38 @@ export type ProposalListItemBase = {
   endDate: Date;
   status: ProposalStatus;
 };
+
+export type PrepareUpdateParams = {
+  pluginAddress: string;
+  daoAddressOrEns: string;
+  pluginInstallationIndex?: number;
+  newVersion: VersionTag;
+  updateParams?: any[];
+  updateAbi?: MetadataAbiInput[];
+  pluginRepo: string;
+};
+
+export enum PrepareUpdateStep {
+  PREPARING = "preparing",
+  DONE = "done",
+}
+
+export type PrepareUpdateStepValue =
+  | { key: PrepareUpdateStep.PREPARING; txHash: string }
+  | {
+    key: PrepareUpdateStep.DONE;
+  } & ApplyUpdateParams;
+
+export type ApplyUpdateParamsBase = {
+  versionTag: VersionTag;
+  initData: Uint8Array;
+  pluginRepo: string;
+  pluginAddress: string;
+  permissions: MultiTargetPermission[];
+};
+export type ApplyUpdateParams = ApplyUpdateParamsBase & {
+  helpers: string[];
+};
+export type DecodedApplyUpdateParams = ApplyUpdateParamsBase & {
+  helpersHash: string;
+};

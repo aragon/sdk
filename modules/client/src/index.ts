@@ -7,4 +7,15 @@ export * from "./types";
 export * from "./constants";
 
 // Selective reexports for completeness
-export { Context, ContextParams } from "@aragon/sdk-client-common";
+export {
+  ApplyInstallationParams,
+  ApplyUpdateParams,
+  Context,
+  ContextParams,
+  DecodedApplyInstallationParams,
+  DecodedApplyUpdateParams,
+  PrepareInstallationParams,
+  PrepareInstallationStep,
+  PrepareUpdateParams,
+  PrepareUpdateStep,
+} from "@aragon/sdk-client-common";

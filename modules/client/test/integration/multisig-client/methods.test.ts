@@ -26,6 +26,7 @@ import {
   ADDRESS_TWO,
   contextParamsLocalChain,
   SUBGRAPH_ACTIONS,
+  SUBGRAPH_PLUGIN_INSTALLATION,
   SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
   TEST_MULTISIG_PROPOSAL_ID,
@@ -48,10 +49,13 @@ import { SubgraphMultisigProposal } from "../../../src/multisig/internal/types";
 import {
   Context,
   PrepareInstallationStep,
+  PrepareUpdateStep,
   ProposalMetadata,
   ProposalStatus,
   SortDirection,
 } from "@aragon/sdk-client-common";
+import { PluginRepo__factory } from "@aragon/osx-ethers";
+import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
 
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
@@ -253,6 +257,90 @@ describe("Client Multisig", () => {
             expect(typeof step.versionTag.build).toBe("number");
             expect(typeof step.versionTag.release).toBe("number");
             break;
+        }
+      }
+    });
+  });
+
+  describe("Plugin update", () => {
+    it("Should prepare a plugin update for a multisigPlugin", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new MultisigClient(ctx);
+
+      const { dao, plugin } = await buildMultisigDAO(
+        repoAddr,
+      );
+      const release = 1;
+      await createMultisigPluginBuild(release, deployment.multisigRepo.address);
+
+      const pluginSetupInstance = PluginRepo__factory.connect(
+        deployment.multisigRepo.address,
+        client.web3.getConnectedSigner(),
+      );
+      const version = await pluginSetupInstance["getLatestVersion(uint8)"](
+        release,
+      );
+
+      expect(version.tag.release).toBe(release);
+      expect(version.tag.build).toBe(2);
+
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      const installation = SUBGRAPH_PLUGIN_INSTALLATION;
+      installation.appliedPreparation.pluginRepo.id =
+        deployment.multisigRepo.address;
+      installation.appliedPreparation.helpers = [];
+      mockedClient.request.mockResolvedValueOnce({
+        iplugin: { installations: [installation] },
+      });
+      const steps = client.methods.prepareUpdate(
+        {
+          daoAddressOrEns: dao,
+          pluginAddress: plugin,
+          newVersion: {
+            release: 1,
+            build: 2,
+          },
+        },
+      );
+      for await (const step of steps) {
+        switch (step.key) {
+          case PrepareUpdateStep.PREPARING:
+            expect(typeof step.txHash).toBe("string");
+            expect(step.txHash).toMatch(/^0x[A-Fa-f0-9]{64}$/i);
+            break;
+          case PrepareUpdateStep.DONE:
+            expect(typeof step.pluginAddress).toBe("string");
+            expect(step.pluginAddress).toBe(plugin);
+            expect(step.initData instanceof Uint8Array).toBe(true);
+            expect(step.pluginAddress).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(typeof step.pluginRepo).toBe("string");
+            expect(step.pluginRepo).toBe(deployment.multisigRepo.address);
+            expect(step.pluginRepo).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            expect(typeof step.versionTag.build).toBe("number");
+            expect(step.versionTag.build).toBe(2);
+            expect(typeof step.versionTag.release).toBe("number");
+            expect(step.versionTag.release).toBe(1);
+            for (const permission of step.permissions) {
+              if (permission.condition) {
+                expect(typeof permission.condition).toBe("string");
+                expect(permission.condition).toMatch(
+                  /^0x[A-Fa-f0-9]{40}$/i,
+                );
+              }
+              expect(typeof permission.operation).toBe("number");
+              expect(typeof permission.where).toBe("string");
+              expect(permission.where).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+              expect(typeof permission.who).toBe("string");
+              expect(permission.who).toMatch(/^0x[A-Fa-f0-9]{40}$/i);
+            }
+            break;
+          default:
+            throw new Error(
+              "Unexpected DAO prepare update step: " +
+                JSON.stringify(step, null, 2),
+            );
         }
       }
     });

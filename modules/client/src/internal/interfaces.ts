@@ -1,12 +1,16 @@
 // This file contains the definitions of the general purpose DAO client
 import {
   ApplyInstallationParams,
+  ApplyUpdateParams,
   DaoAction,
   DecodedApplyInstallationParams,
+  DecodedApplyUpdateParams,
   GasFeeEstimation,
   InterfaceParams,
   PrepareInstallationParams,
   PrepareInstallationStepValue,
+  PrepareUpdateParams,
+  PrepareUpdateStepValue,
 } from "@aragon/sdk-client-common";
 import {
   ApplyUninstallationParams,
@@ -78,7 +82,10 @@ export interface IClientMethods {
   prepareInstallation: (
     params: PrepareInstallationParams,
   ) => AsyncGenerator<PrepareInstallationStepValue>;
-    // gets the protol version of a dao
+  prepareUpdate: (
+    params: PrepareUpdateParams,
+  ) => AsyncGenerator<PrepareUpdateStepValue>;
+  /** Gets the protocol version of a contract */
   getProtocolVersion: (
     contractAddress: string,
   ) => Promise<[number, number, number]>;
@@ -132,6 +139,10 @@ export interface IClientEncoding {
     daoAddressOrEns: string,
     params: ApplyUninstallationParams,
   ) => DaoAction[];
+  applyUpdateAction: (
+    daoAddressOrEns: string,
+    params: ApplyUpdateParams,
+  ) => DaoAction[];
   initializeFromAction: (
     daoAddressOrEns: string,
     params: InitializeFromParams,
@@ -165,6 +176,7 @@ export interface IClientDecoding {
   applyUninstallationAction: (
     data: Uint8Array,
   ) => DecodedApplyUninstallationParams;
+  applyUpdateAction: (data: Uint8Array) => DecodedApplyUpdateParams;
   initializeFromAction: (
     data: Uint8Array,
   ) => InitializeFromParams;
@@ -176,6 +188,9 @@ export interface IClientEstimation {
     params: DepositParams,
   ) => Promise<GasFeeEstimation>;
   setAllowance: (params: SetAllowanceParams) => Promise<GasFeeEstimation>;
+  prepareUpdate: (
+    params: PrepareUpdateParams,
+  ) => Promise<GasFeeEstimation>;
 }
 
 export interface IClient {

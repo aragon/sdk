@@ -1,4 +1,4 @@
-// mocks need to be at the top of the imports
+import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 import "../../mocks/aragon-sdk-ipfs";
 
 import {
@@ -9,7 +9,10 @@ import {
   DepositParams,
   SetAllowanceParams,
 } from "../../../src";
-import { contextParamsLocalChain } from "../constants";
+import {
+  contextParamsLocalChain,
+  SUBGRAPH_PLUGIN_INSTALLATION,
+} from "../constants";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import { Server } from "ganache";
@@ -17,6 +20,8 @@ import { deployErc20 } from "../../helpers/deploy-erc20";
 import { Context, TokenType } from "@aragon/sdk-client-common";
 import { deployErc1155 } from "../../helpers/deploy-erc1155";
 import { deployErc721 } from "../../helpers/deploy-erc721";
+import { buildMultisigDAO } from "../../helpers/build-daos";
+import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
 
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
@@ -28,6 +33,8 @@ describe("Client", () => {
       server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+      contextParamsLocalChain.pluginSetupProcessorAddress =
+        deployment.pluginSetupProcessor.address;
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
     });
@@ -179,6 +186,41 @@ describe("Client", () => {
       expect(typeof gasFeesEstimation.max).toEqual("bigint");
       expect(gasFeesEstimation.max).toBeGreaterThan(BigInt(0));
       expect(gasFeesEstimation.max).toBeGreaterThan(gasFeesEstimation.average);
+    });
+    it("Should estimate the gas fees for preparing an update", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new Client(ctx);
+      const { dao, plugin } = await buildMultisigDAO(
+        deployment.multisigRepo.address,
+      );
+
+      await createMultisigPluginBuild(1, deployment.multisigRepo.address);
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      const installation = SUBGRAPH_PLUGIN_INSTALLATION;
+      installation.appliedPreparation.pluginRepo.id =
+        deployment.multisigRepo.address;
+      installation.appliedPreparation.helpers = [];
+      mockedClient.request.mockResolvedValueOnce({
+        iplugin: { installations: [installation] },
+      });
+
+      const estimation = await client.estimation.prepareUpdate({
+        pluginAddress: plugin,
+        pluginRepo: deployment.multisigRepo.address,
+        daoAddressOrEns: dao,
+        newVersion: {
+          build: 2,
+          release: 1,
+        },
+      });
+
+      expect(typeof estimation).toEqual("object");
+      expect(typeof estimation.average).toEqual("bigint");
+      expect(typeof estimation.max).toEqual("bigint");
+      expect(estimation.max).toBeGreaterThan(BigInt(0));
+      expect(estimation.max).toBeGreaterThan(estimation.average);
     });
   });
 });

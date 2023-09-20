@@ -19,6 +19,13 @@ export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
     .format("minimal"),
 ];
 
+// TODO:
+// use abi from plugin metadata
+export const UPDATE_ABI: { [build: number]: MetadataAbiInput[] } = {
+  1: [],
+};
+// TODO:
+// use abi from plugin metadata
 export const INSTALLATION_ABI: MetadataAbiInput[] = [
   {
     components: [
@@ -114,7 +121,6 @@ export const INSTALLATION_ABI: MetadataAbiInput[] = [
       "The token mint settings struct containing the `receivers` and `amounts`.",
   },
 ];
-
 
 export const ERC165_INTERFACE_ID = getInterfaceId(
   new Interface(ERC165_ABI),

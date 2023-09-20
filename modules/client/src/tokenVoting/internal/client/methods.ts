@@ -43,6 +43,7 @@ import {
   Erc721TokenDetails,
   TokenVotingMember,
   TokenVotingPluginPrepareInstallationParams,
+  TokenVotingPluginPrepareUpdateParams,
   TokenVotingProposal,
   TokenVotingProposalListItem,
   UndelegateTokensStepValue,
@@ -91,7 +92,9 @@ import {
   findLog,
   MULTI_FETCH_TIMEOUT,
   prepareGenericInstallation,
+  prepareGenericUpdate,
   PrepareInstallationStepValue,
+  PrepareUpdateStepValue,
   ProposalMetadata,
   SortDirection,
   SupportedNetwork,
@@ -104,6 +107,7 @@ import {
   ERC165_INTERFACE_ID,
   GOVERNANCE_SUPPORTED_INTERFACE_IDS,
   INSTALLATION_ABI,
+  UPDATE_ABI,
 } from "../constants";
 import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
 import { Contract } from "@ethersproject/contracts";
@@ -282,6 +286,26 @@ export class TokenVotingClientMethods extends ClientCore
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: tokenVotingInitParamsToContract(params.settings),
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
+    });
+  }
+  /**
+   * Prepares the update of a token voting plugin in a given dao
+   *
+   * @param {TokenVotingPluginPrepareUpdateParams} params
+   * @return {*}  {AsyncGenerator<PrepareUpdateStepValue>}
+   * @memberof TokenVotingClientMethods
+   */
+  public async *prepareUpdate(
+    params: TokenVotingPluginPrepareUpdateParams,
+  ): AsyncGenerator<PrepareUpdateStepValue> {
+    yield* prepareGenericUpdate(this.web3, this.graphql, {
+      ...params,
+      pluginRepo: this.web3.getAddress("tokenVotingRepoAddress"),
+      updateAbi: UPDATE_ABI[params.newVersion.build] ||
+        params.updateAbi || [],
       pluginSetupProcessorAddress: this.web3.getAddress(
         "pluginSetupProcessorAddress",
       ),

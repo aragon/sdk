@@ -11,6 +11,8 @@ import {
   SizeMismatchError,
 } from "@aragon/sdk-common";
 import { ClientCore, GasFeeEstimation } from "@aragon/sdk-client-common";
+import { AddresslistVotingPluginPrepareUpdateParams } from "../../types";
+import { prepareGenericUpdateEstimation } from "@aragon/sdk-client-common";
 
 /**
  * Estimation module the SDK Address List Client
@@ -111,5 +113,23 @@ export class AddresslistVotingClientEstimation extends ClientCore
       id,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
+  }
+  /**
+   * Estimates the gas fee of preparing an update
+   *
+   * @param {AddresslistVotingPluginPrepareUpdateParams} params
+   * @return {*}  {Promise<GasFeeEstimation>}
+   * @memberof AddresslistVotingClientEstimation
+   */
+  public async prepareUpdate(
+    params: AddresslistVotingPluginPrepareUpdateParams,
+  ): Promise<GasFeeEstimation> {
+    return await prepareGenericUpdateEstimation(this.web3, this.graphql, {
+      ...params,
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
+      pluginRepo: this.web3.getAddress("addresslistVotingRepoAddress"),
+    });
   }
 }

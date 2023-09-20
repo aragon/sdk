@@ -1,4 +1,5 @@
 import {
+  PrepareUpdateParams,
   ProposalBase,
   ProposalListItemBase,
   VersionTag,
@@ -37,3 +38,8 @@ export type AddresslistVotingPluginPrepareInstallationParams = {
   daoAddressOrEns: string;
   versionTag?: VersionTag;
 };
+
+export type AddresslistVotingPluginPrepareUpdateParams = Omit<
+  PrepareUpdateParams,
+  "pluginRepo"
+>;

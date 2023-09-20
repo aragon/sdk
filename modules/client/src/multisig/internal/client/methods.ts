@@ -23,6 +23,7 @@ import {
   CanApproveParams,
   CreateMultisigProposalParams,
   MultisigPluginPrepareInstallationParams,
+  MultisigPluginPrepareUpdateParams,
   MultisigProposal,
   MultisigProposalListItem,
   MultisigVotingSettings,
@@ -61,7 +62,9 @@ import {
   findLog,
   MULTI_FETCH_TIMEOUT,
   prepareGenericInstallation,
+  prepareGenericUpdate,
   PrepareInstallationStepValue,
+  PrepareUpdateStepValue,
   ProposalMetadata,
   SortDirection,
   SupportedNetwork,
@@ -69,7 +72,7 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "@aragon/sdk-client-common";
-import { INSTALLATION_ABI } from "../constants";
+import { INSTALLATION_ABI, UPDATE_ABI } from "../constants";
 
 /**
  * Methods module the SDK Address List Client
@@ -266,6 +269,27 @@ export class MultisigClientMethods extends ClientCore
       ),
     });
   }
+  /**
+   * Prepares the update of a multisig plugin in a given dao
+   *
+   * @param {MultisigPluginPrepareUpdateParams} params
+   * @return {*}  {AsyncGenerator<PrepareUpdateStepValue>}
+   * @memberof MultisigClientMethods
+   */
+  public async *prepareUpdate(
+    params: MultisigPluginPrepareUpdateParams,
+  ): AsyncGenerator<PrepareUpdateStepValue> {
+    yield* prepareGenericUpdate(this.web3, this.graphql, {
+      ...params,
+      pluginRepo: this.web3.getAddress("multisigRepoAddress"),
+      updateAbi: UPDATE_ABI[params.newVersion.build] ||
+        params.updateAbi || [],
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
+    });
+  }
+
   /**
    * Checks whether the current proposal can be approved by the given address
    *

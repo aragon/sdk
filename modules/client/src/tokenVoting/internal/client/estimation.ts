@@ -13,8 +13,15 @@ import {
   decodeProposalId,
   SizeMismatchError,
 } from "@aragon/sdk-common";
-import { DelegateTokensParams } from "../../types";
-import { ClientCore, GasFeeEstimation } from "@aragon/sdk-client-common";
+import {
+  DelegateTokensParams,
+  TokenVotingPluginPrepareUpdateParams,
+} from "../../types";
+import {
+  ClientCore,
+  GasFeeEstimation,
+  prepareGenericUpdateEstimation,
+} from "@aragon/sdk-client-common";
 /**
  * Estimation module the SDK TokenVoting Client
  */
@@ -150,6 +157,24 @@ export class TokenVotingClientEstimation extends ClientCore
     return this.delegateTokens({
       tokenAddress,
       delegatee: await signer.getAddress(),
+    });
+  }
+  /**
+   * Estimates the gas fee of preparing an update
+   *
+   * @param {TokenVotingPluginPrepareUpdateParams} params
+   * @return {*}  {Promise<GasFeeEstimation>}
+   * @memberof TokenVotingClientEstimation
+   */
+  public async prepareUpdate(
+    params: TokenVotingPluginPrepareUpdateParams,
+  ): Promise<GasFeeEstimation> {
+    return await prepareGenericUpdateEstimation(this.web3, this.graphql, {
+      ...params,
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
+      pluginRepo: this.web3.getAddress("tokenVotingRepoAddress"),
     });
   }
 }

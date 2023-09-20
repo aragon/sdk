@@ -9,8 +9,13 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   ApproveMultisigProposalParams,
   CreateMultisigProposalParams,
+  MultisigPluginPrepareUpdateParams,
 } from "../../types";
-import { ClientCore, GasFeeEstimation } from "@aragon/sdk-client-common";
+import {
+  ClientCore,
+  GasFeeEstimation,
+  prepareGenericUpdateEstimation,
+} from "@aragon/sdk-client-common";
 /**
  * Estimation module the SDK Address List Client
  */
@@ -107,5 +112,23 @@ export class MultisigClientEstimation extends ClientCore
       id,
     );
     return this.web3.getApproximateGasFee(estimation.toBigInt());
+  }
+  /**
+   * Estimates the gas fee of preparing an update
+   *
+   * @param {MultisigPluginPrepareUpdateParams} params
+   * @return {*}  {Promise<GasFeeEstimation>}
+   * @memberof MultisigClientEstimation
+   */
+  public async prepareUpdate(
+    params: MultisigPluginPrepareUpdateParams,
+  ): Promise<GasFeeEstimation> {
+    return await prepareGenericUpdateEstimation(this.web3, this.graphql, {
+      ...params,
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
+      pluginRepo: this.web3.getAddress("multisigRepoAddress"),
+    });
   }
 }

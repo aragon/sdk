@@ -29,7 +29,9 @@ import {
   ClientCore,
   GasFeeEstimation,
   prepareGenericInstallationEstimation,
+  prepareGenericUpdateEstimation,
   PrepareInstallationParams,
+  PrepareUpdateParams,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -159,6 +161,23 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
       params.amount,
     ).then((gasLimit) => {
       return this.web3.getApproximateGasFee(gasLimit.toBigInt());
+    });
+  }
+  /**
+   * Estimates the gas fee of preparing an update
+   *
+   * @param {PrepareUpdateParams} params
+   * @return {*}  {Promise<GasFeeEstimation>}
+   * @memberof ClientEstimation
+   */
+  public async prepareUpdate(
+    params: PrepareUpdateParams,
+  ): Promise<GasFeeEstimation> {
+    return await prepareGenericUpdateEstimation(this.web3, this.graphql, {
+      ...params,
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
     });
   }
 }

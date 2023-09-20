@@ -50,6 +50,7 @@ import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
   AddresslistVotingPluginPrepareInstallationParams,
+  AddresslistVotingPluginPrepareUpdateParams,
   AddresslistVotingProposal,
   AddresslistVotingProposalListItem,
 } from "../../types";
@@ -64,7 +65,9 @@ import {
   findLog,
   MULTI_FETCH_TIMEOUT,
   prepareGenericInstallation,
+  prepareGenericUpdate,
   PrepareInstallationStepValue,
+  PrepareUpdateStepValue,
   ProposalMetadata,
   SortDirection,
   SupportedNetwork,
@@ -72,7 +75,7 @@ import {
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
 } from "@aragon/sdk-client-common";
-import { INSTALLATION_ABI } from "../constants";
+import { INSTALLATION_ABI, UPDATE_ABI } from "../constants";
 
 /**
  * Methods module the SDK Address List Client
@@ -260,7 +263,29 @@ export class AddresslistVotingClientMethods extends ClientCore
         votingSettingsToContract(params.settings.votingSettings),
         params.settings.addresses,
       ],
-      pluginSetupProcessorAddress: this.web3.getAddress("pluginSetupProcessorAddress"),
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
+    });
+  }
+  /**
+   * Prepares the update of a token voting plugin in a given dao
+   *
+   * @param {AddresslistVotingPluginPrepareUpdateParams} params
+   * @return {*}  {AsyncGenerator<PrepareUpdateStepValue>}
+   * @memberof AddresslistVotingClientMethods
+   */
+  public async *prepareUpdate(
+    params: AddresslistVotingPluginPrepareUpdateParams,
+  ): AsyncGenerator<PrepareUpdateStepValue> {
+    yield* prepareGenericUpdate(this.web3, this.graphql, {
+      ...params,
+      pluginRepo: this.web3.getAddress("addresslistVotingRepoAddress"),
+      updateAbi: UPDATE_ABI[params.newVersion.build] ||
+        params.updateAbi || [],
+      pluginSetupProcessorAddress: this.web3.getAddress(
+        "pluginSetupProcessorAddress",
+      ),
     });
   }
 

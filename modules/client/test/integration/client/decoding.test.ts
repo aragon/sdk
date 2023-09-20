@@ -33,6 +33,7 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
 import {
   ApplyInstallationParams,
+  ApplyUpdateParams,
   Context,
   PermissionOperationType,
   TokenType,
@@ -205,39 +206,39 @@ describe("Client", () => {
         fail("TokenType should be ERC721");
       }
     });
-      it("Should decode an encoded withdraw action of an erc1155 token", async () => {
-        // encoded withdraw erc1155 action data
-        // type: ERC1155
-        // tokenAddress: 0x000000000000000000000000000000000001
-        // recipientAddressOrEns: 0x000000000000000000000000000000000002
-        // daoAddressOrEns: 0x000000000000000000000000000000000003
-        // tokenIds: [10]
-        // amounts: [20]
-        const data =
-          "0xf242432a00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000";
-        const context = new Context(contextParamsLocalChain);
-        const client = new Client(context);
-        const params = client.decoding.withdrawAction(
-          ADDRESS_ONE,
-          BigInt(0),
-          hexToBytes(data),
+    it("Should decode an encoded withdraw action of an erc1155 token", async () => {
+      // encoded withdraw erc1155 action data
+      // type: ERC1155
+      // tokenAddress: 0x000000000000000000000000000000000001
+      // recipientAddressOrEns: 0x000000000000000000000000000000000002
+      // daoAddressOrEns: 0x000000000000000000000000000000000003
+      // tokenIds: [10]
+      // amounts: [20]
+      const data =
+        "0xf242432a00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000";
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const params = client.decoding.withdrawAction(
+        ADDRESS_ONE,
+        BigInt(0),
+        hexToBytes(data),
+      );
+      if (params.type === TokenType.ERC1155) {
+        expect(params.type).toBe(TokenType.ERC1155);
+        expect(params.tokenIds.toString()).toBe([BigInt(10)].toString());
+        expect(params.amounts.toString()).toBe([BigInt(20)].toString());
+        expect(params.daoAddressOrEns).toBe(
+          ADDRESS_THREE,
         );
-        if (params.type === TokenType.ERC1155) {
-          expect(params.type).toBe(TokenType.ERC1155);
-          expect(params.tokenIds.toString()).toBe([BigInt(10)].toString());
-          expect(params.amounts.toString()).toBe([BigInt(20)].toString());
-          expect(params.daoAddressOrEns).toBe(
-            ADDRESS_THREE,
-          )
-          expect(params.recipientAddressOrEns).toBe(
-            ADDRESS_TWO,
-          );
-          expect(params.tokenAddress).toBe(
-            ADDRESS_ONE,
-          );
-        } else {
-          fail("TokenType should be ERC1155");
-        }
+        expect(params.recipientAddressOrEns).toBe(
+          ADDRESS_TWO,
+        );
+        expect(params.tokenAddress).toBe(
+          ADDRESS_ONE,
+        );
+      } else {
+        fail("TokenType should be ERC1155");
+      }
     });
 
     it("Should decode an encoded update metadata action", async () => {
@@ -638,6 +639,7 @@ describe("Client", () => {
         );
       }
     });
+
     it("Should decode an apply installation action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
@@ -710,6 +712,83 @@ describe("Client", () => {
             .permissionId,
         ).toBe(
           decodedApplyInstallationParams.permissions[index]
+            .permissionId,
+        );
+      }
+    });
+    it("Should decode an apply update action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const applyUpdateParams: ApplyUpdateParams = {
+        helpers: [
+          "0x1234567890123456789012345678901234567890",
+          "0x2345678901234567890123456789012345678901",
+          "0x3456789012345678901234567890123456789012",
+          "0x4567890123456789012345678901234567890123",
+          "0x5678901234567890123456789012345678901234",
+        ],
+        initData: new Uint8Array([0, 1, 2, 3]),
+        permissions: [{
+          condition: "0x1234567890123456789012345678901234567890",
+          operation: 1,
+          permissionId: PermissionIds.EXECUTE_PERMISSION_ID,
+          where: "0x1234567890123456789012345678901234567890",
+          who: "0x2345678901234567890123456789012345678901",
+        }],
+        versionTag: {
+          build: 1,
+          release: 1,
+        },
+        pluginRepo: "0x2345678901234567890123456789012345678901",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
+      };
+      const actions = client.encoding.applyUpdateAction(
+        "0x1234567890123456789012345678901234567890",
+        applyUpdateParams,
+      );
+      expect(actions.length).toBe(3);
+      const decodedApplyUpdateParams = client.decoding
+        .applyUpdateAction(
+          actions[1].data,
+        );
+      expect(applyUpdateParams.versionTag.build).toBe(
+        decodedApplyUpdateParams.versionTag.build,
+      );
+      expect(applyUpdateParams.versionTag.release).toBe(
+        decodedApplyUpdateParams.versionTag.release,
+      );
+      expect(applyUpdateParams.pluginAddress).toBe(
+        decodedApplyUpdateParams.pluginAddress,
+      );
+      expect(applyUpdateParams.pluginRepo).toBe(
+        decodedApplyUpdateParams.pluginRepo,
+      );
+      expect(keccak256(
+        defaultAbiCoder.encode(["address[]"], [
+          applyUpdateParams.helpers,
+        ]),
+      )).toBe(
+        decodedApplyUpdateParams.helpersHash,
+      );
+      for (const index in applyUpdateParams.permissions) {
+        expect(applyUpdateParams.permissions[index].condition).toBe(
+          decodedApplyUpdateParams.permissions[index].condition,
+        );
+        expect(applyUpdateParams.permissions[index].operation).toBe(
+          decodedApplyUpdateParams.permissions[index].operation,
+        );
+        expect(applyUpdateParams.permissions[index].who).toBe(
+          decodedApplyUpdateParams.permissions[index].who,
+        );
+        expect(applyUpdateParams.permissions[index].where).toBe(
+          decodedApplyUpdateParams.permissions[index].where,
+        );
+        expect(
+          applyUpdateParams.permissions[index]
+            .permissionId,
+        ).toBe(
+          decodedApplyUpdateParams.permissions[index]
             .permissionId,
         );
       }
