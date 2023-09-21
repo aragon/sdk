@@ -18,13 +18,14 @@ import {
 import {
   applyInstallatonParamsFromContract,
   applyUpdateParamsFromContract,
+  decodeInitializeFromAction,
+  decodeUpgradeToAndCallAction,
   permissionParamsFromContract,
   permissionParamsWitConditionFromContract,
   withdrawParamsFromContract,
 } from "../utils";
 import {
   bytesToHex,
-  hexToBytes,
   InvalidActionError,
   IpfsError,
   resolveIpfsCid,
@@ -317,16 +318,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public upgradeToAndCallAction(
     data: Uint8Array,
   ): UpgradeToAndCallParams {
-    const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data);
-    const expectedFunction = daoInterface.getFunction(
-      "upgradeToAndCall",
-    );
-    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
-    return {
-      implementationAddress: result[0],
-      data: hexToBytes(result[1]),
-    };
+    return decodeUpgradeToAndCallAction(data);
   }
 
   /**
@@ -337,16 +329,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public initializeFromAction(data: Uint8Array): InitializeFromParams {
-    const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data);
-    const expectedFunction = daoInterface.getFunction(
-      "initializeFrom",
-    );
-    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
-    return {
-      previousVersion: result[0],
-      initData: hexToBytes(result[1]),
-    };
+    return decodeInitializeFromAction(data);
   }
 
   /**

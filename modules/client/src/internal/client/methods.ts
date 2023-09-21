@@ -11,13 +11,16 @@ import {
   AmountMismatchError,
   DaoCreationError,
   FailedDepositError,
+  hexToBytes,
   InstallationNotFoundError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidEnsError,
   InvalidParameter,
+  InvalidProposalIdError,
   IpfsPinError,
+  isProposalId,
   MissingExecPermissionError,
   NoProviderError,
   NotImplementedError,
@@ -39,6 +42,7 @@ import {
   QueryDao,
   QueryDaos,
   QueryIPlugin,
+  QueryIProposal,
   QueryPlugin,
   QueryPlugins,
   QueryTokenBalances,
@@ -85,6 +89,7 @@ import {
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
+  SubgraphIProposal,
   SubgraphPluginInstallation,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
@@ -92,6 +97,8 @@ import {
   SubgraphTransferTypeMap,
 } from "../types";
 import {
+  decodeInitializeFromAction,
+  decodeUpgradeToAndCallAction,
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
@@ -1074,5 +1081,31 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       version = [1, 0, 0];
     }
     return version;
+  }
+
+  public async isDaoUpdateProposalValid(proposalId: string): Promise<boolean> {
+    if (!isProposalId(proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+    const name = "IProposal";
+    const query = QueryIProposal;
+    type T = { iproposal: SubgraphIProposal };
+    const { iproposal } = await this.graphql.request<T>({
+      query,
+      params: { id: proposalId.toLowerCase() },
+      name,
+    });
+    if (!iproposal) {
+      throw new ProposalNotFoundError();
+    }
+    if (iproposal.actions.length === 1) {
+      const action = iproposal.actions[0];
+      const upgradeToAdCallParams = decodeUpgradeToAndCallAction(
+        hexToBytes(action.data),
+      );
+      const decodedInitializeFromParams = decodeInitializeFromAction(
+        upgradeToAdCallParams.data,
+      );
+    }
   }
 }

@@ -12,6 +12,7 @@ import {
   GrantPermissionParams,
   GrantPermissionWithConditionDecodedParams,
   GrantPermissionWithConditionParams,
+  InitializeFromParams,
   InstalledPluginListItem,
   PluginRepo,
   PluginRepoBuildMetadata,
@@ -22,6 +23,7 @@ import {
   RevokePermissionParams,
   Transfer,
   TransferType,
+  UpgradeToAndCallParams,
   WithdrawParams,
 } from "../types";
 import {
@@ -59,6 +61,8 @@ import {
   TokenType,
 } from "@aragon/sdk-client-common";
 import {
+  bytesToHex,
+  hexToBytes,
   InvalidParameter,
   NotImplementedError,
   SizeMismatchError,
@@ -643,4 +647,34 @@ export async function estimateErc1155Deposit(
       );
   }
   return estimation;
+}
+
+export function decodeUpgradeToAndCallAction(
+  data: Uint8Array,
+): UpgradeToAndCallParams {
+  const daoInterface = DAO__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = daoInterface.getFunction(
+    "upgradeToAndCall",
+  );
+  const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return {
+    implementationAddress: result[0],
+    data: hexToBytes(result[1]),
+  };
+}
+
+export function decodeInitializeFromAction(
+  data: Uint8Array,
+): InitializeFromParams {
+  const daoInterface = DAO__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = daoInterface.getFunction(
+    "initializeFrom",
+  );
+  const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return {
+    previousVersion: result[0],
+    initData: hexToBytes(result[1]),
+  };
 }

@@ -89,6 +89,10 @@ export interface IClientMethods {
   getProtocolVersion: (
     contractAddress: string,
   ) => Promise<[number, number, number]>;
+  
+  isDaoUpdateProposalValid: (
+    proposalId: string,
+  ) => Promise<boolean>;
 }
 
 export interface IClientEncoding {
