@@ -1138,7 +1138,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         ) {
           res.implementation = true;
         }
-        // initData is valid if it is empty becuse the new implementation doees not need more parameters
+        // initData is valid if it is empty becuse the new implementation of protocol version 1.3.0 does not need more parameters
         if (decodedInitializeFromParams.initData?.length === 0) {
           res.initData = true;
         }
