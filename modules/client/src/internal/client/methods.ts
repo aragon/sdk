@@ -1131,7 +1131,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         ) {
           res.version = true;
         }
-        // check if the implementation matches the latest daoFactoryAddress
+        // check if the implementation matches the implementation in the latest daoFactoryAddress
         if (
           this.web3.getAddress("daoFactoryAddress") ===
             upgradeToAdCallParams.implementationAddress
