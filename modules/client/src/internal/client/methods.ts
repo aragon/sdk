@@ -1113,11 +1113,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (iproposal.actions.length === 1) {
       const action = iproposal.actions[0];
       try {
-        const upgradeToAdCallParams = decodeUpgradeToAndCallAction(
+        const upgradeToAndCallParams = decodeUpgradeToAndCallAction(
           hexToBytes(action.data),
         );
         const decodedInitializeFromParams = decodeInitializeFromAction(
-          upgradeToAdCallParams.data,
+          upgradeToAndCallParams.data,
         );
         // action is decoded that mean the actions are valid
         res.actions = true
@@ -1134,7 +1134,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         // check if the implementation matches the implementation in the latest daoFactoryAddress
         if (
           this.web3.getAddress("daoFactoryAddress") ===
-            upgradeToAdCallParams.implementationAddress
+            upgradeToAndCallParams.implementationAddress
         ) {
           res.implementation = true;
         }
