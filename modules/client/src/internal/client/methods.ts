@@ -1119,7 +1119,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         const decodedInitializeFromParams = decodeInitializeFromAction(
           upgradeToAdCallParams.data,
         );
-        // action is decoded son the actions are valid
+        // action is decoded that mean the actions are valid
         res.actions = true
         const currentDaoVersion = await this.getProtocolVersion(
           iproposal.dao.id,
