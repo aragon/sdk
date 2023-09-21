@@ -422,3 +422,10 @@ export type InitializeFromParams = {
   previousVersion: [number, number, number];
   initData?: Uint8Array;
 };
+
+export type DaoUpdateProposalValidity = {
+  version: boolean
+  implementation: boolean
+  initData: boolean
+  actions: boolean
+}

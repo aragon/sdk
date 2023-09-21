@@ -23,6 +23,7 @@ import {
   DaoListItem,
   DaoMetadata,
   DaoQueryParams,
+  DaoUpdateProposalValidity,
   DecodedApplyUninstallationParams,
   DepositParams,
   GrantPermissionDecodedParams,
@@ -89,10 +90,10 @@ export interface IClientMethods {
   getProtocolVersion: (
     contractAddress: string,
   ) => Promise<[number, number, number]>;
-  
+
   isDaoUpdateProposalValid: (
     proposalId: string,
-  ) => Promise<boolean>;
+  ) => Promise<DaoUpdateProposalValidity>;
 }
 
 export interface IClientEncoding {

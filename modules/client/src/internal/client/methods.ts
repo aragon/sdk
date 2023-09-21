@@ -26,6 +26,7 @@ import {
   NotImplementedError,
   PluginUninstallationPreparationError,
   promiseWithTimeout,
+  ProposalNotFoundError,
   resolveIpfsCid,
   SizeMismatchError,
   UpdateAllowanceError,
@@ -62,6 +63,7 @@ import {
   DaoMetadata,
   DaoQueryParams,
   DaoSortBy,
+  DaoUpdateProposalValidity,
   DepositErc1155Params,
   DepositErc20Params,
   DepositErc721Params,
@@ -1083,10 +1085,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return version;
   }
 
-  public async isDaoUpdateProposalValid(proposalId: string): Promise<boolean> {
+  public async isDaoUpdateProposalValid(
+    proposalId: string,
+  ): Promise<DaoUpdateProposalValidity> {
     if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
+    // search for the proposal
     const name = "IProposal";
     const query = QueryIProposal;
     type T = { iproposal: SubgraphIProposal };
@@ -1098,14 +1103,50 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!iproposal) {
       throw new ProposalNotFoundError();
     }
+    const res: DaoUpdateProposalValidity = {
+      version: false,
+      implementation: false,
+      initData: false,
+      actions: false,
+    };
+    // check if the proposal has only one action for upgrading the dao
     if (iproposal.actions.length === 1) {
       const action = iproposal.actions[0];
-      const upgradeToAdCallParams = decodeUpgradeToAndCallAction(
-        hexToBytes(action.data),
-      );
-      const decodedInitializeFromParams = decodeInitializeFromAction(
-        upgradeToAdCallParams.data,
-      );
+      try {
+        const upgradeToAdCallParams = decodeUpgradeToAndCallAction(
+          hexToBytes(action.data),
+        );
+        const decodedInitializeFromParams = decodeInitializeFromAction(
+          upgradeToAdCallParams.data,
+        );
+        // action is decoded son the actions are valid
+        res.actions = true
+        const currentDaoVersion = await this.getProtocolVersion(
+          iproposal.dao.id,
+        );
+        // check if the version of the specified dao matches the version in the encoded data
+        if (
+          JSON.stringify(currentDaoVersion) ===
+            JSON.stringify(decodedInitializeFromParams.previousVersion)
+        ) {
+          res.version = true;
+        }
+        // check if the implementation matches the latest daoFactoryAddress
+        if (
+          this.web3.getAddress("daoFactoryAddress") ===
+            upgradeToAdCallParams.implementationAddress
+        ) {
+          res.implementation = true;
+        }
+        // initData is valid if it is empty becuse the new implementation doees not need more parameters
+        if (decodedInitializeFromParams.initData?.length === 0) {
+          res.initData = true;
+        }
+      } catch {
+        // if any of the above fails, the proposal is invalid
+        return res;
+      }
     }
+    return res;
   }
 }
