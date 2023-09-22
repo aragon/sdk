@@ -300,7 +300,7 @@ type Erc1155TokenTransfer = TokenTransferBase & {
   tokenId: bigint;
   token: {
     address: string;
-  }
+  };
   amount: bigint;
 };
 
@@ -424,8 +424,13 @@ export type InitializeFromParams = {
 };
 
 export type DaoUpdateProposalValidity = {
-  version: boolean
-  implementation: boolean
-  initData: boolean
-  actions: boolean
+  isValid: boolean;
+  causes: DaoUpdateProposalValidityCause[];
+};
+
+export enum DaoUpdateProposalValidityCause {
+  INVALID_IMPLEMENTATION = "invalidImplementation",
+  INVALID_VERSION = "invalidVersion",
+  INVALID_INIT_DATA = "invalidInitData",
+  INVALID_ACTION = "invalidAction",
 }

@@ -46,6 +46,7 @@ import {
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../types";
+import { IsDaoUpdateProposalValidParams } from "./types";
 
 /** Defines the shape of the general purpose Client class */
 export interface IClientMethods {
@@ -79,7 +80,7 @@ export interface IClientMethods {
   prepareUninstallation: (
     params: PrepareUninstallationParams,
   ) => AsyncGenerator<PrepareUninstallationStepValue>;
-  /** Prepare uninstallation of a plugin */
+  /** Prepare installation of a plugin */
   prepareInstallation: (
     params: PrepareInstallationParams,
   ) => AsyncGenerator<PrepareInstallationStepValue>;
@@ -92,7 +93,7 @@ export interface IClientMethods {
   ) => Promise<[number, number, number]>;
 
   isDaoUpdateProposalValid: (
-    proposalId: string,
+    params: IsDaoUpdateProposalValidParams,
   ) => Promise<DaoUpdateProposalValidity>;
 }
 

@@ -40,6 +40,15 @@ export enum SupportedNetwork {
 
 export const SupportedNetworksArray = Object.values(SupportedNetwork);
 
+
+export enum SupportedVersion {
+  V1_0_0 = "v1.0.0",
+  V1_3_0 = "v1.3.0",
+  LATEST = "v1.3.0",
+}
+
+export const SupportedVersionsArray = Object.values(SupportedVersion);
+
 /**
  * Contains the payload passed to the global DAO factory so that
  * plugins can be initialized

@@ -1,5 +1,6 @@
 import { activeContractsList } from "@aragon/osx-ethers";
-import { ProposalMetadata, SupportedNetwork } from "./types";
+import { activeContractsList as activeContractsListV1_0_0 } from "@aragon/osx-ethers-v1.0.0";
+import { ProposalMetadata, SupportedNetwork, SupportedVersion } from "./types";
 import { NetworkDeployment } from "./internal";
 import { Network } from "@ethersproject/networks";
 
@@ -103,115 +104,223 @@ export const IPFS_NODES: {
   [SupportedNetwork.LOCAL]: IPFS_ENDPOINTS.test,
 };
 
-export const LIVE_CONTRACTS: { [K in SupportedNetwork]: NetworkDeployment } = {
-  [SupportedNetwork.MAINNET]: {
-    daoFactoryAddress: activeContractsList.mainnet.DAOFactory,
-    pluginSetupProcessorAddress: activeContractsList.mainnet.PluginRepoFactory,
-    multisigRepoAddress: activeContractsList.mainnet["multisig-repo"],
-    adminRepoAddress: activeContractsList.mainnet["admin-repo"],
-    addresslistVotingRepoAddress:
-      activeContractsList.mainnet["address-list-voting-repo"],
-    tokenVotingRepoAddress: activeContractsList.mainnet["token-voting-repo"],
-    multisigSetupAddress: activeContractsList.mainnet.MultisigSetup,
-    adminSetupAddress: activeContractsList.mainnet.AdminSetup,
-    addresslistVotingSetupAddress:
-      activeContractsList.mainnet.AddresslistVotingSetup,
-    tokenVotingSetupAddress: activeContractsList.mainnet.TokenVotingSetup,
+export const LIVE_CONTRACTS: {
+  [J in SupportedVersion]: { [K in SupportedNetwork]: NetworkDeployment };
+} = {
+  [SupportedVersion.V1_0_0]: {
+    [SupportedNetwork.MAINNET]: {
+      daoFactoryAddress: activeContractsListV1_0_0.mainnet.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsListV1_0_0.mainnet.PluginRepoFactory,
+      multisigRepoAddress: activeContractsListV1_0_0.mainnet["multisig-repo"],
+      adminRepoAddress: activeContractsListV1_0_0.mainnet["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsListV1_0_0.mainnet["address-list-voting-repo"],
+      tokenVotingRepoAddress:
+        activeContractsListV1_0_0.mainnet["token-voting-repo"],
+      multisigSetupAddress: activeContractsListV1_0_0.mainnet.MultisigSetup,
+      adminSetupAddress: activeContractsListV1_0_0.mainnet.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsListV1_0_0.mainnet.AddresslistVotingSetup,
+      tokenVotingSetupAddress:
+        activeContractsListV1_0_0.mainnet.TokenVotingSetup,
+    },
+    [SupportedNetwork.GOERLI]: {
+      daoFactoryAddress: activeContractsListV1_0_0.goerli.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsListV1_0_0.goerli.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsListV1_0_0.goerli["multisig-repo"],
+      adminRepoAddress: activeContractsListV1_0_0.goerli["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsListV1_0_0.goerli["address-list-voting-repo"],
+      tokenVotingRepoAddress:
+        activeContractsListV1_0_0.goerli["token-voting-repo"],
+      multisigSetupAddress: activeContractsListV1_0_0.goerli.MultisigSetup,
+      adminSetupAddress: activeContractsListV1_0_0.goerli.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsListV1_0_0.goerli.AddresslistVotingSetup,
+      tokenVotingSetupAddress:
+        activeContractsListV1_0_0.goerli.TokenVotingSetup,
+    },
+    [SupportedNetwork.POLYGON]: {
+      daoFactoryAddress: activeContractsListV1_0_0.polygon.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsListV1_0_0.polygon.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsListV1_0_0.polygon["multisig-repo"],
+      adminRepoAddress: activeContractsListV1_0_0.polygon["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsListV1_0_0.polygon["address-list-voting-repo"],
+      tokenVotingRepoAddress:
+        activeContractsListV1_0_0.polygon["token-voting-repo"],
+      multisigSetupAddress: activeContractsListV1_0_0.polygon.MultisigSetup,
+      adminSetupAddress: activeContractsListV1_0_0.polygon.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsListV1_0_0.polygon.AddresslistVotingSetup,
+      tokenVotingSetupAddress:
+        activeContractsListV1_0_0.polygon.TokenVotingSetup,
+    },
+    [SupportedNetwork.MUMBAI]: {
+      daoFactoryAddress: activeContractsListV1_0_0.mumbai.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsListV1_0_0.mumbai.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsListV1_0_0.mumbai["multisig-repo"],
+      adminRepoAddress: activeContractsListV1_0_0.mumbai["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsListV1_0_0.mumbai["address-list-voting-repo"],
+      tokenVotingRepoAddress:
+        activeContractsListV1_0_0.mumbai["token-voting-repo"],
+      multisigSetupAddress: activeContractsListV1_0_0.mumbai.MultisigSetup,
+      adminSetupAddress: activeContractsListV1_0_0.mumbai.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsListV1_0_0.mumbai.AddresslistVotingSetup,
+      tokenVotingSetupAddress:
+        activeContractsListV1_0_0.mumbai.TokenVotingSetup,
+    },
+    [SupportedNetwork.BASE]: {
+      daoFactoryAddress: "",
+      pluginSetupProcessorAddress: "",
+      multisigRepoAddress: "",
+      adminRepoAddress: "",
+      addresslistVotingRepoAddress: "",
+      tokenVotingRepoAddress: "",
+      multisigSetupAddress: "",
+      adminSetupAddress: "",
+      addresslistVotingSetupAddress: "",
+      tokenVotingSetupAddress: "",
+    },
+    [SupportedNetwork.BASE_GOERLI]: {
+      daoFactoryAddress: "",
+      pluginSetupProcessorAddress: "",
+      multisigRepoAddress: "",
+      adminRepoAddress: "",
+      addresslistVotingRepoAddress: "",
+      tokenVotingRepoAddress: "",
+      multisigSetupAddress: "",
+      adminSetupAddress: "",
+      addresslistVotingSetupAddress: "",
+      tokenVotingSetupAddress: "",
+    },
+    [SupportedNetwork.LOCAL]: {
+      daoFactoryAddress: "",
+      pluginSetupProcessorAddress: "",
+      multisigRepoAddress: "",
+      adminRepoAddress: "",
+      addresslistVotingRepoAddress: "",
+      tokenVotingRepoAddress: "",
+      multisigSetupAddress: "",
+      adminSetupAddress: "",
+      addresslistVotingSetupAddress: "",
+      tokenVotingSetupAddress: "",
+    },
   },
-  [SupportedNetwork.GOERLI]: {
-    daoFactoryAddress: activeContractsList.goerli.DAOFactory,
-    pluginSetupProcessorAddress:
-      activeContractsList.goerli.PluginSetupProcessor,
-    multisigRepoAddress: activeContractsList.goerli["multisig-repo"],
-    adminRepoAddress: activeContractsList.goerli["admin-repo"],
-    addresslistVotingRepoAddress:
-      activeContractsList.goerli["address-list-voting-repo"],
-    tokenVotingRepoAddress: activeContractsList.goerli["token-voting-repo"],
-    multisigSetupAddress: activeContractsList.goerli.MultisigSetup,
-    adminSetupAddress: activeContractsList.goerli.AdminSetup,
-    addresslistVotingSetupAddress:
-      activeContractsList.goerli.AddresslistVotingSetup,
-    tokenVotingSetupAddress: activeContractsList.goerli.TokenVotingSetup,
-  },
-  [SupportedNetwork.MUMBAI]: {
-    daoFactoryAddress: activeContractsList.mumbai.DAOFactory,
-    pluginSetupProcessorAddress:
-      activeContractsList.mumbai.PluginSetupProcessor,
-    multisigRepoAddress: activeContractsList.mumbai["multisig-repo"],
-    adminRepoAddress: activeContractsList.mumbai["admin-repo"],
-    addresslistVotingRepoAddress:
-      activeContractsList.mumbai["address-list-voting-repo"],
-    tokenVotingRepoAddress: activeContractsList.mumbai["token-voting-repo"],
-    multisigSetupAddress: activeContractsList.mumbai.MultisigSetup,
-    adminSetupAddress: activeContractsList.mumbai.AdminSetup,
-    addresslistVotingSetupAddress:
-      activeContractsList.mumbai.AddresslistVotingSetup,
-    tokenVotingSetupAddress: activeContractsList.mumbai.TokenVotingSetup,
-    ensRegistryAddress: activeContractsList.mumbai.ENSRegistry,
-  },
-  [SupportedNetwork.POLYGON]: {
-    daoFactoryAddress: activeContractsList.polygon.DAOFactory,
-    pluginSetupProcessorAddress:
-      activeContractsList.polygon.PluginSetupProcessor,
-    multisigRepoAddress: activeContractsList.polygon["multisig-repo"],
-    adminRepoAddress: activeContractsList.polygon["admin-repo"],
-    addresslistVotingRepoAddress:
-      activeContractsList.polygon["address-list-voting-repo"],
-    tokenVotingRepoAddress: activeContractsList.polygon["token-voting-repo"],
-    multisigSetupAddress: activeContractsList.polygon.MultisigSetup,
-    adminSetupAddress: activeContractsList.polygon.AdminSetup,
-    addresslistVotingSetupAddress:
-      activeContractsList.polygon.AddresslistVotingSetup,
-    tokenVotingSetupAddress: activeContractsList.polygon.TokenVotingSetup,
-    ensRegistryAddress: activeContractsList.polygon.ENSRegistry,
-  },
-  [SupportedNetwork.BASE]: {
-    daoFactoryAddress: activeContractsList.baseMainnet.DAOFactory,
-    pluginSetupProcessorAddress:
-      activeContractsList.baseMainnet.PluginSetupProcessor,
-    multisigRepoAddress: activeContractsList.baseMainnet["multisig-repo"],
-    adminRepoAddress: activeContractsList.baseMainnet["admin-repo"],
-    addresslistVotingRepoAddress:
-      activeContractsList.baseMainnet["address-list-voting-repo"],
-    tokenVotingRepoAddress:
-      activeContractsList.baseMainnet["token-voting-repo"],
-    multisigSetupAddress: activeContractsList.baseMainnet.MultisigSetup,
-    adminSetupAddress: activeContractsList.baseMainnet.AdminSetup,
-    addresslistVotingSetupAddress:
-      activeContractsList.baseMainnet.AddresslistVotingSetup,
-    tokenVotingSetupAddress: activeContractsList.baseMainnet.TokenVotingSetup,
-    ensRegistryAddress: activeContractsList.baseMainnet.ENSRegistry,
-  },
-  [SupportedNetwork.BASE_GOERLI]: {
-    daoFactoryAddress: activeContractsList.baseGoerli.DAOFactory,
-    pluginSetupProcessorAddress:
-      activeContractsList.baseGoerli.PluginSetupProcessor,
-    multisigRepoAddress: activeContractsList.baseGoerli["multisig-repo"],
-    adminRepoAddress: activeContractsList.baseGoerli["admin-repo"],
-    addresslistVotingRepoAddress:
-      activeContractsList.baseGoerli["address-list-voting-repo"],
-    tokenVotingRepoAddress: activeContractsList.baseGoerli["token-voting-repo"],
-    multisigSetupAddress: activeContractsList.baseGoerli.MultisigSetup,
-    adminSetupAddress: activeContractsList.baseGoerli.AdminSetup,
-    addresslistVotingSetupAddress:
-      activeContractsList.baseGoerli.AddresslistVotingSetup,
-    tokenVotingSetupAddress: activeContractsList.baseGoerli.TokenVotingSetup,
-    ensRegistryAddress: activeContractsList.baseGoerli.ENSRegistry,
-  },
-  [SupportedNetwork.LOCAL]: {
-    daoFactoryAddress: "",
-    pluginSetupProcessorAddress: "",
-    multisigRepoAddress: "",
-    adminRepoAddress: "",
-    addresslistVotingRepoAddress: "",
-    tokenVotingRepoAddress: "",
-    multisigSetupAddress: "",
-    adminSetupAddress: "",
-    addresslistVotingSetupAddress: "",
-    tokenVotingSetupAddress: "",
-    ensRegistryAddress: "",
+  [SupportedVersion.V1_3_0]: {
+    [SupportedNetwork.MAINNET]: {
+      daoFactoryAddress: activeContractsList.mainnet.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsList.mainnet.PluginRepoFactory,
+      multisigRepoAddress: activeContractsList.mainnet["multisig-repo"],
+      adminRepoAddress: activeContractsList.mainnet["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsList.mainnet["address-list-voting-repo"],
+      tokenVotingRepoAddress: activeContractsList.mainnet["token-voting-repo"],
+      multisigSetupAddress: activeContractsList.mainnet.MultisigSetup,
+      adminSetupAddress: activeContractsList.mainnet.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsList.mainnet.AddresslistVotingSetup,
+      tokenVotingSetupAddress: activeContractsList.mainnet.TokenVotingSetup,
+    },
+    [SupportedNetwork.GOERLI]: {
+      daoFactoryAddress: activeContractsList.goerli.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsList.goerli.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsList.goerli["multisig-repo"],
+      adminRepoAddress: activeContractsList.goerli["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsList.goerli["address-list-voting-repo"],
+      tokenVotingRepoAddress: activeContractsList.goerli["token-voting-repo"],
+      multisigSetupAddress: activeContractsList.goerli.MultisigSetup,
+      adminSetupAddress: activeContractsList.goerli.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsList.goerli.AddresslistVotingSetup,
+      tokenVotingSetupAddress: activeContractsList.goerli.TokenVotingSetup,
+    },
+    [SupportedNetwork.POLYGON]: {
+      daoFactoryAddress: activeContractsList.polygon.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsList.polygon.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsList.polygon["multisig-repo"],
+      adminRepoAddress: activeContractsList.polygon["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsList.polygon["address-list-voting-repo"],
+      tokenVotingRepoAddress: activeContractsList.polygon["token-voting-repo"],
+      multisigSetupAddress: activeContractsList.polygon.MultisigSetup,
+      adminSetupAddress: activeContractsList.polygon.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsList.polygon.AddresslistVotingSetup,
+      tokenVotingSetupAddress: activeContractsList.polygon.TokenVotingSetup,
+    },
+    [SupportedNetwork.MUMBAI]: {
+      daoFactoryAddress: activeContractsList.mumbai.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsList.mumbai.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsList.mumbai["multisig-repo"],
+      adminRepoAddress: activeContractsList.mumbai["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsList.mumbai["address-list-voting-repo"],
+      tokenVotingRepoAddress: activeContractsList.mumbai["token-voting-repo"],
+      multisigSetupAddress: activeContractsList.mumbai.MultisigSetup,
+      adminSetupAddress: activeContractsList.mumbai.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsList.mumbai.AddresslistVotingSetup,
+      tokenVotingSetupAddress: activeContractsList.mumbai.TokenVotingSetup,
+    },
+    [SupportedNetwork.BASE]: {
+      daoFactoryAddress: activeContractsList.baseMainnet.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsList.baseMainnet.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsList.baseMainnet["multisig-repo"],
+      adminRepoAddress: activeContractsList.baseMainnet["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsList.baseMainnet["address-list-voting-repo"],
+      tokenVotingRepoAddress:
+        activeContractsList.baseMainnet["token-voting-repo"],
+      multisigSetupAddress: activeContractsList.baseMainnet.MultisigSetup,
+      adminSetupAddress: activeContractsList.baseMainnet.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsList.baseMainnet.AddresslistVotingSetup,
+      tokenVotingSetupAddress: activeContractsList.baseMainnet.TokenVotingSetup,
+    },
+    [SupportedNetwork.BASE_GOERLI]: {
+      daoFactoryAddress: activeContractsList.baseGoerli.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsList.baseGoerli.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsList.baseGoerli["multisig-repo"],
+      adminRepoAddress: activeContractsList.baseGoerli["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsList.baseGoerli["address-list-voting-repo"],
+      tokenVotingRepoAddress:
+        activeContractsList.baseGoerli["token-voting-repo"],
+      multisigSetupAddress: activeContractsList.baseGoerli.MultisigSetup,
+      adminSetupAddress: activeContractsList.baseGoerli.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsList.baseGoerli.AddresslistVotingSetup,
+      tokenVotingSetupAddress: activeContractsList.baseGoerli.TokenVotingSetup,
+    },
+    [SupportedNetwork.LOCAL]: {
+      daoFactoryAddress: "",
+      pluginSetupProcessorAddress: "",
+      multisigRepoAddress: "",
+      adminRepoAddress: "",
+      addresslistVotingRepoAddress: "",
+      tokenVotingRepoAddress: "",
+      multisigSetupAddress: "",
+      adminSetupAddress: "",
+      addresslistVotingSetupAddress: "",
+      tokenVotingSetupAddress: "",
+    },
   },
 };
+
 export const ADDITIONAL_NETWORKS: Network[] = [
   {
     name: "baseGoerli",

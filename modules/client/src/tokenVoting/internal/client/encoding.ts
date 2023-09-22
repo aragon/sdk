@@ -26,6 +26,7 @@ import {
   PluginInstallItem,
   SupportedNetwork,
   SupportedNetworksArray,
+  SupportedVersion,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
 
@@ -57,7 +58,8 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      id: LIVE_CONTRACTS[networkName].tokenVotingRepoAddress,
+      id: LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
+        .tokenVotingRepoAddress,
       data: hexToBytes(hexBytes),
     };
   }

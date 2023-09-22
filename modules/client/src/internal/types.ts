@@ -200,4 +200,9 @@ export type SubgraphIProposal = {
     id: string;
   };
   actions: SubgraphAction[];
-}
+};
+
+export type IsDaoUpdateProposalValidParams = {
+  proposalId: string;
+  version?: [number, number, number];
+};
