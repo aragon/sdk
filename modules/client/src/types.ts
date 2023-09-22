@@ -425,10 +425,10 @@ export type InitializeFromParams = {
 
 export type DaoUpdateProposalValidity = {
   isValid: boolean;
-  causes: DaoUpdateProposalValidityCause[];
+  causes: DaoUpdateProposalInvalidityCause[];
 };
 
-export enum DaoUpdateProposalValidityCause {
+export enum DaoUpdateProposalInvalidityCause {
   INVALID_IMPLEMENTATION = "invalidImplementation",
   INVALID_VERSION = "invalidVersion",
   INVALID_INIT_DATA = "invalidInitData",

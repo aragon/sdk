@@ -64,7 +64,7 @@ import {
   DaoQueryParams,
   DaoSortBy,
   DaoUpdateProposalValidity,
-  DaoUpdateProposalValidityCause,
+  DaoUpdateProposalInvalidityCause,
   DepositErc1155Params,
   DepositErc20Params,
   DepositErc721Params,
@@ -1119,7 +1119,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!iproposal) {
       throw new ProposalNotFoundError();
     }
-    const causes: DaoUpdateProposalValidityCause[] = [];
+    const causes: DaoUpdateProposalInvalidityCause[] = [];
     // Check if any action try to upgrade the dao
     for (const [index, action] of iproposal.actions.entries()) {
       let decodedUpgradeToAndCallParams: UpgradeToAndCallParams;
@@ -1132,8 +1132,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           decodedUpgradeToAndCallParams.data,
         );
       } catch {
+        // If it is the last action and it is not an upgrade to and call
+        // then it is invalid
         if (index === iproposal.actions.length - 1) {
-          causes.push(DaoUpdateProposalValidityCause.INVALID_ACTION);
+          causes.push(DaoUpdateProposalInvalidityCause.INVALID_ACTION);
           return { isValid: false, causes };
         }
         continue;
@@ -1145,7 +1147,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           daoAddress: iproposal.dao.id,
         })
       ) {
-        causes.push(DaoUpdateProposalValidityCause.INVALID_VERSION);
+        causes.push(DaoUpdateProposalInvalidityCause.INVALID_VERSION);
       }
       // check implementation
       if (
@@ -1155,7 +1157,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
             decodedUpgradeToAndCallParams.implementationAddress,
         })
       ) {
-        causes.push(DaoUpdateProposalValidityCause.INVALID_VERSION);
+        causes.push(DaoUpdateProposalInvalidityCause.INVALID_VERSION);
       }
       // check data
       if (
@@ -1164,7 +1166,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
           data: decodedInitializeFromParams.initData || new Uint8Array(),
         })
       ) {
-        causes.push(DaoUpdateProposalValidityCause.INVALID_INIT_DATA);
+        causes.push(DaoUpdateProposalInvalidityCause.INVALID_INIT_DATA);
       }
       // the action was valid so we stop looping
       break;
@@ -1178,7 +1180,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       daoAddress: string;
     },
   ): Promise<boolean> {
+    // get the current version of the dao, so the result should not be the upgraded value
     const currentDaoVersion = await this.getProtocolVersion(daoAddress);
+    // The currentDAo version should be equal to the previous version
+    // because it references the version that the dao will be upgraded from
+    // ex: if we want to upgrade from version 1.0.0 to 1.3.0
+    // the previous version should be 1.0.0 and so should be the current dao version
     return JSON.stringify(currentDaoVersion) ===
       JSON.stringify(previousVersion);
   }
@@ -1190,6 +1197,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     },
   ): Promise<boolean> {
     const networkName = this.web3.getNetworkName();
+    // The dao factory address holds the implementation address for each version
+    // so we can check that the specified implementation address is the same
+    // as the one from the dao factory
     const daoFactoryAddress =
       LIVE_CONTRACTS[version][networkName].daoFactoryAddress;
     const daoFactoryImplementation = DAOFactory__factory.connect(
