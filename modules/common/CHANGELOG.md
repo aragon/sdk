@@ -21,7 +21,7 @@ TEMPLATE:
 
 ### Added
 
-- New error classes `InvalidVersionError`. `PluginUpdatePreparationError` and `ProposalNotFoundError`
+- New error classes `InvalidVersionError`, `PluginUpdatePreparationError`, and `ProposalNotFoundError`
 ## 1.6.0
 
 ### Added
