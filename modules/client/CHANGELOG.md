@@ -22,7 +22,7 @@ TEMPLATE:
 ### Added
 
 - Add prepareUpdate function to all clients
-- Addd check for dao update proposal
+- Add check for dao update proposal
 
 ### Changed
 
