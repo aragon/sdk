@@ -1108,7 +1108,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         this.web3.getAddress("daoFactoryAddress"),
       );
     }
-    // convert version to string using the fromat from SupportedVersion (vX.X.X)
+// convert version to string using the fromat from SupportedVersion (vX.Y.Z)
     const versionString = "v" + version.join(".") as SupportedVersion;
     // search for the proposal
     const name = "IProposal";
