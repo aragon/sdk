@@ -1712,7 +1712,7 @@ describe("Client", () => {
         ).rejects.toThrow(new InvalidProposalIdError());
       });
 
-      it("should check if a proposal is valid for updating the dao and fail with a proposal that does not exist", async () => {
+      it("throws an `ProposalNotFoundError`` for a proposal that does not exist", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
