@@ -15,7 +15,7 @@ const client: Client = new Client(context);
 // check is valid version
 const isValid = await client.methods.isDaoUpdateVersionValid(
   {
-    previousVersion: [1, 0, 0],
+    specifiedVersion: [1, 0, 0],
     daoAddress: "0x1234567890123456789012345678901234567890",
   },
 );

@@ -442,7 +442,7 @@ export type IsDaoUpdateImplementationValidParams = {
 }
 
 export type IsDaoUpdateVersionValidParams = {
-  previousVersion: [number, number, number];
+  specifiedVersion: [number, number, number];
   daoAddress: string;
 }
 

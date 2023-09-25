@@ -1094,6 +1094,30 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return version;
   }
 
+  /**
+   * Check if a dao update proposal is valid
+   * It checks that the actions contain an
+   * upgrade to and call action that upgrades the dao
+   * with the correct data obtained from the 
+   * initialize from action
+   * 
+   * The values checked are:
+   * - Version: The version of the dao that created
+   * the proposal should be the same as the previous version
+   * encoded in the initialize from action
+   * 
+   * - Implementation: The implementation address should be the same
+   * as the one from the dao factory for the specified version. If
+   * the version is not specified it will get the latest version from
+   * the dao factory
+   * 
+   * - Init data: The init data should be empty for the current version.
+   * This can change in the future
+   *
+   * @param {IsDaoUpdateProposalValidParams} params
+   * @return {*}  {Promise<DaoUpdateProposalValidity>}
+   * @memberof ClientMethods
+   */
   public async isDaoUpdateProposalValid(
     params: IsDaoUpdateProposalValidParams,
   ): Promise<DaoUpdateProposalValidity> {
@@ -1108,7 +1132,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         this.web3.getAddress("daoFactoryAddress"),
       );
     }
-// convert version to string using the fromat from SupportedVersion (vX.Y.Z)
+    // convert version to string using the format from SupportedVersion (vX.Y.Z)
     const versionString = "v" + version.join(".") as SupportedVersion;
     // search for the proposal
     const name = "IProposal";
@@ -1146,7 +1170,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       // check version
       if (
         !await this.isDaoUpdateVersionValid({
-          previousVersion: decodedInitializeFromParams.previousVersion,
+          specifiedVersion: decodedInitializeFromParams.previousVersion,
           daoAddress: iproposal.dao.id,
         })
       ) {
@@ -1176,6 +1200,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return { isValid: causes.length === 0, causes };
   }
 
+  /**
+   * Check if the current version of the dao is the same as the specified version
+   *
+   * @param {IsDaoUpdateVersionValidParams} params
+   * @return {*}  {Promise<boolean>}
+   * @memberof ClientMethods
+   */
   public async isDaoUpdateVersionValid(
     params: IsDaoUpdateVersionValidParams,
   ): Promise<boolean> {
@@ -1186,9 +1217,16 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // ex: if we want to upgrade from version 1.0.0 to 1.3.0
     // the previous version should be 1.0.0 and so should be the current dao version
     return JSON.stringify(currentDaoVersion) ===
-      JSON.stringify(params.previousVersion);
+      JSON.stringify(params.specifiedVersion);
   }
 
+  /**
+   * Check if the implementation address is the same as the one from the dao factory
+   *
+   * @param {IsDaoUpdateImplementationValidParams} params
+   * @return {*}  {Promise<boolean>}
+   * @memberof ClientMethods
+   */
   public async isDaoUpdateImplementationValid(
     params: IsDaoUpdateImplementationValidParams,
   ): Promise<boolean> {
@@ -1202,6 +1240,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return daoBase === params.implementationAddress;
   }
 
+  /**
+   * Check if the init data is valid for the specified version of the dao
+   *
+   * @param {IsDaoUpdateInitDataValidParams} params
+   * @return {*}  {Promise<boolean>}
+   * @memberof ClientMethods
+   */
   public async isDaoUpdateInitDataValid(
     params: IsDaoUpdateInitDataValidParams,
   ): Promise<boolean> {
@@ -1211,6 +1256,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return params.data.length === 0;
   }
 
+  /**
+   * Return the implementation address for the specified dao factory
+   *
+   * @param {string} daoFactoryAddress
+   * @return {*}  {Promise<string>}
+   * @memberof ClientMethods
+   */
   public async getDaoImplementation(
     daoFactoryAddress: string,
   ): Promise<string> {
