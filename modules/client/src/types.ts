@@ -2,6 +2,7 @@ import {
   ApplyInstallationParamsBase,
   Pagination,
   PluginInstallItem,
+  SupportedVersion,
   TokenType,
 } from "@aragon/sdk-client-common";
 
@@ -433,4 +434,19 @@ export enum DaoUpdateProposalInvalidityCause {
   INVALID_VERSION = "invalidVersion",
   INVALID_INIT_DATA = "invalidInitData",
   INVALID_ACTION = "invalidAction",
+}
+
+export type IsDaoUpdateImplementationValidParams = {
+  version: SupportedVersion;
+  implementationAddress: string;
+}
+
+export type IsDaoUpdateVersionValidParams = {
+  previousVersion: [number, number, number];
+  daoAddress: string;
+}
+
+export type IsDaoUpdateInitDataValidParams = {
+  data: Uint8Array;
+  // version: SupportedVersion;
 }

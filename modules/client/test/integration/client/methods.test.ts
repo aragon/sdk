@@ -30,6 +30,7 @@ import {
   DaoDepositSteps,
   DaoQueryParams,
   DaoSortBy,
+  DaoUpdateProposalInvalidityCause,
   DepositParams,
   HasPermissionParams,
   Permissions,
@@ -73,6 +74,7 @@ import { deployErc721 } from "../../helpers/deploy-erc721";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import {
   Context,
+  LIVE_CONTRACTS,
   PrepareInstallationStep,
   PrepareUpdateStep,
   SortDirection,
@@ -119,6 +121,10 @@ describe("Client", () => {
         deployment.tokenVotingPluginSetup.address;
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
+      LIVE_CONTRACTS["v1.3.0"].local.daoFactoryAddress =
+        deployment.daoFactory.address;
+      LIVE_CONTRACTS["v1.0.0"].local.daoFactoryAddress =
+        deploymentV1.daoFactory.address;
 
       const daoCreation = await deployContracts.createTokenVotingDAO(
         deployment,
@@ -1702,7 +1708,7 @@ describe("Client", () => {
         const client = new Client(ctx);
         const proposalId = TEST_DAO_ADDRESS;
         expect(
-          () => client.methods.isDaoUpdateProposalValid(proposalId),
+          () => client.methods.isDaoUpdateProposalValid({ proposalId }),
         ).rejects.toThrow(new InvalidProposalIdError());
       });
 
@@ -1717,23 +1723,24 @@ describe("Client", () => {
           iplugin: null,
         });
         expect(
-          () => client.methods.isDaoUpdateProposalValid(proposalId),
+          () => client.methods.isDaoUpdateProposalValid({ proposalId }),
         ).rejects.toThrow(new ProposalNotFoundError());
       });
-      it("should check if a proposal is valid for updating the dao and fail with a proposal that has more than one action", async () => {
+      it("should check if a proposal with the wrong actions is valid", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
-        const initializeFromAction = client.encoding.initializeFromAction(
-          daoAddressV1,
+        const withdrawAction = await client.encoding.withdrawAction(
           {
-            previousVersion: [1, 0, 0],
+            type: TokenType.NATIVE,
+            amount: BigInt(1),
+            recipientAddressOrEns: ADDRESS_ONE,
           },
         );
-        const subgraphInitializeFromAction: SubgraphAction = {
-          to: initializeFromAction.to,
-          value: initializeFromAction.value.toString(),
-          data: bytesToHex(initializeFromAction.data),
+        const subgraphWithdrawActionAction: SubgraphAction = {
+          to: withdrawAction.to,
+          value: withdrawAction.value.toString(),
+          data: bytesToHex(withdrawAction.data),
         };
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
@@ -1743,66 +1750,34 @@ describe("Client", () => {
           iproposal: {
             id: TEST_MULTISIG_PROPOSAL_ID,
             dao: {
-              id: daoAddressV1
+              id: daoAddressV1,
             },
-            actions: [subgraphInitializeFromAction, subgraphInitializeFromAction],
+            actions: [
+              subgraphWithdrawActionAction,
+            ],
           },
         });
 
         const validationResult = await client.methods
           .isDaoUpdateProposalValid(
-            proposalId,
+            { proposalId },
           );
-        expect(validationResult.actions).toBe(false);
-        expect(validationResult.implementation).toBe(false);
-        expect(validationResult.initData).toBe(false);
-        expect(validationResult.version).toBe(false);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            DaoUpdateProposalInvalidityCause.INVALID_ACTION,
+          ),
+        ).toBe(true);
       });
-      it("should check if a proposal is valid for updating the dao and fail with a proposal has the wrong action", async () => {
-        const ctx = new Context(contextParamsLocalChain);
-        const client = new Client(ctx);
-        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
-        const initializeFromAction = client.encoding.initializeFromAction(
-          daoAddressV1,
-          {
-            previousVersion: [1, 0, 0],
-          },
-        );
-        const subgraphInitializeFromAction: SubgraphAction = {
-          to: initializeFromAction.to,
-          value: initializeFromAction.value.toString(),
-          data: bytesToHex(initializeFromAction.data),
-        };
-        const mockedClient = mockedGraphqlRequest.getMockedInstance(
-          client.graphql.getClient(),
-        );
-
-        mockedClient.request.mockResolvedValueOnce({
-          iproposal: {
-            id: TEST_MULTISIG_PROPOSAL_ID,
-            dao: {
-              id: daoAddressV1
-            },
-            actions: [subgraphInitializeFromAction],
-          },
-        });
-
-        const validationResult = await client.methods
-          .isDaoUpdateProposalValid(
-            proposalId,
-          );
-        expect(validationResult.actions).toBe(false);
-        expect(validationResult.implementation).toBe(false);
-        expect(validationResult.initData).toBe(false);
-        expect(validationResult.version).toBe(false);
-      });
-      it("should check if a proposal is valid for updating the dao and fail with a proposal that has a wrong implementation address", async () => {
+      it("should check if a proposal with a wrong implementation address is valid", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
+
         const initializeFromAction = client.encoding.initializeFromAction(
           daoAddressV1,
           {
@@ -1826,21 +1801,24 @@ describe("Client", () => {
           iproposal: {
             id: TEST_MULTISIG_PROPOSAL_ID,
             dao: {
-              id: daoAddressV1
+              id: daoAddressV1,
             },
             actions: [subgraphUpgradeToAndCall],
           },
         });
         const validationResult = await client.methods
           .isDaoUpdateProposalValid(
-            proposalId,
+            { proposalId },
           );
-        expect(validationResult.actions).toBe(true);
-        expect(validationResult.implementation).toBe(false);
-        expect(validationResult.initData).toBe(true);
-        expect(validationResult.version).toBe(true);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            DaoUpdateProposalInvalidityCause.INVALID_IMPLEMENTATION,
+          ),
+        ).toBe(true);
       });
-      it("should check if a proposal is valid for updating the dao and fail with a proposal that has a wrong version", async () => {
+      it("should check if a proposal with the wrong version is valid", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
@@ -1853,10 +1831,13 @@ describe("Client", () => {
             previousVersion: [1, 3, 0],
           },
         );
+        const implementationAddress = await client.methods.getDaoImplementation(
+          deployment.daoFactory.address,
+        )
         const upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
           daoAddressV1,
           {
-            implementationAddress: deployment.daoFactory.address,
+            implementationAddress,
             data: initializeFromAction.data,
           },
         );
@@ -1870,21 +1851,24 @@ describe("Client", () => {
           iproposal: {
             id: TEST_MULTISIG_PROPOSAL_ID,
             dao: {
-              id: daoAddressV1
+              id: daoAddressV1,
             },
             actions: [subgraphUpgradeToAndCall],
           },
         });
         const validationResult = await client.methods
           .isDaoUpdateProposalValid(
-            proposalId,
+            { proposalId },
           );
-        expect(validationResult.actions).toBe(true);
-        expect(validationResult.implementation).toBe(true);
-        expect(validationResult.initData).toBe(true);
-        expect(validationResult.version).toBe(false);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            DaoUpdateProposalInvalidityCause.INVALID_VERSION,
+          ),
+        ).toBe(true);
       });
-      it("should check if a proposal is valid for updating the dao and fail with a proposal that has a wrong init data", async () => {
+      it("should check if a proposal with a non empty init data is valid", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
@@ -1898,10 +1882,13 @@ describe("Client", () => {
             initData: new Uint8Array([1, 2, 3]),
           },
         );
+        const implementationAddress = await client.methods.getDaoImplementation(
+          deployment.daoFactory.address,
+        )
         const upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
           daoAddressV1,
           {
-            implementationAddress: deployment.daoFactory.address,
+            implementationAddress,
             data: initializeFromAction.data,
           },
         );
@@ -1915,21 +1902,24 @@ describe("Client", () => {
           iproposal: {
             id: TEST_MULTISIG_PROPOSAL_ID,
             dao: {
-              id: daoAddressV1
+              id: daoAddressV1,
             },
             actions: [subgraphUpgradeToAndCall],
           },
         });
         const validationResult = await client.methods
           .isDaoUpdateProposalValid(
-            proposalId,
+            { proposalId },
           );
-        expect(validationResult.actions).toBe(true);
-        expect(validationResult.implementation).toBe(true);
-        expect(validationResult.initData).toBe(false);
-        expect(validationResult.version).toBe(true);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            DaoUpdateProposalInvalidityCause.INVALID_INIT_DATA,
+          ),
+        ).toBe(true);
       });
-      it("should check if a proposal is valid for updating the dao and succeed", async () => {
+      it("should check a valid proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
@@ -1942,10 +1932,13 @@ describe("Client", () => {
             previousVersion: [1, 0, 0],
           },
         );
+        const implementationAddress = await client.methods.getDaoImplementation(
+          deployment.daoFactory.address,
+        )
         const upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
           daoAddressV1,
           {
-            implementationAddress: deployment.daoFactory.address,
+            implementationAddress,
             data: initializeFromAction.data,
           },
         );
@@ -1959,19 +1952,17 @@ describe("Client", () => {
           iproposal: {
             id: TEST_MULTISIG_PROPOSAL_ID,
             dao: {
-              id: daoAddressV1
+              id: daoAddressV1,
             },
             actions: [subgraphUpgradeToAndCall],
           },
         });
         const validationResult = await client.methods
           .isDaoUpdateProposalValid(
-            proposalId,
+            { proposalId },
           );
-        expect(validationResult.actions).toBe(true);
-        expect(validationResult.implementation).toBe(true);
-        expect(validationResult.initData).toBe(true);
-        expect(validationResult.version).toBe(true);
+        expect(validationResult.isValid).toBe(true);
+        expect(validationResult.causes.length).toBe(0);
       });
     });
   });
