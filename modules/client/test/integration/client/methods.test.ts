@@ -1703,7 +1703,7 @@ describe("Client", () => {
     });
 
     describe("isDaoUpdateProposalValid", () => {
-      it("should check if a proposal is valid for updating the dao and fail with an invalid proposal id", async () => {
+      it("should throw an `InvalidProposalIDError` for a proposal with an invalid id ", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_DAO_ADDRESS;
@@ -1726,7 +1726,7 @@ describe("Client", () => {
           () => client.methods.isDaoUpdateProposalValid({ proposalId }),
         ).rejects.toThrow(new ProposalNotFoundError());
       });
-      it("should check if a proposal with the wrong actions is valid", async () => {
+      it("should return isValid `false` and `INVALID_ACTIONS` in the causes for a proposal with the wrong actions", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
@@ -1770,7 +1770,7 @@ describe("Client", () => {
           ),
         ).toBe(true);
       });
-      it("should check if a proposal with a wrong implementation address is valid", async () => {
+      it("should return isValid `false` and `INVALID_IMPLEMENTATION` in the causes for a proposal with the wrong implementation address", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
@@ -1818,7 +1818,7 @@ describe("Client", () => {
           ),
         ).toBe(true);
       });
-      it("should check if a proposal with the wrong version is valid", async () => {
+      it("should return isValid `false` and `INVALID_VERSION` in the causes for a proposal with the wrong previous version specified in the `initializeFrom` action", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
@@ -1868,7 +1868,7 @@ describe("Client", () => {
           ),
         ).toBe(true);
       });
-      it("should check if a proposal with a non empty init data is valid", async () => {
+      it("should return isValid `false` and `INVALID_INIT_DATA` in the causes for a proposal with a non empty initData", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
@@ -1919,7 +1919,7 @@ describe("Client", () => {
           ),
         ).toBe(true);
       });
-      it("should check a valid proposal", async () => {
+      it("should pass a valid proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_MULTISIG_PROPOSAL_ID;
