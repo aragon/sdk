@@ -364,6 +364,8 @@ export abstract class ContextCore {
     if (!network.ensAddress) {
       const ensAddress =
         LIVE_CONTRACTS[SupportedVersion.LATEST][networkName].ensRegistryAddress;
+        const contracts = LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
+        console.log("contracts", contracts)
       if (!ensAddress) {
         throw new UnsupportedNetworkError(networkName);
       }

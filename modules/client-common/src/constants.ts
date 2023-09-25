@@ -158,6 +158,7 @@ export const LIVE_CONTRACTS: {
         activeContractsListV1_0_0.polygon.AddresslistVotingSetup,
       tokenVotingSetupAddress:
         activeContractsListV1_0_0.polygon.TokenVotingSetup,
+      ensRegistryAddress: activeContractsListV1_0_0.polygon.ENSRegistry,
     },
     [SupportedNetwork.MUMBAI]: {
       daoFactoryAddress: activeContractsListV1_0_0.mumbai.DAOFactory,
@@ -175,6 +176,7 @@ export const LIVE_CONTRACTS: {
         activeContractsListV1_0_0.mumbai.AddresslistVotingSetup,
       tokenVotingSetupAddress:
         activeContractsListV1_0_0.mumbai.TokenVotingSetup,
+      ensRegistryAddress: activeContractsListV1_0_0.mumbai.ENSRegistry,
     },
     [SupportedNetwork.BASE]: {
       daoFactoryAddress: "",
@@ -187,6 +189,7 @@ export const LIVE_CONTRACTS: {
       adminSetupAddress: "",
       addresslistVotingSetupAddress: "",
       tokenVotingSetupAddress: "",
+      ensRegistryAddress: "",
     },
     [SupportedNetwork.BASE_GOERLI]: {
       daoFactoryAddress: "",
@@ -199,6 +202,7 @@ export const LIVE_CONTRACTS: {
       adminSetupAddress: "",
       addresslistVotingSetupAddress: "",
       tokenVotingSetupAddress: "",
+      ensRegistryAddress: "",
     },
     [SupportedNetwork.LOCAL]: {
       daoFactoryAddress: "",
@@ -211,6 +215,7 @@ export const LIVE_CONTRACTS: {
       adminSetupAddress: "",
       addresslistVotingSetupAddress: "",
       tokenVotingSetupAddress: "",
+      ensRegistryAddress: "",
     },
   },
   [SupportedVersion.V1_3_0]: {
@@ -258,6 +263,7 @@ export const LIVE_CONTRACTS: {
       addresslistVotingSetupAddress:
         activeContractsList.polygon.AddresslistVotingSetup,
       tokenVotingSetupAddress: activeContractsList.polygon.TokenVotingSetup,
+      ensRegistryAddress: activeContractsList.polygon.ENSRegistry,
     },
     [SupportedNetwork.MUMBAI]: {
       daoFactoryAddress: activeContractsList.mumbai.DAOFactory,
@@ -273,6 +279,7 @@ export const LIVE_CONTRACTS: {
       addresslistVotingSetupAddress:
         activeContractsList.mumbai.AddresslistVotingSetup,
       tokenVotingSetupAddress: activeContractsList.mumbai.TokenVotingSetup,
+      ensRegistryAddress: activeContractsList.mumbai.ENSRegistry,
     },
     [SupportedNetwork.BASE]: {
       daoFactoryAddress: activeContractsList.baseMainnet.DAOFactory,
@@ -289,6 +296,7 @@ export const LIVE_CONTRACTS: {
       addresslistVotingSetupAddress:
         activeContractsList.baseMainnet.AddresslistVotingSetup,
       tokenVotingSetupAddress: activeContractsList.baseMainnet.TokenVotingSetup,
+      ensRegistryAddress: activeContractsList.baseMainnet.ENSRegistry,
     },
     [SupportedNetwork.BASE_GOERLI]: {
       daoFactoryAddress: activeContractsList.baseGoerli.DAOFactory,
@@ -305,6 +313,7 @@ export const LIVE_CONTRACTS: {
       addresslistVotingSetupAddress:
         activeContractsList.baseGoerli.AddresslistVotingSetup,
       tokenVotingSetupAddress: activeContractsList.baseGoerli.TokenVotingSetup,
+      ensRegistryAddress: activeContractsList.baseGoerli.ENSRegistry,
     },
     [SupportedNetwork.LOCAL]: {
       daoFactoryAddress: "",
@@ -317,6 +326,7 @@ export const LIVE_CONTRACTS: {
       adminSetupAddress: "",
       addresslistVotingSetupAddress: "",
       tokenVotingSetupAddress: "",
+      ensRegistryAddress: "",
     },
   },
 };
