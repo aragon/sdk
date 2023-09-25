@@ -257,3 +257,11 @@ schema:\
 **Do not run 2 workflows at the same time, otherwise we could encounter a race
 condition in the git repo which could lead to a failure of the automatic
 changelog and package.json update**
+
+## Security
+
+If you believe you've found a security issue, we encourage you to notify us. We welcome working with you to resolve the issue promptly.
+
+Security Contact Email: sirt@aragon.org
+
+Please do not use the issue tracker for security issues.
