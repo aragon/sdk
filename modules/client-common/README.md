@@ -63,3 +63,11 @@ To execute library tests just run:
 ```bash
 yarn test
 ```
+
+## Security
+
+If you believe you've found a security issue, we encourage you to notify us. We welcome working with you to resolve the issue promptly.
+
+Security Contact Email: sirt@aragon.org
+
+Please do not use the issue tracker for security issues.
