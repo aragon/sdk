@@ -30,9 +30,11 @@ import {
   GrantPermissionWithConditionParams,
   HasPermissionParams,
   InitializeFromParams,
+  IsPluginUpdateProposalValidParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoListItem,
+  PluginUpdateProposalValidity,
   PrepareUninstallationParams,
   PrepareUninstallationStepValue,
   RegisterStandardCallbackParams,
@@ -89,6 +91,10 @@ export interface IClientMethods {
   getProtocolVersion: (
     contractAddress: string,
   ) => Promise<[number, number, number]>;
+
+  isPluginUpdateProposalValid: (
+    params: IsPluginUpdateProposalValidParams,
+  ) => Promise<PluginUpdateProposalValidity>;
 }
 
 export interface IClientEncoding {

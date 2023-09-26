@@ -1,5 +1,6 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { TransferType } from "../types";
+import { SubgraphAction } from "../client-common";
 
 export type SubgraphPluginListItem = {
   appliedPreparation: {
@@ -181,7 +182,7 @@ export type SubgraphPluginVersion = {
   build: number;
 };
 
-export type SubgraphPluginPreparation = {
+export type SubgraphPluginPreparationBase = {
   helpers: string[];
   pluginRepo: {
     id: string;
@@ -190,5 +191,31 @@ export type SubgraphPluginPreparation = {
 
 export type SubgraphPluginInstallation = {
   appliedVersion: SubgraphPluginVersion;
-  appliedPreparation: SubgraphPluginPreparation;
+  appliedPreparation: SubgraphPluginPreparationBase;
 };
+
+export type SubgraphIProposal = {
+  dao: {
+    id: string;
+  };
+  actions: SubgraphAction[];
+};
+
+export type SubgraphPluginPreparation = SubgraphPluginPreparationBase & {
+  pluginRepo: {
+    id: string;
+    releases: {
+      builds: {
+        pluginSetup: {
+          id: string;
+        };
+      };
+    };
+  };
+  pluginAddress: string;
+};
+
+export enum SubgraphPluginPreparationType {
+  INSTALLATION = "Installation",
+  UPDATE = "Update",
+}

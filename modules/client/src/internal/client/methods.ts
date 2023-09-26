@@ -11,13 +11,16 @@ import {
   AmountMismatchError,
   DaoCreationError,
   FailedDepositError,
+  hexToBytes,
   InstallationNotFoundError,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   InvalidEnsError,
   InvalidParameter,
+  InvalidProposalIdError,
   IpfsPinError,
+  isProposalId,
   MissingExecPermissionError,
   NoProviderError,
   NotImplementedError,
@@ -39,8 +42,10 @@ import {
   QueryDao,
   QueryDaos,
   QueryIPlugin,
+  QueryIProposal,
   QueryPlugin,
   QueryPlugins,
+  QueryPluginUpdatePreparations,
   QueryTokenBalances,
   QueryTokenTransfers,
 } from "../graphql-queries";
@@ -63,7 +68,9 @@ import {
   DepositErc721Params,
   DepositEthParams,
   DepositParams,
+  GrantPermissionDecodedParams,
   HasPermissionParams,
+  IsPluginUpdateProposalValidParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoBuildMetadata,
@@ -71,9 +78,12 @@ import {
   PluginRepoRelease,
   PluginRepoReleaseMetadata,
   PluginSortBy,
+  PluginUpdateProposalInValidityCause,
+  PluginUpdateProposalValidity,
   PrepareUninstallationParams,
   PrepareUninstallationSteps,
   PrepareUninstallationStepValue,
+  RevokePermissionDecodedParams,
   SetAllowanceParams,
   SetAllowanceSteps,
   SetAllowanceStepValue,
@@ -85,13 +95,19 @@ import {
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
+  SubgraphIProposal,
   SubgraphPluginInstallation,
+  SubgraphPluginPreparation,
+  SubgraphPluginPreparationType,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
 } from "../types";
 import {
+  decodeApplyUpdateAction,
+  decodeGrantAction,
+  decodeRevokeAction,
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
@@ -115,7 +131,7 @@ import {
   UNSUPPORTED_RELEASE_METADATA_LINK,
 } from "../constants";
 import { IClientMethods } from "../interfaces";
-import { PermissionIds } from "../../constants";
+import { PermissionIds, Permissions } from "../../constants";
 import {
   ClientCore,
   findLog,
@@ -130,6 +146,7 @@ import {
   SortDirection,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { DecodedApplyUpdateParams } from "@aragon/sdk-client-common";
 
 /**
  * Methods module the SDK Generic Client
@@ -1074,5 +1091,141 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       version = [1, 0, 0];
     }
     return version;
+  }
+
+  public async isPluginUpdateProposalValid(
+    params: IsPluginUpdateProposalValidParams,
+  ): Promise<PluginUpdateProposalValidity> {
+    if (!isProposalId(params.proposalId)) {
+      throw new InvalidProposalIdError();
+    }
+
+    type T = { iproposal: SubgraphIProposal };
+    const { iproposal } = await this.graphql.request<T>({
+      query: QueryIProposal,
+      params: { id: params.proposalId },
+      name: "iproposal",
+    });
+    const causes: PluginUpdateProposalInValidityCause[] = [];
+    let numberOfDecodedActions = 0;
+    let grantPermissionDecodedParams: GrantPermissionDecodedParams;
+    let decodedApplyUpdateAction: DecodedApplyUpdateParams;
+    let revokePermissionDecodedParams: RevokePermissionDecodedParams;
+    let res = {
+      isValid: causes.length === 0,
+      causes,
+    };
+    for (const [index, action] of iproposal.actions.entries()) {
+      // 3 actions are required for a plugin update proposal
+      // grant permission, apply update, revoke permission
+      if (iproposal.actions.length - index < (3 - numberOfDecodedActions)) {
+        causes.push(PluginUpdateProposalInValidityCause.ACTIONS);
+        return res;
+      }
+      // if grant permission action is not decoded
+      if (numberOfDecodedActions === 0) {
+        // decode grant permission action
+        try {
+          grantPermissionDecodedParams = decodeGrantAction(
+            hexToBytes(action.data),
+          );
+          // check if grant permission action is granting ROOT permission to the dao
+          if (
+            grantPermissionDecodedParams.permission !==
+              Permissions.ROOT_PERMISSION ||
+            grantPermissionDecodedParams.permissionId !==
+              PermissionIds.ROOT_PERMISSION_ID ||
+            grantPermissionDecodedParams.who !== iproposal.dao.id
+          ) {
+            causes.push(PluginUpdateProposalInValidityCause.GRANT_PERMISSION);
+            continue;
+          }
+          numberOfDecodedActions++;
+        } catch {
+          // skip if not a grant permission action
+          continue;
+        }
+      } else if (numberOfDecodedActions === 1) {
+        try {
+          // decode apply update action
+          decodedApplyUpdateAction = decodeApplyUpdateAction(
+            hexToBytes(action.data),
+          );
+          // check plugin address is the same as specified
+          if (decodedApplyUpdateAction.pluginAddress !== params.pluginAddress) {
+            causes.push(PluginUpdateProposalInValidityCause.PLUGIN_ADDRESS);
+            continue;
+          }
+          // check version is the same as specified
+          if (
+            decodedApplyUpdateAction.versionTag.build !==
+              params.version.build ||
+            decodedApplyUpdateAction.versionTag.release !==
+              params.version.release
+          ) {
+            causes.push(PluginUpdateProposalInValidityCause.PLUGIN_VERSION);
+            continue;
+          }
+          // get plugin preparation
+          type T = { pluginPreparations: SubgraphPluginPreparation[] };
+          const { pluginPreparations } = await this.graphql.request<T>({
+            query: QueryPluginUpdatePreparations,
+            params: {
+              build: params.version.build,
+              release: params.version.release,
+              where: {
+                type: SubgraphPluginPreparationType.UPDATE,
+                dao: iproposal.dao.id,
+                pluginAddress: decodedApplyUpdateAction.pluginAddress,
+              },
+            },
+          });
+          // TODO check the pluginSetup
+
+          // Check if plugin preparation exists
+          if (pluginPreparations && pluginPreparations.length !== 0) {
+            const pluginPreparation =
+              pluginPreparations[params.pluginPreparationIndex || 0];
+            // check plugin repo is the same as specified
+            if (
+              pluginPreparation.pluginRepo.id !==
+                decodedApplyUpdateAction.pluginRepo
+            ) {
+              causes.push(PluginUpdateProposalInValidityCause.PLUGIN_REPO);
+              continue;
+            }
+          } else {
+            causes.push(PluginUpdateProposalInValidityCause.PLUGIN_PREPARATION);
+            continue;
+          }
+        } catch {
+          // skip if not a apply update action
+          continue;
+        }
+      } else if (numberOfDecodedActions === 2) {
+        // decode revoke permission action
+        try {
+          revokePermissionDecodedParams = decodeRevokeAction(
+            hexToBytes(action.data),
+          );
+          // check if revoke permission action is revoking ROOT permission to the dao
+          if (
+            revokePermissionDecodedParams.permission !==
+              Permissions.ROOT_PERMISSION ||
+            revokePermissionDecodedParams.permissionId !==
+              PermissionIds.ROOT_PERMISSION_ID ||
+            revokePermissionDecodedParams.who !== iproposal.dao.id
+          ) {
+            causes.push(PluginUpdateProposalInValidityCause.REVOKE_PERMISSION);
+            continue;
+          }
+          numberOfDecodedActions++;
+        } catch {
+          // skip if not a revoke permission action
+          continue;
+        }
+      }
+    }
+    return res;
   }
 }

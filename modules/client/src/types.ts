@@ -3,6 +3,7 @@ import {
   Pagination,
   PluginInstallItem,
   TokenType,
+  VersionTag,
 } from "@aragon/sdk-client-common";
 
 /* DAO creation */
@@ -422,3 +423,25 @@ export type InitializeFromParams = {
   previousVersion: [number, number, number];
   initData?: Uint8Array;
 };
+
+export type PluginUpdateProposalValidity = {
+  isValid: boolean;
+  causes: PluginUpdateProposalInValidityCause[];
+}
+
+export enum PluginUpdateProposalInValidityCause {
+  ACTIONS = "actions",
+  GRANT_PERMISSION = "grantPermission",
+  REVOKE_PERMISSION = "revokePermission",
+  PLUGIN_ADDRESS = "pluginAddress",
+  PLUGIN_REPO = "pluginRepo",
+  PLUGIN_VERSION = "pluginVersion",
+  PLUGIN_PREPARATION = "pluginPreparation",
+}
+
+export type IsPluginUpdateProposalValidParams = {
+  proposalId: string;
+  version: VersionTag;
+  pluginAddress: string;
+  pluginPreparationIndex?: number;
+}

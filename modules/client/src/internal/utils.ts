@@ -49,7 +49,7 @@ import { defaultAbiCoder, Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { AddressZero } from "@ethersproject/constants";
-import { DAO__factory, PluginSetupProcessor } from "@aragon/osx-ethers";
+import { DAO__factory, PluginSetupProcessor, PluginSetupProcessor__factory } from "@aragon/osx-ethers";
 import { PermissionIds } from "../constants";
 import {
   ApplyInstallationParams,
@@ -62,6 +62,7 @@ import {
   InvalidParameter,
   NotImplementedError,
   SizeMismatchError,
+  bytesToHex,
 } from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract } from "@ethersproject/contracts";
@@ -643,4 +644,27 @@ export async function estimateErc1155Deposit(
       );
   }
   return estimation;
+}
+
+export function decodeGrantAction(data: Uint8Array): GrantPermissionDecodedParams {
+  const daoInterface = DAO__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = daoInterface.getFunction("grant");
+  const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return permissionParamsFromContract(result);
+}
+export function decodeRevokeAction(data: Uint8Array): RevokePermissionDecodedParams{
+  const daoInterface = DAO__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = daoInterface.getFunction("grant");
+  const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return permissionParamsFromContract(result);
+}
+
+export function decodeApplyUpdateAction(data:Uint8Array): DecodedApplyUpdateParams {
+  const pspInterface = PluginSetupProcessor__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = pspInterface.getFunction("applyUpdate");
+  const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return applyUpdateParamsFromContract(result);
 }

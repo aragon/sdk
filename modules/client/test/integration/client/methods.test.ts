@@ -45,6 +45,7 @@ import {
 } from "../../../src";
 import {
   InvalidAddressError,
+  InvalidProposalIdError,
   MissingExecPermissionError,
 } from "@aragon/sdk-common";
 import { Server } from "ganache";
@@ -1690,6 +1691,26 @@ describe("Client", () => {
       // await expect(client.methods.getTransfers("the.dao")).rejects.toThrow(
       //   "Invalid ENS name"
       // );
+    });
+    describe("isPluginUpdateProposal", () => {
+      it("should throw an `InvalidProposalIdError` for a proposal with an invalid id", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+        const proposalId = TEST_DAO_ADDRESS;
+        const version = {
+          build: 1,
+          release: 1,
+        };
+        const pluginAddress = ADDRESS_ONE;
+        expect(
+          () =>
+            client.methods.isPluginUpdateProposalValid({
+              proposalId,
+              version,
+              pluginAddress,
+            }),
+        ).rejects.toThrow(new InvalidProposalIdError());
+      });
     });
   });
 });
