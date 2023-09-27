@@ -301,3 +301,8 @@ export class PluginUpdatePreparationError extends SdkError {
     );
   }
 }
+export class ProposalNotFoundError extends SdkError {
+  constructor(cause?: any) {
+    super("Proposal not found", cause);
+  }
+}

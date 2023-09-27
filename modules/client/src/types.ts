@@ -430,13 +430,17 @@ export type PluginUpdateProposalValidity = {
 }
 
 export enum PluginUpdateProposalInValidityCause {
-  ACTIONS = "actions",
-  GRANT_PERMISSION = "grantPermission",
-  REVOKE_PERMISSION = "revokePermission",
-  PLUGIN_ADDRESS = "pluginAddress",
-  PLUGIN_REPO = "pluginRepo",
-  PLUGIN_VERSION = "pluginVersion",
-  PLUGIN_PREPARATION = "pluginPreparation",
+  INVALID_ACTIONS = "invalidActions",
+  INVALID_GRANT_PERMISSION = "invalidGrantPermission",
+  INVALID_REVOKE_PERMISSION = "invalidRevokePermission",
+  PLUGIN_NOT_INSTALLED = "pluginNotInstalled",
+  NOT_ARAGON_PLUGIN_REPO = "notAragonPluginRepo",
+  MISSING_PLUGIN_REPO = "missingPluginRepo",
+  MISSING_PLUGIN_PREPARATION = "missingPluginPreparation",
+  INVALID_ALLOW_FAILURE_MAP = "invalidAllowFailureMap",
+  INVALID_PLUGIN_RELEASE = "invalidPluginRelease",
+  INVALID_PLUGIN_BUILD = "invalidPluginBuild",
+  INVALID_DATA = "invalidData",
 }
 
 export type IsPluginUpdateProposalValidParams = {

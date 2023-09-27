@@ -19,6 +19,7 @@ import {
   applyInstallatonParamsFromContract,
   decodeApplyUpdateAction,
   decodeGrantAction,
+  findInterface,
   permissionParamsFromContract,
   permissionParamsWitConditionFromContract,
   withdrawParamsFromContract,
@@ -41,7 +42,6 @@ import {
   ClientCore,
   DecodedApplyInstallationParams,
   DecodedApplyUpdateParams,
-  getFunctionFragment,
   InterfaceParams,
   TokenType,
 } from "@aragon/sdk-client-common";
@@ -350,15 +350,6 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public findInterface(data: Uint8Array): InterfaceParams | null {
-    try {
-      const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
-      return {
-        id: func.format("minimal"),
-        functionName: func.name,
-        hash: bytesToHex(data).substring(0, 10),
-      };
-    } catch {
-      return null;
-    }
+    return findInterface(data, AVAILABLE_FUNCTION_SIGNATURES);
   }
 }

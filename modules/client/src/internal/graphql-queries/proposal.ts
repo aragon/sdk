@@ -6,6 +6,7 @@ query IProposal($id: String!) {
         dao {
             id
         }
+        allowFailureMap
         actions {
             to
             value

@@ -182,7 +182,7 @@ export type SubgraphPluginVersion = {
   build: number;
 };
 
-export type SubgraphPluginPreparationBase = {
+export type SubgraphPluginPreparation = {
   helpers: string[];
   pluginRepo: {
     id: string;
@@ -191,28 +191,19 @@ export type SubgraphPluginPreparationBase = {
 
 export type SubgraphPluginInstallation = {
   appliedVersion: SubgraphPluginVersion;
-  appliedPreparation: SubgraphPluginPreparationBase;
+  appliedPreparation: SubgraphPluginPreparation;
 };
 
 export type SubgraphIProposal = {
   dao: {
     id: string;
   };
+  allowFailureMap: string;
   actions: SubgraphAction[];
 };
 
-export type SubgraphPluginPreparation = SubgraphPluginPreparationBase & {
-  pluginRepo: {
-    id: string;
-    releases: {
-      builds: {
-        pluginSetup: {
-          id: string;
-        };
-      };
-    };
-  };
-  pluginAddress: string;
+export type SubgraphPluginUpdatePreparation = {
+  data: string
 };
 
 export enum SubgraphPluginPreparationType {
