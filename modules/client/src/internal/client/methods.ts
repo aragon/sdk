@@ -1098,7 +1098,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return version;
   }
 
-
+  /**
+   * Check if the specified actions try to update a plugin
+   *
+   * @param {DaoAction[]} actions
+   * @return {*}  {boolean}
+   * @memberof ClientMethods
+   */
   public isPluginUpdateProposal(
     actions: DaoAction[],
   ): boolean {
@@ -1112,6 +1118,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     daoAddress: string,
   ): boolean {
     const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
+    // check if permission is root
+    // check if permissionId is root
+    // check if where is the dao address
+    // check if who is the psp address
     return (
       params.permission === Permissions.ROOT_PERMISSION &&
       params.permissionId === PermissionIds.ROOT_PERMISSION_ID &&
@@ -1120,16 +1130,23 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     );
   }
 
+  /**
+   * Check if the specified proposal id is valid for updating a plugin
+   *
+   * @param {string} proposalId
+   * @return {*}  {Promise<PluginUpdateProposalValidity>}
+   * @memberof ClientMethods
+   */
   public async isPluginUpdateProposalValid(
-    params: IsPluginUpdateProposalValidParams,
+    proposalId: string,
   ): Promise<PluginUpdateProposalValidity> {
-    if (!isProposalId(params.proposalId)) {
+    if (!isProposalId(proposalId)) {
       throw new InvalidProposalIdError();
     }
     type T = { iproposal: SubgraphIProposal };
     const { iproposal } = await this.graphql.request<T>({
       query: QueryIProposal,
-      params: { id: params.proposalId },
+      params: { id: proposalId },
       name: "iproposal",
     });
     if (!iproposal) {
@@ -1137,9 +1154,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
     const causes: PluginUpdateProposalInValidityCause[] = [];
     if (iproposal.allowFailureMap !== "0") {
-      causes.push(PluginUpdateProposalInValidityCause.INVALID_ALLOW_FAILURE_MAP);
+      causes.push(
+        PluginUpdateProposalInValidityCause.INVALID_ALLOW_FAILURE_MAP,
+      );
     }
-    // check actions are valid
+    // get expected actions signatures
     const grantSignature = DAO__factory.createInterface().getFunction("grant")
       .format("minimal");
     const revokeSignature = DAO__factory.createInterface().getFunction("revoke")
@@ -1147,10 +1166,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const applyUpdateSignature = PluginSetupProcessor__factory.createInterface()
       .getFunction("applyUpdate").format("minimal");
 
+    // find signatures in the actions specified in the proposal
     const daoActions = toDaoActions(iproposal.actions);
     const grantIndex = findAction(daoActions, grantSignature);
     const applyUpdateIndex = findAction(daoActions, applyUpdateSignature);
     const revokeIndex = findAction(daoActions, revokeSignature);
+
     // check that all actions are present and in the correct order
     if (
       [grantIndex, applyUpdateIndex, revokeIndex].includes(-1) ||
@@ -1163,6 +1184,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         causes,
       };
     }
+
     // check grant action
     if (
       !this.isPluginUpdatePermissionValid(
@@ -1172,6 +1194,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     ) {
       causes.push(PluginUpdateProposalInValidityCause.INVALID_GRANT_PERMISSION);
     }
+
     // check revoke action
     if (
       !this.isPluginUpdatePermissionValid(
@@ -1179,33 +1202,39 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         iproposal.dao.id,
       )
     ) {
-      causes.push(PluginUpdateProposalInValidityCause.INVALID_REVOKE_PERMISSION);
+      causes.push(
+        PluginUpdateProposalInValidityCause.INVALID_REVOKE_PERMISSION,
+      );
     }
+
     // check apply update action
     const decodedApplyUpdateActionParams = decodeApplyUpdateAction(
       daoActions[applyUpdateIndex].data,
     );
+    // get dao with plugins
     type U = { dao: SubgraphDao };
     const { dao } = await this.graphql.request<U>({
       query: QueryDao,
       params: { address: iproposal.dao.id },
       name: "dao",
     });
+    // find the plugin with the same address
     const plugin = dao.plugins.find((plugin) =>
       plugin.appliedPreparation?.pluginAddress ===
         decodedApplyUpdateActionParams.pluginAddress
     );
-    if (plugin) {// check release
+    if (plugin) {
+      // check release is the same as the one installed
       if (
         plugin.appliedVersion?.release.release !==
           decodedApplyUpdateActionParams.versionTag.release
       ) {
         causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE);
       }
-      // check build
+      // check build is higher than the one installed
       if (
         !plugin.appliedVersion?.build ||
-        plugin.appliedVersion?.build >=
+        plugin.appliedVersion?.build <=
           decodedApplyUpdateActionParams.versionTag.build
       ) {
         causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD);
@@ -1250,7 +1279,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         causes.push(PluginUpdateProposalInValidityCause.INVALID_DATA);
       }
     } else {
-      causes.push(PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION);
+      causes.push(
+        PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
+      );
     }
     return {
       isValid: causes.length === 0,
