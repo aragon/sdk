@@ -141,6 +141,7 @@ import {
   ClientCore,
   DaoAction,
   findLog,
+  getNamedTypesFromMetadata,
   MULTI_FETCH_TIMEOUT,
   MultiTargetPermission,
   prepareGenericInstallation,
@@ -1250,6 +1251,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       name: "pluginRepo",
     });
     if (pluginRepo) {
+      // check if is one of the aragon plugin repos
       if (
         !SupportedPluginRepoArray.includes(
           pluginRepo.subdomain as SupportedPluginRepo,
@@ -1261,11 +1263,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       causes.push(PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO);
     }
 
+    // get the prepared setup id
     const preparedSetupId = getPreparedSetupId(
       decodedApplyUpdateActionParams,
       PreparationType.UPDATE,
     );
-
+    // get plugin preparation
     type W = { pluginPreparation: SubgraphPluginUpdatePreparation };
     const { pluginPreparation } = await this.graphql.request<W>({
       query: QueryPluginPreparations,
@@ -1273,10 +1276,35 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       name: "pluginPreparation",
     });
     if (pluginPreparation) {
-      // TODO
-      // check for each build if the data con be decoded with the abi specified in the metadata
-      if (pluginPreparation.data) {
-        causes.push(PluginUpdateProposalInValidityCause.INVALID_DATA);
+      // get the metadata of the plugin repo
+      // for the release and build specified
+      const metadataCid =
+        pluginRepo.releases[decodedApplyUpdateActionParams.versionTag.release]
+          .builds[decodedApplyUpdateActionParams.versionTag.build].metadata;
+      // fetch the metadata
+      const metadata = await this.ipfs.fetchString(metadataCid);
+      const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
+      // get the update abi for the specified build
+      const updateAbi = metadataJson.pluginSetup
+        .prepareUpdate[decodedApplyUpdateActionParams.versionTag.build]?.inputs;
+      if (updateAbi) {
+        // if the abi exists try to decode the data
+        try {
+          // if the decode does not thorw an error the data is valid
+          defaultAbiCoder.decode(
+            getNamedTypesFromMetadata(updateAbi),
+            decodedApplyUpdateActionParams.initData,
+          );
+        } catch {
+          // if the decode throws an error the data is invalid
+          causes.push(
+            PluginUpdateProposalInValidityCause.INVALID_DATA,
+          );
+        }
+      } else {
+        causes.push(
+          PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
+        );
       }
     } else {
       causes.push(

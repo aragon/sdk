@@ -1,5 +1,6 @@
 import {
   ApplyInstallationParamsBase,
+  MetadataAbiInput,
   Pagination,
   PluginInstallItem,
   TokenType,
@@ -90,9 +91,14 @@ export type PluginRepoReleaseMetadata = {
 export type PluginRepoBuildMetadata = {
   ui: string;
   change: string;
-  pluginSetupABI: {
+  pluginSetup: {
     prepareInstallation: string[];
-    prepareUpdate: string[];
+    prepareUpdate: {
+      [key: number]: {
+        description: string;
+        inputs: MetadataAbiInput[];
+      };
+    };
     prepareUninstallation: string[];
   };
 };
@@ -301,7 +307,7 @@ type Erc1155TokenTransfer = TokenTransferBase & {
   tokenId: bigint;
   token: {
     address: string;
-  }
+  };
   amount: bigint;
 };
 
@@ -427,7 +433,7 @@ export type InitializeFromParams = {
 export type PluginUpdateProposalValidity = {
   isValid: boolean;
   causes: PluginUpdateProposalInValidityCause[];
-}
+};
 
 export enum PluginUpdateProposalInValidityCause {
   INVALID_ACTIONS = "invalidActions",
@@ -441,6 +447,7 @@ export enum PluginUpdateProposalInValidityCause {
   INVALID_PLUGIN_RELEASE = "invalidPluginRelease",
   INVALID_PLUGIN_BUILD = "invalidPluginBuild",
   INVALID_DATA = "invalidData",
+  INVALID_PLUGIN_REPO_METADATA = "invalidPluginRepoMetadata",
 }
 
 export type IsPluginUpdateProposalValidParams = {
@@ -448,4 +455,4 @@ export type IsPluginUpdateProposalValidParams = {
   version: VersionTag;
   pluginAddress: string;
   pluginPreparationIndex?: number;
-}
+};
