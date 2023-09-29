@@ -48,7 +48,6 @@ import {
 } from "../../../src";
 import {
   InvalidAddressError,
-  InvalidProposalIdError,
   MissingExecPermissionError,
   ProposalNotFoundError,
 } from "@aragon/sdk-common";
@@ -1782,14 +1781,6 @@ describe("Client", () => {
           data: "0x",
         };
       });
-      it("should throw an `InvalidProposalIdError` for a proposal with an invalid id", async () => {
-        const ctx = new Context(contextParamsLocalChain);
-        const client = new Client(ctx);
-        const proposalId = TEST_DAO_ADDRESS;
-        expect(
-          () => client.methods.isPluginUpdateProposalValid(proposalId),
-        ).rejects.toThrow(new InvalidProposalIdError());
-      });
       it("should throw a `ProposalNotFoundError` for a proposal that does not exist", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
@@ -2177,7 +2168,10 @@ describe("Client", () => {
         mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
           JSON.stringify({
             ...TOKEN_VOTING_BUILD_METADATA,
-            prepareUpdate: {},
+            pluginSetup: {
+              ...TOKEN_VOTING_BUILD_METADATA.pluginSetup,
+              prepareUpdate: {},
+            },
           }),
         ));
         const validationResult = await client.methods

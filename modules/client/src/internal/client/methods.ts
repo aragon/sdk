@@ -17,9 +17,7 @@ import {
   InvalidCidError,
   InvalidEnsError,
   InvalidParameter,
-  InvalidProposalIdError,
   IpfsPinError,
-  isProposalId,
   MissingExecPermissionError,
   NoProviderError,
   NotImplementedError,
@@ -140,6 +138,7 @@ import { PermissionIds, Permissions } from "../../constants";
 import {
   ClientCore,
   DaoAction,
+  DecodedApplyUpdateParams,
   findLog,
   getNamedTypesFromMetadata,
   MULTI_FETCH_TIMEOUT,
@@ -1114,21 +1113,167 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return findAction(actions, applyUpdateInterface) !== -1;
   }
 
+  /**
+   * check if permission is root
+   * check if permissionId is root
+   * check if where is the dao address
+   * check if who is the psp address
+   *
+   * @private
+   * @param {(GrantPermissionDecodedParams | RevokePermissionDecodedParams)} params
+   * @param {string} daoAddress
+   * @return {*}  {boolean}
+   * @memberof ClientMethods
+   */
   private isPluginUpdatePermissionValid(
     params: GrantPermissionDecodedParams | RevokePermissionDecodedParams,
     daoAddress: string,
   ): boolean {
     const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
-    // check if permission is root
-    // check if permissionId is root
-    // check if where is the dao address
-    // check if who is the psp address
     return (
       params.permission === Permissions.ROOT_PERMISSION &&
       params.permissionId === PermissionIds.ROOT_PERMISSION_ID &&
       params.where === daoAddress &&
       params.who === pspAddress
     );
+  }
+
+  /**
+   * check if the plugin is installed
+   * check if the plugin release is the same as the one installed
+   * check if the plugin build is higher than the one installed
+   * check if the plugin repo (pluginSetupRepo) exist
+   * check if is one of the aragon plugin repos
+   * check if the plugin repo metadata is valid
+   * check if the plugin preparation exist
+   * check if the plugin preparation data is valid
+   *
+   * @private
+   * @param {string} daoAddress
+   * @param {DecodedApplyUpdateParams} decodedApplyUpdateActionParams
+   * @return {*}  {Promise<PluginUpdateProposalInValidityCause[]>}
+   * @memberof ClientMethods
+   */
+  private async checkApplyUpdateActionInvalidityCauses(
+    daoAddress: string,
+    decodedApplyUpdateActionParams: DecodedApplyUpdateParams,
+  ): Promise<PluginUpdateProposalInValidityCause[]> {
+    const causes: PluginUpdateProposalInValidityCause[] = [];
+    // get dao with plugins
+    type U = { dao: SubgraphDao };
+    const { dao } = await this.graphql.request<U>({
+      query: QueryDao,
+      params: { address: daoAddress },
+      name: "dao",
+    });
+    // find the plugin with the same address
+    const plugin = dao.plugins.find((plugin) =>
+      plugin.appliedPreparation?.pluginAddress ===
+        decodedApplyUpdateActionParams.pluginAddress
+    );
+    if (plugin) {
+      // check release is the same as the one installed
+      if (
+        plugin.appliedVersion?.release.release !==
+          decodedApplyUpdateActionParams.versionTag.release
+      ) {
+        causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE);
+      }
+      // check build is higher than the one installed
+      if (
+        !plugin.appliedVersion?.build ||
+        plugin.appliedVersion?.build >=
+          decodedApplyUpdateActionParams.versionTag.build
+      ) {
+        causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD);
+      }
+    } else {
+      causes.push(PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED);
+      return causes;
+    }
+    // check if plugin repo (pluginSetupRepo) exist
+    type V = { pluginRepo: SubgraphPluginRepo };
+    const { pluginRepo } = await this.graphql.request<V>({
+      query: QueryPlugin,
+      params: { id: decodedApplyUpdateActionParams.pluginRepo },
+      name: "pluginRepo",
+    });
+    if (pluginRepo) {
+      // check if is one of the aragon plugin repos
+      if (
+        !SupportedPluginRepoArray.includes(
+          pluginRepo.subdomain as SupportedPluginRepo,
+        )
+      ) {
+        causes.push(PluginUpdateProposalInValidityCause.NOT_ARAGON_PLUGIN_REPO);
+      }
+    } else {
+      causes.push(PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO);
+      return causes;
+    }
+
+    // get the prepared setup id
+    const preparedSetupId = getPreparedSetupId(
+      decodedApplyUpdateActionParams,
+      PreparationType.UPDATE,
+    );
+    // get plugin preparation
+    type W = { pluginPreparation: SubgraphPluginUpdatePreparation };
+    const { pluginPreparation } = await this.graphql.request<W>({
+      query: QueryPluginPreparations,
+      params: { where: { preparedSetupId } },
+      name: "pluginPreparation",
+    });
+    if (pluginPreparation) {
+      // get the metadata of the plugin repo
+      // for the release and build specified
+      const release = pluginRepo.releases.find((
+        release: SubgraphPluginRepoRelease,
+      ) =>
+        release.release === decodedApplyUpdateActionParams.versionTag.release
+      );
+      const build = release?.builds.find((
+        build: { build: number; metadata: string },
+      ) => build.build === decodedApplyUpdateActionParams.versionTag.build);
+      const metadataCid = build?.metadata;
+
+      // fetch the metadata
+      const metadata = await this.ipfs.fetchString(metadataCid!);
+      const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
+      // get the update abi for the specified build
+      const updateAbi = metadataJson.pluginSetup
+        .prepareUpdate[decodedApplyUpdateActionParams.versionTag.build]?.inputs;
+      if (updateAbi) {
+        // if the abi exists try to decode the data
+        try {
+          if (
+            decodedApplyUpdateActionParams.initData.length > 0 &&
+            updateAbi.length === 0
+          ) {
+            throw new Error();
+          }
+          // if the decode does not throw an error the data is valid
+          defaultAbiCoder.decode(
+            getNamedTypesFromMetadata(updateAbi),
+            decodedApplyUpdateActionParams.initData,
+          );
+        } catch {
+          // if the decode throws an error the data is invalid
+          causes.push(
+            PluginUpdateProposalInValidityCause.INVALID_DATA,
+          );
+        }
+      } else {
+        causes.push(
+          PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
+        );
+      }
+    } else {
+      causes.push(
+        PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
+      );
+    }
+    return causes;
   }
 
   /**
@@ -1141,9 +1286,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async isPluginUpdateProposalValid(
     proposalId: string,
   ): Promise<PluginUpdateProposalValidity> {
-    if (!isProposalId(proposalId)) {
-      throw new InvalidProposalIdError();
-    }
     type T = { iproposal: SubgraphIProposal };
     const { iproposal } = await this.graphql.request<T>({
       query: QueryIProposal,
@@ -1212,126 +1354,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const decodedApplyUpdateActionParams = decodeApplyUpdateAction(
       daoActions[applyUpdateIndex].data,
     );
-    // get dao with plugins
-    type U = { dao: SubgraphDao };
-    const { dao } = await this.graphql.request<U>({
-      query: QueryDao,
-      params: { address: iproposal.dao.id },
-      name: "dao",
-    });
-    // find the plugin with the same address
-    const plugin = dao.plugins.find((plugin) =>
-      plugin.appliedPreparation?.pluginAddress ===
-        decodedApplyUpdateActionParams.pluginAddress
-    );
-    if (plugin) {
-      // check release is the same as the one installed
-      if (
-        plugin.appliedVersion?.release.release !==
-          decodedApplyUpdateActionParams.versionTag.release
-      ) {
-        causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE);
-      }
-      // check build is higher than the one installed
-      if (
-        !plugin.appliedVersion?.build ||
-        plugin.appliedVersion?.build >=
-          decodedApplyUpdateActionParams.versionTag.build
-      ) {
-        causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD);
-      }
-    } else {
-      causes.push(PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED);
-      return {
-        isValid: causes.length === 0,
-        causes,
-      };
-    }
-    // check if plugin repo (pluginSetupRepo) exist
-    type V = { pluginRepo: SubgraphPluginRepo };
-    const { pluginRepo } = await this.graphql.request<V>({
-      query: QueryPlugin,
-      params: { id: decodedApplyUpdateActionParams.pluginRepo },
-      name: "pluginRepo",
-    });
-    if (pluginRepo) {
-      // check if is one of the aragon plugin repos
-      if (
-        !SupportedPluginRepoArray.includes(
-          pluginRepo.subdomain as SupportedPluginRepo,
-        )
-      ) {
-        causes.push(PluginUpdateProposalInValidityCause.NOT_ARAGON_PLUGIN_REPO);
-      }
-    } else {
-      causes.push(PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO);
-      return {
-        isValid: causes.length === 0,
-        causes,
-      };
-    }
-
-    // get the prepared setup id
-    const preparedSetupId = getPreparedSetupId(
+    const applyUpdateCauses = await this.checkApplyUpdateActionInvalidityCauses(
+      iproposal.dao.id,
       decodedApplyUpdateActionParams,
-      PreparationType.UPDATE,
     );
-    // get plugin preparation
-    type W = { pluginPreparation: SubgraphPluginUpdatePreparation };
-    const { pluginPreparation } = await this.graphql.request<W>({
-      query: QueryPluginPreparations,
-      params: { where: { preparedSetupId } },
-      name: "pluginPreparation",
-    });
-    if (pluginPreparation) {
-      // get the metadata of the plugin repo
-      // for the release and build specified
-      const release = pluginRepo.releases.find((
-        release: SubgraphPluginRepoRelease,
-      ) =>
-        release.release === decodedApplyUpdateActionParams.versionTag.release
-      );
-      const build = release?.builds.find((
-        build: { build: number; metadata: string },
-      ) => build.build === decodedApplyUpdateActionParams.versionTag.build);
-      const metadataCid = build?.metadata;
-
-      // fetch the metadata
-      const metadata = await this.ipfs.fetchString(metadataCid!);
-      const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
-      // get the update abi for the specified build
-      const updateAbi = metadataJson.pluginSetup
-        .prepareUpdate[decodedApplyUpdateActionParams.versionTag.build]?.inputs;
-      if (updateAbi) {
-        // if the abi exists try to decode the data
-        try {
-          if (
-            decodedApplyUpdateActionParams.initData.length > 0 &&
-            updateAbi.length === 0
-          ) {
-              throw new Error();
-          }
-          // if the decode does not throw an error the data is valid
-          defaultAbiCoder.decode(
-            getNamedTypesFromMetadata(updateAbi),
-            decodedApplyUpdateActionParams.initData,
-          );
-        } catch {
-          // if the decode throws an error the data is invalid
-          causes.push(
-            PluginUpdateProposalInValidityCause.INVALID_DATA,
-          );
-        }
-      } else {
-        causes.push(
-          PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
-        );
-      }
-    } else {
-      causes.push(
-        PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
-      );
-    }
+    causes.push(...applyUpdateCauses);
     return {
       isValid: causes.length === 0,
       causes,
