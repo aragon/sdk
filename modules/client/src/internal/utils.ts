@@ -726,34 +726,36 @@ export function toDaoActions(actions: SubgraphAction[]): DaoAction[] {
 export function hashPermissions(permissions: MultiTargetPermission[]) {
   return keccak256(
     defaultAbiCoder.encode(
-      ['tuple(uint8,address,address,address,bytes32)[]'],
-      [permissions]
-    )
+      ["tuple(uint8,address,address,address,bytes32)[]"],
+      [permissions],
+    ),
   );
 }
 
 export function getPreparedSetupId(
   params: DecodedApplyInstallationParams | DecodedApplyUpdateParams,
-  preparationType: PreparationType
+  preparationType: PreparationType,
 ) {
   return keccak256(
     defaultAbiCoder.encode(
       [
-        'tuple(uint8, uint16)',
-        'address',
-        'bytes32',
-        'bytes32',
-        'bytes32',
-        'uint8',
+        "tuple(uint8, uint16)",
+        "address",
+        "bytes32",
+        "bytes32",
+        "bytes32",
+        "uint8",
       ],
       [
         [params.versionTag.release, params.versionTag.build],
         params.pluginRepo,
-        params.permissions !== null ? hashPermissions(params.permissions) : ZERO_BYTES_HASH,
+        params.permissions !== null
+          ? hashPermissions(params.permissions)
+          : ZERO_BYTES_HASH,
         params.helpersHash || ZERO_BYTES_HASH,
         ZERO_BYTES_HASH, // keccak256(params.data) || ZERO_BYTES_HASH,
         preparationType,
-      ]
-    )
+      ],
+    ),
   );
 }

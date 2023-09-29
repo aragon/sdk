@@ -203,7 +203,7 @@ export type SubgraphIProposal = {
 };
 
 export type SubgraphPluginUpdatePreparation = {
-  data: string
+  data: string;
 };
 
 export enum SubgraphPluginPreparationType {
