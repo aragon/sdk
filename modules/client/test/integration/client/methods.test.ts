@@ -18,6 +18,7 @@ import {
   TEST_NO_BALANCES_DAO_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
   TEST_TX_HASH,
+  TOKEN_VOTING_BUILD_METADATA,
   // TEST_WALLET,
 } from "../constants";
 import {
@@ -35,9 +36,11 @@ import {
   Permissions,
   PluginQueryParams,
   PluginSortBy,
+  PluginUpdateProposalInValidityCause,
   PrepareUninstallationSteps,
   SetAllowanceParams,
   SetAllowanceSteps,
+  SubgraphAction,
   TransferQueryParams,
   TransferSortBy,
   TransferType,
@@ -47,14 +50,17 @@ import {
   InvalidAddressError,
   InvalidProposalIdError,
   MissingExecPermissionError,
+  ProposalNotFoundError,
 } from "@aragon/sdk-common";
 import { Server } from "ganache";
 import {
   SubgraphBalance,
   SubgraphDao,
+  SubgraphIProposal,
   SubgraphPluginInstallation,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
+  SubgraphPluginUpdatePreparation,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "../../../src/internal/types";
@@ -69,7 +75,9 @@ import { deployErc20 } from "../../helpers/deploy-erc20";
 import { deployErc721 } from "../../helpers/deploy-erc721";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import {
+  ApplyUpdateParams,
   Context,
+  DaoAction,
   PrepareInstallationStep,
   PrepareUpdateStep,
   SortDirection,
@@ -83,9 +91,12 @@ import {
   PluginRepo__factory,
 } from "@aragon/osx-ethers";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { toSubgraphAction } from "../../helpers/subgraph";
+import { SupportedPluginRepo } from "../../../src/internal/constants";
 
 describe("Client", () => {
   let daoAddress: string;
+  let pluginAddress: string;
   let daoAddressV1: string;
   let deployment: deployContracts.Deployment;
   let deploymentV1: deployV1Contracts.Deployment;
@@ -128,6 +139,7 @@ describe("Client", () => {
         VotingMode.STANDARD,
       );
       daoAddress = daoCreation.daoAddr;
+      pluginAddress = daoCreation.pluginAddrs[0];
       daoAddressV1 = daoCreationV1.daoAddr;
     });
 
@@ -1600,7 +1612,7 @@ describe("Client", () => {
             JSON.stringify({
               ui: "test",
               change: "test",
-              pluginSetupABI: {},
+              pluginSetup: {},
             }),
           ),
         );
@@ -1636,7 +1648,7 @@ describe("Client", () => {
         expect(typeof plugin.current.build.metadata.ui).toBe("string");
         expect(plugin.current.build.metadata.change).toBe("test");
         expect(typeof plugin.current.build.metadata.change).toBe("string");
-        expect(typeof plugin.current.build.metadata.pluginSetupABI).toBe(
+        expect(typeof plugin.current.build.metadata.pluginSetup).toBe(
           "object",
         );
         expect(plugin.current.release.number).toBe(1);
@@ -1693,23 +1705,551 @@ describe("Client", () => {
       // );
     });
     describe("isPluginUpdateProposal", () => {
+      let subgraphIProposal: SubgraphIProposal;
+      let updateActions: DaoAction[];
+      let applyUpdateParams: ApplyUpdateParams;
+      let subgraphDao: SubgraphDao;
+      let subgraphPluginRepo: SubgraphPluginRepo;
+      let subgraphPluginPreparation: SubgraphPluginUpdatePreparation;
+      let subgraphUpdateActions: SubgraphAction[];
+      beforeAll(() => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+        applyUpdateParams = {
+          helpers: [],
+          pluginAddress,
+          pluginRepo: ADDRESS_ONE,
+          initData: new Uint8Array(),
+          permissions: [],
+          versionTag: {
+            release: 1,
+            build: 2,
+          },
+        };
+        updateActions = client.encoding.applyUpdateAction(
+          daoAddress,
+          applyUpdateParams,
+        );
+        subgraphUpdateActions = toSubgraphAction(updateActions);
+        subgraphIProposal = {
+          dao: {
+            id: daoAddress,
+          },
+          actions: subgraphUpdateActions,
+          allowFailureMap: "0",
+        };
+        subgraphDao = {
+          id: daoAddress,
+          subdomain: "test-tokenvoting-dao",
+          metadata: `ipfs://${IPFS_CID}`,
+          createdAt: "1234567890",
+          plugins: [{
+            appliedPreparation: {
+              pluginAddress: pluginAddress,
+            },
+            appliedPluginRepo: {
+              subdomain: SupportedPluginRepo.TOKEN_VOTING,
+            },
+            appliedVersion: {
+              build: 1,
+              release: {
+                release: 1,
+              },
+            },
+          }],
+        };
+        subgraphPluginRepo = {
+          id: deployment.tokenVotingRepo.address,
+          subdomain: SupportedPluginRepo.TOKEN_VOTING,
+          releases: [
+            {
+              release: 1,
+              metadata: `ipfs://${IPFS_CID}`,
+              builds: [
+                {
+                  build: 1,
+                  metadata: `ipfs://${IPFS_CID}`,
+                },
+                {
+                  build: 2,
+                  metadata: `ipfs://${IPFS_CID}`,
+                },
+              ],
+            },
+          ],
+        };
+        subgraphPluginPreparation = {
+          data: "0x",
+        };
+      });
       it("should throw an `InvalidProposalIdError` for a proposal with an invalid id", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new Client(ctx);
         const proposalId = TEST_DAO_ADDRESS;
-        const version = {
-          build: 1,
-          release: 1,
-        };
-        const pluginAddress = ADDRESS_ONE;
         expect(
-          () =>
-            client.methods.isPluginUpdateProposalValid({
-              proposalId,
-              version,
-              pluginAddress,
-            }),
+          () => client.methods.isPluginUpdateProposalValid(proposalId),
         ).rejects.toThrow(new InvalidProposalIdError());
+      });
+      it("should throw a `ProposalNotFoundError` for a proposal that does not exist", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: null,
+        });
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        expect(
+          () => client.methods.isPluginUpdateProposalValid(proposalId),
+        ).rejects.toThrow(new ProposalNotFoundError());
+      });
+      it("should return `INVALID_ACTIONS` when any of the required actions is not present", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: {
+            ...subgraphIProposal,
+            actions: [subgraphUpdateActions[0], subgraphUpdateActions[1]],
+          },
+        });
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.INVALID_ACTIONS,
+          ),
+        ).toBe(true);
+      });
+      it("should return `INVALID_GRANT_PERMISSION` when the grant permission is invalid", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        const invalidGrantAction = client.encoding.grantAction(
+          daoAddress,
+          {
+            permission: Permissions.ROOT_PERMISSION,
+            where: pluginAddress,
+            who: daoAddress,
+          },
+        );
+        const invalidSubgraphGrantAction =
+          toSubgraphAction([invalidGrantAction])[0];
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: {
+            ...subgraphIProposal,
+            actions: [
+              invalidSubgraphGrantAction,
+              subgraphUpdateActions[1],
+              subgraphUpdateActions[2],
+            ],
+          },
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: subgraphPluginRepo,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparation: subgraphPluginPreparation,
+        });
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+        ));
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.INVALID_GRANT_PERMISSION,
+          ),
+        ).toBe(true);
+      });
+      it("should return `INVALID_REVOKE_PERMISSION` when the grant permission is invalid", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        const invalidRevokeAction = client.encoding.revokeAction(
+          daoAddress,
+          {
+            permission: Permissions.ROOT_PERMISSION,
+            where: pluginAddress,
+            who: daoAddress,
+          },
+        );
+        const invalidSubgraphRevokeAction =
+          toSubgraphAction([invalidRevokeAction])[0];
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: {
+            ...subgraphIProposal,
+            actions: [
+              subgraphUpdateActions[0],
+              subgraphUpdateActions[1],
+              invalidSubgraphRevokeAction,
+            ],
+          },
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: subgraphPluginRepo,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparation: subgraphPluginPreparation,
+        });
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+        ));
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.INVALID_REVOKE_PERMISSION,
+          ),
+        ).toBe(true);
+      });
+      it("should return `INVALID_PLUGIN_RELEASE` when the release of the update is different", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        const invalidApplyUpdateActions = client.encoding.applyUpdateAction(
+          daoAddress,
+          { ...applyUpdateParams, versionTag: { release: 2, build: 2 } },
+        );
+        const invalidSubgraphApplyUpdateActions = toSubgraphAction(
+          invalidApplyUpdateActions,
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: {
+            ...subgraphIProposal,
+            actions: invalidSubgraphApplyUpdateActions,
+          },
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: subgraphPluginRepo,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparation: subgraphPluginPreparation,
+        });
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+        ));
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE,
+          ),
+        ).toBe(true);
+      });
+      it("should return `INVALID_PLUGIN_BUILD` when the build of the update is equal or lower to the one installed", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        const invalidApplyUpdateActions = client.encoding.applyUpdateAction(
+          daoAddress,
+          { ...applyUpdateParams, versionTag: { release: 1, build: 1 } },
+        );
+        const invalidSubgraphApplyUpdateActions = toSubgraphAction(
+          invalidApplyUpdateActions,
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: {
+            ...subgraphIProposal,
+            actions: invalidSubgraphApplyUpdateActions,
+          },
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: subgraphPluginRepo,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparation: subgraphPluginPreparation,
+        });
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+        ));
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD,
+          ),
+        ).toBe(true);
+      });
+
+      it("should return `PLUGIN_NOT_INSTALLED` when the plugin is not installed in the dao", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: subgraphIProposal,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: {
+            ...subgraphDao,
+            plugins: [{
+              subdomain: SupportedPluginRepo.TOKEN_VOTING,
+              appliedVersion: { build: 2, release: { release: 1 } },
+            }],
+          },
+        });
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED,
+          ),
+        ).toBe(true);
+      });
+
+      it("should return `NOT_ARAGON_PLUGIN_REPO` when the plugin is not an aragon plugin", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: subgraphIProposal,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: { ...subgraphPluginRepo, subdomain: "test" },
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparation: subgraphPluginPreparation,
+        });
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+        ));
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.NOT_ARAGON_PLUGIN_REPO,
+          ),
+        ).toBe(true);
+      });
+
+      it("should return `MISSING_PLUGIN_REPO` when the plugin repo does not exist", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: subgraphIProposal,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: null,
+        });
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO,
+          ),
+        ).toBe(true);
+      });
+
+      it("should return `INVALID_DATA` when the initData does not match the abi in metadata", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        const invalidApplyUpdateActions = client.encoding.applyUpdateAction(
+          daoAddress,
+          { ...applyUpdateParams, initData: updateActions[0].data },
+        );
+        const invalidSubgraphApplyUpdateActions = toSubgraphAction(
+          invalidApplyUpdateActions,
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: {
+            ...subgraphIProposal,
+            actions: invalidSubgraphApplyUpdateActions,
+          },
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: subgraphPluginRepo,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparation: subgraphPluginPreparation,
+        });
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+        ));
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.INVALID_DATA,
+          ),
+        ).toBe(true);
+      });
+
+      it("should return `INVALID_PLUGIN_REPO_METADATA` if the abi of the metadata is not available", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: subgraphIProposal,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: subgraphPluginRepo,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparation: subgraphPluginPreparation,
+        });
+
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify({
+            ...TOKEN_VOTING_BUILD_METADATA,
+            prepareUpdate: {},
+          }),
+        ));
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
+          ),
+        ).toBe(true);
+      });
+      it("should return `MISSING_PLUGIN_PREPARATION` if the preparation does not exist", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: subgraphIProposal,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: subgraphPluginRepo,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparation: null,
+        });
+
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(false);
+        expect(validationResult.causes.length).toBe(1);
+        expect(
+          validationResult.causes.includes(
+            PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
+          ),
+        ).toBe(true);
+      });
+      it("should pass and the `cause` array be empty", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new Client(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        const proposalId = TEST_MULTISIG_PROPOSAL_ID;
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: subgraphIProposal,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          dao: subgraphDao,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginRepo: subgraphPluginRepo,
+        });
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparation: subgraphPluginPreparation,
+        });
+
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+        ));
+
+        const validationResult = await client.methods
+          .isPluginUpdateProposalValid(proposalId);
+        expect(validationResult.isValid).toBe(true);
+        expect(validationResult.causes.length).toBe(0);
       });
     });
   });

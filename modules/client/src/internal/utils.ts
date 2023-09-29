@@ -493,7 +493,7 @@ export function applyUpdateParamsFromContract(
     versionTag: params.pluginSetupRef.versionTag,
     pluginAddress: params.plugin,
     pluginRepo: params.pluginSetupRef.pluginSetupRepo,
-    initData: params.initData,
+    initData: hexToBytes(params.initData),
   };
 }
 
@@ -671,7 +671,7 @@ export function decodeRevokeAction(
 ): RevokePermissionDecodedParams {
   const daoInterface = DAO__factory.createInterface();
   const hexBytes = bytesToHex(data);
-  const expectedFunction = daoInterface.getFunction("grant");
+  const expectedFunction = daoInterface.getFunction("revoke");
   const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
   return permissionParamsFromContract(result);
 }

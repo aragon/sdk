@@ -70,7 +70,6 @@ import {
   DepositParams,
   GrantPermissionDecodedParams,
   HasPermissionParams,
-  IsPluginUpdateProposalValidParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoBuildMetadata,
@@ -99,6 +98,7 @@ import {
   SubgraphPluginInstallation,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
+  SubgraphPluginRepoRelease,
   SubgraphPluginUpdatePreparation,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
@@ -1235,13 +1235,17 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       // check build is higher than the one installed
       if (
         !plugin.appliedVersion?.build ||
-        plugin.appliedVersion?.build <=
+        plugin.appliedVersion?.build >=
           decodedApplyUpdateActionParams.versionTag.build
       ) {
         causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD);
       }
     } else {
       causes.push(PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED);
+      return {
+        isValid: causes.length === 0,
+        causes,
+      };
     }
     // check if plugin repo (pluginSetupRepo) exist
     type V = { pluginRepo: SubgraphPluginRepo };
@@ -1261,6 +1265,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       }
     } else {
       causes.push(PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO);
+      return {
+        isValid: causes.length === 0,
+        causes,
+      };
     }
 
     // get the prepared setup id
@@ -1278,11 +1286,18 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (pluginPreparation) {
       // get the metadata of the plugin repo
       // for the release and build specified
-      const metadataCid =
-        pluginRepo.releases[decodedApplyUpdateActionParams.versionTag.release]
-          .builds[decodedApplyUpdateActionParams.versionTag.build].metadata;
+      const release = pluginRepo.releases.find((
+        release: SubgraphPluginRepoRelease,
+      ) =>
+        release.release === decodedApplyUpdateActionParams.versionTag.release
+      );
+      const build = release?.builds.find((
+        build: { build: number; metadata: string },
+      ) => build.build === decodedApplyUpdateActionParams.versionTag.build);
+      const metadataCid = build?.metadata;
+
       // fetch the metadata
-      const metadata = await this.ipfs.fetchString(metadataCid);
+      const metadata = await this.ipfs.fetchString(metadataCid!);
       const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
       // get the update abi for the specified build
       const updateAbi = metadataJson.pluginSetup
@@ -1290,7 +1305,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       if (updateAbi) {
         // if the abi exists try to decode the data
         try {
-          // if the decode does not thorw an error the data is valid
+          if (
+            decodedApplyUpdateActionParams.initData.length > 0 &&
+            updateAbi.length === 0
+          ) {
+              throw new Error();
+          }
+          // if the decode does not throw an error the data is valid
           defaultAbiCoder.decode(
             getNamedTypesFromMetadata(updateAbi),
             decodedApplyUpdateActionParams.initData,

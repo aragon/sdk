@@ -1,5 +1,6 @@
 import { Wallet } from "@ethersproject/wallet";
 import {
+  PluginRepoBuildMetadata,
   SubgraphAction,
   SubgraphProposalBase,
   SubgraphVoterListItemBase,
@@ -188,5 +189,26 @@ export const SUBGRAPH_PLUGIN_INSTALLATION = {
       release: 1,
     },
     build: 1,
+  },
+};
+
+export const TOKEN_VOTING_BUILD_METADATA: PluginRepoBuildMetadata = {
+  ui: "",
+  change:
+    "- The `ProposalCreated` event is now emitted with the correct start and end date if 0 is used as an input parameter.\n- The ability to create a proposal now depends on the membership status of the current instead of the snapshot block.",
+  pluginSetup: {
+    prepareInstallation: [],
+
+    prepareUpdate: {
+      1: {
+        description: "No input is required for the update.",
+        inputs: [],
+      },
+      2: {
+        description: "No input is required for the update.",
+        inputs: [],
+      },
+    },
+    prepareUninstallation: [],
   },
 };

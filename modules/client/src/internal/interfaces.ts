@@ -30,7 +30,6 @@ import {
   GrantPermissionWithConditionParams,
   HasPermissionParams,
   InitializeFromParams,
-  IsPluginUpdateProposalValidParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoListItem,
@@ -93,7 +92,7 @@ export interface IClientMethods {
   ) => Promise<[number, number, number]>;
 
   isPluginUpdateProposalValid: (
-    params: IsPluginUpdateProposalValidParams,
+    proposalId: string,
   ) => Promise<PluginUpdateProposalValidity>;
 }
 

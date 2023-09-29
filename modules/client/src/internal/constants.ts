@@ -73,7 +73,7 @@ export const UNAVAILABLE_RELEASE_METADATA: PluginRepoReleaseMetadata = {
 export const UNSUPPORTED_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
   ui: "",
   change: "(unsupported metadata link)",
-  pluginSetupABI: {
+  pluginSetup: {
     prepareInstallation: [],
     prepareUninstallation: [],
     prepareUpdate: [],
@@ -82,7 +82,7 @@ export const UNSUPPORTED_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
 export const EMPTY_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
   ui: "",
   change: "(the build has no metadata)",
-  pluginSetupABI: {
+  pluginSetup: {
     prepareInstallation: [],
     prepareUninstallation: [],
     prepareUpdate: [],
@@ -92,7 +92,7 @@ export const EMPTY_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
 export const UNAVAILABLE_BUILD_METADATA: PluginRepoBuildMetadata = {
   ui: "",
   change: "(unavailable metadata)",
-  pluginSetupABI: {
+  pluginSetup: {
     prepareInstallation: [],
     prepareUninstallation: [],
     prepareUpdate: [],
@@ -116,8 +116,8 @@ export const ZERO_BYTES_HASH = keccak256(
 );
 
 export enum PreparationType {
-  NONE = "None",
-  INSTALLATION = "Installation",
-  UPDATE = "Update",
-  UNINSTALLATION = "Uninstallation",
+  NONE = 0,
+  INSTALLATION = 1,
+  UPDATE = 2,
+  UNINSTALLATION = 3,
 }
