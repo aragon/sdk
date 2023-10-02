@@ -22,6 +22,7 @@ TEMPLATE:
 ### Added
 
 - Add prepareUpdate function to all clients
+- Plugin update check function
 
 ### Changed
 

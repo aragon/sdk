@@ -94,6 +94,10 @@ export interface IClientMethods {
   isPluginUpdateProposalValid: (
     proposalId: string,
   ) => Promise<PluginUpdateProposalValidity>;
+
+  isPluginUpdateProposal: (
+    actions: DaoAction[],
+  ) => boolean;
 }
 
 export interface IClientEncoding {
