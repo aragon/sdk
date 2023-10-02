@@ -6,6 +6,8 @@ import {
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
 } from "../types";
+import { defaultAbiCoder } from "@ethersproject/abi";
+import { keccak256 } from "@ethersproject/keccak256";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 
@@ -71,7 +73,7 @@ export const UNAVAILABLE_RELEASE_METADATA: PluginRepoReleaseMetadata = {
 export const UNSUPPORTED_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
   ui: "",
   change: "(unsupported metadata link)",
-  pluginSetupABI: {
+  pluginSetup: {
     prepareInstallation: [],
     prepareUninstallation: [],
     prepareUpdate: [],
@@ -80,7 +82,7 @@ export const UNSUPPORTED_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
 export const EMPTY_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
   ui: "",
   change: "(the build has no metadata)",
-  pluginSetupABI: {
+  pluginSetup: {
     prepareInstallation: [],
     prepareUninstallation: [],
     prepareUpdate: [],
@@ -90,9 +92,32 @@ export const EMPTY_BUILD_METADATA_LINK: PluginRepoBuildMetadata = {
 export const UNAVAILABLE_BUILD_METADATA: PluginRepoBuildMetadata = {
   ui: "",
   change: "(unavailable metadata)",
-  pluginSetupABI: {
+  pluginSetup: {
     prepareInstallation: [],
     prepareUninstallation: [],
     prepareUpdate: [],
   },
 };
+
+export enum SupportedPluginRepo {
+  ADMIN = "admin",
+  MULTISIG = "multisig",
+  TOKEN_VOTING = "token-voting",
+  ADDRESS_LIST_VOTING = "address-list-voting",
+}
+
+export const SupportedPluginRepoArray = Object.values(SupportedPluginRepo);
+
+export const ZERO_BYTES_HASH = keccak256(
+  defaultAbiCoder.encode(
+    ["bytes32"],
+    ["0x0000000000000000000000000000000000000000000000000000000000000000"],
+  ),
+);
+
+export enum PreparationType {
+  NONE = 0,
+  INSTALLATION = 1,
+  UPDATE = 2,
+  UNINSTALLATION = 3,
+}

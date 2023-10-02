@@ -1,8 +1,10 @@
 import {
   ApplyInstallationParamsBase,
+  MetadataAbiInput,
   Pagination,
   PluginInstallItem,
   TokenType,
+  VersionTag,
 } from "@aragon/sdk-client-common";
 
 /* DAO creation */
@@ -89,9 +91,14 @@ export type PluginRepoReleaseMetadata = {
 export type PluginRepoBuildMetadata = {
   ui: string;
   change: string;
-  pluginSetupABI: {
+  pluginSetup: {
     prepareInstallation: string[];
-    prepareUpdate: string[];
+    prepareUpdate: {
+      [key: number]: {
+        description: string;
+        inputs: MetadataAbiInput[];
+      };
+    };
     prepareUninstallation: string[];
   };
 };
@@ -300,7 +307,7 @@ type Erc1155TokenTransfer = TokenTransferBase & {
   tokenId: bigint;
   token: {
     address: string;
-  }
+  };
   amount: bigint;
 };
 
@@ -421,4 +428,31 @@ export type UpgradeToAndCallParams = {
 export type InitializeFromParams = {
   previousVersion: [number, number, number];
   initData?: Uint8Array;
+};
+
+export type PluginUpdateProposalValidity = {
+  isValid: boolean;
+  causes: PluginUpdateProposalInValidityCause[];
+};
+
+export enum PluginUpdateProposalInValidityCause {
+  INVALID_ACTIONS = "invalidActions",
+  INVALID_GRANT_PERMISSION = "invalidGrantPermission",
+  INVALID_REVOKE_PERMISSION = "invalidRevokePermission",
+  PLUGIN_NOT_INSTALLED = "pluginNotInstalled",
+  NOT_ARAGON_PLUGIN_REPO = "notAragonPluginRepo",
+  MISSING_PLUGIN_REPO = "missingPluginRepo",
+  MISSING_PLUGIN_PREPARATION = "missingPluginPreparation",
+  INVALID_ALLOW_FAILURE_MAP = "invalidAllowFailureMap",
+  INVALID_PLUGIN_RELEASE = "invalidPluginRelease",
+  INVALID_PLUGIN_BUILD = "invalidPluginBuild",
+  INVALID_DATA = "invalidData",
+  INVALID_PLUGIN_REPO_METADATA = "invalidPluginRepoMetadata",
+}
+
+export type IsPluginUpdateProposalValidParams = {
+  proposalId: string;
+  version: VersionTag;
+  pluginAddress: string;
+  pluginPreparationIndex?: number;
 };

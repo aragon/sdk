@@ -33,6 +33,7 @@ import {
   PluginQueryParams,
   PluginRepo,
   PluginRepoListItem,
+  PluginUpdateProposalValidity,
   PrepareUninstallationParams,
   PrepareUninstallationStepValue,
   RegisterStandardCallbackParams,
@@ -89,6 +90,14 @@ export interface IClientMethods {
   getProtocolVersion: (
     contractAddress: string,
   ) => Promise<[number, number, number]>;
+
+  isPluginUpdateProposalValid: (
+    proposalId: string,
+  ) => Promise<PluginUpdateProposalValidity>;
+
+  isPluginUpdateProposal: (
+    actions: DaoAction[],
+  ) => boolean;
 }
 
 export interface IClientEncoding {

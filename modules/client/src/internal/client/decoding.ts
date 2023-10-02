@@ -17,7 +17,9 @@ import {
 } from "@aragon/osx-ethers";
 import {
   applyInstallatonParamsFromContract,
-  applyUpdateParamsFromContract,
+  decodeApplyUpdateAction,
+  decodeGrantAction,
+  findInterface,
   permissionParamsFromContract,
   permissionParamsWitConditionFromContract,
   withdrawParamsFromContract,
@@ -40,7 +42,6 @@ import {
   ClientCore,
   DecodedApplyInstallationParams,
   DecodedApplyUpdateParams,
-  getFunctionFragment,
   InterfaceParams,
   TokenType,
 } from "@aragon/sdk-client-common";
@@ -88,11 +89,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public applyUpdateAction(
     data: Uint8Array,
   ): DecodedApplyUpdateParams {
-    const pspInterface = PluginSetupProcessor__factory.createInterface();
-    const hexBytes = bytesToHex(data);
-    const expectedFunction = pspInterface.getFunction("applyUpdate");
-    const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
-    return applyUpdateParamsFromContract(result);
+    return decodeApplyUpdateAction(data);
   }
 
   /**
@@ -103,11 +100,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public grantAction(data: Uint8Array): GrantPermissionDecodedParams {
-    const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data);
-    const expectedFunction = daoInterface.getFunction("grant");
-    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
-    return permissionParamsFromContract(result);
+    return decodeGrantAction(data);
   }
   /**
    * Decodes the grant permission with condition parameters from an encoded grant with condition action
@@ -357,15 +350,6 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public findInterface(data: Uint8Array): InterfaceParams | null {
-    try {
-      const func = getFunctionFragment(data, AVAILABLE_FUNCTION_SIGNATURES);
-      return {
-        id: func.format("minimal"),
-        functionName: func.name,
-        hash: bytesToHex(data).substring(0, 10),
-      };
-    } catch {
-      return null;
-    }
+    return findInterface(data, AVAILABLE_FUNCTION_SIGNATURES);
   }
 }

@@ -49,16 +49,26 @@ import { defaultAbiCoder, Result } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { AddressZero } from "@ethersproject/constants";
-import { DAO__factory, PluginSetupProcessor } from "@aragon/osx-ethers";
+import {
+  DAO__factory,
+  PluginSetupProcessor,
+  PluginSetupProcessor__factory,
+} from "@aragon/osx-ethers";
 import { PermissionIds } from "../constants";
 import {
   ApplyInstallationParams,
   ApplyUpdateParams,
+  DaoAction,
   DecodedApplyInstallationParams,
   DecodedApplyUpdateParams,
+  getFunctionFragment,
+  InterfaceParams,
+  MultiTargetPermission,
   TokenType,
 } from "@aragon/sdk-client-common";
 import {
+  bytesToHex,
+  hexToBytes,
   InvalidParameter,
   NotImplementedError,
   SizeMismatchError,
@@ -68,6 +78,8 @@ import { Contract } from "@ethersproject/contracts";
 import { BigNumber } from "@ethersproject/bignumber";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
+import { SubgraphAction } from "../client-common";
+import { PreparationType, ZERO_BYTES_HASH } from "./constants";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -481,7 +493,7 @@ export function applyUpdateParamsFromContract(
     versionTag: params.pluginSetupRef.versionTag,
     pluginAddress: params.plugin,
     pluginRepo: params.pluginSetupRef.pluginSetupRepo,
-    initData: params.initData,
+    initData: hexToBytes(params.initData),
   };
 }
 
@@ -643,4 +655,107 @@ export async function estimateErc1155Deposit(
       );
   }
   return estimation;
+}
+
+export function decodeGrantAction(
+  data: Uint8Array,
+): GrantPermissionDecodedParams {
+  const daoInterface = DAO__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = daoInterface.getFunction("grant");
+  const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return permissionParamsFromContract(result);
+}
+export function decodeRevokeAction(
+  data: Uint8Array,
+): RevokePermissionDecodedParams {
+  const daoInterface = DAO__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = daoInterface.getFunction("revoke");
+  const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return permissionParamsFromContract(result);
+}
+
+export function decodeApplyUpdateAction(
+  data: Uint8Array,
+): DecodedApplyUpdateParams {
+  const pspInterface = PluginSetupProcessor__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = pspInterface.getFunction("applyUpdate");
+  const result = pspInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return applyUpdateParamsFromContract(result);
+}
+
+export function findInterface(
+  data: Uint8Array,
+  functionSignatures: string[],
+): InterfaceParams | null {
+  try {
+    const func = getFunctionFragment(data, functionSignatures);
+    return {
+      id: func.format("minimal"),
+      functionName: func.name,
+      hash: bytesToHex(data).substring(0, 10),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function findAction(
+  actions: DaoAction[],
+  functionSignature: string,
+): number {
+  for (const [index, action] of actions.entries()) {
+    const iface = findInterface(action.data, [functionSignature]);
+    if (iface) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+export function toDaoActions(actions: SubgraphAction[]): DaoAction[] {
+  return actions.map((action) => ({
+    to: action.to,
+    value: BigInt(action.value),
+    data: hexToBytes(action.data),
+  }));
+}
+
+export function hashPermissions(permissions: MultiTargetPermission[]) {
+  return keccak256(
+    defaultAbiCoder.encode(
+      ["tuple(uint8,address,address,address,bytes32)[]"],
+      [permissions],
+    ),
+  );
+}
+
+export function getPreparedSetupId(
+  params: DecodedApplyInstallationParams | DecodedApplyUpdateParams,
+  preparationType: PreparationType,
+) {
+  return keccak256(
+    defaultAbiCoder.encode(
+      [
+        "tuple(uint8, uint16)",
+        "address",
+        "bytes32",
+        "bytes32",
+        "bytes32",
+        "uint8",
+      ],
+      [
+        [params.versionTag.release, params.versionTag.build],
+        params.pluginRepo,
+        params.permissions !== null
+          ? hashPermissions(params.permissions)
+          : ZERO_BYTES_HASH,
+        params.helpersHash || ZERO_BYTES_HASH,
+        ZERO_BYTES_HASH, // keccak256(params.data) || ZERO_BYTES_HASH,
+        preparationType,
+      ],
+    ),
+  );
 }

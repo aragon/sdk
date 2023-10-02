@@ -53,3 +53,11 @@ query IPlugin($address: ID!, $where: IPlugin_filter!) {
   }
 }
 `;
+
+export const QueryPluginPreparations = gql`
+query PluginPreparations($where: PluginUpdatePreparation_filter!) {
+  pluginPreparations(where: $where){
+    data
+  }
+}
+`;
