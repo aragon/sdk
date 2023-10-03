@@ -23,9 +23,9 @@ import {
   PluginInstallItem,
   SupportedNetwork,
   SupportedNetworksArray,
+  SupportedVersion,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
-import { SupportedVersion } from "@aragon/sdk-client-common";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -58,7 +58,8 @@ export class AddresslistVotingClientEncoding extends ClientCore
     );
 
     return {
-      id: LIVE_CONTRACTS[SupportedVersion.LATEST][networkName].addresslistVotingRepoAddress,
+      id: LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
+        .addresslistVotingRepoAddress,
       data: hexToBytes(hexBytes),
     };
   }
