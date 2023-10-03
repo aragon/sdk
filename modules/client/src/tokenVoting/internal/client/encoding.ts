@@ -28,6 +28,7 @@ import {
   SupportedNetworksArray,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
+import { SupportedVersion } from "@aragon/sdk-client-common";
 
 /**
  * Encoding module the SDK TokenVoting Client
@@ -57,7 +58,7 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      id: LIVE_CONTRACTS[networkName].tokenVotingRepoAddress,
+      id: LIVE_CONTRACTS[SupportedVersion.LATEST][networkName].tokenVotingRepoAddress,
       data: hexToBytes(hexBytes),
     };
   }

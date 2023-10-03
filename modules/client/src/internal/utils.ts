@@ -4,6 +4,7 @@ import {
   DaoDetails,
   DaoListItem,
   DaoMetadata,
+  DecodedInitializeFromParams,
   DepositErc1155Params,
   DepositErc20Params,
   DepositErc721Params,
@@ -22,6 +23,7 @@ import {
   RevokePermissionParams,
   Transfer,
   TransferType,
+  UpgradeToAndCallParams,
   WithdrawParams,
 } from "../types";
 import {
@@ -758,4 +760,34 @@ export function getPreparedSetupId(
       ],
     ),
   );
+}
+
+export function decodeUpgradeToAndCallAction(
+  data: Uint8Array,
+): UpgradeToAndCallParams {
+  const daoInterface = DAO__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = daoInterface.getFunction(
+    "upgradeToAndCall",
+  );
+  const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return {
+    implementationAddress: result[0],
+    data: hexToBytes(result[1]),
+  };
+}
+
+export function decodeInitializeFromAction(
+  data: Uint8Array,
+): DecodedInitializeFromParams {
+  const daoInterface = DAO__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = daoInterface.getFunction(
+    "initializeFrom",
+  );
+  const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return {
+    previousVersion: result[0],
+    initData: hexToBytes(result[1]),
+  };
 }

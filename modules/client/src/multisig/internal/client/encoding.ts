@@ -27,6 +27,7 @@ import {
   SupportedNetworksArray,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
+import { SupportedVersion } from "@aragon/sdk-client-common";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -62,7 +63,7 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
-      id: LIVE_CONTRACTS[networkName].multisigRepoAddress,
+      id: LIVE_CONTRACTS[SupportedVersion.LATEST][networkName].multisigRepoAddress,
       data: hexToBytes(hexBytes),
     };
   }

@@ -12,6 +12,7 @@ import {
   GRAPHQL_NODES,
   IPFS_NODES,
   LIVE_CONTRACTS,
+  SupportedVersion,
 } from "@aragon/sdk-client-common";
 
 const TEST_WALLET =
@@ -44,7 +45,7 @@ describe("Context instances", () => {
     expect(context.network.name).toBe("homestead");
     expect(context.network.chainId).toBe(1);
     expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS.homestead.daoFactoryAddress,
+      LIVE_CONTRACTS[SupportedVersion.LATEST].homestead.daoFactoryAddress,
     );
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
@@ -120,7 +121,7 @@ describe("Context instances", () => {
     expect(context.network.name).toBe("goerli");
     expect(context.network.chainId).toBe(5);
     expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS.goerli.daoFactoryAddress,
+      LIVE_CONTRACTS[SupportedVersion.LATEST].goerli.daoFactoryAddress,
     );
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
@@ -143,10 +144,10 @@ describe("Context instances", () => {
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
     expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS.matic.daoFactoryAddress,
+      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.daoFactoryAddress,
     );
     expect(context.ensRegistryAddress).toBe(
-      LIVE_CONTRACTS.matic.ensRegistryAddress,
+      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress,
     );
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(1);
@@ -172,10 +173,10 @@ describe("Context instances", () => {
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
     expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS.matic.daoFactoryAddress,
+      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.daoFactoryAddress,
     );
     expect(context.ensRegistryAddress).toBe(
-      LIVE_CONTRACTS.matic.ensRegistryAddress,
+      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress,
     );
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(1);
@@ -215,7 +216,7 @@ describe("Context instances", () => {
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
     expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS.matic.daoFactoryAddress,
+      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.daoFactoryAddress,
     );
     expect(context.ensRegistryAddress).toBe(ADDRESS_ONE);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
@@ -257,14 +258,14 @@ describe("Context instances", () => {
       provider.getNetwork().then((nw) => {
         expect(nw.chainId).toEqual(137);
         expect(nw.name).toEqual("matic");
-        expect(nw.ensAddress).toEqual(LIVE_CONTRACTS.matic.ensRegistryAddress);
+        expect(nw.ensAddress).toEqual(LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress);
       })
     );
     expect(context.daoFactoryAddress).toEqual(
-      LIVE_CONTRACTS.matic.daoFactoryAddress,
+      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.daoFactoryAddress,
     );
     expect(context.ensRegistryAddress).toEqual(
-      LIVE_CONTRACTS.matic.ensRegistryAddress,
+      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress,
     );
   });
 });

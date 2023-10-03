@@ -61,6 +61,9 @@ import {
   DaoMetadata,
   DaoQueryParams,
   DaoSortBy,
+  DaoUpdateProposalInvalidityCause,
+  DaoUpdateProposalValidity,
+  DecodedInitializeFromParams,
   DepositErc1155Params,
   DepositErc20Params,
   DepositErc721Params,
@@ -68,6 +71,7 @@ import {
   DepositParams,
   GrantPermissionDecodedParams,
   HasPermissionParams,
+  IsDaoUpdateProposalValidParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoBuildMetadata,
@@ -104,7 +108,9 @@ import {
 import {
   decodeApplyUpdateAction,
   decodeGrantAction,
+  decodeInitializeFromAction,
   decodeRevokeAction,
+  decodeUpgradeToAndCallAction,
   findAction,
   getPreparedSetupId,
   toAssetBalance,
@@ -141,6 +147,7 @@ import {
   DecodedApplyUpdateParams,
   findLog,
   getNamedTypesFromMetadata,
+  LIVE_CONTRACTS,
   MULTI_FETCH_TIMEOUT,
   MultiTargetPermission,
   prepareGenericInstallation,
@@ -150,6 +157,7 @@ import {
   PrepareUpdateParams,
   PrepareUpdateStepValue,
   SortDirection,
+  SupportedVersion,
   TokenType,
 } from "@aragon/sdk-client-common";
 
@@ -1098,6 +1106,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return version;
   }
 
+  public isDaoUpdateProposal(
+    actions: DaoAction[],
+  ): boolean {
+    const initializeFromInterface = DAO__factory.createInterface()
+      .getFunction("initializeFrom").format("minimal");
+    return findAction(actions, initializeFromInterface) !== -1;
+  }
   /**
    * Check if the specified actions try to update a plugin
    *
@@ -1363,5 +1378,163 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       isValid: causes.length === 0,
       causes,
     };
+  }
+
+  public async isDaoUpdateProposalValid(
+    params: IsDaoUpdateProposalValidParams,
+  ): Promise<DaoUpdateProposalValidity> {
+    type T = { iproposal: SubgraphIProposal };
+    const { iproposal } = await this.graphql.request<T>({
+      query: QueryIProposal,
+      params: { id: params.proposalId },
+      name: "iproposal",
+    });
+    if (!iproposal) {
+      throw new ProposalNotFoundError();
+    }
+    const causes: DaoUpdateProposalInvalidityCause[] = [];
+    // get initialize from signature
+    const upgradeToAndCallSignature = DAO__factory.createInterface()
+      .getFunction(
+        "upgradeToAndCall",
+      ).format("minimal");
+    // find initialize from signature in the actions specified in the proposal
+    const daoActions = toDaoActions(iproposal.actions);
+    const upgradeToAndCallIndex = findAction(
+      daoActions,
+      upgradeToAndCallSignature,
+    );
+    // check that initialize from action is present
+    if (upgradeToAndCallIndex === -1) {
+      causes.push(DaoUpdateProposalInvalidityCause.INVALID_ACTIONS);
+      return {
+        isValid: causes.length === 0,
+        causes,
+      };
+    }
+    const decodedUpgradeToAndCallParams = decodeUpgradeToAndCallAction(
+      daoActions[upgradeToAndCallIndex].data,
+    );
+    let decodedInitializeFromParams: DecodedInitializeFromParams;
+    try {
+      decodedInitializeFromParams = decodeInitializeFromAction(
+        decodedUpgradeToAndCallParams.data,
+      );
+    } catch {
+      causes.push(DaoUpdateProposalInvalidityCause.INVALID_ACTIONS);
+      return { isValid: causes.length === 0, causes };
+    }
+
+    // check version
+    if (
+      !await this.isDaoUpdateVersionValid(
+        iproposal.dao.id,
+        decodedInitializeFromParams.previousVersion,
+      )
+    ) {
+      causes.push(DaoUpdateProposalInvalidityCause.INVALID_VERSION);
+    }
+    // get version if not specified use the one from the dao factory address
+    // in the context
+    let upgradeToVersion = params.version;
+    if (!upgradeToVersion) {
+      upgradeToVersion = await this.getProtocolVersion(
+        this.web3.getAddress("daoFactoryAddress"),
+      );
+    }
+    // check implementation
+    if (
+      !await this.isDaoUpdateImplementationValid(
+        upgradeToVersion.join(".") as SupportedVersion,
+        decodedUpgradeToAndCallParams.implementationAddress,
+      )
+    ) {
+      causes.push(DaoUpdateProposalInvalidityCause.INVALID_IMPLEMENTATION);
+    }
+    // check data
+    if (!this.isDaoUpdateInitDataValid(decodedInitializeFromParams.initData)) {
+      causes.push(DaoUpdateProposalInvalidityCause.INVALID_INIT_DATA);
+    }
+    return { isValid: causes.length === 0, causes };
+  }
+
+  /**
+   * Check if the current version of the dao is the same as the specified version
+   *
+   * @private
+   * @param {string} daoAddress
+   * @param {[number, number, number]} specifiedVersion
+   * @return {*}  {Promise<boolean>}
+   * @memberof ClientMethods
+   */
+  private async isDaoUpdateVersionValid(
+    daoAddress: string,
+    specifiedVersion: [number, number, number],
+  ): Promise<boolean> {
+    // get the current version of the dao, so the result should not be the upgraded value
+    const currentDaoVersion = await this.getProtocolVersion(daoAddress);
+    // currentDao version should be equal to the previous version
+    // because it references the version that the dao will be upgraded from
+    // ex: if we want to upgrade from version 1.0.0 to 1.3.0
+    // the previous version should be 1.0.0 and so should be the current dao version
+    return JSON.stringify(currentDaoVersion) ===
+      JSON.stringify(specifiedVersion);
+  }
+
+  /**
+   * Check if the implementation address is the same as the one from the dao factory
+   *
+   * @private
+   * @param {SupportedVersion} version
+   * @param {string} implementationAddress
+   * @return {*}  {Promise<boolean>}
+   * @memberof ClientMethods
+   */
+  private async isDaoUpdateImplementationValid(
+    version: SupportedVersion,
+    implementationAddress: string,
+  ): Promise<boolean> {
+    const networkName = this.web3.getNetworkName();
+    // The dao factory address holds the implementation address for each version
+    // so we can check that the specified implementation address is the same
+    // as the one from the dao factory
+    const daoFactoryAddress =
+      LIVE_CONTRACTS[version][networkName].daoFactoryAddress;
+    const daoBase = await this.getDaoImplementation(daoFactoryAddress);
+    return daoBase === implementationAddress;
+  }
+
+  /**
+   * Check if the init data is valid for the specified version of the dao
+   *
+   * @param {IsDaoUpdateInitDataValidParams} params
+   * @return {*}  {Promise<boolean>}
+   * @memberof ClientMethods
+   */
+  private isDaoUpdateInitDataValid(
+    data: Uint8Array,
+    _version?: SupportedVersion,
+  ): boolean {
+    // TODO: decode the data using the abi from the the prepare update
+    // for now the init data must be empty but this can change in the future
+    // atm we cannot know the parameters for each version of the dao
+    return data.length === 0;
+  }
+
+  /**
+   *  Return the implementation address for the specified dao factory
+   *
+   * @param {string} daoFactoryAddress
+   * @return {*}  {Promise<string>}
+   * @memberof ClientMethods
+   */
+  public async getDaoImplementation(
+    daoFactoryAddress: string,
+  ): Promise<string> {
+    const daoFactoryImplementation = DAOFactory__factory.connect(
+      daoFactoryAddress,
+      this.web3.getProvider(),
+    );
+    return daoFactoryImplementation.daoBase();
   }
 }
