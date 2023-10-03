@@ -26,6 +26,7 @@ import {
   PrepareUpdateStep,
   PrepareUpdateStepValue,
   SupportedNetwork,
+  SupportedVersion,
 } from "./types";
 import {
   IClientGraphQLCore,
@@ -123,7 +124,8 @@ export async function prepareGenericInstallationEstimation(
   );
   // connect to psp contract
   const pspContract = PluginSetupProcessor__factory.connect(
-    LIVE_CONTRACTS[networkName].pluginSetupProcessorAddress,
+    LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
+      .pluginSetupProcessorAddress,
     provider,
   );
 
