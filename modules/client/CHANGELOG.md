@@ -23,6 +23,7 @@ TEMPLATE:
 
 - Add prepareUpdate function to all clients
 - Plugin update check function
+- Dao update check function
 
 ### Changed
 

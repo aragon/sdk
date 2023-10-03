@@ -23,6 +23,7 @@ TEMPLATE:
 
 - Add generic prepare update function
 - Add generic prepare update estimation function
+- Support for multiple versions on `LIVE_CONTRACTS`
 
 ## 1.5.0-rc0
 
