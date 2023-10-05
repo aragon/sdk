@@ -23,6 +23,7 @@ import {
   DaoListItem,
   DaoMetadata,
   DaoQueryParams,
+  DaoUpdateProposalValidity,
   DecodedApplyUninstallationParams,
   DepositParams,
   GrantPermissionDecodedParams,
@@ -30,6 +31,7 @@ import {
   GrantPermissionWithConditionParams,
   HasPermissionParams,
   InitializeFromParams,
+  IsDaoUpdateProposalValidParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoListItem,
@@ -98,6 +100,18 @@ export interface IClientMethods {
   isPluginUpdateProposal: (
     actions: DaoAction[],
   ) => boolean;
+  
+  isDaoUpdateProposal: (
+    actions: DaoAction[],
+  ) => boolean;
+
+  isDaoUpdateProposalValid: (
+    params: IsDaoUpdateProposalValidParams,
+  ) => Promise<DaoUpdateProposalValidity>;
+
+  getDaoImplementation: (
+    daoFactoryAddress: string,
+  ) => Promise<string>;
 }
 
 export interface IClientEncoding {

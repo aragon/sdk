@@ -429,6 +429,10 @@ export type InitializeFromParams = {
   previousVersion: [number, number, number];
   initData?: Uint8Array;
 };
+export type DecodedInitializeFromParams = {
+  previousVersion: [number, number, number];
+  initData: Uint8Array;
+};
 
 export type PluginUpdateProposalValidity = {
   isValid: boolean;
@@ -455,4 +459,21 @@ export type IsPluginUpdateProposalValidParams = {
   version: VersionTag;
   pluginAddress: string;
   pluginPreparationIndex?: number;
+};
+
+export enum DaoUpdateProposalInvalidityCause {
+  INVALID_ACTIONS = "invalidActions",
+  INVALID_IMPLEMENTATION = "invalidImplementation",
+  INVALID_VERSION = "invalidVersion",
+  INVALID_INIT_DATA = "invalidInitData",
+}
+
+export type DaoUpdateProposalValidity = {
+  isValid: boolean;
+  causes: DaoUpdateProposalInvalidityCause[];
+};
+
+export type IsDaoUpdateProposalValidParams = {
+  proposalId: string;
+  version?: [number, number, number];
 };

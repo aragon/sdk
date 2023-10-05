@@ -15,6 +15,7 @@ import {
   OverriddenState,
   SupportedNetwork,
   SupportedNetworksArray,
+  SupportedVersion,
 } from "./types";
 import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
 import { getNetwork } from "./utils";
@@ -110,7 +111,7 @@ export abstract class ContextCore {
     if (
       !GRAPHQL_NODES[networkName]?.length ||
       !IPFS_NODES[networkName]?.length ||
-      !LIVE_CONTRACTS[networkName]
+      !LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
     ) {
       throw new UnsupportedNetworkError(networkName);
     }
@@ -127,7 +128,8 @@ export abstract class ContextCore {
 
     for (const address of DeployedAddressesArray) {
       if (!this.overriden[address]) {
-        let defaultAddress = LIVE_CONTRACTS[networkName][address];
+        let defaultAddress =
+          LIVE_CONTRACTS[SupportedVersion.LATEST][networkName][address];
         // custom check for ensRegistryAddress
         if (address === "ensRegistryAddress" && !defaultAddress) {
           defaultAddress = this.network.ensAddress;
@@ -360,7 +362,8 @@ export abstract class ContextCore {
     }
 
     if (!network.ensAddress) {
-      const ensAddress = LIVE_CONTRACTS[networkName].ensRegistryAddress;
+      const ensAddress =
+        LIVE_CONTRACTS[SupportedVersion.LATEST][networkName].ensRegistryAddress;
       if (!ensAddress) {
         throw new UnsupportedNetworkError(networkName);
       }
