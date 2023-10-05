@@ -7,16 +7,6 @@ import {
 } from "@ethersproject/providers";
 import { ContractReceipt } from "@ethersproject/contracts";
 import {
-  bytesToHex,
-  hexToBytes,
-  InstallationNotFoundError,
-  InvalidAddressError,
-  InvalidVersionError,
-  PluginInstallationPreparationError,
-  PluginUpdatePreparationError,
-  UnsupportedNetworkError,
-} from "@aragon/sdk-common";
-import {
   GasFeeEstimation,
   MetadataAbiInput,
   PrepareInstallationParams,
@@ -43,6 +33,15 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 import { isAddress } from "@ethersproject/address";
 import { Network } from "@ethersproject/networks";
 import { QueryIPlugin } from "./internal/graphql-queries";
+import { bytesToHex, hexToBytes } from "./encoding";
+import {
+  InstallationNotFoundError,
+  InvalidAddressError,
+  InvalidVersionError,
+  PluginInstallationPreparationError,
+  PluginUpdatePreparationError,
+  UnsupportedNetworkError,
+} from "./errors";
 
 export function findLog(
   receipt: ContractReceipt,

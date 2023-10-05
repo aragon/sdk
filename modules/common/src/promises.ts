@@ -11,6 +11,14 @@ export function allSettled(
   return Promise.all(proms.map(reflect));
 }
 
+/**
+ * 
+ *
+ * @template T
+ * @param {Promise<T>} prom
+ * @return {*}
+ * @deprecated 
+ */
 function reflect<T>(prom: Promise<T>) {
   return prom
     .then((value: T) => ({ value, status: "fulfilled" }))

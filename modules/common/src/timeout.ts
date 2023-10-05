@@ -4,6 +4,7 @@ import { TimeoutError } from "./errors";
  * @param func The promise-returning function to invoke
  * @param timeout Timeout (in seconds) to wait before failing
  * @param timeoutMessage (optional) Message to use when throwing a timeout error
+ * @deprecated Use `promiseWithTimeout` instead
  */
 export function promiseFuncWithTimeout<T>(
   func: () => Promise<T>,
@@ -29,6 +30,7 @@ export function promiseFuncWithTimeout<T>(
  * @param prom The promise to track
  * @param timeout Timeout (in milliseconds) to wait before failing
  * @param timeoutMessage (optional) Message to use when throwing a timeout error. By default: `"Time out"`
+ * @deprecated moved to `sdk-common-client`
  */
 export function promiseWithTimeout<T>(
   prom: Promise<T>,

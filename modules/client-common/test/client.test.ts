@@ -1,8 +1,12 @@
 import { Wallet } from "@ethersproject/wallet";
 import { ClientCore, ContextCore, ContextParams } from "../src";
-import { DEFAULT_IPFS_ENDPOINTS, TEST_WALLET, TEST_WALLET_ADDRESS, web3endpoints } from "./constants";
-import { NoProviderError, NoSignerError } from "@aragon/sdk-common";
-
+import {
+  DEFAULT_IPFS_ENDPOINTS,
+  TEST_WALLET,
+  TEST_WALLET_ADDRESS,
+  web3endpoints,
+} from "./constants";
+import { NoProviderError, NoSignerError } from "../src/errors";
 class TestContext extends ContextCore {
   constructor(params?: Partial<ContextParams>) {
     super(params);
@@ -31,7 +35,7 @@ describe("Test an extended client", () => {
     const provider = client.web3.getProvider();
     expect(provider).toBeDefined();
 
-    const networkName = client.web3.getNetworkName()
+    const networkName = client.web3.getNetworkName();
     expect(networkName).toBe("homestead");
 
     const signer = client.web3.getConnectedSigner();
@@ -40,7 +44,9 @@ describe("Test an extended client", () => {
 
     const ipfsClient = client.ipfs.getClient();
     expect(ipfsClient).toBeDefined();
-    expect(DEFAULT_IPFS_ENDPOINTS.includes(ipfsClient.url.toString())).toBe(true);
+    expect(DEFAULT_IPFS_ENDPOINTS.includes(ipfsClient.url.toString())).toBe(
+      true,
+    );
 
     const graphqlClient = client.graphql.getClient();
     expect(graphqlClient).toBeDefined();
@@ -55,7 +61,7 @@ describe("Test an extended client", () => {
     expect(client.ipfs).toBeDefined();
     expect(client.graphql).toBeDefined();
 
-    const networkName = client.web3.getNetworkName()
+    const networkName = client.web3.getNetworkName();
     expect(networkName).toBe("homestead");
 
     expect(() => client.web3.getProvider()).toThrowError(NoProviderError);
@@ -63,19 +69,20 @@ describe("Test an extended client", () => {
 
     const ipfsClient = client.ipfs.getClient();
     expect(ipfsClient).toBeDefined();
-    expect(DEFAULT_IPFS_ENDPOINTS.includes(ipfsClient.url.toString())).toBe (true);
+    expect(DEFAULT_IPFS_ENDPOINTS.includes(ipfsClient.url.toString())).toBe(
+      true,
+    );
 
     const graphqlClient = client.graphql.getClient();
     expect(graphqlClient).toBeDefined();
-    
   });
 
   it("Should create a client with baseGoerli context parameters", async () => {
     const contextParams: ContextParams = {
       network: "baseGoerli",
       signer: new Wallet(TEST_WALLET),
-      web3Providers: "https://goerli.base.org"
-    }
+      web3Providers: "https://goerli.base.org",
+    };
     const ctx = new TestContext(contextParams);
     const client = new TestClient(ctx);
     expect(client).toBeDefined();
@@ -84,7 +91,7 @@ describe("Test an extended client", () => {
     expect(client.ipfs).toBeDefined();
     expect(client.graphql).toBeDefined();
 
-    const networkName = client.web3.getNetworkName()
+    const networkName = client.web3.getNetworkName();
     expect(networkName).toBe("baseGoerli");
     const signer = client.web3.getConnectedSigner();
     expect(signer).toBeDefined();
@@ -92,9 +99,11 @@ describe("Test an extended client", () => {
 
     const ipfsClient = client.ipfs.getClient();
     expect(ipfsClient).toBeDefined();
-    expect(DEFAULT_IPFS_ENDPOINTS.includes(ipfsClient.url.toString())).toBe(true);
+    expect(DEFAULT_IPFS_ENDPOINTS.includes(ipfsClient.url.toString())).toBe(
+      true,
+    );
 
     const graphqlClient = client.graphql.getClient();
     expect(graphqlClient).toBeDefined();
-  })
+  });
 });

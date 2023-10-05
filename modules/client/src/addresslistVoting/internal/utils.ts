@@ -1,10 +1,4 @@
 import {
-  decodeRatio,
-  getCompactProposalId,
-  hexToBytes,
-  InvalidProposalStatusError,
-} from "@aragon/sdk-common";
-import {
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,
