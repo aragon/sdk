@@ -21,9 +21,9 @@ TEMPLATE:
 ### Added
 
 - Add common schemas for validations
+- Support for sepolia network
 
 ## 1.6.0
-
 ### Added
 
 - Add generic prepare update function
