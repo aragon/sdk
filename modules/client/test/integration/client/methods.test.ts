@@ -47,9 +47,6 @@ import {
   UpgradeToAndCallParams,
   VotingMode,
 } from "../../../src";
-import {
-  ProposalNotFoundError,
-} from "@aragon/sdk-common";
 import { Server } from "ganache";
 import {
   SubgraphBalance,
@@ -77,10 +74,11 @@ import {
   Context,
   DaoAction,
   LIVE_CONTRACTS,
-  PrepareUpdateStep,
   Permissions,
   PrepareInstallationStep,
   PrepareUninstallationSteps,
+  PrepareUpdateStep,
+  ProposalNotFoundError,
   SortDirection,
   SupportedVersion,
   TokenType,
@@ -224,7 +222,9 @@ describe("Client", () => {
         };
 
         await expect(client.methods.createDao(daoCreationParams).next()).rejects
-          .toEqual(new ValidationError("plugins field must have at least 1 items"));
+          .toEqual(
+            new ValidationError("plugins field must have at least 1 items"),
+          );
       });
     });
 

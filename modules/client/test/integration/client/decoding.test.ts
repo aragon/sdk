@@ -25,7 +25,6 @@ import {
 } from "../constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
-import { bytesToHex, hexToBytes } from "@aragon/sdk-common";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
 import {
@@ -34,6 +33,9 @@ import {
   ApplyUninstallationParams,
   Context,
   PermissionIds,
+  bytesToHex,
+  Context,
+  hexToBytes,
   PermissionOperationType,
   Permissions,
   TokenType,

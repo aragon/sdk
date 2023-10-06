@@ -23,13 +23,6 @@ import { Contract } from "@ethersproject/contracts";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
-import {
-  hexToBytes,
-  InvalidAddressError,
-  InvalidAddressOrEnsError,
-  InvalidEnsError,
-  NotImplementedError,
-} from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IClientEncoding } from "../interfaces";
 import {
@@ -43,6 +36,13 @@ import {
   DaoAction,
   IpfsUriSchema,
   Permissions,
+  hexToBytes,
+  InvalidAddressError,
+  InvalidAddressOrEnsError,
+  InvalidEnsError,
+  InvalidParameter,
+  NotImplementedError,
+  SizeMismatchError,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { Interface } from "@ethersproject/abi";

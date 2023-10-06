@@ -1,12 +1,17 @@
 import { Wallet } from "@ethersproject/wallet";
-import { ClientCore, ContextCore, ContextParams } from "../src";
+import {
+  ClientCore,
+  ContextCore,
+  ContextParams,
+  NoProviderError,
+  NoSignerError,
+} from "../../src";
 import {
   DEFAULT_IPFS_ENDPOINTS,
   TEST_WALLET,
   TEST_WALLET_ADDRESS,
   web3endpoints,
-} from "./constants";
-import { NoProviderError, NoSignerError } from "../src/errors";
+} from "../constants";
 class TestContext extends ContextCore {
   constructor(params?: Partial<ContextParams>) {
     super(params);

@@ -135,6 +135,7 @@ export function decodeProposalId(
 }
 
 /** Gets the extended version of a proposal id from the compact one */
+
 export const getExtendedProposalId = (proposalId: string): string => {
   if (!proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/)) {
     throw new Error("Invalid proposalId");

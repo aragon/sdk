@@ -1,5 +1,4 @@
-import { Zero } from "@ethersproject/constants";
-import { Interface } from "@ethersproject/abi";
+import { hexZeroPad } from "@ethersproject/bytes";
 import { HEX_STRING_REGEX, OSX_PROPOSAL_ID_REGEX } from "./constants";
 import { isProposalId } from "./validation";
 
@@ -152,17 +151,71 @@ export function decodeProposalId(
 }
 
 /**
- * Gets the interfaceId of a given interface
- *
+ * Transforms an array of booleans into a bitmap big integer
+ * 
  * @export
- * @param {Interface} iface
- * @return {*}  {string}
+ * @param {Array<boolean>} [bools]
+ * @return {*}
  */
-export function getInterfaceId(iface: Interface): string {
-  let interfaceId = Zero;
-  const functions: string[] = Object.keys(iface.functions);
-  for (const func of functions) {
-    interfaceId = interfaceId.xor(iface.getSighash(func));
+export function boolArrayToBitmap(bools?: Array<boolean>) {
+  if (!bools || !bools.length) return BigInt(0);
+  else if (bools.length > 256) throw new Error("The array is too big");
+
+  let result = BigInt(0);
+  for (let i = 0; i < 256; i++) {
+    if (!bools[i]) continue;
+    result |= BigInt(1) << BigInt(i);
   }
-  return interfaceId.toHexString();
+
+  return result;
 }
+
+/**
+ * Transforms a bigint into an array of booleans
+ *
+ * @param {bigint} bitmap
+ * @return {*}  {Array<boolean>}
+ */
+export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
+  if (bitmap >= (BigInt(1) << BigInt(256))) {
+    throw new Error("The bitmap value is too big");
+  }
+
+  const result: Array<boolean> = [];
+  for (let i = 0; i < 256; i++) {
+    const mask = BigInt(1) << BigInt(i);
+    result.push((bitmap & mask) != BigInt(0));
+  }
+
+  return result;
+}
+
+/**
+ * Gets the extended version of a proposal id from the compact one
+ * 
+ * @export
+ * @param {string} proposalId 
+ * @returns {*} {string}
+ */
+export const getExtendedProposalId = (proposalId: string): string => {
+  if (!proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/)) {
+    throw new Error("Invalid proposalId");
+  }
+  const splits = proposalId.split("_");
+  return splits[0].toLowerCase() + "_" + hexZeroPad(splits[1], 32);
+};
+
+/**
+ * Gets the compact version of a proposal id from the extended one
+ * 
+ * @export
+ * @param {string} proposalId 
+ * @returns {*} {string}
+ */
+export const getCompactProposalId = (proposalId: string): string => {
+  if (!proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/)) {
+    throw new Error("Invalid proposalId");
+  }
+  const splits = proposalId.split("_");
+  return splits[0].toLowerCase() + "_0x" + parseInt(splits[1]).toString(16);
+};

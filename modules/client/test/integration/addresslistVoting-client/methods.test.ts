@@ -21,10 +21,6 @@ import {
   VotingMode,
 } from "../../../src";
 import {
-  getExtendedProposalId,
-  InvalidAddressOrEnsError,
-} from "@aragon/sdk-common";
-import {
   ADDRESS_ONE,
   contextParamsLocalChain,
   SUBGRAPH_ACTIONS,
@@ -57,6 +53,7 @@ import {
 } from "../../../src/addresslistVoting/internal/types";
 import {
   Context,
+  InvalidAddressOrEnsError,
   PrepareInstallationStep,
   PrepareUpdateStep,
   ProposalMetadata,

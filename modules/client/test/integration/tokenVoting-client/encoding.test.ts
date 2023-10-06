@@ -8,9 +8,8 @@ import {
   VotingSettings,
 } from "../../../src";
 
-import { InvalidAddressError } from "@aragon/sdk-common";
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
-import { Context } from "@aragon/sdk-client-common";
+import { Context, InvalidAddressError } from "@aragon/sdk-client-common";
 
 describe("Token Voting Client", () => {
   beforeAll(() => {

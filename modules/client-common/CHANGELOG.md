@@ -26,6 +26,12 @@ TEMPLATE:
 ## 1.6.0
 ### Added
 
+- Move functionality from `sdk-common` to `sdk-client-common`
+
+## 1.6.0
+
+### Added
+
 - Add generic prepare update function
 - Add generic prepare update estimation function
 - Support for multiple versions on `LIVE_CONTRACTS`

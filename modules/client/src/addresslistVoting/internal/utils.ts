@@ -17,6 +17,10 @@ import {
 } from "./types";
 import {
   DaoAction,
+  decodeRatio,
+  getCompactProposalId,
+  hexToBytes,
+  InvalidProposalStatusError,
   ProposalMetadata,
   ProposalStatus,
 } from "@aragon/sdk-client-common";

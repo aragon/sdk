@@ -3,8 +3,7 @@ import {
   IGovernanceWrappedERC20__factory,
   MajorityVotingBase__factory,
 } from "@aragon/osx-ethers";
-import { getInterfaceId } from "@aragon/sdk-common";
-import { MetadataAbiInput } from "@aragon/sdk-client-common";
+import { getInterfaceId, MetadataAbiInput } from "@aragon/sdk-client-common";
 import { abi as IVOTES_ABI } from "@openzeppelin/contracts/build/contracts/IVotes.json";
 import { abi as IVOTES_UPGRADEABLE_ABI } from "@openzeppelin/contracts-upgradeable/build/contracts/IVotesUpgradeable.json";
 import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";

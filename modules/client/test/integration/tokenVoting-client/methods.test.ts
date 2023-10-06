@@ -29,13 +29,6 @@ import {
 } from "../../../src";
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
-
-import {
-  getExtendedProposalId,
-  InvalidAddressError,
-  InvalidAddressOrEnsError,
-  NotAContractError,
-} from "@aragon/sdk-common";
 import {
   ADDRESS_FOUR,
   ADDRESS_ONE,
@@ -88,6 +81,9 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import {
   Context,
+  InvalidAddressError,
+  InvalidAddressOrEnsError,
+  NotAContractError,
   PrepareInstallationStep,
   PrepareUpdateStep,
   ProposalMetadata,

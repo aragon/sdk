@@ -18,10 +18,6 @@ import {
   ProposalSortBy,
 } from "../../../src";
 import {
-  getExtendedProposalId,
-  InvalidAddressOrEnsError,
-} from "@aragon/sdk-common";
-import {
   ADDRESS_ONE,
   ADDRESS_TWO,
   contextParamsLocalChain,
@@ -48,6 +44,7 @@ import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-que
 import { SubgraphMultisigProposal } from "../../../src/multisig/internal/types";
 import {
   Context,
+  InvalidAddressOrEnsError,
   PrepareInstallationStep,
   PrepareUpdateStep,
   ProposalMetadata,

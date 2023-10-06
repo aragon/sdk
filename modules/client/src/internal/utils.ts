@@ -65,6 +65,7 @@ import {
   ApplyInstallationParams,
   ApplyUninstallationParams,
   ApplyUpdateParams,
+  bytesToHex,
   DaoAction,
   DecodedApplyInstallationParams,
   DecodedApplyUpdateParams,
@@ -72,6 +73,12 @@ import {
   InterfaceParams,
   MultiTargetPermission,
   PermissionIds,
+  hexToBytes,
+  InterfaceParams,
+  InvalidParameter,
+  MultiTargetPermission,
+  NotImplementedError,
+  SizeMismatchError,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { Signer } from "@ethersproject/abstract-signer";

@@ -42,7 +42,17 @@ import {
   PluginUpdatePreparationError,
   UnsupportedNetworkError,
 } from "./errors";
+import { Zero } from "@ethersproject/constants";
 
+/**
+ * Finds a log in a receipt given the event name
+ *
+ * @export
+ * @param {ContractReceipt} receipt
+ * @param {Interface} iface
+ * @param {string} eventName
+ * @return {*}  {(Log | undefined)}
+ */
 export function findLog(
   receipt: ContractReceipt,
   iface: Interface,
@@ -59,6 +69,14 @@ export function findLog(
   );
 }
 
+/**
+ * Gets a function fragment from encoded data
+ *
+ * @export
+ * @param {Uint8Array} data
+ * @param {string[]} availableFunctions
+ * @return {*}  {FunctionFragment}
+ */
 export function getFunctionFragment(
   data: Uint8Array,
   availableFunctions: string[],
@@ -68,6 +86,13 @@ export function getFunctionFragment(
   return iface.getFunction(hexBytes.substring(0, 10));
 }
 
+/**
+ * Gets the named types from a metadata abi input
+ *
+ * @export
+ * @param {MetadataAbiInput[]} [inputs=[]]
+ * @return {*}  {string[]}
+ */
 export function getNamedTypesFromMetadata(
   inputs: MetadataAbiInput[] = [],
 ): string[] {
@@ -93,6 +118,14 @@ export function getNamedTypesFromMetadata(
   });
 }
 
+/**
+ * Gets the named types from a metadata abi input
+ *
+ * @export
+ * @param {IClientWeb3Core} web3
+ * @param {PrepareInstallationParams} params
+ * @return {*}
+ */
 export async function prepareGenericInstallationEstimation(
   web3: IClientWeb3Core,
   params: PrepareInstallationParams,
@@ -141,6 +174,14 @@ export async function prepareGenericInstallationEstimation(
   return web3.getApproximateGasFee(gasEstimation.toBigInt());
 }
 
+/**
+ * Prepares an installation of a plugin
+ *
+ * @export
+ * @param {IClientWeb3Core} web3
+ * @param {(PrepareInstallationParams & { pluginSetupProcessorAddress: string })} params
+ * @return {*}  {AsyncGenerator<PrepareInstallationStepValue>}
+ */
 export async function* prepareGenericInstallation(
   web3: IClientWeb3Core,
   params: PrepareInstallationParams & { pluginSetupProcessorAddress: string },
@@ -213,6 +254,13 @@ export async function* prepareGenericInstallation(
   };
 }
 
+/**
+ * Gets the parameters to be given when preparing an update
+ *
+ * @param {IClientGraphQLCore} graphql
+ * @param {PrepareUpdateParams} params
+ * @return {*}  {Promise<PluginSetupProcessor.PrepareUpdateParamsStruct>}
+ */
 async function getPrepareUpdateParams(
   graphql: IClientGraphQLCore,
   params: PrepareUpdateParams,
@@ -264,6 +312,15 @@ async function getPrepareUpdateParams(
   };
 }
 
+/**
+ * Gets an estimation of the gas fee of preparing an update
+ *
+ * @export
+ * @param {IClientWeb3Core} web3
+ * @param {IClientGraphQLCore} graphql
+ * @param {(PrepareUpdateParams & { pluginSetupProcessorAddress: string })} params
+ * @return {*}  {Promise<GasFeeEstimation>}
+ */
 export async function prepareGenericUpdateEstimation(
   web3: IClientWeb3Core,
   graphql: IClientGraphQLCore,
@@ -339,6 +396,13 @@ export async function* prepareGenericUpdate(
   };
 }
 
+/**
+ * Replacing function for ethers getNetwork that includes additional networks
+ *
+ * @export
+ * @param {Networkish} networkish
+ * @return {*}  {Network}
+ */
 export function getNetwork(networkish: Networkish): Network {
   let network: Network | undefined;
   for (const nw of ADDITIONAL_NETWORKS) {
@@ -366,4 +430,20 @@ export function getNetwork(networkish: Networkish): Network {
     network = ethersGetNetwork(networkish);
   }
   return network;
+}
+
+/**
+ * Gets the interfaceId of a given interface
+ *
+ * @export
+ * @param {Interface} iface
+ * @return {*}  {string}
+ */
+export function getInterfaceId(iface: Interface): string {
+  let interfaceId = Zero;
+  const functions: string[] = Object.keys(iface.functions);
+  for (const func of functions) {
+    interfaceId = interfaceId.xor(iface.getSighash(func));
+  }
+  return interfaceId.toHexString();
 }

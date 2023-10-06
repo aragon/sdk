@@ -68,6 +68,3 @@ export class MultiUri {
   }
 }
 
-/** Attempts to parse the given string as a URL and returns the IPFS CiD contained in it.
- * Alternatively it tries to use the raw value after validating it.
- */

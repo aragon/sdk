@@ -1,7 +1,6 @@
 // @ts-ignore
 declare const describe, it, expect;
 
-import { bytesToHex } from "@aragon/sdk-common";
 import {
   MintTokenParams,
   TokenVotingClient,
@@ -10,7 +9,7 @@ import {
 } from "../../../src";
 
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
-import { Context } from "@aragon/sdk-client-common";
+import { Context, bytesToHex } from "@aragon/sdk-client-common";
 
 describe("Token Voting Client", () => {
   beforeAll(() => {

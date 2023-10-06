@@ -1,13 +1,18 @@
 import {
+  bitmapToBoolArray,
+  boolArrayToBitmap,
   bytesToHex,
   decodeProposalId,
   decodeRatio,
   encodeProposalId,
   encodeRatio,
   ensure0x,
+  getCompactProposalId,
+  getExtendedProposalId,
   hexToBytes,
   strip0x,
-} from "../src/encoding";
+} from "../../src/encoding";
+import { getEmpty256Array } from "../utils";
 
 describe("Test encoding helper functions", () => {
   describe("ensure0x", () => {
@@ -145,7 +150,7 @@ describe("Test encoding helper functions", () => {
       }
     });
   });
-  describe("encodeRation", () => {
+  describe("encodeRatio", () => {
     it("Should encode a bigint from a float and the number of digits", () => {
       const inputs = [
         { float: .5, digits: 1, out: BigInt(5) },
@@ -288,6 +293,158 @@ describe("Test encoding helper functions", () => {
         const result = decodeProposalId(entry.input);
         expect(result.pluginAddress).toBe(entry.addr);
         expect(result.id).toBe(entry.nonce);
+      }
+    });
+  });
+  describe("boolArrayToBitmap", () => {
+    it("boolArrayToBitmap should fail when the array is too large", () => {
+      expect(() => {
+        let tmp = getEmpty256Array();
+        tmp.push(false);
+        boolArrayToBitmap(tmp);
+      }).toThrow();
+    });
+    it("should transform a boolean array into a bigint bitmap", () => {
+      const tests = [
+        { input: undefined, output: BigInt(0) },
+        { input: [], output: BigInt(0) },
+        { input: [false], output: BigInt(0) },
+        { input: [true], output: BigInt(1) },
+        { input: [true, false], output: BigInt(1) },
+        { input: [true, false, false, false, false, false], output: BigInt(1) },
+        { input: [false, true, false, true], output: BigInt(10) },
+        { input: getEmpty256Array(), output: BigInt(0) },
+      ];
+      let input = getEmpty256Array();
+      input[0] = true;
+      tests.push({ input, output: BigInt(1) << BigInt(0) });
+
+      input = getEmpty256Array();
+      input[100] = true;
+      tests.push({ input, output: BigInt(1) << BigInt(100) });
+
+      input = getEmpty256Array();
+      input[150] = true;
+      tests.push({ input, output: BigInt(1) << BigInt(150) });
+
+      for (const entry of tests) {
+        expect(boolArrayToBitmap(entry.input)).toEqual(entry.output);
+      }
+    });
+  });
+  describe("bitmapToBoolArray", () => {
+    it("should transform a bigint bitmap into a boolean array", () => {
+      const tests = [
+        { input: BigInt(0), output: getEmpty256Array() },
+      ];
+      let output = getEmpty256Array();
+      output[0] = true;
+      tests.push({ input: BigInt(1) << BigInt(0), output });
+
+      output = getEmpty256Array();
+      output[1] = true;
+      tests.push({ input: BigInt(1) << BigInt(1), output });
+
+      output = getEmpty256Array();
+      output[2] = true;
+      tests.push({ input: BigInt(1) << BigInt(2), output });
+
+      output = getEmpty256Array();
+      output[5] = true;
+      tests.push({ input: BigInt(1) << BigInt(5), output });
+
+      output = getEmpty256Array();
+      output[100] = true;
+      tests.push({ input: BigInt(1) << BigInt(100), output });
+
+      output = getEmpty256Array();
+      output[150] = true;
+      tests.push({ input: BigInt(1) << BigInt(150), output });
+
+      for (const entry of tests) {
+        expect(bitmapToBoolArray(entry.input)).toMatchObject(entry.output);
+      }
+    });
+
+    it("should fail when the bigint is too large", () => {
+      expect(() => {
+        bitmapToBoolArray(BigInt(1) << BigInt(256));
+      }).toThrow();
+    });
+  });
+  describe("getExtendedProposalId", () => {
+    it("Should get an extended version of a proposal id", () => {
+      const entries = [
+        {
+          in: "0x0000000000000000000000000000000000000000_0x1",
+          out:
+            "0x0000000000000000000000000000000000000000_0x0000000000000000000000000000000000000000000000000000000000000001",
+          error: "",
+        },
+        {
+          in: "0x0000000000000000000000000000000000000000_0xffff",
+          out:
+            "0x0000000000000000000000000000000000000000_0x000000000000000000000000000000000000000000000000000000000000ffff",
+          error: "",
+        },
+        {
+          in: "invalid_proposal",
+          out: "",
+          error: "Invalid proposalId",
+        },
+        {
+          in:
+            "0x0000000000000000000000000000000000000000_0x000000000000000000000000000000000000000000000000000000000000pppp",
+          out: "",
+          error: "Invalid proposalId",
+        },
+      ];
+  
+      for (const entry of entries) {
+        if (entry.error) {
+          expect(() => getExtendedProposalId(entry.in)).toThrow(entry.error);
+        } else {
+          const result = getExtendedProposalId(entry.in);
+          expect(result).toBe(entry.out);
+        }
+      }
+    });
+  });
+  describe("getCompactProposalId", () => {
+    it("Should get a compact version of a proposal id", () => {
+      const entries = [
+        {
+          in:
+            "0x0000000000000000000000000000000000000000_0x0000000000000000000000000000000000000000000000000000000000000001",
+          out: "0x0000000000000000000000000000000000000000_0x1",
+          error: "",
+        },
+        {
+          in:
+            "0x0000000000000000000000000000000000000000_0x000000000000000000000000000000000000000000000000000000000000ffff",
+          out: "0x0000000000000000000000000000000000000000_0xffff",
+          error: "",
+        },
+        {
+          in: "invalid_proposal",
+          out: "",
+          error: "Invalid proposalId",
+        },
+        {
+          in:
+            "0x0000000000000000000000000000000000000000_0x000000000000000000000000000000000000000000000000000000000000pppp",
+          out: "",
+          error: "Invalid proposalId",
+        },
+      ];
+  
+      for (const entry of entries) {
+        if (entry.error) {
+          expect(() => getCompactProposalId(entry.in)).toThrow(entry.error);
+        } else {
+          const result = getCompactProposalId(entry.in);
+          expect(result).toBe(entry.out);
+        }
       }
     });
   });
