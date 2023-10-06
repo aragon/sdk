@@ -90,6 +90,7 @@ import {
   ProposalStatus,
   SortDirection,
   TokenType,
+  getExtendedProposalId,
 } from "@aragon/sdk-client-common";
 import { createTokenVotingPluginBuild } from "../../helpers/create-plugin-build";
 

@@ -1,4 +1,8 @@
-import { TimeoutError } from "./errors";
+import {
+  InvalidPromiseError,
+  InvalidTimeoutError,
+  TimeoutError,
+} from "./errors";
 
 /**
  * Run a promise with a timeout
@@ -20,8 +24,8 @@ export function promiseWithTimeout<T>(
     typeof prom.then !== "function" ||
     typeof prom.catch !== "function"
   ) {
-    throw new Error("Invalid promise");
-  } else if (isNaN(timeout) || timeout < 0) throw new Error("Invalid timeout");
+    throw new InvalidPromiseError();
+  } else if (isNaN(timeout) || timeout < 0) throw new InvalidTimeoutError();
 
   return new Promise((resolve, reject) => {
     setTimeout(
@@ -33,7 +37,6 @@ export function promiseWithTimeout<T>(
   });
 }
 
-
 /**
  * Run a promise and retry it until it succeeds or the `shouldRetry` function returns false
  *
@@ -44,7 +47,7 @@ export function promiseWithTimeout<T>(
  *   onFail?: (e: Error) => void;
  *   shouldRetry: () => boolean;
  * }} { func, onFail, shouldRetry }
- * @return {*} 
+ * @return {*}
  */
 export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
   func: () => Promise<T>;

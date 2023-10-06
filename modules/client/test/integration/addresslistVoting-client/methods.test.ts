@@ -59,6 +59,7 @@ import {
   ProposalMetadata,
   ProposalStatus,
   SortDirection,
+  getExtendedProposalId,
 } from "@aragon/sdk-client-common";
 import { PluginRepo__factory } from "@aragon/osx-ethers";
 import { createAddresslistVotingPluginBuild } from "../../helpers/create-plugin-build";

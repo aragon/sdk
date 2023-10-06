@@ -1,3 +1,4 @@
+import { InvalidProposalIdError } from "../../src";
 import {
   bitmapToBoolArray,
   boolArrayToBitmap,
@@ -390,13 +391,13 @@ describe("Test encoding helper functions", () => {
         {
           in: "invalid_proposal",
           out: "",
-          error: "Invalid proposalId",
+          error: InvalidProposalIdError
         },
         {
           in:
             "0x0000000000000000000000000000000000000000_0x000000000000000000000000000000000000000000000000000000000000pppp",
           out: "",
-          error: "Invalid proposalId",
+          error: InvalidProposalIdError,
         },
       ];
   

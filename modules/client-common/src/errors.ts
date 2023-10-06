@@ -306,3 +306,72 @@ export class ProposalNotFoundError extends SdkError {
     super("Proposal not found", cause);
   }
 }
+
+export class InvalidArraySizeError extends SdkError {
+  constructor(size: number, cause?: any) {
+    super(`Invalid array size: ${size}`, cause);
+  }
+}
+
+export class InvalidRatioValueError extends SdkError {
+  constructor(ratio: number, cause?: any) {
+    super(
+      `The ratio value should range between 0 and 1, received value: ${ratio}`,
+      cause,
+    );
+  }
+}
+
+export class InvalidDigitsValueError extends SdkError {
+  constructor(digits: number, cause?: any) {
+    super(
+      `The number of digits should range between 1 and 15, received value: ${digits}`,
+      cause,
+    );
+  }
+}
+
+export class ValueOutOfRangeError extends SdkError {
+  constructor(cause?: any) {
+    super(
+      `The value is out of range`,
+      cause,
+    );
+  }
+}
+
+export class InvalidBitMapValueError extends SdkError {
+  constructor(cause?: any) {
+    super(
+      "The bitmap value is too big",
+      cause,
+    );
+  }
+}
+
+export class EmptyMultiUriError extends SdkError {
+  constructor(cause?: any) {
+    super(
+      "The multi URI is empty",
+      cause,
+    );
+  }
+}
+
+export class InvalidPromiseError extends SdkError {
+  constructor(cause?: any) {
+    super(
+      "Invalid promise",
+      cause,
+    );
+  }
+}
+
+export class InvalidTimeoutError extends SdkError {
+  constructor(cause?: any) {
+    super(
+      "Invalid timeout",
+      cause,
+    );
+  }
+}

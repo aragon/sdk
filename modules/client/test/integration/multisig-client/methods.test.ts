@@ -50,6 +50,7 @@ import {
   ProposalMetadata,
   ProposalStatus,
   SortDirection,
+  getExtendedProposalId,
 } from "@aragon/sdk-client-common";
 import { PluginRepo__factory } from "@aragon/osx-ethers";
 import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";

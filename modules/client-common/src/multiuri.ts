@@ -1,4 +1,5 @@
 import { IPFS_CID_REGEX } from "./constants";
+import { EmptyMultiUriError } from "./errors";
 
 /**
  * Parses a multi URI and returns the IPFS or HTTP URI.
@@ -10,7 +11,7 @@ export class MultiUri {
   readonly items: string[] = [];
 
   constructor(multiUri: string) {
-    if (!multiUri) throw new Error("The multi URI is empty");
+    if (!multiUri) throw new EmptyMultiUriError();
     this.items = multiUri.split(",");
   }
 
@@ -67,4 +68,3 @@ export class MultiUri {
     );
   }
 }
-

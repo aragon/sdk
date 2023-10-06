@@ -1,6 +1,14 @@
 import { hexZeroPad } from "@ethersproject/bytes";
 import { HEX_STRING_REGEX, OSX_PROPOSAL_ID_REGEX } from "./constants";
 import { isProposalId } from "./validation";
+import {
+  InvalidArraySizeError,
+  InvalidBitMapValueError,
+  InvalidDigitsValueError,
+  InvalidProposalIdError,
+  InvalidRatioValueError,
+  ValueOutOfRangeError,
+} from "./errors";
 
 /**
  * Ensures that a hex string has the "0x" prefix
@@ -77,11 +85,9 @@ export function bytesToHex(buff: Uint8Array, skip0x?: boolean): string {
  */
 export function encodeRatio(ratio: number, digits: number): number {
   if (ratio < 0 || ratio > 1) {
-    throw new Error("The ratio value should range between 0 and 1");
+    throw new InvalidRatioValueError(ratio);
   } else if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
-    throw new Error(
-      "The number of digits should range between 1 and 15",
-    );
+    throw new InvalidDigitsValueError(digits);
   }
   return Math.round(ratio * (10 ** digits));
 }
@@ -99,11 +105,9 @@ export function decodeRatio(
   digits: number,
 ): number {
   if (!Number.isInteger(digits) || digits < 1 || digits > 15) {
-    throw new Error(
-      "The number of digits should be a positive integer between 1 and 15",
-    );
+    throw new InvalidDigitsValueError(digits);
   } else if (onChainValue > 10 ** digits) {
-    throw new Error("The value is out of range");
+    throw new ValueOutOfRangeError();
   }
 
   return Number(onChainValue) / (10 ** digits);
@@ -136,12 +140,14 @@ export function decodeProposalId(
   proposalId: string,
 ): { pluginAddress: string; id: number } {
   if (!isProposalId(proposalId)) {
-    throw new Error("Invalid proposalId");
+    throw new InvalidProposalIdError();
   }
+  // const matchedRegexResult =
+  //   proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/) || [];
 
   const matchedRegexResult = proposalId.match(OSX_PROPOSAL_ID_REGEX) || [];
   if (matchedRegexResult.length !== 3) {
-    throw new Error("Could not parse the proposal ID");
+    throw new InvalidProposalIdError();
   }
 
   return {
@@ -152,14 +158,14 @@ export function decodeProposalId(
 
 /**
  * Transforms an array of booleans into a bitmap big integer
- * 
+ *
  * @export
  * @param {Array<boolean>} [bools]
  * @return {*}
  */
 export function boolArrayToBitmap(bools?: Array<boolean>) {
   if (!bools || !bools.length) return BigInt(0);
-  else if (bools.length > 256) throw new Error("The array is too big");
+  else if (bools.length > 256) throw new InvalidArraySizeError(bools.length);
 
   let result = BigInt(0);
   for (let i = 0; i < 256; i++) {
@@ -178,7 +184,7 @@ export function boolArrayToBitmap(bools?: Array<boolean>) {
  */
 export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
   if (bitmap >= (BigInt(1) << BigInt(256))) {
-    throw new Error("The bitmap value is too big");
+    throw new InvalidBitMapValueError();
   }
 
   const result: Array<boolean> = [];
@@ -192,14 +198,14 @@ export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
 
 /**
  * Gets the extended version of a proposal id from the compact one
- * 
+ *
  * @export
- * @param {string} proposalId 
+ * @param {string} proposalId
  * @returns {*} {string}
  */
 export const getExtendedProposalId = (proposalId: string): string => {
-  if (!proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/)) {
-    throw new Error("Invalid proposalId");
+  if (!isProposalId(proposalId)) {
+    throw new InvalidProposalIdError();
   }
   const splits = proposalId.split("_");
   return splits[0].toLowerCase() + "_" + hexZeroPad(splits[1], 32);
@@ -207,9 +213,9 @@ export const getExtendedProposalId = (proposalId: string): string => {
 
 /**
  * Gets the compact version of a proposal id from the extended one
- * 
+ *
  * @export
- * @param {string} proposalId 
+ * @param {string} proposalId
  * @returns {*} {string}
  */
 export const getCompactProposalId = (proposalId: string): string => {
