@@ -17,10 +17,10 @@
   dependencies:
     ethers "^5.6.2"
 
-"@aragon/osx-ethers@1.3.0-rc0.2", "@aragon/osx-ethers@^1.3.0-rc0.2":
-  version "1.3.0-rc0.2"
-  resolved "https://registry.yarnpkg.com/@aragon/osx-ethers/-/osx-ethers-1.3.0-rc0.2.tgz#820f325ee8514bc6e598135bba2501f124d92d31"
-  integrity sha512-PpsmyZOBRQPElEsiLNkoGg/4j+oJn8SJC6S0oN837k5JofkleLbOdZgUmB0SHmL98hvcE157MoRZ4YM+IXbhhA==
+"@aragon/osx-ethers@1.3.0-rc0.3", "@aragon/osx-ethers@^1.3.0-rc0.3":
+  version "1.3.0-rc0.3"
+  resolved "https://registry.yarnpkg.com/@aragon/osx-ethers/-/osx-ethers-1.3.0-rc0.3.tgz#53c7ee2888e25704932e4450c1518014cb383093"
+  integrity sha512-8hjNtAni7rGygtZDScJuCUh0QnA5q6gF8zhQycyhCvvjwakxWouLFEySpBPIYoFsMziqFa4E2uu/XyNHQb+YiQ==
   dependencies:
     ethers "^5.6.2"
 
