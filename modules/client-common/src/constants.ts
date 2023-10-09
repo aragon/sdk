@@ -347,8 +347,6 @@ export const LIVE_CONTRACTS: {
       tokenVotingSetupAddress: "",
       ensRegistryAddress: "",
     },
-    // TODO: Upgrade osx-ethers to v1.3.0 the latest version so it
-    // contains the active contracts for sepolia
     [SupportedNetwork.SEPOLIA]: {
       daoFactoryAddress: activeContractsList.sepolia.DAOFactory,
       pluginSetupProcessorAddress:
