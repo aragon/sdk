@@ -5,7 +5,6 @@ import {
 } from "@aragon/osx-ethers";
 import {
   InvalidAddressOrEnsError,
-  InvalidSubdomainError,
   NoProviderError,
   NotImplementedError,
 } from "@aragon/sdk-common";
@@ -21,6 +20,7 @@ import {
   estimateErc1155Deposit,
   estimateErc20Deposit,
   estimateErc721Deposit,
+  estimateNativeDeposit,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -32,9 +32,18 @@ import {
   prepareGenericUpdateEstimation,
   PrepareInstallationParams,
   PrepareUpdateParams,
+  PrepareInstallationSchema,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { BigNumber } from "@ethersproject/bignumber";
+import {
+  CreateDaoSchema,
+  DepositErc1155Schema,
+  DepositErc20Schema,
+  DepositErc721Schema,
+  DepositEthSchema,
+  SetAllowanceSchema,
+} from "../schemas";
 
 /**
  * Estimation module the SDK Generic Client
@@ -43,6 +52,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
   public async prepareInstallation(
     params: PrepareInstallationParams,
   ): Promise<GasFeeEstimation> {
+    await PrepareInstallationSchema.strict().validate(params);
     return prepareGenericInstallationEstimation(this.web3, params);
   }
   /**
@@ -53,12 +63,8 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * @memberof ClientEstimation
    */
   public async createDao(params: CreateDaoParams): Promise<GasFeeEstimation> {
+    await CreateDaoSchema.strict().validate(params);
     const provider = this.web3.getProvider();
-    if (
-      params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
-    ) {
-      throw new InvalidSubdomainError();
-    }
 
     const daoInstance = DAOFactory__factory.connect(
       this.web3.getAddress("daoFactoryAddress"),
@@ -108,13 +114,19 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
     let estimation: BigNumber;
     switch (params.type) {
       case TokenType.NATIVE:
+        await DepositEthSchema.strict().validate(params);
+        estimation = await estimateNativeDeposit(signer, params);
+        break;
       case TokenType.ERC20:
+        await DepositErc20Schema.strict().validate(params);
         estimation = await estimateErc20Deposit(signer, params);
         break;
       case TokenType.ERC721:
+        await DepositErc721Schema.strict().validate(params);
         estimation = await estimateErc721Deposit(signer, params);
         break;
       case TokenType.ERC1155:
+        await DepositErc1155Schema.strict().validate(params);
         estimation = await estimateErc1155Deposit(signer, params);
         break;
       default:
@@ -135,6 +147,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
   public async setAllowance(
     params: SetAllowanceParams,
   ): Promise<GasFeeEstimation> {
+    await SetAllowanceSchema.strict().validate(params);
     const signer = this.web3.getConnectedSigner();
     // resolve ens
     let daoAddress = params.spender;

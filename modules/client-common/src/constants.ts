@@ -3,6 +3,8 @@ import { activeContractsList as activeContractsListV1_0_0 } from "@aragon/osx-et
 import { ProposalMetadata, SupportedNetwork, SupportedVersion } from "./types";
 import { NetworkDeployment } from "./internal";
 import { Network } from "@ethersproject/networks";
+import { keccak256 } from "@ethersproject/keccak256";
+import { toUtf8Bytes } from "@ethersproject/strings";
 
 /** Timeout that will be applied to operations involving
  * many fetch requests that could take a long time */
@@ -344,3 +346,30 @@ export const ADDITIONAL_NETWORKS: Network[] = [
     chainId: 31337,
   },
 ];
+
+const Permissions = {
+  UPGRADE_PERMISSION: "UPGRADE_PERMISSION",
+  SET_METADATA_PERMISSION: "SET_METADATA_PERMISSION",
+  EXECUTE_PERMISSION: "EXECUTE_PERMISSION",
+  WITHDRAW_PERMISSION: "WITHDRAW_PERMISSION",
+  SET_SIGNATURE_VALIDATOR_PERMISSION: "SET_SIGNATURE_VALIDATOR_PERMISSION",
+  SET_TRUSTED_FORWARDER_PERMISSION: "SET_TRUSTED_FORWARDER_PERMISSION",
+  ROOT_PERMISSION: "ROOT_PERMISSION",
+  CREATE_VERSION_PERMISSION: "CREATE_VERSION_PERMISSION",
+  REGISTER_PERMISSION: "REGISTER_PERMISSION",
+  REGISTER_DAO_PERMISSION: "REGISTER_DAO_PERMISSION",
+  REGISTER_ENS_SUBDOMAIN_PERMISSION: "REGISTER_ENS_SUBDOMAIN_PERMISSION",
+  MINT_PERMISSION: "MINT_PERMISSION",
+  MERKLE_MINT_PERMISSION: "MERKLE_MINT_PERMISSION",
+  MODIFY_ALLOWLIST_PERMISSION: "MODIFY_ALLOWLIST_PERMISSION",
+  SET_CONFIGURATION_PERMISSION: "SET_CONFIGURATION_PERMISSION",
+};
+
+const PermissionIds = Object.entries(Permissions).reduce(
+  (acc, [k, v]) => ({ ...acc, [k + "_ID"]: keccak256(toUtf8Bytes(v)) }),
+  {} as { [k: string]: string },
+);
+Object.freeze(Permissions);
+export { Permissions };
+Object.freeze(PermissionIds);
+export { PermissionIds };

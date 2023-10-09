@@ -108,6 +108,27 @@ export type DecodedApplyInstallationParams = ApplyInstallationParamsBase & {
   helpersHash: string;
 };
 
+/* Uninstallation */
+export type PrepareUninstallationParams = {
+  daoAddressOrEns: string;
+  pluginAddress: string;
+  pluginInstallationIndex?: number;
+  uninstallationParams?: any[];
+  uninstallationAbi?: string[];
+};
+export enum PrepareUninstallationSteps {
+  PREPARING = "preparing",
+  DONE = "done",
+}
+export type PrepareUninstallationStepValue =
+  | { key: PrepareUninstallationSteps.PREPARING; txHash: string }
+  | {
+    key: PrepareUninstallationSteps.DONE;
+  } & ApplyUninstallationParams;
+
+export type ApplyUninstallationParams = ApplyInstallationParamsBase;
+export type DecodedApplyUninstallationParams = ApplyInstallationParamsBase;
+
 export type VersionTag = {
   build: number;
   release: number;

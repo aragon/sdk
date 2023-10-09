@@ -5,15 +5,12 @@ declare const describe, it, expect;
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 
 import {
-  ApplyUninstallationParams,
   Client,
   DaoMetadata,
   GrantPermissionDecodedParams,
   GrantPermissionParams,
   GrantPermissionWithConditionParams,
   InitializeFromParams,
-  PermissionIds,
-  Permissions,
   RegisterStandardCallbackParams,
   RevokePermissionDecodedParams,
   RevokePermissionParams,
@@ -34,8 +31,11 @@ import { AddressZero } from "@ethersproject/constants";
 import {
   ApplyInstallationParams,
   ApplyUpdateParams,
+  ApplyUninstallationParams,
   Context,
+  PermissionIds,
   PermissionOperationType,
+  Permissions,
   TokenType,
 } from "@aragon/sdk-client-common";
 

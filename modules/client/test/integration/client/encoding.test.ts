@@ -9,13 +9,10 @@ import {
 } from "@aragon/osx-ethers";
 
 import {
-  ApplyUninstallationParams,
   Client,
   DaoMetadata,
   GrantPermissionParams,
   InitializeFromParams,
-  PermissionIds,
-  Permissions,
   RegisterStandardCallbackParams,
   RevokePermissionParams,
   UpgradeToAndCallParams,
@@ -34,8 +31,11 @@ import { AddressZero } from "@ethersproject/constants";
 import {
   ApplyInstallationParams,
   ApplyUpdateParams,
+  ApplyUninstallationParams,
   Context,
   DaoAction,
+  PermissionIds,
+  Permissions,
   TokenType,
 } from "@aragon/sdk-client-common";
 

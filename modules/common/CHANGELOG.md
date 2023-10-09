@@ -22,6 +22,8 @@ TEMPLATE:
 ### Added
 
 - New error classes `InvalidVersionError`, `PluginUpdatePreparationError` and `ProposalNotFoundError`
+- Add `isSubdomain`, `isIpfsUri` and `isEnsName` functions
+- Update SizeMismatchError error class
 
 ## 1.6.0
 
@@ -29,7 +31,6 @@ TEMPLATE:
 
 - New error classes
 - `getInterfaceId` function
-
 ## 1.5.0
 
 ### Added

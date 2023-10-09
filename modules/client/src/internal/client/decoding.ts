@@ -1,6 +1,5 @@
 import {
   DaoMetadata,
-  DecodedApplyUninstallationParams,
   GrantPermissionDecodedParams,
   GrantPermissionWithConditionParams,
   InitializeFromParams,
@@ -40,11 +39,15 @@ import { AddressZero } from "@ethersproject/constants";
 import { toUtf8String } from "@ethersproject/strings";
 import { IClientDecoding } from "../interfaces";
 import {
+  AddressOrEnsSchema,
+  BigintSchema,
   ClientCore,
   DecodedApplyInstallationParams,
+  DecodedApplyUninstallationParams,
   DecodedApplyUpdateParams,
   InterfaceParams,
   TokenType,
+  Uint8ArraySchema,
 } from "@aragon/sdk-client-common";
 
 /**
@@ -59,6 +62,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public applyInstallationAction(
     data: Uint8Array,
   ): DecodedApplyInstallationParams {
+    Uint8ArraySchema.strict().validateSync(data);
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = pspInterface.getFunction("applyInstallation");
@@ -73,6 +77,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public applyUninstallationAction(
     data: Uint8Array,
   ): DecodedApplyUninstallationParams {
+    Uint8ArraySchema.strict().validateSync(data);
     const pspInterface = PluginSetupProcessor__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = pspInterface.getFunction("applyUninstallation");
@@ -101,6 +106,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public grantAction(data: Uint8Array): GrantPermissionDecodedParams {
+    Uint8ArraySchema.strict().validate(data);
     return decodeGrantAction(data);
   }
   /**
@@ -113,6 +119,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public grantWithConditionAction(
     data: Uint8Array,
   ): GrantPermissionWithConditionParams {
+    Uint8ArraySchema.strict().validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("grantWithCondition");
@@ -127,6 +134,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public revokeAction(data: Uint8Array): RevokePermissionDecodedParams {
+    Uint8ArraySchema.strict().validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("revoke");
@@ -145,6 +153,9 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     value: bigint,
     data: Uint8Array,
   ): WithdrawParams {
+    AddressOrEnsSchema.strict().validateSync(to);
+    BigintSchema.strict().validateSync(value);
+    Uint8ArraySchema.strict().validateSync(data);
     // Native
     if (!data?.length) {
       return {
@@ -209,6 +220,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public updateDaoMetadataRawAction(data: Uint8Array): string {
+    Uint8ArraySchema.strict().validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("setMetadata");
@@ -225,6 +237,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public async updateDaoMetadataAction(data: Uint8Array): Promise<DaoMetadata> {
+    await Uint8ArraySchema.strict().validate(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("setMetadata");
@@ -246,6 +259,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public setDaoUriAction(data: Uint8Array): string {
+    Uint8ArraySchema.strict().validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction("setDaoURI");
@@ -262,6 +276,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public registerStandardCallbackAction(
     data: Uint8Array,
   ): RegisterStandardCallbackParams {
+    Uint8ArraySchema.strict().validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction(
@@ -284,6 +299,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public setSignatureValidatorAction(
     data: Uint8Array,
   ): string {
+    Uint8ArraySchema.strict().validateSync(data);
     const daoInterface = DAO__factory.createInterface();
     const hexBytes = bytesToHex(data);
     const expectedFunction = daoInterface.getFunction(
@@ -311,6 +327,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public upgradeToAndCallAction(
     data: Uint8Array,
   ): UpgradeToAndCallParams {
+    Uint8ArraySchema.strict().validate(data);
     return decodeUpgradeToAndCallAction(data);
   }
 
@@ -322,6 +339,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public initializeFromAction(data: Uint8Array): InitializeFromParams {
+    Uint8ArraySchema.strict().validate(data);
     return decodeInitializeFromAction(data);
   }
 
@@ -333,6 +351,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * @memberof ClientDecoding
    */
   public findInterface(data: Uint8Array): InterfaceParams | null {
+    Uint8ArraySchema.strict().validate(data);
     return findInterface(data, AVAILABLE_FUNCTION_SIGNATURES);
   }
 }

@@ -18,6 +18,11 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+
+- Add common schemas for validations
+
+## 1.6.0
 
 ### Added
 

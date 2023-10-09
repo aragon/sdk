@@ -12,11 +12,8 @@ import {
   DaoCreationError,
   FailedDepositError,
   InstallationNotFoundError,
-  InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
-  InvalidEnsError,
-  InvalidParameter,
   IpfsPinError,
   MissingExecPermissionError,
   NoProviderError,
@@ -25,7 +22,6 @@ import {
   promiseWithTimeout,
   ProposalNotFoundError,
   resolveIpfsCid,
-  SizeMismatchError,
   UpdateAllowanceError,
 } from "@aragon/sdk-common";
 
@@ -81,9 +77,6 @@ import {
   PluginSortBy,
   PluginUpdateProposalInValidityCause,
   PluginUpdateProposalValidity,
-  PrepareUninstallationParams,
-  PrepareUninstallationSteps,
-  PrepareUninstallationStepValue,
   RevokePermissionDecodedParams,
   SetAllowanceParams,
   SetAllowanceSteps,
@@ -140,8 +133,8 @@ import {
   UNSUPPORTED_RELEASE_METADATA_LINK,
 } from "../constants";
 import { IClientMethods } from "../interfaces";
-import { PermissionIds, Permissions } from "../../constants";
 import {
+  AddressOrEnsSchema,
   ClientCore,
   DaoAction,
   DecodedApplyUpdateParams,
@@ -150,16 +143,35 @@ import {
   LIVE_CONTRACTS,
   MULTI_FETCH_TIMEOUT,
   MultiTargetPermission,
+  PermissionIds,
+  Permissions,
   prepareGenericInstallation,
   prepareGenericUpdate,
   PrepareInstallationParams,
+  PrepareInstallationSchema,
   PrepareInstallationStepValue,
+  PrepareUninstallationParams,
+  PrepareUninstallationSchema,
+  PrepareUninstallationSteps,
+  PrepareUninstallationStepValue,
   PrepareUpdateParams,
   PrepareUpdateStepValue,
   SortDirection,
   SupportedVersion,
   TokenType,
 } from "@aragon/sdk-client-common";
+import {
+  CreateDaoSchema,
+  DaoBalancesQuerySchema,
+  DaoMetadataSchema,
+  DaoQuerySchema,
+  DepositErc1155Schema,
+  DepositErc20Schema,
+  DepositErc721Schema,
+  DepositEthSchema,
+  HasPermissionSchema,
+  PluginQuerySchema,
+} from "../schemas";
 
 /**
  * Methods module the SDK Generic Client
@@ -168,6 +180,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async *prepareInstallation(
     params: PrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
+    await PrepareInstallationSchema.strict().validate(params);
     yield* prepareGenericInstallation(this.web3, {
       ...params,
       pluginSetupProcessorAddress: this.web3.getAddress(
@@ -177,7 +190,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   }
   /**
    * Creates a DAO with the given settings and plugins
-   *
+
    * @param {CreateDaoParams} params
    * @return {*}  {AsyncGenerator<DaoCreationStepValue>}
    * @memberof ClientMethods
@@ -185,12 +198,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async *createDao(
     params: CreateDaoParams,
   ): AsyncGenerator<DaoCreationStepValue> {
+    await CreateDaoSchema.strict().validate(params);
     const signer = this.web3.getConnectedSigner();
-    if (
-      params.ensSubdomain && !params.ensSubdomain.match(/^[a-z0-9\-]+$/)
-    ) {
-      throw new InvalidEnsError();
-    }
 
     const daoFactoryInstance = DAOFactory__factory.connect(
       this.web3.getAddress("daoFactoryAddress"),
@@ -303,6 +312,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async pinMetadata(params: DaoMetadata): Promise<string> {
+    await DaoMetadataSchema.strict().validate(params);
     try {
       const cid = await this.ipfs.add(JSON.stringify(params));
       await this.ipfs.pin(cid);
@@ -344,6 +354,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   private async *depositNative(
     params: DepositEthParams,
   ): AsyncGenerator<DaoDepositStepValue> {
+    await DepositEthSchema.strict().validate(params);
     const signer = this.web3.getConnectedSigner();
     const { daoAddressOrEns, amount } = params;
     const override: { value?: bigint } = { value: params.amount };
@@ -378,6 +389,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   private async *depositErc20(
     params: DepositErc20Params,
   ): AsyncGenerator<DaoDepositStepValue> {
+    await DepositErc20Schema.strict().validate(params);
     const signer = this.web3.getConnectedSigner();
     const { tokenAddress, daoAddressOrEns, amount } = params;
     // check current allowance
@@ -437,6 +449,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   private async *depositErc721(
     params: DepositErc721Params,
   ): AsyncGenerator<DaoDepositStepValue> {
+    await DepositErc721Schema.strict().validate(params) as DepositErc721Params;
     const signer = this.web3.getConnectedSigner();
     const erc721Contract = new Contract(
       params.tokenAddress,
@@ -474,17 +487,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   private async *depositErc1155(
     params: DepositErc1155Params,
   ): AsyncGenerator<DaoDepositStepValue> {
-    // if length is 0, throw
-    if (!params.tokenIds.length || !params.amounts.length) {
-      throw new InvalidParameter("tokenIds or amounts cannot be empty");
-    }
-    // if tokenIds and amounts length are different, throw
-    if (
-      params.tokenIds.length !== params.amounts.length
-    ) {
-      throw new SizeMismatchError();
-    }
-
+    await DepositErc1155Schema.strict().validate(params);
     const signer = this.web3.getConnectedSigner();
     const erc1155Contract = new Contract(
       params.tokenAddress,
@@ -593,6 +596,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async *prepareUninstallation(
     params: PrepareUninstallationParams,
   ): AsyncGenerator<PrepareUninstallationStepValue> {
+    await PrepareUninstallationSchema.strict().validate(
+      params,
+    );
     const signer = this.web3.getConnectedSigner();
     type T = {
       iplugin: { installations: SubgraphPluginInstallation[] };
@@ -701,6 +707,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async hasPermission(params: HasPermissionParams): Promise<boolean> {
+    await HasPermissionSchema.strict().validate(params);
     const provider = this.web3.getProvider();
     // connect to the managing dao
     const daoInstance = DAO__factory.connect(params.daoAddressOrEns, provider);
@@ -719,6 +726,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async getDao(daoAddressOrEns: string): Promise<DaoDetails | null> {
+    await AddressOrEnsSchema.strict().validate(daoAddressOrEns);
     let address = daoAddressOrEns.toLowerCase();
     if (!isAddress(address)) {
       await this.web3.ensureOnline();
@@ -779,6 +787,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     direction = SortDirection.ASC,
     sortBy = DaoSortBy.CREATED_AT,
   }: DaoQueryParams): Promise<DaoListItem[]> {
+    await DaoQuerySchema.strict().validate({
+      limit,
+      skip,
+      direction,
+      sortBy,
+    });
     const query = QueryDaos;
     const params = {
       limit,
@@ -837,6 +851,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     direction = SortDirection.ASC,
     sortBy = AssetBalanceSortBy.LAST_UPDATED,
   }: DaoBalancesQueryParams): Promise<AssetBalance[] | null> {
+    await DaoBalancesQuerySchema.strict().validate({
+      daoAddressOrEns,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    });
     let where = {};
     let address = daoAddressOrEns;
     if (address) {
@@ -966,6 +987,14 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     sortBy = PluginSortBy.SUBDOMAIN,
     subdomain,
   }: PluginQueryParams = {}): Promise<PluginRepoListItem[]> {
+    await PluginQuerySchema.strict().validate({
+      limit,
+      skip,
+      direction,
+      sortBy,
+      subdomain,
+    });
+
     let where = {};
     if (subdomain) {
       where = { subdomain_contains_nocase: subdomain };
@@ -1030,6 +1059,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @memberof ClientMethods
    */
   public async getPlugin(pluginAddress: string): Promise<PluginRepo> {
+    await AddressOrEnsSchema.strict().validate(pluginAddress);
     const name = "plugin version";
     const query = QueryPlugin;
     type T = { pluginRepo: SubgraphPluginRepo };
@@ -1087,9 +1117,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async getProtocolVersion(
     contractAddress: string,
   ): Promise<[number, number, number]> {
-    if (!isAddress(contractAddress)) {
-      throw new InvalidAddressError();
-    }
+    await AddressOrEnsSchema.strict().validate(contractAddress);
     const provider = this.web3.getProvider();
     const protocolInstance = IProtocolVersion__factory.connect(
       contractAddress,

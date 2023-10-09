@@ -105,7 +105,7 @@ export class MultisigClientMethods extends ClientCore
       params.failSafeActions?.length &&
       params.failSafeActions.length !== params.actions?.length
     ) {
-      throw new SizeMismatchError();
+      throw new SizeMismatchError("failSafeActions", "actions");
     }
     const allowFailureMap = boolArrayToBitmap(params.failSafeActions);
 
