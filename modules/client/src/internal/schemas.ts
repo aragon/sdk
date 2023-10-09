@@ -4,10 +4,10 @@ import {
   IpfsUriSchema,
   PaginationSchema,
   PluginInstallItemSchema,
+  SizeMismatchError,
   SubdomainSchema,
   Uint8ArraySchema,
 } from "@aragon/sdk-client-common";
-import { SizeMismatchError } from "@aragon/sdk-common";
 import { array, mixed, number, object, string } from "yup";
 
 export const CreateDaoSchema = object({

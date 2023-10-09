@@ -24,14 +24,13 @@ import {
   ClientCore,
   GasFeeEstimation,
   InvalidAddressOrEnsError,
-  InvalidSubdomainError,
   NoProviderError,
   NotImplementedError,
   prepareGenericInstallationEstimation,
   prepareGenericUpdateEstimation,
   PrepareInstallationParams,
-  PrepareUpdateParams,
   PrepareInstallationSchema,
+  PrepareUpdateParams,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { BigNumber } from "@ethersproject/bignumber";

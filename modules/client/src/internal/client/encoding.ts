@@ -28,21 +28,19 @@ import { IClientEncoding } from "../interfaces";
 import {
   AddressOrEnsSchema,
   ApplyInstallationParams,
-  ApplyUpdateParams,
   ApplyInstallationSchema,
   ApplyUninstallationParams,
   ApplyUninstallationSchema,
+  ApplyUpdateParams,
   ClientCore,
   DaoAction,
-  IpfsUriSchema,
-  Permissions,
   hexToBytes,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidEnsError,
-  InvalidParameter,
+  IpfsUriSchema,
   NotImplementedError,
-  SizeMismatchError,
+  Permissions,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { Interface } from "@ethersproject/abi";
@@ -340,7 +338,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           data: hexToBytes(data),
         };
       case TokenType.ERC721:
-       await WithdrawErc721Schema.strict().validate(params);
+        await WithdrawErc721Schema.strict().validate(params);
         iface = new Contract(
           params.tokenAddress,
           ERC721_ABI,

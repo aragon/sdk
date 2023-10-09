@@ -8,23 +8,6 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 // HEAD
-import {
-  AmountMismatchError,
-  DaoCreationError,
-  FailedDepositError,
-  InstallationNotFoundError,
-  InvalidAddressOrEnsError,
-  InvalidCidError,
-  IpfsPinError,
-  MissingExecPermissionError,
-  NoProviderError,
-  NotImplementedError,
-  PluginUninstallationPreparationError,
-  promiseWithTimeout,
-  ProposalNotFoundError,
-  resolveIpfsCid,
-  UpdateAllowanceError,
-} from "@aragon/sdk-common";
 
 //
 //079ce5f1 (merge common packages and deprecate sdk-common)
@@ -147,11 +130,8 @@ import {
   findLog,
   getNamedTypesFromMetadata,
   InstallationNotFoundError,
-  InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
-  InvalidEnsError,
-  InvalidParameter,
   IpfsPinError,
   LIVE_CONTRACTS,
   MissingExecPermissionError,
@@ -176,7 +156,6 @@ import {
   promiseWithTimeout,
   ProposalNotFoundError,
   resolveIpfsCid,
-  SizeMismatchError,
   SortDirection,
   SupportedVersion,
   TokenType,

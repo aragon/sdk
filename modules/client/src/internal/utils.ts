@@ -56,12 +56,6 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import {
-  bytesToHex,
-  hexToBytes,
-  InvalidParameter,
-  NotImplementedError,
-} from "@aragon/sdk-common";
-import {
   ApplyInstallationParams,
   ApplyUninstallationParams,
   ApplyUpdateParams,
@@ -70,15 +64,12 @@ import {
   DecodedApplyInstallationParams,
   DecodedApplyUpdateParams,
   getFunctionFragment,
-  InterfaceParams,
-  MultiTargetPermission,
-  PermissionIds,
   hexToBytes,
   InterfaceParams,
   InvalidParameter,
   MultiTargetPermission,
   NotImplementedError,
-  SizeMismatchError,
+  PermissionIds,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { Signer } from "@ethersproject/abstract-signer";

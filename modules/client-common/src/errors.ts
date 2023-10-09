@@ -231,8 +231,8 @@ export class AlwaysFailingProposalError extends SdkError {
 }
 
 export class SizeMismatchError extends SdkError {
-  constructor(cause?: Error) {
-    super("Size mismatch: actions and failSafeActions should match", cause);
+  constructor(field1: string, field2: string, cause?: Error) {
+    super(`Size mismatch: ${field1} and ${field2} should match`, cause);
   }
 }
 
