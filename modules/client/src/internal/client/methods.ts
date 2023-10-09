@@ -77,9 +77,6 @@ import {
   PluginSortBy,
   PluginUpdateProposalInValidityCause,
   PluginUpdateProposalValidity,
-  PrepareUninstallationParams,
-  PrepareUninstallationSteps,
-  PrepareUninstallationStepValue,
   RevokePermissionDecodedParams,
   SetAllowanceParams,
   SetAllowanceSteps,
@@ -136,7 +133,6 @@ import {
   UNSUPPORTED_RELEASE_METADATA_LINK,
 } from "../constants";
 import { IClientMethods } from "../interfaces";
-import { PermissionIds, Permissions } from "../../constants";
 import {
   AddressOrEnsSchema,
   ClientCore,
@@ -148,17 +144,18 @@ import {
   MULTI_FETCH_TIMEOUT,
   MultiTargetPermission,
   PermissionIds,
+  Permissions,
   prepareGenericInstallation,
   prepareGenericUpdate,
   PrepareInstallationParams,
   PrepareInstallationSchema,
   PrepareInstallationStepValue,
-  PrepareUpdateParams,
-  PrepareUpdateStepValue,
   PrepareUninstallationParams,
   PrepareUninstallationSchema,
   PrepareUninstallationSteps,
   PrepareUninstallationStepValue,
+  PrepareUpdateParams,
+  PrepareUpdateStepValue,
   SortDirection,
   SupportedVersion,
   TokenType,

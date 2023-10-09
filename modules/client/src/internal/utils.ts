@@ -55,9 +55,15 @@ import {
   PluginSetupProcessor,
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
-import { PermissionIds } from "../constants";
+import {
+  bytesToHex,
+  hexToBytes,
+  InvalidParameter,
+  NotImplementedError,
+} from "@aragon/sdk-common";
 import {
   ApplyInstallationParams,
+  ApplyUninstallationParams,
   ApplyUpdateParams,
   DaoAction,
   DecodedApplyInstallationParams,
@@ -65,24 +71,9 @@ import {
   getFunctionFragment,
   InterfaceParams,
   MultiTargetPermission,
-  TokenType,
-} from "@aragon/sdk-client-common";
-import {
-  bytesToHex,
-  hexToBytes,
-  InvalidParameter,
-  NotImplementedError,
-  SizeMismatchError,
-} from "@aragon/sdk-common";
-import { DAO__factory, PluginSetupProcessor } from "@aragon/osx-ethers";
-import {
-  ApplyInstallationParams,
-  ApplyUninstallationParams,
-  DecodedApplyInstallationParams,
   PermissionIds,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { InvalidParameter, NotImplementedError } from "@aragon/sdk-common";
 import { Signer } from "@ethersproject/abstract-signer";
 import { Contract } from "@ethersproject/contracts";
 import { BigNumber } from "@ethersproject/bignumber";

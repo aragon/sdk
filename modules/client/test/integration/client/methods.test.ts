@@ -35,13 +35,9 @@ import {
   DepositParams,
   HasPermissionParams,
   InitializeFromParams,
-  Permissions,
   PluginQueryParams,
   PluginSortBy,
   PluginUpdateProposalInValidityCause,
-  PrepareUninstallationSteps,
-  PluginQueryParams,
-  PluginSortBy,
   SetAllowanceParams,
   SetAllowanceSteps,
   SubgraphAction,
@@ -52,8 +48,6 @@ import {
   VotingMode,
 } from "../../../src";
 import {
-  InvalidAddressError,
-  MissingExecPermissionError,
   ProposalNotFoundError,
 } from "@aragon/sdk-common";
 import { Server } from "ganache";
@@ -83,7 +77,6 @@ import {
   Context,
   DaoAction,
   LIVE_CONTRACTS,
-  PrepareInstallationStep,
   PrepareUpdateStep,
   Permissions,
   PrepareInstallationStep,
