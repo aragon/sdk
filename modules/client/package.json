@@ -61,7 +61,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "@aragon/osx-ethers": "1.3.0-rc0.2",
+    "@aragon/osx-ethers": "1.3.0-rc0.3",
     "@aragon/sdk-client-common": "^1.6.0",
     "@aragon/sdk-common": "^1.7.0",
     "@aragon/sdk-ipfs": "^1.1.0",

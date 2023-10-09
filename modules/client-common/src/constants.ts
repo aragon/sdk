@@ -17,7 +17,8 @@ type GraphqlNetworks =
   | "mumbai"
   | "baseGoerli"
   | "baseMainnet"
-  | "local";
+  | "local"
+  | "sepolia";
 
 const SupportedNetworksToGraphqlNetworks: {
   [K in SupportedNetwork]: GraphqlNetworks;
@@ -29,6 +30,7 @@ const SupportedNetworksToGraphqlNetworks: {
   [SupportedNetwork.BASE_GOERLI]: "baseGoerli",
   [SupportedNetwork.BASE]: "baseMainnet",
   [SupportedNetwork.LOCAL]: "local",
+  [SupportedNetwork.SEPOLIA]: "sepolia",
 };
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
@@ -70,6 +72,7 @@ export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
     url: getGraphqlNode(SupportedNetwork.BASE_GOERLI),
   }],
   [SupportedNetwork.LOCAL]: [{ url: getGraphqlNode(SupportedNetwork.LOCAL) }],
+  [SupportedNetwork.SEPOLIA]: [{ url: getGraphqlNode(SupportedNetwork.SEPOLIA) }],
 };
 
 const IPFS_ENDPOINTS = {
@@ -104,6 +107,7 @@ export const IPFS_NODES: {
   [SupportedNetwork.BASE]: IPFS_ENDPOINTS.prod,
   [SupportedNetwork.BASE_GOERLI]: IPFS_ENDPOINTS.test,
   [SupportedNetwork.LOCAL]: IPFS_ENDPOINTS.test,
+  [SupportedNetwork.SEPOLIA]: IPFS_ENDPOINTS.test,
 };
 
 export const LIVE_CONTRACTS: {
@@ -207,6 +211,19 @@ export const LIVE_CONTRACTS: {
       ensRegistryAddress: "",
     },
     [SupportedNetwork.LOCAL]: {
+      daoFactoryAddress: "",
+      pluginSetupProcessorAddress: "",
+      multisigRepoAddress: "",
+      adminRepoAddress: "",
+      addresslistVotingRepoAddress: "",
+      tokenVotingRepoAddress: "",
+      multisigSetupAddress: "",
+      adminSetupAddress: "",
+      addresslistVotingSetupAddress: "",
+      tokenVotingSetupAddress: "",
+      ensRegistryAddress: "",
+    },
+    [SupportedNetwork.SEPOLIA]: {
       daoFactoryAddress: "",
       pluginSetupProcessorAddress: "",
       multisigRepoAddress: "",
@@ -329,6 +346,23 @@ export const LIVE_CONTRACTS: {
       addresslistVotingSetupAddress: "",
       tokenVotingSetupAddress: "",
       ensRegistryAddress: "",
+    },
+    [SupportedNetwork.SEPOLIA]: {
+      daoFactoryAddress: activeContractsList.sepolia.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsList.sepolia.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsList.sepolia["multisig-repo"],
+      adminRepoAddress: activeContractsList.sepolia["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsList.sepolia["address-list-voting-repo"],
+      tokenVotingRepoAddress:
+        activeContractsList.sepolia["token-voting-repo"],
+      multisigSetupAddress: activeContractsList.sepolia.MultisigSetup,
+      adminSetupAddress: activeContractsList.sepolia.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsList.sepolia.AddresslistVotingSetup,
+      tokenVotingSetupAddress: activeContractsList.sepolia.TokenVotingSetup,
+      ensRegistryAddress: activeContractsList.sepolia.ENSRegistry,
     },
   },
 };
