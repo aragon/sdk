@@ -142,8 +142,6 @@ export function decodeProposalId(
   if (!isProposalId(proposalId)) {
     throw new InvalidProposalIdError();
   }
-  // const matchedRegexResult =
-  //   proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/) || [];
 
   const matchedRegexResult = proposalId.match(OSX_PROPOSAL_ID_REGEX) || [];
   if (matchedRegexResult.length !== 3) {

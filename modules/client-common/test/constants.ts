@@ -4,11 +4,6 @@ export const TEST_WALLET =
   "0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 export const TEST_WALLET_ADDRESS = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
 export const ADDRESS_ONE = "0x0000000000000000000000000000000000000001";
-export const IPFS_CID = "QmSH4tFQd6zqPW9b8ryvtrnbhr9HATyetmWxtGgWUJ33ik";
-export const INVALID_IPFS_CID = "1nv4l1d_c1d";
-export const INVALID_IPFS_URI = `ipfs://${INVALID_IPFS_CID}`;
-export const IPFS_URI = `ipfs://${IPFS_CID}`;
-export const HTTP_URI = "https://aragon.org";
 
 export const web3endpoints = {
   working: [
@@ -115,7 +110,6 @@ export const TEST_ABI: MetadataAbiInput[] = [
   },
 ];
 
-
 export const TEST_ADDRESS = "0x0000000000000000000000000000000000000001";
 export const TEST_INVALID_ADDRESS =
   "0x000000000000000000000000000000000000000P";
@@ -123,12 +117,15 @@ export const TEST_INVALID_ADDRESS =
 export const TEST_ENS_NAME = "test.eth";
 export const TEST_INVALID_ENS_NAME = "test.invalid";
 
-export const TEST_IPFS_URI_V0 =
-  "ipfs://QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR";
-export const TEST_IPFS_URI_V1 =
-  "ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi";
-export const TEST_INVALID_IPFS_URI =
-  "ipfs://QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR-invalid";
+export const TEST_IPFS_CID_V0 =
+  "QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR";
+export const TEST_IPFS_CID_V1 =
+  "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi";
+
+export const TEST_IPFS_URI_V0 = `ipfs://${TEST_IPFS_CID_V0}`;
+export const TEST_IPFS_URI_V1 = `ipfs://${TEST_IPFS_CID_V1}`;
+export const TEST_INVALID_IPFS_CID = "1nv4l1d_c1d";
+export const TEST_INVALID_IPFS_URI = `ipfs://${TEST_INVALID_IPFS_CID}`;
 
 export const TEST_HTTP_URI = "https://test.com";
 export const TEST_INVALID_HTTP_URI = "https://te?st.com-invalid";

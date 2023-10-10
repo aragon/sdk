@@ -4,13 +4,11 @@ import {
   InvalidContractAbiError,
   InvalidParameter,
   InvalidSubdomainError,
-  isEnsName,
-  isIpfsUri,
-  isSubdomain,
-} from ".";
+} from "./errors";
 import { array, mixed, number, object, string } from "yup";
 import { isAddress } from "@ethersproject/address";
 import { ANY_ADDRESS } from "./internal/constants";
+import { isEnsName, isIpfsUri, isSubdomain } from "./validation";
 
 export const BigintSchema = mixed().test(
   "isBigint",

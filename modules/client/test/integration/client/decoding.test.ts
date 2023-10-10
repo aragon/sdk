@@ -29,13 +29,12 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
 import {
   ApplyInstallationParams,
-  ApplyUpdateParams,
   ApplyUninstallationParams,
-  Context,
-  PermissionIds,
+  ApplyUpdateParams,
   bytesToHex,
   Context,
   hexToBytes,
+  PermissionIds,
   PermissionOperationType,
   Permissions,
   TokenType,
