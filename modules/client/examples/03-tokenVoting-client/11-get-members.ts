@@ -19,7 +19,7 @@ const tokenVotingClient: TokenVotingClient = new TokenVotingClient(
 const pluginAddress: string = "0x12345384572394756239846529574932532985"; //  The address of the plugin that DAO has installed. You can find this by calling `getDao(daoAddress)` and getting the DAO details .
 
 const members: TokenVotingMember[] = await tokenVotingClient.methods.getMembers(
-  pluginAddress,
+  { pluginAddress },
 );
 console.log(members);
 

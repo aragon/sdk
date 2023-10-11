@@ -1,6 +1,7 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import {
   ContractVotingSettings,
+  MembersQueryParamsBase,
   SubgraphAction,
   SubgraphProposalBase,
   SubgraphVoterListItemBase,
@@ -89,6 +90,15 @@ export type SubgraphTokenVotingMember = {
     address: string;
     balance: string;
   }[];
+};
+
+export enum TokenVotingMembersSortBy {
+  ADDRESS = "address",
+  BALANCE = "balance",
+  VOTING_POWER = "votingPower",
+}
+export type TokenVotingMembersQueryParams = MembersQueryParamsBase & {
+  sortBy?: TokenVotingMembersSortBy;
 };
 
 export enum TokenVotingTokenCompatibility {

@@ -62,6 +62,8 @@ import {
   SubgraphTokenVotingMember,
   SubgraphTokenVotingProposal,
   SubgraphTokenVotingProposalListItem,
+  TokenVotingMembersQueryParams,
+  TokenVotingMembersSortBy,
   TokenVotingTokenCompatibility,
 } from "../types";
 import {
@@ -477,32 +479,45 @@ export class TokenVotingClientMethods extends ClientCore
   /**
    * Returns the list of wallet addresses holding tokens from the underlying Token contract used by the plugin
    *
-   * @async
-   * @param {string} pluginAddress
-   * @param {number} blockNumber
+   * @param {MembersQueryParams} {
+   *     pluginAddress,
+   *     blockNumber,
+   *     limit = 10,
+   *     skip = 0,
+   *     direction = SortDirection.ASC,
+   *     sortBy = MembersSortBy.ADDRESS,
+   *   }
    * @return {*}  {Promise<string[]>}
-   * @memberof TokenVotingClient
+   * @memberof TokenVotingClientMethods
    */
-  public async getMembers(
-    pluginAddress: string,
-    blockNumber?: number,
-  ): Promise<TokenVotingMember[]> {
+  public async getMembers({
+    pluginAddress,
+    blockNumber,
+    limit = 10,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = TokenVotingMembersSortBy.VOTING_POWER,
+  }: TokenVotingMembersQueryParams): Promise<TokenVotingMember[]> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
     const query = QueryTokenVotingMembers;
     const params = {
-      address: pluginAddress.toLowerCase(),
+      where: { plugin: pluginAddress.toLowerCase() },
       block: blockNumber ? { number: blockNumber } : null,
+      skip,
+      limit,
+      direction,
+      sortBy,
     };
     const name = "TokenVoting members";
-    type T = { tokenVotingPlugin: { members: SubgraphTokenVotingMember[] } };
-    const { tokenVotingPlugin } = await this.graphql.request<T>({
+    type T = { tokenVotingMembers: SubgraphTokenVotingMember[] };
+    const { tokenVotingMembers } = await this.graphql.request<T>({
       query,
       params,
       name,
     });
-    return tokenVotingPlugin.members.map((
+    return tokenVotingMembers.map((
       member: SubgraphTokenVotingMember,
     ) => toTokenVotingMember(member));
   }

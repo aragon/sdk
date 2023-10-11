@@ -36,6 +36,8 @@ import {
 import {
   ExecuteProposalStep,
   ExecuteProposalStepValue,
+  MembersQueryParams,
+  MembersSortBy,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalQueryParams,
@@ -371,15 +373,25 @@ export class MultisigClientMethods extends ClientCore
   /**
    * returns the members of the multisig
    *
-   * @param {string} pluginAddress
-   * @param {number} blockNumber
+   * @param {MembersQueryParams} {
+   *     pluginAddress,
+   *     blockNumber,
+   *     limit = 10,
+   *     skip = 0,
+   *     direction = SortDirection.ASC,
+   *     sortBy = MembersSortBy.ADDRESS,
+   *   }
    * @return {*}  {Promise<string[]>}
    * @memberof MultisigClientMethods
    */
-  public async getMembers(
-    pluginAddress: string,
-    blockNumber?: number,
-  ): Promise<string[]> {
+  public async getMembers({
+    pluginAddress,
+    blockNumber,
+    limit = 10,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = MembersSortBy.ADDRESS,
+  }: MembersQueryParams): Promise<string[]>{
     // TODO
     // update this with yup validation
     if (!isAddress(pluginAddress)) {
@@ -387,17 +399,21 @@ export class MultisigClientMethods extends ClientCore
     }
     const query = QueryMultisigMembers;
     const params = {
-      address: pluginAddress.toLowerCase(),
+      where: { plugin: pluginAddress.toLowerCase() },
       block: blockNumber ? { number: blockNumber } : null,
+      skip,
+      limit,
+      direction,
+      sortBy,
     };
     const name = "Multisig members";
-    type T = { multisigPlugin: SubgraphMembers };
-    const { multisigPlugin } = await this.graphql.request<T>({
+    type T = { multisigApprovers: SubgraphMembers };
+    const { multisigApprovers } = await this.graphql.request<T>({
       query,
       params,
       name,
     });
-    return multisigPlugin.members.map((member) => member.address);
+    return multisigApprovers.map((member) => member.address);
   }
 
   /**

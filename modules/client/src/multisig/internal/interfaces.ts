@@ -10,6 +10,7 @@ import {
 } from "@aragon/sdk-client-common";
 import {
   ExecuteProposalStepValue,
+  MembersQueryParams,
   ProposalCreationStepValue,
   ProposalQueryParams,
 } from "../../client-common";
@@ -52,10 +53,7 @@ export interface IMultisigClientMethods {
     addressOrEns: string,
     blockNumber?: number,
   ) => Promise<MultisigVotingSettings>;
-  getMembers: (
-    addressOrEns: string,
-    blockNumber?: number,
-  ) => Promise<string[]>;
+  getMembers: (params: MembersQueryParams) => Promise<string[]>;
   getProposal: (proposalId: string) => Promise<MultisigProposal | null>;
   getProposals: (
     params: ProposalQueryParams,

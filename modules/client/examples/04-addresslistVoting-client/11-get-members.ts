@@ -20,7 +20,7 @@ const addresslistVotingClient: AddresslistVotingClient =
 const daoPluginAddress = "0x12345382947301297439127433492834"; // The address of the plugin that DAO has installed. You can find this by calling `getDao(daoAddress)` and getting the DAO details .
 
 const members: string[] = await addresslistVotingClient.methods.getMembers(
-  daoPluginAddress,
+  { pluginAddress: daoPluginAddress },
 );
 console.log({ members });
 

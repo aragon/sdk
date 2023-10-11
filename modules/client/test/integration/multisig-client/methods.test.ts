@@ -477,20 +477,28 @@ describe("Client Multisig", () => {
       const members = [ADDRESS_ONE, ADDRESS_TWO];
 
       mockedClient.request.mockResolvedValueOnce({
-        multisigPlugin: {
-          members: members.map((member) => ({ address: member })),
-        },
+        multisigApprovers: members.map((member) => {
+          return { address: member };
+        }),
       });
 
       const wallets = await client.methods.getMembers(
-        ADDRESS_ONE,
-        123456,
+        {
+          pluginAddress: ADDRESS_ONE,
+          blockNumber: 123456,
+        },
       );
       expect(wallets.length).toBe(2);
       expect(wallets).toMatchObject(members);
       expect(mockedClient.request).toHaveBeenCalledWith(QueryMultisigMembers, {
-        address: ADDRESS_ONE,
-        block: { number: 123456 },
+        where: { plugin: ADDRESS_ONE },
+        block: {
+          number: 123456,
+        },
+        direction: "asc",
+        limit: 10,
+        skip: 0,
+        sortBy: "address",
       });
     });
 
