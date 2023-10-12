@@ -23,7 +23,6 @@ TEMPLATE:
 
 - Deprecate package, functionality moved to `@aragon/sdk-client-common`
 
-
 ## 1.6.0
 
 ### Added
