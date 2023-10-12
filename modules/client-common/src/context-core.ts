@@ -1,10 +1,4 @@
 import { JsonRpcProvider, Network, Networkish } from "@ethersproject/providers";
-import {
-  InvalidAddressError,
-  InvalidGasEstimationFactorError,
-  UnsupportedNetworkError,
-  UnsupportedProtocolError,
-} from "@aragon/sdk-common";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 import { isAddress } from "@ethersproject/address";
@@ -20,6 +14,12 @@ import {
 import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
 import { getNetwork } from "./utils";
 import { DeployedAddressesArray } from "./internal";
+import {
+  InvalidAddressError,
+  InvalidGasEstimationFactorError,
+  UnsupportedNetworkError,
+  UnsupportedProtocolError,
+} from "./errors";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 const supportedProtocols = ["https:"];

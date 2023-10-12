@@ -25,7 +25,6 @@ import {
   contextParamsLocalChain,
 } from "../constants";
 import { toUtf8Bytes, toUtf8String } from "@ethersproject/strings";
-import { bytesToHex } from "@aragon/sdk-common";
 import { keccak256 } from "@ethersproject/keccak256";
 import { AddressZero } from "@ethersproject/constants";
 import {
@@ -37,6 +36,7 @@ import {
   PermissionIds,
   Permissions,
   TokenType,
+  bytesToHex,
 } from "@aragon/sdk-client-common";
 
 describe("Client", () => {

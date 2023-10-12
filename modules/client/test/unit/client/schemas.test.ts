@@ -1,11 +1,4 @@
 import {
-  InvalidAddressOrEnsError,
-  InvalidCidError,
-  InvalidParameter,
-  InvalidSubdomainError,
-  SizeMismatchError,
-} from "@aragon/sdk-common";
-import {
   CreateDaoSchema,
   DaoBalancesQuerySchema,
   DaoMetadataSchema,
@@ -36,7 +29,12 @@ import {
   TEST_SUBDOMAIN,
 } from "../../constants";
 import {
+  InvalidAddressOrEnsError,
+  InvalidCidError,
+  InvalidParameter,
+  InvalidSubdomainError,
   Permissions,
+  SizeMismatchError,
   SortDirection,
   TokenType,
 } from "@aragon/sdk-client-common";

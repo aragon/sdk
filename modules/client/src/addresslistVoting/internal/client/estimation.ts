@@ -6,13 +6,14 @@ import {
 import { IAddresslistVotingClientEstimation } from "../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
-  boolArrayToBitmap,
+  ClientCore,
   decodeProposalId,
+  GasFeeEstimation,
   SizeMismatchError,
-} from "@aragon/sdk-common";
-import { ClientCore, GasFeeEstimation } from "@aragon/sdk-client-common";
+} from "@aragon/sdk-client-common";
 import { AddresslistVotingPluginPrepareUpdateParams } from "../../types";
 import { prepareGenericUpdateEstimation } from "@aragon/sdk-client-common";
+import { boolArrayToBitmap } from "@aragon/sdk-client-common";
 
 /**
  * Estimation module the SDK Address List Client

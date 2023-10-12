@@ -1,5 +1,4 @@
-import { DaoAction } from "@aragon/sdk-client-common";
-import { bytesToHex } from "@aragon/sdk-common";
+import { bytesToHex, DaoAction } from "@aragon/sdk-client-common";
 
 export function toSubgraphAction(actions: DaoAction[]) {
   return actions.map((action) => {

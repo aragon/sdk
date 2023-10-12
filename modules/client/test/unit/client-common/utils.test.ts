@@ -1,10 +1,9 @@
-import { hexToBytes } from "@aragon/sdk-common";
 import {
   isFailingProposal,
 } from "../../../src";
 import { Multisig__factory } from "@aragon/osx-ethers";
 import { id } from "@ethersproject/hash";
-import { DaoAction } from "@aragon/sdk-client-common";
+import { DaoAction, hexToBytes } from "@aragon/sdk-client-common";
 
 const UPDATE_MULTISIG_SETTINGS_ACTION = {
   value: BigInt(0),

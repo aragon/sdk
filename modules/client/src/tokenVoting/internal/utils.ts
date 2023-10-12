@@ -30,13 +30,11 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { Result } from "@ethersproject/abi";
 import { AddressZero } from "@ethersproject/constants";
 import {
+  DaoAction,
   decodeRatio,
   getCompactProposalId,
   hexToBytes,
   InvalidProposalStatusError,
-} from "@aragon/sdk-common";
-import {
-  DaoAction,
   ProposalMetadata,
   ProposalStatus,
   TokenType,

@@ -110,7 +110,6 @@ export const TEST_ABI: MetadataAbiInput[] = [
   },
 ];
 
-
 export const TEST_ADDRESS = "0x0000000000000000000000000000000000000001";
 export const TEST_INVALID_ADDRESS =
   "0x000000000000000000000000000000000000000P";
@@ -118,15 +117,39 @@ export const TEST_INVALID_ADDRESS =
 export const TEST_ENS_NAME = "test.eth";
 export const TEST_INVALID_ENS_NAME = "test.invalid";
 
-export const TEST_IPFS_URI_V0 =
-  "ipfs://QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR";
-export const TEST_IPFS_URI_V1 =
-  "ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi";
-export const TEST_INVALID_IPFS_URI =
-  "ipfs://QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR-invalid";
+export const TEST_IPFS_CID_V0 =
+  "QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR";
+export const TEST_IPFS_CID_V1 =
+  "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi";
+
+export const TEST_IPFS_URI_V0 = `ipfs://${TEST_IPFS_CID_V0}`;
+export const TEST_IPFS_URI_V1 = `ipfs://${TEST_IPFS_CID_V1}`;
+export const TEST_INVALID_IPFS_CID = "1nv4l1d_c1d";
+export const TEST_INVALID_IPFS_URI = `ipfs://${TEST_INVALID_IPFS_CID}`;
 
 export const TEST_HTTP_URI = "https://test.com";
 export const TEST_INVALID_HTTP_URI = "https://te?st.com-invalid";
 
 export const TEST_SUBDOMAIN = "test";
 export const TEST_INVALID_SUBDOMAIN = "test.invalid";
+export const ERC165_ABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4",
+      },
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool",
+      },
+    ],
+    "stateMutability": "view",
+    "type": "function",
+  },
+];

@@ -1,4 +1,3 @@
-import { bytesToHex } from "@aragon/sdk-common";
 import {
   decodeUpdatePluginSettingsAction,
   VotingSettings,
@@ -7,6 +6,7 @@ import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { IAddresslistVotingClientDecoding } from "../interfaces";
 import { AddresslistVoting__factory } from "@aragon/osx-ethers";
 import {
+  bytesToHex,
   ClientCore,
   getFunctionFragment,
   InterfaceParams,

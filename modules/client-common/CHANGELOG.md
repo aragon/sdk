@@ -22,8 +22,13 @@ TEMPLATE:
 
 - Add common schemas for validations
 - Support for sepolia network
+- Move functionality from `sdk-common` to `sdk-client-common`
+- New error classes `InvalidVersionError`, `PluginUpdatePreparationError` and `ProposalNotFoundError`
+- Add `isSubdomain`, `isIpfsUri` and `isEnsName` functions
+- Update SizeMismatchError error class
 
 ## 1.6.0
+
 ### Added
 
 - Add generic prepare update function

@@ -1,20 +1,3 @@
-import {
-  boolArrayToBitmap,
-  decodeProposalId,
-  encodeProposalId,
-  getExtendedProposalId,
-  InvalidAddressOrEnsError,
-  InvalidCidError,
-  InvalidProposalIdError,
-  IpfsPinError,
-  isProposalId,
-  NoProviderError,
-  promiseWithTimeout,
-  ProposalCreationError,
-  resolveIpfsCid,
-  SizeMismatchError,
-  UnsupportedNetworkError,
-} from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import {
   ApproveMultisigProposalParams,
@@ -57,20 +40,35 @@ import {
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IMultisigClientMethods } from "../interfaces";
 import {
+  boolArrayToBitmap,
   ClientCore,
+  decodeProposalId,
   EMPTY_PROPOSAL_METADATA_LINK,
+  encodeProposalId,
   findLog,
+  getExtendedProposalId,
+  InvalidAddressOrEnsError,
+  InvalidCidError,
+  InvalidProposalIdError,
+  IpfsPinError,
+  isProposalId,
   MULTI_FETCH_TIMEOUT,
+  NoProviderError,
   prepareGenericInstallation,
   prepareGenericUpdate,
   PrepareInstallationStepValue,
   PrepareUpdateStepValue,
+  promiseWithTimeout,
+  ProposalCreationError,
   ProposalMetadata,
+  resolveIpfsCid,
+  SizeMismatchError,
   SortDirection,
   SupportedNetwork,
   SupportedNetworksArray,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI, UPDATE_ABI } from "../constants";
 

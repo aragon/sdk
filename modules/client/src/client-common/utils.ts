@@ -3,14 +3,11 @@ import { VoteValues, VotingMode } from "./types/plugin";
 import {
   CreateMajorityVotingProposalParams,
 } from "./types/plugin";
-
-import {
-  InvalidVotingModeError,
-} from "@aragon/sdk-common";
 import { FAILING_PROPOSAL_AVAILABLE_FUNCTION_SIGNATURES } from "./internal";
 import {
   DaoAction,
   DecodedApplyInstallationParams,
+  InvalidVotingModeError,
   getFunctionFragment,
 } from "@aragon/sdk-client-common";
 

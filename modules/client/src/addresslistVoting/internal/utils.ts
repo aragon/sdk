@@ -1,10 +1,4 @@
 import {
-  decodeRatio,
-  getCompactProposalId,
-  hexToBytes,
-  InvalidProposalStatusError,
-} from "@aragon/sdk-common";
-import {
   SubgraphAction,
   SubgraphVoteValuesMap,
   VoteValues,
@@ -23,6 +17,10 @@ import {
 } from "./types";
 import {
   DaoAction,
+  decodeRatio,
+  getCompactProposalId,
+  hexToBytes,
+  InvalidProposalStatusError,
   ProposalMetadata,
   ProposalStatus,
 } from "@aragon/sdk-client-common";

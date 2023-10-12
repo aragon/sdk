@@ -19,11 +19,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 
-### Added
+### Change
 
-- New error classes `InvalidVersionError`, `PluginUpdatePreparationError` and `ProposalNotFoundError`
-- Add `isSubdomain`, `isIpfsUri` and `isEnsName` functions
-- Update SizeMismatchError error class
+- Deprecate package, functionality moved to `@aragon/sdk-client-common`
+
 
 ## 1.6.0
 

@@ -1,4 +1,3 @@
-import { bytesToHex } from "@aragon/sdk-common";
 import { AVAILABLE_FUNCTION_SIGNATURES } from "../constants";
 import { MultisigVotingSettings } from "../../types";
 // @ts-ignore
@@ -6,6 +5,7 @@ import { MultisigVotingSettings } from "../../types";
 import { Multisig__factory } from "@aragon/osx-ethers";
 import { IMultisigClientDecoding } from "../interfaces";
 import {
+  bytesToHex,
   ClientCore,
   getFunctionFragment,
   InterfaceParams,
