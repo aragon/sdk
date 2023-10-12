@@ -1,21 +1,3 @@
-import {
-  boolArrayToBitmap,
-  decodeProposalId,
-  decodeRatio,
-  encodeProposalId,
-  getExtendedProposalId,
-  InvalidAddressError,
-  InvalidAddressOrEnsError,
-  InvalidCidError,
-  InvalidProposalIdError,
-  IpfsPinError,
-  isProposalId,
-  NoProviderError,
-  promiseWithTimeout,
-  ProposalCreationError,
-  resolveIpfsCid,
-  UnsupportedNetworkError,
-} from "@aragon/sdk-common";
 import { isAddress } from "@ethersproject/address";
 import { IAddresslistVotingClientMethods } from "../interfaces";
 import {
@@ -60,24 +42,40 @@ import {
   SubgraphAddresslistVotingProposal,
   SubgraphAddresslistVotingProposalListItem,
 } from "../types";
-import { SizeMismatchError } from "@aragon/sdk-common";
 import {
+  boolArrayToBitmap,
   ClientCore,
+  decodeProposalId,
+  decodeRatio,
   EMPTY_PROPOSAL_METADATA_LINK,
+  encodeProposalId,
   findLog,
+  InvalidAddressError,
+  InvalidAddressOrEnsError,
+  InvalidCidError,
+  InvalidProposalIdError,
+  IpfsPinError,
+  isProposalId,
   MULTI_FETCH_TIMEOUT,
+  NoProviderError,
   prepareGenericInstallation,
   prepareGenericUpdate,
   PrepareInstallationStepValue,
   PrepareUpdateStepValue,
+  promiseWithTimeout,
+  ProposalCreationError,
   ProposalMetadata,
+  resolveIpfsCid,
+  SizeMismatchError,
   SortDirection,
   SupportedNetwork,
   SupportedNetworksArray,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI, UPDATE_ABI } from "../constants";
+import { getExtendedProposalId } from "@aragon/sdk-client-common";
 
 /**
  * Methods module the SDK Address List Client

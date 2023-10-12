@@ -1,4 +1,3 @@
-import { InvalidProposalStatusError, getCompactProposalId, hexToBytes } from "@aragon/sdk-common";
 import { SubgraphAction } from "../../client-common";
 import { MultisigProposal, MultisigProposalListItem } from "../types";
 import {
@@ -7,6 +6,9 @@ import {
 } from "./types";
 import {
   DaoAction,
+  getCompactProposalId,
+  hexToBytes,
+  InvalidProposalStatusError,
   ProposalMetadata,
   ProposalStatus,
 } from "@aragon/sdk-client-common";

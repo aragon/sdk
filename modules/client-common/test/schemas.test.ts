@@ -6,6 +6,10 @@ import {
   ApplyUninstallationParams,
   ApplyUninstallationSchema,
   BigintSchema,
+  InvalidAddressOrEnsError,
+  InvalidCidError,
+  InvalidParameter,
+  InvalidSubdomainError,
   IpfsUriSchema,
   MultiTargetPermission,
   MultiTargetPermissionSchema,
@@ -22,12 +26,6 @@ import {
   Uint8ArraySchema,
   VersionTagSchema,
 } from "../src";
-import {
-  InvalidAddressOrEnsError,
-  InvalidCidError,
-  InvalidParameter,
-  InvalidSubdomainError,
-} from "@aragon/sdk-common";
 import {
   TEST_ADDRESS,
   TEST_ENS_NAME,

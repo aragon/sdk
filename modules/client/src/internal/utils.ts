@@ -56,21 +56,19 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import {
-  bytesToHex,
-  hexToBytes,
-  InvalidParameter,
-  NotImplementedError,
-} from "@aragon/sdk-common";
-import {
   ApplyInstallationParams,
   ApplyUninstallationParams,
   ApplyUpdateParams,
+  bytesToHex,
   DaoAction,
   DecodedApplyInstallationParams,
   DecodedApplyUpdateParams,
   getFunctionFragment,
+  hexToBytes,
   InterfaceParams,
+  InvalidParameter,
   MultiTargetPermission,
+  NotImplementedError,
   PermissionIds,
   TokenType,
 } from "@aragon/sdk-client-common";

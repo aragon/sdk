@@ -1,13 +1,13 @@
-import {
-  ClientNotInitializedError,
-  GraphQLError,
-  NoNodesAvailableError,
-  runAndRetry,
-} from "@aragon/sdk-common";
 import { ClientError, GraphQLClient } from "graphql-request";
 import { IClientGraphQLCore } from "../interfaces";
 import { Context } from "../../context";
 import { QueryStatus } from "../graphql-queries";
+import {
+  ClientNotInitializedError,
+  GraphQLError,
+  NoNodesAvailableError,
+} from "../../errors";
+import { runAndRetry } from "../../promises";
 
 export class GraphqlModule implements IClientGraphQLCore {
   private clientIdx: number = -1;

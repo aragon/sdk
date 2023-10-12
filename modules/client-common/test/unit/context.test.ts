@@ -6,8 +6,8 @@ import {
   IPFS_NODES,
   LIVE_CONTRACTS,
   SupportedVersion,
-} from "../src";
-import { ADDRESS_ONE, TEST_WALLET, web3endpoints } from "./constants";
+} from "../../src";
+import { ADDRESS_ONE, TEST_WALLET, web3endpoints } from "../constants";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { GraphQLClient } from "graphql-request";
@@ -251,7 +251,9 @@ describe("Context instances", () => {
       provider.getNetwork().then((nw) => {
         expect(nw.chainId).toEqual(137);
         expect(nw.name).toEqual("matic");
-        expect(nw.ensAddress).toEqual(LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress);
+        expect(nw.ensAddress).toEqual(
+          LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress,
+        );
       })
     );
     expect(context.daoFactoryAddress).toEqual(

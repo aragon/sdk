@@ -1,10 +1,17 @@
-import { InvalidCidError } from "./errors";
+import { IPFS_CID_REGEX } from "./constants";
+import { EmptyMultiUriError } from "./errors";
 
+/**
+ * Parses a multi URI and returns the IPFS or HTTP URI.
+ *
+ * @export
+ * @class MultiUri
+ */
 export class MultiUri {
   readonly items: string[] = [];
 
   constructor(multiUri: string) {
-    if (!multiUri) throw new Error("The multi URI is empty");
+    if (!multiUri) throw new EmptyMultiUriError();
     this.items = multiUri.split(",");
   }
 
@@ -60,19 +67,4 @@ export class MultiUri {
       item.startsWith("http://") || item.startsWith("https://")
     );
   }
-}
-
-const IPFS_CID_REGEX =
-  /^Qm([1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/;
-
-/** Attempts to parse the given string as a URL and returns the IPFS CiD contained in it.
- * Alternatively it tries to use the raw value after validating it.
- */
-export function resolveIpfsCid(data: string): string {
-  const uri = new MultiUri(data);
-  const cid = uri.ipfsCid;
-  if (!cid) {
-    throw new InvalidCidError();
-  }
-  return cid;
 }

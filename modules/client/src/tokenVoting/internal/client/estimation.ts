@@ -9,18 +9,16 @@ import {
 import { ITokenVotingClientEstimation } from "../interfaces";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import {
-  boolArrayToBitmap,
-  decodeProposalId,
-  SizeMismatchError,
-} from "@aragon/sdk-common";
-import {
   DelegateTokensParams,
   TokenVotingPluginPrepareUpdateParams,
 } from "../../types";
 import {
+  boolArrayToBitmap,
   ClientCore,
+  decodeProposalId,
   GasFeeEstimation,
   prepareGenericUpdateEstimation,
+  SizeMismatchError,
 } from "@aragon/sdk-client-common";
 /**
  * Estimation module the SDK TokenVoting Client

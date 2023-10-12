@@ -1,10 +1,4 @@
 import { MajorityVotingBase__factory } from "@aragon/osx-ethers";
-import {
-  bytesToHex,
-  decodeRatio,
-  encodeRatio,
-  hexToBytes,
-} from "@aragon/sdk-common";
 import { Result } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { votingModeFromContracts, votingModeToContracts } from "./utils";
@@ -13,6 +7,7 @@ import {
   VotingMode,
   VotingSettings,
 } from "./types/plugin";
+import { bytesToHex, decodeRatio, encodeRatio, hexToBytes } from "@aragon/sdk-client-common";
 
 export function decodeUpdatePluginSettingsAction(
   data: Uint8Array,

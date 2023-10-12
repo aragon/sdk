@@ -23,25 +23,23 @@ import { Contract } from "@ethersproject/contracts";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
-import {
-  hexToBytes,
-  InvalidAddressError,
-  InvalidAddressOrEnsError,
-  InvalidEnsError,
-  NotImplementedError,
-} from "@aragon/sdk-common";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { IClientEncoding } from "../interfaces";
 import {
   AddressOrEnsSchema,
   ApplyInstallationParams,
-  ApplyUpdateParams,
   ApplyInstallationSchema,
   ApplyUninstallationParams,
   ApplyUninstallationSchema,
+  ApplyUpdateParams,
   ClientCore,
   DaoAction,
+  hexToBytes,
+  InvalidAddressError,
+  InvalidAddressOrEnsError,
+  InvalidEnsError,
   IpfsUriSchema,
+  NotImplementedError,
   Permissions,
   TokenType,
 } from "@aragon/sdk-client-common";
@@ -340,7 +338,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           data: hexToBytes(data),
         };
       case TokenType.ERC721:
-       await WithdrawErc721Schema.strict().validate(params);
+        await WithdrawErc721Schema.strict().validate(params);
         iface = new Contract(
           params.tokenAddress,
           ERC721_ABI,

@@ -7,24 +7,10 @@ import {
   PluginRepo__factory,
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
-import {
-  AmountMismatchError,
-  DaoCreationError,
-  FailedDepositError,
-  InstallationNotFoundError,
-  InvalidAddressOrEnsError,
-  InvalidCidError,
-  IpfsPinError,
-  MissingExecPermissionError,
-  NoProviderError,
-  NotImplementedError,
-  PluginUninstallationPreparationError,
-  promiseWithTimeout,
-  ProposalNotFoundError,
-  resolveIpfsCid,
-  UpdateAllowanceError,
-} from "@aragon/sdk-common";
+// HEAD
 
+//
+//079ce5f1 (merge common packages and deprecate sdk-common)
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
@@ -135,16 +121,27 @@ import {
 import { IClientMethods } from "../interfaces";
 import {
   AddressOrEnsSchema,
+  AmountMismatchError,
   ClientCore,
   DaoAction,
+  DaoCreationError,
   DecodedApplyUpdateParams,
+  FailedDepositError,
   findLog,
   getNamedTypesFromMetadata,
+  InstallationNotFoundError,
+  InvalidAddressOrEnsError,
+  InvalidCidError,
+  IpfsPinError,
   LIVE_CONTRACTS,
+  MissingExecPermissionError,
   MULTI_FETCH_TIMEOUT,
   MultiTargetPermission,
+  NoProviderError,
+  NotImplementedError,
   PermissionIds,
   Permissions,
+  PluginUninstallationPreparationError,
   prepareGenericInstallation,
   prepareGenericUpdate,
   PrepareInstallationParams,
@@ -156,9 +153,13 @@ import {
   PrepareUninstallationStepValue,
   PrepareUpdateParams,
   PrepareUpdateStepValue,
+  promiseWithTimeout,
+  ProposalNotFoundError,
+  resolveIpfsCid,
   SortDirection,
   SupportedVersion,
   TokenType,
+  UpdateAllowanceError,
 } from "@aragon/sdk-client-common";
 import {
   CreateDaoSchema,

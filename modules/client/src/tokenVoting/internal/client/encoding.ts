@@ -1,9 +1,4 @@
 import {
-  hexToBytes,
-  InvalidAddressError,
-  UnsupportedNetworkError,
-} from "@aragon/sdk-common";
-import {
   encodeUpdateVotingSettingsAction,
   VotingSettings,
 } from "../../../client-common";
@@ -22,11 +17,14 @@ import {
   DaoAction,
   getNamedTypesFromMetadata,
   getNetwork,
+  hexToBytes,
+  InvalidAddressError,
   LIVE_CONTRACTS,
   PluginInstallItem,
   SupportedNetwork,
   SupportedNetworksArray,
   SupportedVersion,
+  UnsupportedNetworkError,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
 

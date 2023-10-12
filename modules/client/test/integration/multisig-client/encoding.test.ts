@@ -7,13 +7,16 @@ import {
   MultisigPluginInstallParams,
   RemoveAddressesParams,
 } from "../../../src";
-import { bytesToHex, InvalidAddressError } from "@aragon/sdk-common";
 import {
   ADDRESS_ONE,
   contextParamsLocalChain,
   TEST_INVALID_ADDRESS,
 } from "../constants";
-import { Context } from "@aragon/sdk-client-common";
+import {
+  bytesToHex,
+  Context,
+  InvalidAddressError,
+} from "@aragon/sdk-client-common";
 
 describe("Client Multisig", () => {
   beforeAll(() => {

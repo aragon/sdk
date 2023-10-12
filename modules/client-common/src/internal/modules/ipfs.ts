@@ -3,15 +3,15 @@ import {
   ClientError,
   PinResponse,
 } from "@aragon/sdk-ipfs";
-import {
-  ClientNotInitializedError,
-  IpfsError,
-  NoNodesAvailableError,
-  runAndRetry,
-  DataDecodingError
-} from "@aragon/sdk-common";
 import { IClientIpfsCore } from "../interfaces";
 import { Context } from "../../context";
+import {
+  ClientNotInitializedError,
+  DataDecodingError,
+  IpfsError,
+  NoNodesAvailableError,
+} from "../../errors";
+import { runAndRetry } from "../../promises";
 
 export class IPFSModule implements IClientIpfsCore {
   private clientIdx: number = -1;

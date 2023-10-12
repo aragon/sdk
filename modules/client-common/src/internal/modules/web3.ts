@@ -2,15 +2,6 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { isAddress } from "@ethersproject/address";
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { Signer } from "@ethersproject/abstract-signer";
-import {
-  CannotEstimateGasError,
-  InvalidAddressError,
-  InvalidContractAbiError,
-  NoNodesAvailableError,
-  NoProviderError,
-  NoSignerError,
-  UnsupportedNetworkError,
-} from "@aragon/sdk-common";
 import { IClientWeb3Core } from "../interfaces";
 import { Context } from "../../context";
 import {
@@ -19,6 +10,15 @@ import {
   SupportedNetworksArray,
 } from "../../types";
 import { DeployedAddresses } from "../types";
+import {
+  CannotEstimateGasError,
+  InvalidAddressError,
+  InvalidContractAbiError,
+  NoNodesAvailableError,
+  NoProviderError,
+  NoSignerError,
+  UnsupportedNetworkError,
+} from "../../errors";
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
   private providerIdx: number = -1;
@@ -145,5 +145,5 @@ export class Web3Module implements IClientWeb3Core {
       throw new InvalidAddressError();
     }
     return address;
-  }  
+  }
 }
