@@ -12,6 +12,7 @@ import {
   CanVoteParams,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStepValue,
+  MembersQueryParams,
   ProposalCreationStepValue,
   ProposalQueryParams,
   VoteProposalParams,
@@ -45,7 +46,7 @@ export interface IAddresslistVotingClientMethods {
   ) => AsyncGenerator<PrepareUpdateStepValue>;
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
-  getMembers: (addressOrEns: string, blockNumber?: number) => Promise<string[]>;
+  getMembers: (params: MembersQueryParams) => Promise<string[]>;
   getProposal: (
     propoosalId: string,
   ) => Promise<AddresslistVotingProposal | null>;

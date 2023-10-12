@@ -693,23 +693,34 @@ describe("Client Address List", () => {
         client.graphql.getClient(),
       );
       mockedClient.request.mockResolvedValueOnce({
-        addresslistVotingPlugin: {
-          members: [{
+        addresslistVotingVoters: [
+          {
             address: ADDRESS_ONE,
-          }],
-        },
+          },
+        ],
       });
 
       const wallets = await client.methods.getMembers(
-        ADDRESS_ONE,
-        123456,
+        {
+          pluginAddress: ADDRESS_ONE,
+          blockNumber: 123456,
+        },
       );
 
       expect(wallets.length).toBe(1);
       expect(wallets[0]).toBe(ADDRESS_ONE);
       expect(mockedClient.request).toHaveBeenLastCalledWith(
         QueryAddresslistVotingMembers,
-        { address: ADDRESS_ONE, block: { number: 123456 } },
+        {
+          where: { plugin: ADDRESS_ONE },
+          block: {
+            number: 123456,
+          },
+          direction: "asc",
+          limit: 10,
+          skip: 0,
+          sortBy: "address",
+        },
       );
     });
     it("Should fetch the given proposal", async () => {

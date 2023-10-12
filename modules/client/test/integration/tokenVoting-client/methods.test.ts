@@ -927,12 +927,13 @@ describe("Token Voting Client", () => {
           },
         ];
         mockedClient.request.mockResolvedValueOnce({
-          tokenVotingPlugin: {
-            members: subgraphMembers,
-          },
+          tokenVotingMembers: subgraphMembers,
         });
         const members = await client.methods.getMembers(
-          ADDRESS_ONE,
+          {
+            pluginAddress: ADDRESS_ONE,
+            blockNumber: 123456,
+          },
         );
         const expectedMembers: TokenVotingMember[] = [
           {
@@ -963,7 +964,16 @@ describe("Token Voting Client", () => {
 
         expect(mockedClient.request).toHaveBeenCalledWith(
           QueryTokenVotingMembers,
-          { address: ADDRESS_ONE, block: null },
+          {
+            where: { plugin: ADDRESS_ONE },
+            block: {
+              number: 123456,
+            },
+            direction: "asc",
+            limit: 10,
+            skip: 0,
+            sortBy: "votingPower",
+          },
         );
       });
       it("Should fetch the given proposal", async () => {

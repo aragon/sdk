@@ -1,11 +1,16 @@
 import { gql } from "graphql-request";
 
 export const QueryMultisigMembers = gql`
-query MultisigMembers($address: ID!, $block: Block_height) {
-    multisigPlugin(id: $address, block: $block){
-        members {
-            address
-        }
-    }
+query MultisigMembers($where: MultisigApprover_filter!, $block: Block_height, $limit: Int!, $skip: Int!, $sortBy: MultisigApprover_orderBy!, $direction: OrderDirection!) {
+  multisigApprovers(
+    where: $where
+    block: $block
+    first: $limit
+    skip: $skip
+    orderBy: $sortBy
+    orderDirection: $direction
+  ) {
+    address
+  }
 }
 `;

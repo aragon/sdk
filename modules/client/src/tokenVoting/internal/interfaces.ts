@@ -11,6 +11,7 @@ import {
   CanVoteParams,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStepValue,
+  MembersQueryParams,
   ProposalCreationStepValue,
   ProposalQueryParams,
   VoteProposalParams,
@@ -35,7 +36,10 @@ import {
   WrapTokensParams,
   WrapTokensStepValue,
 } from "../types";
-import { TokenVotingTokenCompatibility } from "./types";
+import {
+  TokenVotingMembersQueryParams,
+  TokenVotingTokenCompatibility,
+} from "./types";
 
 // TokenVoting
 
@@ -59,8 +63,7 @@ export interface ITokenVotingClientMethods {
   canVote: (params: CanVoteParams) => Promise<boolean>;
   canExecute: (proposalId: string) => Promise<boolean>;
   getMembers: (
-    addressOrEns: string,
-    blockNumber?: number,
+    params: TokenVotingMembersQueryParams,
   ) => Promise<TokenVotingMember[]>;
   getProposal: (propoosalId: string) => Promise<TokenVotingProposal | null>;
   getProposals: (

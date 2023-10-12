@@ -185,7 +185,18 @@ export type SubgraphVotingSettings = {
 };
 
 export type SubgraphMembers = {
-  members: {
-    address: string;
-  }[];
+  address: string;
+}[];
+
+export type MembersQueryParamsBase = Pagination & {
+  pluginAddress: string;
+  blockNumber?: number;
 };
+
+export type MembersQueryParams = MembersQueryParamsBase & {
+  sortBy?: MembersSortBy;
+};
+
+export enum MembersSortBy {
+  ADDRESS = "address",
+}

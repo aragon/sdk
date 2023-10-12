@@ -5,6 +5,8 @@ import {
   CreateMajorityVotingProposalParams,
   ExecuteProposalStep,
   ExecuteProposalStepValue,
+  MembersQueryParams,
+  MembersSortBy,
   ProposalCreationSteps,
   ProposalCreationStepValue,
   ProposalQueryParams,
@@ -333,32 +335,45 @@ export class AddresslistVotingClientMethods extends ClientCore
   /**
    * Returns the list of wallet addresses with signing capabilities on the plugin
    *
-   * @async
-   * @param {string} pluginAddress
-   * @param {number} blockNumber
+   * @param {MembersQueryParams} {
+   *     pluginAddress,
+   *     blockNumber,
+   *     limit = 10,
+   *     skip = 0,
+   *     direction = SortDirection.ASC,
+   *     sortBy = MembersSortBy.ADDRESS,
+   *   }
    * @return {*}  {Promise<string[]>}
    * @memberof AddresslistVotingClientMethods
    */
-  public async getMembers(
-    pluginAddress: string,
-    blockNumber?: number,
-  ): Promise<string[]> {
+  public async getMembers({
+    pluginAddress,
+    blockNumber,
+    limit = 10,
+    skip = 0,
+    direction = SortDirection.ASC,
+    sortBy = MembersSortBy.ADDRESS,
+  }: MembersQueryParams): Promise<string[]> {
     if (!isAddress(pluginAddress)) {
       throw new InvalidAddressError();
     }
     const query = QueryAddresslistVotingMembers;
     const params = {
-      address: pluginAddress.toLowerCase(),
+      where: { plugin: pluginAddress.toLowerCase() },
       block: blockNumber ? { number: blockNumber } : null,
+      skip,
+      limit,
+      direction,
+      sortBy,
     };
     const name = "AddresslistVotingVoting members";
-    type T = { addresslistVotingPlugin: SubgraphMembers };
-    const { addresslistVotingPlugin } = await this.graphql.request<T>({
+    type T = { addresslistVotingVoters: SubgraphMembers };
+    const { addresslistVotingVoters } = await this.graphql.request<T>({
       query,
       params,
       name,
     });
-    return addresslistVotingPlugin.members.map((
+    return addresslistVotingVoters.map((
       member: { address: string },
     ) => member.address);
   }
