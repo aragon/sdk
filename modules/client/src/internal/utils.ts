@@ -15,8 +15,6 @@ import {
   InstalledPluginListItem,
   PluginRepo,
   PluginRepoBuildMetadata,
-  PluginRepoListItem,
-  PluginRepoRelease,
   PluginRepoReleaseMetadata,
   RevokePermissionDecodedParams,
   RevokePermissionParams,
@@ -41,8 +39,6 @@ import {
   SubgraphNativeTransferListItem,
   SubgraphPluginListItem,
   SubgraphPluginRepo,
-  SubgraphPluginRepoListItem,
-  SubgraphPluginRepoReleaseListItem,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "./types";
@@ -381,27 +377,6 @@ export function toTokenTransfer(transfer: SubgraphTransferListItem): Transfer {
   }
 }
 
-export function toPluginRepoRelease(
-  release: SubgraphPluginRepoReleaseListItem,
-  metadata: PluginRepoReleaseMetadata,
-): PluginRepoRelease {
-  return {
-    release: release.release,
-    currentBuild: Math.max(...release.builds.map((build) => build.build)),
-    metadata,
-  };
-}
-
-export function toPluginRepoListItem(
-  pluginRepo: SubgraphPluginRepoListItem,
-  releases: PluginRepoRelease[],
-): PluginRepoListItem {
-  return {
-    address: pluginRepo.id,
-    subdomain: pluginRepo.subdomain,
-    releases,
-  };
-}
 export function toPluginRepo(
   pluginRepo: SubgraphPluginRepo,
   releaseMetadata: PluginRepoReleaseMetadata,
@@ -410,6 +385,14 @@ export function toPluginRepo(
   return {
     address: pluginRepo.id,
     subdomain: pluginRepo.subdomain,
+    releases: pluginRepo.releases.map((release) => ({
+      release: release.release,
+      metadata: release.metadata,
+      builds: release.builds.map((build) => ({
+        build: build.build,
+        metadata: build.metadata,
+      })),
+    })),
     current: {
       build: {
         metadata: buildMetadata,
@@ -419,8 +402,8 @@ export function toPluginRepo(
       },
       release: {
         metadata: releaseMetadata,
-        // the subgraph returns only one realease ordered by realease number
-        // in descending order, this means it's the latest realease
+        // the subgraph returns only one release ordered by release number
+        // in descending order, this means it's the latest release
         number: pluginRepo.releases?.[0]?.release,
       },
     },

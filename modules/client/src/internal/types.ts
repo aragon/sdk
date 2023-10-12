@@ -149,30 +149,24 @@ export type ContractPermissionWithConditionParams = [
 ];
 export type ContractWithdrawParams = [string, string, BigNumber, string];
 
-export type SubgraphPluginRepoReleaseListItem = {
-  release: number;
-  metadata: string;
-  builds: {
-    build: number;
-  }[];
-};
-
-export type SubgraphPluginRepoRelease = SubgraphPluginRepoReleaseListItem & {
-  builds: {
-    build: number;
-    metadata: string;
-  }[];
-};
-
-export type SubgraphPluginRepoListItem = {
+export type SubgraphPluginRepo = {
   id: string;
   subdomain: string;
-  releases: SubgraphPluginRepoReleaseListItem[];
-};
-
-export type SubgraphPluginRepo = SubgraphPluginRepoListItem & {
   releases: SubgraphPluginRepoRelease[];
 };
+
+export type SubgraphPluginRepoRelease = {
+  release: number;
+  metadata: string;
+  builds: SubgraphPluginRepoBuild[];
+};
+
+export type SubgraphPluginRepoBuild = {
+  build: number;
+  metadata: string;
+};
+
+export type SubgraphPluginRepoListItem = SubgraphPluginRepo;
 
 export type SubgraphPluginVersion = {
   release: {
