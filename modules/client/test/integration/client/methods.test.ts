@@ -36,6 +36,8 @@ import {
   HasPermissionParams,
   InitializeFromParams,
   PluginQueryParams,
+  PluginRepoBuildMetadata,
+  PluginRepoReleaseMetadata,
   PluginSortBy,
   PluginUpdateProposalInValidityCause,
   SetAllowanceParams,
@@ -1539,13 +1541,35 @@ describe("Client", () => {
         const defaultCatImplementation = mockedIPFSClient.cat
           .getMockImplementation();
 
-        mockedIPFSClient.cat.mockResolvedValue(
+        const releaseMetadata: PluginRepoReleaseMetadata = {
+          name: "Name",
+          description: "Description",
+          images: {},
+        };
+
+        const buildMetadata: PluginRepoBuildMetadata = {
+          ui: `ipfs://${IPFS_CID}`,
+          change: "This is the description of the change",
+          pluginSetup: {
+            prepareInstallation: [],
+            prepareUpdate: {
+              1: {
+                description: "description of build 1",
+                inputs: [],
+              },
+            },
+            prepareUninstallation: [],
+          },
+        };
+
+        mockedIPFSClient.cat.mockResolvedValueOnce(
           Buffer.from(
-            JSON.stringify({
-              name: "Name",
-              description: "Description",
-              images: {},
-            }),
+            JSON.stringify(releaseMetadata),
+          ),
+        );
+        mockedIPFSClient.cat.mockResolvedValueOnce(
+          Buffer.from(
+            JSON.stringify(buildMetadata),
           ),
         );
 
@@ -1558,23 +1582,26 @@ describe("Client", () => {
           subdomain: "test",
           releases: [
             {
-              release: 1,
-              metadata: `ipfs://${IPFS_CID}`,
-              builds: [
-                {
-                  build: 1,
-                },
-                {
-                  build: 2,
-                },
-              ],
-            },
-            {
               release: 2,
               metadata: `ipfs://${IPFS_CID}`,
               builds: [
                 {
                   build: 1,
+                  metadata: `ipfs://${IPFS_CID}`,
+                },
+              ],
+            },
+            {
+              release: 1,
+              metadata: `ipfs://${IPFS_CID}`,
+              builds: [
+                {
+                  build: 1,
+                  metadata: `ipfs://${IPFS_CID}`,
+                },
+                {
+                  build: 2,
+                  metadata: `ipfs://${IPFS_CID}`,
                 },
               ],
             },
@@ -1593,11 +1620,15 @@ describe("Client", () => {
 
         const plugins = await client.methods.getPlugins(params);
         expect(plugins.length).toBe(1);
-        expect(plugins[0].releases.length).toBe(2);
-        expect(plugins[0].releases[0].release).toBe(1);
-        expect(plugins[0].releases[0].metadata.name).toBe("Name");
-        expect(plugins[0].releases[0].metadata.description).toBe("Description");
-        expect(plugins[0].releases[0].currentBuild).toBe(2);
+        expect(plugins[0].current.build.number).toBe(1);
+        expect(plugins[0].current.release.number).toBe(2);
+        expect(plugins[0].current.build.metadata).toMatchObject(
+          buildMetadata,
+        );
+        expect(plugins[0].current.release.metadata).toMatchObject(
+          releaseMetadata,
+        );
+        expect(plugins[0].releases.length).toBe(2)
         mockedIPFSClient.cat.mockImplementation(defaultCatImplementation);
       });
 

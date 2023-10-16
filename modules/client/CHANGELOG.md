@@ -18,10 +18,16 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-## [1.14.0]
 ### Added
 
 - Add input validation on client functions
+- Pagination on getMembers function
+- Support for sepolia
+- Return all version son `getPlugins` function
+
+### Changed
+- Update `sdk-common` imports to `sdk-common-client`
+## [1.14.0]
 
 ### Added
 

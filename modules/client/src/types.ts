@@ -102,32 +102,36 @@ export type PluginRepoBuildMetadata = {
   };
 };
 
-export type PluginRepoRelease = {
-  release: number;
-  metadata: PluginRepoReleaseMetadata;
-  currentBuild: number;
+export type PluginRepoCurrent = {
+  build: {
+    number: number;
+    metadata: PluginRepoBuildMetadata;
+  };
+  release: {
+    number: number;
+    metadata: PluginRepoReleaseMetadata;
+  };
 };
 
-export type PluginRepoListItem = {
+type PluginRepoBase = {
   address: string;
   subdomain: string;
+  current: PluginRepoCurrent
   releases: PluginRepoRelease[];
 };
 
-export type PluginRepo = {
-  address: string;
-  subdomain: string;
-  current: {
-    build: {
-      number: number;
-      metadata: PluginRepoBuildMetadata;
-    };
-    release: {
-      number: number;
-      metadata: PluginRepoReleaseMetadata;
-    };
-  };
+type PluginRepoRelease = {
+  release: number;
+  metadata: string;
+  builds: PluginRepoBuild[];
 };
+
+type PluginRepoBuild = {
+  build: number;
+  metadata: string;
+};
+export type PluginRepo = PluginRepoBase;
+export type PluginRepoListItem = PluginRepoBase;
 
 /* Deposits */
 type DepositBaseParams = {

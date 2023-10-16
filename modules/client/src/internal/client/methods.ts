@@ -58,7 +58,6 @@ import {
   PluginRepo,
   PluginRepoBuildMetadata,
   PluginRepoListItem,
-  PluginRepoRelease,
   PluginRepoReleaseMetadata,
   PluginSortBy,
   PluginUpdateProposalInValidityCause,
@@ -97,8 +96,6 @@ import {
   toDaoDetails,
   toDaoListItem,
   toPluginRepo,
-  toPluginRepoListItem,
-  toPluginRepoRelease,
   toTokenTransfer,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
@@ -126,6 +123,7 @@ import {
   DaoAction,
   DaoCreationError,
   DecodedApplyUpdateParams,
+  EmptyMultiUriError,
   FailedDepositError,
   findLog,
   getNamedTypesFromMetadata,
@@ -967,6 +965,47 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         toTokenTransfer(transfer),
     );
   }
+  private async getMetadata(
+    ipfsUri: string,
+  ) {
+    const metadataCid = resolveIpfsCid(ipfsUri);
+    const stringMetadata = await this.ipfs.fetchString(metadataCid);
+    const resolvedMetadata = JSON.parse(stringMetadata);
+    return resolvedMetadata;
+  }
+
+  private async getPluginRepo(
+    pluginRepo: SubgraphPluginRepo,
+  ): Promise<PluginRepo> {
+    let releaseMetadata: PluginRepoReleaseMetadata;
+    // releases are ordered son the index 0 will be the latest
+    const releaseIpfsUri = pluginRepo?.releases[0]?.metadata;
+    try {
+      releaseMetadata = await this.getMetadata(releaseIpfsUri);
+    } catch (err) {
+      releaseMetadata = UNAVAILABLE_RELEASE_METADATA;
+      if (err instanceof InvalidCidError) {
+        releaseMetadata = UNSUPPORTED_RELEASE_METADATA_LINK;
+      } else if (err instanceof EmptyMultiUriError) {
+        releaseMetadata = EMPTY_RELEASE_METADATA_LINK;
+      }
+    }
+
+    let buildMetadata: PluginRepoBuildMetadata;
+    // builds are ordered son the index 0 will be the latest
+    const buildIpfsUri = pluginRepo?.releases[0]?.builds[0]?.metadata;
+    try {
+      buildMetadata = await this.getMetadata(buildIpfsUri);
+    } catch (err) {
+      buildMetadata = UNAVAILABLE_BUILD_METADATA;
+      if (err instanceof InvalidCidError) {
+        buildMetadata = UNSUPPORTED_BUILD_METADATA_LINK;
+      } else if (err instanceof EmptyMultiUriError) {
+        buildMetadata = EMPTY_BUILD_METADATA_LINK;
+      }
+    }
+    return toPluginRepo(pluginRepo, releaseMetadata, buildMetadata);
+  }
 
   /**
    * Retrieves the list of plugins available on the PluginRegistry
@@ -1017,37 +1056,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     });
     return Promise.all(
       pluginRepos.map(
-        async (
-          pluginRepo: SubgraphPluginRepoListItem,
-        ): Promise<PluginRepoListItem> => {
-          let pluginRepoReleases: PluginRepoRelease[] = [];
-          for (const release of pluginRepo.releases) {
-            let metadata: PluginRepoReleaseMetadata;
-            if (!release.metadata) {
-              metadata = EMPTY_RELEASE_METADATA_LINK;
-            } else {
-              try {
-                const metadataCid = resolveIpfsCid(release.metadata);
-                // Avoid blocking Promise.all if this individual fetch takes too long
-                const stringMetadata = await promiseWithTimeout(
-                  this.ipfs.fetchString(metadataCid),
-                  MULTI_FETCH_TIMEOUT,
-                );
-                const resolvedMetadata = JSON.parse(stringMetadata);
-                metadata = resolvedMetadata;
-              } catch (err) {
-                metadata = UNAVAILABLE_RELEASE_METADATA;
-                if (err instanceof InvalidCidError) {
-                  metadata = UNSUPPORTED_RELEASE_METADATA_LINK;
-                }
-              }
-            }
-            pluginRepoReleases = [
-              ...pluginRepoReleases,
-              toPluginRepoRelease(release, metadata),
-            ];
-          }
-          return toPluginRepoListItem(pluginRepo, pluginRepoReleases);
+        (pluginRepo: SubgraphPluginRepoListItem) => {
+          return this.getPluginRepo(pluginRepo);
         },
       ),
     );
@@ -1070,42 +1080,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       name,
     });
     // get release metadata
-    let releaseMetadata: PluginRepoReleaseMetadata;
-    if (!pluginRepo.releases[0].metadata) {
-      releaseMetadata = EMPTY_RELEASE_METADATA_LINK;
-    } else {
-      try {
-        const metadataCid = resolveIpfsCid(pluginRepo.releases[0].metadata);
-        const stringMetadata = await this.ipfs.fetchString(metadataCid);
-        const resolvedMetadata = JSON.parse(stringMetadata);
-        releaseMetadata = resolvedMetadata;
-      } catch (err) {
-        releaseMetadata = UNAVAILABLE_RELEASE_METADATA;
-        if (err instanceof InvalidCidError) {
-          releaseMetadata = UNSUPPORTED_RELEASE_METADATA_LINK;
-        }
-      }
-    }
-    // get build metadata
-    let buildMetadata: PluginRepoBuildMetadata;
-    if (!pluginRepo.releases[0].builds[0].metadata) {
-      buildMetadata = EMPTY_BUILD_METADATA_LINK;
-    } else {
-      try {
-        const metadataCid = resolveIpfsCid(
-          pluginRepo.releases[0].builds[0].metadata,
-        );
-        const stringMetadata = await this.ipfs.fetchString(metadataCid);
-        const resolvedMetadata = JSON.parse(stringMetadata);
-        buildMetadata = resolvedMetadata;
-      } catch (err) {
-        buildMetadata = UNAVAILABLE_BUILD_METADATA;
-        if (err instanceof InvalidCidError) {
-          buildMetadata = UNSUPPORTED_BUILD_METADATA_LINK;
-        }
-      }
-    }
-    return toPluginRepo(pluginRepo, releaseMetadata, buildMetadata);
+    return this.getPluginRepo(pluginRepo);
   }
   /**
    * Returns the protocol version of a contract

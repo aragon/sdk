@@ -5,11 +5,12 @@ query Plugins($where: PluginRepo_filter!, $limit:Int!, $skip: Int!, $direction: 
   pluginRepos(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     subdomain
-    releases{
+    releases (orderBy: release, orderDirection: desc){
       release
       metadata
-      builds{
+      builds (orderBy: build, orderDirection: desc) {
         build
+        metadata
       }
     }
   }
@@ -19,11 +20,12 @@ query Plugins($where: PluginRepo_filter!, $limit:Int!, $skip: Int!, $direction: 
 export const QueryPlugin = gql`
 query Plugin($id: ID!) {
   pluginRepo(id:$id){
+    id
     subdomain
-    releases(orderBy: release, orderDirection: desc, first: 1){
+    releases(orderBy: release, orderDirection: desc){
       release
       metadata
-      builds(orderBy: build, orderDirection: desc, first: 1){
+      builds(orderBy: build, orderDirection: desc){
         build
         metadata
       }
