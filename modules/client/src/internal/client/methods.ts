@@ -22,7 +22,6 @@ import {
   QueryDao,
   QueryDaos,
   QueryIPlugin,
-  QueryIProposal,
   QueryPlugin,
   QueryPluginPreparations,
   QueryPlugins,
@@ -53,7 +52,8 @@ import {
   DepositParams,
   GrantPermissionDecodedParams,
   HasPermissionParams,
-  IsDaoUpdateProposalValidParams,
+  IsDaoUpdateValidParams,
+  IsPluginUpdateValidParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoBuildMetadata,
@@ -74,7 +74,6 @@ import {
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
-  SubgraphIProposal,
   SubgraphPluginInstallation,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
@@ -92,7 +91,6 @@ import {
   findAction,
   getPreparedSetupId,
   toAssetBalance,
-  toDaoActions,
   toDaoDetails,
   toDaoListItem,
   toPluginRepo,
@@ -152,7 +150,6 @@ import {
   PrepareUpdateParams,
   PrepareUpdateStepValue,
   promiseWithTimeout,
-  ProposalNotFoundError,
   resolveIpfsCid,
   SortDirection,
   SupportedVersion,
@@ -169,6 +166,7 @@ import {
   DepositErc721Schema,
   DepositEthSchema,
   HasPermissionSchema,
+  IsPluginUpdateValidSchema,
   PluginQuerySchema,
 } from "../schemas";
 
@@ -1110,7 +1108,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return version;
   }
 
-  public isDaoUpdateProposal(
+  public isDaoUpdate(
     actions: DaoAction[],
   ): boolean {
     const initializeFromInterface = DAO__factory.createInterface()
@@ -1124,7 +1122,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {boolean}
    * @memberof ClientMethods
    */
-  public isPluginUpdateProposal(
+  public isPluginUpdate(
     actions: DaoAction[],
   ): boolean {
     const applyUpdateInterface = PluginSetupProcessor__factory.createInterface()
@@ -1297,29 +1295,17 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
   /**
    * Check if the specified proposal id is valid for updating a plugin
+   * The failure map should be checked before calling this method
    *
-   * @param {string} proposalId
+   * @param {DaoAction[]} actions
    * @return {*}  {Promise<PluginUpdateProposalValidity>}
    * @memberof ClientMethods
    */
-  public async isPluginUpdateProposalValid(
-    proposalId: string,
+  public async isPluginUpdateValid(
+    params: IsPluginUpdateValidParams,
   ): Promise<PluginUpdateProposalValidity> {
-    type T = { iproposal: SubgraphIProposal };
-    const { iproposal } = await this.graphql.request<T>({
-      query: QueryIProposal,
-      params: { id: proposalId },
-      name: "iproposal",
-    });
-    if (!iproposal) {
-      throw new ProposalNotFoundError();
-    }
+    await IsPluginUpdateValidSchema.strict().validate(params);
     const causes: PluginUpdateProposalInValidityCause[] = [];
-    if (iproposal.allowFailureMap !== "0") {
-      causes.push(
-        PluginUpdateProposalInValidityCause.INVALID_ALLOW_FAILURE_MAP,
-      );
-    }
     // get expected actions signatures
     const grantSignature = DAO__factory.createInterface().getFunction("grant")
       .format("minimal");
@@ -1329,10 +1315,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       .getFunction("applyUpdate").format("minimal");
 
     // find signatures in the actions specified in the proposal
-    const daoActions = toDaoActions(iproposal.actions);
-    const grantIndex = findAction(daoActions, grantSignature);
-    const applyUpdateIndex = findAction(daoActions, applyUpdateSignature);
-    const revokeIndex = findAction(daoActions, revokeSignature);
+    const grantIndex = findAction(params.actions, grantSignature);
+    const applyUpdateIndex = findAction(params.actions, applyUpdateSignature);
+    const revokeIndex = findAction(params.actions, revokeSignature);
 
     // check that all actions are present and in the correct order
     if (
@@ -1350,8 +1335,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // check grant action
     if (
       !this.isPluginUpdatePermissionValid(
-        decodeGrantAction(daoActions[grantIndex].data),
-        iproposal.dao.id,
+        decodeGrantAction(params.actions[grantIndex].data),
+        params.daoAddress,
       )
     ) {
       causes.push(PluginUpdateProposalInValidityCause.INVALID_GRANT_PERMISSION);
@@ -1360,8 +1345,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // check revoke action
     if (
       !this.isPluginUpdatePermissionValid(
-        decodeRevokeAction(daoActions[revokeIndex].data),
-        iproposal.dao.id,
+        decodeRevokeAction(params.actions[revokeIndex].data),
+        params.daoAddress,
       )
     ) {
       causes.push(
@@ -1371,10 +1356,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     // check apply update action
     const decodedApplyUpdateActionParams = decodeApplyUpdateAction(
-      daoActions[applyUpdateIndex].data,
+      params.actions[applyUpdateIndex].data,
     );
     const applyUpdateCauses = await this.checkApplyUpdateActionInvalidityCauses(
-      iproposal.dao.id,
+      params.daoAddress,
       decodedApplyUpdateActionParams,
     );
     causes.push(...applyUpdateCauses);
@@ -1383,29 +1368,25 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       causes,
     };
   }
-
-  public async isDaoUpdateProposalValid(
-    params: IsDaoUpdateProposalValidParams,
+  /**
+   * Check if the specified actions are valid for updating a dao
+   * The failure map should be checked before calling this method
+   *
+   * @param {IsDaoUpdateValidParams} params
+   * @return {*}  {Promise<DaoUpdateProposalValidity>}
+   * @memberof ClientMethods
+   */
+  public async isDaoUpdateValid(
+    params: IsDaoUpdateValidParams,
   ): Promise<DaoUpdateProposalValidity> {
-    type T = { iproposal: SubgraphIProposal };
-    const { iproposal } = await this.graphql.request<T>({
-      query: QueryIProposal,
-      params: { id: params.proposalId },
-      name: "iproposal",
-    });
-    if (!iproposal) {
-      throw new ProposalNotFoundError();
-    }
     const causes: DaoUpdateProposalInvalidityCause[] = [];
     // get initialize from signature
     const upgradeToAndCallSignature = DAO__factory.createInterface()
       .getFunction(
         "upgradeToAndCall",
       ).format("minimal");
-    // find initialize from signature in the actions specified in the proposal
-    const daoActions = toDaoActions(iproposal.actions);
     const upgradeToAndCallIndex = findAction(
-      daoActions,
+      params.actions,
       upgradeToAndCallSignature,
     );
     // check that initialize from action is present
@@ -1417,7 +1398,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       };
     }
     const decodedUpgradeToAndCallParams = decodeUpgradeToAndCallAction(
-      daoActions[upgradeToAndCallIndex].data,
+      params.actions[upgradeToAndCallIndex].data,
     );
     let decodedInitializeFromParams: DecodedInitializeFromParams;
     try {
@@ -1432,7 +1413,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     // check version
     if (
       !await this.isDaoUpdateVersionValid(
-        iproposal.dao.id,
+        params.daoAddress,
         decodedInitializeFromParams.previousVersion,
       )
     ) {

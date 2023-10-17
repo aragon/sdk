@@ -169,3 +169,12 @@ export const DaoUpdateSchema = object({
   initData: Uint8ArraySchema.notRequired(),
   daoFactoryAddress: AddressOrEnsSchema.notRequired(),
 });
+
+export const IsPluginUpdateValidSchema = object({
+  actions: array().of(object({
+    to: AddressOrEnsSchema.required(),
+    value: BigintSchema.required(),
+    data: Uint8ArraySchema.required(),
+  })).required().min(1),
+  daoAddress: AddressOrEnsSchema.required(),
+});
