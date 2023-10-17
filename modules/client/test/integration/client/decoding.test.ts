@@ -3,10 +3,13 @@ declare const describe, it, expect;
 
 // mocks need to be at the top of the imports
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
 
 import {
   Client,
   DaoMetadata,
+  DaoUpdateParams,
   GrantPermissionDecodedParams,
   GrantPermissionParams,
   GrantPermissionWithConditionParams,
@@ -34,16 +37,28 @@ import {
   bytesToHex,
   Context,
   hexToBytes,
+  LIVE_CONTRACTS,
   PermissionIds,
   PermissionOperationType,
   Permissions,
+  SupportedVersion,
   TokenType,
 } from "@aragon/sdk-client-common";
+import { Server } from "ganache";
 
 describe("Client", () => {
-  beforeAll(() => {
+  let deployment: deployContracts.Deployment;
+  let server: Server;
+  beforeAll(async () => {
+    server = await ganacheSetup.start();
+    deployment = await deployContracts.deploy();
     contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
     contextParamsLocalChain.pluginSetupProcessorAddress = ADDRESS_TWO;
+    LIVE_CONTRACTS[SupportedVersion.LATEST].local.daoFactoryAddress =
+      deployment.daoFactory.address;
+  });
+  afterAll(async () => {
+    await server.close();
   });
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {
@@ -813,6 +828,33 @@ describe("Client", () => {
       }
       expect(bytesToHex(params.initData as Uint8Array)).toBe(
         bytesToHex(decodedParams.initData as Uint8Array),
+      );
+    });
+    it("Should decode an dao update action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const daoFactoryAddress = LIVE_CONTRACTS["1.3.0"].local.daoFactoryAddress;
+      const params: DaoUpdateParams = {
+        previousVersion: [1, 0, 0],
+        daoFactoryAddress,
+        initData: new Uint8Array([0, 1, 2, 3]),
+      };
+      const action = await client.encoding.daoUpdateAction(
+        "0x1234567890123456789012345678901234567890",
+        params,
+      );
+      const implementationAddress = await client.methods.getDaoImplementation(
+        daoFactoryAddress,
+      );
+      const decodedParams = client.decoding.daoUpdateAction(action.data);
+      expect(bytesToHex(params.initData as Uint8Array)).toBe(
+        bytesToHex(decodedParams.initData as Uint8Array),
+      );
+      expect(implementationAddress).toBe(
+        decodedParams.implementationAddress,
+      );
+      expect(params.previousVersion.toString()).toBe(
+        decodedParams.previousVersion.toString(),
       );
     });
   });

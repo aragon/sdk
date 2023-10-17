@@ -23,6 +23,8 @@ import {
   DaoListItem,
   DaoMetadata,
   DaoQueryParams,
+  DaoUpdateDecodedParams,
+  DaoUpdateParams,
   DaoUpdateProposalValidity,
   DecodedApplyUninstallationParams,
   DepositParams,
@@ -100,7 +102,7 @@ export interface IClientMethods {
   isPluginUpdateProposal: (
     actions: DaoAction[],
   ) => boolean;
-  
+
   isDaoUpdateProposal: (
     actions: DaoAction[],
   ) => boolean;
@@ -170,6 +172,10 @@ export interface IClientEncoding {
     daoAddressOrEns: string,
     params: InitializeFromParams,
   ) => DaoAction;
+  daoUpdateAction: (
+    daoAddressOrEns: string,
+    params: DaoUpdateParams,
+  ) => Promise<DaoAction>;
 }
 
 export interface IClientDecoding {
@@ -203,6 +209,9 @@ export interface IClientDecoding {
   initializeFromAction: (
     data: Uint8Array,
   ) => InitializeFromParams;
+  daoUpdateAction: (
+    data: Uint8Array,
+  ) => DaoUpdateDecodedParams;
 }
 
 export interface IClientEstimation {

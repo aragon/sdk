@@ -3,6 +3,8 @@ declare const describe, it, expect;
 
 // mocks need to be at the top of the imports
 import "../../mocks/aragon-sdk-ipfs";
+import * as ganacheSetup from "../../helpers/ganache-setup";
+import * as deployContracts from "../../helpers/deployContracts";
 import {
   DAO__factory,
   PluginSetupProcessor__factory,
@@ -11,6 +13,7 @@ import {
 import {
   Client,
   DaoMetadata,
+  DaoUpdateParams,
   GrantPermissionParams,
   InitializeFromParams,
   RegisterStandardCallbackParams,
@@ -29,20 +32,30 @@ import { keccak256 } from "@ethersproject/keccak256";
 import { AddressZero } from "@ethersproject/constants";
 import {
   ApplyInstallationParams,
-  ApplyUpdateParams,
   ApplyUninstallationParams,
+  ApplyUpdateParams,
+  bytesToHex,
   Context,
   DaoAction,
+  hexToBytes,
   PermissionIds,
   Permissions,
   TokenType,
-  bytesToHex,
 } from "@aragon/sdk-client-common";
+import { Server } from "ganache";
 
 describe("Client", () => {
-  beforeAll(() => {
+  let deployment: deployContracts.Deployment;
+  let server: Server;
+  beforeAll(async () => {
+    server = await ganacheSetup.start();
+    deployment = await deployContracts.deploy();
     contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
     contextParamsLocalChain.pluginSetupProcessorAddress = ADDRESS_TWO;
+    contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+  });
+  afterAll(async () => {
+    await server.close();
   });
   describe("Action generators", () => {
     it("Should create a client and generate a native withdraw action", async () => {
@@ -672,6 +685,34 @@ describe("Client", () => {
       }
       expect(argsDecoded[1]).toBe(
         bytesToHex(params.initData as Uint8Array),
+      );
+    });
+    it("Should encode a DaoUpdate action", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+      const daoUpdateParams: DaoUpdateParams = {
+        previousVersion: [1, 0, 0],
+      };
+      const action = await client.encoding.daoUpdateAction(
+        "0x1234567890123456789012345678901234567890",
+        daoUpdateParams,
+      );
+      expect(typeof action).toBe("object");
+      expect(action.data).toBeInstanceOf(Uint8Array);
+
+      const daoInterface = DAO__factory.createInterface();
+      const upgradeToDecoded = daoInterface.decodeFunctionData(
+        "upgradeToAndCall",
+        bytesToHex(action.data),
+      );
+      const initializeFromDecoded = daoInterface.decodeFunctionData(
+        "initializeFrom",
+        hexToBytes(upgradeToDecoded[1]),
+      );
+      expect(initializeFromDecoded.length).toBe(2);
+      expect(initializeFromDecoded[0].length).toBe(3);
+      expect(initializeFromDecoded[1]).toBe(
+        bytesToHex(new Uint8Array(0)),
       );
     });
   });
