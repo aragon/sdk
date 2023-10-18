@@ -20,6 +20,11 @@ TEMPLATE:
 ## [UPCOMING]
 ### Added
 
+- Helper for `daoUpdateAction` in `Client`
+
+## [1.15.0]
+### Added
+
 - Add input validation on client functions
 - Pagination on getMembers function
 - Support for sepolia

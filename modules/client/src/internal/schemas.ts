@@ -163,3 +163,9 @@ export const InitializeFromSchema = object({
   previousVersion: array().of(number()).length(3).required(),
   initData: Uint8ArraySchema.notRequired(),
 });
+
+export const DaoUpdateSchema = object({
+  previousVersion: array().of(number()).length(3).required(),
+  initData: Uint8ArraySchema.notRequired(),
+  daoFactoryAddress: AddressOrEnsSchema.notRequired(),
+});

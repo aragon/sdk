@@ -116,7 +116,7 @@ export type PluginRepoCurrent = {
 type PluginRepoBase = {
   address: string;
   subdomain: string;
-  current: PluginRepoCurrent
+  current: PluginRepoCurrent;
   releases: PluginRepoRelease[];
 };
 
@@ -458,4 +458,12 @@ export type DaoUpdateProposalValidity = {
 export type IsDaoUpdateProposalValidParams = {
   proposalId: string;
   version?: [number, number, number];
+};
+
+export type DaoUpdateParams = InitializeFromParams & {
+  daoFactoryAddress?: string;
+};
+
+export type DaoUpdateDecodedParams = InitializeFromParams & {
+  implementationAddress: string;
 };

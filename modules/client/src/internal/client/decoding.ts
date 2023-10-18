@@ -1,5 +1,6 @@
 import {
   DaoMetadata,
+  DaoUpdateDecodedParams,
   GrantPermissionDecodedParams,
   GrantPermissionWithConditionParams,
   InitializeFromParams,
@@ -351,5 +352,27 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   public findInterface(data: Uint8Array): InterfaceParams | null {
     Uint8ArraySchema.strict().validate(data);
     return findInterface(data, AVAILABLE_FUNCTION_SIGNATURES);
+  }
+
+  /**
+   * Decodes the dao update params from a daoUpdateAction
+   *
+   * @param {Uint8Array} data
+   * @return {*}  {DaoUpdateDecodedParams}
+   * @memberof ClientDecoding
+   */
+  public daoUpdateAction(
+    data: Uint8Array,
+  ): DaoUpdateDecodedParams {
+    const upgradeToAndCallDecodedParams = this.upgradeToAndCallAction(data);
+    const initializeFromDecodedParams = this.initializeFromAction(
+      upgradeToAndCallDecodedParams.data,
+    );
+    return {
+      implementationAddress:
+        upgradeToAndCallDecodedParams.implementationAddress,
+      previousVersion: initializeFromDecodedParams.previousVersion,
+      initData: initializeFromDecodedParams.initData,
+    };
   }
 }

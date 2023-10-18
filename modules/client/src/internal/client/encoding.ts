@@ -1,4 +1,5 @@
 import {
+  DaoUpdateParams,
   GrantPermissionParams,
   GrantPermissionWithConditionParams,
   InitializeFromParams,
@@ -10,6 +11,7 @@ import {
 import { isAddress } from "@ethersproject/address";
 import {
   DAO__factory,
+  DAOFactory__factory,
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import {
@@ -45,6 +47,7 @@ import {
 } from "@aragon/sdk-client-common";
 import { Interface } from "@ethersproject/abi";
 import {
+  DaoUpdateSchema,
   InitializeFromSchema,
   PermissionBaseSchema,
   PermissionWithConditionSchema,
@@ -574,5 +577,35 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       value: BigInt(0),
       data: hexToBytes(hexBytes),
     };
+  }
+
+  /**
+   * Does the necessary steps to encode an action that updates a DAO
+   *
+   * @param {string} daoAddressOrEns
+   * @param {DaoUpdateParams} params
+   * @return {*}
+   * @memberof ClientEncoding
+   */
+  public async daoUpdateAction(
+    daoAddressOrEns: string,
+    params: DaoUpdateParams,
+  ): Promise<DaoAction> {
+    AddressOrEnsSchema.strict().validateSync(daoAddressOrEns);
+    DaoUpdateSchema.strict().validateSync(params);
+    const initializeFromAction = this.initializeFromAction(
+      daoAddressOrEns,
+      params,
+    );
+    const { daoFactoryAddress } = params;
+    const daoFactory = DAOFactory__factory.connect(
+      daoFactoryAddress || this.web3.getAddress("daoFactoryAddress"),
+      this.web3.getProvider(),
+    );
+    const implementation = await daoFactory.daoBase();
+    return this.upgradeToAndCallAction(daoAddressOrEns, {
+      implementationAddress: implementation,
+      data: initializeFromAction.data,
+    });
   }
 }
