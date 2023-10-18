@@ -166,6 +166,7 @@ import {
   DepositErc721Schema,
   DepositEthSchema,
   HasPermissionSchema,
+  IsDaoUpdateValidSchema,
   IsPluginUpdateValidSchema,
   PluginQuerySchema,
 } from "../schemas";
@@ -1316,7 +1317,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     // find signatures in the actions specified in the proposal
     const grantIndex = findActionIndex(params.actions, grantSignature);
-    const applyUpdateIndex = findActionIndex(params.actions, applyUpdateSignature);
+    const applyUpdateIndex = findActionIndex(
+      params.actions,
+      applyUpdateSignature,
+    );
     const revokeIndex = findActionIndex(params.actions, revokeSignature);
 
     // check that all actions are present and in the correct order
@@ -1379,6 +1383,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async isDaoUpdateValid(
     params: IsDaoUpdateValidParams,
   ): Promise<DaoUpdateProposalValidity> {
+    await IsDaoUpdateValidSchema.strict().validate(params);
     const causes: DaoUpdateProposalInvalidityCause[] = [];
     // get initialize from signature
     const upgradeToAndCallSignature = DAO__factory.createInterface()
