@@ -1,4 +1,5 @@
 import {
+  DaoAction,
   MetadataAbiInput,
   Pagination,
   PluginInstallItem,
@@ -455,8 +456,12 @@ export type DaoUpdateProposalValidity = {
   causes: DaoUpdateProposalInvalidityCause[];
 };
 
-export type IsDaoUpdateProposalValidParams = {
-  proposalId: string;
+type IsUpdateParamsBase = {
+  actions: DaoAction[];
+  daoAddress: string;
+};
+
+export type IsDaoUpdateValidParams = IsUpdateParamsBase & {
   version?: [number, number, number];
 };
 
@@ -467,3 +472,4 @@ export type DaoUpdateParams = InitializeFromParams & {
 export type DaoUpdateDecodedParams = InitializeFromParams & {
   implementationAddress: string;
 };
+export type IsPluginUpdateValidParams = IsUpdateParamsBase;

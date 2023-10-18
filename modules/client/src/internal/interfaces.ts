@@ -33,7 +33,7 @@ import {
   GrantPermissionWithConditionParams,
   HasPermissionParams,
   InitializeFromParams,
-  IsDaoUpdateProposalValidParams,
+  IsDaoUpdateValidParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoListItem,
@@ -95,20 +95,20 @@ export interface IClientMethods {
     contractAddress: string,
   ) => Promise<[number, number, number]>;
 
-  isPluginUpdateProposalValid: (
-    proposalId: string,
+  isPluginUpdate: (
+    actions: DaoAction[],
+  ) => boolean;
+
+  isPluginUpdateValid: (
+    params: IsDaoUpdateValidParams,
   ) => Promise<PluginUpdateProposalValidity>;
 
-  isPluginUpdateProposal: (
+  isDaoUpdate: (
     actions: DaoAction[],
   ) => boolean;
 
-  isDaoUpdateProposal: (
-    actions: DaoAction[],
-  ) => boolean;
-
-  isDaoUpdateProposalValid: (
-    params: IsDaoUpdateProposalValidParams,
+  isDaoUpdateValid: (
+    params: IsDaoUpdateValidParams,
   ) => Promise<DaoUpdateProposalValidity>;
 
   getDaoImplementation: (

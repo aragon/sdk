@@ -22,6 +22,12 @@ TEMPLATE:
 
 - Helper for `daoUpdateAction` in `Client`
 
+### Changed
+
+- Input params for `isDaoUpdateValid` and `isPluginUpdateValid`
+- Rename `isDaoUpdateProposalValid` to `isDaoUpdateValid`
+- Rename `isPluginUpdateProposalValid` to `isPluginUpdateValid`
+
 ## [1.15.0]
 ### Added
 
