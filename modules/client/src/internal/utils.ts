@@ -690,7 +690,7 @@ export function findInterface(
   }
 }
 
-export function findAction(
+export function findActionIndex(
   actions: DaoAction[],
   functionSignature: string,
 ): number {

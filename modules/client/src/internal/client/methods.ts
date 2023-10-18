@@ -88,7 +88,7 @@ import {
   decodeInitializeFromAction,
   decodeRevokeAction,
   decodeUpgradeToAndCallAction,
-  findAction,
+  findActionIndex,
   getPreparedSetupId,
   toAssetBalance,
   toDaoDetails,
@@ -1113,7 +1113,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): boolean {
     const initializeFromInterface = DAO__factory.createInterface()
       .getFunction("initializeFrom").format("minimal");
-    return findAction(actions, initializeFromInterface) !== -1;
+    return findActionIndex(actions, initializeFromInterface) !== -1;
   }
   /**
    * Check if the specified actions try to update a plugin
@@ -1127,7 +1127,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): boolean {
     const applyUpdateInterface = PluginSetupProcessor__factory.createInterface()
       .getFunction("applyUpdate").format("minimal");
-    return findAction(actions, applyUpdateInterface) !== -1;
+    return findActionIndex(actions, applyUpdateInterface) !== -1;
   }
 
   /**
@@ -1315,9 +1315,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       .getFunction("applyUpdate").format("minimal");
 
     // find signatures in the actions specified in the proposal
-    const grantIndex = findAction(params.actions, grantSignature);
-    const applyUpdateIndex = findAction(params.actions, applyUpdateSignature);
-    const revokeIndex = findAction(params.actions, revokeSignature);
+    const grantIndex = findActionIndex(params.actions, grantSignature);
+    const applyUpdateIndex = findActionIndex(params.actions, applyUpdateSignature);
+    const revokeIndex = findActionIndex(params.actions, revokeSignature);
 
     // check that all actions are present and in the correct order
     if (
@@ -1385,7 +1385,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       .getFunction(
         "upgradeToAndCall",
       ).format("minimal");
-    const upgradeToAndCallIndex = findAction(
+    const upgradeToAndCallIndex = findActionIndex(
       params.actions,
       upgradeToAndCallSignature,
     );
