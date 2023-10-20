@@ -416,5 +416,5 @@ export const IPFS_URI_REGEX =
 export const OSX_PROPOSAL_ID_REGEX =
   /^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/;
 export const HEX_STRING_REGEX = /^(0x)?[0-9a-fA-F]*$/;
-export const ENS_REGEX = /^(\.{0,1}[a-z0-9-]+)+\.eth$/;
+export const ENS_REGEX = /(\.{0,1}[a-z0-9-])+\.eth$/;
 export const SUBDOMAIN_REGEX = /^[a-z0-9-]+$/;
