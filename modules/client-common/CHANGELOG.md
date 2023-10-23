@@ -18,6 +18,9 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+
+- ENS name Regex
 
 ## [1.7.0]
 ### Added
