@@ -18,6 +18,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+### Fixed
+
+- Estimations using `getProvider` instead of `getConnectedSigner` in functions where the identity of the wallet is needed
+
+## [1.16.0]
 ### Added
 
 - Helper for `daoUpdateAction` in `Client`

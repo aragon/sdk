@@ -29,7 +29,7 @@ export class MultisigClientEstimation extends ClientCore
   public async createProposal(
     params: CreateMultisigProposalParams,
   ): Promise<GasFeeEstimation> {
-    const provider = this.web3.getProvider();
+    const provider = this.web3.getConnectedSigner();
 
     const multisigContract = Multisig__factory.connect(
       params.pluginAddress,
@@ -69,7 +69,7 @@ export class MultisigClientEstimation extends ClientCore
   public async approveProposal(
     params: ApproveMultisigProposalParams,
   ): Promise<GasFeeEstimation> {
-    const provider = this.web3.getProvider();
+    const provider = this.web3.getConnectedSigner();
     const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
     );
@@ -95,7 +95,7 @@ export class MultisigClientEstimation extends ClientCore
   public async executeProposal(
     proposalId: string,
   ): Promise<GasFeeEstimation> {
-    const provider = this.web3.getProvider();
+    const provider = this.web3.getConnectedSigner();
 
     const { pluginAddress, id } = decodeProposalId(
       proposalId,

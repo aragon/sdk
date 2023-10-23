@@ -35,7 +35,7 @@ export class TokenVotingClientEstimation extends ClientCore
   public async createProposal(
     params: CreateMajorityVotingProposalParams,
   ): Promise<GasFeeEstimation> {
-    const provider = this.web3.getProvider();
+    const provider = this.web3.getConnectedSigner();
 
     const tokenVotingContract = TokenVoting__factory.connect(
       params.pluginAddress,
@@ -75,7 +75,7 @@ export class TokenVotingClientEstimation extends ClientCore
   public async voteProposal(
     params: VoteProposalParams,
   ): Promise<GasFeeEstimation> {
-    const provider = this.web3.getProvider();
+    const provider = this.web3.getConnectedSigner();
 
     const { pluginAddress, id } = decodeProposalId(
       params.proposalId,
@@ -104,7 +104,7 @@ export class TokenVotingClientEstimation extends ClientCore
   public async executeProposal(
     proposalId: string,
   ): Promise<GasFeeEstimation> {
-    const provider = this.web3.getProvider();
+    const provider = this.web3.getConnectedSigner();
 
     const { pluginAddress, id } = decodeProposalId(
       proposalId,
@@ -130,7 +130,7 @@ export class TokenVotingClientEstimation extends ClientCore
   public async delegateTokens(
     params: DelegateTokensParams,
   ): Promise<GasFeeEstimation> {
-    const provider = this.web3.getProvider();
+    const provider = this.web3.getConnectedSigner();
     const governanceErc20Contract = GovernanceERC20__factory.connect(
       params.tokenAddress,
       provider,
