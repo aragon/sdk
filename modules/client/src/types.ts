@@ -482,8 +482,9 @@ export type PluginPreparationQueryParams = Pagination & {
   daoAddressOrEns?: string;
 };
 export enum PluginPreparationType {
-  UPDATE = "Update",
   INSTALLATION = "Installation",
+  UPDATE = "Update",
+  UNINSTALLATION = "Uninstallation",
 }
 
 export enum PluginPreparationSortBy {
