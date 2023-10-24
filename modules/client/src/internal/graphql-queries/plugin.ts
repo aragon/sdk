@@ -63,3 +63,36 @@ query PluginPreparations($where: PluginUpdatePreparation_filter!) {
   }
 }
 `;
+
+export const QueryPluginPreparationsExtended = gql`
+query PluginPreparations($where: PluginUpdatePreparation_filter!, limit: Int!, skip: Int!, direction: OrderDirection!, sortBy: PluginUpdatePreparation_orderBy!) {
+  pluginPreparations(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
+    id
+    type
+    creator
+    dao {
+      id
+    }
+    pluginRepo {
+      id
+      subdomain
+    }
+    pluginVersion{
+      build
+      release{
+        release
+      }
+    }
+    pluginAddress
+    permissions {
+      id
+      operation
+      where
+      who
+      condition
+    }
+    helpers
+    data
+  }
+}
+`;

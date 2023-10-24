@@ -1,6 +1,7 @@
 import {
   DaoAction,
   MetadataAbiInput,
+  MultiTargetPermission,
   Pagination,
   PluginInstallItem,
   TokenType,
@@ -473,3 +474,37 @@ export type DaoUpdateDecodedParams = InitializeFromParams & {
   implementationAddress: string;
 };
 export type IsPluginUpdateValidParams = IsUpdateParamsBase;
+export type PluginPreparationQueryParams = Pagination & {
+  sortBy?: PluginPreparationSortBy;
+  type?: PluginPreparationType;
+  pluginAddress?: string;
+  pluginRepoAddress?: string;
+  daoAddressOrEns?: string;
+};
+export enum PluginPreparationType {
+  UPDATE = "Update",
+  INSTALLATION = "Installation",
+}
+
+export enum PluginPreparationSortBy {
+  ID = "id",
+}
+
+export type PluginPreparationListItem = {
+  id: string;
+  type: PluginPreparationType;
+  creator: string;
+  dao: string;
+  pluginRepo: {
+    id: string;
+    subdomain: string;
+  };
+  versionTag: {
+    build: number;
+    release: number;
+  };
+  pluginAddress: string;
+  permissions: MultiTargetPermission[];
+  helpers: string[];
+  data: Uint8Array;
+};

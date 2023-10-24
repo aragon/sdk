@@ -24,6 +24,7 @@ import {
   QueryIPlugin,
   QueryPlugin,
   QueryPluginPreparations,
+  QueryPluginPreparationsExtended,
   QueryPlugins,
   QueryTokenBalances,
   QueryTokenTransfers,
@@ -54,6 +55,9 @@ import {
   HasPermissionParams,
   IsDaoUpdateValidParams,
   IsPluginUpdateValidParams,
+  PluginPreparationListItem,
+  PluginPreparationQueryParams,
+  PluginPreparationSortBy,
   PluginQueryParams,
   PluginRepo,
   PluginRepoBuildMetadata,
@@ -75,6 +79,7 @@ import {
   SubgraphDao,
   SubgraphDaoListItem,
   SubgraphPluginInstallation,
+  SubgraphPluginPreparationListItem,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
   SubgraphPluginRepoRelease,
@@ -93,6 +98,7 @@ import {
   toAssetBalance,
   toDaoDetails,
   toDaoListItem,
+  toPluginPreparationListItem,
   toPluginRepo,
   toTokenTransfer,
 } from "../utils";
@@ -168,6 +174,7 @@ import {
   HasPermissionSchema,
   IsDaoUpdateValidSchema,
   IsPluginUpdateValidSchema,
+  PluginPreparationQuerySchema,
   PluginQuerySchema,
 } from "../schemas";
 
@@ -1526,5 +1533,65 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       this.web3.getProvider(),
     );
     return daoFactoryImplementation.daoBase();
+  }
+
+  public async getPluginPreparations(
+    {
+      type,
+      pluginAddress,
+      pluginRepoAddress,
+      daoAddressOrEns,
+      limit = 10,
+      skip = 0,
+      direction = SortDirection.ASC,
+      sortBy = PluginPreparationSortBy.ID,
+    }: PluginPreparationQueryParams,
+  ): Promise<PluginPreparationListItem[]> {
+    await PluginPreparationQuerySchema.strict().validate({
+      type,
+      pluginAddress,
+      pluginRepoAddress,
+      daoAddressOrEns,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    });
+
+    let where = {};
+    if (type) {
+      where = { ...where, type };
+    }
+    if (pluginAddress) {
+      where = { ...where, pluginAddress: pluginAddress.toLowerCase() };
+    }
+    if (pluginRepoAddress) {
+      where = { ...where, pluginRepoAddress: pluginRepoAddress.toLowerCase() };
+    }
+    if (daoAddressOrEns) {
+      where = { ...where, dao: daoAddressOrEns.toLowerCase() };
+    }
+    const query = QueryPluginPreparationsExtended;
+    const params = {
+      where,
+      limit,
+      skip,
+      direction,
+      sortBy,
+    };
+    const name = "plugin preparations";
+    type T = { pluginPreparations: SubgraphPluginPreparationListItem[] };
+    const { pluginPreparations } = await this.graphql.request<T>({
+      query,
+      params,
+      name,
+    });
+    return Promise.all(
+      pluginPreparations.map(
+        (pluginPreparation: SubgraphPluginPreparationListItem) => {
+          return toPluginPreparationListItem(pluginPreparation);
+        },
+      ),
+    );
   }
 }

@@ -34,6 +34,8 @@ import {
   HasPermissionParams,
   InitializeFromParams,
   IsDaoUpdateValidParams,
+  PluginPreparationListItem,
+  PluginPreparationQueryParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoListItem,
@@ -114,6 +116,10 @@ export interface IClientMethods {
   getDaoImplementation: (
     daoFactoryAddress: string,
   ) => Promise<string>;
+
+  getPluginPreparations(
+    params: PluginPreparationQueryParams,
+  ): Promise<PluginPreparationListItem[]>;
 }
 
 export interface IClientEncoding {

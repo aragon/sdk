@@ -1,5 +1,5 @@
 import { BigNumber } from "@ethersproject/bignumber";
-import { TransferType } from "../types";
+import { PluginPreparationType, TransferType } from "../types";
 import { SubgraphAction } from "../client-common";
 
 export type SubgraphPluginListItem = {
@@ -200,7 +200,41 @@ export type SubgraphPluginUpdatePreparation = {
   data: string;
 };
 
-export enum SubgraphPluginPreparationType {
-  INSTALLATION = "Installation",
-  UPDATE = "Update",
+
+export type SubgraphPluginPreparationListItem = {
+  id: string;
+  type: PluginPreparationType;
+  creator: string;
+  dao: {
+    id: string;
+  };
+  pluginRepo: {
+    id: string;
+    subdomain: string;
+  };
+  pluginVersion: {
+    build: number;
+    release: {
+      release: number;
+    };
+  };
+  pluginAddress: string;
+  permissions: SubgraphPluginPermission[];
+  helpers: string[];
+  data: string;
+};
+
+export type SubgraphPluginPermission = {
+  id: string;
+  operation: SubgraphPluginPermissionOperation;
+  where: string;
+  who: string;
+  condition: string;
+  permissionId: string;
+};
+
+export enum SubgraphPluginPermissionOperation {
+  GRANT = "Grant",
+  REVOKE = "Revoke",
+  GRANT_WITH_CONDITION = "GrantWithCondition",
 }

@@ -35,6 +35,9 @@ import {
   DepositParams,
   HasPermissionParams,
   InitializeFromParams,
+  PluginPreparationQueryParams,
+  PluginPreparationSortBy,
+  PluginPreparationType,
   PluginQueryParams,
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
@@ -53,6 +56,8 @@ import {
   SubgraphBalance,
   SubgraphDao,
   SubgraphPluginInstallation,
+  SubgraphPluginPermissionOperation,
+  SubgraphPluginPreparationListItem,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
   SubgraphPluginUpdatePreparation,
@@ -61,6 +66,7 @@ import {
 } from "../../../src/internal/types";
 import { QueryDao, QueryDaos } from "../../../src/internal/graphql-queries/dao";
 import {
+  QueryPluginPreparationsExtended,
   QueryTokenBalances,
   QueryTokenTransfers,
 } from "../../../src/internal/graphql-queries";
@@ -71,6 +77,7 @@ import { deployErc721 } from "../../helpers/deploy-erc721";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import {
   ApplyUpdateParams,
+  bytesToHex,
   Context,
   DaoAction,
   LIVE_CONTRACTS,
@@ -92,6 +99,7 @@ import {
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { SupportedPluginRepo } from "../../../src/internal/constants";
 import { ValidationError } from "yup";
+import { toPluginPermissionOperationType } from "../../../src/internal/utils";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -1722,6 +1730,127 @@ describe("Client", () => {
         expect(protocolVersion).toMatchObject([1, 0, 0]);
       });
 
+      it("Should retrieve a list of plugin parameters based on the given search params", async () => {
+        const context = new Context(contextParamsLocalChain);
+        const client = new Client(context);
+        const limit = 3;
+        const params: PluginPreparationQueryParams = {
+          limit,
+          skip: 0,
+          direction: SortDirection.ASC,
+          sortBy: PluginPreparationSortBy.ID,
+          pluginAddress: ADDRESS_ONE,
+          daoAddressOrEns: TEST_DAO_ADDRESS,
+          pluginRepoAddress: ADDRESS_TWO,
+        };
+
+        const subgraphPluginPreparation: SubgraphPluginPreparationListItem = {
+          id: ADDRESS_ONE,
+          type: PluginPreparationType.INSTALLATION,
+          creator: ADDRESS_TWO,
+          dao: {
+            id: ADDRESS_ONE,
+          },
+          pluginRepo: {
+            id: ADDRESS_ONE,
+            subdomain: SupportedPluginRepo.TOKEN_VOTING,
+          },
+          pluginVersion: {
+            build: 1,
+            release: {
+              release: 1,
+            },
+          },
+          pluginAddress: ADDRESS_ONE,
+          permissions: [
+            {
+              who: ADDRESS_ONE,
+              where: ADDRESS_TWO,
+              condition: ADDRESS_THREE,
+              operation: SubgraphPluginPermissionOperation.GRANT,
+              permissionId: "0x00000000",
+              id: ADDRESS_ONE,
+            },
+          ],
+          helpers: [ADDRESS_ONE, ADDRESS_TWO],
+          data: "0x",
+        };
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          pluginPreparations: [subgraphPluginPreparation],
+        });
+
+        const pluginPreparations = await client.methods.getPluginPreparations(
+          params,
+        );
+        expect(pluginPreparations.length).toBe(1);
+        const pluginPreparation = pluginPreparations[0];
+
+        expect(pluginPreparation.id).toBe(subgraphPluginPreparation.id);
+        expect(pluginPreparation.type).toBe(subgraphPluginPreparation.type);
+        expect(pluginPreparation.creator).toBe(
+          subgraphPluginPreparation.creator,
+        );
+        expect(pluginPreparation.dao).toBe(subgraphPluginPreparation.dao.id);
+        expect(pluginPreparation.pluginRepo.id).toBe(
+          subgraphPluginPreparation.pluginRepo.id,
+        );
+        expect(pluginPreparation.pluginRepo.subdomain).toBe(
+          subgraphPluginPreparation.pluginRepo.subdomain,
+        );
+        expect(pluginPreparation.versionTag.build).toBe(
+          subgraphPluginPreparation.pluginVersion.build,
+        );
+        expect(pluginPreparation.versionTag.release).toBe(
+          subgraphPluginPreparation.pluginVersion.release.release,
+        );
+        expect(pluginPreparation.pluginAddress).toBe(
+          subgraphPluginPreparation.pluginAddress,
+        );
+        expect(pluginPreparation.permissions.length).toBe(
+          subgraphPluginPreparation.permissions.length,
+        );
+        for (let i = 0; i < pluginPreparation.permissions.length; i++) {
+          const permission = pluginPreparation.permissions[i];
+          const subgraphPermission = subgraphPluginPreparation.permissions[i];
+          expect(permission.who).toBe(subgraphPermission.who);
+          expect(permission.where).toBe(subgraphPermission.where);
+          expect(permission.condition).toBe(subgraphPermission.condition);
+          expect(permission.operation).toBe(
+            toPluginPermissionOperationType(subgraphPermission.operation),
+          );
+          expect(permission.permissionId).toBe(subgraphPermission.permissionId);
+        }
+        expect(pluginPreparation.helpers.length).toBe(
+          subgraphPluginPreparation.helpers.length,
+        );
+        for (let i = 0; i < pluginPreparation.helpers.length; i++) {
+          const helper = pluginPreparation.helpers[i];
+          const subgraphHelper = subgraphPluginPreparation.helpers[i];
+          expect(helper).toBe(subgraphHelper);
+        }
+        expect(bytesToHex(pluginPreparation.data)).toBe(
+          subgraphPluginPreparation.data,
+        );
+
+        expect(mockedClient.request).toHaveBeenCalledWith(
+          QueryPluginPreparationsExtended,
+          {
+            where: {
+              dao: params.daoAddressOrEns,
+              pluginAddress: params.pluginAddress,
+              pluginRepoAddress: params.pluginRepoAddress,
+            },
+            limit: params.limit,
+            skip: params.skip,
+            direction: params.direction,
+            sortBy: params.sortBy,
+          },
+        );
+      });
+
       test.todo(
         "Should return an empty array when getting the transfers of a DAO that does not exist",
       ); //, async () => {
@@ -1815,7 +1944,9 @@ describe("Client", () => {
               actions: [],
               daoAddress,
             }),
-        ).rejects.toThrow(new Error("actions field must have at least 1 items"));
+        ).rejects.toThrow(
+          new Error("actions field must have at least 1 items"),
+        );
       });
       it("should return `INVALID_ACTIONS` when any of the required actions is not present", async () => {
         const ctx = new Context(contextParamsLocalChain);
@@ -2288,10 +2419,10 @@ describe("Client", () => {
           },
         );
         const validationResult = await client.methods
-          .isDaoUpdateValid({ 
+          .isDaoUpdateValid({
             actions: [upgradeToAndCallAction],
             daoAddress: daoAddressV1,
-           });
+          });
         expect(validationResult.isValid).toBe(false);
         expect(validationResult.causes.length).toBe(1);
         expect(
@@ -2319,10 +2450,10 @@ describe("Client", () => {
         );
 
         const validationResult = await client.methods
-          .isDaoUpdateValid({ 
+          .isDaoUpdateValid({
             actions: [upgradeToAndCallAction],
             daoAddress: daoAddressV1,
-           });
+          });
         expect(validationResult.isValid).toBe(false);
         expect(validationResult.causes.length).toBe(1);
         expect(
@@ -2343,10 +2474,10 @@ describe("Client", () => {
           },
         );
         const validationResult = await client.methods
-          .isDaoUpdateValid({ 
+          .isDaoUpdateValid({
             actions: [upgradeToAndCallAction],
             daoAddress: daoAddressV1,
-           });
+          });
         expect(validationResult.isValid).toBe(false);
         expect(validationResult.causes.length).toBe(1);
         expect(
@@ -2373,10 +2504,10 @@ describe("Client", () => {
           },
         );
         const validationResult = await client.methods
-          .isDaoUpdateValid({ 
+          .isDaoUpdateValid({
             actions: [upgradeToAndCallAction],
             daoAddress: daoAddressV1,
-           });
+          });
         expect(validationResult.isValid).toBe(false);
         expect(validationResult.causes.length).toBe(1);
         expect(
@@ -2390,10 +2521,10 @@ describe("Client", () => {
         const client = new Client(ctx);
 
         const validationResult = await client.methods
-          .isDaoUpdateValid({ 
+          .isDaoUpdateValid({
             actions: [upgradeToAndCallAction],
             daoAddress: daoAddressV1,
-           });
+          });
         expect(validationResult.isValid).toBe(true);
         expect(validationResult.causes.length).toBe(0);
       });
