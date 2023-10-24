@@ -200,7 +200,6 @@ export type SubgraphPluginUpdatePreparation = {
   data: string;
 };
 
-
 export type SubgraphPluginPreparationListItem = {
   id: string;
   type: PluginPreparationType;
