@@ -18,7 +18,11 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
 
+- `getPluginPreparations` function to `Client`
+
+## [1.16.3]
 ### Fixed
 
 - Required ensSubdomain in createDao

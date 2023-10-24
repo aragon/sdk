@@ -1,11 +1,18 @@
 /* MARKDOWN
 ---
-title: Get DAOs
+title: Get Plugin Preparations
 ---
 
-## Get Existing DAOs from the DAO Registry
+## Get Plugin Preparations 
 
-Gets a list of DAOs from the Aragon OSx DAO registry.
+Returns plugin preparations filtered by:
+
+- pluginAddress
+- daoAddressOrEns
+- pluginRepoAddress
+- type(Installation or Update)
+
+
 */
 
 import {
