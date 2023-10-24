@@ -11,7 +11,7 @@ import {
 export type CreateDaoParams = {
   metadataUri: string;
   daoUri?: string;
-  ensSubdomain: string;
+  ensSubdomain?: string;
   trustedForwarder?: string;
   plugins: PluginInstallItem[];
 };
