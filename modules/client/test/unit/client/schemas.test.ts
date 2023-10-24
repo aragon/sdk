@@ -103,21 +103,6 @@ describe("Test client schemas", () => {
           new ValidationError("metadataUri is a required field"),
         );
     });
-    it("should throw an error if the ensSubdomain is missing", () => {
-      const createDaoParams = {
-        metadataUri: TEST_IPFS_URI_V0,
-        plugins: [
-          {
-            id: TEST_ADDRESS,
-            data: new Uint8Array(),
-          },
-        ],
-      };
-      expect(() => CreateDaoSchema.strict().validateSync(createDaoParams))
-        .toThrow(
-          new ValidationError("ensSubdomain is a required field"),
-        );
-    });
     it("should throw an error if the plugins is missing", () => {
       const createDaoParams = {
         metadataUri: TEST_IPFS_URI_V0,

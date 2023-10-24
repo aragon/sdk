@@ -13,7 +13,7 @@ import { array, mixed, number, object, string } from "yup";
 export const CreateDaoSchema = object({
   metadataUri: IpfsUriSchema.required(),
   daoUri: string().url().notRequired(),
-  ensSubdomain: SubdomainSchema.required(),
+  ensSubdomain: SubdomainSchema.notRequired(),
   trustedForwarder: AddressOrEnsSchema.notRequired(),
   plugins: array(PluginInstallItemSchema).min(1).required(),
 });

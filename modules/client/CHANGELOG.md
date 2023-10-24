@@ -18,6 +18,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+### Fixed
+
+- Required ensSubdomain in createDao
+
+## [1.16.2]
 ### Fixed
 
 - Ens name regex
