@@ -9,6 +9,7 @@ import {
   Uint8ArraySchema,
 } from "@aragon/sdk-client-common";
 import { array, mixed, number, object, string } from "yup";
+import { PluginPreparationSortBy, PluginPreparationType } from "../types";
 
 export const CreateDaoSchema = object({
   metadataUri: IpfsUriSchema.required(),
@@ -187,3 +188,13 @@ export const IsDaoUpdateValidSchema = object({
   daoAddress: AddressOrEnsSchema.required(),
   version: array().of(number()).length(3).notRequired(),
 });
+export const PluginPreparationQuerySchema = PaginationSchema.concat(object({
+  sortBy: string().notRequired().oneOf([PluginPreparationSortBy.ID]),
+  type: string().notRequired().oneOf([
+    PluginPreparationType.INSTALLATION,
+    PluginPreparationType.UPDATE,
+  ]),
+  daoAddressOrEns: AddressOrEnsSchema.notRequired(),
+  pluginAddress: AddressOrEnsSchema.notRequired(),
+  pluginRepoAddress: AddressOrEnsSchema.notRequired(),
+}));

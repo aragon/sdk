@@ -375,3 +375,9 @@ export class InvalidTimeoutError extends SdkError {
     );
   }
 }
+
+export class InvalidPermissionOperationType extends SdkError {
+  constructor(cause?: any) {
+    super("Invalid permission operation", cause);
+  }
+}

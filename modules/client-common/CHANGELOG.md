@@ -18,6 +18,11 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+
+- Add new class error `InvalidPermissionOperationType`
+
+## [1.7.1]
 ### Fixed
 
 - ENS name Regex

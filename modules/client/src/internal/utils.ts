@@ -13,6 +13,7 @@ import {
   GrantPermissionWithConditionDecodedParams,
   GrantPermissionWithConditionParams,
   InstalledPluginListItem,
+  PluginPreparationListItem,
   PluginRepo,
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
@@ -38,6 +39,8 @@ import {
   SubgraphNativeBalance,
   SubgraphNativeTransferListItem,
   SubgraphPluginListItem,
+  SubgraphPluginPermissionOperation,
+  SubgraphPluginPreparationListItem,
   SubgraphPluginRepo,
   SubgraphTransferListItem,
   SubgraphTransferType,
@@ -63,9 +66,11 @@ import {
   hexToBytes,
   InterfaceParams,
   InvalidParameter,
+  InvalidPermissionOperationType,
   MultiTargetPermission,
   NotImplementedError,
   PermissionIds,
+  PermissionOperationType,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { Signer } from "@ethersproject/abstract-signer";
@@ -776,4 +781,46 @@ export function decodeInitializeFromAction(
     previousVersion: result[0],
     initData: hexToBytes(result[1]),
   };
+}
+
+export function toPluginPreparationListItem(
+  pluginPreparation: SubgraphPluginPreparationListItem,
+): PluginPreparationListItem {
+  return {
+    id: pluginPreparation.id,
+    type: pluginPreparation.type,
+    creator: pluginPreparation.creator,
+    dao: pluginPreparation.dao.id,
+    pluginRepo: pluginPreparation.pluginRepo,
+    versionTag: {
+      build: pluginPreparation.pluginVersion.build,
+      release: pluginPreparation.pluginVersion.release.release,
+    },
+    pluginAddress: pluginPreparation.pluginAddress,
+    permissions: pluginPreparation.permissions.map((permission) => ({
+      id: permission.id,
+      operation: toPluginPermissionOperationType(permission.operation),
+      who: permission.who,
+      where: permission.where,
+      condition: permission.condition,
+      permissionId: permission.permissionId,
+    })),
+    helpers: pluginPreparation.helpers,
+    data: hexToBytes(pluginPreparation.data),
+  };
+}
+
+export function toPluginPermissionOperationType(
+  operation: SubgraphPluginPermissionOperation,
+): PermissionOperationType {
+  switch (operation) {
+    case SubgraphPluginPermissionOperation.GRANT:
+      return PermissionOperationType.GRANT;
+    case SubgraphPluginPermissionOperation.REVOKE:
+      return PermissionOperationType.REVOKE;
+    case SubgraphPluginPermissionOperation.GRANT_WITH_CONDITION:
+      return PermissionOperationType.GRANT_WITH_CONDITION;
+    default:
+      throw new InvalidPermissionOperationType();
+  }
 }

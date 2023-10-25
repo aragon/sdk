@@ -1,19 +1,22 @@
 // This file contains the definitions of the general purpose DAO client
 import {
   ApplyInstallationParams,
+  ApplyUninstallationParams,
   ApplyUpdateParams,
   DaoAction,
   DecodedApplyInstallationParams,
+  DecodedApplyUninstallationParams,
   DecodedApplyUpdateParams,
   GasFeeEstimation,
   InterfaceParams,
   PrepareInstallationParams,
   PrepareInstallationStepValue,
+  PrepareUninstallationParams,
+  PrepareUninstallationStepValue,
   PrepareUpdateParams,
   PrepareUpdateStepValue,
 } from "@aragon/sdk-client-common";
 import {
-  ApplyUninstallationParams,
   AssetBalance,
   CreateDaoParams,
   DaoBalancesQueryParams,
@@ -26,7 +29,6 @@ import {
   DaoUpdateDecodedParams,
   DaoUpdateParams,
   DaoUpdateProposalValidity,
-  DecodedApplyUninstallationParams,
   DepositParams,
   GrantPermissionDecodedParams,
   GrantPermissionParams,
@@ -34,12 +36,12 @@ import {
   HasPermissionParams,
   InitializeFromParams,
   IsDaoUpdateValidParams,
+  PluginPreparationListItem,
+  PluginPreparationQueryParams,
   PluginQueryParams,
   PluginRepo,
   PluginRepoListItem,
   PluginUpdateProposalValidity,
-  PrepareUninstallationParams,
-  PrepareUninstallationStepValue,
   RegisterStandardCallbackParams,
   RevokePermissionDecodedParams,
   RevokePermissionParams,
@@ -114,6 +116,10 @@ export interface IClientMethods {
   getDaoImplementation: (
     daoFactoryAddress: string,
   ) => Promise<string>;
+
+  getPluginPreparations(
+    params: PluginPreparationQueryParams,
+  ): Promise<PluginPreparationListItem[]>;
 }
 
 export interface IClientEncoding {
