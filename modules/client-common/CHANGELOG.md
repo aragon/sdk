@@ -18,6 +18,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+### Changed
+
+- Subgraph version from 1.3.0 to 1.3.1
+
+## [1.8.0]
 ### Added
 
 - Add new class error `InvalidPermissionOperationType`

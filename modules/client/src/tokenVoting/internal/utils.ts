@@ -269,7 +269,7 @@ export function toTokenVotingMember(
     address: member.address,
     votingPower: BigInt(member.votingPower),
     balance: BigInt(member.balance),
-    delegatee: member.delegatee.address === member.address
+    delegatee: member.delegatee?.address === member.address || !member.delegatee
       ? null
       : member.delegatee.address,
     delegators: member.delegators.filter((delegator) =>

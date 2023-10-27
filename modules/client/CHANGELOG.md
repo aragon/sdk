@@ -18,6 +18,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+### Fixed
+
+- Fix support for subgraph 1.3.1
+
+## [1.17.0]
 ### Added
 
 - `getPluginPreparations` function to `Client`
