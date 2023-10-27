@@ -55,7 +55,7 @@ export const UNAVAILABLE_PROPOSAL_METADATA: ProposalMetadata = {
 const getGraphqlNode = (network: SupportedNetwork): string => {
   return `https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-${
     SupportedNetworksToGraphqlNetworks[network]
-  }/version/v1.3.0/api`;
+  }/version/v1.3.1/api`;
 };
 
 export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {

@@ -83,7 +83,7 @@ export type SubgraphTokenVotingMember = {
   address: string;
   balance: string;
   votingPower: string;
-  delegatee: {
+  delegatee?: {
     address: string;
   };
   delegators: {
