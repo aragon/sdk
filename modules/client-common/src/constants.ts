@@ -18,7 +18,9 @@ type GraphqlNetworks =
   | "baseGoerli"
   | "baseMainnet"
   | "local"
-  | "sepolia";
+  | "sepolia"
+  | "arbitrum"
+  | "arbitrumGoerli";
 
 const SupportedNetworksToGraphqlNetworks: {
   [K in SupportedNetwork]: GraphqlNetworks;
@@ -31,6 +33,8 @@ const SupportedNetworksToGraphqlNetworks: {
   [SupportedNetwork.BASE]: "baseMainnet",
   [SupportedNetwork.LOCAL]: "local",
   [SupportedNetwork.SEPOLIA]: "sepolia",
+  [SupportedNetwork.ARBITRUM]: "arbitrum",
+  [SupportedNetwork.ARBITRUM_GOERLI]: "arbitrumGoerli",
 };
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
@@ -75,6 +79,12 @@ export const GRAPHQL_NODES: { [K in SupportedNetwork]: { url: string }[] } = {
   [SupportedNetwork.SEPOLIA]: [{
     url: getGraphqlNode(SupportedNetwork.SEPOLIA),
   }],
+  [SupportedNetwork.ARBITRUM]: [{
+    url: getGraphqlNode(SupportedNetwork.ARBITRUM),
+  }],
+  [SupportedNetwork.ARBITRUM_GOERLI]: [{
+    url: getGraphqlNode(SupportedNetwork.ARBITRUM_GOERLI),
+  }],
 };
 
 const IPFS_ENDPOINTS = {
@@ -110,6 +120,8 @@ export const IPFS_NODES: {
   [SupportedNetwork.BASE_GOERLI]: IPFS_ENDPOINTS.test,
   [SupportedNetwork.LOCAL]: IPFS_ENDPOINTS.test,
   [SupportedNetwork.SEPOLIA]: IPFS_ENDPOINTS.test,
+  [SupportedNetwork.ARBITRUM]: IPFS_ENDPOINTS.prod,
+  [SupportedNetwork.ARBITRUM_GOERLI]: IPFS_ENDPOINTS.test,
 };
 
 export const LIVE_CONTRACTS: {
@@ -226,6 +238,32 @@ export const LIVE_CONTRACTS: {
       ensRegistryAddress: "",
     },
     [SupportedNetwork.SEPOLIA]: {
+      daoFactoryAddress: "",
+      pluginSetupProcessorAddress: "",
+      multisigRepoAddress: "",
+      adminRepoAddress: "",
+      addresslistVotingRepoAddress: "",
+      tokenVotingRepoAddress: "",
+      multisigSetupAddress: "",
+      adminSetupAddress: "",
+      addresslistVotingSetupAddress: "",
+      tokenVotingSetupAddress: "",
+      ensRegistryAddress: "",
+    },
+    [SupportedNetwork.ARBITRUM]: {
+      daoFactoryAddress: "",
+      pluginSetupProcessorAddress: "",
+      multisigRepoAddress: "",
+      adminRepoAddress: "",
+      addresslistVotingRepoAddress: "",
+      tokenVotingRepoAddress: "",
+      multisigSetupAddress: "",
+      adminSetupAddress: "",
+      addresslistVotingSetupAddress: "",
+      tokenVotingSetupAddress: "",
+      ensRegistryAddress: "",
+    },
+    [SupportedNetwork.ARBITRUM_GOERLI]: {
       daoFactoryAddress: "",
       pluginSetupProcessorAddress: "",
       multisigRepoAddress: "",
@@ -365,6 +403,38 @@ export const LIVE_CONTRACTS: {
       tokenVotingSetupAddress: activeContractsList.sepolia.TokenVotingSetup,
       ensRegistryAddress: activeContractsList.sepolia.ENSRegistry,
     },
+    [SupportedNetwork.ARBITRUM]: {
+      daoFactoryAddress: activeContractsList.arbitrum.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsList.arbitrum.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsList.arbitrum["multisig-repo"],
+      adminRepoAddress: activeContractsList.arbitrum["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsList.arbitrum["address-list-voting-repo"],
+      tokenVotingRepoAddress: activeContractsList.arbitrum["token-voting-repo"],
+      multisigSetupAddress: activeContractsList.arbitrum.MultisigSetup,
+      adminSetupAddress: activeContractsList.arbitrum.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsList.arbitrum.AddresslistVotingSetup,
+      tokenVotingSetupAddress: activeContractsList.arbitrum.TokenVotingSetup,
+      ensRegistryAddress: activeContractsList.arbitrum.ENSRegistry,
+    },
+    [SupportedNetwork.ARBITRUM_GOERLI]: {
+      daoFactoryAddress: activeContractsList.arbitrumGoerli.DAOFactory,
+      pluginSetupProcessorAddress:
+        activeContractsList.arbitrumGoerli.PluginSetupProcessor,
+      multisigRepoAddress: activeContractsList.arbitrumGoerli["multisig-repo"],
+      adminRepoAddress: activeContractsList.arbitrumGoerli["admin-repo"],
+      addresslistVotingRepoAddress:
+        activeContractsList.arbitrumGoerli["address-list-voting-repo"],
+      tokenVotingRepoAddress: activeContractsList.arbitrumGoerli["token-voting-repo"],
+      multisigSetupAddress: activeContractsList.arbitrumGoerli.MultisigSetup,
+      adminSetupAddress: activeContractsList.arbitrumGoerli.AdminSetup,
+      addresslistVotingSetupAddress:
+        activeContractsList.arbitrumGoerli.AddresslistVotingSetup,
+      tokenVotingSetupAddress: activeContractsList.arbitrumGoerli.TokenVotingSetup,
+      ensRegistryAddress: activeContractsList.arbitrumGoerli.ENSRegistry,
+    },
   },
 };
 export const ADDITIONAL_NETWORKS: Network[] = [
@@ -375,6 +445,18 @@ export const ADDITIONAL_NETWORKS: Network[] = [
   {
     name: "base",
     chainId: 8453,
+  },
+  {
+    name: "arbitrum",
+    chainId: 42161,
+  },
+  {
+    name: "arbitrumGoerli",
+    chainId: 421613,
+  },
+  {
+    name: "sepolia",
+    chainId: 58008,
   },
   {
     name: "local",
