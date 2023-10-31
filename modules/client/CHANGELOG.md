@@ -18,7 +18,11 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
 
+- Support for arbitrum network
+
+## [1.18.0]
 ### Fixed
 
 - Fix support for subgraph 1.3.1

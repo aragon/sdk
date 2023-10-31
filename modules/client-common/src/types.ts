@@ -37,6 +37,8 @@ export enum SupportedNetwork {
   BASE_GOERLI = "baseGoerli",
   LOCAL = "local",
   SEPOLIA = "sepolia",
+  ARBITRUM = "arbitrum",
+  ARBITRUM_GOERLI = "arbitrumGoerli",
 }
 
 export const SupportedNetworksArray = Object.values(SupportedNetwork);

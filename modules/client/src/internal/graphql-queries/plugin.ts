@@ -57,7 +57,7 @@ query IPlugin($address: ID!, $where: IPlugin_filter!) {
 `;
 
 export const QueryPluginPreparations = gql`
-query PluginPreparations($where: PluginUpdatePreparation_filter!) {
+query PluginPreparations($where: PluginPreparation_filter!) {
   pluginPreparations(where: $where){
     data
   }
@@ -65,7 +65,7 @@ query PluginPreparations($where: PluginUpdatePreparation_filter!) {
 `;
 
 export const QueryPluginPreparationsExtended = gql`
-query PluginPreparations($where: PluginUpdatePreparation_filter!, limit: Int!, skip: Int!, direction: OrderDirection!, sortBy: PluginUpdatePreparation_orderBy!) {
+query PluginPreparations($where: PluginPreparation_filter!, $limit: Int!, $skip: Int!, $direction: OrderDirection!, $sortBy: PluginPreparation_orderBy!) {
   pluginPreparations(where: $where, first: $limit, skip: $skip, orderDirection: $direction, orderBy: $sortBy){
     id
     type

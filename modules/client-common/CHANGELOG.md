@@ -18,6 +18,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Added
+
+- Add support for arbitrum network
+
+
+## [1.9.0]
 
 ### Changed
 
