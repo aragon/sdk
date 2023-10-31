@@ -19,8 +19,8 @@ type GraphqlNetworks =
   | "baseMainnet"
   | "local"
   | "sepolia"
-  | "arbitrum"
-  | "arbitrumGoerli";
+  | "arbitrum-one"
+  | "arbitrum-goerli";
 
 const SupportedNetworksToGraphqlNetworks: {
   [K in SupportedNetwork]: GraphqlNetworks;
@@ -33,8 +33,8 @@ const SupportedNetworksToGraphqlNetworks: {
   [SupportedNetwork.BASE]: "baseMainnet",
   [SupportedNetwork.LOCAL]: "local",
   [SupportedNetwork.SEPOLIA]: "sepolia",
-  [SupportedNetwork.ARBITRUM]: "arbitrum",
-  [SupportedNetwork.ARBITRUM_GOERLI]: "arbitrumGoerli",
+  [SupportedNetwork.ARBITRUM]: "arbitrum-one",
+  [SupportedNetwork.ARBITRUM_GOERLI]: "arbitrum-goerli",
 };
 
 export const UNSUPPORTED_PROPOSAL_METADATA_LINK: ProposalMetadata = {
