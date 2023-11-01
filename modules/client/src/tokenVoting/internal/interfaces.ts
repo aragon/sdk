@@ -11,7 +11,6 @@ import {
   CanVoteParams,
   CreateMajorityVotingProposalParams,
   ExecuteProposalStepValue,
-  MembersQueryParams,
   ProposalCreationStepValue,
   ProposalQueryParams,
   VoteProposalParams,

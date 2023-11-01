@@ -18,11 +18,21 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+
+- ERC20Transfers query missing decimals
+
+
+## [1.18.0]
 ### Added
 
 - Support for arbitrum network
 
-## [1.18.0]
+### Fixed
+
+- Plugin preparations query
+
+## [1.17.1]
 ### Fixed
 
 - Fix support for subgraph 1.3.1

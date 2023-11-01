@@ -15,10 +15,12 @@ query TokenTransfers($where: TokenTransfer_filter!, $limit:Int!, $skip: Int!, $d
     ... on ERC20Transfer {
       amount
       token {
-        id
-        name
-        symbol
-        decimals
+        ...on ERC20Contract {
+          id
+          name
+          symbol
+          decimals
+        }
       }
     }
     ... on ERC721Transfer {
