@@ -1841,7 +1841,7 @@ describe("Client", () => {
             where: {
               dao: params.daoAddressOrEns,
               pluginAddress: params.pluginAddress,
-              pluginRepoAddress: params.pluginRepoAddress,
+              pluginRepo: params.pluginRepoAddress,
             },
             limit: params.limit,
             skip: params.skip,

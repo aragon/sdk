@@ -20,6 +20,11 @@ TEMPLATE:
 ## [UPCOMING]
 ### Fixed
 
+- Plugin preparations query
+
+## [1.18.1]
+### Fixed
+
 - ERC20Transfers query missing decimals
 
 
