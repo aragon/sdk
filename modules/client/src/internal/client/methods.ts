@@ -1566,7 +1566,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       where = { ...where, pluginAddress: pluginAddress.toLowerCase() };
     }
     if (pluginRepoAddress) {
-      where = { ...where, pluginRepoAddress: pluginRepoAddress.toLowerCase() };
+      where = { ...where, pluginRepo: pluginRepoAddress.toLowerCase() };
     }
     if (daoAddressOrEns) {
       where = { ...where, dao: daoAddressOrEns.toLowerCase() };
