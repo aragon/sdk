@@ -82,6 +82,7 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import {
   Context,
+  getExtendedProposalId,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   NotAContractError,
@@ -91,7 +92,6 @@ import {
   ProposalStatus,
   SortDirection,
   TokenType,
-  getExtendedProposalId,
 } from "@aragon/sdk-client-common";
 import { createTokenVotingPluginBuild } from "../../helpers/create-plugin-build";
 
@@ -884,7 +884,7 @@ describe("Token Voting Client", () => {
       it("Should check if an address is a member of a DAO and return true", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
-  
+
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
@@ -909,7 +909,7 @@ describe("Token Voting Client", () => {
       it("Should check if an address is a member in a specified block number of a DAO and return true", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
-  
+
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
@@ -938,7 +938,7 @@ describe("Token Voting Client", () => {
       it("Should check if an address is a member of a DAO and return false", async () => {
         const ctx = new Context(contextParamsLocalChain);
         const client = new TokenVotingClient(ctx);
-  
+
         const mockedClient = mockedGraphqlRequest.getMockedInstance(
           client.graphql.getClient(),
         );
