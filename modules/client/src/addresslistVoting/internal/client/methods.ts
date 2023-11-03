@@ -20,6 +20,7 @@ import {
   votingSettingsToContract,
 } from "../../../client-common";
 import {
+  QueryAddresslistVotingIsMember,
   QueryAddresslistVotingMembers,
   QueryAddresslistVotingProposal,
   QueryAddresslistVotingProposals,
@@ -55,6 +56,8 @@ import {
   InvalidCidError,
   InvalidProposalIdError,
   IpfsPinError,
+  IsMemberParams,
+  IsMemberSchema,
   isProposalId,
   MULTI_FETCH_TIMEOUT,
   NoProviderError,
@@ -577,5 +580,30 @@ export class AddresslistVotingClientMethods extends ClientCore
       ),
       votingMode: addresslistVotingPlugin.votingMode,
     };
+  }
+
+  /**
+   * Checks if a given address is a member of the AddresslistVoting contract.
+   * @param params - The parameters for the isMember method.
+   * @param params.pluginAddress - The address of the plugin.
+   * @param params.address - The address to check.
+   * @param params.blockNumber - The block number for specifying a specific block.
+   * @returns A boolean indicating whether the address is a member or not.
+   */
+  public async isMember(params: IsMemberParams): Promise<boolean> {
+    IsMemberSchema.strict().validateSync(params);
+    const query = QueryAddresslistVotingIsMember;
+    const name = "AddresslistVoting isMember";
+    type T = { addresslistVotingVoter: { id: string } };
+    const { addresslistVotingVoter } = await this.graphql.request<T>({
+      query,
+      params: {
+        id:
+          `${params.pluginAddress.toLowerCase()}_${params.address.toLowerCase()}`,
+        blockHeight: params.blockNumber ? { number: params.blockNumber } : null,
+      },
+      name,
+    });
+    return !!addresslistVotingVoter;
   }
 }
