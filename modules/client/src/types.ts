@@ -423,6 +423,7 @@ export type PluginUpdateProposalValidity = {
   causes: PluginUpdateProposalInValidityCause[];
 };
 
+// TODO document these causes extensively so that the frontend knows what to display.
 export enum PluginUpdateProposalInValidityCause {
   INVALID_ACTIONS = "invalidActions",
   INVALID_GRANT_PERMISSION = "invalidGrantPermission",

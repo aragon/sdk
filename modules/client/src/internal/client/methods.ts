@@ -1150,7 +1150,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {boolean}
    * @memberof ClientMethods
    */
-  private isPluginUpdatePermissionValid(
+  private isPluginUpdatePermissionValid(// TODO rename this to mention this function is only about checking the ROOT_PERMISSION
     params: GrantPermissionDecodedParams | RevokePermissionDecodedParams,
     daoAddress: string,
   ): boolean {
@@ -1302,6 +1302,35 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   }
 
   /**
+TODO Now
+- Check that action{... value: 0,...} is actually zero. 
+- Check that ROOT_PERMISSION cannot be Grant Revoke Granted (!!)
+- Tell selim that 
+	- there will be two checks, one for DAO, one for plugin.
+	- there can multiple causes at once that we need to display.
+
+
+- Document the invalidity causes and what's behind them.
+	- Selim will probably want to display contract addresses or information for people to go there and check things on-chain.  
+- Document the code (function documentation via jsdoc, or comments)
+	- More explicity function and variable naming
+
+- Another round of thinking/security review (Michael & Jose, maybe async, maybe even with the rest of the team)
+
+
+TODO Later
+
+What if the DAO is not updated but the Plugin requires the DAO updated
+- the PluginSetup should check that the DAO has the right protocol version
+- later our sdk should be smart enough to re-order the actions
+- should DAO update always be conducted first?
+  - Probably yes.
+
+   * 
+   * 
+   */
+
+  /**
    * Check if the specified proposal id is valid for updating a plugin
    * The failure map should be checked before calling this method
    *
@@ -1312,9 +1341,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async isPluginUpdateValid(
     params: IsPluginUpdateValidParams,
   ): Promise<PluginUpdateProposalValidity> {
+
+    // Check that the input argumetns have the correct types
     await IsPluginUpdateValidSchema.strict().validate(params);
     const causes: PluginUpdateProposalInValidityCause[] = [];
-    // get expected actions signatures
+
+    // Get expected actions signatures
     const grantSignature = DAO__factory.createInterface().getFunction("grant")
       .format("minimal");
     const revokeSignature = DAO__factory.createInterface().getFunction("revoke")
@@ -1322,7 +1354,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const applyUpdateSignature = PluginSetupProcessor__factory.createInterface()
       .getFunction("applyUpdate").format("minimal");
 
-    // find signatures in the actions specified in the proposal
+    // Find the indexes of the signatures in the actions specified in the proposal
     const grantIndex = findActionIndex(params.actions, grantSignature);
     const applyUpdateIndex = findActionIndex(
       params.actions,
@@ -1330,7 +1362,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     );
     const revokeIndex = findActionIndex(params.actions, revokeSignature);
 
-    // check that all actions are present and in the correct order
+    // check that all actions are present and in the correct order (grant should be before revoke)
     if (
       [grantIndex, applyUpdateIndex, revokeIndex].includes(-1) ||
       grantIndex > applyUpdateIndex ||
@@ -1342,18 +1374,19 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         causes,
       };
     }
+    // TODO Is this method smart enough to detect that situations such as Grant Revoke AntotherGrant?
 
-    // check grant action
+    // Check if the ROOT_PERMISSION_ID on the DAO is granted to the PSP
     if (
       !this.isPluginUpdatePermissionValid(
-        decodeGrantAction(params.actions[grantIndex].data),
+        decodeGrantAction(params.actions[grantIndex].data),// 
         params.daoAddress,
       )
     ) {
       causes.push(PluginUpdateProposalInValidityCause.INVALID_GRANT_PERMISSION);
     }
 
-    // check revoke action
+    // Check if the ROOT_PERMISSION_ID on the DAO is revoked from the PSP
     if (
       !this.isPluginUpdatePermissionValid(
         decodeRevokeAction(params.actions[revokeIndex].data),
@@ -1390,6 +1423,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   public async isDaoUpdateValid(
     params: IsDaoUpdateValidParams,
   ): Promise<DaoUpdateProposalValidity> {
+
+    // Check the the types are right
     await IsDaoUpdateValidSchema.strict().validate(params);
     const causes: DaoUpdateProposalInvalidityCause[] = [];
     // get initialize from signature
@@ -1401,7 +1436,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       params.actions,
       upgradeToAndCallSignature,
     );
-    // check that initialize from action is present
+    // check that the `initializeFrom` action is present
     if (upgradeToAndCallIndex === -1) {
       causes.push(DaoUpdateProposalInvalidityCause.INVALID_ACTIONS);
       return {
@@ -1409,9 +1444,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         causes,
       };
     }
+
     const decodedUpgradeToAndCallParams = decodeUpgradeToAndCallAction(
       params.actions[upgradeToAndCallIndex].data,
     );
+
     let decodedInitializeFromParams: DecodedInitializeFromParams;
     try {
       decodedInitializeFromParams = decodeInitializeFromAction(
@@ -1422,24 +1459,27 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return { isValid: causes.length === 0, causes };
     }
 
-    // check version
+    // From now, we know that the actions are calling the expected functions.
+
+    // check that `previousVersion` matches with the protocolVersion() stored in the DAO contract.
     if (
       !await this.isDaoUpdateVersionValid(
         params.daoAddress,
         decodedInitializeFromParams.previousVersion,
       )
     ) {
-      causes.push(DaoUpdateProposalInvalidityCause.INVALID_VERSION);
+      causes.push(DaoUpdateProposalInvalidityCause.INVALID_VERSION); // MISMATCHED_PREVIOUS_VERSION ?
     }
-    // get version if not specified use the one from the dao factory address
+    // If not specified, get the address of the DAO contract we are upgrading to from the dao factory implementation address
     // in the context
-    let upgradeToVersion = params.version;
+    // TODO BE CAREFUL HERE, it should not be optional.
+    let upgradeToVersion = params.version; // TODO Why is this optional? Rename to `daoImplementationToUpgradeTo`
     if (!upgradeToVersion) {
       upgradeToVersion = await this.getProtocolVersion(
         this.web3.getAddress("daoFactoryAddress"),
       );
     }
-    // check implementation
+    // Check that the implementation 
     if (
       !await this.isDaoUpdateImplementationValid(
         upgradeToVersion.join(".") as SupportedVersion,
@@ -1448,7 +1488,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     ) {
       causes.push(DaoUpdateProposalInvalidityCause.INVALID_IMPLEMENTATION);
     }
-    // check data
+    // check data // TODO must be improved once the final abi is ready (see comments within `isDaoUpdateInitDataValid()`).
     if (!this.isDaoUpdateInitDataValid(decodedInitializeFromParams.initData)) {
       causes.push(DaoUpdateProposalInvalidityCause.INVALID_INIT_DATA);
     }
@@ -1514,7 +1554,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   ): boolean {
     // TODO: decode the data using the abi from the the prepare update
     // for now the init data must be empty but this can change in the future
-    // atm we cannot know the parameters for each version of the dao
+    // atm we cannot know the parameters for each version of the dao // TODO write why we cannot know it :)
     return data.length === 0;
   }
 
