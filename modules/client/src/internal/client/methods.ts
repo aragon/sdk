@@ -1308,7 +1308,8 @@ TODO Now
 - Tell selim that 
 	- there will be two checks, one for DAO, one for plugin.
 	- there can multiple causes at once that we need to display.
-
+- Check that this is a pure update proposal (only upgradeToAndCall, applyUpdate, grant ROOT, revoke ROOT actions) and that no other actions are sneaked in (e.g. send all money to attackers wallet)
+  - maybe some warning if there are more actions present than expected.
 
 - Document the invalidity causes and what's behind them.
 	- Selim will probably want to display contract addresses or information for people to go there and check things on-chain.  
