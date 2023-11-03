@@ -95,6 +95,15 @@ export function toMultisigProposalListItem(
     approvals: proposal.approvers.map(
       (approver) => approver.id.slice(0, 42),
     ),
+    actions: proposal.actions.map(
+      (action: SubgraphAction): DaoAction => {
+        return {
+          data: hexToBytes(action.data),
+          to: action.to,
+          value: BigInt(action.value),
+        };
+      },
+    ),
     settings: {
       onlyListed: proposal.plugin.onlyListed,
       minApprovals: proposal.minApprovals,

@@ -23,7 +23,6 @@ import {
 import {
   ADDRESS_ONE,
   contextParamsLocalChain,
-  SUBGRAPH_ACTIONS,
   SUBGRAPH_PLUGIN_INSTALLATION,
   SUBGRAPH_PROPOSAL_BASE,
   SUBGRAPH_VOTERS,
@@ -52,14 +51,15 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../../src/addresslistVoting/internal/types";
 import {
+  bytesToHex,
   Context,
+  getExtendedProposalId,
   InvalidAddressOrEnsError,
   PrepareInstallationStep,
   PrepareUpdateStep,
   ProposalMetadata,
   ProposalStatus,
   SortDirection,
-  getExtendedProposalId,
 } from "@aragon/sdk-client-common";
 import { PluginRepo__factory } from "@aragon/osx-ethers";
 import { createAddresslistVotingPluginBuild } from "../../helpers/create-plugin-build";
@@ -750,7 +750,6 @@ describe("Client Address List", () => {
 
       const subgraphProposal: SubgraphAddresslistVotingProposal = {
         createdAt: Math.round(Date.now() / 1000).toString(),
-        actions: SUBGRAPH_ACTIONS,
         supportThreshold: "1000000",
         minVotingPower: "20",
         voters: SUBGRAPH_VOTERS,
@@ -927,6 +926,15 @@ describe("Client Address List", () => {
       expect(proposals[0].creatorAddress).toBe(SUBGRAPH_PROPOSAL_BASE.creator);
       expect(proposals[0].metadata.title).toBe(ipfsMetadata.title);
       expect(proposals[0].metadata.summary).toBe(ipfsMetadata.summary);
+      for (const [index, action] of proposals[0].actions.entries()) {
+        expect(action.value).toBe(
+          BigInt(SUBGRAPH_PROPOSAL_BASE.actions[index].value),
+        );
+        expect(action.to).toBe(SUBGRAPH_PROPOSAL_BASE.actions[index].to);
+        expect(bytesToHex(action.data)).toBe(
+          SUBGRAPH_PROPOSAL_BASE.actions[index].data.toLowerCase(),
+        );
+      }
       expect(proposals[0].startDate.getTime()).toBe(
         parseInt(SUBGRAPH_PROPOSAL_BASE.startDate) * 1000,
       );
