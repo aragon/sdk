@@ -18,6 +18,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+### Added
+
+- Added `actions` to `SubgraphListItem` type
+
+## [1.10.0]
 ### Added
 
 - Add support for arbitrum network
