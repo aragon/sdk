@@ -152,6 +152,7 @@ export const SUBGRAPH_VOTERS: SubgraphVoterListItemBase[] = [
 
 export const SUBGRAPH_PROPOSAL_BASE: SubgraphProposalBase = {
   id: TEST_ADDRESSLIST_PROPOSAL_ID,
+  actions: SUBGRAPH_ACTIONS,
   dao: {
     id: ADDRESS_ONE,
     subdomain: "test",

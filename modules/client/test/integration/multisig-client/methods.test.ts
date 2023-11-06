@@ -21,7 +21,6 @@ import {
   ADDRESS_ONE,
   ADDRESS_TWO,
   contextParamsLocalChain,
-  SUBGRAPH_ACTIONS,
   SUBGRAPH_PLUGIN_INSTALLATION,
   SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
@@ -46,6 +45,7 @@ import {
 } from "../../../src/multisig/internal/graphql-queries/members";
 import { SubgraphMultisigProposal } from "../../../src/multisig/internal/types";
 import {
+  bytesToHex,
   Context,
   getExtendedProposalId,
   InvalidAddressOrEnsError,
@@ -609,7 +609,6 @@ describe("Client Multisig", () => {
 
       const subgraphProposal: SubgraphMultisigProposal = {
         createdAt: Math.round(Date.now() / 1000).toString(),
-        actions: SUBGRAPH_ACTIONS,
         creationBlockNumber: "40",
         executionDate: Math.round(Date.now() / 1000).toString(),
         executionBlockNumber: "50",
@@ -655,6 +654,15 @@ describe("Client Multisig", () => {
       expect(proposal.creationDate.getTime()).toBe(
         parseInt(subgraphProposal.createdAt) * 1000,
       );
+      for (const [index, action] of proposal.actions.entries()) {
+        expect(action.value).toBe(
+          BigInt(subgraphProposal.actions[index].value),
+        );
+        expect(action.to).toBe(subgraphProposal.actions[index].to);
+        expect(bytesToHex(action.data)).toBe(
+          subgraphProposal.actions[index].data.toLowerCase(),
+        );
+      }
       expect(proposal.actions).toMatchObject(proposal.actions);
 
       expect(proposal.executionTxHash).toMatch(
@@ -762,6 +770,15 @@ describe("Client Multisig", () => {
       expect(proposals[0].approvals).toMatchObject([ADDRESS_ONE, ADDRESS_TWO]);
       expect(proposals[0].settings.minApprovals).toBe(5);
       expect(proposals[0].settings.onlyListed).toBe(true);
+      for (const [index, action] of proposals[0].actions.entries()) {
+        expect(action.value).toBe(
+          BigInt(SUBGRAPH_PROPOSAL_BASE.actions[index].value),
+        );
+        expect(action.to).toBe(SUBGRAPH_PROPOSAL_BASE.actions[index].to);
+        expect(bytesToHex(action.data)).toBe(
+          SUBGRAPH_PROPOSAL_BASE.actions[index].data.toLowerCase(),
+        );
+      }
 
       expect(mockedClient.request).toHaveBeenCalledWith(
         QueryMultisigProposals,

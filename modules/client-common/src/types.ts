@@ -237,6 +237,7 @@ export type ProposalListItemBase = {
   startDate: Date;
   endDate: Date;
   status: ProposalStatus;
+  actions: DaoAction[];
 };
 
 export type PrepareUpdateParams = {

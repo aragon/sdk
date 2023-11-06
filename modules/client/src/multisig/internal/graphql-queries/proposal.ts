@@ -55,6 +55,11 @@ query MultisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: In
     approvers {
       id
     }
+    actions {
+      to
+      value
+      data
+    }
     minApprovals
     plugin{
       onlyListed

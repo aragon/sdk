@@ -35,7 +35,6 @@ import {
   ADDRESS_THREE,
   ADDRESS_TWO,
   contextParamsLocalChain,
-  SUBGRAPH_ACTIONS,
   SUBGRAPH_PLUGIN_INSTALLATION,
   SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
@@ -81,6 +80,7 @@ import {
 } from "@aragon/osx-ethers";
 import { BigNumber } from "@ethersproject/bignumber";
 import {
+  bytesToHex,
   Context,
   getExtendedProposalId,
   InvalidAddressError,
@@ -1081,7 +1081,6 @@ describe("Token Voting Client", () => {
 
         const subgraphProposal: SubgraphTokenVotingProposal = {
           createdAt: Math.round(Date.now() / 1000).toString(),
-          actions: SUBGRAPH_ACTIONS,
           supportThreshold: "1000000",
           totalVotingPower: "3000000",
           votingMode: VotingMode.EARLY_EXECUTION,
@@ -1326,6 +1325,15 @@ describe("Token Voting Client", () => {
         expect(proposals.length).toBe(2);
         for (const [index, proposal] of proposals.entries()) {
           expect(proposal.id).toBe(subgraphProposals[index].id);
+          for (const [actionIndex, action] of proposal.actions.entries()) {
+            expect(action.value).toBe(
+              BigInt(subgraphProposals[index].actions[actionIndex].value),
+            );
+            expect(action.to).toBe(subgraphProposals[index].actions[actionIndex].to);
+            expect(bytesToHex(action.data)).toBe(
+              subgraphProposals[index].actions[actionIndex].data.toLowerCase(),
+            );
+          }
           expect(proposal.dao.address).toBe(subgraphProposals[index].dao.id);
           expect(proposal.dao.name).toBe(
             subgraphProposals[index].dao.subdomain,
