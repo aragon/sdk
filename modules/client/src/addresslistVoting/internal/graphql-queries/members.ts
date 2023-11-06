@@ -13,3 +13,13 @@ query AddresslistVotingMembers($where: AddresslistVotingVoter_filter!, $block: B
     address
   }
 }`;
+
+export const QueryAddresslistVotingIsMember = gql`
+query AddresslistVotingIsMember($id: ID!, $block: Block_height) {
+  addresslistVotingVoter(
+    id: $id
+    block: $block
+  ) {
+    id
+  }
+}`;

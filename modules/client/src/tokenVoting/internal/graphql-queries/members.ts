@@ -23,3 +23,13 @@ query TokenVotingMembers($where: TokenVotingMember_filter!, $block: Block_height
   }
 }
 `;
+
+export const QueryTokenVotingIsMember = gql`
+query TokenVotingIsMember($id: ID!, $block: Block_height) {
+  tokenVotingMember(
+    id: $id
+    block: $block
+  ) {
+    id
+  }
+}`;

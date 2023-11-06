@@ -4,6 +4,7 @@ import {
   DaoAction,
   GasFeeEstimation,
   InterfaceParams,
+  IsMemberParams,
   PrepareInstallationStepValue,
   PrepareUpdateStepValue,
   ProposalMetadata,
@@ -57,6 +58,7 @@ export interface IAddresslistVotingClientMethods {
     pluginAddress: string,
     blockNumber?: number,
   ) => Promise<VotingSettings | null>;
+  isMember: (params: IsMemberParams) => Promise<boolean>;
 }
 
 export interface IAddresslistVotingClientEncoding {

@@ -4,6 +4,7 @@ import {
   DaoAction,
   GasFeeEstimation,
   InterfaceParams,
+  IsMemberParams,
   PrepareInstallationStepValue,
   PrepareUpdateStepValue,
   ProposalMetadata,
@@ -58,6 +59,7 @@ export interface IMultisigClientMethods {
   getProposals: (
     params: ProposalQueryParams,
   ) => Promise<MultisigProposalListItem[]>;
+  isMember: (params: IsMemberParams) => Promise<boolean>;
 }
 
 export interface IMultisigClientEncoding {

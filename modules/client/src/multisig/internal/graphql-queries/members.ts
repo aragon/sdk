@@ -14,3 +14,13 @@ query MultisigMembers($where: MultisigApprover_filter!, $block: Block_height, $l
   }
 }
 `;
+
+export const QueryMultisigIsMember = gql`
+query MultisigIsMember($id: ID!, $block: Block_height) {
+  multisigApprover(
+    id: $id
+    block: $block
+  ) {
+    id
+  }
+}`;
