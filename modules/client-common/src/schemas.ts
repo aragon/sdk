@@ -98,3 +98,9 @@ export const ApplyUninstallationSchema = object({
 export const ApplyInstallationSchema = ApplyUninstallationSchema.concat(object({
   helpers: array(AddressOrEnsSchema).required(),
 }));
+
+export const IsMemberSchema = object({
+  address: AddressOrEnsSchema.required(),
+  pluginAddress: AddressOrEnsSchema.required(),
+  blockNumber: number().notRequired(),
+});

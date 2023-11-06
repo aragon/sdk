@@ -18,6 +18,14 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+### Added
+
+- `isMember` function to `TokenVotingClient`
+- `isMember` function to `AddresslistVotingClient`
+- `isMember` function to `Client`
+
+## [1.18.2]
 ### Fixed
 
 - Plugin preparations query
