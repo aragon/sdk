@@ -585,7 +585,73 @@ describe("Client", () => {
         );
       }
     });
-    it("Should encode an applyUpdate action", async () => {
+    it("Should encode an applyUpdate action without permissions", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const applyUpdateParams: ApplyUpdateParams = {
+        permissions: [],
+        versionTag: {
+          build: 1,
+          release: 1,
+        },
+        pluginRepo: "0x2345678901234567890123456789012345678901",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
+        initData: new Uint8Array([0, 1, 2, 3]),
+        helpers: [],
+      };
+      const daoAddress = "0x1234567890123456789012345678901234567890";
+      const actions = client.encoding.applyUpdateAction(
+        daoAddress,
+        applyUpdateParams,
+      );
+
+      expect(actions.length).toBe(3);
+      expect(typeof actions[1]).toBe("object");
+      expect(actions[1].data).toBeInstanceOf(Uint8Array);
+
+      const daoInterface = PluginSetupProcessor__factory.createInterface();
+      const hexString = bytesToHex(actions[1].data);
+      const argsDecoded = daoInterface.decodeFunctionData(
+        "applyUpdate",
+        hexString,
+      );
+      expect(argsDecoded.length).toBe(2);
+      expect(argsDecoded[0]).toBe(
+        daoAddress,
+      );
+      expect(argsDecoded[1].pluginSetupRef.versionTag.build).toBe(
+        applyUpdateParams.versionTag.build,
+      );
+      expect(argsDecoded[1].pluginSetupRef.versionTag.release).toBe(
+        applyUpdateParams.versionTag.release,
+      );
+      expect(argsDecoded[1].plugin).toBe(
+        applyUpdateParams.pluginAddress,
+      );
+      expect(argsDecoded[1].pluginSetupRef.pluginSetupRepo).toBe(
+        applyUpdateParams.pluginRepo,
+      );
+      for (const index in argsDecoded[1].permissions) {
+        expect(argsDecoded[1].permissions[parseInt(index)].operation).toBe(
+          applyUpdateParams.permissions[parseInt(index)].operation,
+        );
+        expect(argsDecoded[1].permissions[parseInt(index)].where).toBe(
+          applyUpdateParams.permissions[parseInt(index)].where,
+        );
+        expect(argsDecoded[1].permissions[parseInt(index)].who).toBe(
+          applyUpdateParams.permissions[parseInt(index)].who,
+        );
+        expect(argsDecoded[1].permissions[parseInt(index)].condition).toBe(
+          AddressZero,
+        );
+        expect(argsDecoded[1].permissions[parseInt(index)].permissionId).toBe(
+          applyUpdateParams.permissions[parseInt(index)]
+            .permissionId,
+        );
+      }
+    });
+    it("Should encode an applyUpdate action with permissions", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
@@ -611,12 +677,12 @@ describe("Client", () => {
         applyUpdateParams,
       );
 
-      expect(actions.length).toBe(3);
+      expect(actions.length).toBe(5);
       expect(typeof actions[1]).toBe("object");
       expect(actions[1].data).toBeInstanceOf(Uint8Array);
 
       const daoInterface = PluginSetupProcessor__factory.createInterface();
-      const hexString = bytesToHex(actions[1].data);
+      const hexString = bytesToHex(actions[2].data);
       const argsDecoded = daoInterface.decodeFunctionData(
         "applyUpdate",
         hexString,
