@@ -167,13 +167,13 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     
     // Grant UPGRADE_PLUGIN_PERMISSION in the plugin to the PSP
     const grantUpgradeAction = this.grantAction(daoAddress, {
-      where: daoAddress,
+      where: params.pluginAddress,
       who: pspAddress,
       permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
     });
     // Revoke UPGRADE_PLUGIN_PERMISSION in the plugin to the PSP
     const revokeUpgradeAction = this.revokeAction(daoAddress, {
-      where: daoAddress,
+      where: params.pluginAddress,
       who: pspAddress,
       permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
     });
@@ -199,8 +199,8 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
           value: BigInt(0),
           data: hexToBytes(hexBytes),
         },
-        revokeUpgradeAction,
         revokeRootAction,
+        revokeUpgradeAction,
       ];
     }
     return [
@@ -210,7 +210,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
         value: BigInt(0),
         data: hexToBytes(hexBytes),
       },
-      grantUpgradeAction,
+      revokeUpgradeAction,
     ];
   }
 
