@@ -21,6 +21,12 @@ TEMPLATE:
 
 ### Added
 
+- Added `UPGRADE_PLUGIN_PERMISSION` to `PermissionType` enum
+
+## [1.11.0]
+
+### Added
+
 - Added `actions` to `SubgraphListItem` type
 
 ## [1.10.0]

@@ -19,6 +19,12 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Fixed
+
+- Permission encoding in `applyUpdate`
+
+## [1.19.0]
+
 ### Added
 
 - `isMember` function to `TokenVotingClient`

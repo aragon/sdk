@@ -164,26 +164,53 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       args,
     ]);
     const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
-    // Grant ROOT_PERMISION in the DAO to the PSP
-    const grantAction = this.grantAction(daoAddress, {
+    
+    // Grant UPGRADE_PLUGIN_PERMISSION in the plugin to the PSP
+    const grantUpgradeAction = this.grantAction(daoAddress, {
       where: daoAddress,
       who: pspAddress,
-      permission: Permissions.ROOT_PERMISSION,
+      permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
     });
-    // Revoke ROOT_PERMISION in the DAO to the PSP
-    const revokeAction = this.revokeAction(daoAddress, {
+    // Revoke UPGRADE_PLUGIN_PERMISSION in the plugin to the PSP
+    const revokeUpgradeAction = this.revokeAction(daoAddress, {
       where: daoAddress,
       who: pspAddress,
-      permission: Permissions.ROOT_PERMISSION,
+      permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
     });
+    // if there are permissions to be granted or revoked i need to
+    // grant ROOT_PERMISSION in the DAO to the PSP
+    if (params.permissions.length > 0) {
+      const grantRootAction = this.grantAction(daoAddress, {
+        where: daoAddress,
+        who: pspAddress,
+        permission: Permissions.ROOT_PERMISSION,
+      });
+      // Revoke ROOT_PERMISSION in the DAO to the PSP
+      const revokeRootAction = this.revokeAction(daoAddress, {
+        where: daoAddress,
+        who: pspAddress,
+        permission: Permissions.ROOT_PERMISSION,
+      });
+      return [
+        grantUpgradeAction,
+        grantRootAction,
+        {
+          to: pspAddress,
+          value: BigInt(0),
+          data: hexToBytes(hexBytes),
+        },
+        revokeUpgradeAction,
+        revokeRootAction,
+      ];
+    }
     return [
-      grantAction,
+      grantUpgradeAction,
       {
         to: pspAddress,
         value: BigInt(0),
         data: hexToBytes(hexBytes),
       },
-      revokeAction,
+      grantUpgradeAction,
     ];
   }
 
