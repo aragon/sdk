@@ -19,7 +19,7 @@ TEMPLATE:
 
 ## [UPCOMING]
 
-### Fixed
+### Changed
 
 - Permission encoding in `applyUpdate`
 
