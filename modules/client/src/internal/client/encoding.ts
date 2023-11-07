@@ -177,8 +177,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       who: pspAddress,
       permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
     });
-    // if there are permissions to be granted or revoked i need to
-    // grant ROOT_PERMISSION in the DAO to the PSP
+    // If the update requests permissions to be granted or revoked, the PSP needs temporary `ROOT_PERMISSION_ID` permission
     if (params.permissions.length > 0) {
       const grantRootAction = this.grantAction(daoAddress, {
         where: daoAddress,
