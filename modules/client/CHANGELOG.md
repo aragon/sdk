@@ -21,7 +21,7 @@ TEMPLATE:
 
 ### Changed
 
-- Permission encoding in `applyUpdate`
+- Add grant and revoke for permission `UPGRADE_PLUGIN_PERMISSION` in `applyUpdate` encoder
 
 ## [1.19.0]
 
