@@ -824,3 +824,18 @@ export function toPluginPermissionOperationType(
       throw new InvalidPermissionOperationType();
   }
 }
+
+// function that compares 2 generic arrays
+// and returns true if they are equal
+// and false if they are not
+export function compareArrays<T>(array1: T[], array2: T[]): boolean {
+  if (array1.length !== array2.length) {
+    return false;
+  }
+  for (const [index, element] of array1.entries()) {
+    if (element !== array2[index]) {
+      return false;
+    }
+  }
+  return true;
+}
