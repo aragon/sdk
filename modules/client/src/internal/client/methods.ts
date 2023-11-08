@@ -75,6 +75,8 @@ import {
   TransferSortBy,
 } from "../../types";
 import {
+  AllowedUpdateActions,
+  ProposalActionTypes,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
@@ -88,6 +90,7 @@ import {
   SubgraphTransferTypeMap,
 } from "../types";
 import {
+  compareArrays,
   decodeApplyUpdateAction,
   decodeGrantAction,
   decodeInitializeFromAction,
@@ -109,6 +112,8 @@ import {
   EMPTY_BUILD_METADATA_LINK,
   EMPTY_DAO_METADATA_LINK,
   EMPTY_RELEASE_METADATA_LINK,
+  PLUGIN_UPDATE_ACTION_PATTERN,
+  PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN,
   PreparationType,
   SupportedPluginRepo,
   SupportedPluginRepoArray,
@@ -118,6 +123,7 @@ import {
   UNSUPPORTED_BUILD_METADATA_LINK,
   UNSUPPORTED_DAO_METADATA_LINK,
   UNSUPPORTED_RELEASE_METADATA_LINK,
+  UPDATE_PLUGIN_SIGNATURES,
 } from "../constants";
 import { IClientMethods } from "../interfaces";
 import {
@@ -130,8 +136,10 @@ import {
   EmptyMultiUriError,
   FailedDepositError,
   findLog,
+  getFunctionFragment,
   getNamedTypesFromMetadata,
   InstallationNotFoundError,
+  InvalidActionError,
   InvalidAddressOrEnsError,
   InvalidCidError,
   IpfsPinError,
@@ -142,6 +150,7 @@ import {
   NoProviderError,
   NotImplementedError,
   PermissionIds,
+  PermissionOperationType,
   Permissions,
   PluginUninstallationPreparationError,
   prepareGenericInstallation,
@@ -1153,11 +1162,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   private isPluginUpdatePermissionValid(
     params: GrantPermissionDecodedParams | RevokePermissionDecodedParams,
     daoAddress: string,
+    permission: string,
+    permissionId: string,
   ): boolean {
     const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
     return (
-      params.permission === Permissions.ROOT_PERMISSION &&
-      params.permissionId === PermissionIds.ROOT_PERMISSION_ID &&
+      params.permission === permission &&
+      params.permissionId === permissionId &&
       params.where === daoAddress &&
       params.who === pspAddress
     );
@@ -1309,75 +1320,474 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {Promise<PluginUpdateProposalValidity>}
    * @memberof ClientMethods
    */
-  public async isPluginUpdateValid(
-    params: IsPluginUpdateValidParams,
-  ): Promise<PluginUpdateProposalValidity> {
-    await IsPluginUpdateValidSchema.strict().validate(params);
+
+  /**
+   * Check that the failure map is all false -> cannot be checked because we receive tha actions, not the proposal id
+   * Divide the proposal into blocks of actions, and then check them separately.
+   * - UpgradeTo and upgradeToAndCall should only be in the first position of the list, this means that we can assume
+   *   that the rest of the actions will be related to o one or multiple plugin updates.
+   *   Michael:
+   *
+   *   This is required in case
+   *    - there is a dependency (the new plugin version requires a specific DAO version, although the PluginSetup could theoretically check this)
+   *    - the DAO update fixes a bug / exploit that could be triggered by a plugin setup being applied afterwards.
+   *
+   * - In the rest of cases we must follow a pattern checking.
+   *   Since we are doing an update we should have at least 3 actions and up to 5 actions:
+   *    - First action is always grant UPGRADE_PLUGIN_PERMISSION
+   *    - Check third action, if its revoke UPGRADE_PLUGIN_PERMISSION, the middle one is an applyUpdate, if its an applyUpdate the middle one is a grant ROOT_PERMISSION
+   *    - If third action is a revoke, check that the fourth and fifth are a revoke of ROOT_PERMISSION and a revoke of UPGRADE_PLUGIN_PERMISSION
+   *
+   * Check that the to in all actions are expected contracts (PSP, dao) anything else is invalid
+   * Check that the value is 0 in all cases, this may change in the future, but for now is always 0
+   * Filter all the actions and make sure that we only have the calls to expected methods (grant, revoke, upgradeToAndCall...)
+   * ands that there is not any other action like withdraw or transfer
+   * Pattern matching is needed grant/applyupdate/revoke => valid
+   * Then do the proper checks for each group of actions depending on what you want to do,
+   * for example checking a plugin upgrade should only receive the subset of actions related to that plugin upgrade
+   * Checking that the ROOT_PERMISSION is granted if the permissions in the applyUpdate action are not empty
+   */
+
+  private validateGrantUpdatePluginPermissionAction(
+    action: DaoAction,
+    daoAddress: string,
+  ): PluginUpdateProposalInValidityCause[] {
     const causes: PluginUpdateProposalInValidityCause[] = [];
-    // get expected actions signatures
-    const grantSignature = DAO__factory.createInterface().getFunction("grant")
-      .format("minimal");
-    const revokeSignature = DAO__factory.createInterface().getFunction("revoke")
-      .format("minimal");
-    const applyUpdateSignature = PluginSetupProcessor__factory.createInterface()
-      .getFunction("applyUpdate").format("minimal");
+    // check if the action is a grant permission
+    if (action.value.toString() !== "0") {
+      causes.push(
+        PluginUpdateProposalInValidityCause.INVALID_GRANT_ACTION_VALUE,
+      );
+    }
+    return causes;
+  }
+  private validateRevokeUpdatePluginPermissionAction(
+    action: DaoAction,
+  ): PluginUpdateProposalInValidityCause[] {
+    return [];
+  }
+  private validateGrantRootPermissionAction(
+    action: DaoAction,
+  ): PluginUpdateProposalInValidityCause[] {
+    return [];
+  }
+  private validateRevokeRootPermissionAction(
+    action: DaoAction,
+  ): PluginUpdateProposalInValidityCause[] {
+    return [];
+  }
+  private validateApplyUpdateAction(
+    action: DaoAction,
+  ): PluginUpdateProposalInValidityCause[] {
+    return [];
+  }
 
-    // find signatures in the actions specified in the proposal
-    const grantIndex = findActionIndex(params.actions, grantSignature);
-    const applyUpdateIndex = findActionIndex(
-      params.actions,
-      applyUpdateSignature,
-    );
-    const revokeIndex = findActionIndex(params.actions, revokeSignature);
+  private isUpdateActionWithRootPermission(actions: DaoAction[]): boolean {
+    return true;
+  }
 
-    // check that all actions are present and in the correct order
+  private classifyProposalActions(actions: DaoAction[]): ProposalActionTypes[] {
+    const classifiedActions: ProposalActionTypes[] = [];
+
+    for (const action of actions) {
+      try {
+        let decodedPermission:
+          | GrantPermissionDecodedParams
+          | RevokePermissionDecodedParams;
+        const func = getFunctionFragment(action.data, UPDATE_PLUGIN_SIGNATURES);
+        switch (func.name) {
+          case "upgradeTo":
+            classifiedActions.push(ProposalActionTypes.UPGRADE_TO);
+            break;
+          case "upgradeToAndCall":
+            classifiedActions.push(ProposalActionTypes.UPGRADE_TO_AND_CALL);
+            break;
+          case "grant":
+            decodedPermission = decodeGrantAction(action.data);
+            // check the permission that is being granted
+            if (
+              decodedPermission.permission ===
+                Permissions.UPGRADE_PLUGIN_PERMISSION
+            ) {
+              classifiedActions.push(
+                ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+              );
+            } else if (
+              decodedPermission.permission === Permissions.ROOT_PERMISSION
+            ) {
+              classifiedActions.push(
+                ProposalActionTypes.GRANT_ROOT_PERMISSION,
+              );
+            }
+            break;
+          case "revoke":
+            decodedPermission = decodeRevokeAction(action.data);
+            // check the permission that is being granted
+            if (
+              decodedPermission.permission ===
+                Permissions.UPGRADE_PLUGIN_PERMISSION
+            ) {
+              classifiedActions.push(
+                ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
+              );
+            } else if (
+              decodedPermission.permission === Permissions.ROOT_PERMISSION
+            ) {
+              classifiedActions.push(
+                ProposalActionTypes.REVOKE_ROOT_PERMISSION,
+              );
+            }
+            break;
+          case "applyUpdate":
+            classifiedActions.push(ProposalActionTypes.APPLY_UPDATE);
+            break;
+          default:
+            classifiedActions.push(ProposalActionTypes.ACTION_NOT_ALLOWED);
+            break;
+        }
+      } catch {
+        classifiedActions.push(ProposalActionTypes.UNKNOWN);
+      }
+    }
+    return classifiedActions;
+  }
+  private isPluginUpdateActionWithRootPermission(
+    actions: ProposalActionTypes[],
+  ): boolean {
+    // get the first 4 actions
+    const receivedPattern = actions.slice(0, 4);
+    // check if it matches the expected pattern
+    // length should be 5
     if (
-      [grantIndex, applyUpdateIndex, revokeIndex].includes(-1) ||
-      grantIndex > applyUpdateIndex ||
-      applyUpdateIndex > revokeIndex
+      actions.length !== 5 ||
+      !compareArrays(receivedPattern, PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN)
     ) {
-      causes.push(PluginUpdateProposalInValidityCause.INVALID_ACTIONS);
+      return false;
+    }
+    return true;
+  }
+  private isPluginUpdateAction(actions: ProposalActionTypes[]): boolean {
+    // get the first 3 actions
+    const receivedPattern = actions.slice(0, 2);
+    // check if it matches the expected pattern
+    // length should be 3
+    if (
+      actions.length !== 3 ||
+      !compareArrays(receivedPattern, PLUGIN_UPDATE_ACTION_PATTERN)
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  // private splitActionsAfterRevoke(
+  //   actions: ProposalActionTypes[],
+  // ): ProposalActionTypes[][] {
+  //   const subArrays: ProposalActionTypes[][] = [];
+  //   let count = 0;
+  //   for (const action of actions) {
+  //     subArrays[count].push(action);
+  //     if (action === ProposalActionTypes.REVOKE) {
+  //       count++;
+  //     }
+  //   }
+  //   return subArrays;
+  // }
+
+  private validateUpdatePluginPermissionAction(
+    action: DaoAction,
+    daoAddress: string,
+    operation: PermissionOperationType,
+  ) {
+    const causes: PluginUpdateProposalInValidityCause[] = [];
+    const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
+    const decodedPermission = decodeGrantAction(action.data);
+    if (decodedPermission.who !== pspAddress) {
+      if (operation === PermissionOperationType.GRANT) {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_GRANT_UPDATE_PREMISSION_WHO_ADDRESS,
+        );
+      } else {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_REVOKE_UPDATE_PREMISSION_WHO_ADDRESS,
+        );
+      }
+    }
+    if (decodedPermission.where !== daoAddress) {
+      if (operation === PermissionOperationType.GRANT) {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_GRANT_UPDATE_PERMISSION_WHERE_ADDRESS,
+        );
+      } else {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_REVOKE_UPDATE_PERMISSION_WHERE_ADDRESS,
+        );
+      }
+    }
+    if (action.value.toString() !== "0") {
+      if (operation === PermissionOperationType.GRANT) {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_GRANT_UPDATE_PERMISSION_VALUE,
+        );
+      } else {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_REVOKE_UPDATE_PERMISSION_VALUE,
+        );
+      }
+    }
+    if (
+      decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
+    ) {
+      if (operation === PermissionOperationType.GRANT) {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_GRANT_UPDATE_PERMISSION_PERMISSION,
+        );
+      } else {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION,
+        );
+      }
+    }
+    if (
+      decodedPermission.permissionId !== PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
+    ) {
+      if (operation === PermissionOperationType.GRANT) {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_GRANT_UPDATE_PERMISSION_PERMISSION_ID,
+        );
+      } else {
+        causes.push(
+          PluginUpdateProposalInValidityCause
+            .INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION_ID,
+        );
+      }
+    }
+    return causes;
+  }
+
+  public isPluginUpdateValid(
+    params: IsPluginUpdateValidParams,
+  ): PluginUpdateProposalValidity {
+    IsPluginUpdateValidSchema.strict().validate(params);
+    let causes: PluginUpdateProposalInValidityCause[] = [];
+    const { actions, daoAddress } = params;
+    const classifiedActions = this.classifyProposalActions(params.actions);
+    if (this.isPluginUpdateAction(classifiedActions)) {
+      //
+      for (const [index, action] of classifiedActions.entries()) {
+        switch (action) {
+          case ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION:
+            causes.concat(
+              this.validateUpdatePluginPermissionAction(
+                actions[index],
+                daoAddress,
+                PermissionOperationType.GRANT,
+              )
+            );
+            break;
+          case ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION:
+            causes.concat(
+              this.validateUpdatePluginPermissionAction(
+                actions[index],
+                daoAddress,
+                PermissionOperationType.REVOKE,
+              )
+            );
+            break;
+          case ProposalActionTypes.APPLY_UPDATE:
+            this.validateApplyUpdateAction(actions[index], daoAddress);
+            break;
+        }
+      }
+    } else if (this.isPluginUpdateActionWithRootPermission(classifiedActions)) {
+      for (const [index, action] of classifiedActions.entries()) {
+        switch (action) {
+          case ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION:
+          case ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION:
+            this.validateUpdatePluginPermissionAction(actions[index]);
+            break;
+          case ProposalActionTypes.GRANT_ROOT_PERMISSION:
+          case ProposalActionTypes.REVOKE_ROOT_PERMISSION:
+            this.validateRootPermissionAction(actions[index]);
+            break;
+          case ProposalActionTypes.APPLY_UPDATE:
+            this.validateApplyUpdateAction(actions[index], daoAddress);
+            break;
+        }
+      }
+    } else {
       return {
-        isValid: causes.length === 0,
-        causes,
+        isValid: false,
+        causes: [PluginUpdateProposalInValidityCause.INVALID_ACTIONS],
       };
     }
 
-    // check grant action
-    if (
-      !this.isPluginUpdatePermissionValid(
-        decodeGrantAction(params.actions[grantIndex].data),
-        params.daoAddress,
-      )
-    ) {
-      causes.push(PluginUpdateProposalInValidityCause.INVALID_GRANT_PERMISSION);
-    }
+    // let { actions, daoAddress } = params;
+    // if (actions.length < 3) {
+    //   return {
+    //     isValid: false,
+    //     causes: [PluginUpdateProposalInValidityCause.INVALID_ACTIONS],
+    //   };
+    // }
+    // // check if the first action is an upgradeTo or upgradeToAndCall
+    // if (this.isDaoUpdate([params.actions[0]])) {
+    //   // if it is a dao update remove the first action and continue
+    //   // with the rest of the actions
+    //   actions = params.actions.slice(1);
+    // }
+    // // declare available function signatures
+    // const grantSignature = DAO__factory.createInterface().getFunction("grant")
+    //   .format("minimal");
+    // const revokeSignature = DAO__factory.createInterface().getFunction("revoke")
+    //   .format("minimal");
 
-    // check revoke action
-    if (
-      !this.isPluginUpdatePermissionValid(
-        decodeRevokeAction(params.actions[revokeIndex].data),
-        params.daoAddress,
-      )
-    ) {
-      causes.push(
-        PluginUpdateProposalInValidityCause.INVALID_REVOKE_PERMISSION,
-      );
-    }
+    // const grantUpdateIndex = findActionIndex(actions, grantSignature);
 
-    // check apply update action
-    const decodedApplyUpdateActionParams = decodeApplyUpdateAction(
-      params.actions[applyUpdateIndex].data,
-    );
-    const applyUpdateCauses = await this.checkApplyUpdateActionInvalidityCauses(
-      params.daoAddress,
-      decodedApplyUpdateActionParams,
-    );
-    causes.push(...applyUpdateCauses);
-    return {
-      isValid: causes.length === 0,
-      causes,
-    };
+    // if (grantUpdateIndex !== 0) {
+    //   return {
+    //     isValid: false,
+    //     causes: [PluginUpdateProposalInValidityCause.INVALID_ACTIONS],
+    //   };
+    // }
+
+    // const revokeUpdateIndex = findActionIndex(actions, revokeSignature);
+
+    // // revoke should be in the third or fifth position of the list
+    // let grantUpdatePluginPermissionInvalidityCauses:
+    //     PluginUpdateProposalInValidityCause[] = [],
+    //   applyUpdateInvalidityCauses: PluginUpdateProposalInValidityCause[] = [],
+    //   grantRootInvalidityCauses: PluginUpdateProposalInValidityCause[] = [],
+    //   revokeRootInvalidityCauses: PluginUpdateProposalInValidityCause[] = [],
+    //   revokeUpdatePluginPermissionInvalidityCauses:
+    //     PluginUpdateProposalInValidityCause[] = [];
+
+    // switch (revokeUpdateIndex) {
+    //   case 2:
+    //     // we can assume that the middle one is an applyUpdate
+    //     grantUpdatePluginPermissionInvalidityCauses = this
+    //       .validateGrantUpdatePluginPermissionAction(actions[0], daoAddress);
+    //     applyUpdateInvalidityCauses = this.validateApplyUpdateAction(
+    //       actions[1],
+    //     );
+    //     revokeUpdatePluginPermissionInvalidityCauses = this
+    //       .validateGrantUpdatePluginPermissionAction(actions[2]);
+    //     actions = actions.slice(3);
+    //     break;
+    //   case 4:
+    //     grantUpdatePluginPermissionInvalidityCauses = this
+    //       .validateGrantUpdatePluginPermissionAction(actions[0]);
+    //     grantRootInvalidityCauses = this.validateApplyUpdateAction(
+    //       actions[1],
+    //     );
+    //     applyUpdateInvalidityCauses = this.validateApplyUpdateAction(
+    //       actions[2],
+    //     );
+    //     revokeRootInvalidityCauses = this.validateApplyUpdateAction(
+    //       actions[3],
+    //     );
+    //     applyUpdateInvalidityCauses = this.validateApplyUpdateAction(
+    //       actions[4],
+    //     );
+    //     revokeUpdatePluginPermissionInvalidityCauses = this
+    //       .validateGrantUpdatePluginPermissionAction(actions[4]);
+    //     actions = actions.slice(5);
+    //     break;
+    //   default:
+    //     return {
+    //       isValid: false,
+    //       causes: [PluginUpdateProposalInValidityCause.INVALID_ACTIONS],
+    //     };
+    // }
+
+    // let causes: PluginUpdateProposalInValidityCause[] = [
+    //   ...grantUpdatePluginPermissionInvalidityCauses,
+    //   ...applyUpdateInvalidityCauses,
+    //   ...revokeUpdatePluginPermissionInvalidityCauses,
+    //   ...grantRootInvalidityCauses,
+    //   ...revokeRootInvalidityCauses,
+    // ];
+    // if (actions.length > 0) {
+    //   causes = [
+    //     ...this.isPluginUpdateValid({
+    //       daoAddress: params.daoAddress,
+    //       actions,
+    //     }).causes,
+    //     ...causes,
+    //   ];
+    // }
+    // return {
+    //   isValid: true,
+    //   causes,
+    // };
+
+    // const causes: PluginUpdateProposalInValidityCause[] = [];
+    // // get expected actions signatures
+
+    // // find signatures in the actions specified in the proposal
+    // const grantIndex = findActionIndex(params.actions, grantSignature);
+    // const applyUpdateIndex = findActionIndex(
+    //   params.actions,
+    //   applyUpdateSignature,
+    // );
+    // const revokeIndex = findActionIndex(params.actions, revokeSignature);
+
+    // // check that all actions are present and in the correct order
+    // if (
+    //   [grantIndex, applyUpdateIndex, revokeIndex].includes(-1) ||
+    //   grantIndex > applyUpdateIndex ||
+    //   applyUpdateIndex > revokeIndex
+    // ) {
+    //   causes.push(PluginUpdateProposalInValidityCause.INVALID_ACTIONS);
+    //   return {
+    //     isValid: causes.length === 0,
+    //     causes,
+    //   };
+    // }
+
+    // // check grant action
+    // if (
+    //   !this.isPluginUpdatePermissionValid(
+    //     decodeGrantAction(params.actions[grantIndex].data),
+    //     params.daoAddress,
+    //   )
+    // ) {
+    //   causes.push(PluginUpdateProposalInValidityCause.INVALID_GRANT_PERMISSION);
+    // }
+
+    // // check revoke action
+    // if (
+    //   !this.isPluginUpdatePermissionValid(
+    //     decodeRevokeAction(params.actions[revokeIndex].data),
+    //     params.daoAddress,
+    //   )
+    // ) {
+    //   causes.push(
+    //     PluginUpdateProposalInValidityCause.INVALID_REVOKE_PERMISSION,
+    //   );
+    // }
+
+    // // check apply update action
+    // const decodedApplyUpdateActionParams = decodeApplyUpdateAction(
+    //   params.actions[applyUpdateIndex].data,
+    // );
+    // const applyUpdateCauses = await this.checkApplyUpdateActionInvalidityCauses(
+    //   params.daoAddress,
+    //   decodedApplyUpdateActionParams,
+    // );
+    // causes.push(...applyUpdateCauses);
+    // return {
+    //   isValid: causes.length === 0,
+    //   causes,
+    // };
   }
   /**
    * Check if the specified actions are valid for updating a dao
