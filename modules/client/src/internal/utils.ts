@@ -1133,10 +1133,11 @@ export async function validateApplyUpdateFunction(
     const metadata = await ipfs.fetchString(metadataCid!);
     const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
     // get the update abi for the specified build
-    const updateAbi = metadataJson.pluginSetup
-      .prepareUpdate[decodedParams.versionTag.build]?.inputs;
-    if (updateAbi) {
+    if (metadataJson?.pluginSetup?.prepareUpdate[decodedParams.versionTag.build]?.inputs) {
       // if the abi exists try to decode the data
+      const updateAbi = metadataJson.pluginSetup.prepareUpdate[
+        decodedParams.versionTag.build
+      ].inputs;
       try {
         if (
           decodedParams.initData.length > 0 &&
@@ -1168,7 +1169,9 @@ export async function validateApplyUpdateFunction(
   return causes;
 }
 
-export function classifyProposalActions(actions: DaoAction[]): ProposalActionTypes[] {
+export function classifyProposalActions(
+  actions: DaoAction[],
+): ProposalActionTypes[] {
   const classifiedActions: ProposalActionTypes[] = [];
 
   for (const action of actions) {
