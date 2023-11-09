@@ -420,13 +420,55 @@ export type DecodedInitializeFromParams = {
 
 export type PluginUpdateProposalValidity = {
   isValid: boolean;
-  causes: PluginUpdateProposalInValidityCause[];
+  causes: PluginUpdateProposalInValidityCause[][];
 };
 
 export enum PluginUpdateProposalInValidityCause {
+  // Grant UPDATE_PLUGIN_PERMISSION action
+  INVALID_GRANT_UPDATE_PERMISSION_WHO_ADDRESS =
+    "invalidGrantUpdatePermissionWhoAddress",
+  INVALID_GRANT_UPDATE_PERMISSION_WHERE_ADDRESS =
+    "invalidGrantUpdatePermissionWhereAddress",
+  INVALID_GRANT_UPDATE_PERMISSION_PERMISSION =
+    "invalidGrantUpdatePermissionPermission",
+  INVALID_GRANT_UPDATE_PERMISSION_VALUE =
+    "invalidGrantUpdatePermissionCondition",
+  INVALID_GRANT_UPDATE_PERMISSION_PERMISSION_ID =
+    "invalidGrantUpdatePermissionPermissionId",
+  // Revoke UPDATE_PLUGIN_PERMISSION action
+  INVALID_REVOKE_UPDATE_PERMISSION_WHO_ADDRESS =
+    "invalidRevokeUpdatePermissionWhoAddress",
+  INVALID_REVOKE_UPDATE_PERMISSION_WHERE_ADDRESS =
+    "invalidRevokeUpdatePermissionWhereAddress",
+  INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION =
+    "invalidRevokeUpdatePermissionPermission",
+  INVALID_REVOKE_UPDATE_PERMISSION_VALUE =
+    "invalidRevokeUpdatePermissionCondition",
+  INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION_ID =
+    "invalidRevokeUpdatePermissionPermissionId",
+  // Grant ROOT_PERMISSION action
+  INVALID_GRANT_ROOT_PERMISSION_WHO_ADDRESS =
+    "invalidGrantRootPermissionWhoAddress",
+  INVALID_GRANT_ROOT_PERMISSION_WHERE_ADDRESS =
+    "invalidGrantRootPermissionWhereAddress",
+  INVALID_GRANT_ROOT_PERMISSION_PERMISSION =
+    "invalidGrantRootPermissionPermission",
+  INVALID_GRANT_ROOT_PERMISSION_VALUE = "invalidGrantRootPermissionCondition",
+  INVALID_GRANT_ROOT_PERMISSION_PERMISSION_ID =
+    "invalidGrantRootPermissionPermissionId",
+  // Revoke ROOT_PERMISSION action
+  INVALID_REVOKE_ROOT_PERMISSION_WHO_ADDRESS =
+    "invalidRevokeRootPermissionWhoAddress",
+  INVALID_REVOKE_ROOT_PERMISSION_WHERE_ADDRESS =
+    "invalidRevokeRootPermissionWhereAddress",
+  INVALID_REVOKE_ROOT_PERMISSION_PERMISSION =
+    "invalidRevokeRootPermissionPermission",
+  INVALID_REVOKE_ROOT_PERMISSION_VALUE = "invalidRevokeRootPermissionCondition",
+  INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_ID =
+    "invalidRevokeRootPermissionPermissionId",
+  // applyUpdate action
   INVALID_ACTIONS = "invalidActions",
-  INVALID_GRANT_PERMISSION = "invalidGrantPermission",
-  INVALID_REVOKE_PERMISSION = "invalidRevokePermission",
+  INVALID_APPLY_UPDATE_ACTION_VALUE = "invalidApplyUpdateActionValue",
   PLUGIN_NOT_INSTALLED = "pluginNotInstalled",
   NOT_ARAGON_PLUGIN_REPO = "notAragonPluginRepo",
   MISSING_PLUGIN_REPO = "missingPluginRepo",
@@ -460,6 +502,7 @@ export type DaoUpdateProposalValidity = {
 type IsUpdateParamsBase = {
   actions: DaoAction[];
   daoAddress: string;
+  pluginAddress: string;
 };
 
 export type IsDaoUpdateValidParams = IsUpdateParamsBase & {

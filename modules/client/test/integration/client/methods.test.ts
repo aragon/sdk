@@ -1,4 +1,4 @@
-// mocks need to be at the top of the imports
+l// mocks need to be at the top of the imports
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 

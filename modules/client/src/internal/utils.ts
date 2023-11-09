@@ -17,6 +17,7 @@ import {
   PluginRepo,
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
+  PluginUpdateProposalInValidityCause,
   RevokePermissionDecodedParams,
   RevokePermissionParams,
   Transfer,
@@ -27,6 +28,7 @@ import {
 import {
   ContractPermissionParams,
   ContractPermissionWithConditionParams,
+  ProposalActionTypes,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
@@ -42,6 +44,8 @@ import {
   SubgraphPluginPermissionOperation,
   SubgraphPluginPreparationListItem,
   SubgraphPluginRepo,
+  SubgraphPluginRepoRelease,
+  SubgraphPluginUpdatePreparation,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "./types";
@@ -63,6 +67,7 @@ import {
   DecodedApplyInstallationParams,
   DecodedApplyUpdateParams,
   getFunctionFragment,
+  getNamedTypesFromMetadata,
   hexToBytes,
   InterfaceParams,
   InvalidParameter,
@@ -71,6 +76,7 @@ import {
   NotImplementedError,
   PermissionIds,
   PermissionOperationType,
+  Permissions,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { Signer } from "@ethersproject/abstract-signer";
@@ -79,13 +85,30 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
 import { SubgraphAction } from "../client-common";
-import { PreparationType, ZERO_BYTES_HASH } from "./constants";
+import {
+  PLUGIN_UPDATE_ACTION_PATTERN,
+  PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN,
+  PreparationType,
+  SupportedPluginRepo,
+  SupportedPluginRepoArray,
+  UPDATE_PLUGIN_SIGNATURES,
+  ZERO_BYTES_HASH,
+} from "./constants";
 import {
   DepositErc1155Schema,
   DepositErc20Schema,
   DepositErc721Schema,
   DepositEthSchema,
 } from "./schemas";
+import {
+  IClientGraphQLCore,
+  IClientIpfsCore,
+} from "@aragon/sdk-client-common/dist/internal";
+import {
+  QueryDao,
+  QueryPlugin,
+  QueryPluginPreparations,
+} from "./graphql-queries";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -836,6 +859,405 @@ export function compareArrays<T>(array1: T[], array2: T[]): boolean {
     if (element !== array2[index]) {
       return false;
     }
+  }
+  return true;
+}
+export function validateGrantUpdatePluginPermissionAction(
+  action: DaoAction,
+  pluginAddress: string,
+  pspAddress: string,
+): PluginUpdateProposalInValidityCause[] {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  const decodedPermission = decodeGrantAction(action.data);
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_UPDATE_PERMISSION_VALUE,
+    );
+  }
+  if (decodedPermission.where !== pluginAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_UPDATE_PERMISSION_WHERE_ADDRESS,
+    );
+  }
+  if (decodedPermission.who !== pspAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_UPDATE_PERMISSION_WHO_ADDRESS,
+    );
+  }
+  if (
+    decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_UPDATE_PERMISSION_PERMISSION,
+    );
+  }
+  if (
+    decodedPermission.permissionId !==
+      PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_UPDATE_PERMISSION_PERMISSION_ID,
+    );
+  }
+  return causes;
+}
+export function validateRevokeUpdatePluginPermissionAction(
+  action: DaoAction,
+  pluginAddress: string,
+  pspAddress: string,
+): PluginUpdateProposalInValidityCause[] {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  const decodedPermission = decodeRevokeAction(action.data);
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_UPDATE_PERMISSION_VALUE,
+    );
+  }
+  if (decodedPermission.where !== pluginAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_UPDATE_PERMISSION_WHERE_ADDRESS,
+    );
+  }
+  if (decodedPermission.who !== pspAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_UPDATE_PERMISSION_WHO_ADDRESS,
+    );
+  }
+  if (
+    decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION,
+    );
+  }
+  if (
+    decodedPermission.permissionId !==
+      PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION_ID,
+    );
+  }
+  return causes;
+}
+export function validateGrantRootPermissionAction(
+  action: DaoAction,
+  daoAddress: string,
+  pspAddress: string,
+): PluginUpdateProposalInValidityCause[] {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  const decodedPermission = decodeGrantAction(action.data);
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_VALUE,
+    );
+  }
+  if (decodedPermission.where !== daoAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_WHERE_ADDRESS,
+    );
+  }
+  if (decodedPermission.who !== pspAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_WHO_ADDRESS,
+    );
+  }
+  if (
+    decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_PERMISSION,
+    );
+  }
+  if (
+    decodedPermission.permissionId !==
+      PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_PERMISSION_ID,
+    );
+  }
+  return causes;
+}
+export function validateRevokeRootPermissionAction(
+  action: DaoAction,
+  daoAddress: string,
+  pspAddress: string,
+): PluginUpdateProposalInValidityCause[] {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  const decodedPermission = decodeRevokeAction(action.data);
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_VALUE,
+    );
+  }
+  if (decodedPermission.where !== daoAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_WHERE_ADDRESS,
+    );
+  }
+  if (decodedPermission.who !== pspAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_WHO_ADDRESS,
+    );
+  }
+  if (
+    decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_PERMISSION,
+    );
+  }
+  if (
+    decodedPermission.permissionId !==
+      PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_ID,
+    );
+  }
+  return causes;
+}
+export async function validateApplyUpdateFunction(
+  action: DaoAction,
+  daoAddress: string,
+  graphql: IClientGraphQLCore,
+  ipfs: IClientIpfsCore,
+): Promise<PluginUpdateProposalInValidityCause[]> {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause.INVALID_APPLY_UPDATE_ACTION_VALUE,
+    );
+  }
+  const decodedParams = decodeApplyUpdateAction(
+    action.data,
+  );
+  // get dao with plugins
+  type U = { dao: SubgraphDao };
+  const { dao } = await graphql.request<U>({
+    query: QueryDao,
+    params: { address: daoAddress },
+    name: "dao",
+  });
+  // find the plugin with the same address
+  const plugin = dao.plugins.find((plugin) =>
+    plugin.appliedPreparation?.pluginAddress ===
+      decodedParams.pluginAddress
+  );
+  if (plugin) {
+    // check release is the same as the one installed
+    if (
+      plugin.appliedVersion?.release.release !==
+        decodedParams.versionTag.release
+    ) {
+      causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE);
+    }
+    // check build is higher than the one installed
+    if (
+      !plugin.appliedVersion?.build ||
+      plugin.appliedVersion?.build >=
+        decodedParams.versionTag.build
+    ) {
+      causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD);
+    }
+  } else {
+    causes.push(PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED);
+    return causes;
+  }
+  // check if plugin repo (pluginSetupRepo) exist
+  type V = { pluginRepo: SubgraphPluginRepo };
+  const { pluginRepo } = await graphql.request<V>({
+    query: QueryPlugin,
+    params: { id: decodedParams.pluginRepo },
+    name: "pluginRepo",
+  });
+  if (pluginRepo) {
+    // check if is one of the aragon plugin repos
+    if (
+      !SupportedPluginRepoArray.includes(
+        pluginRepo.subdomain as SupportedPluginRepo,
+      )
+    ) {
+      causes.push(PluginUpdateProposalInValidityCause.NOT_ARAGON_PLUGIN_REPO);
+    }
+  } else {
+    causes.push(PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO);
+    return causes;
+  }
+
+  // get the prepared setup id
+  const preparedSetupId = getPreparedSetupId(
+    decodedParams,
+    PreparationType.UPDATE,
+  );
+  // get plugin preparation
+  type W = { pluginPreparation: SubgraphPluginUpdatePreparation };
+  const { pluginPreparation } = await graphql.request<W>({
+    query: QueryPluginPreparations,
+    params: { where: { preparedSetupId } },
+    name: "pluginPreparation",
+  });
+  if (pluginPreparation) {
+    // get the metadata of the plugin repo
+    // for the release and build specified
+    const release = pluginRepo.releases.find((
+      release: SubgraphPluginRepoRelease,
+    ) => release.release === decodedParams.versionTag.release);
+    const build = release?.builds.find((
+      build: { build: number; metadata: string },
+    ) => build.build === decodedParams.versionTag.build);
+    const metadataCid = build?.metadata;
+
+    // fetch the metadata
+    const metadata = await ipfs.fetchString(metadataCid!);
+    const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
+    // get the update abi for the specified build
+    const updateAbi = metadataJson.pluginSetup
+      .prepareUpdate[decodedParams.versionTag.build]?.inputs;
+    if (updateAbi) {
+      // if the abi exists try to decode the data
+      try {
+        if (
+          decodedParams.initData.length > 0 &&
+          updateAbi.length === 0
+        ) {
+          throw new Error();
+        }
+        // if the decode does not throw an error the data is valid
+        defaultAbiCoder.decode(
+          getNamedTypesFromMetadata(updateAbi),
+          decodedParams.initData,
+        );
+      } catch {
+        // if the decode throws an error the data is invalid
+        causes.push(
+          PluginUpdateProposalInValidityCause.INVALID_DATA,
+        );
+      }
+    } else {
+      causes.push(
+        PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
+      );
+    }
+  } else {
+    causes.push(
+      PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
+    );
+  }
+  return causes;
+}
+
+export function classifyProposalActions(actions: DaoAction[]): ProposalActionTypes[] {
+  const classifiedActions: ProposalActionTypes[] = [];
+
+  for (const action of actions) {
+    try {
+      let decodedPermission:
+        | GrantPermissionDecodedParams
+        | RevokePermissionDecodedParams;
+      const func = getFunctionFragment(action.data, UPDATE_PLUGIN_SIGNATURES);
+      switch (func.name) {
+        case "upgradeTo":
+          classifiedActions.push(ProposalActionTypes.UPGRADE_TO);
+          break;
+        case "upgradeToAndCall":
+          classifiedActions.push(ProposalActionTypes.UPGRADE_TO_AND_CALL);
+          break;
+        case "grant":
+          decodedPermission = decodeGrantAction(action.data);
+          // check the permission that is being granted
+          if (
+            decodedPermission.permission ===
+              Permissions.UPGRADE_PLUGIN_PERMISSION
+          ) {
+            classifiedActions.push(
+              ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            );
+          } else if (
+            decodedPermission.permission === Permissions.ROOT_PERMISSION
+          ) {
+            classifiedActions.push(
+              ProposalActionTypes.GRANT_ROOT_PERMISSION,
+            );
+          }
+          break;
+        case "revoke":
+          decodedPermission = decodeRevokeAction(action.data);
+          // check the permission that is being granted
+          if (
+            decodedPermission.permission ===
+              Permissions.UPGRADE_PLUGIN_PERMISSION
+          ) {
+            classifiedActions.push(
+              ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
+            );
+          } else if (
+            decodedPermission.permission === Permissions.ROOT_PERMISSION
+          ) {
+            classifiedActions.push(
+              ProposalActionTypes.REVOKE_ROOT_PERMISSION,
+            );
+          }
+          break;
+        case "applyUpdate":
+          classifiedActions.push(ProposalActionTypes.APPLY_UPDATE);
+          break;
+        default:
+          classifiedActions.push(ProposalActionTypes.ACTION_NOT_ALLOWED);
+          break;
+      }
+    } catch {
+      classifiedActions.push(ProposalActionTypes.UNKNOWN);
+    }
+  }
+  return classifiedActions;
+}
+export function isPluginUpdateActionWithRootPermission(
+  actions: ProposalActionTypes[],
+): boolean {
+  // get the first 4 actions
+  const receivedPattern = actions.slice(0, 4);
+  // check if it matches the expected pattern
+  // length should be 5
+  if (
+    actions.length !== 5 ||
+    !compareArrays(receivedPattern, PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN)
+  ) {
+    return false;
+  }
+  return true;
+}
+export function isPluginUpdateAction(actions: ProposalActionTypes[]): boolean {
+  // get the first 3 actions
+  const receivedPattern = actions.slice(0, 2);
+  // check if it matches the expected pattern
+  // length should be 3
+  if (
+    actions.length !== 3 ||
+    !compareArrays(receivedPattern, PLUGIN_UPDATE_ACTION_PATTERN)
+  ) {
+    return false;
   }
   return true;
 }
