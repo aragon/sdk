@@ -456,7 +456,7 @@ export const ADDITIONAL_NETWORKS: Network[] = [
   },
   {
     name: "sepolia",
-    chainId: 58008,
+    chainId: 11155111,
   },
   {
     name: "local",
