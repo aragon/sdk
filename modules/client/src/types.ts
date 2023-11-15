@@ -424,6 +424,7 @@ export type PluginUpdateProposalValidity = {
 };
 
 export enum PluginUpdateProposalInValidityCause {
+  PROPOSAL_NOT_FOUND = "proposalNotFound",
   // Grant UPDATE_PLUGIN_PERMISSION action
   INVALID_GRANT_UPDATE_PERMISSION_WHO_ADDRESS =
     "invalidGrantUpdatePermissionWhoAddress",
@@ -488,10 +489,16 @@ export type IsPluginUpdateProposalValidParams = {
 };
 
 export enum DaoUpdateProposalInvalidityCause {
+  PROPOSAL_NOT_FOUND = "proposalNotFound",
   INVALID_ACTIONS = "invalidActions",
-  INVALID_IMPLEMENTATION = "invalidImplementation",
-  INVALID_VERSION = "invalidVersion",
-  INVALID_INIT_DATA = "invalidInitData",
+  INVALID_TO_ADDRESS = "invalidToAddress",
+  INVALID_VALUE = "invalidValue",
+  INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS =
+    "invalidUpgradeToImplementationAddress",
+  INVALID_UPGRADE_TO_AND_CALL_DATA = "invalidUpgradeToAndCallData",
+  INVALID_UPGRADE_TO_AND_CALL_IMPLEMENTATION_ADDRESS =
+    "invalidUpgradeToAndCallImplementationAddress",
+  INVALID_UPGRADE_TO_AND_CALL_VERSION = "invalidUpgradeToAndCallVersion",
 }
 
 export type DaoUpdateProposalValidity = {

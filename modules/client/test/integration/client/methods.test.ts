@@ -18,7 +18,6 @@ import {
   TEST_NO_BALANCES_DAO_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
   TEST_TX_HASH,
-  TOKEN_VOTING_BUILD_METADATA,
   // TEST_WALLET,
 } from "../constants";
 import {
@@ -40,6 +39,7 @@ import {
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
   PluginSortBy,
+  PluginUpdateProposalInValidityCause,
   SetAllowanceParams,
   SetAllowanceSteps,
   TransferQueryParams,
@@ -51,6 +51,7 @@ import { Server } from "ganache";
 import {
   SubgraphBalance,
   SubgraphDao,
+  SubgraphIProposal,
   SubgraphPluginInstallation,
   SubgraphPluginPermissionOperation,
   SubgraphPluginPreparationListItem,
@@ -95,7 +96,10 @@ import {
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { SupportedPluginRepo } from "../../../src/internal/constants";
 import { ValidationError } from "yup";
-import { toPluginPermissionOperationType } from "../../../src/internal/utils";
+import {
+  toPluginPermissionOperationType,
+  toSubgraphActions,
+} from "../../../src/internal/utils";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -1866,30 +1870,47 @@ describe("Client", () => {
     describe("isPluginUpdateValid", () => {
       const context = new Context();
       const client = new Client(context);
-      const mockedClient = mockedGraphqlRequest.getMockedInstance(
-        client.graphql.getClient(),
-      );
       let updateActions: DaoAction[];
       let applyUpdateParams: ApplyUpdateParams;
       let subgraphDao: SubgraphDao;
       let subgraphPluginRepo: SubgraphPluginRepo;
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
       let subgraphPluginPreparation: SubgraphPluginUpdatePreparation;
+      let subgraphIProposal: SubgraphIProposal;
+      beforeEach(() => {
+        mockedClient.request.mockReset();
+      });
       beforeAll(() => {
-        applyUpdateParams = {
-          helpers: [],
-          pluginAddress,
-          pluginRepo: ADDRESS_ONE,
-          initData: new Uint8Array(),
-          permissions: [],
-          versionTag: {
-            release: 1,
-            build: 2,
-          },
+        subgraphPluginPreparation = {
+          data: "0x",
         };
+
+        applyUpdateParams = {
+          versionTag: {
+            build: 2,
+            release: 1,
+          },
+          initData: new Uint8Array(),
+          pluginRepo: ADDRESS_ONE,
+          pluginAddress: ADDRESS_ONE,
+          permissions: [],
+          helpers: [],
+        };
+
         updateActions = client.encoding.applyUpdateAction(
           daoAddress,
           applyUpdateParams,
         );
+        subgraphIProposal = {
+          dao: {
+            id: daoAddress,
+          },
+          allowFailureMap: "0",
+          actions: toSubgraphActions(updateActions),
+        };
+
         subgraphDao = {
           id: daoAddress,
           subdomain: "test-tokenvoting-dao",
@@ -1910,8 +1931,9 @@ describe("Client", () => {
             },
           }],
         };
+
         subgraphPluginRepo = {
-          id: deployment.tokenVotingRepo.address,
+          id: ADDRESS_ONE,
           subdomain: SupportedPluginRepo.TOKEN_VOTING,
           releases: [
             {
@@ -1930,629 +1952,98 @@ describe("Client", () => {
             },
           ],
         };
-        subgraphPluginPreparation = {
-          data: "0x",
-        };
       });
-      it("should return an empty array when the actions are valid", async () => {
-        const ctx = new Context(contextParamsLocalChain);
-        const client = new Client(ctx);
-
-        mockedClient.request.mockResolvedValueOnce({
+      it("Should return true if the update is valid", async () => {
+        mockedClient.request.mockResolvedValue({
+          iproposal: subgraphIProposal,
+          pluginInstallations: [{
+            id: ADDRESS_ONE,
+          }],
           dao: subgraphDao,
-        });
-        mockedClient.request.mockResolvedValueOnce({
+          subgraphPreparation: subgraphPluginPreparation,
           pluginRepo: subgraphPluginRepo,
         });
-        mockedClient.request.mockResolvedValueOnce({
-          pluginPreparation: subgraphPluginPreparation,
-        });
-        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
-          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
-        ));
-
-        const result = await client.methods.isPluginUpdateValid({
-          daoAddress,
-          pluginAddress,
-          actions: updateActions,
-        });
-
-        expect(result.isValid).toBe(true);
-        expect(result.causes.length).toBe(0);
+        const res = await client.methods.isPluginUpdateValid(
+          TEST_MULTISIG_PROPOSAL_ID,
+        );
+        expect(res.isValid).toBe(true);
+        expect(res.causes).toMatchObject([[]]);
       });
-      //   it("should throw a `ProposalNotFoundError` for a proposal that does not exist", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-      //     expect(
-      //       () =>
-      //         client.methods.isPluginUpdateValid({
-      //           actions: [],
-      //           daoAddress,
-      //         }),
-      //     ).rejects.toThrow(
-      //       new Error("actions field must have at least 1 items"),
-      //     );
-      //   });
-      //   it("should return `INVALID_ACTIONS` when any of the required actions is not present", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         daoAddress,
-      //         actions: [updateActions[0], updateActions[1]],
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.INVALID_ACTIONS,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should return `INVALID_GRANT_PERMISSION` when the grant permission is invalid", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     const invalidGrantAction = client.encoding.grantAction(
-      //       daoAddress,
-      //       {
-      //         permission: Permissions.ROOT_PERMISSION,
-      //         where: pluginAddress,
-      //         who: daoAddress,
-      //       },
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: subgraphPluginRepo,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginPreparation: subgraphPluginPreparation,
-      //     });
-      //     mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
-      //       JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
-      //     ));
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         actions: [
-      //           invalidGrantAction,
-      //           updateActions[1],
-      //           updateActions[2],
-      //         ],
-      //         daoAddress,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.INVALID_GRANT_PERMISSION,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should return `INVALID_REVOKE_PERMISSION` when the grant permission is invalid", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     const invalidRevokeAction = client.encoding.revokeAction(
-      //       daoAddress,
-      //       {
-      //         permission: Permissions.ROOT_PERMISSION,
-      //         where: pluginAddress,
-      //         who: daoAddress,
-      //       },
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: subgraphPluginRepo,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginPreparation: subgraphPluginPreparation,
-      //     });
-      //     mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
-      //       JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
-      //     ));
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         daoAddress,
-      //         actions: [
-      //           updateActions[0],
-      //           updateActions[1],
-      //           invalidRevokeAction,
-      //         ],
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.INVALID_REVOKE_PERMISSION,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should return `INVALID_PLUGIN_RELEASE` when the release of the update is different", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     const invalidApplyUpdateActions = client.encoding.applyUpdateAction(
-      //       daoAddress,
-      //       { ...applyUpdateParams, versionTag: { release: 2, build: 2 } },
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: subgraphPluginRepo,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginPreparation: subgraphPluginPreparation,
-      //     });
-      //     mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
-      //       JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
-      //     ));
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         actions: invalidApplyUpdateActions,
-      //         daoAddress,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should return `INVALID_PLUGIN_BUILD` when the build of the update is equal or lower to the one installed", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     const invalidApplyUpdateActions = client.encoding.applyUpdateAction(
-      //       daoAddress,
-      //       { ...applyUpdateParams, versionTag: { release: 1, build: 1 } },
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: subgraphPluginRepo,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginPreparation: subgraphPluginPreparation,
-      //     });
-      //     mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
-      //       JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
-      //     ));
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         daoAddress,
-      //         actions: invalidApplyUpdateActions,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD,
-      //       ),
-      //     ).toBe(true);
-      //   });
-
-      //   it("should return `PLUGIN_NOT_INSTALLED` when the plugin is not installed in the dao", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: {
-      //         ...subgraphDao,
-      //         plugins: [{
-      //           subdomain: SupportedPluginRepo.TOKEN_VOTING,
-      //           appliedVersion: { build: 2, release: { release: 1 } },
-      //         }],
-      //       },
-      //     });
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         daoAddress,
-      //         actions: updateActions,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED,
-      //       ),
-      //     ).toBe(true);
-      //   });
-
-      //   it("should return `NOT_ARAGON_PLUGIN_REPO` when the plugin is not an aragon plugin", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: { ...subgraphPluginRepo, subdomain: "test" },
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginPreparation: subgraphPluginPreparation,
-      //     });
-      //     mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
-      //       JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
-      //     ));
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid(
-      //         {
-      //           daoAddress,
-      //           actions: updateActions,
-      //         },
-      //       );
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.NOT_ARAGON_PLUGIN_REPO,
-      //       ),
-      //     ).toBe(true);
-      //   });
-
-      //   it("should return `MISSING_PLUGIN_REPO` when the plugin repo does not exist", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: null,
-      //     });
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         daoAddress,
-      //         actions: updateActions,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO,
-      //       ),
-      //     ).toBe(true);
-      //   });
-
-      //   it("should return `INVALID_DATA` when the initData does not match the abi in metadata", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     const invalidApplyUpdateActions = client.encoding.applyUpdateAction(
-      //       daoAddress,
-      //       { ...applyUpdateParams, initData: updateActions[0].data },
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: subgraphPluginRepo,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginPreparation: subgraphPluginPreparation,
-      //     });
-      //     mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
-      //       JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
-      //     ));
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         actions: invalidApplyUpdateActions,
-      //         daoAddress,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.INVALID_DATA,
-      //       ),
-      //     ).toBe(true);
-      //   });
-
-      //   it("should return `INVALID_PLUGIN_REPO_METADATA` if the abi of the metadata is not available", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: subgraphPluginRepo,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginPreparation: subgraphPluginPreparation,
-      //     });
-
-      //     mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
-      //       JSON.stringify({
-      //         ...TOKEN_VOTING_BUILD_METADATA,
-      //         pluginSetup: {
-      //           ...TOKEN_VOTING_BUILD_METADATA.pluginSetup,
-      //           prepareUpdate: {},
-      //         },
-      //       }),
-      //     ));
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         daoAddress,
-      //         actions: updateActions,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should return `MISSING_PLUGIN_PREPARATION` if the preparation does not exist", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: subgraphPluginRepo,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginPreparation: null,
-      //     });
-
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         actions: updateActions,
-      //         daoAddress,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should pass and the `cause` array be empty", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //       client.graphql.getClient(),
-      //     );
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       dao: subgraphDao,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginRepo: subgraphPluginRepo,
-      //     });
-      //     mockedClient.request.mockResolvedValueOnce({
-      //       pluginPreparation: subgraphPluginPreparation,
-      //     });
-
-      //     mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
-      //       JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
-      //     ));
-
-      //     const validationResult = await client.methods
-      //       .isPluginUpdateValid({
-      //         daoAddress,
-      //         actions: updateActions,
-      //       });
-      //     expect(validationResult.isValid).toBe(true);
-      //     expect(validationResult.causes.length).toBe(0);
-      //   });
-      // });
-      // describe("isDaoUpdateValid", () => {
-      //   let upgradeToAndCallAction: DaoAction;
-      //   let upgradeToAndCallParams: UpgradeToAndCallParams;
-      //   let initializeFromParams: InitializeFromParams;
+      it("Should throw if the proposal does not exist", async () => {
+        mockedClient.request.mockResolvedValue({
+          iproposal: null,
+          pluginInstallations: [{
+            id: ADDRESS_ONE,
+          }],
+          dao: subgraphDao,
+          subgraphPreparation: subgraphPluginPreparation,
+          pluginRepo: subgraphPluginRepo,
+        });
+        const res = await client.methods.isPluginUpdateValid(
+          TEST_MULTISIG_PROPOSAL_ID,
+        );
+        expect(res.isValid).toBe(false);
+        expect(res.causes).toMatchObject([[
+          PluginUpdateProposalInValidityCause.PROPOSAL_NOT_FOUND,
+        ]]);
+      });
+      it("Should throw if the failure map is not 0", async () => {
+        mockedClient.request.mockResolvedValue({
+          iproposal: { ...subgraphIProposal, allowFailureMap: "1" },
+          pluginInstallations: [{
+            id: ADDRESS_ONE,
+          }],
+          dao: subgraphDao,
+          subgraphPreparation: subgraphPluginPreparation,
+          pluginRepo: subgraphPluginRepo,
+        });
+        const res = await client.methods.isPluginUpdateValid(
+          TEST_MULTISIG_PROPOSAL_ID,
+        );
+        expect(res.isValid).toBe(false);
+        expect(res.causes).toMatchObject([[
+          PluginUpdateProposalInValidityCause.INVALID_ALLOW_FAILURE_MAP,
+        ]]);
+      });
+    });
+    describe("isDaoUpdateValid", () => {
+      // it("Should return true for a valid update", async () => {
+      //   const context = new Context();
+      //   const client = new Client(context);
       //   let initializeFromAction: DaoAction;
-      //   let implementationAddress: string;
-      //   beforeAll(async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-      //     initializeFromParams = {
+      //   let upgradeToAndCallAction: DaoAction;
+      //   initializeFromAction = client.encoding.initializeFromAction(
+      //     daoAddress,
+      //     {
+      //       initData: new Uint8Array(),
       //       previousVersion: [1, 0, 0],
-      //     };
-      //     initializeFromAction = client.encoding.initializeFromAction(
-      //       daoAddressV1,
-      //       initializeFromParams,
-      //     );
-      //     implementationAddress = await client.methods.getDaoImplementation(
-      //       deployment.daoFactory.address,
-      //     );
-      //     upgradeToAndCallParams = {
-      //       implementationAddress,
+      //     },
+      //   );
+      //   upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
+      //     daoAddressV1,
+      //     {
       //       data: initializeFromAction.data,
-      //     };
-      //     upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
-      //       daoAddressV1,
-      //       upgradeToAndCallParams,
-      //     );
-      //   });
-      //   it("should return `INVALID_ACTIONS` when the action is not an upgradeToAndCall", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const invalidAction = client.encoding.upgradeToAction(
-      //       daoAddressV1,
-      //       ADDRESS_ONE,
-      //     );
-
-      //     const validationResult = await client.methods
-      //       .isDaoUpdateValid({
-      //         actions: [invalidAction],
-      //         daoAddress: daoAddressV1,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         DaoUpdateProposalInvalidityCause.INVALID_ACTIONS,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should return `INVALID_ACTIONS` when the call data is not an encoded initializeFrom", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-      //     const invalidAction = client.encoding.upgradeToAction(
-      //       daoAddressV1,
-      //       ADDRESS_ONE,
-      //     );
-      //     const upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
-      //       daoAddressV1,
-      //       {
-      //         implementationAddress,
-      //         data: invalidAction.data,
+      //       implementationAddress: "0x1234567890123456789012345678901234567890",
+      //     },
+      //   );
+      //   const mockedClient = mockedGraphqlRequest.getMockedInstance(
+      //     client.graphql.getClient(),
+      //   );
+      //   mockedClient.request.mockResolvedValueOnce({
+      //     iproposal: {
+      //       dao: {
+      //         id: daoAddress,
       //       },
-      //     );
-      //     const validationResult = await client.methods
-      //       .isDaoUpdateValid({
-      //         actions: [upgradeToAndCallAction],
-      //         daoAddress: daoAddressV1,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         DaoUpdateProposalInvalidityCause.INVALID_ACTIONS,
-      //       ),
-      //     ).toBe(true);
+      //       allowFailureMap: "0",
+      //       actions: toSubgraphActions([upgradeToAndCallAction]),
+      //     },
       //   });
-      //   it("should return `INVALID_VERSION` when the specified previous version is different from the real currentVersion", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const invalidAction = client.encoding.initializeFromAction(
-      //       daoAddressV1,
-      //       {
-      //         previousVersion: [1, 3, 0],
-      //       },
-      //     );
-      //     const upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
-      //       daoAddressV1,
-      //       {
-      //         implementationAddress,
-      //         data: invalidAction.data,
-      //       },
-      //     );
-
-      //     const validationResult = await client.methods
-      //       .isDaoUpdateValid({
-      //         actions: [upgradeToAndCallAction],
-      //         daoAddress: daoAddressV1,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         DaoUpdateProposalInvalidityCause.INVALID_VERSION,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should return `INVALID_IMPLEMENTATION` when the implementation address is not correct", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
-      //       daoAddressV1,
-      //       {
-      //         implementationAddress: "0x1234567890123456789012345678901234567890",
-      //         data: initializeFromAction.data,
-      //       },
-      //     );
-      //     const validationResult = await client.methods
-      //       .isDaoUpdateValid({
-      //         actions: [upgradeToAndCallAction],
-      //         daoAddress: daoAddressV1,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         DaoUpdateProposalInvalidityCause.INVALID_IMPLEMENTATION,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should return `INVALID_INIT_DATA` when the init data is not empty", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-      //     const invalidAction = client.encoding.initializeFromAction(
-      //       daoAddressV1,
-      //       {
-      //         previousVersion: [1, 0, 0],
-      //         initData: new Uint8Array([10, 20, 30, 40, 50]),
-      //       },
-      //     );
-      //     const upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
-      //       daoAddressV1,
-      //       {
-      //         implementationAddress,
-      //         data: invalidAction.data,
-      //       },
-      //     );
-      //     const validationResult = await client.methods
-      //       .isDaoUpdateValid({
-      //         actions: [upgradeToAndCallAction],
-      //         daoAddress: daoAddressV1,
-      //       });
-      //     expect(validationResult.isValid).toBe(false);
-      //     expect(validationResult.causes.length).toBe(1);
-      //     expect(
-      //       validationResult.causes.includes(
-      //         DaoUpdateProposalInvalidityCause.INVALID_INIT_DATA,
-      //       ),
-      //     ).toBe(true);
-      //   });
-      //   it("should valid and not return anything in the cause", async () => {
-      //     const ctx = new Context(contextParamsLocalChain);
-      //     const client = new Client(ctx);
-
-      //     const validationResult = await client.methods
-      //       .isDaoUpdateValid({
-      //         actions: [upgradeToAndCallAction],
-      //         daoAddress: daoAddressV1,
-      //       });
-      //     expect(validationResult.isValid).toBe(true);
-      //     expect(validationResult.causes.length).toBe(0);
-      //   });
+      //   const res = await client.methods.isDaoUpdateValid(
+      //     TEST_MULTISIG_PROPOSAL_ID,
+      //   );
+      //   expect(res.isValid).toBe(true);
+      //   expect(res.causes).toMatchObject([]);
+      // });
     });
   });
 });

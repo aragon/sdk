@@ -20,6 +20,7 @@ import {
   decodeApplyUpdateAction,
   decodeGrantAction,
   decodeInitializeFromAction,
+  decodeUpgradeToAction,
   decodeUpgradeToAndCallAction,
   findInterface,
   permissionParamsFromContract,
@@ -308,13 +309,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
     return result[0];
   }
   public upgradeToAction(data: Uint8Array): string {
-    const daoInterface = DAO__factory.createInterface();
-    const hexBytes = bytesToHex(data);
-    const expectedFunction = daoInterface.getFunction(
-      "upgradeTo",
-    );
-    const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
-    return result[0];
+    return decodeUpgradeToAction(data);
   }
   /**
    * Decodes upgradeToAndCallback params from an upgradeToAndCallAction

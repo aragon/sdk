@@ -96,3 +96,10 @@ query PluginPreparations($where: PluginPreparation_filter!, $limit: Int!, $skip:
   }
 }
 `;
+
+export const QueryPluginInstallations = gql`
+  query PluginInstallations($where: PluginInstallation_filter!) {
+    pluginInstallations(where: $where) {
+      id
+    }
+  }`

@@ -242,10 +242,14 @@ export enum ProposalActionTypes {
   UPGRADE_TO = "upgradeTo",
   UPGRADE_TO_AND_CALL = "upgradeToAndCall",
   APPLY_UPDATE = "applyUpdate",
-  GRANT_PLUGIN_UPDATE_PERMISSION = "grant",
-  REVOKE_PLUGIN_UPGRADE_PERMISSION = "revoke",
+  GRANT_PLUGIN_UPDATE_PERMISSION = "grantUpdatePluginPermission",
+  REVOKE_PLUGIN_UPGRADE_PERMISSION = "revokeUpdatePluginPeermission",
   GRANT_ROOT_PERMISSION = "grantRootPermission",
   REVOKE_ROOT_PERMISSION = "revokeRootPermission",
   ACTION_NOT_ALLOWED = "actionNotAllowed",
   UNKNOWN = "unknown",
 }
+
+export type SubgraphPluginInstallationListItem = {
+  id: string;
+};
