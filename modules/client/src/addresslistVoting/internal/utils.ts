@@ -172,7 +172,7 @@ export function computeProposalStatus(
   if (startDate >= now) {
     return ProposalStatus.PENDING;
   }
-  if (proposal.potentiallyExecutable || proposal.earlyExecutable) {
+  if (proposal.approvalReached || proposal.earlyExecutable) {
     return ProposalStatus.SUCCEEDED;
   }
   if (endDate >= now) {

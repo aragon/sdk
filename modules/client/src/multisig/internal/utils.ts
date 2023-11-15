@@ -128,8 +128,19 @@ export function computeProposalStatus(
   if (now < startDate) {
     return ProposalStatus.PENDING;
   }
-  if (proposal.potentiallyExecutable && now < endDate) {
-    return ProposalStatus.SUCCEEDED;
+  if (proposal.approvalReached) {
+    if(proposal.actions.length === 0){
+      // Signalling proposals (having an empty actions array) don't need to be executed 
+      // and should remain with `ProposalStatus.SUCCEEDED` after `endDate` has passed
+      return ProposalStatus.SUCCEEDED;
+    } else {
+      
+      // Conventional proposals become `ProposalStatus.SUCCEEDED`  before the `endDate` has passed. 
+      // If they don't get executed afterwards, they will become `ProposalStatus.DEFEATED`
+      if (now < endDate) {
+        return ProposalStatus.SUCCEEDED;
+      }
+    }
   }
   if (now < endDate) {
     return ProposalStatus.ACTIVE;
@@ -151,7 +162,7 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
       where = { executed: true };
       break;
     case ProposalStatus.SUCCEEDED:
-      where = { potentiallyExecutable: true, endDate_gte: now };
+      where = { potentiallyExecutable: true, endDate_gte: now }; // TODO rename to 
       break;
     case ProposalStatus.DEFEATED:
       where = {
