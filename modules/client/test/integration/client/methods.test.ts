@@ -1,7 +1,6 @@
 // mocks need to be at the top of the imports
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import * as mockedGraphqlRequest from "../../mocks/graphql-request";
-
 import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import * as deployV1Contracts from "../../helpers/deploy-v1-contracts";
@@ -30,6 +29,7 @@ import {
   DaoDepositSteps,
   DaoQueryParams,
   DaoSortBy,
+  DaoUpdateProposalInvalidityCause,
   DepositParams,
   HasPermissionParams,
   PluginPreparationQueryParams,
@@ -2007,43 +2007,72 @@ describe("Client", () => {
       });
     });
     describe("isDaoUpdateValid", () => {
-      // it("Should return true for a valid update", async () => {
-      //   const context = new Context();
-      //   const client = new Client(context);
-      //   let initializeFromAction: DaoAction;
-      //   let upgradeToAndCallAction: DaoAction;
-      //   initializeFromAction = client.encoding.initializeFromAction(
-      //     daoAddress,
-      //     {
-      //       initData: new Uint8Array(),
-      //       previousVersion: [1, 0, 0],
-      //     },
-      //   );
-      //   upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
-      //     daoAddressV1,
-      //     {
-      //       data: initializeFromAction.data,
-      //       implementationAddress: "0x1234567890123456789012345678901234567890",
-      //     },
-      //   );
-      //   const mockedClient = mockedGraphqlRequest.getMockedInstance(
-      //     client.graphql.getClient(),
-      //   );
-      //   mockedClient.request.mockResolvedValueOnce({
-      //     iproposal: {
-      //       dao: {
-      //         id: daoAddress,
-      //       },
-      //       allowFailureMap: "0",
-      //       actions: toSubgraphActions([upgradeToAndCallAction]),
-      //     },
-      //   });
-      //   const res = await client.methods.isDaoUpdateValid(
-      //     TEST_MULTISIG_PROPOSAL_ID,
-      //   );
-      //   expect(res.isValid).toBe(true);
-      //   expect(res.causes).toMatchObject([]);
-      // });
+      let client: Client;
+      let initializeFromAction: DaoAction;
+      let upgradeToAndCallAction: DaoAction;
+      beforeAll(() => {
+        const context = new Context(contextParamsLocalChain);
+        client = new Client(context);
+        initializeFromAction = client.encoding.initializeFromAction(
+          daoAddressV1,
+          {
+            initData: new Uint8Array(),
+            previousVersion: [1, 0, 0],
+          },
+        );
+      });
+      it("Should return true for a valid update", async () => {
+        const implementationAddress = await client.methods.getDaoImplementation(
+          client.web3.getAddress("daoFactoryAddress"),
+        );
+        upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
+          daoAddressV1,
+          {
+            data: initializeFromAction.data,
+            implementationAddress,
+          },
+        );
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: {
+            dao: {
+              id: daoAddressV1,
+            },
+            allowFailureMap: "0",
+            actions: toSubgraphActions([upgradeToAndCallAction]),
+          },
+        });
+        const res = await client.methods.isDaoUpdateValid(
+          TEST_MULTISIG_PROPOSAL_ID,
+        );
+        expect(res.isValid).toBe(true);
+        expect(res.causes).toMatchObject([]);
+      });
+      it("Should PROPOSAL_NOT_FOUND when the proposal is null", async () => {
+        const implementationAddress = await client.methods.getDaoImplementation(
+          client.web3.getAddress("daoFactoryAddress"),
+        );
+        upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
+          daoAddressV1,
+          {
+            data: initializeFromAction.data,
+            implementationAddress,
+          },
+        );
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          iproposal: null,
+        });
+        const res = await client.methods.isDaoUpdateValid(
+          TEST_MULTISIG_PROPOSAL_ID,
+        );
+        expect(res.isValid).toBe(false);
+        expect(res.causes).toMatchObject([DaoUpdateProposalInvalidityCause.PROPOSAL_NOT_FOUND]);
+      });
     });
   });
 });

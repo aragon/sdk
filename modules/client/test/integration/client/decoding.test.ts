@@ -763,10 +763,10 @@ describe("Client", () => {
         "0x1234567890123456789012345678901234567890",
         applyUpdateParams,
       );
-      expect(actions.length).toBe(3);
+      expect(actions.length).toBe(5);
       const decodedApplyUpdateParams = client.decoding
         .applyUpdateAction(
-          actions[1].data,
+          actions[2].data,
         );
       expect(applyUpdateParams.versionTag.build).toBe(
         decodedApplyUpdateParams.versionTag.build,
