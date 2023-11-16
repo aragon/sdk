@@ -337,7 +337,7 @@ describe("Test client utils", () => {
       const revokeAction = client.encoding.grantAction(daoAddress, {
         where: daoAddress,
         who: pspAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       const result = validateGrantRootPermissionAction(
         revokeAction,
@@ -363,7 +363,7 @@ describe("Test client utils", () => {
       const grantAction = client.encoding.grantAction(daoAddress, {
         where: daoAddress,
         who: pspAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       grantAction.value = BigInt(10);
       const result = validateGrantRootPermissionAction(
@@ -380,7 +380,7 @@ describe("Test client utils", () => {
       const grantAction = client.encoding.grantAction(daoAddress, {
         where: pluginAddress,
         who: pspAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       const result = validateGrantRootPermissionAction(
         grantAction,
@@ -396,7 +396,7 @@ describe("Test client utils", () => {
       const grantAction = client.encoding.grantAction(daoAddress, {
         where: daoAddress,
         who: daoAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       const result = validateGrantRootPermissionAction(
         grantAction,
@@ -430,7 +430,7 @@ describe("Test client utils", () => {
       const grantAction = client.encoding.grantAction(daoAddress, {
         where: pluginAddress,
         who: daoAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       const result = validateGrantRootPermissionAction(
         grantAction,
@@ -453,7 +453,7 @@ describe("Test client utils", () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
         where: pluginAddress,
         who: pspAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       const result = validateRevokeRootPermissionAction(
         revokeAction,
@@ -479,7 +479,7 @@ describe("Test client utils", () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
         where: daoAddress,
         who: pspAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       revokeAction.value = BigInt(10);
       const result = validateRevokeRootPermissionAction(
@@ -496,7 +496,7 @@ describe("Test client utils", () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
         where: pluginAddress,
         who: pspAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       const result = validateRevokeRootPermissionAction(
         revokeAction,
@@ -512,7 +512,7 @@ describe("Test client utils", () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
         where: daoAddress,
         who: daoAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       const result = validateRevokeRootPermissionAction(
         revokeAction,
@@ -546,7 +546,7 @@ describe("Test client utils", () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
         where: pluginAddress,
         who: daoAddress,
-        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+        permission: Permissions.ROOT_PERMISSION,
       });
       const result = validateRevokeRootPermissionAction(
         revokeAction,
@@ -1002,6 +1002,9 @@ describe("Test client utils", () => {
           id: ADDRESS_ONE,
         }],
       });
+      mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+        JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+      ));
       const result = await validateUpdatePluginProposalActions(
         actions,
         daoAddress,
@@ -1039,6 +1042,9 @@ describe("Test client utils", () => {
           id: ADDRESS_ONE,
         }],
       });
+      mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+        JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+      ));
       const result = await validateUpdatePluginProposalActions(
         actions,
         daoAddress,
@@ -1082,6 +1088,9 @@ describe("Test client utils", () => {
             id: ADDRESS_ONE,
           }],
         });
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+        ));
       }
 
       const result = await validateUpdatePluginProposalActions(

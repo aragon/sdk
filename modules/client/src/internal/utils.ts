@@ -1027,7 +1027,7 @@ export function validateGrantRootPermissionAction(
     );
   }
   if (
-    decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
+    decodedPermission.permission !== Permissions.ROOT_PERMISSION
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
@@ -1036,7 +1036,7 @@ export function validateGrantRootPermissionAction(
   }
   if (
     decodedPermission.permissionId !==
-      PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
+      PermissionIds.ROOT_PERMISSION_ID
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
@@ -1071,7 +1071,7 @@ export function validateRevokeRootPermissionAction(
     );
   }
   if (
-    decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
+    decodedPermission.permission !== Permissions.ROOT_PERMISSION
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
@@ -1080,7 +1080,7 @@ export function validateRevokeRootPermissionAction(
   }
   if (
     decodedPermission.permissionId !==
-      PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
+      PermissionIds.ROOT_PERMISSION_ID
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
@@ -1484,47 +1484,63 @@ export async function validateUpdatePluginProposalActions(
   graphql: IClientGraphQLCore,
   ipfs: IClientIpfsCore,
 ) {
+  // Declare variables
   let causes: PluginUpdateProposalInValidityCause[][] = [];
+  let resCauses: PluginUpdateProposalInValidityCause[];
   const classifiedActions = classifyProposalActions(actions);
+  // check if is an update plugin proposal
   if (isPluginUpdateAction(classifiedActions)) {
+    // initialize the causes array
+    // we always use the index 0
+    // because this is going to be called recursively
+    // and then joined
     causes[0] = [];
-    for (const [index, action] of classifiedActions.entries()) {
+    // iterate over the first 3 actions actions
+    for (const [index, action] of classifiedActions.slice(0, 3).entries()) {
       switch (action) {
+        // if the action is grant plugin update permission
+        // validate the action
         case ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION:
-          causes[0].concat(
-            await validateGrantUpdatePluginPermissionAction(
-              actions[index],
-              pspAddress,
-              daoAddress,
-              graphql,
-            ),
+          resCauses = await validateGrantUpdatePluginPermissionAction(
+            actions[index],
+            pspAddress,
+            daoAddress,
+            graphql,
           );
+          causes[0] = [...causes[0], ...resCauses];
           break;
+          // if the action is revoke plugin update permission
+          // validate the action
         case ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION:
-          causes[0].concat(
-            await validateRevokeUpdatePluginPermissionAction(
-              actions[index],
-              pspAddress,
-              daoAddress,
-              graphql,
-            ),
+          resCauses = await validateRevokeUpdatePluginPermissionAction(
+            actions[index],
+            pspAddress,
+            daoAddress,
+            graphql,
           );
+          causes[0] = [...causes[0], ...resCauses];
           break;
+          // if the action is grant root permission
+          // validate the action
         case ProposalActionTypes.APPLY_UPDATE:
-          const resCauses = await validateApplyUpdateFunction(
+          resCauses = await validateApplyUpdateFunction(
             actions[index],
             daoAddress,
             graphql,
             ipfs,
           );
-          causes[0].concat(
-            resCauses,
-          );
+          causes[0] = [...causes[0], ...resCauses];
           break;
+          // other cases are not allowed and should have been
+          // caught by the isPluginUpdateAction function
       }
     }
+    // slice the first 3 actions
+    // because they have already been validated
+    // and recursively call the function
     actions = actions.slice(3);
     if (actions.length !== 0) {
+      // recursively call the function
       const recCauses = await validateUpdatePluginProposalActions(
         actions,
         daoAddress,
@@ -1532,64 +1548,82 @@ export async function validateUpdatePluginProposalActions(
         graphql,
         ipfs,
       );
+      // join the causes
       causes = causes.concat(recCauses.causes);
     }
   } else if (isPluginUpdateActionWithRootPermission(classifiedActions)) {
+    // initialize the causes array
+    // we always use the index 0
+    // because this is going to be called recursively
+    // and then joined
     causes[0] = [];
-    for (const [index, action] of classifiedActions.entries()) {
+    // iterate over the first 5 actions actions
+    for (const [index, action] of classifiedActions.slice(0, 5).entries()) {
       switch (action) {
+        // if the action is grant plugin update permission
+        // validate the action
         case ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION:
-          causes[0].concat(
-            await validateGrantUpdatePluginPermissionAction(
-              actions[index],
-              pspAddress,
-              daoAddress,
-              graphql,
-            ),
+          resCauses = await validateGrantUpdatePluginPermissionAction(
+            actions[index],
+            pspAddress,
+            daoAddress,
+            graphql,
           );
+          causes[0] = [...causes[0], ...resCauses];
           break;
+          // if the action is revoke plugin update permission
+          // validate the action
         case ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION:
-          causes[0].concat(
-            await validateRevokeUpdatePluginPermissionAction(
-              actions[index],
-              pspAddress,
-              daoAddress,
-              graphql,
-            ),
+          resCauses = await validateRevokeUpdatePluginPermissionAction(
+            actions[index],
+            pspAddress,
+            daoAddress,
+            graphql,
           );
+          causes[0] = [...causes[0], ...resCauses];
           break;
+          // if the action is grant root permission
+          // validate the action
         case ProposalActionTypes.GRANT_ROOT_PERMISSION:
-          causes[0].concat(
-            validateGrantRootPermissionAction(
-              actions[index],
-              daoAddress,
-              pspAddress,
-            ),
+          resCauses = validateGrantRootPermissionAction(
+            actions[index],
+            daoAddress,
+            pspAddress,
           );
+          causes[0] = [...causes[0], ...resCauses];
           break;
+          // if the action is revoke root permission
+          // validate the action
+
         case ProposalActionTypes.REVOKE_ROOT_PERMISSION:
-          causes[0].concat(
-            validateRevokeRootPermissionAction(
-              actions[index],
-              daoAddress,
-              pspAddress,
-            ),
+          resCauses = validateRevokeRootPermissionAction(
+            actions[index],
+            daoAddress,
+            pspAddress,
           );
+          causes[0] = [...causes[0], ...resCauses];
           break;
+          // if the action is apply update
+          // validate the action
         case ProposalActionTypes.APPLY_UPDATE:
-          causes[0].concat(
-            await validateApplyUpdateFunction(
-              actions[index],
-              daoAddress,
-              graphql,
-              ipfs,
-            ),
+          resCauses = await validateApplyUpdateFunction(
+            actions[index],
+            daoAddress,
+            graphql,
+            ipfs,
           );
+          causes[0] = [...causes[0], ...resCauses];
           break;
+
+          // other cases are not allowed and should have been
+          // caught by the isPluginUpdateActionWithRootPermission function
       }
     }
+    // slice the first 5 actions
+    // because they have already been validated
     actions = actions.slice(5);
     if (actions.length !== 0) {
+      // recursively call the function
       const recCauses = await validateUpdatePluginProposalActions(
         actions,
         daoAddress,
@@ -1597,13 +1631,17 @@ export async function validateUpdatePluginProposalActions(
         graphql,
         ipfs,
       );
+      // join the causes
       causes = [...causes, ...recCauses.causes];
     }
   } else {
+    // add invalid actions to the causes array
     causes[0] = [];
     causes[0].push(
       PluginUpdateProposalInValidityCause.INVALID_ACTIONS,
     );
+    // return, if this is inside the recursion
+    // it will be added to the array
     return {
       isValid: false,
       causes,
