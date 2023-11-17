@@ -3,7 +3,7 @@ import { SubgraphProposalBase } from "../../client-common";
 export type SubgraphMultisigProposalBase = SubgraphProposalBase & {
   plugin: SubgraphMultisigVotingSettings;
   minApprovals: number;
-  potentiallyExecutable: boolean;
+  approvalReached: boolean;
   approvers: { id: string }[];
   // TODO change on subgraph fix
   // approvers: SubgraphMultisigApproversListItem[];

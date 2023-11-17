@@ -18,7 +18,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
 
+- Compute of proposal status bu adding the `isSignaling`field
+
+
+## [1.19.0]
 ### Added
 
 - `isMember` function to `TokenVotingClient`

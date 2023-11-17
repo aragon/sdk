@@ -11,7 +11,7 @@ describe("addresslistVoting-client utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: false,
+        approvalReached: false,
         executed: false,
         earlyExecutable: false,
       } as SubgraphAddresslistVotingProposal)).toBe(ProposalStatus.PENDING);
@@ -23,7 +23,7 @@ describe("addresslistVoting-client utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: false,
+        approvalReached: false,
         executed: true,
         earlyExecutable: false,
       } as SubgraphAddresslistVotingProposal)).toBe(ProposalStatus.EXECUTED);
@@ -35,19 +35,19 @@ describe("addresslistVoting-client utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: false,
+        approvalReached: false,
         executed: false,
         earlyExecutable: false,
       } as SubgraphAddresslistVotingProposal)).toBe(ProposalStatus.ACTIVE);
     });
-    it("should return SUCCEDED if executable = true", () => {
+    it("should return SUCCEDED if approvalReached = true", () => {
       const endDate = Date.now() / 1000;
       const startDate = (Date.now() / 1000) - 500;
 
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: true,
+        approvalReached: true,
         executed: false,
         earlyExecutable: false,
       } as SubgraphAddresslistVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
@@ -59,7 +59,7 @@ describe("addresslistVoting-client utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: false,
+        approvalReached: true,
         executed: false,
         earlyExecutable: true,
       } as SubgraphAddresslistVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
@@ -71,7 +71,7 @@ describe("addresslistVoting-client utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: false,
+        approvalReached: false,
         executed: false,
         earlyExecutable: false,
       } as SubgraphAddresslistVotingProposal)).toBe(ProposalStatus.DEFEATED);

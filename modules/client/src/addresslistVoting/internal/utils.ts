@@ -166,19 +166,41 @@ export function computeProposalStatus(
     parseInt(proposal.startDate) * 1000,
   );
   const endDate = new Date(parseInt(proposal.endDate) * 1000);
+  // The proposal is executed so the status becomes EXECUTED
+  // independently of the other conditions
   if (proposal.executed) {
     return ProposalStatus.EXECUTED;
   }
+  // The proposal is not executed and the start date is in the future
+  // so the status becomes PENDING
   if (startDate >= now) {
     return ProposalStatus.PENDING;
   }
-  if (proposal.approvalReached || proposal.earlyExecutable) {
-    return ProposalStatus.SUCCEEDED;
+  // The proposal is not executed and the start date is in the past
+  // So we must check if the proposal reached the approval threshold
+  // If it reached the approval threshold and it's a signaling proposal
+  // the status becomes SUCCEEDED
+  // If it reached the approval threshold and it's not a signaling proposal
+  // the status becomes SUCCEEDED if the end date is in the past or if the
+  // proposal is early executable
+  if (proposal.approvalReached) {
+    if(proposal.isSignaling) {
+      return ProposalStatus.SUCCEEDED;
+    } else {
+      if (now >= endDate || proposal.earlyExecutable) {
+        return ProposalStatus.SUCCEEDED;
+      }
+    }
   }
-  if (endDate >= now) {
+  // The proposal is not executed and the start date is in the past
+  // and the approval threshold is not reached
+  // If the end date is in the future this means that you can still vote
+  // so the status becomes ACTIVE
+  if (now < endDate) {
     return ProposalStatus.ACTIVE;
   }
-  return ProposalStatus.DEFEATED;
+  // If none of the other conditions are met the status becomes DEFEATED
+  return ProposalStatus.DEFEATED
 }
 
 export function computeProposalStatusFilter(status: ProposalStatus) {
@@ -195,7 +217,13 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
       where = { executed: true };
       break;
     case ProposalStatus.SUCCEEDED:
-      where = { potentiallyExecutable: true, endDate_lt: now };
+      where = {
+        or: [
+          { approvalReached: true, endDate_lt: now, isSignaling: false },
+          { approvalReached: true, earlyExecutable: true, isSignaling: false },
+          { approvalReached: true, isSignaling: true },
+        ],
+      };
       break;
     case ProposalStatus.DEFEATED:
       where = {

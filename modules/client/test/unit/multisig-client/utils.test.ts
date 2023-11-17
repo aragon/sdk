@@ -11,7 +11,7 @@ describe("multisig-client utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: false,
+        approvalReached: false,
         executed: false,
       } as SubgraphMultisigProposal)).toBe(ProposalStatus.PENDING);
     });
@@ -22,7 +22,7 @@ describe("multisig-client utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: false,
+        approvalReached: false,
         executed: true,
       } as SubgraphMultisigProposal)).toBe(ProposalStatus.EXECUTED);
     });
@@ -33,29 +33,29 @@ describe("multisig-client utils", () => {
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: false,
+        approvalReached: false,
         executed: false,
       } as SubgraphMultisigProposal)).toBe(ProposalStatus.ACTIVE);
     });
-    it("should return SUCCEDED if executable = true", () => {
+    it("should return SUCCEDED if approvalReached = true", () => {
       const endDate = (Date.now() / 1000) + 500;
       const startDate = (Date.now() / 1000) - 500;
 
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: true,
+        approvalReached: true,
         executed: false,
       } as SubgraphMultisigProposal)).toBe(ProposalStatus.SUCCEEDED);
     });
     it("should return DEFEATED", () => {
-      const endDate = (Date.now() / 1000) - 200;
-      const startDate = (Date.now() / 1000) - 500;
+      const endDate = (Date.now() / 1000) - 5000;
+      const startDate = (Date.now() / 1000) - 10000;
 
       expect(computeProposalStatus({
         endDate: endDate.toString(),
         startDate: startDate.toString(),
-        potentiallyExecutable: true,
+        approvalReached: true,
         executed: false,
       } as SubgraphMultisigProposal)).toBe(ProposalStatus.DEFEATED);
     });

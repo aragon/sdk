@@ -19,6 +19,13 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Changed
+
+- Updated subgraph version to 1.3.2
+
+
+## [1.11.0]
+
 ### Added
 
 - Added `actions` to `SubgraphListItem` type

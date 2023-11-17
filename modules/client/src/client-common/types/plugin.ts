@@ -127,7 +127,8 @@ export type SubgraphProposalBase = {
   startDate: string;
   endDate: string;
   executed: boolean;
-  potentiallyExecutable: boolean;
+  approvalReached: boolean;
+  isSignaling: boolean;
   actions: SubgraphAction[]
 };
 

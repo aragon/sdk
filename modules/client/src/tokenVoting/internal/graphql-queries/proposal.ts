@@ -28,7 +28,8 @@ query TokenVotingProposal($proposalId: ID!) {
     endDate
     executed
     earlyExecutable
-    potentiallyExecutable
+    approvalReached
+    isSignaling
     executionTxHash
     voters{
       voter{
@@ -80,7 +81,8 @@ query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
     endDate
     executed
     earlyExecutable
-    potentiallyExecutable
+    approvalReached
+    isSignaling
     votingMode
     supportThreshold
     minVotingPower
