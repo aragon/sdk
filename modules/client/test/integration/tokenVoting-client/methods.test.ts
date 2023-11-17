@@ -27,7 +27,6 @@ import {
   VotingMode,
   WrapTokensStep,
 } from "../../../src";
-import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import {
   ADDRESS_FOUR,
@@ -43,7 +42,6 @@ import {
   TEST_TX_HASH,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import { Server } from "ganache";
 import {
   buildExistingTokenVotingDAO,
   buildTokenVotingDAO,
@@ -96,13 +94,11 @@ import {
 import { createTokenVotingPluginBuild } from "../../helpers/create-plugin-build";
 
 describe("Token Voting Client", () => {
-  let server: Server;
   let deployment: deployContracts.Deployment;
   let repoAddr: string;
   let provider: JsonRpcProvider;
 
   beforeAll(async () => {
-    server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
 
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
@@ -134,10 +130,6 @@ describe("Token Voting Client", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
-  });
-
-  afterAll(async () => {
-    await server.close();
   });
 
   beforeEach(() => {
@@ -186,7 +178,7 @@ describe("Token Voting Client", () => {
     };
 
     const ipfsUri = await client.methods.pinMetadata(metadata);
-    const endDate = new Date(Date.now() + 60 * 60 * 1000 + 10 * 1000);
+    const endDate = new Date(0);
 
     const proposalParams: CreateMajorityVotingProposalParams = {
       pluginAddress,

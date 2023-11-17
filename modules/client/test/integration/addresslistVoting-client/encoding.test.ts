@@ -1,6 +1,3 @@
-// @ts-ignore
-declare const describe, it, expect;
-
 import {
   AddresslistVotingClient,
   AddresslistVotingPluginInstall,

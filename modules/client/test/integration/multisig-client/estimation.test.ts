@@ -1,8 +1,5 @@
-import * as mockedGraphqlRequest from "../../mocks/graphql-request";
-// @ts-ignore
-declare const describe, it, expect, beforeAll, afterAll;
-
 // mocks need to be at the top of the imports
+import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 import "../../mocks/aragon-sdk-ipfs";
 
 import {
@@ -15,9 +12,7 @@ import {
   SUBGRAPH_PLUGIN_INSTALLATION,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
-import { Server } from "ganache";
 import { Context } from "@aragon/sdk-client-common";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
@@ -25,11 +20,9 @@ import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
 describe("Client Multisig", () => {
   describe("Estimation module", () => {
     let pluginAddress: string;
-    let server: Server;
     let deployment: deployContracts.Deployment;
 
     beforeAll(async () => {
-      server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
       contextParamsLocalChain.multisigRepoAddress =
@@ -47,9 +40,6 @@ describe("Client Multisig", () => {
       // advance to get past the voting checkpoint
     });
 
-    afterAll(async () => {
-      await server.close();
-    });
     it("Should estimate the gas fees for creating a new proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
       const multisigClient = new MultisigClient(ctx);

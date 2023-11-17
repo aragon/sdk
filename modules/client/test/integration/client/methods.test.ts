@@ -2,7 +2,6 @@
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 
-import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 import * as deployV1Contracts from "../../helpers/deploy-v1-contracts";
 import {
@@ -51,7 +50,6 @@ import {
   UpgradeToAndCallParams,
   VotingMode,
 } from "../../../src";
-import { Server } from "ganache";
 import {
   SubgraphBalance,
   SubgraphDao,
@@ -96,7 +94,6 @@ import {
   MultisigSetup__factory,
   PluginRepo__factory,
 } from "@aragon/osx-ethers";
-import { JsonRpcProvider } from "@ethersproject/providers";
 import { SupportedPluginRepo } from "../../../src/internal/constants";
 import { ValidationError } from "yup";
 import { toPluginPermissionOperationType } from "../../../src/internal/utils";
@@ -109,10 +106,8 @@ describe("Client", () => {
   let deploymentV1: deployV1Contracts.Deployment;
 
   describe("Methods Module tests", () => {
-    let server: Server;
 
     beforeAll(async () => {
-      server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       deploymentV1 = await deployV1Contracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
@@ -152,10 +147,6 @@ describe("Client", () => {
       daoAddress = daoCreation.daoAddr;
       pluginAddress = daoCreation.pluginAddrs[0];
       daoAddressV1 = daoCreationV1.daoAddr;
-    });
-
-    afterAll(async () => {
-      await server.close();
     });
 
     describe("DAO Creation", () => {
@@ -727,8 +718,7 @@ describe("Client", () => {
         // deploy a new build to be able to update
         // this has to be done after creating the DAO beacause
         // the default behaivour is using the latest version
-        const provider = new JsonRpcProvider("http://127.0.0.1:8545");
-        const deployer = provider.getSigner();
+        const deployer = hardhat.provider.getSigner();
         const multisigFactory = new MultisigSetup__factory();
         const newSetup = await multisigFactory
           .connect(deployer)

@@ -9,16 +9,16 @@ export function mineBlockWithTime(
   targetDate: Date,
 ) {
   const val = Math.ceil(targetDate.getTime() / 1000);
-  return provider.send("evm_mine", [
-    `0x${val.toString(16)}`,
-  ]);
+  provider.send("evm_setNextBlockTimestamp", [val]);
+  provider.send("evm_mine", []);
 }
 
-export function mineBlockWithTimeOffset(
+export async function mineBlockWithTimeOffset(
   provider: JsonRpcProvider,
   secondsForward: number,
 ) {
-  const val = Math.ceil(Date.now() / 1000) + secondsForward;
+  const latestBlock = await provider.getBlock('latest');
+  const val = latestBlock.timestamp + secondsForward;
   return provider.send("evm_mine", [
     `0x${val.toString(16)}`,
   ]);
@@ -34,7 +34,8 @@ export function mineBlockWithTimeOffset(
 // }
 
 export function restoreBlockTime(provider: JsonRpcProvider) {
-  return mineBlockWithTime(provider, new Date());
+  provider.network;
+  //return mineBlockWithTime(provider, new Date());
 }
 
 export async function getBlockTime(provider: JsonRpcProvider) {

@@ -3,7 +3,6 @@ import * as aragonContracts from "osx-ethers-v1";
 import ENSRegistry from "@ensdomains/ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json";
 import PublicResolver from "@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json";
 import { AddressZero, HashZero } from "@ethersproject/constants";
-import { JsonRpcProvider } from "@ethersproject/providers";
 import { id, namehash } from "@ethersproject/hash";
 import { parseEther } from "@ethersproject/units";
 import { Signer } from "@ethersproject/abstract-signer";
@@ -35,8 +34,7 @@ export interface Deployment {
 }
 
 export async function deploy(): Promise<Deployment> {
-  const provider = new JsonRpcProvider("http://127.0.0.1:8545");
-  const deployOwnerWallet = provider.getSigner();
+  const deployOwnerWallet = hardhat.provider.getSigner();
   const { ensRegistry, ensResolver } = await deployEnsContracts(
     deployOwnerWallet,
   );

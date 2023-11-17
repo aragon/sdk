@@ -1,3 +1,5 @@
+// @ts-ignore Needed to get the global typing for hardhat
+import * as jestenv from "jest-environment-hardhat"
 import { Wallet } from "@ethersproject/wallet";
 import {
   PluginRepoBuildMetadata,
@@ -102,10 +104,10 @@ export const contextParamsMainnet: ContextParams = {
 };
 
 export const contextParamsLocalChain: ContextParams = {
-  network: 31337,
+  network: hardhat.hre.config.networks.hardhat.chainId,
   signer: new Wallet(TEST_WALLET),
   daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
-  web3Providers: ["http://localhost:8545"],
+  web3Providers: [hardhat.url],
   ipfsNodes: ipfsEndpoints.working,
   graphqlNodes: grapqhlEndpoints.working,
 };

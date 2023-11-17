@@ -1,9 +1,5 @@
-// @ts-ignore
-declare const describe, it, expect;
-
 // mocks need to be at the top of the imports
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
-import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 
 import {
@@ -44,21 +40,15 @@ import {
   SupportedVersion,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { Server } from "ganache";
 
 describe("Client", () => {
   let deployment: deployContracts.Deployment;
-  let server: Server;
   beforeAll(async () => {
-    server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
     contextParamsLocalChain.pluginSetupProcessorAddress = ADDRESS_TWO;
     LIVE_CONTRACTS[SupportedVersion.LATEST].local.daoFactoryAddress =
       deployment.daoFactory.address;
-  });
-  afterAll(async () => {
-    await server.close();
   });
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {

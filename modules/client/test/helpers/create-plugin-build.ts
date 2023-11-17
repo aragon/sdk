@@ -1,3 +1,5 @@
+// @ts-ignore Needed to get the global typing for hardhat
+import * as jestenv from "jest-environment-hardhat"
 import {
   AddresslistVotingSetup__factory,
   GovernanceERC20__factory,
@@ -9,7 +11,6 @@ import {
 import { Signer } from "@ethersproject/abstract-signer";
 import { hexlify } from "@ethersproject/bytes";
 import { AddressZero } from "@ethersproject/constants";
-import { JsonRpcProvider } from "@ethersproject/providers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 
 export async function createPluginBuild(
@@ -40,8 +41,7 @@ export async function createTokenVotingPluginBuild(
   release: number,
   pluginRepoAddress: string,
 ) {
-  const provider = new JsonRpcProvider("http://localhost:8545");
-  const deployer = provider.getSigner();
+  const deployer = hardhat.provider.getSigner();
   const governanceErc20Factory = new GovernanceERC20__factory();
   const governanceWrappedErc20Factory = new GovernanceWrappedERC20__factory();
   const governanceErc20Instance = await governanceErc20Factory.connect(
@@ -73,8 +73,7 @@ export async function createMultisigPluginBuild(
   release: number,
   pluginRepoAddress: string,
 ) {
-  const provider = new JsonRpcProvider("http://localhost:8545");
-  const deployer = provider.getSigner();
+  const deployer = hardhat.provider.getSigner();
 
   // Token Voting Plugin
   const tokenVotingSetupFactory = new MultisigSetup__factory();
@@ -94,8 +93,7 @@ export async function createAddresslistVotingPluginBuild(
   release: number,
   pluginRepoAddress: string,
 ) {
-  const provider = new JsonRpcProvider("http://localhost:8545");
-  const deployer = provider.getSigner();
+  const deployer = hardhat.provider.getSigner();
 
   // Token Voting Plugin
   const tokenVotingSetupFactory = new AddresslistVotingSetup__factory();

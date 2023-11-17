@@ -2,7 +2,6 @@
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 
-import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
 
 import {
@@ -29,7 +28,6 @@ import {
   TEST_TX_HASH,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import { Server } from "ganache";
 import { ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
@@ -60,12 +58,10 @@ import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
 
 describe("Client Multisig", () => {
   let deployment: deployContracts.Deployment;
-  let server: Server;
   let repoAddr: string;
   let provider: JsonRpcProvider;
 
   beforeAll(async () => {
-    server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
     contextParamsLocalChain.pluginSetupProcessorAddress =
@@ -97,10 +93,6 @@ describe("Client Multisig", () => {
       );
     }
     await restoreBlockTime(provider);
-  });
-
-  afterAll(async () => {
-    await server.close();
   });
 
   async function buildDao() {
