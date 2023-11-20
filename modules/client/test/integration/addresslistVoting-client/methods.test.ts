@@ -22,8 +22,8 @@ import {
 } from "../../../src";
 import {
   ADDRESS_ONE,
+  ADDRESS_TWO,
   contextParamsLocalChain,
-  SUBGRAPH_ACTIONS,
   SUBGRAPH_PLUGIN_INSTALLATION,
   SUBGRAPH_PROPOSAL_BASE,
   SUBGRAPH_VOTERS,
@@ -42,6 +42,7 @@ import {
 import { buildAddressListVotingDAO } from "../../helpers/build-daos";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import {
+  QueryAddresslistVotingIsMember,
   QueryAddresslistVotingMembers,
   QueryAddresslistVotingProposal,
   QueryAddresslistVotingProposals,
@@ -52,14 +53,15 @@ import {
   SubgraphAddresslistVotingProposalListItem,
 } from "../../../src/addresslistVoting/internal/types";
 import {
+  bytesToHex,
   Context,
+  getExtendedProposalId,
   InvalidAddressOrEnsError,
   PrepareInstallationStep,
   PrepareUpdateStep,
   ProposalMetadata,
   ProposalStatus,
   SortDirection,
-  getExtendedProposalId,
 } from "@aragon/sdk-client-common";
 import { PluginRepo__factory } from "@aragon/osx-ethers";
 import { createAddresslistVotingPluginBuild } from "../../helpers/create-plugin-build";
@@ -684,6 +686,86 @@ describe("Client Address List", () => {
     });
   });
 
+  describe("isMember", () => {
+    it("Should check if an address is a member of a DAO and return true", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new AddresslistVotingClient(ctx);
+
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      mockedClient.request.mockResolvedValueOnce({
+        addresslistVotingVoter: {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+        },
+      });
+      const isMember = await client.methods.isMember({
+        pluginAddress: ADDRESS_ONE,
+        address: ADDRESS_TWO,
+      });
+      expect(isMember).toBe(true);
+      expect(mockedClient.request).toHaveBeenLastCalledWith(
+        QueryAddresslistVotingIsMember,
+        {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+          blockHeight: null,
+        },
+      );
+    });
+    it("Should check if an address is a member in a specified block number of a DAO and return true", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new AddresslistVotingClient(ctx);
+
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      mockedClient.request.mockResolvedValueOnce({
+        addresslistVotingVoter: {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+        },
+      });
+      const blockNumber = 123456;
+      const isMember = await client.methods.isMember({
+        pluginAddress: ADDRESS_ONE,
+        address: ADDRESS_TWO,
+        blockNumber,
+      });
+      expect(isMember).toBe(true);
+      expect(mockedClient.request).toHaveBeenLastCalledWith(
+        QueryAddresslistVotingIsMember,
+        {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+          blockHeight: {
+            number: blockNumber,
+          },
+        },
+      );
+    });
+    it("Should check if an address is a member of a DAO and return false", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new AddresslistVotingClient(ctx);
+
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      mockedClient.request.mockResolvedValueOnce({
+        addresslistVotingVoter: null,
+      });
+      const isMember = await client.methods.isMember({
+        pluginAddress: ADDRESS_ONE,
+        address: ADDRESS_TWO,
+      });
+      expect(isMember).toBe(false);
+      expect(mockedClient.request).toHaveBeenLastCalledWith(
+        QueryAddresslistVotingIsMember,
+        {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+          blockHeight: null,
+        },
+      );
+    });
+  });
+
   describe("Data retrieval", () => {
     it("Should get the list of members that can vote in a proposal", async () => {
       const ctx = new Context(contextParamsLocalChain);
@@ -750,7 +832,6 @@ describe("Client Address List", () => {
 
       const subgraphProposal: SubgraphAddresslistVotingProposal = {
         createdAt: Math.round(Date.now() / 1000).toString(),
-        actions: SUBGRAPH_ACTIONS,
         supportThreshold: "1000000",
         minVotingPower: "20",
         voters: SUBGRAPH_VOTERS,
@@ -927,6 +1008,15 @@ describe("Client Address List", () => {
       expect(proposals[0].creatorAddress).toBe(SUBGRAPH_PROPOSAL_BASE.creator);
       expect(proposals[0].metadata.title).toBe(ipfsMetadata.title);
       expect(proposals[0].metadata.summary).toBe(ipfsMetadata.summary);
+      for (const [index, action] of proposals[0].actions.entries()) {
+        expect(action.value).toBe(
+          BigInt(SUBGRAPH_PROPOSAL_BASE.actions[index].value),
+        );
+        expect(action.to).toBe(SUBGRAPH_PROPOSAL_BASE.actions[index].to);
+        expect(bytesToHex(action.data)).toBe(
+          SUBGRAPH_PROPOSAL_BASE.actions[index].data.toLowerCase(),
+        );
+      }
       expect(proposals[0].startDate.getTime()).toBe(
         parseInt(SUBGRAPH_PROPOSAL_BASE.startDate) * 1000,
       );

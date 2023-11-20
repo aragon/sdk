@@ -35,7 +35,6 @@ import {
   ADDRESS_THREE,
   ADDRESS_TWO,
   contextParamsLocalChain,
-  SUBGRAPH_ACTIONS,
   SUBGRAPH_PLUGIN_INSTALLATION,
   SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
@@ -56,6 +55,7 @@ import {
 } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import {
+  QueryTokenVotingIsMember,
   QueryTokenVotingMembers,
   QueryTokenVotingPlugin,
   QueryTokenVotingProposal,
@@ -80,7 +80,9 @@ import {
 } from "@aragon/osx-ethers";
 import { BigNumber } from "@ethersproject/bignumber";
 import {
+  bytesToHex,
   Context,
+  getExtendedProposalId,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   NotAContractError,
@@ -90,7 +92,6 @@ import {
   ProposalStatus,
   SortDirection,
   TokenType,
-  getExtendedProposalId,
 } from "@aragon/sdk-client-common";
 import { createTokenVotingPluginBuild } from "../../helpers/create-plugin-build";
 
@@ -879,6 +880,85 @@ describe("Token Voting Client", () => {
       delegatee = await client.methods.getDelegatee(tokenAddress);
       expect(delegatee).toBe(null);
     });
+    describe("isMember", () => {
+      it("Should check if an address is a member of a DAO and return true", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          tokenVotingMember: {
+            id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+          },
+        });
+        const isMember = await client.methods.isMember({
+          pluginAddress: ADDRESS_ONE,
+          address: ADDRESS_TWO,
+        });
+        expect(isMember).toBe(true);
+        expect(mockedClient.request).toHaveBeenLastCalledWith(
+          QueryTokenVotingIsMember,
+          {
+            id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+            blockHeight: null,
+          },
+        );
+      });
+      it("Should check if an address is a member in a specified block number of a DAO and return true", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          tokenVotingMember: {
+            id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+          },
+        });
+        const blockNumber = 123456;
+        const isMember = await client.methods.isMember({
+          pluginAddress: ADDRESS_ONE,
+          address: ADDRESS_TWO,
+          blockNumber,
+        });
+        expect(isMember).toBe(true);
+        expect(mockedClient.request).toHaveBeenLastCalledWith(
+          QueryTokenVotingIsMember,
+          {
+            id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+            blockHeight: {
+              number: blockNumber,
+            },
+          },
+        );
+      });
+      it("Should check if an address is a member of a DAO and return false", async () => {
+        const ctx = new Context(contextParamsLocalChain);
+        const client = new TokenVotingClient(ctx);
+
+        const mockedClient = mockedGraphqlRequest.getMockedInstance(
+          client.graphql.getClient(),
+        );
+        mockedClient.request.mockResolvedValueOnce({
+          tokenVotingMember: null,
+        });
+        const isMember = await client.methods.isMember({
+          pluginAddress: ADDRESS_ONE,
+          address: ADDRESS_TWO,
+        });
+        expect(isMember).toBe(false);
+        expect(mockedClient.request).toHaveBeenLastCalledWith(
+          QueryTokenVotingIsMember,
+          {
+            id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+            blockHeight: null,
+          },
+        );
+      });
+    });
     describe("Data retrieval", () => {
       it("Should get the list of members that can vote in a proposal", async () => {
         const ctx = new Context(contextParamsLocalChain);
@@ -1001,7 +1081,6 @@ describe("Token Voting Client", () => {
 
         const subgraphProposal: SubgraphTokenVotingProposal = {
           createdAt: Math.round(Date.now() / 1000).toString(),
-          actions: SUBGRAPH_ACTIONS,
           supportThreshold: "1000000",
           totalVotingPower: "3000000",
           votingMode: VotingMode.EARLY_EXECUTION,
@@ -1246,6 +1325,15 @@ describe("Token Voting Client", () => {
         expect(proposals.length).toBe(2);
         for (const [index, proposal] of proposals.entries()) {
           expect(proposal.id).toBe(subgraphProposals[index].id);
+          for (const [actionIndex, action] of proposal.actions.entries()) {
+            expect(action.value).toBe(
+              BigInt(subgraphProposals[index].actions[actionIndex].value),
+            );
+            expect(action.to).toBe(subgraphProposals[index].actions[actionIndex].to);
+            expect(bytesToHex(action.data)).toBe(
+              subgraphProposals[index].actions[actionIndex].data.toLowerCase(),
+            );
+          }
           expect(proposal.dao.address).toBe(subgraphProposals[index].dao.id);
           expect(proposal.dao.name).toBe(
             subgraphProposals[index].dao.subdomain,

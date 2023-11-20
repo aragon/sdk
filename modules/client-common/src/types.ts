@@ -237,6 +237,7 @@ export type ProposalListItemBase = {
   startDate: Date;
   endDate: Date;
   status: ProposalStatus;
+  actions: DaoAction[];
 };
 
 export type PrepareUpdateParams = {
@@ -278,3 +279,8 @@ export enum SupportedVersion {
   V1_3_0 = "1.3.0",
   LATEST = "1.3.0",
 }
+export type IsMemberParams = {
+  address: string;
+  pluginAddress: string;
+  blockNumber?: number;
+};

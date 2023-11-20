@@ -176,6 +176,15 @@ export function toTokenVotingProposalListItem(
         };
       },
     ),
+    actions: proposal.actions.map(
+      (action: SubgraphAction): DaoAction => {
+        return {
+          data: hexToBytes(action.data),
+          to: action.to,
+          value: BigInt(action.value),
+        };
+      },
+    ),
   };
 }
 

@@ -1,6 +1,5 @@
 import {
   ContractVotingSettings,
-  SubgraphAction,
   SubgraphProposalBase,
   SubgraphVoterListItemBase,
   VotingMode,
@@ -22,7 +21,6 @@ export type SubgraphAddresslistVotingProposalListItem = SubgraphProposalBase & {
 
 export type SubgraphAddresslistVotingProposal = SubgraphProposalBase & {
   createdAt: string;
-  actions: SubgraphAction[];
   supportThreshold: string;
   minVotingPower: string;
   voters: SubgraphAddresslistVotingVoterListItem[];

@@ -1,19 +1,4 @@
-import { SubgraphAction } from "../../client-common";
-
-/* Subgraph types */
-type SubgraphProposalBase = {
-  id: string;
-  dao: {
-    id: string;
-    subdomain: string;
-  };
-  creator: string;
-  metadata: string;
-  executed: boolean;
-  createdAt: string;
-  startDate: string;
-  endDate: string;
-};
+import { SubgraphProposalBase } from "../../client-common";
 
 export type SubgraphMultisigProposalBase = SubgraphProposalBase & {
   plugin: SubgraphMultisigVotingSettings;
@@ -27,7 +12,7 @@ export type SubgraphMultisigProposalBase = SubgraphProposalBase & {
 export type SubgraphMultisigProposalListItem = SubgraphMultisigProposalBase;
 
 export type SubgraphMultisigProposal = SubgraphMultisigProposalBase & {
-  actions: SubgraphAction[];
+  createdAt: string;
   executionTxHash: string;
   executionDate: string;
   executionBlockNumber: string;

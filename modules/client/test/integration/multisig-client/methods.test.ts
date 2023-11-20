@@ -21,7 +21,6 @@ import {
   ADDRESS_ONE,
   ADDRESS_TWO,
   contextParamsLocalChain,
-  SUBGRAPH_ACTIONS,
   SUBGRAPH_PLUGIN_INSTALLATION,
   SUBGRAPH_PROPOSAL_BASE,
   TEST_INVALID_ADDRESS,
@@ -40,17 +39,21 @@ import {
   QueryMultisigProposals,
   QueryMultisigVotingSettings,
 } from "../../../src/multisig/internal/graphql-queries";
-import { QueryMultisigMembers } from "../../../src/multisig/internal/graphql-queries/members";
+import {
+  QueryMultisigIsMember,
+  QueryMultisigMembers,
+} from "../../../src/multisig/internal/graphql-queries/members";
 import { SubgraphMultisigProposal } from "../../../src/multisig/internal/types";
 import {
+  bytesToHex,
   Context,
+  getExtendedProposalId,
   InvalidAddressOrEnsError,
   PrepareInstallationStep,
   PrepareUpdateStep,
   ProposalMetadata,
   ProposalStatus,
   SortDirection,
-  getExtendedProposalId,
 } from "@aragon/sdk-client-common";
 import { PluginRepo__factory } from "@aragon/osx-ethers";
 import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
@@ -435,6 +438,85 @@ describe("Client Multisig", () => {
       }
     });
   });
+  describe("isMember", () => {
+    it("Should check if an address is a member of a DAO and return true", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new MultisigClient(ctx);
+
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      mockedClient.request.mockResolvedValueOnce({
+        multisigApprover: {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+        },
+      });
+      const isMember = await client.methods.isMember({
+        pluginAddress: ADDRESS_ONE,
+        address: ADDRESS_TWO,
+      });
+      expect(isMember).toBe(true);
+      expect(mockedClient.request).toHaveBeenLastCalledWith(
+        QueryMultisigIsMember,
+        {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+          blockHeight: null,
+        },
+      );
+    });
+    it("Should check if an address is a member in a specified block number of a DAO and return true", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new MultisigClient(ctx);
+
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      mockedClient.request.mockResolvedValueOnce({
+        multisigApprover: {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+        },
+      });
+      const blockNumber = 123456;
+      const isMember = await client.methods.isMember({
+        pluginAddress: ADDRESS_ONE,
+        address: ADDRESS_TWO,
+        blockNumber,
+      });
+      expect(isMember).toBe(true);
+      expect(mockedClient.request).toHaveBeenLastCalledWith(
+        QueryMultisigIsMember,
+        {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+          blockHeight: {
+            number: blockNumber,
+          },
+        },
+      );
+    });
+    it("Should check if an address is a member of a DAO and return false", async () => {
+      const ctx = new Context(contextParamsLocalChain);
+      const client = new MultisigClient(ctx);
+
+      const mockedClient = mockedGraphqlRequest.getMockedInstance(
+        client.graphql.getClient(),
+      );
+      mockedClient.request.mockResolvedValueOnce({
+        multisigApprover: null,
+      });
+      const isMember = await client.methods.isMember({
+        pluginAddress: ADDRESS_ONE,
+        address: ADDRESS_TWO,
+      });
+      expect(isMember).toBe(false);
+      expect(mockedClient.request).toHaveBeenLastCalledWith(
+        QueryMultisigIsMember,
+        {
+          id: `${ADDRESS_ONE}_${ADDRESS_TWO}`,
+          blockHeight: null,
+        },
+      );
+    });
+  });
 
   describe("Data retrieval", () => {
     it("Should get the voting settings of the plugin", async () => {
@@ -527,7 +609,6 @@ describe("Client Multisig", () => {
 
       const subgraphProposal: SubgraphMultisigProposal = {
         createdAt: Math.round(Date.now() / 1000).toString(),
-        actions: SUBGRAPH_ACTIONS,
         creationBlockNumber: "40",
         executionDate: Math.round(Date.now() / 1000).toString(),
         executionBlockNumber: "50",
@@ -573,6 +654,15 @@ describe("Client Multisig", () => {
       expect(proposal.creationDate.getTime()).toBe(
         parseInt(subgraphProposal.createdAt) * 1000,
       );
+      for (const [index, action] of proposal.actions.entries()) {
+        expect(action.value).toBe(
+          BigInt(subgraphProposal.actions[index].value),
+        );
+        expect(action.to).toBe(subgraphProposal.actions[index].to);
+        expect(bytesToHex(action.data)).toBe(
+          subgraphProposal.actions[index].data.toLowerCase(),
+        );
+      }
       expect(proposal.actions).toMatchObject(proposal.actions);
 
       expect(proposal.executionTxHash).toMatch(
@@ -680,6 +770,15 @@ describe("Client Multisig", () => {
       expect(proposals[0].approvals).toMatchObject([ADDRESS_ONE, ADDRESS_TWO]);
       expect(proposals[0].settings.minApprovals).toBe(5);
       expect(proposals[0].settings.onlyListed).toBe(true);
+      for (const [index, action] of proposals[0].actions.entries()) {
+        expect(action.value).toBe(
+          BigInt(SUBGRAPH_PROPOSAL_BASE.actions[index].value),
+        );
+        expect(action.to).toBe(SUBGRAPH_PROPOSAL_BASE.actions[index].to);
+        expect(bytesToHex(action.data)).toBe(
+          SUBGRAPH_PROPOSAL_BASE.actions[index].data.toLowerCase(),
+        );
+      }
 
       expect(mockedClient.request).toHaveBeenCalledWith(
         QueryMultisigProposals,

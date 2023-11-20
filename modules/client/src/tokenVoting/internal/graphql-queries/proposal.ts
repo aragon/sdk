@@ -85,6 +85,11 @@ query TokenVotingProposals($where: TokenVotingProposal_filter!, $limit:Int!, $sk
     supportThreshold
     minVotingPower
     totalVotingPower
+    actions {
+      to
+      value
+      data
+    }
     voters{
       voter{
         address

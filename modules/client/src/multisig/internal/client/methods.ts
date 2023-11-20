@@ -29,6 +29,7 @@ import {
 } from "../../../client-common";
 import { Multisig__factory } from "@aragon/osx-ethers";
 import {
+  QueryMultisigIsMember,
   QueryMultisigMembers,
   QueryMultisigProposal,
   QueryMultisigProposals,
@@ -53,6 +54,8 @@ import {
   InvalidCidError,
   InvalidProposalIdError,
   IpfsPinError,
+  IsMemberParams,
+  IsMemberSchema,
   isProposalId,
   MULTI_FETCH_TIMEOUT,
   NoProviderError,
@@ -389,7 +392,7 @@ export class MultisigClientMethods extends ClientCore
     skip = 0,
     direction = SortDirection.ASC,
     sortBy = MembersSortBy.ADDRESS,
-  }: MembersQueryParams): Promise<string[]>{
+  }: MembersQueryParams): Promise<string[]> {
     // TODO
     // update this with yup validation
     if (!isAddress(pluginAddress)) {
@@ -564,5 +567,30 @@ export class MultisigClientMethods extends ClientCore
         },
       ),
     );
+  }
+
+  /**
+   * Checks if a given address is a member of the tokenVoting contract.
+   * @param params - The parameters for the isMember method.
+   * @param params.pluginAddress - The address of the plugin.
+   * @param params.address - The address to check.
+   * @param params.blockNumber - The block number for specifying a specific block.
+   * @returns A boolean indicating whether the address is a member or not.
+   */
+  public async isMember(params: IsMemberParams): Promise<boolean> {
+    IsMemberSchema.strict().validateSync(params);
+    const query = QueryMultisigIsMember;
+    const name = "multisig isMember";
+    type T = { multisigApprover: { id: string } };
+    const { multisigApprover } = await this.graphql.request<T>({
+      query,
+      params: {
+        id:
+          `${params.pluginAddress.toLowerCase()}_${params.address.toLowerCase()}`,
+        blockHeight: params.blockNumber ? { number: params.blockNumber } : null,
+      },
+      name,
+    });
+    return !!multisigApprover;
   }
 }

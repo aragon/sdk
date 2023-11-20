@@ -50,6 +50,11 @@ query AddresslistVotingProposals($where: AddresslistVotingProposal_filter!, $lim
       id
       subdomain
     }
+    actions {
+      to
+      value
+      data
+    }
     creator
     metadata
     yes

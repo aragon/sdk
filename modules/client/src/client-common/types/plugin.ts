@@ -128,6 +128,7 @@ export type SubgraphProposalBase = {
   endDate: string;
   executed: boolean;
   potentiallyExecutable: boolean;
+  actions: SubgraphAction[]
 };
 
 export type ProposalQueryParams = Pagination & {

@@ -3,6 +3,7 @@ import {
   DaoAction,
   GasFeeEstimation,
   InterfaceParams,
+  IsMemberParams,
   PrepareInstallationStepValue,
   PrepareUpdateStepValue,
   ProposalMetadata,
@@ -91,6 +92,7 @@ export interface ITokenVotingClientMethods {
   isTokenVotingCompatibleToken: (
     tokenAddress: string,
   ) => Promise<TokenVotingTokenCompatibility>;
+  isMember: (params: IsMemberParams) => Promise<boolean>;
 }
 
 export interface ITokenVotingClientEncoding {

@@ -47,6 +47,7 @@ import {
   TokenVotingTokenCompatibility,
 } from "../types";
 import {
+  QueryTokenVotingIsMember,
   QueryTokenVotingMembers,
   QueryTokenVotingPlugin,
   QueryTokenVotingProposal,
@@ -112,6 +113,8 @@ import {
 import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
+import { IsMemberSchema } from "@aragon/sdk-client-common";
+import { IsMemberParams } from "@aragon/sdk-client-common";
 
 /**
  * Methods module the SDK TokenVoting Client
@@ -831,5 +834,29 @@ export class TokenVotingClientMethods extends ClientCore
     } catch (e) {
       return TokenVotingTokenCompatibility.NEEDS_WRAPPING;
     }
+  }
+  /**
+   * Checks if a given address is a member of the tokenVoting contract.
+   * @param params - The parameters for the isMember method.
+   * @param params.pluginAddress - The address of the plugin.
+   * @param params.address - The address to check.
+   * @param params.blockNumber - The block number for specifying a specific block.
+   * @returns A boolean indicating whether the address is a member or not.
+   */
+  public async isMember(params: IsMemberParams): Promise<boolean> {
+    IsMemberSchema.strict().validateSync(params);
+    const query = QueryTokenVotingIsMember;
+    const name = "TokenVoting isMember";
+    type T = { tokenVotingMember: { id: string } };
+    const { tokenVotingMember } = await this.graphql.request<T>({
+      query,
+      params: {
+        id:
+          `${params.pluginAddress.toLowerCase()}_${params.address.toLowerCase()}`,
+        blockHeight: params.blockNumber ? { number: params.blockNumber } : null,
+      },
+      name,
+    });
+    return !!tokenVotingMember;
   }
 }
