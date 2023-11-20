@@ -37,7 +37,7 @@ describe("multisig-client utils", () => {
         executed: false,
       } as SubgraphMultisigProposal)).toBe(ProposalStatus.ACTIVE);
     });
-    it("should return SUCCEDED if approvalReached = true", () => {
+    it("should return SUCCEEDED if approvalReached = true", () => {
       const endDate = (Date.now() / 1000) + 500;
       const startDate = (Date.now() / 1000) - 500;
 
@@ -49,8 +49,8 @@ describe("multisig-client utils", () => {
       } as SubgraphMultisigProposal)).toBe(ProposalStatus.SUCCEEDED);
     });
     it("should return DEFEATED", () => {
-      const endDate = (Date.now() / 1000) - 5000;
-      const startDate = (Date.now() / 1000) - 10000;
+      const endDate = (Date.now() / 1000) - 200;
+      const startDate = (Date.now() / 1000) - 500;
 
       expect(computeProposalStatus({
         endDate: endDate.toString(),

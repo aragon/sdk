@@ -150,7 +150,7 @@ export function computeProposalStatus(
   // and the approval threshold is not reached
   // If the end date is in the future this means that you can still vote
   // so the status becomes ACTIVE
-  if (now < endDate) {
+  if (now <= endDate) {
     return ProposalStatus.ACTIVE;
   }
   // If none of the other conditions are met the status becomes DEFEATED

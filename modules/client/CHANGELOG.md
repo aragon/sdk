@@ -20,7 +20,8 @@ TEMPLATE:
 ## [UPCOMING]
 ### Fixed
 
-- Compute of proposal status bu adding the `isSignaling`field
+- Classify signalling multisig proposals as succeeded even after the end date is passed using the subgraph `isSignalling` attribute.  
+
 
 
 ## [1.19.0]

@@ -40,7 +40,7 @@ describe("addresslistVoting-client utils", () => {
         earlyExecutable: false,
       } as SubgraphAddresslistVotingProposal)).toBe(ProposalStatus.ACTIVE);
     });
-    it("should return SUCCEDED if approvalReached = true", () => {
+    it("should return SUCCEEDED if approvalReached = true", () => {
       const endDate = Date.now() / 1000;
       const startDate = (Date.now() / 1000) - 500;
 
@@ -52,7 +52,7 @@ describe("addresslistVoting-client utils", () => {
         earlyExecutable: false,
       } as SubgraphAddresslistVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
     });
-    it("should return SUCCEDED if earlyExecutable = true", () => {
+    it("should return SUCCEEDED if earlyExecutable = true", () => {
       const endDate = (Date.now() / 1000) + 500;
       const startDate = (Date.now() / 1000) - 500;
 
