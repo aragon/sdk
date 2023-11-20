@@ -22,6 +22,11 @@ TEMPLATE:
 ### Changed
 
 - Add grant and revoke for permission `UPGRADE_PLUGIN_PERMISSION` in `applyUpdate` encoder
+- Refactor DAO update proposal validation function
+- Refactor plugin update proposal validation function
+- Refactor boolean check for checking if a proposal is a DAO update proposal
+- Refactor boolean check for checking if a proposal is a plugin update proposal
+
 
 ## [1.19.0]
 
