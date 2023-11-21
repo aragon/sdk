@@ -1,11 +1,9 @@
 import {
-  DaoAction,
   MetadataAbiInput,
   MultiTargetPermission,
   Pagination,
   PluginInstallItem,
   TokenType,
-  VersionTag,
 } from "@aragon/sdk-client-common";
 
 /* DAO creation */
@@ -485,13 +483,6 @@ export enum PluginUpdateProposalInValidityCause {
   INVALID_PLUGIN_REPO_METADATA = "invalidPluginRepoMetadata",
 }
 
-export type IsPluginUpdateProposalValidParams = {
-  proposalId: string;
-  version: VersionTag;
-  pluginAddress: string;
-  pluginPreparationIndex?: number;
-};
-
 export enum DaoUpdateProposalInvalidityCause {
   PROPOSAL_NOT_FOUND = "proposalNotFound",
   INVALID_ACTIONS = "invalidActions",
@@ -510,16 +501,6 @@ export type DaoUpdateProposalValidity = {
   causes: DaoUpdateProposalInvalidityCause[];
 };
 
-type IsUpdateParamsBase = {
-  actions: DaoAction[];
-  daoAddress: string;
-  pluginAddress: string;
-};
-
-export type IsDaoUpdateProposalValidParams = IsUpdateParamsBase & {
-  version?: [number, number, number];
-};
-
 export type DaoUpdateParams = InitializeFromParams & {
   daoFactoryAddress?: string;
 };
@@ -527,7 +508,6 @@ export type DaoUpdateParams = InitializeFromParams & {
 export type DaoUpdateDecodedParams = InitializeFromParams & {
   implementationAddress: string;
 };
-// export type IsPluginUpdateProposalValidParams = IsUpdateParamsBase;
 export type PluginPreparationQueryParams = Pagination & {
   sortBy?: PluginPreparationSortBy;
   type?: PluginPreparationType;
