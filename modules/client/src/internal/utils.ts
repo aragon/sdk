@@ -1120,25 +1120,24 @@ export async function validateApplyUpdateFunction(
     plugin.appliedPreparation?.pluginAddress ===
       decodedParams.pluginAddress
   );
-  if (plugin) {
-    // check release is the same as the one installed
-    if (
-      plugin.appliedVersion?.release.release !==
-        decodedParams.versionTag.release
-    ) {
-      causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE);
-    }
-    // check build is higher than the one installed
-    if (
-      !plugin.appliedVersion?.build ||
-      plugin.appliedVersion?.build >=
-        decodedParams.versionTag.build
-    ) {
-      causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD);
-    }
-  } else {
+  if (!plugin) {
     causes.push(PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED);
     return causes;
+  }
+  // check release is the same as the one installed
+  if (
+    plugin.appliedVersion?.release.release !==
+      decodedParams.versionTag.release
+  ) {
+    causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE);
+  }
+  // check build is higher than the one installed
+  if (
+    !plugin.appliedVersion?.build ||
+    plugin.appliedVersion?.build >=
+      decodedParams.versionTag.build
+  ) {
+    causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD);
   }
   // check if plugin repo (pluginSetupRepo) exist
   type V = { pluginRepo: SubgraphPluginRepo };
@@ -1147,18 +1146,17 @@ export async function validateApplyUpdateFunction(
     params: { id: decodedParams.pluginRepo },
     name: "pluginRepo",
   });
-  if (pluginRepo) {
-    // check if is one of the aragon plugin repos
-    if (
-      !SupportedPluginRepoArray.includes(
-        pluginRepo.subdomain as SupportedPluginRepo,
-      )
-    ) {
-      causes.push(PluginUpdateProposalInValidityCause.NOT_ARAGON_PLUGIN_REPO);
-    }
-  } else {
+  if (!pluginRepo) {
     causes.push(PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO);
     return causes;
+  }
+  // check if is one of the aragon plugin repos
+  if (
+    !SupportedPluginRepoArray.includes(
+      pluginRepo.subdomain as SupportedPluginRepo,
+    )
+  ) {
+    causes.push(PluginUpdateProposalInValidityCause.NOT_ARAGON_PLUGIN_REPO);
   }
 
   // get the prepared setup id
@@ -1173,55 +1171,54 @@ export async function validateApplyUpdateFunction(
     params: { where: { preparedSetupId } },
     name: "pluginPreparation",
   });
-  if (pluginPreparation) {
-    // get the metadata of the plugin repo
-    // for the release and build specified
-    const release = pluginRepo.releases.find((
-      release: SubgraphPluginRepoRelease,
-    ) => release.release === decodedParams.versionTag.release);
-    const build = release?.builds.find((
-      build: { build: number; metadata: string },
-    ) => build.build === decodedParams.versionTag.build);
-    const metadataCid = build?.metadata;
+  if (!pluginPreparation) {
+    causes.push(
+      PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
+    );
+  }
+  // get the metadata of the plugin repo
+  // for the release and build specified
+  const release = pluginRepo.releases.find((
+    release: SubgraphPluginRepoRelease,
+  ) => release.release === decodedParams.versionTag.release);
+  const build = release?.builds.find((
+    build: { build: number; metadata: string },
+  ) => build.build === decodedParams.versionTag.build);
+  const metadataCid = build?.metadata;
 
-    // fetch the metadata
-    const metadata = await ipfs.fetchString(metadataCid!);
-    const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
-    // get the update abi for the specified build
-    if (
-      metadataJson?.pluginSetup?.prepareUpdate[decodedParams.versionTag.build]
-        ?.inputs
-    ) {
-      // if the abi exists try to decode the data
-      const updateAbi = metadataJson.pluginSetup.prepareUpdate[
-        decodedParams.versionTag.build
-      ].inputs;
-      try {
-        if (
-          decodedParams.initData.length > 0 &&
-          updateAbi.length === 0
-        ) {
-          throw new Error();
-        }
-        // if the decode does not throw an error the data is valid
-        defaultAbiCoder.decode(
-          getNamedTypesFromMetadata(updateAbi),
-          decodedParams.initData,
-        );
-      } catch {
-        // if the decode throws an error the data is invalid
-        causes.push(
-          PluginUpdateProposalInValidityCause.INVALID_DATA,
-        );
+  // fetch the metadata
+  const metadata = await ipfs.fetchString(metadataCid!);
+  const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
+  // get the update abi for the specified build
+  if (
+    metadataJson?.pluginSetup?.prepareUpdate[decodedParams.versionTag.build]
+      ?.inputs
+  ) {
+    // if the abi exists try to decode the data
+    const updateAbi = metadataJson.pluginSetup.prepareUpdate[
+      decodedParams.versionTag.build
+    ].inputs;
+    try {
+      if (
+        decodedParams.initData.length > 0 &&
+        updateAbi.length === 0
+      ) {
+        throw new Error();
       }
-    } else {
+      // if the decode does not throw an error the data is valid
+      defaultAbiCoder.decode(
+        getNamedTypesFromMetadata(updateAbi),
+        decodedParams.initData,
+      );
+    } catch {
+      // if the decode throws an error the data is invalid
       causes.push(
-        PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
+        PluginUpdateProposalInValidityCause.INVALID_DATA,
       );
     }
   } else {
     causes.push(
-      PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
+      PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
     );
   }
   return causes;
@@ -1477,11 +1474,11 @@ export async function validateUpdatePluginProposalActions(
   pspAddress: string,
   graphql: IClientGraphQLCore,
   ipfs: IClientIpfsCore,
-): Promise<PluginUpdateProposalValidity>{
+): Promise<PluginUpdateProposalValidity> {
   // Declare variables
   let actionErrorCauses: PluginUpdateProposalInValidityCause[][] = [];
   let resCauses: PluginUpdateProposalInValidityCause[];
-  let proposalSettingsErrorCauses: ProposalSettingsErrorCause[] =  []
+  let proposalSettingsErrorCauses: ProposalSettingsErrorCause[] = [];
   const classifiedActions = classifyProposalActions(actions);
   // check if is an update plugin proposal
   if (isPluginUpdateAction(classifiedActions)) {
@@ -1544,8 +1541,14 @@ export async function validateUpdatePluginProposalActions(
         ipfs,
       );
       // join the causes
-      actionErrorCauses = [...actionErrorCauses, ...recCauses.actionErrorCauses];
-      proposalSettingsErrorCauses = [...proposalSettingsErrorCauses, ...recCauses.proposalSettingsErrorCauses]
+      actionErrorCauses = [
+        ...actionErrorCauses,
+        ...recCauses.actionErrorCauses,
+      ];
+      proposalSettingsErrorCauses = [
+        ...proposalSettingsErrorCauses,
+        ...recCauses.proposalSettingsErrorCauses,
+      ];
     }
   } else if (isPluginUpdateActionWithRootPermission(classifiedActions)) {
     // initialize the causes array
@@ -1628,8 +1631,14 @@ export async function validateUpdatePluginProposalActions(
         ipfs,
       );
       // join the causes
-      actionErrorCauses = [...actionErrorCauses, ...recCauses.actionErrorCauses];
-      proposalSettingsErrorCauses = [...proposalSettingsErrorCauses, ...recCauses.proposalSettingsErrorCauses]
+      actionErrorCauses = [
+        ...actionErrorCauses,
+        ...recCauses.actionErrorCauses,
+      ];
+      proposalSettingsErrorCauses = [
+        ...proposalSettingsErrorCauses,
+        ...recCauses.proposalSettingsErrorCauses,
+      ];
     }
   } else {
     // add invalid actions to the causes array
@@ -1637,13 +1646,14 @@ export async function validateUpdatePluginProposalActions(
     // it will be added to the array
     return {
       isValid: false,
-      proposalSettingsErrorCauses:[ProposalSettingsErrorCause.INVALID_ACTIONS],
+      proposalSettingsErrorCauses: [ProposalSettingsErrorCause.INVALID_ACTIONS],
       actionErrorCauses: actionErrorCauses,
     };
   }
   return {
     // every item in the array should be empty
-    isValid: actionErrorCauses.every((cause) => cause.length === 0) && proposalSettingsErrorCauses.length === 0,
+    isValid: actionErrorCauses.every((cause) => cause.length === 0) &&
+      proposalSettingsErrorCauses.length === 0,
     actionErrorCauses,
     proposalSettingsErrorCauses,
   };
