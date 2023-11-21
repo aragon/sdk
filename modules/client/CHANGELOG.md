@@ -32,6 +32,8 @@ TEMPLATE:
 - Rename `isDaoUpdateValid` to `isDaoUpdateProposalValid` 
 - Rename `isPluginUpdate` to `isPluginUpdateProposal`
 - Rename `isPluginUpdateValid` to `isPluginUpdateProposalValid` 
+- Rename `isPluginUpdateAction` to `containsPluginUpdateAction`
+- Rename `isPluginUpdateActionBlockWithRootPermission` to `containsPluginUpdateActionBlockWithRootPermission`
 
 
 

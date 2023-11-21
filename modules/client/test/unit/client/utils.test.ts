@@ -28,7 +28,7 @@ import {
 import {
   containsDaoUpdateAction,
   isPluginUpdateAction,
-  isPluginUpdateActionBlockWithRootPermission,
+  containsPluginUpdateActionBlockWithRootPermission,
   validateApplyUpdateFunction,
   validateGrantRootPermissionAction,
   validateGrantUpdatePluginPermissionAction,
@@ -1359,7 +1359,7 @@ describe("Test client utils", () => {
       }
     });
   });
-  describe("isPluginUpdateAction", () => {
+  describe("containsPluginUpdateActionBlock", () => {
     it("should return the expected output given a specific input", () => {
       const cases = [
         { input: [ProposalActionTypes.UPGRADE_TO], expected: false },
@@ -1419,7 +1419,7 @@ describe("Test client utils", () => {
         },
       ];
       for (const { input, expected } of cases) {
-        const result = isPluginUpdateAction(input);
+        const result = containsPluginUpdateActionBlock(input);
         expect(result).toEqual(expected);
       }
     });
@@ -1488,7 +1488,7 @@ describe("Test client utils", () => {
         },
       ];
       for (const { input, expected } of cases) {
-        const result = isPluginUpdateActionBlockWithRootPermission(input);
+        const result = containsPluginUpdateActionBlockWithRootPermission(input);
         expect(result).toEqual(expected);
       }
     });

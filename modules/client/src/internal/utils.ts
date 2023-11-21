@@ -1328,7 +1328,7 @@ export function classifyProposalActions(
  * @param {ProposalActionTypes[]} actions
  * @return {*}  {boolean}
  */
-export function isPluginUpdateActionBlockWithRootPermission(
+export function containsPluginUpdateActionBlockWithRootPermission(
   actions: ProposalActionTypes[],
 ): boolean {
   // get the first 5 actions
@@ -1346,7 +1346,7 @@ export function isPluginUpdateActionBlockWithRootPermission(
  * @param {ProposalActionTypes[]} actions
  * @return {*}  {boolean}
  */
-export function isPluginUpdateAction(actions: ProposalActionTypes[]): boolean {
+export function containsPluginUpdateActionBlock(actions: ProposalActionTypes[]): boolean {
   // get the first 3 action
   const receivedPattern = actions.slice(0, 3);
   // check if it matches the expected pattern
@@ -1478,7 +1478,7 @@ export async function validateUpdatePluginProposalActions(
   let proposalSettingsErrorCauses: ProposalSettingsErrorCause[] = [];
   const classifiedActions = classifyProposalActions(actions);
   // check if is an update plugin proposal
-  if (isPluginUpdateAction(classifiedActions)) {
+  if (containsPluginUpdateActionBlock(classifiedActions)) {
     // initialize the causes array
     // we always use the index 0
     // because this is going to be called recursively
@@ -1521,7 +1521,7 @@ export async function validateUpdatePluginProposalActions(
           actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
           break;
           // other cases are not allowed and should have been
-          // caught by the isPluginUpdateAction function
+          // caught by the containsPluginUpdateActionBlock function
       }
     }
     // slice the first 3 actions
@@ -1556,7 +1556,7 @@ export async function validateUpdatePluginProposalActions(
     };
   }
 
-  if (isPluginUpdateActionBlockWithRootPermission(classifiedActions)) {
+  if (containsPluginUpdateActionBlockWithRootPermission(classifiedActions)) {
     // initialize the causes array
     // we always use the index 0
     // because this is going to be called recursively
@@ -1621,7 +1621,7 @@ export async function validateUpdatePluginProposalActions(
           break;
 
           // other cases are not allowed and should have been
-          // caught by the isPluginUpdateActionBlockWithRootPermission function
+          // caught by the containsPluginUpdateActionBlockWithRootPermission function
       }
     }
     // slice the first 5 actions

@@ -85,8 +85,8 @@ import {
 import {
   classifyProposalActions,
   containsDaoUpdateAction,
-  isPluginUpdateAction,
-  isPluginUpdateActionBlockWithRootPermission,
+  containsPluginUpdateActionBlock,
+  containsPluginUpdateActionBlockWithRootPermission,
   toAssetBalance,
   toDaoActions,
   toDaoDetails,
@@ -1155,8 +1155,8 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if(containsDaoUpdateAction(classifiedActions)) {
       classifiedActions = classifiedActions.slice(1);
     }
-    return isPluginUpdateAction(classifiedActions) ||
-      isPluginUpdateActionBlockWithRootPermission(classifiedActions);
+    return containsPluginUpdateActionBlock(classifiedActions) ||
+      containsPluginUpdateActionBlockWithRootPermission(classifiedActions);
   }
   /**
    * Check if the specified proposal id is valid for updating a plugin
