@@ -40,6 +40,7 @@ import {
   PluginRepoReleaseMetadata,
   PluginSortBy,
   PluginUpdateProposalInValidityCause,
+  ProposalSettingsErrorCause,
   SetAllowanceParams,
   SetAllowanceSteps,
   TransferQueryParams,
@@ -1967,7 +1968,8 @@ describe("Client", () => {
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(true);
-        expect(res.causes).toMatchObject([[]]);
+        expect(res.proposalSettingsErrorCauses).toMatchObject([]);
+        expect(res.actionErrorCauses).toMatchObject([[]]);
       });
       it("Should throw if the proposal does not exist", async () => {
         mockedClient.request.mockResolvedValue({
@@ -1983,9 +1985,10 @@ describe("Client", () => {
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(false);
-        expect(res.causes).toMatchObject([[
-          PluginUpdateProposalInValidityCause.PROPOSAL_NOT_FOUND,
-        ]]);
+        expect(res.proposalSettingsErrorCauses).toMatchObject([
+          ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND,
+        ]);
+        expect(res.actionErrorCauses).toMatchObject([]);
       });
       it("Should throw if the failure map is not 0", async () => {
         mockedClient.request.mockResolvedValue({
@@ -2001,9 +2004,10 @@ describe("Client", () => {
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(false);
-        expect(res.causes).toMatchObject([[
-          PluginUpdateProposalInValidityCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE,
-        ]]);
+        expect(res.proposalSettingsErrorCauses).toMatchObject([
+          ProposalSettingsErrorCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE,
+        ]);
+        expect(res.actionErrorCauses).toMatchObject([]);
       });
     });
     describe("isDaoUpdateProposalValid", () => {

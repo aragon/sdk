@@ -1190,6 +1190,7 @@ export async function validateApplyUpdateFunction(
     causes.push(
       PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
     );
+    return causes
   }
   // get the metadata of the plugin repo
   // for the release and build specified

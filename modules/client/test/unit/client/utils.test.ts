@@ -14,6 +14,7 @@ import {
   Client,
   DaoUpdateProposalInvalidityCause,
   PluginUpdateProposalInValidityCause,
+  ProposalSettingsErrorCause,
 } from "../../../src";
 // import * as deployV1Contracts from "../../helpers/deploy-v1-contracts";
 
@@ -27,7 +28,7 @@ import {
 } from "../../integration/constants";
 import {
   containsDaoUpdateAction,
-  isPluginUpdateAction,
+  containsPluginUpdateActionBlock,
   containsPluginUpdateActionBlockWithRootPermission,
   validateApplyUpdateFunction,
   validateGrantRootPermissionAction,
@@ -1013,7 +1014,8 @@ describe("Test client utils", () => {
         client.ipfs,
       );
       expect(result.isValid).toEqual(true);
-      expect(result.causes).toMatchObject([[]]);
+      expect(result.actionErrorCauses).toMatchObject([[]]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return an empty array for a valid actions where root is granted", async () => {
       const actions = client.encoding.applyUpdateAndPermissionsActionBlock(
@@ -1053,7 +1055,8 @@ describe("Test client utils", () => {
         client.ipfs,
       );
       expect(result.isValid).toEqual(true);
-      expect(result.causes).toMatchObject([[]]);
+      expect(result.actionErrorCauses).toMatchObject([[]]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return an empty for two groups of apply update", async () => {
       const actionsGroupOne = client.encoding.applyUpdateAndPermissionsActionBlock(
@@ -1101,7 +1104,8 @@ describe("Test client utils", () => {
         client.ipfs,
       );
       expect(result.isValid).toEqual(true);
-      expect(result.causes).toMatchObject([[], []]);
+      expect(result.actionErrorCauses).toMatchObject([[],[]]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return an INVALID_ACTIONS when the actions don't match the expected pattern", async () => {
       const actions = await client.encoding.withdrawAction({
@@ -1118,9 +1122,8 @@ describe("Test client utils", () => {
         client.ipfs,
       );
       expect(result.isValid).toEqual(false);
-      expect(result.causes).toMatchObject([[
-        PluginUpdateProposalInValidityCause.INVALID_ACTIONS,
-      ]]);
+      expect(result.actionErrorCauses).toMatchObject([]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([ProposalSettingsErrorCause.INVALID_ACTIONS]);
     });
   });
   describe("validateUpdateDaoProposalActions", () => {
@@ -1366,24 +1369,6 @@ describe("Test client utils", () => {
         { input: [ProposalActionTypes.UPGRADE_TO_AND_CALL], expected: false },
         {
           input: [
-            ProposalActionTypes.UPGRADE_TO,
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
-            ProposalActionTypes.APPLY_UPDATE,
-            ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
-          ],
-          expected: true,
-        },
-        {
-          input: [
-            ProposalActionTypes.UPGRADE_TO_AND_CALL,
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
-            ProposalActionTypes.APPLY_UPDATE,
-            ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
-          ],
-          expected: true,
-        },
-        {
-          input: [
             ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
@@ -1407,7 +1392,6 @@ describe("Test client utils", () => {
         },
         {
           input: [
-            ProposalActionTypes.UPGRADE_TO_AND_CALL,
             ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
@@ -1431,28 +1415,6 @@ describe("Test client utils", () => {
         { input: [ProposalActionTypes.UPGRADE_TO_AND_CALL], expected: false },
         {
           input: [
-            ProposalActionTypes.UPGRADE_TO,
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
-            ProposalActionTypes.GRANT_ROOT_PERMISSION,
-            ProposalActionTypes.APPLY_UPDATE,
-            ProposalActionTypes.REVOKE_ROOT_PERMISSION,
-            ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
-          ],
-          expected: true,
-        },
-        {
-          input: [
-            ProposalActionTypes.UPGRADE_TO_AND_CALL,
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
-            ProposalActionTypes.GRANT_ROOT_PERMISSION,
-            ProposalActionTypes.APPLY_UPDATE,
-            ProposalActionTypes.REVOKE_ROOT_PERMISSION,
-            ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
-          ],
-          expected: true,
-        },
-        {
-          input: [
             ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
             ProposalActionTypes.GRANT_ROOT_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
@@ -1472,7 +1434,6 @@ describe("Test client utils", () => {
         },
         {
           input: [
-            ProposalActionTypes.UPGRADE_TO_AND_CALL,
             ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
             ProposalActionTypes.GRANT_ROOT_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
