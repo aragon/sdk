@@ -1253,37 +1253,43 @@ export function classifyProposalActions(
         case "grant":
           decodedPermission = decodeGrantAction(action.data);
           // check the permission that is being granted
-          if (
-            decodedPermission.permission ===
-              Permissions.UPGRADE_PLUGIN_PERMISSION
-          ) {
-            classifiedActions.push(
-              ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
-            );
-          } else if (
-            decodedPermission.permission === Permissions.ROOT_PERMISSION
-          ) {
-            classifiedActions.push(
-              ProposalActionTypes.GRANT_ROOT_PERMISSION,
-            );
+          switch (decodedPermission.permission) {
+            case Permissions.UPGRADE_PLUGIN_PERMISSION:
+              classifiedActions.push(
+                ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+              );
+              break;
+            case Permissions.ROOT_PERMISSION:
+              classifiedActions.push(
+                ProposalActionTypes.GRANT_ROOT_PERMISSION,
+              );
+              break;
+            default:
+              classifiedActions.push(
+                ProposalActionTypes.UNKNOWN,
+              );
+              break;
           }
           break;
         case "revoke":
           decodedPermission = decodeRevokeAction(action.data);
           // check the permission that is being granted
-          if (
-            decodedPermission.permission ===
-              Permissions.UPGRADE_PLUGIN_PERMISSION
-          ) {
-            classifiedActions.push(
-              ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
-            );
-          } else if (
-            decodedPermission.permission === Permissions.ROOT_PERMISSION
-          ) {
-            classifiedActions.push(
-              ProposalActionTypes.REVOKE_ROOT_PERMISSION,
-            );
+          switch (decodedPermission.permission) {
+            case Permissions.UPGRADE_PLUGIN_PERMISSION:
+              classifiedActions.push(
+                ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
+              );
+              break;
+            case Permissions.ROOT_PERMISSION:
+              classifiedActions.push(
+                ProposalActionTypes.REVOKE_ROOT_PERMISSION,
+              );
+              break;
+            default:
+              classifiedActions.push(
+                ProposalActionTypes.UNKNOWN,
+              );
+              break;
           }
           break;
         case "applyUpdate":
