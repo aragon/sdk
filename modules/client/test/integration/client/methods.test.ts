@@ -17,6 +17,7 @@ import {
   TEST_NO_BALANCES_DAO_ADDRESS,
   TEST_NON_EXISTING_ADDRESS,
   TEST_TX_HASH,
+  TOKEN_VOTING_BUILD_METADATA,
   // TEST_WALLET,
 } from "../constants";
 import {
@@ -39,7 +40,6 @@ import {
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
   PluginSortBy,
-  PluginUpdateProposalInValidityCause,
   ProposalSettingsErrorCause,
   SetAllowanceParams,
   SetAllowanceSteps,
@@ -1895,7 +1895,7 @@ describe("Client", () => {
           },
           initData: new Uint8Array(),
           pluginRepo: ADDRESS_ONE,
-          pluginAddress: ADDRESS_ONE,
+          pluginAddress,
           permissions: [],
           helpers: [],
         };
@@ -1961,9 +1961,12 @@ describe("Client", () => {
             id: ADDRESS_ONE,
           }],
           dao: subgraphDao,
-          subgraphPreparation: subgraphPluginPreparation,
+          pluginPreparation: subgraphPluginPreparation,
           pluginRepo: subgraphPluginRepo,
         });
+        mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+          JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
+        ));
         const res = await client.methods.isPluginUpdateProposalValid(
           TEST_MULTISIG_PROPOSAL_ID,
         );
@@ -1978,7 +1981,7 @@ describe("Client", () => {
             id: ADDRESS_ONE,
           }],
           dao: subgraphDao,
-          subgraphPreparation: subgraphPluginPreparation,
+          pluginPreparation: subgraphPluginPreparation,
           pluginRepo: subgraphPluginRepo,
         });
         const res = await client.methods.isPluginUpdateProposalValid(
@@ -1997,7 +2000,7 @@ describe("Client", () => {
             id: ADDRESS_ONE,
           }],
           dao: subgraphDao,
-          subgraphPreparation: subgraphPluginPreparation,
+          pluginPreparation: subgraphPluginPreparation,
           pluginRepo: subgraphPluginRepo,
         });
         const res = await client.methods.isPluginUpdateProposalValid(

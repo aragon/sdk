@@ -1191,7 +1191,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return {
         isValid: false,
         actionErrorCauses: [],
-        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]
+        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE]
       };
     }
     // validate actions

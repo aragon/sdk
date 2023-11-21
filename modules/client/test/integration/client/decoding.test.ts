@@ -759,7 +759,7 @@ describe("Client", () => {
         pluginRepo: "0x2345678901234567890123456789012345678901",
         pluginAddress: "0x1234567890123456789012345678901234567890",
       };
-      const actions = client.encoding.applyUpdateAction(
+      const actions = client.encoding.applyUpdateAndPermissionsActionBlock(
         "0x1234567890123456789012345678901234567890",
         applyUpdateParams,
       );
