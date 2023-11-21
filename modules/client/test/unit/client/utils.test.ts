@@ -28,7 +28,7 @@ import {
 import {
   isDaoUpdateAction,
   isPluginUpdateAction,
-  isPluginUpdateActionWithRootPermission,
+  isPluginUpdateActionBlockWithRootPermission,
   validateApplyUpdateFunction,
   validateGrantRootPermissionAction,
   validateGrantUpdatePluginPermissionAction,
@@ -1480,7 +1480,7 @@ describe("Test client utils", () => {
         },
       ];
       for (const { input, expected } of cases) {
-        const result = isPluginUpdateActionWithRootPermission(input);
+        const result = isPluginUpdateActionBlockWithRootPermission(input);
         expect(result).toEqual(expected);
       }
     });

@@ -1140,7 +1140,9 @@ export async function validateApplyUpdateFunction(
     plugin.appliedVersion?.release.release !==
       decodedParams.versionTag.release
   ) {
-    causes.push(PluginUpdateProposalInValidityCause.UPDATE_TO_INCOMPATIBLE_RELEASE);
+    causes.push(
+      PluginUpdateProposalInValidityCause.UPDATE_TO_INCOMPATIBLE_RELEASE,
+    );
   }
   // check build is higher than the one installed
   if (
@@ -1148,7 +1150,9 @@ export async function validateApplyUpdateFunction(
     plugin.appliedVersion?.build >=
       decodedParams.versionTag.build
   ) {
-    causes.push(PluginUpdateProposalInValidityCause.UPDATE_TO_OLDER_OR_SAME_BUILD);
+    causes.push(
+      PluginUpdateProposalInValidityCause.UPDATE_TO_OLDER_OR_SAME_BUILD,
+    );
   }
   // check if plugin repo (pluginSetupRepo) exist
   type V = { pluginRepo: SubgraphPluginRepo };
@@ -1324,20 +1328,11 @@ export function classifyProposalActions(
  * @param {ProposalActionTypes[]} actions
  * @return {*}  {boolean}
  */
-export function isPluginUpdateActionWithRootPermission(
+export function isPluginUpdateActionBlockWithRootPermission(
   actions: ProposalActionTypes[],
 ): boolean {
   // get the first 5 actions
-  // if the first is a dao upgrade skip it
-  let receivedPattern;
-  if (
-    actions[0] === ProposalActionTypes.UPGRADE_TO ||
-    actions[0] === ProposalActionTypes.UPGRADE_TO_AND_CALL
-  ) {
-    receivedPattern = actions.slice(1, 6);
-  } else {
-    receivedPattern = actions.slice(0, 5);
-  }
+  const receivedPattern = actions.slice(0, 5);
   // check if it matches the expected pattern
   // length should be 5
   return receivedPattern.length === 5 &&
@@ -1353,16 +1348,7 @@ export function isPluginUpdateActionWithRootPermission(
  */
 export function isPluginUpdateAction(actions: ProposalActionTypes[]): boolean {
   // get the first 3 action
-  // if the first is a dao upgrade skip it
-  let receivedPattern;
-  if (
-    actions[0] === ProposalActionTypes.UPGRADE_TO ||
-    actions[0] === ProposalActionTypes.UPGRADE_TO_AND_CALL
-  ) {
-    receivedPattern = actions.slice(1, 4);
-  } else {
-    receivedPattern = actions.slice(0, 3);
-  }
+  const receivedPattern = actions.slice(0, 3);
   // check if it matches the expected pattern
   // length should be 3
   return receivedPattern.length === 3 &&
@@ -1384,22 +1370,22 @@ export function isDaoUpdateAction(actions: ProposalActionTypes[]): boolean {
 export function validateUpdateDaoProposalActions(
   actions: DaoAction[],
   daoAddress: string,
-  implementationAddress: string,
+  expectedImplementationAddress: string,
   currentDaoVersion: [number, number, number],
 ): DaoUpdateProposalValidity {
   const classifiedActions = classifyProposalActions(actions);
   const causes: DaoUpdateProposalInvalidityCause[] = [];
   // check if the actions are valid
-  // if they are not valid return add
-  // invalid actions to the causes and return
   if (!isDaoUpdateAction(classifiedActions)) {
+    // If actions are not valid, add the cause to the causes array
+    // and return
     causes.push(
       DaoUpdateProposalInvalidityCause.INVALID_ACTIONS,
     );
     return { isValid: false, causes };
   }
-  // if they are valid, the upgrade action must
-  // be the first one
+  // if they are valid, this means that 
+  // the upgrade action must be the first one
   const upgradeActionType = classifiedActions[0];
   const upgradeAction = actions[0];
   // if the to address is not the dao address
@@ -1423,7 +1409,7 @@ export function validateUpdateDaoProposalActions(
         actions[0].data,
       );
       // check that the implementation address is the same
-      if (implementationAddress !== decodedImplementationAddress) {
+      if (expectedImplementationAddress !== decodedImplementationAddress) {
         causes.push(
           DaoUpdateProposalInvalidityCause
             .INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS,
@@ -1442,7 +1428,7 @@ export function validateUpdateDaoProposalActions(
       // check that the implementation address is the same as specified
       // in the upgradeToAndCall action
       if (
-        implementationAddress !==
+        expectedImplementationAddress !==
           upgradeToAndCallDecodedParams.implementationAddress
       ) {
         causes.push(
@@ -1570,7 +1556,7 @@ export async function validateUpdatePluginProposalActions(
     };
   }
 
-  if (isPluginUpdateActionWithRootPermission(classifiedActions)) {
+  if (isPluginUpdateActionBlockWithRootPermission(classifiedActions)) {
     // initialize the causes array
     // we always use the index 0
     // because this is going to be called recursively
@@ -1635,7 +1621,7 @@ export async function validateUpdatePluginProposalActions(
           break;
 
           // other cases are not allowed and should have been
-          // caught by the isPluginUpdateActionWithRootPermission function
+          // caught by the isPluginUpdateActionBlockWithRootPermission function
       }
     }
     // slice the first 5 actions

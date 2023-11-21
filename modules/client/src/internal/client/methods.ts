@@ -86,7 +86,7 @@ import {
   classifyProposalActions,
   isDaoUpdateAction,
   isPluginUpdateAction,
-  isPluginUpdateActionWithRootPermission,
+  isPluginUpdateActionBlockWithRootPermission,
   toAssetBalance,
   toDaoActions,
   toDaoDetails,
@@ -1151,9 +1151,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     }
     const subgraphActions = iproposal.actions;
     let actions = toDaoActions(subgraphActions);
-    const classifiedActions = classifyProposalActions(actions);
+    let classifiedActions = classifyProposalActions(actions);
+    if(isDaoUpdateAction(classifiedActions)) {
+      classifiedActions = classifiedActions.slice(1);
+    }
     return isPluginUpdateAction(classifiedActions) ||
-      isPluginUpdateActionWithRootPermission(classifiedActions);
+      isPluginUpdateActionBlockWithRootPermission(classifiedActions);
   }
   /**
    * Check if the specified proposal id is valid for updating a plugin
