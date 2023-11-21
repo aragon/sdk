@@ -425,7 +425,7 @@ export type PluginUpdateProposalValidity = {
 };
 
 export enum ProposalSettingsErrorCause {
-  INVALID_ALLOW_FAILURE_MAP = "invalidAllowFailureMap",
+  NON_ZERO_ALLOW_FAILURE_MAP_VALUE = "nonZeroAllowFailureMapValue",
   INVALID_ACTIONS = "invalidActions",
   PROPOSAL_NOT_FOUND = "proposalNotFound",
 }
@@ -460,7 +460,7 @@ export enum PluginUpdateProposalInValidityCause {
     "invalidGrantRootPermissionWhereAddress",
   INVALID_GRANT_ROOT_PERMISSION_PERMISSION =
     "invalidGrantRootPermissionPermission",
-  INVALID_GRANT_ROOT_PERMISSION_VALUE = "invalidGrantRootPermissionCondition",
+  NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE = "nonZeroGrantRootPermissionCallValue",
   INVALID_GRANT_ROOT_PERMISSION_PERMISSION_ID =
     "invalidGrantRootPermissionPermissionId",
   // Revoke ROOT_PERMISSION action
@@ -479,8 +479,8 @@ export enum PluginUpdateProposalInValidityCause {
   NOT_ARAGON_PLUGIN_REPO = "notAragonPluginRepo",
   MISSING_PLUGIN_REPO = "missingPluginRepo",
   MISSING_PLUGIN_PREPARATION = "missingPluginPreparation",
-  INVALID_PLUGIN_RELEASE = "invalidPluginRelease",
-  INVALID_PLUGIN_BUILD = "invalidPluginBuild",
+  UPDATE_TO_INCOMPATIBLE_RELEASE = "updateToIncompatibleRelease",
+  UPDATE_TO_OLDER_OR_SAME_BUILD = "updateToOlderOrSameBuild",
   INVALID_DATA = "invalidData",
   INVALID_PLUGIN_REPO_METADATA = "invalidPluginRepoMetadata",
 }
@@ -496,7 +496,7 @@ export enum DaoUpdateProposalInvalidityCause {
   PROPOSAL_NOT_FOUND = "proposalNotFound",
   INVALID_ACTIONS = "invalidActions",
   INVALID_TO_ADDRESS = "invalidToAddress",
-  INVALID_VALUE = "invalidValue",
+  NON_ZERO_CALL_VALUE = "nonZeroCallValue",
   INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS =
     "invalidUpgradeToImplementationAddress",
   INVALID_UPGRADE_TO_AND_CALL_DATA = "invalidUpgradeToAndCallData",

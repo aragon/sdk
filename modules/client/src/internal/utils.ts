@@ -901,30 +901,40 @@ export async function validateGrantUpdatePluginPermissionAction(
   graphql: IClientGraphQLCore,
 ): Promise<PluginUpdateProposalInValidityCause[]> {
   const causes: PluginUpdateProposalInValidityCause[] = [];
+  // decode the action
   const decodedPermission = decodeGrantAction(action.data);
+  // retrieve the plugin installations from subgraph
+  // with the same plugin address and the specified
+  // dao address
   const pluginInstallations = await getPluginInstallations(
     daoAddress,
     decodedPermission.where,
     graphql,
   );
+  // if the plugin installations length is 0 means that
+  // that the address in the where field is not a plugin
+  // or is not installed in the specified dao
   if (pluginInstallations.length === 0) {
     causes.push(
       PluginUpdateProposalInValidityCause
         .INVALID_GRANT_UPDATE_PERMISSION_WHERE_ADDRESS,
     );
   }
+  // Value must be 0
   if (action.value.toString() !== "0") {
     causes.push(
       PluginUpdateProposalInValidityCause
         .INVALID_GRANT_UPDATE_PERMISSION_VALUE,
     );
   }
+  // The permission should be granted to the PSP
   if (decodedPermission.who !== pspAddress) {
     causes.push(
       PluginUpdateProposalInValidityCause
         .INVALID_GRANT_UPDATE_PERMISSION_WHO_ADDRESS,
     );
   }
+  // The permission should be `UPGRADE_PLUGIN_PERMISSION`
   if (
     decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
   ) {
@@ -933,6 +943,7 @@ export async function validateGrantUpdatePluginPermissionAction(
         .INVALID_GRANT_UPDATE_PERMISSION_PERMISSION,
     );
   }
+  // The permissionId should be `UPGRADE_PLUGIN_PERMISSION_ID`
   if (
     decodedPermission.permissionId !==
       PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
@@ -1005,7 +1016,7 @@ export function validateGrantRootPermissionAction(
   if (action.value.toString() !== "0") {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_ROOT_PERMISSION_VALUE,
+        .NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE,
     );
   }
   if (decodedPermission.where !== daoAddress) {
@@ -1129,7 +1140,7 @@ export async function validateApplyUpdateFunction(
     plugin.appliedVersion?.release.release !==
       decodedParams.versionTag.release
   ) {
-    causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE);
+    causes.push(PluginUpdateProposalInValidityCause.UPDATE_TO_INCOMPATIBLE_RELEASE);
   }
   // check build is higher than the one installed
   if (
@@ -1137,7 +1148,7 @@ export async function validateApplyUpdateFunction(
     plugin.appliedVersion?.build >=
       decodedParams.versionTag.build
   ) {
-    causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD);
+    causes.push(PluginUpdateProposalInValidityCause.UPDATE_TO_OLDER_OR_SAME_BUILD);
   }
   // check if plugin repo (pluginSetupRepo) exist
   type V = { pluginRepo: SubgraphPluginRepo };
@@ -1402,7 +1413,7 @@ export function validateUpdateDaoProposalActions(
   // add the cause to the causes array
   if (upgradeAction.value.toString() !== "0") {
     causes.push(
-      DaoUpdateProposalInvalidityCause.INVALID_VALUE,
+      DaoUpdateProposalInvalidityCause.NON_ZERO_CALL_VALUE,
     );
   }
   switch (upgradeActionType) {

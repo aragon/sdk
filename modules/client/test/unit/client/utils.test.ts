@@ -373,7 +373,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_ROOT_PERMISSION_VALUE,
+          .NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE,
       ]);
     });
     it("should return an error if the permission is not granted in the DAO", () => {
@@ -676,7 +676,7 @@ describe("Test client utils", () => {
         PluginUpdateProposalInValidityCause.INVALID_APPLY_UPDATE_ACTION_VALUE,
       ]);
     });
-    it("should return an `INVALID_PLUGIN_RELEASE` when the release is different from the one on subgraph", async () => {
+    it("should return an `UPDATE_TO_INCOMPATIBLE_RELEASE` when the release is different from the one on subgraph", async () => {
       const updatedApplyUpdateParams = {
         ...applyUpdateParams,
         versionTag: {
@@ -708,10 +708,10 @@ describe("Test client utils", () => {
         client.ipfs,
       );
       expect(result).toMatchObject([
-        PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE,
+        PluginUpdateProposalInValidityCause.UPDATE_TO_INCOMPATIBLE_RELEASE,
       ]);
     });
-    it("should return an `INVALID_PLUGIN_BUILD` when the release is different from the one on subgraph", async () => {
+    it("should return an `UPDATE_TO_OLDER_OR_SAME_BUILD` when the release is different from the one on subgraph", async () => {
       const updatedApplyUpdateParams = {
         ...applyUpdateParams,
         versionTag: {
@@ -743,7 +743,7 @@ describe("Test client utils", () => {
         client.ipfs,
       );
       expect(result).toMatchObject([
-        PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD,
+        PluginUpdateProposalInValidityCause.UPDATE_TO_OLDER_OR_SAME_BUILD,
       ]);
     });
     it("should return an `PLUGIN_NOT_INSTALLED` when the plugin is not found on subgraph", async () => {
@@ -1198,7 +1198,7 @@ describe("Test client utils", () => {
         DaoUpdateProposalInvalidityCause.INVALID_TO_ADDRESS,
       ]);
     });
-    it("should return INVALID_VALUE when the the value of the action is not 0", () => {
+    it("should return NON_ZERO_CALL_VALUE when the the value of the action is not 0", () => {
       upgradeToAndCallAction.value = BigInt(10);
       const result = validateUpdateDaoProposalActions(
         [upgradeToAndCallAction],
@@ -1208,7 +1208,7 @@ describe("Test client utils", () => {
       );
       expect(result.isValid).toEqual(false);
       expect(result.causes).toMatchObject([
-        DaoUpdateProposalInvalidityCause.INVALID_VALUE,
+        DaoUpdateProposalInvalidityCause.NON_ZERO_CALL_VALUE,
       ]);
     });
     it("should return INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS when the implementation address is not the correct one", () => {

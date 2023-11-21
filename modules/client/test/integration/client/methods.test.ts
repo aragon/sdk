@@ -2002,7 +2002,7 @@ describe("Client", () => {
         );
         expect(res.isValid).toBe(false);
         expect(res.causes).toMatchObject([[
-          PluginUpdateProposalInValidityCause.INVALID_ALLOW_FAILURE_MAP,
+          PluginUpdateProposalInValidityCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE,
         ]]);
       });
     });
