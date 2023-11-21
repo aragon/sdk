@@ -20,6 +20,8 @@ import {
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
   PluginUpdateProposalInValidityCause,
+  PluginUpdateProposalValidity,
+  ProposalSettingsErrorCause,
   RevokePermissionDecodedParams,
   RevokePermissionParams,
   Transfer,
@@ -1483,10 +1485,11 @@ export async function validateUpdatePluginProposalActions(
   pspAddress: string,
   graphql: IClientGraphQLCore,
   ipfs: IClientIpfsCore,
-) {
+): Promise<PluginUpdateProposalValidity>{
   // Declare variables
-  let causes: PluginUpdateProposalInValidityCause[][] = [];
+  let actionErrorCauses: PluginUpdateProposalInValidityCause[][] = [];
   let resCauses: PluginUpdateProposalInValidityCause[];
+  let proposalSettingsErrorCauses: ProposalSettingsErrorCause[] =  []
   const classifiedActions = classifyProposalActions(actions);
   // check if is an update plugin proposal
   if (isPluginUpdateAction(classifiedActions)) {
@@ -1494,7 +1497,7 @@ export async function validateUpdatePluginProposalActions(
     // we always use the index 0
     // because this is going to be called recursively
     // and then joined
-    causes[0] = [];
+    actionErrorCauses[0] = [];
     // iterate over the first 3 actions actions
     for (const [index, action] of classifiedActions.slice(0, 3).entries()) {
       switch (action) {
@@ -1507,7 +1510,7 @@ export async function validateUpdatePluginProposalActions(
             daoAddress,
             graphql,
           );
-          causes[0] = [...causes[0], ...resCauses];
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
           break;
           // if the action is revoke plugin update permission
           // validate the action
@@ -1518,7 +1521,7 @@ export async function validateUpdatePluginProposalActions(
             daoAddress,
             graphql,
           );
-          causes[0] = [...causes[0], ...resCauses];
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
           break;
           // if the action is grant root permission
           // validate the action
@@ -1529,7 +1532,7 @@ export async function validateUpdatePluginProposalActions(
             graphql,
             ipfs,
           );
-          causes[0] = [...causes[0], ...resCauses];
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
           break;
           // other cases are not allowed and should have been
           // caught by the isPluginUpdateAction function
@@ -1549,14 +1552,15 @@ export async function validateUpdatePluginProposalActions(
         ipfs,
       );
       // join the causes
-      causes = causes.concat(recCauses.causes);
+      actionErrorCauses = [...actionErrorCauses, ...recCauses.actionErrorCauses];
+      proposalSettingsErrorCauses = [...proposalSettingsErrorCauses, ...recCauses.proposalSettingsErrorCauses]
     }
   } else if (isPluginUpdateActionWithRootPermission(classifiedActions)) {
     // initialize the causes array
     // we always use the index 0
     // because this is going to be called recursively
     // and then joined
-    causes[0] = [];
+    actionErrorCauses[0] = [];
     // iterate over the first 5 actions actions
     for (const [index, action] of classifiedActions.slice(0, 5).entries()) {
       switch (action) {
@@ -1569,7 +1573,7 @@ export async function validateUpdatePluginProposalActions(
             daoAddress,
             graphql,
           );
-          causes[0] = [...causes[0], ...resCauses];
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
           break;
           // if the action is revoke plugin update permission
           // validate the action
@@ -1580,7 +1584,7 @@ export async function validateUpdatePluginProposalActions(
             daoAddress,
             graphql,
           );
-          causes[0] = [...causes[0], ...resCauses];
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
           break;
           // if the action is grant root permission
           // validate the action
@@ -1590,7 +1594,7 @@ export async function validateUpdatePluginProposalActions(
             daoAddress,
             pspAddress,
           );
-          causes[0] = [...causes[0], ...resCauses];
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
           break;
           // if the action is revoke root permission
           // validate the action
@@ -1601,7 +1605,7 @@ export async function validateUpdatePluginProposalActions(
             daoAddress,
             pspAddress,
           );
-          causes[0] = [...causes[0], ...resCauses];
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
           break;
           // if the action is apply update
           // validate the action
@@ -1612,7 +1616,7 @@ export async function validateUpdatePluginProposalActions(
             graphql,
             ipfs,
           );
-          causes[0] = [...causes[0], ...resCauses];
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
           break;
 
           // other cases are not allowed and should have been
@@ -1632,25 +1636,24 @@ export async function validateUpdatePluginProposalActions(
         ipfs,
       );
       // join the causes
-      causes = [...causes, ...recCauses.causes];
+      actionErrorCauses = [...actionErrorCauses, ...recCauses.actionErrorCauses];
+      proposalSettingsErrorCauses = [...proposalSettingsErrorCauses, ...recCauses.proposalSettingsErrorCauses]
     }
   } else {
     // add invalid actions to the causes array
-    causes[0] = [];
-    causes[0].push(
-      PluginUpdateProposalInValidityCause.INVALID_ACTIONS,
-    );
     // return, if this is inside the recursion
     // it will be added to the array
     return {
       isValid: false,
-      causes,
+      proposalSettingsErrorCauses:[ProposalSettingsErrorCause.INVALID_ACTIONS],
+      actionErrorCauses: actionErrorCauses,
     };
   }
   return {
     // every item in the array should be empty
-    isValid: causes.every((cause) => cause.length === 0),
-    causes,
+    isValid: actionErrorCauses.every((cause) => cause.length === 0) && proposalSettingsErrorCauses.length === 0,
+    actionErrorCauses,
+    proposalSettingsErrorCauses,
   };
 }
 

@@ -420,11 +420,17 @@ export type DecodedInitializeFromParams = {
 
 export type PluginUpdateProposalValidity = {
   isValid: boolean;
-  causes: PluginUpdateProposalInValidityCause[][];
+  actionErrorCauses: PluginUpdateProposalInValidityCause[][];
+  proposalSettingsErrorCauses: ProposalSettingsErrorCause[]
 };
 
-export enum PluginUpdateProposalInValidityCause {
+export enum ProposalSettingsErrorCause {
+  INVALID_ALLOW_FAILURE_MAP = "invalidAllowFailureMap",
+  INVALID_ACTIONS = "invalidActions",
   PROPOSAL_NOT_FOUND = "proposalNotFound",
+}
+
+export enum PluginUpdateProposalInValidityCause {
   // Grant UPDATE_PLUGIN_PERMISSION action
   INVALID_GRANT_UPDATE_PERMISSION_WHO_ADDRESS =
     "invalidGrantUpdatePermissionWhoAddress",
@@ -468,13 +474,11 @@ export enum PluginUpdateProposalInValidityCause {
   INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_ID =
     "invalidRevokeRootPermissionPermissionId",
   // applyUpdate action
-  INVALID_ACTIONS = "invalidActions",
   INVALID_APPLY_UPDATE_ACTION_VALUE = "invalidApplyUpdateActionValue",
   PLUGIN_NOT_INSTALLED = "pluginNotInstalled",
   NOT_ARAGON_PLUGIN_REPO = "notAragonPluginRepo",
   MISSING_PLUGIN_REPO = "missingPluginRepo",
   MISSING_PLUGIN_PREPARATION = "missingPluginPreparation",
-  INVALID_ALLOW_FAILURE_MAP = "invalidAllowFailureMap",
   INVALID_PLUGIN_RELEASE = "invalidPluginRelease",
   INVALID_PLUGIN_BUILD = "invalidPluginBuild",
   INVALID_DATA = "invalidData",

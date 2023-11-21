@@ -62,6 +62,7 @@ import {
   PluginSortBy,
   PluginUpdateProposalInValidityCause,
   PluginUpdateProposalValidity,
+  ProposalSettingsErrorCause,
   SetAllowanceParams,
   SetAllowanceSteps,
   SetAllowanceStepValue,
@@ -1165,7 +1166,6 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     proposalId: string,
   ): Promise<PluginUpdateProposalValidity> {
     // not validating the proposalId because multiple proposal id formats can be used
-    let causes: PluginUpdateProposalInValidityCause[][] = [];
     // get the iproposal given the proposal id
     const name = "iproposal";
     const query = QueryIProposal;
@@ -1176,26 +1176,20 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       name,
     });
     if (!iproposal) {
-      // if the proposal does not exist return proposal not found
-      causes[0] = [];
-      causes[0].push(
-        PluginUpdateProposalInValidityCause.PROPOSAL_NOT_FOUND,
-      );
+      // if the proposal does not exist return invalid
       return {
         isValid: false,
-        causes,
+        actionErrorCauses: [],
+        proposalSettingErrorCauses: [ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]
       };
     }
     // check failure map
     if (iproposal.allowFailureMap !== "0") {
-      causes[0] = [];
       // if the failure map is not 0 return invalid failure map
-      causes[0].push(
-        PluginUpdateProposalInValidityCause.INVALID_ALLOW_FAILURE_MAP,
-      );
       return {
         isValid: false,
-        causes,
+        actionErrorCauses: [],
+        proposalSettingErrorCauses: [ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]
       };
     }
     // validate actions
