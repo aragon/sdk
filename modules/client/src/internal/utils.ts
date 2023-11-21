@@ -1550,7 +1550,16 @@ export async function validateUpdatePluginProposalActions(
         ...recCauses.proposalSettingsErrorCauses,
       ];
     }
-  } else if (isPluginUpdateActionWithRootPermission(classifiedActions)) {
+    return {
+      // every item in the array should be empty
+      isValid: actionErrorCauses.every((cause) => cause.length === 0) &&
+        proposalSettingsErrorCauses.length === 0,
+      actionErrorCauses,
+      proposalSettingsErrorCauses,
+    };
+  }
+
+  if (isPluginUpdateActionWithRootPermission(classifiedActions)) {
     // initialize the causes array
     // we always use the index 0
     // because this is going to be called recursively
@@ -1640,22 +1649,21 @@ export async function validateUpdatePluginProposalActions(
         ...recCauses.proposalSettingsErrorCauses,
       ];
     }
-  } else {
-    // add invalid actions to the causes array
-    // return, if this is inside the recursion
-    // it will be added to the array
     return {
-      isValid: false,
-      proposalSettingsErrorCauses: [ProposalSettingsErrorCause.INVALID_ACTIONS],
-      actionErrorCauses: actionErrorCauses,
+      // every item in the array should be empty
+      isValid: actionErrorCauses.every((cause) => cause.length === 0) &&
+        proposalSettingsErrorCauses.length === 0,
+      actionErrorCauses,
+      proposalSettingsErrorCauses,
     };
   }
+  // add invalid actions to the causes array
+  // return, if this is inside the recursion
+  // it will be added to the array
   return {
-    // every item in the array should be empty
-    isValid: actionErrorCauses.every((cause) => cause.length === 0) &&
-      proposalSettingsErrorCauses.length === 0,
-    actionErrorCauses,
-    proposalSettingsErrorCauses,
+    isValid: false,
+    proposalSettingsErrorCauses: [ProposalSettingsErrorCause.INVALID_ACTIONS],
+    actionErrorCauses: actionErrorCauses,
   };
 }
 
