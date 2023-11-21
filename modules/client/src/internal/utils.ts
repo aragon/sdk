@@ -1329,13 +1329,8 @@ export function isPluginUpdateActionWithRootPermission(
   }
   // check if it matches the expected pattern
   // length should be 5
-  if (
-    receivedPattern.length !== 5 ||
-    !compareArrays(receivedPattern, PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN)
-  ) {
-    return false;
-  }
-  return true;
+  return receivedPattern.length === 5 &&
+    compareArrays(receivedPattern, PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN);
 }
 
 /**
@@ -1359,13 +1354,8 @@ export function isPluginUpdateAction(actions: ProposalActionTypes[]): boolean {
   }
   // check if it matches the expected pattern
   // length should be 3
-  if (
-    receivedPattern.length !== 3 ||
-    !compareArrays(receivedPattern, PLUGIN_UPDATE_ACTION_PATTERN)
-  ) {
-    return false;
-  }
-  return true;
+  return receivedPattern.length === 3 &&
+    compareArrays(receivedPattern, PLUGIN_UPDATE_ACTION_PATTERN);
 }
 /**
  * Returns true if the actions are valid for a plugin update proposal
