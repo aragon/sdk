@@ -1392,6 +1392,14 @@ describe("Test client utils", () => {
         },
         {
           input: [
+            ProposalActionTypes.GRANT_ROOT_PERMISSION,
+            ProposalActionTypes.APPLY_UPDATE,
+            ProposalActionTypes.REVOKE_ROOT_PERMISSION,
+          ],
+          expected: false,
+        },
+        {
+          input: [
             ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
           ],
