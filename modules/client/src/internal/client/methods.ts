@@ -60,7 +60,6 @@ import {
   PluginRepoListItem,
   PluginRepoReleaseMetadata,
   PluginSortBy,
-  PluginUpdateProposalInValidityCause,
   PluginUpdateProposalValidity,
   ProposalSettingsErrorCause,
   SetAllowanceParams,
@@ -1183,7 +1182,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return {
         isValid: false,
         actionErrorCauses: [],
-        proposalSettingErrorCauses: [ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]
+        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]
       };
     }
     // check failure map
@@ -1192,7 +1191,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return {
         isValid: false,
         actionErrorCauses: [],
-        proposalSettingErrorCauses: [ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]
+        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]
       };
     }
     // validate actions

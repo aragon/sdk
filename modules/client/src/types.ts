@@ -527,7 +527,7 @@ export type DaoUpdateParams = InitializeFromParams & {
 export type DaoUpdateDecodedParams = InitializeFromParams & {
   implementationAddress: string;
 };
-export type IsPluginUpdateProposalValidParams = IsUpdateParamsBase;
+// export type IsPluginUpdateProposalValidParams = IsUpdateParamsBase;
 export type PluginPreparationQueryParams = Pagination & {
   sortBy?: PluginPreparationSortBy;
   type?: PluginPreparationType;
