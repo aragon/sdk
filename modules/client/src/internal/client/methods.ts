@@ -1135,7 +1135,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {Promise<boolean>}
    * @memberof ClientMethods
    */
-  public async isPluginUpdate(
+  public async isPluginUpdateProposal(
     proposalId: string,
   ): Promise<boolean> {
     const name = "iproposal";
@@ -1165,7 +1165,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {Promise<PluginUpdateProposalValidity>}
    * @memberof ClientMethods
    */
-  public async isPluginUpdateValid(
+  public async isPluginUpdateProposalValid(
     proposalId: string,
   ): Promise<PluginUpdateProposalValidity> {
     // not validating the proposalId because multiple proposal id formats can be used

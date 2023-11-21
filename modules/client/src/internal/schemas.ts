@@ -171,7 +171,7 @@ export const DaoUpdateSchema = object({
   daoFactoryAddress: AddressOrEnsSchema.notRequired(),
 });
 
-export const IsPluginUpdateValidSchema = object({
+export const IsPluginUpdateProposalValidSchema = object({
   actions: array().of(object({
     to: AddressOrEnsSchema.required(),
     value: BigintSchema.required(),

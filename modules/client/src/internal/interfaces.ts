@@ -97,11 +97,11 @@ export interface IClientMethods {
     contractAddress: string,
   ) => Promise<[number, number, number]>;
 
-  isPluginUpdate: (
+  isPluginUpdateProposal: (
     proposalId: string,
   ) => Promise<boolean>;
 
-  isPluginUpdateValid: (
+  isPluginUpdateProposalValid: (
     proposalId: string,
   ) => Promise<PluginUpdateProposalValidity>;
 

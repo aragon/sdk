@@ -30,6 +30,9 @@ TEMPLATE:
 - Rename `isDaoUpdateAction`to `containsDaoUpdateAction`
 - Rename `isDaoUpdate` to `isDaoUpdateProposal`
 - Rename `isDaoUpdateValid` to `isDaoUpdateProposalValid` 
+- Rename `isPluginUpdate` to `isPluginUpdateProposal`
+- Rename `isPluginUpdateValid` to `isPluginUpdateProposalValid` 
+
 
 
 ## [1.19.0]

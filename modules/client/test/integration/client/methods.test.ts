@@ -1867,7 +1867,7 @@ describe("Client", () => {
       //   "Invalid ENS name"
       // );
     });
-    describe("isPluginUpdateValid", () => {
+    describe("isPluginUpdateProposalValid", () => {
       const context = new Context();
       const client = new Client(context);
       let updateActions: DaoAction[];
@@ -1963,7 +1963,7 @@ describe("Client", () => {
           subgraphPreparation: subgraphPluginPreparation,
           pluginRepo: subgraphPluginRepo,
         });
-        const res = await client.methods.isPluginUpdateValid(
+        const res = await client.methods.isPluginUpdateProposalValid(
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(true);
@@ -1979,7 +1979,7 @@ describe("Client", () => {
           subgraphPreparation: subgraphPluginPreparation,
           pluginRepo: subgraphPluginRepo,
         });
-        const res = await client.methods.isPluginUpdateValid(
+        const res = await client.methods.isPluginUpdateProposalValid(
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(false);
@@ -1997,7 +1997,7 @@ describe("Client", () => {
           subgraphPreparation: subgraphPluginPreparation,
           pluginRepo: subgraphPluginRepo,
         });
-        const res = await client.methods.isPluginUpdateValid(
+        const res = await client.methods.isPluginUpdateProposalValid(
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(false);
