@@ -171,7 +171,7 @@ export interface IClientEncoding {
     daoAddressOrEns: string,
     params: ApplyUninstallationParams,
   ) => DaoAction[];
-  applyUpdateAction: (
+  applyUpdateAndPermissionsActionBlock: (
     daoAddressOrEns: string,
     params: ApplyUpdateParams,
   ) => DaoAction[];

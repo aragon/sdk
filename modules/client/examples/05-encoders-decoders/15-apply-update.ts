@@ -42,7 +42,7 @@ const applyUpdateParams: ApplyUpdateParams = {
 
 const daoAddressOrEns: string = "0x123123123123123123123123123123123123"; // "my-dao.eth"
 
-const actions: DaoAction[] = client.encoding.applyUpdateAction(
+const actions: DaoAction[] = client.encoding.applyUpdateAndPermissionsActionBlock(
   daoAddressOrEns,
   applyUpdateParams,
 );

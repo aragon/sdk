@@ -84,7 +84,7 @@ import {
 } from "../types";
 import {
   classifyProposalActions,
-  isDaoUpdateAction,
+  containsDaoUpdateAction,
   isPluginUpdateAction,
   isPluginUpdateActionBlockWithRootPermission,
   toAssetBalance,
@@ -1126,7 +1126,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const subgraphActions = iproposal.actions;
     let actions = toDaoActions(subgraphActions);
     const classifiedActions = classifyProposalActions(actions);
-    return isDaoUpdateAction(classifiedActions);
+    return containsDaoUpdateAction(classifiedActions);
   }
   /**
    * Given a proposal id returns if that proposal is a plugin update proposal
@@ -1152,7 +1152,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const subgraphActions = iproposal.actions;
     let actions = toDaoActions(subgraphActions);
     let classifiedActions = classifyProposalActions(actions);
-    if(isDaoUpdateAction(classifiedActions)) {
+    if(containsDaoUpdateAction(classifiedActions)) {
       classifiedActions = classifiedActions.slice(1);
     }
     return isPluginUpdateAction(classifiedActions) ||

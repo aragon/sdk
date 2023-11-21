@@ -1899,7 +1899,7 @@ describe("Client", () => {
           helpers: [],
         };
 
-        updateActions = client.encoding.applyUpdateAction(
+        updateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
           daoAddress,
           applyUpdateParams,
         );

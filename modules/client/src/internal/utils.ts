@@ -1361,7 +1361,7 @@ export function isPluginUpdateAction(actions: ProposalActionTypes[]): boolean {
  * @param {ProposalActionTypes[]} actions
  * @return {*}  {boolean}
  */
-export function isDaoUpdateAction(actions: ProposalActionTypes[]): boolean {
+export function containsDaoUpdateAction(actions: ProposalActionTypes[]): boolean {
   // UpgradeTo or UpgradeToAndCall should be the first action
   return actions[0] === ProposalActionTypes.UPGRADE_TO ||
     actions[0] === ProposalActionTypes.UPGRADE_TO_AND_CALL;
@@ -1376,7 +1376,7 @@ export function validateUpdateDaoProposalActions(
   const classifiedActions = classifyProposalActions(actions);
   const causes: DaoUpdateProposalInvalidityCause[] = [];
   // check if the actions are valid
-  if (!isDaoUpdateAction(classifiedActions)) {
+  if (!containsDaoUpdateAction(classifiedActions)) {
     // If actions are not valid, add the cause to the causes array
     // and return
     causes.push(

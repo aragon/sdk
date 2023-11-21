@@ -26,7 +26,7 @@ import {
   TOKEN_VOTING_BUILD_METADATA,
 } from "../../integration/constants";
 import {
-  isDaoUpdateAction,
+  containsDaoUpdateAction,
   isPluginUpdateAction,
   isPluginUpdateActionBlockWithRootPermission,
   validateApplyUpdateFunction,
@@ -622,7 +622,7 @@ describe("Test client utils", () => {
       };
     });
     it("should return an empty array for a valid action", async () => {
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
@@ -648,7 +648,7 @@ describe("Test client utils", () => {
       expect(result).toEqual([]);
     });
     it("should return an `INVALID_APPLY_UPDATE_ACTION_VALUE` when the value in the action is not 0", async () => {
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
@@ -684,7 +684,7 @@ describe("Test client utils", () => {
           build: 2,
         },
       };
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         updatedApplyUpdateParams,
       );
@@ -719,7 +719,7 @@ describe("Test client utils", () => {
           build: 1,
         },
       };
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         updatedApplyUpdateParams,
       );
@@ -751,7 +751,7 @@ describe("Test client utils", () => {
         ...subgraphDao,
         plugins: [],
       };
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
@@ -774,7 +774,7 @@ describe("Test client utils", () => {
         ...subgraphPluginRepo,
         subdomain: "external-plugin-repo",
       };
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
@@ -802,7 +802,7 @@ describe("Test client utils", () => {
       ]);
     });
     it("should return an `MISSING_PLUGIN_REPO` when the plugin repo is not on subgraph", async () => {
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
@@ -828,7 +828,7 @@ describe("Test client utils", () => {
         ...applyUpdateParams,
         initData: new Uint8Array([1, 2, 3]),
       };
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         updatedApplyUpdateParams,
       );
@@ -856,7 +856,7 @@ describe("Test client utils", () => {
       ]);
     });
     it("should return an `INVALID_PLUGIN_REPO_METADATA` when the provided metadata does not exist or is not correct", async () => {
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
@@ -884,7 +884,7 @@ describe("Test client utils", () => {
       ]);
     });
     it("should return an `MISSING_PLUGIN_PREPARATION` when the pluginPreparation is null", async () => {
-      const applyUpdateActions = client.encoding.applyUpdateAction(
+      const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
@@ -979,7 +979,7 @@ describe("Test client utils", () => {
       };
     });
     it("should return an empty array for a valid actions", async () => {
-      const actions = client.encoding.applyUpdateAction(
+      const actions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
@@ -1016,7 +1016,7 @@ describe("Test client utils", () => {
       expect(result.causes).toMatchObject([[]]);
     });
     it("should return an empty array for a valid actions where root is granted", async () => {
-      const actions = client.encoding.applyUpdateAction(
+      const actions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         {
           ...applyUpdateParams,
@@ -1056,11 +1056,11 @@ describe("Test client utils", () => {
       expect(result.causes).toMatchObject([[]]);
     });
     it("should return an empty for two groups of apply update", async () => {
-      const actionsGroupOne = client.encoding.applyUpdateAction(
+      const actionsGroupOne = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
-      const actionsGroupTwo = client.encoding.applyUpdateAction(
+      const actionsGroupTwo = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         {
           ...applyUpdateParams,
@@ -1303,7 +1303,7 @@ describe("Test client utils", () => {
       ]);
     });
   });
-  describe("isDaoUpdateAction", () => {
+  describe("containsDaoUpdateAction", () => {
     it("should return the expected output given a specific input", () => {
       const cases = [
         { input: [ProposalActionTypes.UPGRADE_TO], expected: true },
@@ -1354,7 +1354,7 @@ describe("Test client utils", () => {
         },
       ];
       for (const { input, expected } of cases) {
-        const result = isDaoUpdateAction(input);
+        const result = containsDaoUpdateAction(input);
         expect(result).toEqual(expected);
       }
     });

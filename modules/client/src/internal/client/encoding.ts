@@ -152,7 +152,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * @return {*}  {DaoAction[]}
    * @memberof ClientEncoding
    */
-  public applyUpdateAction(
+  public applyUpdateAndPermissionsActionBlock(
     daoAddress: string,
     params: ApplyUpdateParams,
   ): DaoAction[] {

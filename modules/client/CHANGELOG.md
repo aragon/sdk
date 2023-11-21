@@ -26,6 +26,9 @@ TEMPLATE:
 - Refactor plugin update proposal validation function
 - Refactor boolean check for checking if a proposal is a DAO update proposal
 - Refactor boolean check for checking if a proposal is a plugin update proposal
+- Rename `applyUpdateAction` to `applyUpdateActionAndPermissionsBlock`
+- Rename `isDaoUpdateAction`to `containsDaoUpdateAction`
+-  
 
 
 ## [1.19.0]

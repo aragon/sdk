@@ -601,7 +601,7 @@ describe("Client", () => {
         helpers: [],
       };
       const daoAddress = "0x1234567890123456789012345678901234567890";
-      const actions = client.encoding.applyUpdateAction(
+      const actions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
@@ -704,7 +704,7 @@ describe("Client", () => {
         initData: new Uint8Array([0, 1, 2, 3]),
         helpers: [],
       };
-      const actions = client.encoding.applyUpdateAction(
+      const actions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
