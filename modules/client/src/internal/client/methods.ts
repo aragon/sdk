@@ -1109,7 +1109,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {Promise<boolean>}
    * @memberof ClientMethods
    */
-  public async isDaoUpdate(
+  public async isDaoUpdateProposal(
     proposalId: string,
   ): Promise<boolean> {
     const name = "iproposal";
@@ -1212,7 +1212,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * @return {*}  {Promise<DaoUpdateProposalValidity>}
    * @memberof ClientMethods
    */
-  public async isDaoUpdateValid(
+  public async isDaoUpdateProposalValid(
     proposalId: string,
     version?: SupportedVersion,
   ): Promise<DaoUpdateProposalValidity> {

@@ -2006,7 +2006,7 @@ describe("Client", () => {
         ]]);
       });
     });
-    describe("isDaoUpdateValid", () => {
+    describe("isDaoUpdateProposalValid", () => {
       let client: Client;
       let initializeFromAction: DaoAction;
       let upgradeToAndCallAction: DaoAction;
@@ -2044,7 +2044,7 @@ describe("Client", () => {
             actions: toSubgraphActions([upgradeToAndCallAction]),
           },
         });
-        const res = await client.methods.isDaoUpdateValid(
+        const res = await client.methods.isDaoUpdateProposalValid(
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(true);
@@ -2067,7 +2067,7 @@ describe("Client", () => {
         mockedClient.request.mockResolvedValueOnce({
           iproposal: null,
         });
-        const res = await client.methods.isDaoUpdateValid(
+        const res = await client.methods.isDaoUpdateProposalValid(
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(false);

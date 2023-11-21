@@ -105,11 +105,11 @@ export interface IClientMethods {
     proposalId: string,
   ) => Promise<PluginUpdateProposalValidity>;
 
-  isDaoUpdate: (
+  isDaoUpdateProposal: (
     proposalId: string,
   ) => Promise<boolean>;
 
-  isDaoUpdateValid: (
+  isDaoUpdateProposalValid: (
     proposalId: string,
     version?: SupportedVersion,
   ) => Promise<DaoUpdateProposalValidity>;

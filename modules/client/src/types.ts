@@ -516,7 +516,7 @@ type IsUpdateParamsBase = {
   pluginAddress: string;
 };
 
-export type IsDaoUpdateValidParams = IsUpdateParamsBase & {
+export type IsDaoUpdateProposalValidParams = IsUpdateParamsBase & {
   version?: [number, number, number];
 };
 
