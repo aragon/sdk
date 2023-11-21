@@ -1381,27 +1381,32 @@ export function validateUpdateDaoProposalActions(
   // check if the actions are valid
   // if they are not valid return add
   // invalid actions to the causes and return
-  if (isDaoUpdateAction(classifiedActions)) {
-    // if they are valid, the upgrade action must
-    // be the first one
-    const upgradeActionType = classifiedActions[0];
-    const upgradeAction = actions[0];
-    // if the to address is not the dao address
-    // add the cause to the causes array
-    if (upgradeAction.to !== daoAddress) {
-      causes.push(
-        DaoUpdateProposalInvalidityCause.INVALID_TO_ADDRESS,
-      );
-    }
-    // if the value is different from 0
-    // add the cause to the causes array
-    if (upgradeAction.value.toString() !== "0") {
-      causes.push(
-        DaoUpdateProposalInvalidityCause.INVALID_VALUE,
-      );
-    }
-    // if the upgrade action is upgradeTo
-    if (upgradeActionType === ProposalActionTypes.UPGRADE_TO) {
+  if (!isDaoUpdateAction(classifiedActions)) {
+    causes.push(
+      DaoUpdateProposalInvalidityCause.INVALID_ACTIONS,
+    );
+    return { isValid: false, causes };
+  }
+  // if they are valid, the upgrade action must
+  // be the first one
+  const upgradeActionType = classifiedActions[0];
+  const upgradeAction = actions[0];
+  // if the to address is not the dao address
+  // add the cause to the causes array
+  if (upgradeAction.to !== daoAddress) {
+    causes.push(
+      DaoUpdateProposalInvalidityCause.INVALID_TO_ADDRESS,
+    );
+  }
+  // if the value is different from 0
+  // add the cause to the causes array
+  if (upgradeAction.value.toString() !== "0") {
+    causes.push(
+      DaoUpdateProposalInvalidityCause.INVALID_VALUE,
+    );
+  }
+  switch (upgradeActionType) {
+    case ProposalActionTypes.UPGRADE_TO:
       // decode the upgradeTo action
       const decodedImplementationAddress = decodeUpgradeToAction(
         actions[0].data,
@@ -1413,9 +1418,8 @@ export function validateUpdateDaoProposalActions(
             .INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS,
         );
       }
-      // if the upgrade action is upgradeToAndCall
-    } else if (upgradeActionType === ProposalActionTypes.UPGRADE_TO_AND_CALL) {
-      // decode the action
+      break;
+    case ProposalActionTypes.UPGRADE_TO_AND_CALL: // decode the action
       const upgradeToAndCallDecodedParams = decodeUpgradeToAndCallAction(
         actions[0].data,
       );
@@ -1453,12 +1457,12 @@ export function validateUpdateDaoProposalActions(
           DaoUpdateProposalInvalidityCause.INVALID_UPGRADE_TO_AND_CALL_DATA,
         );
       }
-    }
-  } else {
-    // add invalid actions to the causes array
-    causes.push(
-      DaoUpdateProposalInvalidityCause.INVALID_ACTIONS,
-    );
+      break;
+    default:
+      causes.push(
+        DaoUpdateProposalInvalidityCause.INVALID_ACTIONS,
+      );
+      break;
   }
   // return the validity of the proposal
   return { isValid: causes.length === 0, causes };
