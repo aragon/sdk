@@ -12,6 +12,10 @@ export default {
     format: "cjs",
     sourcemap: true,
   }, {
+    file: "dist/sdk-client-common.cjs.production.min.js",
+    format: "cjs",
+    sourcemap: true,
+  }, {
     file: "dist/sdk-client-common.esm.js",
     format: "esm",
     sourcemap: true,
