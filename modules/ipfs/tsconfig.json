@@ -1,6 +1,5 @@
 {
   // see https://www.typescriptlang.org/tsconfig to better understand tsconfigs
-  "include": ["src", "types"],
   "compilerOptions": {
     "module": "esnext",
     "lib": ["dom", "esnext"],
@@ -8,6 +7,7 @@
     "importHelpers": true,
     // output .d.ts declaration files for consumers
     "declaration": true,
+    "outDir": "./dist",
     // output .js.map sourcemap files for consumers
     "sourceMap": true,
     // match output dir to input dir. e.g. dist/index instead of dist/src/index
@@ -30,5 +30,7 @@
     "forceConsistentCasingInFileNames": true,
     // `tsdx build` ignores this option, but it is commonly used when type-checking separately with `tsc`
     "noEmit": true,
-  }
+    "resolveJsonModule": true
+  },
+  "include": ["src", "types"],
 }
