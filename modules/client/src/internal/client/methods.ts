@@ -43,7 +43,6 @@ import {
   DaoMetadata,
   DaoQueryParams,
   DaoSortBy,
-  DaoUpdateProposalInvalidityCause,
   DaoUpdateProposalValidity,
   DepositErc1155Params,
   DepositErc20Params,

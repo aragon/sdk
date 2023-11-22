@@ -114,7 +114,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPDATE_PERMISSION_VALUE,
+          .INVALID_GRANT_UPGRADE_PERMISSION_VALUE,
       ]);
     });
     it("should return an error if the plugin does not exist", async () => {
@@ -134,7 +134,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPDATE_PERMISSION_WHERE_ADDRESS,
+          .INVALID_GRANT_UPGRADE_PERMISSION_WHERE_ADDRESS,
       ]);
     });
     it("should return an error if the permission is not granted to the psp", async () => {
@@ -151,7 +151,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPDATE_PERMISSION_WHO_ADDRESS,
+          .INVALID_GRANT_UPGRADE_PERMISSION_WHO_ADDRESS,
       ]);
     });
     it("should return an error if the permission is not correct", async () => {
@@ -168,9 +168,9 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPDATE_PERMISSION_PERMISSION,
+          .INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION,
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPDATE_PERMISSION_PERMISSION_ID,
+          .INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION_ID,
       ]);
     });
     it("should return two causes if the permission is not granted to the psp and the plugin does not exist", async () => {
@@ -190,9 +190,9 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPDATE_PERMISSION_WHERE_ADDRESS,
+          .INVALID_GRANT_UPGRADE_PERMISSION_WHERE_ADDRESS,
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPDATE_PERMISSION_WHO_ADDRESS,
+          .INVALID_GRANT_UPGRADE_PERMISSION_WHO_ADDRESS,
       ]);
     });
   });
@@ -248,7 +248,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPDATE_PERMISSION_VALUE,
+          .INVALID_REVOKE_UPGRADE_PERMISSION_VALUE,
       ]);
     });
     it("should return an error if the installation doees not exist", async () => {
@@ -268,7 +268,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPDATE_PERMISSION_WHERE_ADDRESS,
+          .INVALID_REVOKE_UPGRADE_PERMISSION_WHERE_ADDRESS,
       ]);
     });
     it("should return an error if the is not revoked from the psp", async () => {
@@ -285,7 +285,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPDATE_PERMISSION_WHO_ADDRESS,
+          .INVALID_REVOKE_UPGRADE_PERMISSION_WHO_ADDRESS,
       ]);
     });
     it("should return an error if the permission is not correct", async () => {
@@ -302,9 +302,9 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION,
+          .INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION,
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION_ID,
+          .INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION_ID,
       ]);
     });
     it("should return two causes if the permission is not granted to the psp and the plugin installation does not exist", async () => {
@@ -324,9 +324,9 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPDATE_PERMISSION_WHERE_ADDRESS,
+          .INVALID_REVOKE_UPGRADE_PERMISSION_WHERE_ADDRESS,
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPDATE_PERMISSION_WHO_ADDRESS,
+          .INVALID_REVOKE_UPGRADE_PERMISSION_WHO_ADDRESS,
       ]);
     });
   });
@@ -1159,7 +1159,8 @@ describe("Test client utils", () => {
         currentDaoVersion,
       );
       expect(result.isValid).toEqual(true);
-      expect(result.causes).toMatchObject([]);
+      expect(result.actionErrorCauses).toMatchObject([]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return an empty array for a valid upgradeTo action", () => {
       const result = validateUpdateDaoProposalActions(
@@ -1169,7 +1170,8 @@ describe("Test client utils", () => {
         currentDaoVersion,
       );
       expect(result.isValid).toEqual(true);
-      expect(result.causes).toMatchObject([]);
+      expect(result.actionErrorCauses).toMatchObject([]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return INVALID_ACTIONS when the actions are not valid for updating a dao", async () => {
       const withdrawAction = await client.encoding.withdrawAction({
@@ -1184,9 +1186,10 @@ describe("Test client utils", () => {
         currentDaoVersion,
       );
       expect(result.isValid).toEqual(false);
-      expect(result.causes).toMatchObject([
-        DaoUpdateProposalInvalidityCause.INVALID_ACTIONS,
+      expect(result.proposalSettingsErrorCauses).toMatchObject([
+        ProposalSettingsErrorCause.INVALID_ACTIONS,
       ]);
+      expect(result.actionErrorCauses).toMatchObject([]);
     });
     it("should return INVALID_TO_ADDRESS when the to address is not the dao address", () => {
       upgradeToAndCallAction.to = ADDRESS_FOUR;
@@ -1197,9 +1200,10 @@ describe("Test client utils", () => {
         currentDaoVersion,
       );
       expect(result.isValid).toEqual(false);
-      expect(result.causes).toMatchObject([
+      expect(result.actionErrorCauses).toMatchObject([
         DaoUpdateProposalInvalidityCause.INVALID_TO_ADDRESS,
       ]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return NON_ZERO_CALL_VALUE when the the value of the action is not 0", () => {
       upgradeToAndCallAction.value = BigInt(10);
@@ -1210,9 +1214,11 @@ describe("Test client utils", () => {
         currentDaoVersion,
       );
       expect(result.isValid).toEqual(false);
-      expect(result.causes).toMatchObject([
+      expect(result.actionErrorCauses).toMatchObject([
         DaoUpdateProposalInvalidityCause.NON_ZERO_CALL_VALUE,
       ]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
+      
     });
     it("should return INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS when the implementation address is not the correct one", () => {
       upgradeToAction = client.encoding.upgradeToAction(
@@ -1226,10 +1232,11 @@ describe("Test client utils", () => {
         currentDaoVersion,
       );
       expect(result.isValid).toEqual(false);
-      expect(result.causes).toMatchObject([
+      expect(result.actionErrorCauses).toMatchObject([
         DaoUpdateProposalInvalidityCause
           .INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS,
       ]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return INVALID_UPGRADE_TO_AND_CALL_IMPLEMENTATION_ADDRESS when the implementation address is not the correct one", () => {
       upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
@@ -1246,10 +1253,11 @@ describe("Test client utils", () => {
         currentDaoVersion,
       );
       expect(result.isValid).toEqual(false);
-      expect(result.causes).toMatchObject([
+      expect(result.actionErrorCauses).toMatchObject([
         DaoUpdateProposalInvalidityCause
           .INVALID_UPGRADE_TO_AND_CALL_IMPLEMENTATION_ADDRESS,
       ]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return INVALID_UPGRADE_TO_AND_CALL_VERSION when the version in the encoded initializeFrom action is not the correct one", () => {
       initializeFromAction = client.encoding.initializeFromAction(
@@ -1273,10 +1281,11 @@ describe("Test client utils", () => {
         currentDaoVersion,
       );
       expect(result.isValid).toEqual(false);
-      expect(result.causes).toMatchObject([
+      expect(result.actionErrorCauses).toMatchObject([
         DaoUpdateProposalInvalidityCause
           .INVALID_UPGRADE_TO_AND_CALL_VERSION,
       ]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return INVALID_UPGRADE_TO_AND_CALL_DATA when the data in the encoded initializeFrom action is not empty", () => {
       initializeFromAction = client.encoding.initializeFromAction(
@@ -1300,10 +1309,11 @@ describe("Test client utils", () => {
         currentDaoVersion,
       );
       expect(result.isValid).toEqual(false);
-      expect(result.causes).toMatchObject([
+      expect(result.actionErrorCauses).toMatchObject([
         DaoUpdateProposalInvalidityCause
           .INVALID_UPGRADE_TO_AND_CALL_DATA,
       ]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
   });
   describe("containsDaoUpdateAction", () => {

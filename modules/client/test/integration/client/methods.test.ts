@@ -30,7 +30,6 @@ import {
   DaoDepositSteps,
   DaoQueryParams,
   DaoSortBy,
-  DaoUpdateProposalInvalidityCause,
   DepositParams,
   HasPermissionParams,
   PluginPreparationQueryParams,
@@ -2055,7 +2054,8 @@ describe("Client", () => {
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(true);
-        expect(res.causes).toMatchObject([]);
+        expect(res.actionErrorCauses).toMatchObject([]);
+        expect(res.proposalSettingsErrorCauses).toMatchObject([]);
       });
       it("Should PROPOSAL_NOT_FOUND when the proposal is null", async () => {
         const implementationAddress = await client.methods.getDaoImplementation(
@@ -2078,7 +2078,8 @@ describe("Client", () => {
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(false);
-        expect(res.causes).toMatchObject([ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]);
+        expect(res.proposalSettingsErrorCauses).toMatchObject([ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]);
+        expect(res.actionErrorCauses).toMatchObject([]);
       });
     });
   });

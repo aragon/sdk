@@ -917,21 +917,21 @@ export async function validateGrantUpdatePluginPermissionAction(
   if (pluginInstallations.length === 0) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPDATE_PERMISSION_WHERE_ADDRESS,
+        .INVALID_GRANT_UPGRADE_PERMISSION_WHERE_ADDRESS,
     );
   }
   // Value must be 0
   if (action.value.toString() !== "0") {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPDATE_PERMISSION_VALUE,
+        .INVALID_GRANT_UPGRADE_PERMISSION_VALUE,
     );
   }
   // The permission should be granted to the PSP
   if (decodedPermission.who !== pspAddress) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPDATE_PERMISSION_WHO_ADDRESS,
+        .INVALID_GRANT_UPGRADE_PERMISSION_WHO_ADDRESS,
     );
   }
   // The permission should be `UPGRADE_PLUGIN_PERMISSION`
@@ -940,7 +940,7 @@ export async function validateGrantUpdatePluginPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPDATE_PERMISSION_PERMISSION,
+        .INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION,
     );
   }
   // The permissionId should be `UPGRADE_PLUGIN_PERMISSION_ID`
@@ -950,7 +950,7 @@ export async function validateGrantUpdatePluginPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPDATE_PERMISSION_PERMISSION_ID,
+        .INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION_ID,
     );
   }
   return causes;
@@ -972,19 +972,19 @@ export async function validateRevokeUpdatePluginPermissionAction(
   if (pluginInstallations.length === 0) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPDATE_PERMISSION_WHERE_ADDRESS,
+        .INVALID_REVOKE_UPGRADE_PERMISSION_WHERE_ADDRESS,
     );
   }
   if (action.value.toString() !== "0") {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPDATE_PERMISSION_VALUE,
+        .INVALID_REVOKE_UPGRADE_PERMISSION_VALUE,
     );
   }
   if (decodedPermission.who !== pspAddress) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPDATE_PERMISSION_WHO_ADDRESS,
+        .INVALID_REVOKE_UPGRADE_PERMISSION_WHO_ADDRESS,
     );
   }
   if (
@@ -992,7 +992,7 @@ export async function validateRevokeUpdatePluginPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION,
+        .INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION,
     );
   }
   if (
@@ -1001,7 +1001,7 @@ export async function validateRevokeUpdatePluginPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPDATE_PERMISSION_PERMISSION_ID,
+        .INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION_ID,
     );
   }
   return causes;
