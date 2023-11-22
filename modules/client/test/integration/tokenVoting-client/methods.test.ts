@@ -49,7 +49,6 @@ import {
 import {
   mineBlock,
   mineBlockWithTimeOffset,
-  restoreBlockTime,
 } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import {
@@ -130,10 +129,6 @@ describe("Token Voting Client", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
-  });
-
-  beforeEach(() => {
-    return restoreBlockTime(provider);
   });
 
   // Helpers

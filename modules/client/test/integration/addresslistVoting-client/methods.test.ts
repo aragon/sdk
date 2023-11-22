@@ -38,7 +38,6 @@ import {
 import {
   mineBlock,
   mineBlockWithTimeOffset,
-  restoreBlockTime,
 } from "../../helpers/block-times";
 import { buildAddressListVotingDAO } from "../../helpers/build-daos";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -103,10 +102,6 @@ describe("Client Address List", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
-  });
-
-  beforeEach(() => {
-    return restoreBlockTime(provider);
   });
 
   // Helpers

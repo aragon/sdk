@@ -30,7 +30,7 @@ import {
 } from "../constants";
 import { ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
-import { mineBlock, restoreBlockTime } from "../../helpers/block-times";
+import { mineBlock } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import {
   QueryMultisigProposal,
@@ -92,7 +92,6 @@ describe("Client Multisig", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
-    await restoreBlockTime(provider);
   });
 
   async function buildDao() {

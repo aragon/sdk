@@ -24,20 +24,6 @@ export async function mineBlockWithTimeOffset(
   ]);
 }
 
-// export function setNextBlockTimeOffset(
-//   provider: JsonRpcProvider,
-//   secondsForward: number,
-// ) {
-//   return provider.send("evm_increaseTime", [
-//     `0x${secondsForward.toString(16)}`,
-//   ]);
-// }
-
-export function restoreBlockTime(provider: JsonRpcProvider) {
-  provider.network;
-  //return mineBlockWithTime(provider, new Date());
-}
-
 export async function getBlockTime(provider: JsonRpcProvider) {
   const blockNumber = await provider.getBlockNumber();
   const block = await provider.getBlock(blockNumber);
