@@ -28,6 +28,12 @@ TEMPLATE:
 - Add `actions` to `TokenVotingProposalListItem`
 - Add `actions` to `AddresslistVotingProposalListItem`
 
+### Changed
+
+- Replaces tsdx with eslint, rollupjs and jest
+- Upgrades typescript to v5
+- Replaces ganache with hardhat
+
 ## [1.18.2]
 ### Fixed
 

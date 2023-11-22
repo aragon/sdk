@@ -19,6 +19,11 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Changed
+
+- Replaces tsdx with eslint, rollupjs and jest
+- Upgrades typescript to v5
+
 ## 1.1.0
 
 - Add common errors with response embedded

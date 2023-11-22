@@ -19,9 +19,11 @@ TEMPLATE:
 
 ## [UPCOMING]
 
-### Change
+### Changed
 
 - Deprecate package, functionality moved to `@aragon/sdk-client-common`
+- Replaces tsdx with eslint, rollupjs and jest
+- Upgrades typescript to v5
 
 ## 1.6.0
 
