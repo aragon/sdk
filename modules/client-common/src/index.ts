@@ -10,4 +10,3 @@ export * from "./multiuri";
 export * from "./encoding";
 export * from "./promises";
 export * from "./errors";
-console.log("SDK COMMON LINKED")

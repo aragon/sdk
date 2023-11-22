@@ -4,7 +4,6 @@ export * from "./tokenVoting";
 export * from "./client-common";
 export * from "./multisig";
 export * from "./types";
-console.log("SDK LINKED")
 // Selective reexports for completeness
 export {
   ApplyInstallationParams,
