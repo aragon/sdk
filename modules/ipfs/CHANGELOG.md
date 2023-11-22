@@ -21,7 +21,7 @@ TEMPLATE:
 
 ### Changed
 
-- Replaces tsdx with eslint, rollupjs and jest
+- Replaces tsdx with dts-cli
 - Upgrades typescript to v5
 
 ## 1.1.0

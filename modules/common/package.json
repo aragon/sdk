@@ -17,9 +17,9 @@
     "node": ">=14"
   },
   "scripts": {
-    "build": "yarn run clean && rollup --config rollup.config.ts --configPlugin typescript",
-    "test": "TESTING=true jest --verbose",
-    "lint": "eslint --ext .js,.ts",
+    "build": "yarn run clean && dts build",
+    "test": "TESTING=true dts test",
+    "lint": "dts lint",
     "prepare": "yarn build",
     "size": "size-limit",
     "analyze": "size-limit --why",
@@ -50,16 +50,12 @@
   "devDependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/constants": "^5.7.0",
-    "@rollup/plugin-json": "^6.0.1",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.5",
     "@size-limit/preset-small-lib": "^7.0.8",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/jest": "^29.5.9",
+    "dts-cli": "^2.0.3",
     "husky": "^7.0.4",
     "size-limit": "^7.0.8",
-    "ts-jest": "^29.1.1",
     "tslib": "^2.6.2",
     "typescript": "^5.3.2"
   },
