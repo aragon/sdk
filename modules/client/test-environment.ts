@@ -6,7 +6,7 @@ module.exports = class CustomTestEnvironment extends TestEnvironment.default {
 
     // disable hardhat node logging
     await this.global.hardhat.provider.send('hardhat_setLoggingEnabled', [
-      false,
+      true,
     ]);
 
     if (typeof this.global.TextEncoder === 'undefined') {
