@@ -1190,7 +1190,7 @@ export async function validateApplyUpdateFunction(
     causes.push(
       PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
     );
-    return causes
+    return causes;
   }
   // get the metadata of the plugin repo
   // for the release and build specified
@@ -1272,7 +1272,7 @@ export function classifyProposalActions(
           switch (decodedPermission.permission) {
             case Permissions.UPGRADE_PLUGIN_PERMISSION:
               classifiedActions.push(
-                ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+                ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
               );
               break;
             case Permissions.ROOT_PERMISSION:
@@ -1347,7 +1347,9 @@ export function containsPluginUpdateActionBlockWithRootPermission(
  * @param {ProposalActionTypes[]} actions
  * @return {*}  {boolean}
  */
-export function containsPluginUpdateActionBlock(actions: ProposalActionTypes[]): boolean {
+export function containsPluginUpdateActionBlock(
+  actions: ProposalActionTypes[],
+): boolean {
   // get the first 3 action
   const receivedPattern = actions.slice(0, 3);
   // check if it matches the expected pattern
@@ -1362,7 +1364,9 @@ export function containsPluginUpdateActionBlock(actions: ProposalActionTypes[]):
  * @param {ProposalActionTypes[]} actions
  * @return {*}  {boolean}
  */
-export function containsDaoUpdateAction(actions: ProposalActionTypes[]): boolean {
+export function containsDaoUpdateAction(
+  actions: ProposalActionTypes[],
+): boolean {
   // UpgradeTo or UpgradeToAndCall should be the first action
   return actions[0] === ProposalActionTypes.UPGRADE_TO ||
     actions[0] === ProposalActionTypes.UPGRADE_TO_AND_CALL;
@@ -1375,31 +1379,33 @@ export function validateUpdateDaoProposalActions(
   currentDaoVersion: [number, number, number],
 ): DaoUpdateProposalValidity {
   const classifiedActions = classifyProposalActions(actions);
-  const causes: DaoUpdateProposalInvalidityCause[] = [];
+  const actionErrorCauses: DaoUpdateProposalInvalidityCause[] = [];
+  const proposalSettingsErrorCauses: ProposalSettingsErrorCause[] = [];
   // check if the actions are valid
   if (!containsDaoUpdateAction(classifiedActions)) {
     // If actions are not valid, add the cause to the causes array
     // and return
-    causes.push(
-      DaoUpdateProposalInvalidityCause.INVALID_ACTIONS,
-    );
-    return { isValid: false, causes };
+    return {
+      isValid: false,
+      proposalSettingsErrorCauses: [ProposalSettingsErrorCause.INVALID_ACTIONS],
+      actionErrorCauses: [],
+    };
   }
-  // if they are valid, this means that 
+  // if they are valid, this means that
   // the upgrade action must be the first one
   const upgradeActionType = classifiedActions[0];
   const upgradeAction = actions[0];
   // if the to address is not the dao address
   // add the cause to the causes array
   if (upgradeAction.to !== daoAddress) {
-    causes.push(
+    actionErrorCauses.push(
       DaoUpdateProposalInvalidityCause.INVALID_TO_ADDRESS,
     );
   }
   // if the value is different from 0
   // add the cause to the causes array
   if (upgradeAction.value.toString() !== "0") {
-    causes.push(
+    actionErrorCauses.push(
       DaoUpdateProposalInvalidityCause.NON_ZERO_CALL_VALUE,
     );
   }
@@ -1411,7 +1417,7 @@ export function validateUpdateDaoProposalActions(
       );
       // check that the implementation address is the same
       if (expectedImplementationAddress !== decodedImplementationAddress) {
-        causes.push(
+        actionErrorCauses.push(
           DaoUpdateProposalInvalidityCause
             .INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS,
         );
@@ -1432,7 +1438,7 @@ export function validateUpdateDaoProposalActions(
         expectedImplementationAddress !==
           upgradeToAndCallDecodedParams.implementationAddress
       ) {
-        causes.push(
+        actionErrorCauses.push(
           DaoUpdateProposalInvalidityCause
             .INVALID_UPGRADE_TO_AND_CALL_IMPLEMENTATION_ADDRESS,
         );
@@ -1443,7 +1449,7 @@ export function validateUpdateDaoProposalActions(
         JSON.stringify(initializeFromDecodedParams.previousVersion) !==
           JSON.stringify(currentDaoVersion)
       ) {
-        causes.push(
+        actionErrorCauses.push(
           DaoUpdateProposalInvalidityCause.INVALID_UPGRADE_TO_AND_CALL_VERSION,
         );
       }
@@ -1451,19 +1457,24 @@ export function validateUpdateDaoProposalActions(
       // check that the data can be decoded with the abi in the metadata of the version we are
       // upgrading to. For now is not possible so we check that the data is empty
       if (initializeFromDecodedParams.initData.length !== 0) {
-        causes.push(
+        actionErrorCauses.push(
           DaoUpdateProposalInvalidityCause.INVALID_UPGRADE_TO_AND_CALL_DATA,
         );
       }
       break;
     default:
-      causes.push(
-        DaoUpdateProposalInvalidityCause.INVALID_ACTIONS,
+      proposalSettingsErrorCauses.push(
+        ProposalSettingsErrorCause.INVALID_ACTIONS,
       );
       break;
   }
   // return the validity of the proposal
-  return { isValid: causes.length === 0, causes };
+  return {
+    isValid: actionErrorCauses.length === 0 &&
+      proposalSettingsErrorCauses.length === 0,
+    actionErrorCauses,
+    proposalSettingsErrorCauses,
+  };
 }
 
 export async function validateUpdatePluginProposalActions(
@@ -1490,7 +1501,7 @@ export async function validateUpdatePluginProposalActions(
       switch (action) {
         // if the action is grant plugin update permission
         // validate the action
-        case ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION:
+        case ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION:
           resCauses = await validateGrantUpdatePluginPermissionAction(
             actions[index],
             pspAddress,
@@ -1568,7 +1579,7 @@ export async function validateUpdatePluginProposalActions(
       switch (action) {
         // if the action is grant plugin update permission
         // validate the action
-        case ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION:
+        case ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION:
           resCauses = await validateGrantUpdatePluginPermissionAction(
             actions[index],
             pspAddress,

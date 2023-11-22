@@ -484,10 +484,8 @@ export enum PluginUpdateProposalInValidityCause {
 }
 
 export enum DaoUpdateProposalInvalidityCause {
-  PROPOSAL_NOT_FOUND = "proposalNotFound",
-  INVALID_ACTIONS = "invalidActions",
-  INVALID_TO_ADDRESS = "invalidToAddress",
   NON_ZERO_CALL_VALUE = "nonZeroCallValue",
+  INVALID_TO_ADDRESS = "invalidToAddress",
   INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS =
     "invalidUpgradeToImplementationAddress",
   INVALID_UPGRADE_TO_AND_CALL_DATA = "invalidUpgradeToAndCallData",
@@ -498,7 +496,8 @@ export enum DaoUpdateProposalInvalidityCause {
 
 export type DaoUpdateProposalValidity = {
   isValid: boolean;
-  causes: DaoUpdateProposalInvalidityCause[];
+  actionErrorCauses: DaoUpdateProposalInvalidityCause[];
+  proposalSettingsErrorCauses: ProposalSettingsErrorCause[];
 };
 
 export type DaoUpdateParams = InitializeFromParams & {

@@ -2078,7 +2078,7 @@ describe("Client", () => {
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(false);
-        expect(res.causes).toMatchObject([DaoUpdateProposalInvalidityCause.PROPOSAL_NOT_FOUND]);
+        expect(res.causes).toMatchObject([ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]);
       });
     });
   });

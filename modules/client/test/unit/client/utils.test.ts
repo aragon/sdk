@@ -1314,7 +1314,7 @@ describe("Test client utils", () => {
         {
           input: [
             ProposalActionTypes.UPGRADE_TO,
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
           ],
@@ -1323,7 +1323,7 @@ describe("Test client utils", () => {
         {
           input: [
             ProposalActionTypes.UPGRADE_TO_AND_CALL,
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
           ],
@@ -1331,7 +1331,7 @@ describe("Test client utils", () => {
         },
         {
           input: [
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
           ],
@@ -1339,7 +1339,7 @@ describe("Test client utils", () => {
         },
         {
           input: [
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.UPGRADE_TO,
@@ -1348,12 +1348,27 @@ describe("Test client utils", () => {
         },
         {
           input: [
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.UPGRADE_TO_AND_CALL,
           ],
           expected: false,
+        },
+        {
+          input: [
+            ProposalActionTypes.UPGRADE_TO,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
+            ProposalActionTypes.APPLY_UPDATE,
+            ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
+            //
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
+            ProposalActionTypes.GRANT_ROOT_PERMISSION,
+            ProposalActionTypes.APPLY_UPDATE,
+            ProposalActionTypes.REVOKE_ROOT_PERMISSION,
+            ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
+          ],
+          expected: true,
         },
       ];
       for (const { input, expected } of cases) {
@@ -1369,7 +1384,7 @@ describe("Test client utils", () => {
         { input: [ProposalActionTypes.UPGRADE_TO_AND_CALL], expected: false },
         {
           input: [
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
           ],
@@ -1385,17 +1400,17 @@ describe("Test client utils", () => {
         },
         {
           input: [
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
           ],
           expected: false,
         },
         {
           input: [
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
           ],
@@ -1415,7 +1430,7 @@ describe("Test client utils", () => {
         { input: [ProposalActionTypes.UPGRADE_TO_AND_CALL], expected: false },
         {
           input: [
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.GRANT_ROOT_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_ROOT_PERMISSION,
@@ -1425,7 +1440,7 @@ describe("Test client utils", () => {
         },
         {
           input: [
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.GRANT_ROOT_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
@@ -1434,12 +1449,12 @@ describe("Test client utils", () => {
         },
         {
           input: [
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.GRANT_ROOT_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_ROOT_PERMISSION,
             ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
-            ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+            ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
             ProposalActionTypes.GRANT_ROOT_PERMISSION,
             ProposalActionTypes.APPLY_UPDATE,
             ProposalActionTypes.REVOKE_ROOT_PERMISSION,

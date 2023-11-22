@@ -1231,9 +1231,19 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!iproposal) {
       return {
         isValid: false,
-        causes: [
-          DaoUpdateProposalInvalidityCause.PROPOSAL_NOT_FOUND,
+        proposalSettingsErrorCauses: [
+          ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND,
         ],
+        actionErrorCauses: [],
+      };
+    }
+    // check failure map
+    if (iproposal.allowFailureMap !== "0") {
+      // if the failure map is not 0 return invalid failure map
+      return {
+        isValid: false,
+        actionErrorCauses: [],
+        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE]
       };
     }
     // get implementation address, use latest version as default

@@ -143,12 +143,12 @@ export const UPDATE_PLUGIN_SIGNATURES: string[] = [
 ];
 
 export const PLUGIN_UPDATE_ACTION_PATTERN = [
-  ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+  ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
   ProposalActionTypes.APPLY_UPDATE,
   ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
 ];
 export const PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN = [
-  ProposalActionTypes.GRANT_PLUGIN_UPDATE_PERMISSION,
+  ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
   ProposalActionTypes.GRANT_ROOT_PERMISSION,
   ProposalActionTypes.APPLY_UPDATE,
   ProposalActionTypes.REVOKE_ROOT_PERMISSION,
