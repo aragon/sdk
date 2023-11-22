@@ -1453,9 +1453,9 @@ export function validateUpdateDaoProposalActions(
           DaoUpdateProposalInvalidityCause.INVALID_UPGRADE_TO_AND_CALL_VERSION,
         );
       }
-      // TODO
-      // check that the data can be decoded with the abi in the metadata of the version we are
-      // upgrading to. For now is not possible so we check that the data is empty
+
+      // For now, we check that the `bytes calldata _initData` parameter of the `initializeFrom` function call is empty (because updates related to 1.0.0, 1.3.0, or 1.4.0 don't require `_initData`). 
+      // TODO For future upgrade requiring non-empty `_initData`, we must define a place to obtain this information from permissionlessly.
       if (initializeFromDecodedParams.initData.length !== 0) {
         actionErrorCauses.push(
           DaoUpdateProposalInvalidityCause.INVALID_UPGRADE_TO_AND_CALL_DATA,
