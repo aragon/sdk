@@ -18,7 +18,8 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
-### Fixed
+
+### Added
 
 - Classify signalling multisig proposals as succeeded even after the end date is passed using the subgraph `isSignalling` attribute.  
 
@@ -37,8 +38,6 @@ TEMPLATE:
 - Rename `isPluginUpdateValid` to `isPluginUpdateProposalValid` 
 - Rename `isPluginUpdateAction` to `containsPluginUpdateAction`
 - Rename `isPluginUpdateActionBlockWithRootPermission` to `containsPluginUpdateActionBlockWithRootPermission`
-
-
 
 ## [1.19.0]
 
