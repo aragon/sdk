@@ -82,7 +82,7 @@ or
 Each block being related to an plugin update MUST contain an `applyUpdate` action exactly once. This action is composed as follows:
 
 - `to` MUST be the `PluginSetupProcessor` address
-- `value` MUST be zero. If not, we return `"invalidApplyUpdateActionValue"`.
+- `value` MUST be zero. If not, we return `"nonZeroApplyUpdateCallValue"`.
 - `data` MUST contain the `applyUpdate` function selector in the first 4 bytes. The following bytes MUST be encoded according to the [the `build-metadata.json` specifications](https://devs.aragon.org/docs/osx/how-to-guides/plugin-development/publication/metadata).
   If we cannot decode the action, we return `"invalidData"`.
   If we cannot obtain the metadata, we return `"invalidPluginRepoMetadata"`.
@@ -101,12 +101,10 @@ The `applyUpdate` action MUST be wrapped by `grant` and `revoke` actions on the 
 - `to` MUST be the DAO address
 - `value` MUST be zero. If not, we return `"nonZeroGrantUpgradePluginPermissionCallValue"` / `"nonZeroRevokeUpgradePluginPermissionCallValue"`.
 - `data` MUST contain the `grant` / `revoke` function selector in the first 4 bytes. The subsequent bytes MUST be as follows:
-  - `where` MUST be the plugin proxy address. If not, we return `"invalidGrantUpgradePermissionWhereAddress"` / `"invalidRevokeUpgradePermissionWhereAddress"`.
-  - `who` MUST be the `PluginSetupProcessor` address. If not, we return `"invalidGrantUpgradePermissionWhoAddress"` / `"invalidRevokeUpgradePermissionWhoAddress"`.
-  - `permissionId` MUST be `bytes32 UPGRADE_PLUGIN_PERMISSION_ID = keccak256("UPGRADE_PLUGIN_PERMISSION")`. If not, we return `"invalidGrantUpgradePermissionPermissionId"` / `"invalidRevokeUpgradePermissionPermissionId"`.
-  - `condition` MUST be the empty address. If not, we return `"invalidGrantUpgradePermissionCondition"` / `"invalidRevokeUpgradePermissionCondition"`
-
-**TODO** What we are checking with `"invalidGrantUpgradePermissionPermission"` `"invalidRevokeUpgradePermissionPermission"` exactly?
+  - `where` MUST be the plugin proxy address. If not, we return `"invalidGrantUpgradePluginPermissionWhereAddress"` / `"invalidRevokeUpgradePluginPermissionWhereAddress"`.
+  - `who` MUST be the `PluginSetupProcessor` address. If not, we return `"invalidGrantUpgradePluginPermissionWhoAddress"` / `"invalidRevokeUpgradePluginPermissionWhoAddress"`.
+  - `permissionId` MUST be `bytes32 UPGRADE_PLUGIN_PERMISSION_ID = keccak256("UPGRADE_PLUGIN_PERMISSION")`. If not, we return `"invalidGrantUpgradePluginPermissionPermissionId"` / `"invalidRevokeUpgradePluginPermissionPermissionId"`.
+  - `permissionName` MUST be `UPGRADE_PLUGIN_PERMISSION`. If not, we return `"invalidGrantUpgradePluginPermissionPermissionName"` / `"invalidRevokeUpgradePluginPermissionPermissionName"`
 
 #### Optional `grant`/`revoke` `ROOT_PERMISSION` Calls
 
@@ -115,9 +113,9 @@ The `applyUpdate` action CAN be wrapped by `grant` and `revoke` actions on the s
 - `to` MUST be the DAO address
 - `value` MUST be zero. If not, we return `"nonZeroGrantRootPermissionCallValue"` / `"nonZeroRevokeRootPermissionCallValue"`.
 - `data` MUST contain the `grant` / `revoke` function selector in the first 4 bytes. The subsequent bytes MUST be as follows:
-  - `where` MUST be the DAO proxy address. If not, we return `"invalidGrantRootWhereAddress"` / `"invalidRevokeRootWhereAddress"`.
-  - `who` MUST be the `PluginSetupProcessor` address. If not, we return `"invalidGrantRootWhoAddress"` / `"invalidRevokeRootWhoAddress"`.
-  - `permissionId` MUST be `bytes32 ROOT_PERMISSION_ID = keccak256("ROOT_PERMISSION")`. If not, we return `"invalidGrantRootPermissionId"` / `"invalidRevokeRootPermissionId"`.
-  - `condition` MUST be the empty address. If not, we return `"invalidGrantRootCondition"` / `"invalidRevokeRootCondition"`
+  - `where` MUST be the DAO proxy address. If not, we return `"invalidGrantRootPermissionWhereAddress"` / `"invalidRevokeRootPermissionWhereAddress"`.
+  - `who` MUST be the `PluginSetupProcessor` address. If not, we return `"invalidGrantRootPermissionWhoAddress"` / `"invalidRevokeRootPermissionWhoAddress"`.
+  - `permissionId` MUST be `bytes32 ROOT_PERMISSION_ID = keccak256("ROOT_PERMISSION")`. If not, we return `"invalidGrantRootPermissionPermissionId"` / `"invalidRevokeRootPermissionPermissionId"`.
+  - `permissionName` MUST be `ROOT_PERMISSION`. If not, we return `"invalidGrantRootPermissionPermissionName"` / `"invalidRevokeRootPermissionPermissionName"`
 
-**TODO** What we are checking with `"invalidGrantRootPermissionPermission"` `"invalidRevokeRootPermissionPermission"` exactly?
+
