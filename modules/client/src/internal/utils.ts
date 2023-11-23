@@ -917,21 +917,21 @@ export async function validateGrantUpdatePluginPermissionAction(
   if (pluginInstallations.length === 0) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPGRADE_PERMISSION_WHERE_ADDRESS,
+        .PLUGIN_NOT_INSTALLED,
     );
   }
   // Value must be 0
   if (action.value.toString() !== "0") {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPGRADE_PERMISSION_VALUE,
+        .NON_ZERO_GRANT_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
     );
   }
   // The permission should be granted to the PSP
   if (decodedPermission.who !== pspAddress) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPGRADE_PERMISSION_WHO_ADDRESS,
+        .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS,
     );
   }
   // The permission should be `UPGRADE_PLUGIN_PERMISSION`
@@ -940,7 +940,7 @@ export async function validateGrantUpdatePluginPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION,
+        .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME,
     );
   }
   // The permissionId should be `UPGRADE_PLUGIN_PERMISSION_ID`
@@ -950,7 +950,7 @@ export async function validateGrantUpdatePluginPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION_ID,
+        .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID,
     );
   }
   return causes;
@@ -972,19 +972,19 @@ export async function validateRevokeUpdatePluginPermissionAction(
   if (pluginInstallations.length === 0) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPGRADE_PERMISSION_WHERE_ADDRESS,
+        .PLUGIN_NOT_INSTALLED,
     );
   }
   if (action.value.toString() !== "0") {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPGRADE_PERMISSION_VALUE,
+        .NON_ZERO_REVOKE_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
     );
   }
   if (decodedPermission.who !== pspAddress) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPGRADE_PERMISSION_WHO_ADDRESS,
+        .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS,
     );
   }
   if (
@@ -992,7 +992,7 @@ export async function validateRevokeUpdatePluginPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION,
+        .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME,
     );
   }
   if (
@@ -1001,7 +1001,7 @@ export async function validateRevokeUpdatePluginPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION_ID,
+        .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID,
     );
   }
   return causes;
@@ -1036,7 +1036,7 @@ export function validateGrantRootPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_GRANT_ROOT_PERMISSION_PERMISSION,
+        .INVALID_GRANT_ROOT_PERMISSION_PERMISSION_NAME,
     );
   }
   if (
@@ -1060,7 +1060,7 @@ export function validateRevokeRootPermissionAction(
   if (action.value.toString() !== "0") {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_ROOT_PERMISSION_VALUE,
+        .NON_ZERO_REVOKE_ROOT_PERMISSION_CALL_VALUE,
     );
   }
   if (decodedPermission.where !== daoAddress) {
@@ -1080,7 +1080,7 @@ export function validateRevokeRootPermissionAction(
   ) {
     causes.push(
       PluginUpdateProposalInValidityCause
-        .INVALID_REVOKE_ROOT_PERMISSION_PERMISSION,
+        .INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_NAME,
     );
   }
   if (
@@ -1113,7 +1113,7 @@ export async function validateApplyUpdateFunction(
   const causes: PluginUpdateProposalInValidityCause[] = [];
   if (action.value.toString() !== "0") {
     causes.push(
-      PluginUpdateProposalInValidityCause.INVALID_APPLY_UPDATE_ACTION_VALUE,
+      PluginUpdateProposalInValidityCause.NON_ZERO_APPLY_UPDATE_CALL_VALUE,
     );
   }
   const decodedParams = decodeApplyUpdateAction(
@@ -1454,7 +1454,7 @@ export function validateUpdateDaoProposalActions(
         );
       }
 
-      // For now, we check that the `bytes calldata _initData` parameter of the `initializeFrom` function call is empty (because updates related to 1.0.0, 1.3.0, or 1.4.0 don't require `_initData`). 
+      // For now, we check that the `bytes calldata _initData` parameter of the `initializeFrom` function call is empty (because updates related to 1.0.0, 1.3.0, or 1.4.0 don't require `_initData`).
       // TODO For future upgrade requiring non-empty `_initData`, we must define a place to obtain this information from permissionlessly.
       if (initializeFromDecodedParams.initData.length !== 0) {
         actionErrorCauses.push(

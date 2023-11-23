@@ -419,7 +419,7 @@ export type DecodedInitializeFromParams = {
 export type PluginUpdateProposalValidity = {
   isValid: boolean;
   actionErrorCauses: PluginUpdateProposalInValidityCause[][];
-  proposalSettingsErrorCauses: ProposalSettingsErrorCause[]
+  proposalSettingsErrorCauses: ProposalSettingsErrorCause[];
 };
 
 export enum ProposalSettingsErrorCause {
@@ -430,35 +430,36 @@ export enum ProposalSettingsErrorCause {
 
 export enum PluginUpdateProposalInValidityCause {
   // Grant UPDATE_PLUGIN_PERMISSION action
-  INVALID_GRANT_UPGRADE_PERMISSION_WHO_ADDRESS =
-    "invalidGrantUpdatePermissionWhoAddress",
-  INVALID_GRANT_UPGRADE_PERMISSION_WHERE_ADDRESS =
-    "invalidGrantUpdatePermissionWhereAddress",
-  INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION =
-    "invalidGrantUpdatePermissionPermission",
-  INVALID_GRANT_UPGRADE_PERMISSION_VALUE =
-    "invalidGrantUpdatePermissionCondition",
-  INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION_ID =
-    "invalidGrantUpdatePermissionPermissionId",
+  INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS =
+    "invalidGrantUpgradePluginPermissionWhoAddress",
+  INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_WHERE_ADDRESS =
+    "invalidGrantUpgradePluginPermissionWhereAddress",
+  INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME =
+    "invalidGrantUpgradePluginPermissionPermissionName",
+  NON_ZERO_GRANT_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE =
+    "nonZeroGrantUpgradePluginPermissionCallValue",
+  INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID =
+    "invalidGrantUpgradePluginPermissionPermissionId",
   // Revoke UPDATE_PLUGIN_PERMISSION action
-  INVALID_REVOKE_UPGRADE_PERMISSION_WHO_ADDRESS =
-    "invalidRevokeUpdatePermissionWhoAddress",
-  INVALID_REVOKE_UPGRADE_PERMISSION_WHERE_ADDRESS =
-    "invalidRevokeUpdatePermissionWhereAddress",
-  INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION =
-    "invalidRevokeUpdatePermissionPermission",
-  INVALID_REVOKE_UPGRADE_PERMISSION_VALUE =
-    "invalidRevokeUpdatePermissionCondition",
-  INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION_ID =
-    "invalidRevokeUpdatePermissionPermissionId",
+  INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS =
+    "invalidRevokeUpgradePluginPermissionWhoAddress",
+  INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_WHERE_ADDRESS =
+    "invalidRevokeUpgradePluginPermissionWhereAddress",
+  INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME =
+    "invalidRevokeUpgradePluginPermissionPermissionName",
+  NON_ZERO_REVOKE_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE =
+    "nonZeroRevokeUpgradePluginPermissionCallValue",
+  INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID =
+    "invalidRevokeUpgradePluginPermissionPermissionId",
   // Grant ROOT_PERMISSION action
   INVALID_GRANT_ROOT_PERMISSION_WHO_ADDRESS =
     "invalidGrantRootPermissionWhoAddress",
   INVALID_GRANT_ROOT_PERMISSION_WHERE_ADDRESS =
     "invalidGrantRootPermissionWhereAddress",
-  INVALID_GRANT_ROOT_PERMISSION_PERMISSION =
-    "invalidGrantRootPermissionPermission",
-  NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE = "nonZeroGrantRootPermissionCallValue",
+  INVALID_GRANT_ROOT_PERMISSION_PERMISSION_NAME =
+    "invalidGrantRootPermissionPermissionName",
+  NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE =
+    "nonZeroGrantRootPermissionCallValue",
   INVALID_GRANT_ROOT_PERMISSION_PERMISSION_ID =
     "invalidGrantRootPermissionPermissionId",
   // Revoke ROOT_PERMISSION action
@@ -466,13 +467,14 @@ export enum PluginUpdateProposalInValidityCause {
     "invalidRevokeRootPermissionWhoAddress",
   INVALID_REVOKE_ROOT_PERMISSION_WHERE_ADDRESS =
     "invalidRevokeRootPermissionWhereAddress",
-  INVALID_REVOKE_ROOT_PERMISSION_PERMISSION =
-    "invalidRevokeRootPermissionPermission",
-  INVALID_REVOKE_ROOT_PERMISSION_VALUE = "invalidRevokeRootPermissionCondition",
+  INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_NAME =
+    "invalidRevokeRootPermissionPermissionName",
+  NON_ZERO_REVOKE_ROOT_PERMISSION_CALL_VALUE =
+    "nonZeroRevokeRootPermissionCallValue",
   INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_ID =
     "invalidRevokeRootPermissionPermissionId",
   // applyUpdate action
-  INVALID_APPLY_UPDATE_ACTION_VALUE = "invalidApplyUpdateActionValue",
+  NON_ZERO_APPLY_UPDATE_CALL_VALUE = "nonZeroApplyUpdateCallValue",
   PLUGIN_NOT_INSTALLED = "pluginNotInstalled",
   NOT_ARAGON_PLUGIN_REPO = "notAragonPluginRepo",
   MISSING_PLUGIN_REPO = "missingPluginRepo",

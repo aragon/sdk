@@ -114,7 +114,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPGRADE_PERMISSION_VALUE,
+          .NON_ZERO_GRANT_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
       ]);
     });
     it("should return an error if the plugin does not exist", async () => {
@@ -134,7 +134,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPGRADE_PERMISSION_WHERE_ADDRESS,
+          .PLUGIN_NOT_INSTALLED,
       ]);
     });
     it("should return an error if the permission is not granted to the psp", async () => {
@@ -151,7 +151,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPGRADE_PERMISSION_WHO_ADDRESS,
+          .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS,
       ]);
     });
     it("should return an error if the permission is not correct", async () => {
@@ -168,9 +168,9 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION,
+          .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME,
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPGRADE_PERMISSION_PERMISSION_ID,
+          .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID,
       ]);
     });
     it("should return two causes if the permission is not granted to the psp and the plugin does not exist", async () => {
@@ -190,9 +190,9 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPGRADE_PERMISSION_WHERE_ADDRESS,
+          .PLUGIN_NOT_INSTALLED,
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_UPGRADE_PERMISSION_WHO_ADDRESS,
+          .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS,
       ]);
     });
   });
@@ -248,10 +248,10 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPGRADE_PERMISSION_VALUE,
+          .NON_ZERO_REVOKE_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
       ]);
     });
-    it("should return an error if the installation doees not exist", async () => {
+    it("should return an error if the installation does not exist", async () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
         where: daoAddress,
         who: pspAddress,
@@ -268,7 +268,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPGRADE_PERMISSION_WHERE_ADDRESS,
+          .PLUGIN_NOT_INSTALLED,
       ]);
     });
     it("should return an error if the is not revoked from the psp", async () => {
@@ -285,7 +285,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPGRADE_PERMISSION_WHO_ADDRESS,
+          .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS,
       ]);
     });
     it("should return an error if the permission is not correct", async () => {
@@ -302,9 +302,9 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION,
+          .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME,
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPGRADE_PERMISSION_PERMISSION_ID,
+          .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID,
       ]);
     });
     it("should return two causes if the permission is not granted to the psp and the plugin installation does not exist", async () => {
@@ -324,9 +324,9 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPGRADE_PERMISSION_WHERE_ADDRESS,
+          .PLUGIN_NOT_INSTALLED,
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_UPGRADE_PERMISSION_WHO_ADDRESS,
+          .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS,
       ]);
     });
   });
@@ -422,7 +422,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_GRANT_ROOT_PERMISSION_PERMISSION,
+          .INVALID_GRANT_ROOT_PERMISSION_PERMISSION_NAME,
         PluginUpdateProposalInValidityCause
           .INVALID_GRANT_ROOT_PERMISSION_PERMISSION_ID,
       ]);
@@ -490,7 +490,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_ROOT_PERMISSION_VALUE,
+          .NON_ZERO_REVOKE_ROOT_PERMISSION_CALL_VALUE,
       ]);
     });
     it("should return an error if the permission is not revoked in the DAO", () => {
@@ -538,7 +538,7 @@ describe("Test client utils", () => {
       );
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
-          .INVALID_REVOKE_ROOT_PERMISSION_PERMISSION,
+          .INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_NAME,
         PluginUpdateProposalInValidityCause
           .INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_ID,
       ]);
@@ -674,7 +674,7 @@ describe("Test client utils", () => {
         client.ipfs,
       );
       expect(result).toMatchObject([
-        PluginUpdateProposalInValidityCause.INVALID_APPLY_UPDATE_ACTION_VALUE,
+        PluginUpdateProposalInValidityCause.NON_ZERO_APPLY_UPDATE_CALL_VALUE,
       ]);
     });
     it("should return an `UPDATE_TO_INCOMPATIBLE_RELEASE` when the release is different from the one on subgraph", async () => {
