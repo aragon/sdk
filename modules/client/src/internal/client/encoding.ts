@@ -152,7 +152,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    * @return {*}  {DaoAction[]}
    * @memberof ClientEncoding
    */
-  public applyUpdateAction(
+  public applyUpdateAndPermissionsActionBlock(
     daoAddress: string,
     params: ApplyUpdateParams,
   ): DaoAction[] {
@@ -164,26 +164,52 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       args,
     ]);
     const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
-    // Grant ROOT_PERMISION in the DAO to the PSP
-    const grantAction = this.grantAction(daoAddress, {
-      where: daoAddress,
+    
+    // Grant UPGRADE_PLUGIN_PERMISSION in the plugin to the PSP
+    const grantUpgradeAction = this.grantAction(daoAddress, {
+      where: params.pluginAddress,
       who: pspAddress,
-      permission: Permissions.ROOT_PERMISSION,
+      permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
     });
-    // Revoke ROOT_PERMISION in the DAO to the PSP
-    const revokeAction = this.revokeAction(daoAddress, {
-      where: daoAddress,
+    // Revoke UPGRADE_PLUGIN_PERMISSION in the plugin to the PSP
+    const revokeUpgradeAction = this.revokeAction(daoAddress, {
+      where: params.pluginAddress,
       who: pspAddress,
-      permission: Permissions.ROOT_PERMISSION,
+      permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
     });
+    // If the update requests permissions to be granted or revoked, the PSP needs temporary `ROOT_PERMISSION_ID` permission
+    if (params.permissions.length > 0) {
+      const grantRootAction = this.grantAction(daoAddress, {
+        where: daoAddress,
+        who: pspAddress,
+        permission: Permissions.ROOT_PERMISSION,
+      });
+      // Revoke ROOT_PERMISSION in the DAO to the PSP
+      const revokeRootAction = this.revokeAction(daoAddress, {
+        where: daoAddress,
+        who: pspAddress,
+        permission: Permissions.ROOT_PERMISSION,
+      });
+      return [
+        grantUpgradeAction,
+        grantRootAction,
+        {
+          to: pspAddress,
+          value: BigInt(0),
+          data: hexToBytes(hexBytes),
+        },
+        revokeRootAction,
+        revokeUpgradeAction,
+      ];
+    }
     return [
-      grantAction,
+      grantUpgradeAction,
       {
         to: pspAddress,
         value: BigInt(0),
         data: hexToBytes(hexBytes),
       },
-      revokeAction,
+      revokeUpgradeAction,
     ];
   }
 

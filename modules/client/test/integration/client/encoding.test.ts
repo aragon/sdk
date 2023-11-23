@@ -585,10 +585,109 @@ describe("Client", () => {
         );
       }
     });
-    it("Should encode an applyUpdate action", async () => {
+    it("Should encode an applyUpdate action without permissions", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
 
+      const applyUpdateParams: ApplyUpdateParams = {
+        permissions: [],
+        versionTag: {
+          build: 1,
+          release: 1,
+        },
+        pluginRepo: "0x2345678901234567890123456789012345678901",
+        pluginAddress: "0x1234567890123456789012345678901234567890",
+        initData: new Uint8Array([0, 1, 2, 3]),
+        helpers: [],
+      };
+      const daoAddress = "0x1234567890123456789012345678901234567890";
+      const actions = client.encoding.applyUpdateAndPermissionsActionBlock(
+        daoAddress,
+        applyUpdateParams,
+      );
+      const pspInterface = PluginSetupProcessor__factory.createInterface();
+      const daoInterface = DAO__factory.createInterface();
+      const expectedActions = ["grant", "applyUpdate", "revoke"];
+      let hexString, argsDecoded, action;
+      expect(actions.length).toBe(3);
+      for (const [index, actionName] of expectedActions.entries()) {
+        
+         action = actions[index];
+        expect(typeof action).toBe("object");
+        expect(action.data).toBeInstanceOf(Uint8Array);
+        hexString = bytesToHex(action.data);
+        switch (actionName) {
+          case "grant":
+          case "revoke":
+            argsDecoded = daoInterface.decodeFunctionData(
+              actionName,
+              hexString,
+            );
+            expect(argsDecoded.length).toBe(3);
+            expect(argsDecoded[0]).toBe(
+              daoAddress,
+            );
+            expect(argsDecoded[1]).toBe(
+              contextParamsLocalChain.pluginSetupProcessorAddress,
+            );
+            expect(argsDecoded[2]).toBe(
+              keccak256(toUtf8Bytes(Permissions.UPGRADE_PLUGIN_PERMISSION)),
+            );
+            break;
+          case "applyUpdate":
+            argsDecoded = pspInterface.decodeFunctionData(
+              actionName,
+              hexString,
+            );
+            expect(argsDecoded.length).toBe(2);
+            expect(argsDecoded[0]).toBe(
+              daoAddress,
+            );
+            expect(argsDecoded[1].pluginSetupRef.versionTag.build).toBe(
+              applyUpdateParams.versionTag.build,
+            );
+            expect(argsDecoded[1].pluginSetupRef.versionTag.release).toBe(
+              applyUpdateParams.versionTag.release,
+            );
+            expect(argsDecoded[1].plugin).toBe(
+              applyUpdateParams.pluginAddress,
+            );
+            expect(argsDecoded[1].pluginSetupRef.pluginSetupRepo).toBe(
+              applyUpdateParams.pluginRepo,
+            );
+            for (const index in argsDecoded[1].permissions) {
+              expect(argsDecoded[1].permissions[parseInt(index)].operation)
+                .toBe(
+                  applyUpdateParams.permissions[parseInt(index)].operation,
+                );
+              expect(argsDecoded[1].permissions[parseInt(index)].where).toBe(
+                applyUpdateParams.permissions[parseInt(index)].where,
+              );
+              expect(argsDecoded[1].permissions[parseInt(index)].who).toBe(
+                applyUpdateParams.permissions[parseInt(index)].who,
+              );
+              expect(argsDecoded[1].permissions[parseInt(index)].condition)
+                .toBe(
+                  AddressZero,
+                );
+              expect(argsDecoded[1].permissions[parseInt(index)].permissionId)
+                .toBe(
+                  applyUpdateParams.permissions[parseInt(index)]
+                    .permissionId,
+                );
+            }
+            break;
+          default:
+            throw new Error("Unexpected action name");
+        }
+      }
+    });
+    it("Should encode an applyUpdate action with permissions", async () => {
+      const context = new Context(contextParamsLocalChain);
+      const client = new Client(context);
+
+      const daoAddress = ADDRESS_ONE;
+      const pluginAddress = ADDRESS_TWO;
       const applyUpdateParams: ApplyUpdateParams = {
         permissions: [{
           operation: 1,
@@ -601,59 +700,105 @@ describe("Client", () => {
           release: 1,
         },
         pluginRepo: "0x2345678901234567890123456789012345678901",
-        pluginAddress: "0x1234567890123456789012345678901234567890",
+        pluginAddress,
         initData: new Uint8Array([0, 1, 2, 3]),
         helpers: [],
       };
-      const daoAddress = "0x1234567890123456789012345678901234567890";
-      const actions = client.encoding.applyUpdateAction(
+      const actions = client.encoding.applyUpdateAndPermissionsActionBlock(
         daoAddress,
         applyUpdateParams,
       );
-
-      expect(actions.length).toBe(3);
-      expect(typeof actions[1]).toBe("object");
-      expect(actions[1].data).toBeInstanceOf(Uint8Array);
-
-      const daoInterface = PluginSetupProcessor__factory.createInterface();
-      const hexString = bytesToHex(actions[1].data);
-      const argsDecoded = daoInterface.decodeFunctionData(
-        "applyUpdate",
-        hexString,
-      );
-      expect(argsDecoded.length).toBe(2);
-      expect(argsDecoded[0]).toBe(
-        daoAddress,
-      );
-      expect(argsDecoded[1].pluginSetupRef.versionTag.build).toBe(
-        applyUpdateParams.versionTag.build,
-      );
-      expect(argsDecoded[1].pluginSetupRef.versionTag.release).toBe(
-        applyUpdateParams.versionTag.release,
-      );
-      expect(argsDecoded[1].plugin).toBe(
-        applyUpdateParams.pluginAddress,
-      );
-      expect(argsDecoded[1].pluginSetupRef.pluginSetupRepo).toBe(
-        applyUpdateParams.pluginRepo,
-      );
-      for (const index in argsDecoded[1].permissions) {
-        expect(argsDecoded[1].permissions[parseInt(index)].operation).toBe(
-          applyUpdateParams.permissions[parseInt(index)].operation,
-        );
-        expect(argsDecoded[1].permissions[parseInt(index)].where).toBe(
-          applyUpdateParams.permissions[parseInt(index)].where,
-        );
-        expect(argsDecoded[1].permissions[parseInt(index)].who).toBe(
-          applyUpdateParams.permissions[parseInt(index)].who,
-        );
-        expect(argsDecoded[1].permissions[parseInt(index)].condition).toBe(
-          AddressZero,
-        );
-        expect(argsDecoded[1].permissions[parseInt(index)].permissionId).toBe(
-          applyUpdateParams.permissions[parseInt(index)]
-            .permissionId,
-        );
+      const pspInterface = PluginSetupProcessor__factory.createInterface();
+      const daoInterface = DAO__factory.createInterface();
+      const expectedActions = ["grant", "grant", "applyUpdate", "revoke", "revoke"];
+      let hexString, argsDecoded, action;
+      expect(actions.length).toBe(5);
+      for (const [index, actionName] of expectedActions.entries()) {
+        action = actions[index];
+        expect(typeof action).toBe("object");
+        expect(action.data).toBeInstanceOf(Uint8Array);
+        hexString = bytesToHex(action.data);
+        switch (index) {
+          case 1:
+          case 3:
+            argsDecoded = daoInterface.decodeFunctionData(
+              actionName,
+              hexString,
+            );
+            expect(argsDecoded.length).toBe(3);
+            expect(argsDecoded[0]).toBe(
+              daoAddress,
+            );
+            expect(argsDecoded[1]).toBe(
+              contextParamsLocalChain.pluginSetupProcessorAddress,
+            );
+            expect(argsDecoded[2]).toBe(
+              keccak256(toUtf8Bytes(Permissions.ROOT_PERMISSION)),
+            );
+            break;
+          case 0:
+          case 4:
+            argsDecoded = daoInterface.decodeFunctionData(
+              actionName,
+              hexString,
+            );
+            expect(argsDecoded.length).toBe(3);
+            expect(argsDecoded[0]).toBe(
+              pluginAddress,
+            );
+            expect(argsDecoded[1]).toBe(
+              contextParamsLocalChain.pluginSetupProcessorAddress,
+            );
+            expect(argsDecoded[2]).toBe(
+              keccak256(toUtf8Bytes(Permissions.UPGRADE_PLUGIN_PERMISSION)),
+            );
+            break;
+          case 2:
+            argsDecoded = pspInterface.decodeFunctionData(
+              actionName,
+              hexString,
+            );
+            expect(argsDecoded.length).toBe(2);
+            expect(argsDecoded[0]).toBe(
+              daoAddress,
+            );
+            expect(argsDecoded[1].pluginSetupRef.versionTag.build).toBe(
+              applyUpdateParams.versionTag.build,
+            );
+            expect(argsDecoded[1].pluginSetupRef.versionTag.release).toBe(
+              applyUpdateParams.versionTag.release,
+            );
+            expect(argsDecoded[1].plugin).toBe(
+              applyUpdateParams.pluginAddress,
+            );
+            expect(argsDecoded[1].pluginSetupRef.pluginSetupRepo).toBe(
+              applyUpdateParams.pluginRepo,
+            );
+            for (const index in argsDecoded[1].permissions) {
+              expect(argsDecoded[1].permissions[parseInt(index)].operation)
+                .toBe(
+                  applyUpdateParams.permissions[parseInt(index)].operation,
+                );
+              expect(argsDecoded[1].permissions[parseInt(index)].where).toBe(
+                applyUpdateParams.permissions[parseInt(index)].where,
+              );
+              expect(argsDecoded[1].permissions[parseInt(index)].who).toBe(
+                applyUpdateParams.permissions[parseInt(index)].who,
+              );
+              expect(argsDecoded[1].permissions[parseInt(index)].condition)
+                .toBe(
+                  AddressZero,
+                );
+              expect(argsDecoded[1].permissions[parseInt(index)].permissionId)
+                .toBe(
+                  applyUpdateParams.permissions[parseInt(index)]
+                    .permissionId,
+                );
+            }
+            break;
+          default:
+            throw new Error("Unexpected action name");
+        }
       }
     });
 

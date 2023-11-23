@@ -15,6 +15,7 @@ import {
   PrepareUninstallationStepValue,
   PrepareUpdateParams,
   PrepareUpdateStepValue,
+  SupportedVersion,
 } from "@aragon/sdk-client-common";
 import {
   AssetBalance,
@@ -35,7 +36,6 @@ import {
   GrantPermissionWithConditionParams,
   HasPermissionParams,
   InitializeFromParams,
-  IsDaoUpdateValidParams,
   PluginPreparationListItem,
   PluginPreparationQueryParams,
   PluginQueryParams,
@@ -97,20 +97,21 @@ export interface IClientMethods {
     contractAddress: string,
   ) => Promise<[number, number, number]>;
 
-  isPluginUpdate: (
-    actions: DaoAction[],
-  ) => boolean;
+  isPluginUpdateProposal: (
+    proposalId: string,
+  ) => Promise<boolean>;
 
-  isPluginUpdateValid: (
-    params: IsDaoUpdateValidParams,
+  isPluginUpdateProposalValid: (
+    proposalId: string,
   ) => Promise<PluginUpdateProposalValidity>;
 
-  isDaoUpdate: (
-    actions: DaoAction[],
-  ) => boolean;
+  isDaoUpdateProposal: (
+    proposalId: string,
+  ) => Promise<boolean>;
 
-  isDaoUpdateValid: (
-    params: IsDaoUpdateValidParams,
+  isDaoUpdateProposalValid: (
+    proposalId: string,
+    version?: SupportedVersion,
   ) => Promise<DaoUpdateProposalValidity>;
 
   getDaoImplementation: (
@@ -170,7 +171,7 @@ export interface IClientEncoding {
     daoAddressOrEns: string,
     params: ApplyUninstallationParams,
   ) => DaoAction[];
-  applyUpdateAction: (
+  applyUpdateAndPermissionsActionBlock: (
     daoAddressOrEns: string,
     params: ApplyUpdateParams,
   ) => DaoAction[];
