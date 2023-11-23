@@ -176,21 +176,18 @@ export function computeProposalStatus(
   if (startDate >= now) {
     return ProposalStatus.PENDING;
   }
-  // The proposal is not executed and the start date is in the past
-  // So we must check if the proposal reached the approval threshold
-  // If it reached the approval threshold and it's a signaling proposal
-  // the status becomes SUCCEEDED
-  // If it reached the approval threshold and it's not a signaling proposal
-  // the status becomes SUCCEEDED if the end date is in the past or if the
-  // proposal is early executable
-  if (proposal.approvalReached) {
-    if(proposal.isSignaling) {
-      return ProposalStatus.SUCCEEDED;
-    } else {
-      if (now >= endDate || proposal.earlyExecutable) {
-        return ProposalStatus.SUCCEEDED;
-      }
-    }
+  // The proposal is not executed and the start date is in the past.
+  // Accordingly, we check if the proposal reached enough approval 
+  // (i.e., that the supportThreshold and minParticipation criteria are both met).
+  // If the approval is reached and the vote has ended (end date is in the past) it has succeded. 
+  // This applies to normal mode and vote replacement mode.
+  if (proposal.approvalReached && endDate <= now) {
+    return ProposalStatus.SUCCEEDED;
+  }
+  // In early exeuction mode, we calculate if subsequent voting can change the result of the vote. 
+  // If not, the proposal is early executable and is therefore succeeded as well.
+  if(proposal.earlyExecutable){
+    return ProposalStatus.SUCCEEDED;
   }
   // The proposal is not executed and the start date is in the past
   // and the approval threshold is not reached
@@ -219,9 +216,8 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
     case ProposalStatus.SUCCEEDED:
       where = {
         or: [
-          { approvalReached: true, endDate_lt: now, isSignaling: false },
-          { approvalReached: true, earlyExecutable: true, isSignaling: false },
-          { approvalReached: true, isSignaling: true },
+          { approvalReached: true, endDate_lt: now },
+          { earlyExecutable: true },
         ],
       };
       break;
