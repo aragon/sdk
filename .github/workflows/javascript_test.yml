@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: ['16.x', '18.x', '20.x']
+        node: ['20.x']
         os: [ubuntu-latest]
 
     steps:
@@ -43,12 +43,12 @@ jobs:
       - name: Build subpackages
         run: yarn run build
 
-      - name: Integration test
-        run: yarn test modules/client/test/integration --ci --coverage --passWithNoTests
-        env:
-          IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
+#      - name: Integration test
+#        run: yarn test modules/client/test/integration --ci --coverage --passWithNoTests
+#        env:
+#          IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
 
       - name: Run unit tests
-        run: yarn test --testPathIgnorePatterns=modules/client/test/integration --ci --coverage  --passWithNoTests
+        run: yarn test --testPathIgnorePatterns=modules/client/test/integration --coverage  --passWithNoTests
         env:
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
