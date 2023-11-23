@@ -40,9 +40,9 @@ describe("Test promise helpers", () => {
   });
   describe("promiseWithTimeout", () => {
     it("Should timeout", async () => {
-      const timeout = 50;
+      const timeout = 100;
       const promise = new Promise((resolve) =>
-        setTimeout(resolve, timeout * 5)
+        setTimeout(resolve, timeout * 50)
       );
       await expect(promiseWithTimeout(promise, timeout)).rejects.toThrow(
         "Time out",
