@@ -1,11 +1,9 @@
 import {
-  DaoAction,
   MetadataAbiInput,
   MultiTargetPermission,
   Pagination,
   PluginInstallItem,
   TokenType,
-  VersionTag,
 } from "@aragon/sdk-client-common";
 
 /* DAO creation */
@@ -420,50 +418,88 @@ export type DecodedInitializeFromParams = {
 
 export type PluginUpdateProposalValidity = {
   isValid: boolean;
-  causes: PluginUpdateProposalInValidityCause[];
+  actionErrorCauses: PluginUpdateProposalInValidityCause[][];
+  proposalSettingsErrorCauses: ProposalSettingsErrorCause[];
 };
 
-export enum PluginUpdateProposalInValidityCause {
+export enum ProposalSettingsErrorCause {
+  NON_ZERO_ALLOW_FAILURE_MAP_VALUE = "nonZeroAllowFailureMapValue",
   INVALID_ACTIONS = "invalidActions",
-  INVALID_GRANT_PERMISSION = "invalidGrantPermission",
-  INVALID_REVOKE_PERMISSION = "invalidRevokePermission",
+  PROPOSAL_NOT_FOUND = "proposalNotFound",
+}
+
+export enum PluginUpdateProposalInValidityCause {
+  // Grant UPDATE_PLUGIN_PERMISSION action
+  INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS =
+    "invalidGrantUpgradePluginPermissionWhoAddress",
+  INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_WHERE_ADDRESS =
+    "invalidGrantUpgradePluginPermissionWhereAddress",
+  INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME =
+    "invalidGrantUpgradePluginPermissionPermissionName",
+  NON_ZERO_GRANT_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE =
+    "nonZeroGrantUpgradePluginPermissionCallValue",
+  INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID =
+    "invalidGrantUpgradePluginPermissionPermissionId",
+  // Revoke UPDATE_PLUGIN_PERMISSION action
+  INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS =
+    "invalidRevokeUpgradePluginPermissionWhoAddress",
+  INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_WHERE_ADDRESS =
+    "invalidRevokeUpgradePluginPermissionWhereAddress",
+  INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME =
+    "invalidRevokeUpgradePluginPermissionPermissionName",
+  NON_ZERO_REVOKE_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE =
+    "nonZeroRevokeUpgradePluginPermissionCallValue",
+  INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID =
+    "invalidRevokeUpgradePluginPermissionPermissionId",
+  // Grant ROOT_PERMISSION action
+  INVALID_GRANT_ROOT_PERMISSION_WHO_ADDRESS =
+    "invalidGrantRootPermissionWhoAddress",
+  INVALID_GRANT_ROOT_PERMISSION_WHERE_ADDRESS =
+    "invalidGrantRootPermissionWhereAddress",
+  INVALID_GRANT_ROOT_PERMISSION_PERMISSION_NAME =
+    "invalidGrantRootPermissionPermissionName",
+  NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE =
+    "nonZeroGrantRootPermissionCallValue",
+  INVALID_GRANT_ROOT_PERMISSION_PERMISSION_ID =
+    "invalidGrantRootPermissionPermissionId",
+  // Revoke ROOT_PERMISSION action
+  INVALID_REVOKE_ROOT_PERMISSION_WHO_ADDRESS =
+    "invalidRevokeRootPermissionWhoAddress",
+  INVALID_REVOKE_ROOT_PERMISSION_WHERE_ADDRESS =
+    "invalidRevokeRootPermissionWhereAddress",
+  INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_NAME =
+    "invalidRevokeRootPermissionPermissionName",
+  NON_ZERO_REVOKE_ROOT_PERMISSION_CALL_VALUE =
+    "nonZeroRevokeRootPermissionCallValue",
+  INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_ID =
+    "invalidRevokeRootPermissionPermissionId",
+  // applyUpdate action
+  NON_ZERO_APPLY_UPDATE_CALL_VALUE = "nonZeroApplyUpdateCallValue",
   PLUGIN_NOT_INSTALLED = "pluginNotInstalled",
   NOT_ARAGON_PLUGIN_REPO = "notAragonPluginRepo",
   MISSING_PLUGIN_REPO = "missingPluginRepo",
   MISSING_PLUGIN_PREPARATION = "missingPluginPreparation",
-  INVALID_ALLOW_FAILURE_MAP = "invalidAllowFailureMap",
-  INVALID_PLUGIN_RELEASE = "invalidPluginRelease",
-  INVALID_PLUGIN_BUILD = "invalidPluginBuild",
+  UPDATE_TO_INCOMPATIBLE_RELEASE = "updateToIncompatibleRelease",
+  UPDATE_TO_OLDER_OR_SAME_BUILD = "updateToOlderOrSameBuild",
   INVALID_DATA = "invalidData",
   INVALID_PLUGIN_REPO_METADATA = "invalidPluginRepoMetadata",
 }
 
-export type IsPluginUpdateProposalValidParams = {
-  proposalId: string;
-  version: VersionTag;
-  pluginAddress: string;
-  pluginPreparationIndex?: number;
-};
-
 export enum DaoUpdateProposalInvalidityCause {
-  INVALID_ACTIONS = "invalidActions",
-  INVALID_IMPLEMENTATION = "invalidImplementation",
-  INVALID_VERSION = "invalidVersion",
-  INVALID_INIT_DATA = "invalidInitData",
+  NON_ZERO_CALL_VALUE = "nonZeroCallValue",
+  INVALID_TO_ADDRESS = "invalidToAddress",
+  INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS =
+    "invalidUpgradeToImplementationAddress",
+  INVALID_UPGRADE_TO_AND_CALL_DATA = "invalidUpgradeToAndCallData",
+  INVALID_UPGRADE_TO_AND_CALL_IMPLEMENTATION_ADDRESS =
+    "invalidUpgradeToAndCallImplementationAddress",
+  INVALID_UPGRADE_TO_AND_CALL_VERSION = "invalidUpgradeToAndCallVersion",
 }
 
 export type DaoUpdateProposalValidity = {
   isValid: boolean;
-  causes: DaoUpdateProposalInvalidityCause[];
-};
-
-type IsUpdateParamsBase = {
-  actions: DaoAction[];
-  daoAddress: string;
-};
-
-export type IsDaoUpdateValidParams = IsUpdateParamsBase & {
-  version?: [number, number, number];
+  actionErrorCauses: DaoUpdateProposalInvalidityCause[];
+  proposalSettingsErrorCauses: ProposalSettingsErrorCause[];
 };
 
 export type DaoUpdateParams = InitializeFromParams & {
@@ -473,7 +509,6 @@ export type DaoUpdateParams = InitializeFromParams & {
 export type DaoUpdateDecodedParams = InitializeFromParams & {
   implementationAddress: string;
 };
-export type IsPluginUpdateValidParams = IsUpdateParamsBase;
 export type PluginPreparationQueryParams = Pagination & {
   sortBy?: PluginPreparationSortBy;
   type?: PluginPreparationType;

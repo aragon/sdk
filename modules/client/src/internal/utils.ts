@@ -3,6 +3,8 @@ import {
   DaoDetails,
   DaoListItem,
   DaoMetadata,
+  DaoUpdateProposalInvalidityCause,
+  DaoUpdateProposalValidity,
   DecodedInitializeFromParams,
   DepositErc1155Params,
   DepositErc20Params,
@@ -17,6 +19,9 @@ import {
   PluginRepo,
   PluginRepoBuildMetadata,
   PluginRepoReleaseMetadata,
+  PluginUpdateProposalInValidityCause,
+  PluginUpdateProposalValidity,
+  ProposalSettingsErrorCause,
   RevokePermissionDecodedParams,
   RevokePermissionParams,
   Transfer,
@@ -27,6 +32,7 @@ import {
 import {
   ContractPermissionParams,
   ContractPermissionWithConditionParams,
+  ProposalActionTypes,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
@@ -38,10 +44,13 @@ import {
   SubgraphErc721TransferListItem,
   SubgraphNativeBalance,
   SubgraphNativeTransferListItem,
+  SubgraphPluginInstallationListItem,
   SubgraphPluginListItem,
   SubgraphPluginPermissionOperation,
   SubgraphPluginPreparationListItem,
   SubgraphPluginRepo,
+  SubgraphPluginRepoRelease,
+  SubgraphPluginUpdatePreparation,
   SubgraphTransferListItem,
   SubgraphTransferType,
 } from "./types";
@@ -63,6 +72,7 @@ import {
   DecodedApplyInstallationParams,
   DecodedApplyUpdateParams,
   getFunctionFragment,
+  getNamedTypesFromMetadata,
   hexToBytes,
   InterfaceParams,
   InvalidParameter,
@@ -71,6 +81,7 @@ import {
   NotImplementedError,
   PermissionIds,
   PermissionOperationType,
+  Permissions,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { Signer } from "@ethersproject/abstract-signer";
@@ -79,13 +90,31 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
 import { abi as ERC1155_ABI } from "@openzeppelin/contracts/build/contracts/ERC1155.json";
 import { SubgraphAction } from "../client-common";
-import { PreparationType, ZERO_BYTES_HASH } from "./constants";
+import {
+  PLUGIN_UPDATE_ACTION_PATTERN,
+  PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN,
+  PreparationType,
+  SupportedPluginRepo,
+  SupportedPluginRepoArray,
+  UPDATE_PLUGIN_SIGNATURES,
+  ZERO_BYTES_HASH,
+} from "./constants";
 import {
   DepositErc1155Schema,
   DepositErc20Schema,
   DepositErc721Schema,
   DepositEthSchema,
 } from "./schemas";
+import {
+  IClientGraphQLCore,
+  IClientIpfsCore,
+} from "@aragon/sdk-client-common/dist/internal";
+import {
+  QueryDao,
+  QueryPlugin,
+  QueryPluginInstallations,
+  QueryPluginPreparations,
+} from "./graphql-queries";
 
 export function unwrapDepositParams(
   params: DepositEthParams | DepositErc20Params,
@@ -768,6 +797,18 @@ export function decodeUpgradeToAndCallAction(
   };
 }
 
+export function decodeUpgradeToAction(
+  data: Uint8Array,
+) {
+  const daoInterface = DAO__factory.createInterface();
+  const hexBytes = bytesToHex(data);
+  const expectedFunction = daoInterface.getFunction(
+    "upgradeTo",
+  );
+  const result = daoInterface.decodeFunctionData(expectedFunction, hexBytes);
+  return result[0];
+}
+
 export function decodeInitializeFromAction(
   data: Uint8Array,
 ): DecodedInitializeFromParams {
@@ -823,4 +864,822 @@ export function toPluginPermissionOperationType(
     default:
       throw new InvalidPermissionOperationType();
   }
+}
+
+// function that compares 2 generic arrays
+// and returns true if they are equal
+// and false if they are not
+export function compareArrays<T>(array1: T[], array2: T[]): boolean {
+  return JSON.stringify(array1) === JSON.stringify(array2);
+}
+async function getPluginInstallations(
+  daoAddress: string,
+  pluginAddress: string,
+  graphql: IClientGraphQLCore,
+): Promise<SubgraphPluginInstallationListItem[]> {
+  const name = "pluginInstallations";
+  type U = { pluginInstallations: SubgraphPluginInstallationListItem[] };
+  const query = QueryPluginInstallations;
+  const params = {
+    where: {
+      plugin: pluginAddress.toLowerCase(),
+      dao: daoAddress.toLowerCase(),
+    },
+  };
+  const res = await graphql.request<U>({
+    query,
+    params,
+    name,
+  });
+  const { pluginInstallations } = res;
+  return pluginInstallations;
+}
+export async function validateGrantUpgradePluginPermissionAction(
+  action: DaoAction,
+  pspAddress: string,
+  daoAddress: string,
+  graphql: IClientGraphQLCore,
+): Promise<PluginUpdateProposalInValidityCause[]> {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  // decode the action
+  const decodedPermission = decodeGrantAction(action.data);
+  // retrieve the plugin installations from subgraph
+  // with the same plugin address and the specified
+  // dao address
+  const pluginInstallations = await getPluginInstallations(
+    daoAddress,
+    decodedPermission.where,
+    graphql,
+  );
+  // if the plugin installations length is 0 means that
+  // that the address in the where field is not a plugin
+  // or is not installed in the specified dao
+  if (pluginInstallations.length === 0) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .PLUGIN_NOT_INSTALLED,
+    );
+  }
+  // Value must be 0
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .NON_ZERO_GRANT_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
+    );
+  }
+  // The permission should be granted to the PSP
+  if (decodedPermission.who !== pspAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS,
+    );
+  }
+  // The permission should be `UPGRADE_PLUGIN_PERMISSION`
+  if (
+    decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME,
+    );
+  }
+  // The permissionId should be `UPGRADE_PLUGIN_PERMISSION_ID`
+  if (
+    decodedPermission.permissionId !==
+      PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID,
+    );
+  }
+  return causes;
+}
+
+export async function validateRevokeUpgradePluginPermissionAction(
+  action: DaoAction,
+  pspAddress: string,
+  daoAddress: string,
+  graphql: IClientGraphQLCore,
+): Promise<PluginUpdateProposalInValidityCause[]> {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  const decodedPermission = decodeRevokeAction(action.data);
+  const pluginInstallations = await getPluginInstallations(
+    daoAddress,
+    decodedPermission.where,
+    graphql,
+  );
+  if (pluginInstallations.length === 0) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .PLUGIN_NOT_INSTALLED,
+    );
+  }
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .NON_ZERO_REVOKE_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
+    );
+  }
+  if (decodedPermission.who !== pspAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS,
+    );
+  }
+  if (
+    decodedPermission.permission !== Permissions.UPGRADE_PLUGIN_PERMISSION
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_NAME,
+    );
+  }
+  if (
+    decodedPermission.permissionId !==
+      PermissionIds.UPGRADE_PLUGIN_PERMISSION_ID
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID,
+    );
+  }
+  return causes;
+}
+export function validateGrantRootPermissionAction(
+  action: DaoAction,
+  daoAddress: string,
+  pspAddress: string,
+): PluginUpdateProposalInValidityCause[] {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  const decodedPermission = decodeGrantAction(action.data);
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE,
+    );
+  }
+  if (decodedPermission.where !== daoAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_WHERE_ADDRESS,
+    );
+  }
+  if (decodedPermission.who !== pspAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_WHO_ADDRESS,
+    );
+  }
+  if (
+    decodedPermission.permission !== Permissions.ROOT_PERMISSION
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_PERMISSION_NAME,
+    );
+  }
+  if (
+    decodedPermission.permissionId !==
+      PermissionIds.ROOT_PERMISSION_ID
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_PERMISSION_ID,
+    );
+  }
+  return causes;
+}
+export function validateRevokeRootPermissionAction(
+  action: DaoAction,
+  daoAddress: string,
+  pspAddress: string,
+): PluginUpdateProposalInValidityCause[] {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  const decodedPermission = decodeRevokeAction(action.data);
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .NON_ZERO_REVOKE_ROOT_PERMISSION_CALL_VALUE,
+    );
+  }
+  if (decodedPermission.where !== daoAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_WHERE_ADDRESS,
+    );
+  }
+  if (decodedPermission.who !== pspAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_WHO_ADDRESS,
+    );
+  }
+  if (
+    decodedPermission.permission !== Permissions.ROOT_PERMISSION
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_NAME,
+    );
+  }
+  if (
+    decodedPermission.permissionId !==
+      PermissionIds.ROOT_PERMISSION_ID
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_ID,
+    );
+  }
+  return causes;
+}
+/**
+ * Validate a plugin update proposal
+ *
+ * @export
+ * @param {DaoAction} action
+ * @param {string} daoAddress
+ * @param {IClientGraphQLCore} graphql
+ * @param {IClientIpfsCore} ipfs
+ * @return {*}  {Promise<PluginUpdateProposalInValidityCause[]>}
+ */
+export async function validateApplyUpdateFunction(
+  action: DaoAction,
+  daoAddress: string,
+  graphql: IClientGraphQLCore,
+  ipfs: IClientIpfsCore,
+): Promise<PluginUpdateProposalInValidityCause[]> {
+  const causes: PluginUpdateProposalInValidityCause[] = [];
+  if (action.value.toString() !== "0") {
+    causes.push(
+      PluginUpdateProposalInValidityCause.NON_ZERO_APPLY_UPDATE_CALL_VALUE,
+    );
+  }
+  const decodedParams = decodeApplyUpdateAction(
+    action.data,
+  );
+  // get dao with plugins
+  type U = { dao: SubgraphDao };
+  const { dao } = await graphql.request<U>({
+    query: QueryDao,
+    params: { address: daoAddress },
+    name: "dao",
+  });
+  // find the plugin with the same address
+  const plugin = dao.plugins.find((plugin) =>
+    plugin.appliedPreparation?.pluginAddress ===
+      decodedParams.pluginAddress
+  );
+  if (!plugin) {
+    causes.push(PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED);
+    return causes;
+  }
+  // check release is the same as the one installed
+  if (
+    plugin.appliedVersion?.release.release !==
+      decodedParams.versionTag.release
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause.UPDATE_TO_INCOMPATIBLE_RELEASE,
+    );
+  }
+  // check build is higher than the one installed
+  if (
+    !plugin.appliedVersion?.build ||
+    plugin.appliedVersion?.build >=
+      decodedParams.versionTag.build
+  ) {
+    causes.push(
+      PluginUpdateProposalInValidityCause.UPDATE_TO_OLDER_OR_SAME_BUILD,
+    );
+  }
+  // check if plugin repo (pluginSetupRepo) exist
+  type V = { pluginRepo: SubgraphPluginRepo };
+  const { pluginRepo } = await graphql.request<V>({
+    query: QueryPlugin,
+    params: { id: decodedParams.pluginRepo },
+    name: "pluginRepo",
+  });
+  if (!pluginRepo) {
+    causes.push(PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO);
+    return causes;
+  }
+  // check if is one of the aragon plugin repos
+  if (
+    !SupportedPluginRepoArray.includes(
+      pluginRepo.subdomain as SupportedPluginRepo,
+    )
+  ) {
+    causes.push(PluginUpdateProposalInValidityCause.NOT_ARAGON_PLUGIN_REPO);
+  }
+
+  // get the prepared setup id
+  const preparedSetupId = getPreparedSetupId(
+    decodedParams,
+    PreparationType.UPDATE,
+  );
+  // get plugin preparation
+  type W = { pluginPreparation: SubgraphPluginUpdatePreparation };
+  const { pluginPreparation } = await graphql.request<W>({
+    query: QueryPluginPreparations,
+    params: { where: { preparedSetupId } },
+    name: "pluginPreparation",
+  });
+  if (!pluginPreparation) {
+    causes.push(
+      PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
+    );
+    return causes;
+  }
+  // get the metadata of the plugin repo
+  // for the release and build specified
+  const release = pluginRepo.releases.find((
+    release: SubgraphPluginRepoRelease,
+  ) => release.release === decodedParams.versionTag.release);
+  const build = release?.builds.find((
+    build: { build: number; metadata: string },
+  ) => build.build === decodedParams.versionTag.build);
+  const metadataCid = build?.metadata;
+
+  // fetch the metadata
+  const metadata = await ipfs.fetchString(metadataCid!);
+  const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
+  // get the update abi for the specified build
+  if (
+    metadataJson?.pluginSetup?.prepareUpdate[decodedParams.versionTag.build]
+      ?.inputs
+  ) {
+    // if the abi exists try to decode the data
+    const updateAbi = metadataJson.pluginSetup.prepareUpdate[
+      decodedParams.versionTag.build
+    ].inputs;
+    try {
+      if (
+        decodedParams.initData.length > 0 &&
+        updateAbi.length === 0
+      ) {
+        throw new Error();
+      }
+      // if the decode does not throw an error the data is valid
+      defaultAbiCoder.decode(
+        getNamedTypesFromMetadata(updateAbi),
+        decodedParams.initData,
+      );
+    } catch {
+      // if the decode throws an error the data is invalid
+      causes.push(
+        PluginUpdateProposalInValidityCause.INVALID_DATA,
+      );
+    }
+  } else {
+    causes.push(
+      PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
+    );
+  }
+  return causes;
+}
+
+/**
+ * Given a list of actions, it decodes the actions and returns the
+ * type of action
+ *
+ * @export
+ * @param {DaoAction[]} actions
+ * @return {*}  {ProposalActionTypes[]}
+ */
+export function classifyProposalActions(
+  actions: DaoAction[],
+): ProposalActionTypes[] {
+  const classifiedActions: ProposalActionTypes[] = [];
+
+  for (const action of actions) {
+    try {
+      let decodedPermission:
+        | GrantPermissionDecodedParams
+        | RevokePermissionDecodedParams;
+      const func = getFunctionFragment(action.data, UPDATE_PLUGIN_SIGNATURES);
+      switch (func.name) {
+        case "upgradeTo":
+          classifiedActions.push(ProposalActionTypes.UPGRADE_TO);
+          break;
+        case "upgradeToAndCall":
+          classifiedActions.push(ProposalActionTypes.UPGRADE_TO_AND_CALL);
+          break;
+        case "grant":
+          decodedPermission = decodeGrantAction(action.data);
+          // check the permission that is being granted
+          switch (decodedPermission.permission) {
+            case Permissions.UPGRADE_PLUGIN_PERMISSION:
+              classifiedActions.push(
+                ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
+              );
+              break;
+            case Permissions.ROOT_PERMISSION:
+              classifiedActions.push(
+                ProposalActionTypes.GRANT_ROOT_PERMISSION,
+              );
+              break;
+            default:
+              classifiedActions.push(
+                ProposalActionTypes.UNKNOWN,
+              );
+              break;
+          }
+          break;
+        case "revoke":
+          decodedPermission = decodeRevokeAction(action.data);
+          // check the permission that is being granted
+          switch (decodedPermission.permission) {
+            case Permissions.UPGRADE_PLUGIN_PERMISSION:
+              classifiedActions.push(
+                ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
+              );
+              break;
+            case Permissions.ROOT_PERMISSION:
+              classifiedActions.push(
+                ProposalActionTypes.REVOKE_ROOT_PERMISSION,
+              );
+              break;
+            default:
+              classifiedActions.push(
+                ProposalActionTypes.UNKNOWN,
+              );
+              break;
+          }
+          break;
+        case "applyUpdate":
+          classifiedActions.push(ProposalActionTypes.APPLY_UPDATE);
+          break;
+        default:
+          classifiedActions.push(ProposalActionTypes.ACTION_NOT_ALLOWED);
+          break;
+      }
+    } catch {
+      classifiedActions.push(ProposalActionTypes.UNKNOWN);
+    }
+  }
+  return classifiedActions;
+}
+
+/**
+ * Returns true if the actions are valid for a plugin update proposal with root permission
+ *
+ * @export
+ * @param {ProposalActionTypes[]} actions
+ * @return {*}  {boolean}
+ */
+export function containsPluginUpdateActionBlockWithRootPermission(
+  actions: ProposalActionTypes[],
+): boolean {
+  // get the first 5 actions
+  const receivedPattern = actions.slice(0, 5);
+  // check if it matches the expected pattern
+  // length should be 5
+  return receivedPattern.length === 5 &&
+    compareArrays(receivedPattern, PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN);
+}
+
+/**
+ * Returns true if the actions are valid for a plugin update proposal without root permission
+ *
+ * @export
+ * @param {ProposalActionTypes[]} actions
+ * @return {*}  {boolean}
+ */
+export function containsPluginUpdateActionBlock(
+  actions: ProposalActionTypes[],
+): boolean {
+  // get the first 3 action
+  const receivedPattern = actions.slice(0, 3);
+  // check if it matches the expected pattern
+  // length should be 3
+  return receivedPattern.length === 3 &&
+    compareArrays(receivedPattern, PLUGIN_UPDATE_ACTION_PATTERN);
+}
+/**
+ * Returns true if the actions are valid for a plugin update proposal
+ *
+ * @export
+ * @param {ProposalActionTypes[]} actions
+ * @return {*}  {boolean}
+ */
+export function containsDaoUpdateAction(
+  actions: ProposalActionTypes[],
+): boolean {
+  // UpgradeTo or UpgradeToAndCall should be the first action
+  return actions[0] === ProposalActionTypes.UPGRADE_TO ||
+    actions[0] === ProposalActionTypes.UPGRADE_TO_AND_CALL;
+}
+
+export function validateUpdateDaoProposalActions(
+  actions: DaoAction[],
+  daoAddress: string,
+  expectedImplementationAddress: string,
+  currentDaoVersion: [number, number, number],
+): DaoUpdateProposalValidity {
+  const classifiedActions = classifyProposalActions(actions);
+  const actionErrorCauses: DaoUpdateProposalInvalidityCause[] = [];
+  const proposalSettingsErrorCauses: ProposalSettingsErrorCause[] = [];
+  // check if the actions are valid
+  if (!containsDaoUpdateAction(classifiedActions)) {
+    // If actions are not valid, add the cause to the causes array
+    // and return
+    return {
+      isValid: false,
+      proposalSettingsErrorCauses: [ProposalSettingsErrorCause.INVALID_ACTIONS],
+      actionErrorCauses: [],
+    };
+  }
+  // if they are valid, this means that
+  // the upgrade action must be the first one
+  const upgradeActionType = classifiedActions[0];
+  const upgradeAction = actions[0];
+  // if the to address is not the dao address
+  // add the cause to the causes array
+  if (upgradeAction.to !== daoAddress) {
+    actionErrorCauses.push(
+      DaoUpdateProposalInvalidityCause.INVALID_TO_ADDRESS,
+    );
+  }
+  // if the value is different from 0
+  // add the cause to the causes array
+  if (upgradeAction.value.toString() !== "0") {
+    actionErrorCauses.push(
+      DaoUpdateProposalInvalidityCause.NON_ZERO_CALL_VALUE,
+    );
+  }
+  switch (upgradeActionType) {
+    case ProposalActionTypes.UPGRADE_TO:
+      // decode the upgradeTo action
+      const decodedImplementationAddress = decodeUpgradeToAction(
+        actions[0].data,
+      );
+      // check that the implementation address is the same
+      if (expectedImplementationAddress !== decodedImplementationAddress) {
+        actionErrorCauses.push(
+          DaoUpdateProposalInvalidityCause
+            .INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS,
+        );
+      }
+      break;
+    case ProposalActionTypes.UPGRADE_TO_AND_CALL: // decode the action
+      const upgradeToAndCallDecodedParams = decodeUpgradeToAndCallAction(
+        actions[0].data,
+      );
+      // the call data should be the initializeFrom function encoded
+      // so we decode the initialize from function
+      const initializeFromDecodedParams = decodeInitializeFromAction(
+        upgradeToAndCallDecodedParams.data,
+      );
+      // check that the implementation address is the same as specified
+      // in the upgradeToAndCall action
+      if (
+        expectedImplementationAddress !==
+          upgradeToAndCallDecodedParams.implementationAddress
+      ) {
+        actionErrorCauses.push(
+          DaoUpdateProposalInvalidityCause
+            .INVALID_UPGRADE_TO_AND_CALL_IMPLEMENTATION_ADDRESS,
+        );
+      }
+      // check that the current version version of the dao is the same
+      // as the one specified as previous version in the initializeFrom function
+      if (
+        JSON.stringify(initializeFromDecodedParams.previousVersion) !==
+          JSON.stringify(currentDaoVersion)
+      ) {
+        actionErrorCauses.push(
+          DaoUpdateProposalInvalidityCause.INVALID_UPGRADE_TO_AND_CALL_VERSION,
+        );
+      }
+
+      // For now, we check that the `bytes calldata _initData` parameter of the `initializeFrom` function call is empty (because updates related to 1.0.0, 1.3.0, or 1.4.0 don't require `_initData`).
+      // TODO For future upgrade requiring non-empty `_initData`, we must define a place to obtain this information from permissionlessly.
+      if (initializeFromDecodedParams.initData.length !== 0) {
+        actionErrorCauses.push(
+          DaoUpdateProposalInvalidityCause.INVALID_UPGRADE_TO_AND_CALL_DATA,
+        );
+      }
+      break;
+    default:
+      proposalSettingsErrorCauses.push(
+        ProposalSettingsErrorCause.INVALID_ACTIONS,
+      );
+      break;
+  }
+  // return the validity of the proposal
+  return {
+    isValid: actionErrorCauses.length === 0 &&
+      proposalSettingsErrorCauses.length === 0,
+    actionErrorCauses,
+    proposalSettingsErrorCauses,
+  };
+}
+
+export async function validateUpdatePluginProposalActions(
+  actions: DaoAction[],
+  daoAddress: string,
+  pspAddress: string,
+  graphql: IClientGraphQLCore,
+  ipfs: IClientIpfsCore,
+): Promise<PluginUpdateProposalValidity> {
+  // Declare variables
+  let actionErrorCauses: PluginUpdateProposalInValidityCause[][] = [];
+  let resCauses: PluginUpdateProposalInValidityCause[];
+  let proposalSettingsErrorCauses: ProposalSettingsErrorCause[] = [];
+  const classifiedActions = classifyProposalActions(actions);
+  // check if is an update plugin proposal
+  if (containsPluginUpdateActionBlock(classifiedActions)) {
+    // initialize the causes array
+    // we always use the index 0
+    // because this is going to be called recursively
+    // and then joined
+    actionErrorCauses[0] = [];
+    // iterate over the first 3 actions actions
+    for (const [index, action] of classifiedActions.slice(0, 3).entries()) {
+      switch (action) {
+        // if the action is grant plugin update permission
+        // validate the action
+        case ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION:
+          resCauses = await validateGrantUpgradePluginPermissionAction(
+            actions[index],
+            pspAddress,
+            daoAddress,
+            graphql,
+          );
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
+          break;
+          // if the action is revoke plugin update permission
+          // validate the action
+        case ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION:
+          resCauses = await validateRevokeUpgradePluginPermissionAction(
+            actions[index],
+            pspAddress,
+            daoAddress,
+            graphql,
+          );
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
+          break;
+          // if the action is grant root permission
+          // validate the action
+        case ProposalActionTypes.APPLY_UPDATE:
+          resCauses = await validateApplyUpdateFunction(
+            actions[index],
+            daoAddress,
+            graphql,
+            ipfs,
+          );
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
+          break;
+          // other cases are not allowed and should have been
+          // caught by the containsPluginUpdateActionBlock function
+      }
+    }
+    // slice the first 3 actions
+    // because they have already been validated
+    // and recursively call the function
+    actions = actions.slice(3);
+    if (actions.length !== 0) {
+      // recursively call the function
+      const recCauses = await validateUpdatePluginProposalActions(
+        actions,
+        daoAddress,
+        pspAddress,
+        graphql,
+        ipfs,
+      );
+      // join the causes
+      actionErrorCauses = [
+        ...actionErrorCauses,
+        ...recCauses.actionErrorCauses,
+      ];
+      proposalSettingsErrorCauses = [
+        ...proposalSettingsErrorCauses,
+        ...recCauses.proposalSettingsErrorCauses,
+      ];
+    }
+    return {
+      // every item in the array should be empty
+      isValid: actionErrorCauses.every((cause) => cause.length === 0) &&
+        proposalSettingsErrorCauses.length === 0,
+      actionErrorCauses,
+      proposalSettingsErrorCauses,
+    };
+  }
+
+  if (containsPluginUpdateActionBlockWithRootPermission(classifiedActions)) {
+    // initialize the causes array
+    // we always use the index 0
+    // because this is going to be called recursively
+    // and then joined
+    actionErrorCauses[0] = [];
+    // iterate over the first 5 actions actions
+    for (const [index, action] of classifiedActions.slice(0, 5).entries()) {
+      switch (action) {
+        // if the action is grant plugin update permission
+        // validate the action
+        case ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION:
+          resCauses = await validateGrantUpgradePluginPermissionAction(
+            actions[index],
+            pspAddress,
+            daoAddress,
+            graphql,
+          );
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
+          break;
+          // if the action is revoke plugin update permission
+          // validate the action
+        case ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION:
+          resCauses = await validateRevokeUpgradePluginPermissionAction(
+            actions[index],
+            pspAddress,
+            daoAddress,
+            graphql,
+          );
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
+          break;
+          // if the action is grant root permission
+          // validate the action
+        case ProposalActionTypes.GRANT_ROOT_PERMISSION:
+          resCauses = validateGrantRootPermissionAction(
+            actions[index],
+            daoAddress,
+            pspAddress,
+          );
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
+          break;
+          // if the action is revoke root permission
+          // validate the action
+
+        case ProposalActionTypes.REVOKE_ROOT_PERMISSION:
+          resCauses = validateRevokeRootPermissionAction(
+            actions[index],
+            daoAddress,
+            pspAddress,
+          );
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
+          break;
+          // if the action is apply update
+          // validate the action
+        case ProposalActionTypes.APPLY_UPDATE:
+          resCauses = await validateApplyUpdateFunction(
+            actions[index],
+            daoAddress,
+            graphql,
+            ipfs,
+          );
+          actionErrorCauses[0] = [...actionErrorCauses[0], ...resCauses];
+          break;
+
+          // other cases are not allowed and should have been
+          // caught by the containsPluginUpdateActionBlockWithRootPermission function
+      }
+    }
+    // slice the first 5 actions
+    // because they have already been validated
+    actions = actions.slice(5);
+    if (actions.length !== 0) {
+      // recursively call the function
+      const recCauses = await validateUpdatePluginProposalActions(
+        actions,
+        daoAddress,
+        pspAddress,
+        graphql,
+        ipfs,
+      );
+      // join the causes
+      actionErrorCauses = [
+        ...actionErrorCauses,
+        ...recCauses.actionErrorCauses,
+      ];
+      proposalSettingsErrorCauses = [
+        ...proposalSettingsErrorCauses,
+        ...recCauses.proposalSettingsErrorCauses,
+      ];
+    }
+    return {
+      // every item in the array should be empty
+      isValid: actionErrorCauses.every((cause) => cause.length === 0) &&
+        proposalSettingsErrorCauses.length === 0,
+      actionErrorCauses,
+      proposalSettingsErrorCauses,
+    };
+  }
+  // add invalid actions to the causes array
+  // return, if this is inside the recursion
+  // it will be added to the array
+  return {
+    isValid: false,
+    proposalSettingsErrorCauses: [ProposalSettingsErrorCause.INVALID_ACTIONS],
+    actionErrorCauses: actionErrorCauses,
+  };
+}
+
+export function toSubgraphActions(actions: DaoAction[]): SubgraphAction[] {
+  return actions.map((action) => ({
+    to: action.to,
+    value: action.value.toString(),
+    data: bytesToHex(action.data),
+  }));
 }
