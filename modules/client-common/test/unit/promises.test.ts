@@ -40,7 +40,7 @@ describe("Test promise helpers", () => {
   });
   describe("promiseWithTimeout", () => {
     it("Should timeout", async () => {
-      const timeout = 1000;
+      const timeout = 50;
       const promise = new Promise((resolve) =>
         setTimeout(resolve, timeout * 5)
       );
