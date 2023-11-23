@@ -54,7 +54,7 @@ For DAO updates, we expect single action at position 0 of the action array being
 
 ### Plugin Updates
 
-For each plugin Updates, we expect a block of associated actions. There can be multiple, independent plugin updates happening in one update proposal.
+For each plugin update, we expect a block of associated actions. There can be multiple, independent plugin updates happening in one update proposal.
 We expect two types of blocks:
 
 ```
@@ -79,7 +79,7 @@ or
 
 #### Mandatory `applyUpdate` Call
 
-Each block being related to an plugin update MUST contain an `applyUpdate` action exactly once. This action is composed as follows:
+Each block being related to a plugin update MUST contain an `applyUpdate` action exactly once. This action is composed as follows:
 
 - `to` MUST be the `PluginSetupProcessor` address
 - `value` MUST be zero. If not, we return `"nonZeroApplyUpdateCallValue"`.
