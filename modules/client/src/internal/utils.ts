@@ -894,7 +894,7 @@ async function getPluginInstallations(
   const { pluginInstallations } = res;
   return pluginInstallations;
 }
-export async function validateGrantUpdatePluginPermissionAction(
+export async function validateGrantUpgradePluginPermissionAction(
   action: DaoAction,
   pspAddress: string,
   daoAddress: string,
@@ -956,7 +956,7 @@ export async function validateGrantUpdatePluginPermissionAction(
   return causes;
 }
 
-export async function validateRevokeUpdatePluginPermissionAction(
+export async function validateRevokeUpgradePluginPermissionAction(
   action: DaoAction,
   pspAddress: string,
   daoAddress: string,
@@ -1502,7 +1502,7 @@ export async function validateUpdatePluginProposalActions(
         // if the action is grant plugin update permission
         // validate the action
         case ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION:
-          resCauses = await validateGrantUpdatePluginPermissionAction(
+          resCauses = await validateGrantUpgradePluginPermissionAction(
             actions[index],
             pspAddress,
             daoAddress,
@@ -1513,7 +1513,7 @@ export async function validateUpdatePluginProposalActions(
           // if the action is revoke plugin update permission
           // validate the action
         case ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION:
-          resCauses = await validateRevokeUpdatePluginPermissionAction(
+          resCauses = await validateRevokeUpgradePluginPermissionAction(
             actions[index],
             pspAddress,
             daoAddress,
@@ -1580,7 +1580,7 @@ export async function validateUpdatePluginProposalActions(
         // if the action is grant plugin update permission
         // validate the action
         case ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION:
-          resCauses = await validateGrantUpdatePluginPermissionAction(
+          resCauses = await validateGrantUpgradePluginPermissionAction(
             actions[index],
             pspAddress,
             daoAddress,
@@ -1591,7 +1591,7 @@ export async function validateUpdatePluginProposalActions(
           // if the action is revoke plugin update permission
           // validate the action
         case ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION:
-          resCauses = await validateRevokeUpdatePluginPermissionAction(
+          resCauses = await validateRevokeUpgradePluginPermissionAction(
             actions[index],
             pspAddress,
             daoAddress,

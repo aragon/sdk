@@ -32,9 +32,9 @@ import {
   containsPluginUpdateActionBlockWithRootPermission,
   validateApplyUpdateFunction,
   validateGrantRootPermissionAction,
-  validateGrantUpdatePluginPermissionAction,
+  validateGrantUpgradePluginPermissionAction,
   validateRevokeRootPermissionAction,
-  validateRevokeUpdatePluginPermissionAction,
+  validateRevokeUpgradePluginPermissionAction,
   validateUpdateDaoProposalActions,
   validateUpdatePluginProposalActions,
 } from "../../../src/internal/utils";
@@ -62,7 +62,7 @@ describe("Test client utils", () => {
   const mockedClient = mockedGraphqlRequest.getMockedInstance(
     client.graphql.getClient(),
   );
-  describe("validateGrantUpdatePluginPermissionAction", () => {
+  describe("validateGrantUpgradePluginPermissionAction", () => {
     beforeEach(() => {
       mockedClient.request.mockReset();
       mockedClient.request.mockResolvedValue({
@@ -77,7 +77,7 @@ describe("Test client utils", () => {
         who: pspAddress,
         permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
       });
-      const result = await validateGrantUpdatePluginPermissionAction(
+      const result = await validateGrantUpgradePluginPermissionAction(
         grantAction,
         pspAddress,
         daoAddress,
@@ -87,7 +87,7 @@ describe("Test client utils", () => {
     });
     it("should return an error if the action is not a grant action", async () => {
       expect(() =>
-        validateGrantUpdatePluginPermissionAction(
+        validateGrantUpgradePluginPermissionAction(
           {
             to: daoAddress,
             value: BigInt(0),
@@ -106,7 +106,7 @@ describe("Test client utils", () => {
         permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
       });
       grantAction.value = BigInt(10);
-      const result = await validateGrantUpdatePluginPermissionAction(
+      const result = await validateGrantUpgradePluginPermissionAction(
         grantAction,
         pspAddress,
         daoAddress,
@@ -126,7 +126,7 @@ describe("Test client utils", () => {
       mockedClient.request.mockResolvedValueOnce({
         pluginInstallations: [],
       });
-      const result = await validateGrantUpdatePluginPermissionAction(
+      const result = await validateGrantUpgradePluginPermissionAction(
         grantAction,
         pspAddress,
         daoAddress,
@@ -143,7 +143,7 @@ describe("Test client utils", () => {
         who: daoAddress,
         permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
       });
-      const result = await validateGrantUpdatePluginPermissionAction(
+      const result = await validateGrantUpgradePluginPermissionAction(
         grantAction,
         pspAddress,
         daoAddress,
@@ -160,7 +160,7 @@ describe("Test client utils", () => {
         who: pspAddress,
         permission: Permissions.MINT_PERMISSION,
       });
-      const result = await validateGrantUpdatePluginPermissionAction(
+      const result = await validateGrantUpgradePluginPermissionAction(
         grantAction,
         pspAddress,
         daoAddress,
@@ -182,7 +182,7 @@ describe("Test client utils", () => {
       mockedClient.request.mockResolvedValueOnce({
         pluginInstallations: [],
       });
-      const result = await validateGrantUpdatePluginPermissionAction(
+      const result = await validateGrantUpgradePluginPermissionAction(
         grantAction,
         pspAddress,
         daoAddress,
@@ -196,7 +196,7 @@ describe("Test client utils", () => {
       ]);
     });
   });
-  describe("validateRevokeUpdatePluginPermissionAction", () => {
+  describe("validateRevokeUpgradePluginPermissionAction", () => {
     beforeEach(() => {
       mockedClient.request.mockReset();
       mockedClient.request.mockResolvedValue({
@@ -211,7 +211,7 @@ describe("Test client utils", () => {
         who: pspAddress,
         permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
       });
-      const result = await validateRevokeUpdatePluginPermissionAction(
+      const result = await validateRevokeUpgradePluginPermissionAction(
         revokeAction,
         pspAddress,
         daoAddress,
@@ -221,7 +221,7 @@ describe("Test client utils", () => {
     });
     it("should return an error if the action is not a revoke action", async () => {
       expect(() =>
-        validateRevokeUpdatePluginPermissionAction(
+        validateRevokeUpgradePluginPermissionAction(
           {
             to: daoAddress,
             value: BigInt(0),
@@ -240,7 +240,7 @@ describe("Test client utils", () => {
         permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
       });
       revokeAction.value = BigInt(10);
-      const result = await validateRevokeUpdatePluginPermissionAction(
+      const result = await validateRevokeUpgradePluginPermissionAction(
         revokeAction,
         pspAddress,
         daoAddress,
@@ -260,7 +260,7 @@ describe("Test client utils", () => {
       mockedClient.request.mockResolvedValueOnce({
         pluginInstallations: [],
       });
-      const result = await validateRevokeUpdatePluginPermissionAction(
+      const result = await validateRevokeUpgradePluginPermissionAction(
         revokeAction,
         pspAddress,
         daoAddress,
@@ -277,7 +277,7 @@ describe("Test client utils", () => {
         who: daoAddress,
         permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
       });
-      const result = await validateRevokeUpdatePluginPermissionAction(
+      const result = await validateRevokeUpgradePluginPermissionAction(
         revokeAction,
         pspAddress,
         daoAddress,
@@ -294,7 +294,7 @@ describe("Test client utils", () => {
         who: pspAddress,
         permission: Permissions.MINT_PERMISSION,
       });
-      const result = await validateRevokeUpdatePluginPermissionAction(
+      const result = await validateRevokeUpgradePluginPermissionAction(
         revokeAction,
         pspAddress,
         daoAddress,
@@ -316,7 +316,7 @@ describe("Test client utils", () => {
       mockedClient.request.mockResolvedValueOnce({
         pluginInstallations: [],
       });
-      const result = await validateRevokeUpdatePluginPermissionAction(
+      const result = await validateRevokeUpgradePluginPermissionAction(
         revokeAction,
         pspAddress,
         daoAddress,
