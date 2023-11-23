@@ -179,7 +179,7 @@ export function computeProposalStatus(
   // The proposal is not executed and the start date is in the past.
   // Accordingly, we check if the proposal reached enough approval 
   // (i.e., that the supportThreshold and minParticipation criteria are both met).
-  // If the approval is reached and the vote has ended (end date is in the past) it has succeded. 
+  // If the approvalReached = true and the vote has ended (end date is in the past) it has succeded. 
   // This applies to normal mode and vote replacement mode.
   if (proposal.approvalReached && endDate <= now) {
     return ProposalStatus.SUCCEEDED;

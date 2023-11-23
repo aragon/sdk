@@ -136,8 +136,34 @@ describe("tokenVoting-client utils", () => {
         earlyExecutable: true,
       } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
     });
-    it("should return SUCCEEDED for a signalng proposal", () => {
+    it("should return SUCCEEDED if earlyExecutable = true and signaling proposal", () => {
       const endDate = (Date.now() / 1000) + 500;
+      const startDate = (Date.now() / 1000) - 500;
+
+      expect(computeProposalStatus({
+        endDate: endDate.toString(),
+        startDate: startDate.toString(),
+        approvalReached: true,
+        executed: false,
+        isSignaling: false,
+        earlyExecutable: true,
+      } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
+    });
+    it("should return SUCCEEDED if approvalReached = true and endDate has passed", () => {
+      const endDate = (Date.now() / 1000) - 200;
+      const startDate = (Date.now() / 1000) - 500;
+
+      expect(computeProposalStatus({
+        endDate: endDate.toString(),
+        startDate: startDate.toString(),
+        approvalReached: true,
+        executed: false,
+        isSignaling: false,
+        earlyExecutable: false,
+      } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
+    });
+    it("should return SUCCEEDED if approvalReached = true and endDate has passed for signaling proposals", () => {
+      const endDate = (Date.now() / 1000) - 200;
       const startDate = (Date.now() / 1000) - 500;
 
       expect(computeProposalStatus({
