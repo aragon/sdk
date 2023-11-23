@@ -90,7 +90,7 @@ describe("addresslistVoting-client utils", () => {
         earlyExecutable: false,
       } as SubgraphAddresslistVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
     });
-    it("should return SUCCEEDED if approvalReached = true and endDate has passed for signaling proposals", () => {
+    it("should return SUCCEEDED if approvalReached = true and endDate has passed and isSignaling = true", () => {
       const endDate = (Date.now() / 1000) - 200;
       const startDate = (Date.now() / 1000) - 500;
 

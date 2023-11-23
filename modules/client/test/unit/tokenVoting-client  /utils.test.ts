@@ -136,7 +136,7 @@ describe("tokenVoting-client utils", () => {
         earlyExecutable: true,
       } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
     });
-    it("should return SUCCEEDED if earlyExecutable = true and signaling proposal", () => {
+    it("should return SUCCEEDED if earlyExecutable = true and isSignaling = true", () => {
       const endDate = (Date.now() / 1000) + 500;
       const startDate = (Date.now() / 1000) - 500;
 
@@ -162,7 +162,7 @@ describe("tokenVoting-client utils", () => {
         earlyExecutable: false,
       } as SubgraphTokenVotingProposal)).toBe(ProposalStatus.SUCCEEDED);
     });
-    it("should return SUCCEEDED if approvalReached = true and endDate has passed for signaling proposals", () => {
+    it("should return SUCCEEDED if approvalReached = true and endDate has passed and isSignaling = true", () => {
       const endDate = (Date.now() / 1000) - 200;
       const startDate = (Date.now() / 1000) - 500;
 
