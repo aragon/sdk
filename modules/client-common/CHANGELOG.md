@@ -21,7 +21,7 @@ TEMPLATE:
 
 ### Changed
 
-- Updated subgraph version to 1.3.2
+- Updated subgraph version to 1.4.0
 
 
 ## [1.11.0]
