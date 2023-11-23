@@ -131,7 +131,7 @@ describe("Client Multisig", () => {
       },
     };
     const ipfsUri = await multisigClient.methods.pinMetadata(metadata);
-    const endDate = new Date(0);
+    const endDate = new Date(Date.now() + 1000 * 60 * 60);
     const proposalParams: CreateMultisigProposalParams = {
       pluginAddress,
       metadataUri: ipfsUri,
