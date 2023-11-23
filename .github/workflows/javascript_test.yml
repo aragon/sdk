@@ -49,6 +49,6 @@ jobs:
 #          IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
 
       - name: Run unit tests
-        run: yarn test --testPathIgnorePatterns=modules/client/test/integration --coverage  --passWithNoTests
+        run: yarn test --testPathIgnorePatterns=modules/client/test/integration --coverage  --passWithNoTests --runInBand
         env:
           IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
