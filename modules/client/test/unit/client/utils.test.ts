@@ -117,7 +117,7 @@ describe("Test client utils", () => {
           .NON_ZERO_GRANT_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
       ]);
     });
-    it("should return an error to of the action is not the DAO", async () => {
+    it("should return an error if `to` is not the DAO address", async () => {
       const grantAction = client.encoding.grantAction(daoAddress, {
         where: daoAddress,
         who: pspAddress,
@@ -269,7 +269,7 @@ describe("Test client utils", () => {
           .NON_ZERO_REVOKE_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
       ]);
     });
-    it("should return an error to of the action is not the DAO", async () => {
+    it("should return an error if `to` is not the DAO address", async () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
         where: daoAddress,
         who: pspAddress,
@@ -413,7 +413,7 @@ describe("Test client utils", () => {
           .NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE,
       ]);
     });
-    it("should return an error to of the action is not the DAO", () => {
+    it("should return an error if `to` is not the DAO address", () => {
       const grantAction = client.encoding.grantAction(daoAddress, {
         where: daoAddress,
         who: pspAddress,
@@ -546,7 +546,7 @@ describe("Test client utils", () => {
           .NON_ZERO_REVOKE_ROOT_PERMISSION_CALL_VALUE,
       ]);
     });
-    it("should return an error to of the action is not the DAO", () => {
+    it("should return an error if `to` is not the DAO address", () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
         where: daoAddress,
         who: pspAddress,
