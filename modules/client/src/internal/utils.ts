@@ -927,6 +927,14 @@ export async function validateGrantUpgradePluginPermissionAction(
         .NON_ZERO_GRANT_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
     );
   }
+  // The action should be sent to the DAO
+  if (action.to !== daoAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_TO_ADDRESS,
+    );
+  }
+  
   // The permission should be granted to the PSP
   if (decodedPermission.who !== pspAddress) {
     causes.push(
@@ -975,6 +983,13 @@ export async function validateRevokeUpgradePluginPermissionAction(
         .PLUGIN_NOT_INSTALLED,
     );
   }
+  // The action should be sent to the DAO
+  if (action.to !== daoAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_TO_ADDRESS,
+    );
+  }
   if (action.value.toString() !== "0") {
     causes.push(
       PluginUpdateProposalInValidityCause
@@ -1019,6 +1034,13 @@ export function validateGrantRootPermissionAction(
         .NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE,
     );
   }
+  // The action should be sent to the DAO
+  if (action.to !== daoAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_GRANT_ROOT_PERMISSION_TO_ADDRESS,
+    );
+  }
   if (decodedPermission.where !== daoAddress) {
     causes.push(
       PluginUpdateProposalInValidityCause
@@ -1061,6 +1083,13 @@ export function validateRevokeRootPermissionAction(
     causes.push(
       PluginUpdateProposalInValidityCause
         .NON_ZERO_REVOKE_ROOT_PERMISSION_CALL_VALUE,
+    );
+  }
+  // The action should be sent to the DAO
+  if (action.to !== daoAddress) {
+    causes.push(
+      PluginUpdateProposalInValidityCause
+        .INVALID_REVOKE_ROOT_PERMISSION_TO_ADDRESS,
     );
   }
   if (decodedPermission.where !== daoAddress) {
