@@ -1,6 +1,3 @@
-// @ts-ignore
-declare const describe, it, beforeEach, expect, test;
-
 import { Wallet } from "@ethersproject/wallet";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";

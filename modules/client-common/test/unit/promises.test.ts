@@ -42,7 +42,7 @@ describe("Test promise helpers", () => {
     it("Should timeout", async () => {
       const timeout = 100;
       const promise = new Promise((resolve) =>
-        setTimeout(resolve, timeout * 2)
+        setTimeout(resolve, timeout * 2).unref()
       );
       await expect(promiseWithTimeout(promise, timeout)).rejects.toThrow(
         "Time out",
@@ -51,7 +51,7 @@ describe("Test promise helpers", () => {
     it("Should not timeout", async () => {
       const timeout = 100;
       const promise = new Promise((resolve) =>
-        setTimeout(resolve, timeout / 2)
+        setTimeout(resolve, timeout / 2).unref()
       );
       await expect(promiseWithTimeout(promise, timeout)).resolves
         .toBeUndefined();

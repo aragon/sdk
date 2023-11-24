@@ -1,15 +1,11 @@
-// @ts-ignore
-declare const describe, it, expect;
-
 // mocks need to be at the top of the imports
 import "../../mocks/aragon-sdk-ipfs";
-import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
+
 import {
   DAO__factory,
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
-
 import {
   Client,
   DaoMetadata,
@@ -42,20 +38,14 @@ import {
   Permissions,
   TokenType,
 } from "@aragon/sdk-client-common";
-import { Server } from "ganache";
 
 describe("Client", () => {
   let deployment: deployContracts.Deployment;
-  let server: Server;
   beforeAll(async () => {
-    server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
     contextParamsLocalChain.pluginSetupProcessorAddress = ADDRESS_TWO;
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-  });
-  afterAll(async () => {
-    await server.close();
   });
   describe("Action generators", () => {
     it("Should create a client and generate a native withdraw action", async () => {

@@ -1,6 +1,3 @@
-// @ts-ignore
-declare const describe, it, expect;
-
 // mocks need to be at the top of the imports
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 

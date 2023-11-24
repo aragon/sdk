@@ -48,6 +48,16 @@ TEMPLATE:
 - Add `actions` to `TokenVotingProposalListItem`
 - Add `actions` to `AddresslistVotingProposalListItem`
 
+### Changed
+
+- Replaces tsdx with dts-cli
+- Upgrades typescript to v5
+- Replaces ganache with hardhat
+
+### Removed
+
+- Removed `restoreBlockTime()` test helper function
+
 ## [1.18.2]
 ### Fixed
 
