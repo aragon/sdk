@@ -19,6 +19,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+- Fixed proposal id not being transformed
+
+## [1.19.1]
+
 ### Changed
 
 - Add grant and revoke for permission `UPGRADE_PLUGIN_PERMISSION` in `applyUpdate` encoder
