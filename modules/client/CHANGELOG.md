@@ -20,7 +20,7 @@ TEMPLATE:
 ## [UPCOMING]
 
 ### Fixed
-- Added missing security check that checks that the to address in the permission actions is the DAO address
+- Added missing security check that checks that the `to` address in the permission actions is the DAO address
 
 ## [1.19.2]
 ### Fixed
