@@ -20,6 +20,12 @@ TEMPLATE:
 ## [UPCOMING]
 
 ### Added
+- Add `isSignalling` to proposal list items and add support for signalling proposals.
+
+
+## [1.19.1]
+
+### Added
 
 - Classify signalling multisig proposals as succeeded even after the end date is passed using the subgraph `isSignalling` attribute.  
 
