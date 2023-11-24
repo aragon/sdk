@@ -118,6 +118,7 @@ import {
   EmptyMultiUriError,
   FailedDepositError,
   findLog,
+  getExtendedProposalId,
   InstallationNotFoundError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -1115,7 +1116,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     type T = { iproposal: SubgraphIProposal };
     const { iproposal } = await this.graphql.request<T>({
       query,
-      params: { id: proposalId.toLowerCase() },
+      params: { id: getExtendedProposalId(proposalId.toLowerCase()) },
       name,
     });
     if (!iproposal) {
@@ -1141,7 +1142,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     type T = { iproposal: SubgraphIProposal };
     const { iproposal } = await this.graphql.request<T>({
       query,
-      params: { id: proposalId.toLowerCase() },
+      params: { id: getExtendedProposalId(proposalId.toLowerCase()) },
       name,
     });
     if (!iproposal) {
@@ -1150,7 +1151,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const subgraphActions = iproposal.actions;
     let actions = toDaoActions(subgraphActions);
     let classifiedActions = classifyProposalActions(actions);
-    if(containsDaoUpdateAction(classifiedActions)) {
+    if (containsDaoUpdateAction(classifiedActions)) {
       classifiedActions = classifiedActions.slice(1);
     }
     return containsPluginUpdateActionBlock(classifiedActions) ||
@@ -1173,7 +1174,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     type T = { iproposal: SubgraphIProposal };
     const { iproposal } = await this.graphql.request<T>({
       query,
-      params: { id: proposalId.toLowerCase() },
+      params: { id: getExtendedProposalId(proposalId.toLowerCase()) },
       name,
     });
     if (!iproposal) {
@@ -1181,7 +1182,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return {
         isValid: false,
         actionErrorCauses: [],
-        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]
+        proposalSettingsErrorCauses: [
+          ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND,
+        ],
       };
     }
     // check failure map
@@ -1190,7 +1193,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return {
         isValid: false,
         actionErrorCauses: [],
-        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE]
+        proposalSettingsErrorCauses: [
+          ProposalSettingsErrorCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE,
+        ],
       };
     }
     // validate actions
@@ -1222,7 +1227,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     type T = { iproposal: SubgraphIProposal };
     const res = await this.graphql.request<T>({
       query,
-      params: { id: proposalId.toLowerCase() },
+      params: { id: getExtendedProposalId(proposalId.toLowerCase()) },
       name,
     });
     const { iproposal } = res;
@@ -1242,7 +1247,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       return {
         isValid: false,
         actionErrorCauses: [],
-        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE]
+        proposalSettingsErrorCauses: [
+          ProposalSettingsErrorCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE,
+        ],
       };
     }
     // get implementation address, use latest version as default
