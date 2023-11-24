@@ -171,7 +171,7 @@ export const DaoUpdateSchema = object({
   daoFactoryAddress: AddressOrEnsSchema.notRequired(),
 });
 
-export const IsPluginUpdateValidSchema = object({
+export const IsPluginUpdateProposalValidSchema = object({
   actions: array().of(object({
     to: AddressOrEnsSchema.required(),
     value: BigintSchema.required(),
@@ -179,7 +179,7 @@ export const IsPluginUpdateValidSchema = object({
   })).required().min(1),
   daoAddress: AddressOrEnsSchema.required(),
 });
-export const IsDaoUpdateValidSchema = object({
+export const IsDaoUpdateProposalValidSchema = object({
   actions: array().of(object({
     to: AddressOrEnsSchema.required(),
     value: BigintSchema.required(),

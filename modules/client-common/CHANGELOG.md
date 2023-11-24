@@ -21,6 +21,13 @@ TEMPLATE:
 
 ### Added
 
+- Added `UPGRADE_PLUGIN_PERMISSION` to `PermissionType` enum
+- Fix chain id for sepolia network
+
+## [1.11.0]
+
+### Added
+
 - Added `actions` to `SubgraphListItem` type
 
 ### Changed

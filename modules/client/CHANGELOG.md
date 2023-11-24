@@ -19,6 +19,26 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Changed
+
+- Add grant and revoke for permission `UPGRADE_PLUGIN_PERMISSION` in `applyUpdate` encoder
+- Refactor DAO update proposal validation function
+- Refactor plugin update proposal validation function
+- Refactor boolean check for checking if a proposal is a DAO update proposal
+- Refactor boolean check for checking if a proposal is a plugin update proposal
+- Rename `applyUpdateAction` to `applyUpdateActionAndPermissionsBlock`
+- Rename `isDaoUpdateAction`to `containsDaoUpdateAction`
+- Rename `isDaoUpdate` to `isDaoUpdateProposal`
+- Rename `isDaoUpdateValid` to `isDaoUpdateProposalValid` 
+- Rename `isPluginUpdate` to `isPluginUpdateProposal`
+- Rename `isPluginUpdateValid` to `isPluginUpdateProposalValid` 
+- Rename `isPluginUpdateAction` to `containsPluginUpdateAction`
+- Rename `isPluginUpdateActionBlockWithRootPermission` to `containsPluginUpdateActionBlockWithRootPermission`
+
+
+
+## [1.19.0]
+
 ### Added
 
 - `isMember` function to `TokenVotingClient`

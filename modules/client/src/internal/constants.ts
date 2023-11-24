@@ -1,4 +1,7 @@
-import { DAO__factory } from "@aragon/osx-ethers";
+import {
+  DAO__factory,
+  PluginSetupProcessor__factory,
+} from "@aragon/osx-ethers";
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import {
@@ -10,6 +13,7 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 import { keccak256 } from "@ethersproject/keccak256";
 import { abi as ERC20_ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json";
 import { abi as ERC721_ABI } from "@openzeppelin/contracts/build/contracts/ERC721.json";
+import { ProposalActionTypes } from "./types";
 
 export const AVAILABLE_FUNCTION_SIGNATURES: string[] = [
   new Contract(AddressZero, ERC20_ABI).interface.getFunction("transfer")
@@ -121,3 +125,32 @@ export enum PreparationType {
   UPDATE = 2,
   UNINSTALLATION = 3,
 }
+
+export const UPDATE_PLUGIN_SIGNATURES: string[] = [
+  DAO__factory.createInterface().getFunction("grant")
+    .format("minimal"),
+  DAO__factory.createInterface().getFunction("revoke")
+    .format("minimal"),
+  PluginSetupProcessor__factory.createInterface().getFunction(
+    "applyUpdate",
+  ).format("minimal"),
+  DAO__factory.createInterface().getFunction(
+    "upgradeTo",
+  ).format("minimal"),
+  DAO__factory.createInterface()
+    .getFunction("upgradeToAndCall")
+    .format("minimal"),
+];
+
+export const PLUGIN_UPDATE_ACTION_PATTERN = [
+  ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
+  ProposalActionTypes.APPLY_UPDATE,
+  ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
+];
+export const PLUGIN_UPDATE_WITH_ROOT_ACTION_PATTERN = [
+  ProposalActionTypes.GRANT_PLUGIN_UPGRADE_PERMISSION,
+  ProposalActionTypes.GRANT_ROOT_PERMISSION,
+  ProposalActionTypes.APPLY_UPDATE,
+  ProposalActionTypes.REVOKE_ROOT_PERMISSION,
+  ProposalActionTypes.REVOKE_PLUGIN_UPGRADE_PERMISSION,
+];

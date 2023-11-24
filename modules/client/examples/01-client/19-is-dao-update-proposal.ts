@@ -24,7 +24,7 @@ const actions: DaoAction[] = [
 ];
 
 // check if a plugin update proposal is valid
-const isValid = client.methods.isDaoUpdateProposal(actions);
+const isValid = client.methods.isDaoUpdateProposalProposal(actions);
 
 console.log(isValid);
 

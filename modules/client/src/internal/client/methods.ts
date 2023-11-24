@@ -22,8 +22,8 @@ import {
   QueryDao,
   QueryDaos,
   QueryIPlugin,
+  QueryIProposal,
   QueryPlugin,
-  QueryPluginPreparations,
   QueryPluginPreparationsExtended,
   QueryPlugins,
   QueryTokenBalances,
@@ -43,18 +43,13 @@ import {
   DaoMetadata,
   DaoQueryParams,
   DaoSortBy,
-  DaoUpdateProposalInvalidityCause,
   DaoUpdateProposalValidity,
-  DecodedInitializeFromParams,
   DepositErc1155Params,
   DepositErc20Params,
   DepositErc721Params,
   DepositEthParams,
   DepositParams,
-  GrantPermissionDecodedParams,
   HasPermissionParams,
-  IsDaoUpdateValidParams,
-  IsPluginUpdateValidParams,
   PluginPreparationListItem,
   PluginPreparationQueryParams,
   PluginPreparationSortBy,
@@ -64,9 +59,8 @@ import {
   PluginRepoListItem,
   PluginRepoReleaseMetadata,
   PluginSortBy,
-  PluginUpdateProposalInValidityCause,
   PluginUpdateProposalValidity,
-  RevokePermissionDecodedParams,
+  ProposalSettingsErrorCause,
   SetAllowanceParams,
   SetAllowanceSteps,
   SetAllowanceStepValue,
@@ -78,29 +72,28 @@ import {
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
+  SubgraphIProposal,
   SubgraphPluginInstallation,
   SubgraphPluginPreparationListItem,
   SubgraphPluginRepo,
   SubgraphPluginRepoListItem,
-  SubgraphPluginRepoRelease,
-  SubgraphPluginUpdatePreparation,
   SubgraphTransferListItem,
   SubgraphTransferTypeMap,
 } from "../types";
 import {
-  decodeApplyUpdateAction,
-  decodeGrantAction,
-  decodeInitializeFromAction,
-  decodeRevokeAction,
-  decodeUpgradeToAndCallAction,
-  findActionIndex,
-  getPreparedSetupId,
+  classifyProposalActions,
+  containsDaoUpdateAction,
+  containsPluginUpdateActionBlock,
+  containsPluginUpdateActionBlockWithRootPermission,
   toAssetBalance,
+  toDaoActions,
   toDaoDetails,
   toDaoListItem,
   toPluginPreparationListItem,
   toPluginRepo,
   toTokenTransfer,
+  validateUpdateDaoProposalActions,
+  validateUpdatePluginProposalActions,
 } from "../utils";
 import { isAddress } from "@ethersproject/address";
 import { toUtf8Bytes } from "@ethersproject/strings";
@@ -109,9 +102,6 @@ import {
   EMPTY_BUILD_METADATA_LINK,
   EMPTY_DAO_METADATA_LINK,
   EMPTY_RELEASE_METADATA_LINK,
-  PreparationType,
-  SupportedPluginRepo,
-  SupportedPluginRepoArray,
   UNAVAILABLE_BUILD_METADATA,
   UNAVAILABLE_DAO_METADATA,
   UNAVAILABLE_RELEASE_METADATA,
@@ -124,13 +114,10 @@ import {
   AddressOrEnsSchema,
   AmountMismatchError,
   ClientCore,
-  DaoAction,
   DaoCreationError,
-  DecodedApplyUpdateParams,
   EmptyMultiUriError,
   FailedDepositError,
   findLog,
-  getNamedTypesFromMetadata,
   InstallationNotFoundError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -142,7 +129,6 @@ import {
   NoProviderError,
   NotImplementedError,
   PermissionIds,
-  Permissions,
   PluginUninstallationPreparationError,
   prepareGenericInstallation,
   prepareGenericUpdate,
@@ -172,8 +158,6 @@ import {
   DepositErc721Schema,
   DepositEthSchema,
   HasPermissionSchema,
-  IsDaoUpdateValidSchema,
-  IsPluginUpdateValidSchema,
   PluginPreparationQuerySchema,
   PluginQuerySchema,
 } from "../schemas";
@@ -1116,408 +1100,169 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return version;
   }
 
-  public isDaoUpdate(
-    actions: DaoAction[],
-  ): boolean {
-    const initializeFromInterface = DAO__factory.createInterface()
-      .getFunction("initializeFrom").format("minimal");
-    return findActionIndex(actions, initializeFromInterface) !== -1;
-  }
   /**
-   * Check if the specified actions try to update a plugin
+   * Given a proposal id returns if that proposal is a dao update proposal
    *
-   * @param {DaoAction[]} actions
-   * @return {*}  {boolean}
+   * @param {string} proposalId
+   * @return {*}  {Promise<boolean>}
    * @memberof ClientMethods
    */
-  public isPluginUpdate(
-    actions: DaoAction[],
-  ): boolean {
-    const applyUpdateInterface = PluginSetupProcessor__factory.createInterface()
-      .getFunction("applyUpdate").format("minimal");
-    return findActionIndex(actions, applyUpdateInterface) !== -1;
+  public async isDaoUpdateProposal(
+    proposalId: string,
+  ): Promise<boolean> {
+    const name = "iproposal";
+    const query = QueryIProposal;
+    type T = { iproposal: SubgraphIProposal };
+    const { iproposal } = await this.graphql.request<T>({
+      query,
+      params: { id: proposalId.toLowerCase() },
+      name,
+    });
+    if (!iproposal) {
+      return false;
+    }
+    const subgraphActions = iproposal.actions;
+    let actions = toDaoActions(subgraphActions);
+    const classifiedActions = classifyProposalActions(actions);
+    return containsDaoUpdateAction(classifiedActions);
   }
-
   /**
-   * check if permission is root
-   * check if permissionId is root
-   * check if where is the dao address
-   * check if who is the psp address
+   * Given a proposal id returns if that proposal is a plugin update proposal
    *
-   * @private
-   * @param {(GrantPermissionDecodedParams | RevokePermissionDecodedParams)} params
-   * @param {string} daoAddress
-   * @return {*}  {boolean}
+   * @param {string} proposalId
+   * @return {*}  {Promise<boolean>}
    * @memberof ClientMethods
    */
-  private isPluginUpdatePermissionValid(
-    params: GrantPermissionDecodedParams | RevokePermissionDecodedParams,
-    daoAddress: string,
-  ): boolean {
-    const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
-    return (
-      params.permission === Permissions.ROOT_PERMISSION &&
-      params.permissionId === PermissionIds.ROOT_PERMISSION_ID &&
-      params.where === daoAddress &&
-      params.who === pspAddress
-    );
+  public async isPluginUpdateProposal(
+    proposalId: string,
+  ): Promise<boolean> {
+    const name = "iproposal";
+    const query = QueryIProposal;
+    type T = { iproposal: SubgraphIProposal };
+    const { iproposal } = await this.graphql.request<T>({
+      query,
+      params: { id: proposalId.toLowerCase() },
+      name,
+    });
+    if (!iproposal) {
+      return false;
+    }
+    const subgraphActions = iproposal.actions;
+    let actions = toDaoActions(subgraphActions);
+    let classifiedActions = classifyProposalActions(actions);
+    if(containsDaoUpdateAction(classifiedActions)) {
+      classifiedActions = classifiedActions.slice(1);
+    }
+    return containsPluginUpdateActionBlock(classifiedActions) ||
+      containsPluginUpdateActionBlockWithRootPermission(classifiedActions);
   }
-
-  /**
-   * check if the plugin is installed
-   * check if the plugin release is the same as the one installed
-   * check if the plugin build is higher than the one installed
-   * check if the plugin repo (pluginSetupRepo) exist
-   * check if is one of the aragon plugin repos
-   * check if the plugin repo metadata is valid
-   * check if the plugin preparation exist
-   * check if the plugin preparation data is valid
-   *
-   * @private
-   * @param {string} daoAddress
-   * @param {DecodedApplyUpdateParams} decodedApplyUpdateActionParams
-   * @return {*}  {Promise<PluginUpdateProposalInValidityCause[]>}
-   * @memberof ClientMethods
-   */
-  private async checkApplyUpdateActionInvalidityCauses(
-    daoAddress: string,
-    decodedApplyUpdateActionParams: DecodedApplyUpdateParams,
-  ): Promise<PluginUpdateProposalInValidityCause[]> {
-    const causes: PluginUpdateProposalInValidityCause[] = [];
-    // get dao with plugins
-    type U = { dao: SubgraphDao };
-    const { dao } = await this.graphql.request<U>({
-      query: QueryDao,
-      params: { address: daoAddress },
-      name: "dao",
-    });
-    // find the plugin with the same address
-    const plugin = dao.plugins.find((plugin) =>
-      plugin.appliedPreparation?.pluginAddress ===
-        decodedApplyUpdateActionParams.pluginAddress
-    );
-    if (plugin) {
-      // check release is the same as the one installed
-      if (
-        plugin.appliedVersion?.release.release !==
-          decodedApplyUpdateActionParams.versionTag.release
-      ) {
-        causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_RELEASE);
-      }
-      // check build is higher than the one installed
-      if (
-        !plugin.appliedVersion?.build ||
-        plugin.appliedVersion?.build >=
-          decodedApplyUpdateActionParams.versionTag.build
-      ) {
-        causes.push(PluginUpdateProposalInValidityCause.INVALID_PLUGIN_BUILD);
-      }
-    } else {
-      causes.push(PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED);
-      return causes;
-    }
-    // check if plugin repo (pluginSetupRepo) exist
-    type V = { pluginRepo: SubgraphPluginRepo };
-    const { pluginRepo } = await this.graphql.request<V>({
-      query: QueryPlugin,
-      params: { id: decodedApplyUpdateActionParams.pluginRepo },
-      name: "pluginRepo",
-    });
-    if (pluginRepo) {
-      // check if is one of the aragon plugin repos
-      if (
-        !SupportedPluginRepoArray.includes(
-          pluginRepo.subdomain as SupportedPluginRepo,
-        )
-      ) {
-        causes.push(PluginUpdateProposalInValidityCause.NOT_ARAGON_PLUGIN_REPO);
-      }
-    } else {
-      causes.push(PluginUpdateProposalInValidityCause.MISSING_PLUGIN_REPO);
-      return causes;
-    }
-
-    // get the prepared setup id
-    const preparedSetupId = getPreparedSetupId(
-      decodedApplyUpdateActionParams,
-      PreparationType.UPDATE,
-    );
-    // get plugin preparation
-    type W = { pluginPreparation: SubgraphPluginUpdatePreparation };
-    const { pluginPreparation } = await this.graphql.request<W>({
-      query: QueryPluginPreparations,
-      params: { where: { preparedSetupId } },
-      name: "pluginPreparation",
-    });
-    if (pluginPreparation) {
-      // get the metadata of the plugin repo
-      // for the release and build specified
-      const release = pluginRepo.releases.find((
-        release: SubgraphPluginRepoRelease,
-      ) =>
-        release.release === decodedApplyUpdateActionParams.versionTag.release
-      );
-      const build = release?.builds.find((
-        build: { build: number; metadata: string },
-      ) => build.build === decodedApplyUpdateActionParams.versionTag.build);
-      const metadataCid = build?.metadata;
-
-      // fetch the metadata
-      const metadata = await this.ipfs.fetchString(metadataCid!);
-      const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
-      // get the update abi for the specified build
-      const updateAbi = metadataJson.pluginSetup
-        .prepareUpdate[decodedApplyUpdateActionParams.versionTag.build]?.inputs;
-      if (updateAbi) {
-        // if the abi exists try to decode the data
-        try {
-          if (
-            decodedApplyUpdateActionParams.initData.length > 0 &&
-            updateAbi.length === 0
-          ) {
-            throw new Error();
-          }
-          // if the decode does not throw an error the data is valid
-          defaultAbiCoder.decode(
-            getNamedTypesFromMetadata(updateAbi),
-            decodedApplyUpdateActionParams.initData,
-          );
-        } catch {
-          // if the decode throws an error the data is invalid
-          causes.push(
-            PluginUpdateProposalInValidityCause.INVALID_DATA,
-          );
-        }
-      } else {
-        causes.push(
-          PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
-        );
-      }
-    } else {
-      causes.push(
-        PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
-      );
-    }
-    return causes;
-  }
-
   /**
    * Check if the specified proposal id is valid for updating a plugin
-   * The failure map should be checked before calling this method
    *
-   * @param {DaoAction[]} actions
+   * @param {string} proposalId
    * @return {*}  {Promise<PluginUpdateProposalValidity>}
    * @memberof ClientMethods
    */
-  public async isPluginUpdateValid(
-    params: IsPluginUpdateValidParams,
+  public async isPluginUpdateProposalValid(
+    proposalId: string,
   ): Promise<PluginUpdateProposalValidity> {
-    await IsPluginUpdateValidSchema.strict().validate(params);
-    const causes: PluginUpdateProposalInValidityCause[] = [];
-    // get expected actions signatures
-    const grantSignature = DAO__factory.createInterface().getFunction("grant")
-      .format("minimal");
-    const revokeSignature = DAO__factory.createInterface().getFunction("revoke")
-      .format("minimal");
-    const applyUpdateSignature = PluginSetupProcessor__factory.createInterface()
-      .getFunction("applyUpdate").format("minimal");
-
-    // find signatures in the actions specified in the proposal
-    const grantIndex = findActionIndex(params.actions, grantSignature);
-    const applyUpdateIndex = findActionIndex(
-      params.actions,
-      applyUpdateSignature,
-    );
-    const revokeIndex = findActionIndex(params.actions, revokeSignature);
-
-    // check that all actions are present and in the correct order
-    if (
-      [grantIndex, applyUpdateIndex, revokeIndex].includes(-1) ||
-      grantIndex > applyUpdateIndex ||
-      applyUpdateIndex > revokeIndex
-    ) {
-      causes.push(PluginUpdateProposalInValidityCause.INVALID_ACTIONS);
+    // not validating the proposalId because multiple proposal id formats can be used
+    // get the iproposal given the proposal id
+    const name = "iproposal";
+    const query = QueryIProposal;
+    type T = { iproposal: SubgraphIProposal };
+    const { iproposal } = await this.graphql.request<T>({
+      query,
+      params: { id: proposalId.toLowerCase() },
+      name,
+    });
+    if (!iproposal) {
+      // if the proposal does not exist return invalid
       return {
-        isValid: causes.length === 0,
-        causes,
+        isValid: false,
+        actionErrorCauses: [],
+        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]
       };
     }
-
-    // check grant action
-    if (
-      !this.isPluginUpdatePermissionValid(
-        decodeGrantAction(params.actions[grantIndex].data),
-        params.daoAddress,
-      )
-    ) {
-      causes.push(PluginUpdateProposalInValidityCause.INVALID_GRANT_PERMISSION);
+    // check failure map
+    if (iproposal.allowFailureMap !== "0") {
+      // if the failure map is not 0 return invalid failure map
+      return {
+        isValid: false,
+        actionErrorCauses: [],
+        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE]
+      };
     }
-
-    // check revoke action
-    if (
-      !this.isPluginUpdatePermissionValid(
-        decodeRevokeAction(params.actions[revokeIndex].data),
-        params.daoAddress,
-      )
-    ) {
-      causes.push(
-        PluginUpdateProposalInValidityCause.INVALID_REVOKE_PERMISSION,
-      );
-    }
-
-    // check apply update action
-    const decodedApplyUpdateActionParams = decodeApplyUpdateAction(
-      params.actions[applyUpdateIndex].data,
+    // validate actions
+    return validateUpdatePluginProposalActions(
+      toDaoActions(iproposal.actions),
+      iproposal.dao.id,
+      this.web3.getAddress("pluginSetupProcessorAddress"),
+      this.graphql,
+      this.ipfs,
     );
-    const applyUpdateCauses = await this.checkApplyUpdateActionInvalidityCauses(
-      params.daoAddress,
-      decodedApplyUpdateActionParams,
-    );
-    causes.push(...applyUpdateCauses);
-    return {
-      isValid: causes.length === 0,
-      causes,
-    };
   }
   /**
-   * Check if the specified actions are valid for updating a dao
-   * The failure map should be checked before calling this method
+   * Check if the specified proposalId actions are valid for updating a dao
    *
-   * @param {IsDaoUpdateValidParams} params
+   * @param {string} proposalId
+   * @param {SupportedVersion} [version]
    * @return {*}  {Promise<DaoUpdateProposalValidity>}
    * @memberof ClientMethods
    */
-  public async isDaoUpdateValid(
-    params: IsDaoUpdateValidParams,
+  public async isDaoUpdateProposalValid(
+    proposalId: string,
+    version?: SupportedVersion,
   ): Promise<DaoUpdateProposalValidity> {
-    await IsDaoUpdateValidSchema.strict().validate(params);
-    const causes: DaoUpdateProposalInvalidityCause[] = [];
-    // get initialize from signature
-    const upgradeToAndCallSignature = DAO__factory.createInterface()
-      .getFunction(
-        "upgradeToAndCall",
-      ).format("minimal");
-    const upgradeToAndCallIndex = findActionIndex(
-      params.actions,
-      upgradeToAndCallSignature,
-    );
-    // check that initialize from action is present
-    if (upgradeToAndCallIndex === -1) {
-      causes.push(DaoUpdateProposalInvalidityCause.INVALID_ACTIONS);
+    // omit input validation because we are receiving the proposal id
+
+    // get the iproposal given the proposal id
+    const name = "iproposal";
+    const query = QueryIProposal;
+    type T = { iproposal: SubgraphIProposal };
+    const res = await this.graphql.request<T>({
+      query,
+      params: { id: proposalId.toLowerCase() },
+      name,
+    });
+    const { iproposal } = res;
+    // if the proposal does not exist return invalid
+    if (!iproposal) {
       return {
-        isValid: causes.length === 0,
-        causes,
+        isValid: false,
+        proposalSettingsErrorCauses: [
+          ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND,
+        ],
+        actionErrorCauses: [],
       };
     }
-    const decodedUpgradeToAndCallParams = decodeUpgradeToAndCallAction(
-      params.actions[upgradeToAndCallIndex].data,
+    // check failure map
+    if (iproposal.allowFailureMap !== "0") {
+      // if the failure map is not 0 return invalid failure map
+      return {
+        isValid: false,
+        actionErrorCauses: [],
+        proposalSettingsErrorCauses: [ProposalSettingsErrorCause.NON_ZERO_ALLOW_FAILURE_MAP_VALUE]
+      };
+    }
+    // get implementation address, use latest version as default
+    let daoFactoryAddress = this.web3.getAddress("daoFactoryAddress");
+    if (version) {
+      // if version is specified get the dao factory address from the live contracts
+      daoFactoryAddress = LIVE_CONTRACTS[version][
+        this.web3.getNetworkName()
+      ].daoFactoryAddress;
+    }
+
+    return validateUpdateDaoProposalActions(
+      toDaoActions(iproposal.actions),
+      iproposal.dao.id,
+      await this.getDaoImplementation(daoFactoryAddress),
+      await this.getProtocolVersion(
+        iproposal.dao.id,
+      ),
     );
-    let decodedInitializeFromParams: DecodedInitializeFromParams;
-    try {
-      decodedInitializeFromParams = decodeInitializeFromAction(
-        decodedUpgradeToAndCallParams.data,
-      );
-    } catch {
-      causes.push(DaoUpdateProposalInvalidityCause.INVALID_ACTIONS);
-      return { isValid: causes.length === 0, causes };
-    }
-
-    // check version
-    if (
-      !await this.isDaoUpdateVersionValid(
-        params.daoAddress,
-        decodedInitializeFromParams.previousVersion,
-      )
-    ) {
-      causes.push(DaoUpdateProposalInvalidityCause.INVALID_VERSION);
-    }
-    // get version if not specified use the one from the dao factory address
-    // in the context
-    let upgradeToVersion = params.version;
-    if (!upgradeToVersion) {
-      upgradeToVersion = await this.getProtocolVersion(
-        this.web3.getAddress("daoFactoryAddress"),
-      );
-    }
-    // check implementation
-    if (
-      !await this.isDaoUpdateImplementationValid(
-        upgradeToVersion.join(".") as SupportedVersion,
-        decodedUpgradeToAndCallParams.implementationAddress,
-      )
-    ) {
-      causes.push(DaoUpdateProposalInvalidityCause.INVALID_IMPLEMENTATION);
-    }
-    // check data
-    if (!this.isDaoUpdateInitDataValid(decodedInitializeFromParams.initData)) {
-      causes.push(DaoUpdateProposalInvalidityCause.INVALID_INIT_DATA);
-    }
-    return { isValid: causes.length === 0, causes };
   }
-
-  /**
-   * Check if the current version of the dao is the same as the specified version
-   *
-   * @private
-   * @param {string} daoAddress
-   * @param {[number, number, number]} specifiedVersion
-   * @return {*}  {Promise<boolean>}
-   * @memberof ClientMethods
-   */
-  private async isDaoUpdateVersionValid(
-    daoAddress: string,
-    specifiedVersion: [number, number, number],
-  ): Promise<boolean> {
-    // get the current version of the dao, so the result should not be the upgraded value
-    const currentDaoVersion = await this.getProtocolVersion(daoAddress);
-    // currentDao version should be equal to the previous version
-    // because it references the version that the dao will be upgraded from
-    // ex: if we want to upgrade from version 1.0.0 to 1.3.0
-    // the previous version should be 1.0.0 and so should be the current dao version
-    return JSON.stringify(currentDaoVersion) ===
-      JSON.stringify(specifiedVersion);
-  }
-
-  /**
-   * Check if the implementation address is the same as the one from the dao factory
-   *
-   * @private
-   * @param {SupportedVersion} version
-   * @param {string} implementationAddress
-   * @return {*}  {Promise<boolean>}
-   * @memberof ClientMethods
-   */
-  private async isDaoUpdateImplementationValid(
-    version: SupportedVersion,
-    implementationAddress: string,
-  ): Promise<boolean> {
-    const networkName = this.web3.getNetworkName();
-    // The dao factory address holds the implementation address for each version
-    // so we can check that the specified implementation address is the same
-    // as the one from the dao factory
-    const daoFactoryAddress =
-      LIVE_CONTRACTS[version][networkName].daoFactoryAddress;
-    const daoBase = await this.getDaoImplementation(daoFactoryAddress);
-    return daoBase === implementationAddress;
-  }
-
-  /**
-   * Check if the init data is valid for the specified version of the dao
-   *
-   * @param {IsDaoUpdateInitDataValidParams} params
-   * @return {*}  {Promise<boolean>}
-   * @memberof ClientMethods
-   */
-  private isDaoUpdateInitDataValid(
-    data: Uint8Array,
-    _version?: SupportedVersion,
-  ): boolean {
-    // TODO: decode the data using the abi from the the prepare update
-    // for now the init data must be empty but this can change in the future
-    // atm we cannot know the parameters for each version of the dao
-    return data.length === 0;
-  }
-
   /**
    *  Return the implementation address for the specified dao factory
    *
