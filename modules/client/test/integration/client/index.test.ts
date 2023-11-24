@@ -1,6 +1,3 @@
-// @ts-ignore
-declare const describe, it, expect;
-
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import { Client } from "../../../src";

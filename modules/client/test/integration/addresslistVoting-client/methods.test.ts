@@ -2,7 +2,9 @@
 import { mockedIPFSClient } from "../../mocks/aragon-sdk-ipfs";
 import * as mockedGraphqlRequest from "../../mocks/graphql-request";
 
-import * as ganacheSetup from "../../helpers/ganache-setup";
+// @ts-ignore Needed to get the global typing for hardhat
+import * as jestenv from "jest-environment-hardhat";
+
 import * as deployContracts from "../../helpers/deployContracts";
 
 import {
@@ -33,11 +35,9 @@ import {
   TEST_TX_HASH,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import { Server } from "ganache";
 import {
   mineBlock,
   mineBlockWithTimeOffset,
-  restoreBlockTime,
 } from "../../helpers/block-times";
 import { buildAddressListVotingDAO } from "../../helpers/build-daos";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -67,13 +67,11 @@ import { PluginRepo__factory } from "@aragon/osx-ethers";
 import { createAddresslistVotingPluginBuild } from "../../helpers/create-plugin-build";
 
 describe("Client Address List", () => {
-  let server: Server;
   let deployment: deployContracts.Deployment;
   let repoAddr: string;
   let provider: JsonRpcProvider;
 
   beforeAll(async () => {
-    server = await ganacheSetup.start();
     deployment = await deployContracts.deploy();
     contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
     contextParamsLocalChain.pluginSetupProcessorAddress =
@@ -104,14 +102,6 @@ describe("Client Address List", () => {
         contextParamsLocalChain.web3Providers as any,
       );
     }
-  });
-
-  afterAll(async () => {
-    await server.close();
-  });
-
-  beforeEach(() => {
-    return restoreBlockTime(provider);
   });
 
   // Helpers
@@ -160,7 +150,7 @@ describe("Client Address List", () => {
     const ipfsUri = await client.methods.pinMetadata(
       metadata,
     );
-    const endDate = new Date(Date.now() + 60 * 60 * 1000 + 10 * 1000);
+    const endDate = new Date(0);
 
     const proposalParams: CreateMajorityVotingProposalParams = {
       pluginAddress,

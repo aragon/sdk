@@ -13,9 +13,7 @@ import {
   contextParamsLocalChain,
   SUBGRAPH_PLUGIN_INSTALLATION,
 } from "../constants";
-import * as ganacheSetup from "../../helpers/ganache-setup";
 import * as deployContracts from "../../helpers/deployContracts";
-import { Server } from "ganache";
 import { deployErc20 } from "../../helpers/deploy-erc20";
 import { Context, TokenType } from "@aragon/sdk-client-common";
 import { deployErc1155 } from "../../helpers/deploy-erc1155";
@@ -27,20 +25,14 @@ let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
   let deployment: deployContracts.Deployment;
   describe("Estimation module", () => {
-    let server: Server;
 
     beforeAll(async () => {
-      server = await ganacheSetup.start();
       deployment = await deployContracts.deploy();
       contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
       contextParamsLocalChain.pluginSetupProcessorAddress =
         deployment.pluginSetupProcessor.address;
       contextParamsLocalChain.ensRegistryAddress =
         deployment.ensRegistry.address;
-    });
-
-    afterAll(async () => {
-      await server.close();
     });
 
     it("Should estimate gas fees for creating a DAO", async () => {

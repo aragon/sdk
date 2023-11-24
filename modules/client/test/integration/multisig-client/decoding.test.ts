@@ -1,6 +1,3 @@
-// @ts-ignore
-declare const describe, it, expect;
-
 import { Context } from "@aragon/sdk-client-common";
 import {
   AddAddressesParams,

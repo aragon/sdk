@@ -37,11 +37,16 @@ TEMPLATE:
 
 - Added `actions` to `SubgraphListItem` type
 
+### Changed
+
+- Replaces tsdx with dts-cli
+- Upgrades typescript to v5
+
 ## [1.10.0]
+
 ### Added
 
 - Add support for arbitrum network
-
 
 ## [1.9.0]
 
@@ -50,22 +55,26 @@ TEMPLATE:
 - Subgraph version from 1.3.0 to 1.3.1
 
 ## [1.8.0]
+
 ### Added
 
 - Add new class error `InvalidPermissionOperationType`
 
 ## [1.7.1]
+
 ### Fixed
 
 - ENS name Regex
 
 ## [1.7.0]
+
 ### Added
 
 - Add common schemas for validations
 - Support for sepolia network
 - Move functionality from `sdk-common` to `sdk-client-common`
-- New error classes `InvalidVersionError`, `PluginUpdatePreparationError` and `ProposalNotFoundError`
+- New error classes `InvalidVersionError`, `PluginUpdatePreparationError` and
+  `ProposalNotFoundError`
 - Add `isSubdomain`, `isIpfsUri` and `isEnsName` functions
 - Update SizeMismatchError error class
 
