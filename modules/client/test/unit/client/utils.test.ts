@@ -117,6 +117,24 @@ describe("Test client utils", () => {
           .NON_ZERO_GRANT_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
       ]);
     });
+    it("should return an error to of the action is not the DAO", async () => {
+      const grantAction = client.encoding.grantAction(daoAddress, {
+        where: daoAddress,
+        who: pspAddress,
+        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+      });
+      grantAction.to = ADDRESS_ONE;
+      const result = await validateGrantUpgradePluginPermissionAction(
+        grantAction,
+        pspAddress,
+        daoAddress,
+        client.graphql,
+      );
+      expect(result).toEqual([
+        PluginUpdateProposalInValidityCause
+          .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_TO_ADDRESS,
+      ]);
+    });
     it("should return an error if the plugin does not exist", async () => {
       const grantAction = client.encoding.grantAction(daoAddress, {
         where: daoAddress,
@@ -251,6 +269,24 @@ describe("Test client utils", () => {
           .NON_ZERO_REVOKE_UPGRADE_PLUGIN_PERMISSION_CALL_VALUE,
       ]);
     });
+    it("should return an error to of the action is not the DAO", async () => {
+      const revokeAction = client.encoding.revokeAction(daoAddress, {
+        where: daoAddress,
+        who: pspAddress,
+        permission: Permissions.UPGRADE_PLUGIN_PERMISSION,
+      });
+      revokeAction.to = ADDRESS_ONE;
+      const result = await validateRevokeUpgradePluginPermissionAction(
+        revokeAction,
+        pspAddress,
+        daoAddress,
+        client.graphql,
+      );
+      expect(result).toEqual([
+        PluginUpdateProposalInValidityCause
+          .INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_TO_ADDRESS,
+      ]);
+    });
     it("should return an error if the installation does not exist", async () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
         where: daoAddress,
@@ -377,6 +413,23 @@ describe("Test client utils", () => {
           .NON_ZERO_GRANT_ROOT_PERMISSION_CALL_VALUE,
       ]);
     });
+    it("should return an error to of the action is not the DAO", () => {
+      const grantAction = client.encoding.grantAction(daoAddress, {
+        where: daoAddress,
+        who: pspAddress,
+        permission: Permissions.ROOT_PERMISSION,
+      });
+      grantAction.to = ADDRESS_ONE;
+      const result = validateGrantRootPermissionAction(
+        grantAction,
+        daoAddress,
+        pspAddress,
+      );
+      expect(result).toEqual([
+        PluginUpdateProposalInValidityCause
+          .INVALID_GRANT_ROOT_PERMISSION_TO_ADDRESS,
+      ]);
+    });
     it("should return an error if the permission is not granted in the DAO", () => {
       const grantAction = client.encoding.grantAction(daoAddress, {
         where: pluginAddress,
@@ -452,13 +505,13 @@ describe("Test client utils", () => {
     });
     it("should return an empty array for a valid action", () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
-        where: pluginAddress,
+        where: daoAddress,
         who: pspAddress,
         permission: Permissions.ROOT_PERMISSION,
       });
       const result = validateRevokeRootPermissionAction(
         revokeAction,
-        pluginAddress,
+        daoAddress,
         pspAddress,
       );
       expect(result).toEqual([]);
@@ -491,6 +544,23 @@ describe("Test client utils", () => {
       expect(result).toEqual([
         PluginUpdateProposalInValidityCause
           .NON_ZERO_REVOKE_ROOT_PERMISSION_CALL_VALUE,
+      ]);
+    });
+    it("should return an error to of the action is not the DAO", () => {
+      const revokeAction = client.encoding.revokeAction(daoAddress, {
+        where: daoAddress,
+        who: pspAddress,
+        permission: Permissions.ROOT_PERMISSION,
+      });
+      revokeAction.to = ADDRESS_ONE;
+      const result = validateRevokeRootPermissionAction(
+        revokeAction,
+        daoAddress,
+        pspAddress,
+      );
+      expect(result).toEqual([
+        PluginUpdateProposalInValidityCause
+          .INVALID_REVOKE_ROOT_PERMISSION_TO_ADDRESS,
       ]);
     });
     it("should return an error if the permission is not revoked in the DAO", () => {
