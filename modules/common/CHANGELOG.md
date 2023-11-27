@@ -31,6 +31,7 @@ TEMPLATE:
 
 - New error classes
 - `getInterfaceId` function
+
 ## 1.5.0
 
 ### Added
