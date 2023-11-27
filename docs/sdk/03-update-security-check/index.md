@@ -172,8 +172,8 @@ The `applyUpdate` action CAN be wrapped by `grant` and `revoke` actions:
 [action]: (../../../../osx/01-how-it-works/01-core/01-dao/01-actions.md#actions)
 [allowfailuremap]: (../../../../osx/01-how-it-works/01-core/01-dao/01-actions.md#allowing-for-failure)
 [initializefrom]: (../../../../osx/03-reference-guide/core/dao/DAO.md#external-function-initializefrom)
-[oz-upgradeto]: (https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/3d4c0d5741b131c231e558d7a6213392ab3672a5/contracts/proxy/utils/UUPSUpgradeable.sol#L74-L77)
-[oz-upgradetoandcall]: (https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/3d4c0d5741b131c231e558d7a6213392ab3672a5/contracts/proxy/utils/UUPSUpgradeable.sol#L89-L92)
+[oz-upgradeto]: https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/3d4c0d5741b131c231e558d7a6213392ab3672a5/contracts/proxy/utils/UUPSUpgradeable.sol#L74-L77
+[oz-upgradetoandcall]: https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/3d4c0d5741b131c231e558d7a6213392ab3672a5/contracts/proxy/utils/UUPSUpgradeable.sol#L89-L92
 [applyupdate]: (../../../../osx//03-reference-guide/framework/plugin/setup/PluginSetupProcessor.md#external-function-applyupdate)
 [grant]: (../../../../osx//03-reference-guide/core/permission/PermissionManager.md#external-function-grant)
 [revoke]: (../../../../osx//03-reference-guide/core/permission/PermissionManager.md#external-function-revoke)
