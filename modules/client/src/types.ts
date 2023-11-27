@@ -440,6 +440,9 @@ export enum PluginUpdateProposalInValidityCause {
     "nonZeroGrantUpgradePluginPermissionCallValue",
   INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID =
     "invalidGrantUpgradePluginPermissionPermissionId",
+  INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_TO_ADDRESS =
+    "invalidGrantUpgradePluginPermissionToAddress",
+
   // Revoke UPDATE_PLUGIN_PERMISSION action
   INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_WHO_ADDRESS =
     "invalidRevokeUpgradePluginPermissionWhoAddress",
@@ -451,6 +454,9 @@ export enum PluginUpdateProposalInValidityCause {
     "nonZeroRevokeUpgradePluginPermissionCallValue",
   INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_PERMISSION_ID =
     "invalidRevokeUpgradePluginPermissionPermissionId",
+  INVALID_REVOKE_UPGRADE_PLUGIN_PERMISSION_TO_ADDRESS = 
+    "invalidRevokeUpdatePluginPermissionToAddress",
+  
   // Grant ROOT_PERMISSION action
   INVALID_GRANT_ROOT_PERMISSION_WHO_ADDRESS =
     "invalidGrantRootPermissionWhoAddress",
@@ -462,6 +468,8 @@ export enum PluginUpdateProposalInValidityCause {
     "nonZeroGrantRootPermissionCallValue",
   INVALID_GRANT_ROOT_PERMISSION_PERMISSION_ID =
     "invalidGrantRootPermissionPermissionId",
+  INVALID_GRANT_ROOT_PERMISSION_TO_ADDRESS = 
+    "invalidGrantRootPermissionToAddress",
   // Revoke ROOT_PERMISSION action
   INVALID_REVOKE_ROOT_PERMISSION_WHO_ADDRESS =
     "invalidRevokeRootPermissionWhoAddress",
@@ -473,6 +481,8 @@ export enum PluginUpdateProposalInValidityCause {
     "nonZeroRevokeRootPermissionCallValue",
   INVALID_REVOKE_ROOT_PERMISSION_PERMISSION_ID =
     "invalidRevokeRootPermissionPermissionId",
+  INVALID_REVOKE_ROOT_PERMISSION_TO_ADDRESS = 
+    "invalidRevokeRootPermissionToAddress",
   // applyUpdate action
   NON_ZERO_APPLY_UPDATE_CALL_VALUE = "nonZeroApplyUpdateCallValue",
   PLUGIN_NOT_INSTALLED = "pluginNotInstalled",
