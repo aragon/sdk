@@ -20,18 +20,20 @@ TEMPLATE:
 ## [UPCOMING]
 
 ### Fixed
+
 - Added missing security check that checks that the `to` address in the permission actions is the DAO address
 
 ## [1.19.2]
-### Fixed
-- Fixed proposal id not being transformed
 
+### Fixed
+
+- Fixed proposal id not being transformed
 
 ## [1.19.1]
 
 ### Added
 
-- Classify signalling multisig proposals as succeeded even after the end date is passed using the subgraph `isSignalling` attribute.  
+- Classify signalling multisig proposals as succeeded even after the end date is passed using the subgraph `isSignalling` attribute.
 
 ### Changed
 
@@ -43,9 +45,9 @@ TEMPLATE:
 - Rename `applyUpdateAction` to `applyUpdateActionAndPermissionsBlock`
 - Rename `isDaoUpdateAction`to `containsDaoUpdateAction`
 - Rename `isDaoUpdate` to `isDaoUpdateProposal`
-- Rename `isDaoUpdateValid` to `isDaoUpdateProposalValid` 
+- Rename `isDaoUpdateValid` to `isDaoUpdateProposalValid`
 - Rename `isPluginUpdate` to `isPluginUpdateProposal`
-- Rename `isPluginUpdateValid` to `isPluginUpdateProposalValid` 
+- Rename `isPluginUpdateValid` to `isPluginUpdateProposalValid`
 - Rename `isPluginUpdateAction` to `containsPluginUpdateAction`
 - Rename `isPluginUpdateActionBlockWithRootPermission` to `containsPluginUpdateActionBlockWithRootPermission`
 
@@ -71,17 +73,19 @@ TEMPLATE:
 - Removed `restoreBlockTime()` test helper function
 
 ## [1.18.2]
+
 ### Fixed
 
 - Plugin preparations query
 
 ## [1.18.1]
+
 ### Fixed
 
 - ERC20Transfers query missing decimals
 
-
 ## [1.18.0]
+
 ### Added
 
 - Support for arbitrum network
@@ -91,26 +95,31 @@ TEMPLATE:
 - Plugin preparations query
 
 ## [1.17.1]
+
 ### Fixed
 
 - Fix support for subgraph 1.3.1
 
 ## [1.17.0]
+
 ### Added
 
 - `getPluginPreparations` function to `Client`
 
 ## [1.16.3]
+
 ### Fixed
 
 - Required ensSubdomain in createDao
 
 ## [1.16.2]
+
 ### Fixed
 
 - Ens name regex
 
 ## [1.16.1]
+
 ### Fixed
 
 - Estimations using `getProvider` instead of `getConnectedSigner` in functions where the identity of the wallet is needed
@@ -118,6 +127,7 @@ TEMPLATE:
 ## [1.16.0]
 
 ### Added
+
 - Helper for `daoUpdateAction` in `Client`
 
 ### Changed
@@ -127,6 +137,7 @@ TEMPLATE:
 - Rename `isPluginUpdateProposalValid` to `isPluginUpdateValid`
 
 ## [1.15.0]
+
 ### Added
 
 - Add input validation on client functions
@@ -134,9 +145,10 @@ TEMPLATE:
 - Support for sepolia
 - Return all version son `getPlugins` function
 
-
 ### Changed
+
 - Update `sdk-common` imports to `sdk-common-client`
+
 ## [1.14.0]
 
 ### Added
@@ -149,6 +161,7 @@ TEMPLATE:
 
 - All addresses are now lowercased on subgraph methods
 - Use signer only when transactions need to be signed, else use provider
+
 ## [1.13.1-rc1]
 
 ### Fixes

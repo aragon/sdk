@@ -23,7 +23,6 @@ TEMPLATE:
 
 - Updated subgraph version to 1.4.0
 
-
 ## [1.11.0]
 
 ### Added
