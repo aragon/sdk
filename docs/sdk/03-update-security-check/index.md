@@ -2,23 +2,34 @@
 title: Update Security Check
 ---
 
-## General Update Proposal Checks
+## Context
 
-The security check is composed of two functions: `isDaoUpdateProposalValid` and `isPluginUpdateProposalValid` that both receive a proposal ID as an input.
-If the proposal cannot be found via the ID or the subgraph is down, we return `"proposalNotFound"` in both cases.
+Aragon DAOs and the plugins installed can be updated via proposals. Upon execution, the proposal will call the DAO's [`execute` function][execute] and execute whatever action are specified inside its action list.
+Accordingly, proposals must be checked thoroughly, especially when it comes to DAO or plugin updates. This happens automatically on the Aragon App frontend.
 
-A proposal contains an `Action[]` array (see [our docs](https://devs.aragon.org/docs/osx/how-it-works/core/dao/actions#actions)).
+All proposals scheduled in the DAO are checked via their proposal ID. A proposal is identified as an update proposals if it contains
 
-The update proposal MUST only contain actions related to the update and no other actions.
-If an unexpected action is present, we return `"invalidActions"`.
+- one call to either
+  - [`upgradeTo(address newImplementation)`][oz-upgradeto]
+    OR
+  - [`upgradeToAndCall(address newImplementation, bytes memory data)`][oz-upgradetoandcall]
+- one or more calls to [`applyUpdate(address _dao, ApplyUpdateParams _params)`][applyupdate]
 
-DAO proposals contain an `_allowFailureMap` value indicating actions in the action array that are allowed to fail (see [our docs](https://devs.aragon.org/docs/osx/how-it-works/core/dao/actions#the-allowfailuremap-input-argument)).
-For updates, `_allowFailureMap` MUST be zero (no failure is allowed).
-If it is non-zero, we return `"nonZeroAllowFailureMapValue"`.
+If a proposal is identified as an update proposal, we conduct general and specific checks on it.
 
-## Specific Action Checks
+## General Proposal Checks
 
-Every `Action` in the actions array has three parameters:
+After a proposal was identified as an update proposal, we check that only allowed actions are part of the action list and that none of them is allowed to fail.
+
+| Error                           | Explanation                                                                                                                                                       |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `"invalidActions"`              | The proposal contains unexpected actions that are not allowed for update proposals.                                                                               |
+| `"nonZeroAllowFailureMapValue"` | The allow failure map is not zero (see [the Aragon OSX docs](https://devs.aragon.org/docs/osx/how-it-works/core/dao/actions#the-allowfailuremap-input-argument)). |
+| `"proposalNotFound"`            | The proposal could not be found.                                                                                                                                  |
+
+## Action-Specific Checks
+
+After the general checks, we check every action in the `Action[]` array separately. An action has three fields [see][action]:
 
 ```solidity title="@aragon/osx/core/dao/IDAO.sol"
 /// @notice The action struct to be consumed by the DAO's `execute` function resulting in an external call.
@@ -30,34 +41,49 @@ struct Action {
   uint256 value;
   bytes data;
 }
+
 ```
 
-In the following, we distinguish between actions related to the DAO.
+In the following, we explain the action specific checks.
 
 ### DAO Update
 
-For DAO updates, we expect single action at position 0 of the action array being characterized as follows:
+For DAO updates, we expect single action at position 0 of the action array. This action, must call
 
-- `to` MUST be the DAO address. If not, we return `"invalidToAddress"`.
+- `upgradeTo(address newImplementation)`
+  OR
+- `upgradeToAndCall(address newImplementation, bytes memory data)`
 
-- `value` MUST be zero. If not, we return `"nonZeroCallValue"`.
+#### Checking the `upgradeTo` Calldata
 
-- `data` MUST contain the `upgradeTo(address newImplementation)` OR `upgradeToAndCall(address newImplementation, bytes memory data)` function selector depending on the nature of the update
-  - The `upgradeToAndCall` call
-    - MUST go to the right implementation address. This can be either the latest version or any other, newer version. If not, we return `"invalidUpgradeToImplementationAddress"`.
-    - MUST go to the `initializeFrom` function
-    - the additional data passed to `initializeFrom` MUST be empty. If not, we return `"invalidUpgradeToAndCallData"`.
-      - the semantic version number of the previous DAO must be as expected. If not, we return `"invalidUpgradeToAndCallVersion"`.
-  - `upgradeTo` can be called instead, if no reinitalization of the DAO is required. The call
-    - MUST go to the right implementation address. This can be either the latest version or any other, newer version. If not, we return `"invalidUpgradeToAndCallImplementationAddress"`.
-    - MUST have empty subsequent calldata. If not, we return `"invalidUpgradeToAndCallData"`.
+| Item    | Error                                     | Explanation                                                                                                                               |
+| ------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `to`    | `"invalidToAddress"`                      | The `to` address of the action must be the DAO contract.                                                                                  |
+|         |                                           |                                                                                                                                           |
+| `value` | `"nonZeroCallValue"`                      | The `value` native token value send with the call must be zero.                                                                           |
+|         |                                           |                                                                                                                                           |
+| `data`  | `"invalidActions"`                        | The first 4 bytes must match the [`upgradeTo` function][oz-upgradeto] selector (see [General Proposal Checks](#general-proposal-checks)). |
+|         | `"invalidUpgradeToImplementationAddress"` | The `newImplementation` address must match with a newer DAO implementation contract developed by Aragon.                                  |
 
-### Plugin Updates
+#### Checking the Action `data` calling `upgradeToAndCall`
+
+| Item    | Error                                            | Explanation                                                                                                                                                                                                                                                                                                                                |
+| ------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `to`    | `"invalidToAddress"`                             | The `to` address of the action must be the DAO contract.                                                                                                                                                                                                                                                                                   |
+|         |                                                  |                                                                                                                                                                                                                                                                                                                                            |
+| `value` | `"nonZeroCallValue"`                             | The `value` native token value send with the call must be zero.                                                                                                                                                                                                                                                                            |
+|         |                                                  |                                                                                                                                                                                                                                                                                                                                            |
+| `data`  | `"invalidActions"`                               | The first 4 bytes must match the [`upgradeToAndCall` function][oz-upgradetoandcall] selector (see [General Proposal Checks](#general-proposal-checks)).                                                                                                                                                                                    |
+|         | `"invalidUpgradeToAndCallImplementationAddress"` | The `newImplementation` address must match with a newer DAO implementation contract developed by Aragon.                                                                                                                                                                                                                                   |
+|         | `"invalidUpgradeToAndCallData"`                  | The `data` passed into `upgradeToAndCall` must call the [`initializeFrom(uint8[3] _previousProtocolVersion, bytes _initData)` function][initializefrom]. The first 96 bytes of `data` must be occupied by an `uint[3] _previousProtocolVersion` semantic version number. The sub `_initData` must be empty for the current Aragon updates. |
+|         | `"invalidUpgradeToAndCallVersion"`               | `uint[3] _previousProtocolVersion` must match with the semantic version number of the DAO the upgrade is transitioning from.                                                                                                                                                                                                               |
+
+### Plugin Update
 
 For each plugin update, we expect a block of associated actions. There can be multiple, independent plugin updates happening in one update proposal.
 We expect two types of blocks:
 
-```
+```solidity
 [
   grant({_where: plugin, _who: pluginSetupProcessor, _permissionId: UPGRADE_PLUGIN_PERMISSION_ID}),
   applyUpdate({_dao: dao, _params: applyUpdateParams}),
@@ -67,7 +93,7 @@ We expect two types of blocks:
 
 or
 
-```
+```solidity
 [
   grant({_where: plugin, _who: pluginSetupProcessor, _permissionId: UPGRADE_PLUGIN_PERMISSION_ID}),
   grant({_where: dao, _who: pluginSetupProcessor, _permissionId: ROOT_PERMISSION_ID}),
@@ -79,43 +105,76 @@ or
 
 #### Mandatory `applyUpdate` Call
 
-Each block being related to a plugin update MUST contain an `applyUpdate` action exactly once. This action is composed as follows:
+Each block being related to a plugin update must contain an action calling the [`applyUpdate(address _dao, ApplyUpdateParams _params)` function][applyupdate] exactly once.
+This action is composed as follows:
 
-- `to` MUST be the `PluginSetupProcessor` address
-- `value` MUST be zero. If not, we return `"nonZeroApplyUpdateCallValue"`.
-- `data` MUST contain the `applyUpdate` function selector in the first 4 bytes. The following bytes MUST be encoded according to the [the `build-metadata.json` specifications](https://devs.aragon.org/docs/osx/how-to-guides/plugin-development/publication/metadata).
-  If we cannot decode the action, we return `"invalidData"`.
-  If we cannot obtain the metadata, we return `"invalidPluginRepoMetadata"`.
-  Furthermore, the data MUST
-  - update a plugin that is currently installed to the DAO. If not, we return `"pluginNotInstalled"`.
-  - update a plugin from an Aragon plugin repo. If it is not an Aragon repo, we return `"notAragonPluginRepo"`. If it does not exist, we return `"missingPluginRepo"`.
-  - reference an update preparation (resulting from an `prepareUpdate` call). If the update is not prepared, we return `"missingPluginPreparation"`.
-  - update to a new build and not
-    - to the same or an older build. If not, we return `"updateToOlderOrSameBuild"`.
-    - to a different release. If not, we return `"updateToIncompatibleRelease"`.
+This action calls the [`applyUpdate(address _dao, ApplyUpdateParams _params)` function][applyupdate]
+
+| `Action` field | Error                           | Explanation                                                                                                                                |
+| -------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `to`           | `"invalidToAddress"`            | The `to` address of the action must be Aragon's `PluginSetupProcessor` contract.                                                           |
+|                |                                 |                                                                                                                                            |
+| `value`        | `"nonZeroApplyUpdateCallValue"` | The `value` send with the call must be zero.                                                                                               |
+|                |                                 |                                                                                                                                            |
+| `data`         | `"invalidActions"`              | The first 4 bytes must match the [`applyUpdate` function][applyupdate] selector (see [General Proposal Checks](#general-proposal-checks)). |
+|                | `"invalidData"`                 | The bytes must be decodable as specified in the plugins `_metadata` [see our specs][build-metadata] (**currently we skip this**).          |
+|                | `"invalidPluginRepoMetadata"`   | The [`build-metadata`][build-metadata] could not be found or is incorrectly formatted.                                                     |
+|                | `"pluginNotInstalled"`          | The plugin address referenced in the `_params` is not installed.                                                                           |
+|                | `"missingPluginRepo"`           | The plugin repo referenced in the `_params` is not existing.                                                                               |
+|                | `"notAragonPluginRepo"`         | The plugin repo referenced in the `_params` is not an Aragon plugin repo.                                                                  |
+|                | `"missingPluginPreparation"`    | The update was not prepared in Aragon's `PluginSetupProcessor` contract.                                                                   |
+|                | `"updateToOlderOrSameBuild"`    | The update wants to transition to the same or an older build.                                                                              |
+|                | `"updateToIncompatibleRelease"` | The update wants to transition to a different, incompatible release.                                                                       |
 
 #### Mandatory `grant`/`revoke` `UPGRADE_PLUGIN_PERMISSION` Calls
 
-The `applyUpdate` action MUST be wrapped by `grant` and `revoke` actions on the same DAO where
+The `applyUpdate` action must be wrapped by `grant` and `revoke` actions:
 
-- `to` MUST be the DAO address
-- `value` MUST be zero. If not, we return `"nonZeroGrantUpgradePluginPermissionCallValue"` / `"nonZeroRevokeUpgradePluginPermissionCallValue"`.
-- `data` MUST contain the `grant` / `revoke` function selector in the first 4 bytes. The subsequent bytes MUST be as follows:
-  - `where` MUST be the plugin proxy address. If not, we return `"invalidGrantUpgradePluginPermissionWhereAddress"` / `"invalidRevokeUpgradePluginPermissionWhereAddress"`.
-  - `who` MUST be the `PluginSetupProcessor` address. If not, we return `"invalidGrantUpgradePluginPermissionWhoAddress"` / `"invalidRevokeUpgradePluginPermissionWhoAddress"`.
-  - `permissionId` MUST be `bytes32 UPGRADE_PLUGIN_PERMISSION_ID = keccak256("UPGRADE_PLUGIN_PERMISSION")`. If not, we return `"invalidGrantUpgradePluginPermissionPermissionId"` / `"invalidRevokeUpgradePluginPermissionPermissionId"`.
-  - `permissionName` MUST be `UPGRADE_PLUGIN_PERMISSION`. If not, we return `"invalidGrantUpgradePluginPermissionPermissionName"` / `"invalidRevokeUpgradePluginPermissionPermissionName"`
+| `Action` field | Error                                                  | Explanation                                                                                                                                          |
+| -------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `to`           | `"invalidGrantUpgradePluginPermissionToAddress"`       | The `to` address must be the DAO contract.                                                                                                           |
+|                |                                                        |                                                                                                                                                      |
+| `value`        | `"nonZeroGrantUpgradePluginPermissionCallValue"`       | The `value` send with the call must be zero.                                                                                                         |
+|                | `"nonZeroRevokeUpgradePluginPermissionCallValue"`      | "                                                                                                                                                    |
+|                |                                                        |                                                                                                                                                      |
+| `data`         | `"invalidActions"`                                     | The first 4 bytes must match the [`grant` or][grant] [`revoke` function][revoke] selector (see [General Proposal Checks](#general-proposal-checks)). |
+|                | `"invalidGrantUpgradePluginPermissionWhereAddress"`    | The `where` address must be the plugin proxy contract.                                                                                               |
+|                | `"invalidRevokeUpgradePluginPermissionWhereAddress"`   | "                                                                                                                                                    |
+|                | `"invalidGrantUpgradePluginPermissionWhoAddress"`      | The `who` address must be Aragon's `PluginSetupProcessor` contract.                                                                                  |
+|                | `"invalidRevokeUpgradePluginPermissionWhoAddress"`     | "                                                                                                                                                    |
+|                | `"invalidGrantUpgradePluginPermissionPermissionId"`    | `permissionId` must be `keccak256("UPGRADE_PLUGIN_PERMISSION")`.                                                                                     |
+|                | `"invalidRevokeUpgradePluginPermissionPermissionId"`   | "                                                                                                                                                    |
+|                | `"invalidGrantUpgradePluginPermissionPermissionName"`  | `permissionName` must be `UPGRADE_PLUGIN_PERMISSION`.                                                                                                |
+|                | `"invalidRevokeUpgradePluginPermissionPermissionName"` | "                                                                                                                                                    |
 
 #### Optional `grant`/`revoke` `ROOT_PERMISSION` Calls
 
-The `applyUpdate` action CAN be wrapped by `grant` and `revoke` actions on the same DAO where
+The `applyUpdate` action CAN be wrapped by `grant` and `revoke` actions:
 
-- `to` MUST be the DAO address
-- `value` MUST be zero. If not, we return `"nonZeroGrantRootPermissionCallValue"` / `"nonZeroRevokeRootPermissionCallValue"`.
-- `data` MUST contain the `grant` / `revoke` function selector in the first 4 bytes. The subsequent bytes MUST be as follows:
-  - `where` MUST be the DAO proxy address. If not, we return `"invalidGrantRootPermissionWhereAddress"` / `"invalidRevokeRootPermissionWhereAddress"`.
-  - `who` MUST be the `PluginSetupProcessor` address. If not, we return `"invalidGrantRootPermissionWhoAddress"` / `"invalidRevokeRootPermissionWhoAddress"`.
-  - `permissionId` MUST be `bytes32 ROOT_PERMISSION_ID = keccak256("ROOT_PERMISSION")`. If not, we return `"invalidGrantRootPermissionPermissionId"` / `"invalidRevokeRootPermissionPermissionId"`.
-  - `permissionName` MUST be `ROOT_PERMISSION`. If not, we return `"invalidGrantRootPermissionPermissionName"` / `"invalidRevokeRootPermissionPermissionName"`
+| `Action` field | Error                                         | Explanation                                                                                                                                          |
+| -------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `to`           | `"invalidGrantRootPermissionToAddress"`       | The `to` address must be the DAO contract.                                                                                                           |
+|                |                                               |                                                                                                                                                      |
+| `value`        | `"nonZeroGrantRootPermissionCallValue"`       | The `value` send with the call must be zero.                                                                                                         |
+|                | `"nonZeroRevokeRootPermissionCallValue"`      | The `value` send with the call must be zero.                                                                                                         |
+|                |                                               |                                                                                                                                                      |
+| `data`         | `"invalidActions"`                            | The first 4 bytes must match the [`grant` or][grant] [`revoke` function][revoke] selector (see [General Proposal Checks](#general-proposal-checks)). |
+|                | `"invalidGrantRootPermissionWhereAddress"`    | The `where` address must be the DAO contract.                                                                                                        |
+|                | `"invalidRevokeRootPermissionWhereAddress"`   | "                                                                                                                                                    |
+|                | `"invalidGrantRootPermissionWhoAddress"`      | The `who` address must be Aragon's `PluginSetupProcessor`.                                                                                           |
+|                | `"invalidRevokeRootPermissionWhoAddress"`     | "                                                                                                                                                    |
+|                | `"invalidGrantRootPermissionPermissionId"`    | The `permissionId` must be `keccak256("ROOT_PERMISSION")`.                                                                                           |
+|                | `"invalidRevokeRootPermissionPermissionId"`   | "                                                                                                                                                    |
+|                | `"invalidGrantRootPermissionPermissionName"`  | The `permissionName` must be `ROOT_PERMISSION`.                                                                                                      |
+|                | `"invalidRevokeRootPermissionPermissionName"` | "                                                                                                                                                    |
 
-
+[execute]: (../../../../osx/01-how-it-works/01-core/01-dao/01-actions.md#a-deep-dive-into-actions-and-execution)
+[action]: (../../../../osx/01-how-it-works/01-core/01-dao/01-actions.md#actions)
+[allowfailuremap]: (../../../../osx/01-how-it-works/01-core/01-dao/01-actions.md#allowing-for-failure)
+[initializefrom]: (../../../../osx/03-reference-guide/core/dao/DAO.md#external-function-initializefrom)
+[oz-upgradeto]: (https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/3d4c0d5741b131c231e558d7a6213392ab3672a5/contracts/proxy/utils/UUPSUpgradeable.sol#L74-L77)
+[oz-upgradetoandcall]: (https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/3d4c0d5741b131c231e558d7a6213392ab3672a5/contracts/proxy/utils/UUPSUpgradeable.sol#L89-L92)
+[applyupdate]: (../../../../osx//03-reference-guide/framework/plugin/setup/PluginSetupProcessor.md#external-function-applyupdate)
+[grant]: (../../../../osx//03-reference-guide/core/permission/PermissionManager.md#external-function-grant)
+[revoke]: (../../../../osx//03-reference-guide/core/permission/PermissionManager.md#external-function-revoke)
+[build-metadata]: (../../../../osx/02-how-to-guides/02-plugin-development/07-publication/02-metadata.md#plugin-metadata-specification)
