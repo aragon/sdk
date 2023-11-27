@@ -28,7 +28,8 @@ query AddresslistVotingProposal($proposalId: ID!) {
     endDate
     executed
     earlyExecutable
-    potentiallyExecutable
+    approvalReached
+    isSignaling
     executionTxHash
     voters{
       voter{
@@ -64,7 +65,8 @@ query AddresslistVotingProposals($where: AddresslistVotingProposal_filter!, $lim
     endDate
     executed
     earlyExecutable
-    potentiallyExecutable
+    approvalReached
+    isSignaling
     voters{
       voter{
         address

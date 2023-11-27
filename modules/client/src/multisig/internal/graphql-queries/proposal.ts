@@ -27,7 +27,8 @@ query MultisigProposal($proposalId: ID!) {
     minApprovals
     executionTxHash
     executed
-    potentiallyExecutable
+    approvalReached
+    isSignaling
     approvers{
       id
     }
@@ -45,7 +46,8 @@ query MultisigProposals($where: MultisigProposal_filter!, $limit:Int!, $skip: In
     creator
     metadata
     executed
-    potentiallyExecutable
+    approvalReached
+    isSignaling
     approvals
     startDate
     endDate

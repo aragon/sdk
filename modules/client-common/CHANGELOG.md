@@ -19,6 +19,13 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Changed
+
+- Updated subgraph version to 1.4.0
+
+
+## [1.11.0]
+
 ### Added
 
 - Added `UPGRADE_PLUGIN_PERMISSION` to `PermissionType` enum
