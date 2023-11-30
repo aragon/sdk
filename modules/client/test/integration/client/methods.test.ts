@@ -1908,7 +1908,7 @@ describe("Client", () => {
           createdAt: "1234567890",
           plugins: [{
             appliedPreparation: {
-              pluginAddress: pluginAddress,
+              pluginAddress: pluginAddress.toLowerCase(),
             },
             appliedPluginRepo: {
               subdomain: SupportedPluginRepo.TOKEN_VOTING,

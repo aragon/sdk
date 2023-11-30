@@ -19,6 +19,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+- Fixed pluginAddress comparison in `validatePluginUpdateProposal`
+
+## [1.20.0]
+
 ### Fixed
 
 - Added missing security check that checks that the `to` address in the permission actions is the DAO address
