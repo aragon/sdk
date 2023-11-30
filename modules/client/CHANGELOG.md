@@ -19,7 +19,7 @@ TEMPLATE:
 
 ## [UPCOMING]
 
-- Fixed lower case decoded address con comparison with a subgraph address on the proposal update checks
+- Fixed pluginAddress comparison in `validatePluginUpdateProposal`
 
 ## [1.20.0]
 
