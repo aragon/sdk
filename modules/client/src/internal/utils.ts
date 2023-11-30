@@ -1158,7 +1158,7 @@ export async function validateApplyUpdateFunction(
   // find the plugin with the same address
   const plugin = dao.plugins.find((plugin) =>
     plugin.appliedPreparation?.pluginAddress ===
-      decodedParams.pluginAddress
+      decodedParams.pluginAddress.toLowerCase()
   );
   if (!plugin) {
     causes.push(PluginUpdateProposalInValidityCause.PLUGIN_NOT_INSTALLED);

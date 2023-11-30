@@ -19,6 +19,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+- Fixed lower case decoded address con comparison with a subgraph address on the proposal update checks
+
+## [1.20.0]
+
 ### Fixed
 
 - Added missing security check that checks that the `to` address in the permission actions is the DAO address
