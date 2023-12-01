@@ -586,7 +586,7 @@ export class MultisigClientMethods extends ClientCore
       query,
       params: {
         id:
-          `${params.address.toLowerCase()}_${params.pluginAddress.toLowerCase()}`,
+          `${params.pluginAddress.toLowerCase()}_${params.address.toLowerCase()}`,
         blockHeight: params.blockNumber ? { number: params.blockNumber } : null,
       },
       name,
