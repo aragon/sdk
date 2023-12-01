@@ -19,6 +19,10 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+- Fixed toLowerCase in subgraphQuery
+
+## [1.20.1]
+
 - Fixed pluginAddress comparison in `validatePluginUpdateProposal`
 
 ## [1.20.0]

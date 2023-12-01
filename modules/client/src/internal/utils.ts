@@ -1187,7 +1187,7 @@ export async function validateApplyUpdateFunction(
   type V = { pluginRepo: SubgraphPluginRepo };
   const { pluginRepo } = await graphql.request<V>({
     query: QueryPlugin,
-    params: { id: decodedParams.pluginRepo },
+    params: { id: decodedParams.pluginRepo.toLowerCase() },
     name: "pluginRepo",
   });
   if (!pluginRepo) {
@@ -1212,7 +1212,7 @@ export async function validateApplyUpdateFunction(
   type W = { pluginPreparation: SubgraphPluginUpdatePreparation };
   const { pluginPreparation } = await graphql.request<W>({
     query: QueryPluginPreparations,
-    params: { where: { preparedSetupId } },
+    params: { where: { preparedSetupId: preparedSetupId.toLowerCase() } },
     name: "pluginPreparation",
   });
   if (!pluginPreparation) {
