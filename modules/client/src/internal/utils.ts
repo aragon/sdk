@@ -1238,9 +1238,9 @@ export async function validateApplyUpdateFunction(
   const metadata = await ipfs.fetchString(metadataCid!);
   const metadataJson = JSON.parse(metadata);
   let updateAbi = []
-  updateAbi = metadataJson?.pluginSetup?.prepareUpdate[plugin.appliedVersion?.build!]?.inputs
+  updateAbi = metadataJson?.pluginSetup?.prepareUpdate?.[plugin.appliedVersion?.build!]?.inputs
   if (!updateAbi) {
-    updateAbi = metadataJson?.pluginSetup?.prepareInstallation?.prepareUpdate[plugin.appliedVersion?.build!]?.inputs
+    updateAbi = metadataJson?.pluginSetup?.prepareInstallation?.prepareUpdate?.[plugin.appliedVersion?.build!]?.inputs
   }
   // get the update abi for the specified build
   if (updateAbi) {
