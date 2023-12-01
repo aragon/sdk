@@ -1216,7 +1216,7 @@ export async function validateApplyUpdateFunction(
     },
     name: "pluginPreparations",
   });
-  if (!pluginPreparations) {
+  if (!pluginPreparations.length) {
     causes.push(
       PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
     );
