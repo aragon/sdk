@@ -1206,13 +1206,17 @@ export async function validateApplyUpdateFunction(
     PreparationType.UPDATE,
   );
   // get plugin preparation
-  type W = { pluginPreparation: SubgraphPluginUpdatePreparation };
-  const { pluginPreparation } = await graphql.request<W>({
+  type W = { pluginPreparations: SubgraphPluginUpdatePreparation };
+  const { pluginPreparations } = await graphql.request<W>({
     query: QueryPluginPreparations,
-    params: { where: { preparedSetupId: preparedSetupId.toLowerCase() } },
-    name: "pluginPreparation",
+    params: { where: { 
+        preparedSetupId: preparedSetupId.toLowerCase(),
+        pluginAddress: decodedParams.pluginAddress.toLowerCase()
+      }
+    },
+    name: "pluginPreparations",
   });
-  if (!pluginPreparation) {
+  if (!pluginPreparations) {
     causes.push(
       PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
     );
