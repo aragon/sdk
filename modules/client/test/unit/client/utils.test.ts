@@ -705,7 +705,7 @@ describe("Test client utils", () => {
         pluginRepo: subgraphPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: subgraphPluginPreparation,
+        pluginPreparations: [subgraphPluginPreparation],
       });
       mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
@@ -732,7 +732,7 @@ describe("Test client utils", () => {
         pluginRepo: subgraphPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: subgraphPluginPreparation,
+        pluginPreparations: [subgraphPluginPreparation],
       });
       mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
@@ -767,7 +767,7 @@ describe("Test client utils", () => {
         pluginRepo: subgraphPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: subgraphPluginPreparation,
+        pluginPreparations: [subgraphPluginPreparation],
       });
       mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
@@ -802,7 +802,7 @@ describe("Test client utils", () => {
         pluginRepo: subgraphPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: subgraphPluginPreparation,
+        pluginPreparations: [subgraphPluginPreparation],
       });
       mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
@@ -857,7 +857,7 @@ describe("Test client utils", () => {
         pluginRepo: externalPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: subgraphPluginPreparation,
+        pluginPreparations: [subgraphPluginPreparation],
       });
       mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
@@ -911,7 +911,7 @@ describe("Test client utils", () => {
         pluginRepo: subgraphPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: subgraphPluginPreparation,
+        pluginPreparations: [subgraphPluginPreparation],
       });
       mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
@@ -939,7 +939,7 @@ describe("Test client utils", () => {
         pluginRepo: subgraphPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: subgraphPluginPreparation,
+        pluginPreparations: [subgraphPluginPreparation],
       });
       mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
         JSON.stringify({}),
@@ -967,7 +967,7 @@ describe("Test client utils", () => {
         pluginRepo: subgraphPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: null,
+        pluginPreparations: [],
       });
       const result = await validateApplyUpdateFunction(
         action,
@@ -1066,7 +1066,7 @@ describe("Test client utils", () => {
         pluginRepo: subgraphPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: subgraphPluginPreparation,
+        pluginPreparations: [subgraphPluginPreparation],
       });
       mockedClient.request.mockResolvedValueOnce({
         pluginInstallations: [{
@@ -1107,7 +1107,7 @@ describe("Test client utils", () => {
         pluginRepo: subgraphPluginRepo,
       });
       mockedClient.request.mockResolvedValueOnce({
-        pluginPreparation: subgraphPluginPreparation,
+        pluginPreparations: [subgraphPluginPreparation],
       });
       mockedClient.request.mockResolvedValueOnce({
         pluginInstallations: [{
@@ -1154,7 +1154,7 @@ describe("Test client utils", () => {
           pluginRepo: subgraphPluginRepo,
         });
         mockedClient.request.mockResolvedValueOnce({
-          pluginPreparation: subgraphPluginPreparation,
+          pluginPreparations: [subgraphPluginPreparation],
         });
         mockedClient.request.mockResolvedValueOnce({
           pluginInstallations: [{

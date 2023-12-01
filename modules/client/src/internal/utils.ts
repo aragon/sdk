@@ -78,6 +78,7 @@ import {
   InvalidParameter,
   InvalidPermissionOperationType,
   MultiTargetPermission,
+  MultiUri,
   NotImplementedError,
   PermissionIds,
   PermissionOperationType,
@@ -1230,9 +1231,10 @@ export async function validateApplyUpdateFunction(
   const build = release?.builds.find((
     build: { build: number; metadata: string },
   ) => build.build === decodedParams.versionTag.build);
-  const metadataCid = build?.metadata;
+  const metadataUri = build?.metadata;
 
   // fetch the metadata
+  const metadataCid = new MultiUri(metadataUri!).ipfsCid
   const metadata = await ipfs.fetchString(metadataCid!);
   const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
   // get the update abi for the specified build
