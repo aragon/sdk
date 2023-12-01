@@ -1206,7 +1206,7 @@ export async function validateApplyUpdateFunction(
     PreparationType.UPDATE,
   );
   // get plugin preparation
-  type W = { pluginPreparations: SubgraphPluginUpdatePreparation };
+  type W = { pluginPreparations: SubgraphPluginUpdatePreparation[] };
   const { pluginPreparations } = await graphql.request<W>({
     query: QueryPluginPreparations,
     params: { where: { 
