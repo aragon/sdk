@@ -1239,12 +1239,12 @@ export async function validateApplyUpdateFunction(
   const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
   // get the update abi for the specified build
   if (
-    metadataJson?.pluginSetup?.prepareUpdate[decodedParams.versionTag.build]
+    metadataJson?.pluginSetup?.prepareUpdate[plugin.appliedVersion?.build!]
       ?.inputs
   ) {
     // if the abi exists try to decode the data
     const updateAbi = metadataJson.pluginSetup.prepareUpdate[
-      decodedParams.versionTag.build
+      plugin.appliedVersion?.build!
     ].inputs;
     try {
       if (
