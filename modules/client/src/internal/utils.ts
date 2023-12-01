@@ -1236,12 +1236,14 @@ export async function validateApplyUpdateFunction(
   // fetch the metadata
   const metadataCid = new MultiUri(metadataUri!).ipfsCid
   const metadata = await ipfs.fetchString(metadataCid!);
-  const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
+  const metadataJson = JSON.parse(metadata);
+  let updateAbi = []
+  updateAbi = metadataJson?.pluginSetup?.prepareUpdate[plugin.appliedVersion?.build!]?.inputs
+  if (!updateAbi) {
+    updateAbi = metadataJson?.pluginSetup?.prepareInstallation?.prepareUpdate[plugin.appliedVersion?.build!]?.inputs
+  }
   // get the update abi for the specified build
-  if (
-    metadataJson?.pluginSetup?.prepareUpdate[plugin.appliedVersion?.build!]
-      ?.inputs
-  ) {
+  if (updateAbi) {
     // if the abi exists try to decode the data
     const updateAbi = metadataJson.pluginSetup.prepareUpdate[
       plugin.appliedVersion?.build!
