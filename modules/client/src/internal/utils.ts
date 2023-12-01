@@ -97,7 +97,6 @@ import {
   SupportedPluginRepo,
   SupportedPluginRepoArray,
   UPDATE_PLUGIN_SIGNATURES,
-  ZERO_BYTES_HASH,
 } from "./constants";
 import {
   DepositErc1155Schema,
@@ -771,11 +770,9 @@ export function getPreparedSetupId(
       [
         [params.versionTag.release, params.versionTag.build],
         params.pluginRepo,
-        params.permissions !== null
-          ? hashPermissions(params.permissions)
-          : ZERO_BYTES_HASH,
-        params.helpersHash || ZERO_BYTES_HASH,
-        ZERO_BYTES_HASH, // keccak256(params.data) || ZERO_BYTES_HASH,
+        hashPermissions(params.permissions),
+        params.helpersHash,
+        keccak256(new Uint8Array()), // there is no data so we pass an empty uint8Array
         preparationType,
       ],
     ),
