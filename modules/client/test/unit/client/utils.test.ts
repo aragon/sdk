@@ -635,6 +635,7 @@ describe("Test client utils", () => {
   describe("validateApplyUpdateFunction", () => {
     beforeEach(() => {
       mockedClient.request.mockReset();
+      mockedIPFSClient.cat.mockReset();
     });
     beforeAll(() => {
       applyUpdateParams = {
@@ -698,16 +699,12 @@ describe("Test client utils", () => {
         applyUpdateParams,
       );
       const action = applyUpdateActions[1];
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
         dao: subgraphDao,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginRepo: subgraphPluginRepo,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginPreparations: [subgraphPluginPreparation],
       });
-      mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+      mockedIPFSClient.cat.mockResolvedValue(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
       ));
       const result = await validateApplyUpdateFunction(
@@ -725,16 +722,12 @@ describe("Test client utils", () => {
       );
       const action = applyUpdateActions[1];
       action.value = BigInt(10);
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
         dao: subgraphDao,
-      });
-      mockedClient.request.mockResolvedValueOnce({
+        pluginPreparations: [subgraphPluginPreparation],
         pluginRepo: subgraphPluginRepo,
       });
-      mockedClient.request.mockResolvedValueOnce({
-        pluginPreparations: [subgraphPluginPreparation],
-      });
-      mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+      mockedIPFSClient.cat.mockResolvedValue(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
       ));
       const result = await validateApplyUpdateFunction(
@@ -760,16 +753,12 @@ describe("Test client utils", () => {
         updatedApplyUpdateParams,
       );
       const action = applyUpdateActions[1];
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
+      pluginRepo: subgraphPluginRepo,
         dao: subgraphDao,
-      });
-      mockedClient.request.mockResolvedValueOnce({
-        pluginRepo: subgraphPluginRepo,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginPreparations: [subgraphPluginPreparation],
       });
-      mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+      mockedIPFSClient.cat.mockResolvedValue(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
       ));
       const result = await validateApplyUpdateFunction(
@@ -780,6 +769,7 @@ describe("Test client utils", () => {
       );
       expect(result).toMatchObject([
         PluginUpdateProposalInValidityCause.UPDATE_TO_INCOMPATIBLE_RELEASE,
+        PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
       ]);
     });
     it("should return an `UPDATE_TO_OLDER_OR_SAME_BUILD` when the release is different from the one on subgraph", async () => {
@@ -795,16 +785,12 @@ describe("Test client utils", () => {
         updatedApplyUpdateParams,
       );
       const action = applyUpdateActions[1];
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
         dao: subgraphDao,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginRepo: subgraphPluginRepo,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginPreparations: [subgraphPluginPreparation],
       });
-      mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+      mockedIPFSClient.cat.mockResolvedValue(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
       ));
       const result = await validateApplyUpdateFunction(
@@ -827,7 +813,7 @@ describe("Test client utils", () => {
         applyUpdateParams,
       );
       const action = applyUpdateActions[1];
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
         dao: subgraphDaoWithoutPlugin,
       });
       const result = await validateApplyUpdateFunction(
@@ -850,16 +836,12 @@ describe("Test client utils", () => {
         applyUpdateParams,
       );
       const action = applyUpdateActions[1];
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
         dao: subgraphDao,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginRepo: externalPluginRepo,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginPreparations: [subgraphPluginPreparation],
       });
-      mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+      mockedIPFSClient.cat.mockResolvedValue(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
       ));
       const result = await validateApplyUpdateFunction(
@@ -878,10 +860,8 @@ describe("Test client utils", () => {
         applyUpdateParams,
       );
       const action = applyUpdateActions[1];
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
         dao: subgraphDao,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginRepo: null,
       });
       const result = await validateApplyUpdateFunction(
@@ -904,16 +884,12 @@ describe("Test client utils", () => {
         updatedApplyUpdateParams,
       );
       const action = applyUpdateActions[1];
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
         dao: subgraphDao,
-      });
-      mockedClient.request.mockResolvedValueOnce({
+        pluginPreparations: [subgraphPluginPreparation],
         pluginRepo: subgraphPluginRepo,
       });
-      mockedClient.request.mockResolvedValueOnce({
-        pluginPreparations: [subgraphPluginPreparation],
-      });
-      mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+      mockedIPFSClient.cat.mockResolvedValue(Buffer.from(
         JSON.stringify(TOKEN_VOTING_BUILD_METADATA),
       ));
       const result = await validateApplyUpdateFunction(
@@ -932,16 +908,12 @@ describe("Test client utils", () => {
         applyUpdateParams,
       );
       const action = applyUpdateActions[1];
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
         dao: subgraphDao,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginRepo: subgraphPluginRepo,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginPreparations: [subgraphPluginPreparation],
       });
-      mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
+      mockedIPFSClient.cat.mockResolvedValue(Buffer.from(
         JSON.stringify({}),
       ));
       const result = await validateApplyUpdateFunction(
@@ -960,14 +932,10 @@ describe("Test client utils", () => {
         applyUpdateParams,
       );
       const action = applyUpdateActions[1];
-      mockedClient.request.mockResolvedValueOnce({
+      mockedClient.request.mockResolvedValue({
         dao: subgraphDao,
-      });
-      mockedClient.request.mockResolvedValueOnce({
-        pluginRepo: subgraphPluginRepo,
-      });
-      mockedClient.request.mockResolvedValueOnce({
         pluginPreparations: [],
+        pluginRepo: subgraphPluginRepo,
       });
       const result = await validateApplyUpdateFunction(
         action,

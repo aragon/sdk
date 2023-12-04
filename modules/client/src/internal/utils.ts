@@ -1231,10 +1231,16 @@ export async function validateApplyUpdateFunction(
   const build = release?.builds.find((
     build: { build: number; metadata: string },
   ) => build.build === decodedParams.versionTag.build);
-  const metadataUri = build?.metadata;
+  if (!build) {
+    causes.push(
+      PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
+    );
+    return causes;
+  }
+  const metadataUri = build.metadata;
 
   // fetch the metadata
-  const metadataCid = new MultiUri(metadataUri!).ipfsCid
+  const metadataCid = new MultiUri(metadataUri).ipfsCid
   const metadata = await ipfs.fetchString(metadataCid!);
   const metadataJson = JSON.parse(metadata);
   let updateAbi = []
