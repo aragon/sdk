@@ -1243,6 +1243,14 @@ export async function validateApplyUpdateFunction(
   const metadataCid = new MultiUri(metadataUri).ipfsCid
   const metadata = await ipfs.fetchString(metadataCid!);
   const metadataJson = JSON.parse(metadata);
+  // Due to an human error the build metadata on the plugins
+  // was not correct on the first release of the plugin repos
+  // this is on chain so we cannot change it and we need to
+  // handle it here. So we check if the metadata has the fields
+  // for the fixed metadata and if it does not we try with the
+  // old metadata fields
+  // Original PR: https://github.com/aragon/osx/pull/375
+  // Fix PR: https://github.com/aragon/osx/pull/481
   let updateAbi = []
   updateAbi = metadataJson?.pluginSetup?.prepareUpdate?.[plugin.appliedVersion?.build!]?.inputs
   if (!updateAbi) {

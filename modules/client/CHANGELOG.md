@@ -19,6 +19,7 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+- Add support for v1.0.0 and v1.3.0 build metadata
 - Fixed toLowerCase in subgraphQuery
 
 ## [1.20.1]
