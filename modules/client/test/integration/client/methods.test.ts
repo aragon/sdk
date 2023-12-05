@@ -1950,7 +1950,7 @@ describe("Client", () => {
             id: ADDRESS_ONE,
           }],
           dao: subgraphDao,
-          pluginPreparation: subgraphPluginPreparation,
+          pluginPreparations: [subgraphPluginPreparation],
           pluginRepo: subgraphPluginRepo,
         });
         mockedIPFSClient.cat.mockResolvedValueOnce(Buffer.from(
@@ -1970,7 +1970,7 @@ describe("Client", () => {
             id: ADDRESS_ONE,
           }],
           dao: subgraphDao,
-          pluginPreparation: subgraphPluginPreparation,
+          pluginPreparations: [subgraphPluginPreparation],
           pluginRepo: subgraphPluginRepo,
         });
         const res = await client.methods.isPluginUpdateProposalValid(
@@ -1989,7 +1989,7 @@ describe("Client", () => {
             id: ADDRESS_ONE,
           }],
           dao: subgraphDao,
-          pluginPreparation: subgraphPluginPreparation,
+          pluginPreparations: [subgraphPluginPreparation],
           pluginRepo: subgraphPluginRepo,
         });
         const res = await client.methods.isPluginUpdateProposalValid(

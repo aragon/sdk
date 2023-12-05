@@ -78,6 +78,7 @@ import {
   InvalidParameter,
   InvalidPermissionOperationType,
   MultiTargetPermission,
+  MultiUri,
   NotImplementedError,
   PermissionIds,
   PermissionOperationType,
@@ -97,7 +98,6 @@ import {
   SupportedPluginRepo,
   SupportedPluginRepoArray,
   UPDATE_PLUGIN_SIGNATURES,
-  ZERO_BYTES_HASH,
 } from "./constants";
 import {
   DepositErc1155Schema,
@@ -771,11 +771,9 @@ export function getPreparedSetupId(
       [
         [params.versionTag.release, params.versionTag.build],
         params.pluginRepo,
-        params.permissions !== null
-          ? hashPermissions(params.permissions)
-          : ZERO_BYTES_HASH,
-        params.helpersHash || ZERO_BYTES_HASH,
-        ZERO_BYTES_HASH, // keccak256(params.data) || ZERO_BYTES_HASH,
+        hashPermissions(params.permissions),
+        params.helpersHash,
+        keccak256(new Uint8Array()), // there is no data so we pass an empty uint8Array
         preparationType,
       ],
     ),
@@ -1187,7 +1185,7 @@ export async function validateApplyUpdateFunction(
   type V = { pluginRepo: SubgraphPluginRepo };
   const { pluginRepo } = await graphql.request<V>({
     query: QueryPlugin,
-    params: { id: decodedParams.pluginRepo },
+    params: { id: decodedParams.pluginRepo.toLowerCase() },
     name: "pluginRepo",
   });
   if (!pluginRepo) {
@@ -1209,13 +1207,17 @@ export async function validateApplyUpdateFunction(
     PreparationType.UPDATE,
   );
   // get plugin preparation
-  type W = { pluginPreparation: SubgraphPluginUpdatePreparation };
-  const { pluginPreparation } = await graphql.request<W>({
+  type W = { pluginPreparations: SubgraphPluginUpdatePreparation[] };
+  const { pluginPreparations } = await graphql.request<W>({
     query: QueryPluginPreparations,
-    params: { where: { preparedSetupId } },
-    name: "pluginPreparation",
+    params: { where: { 
+        preparedSetupId: preparedSetupId.toLowerCase(),
+        pluginAddress: decodedParams.pluginAddress.toLowerCase()
+      }
+    },
+    name: "pluginPreparations",
   });
-  if (!pluginPreparation) {
+  if (!pluginPreparations.length) {
     causes.push(
       PluginUpdateProposalInValidityCause.MISSING_PLUGIN_PREPARATION,
     );
@@ -1229,20 +1231,33 @@ export async function validateApplyUpdateFunction(
   const build = release?.builds.find((
     build: { build: number; metadata: string },
   ) => build.build === decodedParams.versionTag.build);
-  const metadataCid = build?.metadata;
+  if (!build) {
+    causes.push(
+      PluginUpdateProposalInValidityCause.INVALID_PLUGIN_REPO_METADATA,
+    );
+    return causes;
+  }
+  const metadataUri = build.metadata;
 
   // fetch the metadata
+  const metadataCid = new MultiUri(metadataUri).ipfsCid
   const metadata = await ipfs.fetchString(metadataCid!);
-  const metadataJson = JSON.parse(metadata) as PluginRepoBuildMetadata;
+  const metadataJson = JSON.parse(metadata);
+  // Due to an human error the build metadata on the plugins
+  // was not correct on the first release of the plugin repos
+  // this is on chain so we cannot change it and we need to
+  // handle it here. So we check if the metadata has the fields
+  // for the fixed metadata and if it does not we try with the
+  // old metadata fields
+  // Original PR: https://github.com/aragon/osx/pull/375
+  // Fix PR: https://github.com/aragon/osx/pull/481
+  let updateAbi = []
+  updateAbi = metadataJson?.pluginSetup?.prepareUpdate?.[plugin.appliedVersion?.build!]?.inputs
+  if (!updateAbi) {
+    updateAbi = metadataJson?.pluginSetup?.prepareInstallation?.prepareUpdate?.[plugin.appliedVersion?.build!]?.inputs
+  }
   // get the update abi for the specified build
-  if (
-    metadataJson?.pluginSetup?.prepareUpdate[decodedParams.versionTag.build]
-      ?.inputs
-  ) {
-    // if the abi exists try to decode the data
-    const updateAbi = metadataJson.pluginSetup.prepareUpdate[
-      decodedParams.versionTag.build
-    ].inputs;
+  if (updateAbi) {
     try {
       if (
         decodedParams.initData.length > 0 &&
