@@ -1198,15 +1198,25 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         ],
       };
     }
+  
+    let daoActions = toDaoActions(iproposal.actions);
+    const classifiedActions = classifyProposalActions(daoActions);
+
+    // remove upgradeToAndCall action 
+    if (containsDaoUpdateAction(classifiedActions)) {
+      daoActions = daoActions.slice(1);
+    }
+
     // validate actions
     return validateUpdatePluginProposalActions(
-      toDaoActions(iproposal.actions),
+      daoActions,
       iproposal.dao.id,
       this.web3.getAddress("pluginSetupProcessorAddress"),
       this.graphql,
       this.ipfs,
     );
   }
+
   /**
    * Check if the specified proposalId actions are valid for updating a dao
    *

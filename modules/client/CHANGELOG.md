@@ -19,6 +19,12 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Fixed
+
+- Dao upgrade validation not removing Dao update action when validating plugin update
+
+## [1.20.2]
+
 - Add support for v1.0.0 and v1.3.0 build metadata
 - Fixed toLowerCase in subgraphQuery
 
