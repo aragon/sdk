@@ -1210,7 +1210,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
 
     // validate actions
     return validateUpdatePluginProposalActions(
-     daoActions,
+      daoActions,
       iproposal.dao.id,
       this.web3.getAddress("pluginSetupProcessorAddress"),
       this.graphql,
