@@ -1408,7 +1408,7 @@ export function containsPluginUpdateActionBlock(
  * @param {ProposalActionTypes[]} actions
  * @return {*}  {boolean}
  */
-export function containsDaoUpdateAction(
+export function startsWithDaoUpdateAction(
   actions: ProposalActionTypes[],
 ): boolean {
   // UpgradeTo or UpgradeToAndCall should be the first action
@@ -1426,7 +1426,7 @@ export function validateUpdateDaoProposalActions(
   const actionErrorCauses: DaoUpdateProposalInvalidityCause[] = [];
   const proposalSettingsErrorCauses: ProposalSettingsErrorCause[] = [];
   // check if the actions are valid
-  if (!containsDaoUpdateAction(classifiedActions)) {
+  if (!startsWithDaoUpdateAction(classifiedActions)) {
     // If actions are not valid, add the cause to the causes array
     // and return
     return {

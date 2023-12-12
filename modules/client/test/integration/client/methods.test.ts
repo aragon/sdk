@@ -2068,7 +2068,9 @@ describe("Client", () => {
           TEST_MULTISIG_PROPOSAL_ID,
         );
         expect(res.isValid).toBe(false);
-        expect(res.proposalSettingsErrorCauses).toMatchObject([ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND]);
+        expect(res.proposalSettingsErrorCauses).toMatchObject([
+          ProposalSettingsErrorCause.PROPOSAL_NOT_FOUND,
+        ]);
         expect(res.actionErrorCauses).toMatchObject([]);
       });
     });

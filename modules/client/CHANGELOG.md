@@ -18,6 +18,11 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+
+- Fixed update proposal detection
+
+## [1.20.3]
 
 ### Fixed
 

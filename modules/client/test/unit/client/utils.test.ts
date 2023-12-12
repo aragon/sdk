@@ -27,7 +27,7 @@ import {
   TOKEN_VOTING_BUILD_METADATA,
 } from "../../integration/constants";
 import {
-  containsDaoUpdateAction,
+  startsWithDaoUpdateAction,
   containsPluginUpdateActionBlock,
   containsPluginUpdateActionBlockWithRootPermission,
   validateApplyUpdateFunction,
@@ -1323,7 +1323,7 @@ describe("Test client utils", () => {
       expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
   });
-  describe("containsDaoUpdateAction", () => {
+  describe("startsWithDaoUpdateAction", () => {
     it("should return the expected output given a specific input", () => {
       const cases = [
         { input: [ProposalActionTypes.UPGRADE_TO], expected: true },
@@ -1389,7 +1389,7 @@ describe("Test client utils", () => {
         },
       ];
       for (const { input, expected } of cases) {
-        const result = containsDaoUpdateAction(input);
+        const result = startsWithDaoUpdateAction(input);
         expect(result).toEqual(expected);
       }
     });

@@ -69,6 +69,7 @@ import {
   TransferSortBy,
 } from "../../types";
 import {
+  ProposalActionTypes,
   SubgraphBalance,
   SubgraphDao,
   SubgraphDaoListItem,
@@ -82,9 +83,7 @@ import {
 } from "../types";
 import {
   classifyProposalActions,
-  containsDaoUpdateAction,
-  containsPluginUpdateActionBlock,
-  containsPluginUpdateActionBlockWithRootPermission,
+  startsWithDaoUpdateAction,
   toAssetBalance,
   toDaoActions,
   toDaoDetails,
@@ -1125,7 +1124,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const subgraphActions = iproposal.actions;
     let actions = toDaoActions(subgraphActions);
     const classifiedActions = classifyProposalActions(actions);
-    return containsDaoUpdateAction(classifiedActions);
+    return classifiedActions.includes(
+      ProposalActionTypes.UPGRADE_TO_AND_CALL,
+    ) || classifiedActions.includes(ProposalActionTypes.UPGRADE_TO);
   }
   /**
    * Given a proposal id returns if that proposal is a plugin update proposal
@@ -1148,14 +1149,9 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     if (!iproposal) {
       return false;
     }
-    const subgraphActions = iproposal.actions;
-    let actions = toDaoActions(subgraphActions);
+    let actions = toDaoActions(iproposal.actions);
     let classifiedActions = classifyProposalActions(actions);
-    if (containsDaoUpdateAction(classifiedActions)) {
-      classifiedActions = classifiedActions.slice(1);
-    }
-    return containsPluginUpdateActionBlock(classifiedActions) ||
-      containsPluginUpdateActionBlockWithRootPermission(classifiedActions);
+    return classifiedActions.includes(ProposalActionTypes.APPLY_UPDATE);
   }
   /**
    * Check if the specified proposal id is valid for updating a plugin
@@ -1198,12 +1194,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
         ],
       };
     }
-  
+
     let daoActions = toDaoActions(iproposal.actions);
     const classifiedActions = classifyProposalActions(daoActions);
 
-    // remove upgradeToAndCall action 
-    if (containsDaoUpdateAction(classifiedActions)) {
+    // remove upgradeToAndCall action
+    if (startsWithDaoUpdateAction(classifiedActions)) {
       daoActions = daoActions.slice(1);
     }
 
