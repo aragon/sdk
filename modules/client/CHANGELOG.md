@@ -18,6 +18,12 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+### Changed
+
+-Update `osx-ethers` to v1.3.0
+
+## [1.20.4]
 ### Fixed
 
 - Fixed update proposal detection

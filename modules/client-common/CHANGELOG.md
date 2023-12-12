@@ -21,6 +21,12 @@ TEMPLATE:
 
 ### Changed
 
+-Update `osx-ethers` to v1.3.0
+
+## [1.12.0]
+
+### Changed
+
 - Updated subgraph version to 1.4.0
 
 ## [1.11.0]
