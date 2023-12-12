@@ -83,7 +83,7 @@ import {
 } from "../types";
 import {
   classifyProposalActions,
-  containsDaoUpdateAction,
+  startsWithDaoUpdateAction,
   toAssetBalance,
   toDaoActions,
   toDaoDetails,
@@ -1199,7 +1199,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const classifiedActions = classifyProposalActions(daoActions);
 
     // remove upgradeToAndCall action
-    if (containsDaoUpdateAction(classifiedActions)) {
+    if (startsWithDaoUpdateAction(classifiedActions)) {
       daoActions = daoActions.slice(1);
     }
 
