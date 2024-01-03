@@ -18,6 +18,7 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+- Chore: Changed voters and approvers count to 1000 from the default value of 100 in Proposal Queries
 
 ### Changed
 
