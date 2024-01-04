@@ -31,7 +31,7 @@ query TokenVotingProposal($proposalId: ID!) {
     approvalReached
     isSignaling
     executionTxHash
-    voters{
+    voters(first: 1000){
       voter{
         address
       }

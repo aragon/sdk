@@ -20,6 +20,10 @@ TEMPLATE:
 ## [UPCOMING]
 
 ### Changed
+- Chore: Changed voters and approvers count to 1000 from the default value of 100 in Proposal Queries
+
+## [1.21.0]
+### Changed
 
 -Update `osx-ethers` to v1.3.0
 

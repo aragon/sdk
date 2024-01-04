@@ -29,7 +29,7 @@ query MultisigProposal($proposalId: ID!) {
     executed
     approvalReached
     isSignaling
-    approvers{
+    approvers(first: 1000){
       id
     }
   }
