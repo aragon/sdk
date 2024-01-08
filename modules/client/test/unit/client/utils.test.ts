@@ -432,7 +432,7 @@ describe("Test client utils", () => {
     });
     it("should return an error if the permission is not granted in the DAO", () => {
       const grantAction = client.encoding.grantAction(daoAddress, {
-        where: daoAddress,
+        where: pluginAddress,
         who: pspAddress,
         permission: Permissions.ROOT_PERMISSION,
       });
@@ -565,7 +565,7 @@ describe("Test client utils", () => {
     });
     it("should return an error if the permission is not revoked in the DAO", () => {
       const revokeAction = client.encoding.revokeAction(daoAddress, {
-        where: daoAddress,
+        where: pluginAddress,
         who: pspAddress,
         permission: Permissions.ROOT_PERMISSION,
       });
