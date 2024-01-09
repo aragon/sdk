@@ -18,6 +18,10 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+- Compare with dao address in `validatePluginUpdateProposal`
+
+## [1.21.1]
 
 ### Changed
 - Chore: Changed voters and approvers count to 1000 from the default value of 100 in Proposal Queries

@@ -1033,13 +1033,16 @@ export function validateGrantRootPermissionAction(
     );
   }
   // The action should be sent to the DAO
+  // both come from subgraph so they are already lowercase
   if (action.to !== daoAddress) {
     causes.push(
       PluginUpdateProposalInValidityCause
         .INVALID_GRANT_ROOT_PERMISSION_TO_ADDRESS,
     );
   }
-  if (decodedPermission.where !== daoAddress) {
+  // decodedPermission.where is checksummed so we need to lowercase it
+  // to compare it with the daoAddress because it comes from the subgraph
+  if (decodedPermission.where.toLowerCase() !== daoAddress) {
     causes.push(
       PluginUpdateProposalInValidityCause
         .INVALID_GRANT_ROOT_PERMISSION_WHERE_ADDRESS,
