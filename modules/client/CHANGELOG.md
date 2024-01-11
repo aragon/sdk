@@ -18,6 +18,14 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+
+### Added
+
+- Support for arbitrum sepolia network
+- Support for base sepolia network
+
+## [1.21.2]
+
 ### Fixed
 - Compare with dao address in `validatePluginUpdateProposal`
 

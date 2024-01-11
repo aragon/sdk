@@ -19,6 +19,13 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Added
+
+- Support for arbitrum sepolia network
+- Support for base sepolia network
+
+## [1.13.0]
+
 ### Changed
 
 -Update `osx-ethers` to v1.3.0
