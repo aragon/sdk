@@ -440,6 +440,10 @@ export const ADDITIONAL_NETWORKS: Network[] = [
     chainId: 8453,
   },
   {
+    name: "baseSepolia",
+    chainId: 84532,
+  },
+  {
     name: "arbitrum",
     chainId: 42161,
   },
@@ -448,8 +452,8 @@ export const ADDITIONAL_NETWORKS: Network[] = [
     chainId: 421613,
   },
   {
-    name: "arbitrumGoerli",
-    chainId: 421613,
+    name: "arbitrumSepolia",
+    chainId: 421614,
   },
   {
     name: "sepolia",
