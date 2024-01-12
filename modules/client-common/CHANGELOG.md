@@ -21,8 +21,8 @@ TEMPLATE:
 
 ### Added
 
-- Support for arbitrum sepolia network
-- Support for base sepolia network
+- Support for arbitrum sepolia network.
+- Support for base sepolia network.
 
 ## [1.13.0]
 
