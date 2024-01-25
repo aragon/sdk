@@ -18,6 +18,11 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+
+- Typo in `LIVE_CONTRACTS` for mainnet
+
+## [1.22.0]
 
 ### Added
 

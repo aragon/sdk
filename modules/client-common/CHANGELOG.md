@@ -19,6 +19,11 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Fixed
+- Typo in `LIVE_CONTRACTS` for mainnet
+
+## [1.14.0]
+
 ### Added
 
 - Support for arbitrum sepolia network.
