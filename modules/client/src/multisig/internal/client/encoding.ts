@@ -18,14 +18,15 @@ import {
   getNetwork,
   hexToBytes,
   InvalidAddressError,
-  LIVE_CONTRACTS,
   PluginInstallItem,
-  SupportedNetwork,
-  SupportedNetworksArray,
-  SupportedVersion,
   UnsupportedNetworkError,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
+import {
+  contracts,
+  getNetworkNameByAlias,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -46,8 +47,9 @@ export class MultisigClientEncoding extends ClientCore
     params: MultisigPluginInstallParams,
     network: Networkish,
   ): PluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
+    const networkName = getNetwork(network).name;
+    const aragonNw = getNetworkNameByAlias(networkName);
+    if (!aragonNw) {
       throw new UnsupportedNetworkError(networkName);
     }
     const hexBytes = defaultAbiCoder.encode(
@@ -61,8 +63,8 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
-      id: LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
-        .multisigRepoAddress,
+      id: contracts[aragonNw][SupportedVersions.V1_3_0]?.MultisigRepoProxy
+        .address || "",
       data: hexToBytes(hexBytes),
     };
   }

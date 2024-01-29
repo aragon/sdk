@@ -19,19 +19,28 @@ import * as deployContracts from "../../helpers/deployContracts";
 import { Context } from "@aragon/sdk-client-common";
 import { buildTokenVotingDAO } from "../../helpers/build-daos";
 import { createTokenVotingPluginBuild } from "../../helpers/create-plugin-build";
+import {
+  contracts,
+  NetworkDeployment,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 describe("Token Voting Client", () => {
   describe("Estimation Module", () => {
     let deployment: deployContracts.Deployment;
     beforeAll(async () => {
       deployment = await deployContracts.deploy();
-      contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      contextParamsLocalChain.tokenVotingRepoAddress =
+      contextParamsLocalChain.DAOFactory = deployment.daoFactory.address;
+      contextParamsLocalChain.TokenVotingRepoProxy =
         deployment.tokenVotingRepo.address;
-      contextParamsLocalChain.pluginSetupProcessorAddress =
+      contextParamsLocalChain.PluginSetupProcessor =
         deployment.pluginSetupProcessor.address;
-      contextParamsLocalChain.ensRegistryAddress =
-        deployment.ensRegistry.address;
+      contextParamsLocalChain.ENSRegistry = deployment.ensRegistry.address;
+      contracts.local = {
+        [SupportedVersions.V1_3_0]: {
+          TokenVotingRepoProxy: { address: ADDRESS_ONE },
+        } as NetworkDeployment,
+      };
     });
 
     it("Should estimate the gas fees for creating a new proposal", async () => {

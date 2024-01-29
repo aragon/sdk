@@ -20,6 +20,7 @@ import {
   prepareGenericUpdateEstimation,
   SizeMismatchError,
 } from "@aragon/sdk-client-common";
+import { ContractNames } from "@aragon/osx-commons-configs";
 /**
  * Estimation module the SDK TokenVoting Client
  */
@@ -170,9 +171,9 @@ export class TokenVotingClientEstimation extends ClientCore
     return await prepareGenericUpdateEstimation(this.web3, this.graphql, {
       ...params,
       pluginSetupProcessorAddress: this.web3.getAddress(
-        "pluginSetupProcessorAddress",
+        ContractNames.PLUGIN_SETUP_PROCESSOR,
       ),
-      pluginRepo: this.web3.getAddress("tokenVotingRepoAddress"),
+      pluginRepo: this.web3.getAddress(ContractNames.TOKEN_VOTING_REPO_PROXY),
     });
   }
 }

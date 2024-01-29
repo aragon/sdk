@@ -14,6 +14,7 @@ import {
 import { AddresslistVotingPluginPrepareUpdateParams } from "../../types";
 import { prepareGenericUpdateEstimation } from "@aragon/sdk-client-common";
 import { boolArrayToBitmap } from "@aragon/sdk-client-common";
+import { ContractNames } from "@aragon/osx-commons-configs";
 
 /**
  * Estimation module the SDK Address List Client
@@ -128,9 +129,11 @@ export class AddresslistVotingClientEstimation extends ClientCore
     return await prepareGenericUpdateEstimation(this.web3, this.graphql, {
       ...params,
       pluginSetupProcessorAddress: this.web3.getAddress(
-        "pluginSetupProcessorAddress",
+        ContractNames.PLUGIN_SETUP_PROCESSOR,
       ),
-      pluginRepo: this.web3.getAddress("addresslistVotingRepoAddress"),
+      pluginRepo: this.web3.getAddress(
+        ContractNames.ADDRESSLIST_VOTING_REPO_PROXY,
+      ),
     });
   }
 }

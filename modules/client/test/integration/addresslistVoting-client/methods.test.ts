@@ -35,10 +35,7 @@ import {
   TEST_TX_HASH,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import {
-  mineBlock,
-  mineBlockWithTimeOffset,
-} from "../../helpers/block-times";
+import { mineBlock, mineBlockWithTimeOffset } from "../../helpers/block-times";
 import { buildAddressListVotingDAO } from "../../helpers/build-daos";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import {
@@ -65,6 +62,11 @@ import {
 } from "@aragon/sdk-client-common";
 import { PluginRepo__factory } from "@aragon/osx-ethers";
 import { createAddresslistVotingPluginBuild } from "../../helpers/create-plugin-build";
+import {
+  contracts,
+  NetworkDeployment,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 describe("Client Address List", () => {
   let deployment: deployContracts.Deployment;
@@ -73,26 +75,32 @@ describe("Client Address List", () => {
 
   beforeAll(async () => {
     deployment = await deployContracts.deploy();
-    contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-    contextParamsLocalChain.pluginSetupProcessorAddress =
+    contextParamsLocalChain.DAOFactory = deployment.daoFactory.address;
+    contextParamsLocalChain.PluginSetupProcessor =
       deployment.pluginSetupProcessor.address;
-    contextParamsLocalChain.multisigRepoAddress =
-      deployment.multisigRepo.address;
-    contextParamsLocalChain.adminRepoAddress = "";
-    contextParamsLocalChain.addresslistVotingRepoAddress =
+    contextParamsLocalChain.MultisigRepoProxy = deployment.multisigRepo.address;
+    contextParamsLocalChain.AdminRepoProxy = "";
+    contextParamsLocalChain.AddresslistVotingRepoProxy =
       deployment.addresslistVotingRepo.address;
-    contextParamsLocalChain.tokenVotingRepoAddress =
+    contextParamsLocalChain.TokenVotingRepoProxy =
       deployment.tokenVotingRepo.address;
-    contextParamsLocalChain.multisigSetupAddress =
+    contextParamsLocalChain.MultisigSetup =
       deployment.multisigPluginSetup.address;
-    contextParamsLocalChain.adminSetupAddress = "";
-    contextParamsLocalChain.addresslistVotingSetupAddress =
+    contextParamsLocalChain.AdminSetup = "";
+    contextParamsLocalChain.AddresslistVotingSetup =
       deployment.addresslistVotingPluginSetup.address;
-    contextParamsLocalChain.tokenVotingSetupAddress =
+    contextParamsLocalChain.TokenVotingSetup =
       deployment.tokenVotingPluginSetup.address;
-    contextParamsLocalChain.ensRegistryAddress = deployment.ensRegistry.address;
+    contextParamsLocalChain.ENSRegistry = deployment.ensRegistry.address;
     repoAddr = deployment.addresslistVotingRepo.address;
 
+    contracts.local = {
+      [SupportedVersions.V1_3_0]: {
+        AddresslistVotingRepoProxy: {
+          address: deployment.addresslistVotingRepo.address,
+        },
+      } as NetworkDeployment,
+    };
     if (Array.isArray(contextParamsLocalChain.web3Providers)) {
       provider = new JsonRpcProvider(
         contextParamsLocalChain.web3Providers[0] as string,

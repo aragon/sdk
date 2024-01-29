@@ -6,11 +6,14 @@ import { ADDRESS_ONE } from "../integration/constants";
 import {
   Context,
   ContextParams,
-  GRAPHQL_NODES,
-  IPFS_NODES,
-  LIVE_CONTRACTS,
-  SupportedVersion,
+  getDefaultGraphqlNodes,
+  getDefaultIpfsNodes,
 } from "@aragon/sdk-client-common";
+import {
+  ContractNames,
+  contracts,
+  SupportedNetworks,
+} from "@aragon/osx-commons-configs";
 
 const TEST_WALLET =
   "8d7d56a9efa4158d232edbeaae601021eb3477ad77b5f3c720601fd74e8e04bb";
@@ -29,7 +32,7 @@ describe("Context instances", () => {
     contextParams = {
       network: "mainnet",
       signer: new Wallet(TEST_WALLET),
-      daoFactoryAddress: "0x1234",
+      DAOFactory: "0x1234",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
       graphqlNodes: [],
@@ -41,14 +44,18 @@ describe("Context instances", () => {
     expect(context).toBeInstanceOf(Context);
     expect(context.network.name).toBe("homestead");
     expect(context.network.chainId).toBe(1);
-    expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS[SupportedVersion.LATEST].homestead.daoFactoryAddress,
+    expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
+      contracts.mainnet["v1.3.0"]!.DAOFactory.address,
     );
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(0);
-    expect(context.ipfs.length).toBe(IPFS_NODES.homestead.length);
-    expect(context.graphql.length).toBe(GRAPHQL_NODES.homestead.length);
+    expect(context.ipfs.length).toBe(
+      getDefaultIpfsNodes(SupportedNetworks.POLYGON).length,
+    );
+    expect(context.graphql.length).toBe(
+      getDefaultGraphqlNodes(SupportedNetworks.POLYGON).length,
+    );
     context.web3Providers.map((provider) => {
       expect(provider).toBeInstanceOf(JsonRpcProvider);
     });
@@ -65,7 +72,9 @@ describe("Context instances", () => {
     expect(context).toBeInstanceOf(Context);
     expect(context.network.name).toBe("homestead");
     expect(context.network.chainId).toBe(1);
-    expect(context.daoFactoryAddress).toBe(contextParams.daoFactoryAddress);
+    expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
+      contextParams.DAOFactory,
+    );
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(
       contextParams.gasFeeEstimationFactor,
@@ -85,7 +94,7 @@ describe("Context instances", () => {
     contextParams = {
       network: "goerli",
       signer: new Wallet(TEST_WALLET),
-      daoFactoryAddress: "0x2345",
+      DAOFactory: "0x2345",
       web3Providers: web3endpoints.working,
       gasFeeEstimationFactor: 0.1,
       ipfsNodes: [{ url: "https://localhost", headers: {} }],
@@ -97,7 +106,7 @@ describe("Context instances", () => {
     expect(context.network.name).toEqual("goerli");
     expect(context.network.chainId).toEqual(5);
     expect(context.signer).toBeInstanceOf(Wallet);
-    expect(context.daoFactoryAddress).toEqual("0x2345");
+    expect(context.getAddress(ContractNames.DAO_FACTORY)).toEqual("0x2345");
     context.web3Providers?.map((provider) =>
       expect(provider).toBeInstanceOf(JsonRpcProvider)
     );
@@ -117,14 +126,18 @@ describe("Context instances", () => {
     expect(context).toBeInstanceOf(Context);
     expect(context.network.name).toBe("goerli");
     expect(context.network.chainId).toBe(5);
-    expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS[SupportedVersion.LATEST].goerli.daoFactoryAddress,
+    expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
+      contracts.goerli["v1.3.0"]!.DAOFactory.address,
     );
     expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(1);
-    expect(context.ipfs.length).toBe(IPFS_NODES.goerli.length);
-    expect(context.graphql.length).toBe(GRAPHQL_NODES.goerli.length);
+    expect(context.ipfs.length).toBe(
+      getDefaultIpfsNodes(SupportedNetworks.POLYGON).length,
+    );
+    expect(context.graphql.length).toBe(
+      getDefaultGraphqlNodes(SupportedNetworks.POLYGON).length,
+    );
     context.web3Providers.map((provider) => {
       expect(provider).toBeInstanceOf(JsonRpcProvider);
     });
@@ -140,16 +153,20 @@ describe("Context instances", () => {
     });
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
-    expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.daoFactoryAddress,
+    expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
+      contracts.polygon["v1.3.0"]!.DAOFactory.address,
     );
     expect(context.ensRegistryAddress).toBe(
-      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress,
+      contracts.polygon["v1.3.0"]?.ENSRegistry?.address,
     );
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(1);
-    expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
-    expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
+    expect(context.ipfs.length).toBe(
+      getDefaultIpfsNodes(SupportedNetworks.POLYGON).length,
+    );
+    expect(context.graphql.length).toBe(
+      getDefaultGraphqlNodes(SupportedNetworks.POLYGON).length,
+    );
     context.web3Providers.map((provider) => {
       expect(provider).toBeInstanceOf(JsonRpcProvider);
     });
@@ -169,16 +186,20 @@ describe("Context instances", () => {
     });
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
-    expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.daoFactoryAddress,
+    expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
+      contracts.polygon["v1.3.0"]?.DAOFactory.address,
     );
-    expect(context.ensRegistryAddress).toBe(
-      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress,
+    expect(context.getAddress(ContractNames.ENS_REGISTRY)).toBe(
+      contracts.polygon["v1.3.0"]?.ENSRegistry?.address,
     );
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(1);
-    expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
-    expect(context.graphql.length).toBe(GRAPHQL_NODES.matic.length);
+    expect(context.ipfs.length).toBe(
+      getDefaultIpfsNodes(SupportedNetworks.POLYGON).length,
+    );
+    expect(context.graphql.length).toBe(
+      getDefaultGraphqlNodes(SupportedNetworks.POLYGON).length,
+    );
     context.web3Providers.map((provider) => {
       expect(provider).toBeInstanceOf(JsonRpcProvider);
     });
@@ -192,7 +213,7 @@ describe("Context instances", () => {
   it("Should Change the network and update all the parameters", () => {
     const context = new Context();
     context.set({
-      ensRegistryAddress: ADDRESS_ONE,
+      ENSRegistry: ADDRESS_ONE,
       graphqlNodes: [
         {
           url: "https://example.com/1",
@@ -212,13 +233,15 @@ describe("Context instances", () => {
     expect(context).toBeInstanceOf(Context);
     expect(context.network.name).toBe("matic");
     expect(context.network.chainId).toBe(137);
-    expect(context.daoFactoryAddress).toBe(
-      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.daoFactoryAddress,
+    expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
+      contracts.polygon["v1.3.0"]?.DAOFactory.address,
     );
-    expect(context.ensRegistryAddress).toBe(ADDRESS_ONE);
+    expect(context.getAddress(ContractNames.ENS_REGISTRY)).toBe(ADDRESS_ONE);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(0);
-    expect(context.ipfs.length).toBe(IPFS_NODES.matic.length);
+    expect(context.ipfs.length).toBe(
+      getDefaultGraphqlNodes(SupportedNetworks.POLYGON).length,
+    );
     expect(context.graphql.length).toBe(3);
     context.web3Providers.map((provider) => {
       expect(provider).toBeInstanceOf(JsonRpcProvider);
@@ -245,7 +268,7 @@ describe("Context instances", () => {
     }).toThrow();
   });
   it("Should create a context with the correct DAOFactory address from the core-contracts-package", () => {
-    contextParams.daoFactoryAddress = "";
+    contextParams.DAOFactory = "";
     contextParams.network = "matic";
     const context = new Context(contextParams);
 
@@ -255,14 +278,16 @@ describe("Context instances", () => {
       provider.getNetwork().then((nw) => {
         expect(nw.chainId).toEqual(137);
         expect(nw.name).toEqual("matic");
-        expect(nw.ensAddress).toEqual(LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress);
+        expect(nw.ensAddress).toEqual(
+          contracts.polygon["v1.3.0"]?.DAOFactory.address,
+        );
       })
     );
-    expect(context.daoFactoryAddress).toEqual(
-      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.daoFactoryAddress,
+    expect(context.getAddress(ContractNames.DAO_FACTORY)).toEqual(
+      contracts.polygon["v1.3.0"]?.DAOFactory.address,
     );
     expect(context.ensRegistryAddress).toEqual(
-      LIVE_CONTRACTS[SupportedVersion.LATEST].matic.ensRegistryAddress,
+      contracts.polygon["v1.3.0"]?.ENSRegistry?.address,
     );
   });
 });

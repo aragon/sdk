@@ -15,8 +15,6 @@ import {
   PrepareUpdateParams,
   PrepareUpdateStep,
   PrepareUpdateStepValue,
-  SupportedNetwork,
-  SupportedVersion,
 } from "./types";
 import {
   IClientGraphQLCore,
@@ -28,7 +26,7 @@ import {
   PluginSetupProcessor,
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
-import { ADDITIONAL_NETWORKS, LIVE_CONTRACTS } from "./constants";
+import { IPFS_ENDPOINTS } from "./constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { isAddress } from "@ethersproject/address";
 import { Network } from "@ethersproject/networks";
@@ -43,6 +41,16 @@ import {
   UnsupportedNetworkError,
 } from "./errors";
 import { Zero } from "@ethersproject/constants";
+import {
+  ContractNames,
+  getNetworkAlias,
+  getNetworkByNameAliasOrChainId,
+  getNetworkDeploymentForVersion,
+  networks,
+  SupportedAliases,
+  SupportedNetworks,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 /**
  * Finds a log in a receipt given the event name
@@ -134,7 +142,11 @@ export async function prepareGenericInstallationEstimation(
   if (!isAddress(params.pluginRepo)) {
     throw new InvalidAddressError();
   }
-  const networkName = (await provider.getNetwork()).name as SupportedNetwork;
+  const ethers5NetworkName = (await provider.getNetwork()).name;
+  const networkName = getNetworkByNameAliasOrChainId(ethers5NetworkName)?.name;
+  if (!networkName) {
+    throw new UnsupportedNetworkError(ethers5NetworkName);
+  }
   let version = params.version;
   // if version is not specified install latest version
   if (!version) {
@@ -155,9 +167,15 @@ export async function prepareGenericInstallationEstimation(
     installationParams,
   );
   // connect to psp contract
+  const deployment = getNetworkDeploymentForVersion(
+    networkName,
+    SupportedVersions.V1_3_0,
+  );
+  if (!deployment) {
+    throw new UnsupportedNetworkError(networkName);
+  }
   const pspContract = PluginSetupProcessor__factory.connect(
-    LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
-      .pluginSetupProcessorAddress,
+    deployment[ContractNames.PLUGIN_SETUP_PROCESSOR].address,
     provider,
   );
 
@@ -405,21 +423,38 @@ export async function* prepareGenericUpdate(
  */
 export function getNetwork(networkish: Networkish): Network {
   let network: Network | undefined;
-  for (const nw of ADDITIONAL_NETWORKS) {
+  try {
+    network = ethersGetNetwork(networkish);
+  } catch {
+  } finally {
     switch (typeof networkish) {
       case "string":
-        if (networkish === nw.name) {
-          network = nw;
-        }
-        break;
       case "number":
-        if (networkish === nw.chainId) {
-          network = nw;
+        const aragonNw = getNetworkByNameAliasOrChainId(networkish);
+        if (!aragonNw) {
+          throw new UnsupportedNetworkError(networkish.toString());
         }
+        const ethers5Alias = getNetworkAlias(
+          SupportedAliases.ETHERS_5,
+          aragonNw.name,
+        );
+        const nwDeployment = getNetworkDeploymentForVersion(
+          aragonNw.name,
+          SupportedVersions.V1_3_0,
+        );
+        if (!nwDeployment) {
+          throw new UnsupportedNetworkError(aragonNw.name);
+        }
+        const ensRegistryAddress = nwDeployment.ENSRegistry?.address;
+        network = {
+          name: ethers5Alias || aragonNw.name,
+          chainId: aragonNw.chainId,
+          ensAddress: ensRegistryAddress,
+        };
         break;
       case "object":
-        if (networkish.name === nw.name && networkish.chainId === nw.chainId) {
-          network = nw;
+        if (networkish.name && networkish.chainId) {
+          break;
         }
         break;
       default:
@@ -427,7 +462,7 @@ export function getNetwork(networkish: Networkish): Network {
     }
   }
   if (!network) {
-    network = ethersGetNetwork(networkish);
+    throw new UnsupportedNetworkError(networkish.toString());
   }
   return network;
 }
@@ -446,4 +481,17 @@ export function getInterfaceId(iface: Interface): string {
     interfaceId = interfaceId.xor(iface.getSighash(func));
   }
   return interfaceId.toHexString();
+}
+
+export function getDefaultIpfsNodes(network: SupportedNetworks) {
+  return networks[network].isTestnet
+    ? IPFS_ENDPOINTS.test
+    : IPFS_ENDPOINTS.prod;
+}
+
+export function getDefaultGraphqlNodes(network: SupportedNetworks) {
+  return [{
+    url:
+      `https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-${network}/version/v1.4.0/api`,
+  }];
 }

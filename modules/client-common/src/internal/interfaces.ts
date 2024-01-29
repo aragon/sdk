@@ -5,15 +5,15 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Client as IpfsClient, PinResponse } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-import { GasFeeEstimation, SupportedNetwork } from "../types";
-import { DeployedAddresses } from "./types";
+import { GasFeeEstimation } from "../types";
+import { ContractNames, SupportedNetworks } from "@aragon/osx-commons-configs";
 
 export interface IClientWeb3Core {
   shiftProvider: () => void;
   getSigner: () => Signer;
   getConnectedSigner: () => Signer;
   getProvider: () => JsonRpcProvider;
-  getNetworkName: () => SupportedNetwork;
+  getNetworkName: () => SupportedNetworks;
   getMaxFeePerGas: () => Promise<bigint>;
   isUp: () => Promise<boolean>;
   ensureOnline: () => Promise<void>;
@@ -21,7 +21,7 @@ export interface IClientWeb3Core {
     address: string,
     abi: ContractInterface,
   ) => Contract & T;
-  getAddress: (addressName: DeployedAddresses) => string;
+  getAddress: (addressName: ContractNames) => string;
   getApproximateGasFee: (estimatedFee: bigint) => Promise<GasFeeEstimation>;
 }
 export interface IClientIpfsCore {

@@ -1,5 +1,5 @@
 // @ts-ignore Needed to get the global typing for hardhat
-import * as jestenv from "jest-environment-hardhat"
+import * as jestenv from "jest-environment-hardhat";
 import { Wallet } from "@ethersproject/wallet";
 import {
   PluginRepoBuildMetadata,
@@ -97,7 +97,7 @@ export const TEST_NON_EXISTING_ADDRESS =
 export const contextParamsMainnet: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  daoFactoryAddress: "0x0123456789012345678901234567890123456789",
+  DAOFactory: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   ipfsNodes: ipfsEndpoints.working,
   graphqlNodes: grapqhlEndpoints.working,
@@ -106,7 +106,7 @@ export const contextParamsMainnet: ContextParams = {
 export const contextParamsLocalChain: ContextParams = {
   network: hardhat.hre.config.networks.hardhat.chainId,
   signer: new Wallet(TEST_WALLET),
-  daoFactoryAddress: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
+  DAOFactory: "0xf8065dD2dAE72D4A8e74D8BB0c8252F3A9acE7f9",
   web3Providers: [hardhat.url],
   ipfsNodes: ipfsEndpoints.working,
   graphqlNodes: grapqhlEndpoints.working,
@@ -115,7 +115,7 @@ export const contextParamsLocalChain: ContextParams = {
 export const contextParamsFailing: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  daoFactoryAddress: "0x0123456789012345678901234567890123456789",
+  DAOFactory: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.failing,
   ipfsNodes: ipfsEndpoints.failing,
   graphqlNodes: grapqhlEndpoints.failing,
@@ -174,7 +174,7 @@ export const SUBGRAPH_PROPOSAL_BASE: SubgraphProposalBase = {
 export const contextParamsOkWithGraphqlTimeouts: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  daoFactoryAddress: "0x0123456789012345678901234567890123456789",
+  DAOFactory: "0x0123456789012345678901234567890123456789",
   web3Providers: web3endpoints.working,
   ipfsNodes: ipfsEndpoints.working,
   graphqlNodes: grapqhlEndpoints.timeout.concat(grapqhlEndpoints.working),
