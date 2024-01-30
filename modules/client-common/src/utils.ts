@@ -44,8 +44,10 @@ import { Zero } from "@ethersproject/constants";
 import {
   ContractNames,
   getNetworkAlias,
-  getNetworkByNameAliasOrChainId,
+  getNetworkByChainId,
+  getNetworkByNameOrAlias,
   getNetworkDeploymentForVersion,
+  NetworkConfig,
   networks,
   SupportedAliases,
   SupportedNetworks,
@@ -143,7 +145,7 @@ export async function prepareGenericInstallationEstimation(
     throw new InvalidAddressError();
   }
   const ethers5NetworkName = (await provider.getNetwork()).name;
-  const networkName = getNetworkByNameAliasOrChainId(ethers5NetworkName)?.name;
+  const networkName = getNetworkByNameOrAlias(ethers5NetworkName)?.name;
   if (!networkName) {
     throw new UnsupportedNetworkError(ethers5NetworkName);
   }
@@ -427,10 +429,15 @@ export function getNetwork(networkish: Networkish): Network {
     network = ethersGetNetwork(networkish);
   } catch {
   } finally {
+    let aragonNw: NetworkConfig | null = null;
     switch (typeof networkish) {
       case "string":
       case "number":
-        const aragonNw = getNetworkByNameAliasOrChainId(networkish);
+        if(typeof networkish === "number") {
+          aragonNw = getNetworkByChainId(networkish);
+        } else {
+          aragonNw = getNetworkByNameOrAlias(networkish);
+        }
         if (!aragonNw) {
           throw new UnsupportedNetworkError(networkish.toString());
         }
