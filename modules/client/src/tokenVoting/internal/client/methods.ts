@@ -282,8 +282,8 @@ export class TokenVotingClientMethods extends ClientCore
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const network = await this.web3.getProvider().getNetwork();
     const networkName = network.name;
-    const aragonNw = getNetworkNameByAlias(networkName);
-    if (!aragonNw) {
+    const aragonNetwork = getNetworkNameByAlias(networkName);
+    if (!aragonNetwork) {
       throw new UnsupportedNetworkError(networkName);
     }
     yield* prepareGenericInstallation(this.web3, {

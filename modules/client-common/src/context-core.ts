@@ -114,8 +114,8 @@ export abstract class ContextCore {
       );
     }
 
-    for (const address of Object.values(ContractNames)) {
-      if (!this.overriden[address]) {
+    for (const contractName of Object.values(ContractNames)) {
+      if (!this.overriden[contractName]) {
         let contractAddress: string | undefined;
         // get deployment
         let deployment = getNetworkDeploymentForVersion(
@@ -124,15 +124,15 @@ export abstract class ContextCore {
         );
         // get address from deployment
         if (deployment) {
-          contractAddress = deployment[address]?.address;
+          contractAddress = deployment[contractName]?.address;
         }
         // custom check for ensRegistryAddress
         // set the ensRegistryAddress to the network.ensAddress
-        if (address === ContractNames.ENS_REGISTRY && !contractAddress) {
+        if (contractName === ContractNames.ENS_REGISTRY && !contractAddress) {
           contractAddress = this.network.ensAddress;
         }
         if (contractAddress) {
-          this.state[address] = contractAddress;
+          this.state[contractName] = contractAddress;
         }
       }
     }

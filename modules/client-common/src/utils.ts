@@ -445,14 +445,14 @@ export function getNetwork(networkish: Networkish): Network {
           SupportedAliases.ETHERS_5,
           aragonNw.name,
         );
-        const nwDeployment = getNetworkDeploymentForVersion(
+        const networkDeployment = getNetworkDeploymentForVersion(
           aragonNw.name,
           SupportedVersions.V1_3_0,
         );
-        if (!nwDeployment) {
+        if (!networkDeployment) {
           throw new UnsupportedNetworkError(aragonNw.name);
         }
-        const ensRegistryAddress = nwDeployment.ENSRegistry?.address;
+        const ensRegistryAddress = networkDeployment.ENSRegistry?.address;
         network = {
           name: ethers5Alias || aragonNw.name,
           chainId: aragonNw.chainId,

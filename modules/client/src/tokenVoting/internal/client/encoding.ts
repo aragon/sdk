@@ -48,8 +48,8 @@ export class TokenVotingClientEncoding extends ClientCore
     network: Networkish,
   ): PluginInstallItem {
     const networkName = getNetwork(network).name;
-    const aragonNw = getNetworkNameByAlias(networkName);
-    if (!aragonNw) {
+    const aragonNetwork = getNetworkNameByAlias(networkName);
+    if (!aragonNetwork) {
       throw new UnsupportedNetworkError(networkName);
     }
     const args = tokenVotingInitParamsToContract(params);
@@ -58,7 +58,7 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      id: contracts[aragonNw][SupportedVersions.V1_3_0]?.TokenVotingRepoProxy
+      id: contracts[aragonNetwork][SupportedVersions.V1_3_0]?.TokenVotingRepoProxy
         .address || "",
       data: hexToBytes(hexBytes),
     };

@@ -48,8 +48,8 @@ export class MultisigClientEncoding extends ClientCore
     network: Networkish,
   ): PluginInstallItem {
     const networkName = getNetwork(network).name;
-    const aragonNw = getNetworkNameByAlias(networkName);
-    if (!aragonNw) {
+    const aragonNetwork = getNetworkNameByAlias(networkName);
+    if (!aragonNetwork) {
       throw new UnsupportedNetworkError(networkName);
     }
     const hexBytes = defaultAbiCoder.encode(
@@ -63,7 +63,7 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
-      id: contracts[aragonNw][SupportedVersions.V1_3_0]?.MultisigRepoProxy
+      id: contracts[aragonNetwork][SupportedVersions.V1_3_0]?.MultisigRepoProxy
         .address || "",
       data: hexToBytes(hexBytes),
     };
