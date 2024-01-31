@@ -429,39 +429,39 @@ export function getNetwork(networkish: Networkish): Network {
     network = ethersGetNetwork(networkish);
   } catch {
   } finally {
-    let aragonNw: NetworkConfig | null = null;
+    let aragonNetwork: NetworkConfig | null = null;
     switch (typeof networkish) {
       case "string":
       case "number":
         if(typeof networkish === "number") {
-          aragonNw = getNetworkByChainId(networkish);
+          aragonNetwork = getNetworkByChainId(networkish);
         } else {
-          aragonNw = getNetworkByNameOrAlias(networkish);
+          aragonNetwork = getNetworkByNameOrAlias(networkish);
         }
-        if (!aragonNw) {
+        if (!aragonNetwork) {
           throw new UnsupportedNetworkError(networkish.toString());
         }
         const ethers5Alias = getNetworkAlias(
           SupportedAliases.ETHERS_5,
-          aragonNw.name,
+          aragonNetwork.name,
         );
         const networkDeployment = getNetworkDeploymentForVersion(
-          aragonNw.name,
+          aragonNetwork.name,
           SupportedVersions.V1_3_0,
         );
         if (!networkDeployment) {
-          throw new UnsupportedNetworkError(aragonNw.name);
+          throw new UnsupportedNetworkError(aragonNetwork.name);
         }
         const ensRegistryAddress = networkDeployment.ENSRegistry?.address;
         network = {
-          name: ethers5Alias || aragonNw.name,
-          chainId: aragonNw.chainId,
+          name: ethers5Alias || aragonNetwork.name,
+          chainId: aragonNetwork.chainId,
           ensAddress: ensRegistryAddress,
         };
         break;
       case "object":
         if (networkish.name && networkish.chainId) {
-          break;
+          network = networkish;
         }
         break;
       default:
