@@ -11,9 +11,9 @@ import {
   GasFeeEstimation,
   prepareGenericUpdateEstimation,
   SizeMismatchError,
+  boolArrayToBitmap,
 } from "@aragon/sdk-client-common";
 import { AddresslistVotingPluginPrepareUpdateParams } from "../../types";
-import { boolArrayToBitmap } from "@aragon/sdk-client-common";
 import { ContractNames } from "@aragon/osx-commons-configs";
 
 /**

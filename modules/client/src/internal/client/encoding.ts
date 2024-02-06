@@ -236,7 +236,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     PermissionBaseSchema.strict().validateSync(params);
     const { where, who } = params;
     if (
-      !isAddress(where) ?? !isAddress(who) ?? !isAddress(daoAddress)
+      !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
     ) {
       throw new InvalidAddressError();
     }
@@ -272,7 +272,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     PermissionWithConditionSchema.strict().validateSync(params);
     const { where, who } = params;
     if (
-      !isAddress(where) ?? !isAddress(who) ?? !isAddress(daoAddress)
+      !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
     ) {
       throw new InvalidAddressError();
     }
@@ -312,7 +312,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     PermissionBaseSchema.strict().validateSync(params);
     const { where, who } = params;
     if (
-      !isAddress(where) ?? !isAddress(who) ?? !isAddress(daoAddress)
+      !isAddress(where) || !isAddress(who) || !isAddress(daoAddress)
     ) {
       throw new InvalidAddressError();
     }
