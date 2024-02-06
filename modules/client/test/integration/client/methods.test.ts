@@ -148,11 +148,6 @@ describe("Client", () => {
         } as NetworkDeployment,
       };
 
-      // LIVE_CONTRACTS[SupportedVersion.V1_0_0].local.daoFactoryAddress =
-      //   deploymentV1.daoFactory.address;
-      // LIVE_CONTRACTS[SupportedVersion.LATEST].local.daoFactoryAddress =
-      //   deployment.daoFactory.address;
-
       const daoCreation = await deployContracts.createTokenVotingDAO(
         deployment,
         "test-tokenvoting-dao",

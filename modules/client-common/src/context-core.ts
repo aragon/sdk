@@ -97,23 +97,24 @@ export abstract class ContextCore {
   }
 
   private setNetworkDefaults() {
+    // check network
     const networkName = getNetworkNameByAlias(this.network.name);
     if (!networkName) {
       throw new UnsupportedNetworkError(this.network.name);
     }
-
+    // set graphql nodes
     if (!this.overriden.graphqlNodes) {
       this.state.graphql = ContextCore.resolveGraphql(
         getDefaultGraphqlNodes(networkName),
       );
     }
-
+    // set ipfs nodes
     if (!this.overriden.ipfsNodes) {
       this.state.ipfs = ContextCore.resolveIpfs(
         getDefaultIpfsNodes(networkName),
       );
     }
-
+    // set contract addresses
     for (const contractName of Object.values(ContractNames)) {
       if (!this.overriden[contractName]) {
         let contractAddress: string | undefined;

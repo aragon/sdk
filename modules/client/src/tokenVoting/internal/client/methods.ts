@@ -83,6 +83,8 @@ import {
   InvalidCidError,
   InvalidProposalIdError,
   IpfsPinError,
+  IsMemberParams,
+  IsMemberSchema,
   isProposalId,
   MULTI_FETCH_TIMEOUT,
   NoProviderError,
@@ -111,8 +113,6 @@ import {
 import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
-import { IsMemberSchema } from "@aragon/sdk-client-common";
-import { IsMemberParams } from "@aragon/sdk-client-common";
 import {
   ContractNames,
   getNetworkNameByAlias,

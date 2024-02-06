@@ -51,6 +51,7 @@ import {
   EMPTY_PROPOSAL_METADATA_LINK,
   encodeProposalId,
   findLog,
+  getExtendedProposalId,
   InvalidAddressError,
   InvalidAddressOrEnsError,
   InvalidCidError,
@@ -76,7 +77,6 @@ import {
   UnsupportedNetworkError,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI, UPDATE_ABI } from "../constants";
-import { getExtendedProposalId } from "@aragon/sdk-client-common";
 import { ContractNames, getNetworkByAlias } from "@aragon/osx-commons-configs";
 
 /**

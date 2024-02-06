@@ -9,6 +9,7 @@ import {
   ApproveProposalStep,
   CanApproveParams,
   CreateMultisigProposalParams,
+  ExecuteProposalStep,
   MultisigClient,
   MultisigPluginPrepareInstallationParams,
   MultisigProposal,
@@ -28,7 +29,6 @@ import {
   TEST_TX_HASH,
   TEST_WALLET_ADDRESS,
 } from "../constants";
-import { ExecuteProposalStep } from "../../../src";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { mineBlock } from "../../helpers/block-times";
 import { JsonRpcProvider } from "@ethersproject/providers";

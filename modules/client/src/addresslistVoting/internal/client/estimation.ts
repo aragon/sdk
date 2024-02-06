@@ -9,10 +9,10 @@ import {
   ClientCore,
   decodeProposalId,
   GasFeeEstimation,
+  prepareGenericUpdateEstimation,
   SizeMismatchError,
 } from "@aragon/sdk-client-common";
 import { AddresslistVotingPluginPrepareUpdateParams } from "../../types";
-import { prepareGenericUpdateEstimation } from "@aragon/sdk-client-common";
 import { boolArrayToBitmap } from "@aragon/sdk-client-common";
 import { ContractNames } from "@aragon/osx-commons-configs";
 

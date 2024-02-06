@@ -1,4 +1,8 @@
-import { FunctionFragment, Interface } from "@ethersproject/abi";
+import {
+  defaultAbiCoder,
+  FunctionFragment,
+  Interface,
+} from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import {
   getNetwork as ethersGetNetwork,
@@ -27,7 +31,6 @@ import {
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
 import { IPFS_ENDPOINTS } from "./constants";
-import { defaultAbiCoder } from "@ethersproject/abi";
 import { isAddress } from "@ethersproject/address";
 import { Network } from "@ethersproject/networks";
 import { QueryIPlugin } from "./internal/graphql-queries";
@@ -432,8 +435,8 @@ export function getNetwork(networkish: Networkish): Network {
     let aragonNetwork: NetworkConfig | null = null;
     switch (typeof networkish) {
       case "string":
-      case "number":
-        if(typeof networkish === "number") {
+      case "number": {
+        if (typeof networkish === "number") {
           aragonNetwork = getNetworkByChainId(networkish);
         } else {
           aragonNetwork = getNetworkByNameOrAlias(networkish);
@@ -459,6 +462,7 @@ export function getNetwork(networkish: Networkish): Network {
           ensAddress: ensRegistryAddress,
         };
         break;
+      }
       case "object":
         if (networkish.name && networkish.chainId) {
           network = networkish;

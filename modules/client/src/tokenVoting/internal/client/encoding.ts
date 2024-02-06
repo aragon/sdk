@@ -58,8 +58,9 @@ export class TokenVotingClientEncoding extends ClientCore
       args,
     );
     return {
-      id: contracts[aragonNetwork][SupportedVersions.V1_3_0]?.TokenVotingRepoProxy
-        .address || "",
+      id:
+        contracts[aragonNetwork][SupportedVersions.V1_3_0]?.TokenVotingRepoProxy
+          .address || "",
       data: hexToBytes(hexBytes),
     };
   }
