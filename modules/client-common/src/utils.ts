@@ -427,53 +427,67 @@ export async function* prepareGenericUpdate(
  * @return {Network}
  */
 export function getNetwork(networkish: Networkish): Network {
-  let network: Network | undefined;
+  let network: Network | null = null;
   try {
     network = ethersGetNetwork(networkish);
-  } catch {
-  } finally {
-    let aragonNetwork: NetworkConfig | null = null;
-    switch (typeof networkish) {
-      case "string":
-      case "number": {
-        if (typeof networkish === "number") {
-          aragonNetwork = getNetworkByChainId(networkish);
-        } else {
-          aragonNetwork = getNetworkByNameOrAlias(networkish);
-        }
-        if (!aragonNetwork) {
-          throw new UnsupportedNetworkError(networkish.toString());
-        }
-        const ethers5Alias = getNetworkAlias(
-          SupportedAliases.ETHERS_5,
-          aragonNetwork.name,
-        );
-        const networkDeployment = getNetworkDeploymentForVersion(
-          aragonNetwork.name,
-          SupportedVersions.V1_3_0,
-        );
-        if (!networkDeployment) {
-          throw new UnsupportedNetworkError(aragonNetwork.name);
-        }
-        const ensRegistryAddress = networkDeployment.ENSRegistry?.address;
-        network = {
-          name: ethers5Alias || aragonNetwork.name,
-          chainId: aragonNetwork.chainId,
-          ensAddress: ensRegistryAddress,
-        };
-        break;
-      }
-      case "object":
-        if (networkish.name && networkish.chainId) {
-          network = networkish;
-        }
-        break;
-      default:
-        throw new UnsupportedNetworkError(networkish);
-    }
-  }
+  } catch {}
+  try {
+    network = aragonGetNetwork(networkish);
+  } catch {}
   if (!network) {
     throw new UnsupportedNetworkError(networkish.toString());
+  }
+  return network;
+}
+
+/**
+ * When ethers 5 does not support the network return a Network object
+ * using our osx-commons-configs as a source of truth
+ *
+ * @private
+ * @param {Networkish} networkish
+ * @return {*}  {Network}
+ */
+function aragonGetNetwork(networkish: Networkish): Network | null {
+  let aragonNetwork: NetworkConfig | null = null;
+  let network: Network | null = null;
+  switch (typeof networkish) {
+    case "string":
+    case "number": {
+      if (typeof networkish === "number") {
+        aragonNetwork = getNetworkByChainId(networkish);
+      } else {
+        aragonNetwork = getNetworkByNameOrAlias(networkish);
+      }
+      if (!aragonNetwork) {
+        throw new UnsupportedNetworkError(networkish.toString());
+      }
+      const ethers5Alias = getNetworkAlias(
+        SupportedAliases.ETHERS_5,
+        aragonNetwork.name,
+      );
+      const networkDeployment = getNetworkDeploymentForVersion(
+        aragonNetwork.name,
+        SupportedVersions.V1_3_0,
+      );
+      if (!networkDeployment) {
+        throw new UnsupportedNetworkError(aragonNetwork.name);
+      }
+      const ensRegistryAddress = networkDeployment.ENSRegistry?.address;
+      network = {
+        name: ethers5Alias || aragonNetwork.name,
+        chainId: aragonNetwork.chainId,
+        ensAddress: ensRegistryAddress,
+      };
+      break;
+    }
+    case "object":
+      if (networkish.name && networkish.chainId) {
+        network = networkish;
+      }
+      break;
+    default:
+      throw new UnsupportedNetworkError(networkish);
   }
   return network;
 }
