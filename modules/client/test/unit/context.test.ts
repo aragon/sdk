@@ -47,7 +47,7 @@ describe("Context instances", () => {
     expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
       contracts.mainnet["v1.3.0"]!.DAOFactory.address,
     );
-    expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
+    expect(context.getAddress(ContractNames.ENS_REGISTRY)).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(0);
     expect(context.ipfs.length).toBe(
@@ -75,7 +75,7 @@ describe("Context instances", () => {
     expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
       contextParams.DAOFactory,
     );
-    expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
+    expect(context.getAddress(ContractNames.ENS_REGISTRY)).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(
       contextParams.gasFeeEstimationFactor,
     );
@@ -129,7 +129,7 @@ describe("Context instances", () => {
     expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
       contracts.goerli["v1.3.0"]!.DAOFactory.address,
     );
-    expect(context.ensRegistryAddress).toBe(context.network.ensAddress);
+    expect(context.getAddress(ContractNames.ENS_REGISTRY)).toBe(context.network.ensAddress);
     expect(context.gasFeeEstimationFactor).toBe(0.625);
     expect(context.web3Providers.length).toBe(1);
     expect(context.ipfs.length).toBe(
@@ -156,7 +156,7 @@ describe("Context instances", () => {
     expect(context.getAddress(ContractNames.DAO_FACTORY)).toBe(
       contracts.polygon["v1.3.0"]!.DAOFactory.address,
     );
-    expect(context.ensRegistryAddress).toBe(
+    expect(context.getAddress(ContractNames.ENS_REGISTRY)).toBe(
       contracts.polygon["v1.3.0"]?.ENSRegistry?.address,
     );
     expect(context.gasFeeEstimationFactor).toBe(0.625);
@@ -286,7 +286,7 @@ describe("Context instances", () => {
     expect(context.getAddress(ContractNames.DAO_FACTORY)).toEqual(
       contracts.polygon["v1.3.0"]?.DAOFactory.address,
     );
-    expect(context.ensRegistryAddress).toEqual(
+    expect(context.getAddress(ContractNames.ENS_REGISTRY)).toEqual(
       contracts.polygon["v1.3.0"]?.ENSRegistry?.address,
     );
   });

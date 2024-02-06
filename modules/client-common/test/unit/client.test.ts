@@ -12,6 +12,7 @@ import {
   TEST_WALLET_ADDRESS,
   web3endpoints,
 } from "../constants";
+import { SupportedNetworks } from "@aragon/osx-commons-configs";
 class TestContext extends ContextCore {
   constructor(params?: Partial<ContextParams>) {
     super(params);
@@ -41,7 +42,7 @@ describe("Test an extended client", () => {
     expect(provider).toBeDefined();
 
     const networkName = client.web3.getNetworkName();
-    expect(networkName).toBe("homestead");
+    expect(networkName).toBe(SupportedNetworks.MAINNET);
 
     const signer = client.web3.getConnectedSigner();
     expect(signer).toBeDefined();
@@ -67,7 +68,7 @@ describe("Test an extended client", () => {
     expect(client.graphql).toBeDefined();
 
     const networkName = client.web3.getNetworkName();
-    expect(networkName).toBe("homestead");
+    expect(networkName).toBe(SupportedNetworks.MAINNET);
 
     expect(() => client.web3.getProvider()).toThrowError(NoProviderError);
     expect(() => client.web3.getConnectedSigner()).toThrowError(NoSignerError);
@@ -97,7 +98,7 @@ describe("Test an extended client", () => {
     expect(client.graphql).toBeDefined();
 
     const networkName = client.web3.getNetworkName();
-    expect(networkName).toBe("baseGoerli");
+    expect(networkName).toBe(SupportedNetworks.BASE_GOERLI);
     const signer = client.web3.getConnectedSigner();
     expect(signer).toBeDefined();
     expect(await signer.getAddress()).toBe(TEST_WALLET_ADDRESS);

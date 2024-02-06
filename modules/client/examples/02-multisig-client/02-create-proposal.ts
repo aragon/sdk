@@ -47,6 +47,7 @@ const metadataUri: string = await multisigClient.methods.pinMetadata(
 const proposalParams: CreateMultisigProposalParams = {
   pluginAddress: "0x1234567890123456789012345678901234567890",
   metadataUri,
+  failSafeActions: [],
   actions: [], // optional - if left as an empty array, no action will be set for the proposal. the action needs to be encoded and will be executed once a proposal passes.
 };
 
