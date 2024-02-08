@@ -63,6 +63,8 @@ export class MultisigClientEncoding extends ClientCore
       ],
     );
     return {
+      // this case will return "" when the version 1.3.0 of the contracts is not deployed
+      // in the specified network
       id: contracts[aragonNetwork][SupportedVersions.V1_3_0]?.MultisigRepoProxy
         .address || "",
       data: hexToBytes(hexBytes),

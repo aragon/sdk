@@ -118,14 +118,12 @@ describe("Client", () => {
         deployment.pluginSetupProcessor.address;
       contextParamsLocalChain.MultisigRepoProxy =
         deployment.multisigRepo.address;
-      contextParamsLocalChain.AdminRepoProxy = "";
       contextParamsLocalChain.AddresslistVotingRepoProxy =
         deployment.addresslistVotingRepo.address;
       contextParamsLocalChain.TokenVotingRepoProxy =
         deployment.tokenVotingRepo.address;
       contextParamsLocalChain.MultisigSetup =
         deployment.multisigPluginSetup.address;
-      contextParamsLocalChain.AdminSetup = "";
       contextParamsLocalChain.AddresslistVotingSetup =
         deployment.addresslistVotingPluginSetup.address;
       contextParamsLocalChain.TokenVotingSetup =

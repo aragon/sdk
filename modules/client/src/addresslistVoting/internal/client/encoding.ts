@@ -45,8 +45,8 @@ export class AddresslistVotingClientEncoding extends ClientCore
     network: Networkish,
   ): PluginInstallItem {
     const networkName = getNetwork(network).name;
-    const aragonNw = getNetworkNameByAlias(networkName);
-    if (!aragonNw) {
+    const aragonNetwork = getNetworkNameByAlias(networkName);
+    if (!aragonNetwork) {
       throw new UnsupportedNetworkError(networkName);
     }
     const hexBytes = defaultAbiCoder.encode(
@@ -58,7 +58,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
     );
 
     return {
-      id: contracts[aragonNw][SupportedVersions.V1_3_0]
+      id: contracts[aragonNetwork][SupportedVersions.V1_3_0]
         ?.AddresslistVotingRepoProxy.address || "",
       data: hexToBytes(hexBytes),
     };

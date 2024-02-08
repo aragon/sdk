@@ -259,11 +259,6 @@ export type ApplyUpdateParams = ApplyUpdateParamsBase & {
 export type DecodedApplyUpdateParams = ApplyUpdateParamsBase & {
   helpersHash: string;
 };
-export enum SupportedVersion {
-  V1_0_0 = "1.0.0",
-  V1_3_0 = "1.3.0",
-  LATEST = "1.3.0",
-}
 export type IsMemberParams = {
   address: string;
   pluginAddress: string;

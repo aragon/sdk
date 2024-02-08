@@ -24,7 +24,7 @@ const TEST_WALLET =
 const contextParamsMainnet: ContextParams = {
   network: "mainnet",
   signer: new Wallet(TEST_WALLET),
-  DAOFactory: "0x0123456789012345678901234567890123456789",
+  DAOFactory: `0x${'0123456789'.repeat(4)}`,
   web3Providers: web3endpoints.working,
   ipfsNodes: [
     {

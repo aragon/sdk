@@ -24,6 +24,7 @@ import {
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 const supportedProtocols = ["https:"];
+const contractNames = Object.values(ContractNames);
 if (typeof process !== "undefined" && process?.env?.TESTING) {
   supportedProtocols.push("http:");
 }
@@ -31,7 +32,7 @@ if (typeof process !== "undefined" && process?.env?.TESTING) {
 export abstract class ContextCore {
   protected state: ContextState = {} as ContextState;
 
-  protected overriden: OverriddenState = Object.values(ContractNames).reduce(
+  protected overriden: OverriddenState = contractNames.reduce(
     (acc, key) => ({ ...acc, [key]: false }),
     { ENSRegistry: false } as OverriddenState,
   );
@@ -80,7 +81,7 @@ export abstract class ContextCore {
       this.overriden.ipfsNodes = true;
     }
     // Set all the available addresses
-    for (const address of Object.values(ContractNames)) {
+    for (const address of contractNames) {
       if (contextParams[address]) {
         this.state[address] = contextParams[address]!;
         this.overriden[address] = true;
@@ -115,7 +116,7 @@ export abstract class ContextCore {
       );
     }
     // set contract addresses
-    for (const contractName of Object.values(ContractNames)) {
+    for (const contractName of contractNames) {
       if (!this.overriden[contractName]) {
         let contractAddress: string | undefined;
         // get deployment
