@@ -29,7 +29,7 @@
   dependencies:
     ethers "^5.6.2"
 
-"@aragon/osx-ethers@^1.3.0":
+"@aragon/osx-ethers@^1.3.1":
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@aragon/osx-ethers/-/osx-ethers-1.3.1.tgz#d72decea14cc5c11c55ad6654e97b3380429c1c9"
   integrity sha512-6APDAasHrIVmJ0SxUSmWCxusVe46OF3eGZGp8MVD3j4BDJjJ+FIrrjN9ePkTpPja3X8GL6PD00l1WIzW2GZQMQ==

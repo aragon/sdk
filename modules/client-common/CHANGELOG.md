@@ -19,6 +19,18 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Fixed
+- Typo in `LIVE_CONTRACTS` for mainnet
+
+## [1.14.0]
+
+### Added
+
+- Support for arbitrum sepolia network.
+- Support for base sepolia network.
+
+## [1.13.0]
+
 ### Changed
 
 -Update `osx-ethers` to v1.3.0

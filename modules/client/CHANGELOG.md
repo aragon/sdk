@@ -18,6 +18,23 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+### Fixed
+
+- Typo in `LIVE_CONTRACTS` for mainnet
+
+## [1.22.0]
+
+### Added
+
+- Support for arbitrum sepolia network
+- Support for base sepolia network
+
+## [1.21.2]
+
+### Fixed
+- Compare with dao address in `validatePluginUpdateProposal`
+
+## [1.21.1]
 
 ### Changed
 - Chore: Changed voters and approvers count to 1000 from the default value of 100 in Proposal Queries
