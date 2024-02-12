@@ -22,7 +22,7 @@ import {
 } from "./errors";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
-const supportedProtocols = ["https:"];
+const supportedProtocols = ["https:", "http:"];
 if (typeof process !== "undefined" && process?.env?.TESTING) {
   supportedProtocols.push("http:");
 }
