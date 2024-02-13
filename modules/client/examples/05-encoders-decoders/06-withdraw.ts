@@ -117,6 +117,7 @@ console.log({ erc20DecodedParams });
 /* MARKDOWN
 Returns:
 
+```
 { erc20DecodedParams:
   {
     type: "erc20",
@@ -125,7 +126,7 @@ Returns:
     tokenAddress: "0x1234567890123456789012345678901234567890",
   }
 }
-
+```
 */
 
 /* MARKDOWN
@@ -162,6 +163,7 @@ console.log({ erc721DecodedParams });
 
 /* MARKDOWN
 Returns:
+```
 {
   type: TokenType.ERC721;
   tokenAddress: "0x1234567890123456789012345678901234567890";
@@ -169,6 +171,7 @@ Returns:
   daoAddressOrEns: "0x1234567890123456789012345678901234567890";
   recipientAddressOrEns: "0x1234567890123456789012345678901234567890";
 }
+```
 */
 /* MARKDOWN
 ### NFT (ERC-1155) Tokens
@@ -205,6 +208,7 @@ console.log({ erc1155WithdrawDecodedParams });
 
 /* MARKDOWN
 Returns:
+```
 {
   type: TokenType.ERC1155,
   tokenAddress: "0x1234567890123456789012345678901234567890",
@@ -213,4 +217,5 @@ Returns:
   daoAddressOrEns: "0x1234567890123456789012345678901234567890",
   recipientAddressOrEns: "0x1234567890123456789012345678901234567890",
 }
+```
 */
