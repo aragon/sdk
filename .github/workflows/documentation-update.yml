@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sdk repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         # with:
         #   token: ${{ secrets.ARABOT_PAT }}
       - name: Install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           cache: 'yarn'
           node-version: 18.x
@@ -34,7 +34,7 @@ jobs:
       - name: Generate examples Docs
         run: yarn run docs:examples
       - name: Checkout developer-portal repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: aragon/developer-portal
           ref: staging
@@ -59,4 +59,4 @@ jobs:
           title: Update the Aragon SDK docs
           body: 'Automated update by Github actions (Run: [${{ github.run_id }}](https://github.com/aragon/sdk/actions/runs/${{ github.run_id }}))'
           reviewers: ${{ github.actor }}
-          team-reviewers: devrel
+          team-reviewers: Ara-Team-OSX
