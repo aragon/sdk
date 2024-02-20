@@ -377,7 +377,7 @@ export function computeProposalStatusFilter(status: ProposalStatus) {
  * @export
  * @param {string} tokenAddress
  * @param {Signer} signer
- * @return {*}  {Promise<boolean>}
+ * @return {Promise<boolean>}
  */
 export async function isERC20Token(
   tokenAddress: string,

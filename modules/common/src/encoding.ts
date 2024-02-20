@@ -70,7 +70,7 @@ export function strip0x(value: string): string {
  * @export
  * @param {number} ratio
  * @param {number} digits
- * @return {*}  {bigint}
+ * @return {bigint}
  */
 export function encodeRatio(ratio: number, digits: number): number {
   if (ratio < 0 || ratio > 1) {
@@ -88,7 +88,7 @@ export function encodeRatio(ratio: number, digits: number): number {
  * @export
  * @param {bigint} onChainValue
  * @param {number} digits
- * @return {*}  {number}
+ * @return {number}
  */
 export function decodeRatio(
   onChainValue: bigint | number,

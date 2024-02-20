@@ -13,7 +13,7 @@ import { MultiUri } from "./multiuri";
  *
  * @export
  * @param {string} data
- * @return {*}  {string}
+ * @return {string}
  */
 export function resolveIpfsCid(data: string): string {
   const uri = new MultiUri(data);
@@ -29,7 +29,7 @@ export function resolveIpfsCid(data: string): string {
  *
  * @export
  * @param {string} proposalId
- * @return {*}  {boolean}
+ * @return {boolean}
  */
 export function isProposalId(proposalId: string): boolean {
   const regex = new RegExp(OSX_PROPOSAL_ID_REGEX);
@@ -41,7 +41,7 @@ export function isProposalId(proposalId: string): boolean {
  *
  * @export
  * @param {string} name
- * @return {*}  {boolean}
+ * @return {boolean}
  */
 export function isEnsName(name: string): boolean {
   const regex = new RegExp(ENS_REGEX);
@@ -53,7 +53,7 @@ export function isEnsName(name: string): boolean {
  *
  * @export
  * @param {string} cid
- * @return {*}  {boolean}
+ * @return {boolean}
  */
 export function isIpfsUri(cid: string): boolean {
   const regex = new RegExp(
@@ -67,7 +67,7 @@ export function isIpfsUri(cid: string): boolean {
  *
  * @export
  * @param {string} name
- * @return {*}  {boolean}
+ * @return {boolean}
  */
 export function isSubdomain(name: string): boolean {
   const regex = new RegExp(SUBDOMAIN_REGEX);

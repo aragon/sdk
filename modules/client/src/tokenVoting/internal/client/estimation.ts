@@ -29,7 +29,7 @@ export class TokenVotingClientEstimation extends ClientCore
    * Estimates the gas fee of creating a proposal on the plugin
    *
    * @param {CreateMajorityVotingProposalParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async createProposal(
@@ -69,7 +69,7 @@ export class TokenVotingClientEstimation extends ClientCore
    * Estimates the gas fee of casting a vote on a proposal
    *
    * @param {VoteProposalParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async voteProposal(
@@ -98,7 +98,7 @@ export class TokenVotingClientEstimation extends ClientCore
    * Estimates the gas fee of executing a TokenVoting proposal
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async executeProposal(
@@ -124,7 +124,7 @@ export class TokenVotingClientEstimation extends ClientCore
    * Estimates the gas fee of delegating voting power to a delegatee
    *
    * @param {DelegateTokensParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async delegateTokens(
@@ -145,7 +145,7 @@ export class TokenVotingClientEstimation extends ClientCore
    * Estimates the gas fee of undelegating voting power
    *
    * @param {string} tokenAddress
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async undelegateTokens(
@@ -161,7 +161,7 @@ export class TokenVotingClientEstimation extends ClientCore
    * Estimates the gas fee of preparing an update
    *
    * @param {TokenVotingPluginPrepareUpdateParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof TokenVotingClientEstimation
    */
   public async prepareUpdate(

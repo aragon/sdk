@@ -20,7 +20,7 @@ export class MultisigClientDecoding extends ClientCore
    * Decodes a list of addresses from an encoded add members action
    *
    * @param {Uint8Array} data
-   * @return {*}  {string[]}
+   * @return {string[]}
    * @memberof MultisigClientDecoding
    */
   public addAddressesAction(data: Uint8Array): string[] {
@@ -38,7 +38,7 @@ export class MultisigClientDecoding extends ClientCore
    * Decodes a list of addresses from an encoded remove members action
    *
    * @param {Uint8Array} data
-   * @return {*}  {string[]}
+   * @return {string[]}
    * @memberof MultisigClientDecoding
    */
   public removeAddressesAction(data: Uint8Array): string[] {
@@ -57,7 +57,7 @@ export class MultisigClientDecoding extends ClientCore
    * Decodes a list of min approvals from an encoded update min approval action
    *
    * @param {Uint8Array} data
-   * @return {*}  {MultisigVotingSettings}
+   * @return {MultisigVotingSettings}
    * @memberof MultisigClientDecoding
    */
   public updateMultisigVotingSettings(
@@ -81,7 +81,7 @@ export class MultisigClientDecoding extends ClientCore
    * Returns the decoded function info given the encoded data of an action
    *
    * @param {Uint8Array} data
-   * @return {*}  {(InterfaceParams | null)}
+   * @return {(InterfaceParams | null)}
    * @memberof MultisigClientDecoding
    */
   public findInterface(data: Uint8Array): InterfaceParams | null {

@@ -42,7 +42,7 @@ export class AddresslistVotingClient extends ClientCore
      *
      * @param {AddresslistVotingPluginInstall} params
      * @param {Networkish} [network="mainnet"]
-     * @return {*}  {PluginInstallItem}
+     * @return {PluginInstallItem}
      * @memberof AddresslistVotingClient
      */
     getPluginInstallItem: (

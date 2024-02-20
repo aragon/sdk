@@ -12,7 +12,7 @@ import {
  * @param {Promise<T>} prom The promise to track
  * @param {number} timeout Timeout (in milliseconds) to wait before failing
  * @param {string} [timeoutMessage] (optional) Message to use when throwing a timeout error. By default: `"Time out"`
- * @return {*}  {Promise<T>}
+ * @return {Promise<T>}
  */
 export function promiseWithTimeout<T>(
   prom: Promise<T>,
@@ -46,8 +46,8 @@ export function promiseWithTimeout<T>(
  *   func: () => Promise<T>;
  *   onFail?: (e: Error) => void;
  *   shouldRetry: () => boolean;
- * }} { func, onFail, shouldRetry }
- * @return {*}
+ * }} params func, onFail, shouldRetry }
+ * @return 
  */
 export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
   func: () => Promise<T>;

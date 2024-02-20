@@ -15,7 +15,7 @@ import {
  *
  * @export
  * @param {string} value
- * @return {*}  {string}
+ * @return {string}
  */
 export function ensure0x(value: string): string {
   return value.startsWith("0x") ? value : "0x" + value;
@@ -26,7 +26,7 @@ export function ensure0x(value: string): string {
  *
  * @export
  * @param {string} value
- * @return {*}  {string}
+ * @return {string}
  */
 export function strip0x(value: string): string {
   return value.startsWith("0x") ? value.substring(2) : value;
@@ -37,7 +37,7 @@ export function strip0x(value: string): string {
  *
  * @export
  * @param {string} hexString
- * @return {*}  {Uint8Array}
+ * @return {Uint8Array}
  */
 export function hexToBytes(hexString: string): Uint8Array {
   if (!hexString) return new Uint8Array();
@@ -63,7 +63,7 @@ export function hexToBytes(hexString: string): Uint8Array {
  * @export
  * @param {Uint8Array} buff
  * @param {boolean} [skip0x]
- * @return {*}  {string}
+ * @return {string}
  */
 export function bytesToHex(buff: Uint8Array, skip0x?: boolean): string {
   const bytes: string[] = [];
@@ -81,7 +81,7 @@ export function bytesToHex(buff: Uint8Array, skip0x?: boolean): string {
  * @export
  * @param {number} ratio
  * @param {number} digits
- * @return {*}  {bigint}
+ * @return {bigint}
  */
 export function encodeRatio(ratio: number, digits: number): number {
   if (ratio < 0 || ratio > 1) {
@@ -98,7 +98,7 @@ export function encodeRatio(ratio: number, digits: number): number {
  * @export
  * @param {bigint} onChainValue
  * @param {number} digits
- * @return {*}  {number}
+ * @return {number}
  */
 export function decodeRatio(
   onChainValue: bigint | number,
@@ -119,7 +119,7 @@ export function decodeRatio(
  * @export
  * @param {string} pluginAddress
  * @param {number} id
- * @return {*}
+ * @return 
  */
 export function encodeProposalId(pluginAddress: string, id: number) {
   if (!/^0x[A-Fa-f0-9]{40}$/.test(pluginAddress)) {
@@ -134,7 +134,7 @@ export function encodeProposalId(pluginAddress: string, id: number) {
  *
  * @export
  * @param {string} proposalId
- * @return {*}  {{ pluginAddress: string; id: number }}
+ * @return {{ pluginAddress: string; id: number }}
  */
 export function decodeProposalId(
   proposalId: string,
@@ -159,7 +159,7 @@ export function decodeProposalId(
  *
  * @export
  * @param {Array<boolean>} [bools]
- * @return {*}
+ * @return 
  */
 export function boolArrayToBitmap(bools?: Array<boolean>) {
   if (!bools || !bools.length) return BigInt(0);
@@ -178,7 +178,7 @@ export function boolArrayToBitmap(bools?: Array<boolean>) {
  * Transforms a bigint into an array of booleans
  *
  * @param {bigint} bitmap
- * @return {*}  {Array<boolean>}
+ * @return {Array<boolean>}
  */
 export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
   if (bitmap >= (BigInt(1) << BigInt(256))) {
@@ -199,7 +199,7 @@ export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
  *
  * @export
  * @param {string} proposalId
- * @returns {*} {string}
+ * @returns  {string}
  */
 export const getExtendedProposalId = (proposalId: string): string => {
   if (!isProposalId(proposalId)) {
@@ -214,7 +214,7 @@ export const getExtendedProposalId = (proposalId: string): string => {
  *
  * @export
  * @param {string} proposalId
- * @returns {*} {string}
+ * @returns  {string}
  */
 export const getCompactProposalId = (proposalId: string): string => {
   if (!proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/)) {

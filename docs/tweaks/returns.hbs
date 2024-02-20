@@ -1,12 +1,11 @@
 {{#if returns}}
-{{#if returns.[0].description~}}
-**Returnsssss**: {{#each returns~}}
+**Returns**: {{#each returns~}}
   {{#if type~}}
   {{#if type.names}}{{>linked-type-list types=type.names delimiter=" \| " ~}}{{/if}}
-  {{~#if description}} - <p>`{{{stripTags (inlineLinks description)}}}`</p>{{/if~}}
+  {{~#if description}} - {{{inlineLinks description}}}{{/if~}}
   {{else~}}
   {{{inlineLinks description}~}}
   {{/if~}}
 {{~/each}}
   
-{{/if}}{{/if}}
+{{/if}}

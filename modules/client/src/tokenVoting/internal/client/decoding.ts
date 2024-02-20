@@ -23,7 +23,7 @@ export class TokenVotingClientDecoding extends ClientCore
    * Decodes a dao metadata from an encoded update metadata action
    *
    * @param {Uint8Array} data
-   * @return {*}  {VotingSettings}
+   * @return {VotingSettings}
    * @memberof TokenVotingClientDecoding
    */
   public updatePluginSettingsAction(data: Uint8Array): VotingSettings {
@@ -33,7 +33,7 @@ export class TokenVotingClientDecoding extends ClientCore
    * Decodes the mint token params from an encoded mint token action
    *
    * @param {Uint8Array} data
-   * @return {*}  {MintTokenParams}
+   * @return {MintTokenParams}
    * @memberof TokenVotingClientDecoding
    */
   public mintTokenAction(data: Uint8Array): MintTokenParams {
@@ -51,7 +51,7 @@ export class TokenVotingClientDecoding extends ClientCore
    * Returns the decoded function info given the encoded data of an action
    *
    * @param {Uint8Array} data
-   * @return {*}  {(InterfaceParams | null)}
+   * @return {(InterfaceParams | null)}
    * @memberof TokenVotingClientDecoding
    */
   public findInterface(data: Uint8Array): InterfaceParams | null {

@@ -125,7 +125,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Creates a new proposal on the given TokenVoting plugin contract
    *
    * @param {CreateMajorityVotingProposalParams} params
-   * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
+   * @return {AsyncGenerator<ProposalCreationStepValue>}
    * @memberof TokenVotingClient
    */
   public async *createProposal(
@@ -191,7 +191,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Pins a metadata object into IPFS and retruns the generated hash
    *
    * @param {ProposalMetadata} params
-   * @return {*}  {Promise<string>}
+   * @return {Promise<string>}
    * @memberof ClientMethods
    */
   public async pinMetadata(params: ProposalMetadata): Promise<string> {
@@ -208,7 +208,7 @@ export class TokenVotingClientMethods extends ClientCore
    *
    * @param {VoteProposalParams} params
    * @param {VoteValues} vote
-   * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
+   * @return {AsyncGenerator<VoteProposalStepValue>}
    * @memberof TokenVotingClient
    */
   public async *voteProposal(
@@ -242,7 +242,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Executes the given proposal, provided that it has already passed
    *
    * @param {string} proposalId
-   * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
+   * @return {AsyncGenerator<ExecuteProposalStepValue>}
    * @memberof TokenVotingClient
    */
   public async *executeProposal(
@@ -272,7 +272,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Prepares the installation of a token voting plugin in a given dao
    *
    * @param {TokenVotingPluginPrepareInstallationParams} params
-   * @return {*}  {AsyncGenerator<PrepareInstallationStepValue>}
+   * @return {AsyncGenerator<PrepareInstallationStepValue>}
    * @memberof TokenVotingClientMethods
    */
   public async *prepareInstallation(
@@ -298,7 +298,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Prepares the update of a token voting plugin in a given dao
    *
    * @param {TokenVotingPluginPrepareUpdateParams} params
-   * @return {*}  {AsyncGenerator<PrepareUpdateStepValue>}
+   * @return {AsyncGenerator<PrepareUpdateStepValue>}
    * @memberof TokenVotingClientMethods
    */
   public async *prepareUpdate(
@@ -375,7 +375,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Delegates all the signer's voting power to a delegatee
    *
    * @param {DelegateTokensParams} params
-   * @return {*}  {AsyncGenerator<DelegateTokensStepValue>}
+   * @return {AsyncGenerator<DelegateTokensStepValue>}
    * @memberof TokenVotingClientMethods
    */
   public async *delegateTokens(
@@ -400,7 +400,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Delegates all the signer's tokens back to itself
    *
    * @param {string} tokenAddress
-   * @return {*}  {AsyncGenerator<UndelegateTokensStepValue>}
+   * @return {AsyncGenerator<UndelegateTokensStepValue>}
    * @memberof TokenVotingClientMethods
    */
   public async *undelegateTokens(
@@ -416,7 +416,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Retrieves the current signer's delegatee for the given token
    *
    * @param {string} tokenAddress
-   * @return {*}  {Promise<string | null>}
+   * @return {Promise<string | null>}
    * @memberof TokenVotingClientMethods
    */
   public async getDelegatee(tokenAddress: string): Promise<string | null> {
@@ -434,7 +434,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Checks if an user can vote in a proposal
    *
    * @param {CanVoteParams} params
-   * @returns {*}  {Promise<boolean>}
+   * @returns   {Promise<boolean>}
    */
   public async canVote(params: CanVoteParams): Promise<boolean> {
     const provider = this.web3.getProvider();
@@ -460,7 +460,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Checks whether the current proposal can be executed
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<boolean>}
+   * @return {Promise<boolean>}
    * @memberof TokenVotingClientMethods
    */
   public async canExecute(
@@ -480,15 +480,14 @@ export class TokenVotingClientMethods extends ClientCore
   /**
    * Returns the list of wallet addresses holding tokens from the underlying Token contract used by the plugin
    *
-   * @param {MembersQueryParams} {
+   * @param {MembersQueryParams} params
    *     pluginAddress,
    *     blockNumber,
    *     limit = 10,
    *     skip = 0,
    *     direction = SortDirection.ASC,
-   *     sortBy = MembersSortBy.ADDRESS,
-   *   }
-   * @return {*}  {Promise<string[]>}
+   *     sortBy = MembersSortBy.ADDRESS   
+   * @return {Promise<string[]>}
    * @memberof TokenVotingClientMethods
    */
   public async getMembers({
@@ -527,7 +526,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Returns the details of the given proposal
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<TokenVotingProposal>}
+   * @return {Promise<TokenVotingProposal>}
    * @memberof TokenVotingClient
    */
   public async getProposal(
@@ -580,7 +579,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
    * @param {ProposalQueryParams} params
-   * @return {*}  {Promise<TokenVotingProposalListItem[]>}
+   * @return {Promise<TokenVotingProposalListItem[]>}
    * @memberof TokenVotingClient
    */
   public async getProposals({
@@ -673,7 +672,7 @@ export class TokenVotingClientMethods extends ClientCore
    *
    * @param {string} pluginAddress
    * @param {number} blockNumber
-   * @return {*}  {Promise<VotingSettings>}
+   * @return {Promise<VotingSettings>}
    * @memberof TokenVotingClient
    */
   public async getVotingSettings(
@@ -719,7 +718,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Returns the details of the token used in a specific plugin instance
    *
    * @param {string} pluginAddress
-   * @return {*}  {Promise<Erc20TokenDetails | null>}
+   * @return {Promise<Erc20TokenDetails | null>}
    * @memberof TokenVotingClient
    */
   public async getToken(
@@ -796,7 +795,7 @@ export class TokenVotingClientMethods extends ClientCore
    * Checks if the given token is compatible with the TokenVoting plugin
    *
    * @param {string} tokenAddress
-   * @return {*}  {Promise<TokenVotingTokenCompatibility>}
+   * @return {Promise<TokenVotingTokenCompatibility>}
    * @memberof TokenVotingClientMethods
    */
   public async isTokenVotingCompatibleToken(
