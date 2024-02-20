@@ -16,7 +16,7 @@ export function allSettled(
  *
  * @template T
  * @param {Promise<T>} prom
- * @return 
+ * @return {void}
  * @deprecated 
  */
 function reflect<T>(prom: Promise<T>) {

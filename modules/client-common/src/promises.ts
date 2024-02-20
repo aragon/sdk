@@ -46,8 +46,8 @@ export function promiseWithTimeout<T>(
  *   func: () => Promise<T>;
  *   onFail?: (e: Error) => void;
  *   shouldRetry: () => boolean;
- * }} params func, onFail, shouldRetry }
- * @return 
+ * }} { func, onFail, shouldRetry }
+ * @return {void}
  */
 export async function runAndRetry<T>({ func, onFail, shouldRetry }: {
   func: () => Promise<T>;

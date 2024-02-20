@@ -124,7 +124,7 @@ export function getNamedTypesFromMetadata(
  * @export
  * @param {IClientWeb3Core} web3
  * @param {PrepareInstallationParams} params
- * @return 
+ * @return {Promise<GasFeeEstimation>}
  */
 export async function prepareGenericInstallationEstimation(
   web3: IClientWeb3Core,

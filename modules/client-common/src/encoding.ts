@@ -119,7 +119,7 @@ export function decodeRatio(
  * @export
  * @param {string} pluginAddress
  * @param {number} id
- * @return 
+ * @return  {string} proposalId
  */
 export function encodeProposalId(pluginAddress: string, id: number) {
   if (!/^0x[A-Fa-f0-9]{40}$/.test(pluginAddress)) {
@@ -159,7 +159,7 @@ export function decodeProposalId(
  *
  * @export
  * @param {Array<boolean>} [bools]
- * @return 
+ * @return {BigInt} bitmap
  */
 export function boolArrayToBitmap(bools?: Array<boolean>) {
   if (!bools || !bools.length) return BigInt(0);
