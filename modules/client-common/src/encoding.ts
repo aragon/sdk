@@ -134,7 +134,7 @@ export function encodeProposalId(pluginAddress: string, id: number) {
  *
  * @export
  * @param {string} proposalId 
- * @return {object}  {pluginAddress: string; id: number }
+ * @return {object} pluginAddress: string; id: number
  */
 export function decodeProposalId(
   proposalId: string,
