@@ -375,12 +375,12 @@ export class MultisigClientMethods extends ClientCore
    * returns the members of the multisig
    *
    * @param {MembersQueryParams} params
-   *     pluginAddress,
-   *     blockNumber,
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = MembersSortBy.ADDRESS   
+   *     - pluginAddress
+   *     - blockNumber
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = MembersSortBy.ADDRESS   
    * @return {Promise<string[]>}
    * @memberof MultisigClientMethods
    */
@@ -473,12 +473,12 @@ export class MultisigClientMethods extends ClientCore
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
    * @param {ProposalQueryParams} params
-   *       daoAddressOrEns,
-   *       limit = 10,
-   *       status,
-   *       skip = 0,
-   *       direction = SortDirection.ASC,
-   *       sortBy = ProposalSortBy.CREATED_AT
+   *       - daoAddressOrEns
+   *       - limit = 10
+   *       - status
+   *       - skip = 0
+   *       - direction = SortDirection.ASC
+   *       - sortBy = ProposalSortBy.CREATED_AT
    * @return {Promise<MultisigProposalListItem[]>}
    * @memberof MultisigClientMethods
    */

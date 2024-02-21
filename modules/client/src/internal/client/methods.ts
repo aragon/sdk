@@ -762,10 +762,10 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Retrieves metadata for DAO with given identifier (address or ens domain)
    *
    * @param {DaoQueryParams} params
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = DaoSortBy.CREATED_AT   
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = DaoSortBy.CREATED_AT   
    * @return {Promise<DaoListItem[]>}
    * @memberof ClientMethods
    */
@@ -823,11 +823,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
    * @param {DaoBalancesQueryParams} params
-   *     daoAddressOrEns,
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = AssetBalanceSortBy.LAST_UPDATED   
+   *     - daoAddressOrEns
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = AssetBalanceSortBy.LAST_UPDATED   
    * @return {(Promise<AssetBalance[] | null>)}
    * @memberof ClientMethods
    */
@@ -888,12 +888,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)
    *
    * @param {TransferQueryParams} params
-   *     daoAddressOrEns,
-   *     type,
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = TransferSortBy.CREATED_AT   
+   *     - daoAddressOrEns
+   *     - type
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = TransferSortBy.CREATED_AT   
    * @return {(Promise<Transfer[] | null>)}
    * @memberof ClientMethods
    */
@@ -998,11 +998,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Retrieves the list of plugins available on the PluginRegistry
    *
    * @param {PluginQueryParams} params
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = PluginSortBy.SUBDOMAIN,
-   *     subdomain
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = PluginSortBy.SUBDOMAIN
+   *     - subdomain
    * @return {(Promise<PluginRepo[] | null>)}
    * @memberof ClientMethods
    */

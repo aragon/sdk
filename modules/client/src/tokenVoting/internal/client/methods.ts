@@ -481,12 +481,12 @@ export class TokenVotingClientMethods extends ClientCore
    * Returns the list of wallet addresses holding tokens from the underlying Token contract used by the plugin
    *
    * @param {MembersQueryParams} params
-   *     pluginAddress,
-   *     blockNumber,
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = MembersSortBy.ADDRESS   
+   *     - pluginAddress
+   *     - blockNumber
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = MembersSortBy.ADDRESS   
    * @return {Promise<string[]>}
    * @memberof TokenVotingClientMethods
    */

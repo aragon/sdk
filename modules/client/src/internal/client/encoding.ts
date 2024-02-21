@@ -610,7 +610,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddressOrEns
    * @param {DaoUpdateParams} params
-   * @return  {Promise<DaoAction>}
+   * @return {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
   public async daoUpdateAction(

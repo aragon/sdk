@@ -339,12 +339,12 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Returns the list of wallet addresses with signing capabilities on the plugin
    *
    * @param {MembersQueryParams} params
-   *     pluginAddress,
-   *     blockNumber,
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = MembersSortBy.ADDRESS   
+   *     - pluginAddress
+   *     - blockNumber
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = MembersSortBy.ADDRESS   
    * @return {Promise<string[]>}
    * @memberof AddresslistVotingClientMethods
    */
@@ -436,12 +436,12 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
    * @param {ProposalQueryParams} params
-   *       daoAddressOrEns,
-   *       limit = 10,
-   *       status,
-   *       skip = 0,
-   *       direction = SortDirection.ASC,
-   *       sortBy = ProposalSortBy.CREATED_AT
+   *       - daoAddressOrEns
+   *       - limit = 10
+   *       - status
+   *       - skip = 0
+   *       - direction = SortDirection.ASC
+   *       - sortBy = ProposalSortBy.CREATED_AT
    * @return {Promise<AddresslistVotingProposalListItem[]>}
    * @memberof AddresslistVotingClientMethods
    */

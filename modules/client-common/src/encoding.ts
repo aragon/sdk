@@ -119,7 +119,7 @@ export function decodeRatio(
  * @export
  * @param {string} pluginAddress
  * @param {number} id
- * @return  {string} proposalId
+ * @return {string} proposalId
  */
 export function encodeProposalId(pluginAddress: string, id: number) {
   if (!/^0x[A-Fa-f0-9]{40}$/.test(pluginAddress)) {
@@ -133,8 +133,8 @@ export function encodeProposalId(pluginAddress: string, id: number) {
  * Decodes a proposalId from subgraph and returns the original pluginAddress and the nonce
  *
  * @export
- * @param {string} proposalId
- * @return {{ pluginAddress: string; id: number }}
+ * @param {string} proposalId 
+ * @return {object}  {pluginAddress: string; id: number }
  */
 export function decodeProposalId(
   proposalId: string,
@@ -199,7 +199,7 @@ export function bitmapToBoolArray(bitmap: bigint): Array<boolean> {
  *
  * @export
  * @param {string} proposalId
- * @returns  {string}
+ * @returns {string}
  */
 export const getExtendedProposalId = (proposalId: string): string => {
   if (!isProposalId(proposalId)) {
@@ -214,7 +214,7 @@ export const getExtendedProposalId = (proposalId: string): string => {
  *
  * @export
  * @param {string} proposalId
- * @returns  {string}
+ * @returns {string}
  */
 export const getCompactProposalId = (proposalId: string): string => {
   if (!proposalId.match(/^(0x[A-Fa-f0-9]{40})_(0x[A-Fa-f0-9]{1,64})$/)) {
