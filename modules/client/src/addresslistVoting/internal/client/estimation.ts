@@ -24,7 +24,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
    * Estimates the gas fee of creating a proposal on the plugin
    *
    * @param {CreateMajorityVotingProposalParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
   public async createProposal(
@@ -65,7 +65,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
    * Estimates the gas fee of casting a vote on a proposal
    *
    * @param {VoteProposalParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
   public async voteProposal(
@@ -94,7 +94,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
    * Estimates the gas fee of executing an AddressList proposal
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
   public async executeProposal(
@@ -119,7 +119,7 @@ export class AddresslistVotingClientEstimation extends ClientCore
    * Estimates the gas fee of preparing an update
    *
    * @param {AddresslistVotingPluginPrepareUpdateParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof AddresslistVotingClientEstimation
    */
   public async prepareUpdate(

@@ -67,7 +67,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
   /**
    * @param {string} daoAddress
    * @param {ApplyInstallationParams} params
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public applyInstallationAction(
@@ -149,7 +149,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddress
    * @param {ApplyUpdateParams} params
-   * @return {*}  {DaoAction[]}
+   * @return {DaoAction[]}
    * @memberof ClientEncoding
    */
   public applyUpdateAndPermissionsActionBlock(
@@ -218,7 +218,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddress
    * @param {GrantPermissionParams} params
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public grantAction(
@@ -254,7 +254,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddress
    * @param {GrantPermissionWithConditionParams} params
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public grantWithConditionAction(
@@ -294,7 +294,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddress
    * @param {RevokePermissionParams} params
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public revokeAction(
@@ -330,7 +330,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} recipientAddressOrEns
    * @param {WithdrawParams} value
-   * @return {*}  {Promise<DaoAction>}
+   * @return {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
   public async withdrawAction(params: WithdrawParams): Promise<DaoAction> {
@@ -428,7 +428,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddressOrEns
    * @param {DaoMetadata} params
-   * @return {*}  {Promise<DaoAction>}
+   * @return {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
   public async updateDaoMetadataAction(
@@ -462,7 +462,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddressOrEns
    * @param {string} daoUri
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public setDaoUriAction(
@@ -485,7 +485,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddressOrEns
    * @param {string} daoUri
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public registerStandardCallbackAction(
@@ -510,7 +510,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddressOrEns
    * @param {string} signatureValidator
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public setSignatureValidatorAction(
@@ -534,7 +534,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddressOrEns
    * @param {string} implementationAddress
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public upgradeToAction(
@@ -558,7 +558,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddressOrEns
    * @param {UpgradeToAndCallParams} params
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public upgradeToAndCallAction(
@@ -584,7 +584,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddressOrEns
    * @param {InitializeFromParams} params
-   * @return {*}
+   * @return {DaoAction}
    * @memberof ClientEncoding
    */
   public initializeFromAction(
@@ -610,7 +610,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
    *
    * @param {string} daoAddressOrEns
    * @param {DaoUpdateParams} params
-   * @return {*}
+   * @return {Promise<DaoAction>}
    * @memberof ClientEncoding
    */
   public async daoUpdateAction(

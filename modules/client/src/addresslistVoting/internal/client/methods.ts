@@ -89,7 +89,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Creates a new proposal on the given AddressList plugin contract
    *
    * @param {CreateMajorityVotingProposalParams} params
-   * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
+   * @return {AsyncGenerator<ProposalCreationStepValue>}
    * @memberof AddresslistVotingClientMethods
    */
   public async *createProposal(
@@ -164,7 +164,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Pins a metadata object into IPFS and retruns the generated hash
    *
    * @param {ProposalMetadata} params
-   * @return {*}  {Promise<string>}
+   * @return {Promise<string>}
    * @memberof ClientMethods
    */
   public async pinMetadata(params: ProposalMetadata): Promise<string> {
@@ -180,7 +180,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Cast a vote on the given proposal using the client's wallet. Depending on the proposal settings, an affirmative vote may execute the proposal's actions on the DAO.
    *
    * @param {VoteProposalParams} params
-   * @return {*}  {AsyncGenerator<VoteProposalStepValue>}
+   * @return {AsyncGenerator<VoteProposalStepValue>}
    * @memberof AddresslistVotingClientMethods
    */
   public async *voteProposal(
@@ -217,7 +217,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Executes the given proposal, provided that it has already passed
    *
    * @param {string} proposalId
-   * @return {*}  {AsyncGenerator<ExecuteProposalStepValue>}
+   * @return {AsyncGenerator<ExecuteProposalStepValue>}
    * @memberof AddresslistVotingClientMethods
    */
   public async *executeProposal(
@@ -246,7 +246,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Prepares the installation of a token voting plugin in a given dao
    *
    * @param {AddresslistVotingPluginPrepareInstallationParams} params
-   * @return {*}  {AsyncGenerator<PrepareInstallationStepValue>}
+   * @return {AsyncGenerator<PrepareInstallationStepValue>}
    * @memberof MultisigClientMethods
    */
   public async *prepareInstallation(
@@ -275,7 +275,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Prepares the update of a token voting plugin in a given dao
    *
    * @param {AddresslistVotingPluginPrepareUpdateParams} params
-   * @return {*}  {AsyncGenerator<PrepareUpdateStepValue>}
+   * @return {AsyncGenerator<PrepareUpdateStepValue>}
    * @memberof AddresslistVotingClientMethods
    */
   public async *prepareUpdate(
@@ -296,7 +296,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Checks if an user can vote in a proposal
    *
    * @param {CanVoteParams} params
-   * @return {*}  {Promise<boolean>}
+   * @return {Promise<boolean>}
    * @memberof AddresslistVotingClientMethods
    */
   public async canVote(params: CanVoteParams): Promise<boolean> {
@@ -318,7 +318,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Checks whether the current proposal can be executed
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<boolean>}
+   * @return {Promise<boolean>}
    * @memberof AddresslistVotingClientMethods
    */
   public async canExecute(
@@ -338,15 +338,14 @@ export class AddresslistVotingClientMethods extends ClientCore
   /**
    * Returns the list of wallet addresses with signing capabilities on the plugin
    *
-   * @param {MembersQueryParams} {
-   *     pluginAddress,
-   *     blockNumber,
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = MembersSortBy.ADDRESS,
-   *   }
-   * @return {*}  {Promise<string[]>}
+   * @param {MembersQueryParams} params
+   *     - pluginAddress
+   *     - blockNumber
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = MembersSortBy.ADDRESS   
+   * @return {Promise<string[]>}
    * @memberof AddresslistVotingClientMethods
    */
   public async getMembers({
@@ -384,7 +383,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    * Returns the details of the given proposal
    *
    * @param {string} proposalId
-   * @return {*}  {(Promise<AddresslistVotingProposal | null>)}
+   * @return {(Promise<AddresslistVotingProposal | null>)}
    * @memberof AddresslistVotingClientMethods
    */
   public async getProposal(
@@ -436,15 +435,14 @@ export class AddresslistVotingClientMethods extends ClientCore
   /**
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
-   * @param {ProposalQueryParams} {
-   *       daoAddressOrEns,
-   *       limit = 10,
-   *       status,
-   *       skip = 0,
-   *       direction = SortDirection.ASC,
-   *       sortBy = ProposalSortBy.CREATED_AT,
-   *     }
-   * @return {*}  {Promise<AddresslistVotingProposalListItem[]>}
+   * @param {ProposalQueryParams} params
+   *       - daoAddressOrEns
+   *       - limit = 10
+   *       - status
+   *       - skip = 0
+   *       - direction = SortDirection.ASC
+   *       - sortBy = ProposalSortBy.CREATED_AT
+   * @return {Promise<AddresslistVotingProposalListItem[]>}
    * @memberof AddresslistVotingClientMethods
    */
   public async getProposals({
@@ -540,7 +538,7 @@ export class AddresslistVotingClientMethods extends ClientCore
    *
    * @param {string} pluginAddress
    * @param {number} blockNumber
-   * @return {*}  {(Promise<VotingSettings | null>)}
+   * @return {(Promise<VotingSettings | null>)}
    * @memberof AddresslistVotingClientMethods
    */
   public async getVotingSettings(

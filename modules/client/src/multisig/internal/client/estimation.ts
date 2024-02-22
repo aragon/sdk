@@ -23,7 +23,7 @@ export class MultisigClientEstimation extends ClientCore
    * Estimates the gas fee of creating a proposal on the plugin
    *
    * @param {CreateMultisigProposalParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof MultisigClientEstimation
    */
   public async createProposal(
@@ -63,7 +63,7 @@ export class MultisigClientEstimation extends ClientCore
    * Estimates the gas fee of approving a proposal
    *
    * @param {ApproveMultisigProposalParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof MultisigClientEstimation
    */
   public async approveProposal(
@@ -89,7 +89,7 @@ export class MultisigClientEstimation extends ClientCore
    * Estimates the gas fee of executing a proposal
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof MultisigClientEstimation
    */
   public async executeProposal(
@@ -115,7 +115,7 @@ export class MultisigClientEstimation extends ClientCore
    * Estimates the gas fee of preparing an update
    *
    * @param {MultisigPluginPrepareUpdateParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof MultisigClientEstimation
    */
   public async prepareUpdate(

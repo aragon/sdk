@@ -36,7 +36,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    *
    * @param {AddresslistVotingPluginInstall} params
    * @param {Networkish} network
-   * @return {*}  {PluginInstallItem}
+   * @return {PluginInstallItem}
    * @memberof AddresslistVotingClientEncoding
    */
   static getPluginInstallItem(
@@ -67,7 +67,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    *
    * @param {string} pluginAddress
    * @param {VotingSettings} params
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof AddresslistVotingClientEncoding
    */
   public updatePluginSettingsAction(
@@ -89,7 +89,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    *
    * @param {string} pluginAddress
    * @param {string[]} members
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof AddresslistVotingClientEncoding
    */
   public addMembersAction(pluginAddress: string, members: string[]): DaoAction {
@@ -118,7 +118,7 @@ export class AddresslistVotingClientEncoding extends ClientCore
    *
    * @param {string} pluginAddress
    * @param {string[]} members
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof AddresslistVotingClientEncoding
    */
   public removeMembersAction(

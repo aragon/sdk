@@ -37,7 +37,7 @@ export class MultisigClient extends ClientCore implements IMultisigClient {
      *
      * @param {MultisigPluginInstallParams} params
      * @param {Networkish} [network="mainnet"]
-     * @return {*}  {PluginInstallItem}
+     * @return {PluginInstallItem}
      * @memberof MultisigClient
      */
 

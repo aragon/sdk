@@ -86,7 +86,7 @@ export class MultisigClientMethods extends ClientCore
    * Creates a new proposal on the given multisig plugin contract
    *
    * @param {CreateMultisigProposalParams} params
-   * @return {*}  {AsyncGenerator<ProposalCreationStepValue>}
+   * @return {AsyncGenerator<ProposalCreationStepValue>}
    * @memberof MultisigClientMethods
    */
   public async *createProposal(
@@ -158,7 +158,7 @@ export class MultisigClientMethods extends ClientCore
    * Pins a metadata object into IPFS and retruns the generated hash
    *
    * @param {ProposalMetadata} params
-   * @return {*}  {Promise<string>}
+   * @return {Promise<string>}
    * @memberof MultisigClientMethods
    */
   public async pinMetadata(params: ProposalMetadata): Promise<string> {
@@ -174,7 +174,7 @@ export class MultisigClientMethods extends ClientCore
    * Allow a wallet in the multisig give approval to a proposal
    *
    * @param {ApproveMultisigProposalParams} params
-   * @return {*}  {AsyncGenerator<ApproveProposalStepValue>}
+   * @return {AsyncGenerator<ApproveProposalStepValue>}
    * @memberof MultisigClientMethods
    */
   public async *approveProposal(
@@ -208,7 +208,7 @@ export class MultisigClientMethods extends ClientCore
    * Allow a wallet in the multisig give approval to a proposal
    *
    * @param {string} proposalId
-   * @return {*}  {AsyncGenerator<ExecuteMultisigProposalStepValue>}
+   * @return {AsyncGenerator<ExecuteMultisigProposalStepValue>}
    * @memberof MultisigClientMethods
    */
   public async *executeProposal(
@@ -242,7 +242,7 @@ export class MultisigClientMethods extends ClientCore
    * Prepares the installation of a multisig plugin in a given dao
    *
    * @param {MultisigPluginPrepareInstallationParams} params
-   * @return {*}  {AsyncGenerator<PrepareInstallationStepValue>}
+   * @return {AsyncGenerator<PrepareInstallationStepValue>}
    * @memberof MultisigClientMethods
    */
   public async *prepareInstallation(
@@ -276,7 +276,7 @@ export class MultisigClientMethods extends ClientCore
    * Prepares the update of a multisig plugin in a given dao
    *
    * @param {MultisigPluginPrepareUpdateParams} params
-   * @return {*}  {AsyncGenerator<PrepareUpdateStepValue>}
+   * @return {AsyncGenerator<PrepareUpdateStepValue>}
    * @memberof MultisigClientMethods
    */
   public async *prepareUpdate(
@@ -297,7 +297,7 @@ export class MultisigClientMethods extends ClientCore
    * Checks whether the current proposal can be approved by the given address
    *
    * @param {string} addressOrEns
-   * @return {*}  {Promise<boolean>}
+   * @return {Promise<boolean>}
    * @memberof MultisigClientMethods
    */
   public async canApprove(
@@ -320,7 +320,7 @@ export class MultisigClientMethods extends ClientCore
    * Checks whether the current proposal can be executed
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<boolean>}
+   * @return {Promise<boolean>}
    * @memberof MultisigClientMethods
    */
   public async canExecute(
@@ -342,7 +342,7 @@ export class MultisigClientMethods extends ClientCore
    *
    * @param {string} addressOrEns
    * @param {number} blockNumber
-   * @return {*}  {Promise<MultisigVotingSettings>}
+   * @return {Promise<MultisigVotingSettings>}
    * @memberof MultisigClientMethods
    */
   public async getVotingSettings(
@@ -374,15 +374,14 @@ export class MultisigClientMethods extends ClientCore
   /**
    * returns the members of the multisig
    *
-   * @param {MembersQueryParams} {
-   *     pluginAddress,
-   *     blockNumber,
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = MembersSortBy.ADDRESS,
-   *   }
-   * @return {*}  {Promise<string[]>}
+   * @param {MembersQueryParams} params
+   *     - pluginAddress
+   *     - blockNumber
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = MembersSortBy.ADDRESS   
+   * @return {Promise<string[]>}
    * @memberof MultisigClientMethods
    */
   public async getMembers({
@@ -421,7 +420,7 @@ export class MultisigClientMethods extends ClientCore
    * Returns the details of the given proposal
    *
    * @param {string} proposalId
-   * @return {*}  {(Promise<MultisigProposal | null>)}
+   * @return {(Promise<MultisigProposal | null>)}
    * @memberof MultisigClientMethods
    */
   public async getProposal(
@@ -473,15 +472,14 @@ export class MultisigClientMethods extends ClientCore
   /**
    * Returns a list of proposals on the Plugin, filtered by the given criteria
    *
-   * @param {ProposalQueryParams} {
-   *       daoAddressOrEns,
-   *       limit = 10,
-   *       status,
-   *       skip = 0,
-   *       direction = SortDirection.ASC,
-   *       sortBy = ProposalSortBy.CREATED_AT,
-   *     }
-   * @return {*}  {Promise<MultisigProposalListItem[]>}
+   * @param {ProposalQueryParams} params
+   *       - daoAddressOrEns
+   *       - limit = 10
+   *       - status
+   *       - skip = 0
+   *       - direction = SortDirection.ASC
+   *       - sortBy = ProposalSortBy.CREATED_AT
+   * @return {Promise<MultisigProposalListItem[]>}
    * @memberof MultisigClientMethods
    */
   public async getProposals({

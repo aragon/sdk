@@ -181,7 +181,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Creates a DAO with the given settings and plugins
 
    * @param {CreateDaoParams} params
-   * @return {*}  {AsyncGenerator<DaoCreationStepValue>}
+   * @return {AsyncGenerator<DaoCreationStepValue>}
    * @memberof ClientMethods
    */
   public async *createDao(
@@ -297,7 +297,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Pins a metadata object into IPFS and retruns the generated hash
    *
    * @param {DaoMetadata} params
-   * @return {*}  {Promise<string>}
+   * @return {Promise<string>}
    * @memberof ClientMethods
    */
   public async pinMetadata(params: DaoMetadata): Promise<string> {
@@ -314,7 +314,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Deposits ether or an ERC20 token into the DAO
    *
    * @param {DepositParams} params
-   * @return {*}  {AsyncGenerator<DaoDepositStepValue>}
+   * @return {AsyncGenerator<DaoDepositStepValue>}
    * @memberof ClientMethods
    */
   public async *deposit(
@@ -535,7 +535,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Checks if the allowance is enough and updates it
    *
    * @param {SetAllowanceParams} params
-   * @return {*}  {AsyncGenerator<SetAllowanceStepValue>}
+   * @return {AsyncGenerator<SetAllowanceStepValue>}
    * @memberof ClientMethods
    */
   public async *setAllowance(
@@ -579,7 +579,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Prepare uninstallation of a plugin
    *
    * @param {PrepareUninstallationParams} params
-   * @return {*}  {AsyncGenerator<PrepareUninstallationStepValue>}
+   * @return {AsyncGenerator<PrepareUninstallationStepValue>}
    * @memberof ClientMethods
    */
   public async *prepareUninstallation(
@@ -671,7 +671,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Prepare update of a plugin
    *
    * @param {PrepareUpdateParams} params
-   * @return {*}  {AsyncGenerator<PrepareUpdateStepValue>}
+   * @return {AsyncGenerator<PrepareUpdateStepValue>}
    * @memberof ClientMethods
    */
   public async *prepareUpdate(
@@ -692,7 +692,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Checks whether a role is granted by the current DAO's ACL settings
    *
    * @param {HasPermissionParams} params
-   * @return {*}  {Promise<boolean>}
+   * @return {Promise<boolean>}
    * @memberof ClientMethods
    */
   public async hasPermission(params: HasPermissionParams): Promise<boolean> {
@@ -711,7 +711,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Retrieves metadata for DAO with given identifier (address or ens domain)
    *
    * @param {string} daoAddressOrEns
-   * @return {*}  {(Promise<DaoDetails | null>)}
+   * @return {(Promise<DaoDetails | null>)}
    * @memberof ClientMethods
    */
   public async getDao(daoAddressOrEns: string): Promise<DaoDetails | null> {
@@ -761,13 +761,12 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Retrieves metadata for DAO with given identifier (address or ens domain)
    *
-   * @param {DaoQueryParams} {
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = DaoSortBy.CREATED_AT,
-   *   }
-   * @return {*}  {Promise<DaoListItem[]>}
+   * @param {DaoQueryParams} params
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = DaoSortBy.CREATED_AT   
+   * @return {Promise<DaoListItem[]>}
    * @memberof ClientMethods
    */
   public async getDaos({
@@ -823,14 +822,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Retrieves the asset balances of the given DAO, by default, ETH, DAI, USDC and USDT on Mainnet
    *
-   * @param {DaoBalancesQueryParams} {
-   *     daoAddressOrEns,
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = AssetBalanceSortBy.LAST_UPDATED,
-   *   }
-   * @return {*}  {(Promise<AssetBalance[] | null>)}
+   * @param {DaoBalancesQueryParams} params
+   *     - daoAddressOrEns
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = AssetBalanceSortBy.LAST_UPDATED   
+   * @return {(Promise<AssetBalance[] | null>)}
    * @memberof ClientMethods
    */
   public async getDaoBalances({
@@ -889,15 +887,14 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Retrieves the list of asset transfers to and from the given DAO (by default, from ETH, DAI, USDC and USDT, on Mainnet)
    *
-   * @param {TransferQueryParams} {
-   *     daoAddressOrEns,
-   *     type,
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = TransferSortBy.CREATED_AT,
-   *   }
-   * @return {*}  {(Promise<Transfer[] | null>)}
+   * @param {TransferQueryParams} params
+   *     - daoAddressOrEns
+   *     - type
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = TransferSortBy.CREATED_AT   
+   * @return {(Promise<Transfer[] | null>)}
    * @memberof ClientMethods
    */
   public async getDaoTransfers({
@@ -1000,14 +997,13 @@ export class ClientMethods extends ClientCore implements IClientMethods {
   /**
    * Retrieves the list of plugins available on the PluginRegistry
    *
-   * @param {PluginQueryParams} {
-   *     limit = 10,
-   *     skip = 0,
-   *     direction = SortDirection.ASC,
-   *     sortBy = PluginSortBy.SUBDOMAIN,
-   *     subdomain
-   *   }
-   * @return {*}  {(Promise<PluginRepo[] | null>)}
+   * @param {PluginQueryParams} params
+   *     - limit = 10
+   *     - skip = 0
+   *     - direction = SortDirection.ASC
+   *     - sortBy = PluginSortBy.SUBDOMAIN
+   *     - subdomain
+   * @return {(Promise<PluginRepo[] | null>)}
    * @memberof ClientMethods
    */
   public async getPlugins({
@@ -1056,7 +1052,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Get plugin details given an address, release and build
    *
    * @param {string} pluginAddress
-   * @return {*}  {Promise<PluginRepo>}
+   * @return {Promise<PluginRepo>}
    * @memberof ClientMethods
    */
   public async getPlugin(pluginAddress: string): Promise<PluginRepo> {
@@ -1077,7 +1073,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * if the transaction fails returns [1,0,0]
    *
    * @param {string} contractAddress
-   * @return {*}  {Promise<[number, number, number]>}
+   * @return {Promise<number[]>}
    * @memberof ClientMethods
    */
   public async getProtocolVersion(
@@ -1104,7 +1100,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Given a proposal id returns if that proposal is a dao update proposal
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<boolean>}
+   * @return {Promise<boolean>}
    * @memberof ClientMethods
    */
   public async isDaoUpdateProposal(
@@ -1132,7 +1128,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Given a proposal id returns if that proposal is a plugin update proposal
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<boolean>}
+   * @return {Promise<boolean>}
    * @memberof ClientMethods
    */
   public async isPluginUpdateProposal(
@@ -1157,7 +1153,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    * Check if the specified proposal id is valid for updating a plugin
    *
    * @param {string} proposalId
-   * @return {*}  {Promise<PluginUpdateProposalValidity>}
+   * @return {Promise<PluginUpdateProposalValidity>}
    * @memberof ClientMethods
    */
   public async isPluginUpdateProposalValid(
@@ -1218,7 +1214,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    *
    * @param {string} proposalId
    * @param {SupportedVersion} [version]
-   * @return {*}  {Promise<DaoUpdateProposalValidity>}
+   * @return {Promise<DaoUpdateProposalValidity>}
    * @memberof ClientMethods
    */
   public async isDaoUpdateProposalValid(
@@ -1280,7 +1276,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    *  Return the implementation address for the specified dao factory
    *
    * @param {string} daoFactoryAddress
-   * @return {*}  {Promise<string>}
+   * @return {Promise<string>}
    * @memberof ClientMethods
    */
   public async getDaoImplementation(

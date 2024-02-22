@@ -21,7 +21,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * Decodes a dao metadata from an encoded update metadata action
    *
    * @param {Uint8Array} data
-   * @return {*}  {VotingSettings}
+   * @return {VotingSettings}
    * @memberof AddresslistVotingClientDecoding
    */
   public updatePluginSettingsAction(data: Uint8Array): VotingSettings {
@@ -31,7 +31,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * Decodes a list of addresses from an encoded add members action
    *
    * @param {Uint8Array} data
-   * @return {*}  {string[]}
+   * @return {string[]}
    * @memberof AddresslistVotingClientDecoding
    */
   public addMembersAction(data: Uint8Array): string[] {
@@ -48,7 +48,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * Decodes a list of addresses from an encoded remove members action
    *
    * @param {Uint8Array} data
-   * @return {*}  {string[]}
+   * @return {string[]}
    * @memberof AddresslistVotingClientDecoding
    */
   public removeMembersAction(data: Uint8Array): string[] {
@@ -67,7 +67,7 @@ export class AddresslistVotingClientDecoding extends ClientCore
    * Returns the decoded function info given the encoded data of an action
    *
    * @param {Uint8Array} data
-   * @return {*}  {(InterfaceParams | null)}
+   * @return {(InterfaceParams | null)}
    * @memberof AddresslistVotingClientDecoding
    */
   public findInterface(data: Uint8Array): InterfaceParams | null {

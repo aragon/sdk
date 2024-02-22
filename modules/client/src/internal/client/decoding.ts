@@ -56,7 +56,7 @@ import {
 export class ClientDecoding extends ClientCore implements IClientDecoding {
   /**
    * @param {data} Uint8Array
-   * @return {*}  {DecodedApplyInstallationParams}
+   * @return {DecodedApplyInstallationParams}
    * @memberof ClientDecoding
    */
   public applyInstallationAction(
@@ -71,7 +71,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
   }
   /**
    * @param {data} Uint8Array
-   * @return {*}  {DecodedApplyInstallationParams}
+   * @return {DecodedApplyInstallationParams}
    * @memberof ClientDecoding
    */
   public applyUninstallationAction(
@@ -89,7 +89,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the apply update parameters from an encoded apply update action
    *
    * @param {Uint8Array} data
-   * @return {*}  {DecodedApplyUpdateParams}
+   * @return {DecodedApplyUpdateParams}
    * @memberof ClientDecoding
    */
   public applyUpdateAction(
@@ -102,7 +102,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the permission parameters from an encoded grant action
    *
    * @param {Uint8Array} data
-   * @return {*}  {GrantPermissionDecodedParams}
+   * @return {GrantPermissionDecodedParams}
    * @memberof ClientDecoding
    */
   public grantAction(data: Uint8Array): GrantPermissionDecodedParams {
@@ -113,7 +113,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the grant permission with condition parameters from an encoded grant with condition action
    *
    * @param {Uint8Array} data
-   * @return {*}  {GrantPermissionWithConditionParams}
+   * @return {GrantPermissionWithConditionParams}
    * @memberof ClientDecoding
    */
   public grantWithConditionAction(
@@ -130,7 +130,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the permission parameters from an encoded revoke action
    *
    * @param {Uint8Array} data
-   * @return {*}  {RevokePermissionDecodedParams}
+   * @return {RevokePermissionDecodedParams}
    * @memberof ClientDecoding
    */
   public revokeAction(data: Uint8Array): RevokePermissionDecodedParams {
@@ -145,7 +145,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the withdraw parameters from an encoded withdraw action
    *
    * @param {Uint8Array} data
-   * @return {*}  {WithdrawParams}
+   * @return {WithdrawParams}
    * @memberof ClientDecoding
    */
   public withdrawAction(
@@ -216,7 +216,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes a dao metadata ipfs uri from an encoded update metadata action
    *
    * @param {Uint8Array} data
-   * @return {*}  {string}
+   * @return {string}
    * @memberof ClientDecoding
    */
   public updateDaoMetadataRawAction(data: Uint8Array): string {
@@ -233,7 +233,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes a dao metadata from an encoded update metadata raw action
    *
    * @param {Uint8Array} data
-   * @return {*}  {Promise<DaoMetadata>}
+   * @return {Promise<DaoMetadata>}
    * @memberof ClientDecoding
    */
   public async updateDaoMetadataAction(data: Uint8Array): Promise<DaoMetadata> {
@@ -255,7 +255,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the daoUri from a setDaoUriAction
    *
    * @param {Uint8Array} data
-   * @return {*}  {string}
+   * @return {string}
    * @memberof ClientDecoding
    */
   public setDaoUriAction(data: Uint8Array): string {
@@ -270,7 +270,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the RegisterStandardCallbackParams from a registerStandardCallbackAction
    *
    * @param {Uint8Array} data
-   * @return {*}  {RegisterStandardCallbackParams}
+   * @return {RegisterStandardCallbackParams}
    * @memberof ClientDecoding
    */
   public registerStandardCallbackAction(
@@ -293,7 +293,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the implementation address from an encoded upgradeToAction
    *
    * @param {Uint8Array} data
-   * @return {*}  {string}
+   * @return {string}
    * @memberof ClientDecoding
    */
   public setSignatureValidatorAction(
@@ -315,7 +315,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes upgradeToAndCallback params from an upgradeToAndCallAction
    *
    * @param {Uint8Array} data
-   * @return {*}  {UpgradeToAndCallParams}
+   * @return {UpgradeToAndCallParams}
    * @memberof ClientDecoding
    */
   public upgradeToAndCallAction(
@@ -329,7 +329,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the initializeFrom params from an initializeFromAction
    *
    * @param {Uint8Array} data
-   * @return {*}  {InitializeFromParams}
+   * @return {InitializeFromParams}
    * @memberof ClientDecoding
    */
   public initializeFromAction(data: Uint8Array): InitializeFromParams {
@@ -341,7 +341,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Returns the decoded function info given the encoded data of an action
    *
    * @param {Uint8Array} data
-   * @return {*}  {(InterfaceParams | null)}
+   * @return {(InterfaceParams | null)}
    * @memberof ClientDecoding
    */
   public findInterface(data: Uint8Array): InterfaceParams | null {
@@ -353,7 +353,7 @@ export class ClientDecoding extends ClientCore implements IClientDecoding {
    * Decodes the dao update params from a daoUpdateAction
    *
    * @param {Uint8Array} data
-   * @return {*}  {DaoUpdateDecodedParams}
+   * @return {DaoUpdateDecodedParams}
    * @memberof ClientDecoding
    */
   public daoUpdateAction(

@@ -41,7 +41,7 @@ export class TokenVotingClient extends ClientCore
      *
      * @param {TokenVotingPluginInstall} params
      * @param {Networkish} [network="mainnet"]
-     * @return {*}  {PluginInstallItem}
+     * @return {PluginInstallItem}
      * @memberof TokenVotingClient
      */
     getPluginInstallItem: (

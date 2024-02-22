@@ -39,7 +39,7 @@ export class MultisigClientEncoding extends ClientCore
    * @param {MultisigPluginInstallParams} params
    * @param {Networkish} network
    *
-   * @return {*}  {PluginInstallItem}
+   * @return {PluginInstallItem}
    * @memberof MultisigClientEncoding
    */
   static getPluginInstallItem(
@@ -71,7 +71,7 @@ export class MultisigClientEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal that updates the governance configuration
    *
    * @param {AddAddressesParams} params
-   * @return {*}  {DaoAction[]}
+   * @return {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
   public addAddressesAction(
@@ -102,7 +102,7 @@ export class MultisigClientEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal that adds addresses to address list
    *
    * @param {RemoveAddressesParams} params
-   * @return {*}  {DaoAction[]}
+   * @return {DaoAction[]}
    * @memberof MultisigClientEncoding
    */
   public removeAddressesAction(
@@ -133,7 +133,7 @@ export class MultisigClientEncoding extends ClientCore
    * Computes the parameters to be given when creating a proposal updates multisig settings
    *
    * @param {UpdateMultisigVotingSettingsParams} params
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof MultisigClientEncoding
    */
   public updateMultisigVotingSettings(

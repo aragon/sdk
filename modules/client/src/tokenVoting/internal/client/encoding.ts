@@ -39,7 +39,7 @@ export class TokenVotingClientEncoding extends ClientCore
    *
    * @param {TokenVotingPluginInstall} params
    * @param {Networkish} network
-   * @return {*}  {PluginInstallItem}
+   * @return {PluginInstallItem}
    * @memberof TokenVotingClientEncoding
    */
   static getPluginInstallItem(
@@ -66,7 +66,7 @@ export class TokenVotingClientEncoding extends ClientCore
    *
    * @param {string} pluginAddress
    * @param {VotingSettings} params
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof TokenVotingClientEncoding
    */
   public updatePluginSettingsAction(
@@ -89,7 +89,7 @@ export class TokenVotingClientEncoding extends ClientCore
    *
    * @param {string} minterAddress
    * @param {MintTokenParams} params
-   * @return {*}  {DaoAction}
+   * @return {DaoAction}
    * @memberof TokenVotingClientEncoding
    */
   public mintTokenAction(

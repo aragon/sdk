@@ -57,7 +57,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * Estimates the gas fee of creating a DAO
    *
    * @param {CreateDaoParams} _params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
   public async createDao(params: CreateDaoParams): Promise<GasFeeEstimation> {
@@ -102,7 +102,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * This does not estimate the gas cost of updating the allowance of an ERC20 token
    *
    * @param {DepositParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
   public async deposit(
@@ -139,7 +139,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * Estimates the gas fee of updating the allowance of an ERC20 token
    *
    * @param {SetAllowanceParams} _params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
   public async setAllowance(
@@ -178,7 +178,7 @@ export class ClientEstimation extends ClientCore implements IClientEstimation {
    * Estimates the gas fee of preparing an update
    *
    * @param {PrepareUpdateParams} params
-   * @return {*}  {Promise<GasFeeEstimation>}
+   * @return {Promise<GasFeeEstimation>}
    * @memberof ClientEstimation
    */
   public async prepareUpdate(

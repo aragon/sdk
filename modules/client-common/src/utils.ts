@@ -51,7 +51,7 @@ import { Zero } from "@ethersproject/constants";
  * @param {ContractReceipt} receipt
  * @param {Interface} iface
  * @param {string} eventName
- * @return {*}  {(Log | undefined)}
+ * @return {(Log | undefined)}
  */
 export function findLog(
   receipt: ContractReceipt,
@@ -75,7 +75,7 @@ export function findLog(
  * @export
  * @param {Uint8Array} data
  * @param {string[]} availableFunctions
- * @return {*}  {FunctionFragment}
+ * @return {FunctionFragment}
  */
 export function getFunctionFragment(
   data: Uint8Array,
@@ -91,7 +91,7 @@ export function getFunctionFragment(
  *
  * @export
  * @param {MetadataAbiInput[]} [inputs=[]]
- * @return {*}  {string[]}
+ * @return {string[]}
  */
 export function getNamedTypesFromMetadata(
   inputs: MetadataAbiInput[] = [],
@@ -124,7 +124,7 @@ export function getNamedTypesFromMetadata(
  * @export
  * @param {IClientWeb3Core} web3
  * @param {PrepareInstallationParams} params
- * @return {*}
+ * @return {Promise<GasFeeEstimation>}
  */
 export async function prepareGenericInstallationEstimation(
   web3: IClientWeb3Core,
@@ -180,7 +180,7 @@ export async function prepareGenericInstallationEstimation(
  * @export
  * @param {IClientWeb3Core} web3
  * @param {(PrepareInstallationParams & { pluginSetupProcessorAddress: string })} params
- * @return {*}  {AsyncGenerator<PrepareInstallationStepValue>}
+ * @return {AsyncGenerator<PrepareInstallationStepValue>}
  */
 export async function* prepareGenericInstallation(
   web3: IClientWeb3Core,
@@ -259,7 +259,7 @@ export async function* prepareGenericInstallation(
  *
  * @param {IClientGraphQLCore} graphql
  * @param {PrepareUpdateParams} params
- * @return {*}  {Promise<PluginSetupProcessor.PrepareUpdateParamsStruct>}
+ * @return {Promise<PluginSetupProcessor.PrepareUpdateParamsStruct>}
  */
 async function getPrepareUpdateParams(
   graphql: IClientGraphQLCore,
@@ -319,7 +319,7 @@ async function getPrepareUpdateParams(
  * @param {IClientWeb3Core} web3
  * @param {IClientGraphQLCore} graphql
  * @param {(PrepareUpdateParams & { pluginSetupProcessorAddress: string })} params
- * @return {*}  {Promise<GasFeeEstimation>}
+ * @return {Promise<GasFeeEstimation>}
  */
 export async function prepareGenericUpdateEstimation(
   web3: IClientWeb3Core,
@@ -401,7 +401,7 @@ export async function* prepareGenericUpdate(
  *
  * @export
  * @param {Networkish} networkish
- * @return {*}  {Network}
+ * @return {Network}
  */
 export function getNetwork(networkish: Networkish): Network {
   let network: Network | undefined;
@@ -437,7 +437,7 @@ export function getNetwork(networkish: Networkish): Network {
  *
  * @export
  * @param {Interface} iface
- * @return {*}  {string}
+ * @return {string}
  */
 export function getInterfaceId(iface: Interface): string {
   let interfaceId = Zero;

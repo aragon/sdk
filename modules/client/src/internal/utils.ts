@@ -1132,7 +1132,7 @@ export function validateRevokeRootPermissionAction(
  * @param {string} daoAddress
  * @param {IClientGraphQLCore} graphql
  * @param {IClientIpfsCore} ipfs
- * @return {*}  {Promise<PluginUpdateProposalInValidityCause[]>}
+ * @return {Promise<PluginUpdateProposalInValidityCause[]>}
  */
 export async function validateApplyUpdateFunction(
   action: DaoAction,
@@ -1293,7 +1293,7 @@ export async function validateApplyUpdateFunction(
  *
  * @export
  * @param {DaoAction[]} actions
- * @return {*}  {ProposalActionTypes[]}
+ * @return {ProposalActionTypes[]}
  */
 export function classifyProposalActions(
   actions: DaoAction[],
@@ -1374,7 +1374,7 @@ export function classifyProposalActions(
  *
  * @export
  * @param {ProposalActionTypes[]} actions
- * @return {*}  {boolean}
+ * @return {boolean}
  */
 export function containsPluginUpdateActionBlockWithRootPermission(
   actions: ProposalActionTypes[],
@@ -1392,7 +1392,7 @@ export function containsPluginUpdateActionBlockWithRootPermission(
  *
  * @export
  * @param {ProposalActionTypes[]} actions
- * @return {*}  {boolean}
+ * @return {boolean}
  */
 export function containsPluginUpdateActionBlock(
   actions: ProposalActionTypes[],
@@ -1409,7 +1409,7 @@ export function containsPluginUpdateActionBlock(
  *
  * @export
  * @param {ProposalActionTypes[]} actions
- * @return {*}  {boolean}
+ * @return {boolean}
  */
 export function startsWithDaoUpdateAction(
   actions: ProposalActionTypes[],
