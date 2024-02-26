@@ -1,5 +1,6 @@
-
+exports.toLowerCase = toLowerCase
 exports.stripTags = stripTags
+exports.extractText = extractText
 
 function stripTags(input) {
     // Replace HTML entities with their corresponding characters
@@ -8,4 +9,11 @@ function stripTags(input) {
     return decodedInput.replace(/<\/?p>/ig, "");
 }
 
-  
+function toLowerCase(input){
+    return input.toLowerCase();
+}
+
+function extractText(input) {
+    // Keep only alphabetic characters (a-z, A-Z)
+    return input.match(/[a-zA-Z]+/g).join("");
+}

@@ -1,0 +1,4 @@
+{{#each types~}}
+{{>custom-link to=this html=../html ~}}
+{{#unless @last}}{{{../delimiter}}}{{/unless~}}
+{{/each}}
