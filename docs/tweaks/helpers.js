@@ -15,5 +15,5 @@ function toLowerCase(input){
 
 function extractText(input) {
     // Keep only alphabetic characters (a-z, A-Z)
-    return input.match(/[a-zA-Z]+/g).join("");
+    return input.match(/[a-zA-Z0-9]+/g).join("");
 }
