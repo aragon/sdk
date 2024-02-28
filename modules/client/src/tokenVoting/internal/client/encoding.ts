@@ -57,10 +57,15 @@ export class TokenVotingClientEncoding extends ClientCore
       getNamedTypesFromMetadata(INSTALLATION_ABI),
       args,
     );
+
+    const repoAddress =
+      contracts[aragonNetwork][SupportedVersions.V1_3_0].TokenVotingRepoProxy
+        .address;
+    if (!repoAddress) {
+      throw new Error();
+    }
     return {
-      id:
-        contracts[aragonNetwork][SupportedVersions.V1_3_0]?.TokenVotingRepoProxy
-          .address || "",
+      id: repoAddress,
       data: hexToBytes(hexBytes),
     };
   }

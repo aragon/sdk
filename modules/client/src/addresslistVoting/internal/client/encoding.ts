@@ -56,10 +56,14 @@ export class AddresslistVotingClientEncoding extends ClientCore
         params.addresses,
       ],
     );
+    const repoAddress = contracts[aragonNetwork][SupportedVersions.V1_3_0]
+      .AddresslistVotingRepoProxy.address;
+    if (!repoAddress) {
+      throw new Error("AddresslistVotingRepoProxy address not found");
+    }
 
     return {
-      id: contracts[aragonNetwork][SupportedVersions.V1_3_0]
-        ?.AddresslistVotingRepoProxy.address || "",
+      id: repoAddress,
       data: hexToBytes(hexBytes),
     };
   }
