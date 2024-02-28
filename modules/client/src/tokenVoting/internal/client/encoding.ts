@@ -59,7 +59,7 @@ export class TokenVotingClientEncoding extends ClientCore
     );
 
     const repoAddress =
-      contracts[aragonNetwork][SupportedVersions.V1_3_0].TokenVotingRepoProxy
+      contracts[aragonNetwork][SupportedVersions.V1_3_0]?.TokenVotingRepoProxy
         .address;
     if (!repoAddress) {
       throw new Error();
