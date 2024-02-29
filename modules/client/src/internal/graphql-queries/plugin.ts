@@ -102,4 +102,4 @@ export const QueryPluginInstallations = gql`
     pluginInstallations(where: $where) {
       id
     }
-  }`
+  }`;

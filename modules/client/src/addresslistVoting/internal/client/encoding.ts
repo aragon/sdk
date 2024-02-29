@@ -16,14 +16,15 @@ import {
   getNetwork,
   hexToBytes,
   InvalidAddressError,
-  LIVE_CONTRACTS,
   PluginInstallItem,
-  SupportedNetwork,
-  SupportedNetworksArray,
-  SupportedVersion,
   UnsupportedNetworkError,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
+import {
+  contracts,
+  getNetworkNameByAlias,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 /**
  * Encoding module for the SDK AddressList Client
@@ -43,8 +44,9 @@ export class AddresslistVotingClientEncoding extends ClientCore
     params: AddresslistVotingPluginInstall,
     network: Networkish,
   ): PluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
+    const networkName = getNetwork(network).name;
+    const aragonNetwork = getNetworkNameByAlias(networkName);
+    if (!aragonNetwork) {
       throw new UnsupportedNetworkError(networkName);
     }
     const hexBytes = defaultAbiCoder.encode(
@@ -54,10 +56,14 @@ export class AddresslistVotingClientEncoding extends ClientCore
         params.addresses,
       ],
     );
+    const repoAddress = contracts[aragonNetwork][SupportedVersions.V1_3_0]
+      ?.AddresslistVotingRepoProxy.address;
+    if (!repoAddress) {
+      throw new Error("AddresslistVotingRepoProxy address not found");
+    }
 
     return {
-      id: LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
-        .addresslistVotingRepoAddress,
+      id: repoAddress,
       data: hexToBytes(hexBytes),
     };
   }

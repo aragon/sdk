@@ -391,7 +391,7 @@ describe("Test encoding helper functions", () => {
         {
           in: "invalid_proposal",
           out: "",
-          error: InvalidProposalIdError
+          error: InvalidProposalIdError,
         },
         {
           in:
@@ -400,7 +400,7 @@ describe("Test encoding helper functions", () => {
           error: InvalidProposalIdError,
         },
       ];
-  
+
       for (const entry of entries) {
         if (entry.error) {
           expect(() => getExtendedProposalId(entry.in)).toThrow(entry.error);
@@ -438,7 +438,7 @@ describe("Test encoding helper functions", () => {
           error: "Invalid proposalId",
         },
       ];
-  
+
       for (const entry of entries) {
         if (entry.error) {
           expect(() => getCompactProposalId(entry.in)).toThrow(entry.error);

@@ -43,9 +43,9 @@ describe("Client", () => {
   let deployment: deployContracts.Deployment;
   beforeAll(async () => {
     deployment = await deployContracts.deploy();
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
-    contextParamsLocalChain.pluginSetupProcessorAddress = ADDRESS_TWO;
-    contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
+    contextParamsLocalChain.ENSRegistry = ADDRESS_ONE;
+    contextParamsLocalChain.PluginSetupProcessor = ADDRESS_TWO;
+    contextParamsLocalChain.DAOFactory = deployment.daoFactory.address;
   });
   describe("Action generators", () => {
     it("Should create a client and generate a native withdraw action", async () => {
@@ -601,8 +601,7 @@ describe("Client", () => {
       let hexString, argsDecoded, action;
       expect(actions.length).toBe(3);
       for (const [index, actionName] of expectedActions.entries()) {
-        
-         action = actions[index];
+        action = actions[index];
         expect(typeof action).toBe("object");
         expect(action.data).toBeInstanceOf(Uint8Array);
         hexString = bytesToHex(action.data);
@@ -618,7 +617,7 @@ describe("Client", () => {
               daoAddress,
             );
             expect(argsDecoded[1]).toBe(
-              contextParamsLocalChain.pluginSetupProcessorAddress,
+              contextParamsLocalChain.PluginSetupProcessor,
             );
             expect(argsDecoded[2]).toBe(
               keccak256(toUtf8Bytes(Permissions.UPGRADE_PLUGIN_PERMISSION)),
@@ -700,7 +699,13 @@ describe("Client", () => {
       );
       const pspInterface = PluginSetupProcessor__factory.createInterface();
       const daoInterface = DAO__factory.createInterface();
-      const expectedActions = ["grant", "grant", "applyUpdate", "revoke", "revoke"];
+      const expectedActions = [
+        "grant",
+        "grant",
+        "applyUpdate",
+        "revoke",
+        "revoke",
+      ];
       let hexString, argsDecoded, action;
       expect(actions.length).toBe(5);
       for (const [index, actionName] of expectedActions.entries()) {
@@ -720,7 +725,7 @@ describe("Client", () => {
               daoAddress,
             );
             expect(argsDecoded[1]).toBe(
-              contextParamsLocalChain.pluginSetupProcessorAddress,
+              contextParamsLocalChain.PluginSetupProcessor,
             );
             expect(argsDecoded[2]).toBe(
               keccak256(toUtf8Bytes(Permissions.ROOT_PERMISSION)),
@@ -737,7 +742,7 @@ describe("Client", () => {
               pluginAddress,
             );
             expect(argsDecoded[1]).toBe(
-              contextParamsLocalChain.pluginSetupProcessorAddress,
+              contextParamsLocalChain.PluginSetupProcessor,
             );
             expect(argsDecoded[2]).toBe(
               keccak256(toUtf8Bytes(Permissions.UPGRADE_PLUGIN_PERMISSION)),

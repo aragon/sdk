@@ -83,6 +83,8 @@ import {
   InvalidCidError,
   InvalidProposalIdError,
   IpfsPinError,
+  IsMemberParams,
+  IsMemberSchema,
   isProposalId,
   MULTI_FETCH_TIMEOUT,
   NoProviderError,
@@ -97,8 +99,6 @@ import {
   resolveIpfsCid,
   SizeMismatchError,
   SortDirection,
-  SupportedNetwork,
-  SupportedNetworksArray,
   TokenType,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
@@ -113,8 +113,10 @@ import {
 import { abi as ERC165_ABI } from "@openzeppelin/contracts/build/contracts/ERC165.json";
 import { Contract } from "@ethersproject/contracts";
 import { AddressZero } from "@ethersproject/constants";
-import { IsMemberSchema } from "@aragon/sdk-client-common";
-import { IsMemberParams } from "@aragon/sdk-client-common";
+import {
+  ContractNames,
+  getNetworkNameByAlias,
+} from "@aragon/osx-commons-configs";
 
 /**
  * Methods module the SDK TokenVoting Client
@@ -279,18 +281,19 @@ export class TokenVotingClientMethods extends ClientCore
     params: TokenVotingPluginPrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const network = await this.web3.getProvider().getNetwork();
-    const networkName = network.name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
+    const networkName = network.name;
+    const aragonNetwork = getNetworkNameByAlias(networkName);
+    if (!aragonNetwork) {
       throw new UnsupportedNetworkError(networkName);
     }
     yield* prepareGenericInstallation(this.web3, {
       daoAddressOrEns: params.daoAddressOrEns,
-      pluginRepo: this.web3.getAddress("tokenVotingRepoAddress"),
+      pluginRepo: this.web3.getAddress(ContractNames.TOKEN_VOTING_REPO_PROXY),
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: tokenVotingInitParamsToContract(params.settings),
       pluginSetupProcessorAddress: this.web3.getAddress(
-        "pluginSetupProcessorAddress",
+        ContractNames.PLUGIN_SETUP_PROCESSOR,
       ),
     });
   }
@@ -306,11 +309,11 @@ export class TokenVotingClientMethods extends ClientCore
   ): AsyncGenerator<PrepareUpdateStepValue> {
     yield* prepareGenericUpdate(this.web3, this.graphql, {
       ...params,
-      pluginRepo: this.web3.getAddress("tokenVotingRepoAddress"),
+      pluginRepo: this.web3.getAddress(ContractNames.TOKEN_VOTING_REPO_PROXY),
       updateAbi: UPDATE_ABI[params.newVersion.build] ||
         params.updateAbi || [],
       pluginSetupProcessorAddress: this.web3.getAddress(
-        "pluginSetupProcessorAddress",
+        ContractNames.PLUGIN_SETUP_PROCESSOR,
       ),
     });
   }

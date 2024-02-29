@@ -6,11 +6,11 @@ import {
 } from "../../../src";
 
 import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
-import { Context, bytesToHex } from "@aragon/sdk-client-common";
+import { bytesToHex, Context } from "@aragon/sdk-client-common";
 
 describe("Token Voting Client", () => {
   beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+    contextParamsLocalChain.ENSRegistry = ADDRESS_ONE;
   });
   describe("Action decoders", () => {
     it("Should decode the plugin settings from an update plugin settings action", async () => {

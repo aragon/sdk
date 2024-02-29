@@ -20,19 +20,31 @@ import { deployErc1155 } from "../../helpers/deploy-erc1155";
 import { deployErc721 } from "../../helpers/deploy-erc721";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
+import {
+  contracts,
+  NetworkDeployment,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 let daoAddress = "0x1234567890123456789012345678901234567890";
 describe("Client", () => {
   let deployment: deployContracts.Deployment;
   describe("Estimation module", () => {
-
     beforeAll(async () => {
       deployment = await deployContracts.deploy();
-      contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      contextParamsLocalChain.pluginSetupProcessorAddress =
+      contextParamsLocalChain.DAOFactory = deployment.daoFactory.address;
+      contextParamsLocalChain.PluginSetupProcessor =
         deployment.pluginSetupProcessor.address;
-      contextParamsLocalChain.ensRegistryAddress =
-        deployment.ensRegistry.address;
+      contextParamsLocalChain.ENSRegistry = deployment.ensRegistry.address;
+      contracts.local = {
+        [SupportedVersions.V1_3_0]: {
+          DAOFactory: { address: deployment.daoFactory.address },
+          MultisigRepoProxy: { address: deployment.multisigRepo.address },
+          AddresslistVotingRepoProxy: {
+            address: deployment.addresslistVotingRepo.address,
+          },
+        } as NetworkDeployment,
+      };
     });
 
     it("Should estimate gas fees for creating a DAO", async () => {

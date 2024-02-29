@@ -1,4 +1,9 @@
 import {
+  contracts,
+  NetworkDeployment,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
+import {
   AddresslistVotingClient,
   AddresslistVotingPluginInstall,
   VotingSettings,
@@ -12,7 +17,12 @@ import {
 
 describe("Client Address List", () => {
   beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+    contextParamsLocalChain.ENSRegistry = ADDRESS_ONE;
+    contracts.local = {
+      [SupportedVersions.V1_3_0]: {
+        AddresslistVotingRepoProxy: { address: ADDRESS_ONE },
+      } as NetworkDeployment,
+    };
   });
   describe("Action generators", () => {
     it("Should create an AddressList client and generate a install entry", async () => {

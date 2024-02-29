@@ -932,7 +932,7 @@ export async function validateGrantUpgradePluginPermissionAction(
         .INVALID_GRANT_UPGRADE_PLUGIN_PERMISSION_TO_ADDRESS,
     );
   }
-  
+
   // The permission should be granted to the PSP
   if (decodedPermission.who !== pspAddress) {
     causes.push(
@@ -1213,10 +1213,11 @@ export async function validateApplyUpdateFunction(
   type W = { pluginPreparations: SubgraphPluginUpdatePreparation[] };
   const { pluginPreparations } = await graphql.request<W>({
     query: QueryPluginPreparations,
-    params: { where: { 
+    params: {
+      where: {
         preparedSetupId: preparedSetupId.toLowerCase(),
-        pluginAddress: decodedParams.pluginAddress.toLowerCase()
-      }
+        pluginAddress: decodedParams.pluginAddress.toLowerCase(),
+      },
     },
     name: "pluginPreparations",
   });
@@ -1243,7 +1244,7 @@ export async function validateApplyUpdateFunction(
   const metadataUri = build.metadata;
 
   // fetch the metadata
-  const metadataCid = new MultiUri(metadataUri).ipfsCid
+  const metadataCid = new MultiUri(metadataUri).ipfsCid;
   const metadata = await ipfs.fetchString(metadataCid!);
   const metadataJson = JSON.parse(metadata);
   // Due to an human error the build metadata on the plugins
@@ -1254,10 +1255,12 @@ export async function validateApplyUpdateFunction(
   // old metadata fields
   // Original PR: https://github.com/aragon/osx/pull/375
   // Fix PR: https://github.com/aragon/osx/pull/481
-  let updateAbi = []
-  updateAbi = metadataJson?.pluginSetup?.prepareUpdate?.[plugin.appliedVersion?.build!]?.inputs
+  let updateAbi = [];
+  updateAbi = metadataJson?.pluginSetup?.prepareUpdate
+    ?.[plugin.appliedVersion?.build!]?.inputs;
   if (!updateAbi) {
-    updateAbi = metadataJson?.pluginSetup?.prepareInstallation?.prepareUpdate?.[plugin.appliedVersion?.build!]?.inputs
+    updateAbi = metadataJson?.pluginSetup?.prepareInstallation?.prepareUpdate
+      ?.[plugin.appliedVersion?.build!]?.inputs;
   }
   // get the update abi for the specified build
   if (updateAbi) {

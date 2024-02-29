@@ -381,3 +381,17 @@ export class InvalidPermissionOperationType extends SdkError {
     super("Invalid permission operation", cause);
   }
 }
+
+export class ContractNotDeployedError extends SdkError {
+  constructor(
+    contractName: string,
+    version: string,
+    network: string,
+    cause?: any,
+  ) {
+    super(
+      `Contract "${contractName}" version "${version}" is not deployed on network "${network}"`,
+      cause,
+    );
+  }
+}

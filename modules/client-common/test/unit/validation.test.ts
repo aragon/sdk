@@ -96,7 +96,6 @@ describe("Test Validations", () => {
       { in: TEST_IPFS_URI_V1, out: true },
     ];
     for (const input of inputs) {
-
       expect(isIpfsUri(input.in)).toBe(input.out);
     }
   });

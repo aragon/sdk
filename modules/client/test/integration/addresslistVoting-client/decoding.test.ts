@@ -8,7 +8,7 @@ import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 
 describe("Client Address List", () => {
   beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+    contextParamsLocalChain.ENSRegistry = ADDRESS_ONE;
   });
   describe("Action decoders", () => {
     it("Should decode the plugin settings from an update plugin settings action", async () => {

@@ -33,22 +33,31 @@ import {
   bytesToHex,
   Context,
   hexToBytes,
-  LIVE_CONTRACTS,
   PermissionIds,
   PermissionOperationType,
   Permissions,
-  SupportedVersion,
   TokenType,
 } from "@aragon/sdk-client-common";
+import {
+  contracts,
+  NetworkDeployment,
+  SupportedNetworks,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 describe("Client", () => {
   let deployment: deployContracts.Deployment;
   beforeAll(async () => {
     deployment = await deployContracts.deploy();
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
-    contextParamsLocalChain.pluginSetupProcessorAddress = ADDRESS_TWO;
-    LIVE_CONTRACTS[SupportedVersion.LATEST].local.daoFactoryAddress =
-      deployment.daoFactory.address;
+    contextParamsLocalChain.ENSRegistry = ADDRESS_ONE;
+    contextParamsLocalChain.PluginSetupProcessor = ADDRESS_TWO;
+    contracts[SupportedNetworks.LOCAL] = {
+      [SupportedVersions.V1_3_0]: {
+        DAOFactory: {
+          address: deployment.daoFactory.address,
+        },
+      } as NetworkDeployment,
+    };
   });
   describe("Action decoders", () => {
     it("Should decode an encoded grant action", () => {
@@ -823,7 +832,7 @@ describe("Client", () => {
     it("Should decode an dao update action", async () => {
       const context = new Context(contextParamsLocalChain);
       const client = new Client(context);
-      const daoFactoryAddress = LIVE_CONTRACTS["1.3.0"].local.daoFactoryAddress;
+      const daoFactoryAddress = contracts.local["v1.3.0"]!.DAOFactory.address;
       const params: DaoUpdateParams = {
         previousVersion: [1, 0, 0],
         daoFactoryAddress,

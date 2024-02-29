@@ -177,16 +177,16 @@ export function computeProposalStatus(
     return ProposalStatus.PENDING;
   }
   // The proposal is not executed and the start date is in the past.
-  // Accordingly, we check if the proposal reached enough approval 
+  // Accordingly, we check if the proposal reached enough approval
   // (i.e., that the supportThreshold and minParticipation criteria are both met).
-  // If the approvalReached = true and the vote has ended (end date is in the past) it has succeeded. 
+  // If approvalReached is true and the vote has ended (end date is in the past), it has succeeded.
   // This applies to normal mode and vote replacement mode.
   if (proposal.approvalReached && endDate <= now) {
     return ProposalStatus.SUCCEEDED;
   }
-  // In early exeuction mode, we calculate if subsequent voting can change the result of the vote. 
+  // In early exeuction mode, we calculate if subsequent voting can change the result of the vote.
   // If not, the proposal is early executable and is therefore succeeded as well.
-  if(proposal.earlyExecutable){
+  if (proposal.earlyExecutable) {
     return ProposalStatus.SUCCEEDED;
   }
   // The proposal is not executed and the start date is in the past
@@ -197,7 +197,7 @@ export function computeProposalStatus(
     return ProposalStatus.ACTIVE;
   }
   // If none of the other conditions are met the status becomes DEFEATED
-  return ProposalStatus.DEFEATED
+  return ProposalStatus.DEFEATED;
 }
 
 export function computeProposalStatusFilter(status: ProposalStatus) {

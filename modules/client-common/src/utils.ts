@@ -1,4 +1,8 @@
-import { FunctionFragment, Interface } from "@ethersproject/abi";
+import {
+  defaultAbiCoder,
+  FunctionFragment,
+  Interface,
+} from "@ethersproject/abi";
 import { id } from "@ethersproject/hash";
 import {
   getNetwork as ethersGetNetwork,
@@ -15,8 +19,6 @@ import {
   PrepareUpdateParams,
   PrepareUpdateStep,
   PrepareUpdateStepValue,
-  SupportedNetwork,
-  SupportedVersion,
 } from "./types";
 import {
   IClientGraphQLCore,
@@ -28,8 +30,7 @@ import {
   PluginSetupProcessor,
   PluginSetupProcessor__factory,
 } from "@aragon/osx-ethers";
-import { ADDITIONAL_NETWORKS, LIVE_CONTRACTS } from "./constants";
-import { defaultAbiCoder } from "@ethersproject/abi";
+import { IPFS_ENDPOINTS } from "./constants";
 import { isAddress } from "@ethersproject/address";
 import { Network } from "@ethersproject/networks";
 import { QueryIPlugin } from "./internal/graphql-queries";
@@ -43,6 +44,18 @@ import {
   UnsupportedNetworkError,
 } from "./errors";
 import { Zero } from "@ethersproject/constants";
+import {
+  ContractNames,
+  getNetworkAlias,
+  getNetworkByChainId,
+  getNetworkByNameOrAlias,
+  getNetworkDeploymentForVersion,
+  NetworkConfig,
+  networks,
+  SupportedAliases,
+  SupportedNetworks,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 /**
  * Finds a log in a receipt given the event name
@@ -134,7 +147,11 @@ export async function prepareGenericInstallationEstimation(
   if (!isAddress(params.pluginRepo)) {
     throw new InvalidAddressError();
   }
-  const networkName = (await provider.getNetwork()).name as SupportedNetwork;
+  const ethers5NetworkName = (await provider.getNetwork()).name;
+  const networkName = getNetworkByNameOrAlias(ethers5NetworkName)?.name;
+  if (!networkName) {
+    throw new UnsupportedNetworkError(ethers5NetworkName);
+  }
   let version = params.version;
   // if version is not specified install latest version
   if (!version) {
@@ -155,9 +172,15 @@ export async function prepareGenericInstallationEstimation(
     installationParams,
   );
   // connect to psp contract
+  const deployment = getNetworkDeploymentForVersion(
+    networkName,
+    SupportedVersions.V1_3_0,
+  );
+  if (!deployment) {
+    throw new UnsupportedNetworkError(networkName);
+  }
   const pspContract = PluginSetupProcessor__factory.connect(
-    LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
-      .pluginSetupProcessorAddress,
+    deployment[ContractNames.PLUGIN_SETUP_PROCESSOR].address,
     provider,
   );
 
@@ -404,30 +427,67 @@ export async function* prepareGenericUpdate(
  * @return {Network}
  */
 export function getNetwork(networkish: Networkish): Network {
-  let network: Network | undefined;
-  for (const nw of ADDITIONAL_NETWORKS) {
-    switch (typeof networkish) {
-      case "string":
-        if (networkish === nw.name) {
-          network = nw;
-        }
-        break;
-      case "number":
-        if (networkish === nw.chainId) {
-          network = nw;
-        }
-        break;
-      case "object":
-        if (networkish.name === nw.name && networkish.chainId === nw.chainId) {
-          network = nw;
-        }
-        break;
-      default:
-        throw new UnsupportedNetworkError(networkish);
-    }
-  }
-  if (!network) {
+  let network: Network | null = null;
+  try {
     network = ethersGetNetwork(networkish);
+  } catch {}
+  try {
+    network = aragonGetNetwork(networkish);
+  } catch {}
+  if (!network) {
+    throw new UnsupportedNetworkError(networkish.toString());
+  }
+  return network;
+}
+
+/**
+ * When ethers 5 does not support the network return a Network object
+ * using our osx-commons-configs as a source of truth
+ *
+ * @private
+ * @param {Networkish} networkish
+ * @return {*}  {Network}
+ */
+function aragonGetNetwork(networkish: Networkish): Network | null {
+  let aragonNetwork: NetworkConfig | null = null;
+  let network: Network | null = null;
+  switch (typeof networkish) {
+    case "string":
+    case "number": {
+      if (typeof networkish === "number") {
+        aragonNetwork = getNetworkByChainId(networkish);
+      } else {
+        aragonNetwork = getNetworkByNameOrAlias(networkish);
+      }
+      if (!aragonNetwork) {
+        throw new UnsupportedNetworkError(networkish.toString());
+      }
+      const ethers5Alias = getNetworkAlias(
+        SupportedAliases.ETHERS_5,
+        aragonNetwork.name,
+      );
+      const networkDeployment = getNetworkDeploymentForVersion(
+        aragonNetwork.name,
+        SupportedVersions.V1_3_0,
+      );
+      if (!networkDeployment) {
+        throw new UnsupportedNetworkError(aragonNetwork.name);
+      }
+      const ensRegistryAddress = networkDeployment.ENSRegistry?.address;
+      network = {
+        name: ethers5Alias || aragonNetwork.name,
+        chainId: aragonNetwork.chainId,
+        ensAddress: ensRegistryAddress,
+      };
+      break;
+    }
+    case "object":
+      if (networkish.name && networkish.chainId) {
+        network = networkish;
+      }
+      break;
+    default:
+      throw new UnsupportedNetworkError(networkish);
   }
   return network;
 }
@@ -446,4 +506,17 @@ export function getInterfaceId(iface: Interface): string {
     interfaceId = interfaceId.xor(iface.getSighash(func));
   }
   return interfaceId.toHexString();
+}
+
+export function getDefaultIpfsNodes(network: SupportedNetworks) {
+  return networks[network].isTestnet
+    ? IPFS_ENDPOINTS.test
+    : IPFS_ENDPOINTS.prod;
+}
+
+export function getDefaultGraphqlNodes(network: SupportedNetworks) {
+  return [{
+    url:
+      `https://subgraph.satsuma-prod.com/qHR2wGfc5RLi6/aragon/osx-${network}/version/v1.4.0/api`,
+  }];
 }

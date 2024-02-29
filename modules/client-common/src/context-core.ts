@@ -3,48 +3,39 @@ import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
 import { isAddress } from "@ethersproject/address";
 import { Signer } from "@ethersproject/abstract-signer";
+import { ContextParams, ContextState, OverriddenState } from "./types";
 import {
-  ContextParams,
-  ContextState,
-  OverriddenState,
-  SupportedNetwork,
-  SupportedNetworksArray,
-  SupportedVersion,
-} from "./types";
-import { GRAPHQL_NODES, IPFS_NODES, LIVE_CONTRACTS } from "./constants";
-import { getNetwork } from "./utils";
-import { DeployedAddressesArray } from "./internal";
+  getDefaultGraphqlNodes,
+  getDefaultIpfsNodes,
+  getNetwork,
+} from "./utils";
 import {
   InvalidAddressError,
   InvalidGasEstimationFactorError,
   UnsupportedNetworkError,
   UnsupportedProtocolError,
 } from "./errors";
+import {
+  ContractNames,
+  getNetworkDeploymentForVersion,
+  getNetworkNameByAlias,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 const DEFAULT_GAS_FEE_ESTIMATION_FACTOR = 0.625;
 const supportedProtocols = ["https:"];
+const contractNames = Object.values(ContractNames);
 if (typeof process !== "undefined" && process?.env?.TESTING) {
   supportedProtocols.push("http:");
 }
 
 export abstract class ContextCore {
   protected state: ContextState = {} as ContextState;
-  protected overriden: OverriddenState = {
-    daoFactoryAddress: false,
-    pluginSetupProcessorAddress: false,
-    multisigRepoAddress: false,
-    adminRepoAddress: false,
-    addresslistVotingRepoAddress: false,
-    tokenVotingRepoAddress: false,
-    multisigSetupAddress: false,
-    adminSetupAddress: false,
-    addresslistVotingSetupAddress: false,
-    tokenVotingSetupAddress: false,
-    ensRegistryAddress: false,
-    gasFeeEstimationFactor: false,
-    ipfsNodes: false,
-    graphqlNodes: false,
-  };
+
+  protected overriden: OverriddenState = contractNames.reduce(
+    (acc, key) => ({ ...acc, [key]: false }),
+    { ENSRegistry: false } as OverriddenState,
+  );
   // INTERNAL CONTEXT STATE
   /**
    * @param {Object} params
@@ -61,7 +52,7 @@ export abstract class ContextCore {
     if (contextParams.network) {
       this.state.network = ContextCore.resolveNetwork(
         contextParams.network,
-        contextParams.ensRegistryAddress,
+        contextParams.ENSRegistry,
       );
       // once the network is resolved set default values
       this.setNetworkDefaults();
@@ -90,7 +81,7 @@ export abstract class ContextCore {
       this.overriden.ipfsNodes = true;
     }
     // Set all the available addresses
-    for (const address of DeployedAddressesArray) {
+    for (const address of contractNames) {
       if (contextParams[address]) {
         this.state[address] = contextParams[address]!;
         this.overriden[address] = true;
@@ -107,35 +98,43 @@ export abstract class ContextCore {
   }
 
   private setNetworkDefaults() {
-    const networkName = this.network.name as SupportedNetwork;
-    if (
-      !GRAPHQL_NODES[networkName]?.length ||
-      !IPFS_NODES[networkName]?.length ||
-      !LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
-    ) {
-      throw new UnsupportedNetworkError(networkName);
+    // check network
+    const networkName = getNetworkNameByAlias(this.network.name);
+    if (!networkName) {
+      throw new UnsupportedNetworkError(this.network.name);
     }
-
+    // set graphql nodes
     if (!this.overriden.graphqlNodes) {
       this.state.graphql = ContextCore.resolveGraphql(
-        GRAPHQL_NODES[networkName],
+        getDefaultGraphqlNodes(networkName),
       );
     }
-
+    // set ipfs nodes
     if (!this.overriden.ipfsNodes) {
-      this.state.ipfs = ContextCore.resolveIpfs(IPFS_NODES[networkName]);
+      this.state.ipfs = ContextCore.resolveIpfs(
+        getDefaultIpfsNodes(networkName),
+      );
     }
-
-    for (const address of DeployedAddressesArray) {
-      if (!this.overriden[address]) {
-        let defaultAddress =
-          LIVE_CONTRACTS[SupportedVersion.LATEST][networkName][address];
-        // custom check for ensRegistryAddress
-        if (address === "ensRegistryAddress" && !defaultAddress) {
-          defaultAddress = this.network.ensAddress;
+    // set contract addresses
+    for (const contractName of contractNames) {
+      if (!this.overriden[contractName]) {
+        let contractAddress: string | undefined;
+        // get deployment
+        let deployment = getNetworkDeploymentForVersion(
+          networkName,
+          SupportedVersions.V1_3_0,
+        );
+        // get address from deployment
+        if (deployment) {
+          contractAddress = deployment[contractName]?.address;
         }
-        if (defaultAddress) {
-          this.state[address] = defaultAddress;
+        // custom check for ensRegistryAddress
+        // set the ensRegistryAddress to the network.ensAddress
+        if (contractName === ContractNames.ENS_REGISTRY && !contractAddress) {
+          contractAddress = this.network.ensAddress;
+        }
+        if (contractAddress) {
+          this.state[contractName] = contractAddress;
         }
       }
     }
@@ -168,19 +167,6 @@ export abstract class ContextCore {
    *
    * @public
    */
-  get ensRegistryAddress(): string | undefined {
-    return this.state.ensRegistryAddress;
-  }
-
-  /**
-   * Getter for the Signer
-   *
-   * @var signer
-   *
-   * @returns {Signer}
-   *
-   * @public
-   */
   get signer(): Signer {
     return this.state.signer;
   }
@@ -196,109 +182,6 @@ export abstract class ContextCore {
    */
   get web3Providers(): JsonRpcProvider[] {
     return this.state.web3Providers || [];
-  }
-
-  /**
-   * Getter for daoFactoryAddress property
-   *
-   * @var daoFactoryAddress
-   *
-   * @returns {string}
-   *
-   * @public
-   */
-  get daoFactoryAddress(): string {
-    return this.state.daoFactoryAddress;
-  }
-
-  /**
-   * Getter for pluginSetupProcessorAddress property
-   * @var pluginSetupProcessorAddress
-   * @returns {string}
-   * @public
-   */
-  get pluginSetupProcessorAddress(): string {
-    return this.state.pluginSetupProcessorAddress;
-  }
-  /**
-   * Getter for multisigRepoAddress property
-   *
-   * @readonly
-   * @type {string}
-   * @memberof ContextCore
-   */
-  get multisigRepoAddress(): string {
-    return this.state.multisigRepoAddress;
-  }
-  /**
-   * Getter for adminRepoAddress property
-   *
-   * @readonly
-   * @type {string}
-   * @memberof ContextCore
-   */
-  get adminRepoAddress(): string {
-    return this.state.adminRepoAddress;
-  }
-  /**
-   * Getter for addresslistVotingRepoAddress property
-   *
-   * @readonly
-   * @type {string}
-   * @memberof ContextCore
-   */
-  get addresslistVotingRepoAddress(): string {
-    return this.state.addresslistVotingRepoAddress;
-  }
-  /**
-   * Getter for tokenVotingRepoAddress property
-   *
-   * @readonly
-   * @type {string}
-   * @memberof ContextCore
-   */
-  get tokenVotingRepoAddress(): string {
-    return this.state.tokenVotingRepoAddress;
-  }
-  /**
-   * Getter for multisigSetupAddress property
-   *
-   * @readonly
-   * @type {string}
-   * @memberof ContextCore
-   */
-  get multisigSetupAddress(): string {
-    return this.state.multisigSetupAddress;
-  }
-  /**
-   * Getter for adminSetupAddress property
-   *
-   * @readonly
-   * @type {string}
-   * @memberof ContextCore
-   */
-  get adminSetupAddress(): string {
-    return this.state.adminSetupAddress;
-  }
-  /**
-   * Getter for addresslistVotingSetupAddress property
-   *
-   * @readonly
-   * @type {string}
-   * @memberof ContextCore
-   */
-  get addresslistVotingSetupAddress(): string {
-    return this.state.addresslistVotingSetupAddress;
-  }
-  /**
-   * Getter for tokenVotingSetupAddress property
-   *
-   * @readonly
-   * @type {string}
-   * @memberof ContextCore
-   */
-  get tokenVotingSetupAddress(): string {
-    return this.state.tokenVotingSetupAddress;
   }
 
   /**
@@ -342,32 +225,22 @@ export abstract class ContextCore {
     return this.state.graphql;
   }
 
+  public getAddress(contractName: ContractNames): string {
+    return this.state[contractName];
+  }
+
   // INTERNAL HELPERS
   private static resolveNetwork(
     networkish: Networkish,
     ensRegistryAddress?: string,
   ): Network {
     const network = getNetwork(networkish);
-    const networkName = network.name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
-      throw new UnsupportedNetworkError(networkName);
-    }
-
     if (ensRegistryAddress) {
       if (!isAddress(ensRegistryAddress)) {
         throw new InvalidAddressError();
       } else {
         network.ensAddress = ensRegistryAddress;
       }
-    }
-
-    if (!network.ensAddress) {
-      const ensAddress =
-        LIVE_CONTRACTS[SupportedVersion.LATEST][networkName].ensRegistryAddress;
-      if (!ensAddress) {
-        throw new UnsupportedNetworkError(networkName);
-      }
-      network.ensAddress = ensAddress;
     }
     return network;
   }

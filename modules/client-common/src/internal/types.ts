@@ -2,37 +2,11 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { JsonRpcProvider, Network, Networkish } from "@ethersproject/providers";
 import { Client as IpfsClient } from "@aragon/sdk-ipfs";
 import { GraphQLClient } from "graphql-request";
-
-// Create a readonly string array from the keys of NetworkDeployment
-export const DeployedAddressesArray = [
-  "daoFactoryAddress",
-  "pluginSetupProcessorAddress",
-  "multisigRepoAddress",
-  "adminRepoAddress",
-  "addresslistVotingRepoAddress",
-  "tokenVotingRepoAddress",
-  "multisigSetupAddress",
-  "adminSetupAddress",
-  "addresslistVotingSetupAddress",
-  "tokenVotingSetupAddress",
-  "ensRegistryAddress",
-] as const;
-// export the type from the readonly string array
-export type DeployedAddresses = typeof DeployedAddressesArray[number];
-// Override helper type
-type Override<T, U> = Omit<T, keyof U> & U;
-export type NetworkDeployment = Override<
-  {
-    [address in DeployedAddresses]: string;
-  },
-  { ensRegistryAddress?: string }
->;
-// Context input parameters
+import { ContractNames } from "@aragon/osx-commons-configs";
 
 export type Web3ContextParams =
-  /** If any contract is not provided it will use the default from LIVE_CONTRACTS in the provided network */
   & {
-    [address in DeployedAddresses]?: string;
+    [index in ContractNames]?: string;
   }
   & {
     /** Defaults to mainnet */
@@ -53,12 +27,9 @@ export type GraphQLContextParams = {
 };
 
 export type Web3ContextState =
-  & Override<
-    {
-      [address in DeployedAddresses]: string;
-    },
-    { ensRegistryAddress?: string }
-  >
+  & {
+    [index in ContractNames]: string;
+  }
   & {
     network: Network;
     signer: Signer;

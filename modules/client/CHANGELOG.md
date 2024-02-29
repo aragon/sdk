@@ -18,6 +18,14 @@ TEMPLATE:
 -->
 
 ## [UPCOMING]
+## [1.23.0]
+
+### Changed
+
+- Support for new version of `@aragon/osx-client-common`
+- Removed `LIVE_CONTRACTS` and used `contracts` from `@aragon/osx-commons-configs` instead
+
+## [1.22.1]
 ### Fixed
 
 - Typo in `LIVE_CONTRACTS` for mainnet

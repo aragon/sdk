@@ -27,9 +27,9 @@ import {
   TOKEN_VOTING_BUILD_METADATA,
 } from "../../integration/constants";
 import {
-  startsWithDaoUpdateAction,
   containsPluginUpdateActionBlock,
   containsPluginUpdateActionBlockWithRootPermission,
+  startsWithDaoUpdateAction,
   validateApplyUpdateFunction,
   validateGrantRootPermissionAction,
   validateGrantUpgradePluginPermissionAction,
@@ -48,7 +48,7 @@ import { SupportedPluginRepo } from "../../../src/internal/constants";
 
 describe("Test client utils", () => {
   const pspAddress = ADDRESS_TWO;
-  const context = new Context({ pluginSetupProcessorAddress: pspAddress });
+  const context = new Context({ PluginSetupProcessor: pspAddress });
   const client = new Client(context);
   const pluginAddress = ADDRESS_ONE;
   const daoAddress = ADDRESS_THREE;
@@ -634,11 +634,15 @@ describe("Test client utils", () => {
   });
 
   describe("validateApplyUpdateFunction", () => {
-    function getApplyUpdateAction(daoAddress: string, applyUpdateParams: ApplyUpdateParams) {
-       const applyUpdateActions = client.encoding.applyUpdateAndPermissionsActionBlock(
-        daoAddress,
-        applyUpdateParams,
-      );
+    function getApplyUpdateAction(
+      daoAddress: string,
+      applyUpdateParams: ApplyUpdateParams,
+    ) {
+      const applyUpdateActions = client.encoding
+        .applyUpdateAndPermissionsActionBlock(
+          daoAddress,
+          applyUpdateParams,
+        );
       return applyUpdateActions[1];
     }
 
@@ -751,7 +755,7 @@ describe("Test client utils", () => {
       };
       const action = getApplyUpdateAction(daoAddress, updatedApplyUpdateParams);
       mockedClient.request.mockResolvedValue({
-      pluginRepo: subgraphPluginRepo,
+        pluginRepo: subgraphPluginRepo,
         dao: subgraphDao,
         pluginPreparations: [subgraphPluginPreparation],
       });
@@ -1066,17 +1070,19 @@ describe("Test client utils", () => {
       expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return an empty for two groups of apply update", async () => {
-      const actionsGroupOne = client.encoding.applyUpdateAndPermissionsActionBlock(
-        daoAddress,
-        applyUpdateParams,
-      );
-      const actionsGroupTwo = client.encoding.applyUpdateAndPermissionsActionBlock(
-        daoAddress,
-        {
-          ...applyUpdateParams,
-          permissions: [permission],
-        },
-      );
+      const actionsGroupOne = client.encoding
+        .applyUpdateAndPermissionsActionBlock(
+          daoAddress,
+          applyUpdateParams,
+        );
+      const actionsGroupTwo = client.encoding
+        .applyUpdateAndPermissionsActionBlock(
+          daoAddress,
+          {
+            ...applyUpdateParams,
+            permissions: [permission],
+          },
+        );
       // setup mocks
       for (let i = 0; i < 3; i++) {
         mockedClient.request.mockResolvedValueOnce({
@@ -1111,7 +1117,7 @@ describe("Test client utils", () => {
         client.ipfs,
       );
       expect(result.isValid).toEqual(true);
-      expect(result.actionErrorCauses).toMatchObject([[],[]]);
+      expect(result.actionErrorCauses).toMatchObject([[], []]);
       expect(result.proposalSettingsErrorCauses).toMatchObject([]);
     });
     it("should return an INVALID_ACTIONS when the actions don't match the expected pattern", async () => {
@@ -1130,7 +1136,9 @@ describe("Test client utils", () => {
       );
       expect(result.isValid).toEqual(false);
       expect(result.actionErrorCauses).toMatchObject([]);
-      expect(result.proposalSettingsErrorCauses).toMatchObject([ProposalSettingsErrorCause.INVALID_ACTIONS]);
+      expect(result.proposalSettingsErrorCauses).toMatchObject([
+        ProposalSettingsErrorCause.INVALID_ACTIONS,
+      ]);
     });
   });
   describe("validateUpdateDaoProposalActions", () => {
@@ -1225,7 +1233,6 @@ describe("Test client utils", () => {
         DaoUpdateProposalInvalidityCause.NON_ZERO_CALL_VALUE,
       ]);
       expect(result.proposalSettingsErrorCauses).toMatchObject([]);
-      
     });
     it("should return INVALID_UPGRADE_TO_IMPLEMENTATION_ADDRESS when the implementation address is not the correct one", () => {
       upgradeToAction = client.encoding.upgradeToAction(
