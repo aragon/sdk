@@ -33,8 +33,5 @@
     "jsdoc-babel": "^0.5.0",
     "jsdoc-to-markdown": "^8.0.1",
     "turbo": "^1.1.9"
-  },
-  "dependencies": {
-    "array-back": "^6.2.2"
   }
 }
