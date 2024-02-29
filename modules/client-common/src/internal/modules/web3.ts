@@ -4,12 +4,7 @@ import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { Signer } from "@ethersproject/abstract-signer";
 import { IClientWeb3Core } from "../interfaces";
 import { Context } from "../../context";
-import {
-  GasFeeEstimation,
-  SupportedNetwork,
-  SupportedNetworksArray,
-} from "../../types";
-import { DeployedAddresses } from "../types";
+import { GasFeeEstimation } from "../../types";
 import {
   CannotEstimateGasError,
   InvalidAddressError,
@@ -19,6 +14,11 @@ import {
   NoSignerError,
   UnsupportedNetworkError,
 } from "../../errors";
+import {
+  ContractNames,
+  getNetworkByAlias,
+  SupportedNetworks,
+} from "@aragon/osx-commons-configs";
 export class Web3Module implements IClientWeb3Core {
   private static readonly PRECISION_FACTOR_BASE = 1000;
   private providerIdx: number = -1;
@@ -56,12 +56,12 @@ export class Web3Module implements IClientWeb3Core {
   }
 
   /** Returns the currently active network */
-  public getNetworkName(): SupportedNetwork {
-    const networkName = this.context.network.name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
-      throw new UnsupportedNetworkError(networkName);
+  public getNetworkName(): SupportedNetworks {
+    const network = getNetworkByAlias(this.context.network.name);
+    if (!network) {
+      throw new UnsupportedNetworkError(this.context.network.name);
     }
-    return networkName;
+    return network.name;
   }
 
   /** Returns a signer connected to the current network provider */
@@ -139,8 +139,8 @@ export class Web3Module implements IClientWeb3Core {
   }
 
   /** FRAMEWORK ADDRESSES */
-  public getAddress(addressName: DeployedAddresses): string {
-    const address = this.context[addressName];
+  public getAddress(addressName: ContractNames): string {
+    const address = this.context.getAddress(addressName);
     if (!address || !isAddress(address)) {
       throw new InvalidAddressError();
     }

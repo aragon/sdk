@@ -69,13 +69,15 @@ import {
   resolveIpfsCid,
   SizeMismatchError,
   SortDirection,
-  SupportedNetwork,
-  SupportedNetworksArray,
   UNAVAILABLE_PROPOSAL_METADATA,
   UNSUPPORTED_PROPOSAL_METADATA_LINK,
   UnsupportedNetworkError,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI, UPDATE_ABI } from "../constants";
+import {
+  ContractNames,
+  getNetworkNameByAlias,
+} from "@aragon/osx-commons-configs";
 
 /**
  * Methods module the SDK Address List Client
@@ -249,15 +251,16 @@ export class MultisigClientMethods extends ClientCore
     params: MultisigPluginPrepareInstallationParams,
   ): AsyncGenerator<PrepareInstallationStepValue> {
     const network = await this.web3.getProvider().getNetwork();
-    const networkName = network.name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
+    const networkName = network.name;
+    const aragonNetwork = getNetworkNameByAlias(networkName);
+    if (!aragonNetwork) {
       throw new UnsupportedNetworkError(networkName);
     }
     // TODO
     // Check params with yup
     yield* prepareGenericInstallation(this.web3, {
       daoAddressOrEns: params.daoAddressOrEns,
-      pluginRepo: this.web3.getAddress("multisigRepoAddress"),
+      pluginRepo: this.web3.getAddress(ContractNames.MULTISIG_REPO_PROXY),
       version: params.versionTag,
       installationAbi: INSTALLATION_ABI,
       installationParams: [
@@ -268,7 +271,7 @@ export class MultisigClientMethods extends ClientCore
         ],
       ],
       pluginSetupProcessorAddress: this.web3.getAddress(
-        "pluginSetupProcessorAddress",
+        ContractNames.PLUGIN_SETUP_PROCESSOR,
       ),
     });
   }
@@ -284,11 +287,11 @@ export class MultisigClientMethods extends ClientCore
   ): AsyncGenerator<PrepareUpdateStepValue> {
     yield* prepareGenericUpdate(this.web3, this.graphql, {
       ...params,
-      pluginRepo: this.web3.getAddress("multisigRepoAddress"),
+      pluginRepo: this.web3.getAddress(ContractNames.MULTISIG_REPO_PROXY),
       updateAbi: UPDATE_ABI[params.newVersion.build] ||
         params.updateAbi || [],
       pluginSetupProcessorAddress: this.web3.getAddress(
-        "pluginSetupProcessorAddress",
+        ContractNames.PLUGIN_SETUP_PROCESSOR,
       ),
     });
   }

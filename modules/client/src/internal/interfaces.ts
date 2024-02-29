@@ -15,7 +15,6 @@ import {
   PrepareUninstallationStepValue,
   PrepareUpdateParams,
   PrepareUpdateStepValue,
-  SupportedVersion,
 } from "@aragon/sdk-client-common";
 import {
   AssetBalance,
@@ -52,6 +51,7 @@ import {
   UpgradeToAndCallParams,
   WithdrawParams,
 } from "../types";
+import { SupportedVersions } from "@aragon/osx-commons-configs";
 
 /** Defines the shape of the general purpose Client class */
 export interface IClientMethods {
@@ -111,7 +111,7 @@ export interface IClientMethods {
 
   isDaoUpdateProposalValid: (
     proposalId: string,
-    version?: SupportedVersion,
+    version?: SupportedVersions,
   ) => Promise<DaoUpdateProposalValidity>;
 
   getDaoImplementation: (

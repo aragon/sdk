@@ -122,7 +122,6 @@ import {
   InvalidAddressOrEnsError,
   InvalidCidError,
   IpfsPinError,
-  LIVE_CONTRACTS,
   MissingExecPermissionError,
   MULTI_FETCH_TIMEOUT,
   MultiTargetPermission,
@@ -144,7 +143,6 @@ import {
   promiseWithTimeout,
   resolveIpfsCid,
   SortDirection,
-  SupportedVersion,
   TokenType,
   UpdateAllowanceError,
 } from "@aragon/sdk-client-common";
@@ -161,6 +159,11 @@ import {
   PluginPreparationQuerySchema,
   PluginQuerySchema,
 } from "../schemas";
+import {
+  ContractNames,
+  contracts,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 /**
  * Methods module the SDK Generic Client
@@ -173,7 +176,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     yield* prepareGenericInstallation(this.web3, {
       ...params,
       pluginSetupProcessorAddress: this.web3.getAddress(
-        "pluginSetupProcessorAddress",
+        ContractNames.PLUGIN_SETUP_PROCESSOR,
       ),
     });
   }
@@ -191,7 +194,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     const signer = this.web3.getConnectedSigner();
 
     const daoFactoryInstance = DAOFactory__factory.connect(
-      this.web3.getAddress("daoFactoryAddress"),
+      this.web3.getAddress(ContractNames.DAO_FACTORY),
       signer,
     );
 
@@ -615,7 +618,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     );
     // connect to psp contract
     const pspContract = PluginSetupProcessor__factory.connect(
-      this.web3.getAddress("pluginSetupProcessorAddress"),
+      this.web3.getAddress(ContractNames.PLUGIN_SETUP_PROCESSOR),
       signer,
     );
     const tx = await pspContract.prepareUninstallation(
@@ -683,7 +686,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       {
         ...params,
         pluginSetupProcessorAddress: this.web3.getAddress(
-          "pluginSetupProcessorAddress",
+          ContractNames.PLUGIN_SETUP_PROCESSOR,
         ),
       },
     );
@@ -1203,7 +1206,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
     return validateUpdatePluginProposalActions(
       daoActions,
       iproposal.dao.id,
-      this.web3.getAddress("pluginSetupProcessorAddress"),
+      this.web3.getAddress(ContractNames.PLUGIN_SETUP_PROCESSOR),
       this.graphql,
       this.ipfs,
     );
@@ -1219,7 +1222,7 @@ export class ClientMethods extends ClientCore implements IClientMethods {
    */
   public async isDaoUpdateProposalValid(
     proposalId: string,
-    version?: SupportedVersion,
+    version?: SupportedVersions,
   ): Promise<DaoUpdateProposalValidity> {
     // omit input validation because we are receiving the proposal id
 
@@ -1255,12 +1258,11 @@ export class ClientMethods extends ClientCore implements IClientMethods {
       };
     }
     // get implementation address, use latest version as default
-    let daoFactoryAddress = this.web3.getAddress("daoFactoryAddress");
+    let daoFactoryAddress = this.web3.getAddress(ContractNames.DAO_FACTORY);
     if (version) {
       // if version is specified get the dao factory address from the live contracts
-      daoFactoryAddress = LIVE_CONTRACTS[version][
-        this.web3.getNetworkName()
-      ].daoFactoryAddress;
+      daoFactoryAddress =
+        contracts[this.web3.getNetworkName()][version]!.DAOFactory.address;
     }
 
     return validateUpdateDaoProposalActions(

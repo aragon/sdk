@@ -18,14 +18,15 @@ import {
   getNetwork,
   hexToBytes,
   InvalidAddressError,
-  LIVE_CONTRACTS,
   PluginInstallItem,
-  SupportedNetwork,
-  SupportedNetworksArray,
-  SupportedVersion,
   UnsupportedNetworkError,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
+import {
+  contracts,
+  getNetworkNameByAlias,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 /**
  * Encoding module for the SDK Multisig Client
@@ -46,8 +47,9 @@ export class MultisigClientEncoding extends ClientCore
     params: MultisigPluginInstallParams,
     network: Networkish,
   ): PluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
+    const networkName = getNetwork(network).name;
+    const aragonNetwork = getNetworkNameByAlias(networkName);
+    if (!aragonNetwork) {
       throw new UnsupportedNetworkError(networkName);
     }
     const hexBytes = defaultAbiCoder.encode(
@@ -60,9 +62,16 @@ export class MultisigClientEncoding extends ClientCore
         ],
       ],
     );
+    const repoAddress =
+      contracts[aragonNetwork][SupportedVersions.V1_3_0]?.MultisigRepoProxy
+        .address;
+    if (!repoAddress) {
+      throw new Error("AddresslistVotingRepoProxy address not found");
+    }
     return {
-      id: LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
-        .multisigRepoAddress,
+      // this case will return "" when the version 1.3.0 of the contracts is not deployed
+      // in the specified network
+      id: repoAddress,
       data: hexToBytes(hexBytes),
     };
   }

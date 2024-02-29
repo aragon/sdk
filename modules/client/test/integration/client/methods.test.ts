@@ -75,13 +75,11 @@ import {
   bytesToHex,
   Context,
   DaoAction,
-  LIVE_CONTRACTS,
   Permissions,
   PrepareInstallationStep,
   PrepareUninstallationSteps,
   PrepareUpdateStep,
   SortDirection,
-  SupportedVersion,
   TokenType,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../../../src/multisig/internal/constants";
@@ -97,6 +95,12 @@ import {
   toPluginPermissionOperationType,
   toSubgraphActions,
 } from "../../../src/internal/utils";
+import {
+  ContractNames,
+  contracts,
+  NetworkDeployment,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 describe("Client", () => {
   let daoAddress: string;
@@ -106,33 +110,41 @@ describe("Client", () => {
   let deploymentV1: deployV1Contracts.Deployment;
 
   describe("Methods Module tests", () => {
-
     beforeAll(async () => {
       deployment = await deployContracts.deploy();
       deploymentV1 = await deployV1Contracts.deploy();
-      contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      contextParamsLocalChain.pluginSetupProcessorAddress =
+      contextParamsLocalChain.DAOFactory = deployment.daoFactory.address;
+      contextParamsLocalChain.PluginSetupProcessor =
         deployment.pluginSetupProcessor.address;
-      contextParamsLocalChain.multisigRepoAddress =
+      contextParamsLocalChain.MultisigRepoProxy =
         deployment.multisigRepo.address;
-      contextParamsLocalChain.adminRepoAddress = "";
-      contextParamsLocalChain.addresslistVotingRepoAddress =
+      contextParamsLocalChain.AddresslistVotingRepoProxy =
         deployment.addresslistVotingRepo.address;
-      contextParamsLocalChain.tokenVotingRepoAddress =
+      contextParamsLocalChain.TokenVotingRepoProxy =
         deployment.tokenVotingRepo.address;
-      contextParamsLocalChain.multisigSetupAddress =
+      contextParamsLocalChain.MultisigSetup =
         deployment.multisigPluginSetup.address;
-      contextParamsLocalChain.adminSetupAddress = "";
-      contextParamsLocalChain.addresslistVotingSetupAddress =
+      contextParamsLocalChain.AddresslistVotingSetup =
         deployment.addresslistVotingPluginSetup.address;
-      contextParamsLocalChain.tokenVotingSetupAddress =
+      contextParamsLocalChain.TokenVotingSetup =
         deployment.tokenVotingPluginSetup.address;
-      contextParamsLocalChain.ensRegistryAddress =
-        deployment.ensRegistry.address;
-      LIVE_CONTRACTS[SupportedVersion.V1_0_0].local.daoFactoryAddress =
-        deploymentV1.daoFactory.address;
-      LIVE_CONTRACTS[SupportedVersion.LATEST].local.daoFactoryAddress =
-        deployment.daoFactory.address;
+      contextParamsLocalChain.ENSRegistry = deployment.ensRegistry.address;
+      contracts.local = {
+        [SupportedVersions.V1_0_0]: {
+          DAOFactory: { address: deploymentV1.daoFactory.address },
+          MultisigRepoProxy: { address: deploymentV1.multisigRepo.address },
+          AddresslistVotingRepoProxy: {
+            address: deploymentV1.addresslistVotingRepo.address,
+          },
+        } as NetworkDeployment,
+        [SupportedVersions.V1_3_0]: {
+          DAOFactory: { address: deployment.daoFactory.address },
+          MultisigRepoProxy: { address: deployment.multisigRepo.address },
+          AddresslistVotingRepoProxy: {
+            address: deployment.addresslistVotingRepo.address,
+          },
+        } as NetworkDeployment,
+      };
 
       const daoCreation = await deployContracts.createTokenVotingDAO(
         deployment,
@@ -1145,8 +1157,7 @@ describe("Client", () => {
           params: TransferQueryParams,
           ctx: Context;
         beforeAll(() => {
-          contextParamsLocalChain.ensRegistryAddress =
-            deployment.ensRegistry.address;
+          contextParamsLocalChain.ENSRegistry = deployment.ensRegistry.address;
           ctx = new Context(contextParamsLocalChain);
           params = {
             daoAddressOrEns: TEST_DAO_ADDRESS,
@@ -2019,7 +2030,7 @@ describe("Client", () => {
       });
       it("Should return true for a valid update", async () => {
         const implementationAddress = await client.methods.getDaoImplementation(
-          client.web3.getAddress("daoFactoryAddress"),
+          client.web3.getAddress(ContractNames.DAO_FACTORY),
         );
         upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
           daoAddressV1,
@@ -2049,7 +2060,7 @@ describe("Client", () => {
       });
       it("Should PROPOSAL_NOT_FOUND when the proposal is null", async () => {
         const implementationAddress = await client.methods.getDaoImplementation(
-          client.web3.getAddress("daoFactoryAddress"),
+          client.web3.getAddress(ContractNames.DAO_FACTORY),
         );
         upgradeToAndCallAction = client.encoding.upgradeToAndCallAction(
           daoAddressV1,

@@ -19,14 +19,15 @@ import {
   getNetwork,
   hexToBytes,
   InvalidAddressError,
-  LIVE_CONTRACTS,
   PluginInstallItem,
-  SupportedNetwork,
-  SupportedNetworksArray,
-  SupportedVersion,
   UnsupportedNetworkError,
 } from "@aragon/sdk-client-common";
 import { INSTALLATION_ABI } from "../constants";
+import {
+  contracts,
+  getNetworkNameByAlias,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 /**
  * Encoding module the SDK TokenVoting Client
@@ -46,8 +47,9 @@ export class TokenVotingClientEncoding extends ClientCore
     params: TokenVotingPluginInstall,
     network: Networkish,
   ): PluginInstallItem {
-    const networkName = getNetwork(network).name as SupportedNetwork;
-    if (!SupportedNetworksArray.includes(networkName)) {
+    const networkName = getNetwork(network).name;
+    const aragonNetwork = getNetworkNameByAlias(networkName);
+    if (!aragonNetwork) {
       throw new UnsupportedNetworkError(networkName);
     }
     const args = tokenVotingInitParamsToContract(params);
@@ -55,9 +57,15 @@ export class TokenVotingClientEncoding extends ClientCore
       getNamedTypesFromMetadata(INSTALLATION_ABI),
       args,
     );
+
+    const repoAddress =
+      contracts[aragonNetwork][SupportedVersions.V1_3_0]?.TokenVotingRepoProxy
+        .address;
+    if (!repoAddress) {
+      throw new Error();
+    }
     return {
-      id: LIVE_CONTRACTS[SupportedVersion.LATEST][networkName]
-        .tokenVotingRepoAddress,
+      id: repoAddress,
       data: hexToBytes(hexBytes),
     };
   }

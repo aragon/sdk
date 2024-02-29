@@ -1,4 +1,9 @@
 import {
+  contracts,
+  NetworkDeployment,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
+import {
   MintTokenParams,
   TokenVotingClient,
   TokenVotingPluginInstall,
@@ -10,7 +15,12 @@ import { Context, InvalidAddressError } from "@aragon/sdk-client-common";
 
 describe("Token Voting Client", () => {
   beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+    contextParamsLocalChain.ENSRegistry = ADDRESS_ONE;
+    contracts.local = {
+      [SupportedVersions.V1_3_0]: {
+        TokenVotingRepoProxy: { address: ADDRESS_ONE },
+      } as NetworkDeployment,
+    };
   });
   describe("Encoding module", () => {
     it("Should create a TokenVoting client and generate a install entry", async () => {

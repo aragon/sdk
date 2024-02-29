@@ -10,7 +10,7 @@ import { ADDRESS_ONE, contextParamsLocalChain } from "../constants";
 
 describe("Client Multisig", () => {
   beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+    contextParamsLocalChain.ENSRegistry = ADDRESS_ONE;
   });
   describe("Action decoders", () => {
     it("Should decode the members from an add members action", async () => {

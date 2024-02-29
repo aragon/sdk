@@ -36,6 +36,7 @@ const metadata: DaoMetadata = {
 // Through pinning the metadata in IPFS, we can get the IPFS URI. You can read more about it here: https://docs.ipfs.tech/how-to/pin-files/
 const metadataUri = await client.methods.pinMetadata(metadata);
 
+
 // You need at least one plugin in order to create a DAO. In this example, we'll use the TokenVoting plugin, but feel free to install whichever one best suites your needs. You can find resources on how to do this in the plugin sections.
 // These would be the plugin params if you need to mint a new token for the DAO to enable TokenVoting.
 const tokenVotingPluginInstallParams: TokenVotingPluginInstall = {

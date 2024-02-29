@@ -59,6 +59,7 @@ import {
   WithdrawEthSchema,
 } from "../schemas";
 import { string } from "yup";
+import { ContractNames } from "@aragon/osx-commons-configs";
 
 /**
  * Encoding module the SDK Generic Client
@@ -83,7 +84,9 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       daoAddress,
       args,
     ]);
-    const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
+    const pspAddress = this.web3.getAddress(
+      ContractNames.PLUGIN_SETUP_PROCESSOR,
+    );
     // Grant ROOT_PERMISION in the DAO to the PSP
     const grantAction = this.grantAction(daoAddress, {
       where: daoAddress,
@@ -120,7 +123,9 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       daoAddress,
       args,
     ]);
-    const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
+    const pspAddress = this.web3.getAddress(
+      ContractNames.PLUGIN_SETUP_PROCESSOR,
+    );
     // Grant ROOT_PERMISION in the DAO to the PSP
     const grantAction = this.grantAction(daoAddress, {
       where: daoAddress,
@@ -163,8 +168,10 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
       daoAddress,
       args,
     ]);
-    const pspAddress = this.web3.getAddress("pluginSetupProcessorAddress");
-    
+    const pspAddress = this.web3.getAddress(
+      ContractNames.PLUGIN_SETUP_PROCESSOR,
+    );
+
     // Grant UPGRADE_PLUGIN_PERMISSION in the plugin to the PSP
     const grantUpgradeAction = this.grantAction(daoAddress, {
       where: params.pluginAddress,
@@ -625,7 +632,7 @@ export class ClientEncoding extends ClientCore implements IClientEncoding {
     );
     const { daoFactoryAddress } = params;
     const daoFactory = DAOFactory__factory.connect(
-      daoFactoryAddress || this.web3.getAddress("daoFactoryAddress"),
+      daoFactoryAddress ?? this.web3.getAddress(ContractNames.DAO_FACTORY),
       this.web3.getProvider(),
     );
     const implementation = await daoFactory.daoBase();

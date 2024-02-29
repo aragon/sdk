@@ -1,5 +1,5 @@
+import { ContractNames } from "@aragon/osx-commons-configs";
 import {
-  DeployedAddresses,
   GraphQLContextParams,
   GraphQLContextState,
   IpfsContextParams,
@@ -20,30 +20,13 @@ export type ContextState =
 
 export type OverriddenState =
   & {
-    [key in DeployedAddresses]: boolean;
+    [key in ContractNames]: boolean;
   }
   & {
     gasFeeEstimationFactor: boolean;
     ipfsNodes: boolean;
     graphqlNodes: boolean;
   };
-
-export enum SupportedNetwork {
-  MAINNET = "homestead",
-  GOERLI = "goerli",
-  POLYGON = "matic",
-  MUMBAI = "maticmum",
-  BASE = "base",
-  BASE_GOERLI = "baseGoerli",
-  BASE_SEPOLIA = "baseSepolia",
-  LOCAL = "local",
-  SEPOLIA = "sepolia",
-  ARBITRUM = "arbitrum",
-  ARBITRUM_GOERLI = "arbitrumGoerli",
-  ARBITRUM_SEPOLIA = "arbitrumSepolia",
-}
-
-export const SupportedNetworksArray = Object.values(SupportedNetwork);
 
 /**
  * Contains the payload passed to the global DAO factory so that
@@ -276,11 +259,6 @@ export type ApplyUpdateParams = ApplyUpdateParamsBase & {
 export type DecodedApplyUpdateParams = ApplyUpdateParamsBase & {
   helpersHash: string;
 };
-export enum SupportedVersion {
-  V1_0_0 = "1.0.0",
-  V1_3_0 = "1.3.0",
-  LATEST = "1.3.0",
-}
 export type IsMemberParams = {
   address: string;
   pluginAddress: string;

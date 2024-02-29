@@ -19,6 +19,27 @@ TEMPLATE:
 
 ## [UPCOMING]
 
+### Added
+
+- `getDefaultIpfsNodes` function to get the default IPFS nodes for a network
+- `getDefaultGraphNodes` function to get the default Graph nodes for a network
+
+### Changed
+
+- Removed `LIVE_CONTRACTS` and used `contracts` from `@aragon/osx-commons-configs` instead
+- Removed address getters and changed them for a generic `getAddress` function
+- `ContextParams` keys for contract addresses now are the contract names:
+  - `daoFactoryAddress` -> `DaoFactory`
+  - `multisigRepoAddress` -> `MultisigRepoProxy`
+  - `tokenVotingRepoAddress` -> `TokenVotingRepoProxy`
+  - etc...
+- Removed `IPFS_NODES` and `GRAPH_NODES` and used `getDefaultIpfsNodes` and `getDefaultGraphNodes` instead
+- Removed `ADDITIONAL_NETWORKS`
+- `SupportedNetworks` and `SupportedVersions` now are exported from `@aragon/osx-commons-configs`
+- 
+
+## [1.14.1]
+
 ### Fixed
 - Typo in `LIVE_CONTRACTS` for mainnet
 

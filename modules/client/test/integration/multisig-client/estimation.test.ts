@@ -8,6 +8,7 @@ import {
   MultisigClient,
 } from "../../../src";
 import {
+  ADDRESS_ONE,
   contextParamsLocalChain,
   SUBGRAPH_PLUGIN_INSTALLATION,
   TEST_WALLET_ADDRESS,
@@ -16,6 +17,11 @@ import * as deployContracts from "../../helpers/deployContracts";
 import { Context } from "@aragon/sdk-client-common";
 import { buildMultisigDAO } from "../../helpers/build-daos";
 import { createMultisigPluginBuild } from "../../helpers/create-plugin-build";
+import {
+  contracts,
+  NetworkDeployment,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 describe("Client Multisig", () => {
   describe("Estimation module", () => {
@@ -24,19 +30,23 @@ describe("Client Multisig", () => {
 
     beforeAll(async () => {
       deployment = await deployContracts.deploy();
-      contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      contextParamsLocalChain.multisigRepoAddress =
+      contextParamsLocalChain.DAOFactory = deployment.daoFactory.address;
+      contextParamsLocalChain.MultisigRepoProxy =
         deployment.multisigRepo.address;
-      contextParamsLocalChain.pluginSetupProcessorAddress =
+      contextParamsLocalChain.PluginSetupProcessor =
         deployment.pluginSetupProcessor.address;
-      contextParamsLocalChain.ensRegistryAddress =
-        deployment.ensRegistry.address;
+      contextParamsLocalChain.ENSRegistry = deployment.ensRegistry.address;
       const daoCreation = await deployContracts.createMultisigDAO(
         deployment,
         "test-multisig-dao",
         [TEST_WALLET_ADDRESS],
       );
       pluginAddress = daoCreation.pluginAddrs[0];
+      contracts.local = {
+        [SupportedVersions.V1_3_0]: {
+          MultisigRepoProxy: { address: ADDRESS_ONE },
+        } as NetworkDeployment,
+      };
       // advance to get past the voting checkpoint
     });
 

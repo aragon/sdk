@@ -9,6 +9,7 @@ import {
   VoteValues,
 } from "../../../src";
 import {
+  ADDRESS_ONE,
   contextParamsLocalChain,
   SUBGRAPH_PLUGIN_INSTALLATION,
 } from "../constants";
@@ -16,6 +17,11 @@ import * as deployContracts from "../../helpers/deployContracts";
 import { Context } from "@aragon/sdk-client-common";
 import { buildAddressListVotingDAO } from "../../helpers/build-daos";
 import { createAddresslistVotingPluginBuild } from "../../helpers/create-plugin-build";
+import {
+  contracts,
+  NetworkDeployment,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
 
 describe("Client Address List", () => {
   describe("Estimation module", () => {
@@ -23,13 +29,17 @@ describe("Client Address List", () => {
 
     beforeAll(async () => {
       deployment = await deployContracts.deploy();
-      contextParamsLocalChain.daoFactoryAddress = deployment.daoFactory.address;
-      contextParamsLocalChain.pluginSetupProcessorAddress =
+      contextParamsLocalChain.DAOFactory = deployment.daoFactory.address;
+      contextParamsLocalChain.PluginSetupProcessor =
         deployment.pluginSetupProcessor.address;
-      contextParamsLocalChain.addresslistVotingRepoAddress =
+      contextParamsLocalChain.AddresslistVotingRepoProxy =
         deployment.addresslistVotingRepo.address;
-      contextParamsLocalChain.ensRegistryAddress =
-        deployment.ensRegistry.address;
+      contextParamsLocalChain.ENSRegistry = deployment.ensRegistry.address;
+      contracts.local = {
+        [SupportedVersions.V1_3_0]: {
+          AddresslistVotingRepoProxy: { address: ADDRESS_ONE },
+        } as NetworkDeployment,
+      };
     });
 
     it("Should estimate the gas fees for creating a new proposal", async () => {

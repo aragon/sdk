@@ -1,4 +1,9 @@
 import {
+  contracts,
+  NetworkDeployment,
+  SupportedVersions,
+} from "@aragon/osx-commons-configs";
+import {
   AddAddressesParams,
   MultisigClient,
   MultisigPluginInstallParams,
@@ -16,8 +21,13 @@ import {
 } from "@aragon/sdk-client-common";
 
 describe("Client Multisig", () => {
-  beforeAll(() => {
-    contextParamsLocalChain.ensRegistryAddress = ADDRESS_ONE;
+  beforeAll(async () => {
+    contextParamsLocalChain.ENSRegistry = ADDRESS_ONE;
+    contracts.local = {
+      [SupportedVersions.V1_3_0]: {
+        MultisigRepoProxy: { address: ADDRESS_ONE },
+      } as NetworkDeployment,
+    };
   });
   describe("Action generators", () => {
     it("Should create an a Multisig install entry", async () => {

@@ -1,6 +1,4 @@
-import {
-  isFailingProposal,
-} from "../../../src";
+import { isFailingProposal } from "../../../src";
 import { Multisig__factory } from "@aragon/osx-ethers";
 import { id } from "@ethersproject/hash";
 import { DaoAction, hexToBytes } from "@aragon/sdk-client-common";
@@ -53,7 +51,6 @@ const UPGRADE_TO_ACTION = {
     ),
   ),
 };
-
 
 describe("Detect failing proposals", () => {
   it("isFailingProposal should return true because the proposal changes the min approvals and then updates the addresses", async () => {
