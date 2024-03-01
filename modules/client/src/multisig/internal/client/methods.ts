@@ -576,7 +576,7 @@ export class MultisigClientMethods extends ClientCore
    * @param params.pluginAddress - The address of the plugin.
    * @param params.address - The address to check.
    * @param params.blockNumber - The block number for specifying a specific block.
-   * @returns A boolean indicating whether the address is a member or not.
+   * @returns {boolean} A boolean indicating whether the address is a member or not.
    */
   public async isMember(params: IsMemberParams): Promise<boolean> {
     IsMemberSchema.strict().validateSync(params);
